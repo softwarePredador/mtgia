@@ -60,7 +60,7 @@ que o usuário vê na análise do deck.
 ## Etapa 3 — Auditoria de modularização
 
 **Status:** em andamento, com dezenove extrações de testes, seis splits
-do engine e dezoito splits da rota/runtime de optimize concluídos.
+do engine e dezenove splits da rota/runtime de optimize concluídos.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
@@ -144,11 +144,11 @@ do engine e dezoito splits da rota/runtime de optimize concluídos.
 - `server/test/optimize_route_quality_rejection_support_test.dart` — 65 linhas
   cobrindo payloads `OPTIMIZE_NO_SAFE_SWAPS` e
   `OPTIMIZE_QUALITY_REJECTED`.
-- `server/lib/ai/optimize_route_post_validation_support.dart` — 133 linhas
+- `server/lib/ai/optimize_route_post_validation_support.dart` — 146 linhas
   extraídas da rota.
-- `server/test/optimize_route_post_validation_support_test.dart` — 106 linhas
-  cobrindo warnings de identidade de cor, EDHREC, mismatch de tema e comparação
-  antes/depois.
+- `server/test/optimize_route_post_validation_support_test.dart` — 119 linhas
+  cobrindo warnings de identidade de cor, coleta de ausentes no EDHREC,
+  mismatch de tema e comparação antes/depois.
 - `server/lib/ai/optimize_route_retry_support.dart` — 64 linhas extraídas da
   rota.
 - `server/test/optimize_route_retry_support_test.dart` — 105 linhas cobrindo
@@ -297,6 +297,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - Novo módulo Dart `optimize_route_post_validation_support.dart` centraliza
   builders de warnings/improvements pós-processamento: identidade de cor,
   validação EDHREC, mismatch de tema e comparação de análise antes/depois.
+- `optimize_route_post_validation_support.dart` agora também centraliza a coleta
+  de adições ausentes nos dados EDHREC via callback, removendo o loop direto da
+  rota sem acoplar o helper ao tipo `EdhrecCommanderData`.
 - Novo módulo Dart `optimize_route_retry_support.dart` centraliza o plano de
   retry de deterministic-first para IA e a aplicação de metadata (`mode`,
   `strategy_source`, `fallback_trigger`) nos retornos de optimize.
@@ -369,6 +372,8 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 - `dart test test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - `dart analyze lib/ai/optimize_route_rebalance_support.dart routes/ai/optimize/index.dart test/optimize_route_rebalance_support_test.dart`
 - `dart test test/optimize_route_rebalance_support_test.dart test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
+- `dart analyze lib/ai/optimize_route_post_validation_support.dart routes/ai/optimize/index.dart test/optimize_route_post_validation_support_test.dart`
+- `dart test test/optimize_route_post_validation_support_test.dart test/optimize_route_rebalance_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - `dart analyze lib/edh_bracket_policy.dart test/edh_bracket_policy_test.dart test/optimize_runtime_support_test.dart`
 - `dart test test/edh_bracket_policy_test.dart test/optimize_runtime_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`
 - Hermes/AWS pós-push:
@@ -508,8 +513,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    de rejeição do quality gate, validação pós-processamento e retry
    orchestration/filtro inicial de sugestões/filtro de identidade de cor/filtro
    de bracket/top-up determinístico de básicos no modo complete/proteção de
-   remoção de terrenos/reequilíbrio pós-filtros já foram feitos; o próximo corte
-   seguro é extrair validação EDHREC/tema pós-processamento.
+   remoção de terrenos/reequilíbrio pós-filtros/coleta EDHREC pós-processamento
+   já foram feitos; o próximo corte seguro é extrair a query de dados completos
+   das adições/quality gate.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
