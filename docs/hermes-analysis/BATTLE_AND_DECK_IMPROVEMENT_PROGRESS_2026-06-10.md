@@ -138,6 +138,12 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
   extraídas do runtime.
 - `server/test/optimize_candidate_quality_support_test.dart` — 97 linhas
   cobrindo ranking, buckets e export compatível pelo runtime.
+- `server/lib/ai/optimize_archetype_support.dart` — helper único para resolver
+  o arquétipo efetivo entre request genérico/específico e detecção do deck.
+- `server/test/optimize_archetype_support_test.dart` — cobre requests
+  `midrange`, `value`, `goodstuff`, `general`, `tempo`, `unknown`, vazio e
+  prova que `optimize_runtime_support.dart` e `deck_state_analysis.dart`
+  delegam para a mesma política.
 - `server/lib/ai/optimize_route_response_support.dart` — 136 linhas extraídas
   da rota.
 - `server/test/optimize_route_response_support_test.dart` — 156 linhas cobrindo
@@ -741,6 +747,15 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     `engine_metrics_report.py` como dependência operacional.
   - `test_engine_metrics_operational_wiring.py` cobre o wiring do cron e do
     preflight sem executar o ciclo pesado.
+- Fechamento do drift de arquétipo efetivo na melhoria de deck:
+  - `resolveOptimizeArchetype` deixou de ter duas políticas divergentes entre
+    `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
+  - A política única usa detecção do deck quando o request é genérico
+    (`midrange`, `value`, `goodstuff`, `general`, `tempo`) e preserva pedidos
+    explícitos (`aggro`, `control`, `combo`, `stax` etc.) quando a detecção é
+    genérica, vazia ou `unknown`.
+  - Isso alinha optimize/rebuild/deck-state analysis e reduz risco de o mesmo
+    deck receber target profile diferente em fluxos distintos.
 
 ## Etapa 4 — Próximas pendências reais
 

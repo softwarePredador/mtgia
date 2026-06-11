@@ -12,30 +12,28 @@
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-07 11:00 UTC no checkout `2061f291` reportou `Imports quebrados: 0` no recorte backend do auditor base (`server/lib` e `server/routes`). Ainda assim, a varredura ampliada app/server segue apontando frentes prioritárias de organização:
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
-2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-07 19:00 UTC no checkout `5b9c361d`. O maior risco atual continua em regras de IA/optimize que respondem a mesma pergunta com semantica diferente (`resolveOptimizeArchetype`, roles funcionais altos e terrenos basicos/snow basics). Tambem seguem duplicacoes app-facing em trust social, logs sociais/follow, condicao de carta e CMC/tipo. A revalidacao confirmou que wrappers finos em `server/routes/ai/optimize/index.dart` delegam para support e nao sao o corpo duplicado de maior risco.
+2. **P1 — Concentradores de complexidade muito grandes**: revalidado em
+   2026-06-11; `server/lib/ai/optimize_runtime_support.dart` (~2386 linhas) e
+   `server/routes/ai/optimize/index.dart` (~2498 linhas) reduziram, mas seguem
+   como gargalos de manutenção.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente em
+   2026-06-11. `resolveOptimizeArchetype` foi removido do risco por delegar
+   para `optimize_archetype_support.dart`; os maiores riscos restantes são
+   roles funcionais altos, terrenos básicos/snow basics, trust social, logs
+   sociais/follow, condição de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
    `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
    nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
    com `uri_does_not_exist`.
 5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
-   **REVALIDADO no checkout local `1fbc07d8` em 2026-06-06 23:00 UTC**.
-   `POST /ai/optimize` e `POST /ai/archetypes` continuam chamados pelo app com
-   `deck_id`, mas as queries reais carregam `decks`/`deck_cards` por `id` sem
-   `user_id`: a rota optimize le `userId` e nao passa para
-   `loadOptimizeDeckContext`, e `/ai/archetypes` busca o deck por `id` direto.
-   `GET /ai/optimize/jobs/:id` e `GET /ai/generate/jobs/:id` continuam
-   legiveis quando `job.userId == null`, embora sejam usados por polling do app.
-   `POST /ai/rebuild`, `GET /decks/:id/analysis` e
-   `POST /decks/:id/ai-analysis` seguem como controles positivos porque fazem
-   gate de `deck_id + user_id` antes de carregar cartas. Deck analysis carrega
-   `card_function_tags` + `semantic_tags_v2`, mas o contexto principal de
-   optimize ainda threada somente `semantic_tags_v2`, apesar do contrato de
-   `/ai/optimize` listar `card_function_tags` como fonte. A mesma rodada
-   revalidou drift de activation telemetry: o app envia `deck_rebuild_created`,
-   mas `_allowedEvents` rejeita o evento e o contrato ainda marca
-   `/users/me/activation-events` como `internal`/`not proven`.
+   **PARCIAL em 2026-06-11**. O achado antigo de optimize sem owner-scope foi
+   resolvido: `POST /ai/optimize` exige usuário autenticado,
+   `loadOptimizeDeckContext` consulta por `id + user_id`, jobs async têm
+   `userId` obrigatório e polling rejeita job sem owner ou de outro usuário.
+   Deck analysis e optimize também carregam `functional_tags`. Ainda precisam
+   de rodada própria os endpoints experimentais fora do caminho principal
+   (`/ai/archetypes`, activation telemetry e rotas legacy/experimentais).
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-07 05:30 UTC no checkout `84a97d75`. Ainda ha excecoes por nome em
    `functional_card_tags.dart`, `candidate_quality_data_support.dart`,
@@ -59,15 +57,11 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `auth_visual_shell.dart`. Controles positivos desta rodada descartaram
    `LotusLifeCounterScreen` e `DeckProgressIndicator`; a varredura textual
    ampla nao foi usada para acusar DTOs/helpers locais sem evidencia adicional.
-9. **P1 — Drift entre deck analysis e optimize**: revalidado novamente em
-   2026-06-07 05:30 UTC no checkout `84a97d75`. Deck analysis prefere
-   `card_function_tags`; o contexto de optimize, `additionsData`, validator e
-   role delta carregam `semantic_tags_v2`, mas nao threadam `functional_tags`
-   persistidos nesse caminho. Candidate quality tem uso parcial de
-   `card_function_tags` em SQL de sinais, portanto o gap atual e o adapter de
-   role preservation/gate, nao toda a superficie de optimize. O caminho vivo
-   continua escalar via `classifyOptimizationFunctionalRole`; `semantic_tags_v2`
-   multi-tag segue colapsado em um unico role no validator/quality gate/delta.
+9. **P1 — Drift entre deck analysis e optimize**: **PARCIAL em 2026-06-11**.
+   O caminho principal já carrega `functional_tags` e o validator/gate usa
+   precedência `functional_tags -> semantic_tags_v2 -> heurística`. O risco
+   restante é consolidar heurísticas secundárias e endpoints legacy que ainda
+   não reutilizam explicitamente a camada compartilhada.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -147,10 +141,14 @@ Histórico do problema:
 
 ### P1 — Quebrar os módulos centrais do otimizador em unidades menores
 - **Evidência**:
-  - `server/lib/ai/optimize_runtime_support.dart`: 4197 linhas
-  - `server/routes/ai/optimize/index.dart`: 3497 linhas
+  - `server/lib/ai/optimize_runtime_support.dart`: 2374 linhas
+  - `server/routes/ai/optimize/index.dart`: 2498 linhas
   - A rodada focada de duplicacao em 2026-05-28 revalidou que a rota agora possui wrappers finos para helpers como `matchesFunctionalNeed`, `scoreOptimizeReplacementCandidate`, `shouldRetryOptimizeWithAiFallback`, `computeOptimizeStructuralRecoverySwapTarget` e `isOptimizeStructuralRecoveryScenario`, delegando para `optimize_support` em vez de manter corpos duplicados.
-  - Ainda ha drift similar em `resolveOptimizeArchetype`: `server/lib/ai/optimize_runtime_support.dart` e `server/lib/ai/deck_state_analysis.dart` resolvem requested/detected archetype com listas genericas diferentes.
+  - Status 2026-06-11: o drift de `resolveOptimizeArchetype` foi fechado em
+    `server/lib/ai/optimize_archetype_support.dart`; runtime optimize e
+    deck-state analysis agora delegam para a mesma política. Permanecem como
+    foco de modularização os blocos de seleção de candidatos, structural
+    recovery e fallback AI.
 - **Impacto**: alta dificuldade de revisão, regressões sutis e risco de drift entre helpers de dominio que parecem responder a mesma pergunta.
 - **Ação recomendada**:
   1. definir fronteiras explícitas para seleção de candidatos, archetype resolution, structural recovery e fallback AI;
@@ -162,16 +160,14 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-07 19:00 UTC: REVALIDADO/ABERTO no checkout `5b9c361d`.**
+- **Status 2026-06-11: PARCIAL.** `resolveOptimizeArchetype` foi unificado;
+  demais duplicações abaixo continuam abertas conforme domínio.
 - **Evidência**:
-  - `resolveOptimizeArchetype` existe em
-    `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
-    `server/lib/ai/optimize_runtime_support.dart:3369`-`:3389` com contratos
-    diferentes: uma versao aceita `requestedArchetype` nullable e trata
-    `general/tempo` como genericos; a outra exige string, trata `unknown` e usa
-    `goodstuff`/lista restrita de detected especificos. `optimize_request_support.dart`
-    usa a versao de optimize, enquanto `rebuild_guided_service.dart` usa a
-    versao de deck state.
+  - Resolvido: `resolveOptimizeArchetype` agora delega para
+    `server/lib/ai/optimize_archetype_support.dart`, com teste em
+    `server/test/optimize_archetype_support_test.dart` cobrindo
+    `midrange`, `tempo`, `goodstuff`, `general`, `unknown`, vazio e detected
+    específico em runtime e deck-state analysis.
   - `_looksLikeComboPiece`, `_looksLikeEnabler`, `_looksLikeEngine`,
     `_looksLikePayoff` e `_looksLikeWincon` existem tanto em
     `server/lib/ai/functional_card_tags.dart:859`-`:905` quanto em
@@ -209,8 +205,8 @@ Histórico do problema:
     em `server/routes/decks/[id]/simulate/index.dart:171`-`:186`.
 - **Impacto**: mudanca semantica em um ponto nao propaga automaticamente para os demais; risco de respostas inconsistentes por endpoint/fluxo. O risco mais alto e de IA: optimize, rebuild, validator e deck analysis podem discordar sobre arquetipo efetivo e papel funcional de cartas.
 - **Ação recomendada**:
-  1. priorizar unificacao de `resolveOptimizeArchetype` e criar testes de
-     generic/unknown/null antes de mexer em heuristicas maiores;
+  1. manter `optimize_archetype_support.dart` como fonte única de arquétipo
+     efetivo;
   2. criar adapter unico de roles funcionais que aceite nome, `oracle_text`,
      `type_line`, `functional_tags` e `semantic_tags_v2`, retornando conjunto
      de roles + `primary_role`;
@@ -220,8 +216,9 @@ Histórico do problema:
      condicao de carta, CMC/tipo), mantendo wrappers locais so quando o contrato
      divergente for intencional e testado.
 - **Validação**:
-  - testes de optimize/rebuild provam o mesmo arquetipo efetivo para os casos
-    `midrange`, `tempo`, `goodstuff`, `unknown`, vazio e detected especifico;
+  - ✅ `optimize_archetype_support_test.dart` prova o mesmo arquetipo efetivo
+    para `midrange`, `tempo`, `goodstuff`, `general`, `unknown`, vazio e
+    detected especifico;
   - uma carta com papeis multiplos preserva roles secundarios no validator e na
     aba de analise;
   - snow basics tem comportamento igual nos quatro fluxos;

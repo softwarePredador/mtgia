@@ -1,3 +1,5 @@
+import 'optimize_archetype_support.dart' as archetype_support;
+
 class DeckArchetypeAnalyzer {
   DeckArchetypeAnalyzer(this.cards, this.colors);
 
@@ -185,7 +187,8 @@ class DeckArchetypeAnalyzer {
     final issues = <String>[];
 
     if (landCount < 26) {
-      issues.add('Poucos terrenos para Commander (Tem $landCount, ideal >= 34)');
+      issues
+          .add('Poucos terrenos para Commander (Tem $landCount, ideal >= 34)');
     } else if (landCount > 45) {
       issues.add('Terrenos em excesso (Tem $landCount, ideal <= 40)');
     }
@@ -352,8 +355,9 @@ DeckOptimizationState assessDeckOptimizationState({
       (deckAnalysis['type_distribution'] as Map?)?.cast<String, dynamic>() ??
           const <String, dynamic>{};
 
-  final commanders =
-      cards.where((card) => card['is_commander'] == true).toList(growable: false);
+  final commanders = cards
+      .where((card) => card['is_commander'] == true)
+      .toList(growable: false);
   final commanderText = commanders
       .map((card) => (card['oracle_text'] as String?) ?? '')
       .join(' ')
@@ -366,12 +370,13 @@ DeckOptimizationState assessDeckOptimizationState({
   final enchantmentCount = (typeDistribution['enchantments'] as int?) ?? 0;
   final nonLandCount = currentTotalCards - landCount;
   final instantSorceryCount = instantCount + sorceryCount;
-  final manaAssessment = (deckAnalysis['mana_base_assessment']?.toString() ?? '');
+  final manaAssessment =
+      (deckAnalysis['mana_base_assessment']?.toString() ?? '');
   final manaAssessmentLower = manaAssessment.toLowerCase();
   final archetypeConfidence =
       (deckAnalysis['archetype_confidence']?.toString() ?? '').toLowerCase();
-  final sources =
-      (manaBase['sources'] as Map?)?.cast<String, int>() ?? const <String, int>{};
+  final sources = (manaBase['sources'] as Map?)?.cast<String, int>() ??
+      const <String, int>{};
   final anySource = sources['Any'] ?? 0;
 
   final reasons = <String>[];
@@ -437,7 +442,8 @@ DeckOptimizationState assessDeckOptimizationState({
     }
   }
 
-  if (_commanderSignalsSpellslinger(commanderText) && instantSorceryCount < 10) {
+  if (_commanderSignalsSpellslinger(commanderText) &&
+      instantSorceryCount < 10) {
     addReason(
       'O comandante pede instants/sorceries, mas o deck só tem $instantSorceryCount cartas desse tipo.',
       severe: true,
@@ -524,7 +530,8 @@ Map<String, dynamic> _buildDeckRepairPlan({
     );
   }
 
-  if (_commanderSignalsSpellslinger(commanderText) && instantSorceryCount < 24) {
+  if (_commanderSignalsSpellslinger(commanderText) &&
+      instantSorceryCount < 24) {
     roleTargets['instants_or_sorceries_to_add'] = 24 - instantSorceryCount;
     priorityRepairs.add(
       'Reconstruir o core de spells para alinhar o deck ao plano spellslinger do comandante.',
@@ -573,13 +580,8 @@ bool _commanderSignalsEnchantments(String commanderText) {
 String resolveOptimizeArchetype({
   required String? requestedArchetype,
   required String? detectedArchetype,
-}) {
-  final requested = requestedArchetype?.trim().toLowerCase();
-  final detected = detectedArchetype?.trim().toLowerCase();
-
-  const generic = {'midrange', 'general', 'value', 'tempo'};
-  if (requested == null || requested.isEmpty) return detected ?? 'midrange';
-  if (detected == null || detected.isEmpty) return requested;
-  if (generic.contains(requested)) return detected;
-  return requested;
-}
+}) =>
+    archetype_support.resolveEffectiveOptimizeArchetype(
+      requestedArchetype: requestedArchetype,
+      detectedArchetype: detectedArchetype,
+    );

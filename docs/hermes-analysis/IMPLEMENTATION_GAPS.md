@@ -183,6 +183,7 @@
 | Suite de conformidade | ✅ Básico | `test_battle_analyst_v10_3.py` | 15 cenários versionados em `CONFORMANCE_SCENARIOS` |
 | Persistência operacional da telemetria | ✅ Operacional | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR`, `master_optimizer_auto_cycle_cron.sh`, `engine_metrics_report.py` | Auto-cycle gera snapshots por rodada e publica `latest_engine_metrics_report.json` sanitizado |
 | Diagnóstico de roles do optimize | ✅ OK | `optimization_functional_roles.dart`, `optimization_validator_test.dart` | `role_delta` usa `functional_tags` persistido antes de `semantic_tags_v2`, alinhando decisão de swap com a análise exibida ao usuário |
+| Arquétipo efetivo do optimize/rebuild | ✅ OK | `optimize_archetype_support.dart`, `optimize_archetype_support_test.dart` | Política única para request genérico/específico e arquétipo detectado, removendo drift entre runtime e deck-state analysis |
 
 ### 9.1 Arquivos grandes / modularização (P1)
 
@@ -219,6 +220,7 @@
 | `server/lib/ai/optimize_runtime_support.dart` | 2386 | ⚠️ Split iniciado | Cache e quality ranking foram movidos para support dedicado; ainda falta extrair seleção de candidatos, fallback e recovery estrutural |
 | `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimize_candidate_quality_support.dart` | 327 | ✅ Extraído | Centraliza sinais de qualidade agressiva, ranking, buckets de rejeição e loader SQL com export compatível no runtime |
+| `server/lib/ai/optimize_archetype_support.dart` | 29 | ✅ Extraído | Centraliza resolução de arquétipo efetivo para optimize, rebuild e deck-state analysis |
 | `server/lib/ai/optimize_route_response_support.dart` | 136 | ✅ Extraído | Centraliza contagem de swaps, resposta cacheada, diagnostics agressivos e payload `rebuild_guided` |
 | `server/lib/ai/optimize_route_async_support.dart` | 179 | ✅ Extraído | Centraliza criação de job, fire-and-forget e payloads `202 Accepted` de optimize/complete async |
 | `server/lib/ai/optimize_route_request_support.dart` | 65 | ✅ Extraído | Centraliza parsing inicial de request, defaults, overrides e tri-state de async |

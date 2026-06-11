@@ -64,6 +64,12 @@
 > `deck_cards_table_present=true` + `suspicious_nonland_zero_cmc_after=0` para
 > o corpus alvo.
 >
+> **Atualização 2026-06-11 — archetype resolution unificado.**
+> O drift entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`
+> foi fechado com `optimize_archetype_support.dart`. Optimize, rebuild e deck
+> analysis agora compartilham a mesma política para request genérico versus
+> arquétipo detectado, coberta por `optimize_archetype_support_test.dart`.
+>
 > **Atualização 2026-06-10 — etapa deck-improvement.**
 > O diagnóstico/gate semântico do optimize deixou de depender apenas de
 > `semantic_tags_v2` para `role_delta`: agora usa a mesma precedência do produto
@@ -234,6 +240,7 @@
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 | ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + rota incremental |
+| ✅ | Archetype resolution compartilhado | `optimize_archetype_support.dart` |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
 | ✅ | Segunda extração da suite Hermes | `battle_combat_tests.py` |
 | ✅ | Terceira extração da suite Hermes | `battle_replacement_tests.py` |

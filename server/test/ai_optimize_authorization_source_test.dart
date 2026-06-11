@@ -18,7 +18,7 @@ void main() {
     test('route verifies deck access before creating async optimize job', () {
       final source = File('routes/ai/optimize/index.dart').readAsStringSync();
       final accessCheck = source.indexOf('verifyOptimizeDeckAccess');
-      final jobCreate = source.indexOf('OptimizeJobStore.create');
+      final jobCreate = source.indexOf('createOptimizeAsyncJob');
 
       expect(
           source, contains("return unauthorized('Authentication required')"));

@@ -7,6 +7,7 @@ import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
 import 'commander_fallback_policy.dart';
 import 'optimization_functional_roles.dart';
+import 'optimize_archetype_support.dart' as archetype_support;
 import 'optimize_cache_support.dart' as optimize_cache;
 import 'optimize_candidate_quality_support.dart';
 export 'optimize_candidate_quality_support.dart';
@@ -1714,24 +1715,11 @@ Map<String, dynamic> summarizeAggressiveOptimizeUtilitySamples({
 String resolveOptimizeArchetype({
   required String requestedArchetype,
   required String? detectedArchetype,
-}) {
-  final requested = requestedArchetype.trim().toLowerCase();
-  final detected = detectedArchetype?.trim().toLowerCase() ?? '';
-
-  if (requested.isEmpty) return detected.isNotEmpty ? detected : 'midrange';
-  if (detected.isEmpty || detected == 'unknown') return requested;
-  if (requested == detected) return requested;
-
-  const genericRequested = {'midrange', 'value', 'goodstuff'};
-  const specificDetected = {'aggro', 'control', 'combo', 'stax', 'tribal'};
-
-  if (genericRequested.contains(requested) &&
-      specificDetected.contains(detected)) {
-    return detected;
-  }
-
-  return requested;
-}
+}) =>
+    archetype_support.resolveEffectiveOptimizeArchetype(
+      requestedArchetype: requestedArchetype,
+      detectedArchetype: detectedArchetype,
+    );
 
 bool shouldRetryOptimizeWithAiFallback({
   required bool deterministicFirstEnabled,
