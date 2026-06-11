@@ -20,6 +20,8 @@ import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
+import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
+    as optimize_route_empty_fallback;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
@@ -1399,34 +1401,12 @@ Future<Response> onRequest(RequestContext context) async {
       if (removals.isEmpty && additions.isEmpty && !isComplete) {
         emptySuggestionFallbackTriggered = true;
         _emptySuggestionFallbackTriggeredCount++;
-        final fallbackRemovalCandidates = <String>[];
-        final seenLower = <String>{};
-
-        void collectCandidates({required bool preferNonLand}) {
-          for (final card in allCardData) {
-            final name = ((card['name'] as String?) ?? '').trim();
-            if (name.isEmpty) continue;
-
-            final lower = name.toLowerCase();
-            if (seenLower.contains(lower)) continue;
-            if (commanderLower.contains(lower)) continue;
-            if (coreLower.contains(lower)) continue;
-
-            final typeLine =
-                ((card['type_line'] as String?) ?? '').toLowerCase();
-            final isLand = typeLine.contains('land');
-            if (preferNonLand && isLand) continue;
-
-            seenLower.add(lower);
-            fallbackRemovalCandidates.add(name);
-            if (fallbackRemovalCandidates.length >= 2) break;
-          }
-        }
-
-        collectCandidates(preferNonLand: true);
-        if (fallbackRemovalCandidates.isEmpty) {
-          collectCandidates(preferNonLand: false);
-        }
+        final fallbackRemovalCandidates = optimize_route_empty_fallback
+            .selectEmptySuggestionFallbackRemovalCandidates(
+          allCardData: allCardData,
+          commanderLower: commanderLower,
+          coreLower: coreLower,
+        );
         emptySuggestionFallbackCandidateCount =
             fallbackRemovalCandidates.length;
 
@@ -1448,45 +1428,36 @@ Future<Response> onRequest(RequestContext context) async {
                 .map((name) => name.toLowerCase())
                 .toSet(),
           );
-          emptySuggestionFallbackReplacementCount = replacements.length;
+          final fallbackApplication = optimize_route_empty_fallback
+              .buildEmptySuggestionFallbackApplication(
+            removalCandidates: fallbackRemovalCandidates,
+            replacements: replacements,
+          );
+          emptySuggestionFallbackReplacementCount =
+              fallbackApplication.replacementCount;
+          emptySuggestionFallbackPairCount = fallbackApplication.pairCount;
 
-          if (replacements.isNotEmpty) {
-            final fallbackAdditions = replacements
-                .map((r) => (r['name'] as String?)?.trim() ?? '')
-                .where((n) => n.isNotEmpty)
-                .toList();
-
-            final pairCount =
-                fallbackRemovalCandidates.length < fallbackAdditions.length
-                    ? fallbackRemovalCandidates.length
-                    : fallbackAdditions.length;
-            emptySuggestionFallbackPairCount = pairCount;
-
-            if (pairCount > 0) {
-              removals = fallbackRemovalCandidates.take(pairCount).toList();
-              additions = fallbackAdditions.take(pairCount).toList();
-              emptySuggestionFallbackApplied = true;
-              _emptySuggestionFallbackAppliedCount++;
-              emptySuggestionFallbackReason =
-                  'IA retornou sugestÃµes vazias; aplicado fallback heurÃ­stico orientado a sinergia.';
-              Log.i(
-                  'âœ… [AI Optimize] Fallback aplicado com $pairCount swap(s) apÃ³s retorno vazio da IA.');
-            }
+          if (fallbackApplication.applied) {
+            removals = fallbackApplication.removals;
+            additions = fallbackApplication.additions;
+            emptySuggestionFallbackApplied = true;
+            _emptySuggestionFallbackAppliedCount++;
+            emptySuggestionFallbackReason = fallbackApplication.successReason;
+            Log.i(
+                'âœ… [AI Optimize] Fallback aplicado com ${fallbackApplication.pairCount} swap(s) apÃ³s retorno vazio da IA.');
           }
         }
 
         if (!emptySuggestionFallbackApplied) {
+          emptySuggestionFallbackReason = optimize_route_empty_fallback
+              .buildEmptySuggestionFallbackFailureReason(
+            hasRemovalCandidates: fallbackRemovalCandidates.isNotEmpty,
+            replacementCount: emptySuggestionFallbackReplacementCount,
+          );
           if (fallbackRemovalCandidates.isEmpty) {
             _emptySuggestionFallbackNoCandidateCount++;
-            emptySuggestionFallbackReason =
-                'IA retornou sugestÃµes vazias e o deck nÃ£o possui candidatas seguras para remoÃ§Ã£o.';
           } else if (emptySuggestionFallbackReplacementCount == 0) {
             _emptySuggestionFallbackNoReplacementCount++;
-            emptySuggestionFallbackReason =
-                'IA retornou sugestÃµes vazias e nÃ£o foi possÃ­vel encontrar substitutas vÃ¡lidas no fallback.';
-          } else {
-            emptySuggestionFallbackReason =
-                'IA retornou sugestÃµes vazias e nÃ£o foi possÃ­vel gerar fallback seguro.';
           }
         }
       }
