@@ -2,6 +2,7 @@
 
 > Data: 2026-06-10
 > Atualização de fonte local: 2026-06-11
+> Revisão estratégica complementar: `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 > Escopo: battle engine/Hermes e validação Commander prática.
 > Fonte de verdade: documentação oficial Wizards vigente em 2026-06-10.
 > Objetivo: manter `IMPLEMENTATION_GAPS.md`, `PENDING_TASKS.md` e a matriz
@@ -16,8 +17,8 @@
 | `https://media.wizards.com/2026/downloads/MagicCompRules%2020260417.txt` | Base para CR 100-903, incluindo Omen/Station/Preparation. | Referência versionada atual nesta rodada; efetiva em 2026-04-17. |
 | `https://magic.wizards.com/en/formats/commander` | Commander 99+1, color identity, command zone, commander tax, 21 commander damage e multiplayer free-for-all com ataque a múltiplos jogadores. | Referência oficial de produto revalidada em 2026-06-10. |
 | `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Confirma que hybrid mana continua contando como todas as cores da carta no Commander; não houve mudança para modelo "or". | Regra documentada como invariável. |
-| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Station, Warp, Spacecraft, Lander/Void e elegibilidade de Legendary Vehicle/Spacecraft com P/T como commander. | Implementado como suporte mínimo. |
-| `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Mecânica operacional de Spacecraft/Station e Warp em linguagem de produto. | Usada para validar o comportamento mínimo do simulador. |
+| `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Mecânica operacional de Spacecraft/Station, Warp, Lander/Void e elegibilidade de Legendary Vehicle/Spacecraft com P/T como commander. | Usada para validar o comportamento mínimo do simulador. |
+| `https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes` | Detalhes oficiais de Station, striations, charge counters e regra de Commander para Vehicle/Spacecraft. | Referência para regressões card-specific futuras. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-mechanics` | Prepare, Repartee, Opus, Infusion, Increment, Paradigm, Flashback e Converge. | Implementado como suporte mínimo/telemetria. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-release-notes` | Release notes com detalhes de Prepare, Increment e Paradigm. | Usada para classificar o que é engine mínimo vs card-specific. |
 
@@ -88,3 +89,14 @@ apenas em `brawl`.
 ## Próxima auditoria obrigatória
 
 Antes de qualquer nova implementação de regras, reabrir `https://magic.wizards.com/en/rules` e confirmar se a data efetiva da Comprehensive Rules mudou após `2026-04-17`.
+
+## Revisão estratégica 2026-06-11
+
+Resultado da rechecagem: não foi identificado novo requisito que justifique
+expandir ManaLoom para judge engine completo. O backlog correto para os próximos
+20 dias continua sendo card-specific incremental: Warp, Station/Spacecraft,
+Prepare, Omen e Paradigm só ganham comportamento adicional quando houver carta
+real no corpus, replay e teste focado.
+
+O teste guardião `server/test/magic_rules_source_test.dart` foi ampliado para
+cobrir âncoras de CR 802, 903.3, 903.4e, 720, 721, 722, 702.184 e 702.185.

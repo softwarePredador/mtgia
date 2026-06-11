@@ -2,9 +2,11 @@
 
 > Mapeamento da "Especificação técnica de regras faltantes para o ManaLoom Commander"
 > para o código atual do battle_analyst_v9.py (engine ativo).
-> Status: 2026-06-10
+> Status: 2026-06-11
 > Fonte oficial revalidada nesta rodada:
 > `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
+> Revisão estratégica complementar:
+> `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 > Esta lista separa battle engine/regras de gaps de produto/UX. Itens visuais
 > não devem entrar aqui.
 
@@ -262,7 +264,8 @@
 
 ## 10. Regras oficiais 2026 / Mecânicas modernas (P1-P2)
 
-Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
+Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md` e
+`BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 
 | Item | Status | Implementação | Limite restante |
 |---|---|---|---|
@@ -278,3 +281,21 @@ Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md`.
 | Multiplayer attack distribution | ✅ Básico | `assign_attackers_to_defenders` + `multi_defender_attack` | Requirements/restrictions avançadas |
 | Hybrid mana em Commander | ✅ Guardado | servidor + v9 preservam identidade combinada | Não flexibilizar; Wizards confirmou que a regra não mudou em 2026-02-09 |
 | No sideboard/outside-game em Commander | ⚠️ Tracked Gap | gap registrado nesta seção | Validar rotas/deck construction se o produto expuser sideboard/wishboard |
+
+### 10.1 Decisão estratégica 2026-06-11
+
+O suporte atual é intencionalmente mínimo e orientado a simulação Commander.
+Não transformar `battle_analyst_v9.py` em judge engine completo neste ciclo.
+
+Ordem de implementação quando houver corpus concreto:
+
+1. **Warp/Flashback/cast-from-exile card-specific** — validar custo, timing e
+   exile replacement por carta real antes de promover efeito.
+2. **Station/Spacecraft striations** — suportar múltiplos thresholds e efeitos
+   impressos somente para Spacecraft que apareçam em deck real.
+3. **Prepare/Omen/Paradigm** — adicionar resolução completa apenas por carta
+   usada; manter características/cópia/exile tracking como base genérica.
+4. **Multiplayer combat avançado** — requirements/restrictions por defensor,
+   blockers em APNAP e efeitos que referenciam "defending player".
+5. **Ability-word telemetry** — permanecer como sinal semântico; enforcement só
+   se o texto da carta tiver regra executável própria.

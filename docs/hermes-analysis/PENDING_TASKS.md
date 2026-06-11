@@ -11,6 +11,13 @@
 > Todos estão cobertos em `test_battle_analyst_v10_3.py`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 >
+> **Atualização 2026-06-11 — revisão estratégica oficial.**
+> A pesquisa oficial foi rechecada contra Wizards Rules, Commander, Commander
+> Brackets 2026-02-09, Edge of Eternities e Secrets of Strixhaven. O plano de
+> 20 dias permanece prático: manter suporte mínimo testado e implementar
+> card-specific apenas com corpus/replay/evidência. Nova matriz:
+> `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
+>
 > **Atualização 2026-06-10 — etapa deck-improvement.**
 > O diagnóstico/gate semântico do optimize deixou de depender apenas de
 > `semantic_tags_v2` para `role_delta`: agora usa a mesma precedência do produto
@@ -213,6 +220,17 @@
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
 | 6 | Próximo split da rota optimize: revisar blocos remanescentes de orquestração e extrair apenas quando houver support test isolado | 1-2 dias | Médio | `optimize_route_final_gate_support.dart` verde |
+
+### Ordem revalidada 2026-06-11
+
+| Ordem | Entrega | Critério para executar | Validação mínima |
+|---|---|---|---|
+| 1 | Guardar fonte oficial e matriz honesta | Sempre que Wizards publicar novo CR/update | `magic_rules_source_test.dart` + `test_battle_analyst_v10_3.py` |
+| 2 | Commander legality/color identity | Qualquer drift em deck creation/import/validate | `commander_eligibility_test.dart`, `color_identity_test.dart`, `deck_validation_test.dart` |
+| 3 | Warp/Flashback/exile card-specific | Carta real no corpus ou falha de replay | Novo teste em `battle_rules_2026_tests.py` ou módulo card-specific |
+| 4 | Station/Spacecraft card-specific | Spacecraft real em deck aprendido/simulado | Replay + conformance + regra no registry |
+| 5 | Prepare/Omen/Paradigm card-specific | Carta real usada pelo usuário/Hermes | Teste com resolução esperada e sem falso positivo semântico |
+| 6 | Multiplayer combat avançado | Falha de replay envolvendo múltiplos defensores | Teste com defensor escolhido, blockers APNAP e dano por commander |
 
 ---
 

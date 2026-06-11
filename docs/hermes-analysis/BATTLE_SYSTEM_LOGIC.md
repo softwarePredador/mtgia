@@ -5,6 +5,9 @@
 
 Última atualização: 2026-06-10
 
+Revisão estratégica oficial: 2026-06-11
+(`BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`).
+
 ---
 
 ## 1. Visão Geral do Sistema
@@ -144,6 +147,11 @@ O engine agora distingue:
 
 Limite intencional: isso ainda é simulação Commander prática. Não é judge engine
 completo para todas as interações CR 613/616 nem para todo texto card-specific.
+
+Atualização 2026-06-11: a revisão oficial confirmou que o próximo trabalho de
+regras deve ser card-specific e orientado por corpus. Warp, Station,
+Prepare/Omen/Paradigm e ability words não devem ganhar enforcement genérico
+pesado sem carta real, replay e teste focado.
 
 ---
 
