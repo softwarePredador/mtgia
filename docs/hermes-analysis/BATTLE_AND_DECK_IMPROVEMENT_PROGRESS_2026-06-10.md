@@ -465,6 +465,13 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `manaloom-hermes-report-only.sh e39113b0`: `PASS`; sem riscos no escopo do
     diff. Hermes observou apenas os 22 avisos SQL preexistentes da rota, fora
     deste corte.
+- Hermes/AWS pós-push do split land-removal-protection (`8854208b`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_land_removal_protection_support`, rota
+    `ai/optimize` e teste de proteção de lands: sem issues.
+  - `dart test test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 36 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 8854208b`: `PASS`; risco menor apenas de
+    wiring de import, mitigado pelo analyze e pela suite remota.
 
 ## Etapa 4 — Próximas pendências reais
 
