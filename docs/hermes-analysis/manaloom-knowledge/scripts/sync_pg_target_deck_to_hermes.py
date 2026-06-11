@@ -126,6 +126,50 @@ def ensure_sqlite_schema(cur: sqlite3.Cursor) -> None:
     )
 
 
+def aggregate_cards(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Collapse duplicate card-name rows before writing into unique SQLite rows."""
+    aggregated: dict[str, dict[str, Any]] = {}
+    for card in cards:
+        name = str(card.get("name") or "").strip()
+        if not name:
+            continue
+        key = name.casefold()
+        quantity = int(card.get("quantity") or 1)
+        existing = aggregated.get(key)
+        if existing is None:
+            normalized = dict(card)
+            normalized["name"] = name
+            normalized["quantity"] = quantity
+            normalized["is_commander"] = bool(card.get("is_commander"))
+            aggregated[key] = normalized
+            continue
+
+        existing["quantity"] = int(existing.get("quantity") or 0) + quantity
+        existing["is_commander"] = bool(existing.get("is_commander")) or bool(
+            card.get("is_commander")
+        )
+
+        existing_tag = str(existing.get("functional_tag") or "unknown")
+        candidate_tag = str(card.get("functional_tag") or "unknown")
+        if existing_tag == "unknown" and candidate_tag != "unknown":
+            existing["functional_tag"] = candidate_tag
+
+        for field in (
+            "cmc",
+            "type_line",
+            "oracle_text",
+            "rule_source",
+            "rule_review_status",
+        ):
+            if not existing.get(field) and card.get(field):
+                existing[field] = card[field]
+
+    return sorted(
+        aggregated.values(),
+        key=lambda card: (not bool(card.get("is_commander")), str(card.get("name") or "")),
+    )
+
+
 def selected_deck_sql(args: argparse.Namespace) -> tuple[str, tuple[Any, ...]]:
     if args.pg_deck_id:
         return "WHERE d.id = %s", (args.pg_deck_id,)
@@ -250,12 +294,14 @@ def write_sqlite(
     *,
     apply: bool,
 ) -> dict[str, int]:
+    aggregated_cards = aggregate_cards(cards)
     stats = {
         "cards_seen": len(cards),
         "quantity_seen": sum(int(card["quantity"]) for card in cards),
+        "duplicate_rows_collapsed": len(cards) - len(aggregated_cards),
         "cards_written": 0,
         "quantity_written": 0,
-        "commanders": sum(1 for card in cards if card["is_commander"]),
+        "commanders": sum(1 for card in aggregated_cards if card["is_commander"]),
     }
     conn = sqlite3.connect(sqlite_db)
     try:
@@ -277,7 +323,7 @@ def write_sqlite(
                     f"sync_pg_target_deck_to_hermes.py pg_deck_id={deck['pg_deck_id']}",
                 ),
             )
-            for card in cards:
+            for card in aggregated_cards:
                 cur.execute(
                     """
                     INSERT INTO deck_cards (

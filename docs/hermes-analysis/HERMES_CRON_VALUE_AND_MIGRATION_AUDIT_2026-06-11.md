@@ -39,16 +39,42 @@ bash -n /opt/data/scripts/manaloom-hermes-report-only.sh \
   /opt/data/scripts/manaloom-master-watchdog.sh
 ```
 
-Observações:
+Observações iniciais:
 
 - O workspace Hermes foi alinhado em `master`.
 - Remotes reais restantes: `origin/master` e `origin/codex/hermes-analysis-docs`.
 - `jobs.json` chegou a ficar `root:root 600`, impedindo leitura pelo scheduler.
   Foi corrigido com `/opt/data/scripts/fix-cron-perms.sh`.
-- Após a correção, o scheduler recalculou `next_run_at`; os primeiros outputs
-  novos ficam esperados após `2026-06-11T13:05:27Z`.
-- Portanto, esta auditoria valida configuração e função; resultados novos
-  pós-ajuste ainda precisam ser observados na próxima rodada.
+- Após a correção, o scheduler recalculou `next_run_at`.
+
+Evidência nova após a primeira rodada (`2026-06-11T13:05Z`):
+
+| Cron | Resultado observado | Impacto |
+|---|---|---|
+| `manaloom-master-watchdog` | OK; detectou `origin/master` avançando até `5e8de767`. | Confirma que o watchdog voltou a ler Git e emitir alerta útil. |
+| `manaloom-pull-learning-events` | Falhou com `sqlite3.OperationalError: attempt to write a readonly database`. | Expôs ownership incorreto em `/opt/data/workspace/mtgia`, `/opt/data/cron`, `/opt/data/artifacts` e `/opt/data/scripts`. |
+| `lorehold-knowncards-validator` | Falhou com `sqlite3.OperationalError: no such table: learned_decks`. | Expôs dependência real do preflight/sync antes dos validadores de conhecimento. |
+
+Correções operacionais aplicadas no runtime AWS:
+
+```bash
+chown -R hermes:hermes /opt/data/workspace/mtgia \
+  /opt/data/cron /opt/data/artifacts /opt/data/scripts
+/opt/data/scripts/fix-cron-perms.sh
+```
+
+Preflight manual como usuário `hermes` passou a popular `learned_decks` a partir
+de `pg_meta_decks` (`seen=120`, `inserted=120` no primeiro apply), mas revelou
+um segundo problema: o sync do target deck para `deck_cards` falhava em decks
+reais com linhas duplicadas por `card_name`.
+
+Correção versionada:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py`
+  agora agrega duplicatas por nome antes de gravar no SQLite, somando
+  quantidade e preservando comandante/tag funcional.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py`
+  cobre o caso de duplicata que quebrava a cron.
 
 ## Crons habilitadas
 
@@ -122,21 +148,22 @@ Mudanças:
 
 ### Impacto ainda não provado
 
-Ainda não há output novo após o ajuste, porque a próxima execução pós-correção
-começa a partir de `2026-06-11T13:05:27Z`.
+Ainda falta observar uma rodada completa depois da correção de ownership e do
+fix de duplicatas no sync do target deck.
 
-Próxima evidência necessária:
+Próxima evidência necessária no Hermes remoto:
 
 ```bash
 find /opt/data/cron/output -type f -name '*.md' \
   -printf '%TY-%Tm-%TdT%TH:%TM:%TS %p\n' | sort -r | head
 ```
 
-Validar se os jobs de `13:05Z` produziram:
+Validar se a próxima rodada produz sem erro:
 
 - `manaloom-master-watchdog`
 - `manaloom-pull-learning-events`
 - `lorehold-knowncards-validator`
+- `manaloom-master-optimizer-preflight`
 
 ## Caminho para remover Hermes
 

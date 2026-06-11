@@ -29,6 +29,8 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 - `HERMES_CRON_VALUE_AND_MIGRATION_AUDIT_2026-06-11.md`
   - Auditoria uma a uma das crons Hermes, com decisão de manter/pausar e plano
     para migrar o loop para o servidor ManaLoom.
+  - Atualizado com a primeira rodada real pós-ajuste: watchdog OK, falha de
+    ownership SQLite corrigida e sync de target deck com duplicatas tratado.
 
 - `HERMES_DOCS_TRIAGE_2026-06-11.md`
   - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch

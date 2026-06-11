@@ -101,3 +101,21 @@ bash -n /opt/data/scripts/manaloom-hermes-report-only.sh \
 ```
 
 Resultado: `validation=ok`.
+
+## Correção pós-primeira rodada
+
+Após o scheduler voltar a executar, dois problemas reais apareceram:
+
+- permissões `root` em caminhos que o usuário `hermes` precisa escrever;
+- `sync_pg_target_deck_to_hermes.py` quebrando em duplicatas de `card_name`
+  contra a constraint `UNIQUE(deck_id, card_name)`.
+
+Correções:
+
+- ownership de `/opt/data/workspace/mtgia`, `/opt/data/cron`,
+  `/opt/data/artifacts` e `/opt/data/scripts` restaurado para `hermes:hermes`;
+- sync do target deck ajustado no repo para agregar duplicatas antes do insert.
+
+Regra operacional nova: pulls do checkout Hermes devem ser feitos como usuário
+`hermes`, ou então seguidos de `chown -R hermes:hermes` nos caminhos acima. Isso
+evita que as crons voltem a falhar por banco SQLite readonly.
