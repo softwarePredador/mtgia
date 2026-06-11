@@ -24,6 +24,8 @@ import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
 import '../../../lib/ai/optimize_route_quality_rejection_support.dart'
     as optimize_route_quality_rejection;
+import '../../../lib/ai/optimize_route_post_validation_support.dart'
+    as optimize_route_post_validation;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_response_support.dart'
@@ -1882,9 +1884,10 @@ Future<Response> onRequest(RequestContext context) async {
       // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
       // 1. Color Identity Warning (se IA sugeriu cartas invÃ¡lidas)
-      if (filteredByColorIdentity.isNotEmpty) {
-        validationWarnings.add(
-            'âš ï¸ ${filteredByColorIdentity.length} carta(s) sugerida(s) pela IA foram removidas por violar a identidade de cor do commander: ${filteredByColorIdentity.take(3).join(", ")}${filteredByColorIdentity.length > 3 ? "..." : ""}');
+      final colorIdentityWarning = optimize_route_post_validation
+          .buildColorIdentityValidationWarning(filteredByColorIdentity);
+      if (colorIdentityWarning != null) {
+        validationWarnings.add(colorIdentityWarning);
       }
 
       // 2. ValidaÃ§Ã£o EDHREC: verificar se additions tÃªm sinergia comprovada
@@ -1906,16 +1909,13 @@ Future<Response> onRequest(RequestContext context) async {
             }
 
             if (additionsNotInEdhrec.isNotEmpty) {
-              final percent =
-                  (additionsNotInEdhrec.length / validAdditions.length * 100)
-                      .toStringAsFixed(0);
-              if (additionsNotInEdhrec.length > validAdditions.length * 0.5) {
-                validationWarnings.add(
-                    'âš ï¸ ${additionsNotInEdhrec.length} ($percent%) das cartas sugeridas NÃƒO aparecem nos dados EDHREC de ${commanders.firstOrNull ?? ""}. Isso pode indicar baixa sinergia: ${additionsNotInEdhrec.take(3).join(", ")}${additionsNotInEdhrec.length > 3 ? "..." : ""}');
-              } else if (additionsNotInEdhrec.length >= 3) {
-                validationWarnings.add(
-                    'ðŸ’¡ ${additionsNotInEdhrec.length} carta(s) sugerida(s) nÃ£o estÃ£o nos dados EDHREC - podem ser inovadoras ou de baixa sinergia.');
-              }
+              validationWarnings.addAll(
+                optimize_route_post_validation.buildEdhrecValidationWarnings(
+                  commanderName: commanders.firstOrNull ?? "",
+                  validAdditions: validAdditions,
+                  additionsNotInEdhrec: additionsNotInEdhrec,
+                ),
+              );
             }
           }
         } catch (e) {
@@ -1926,23 +1926,13 @@ Future<Response> onRequest(RequestContext context) async {
       // 3. ComparaÃ§Ã£o de Tema: verificar se tema detectado corresponde aos temas EDHREC
       if (edhrecValidationData != null &&
           edhrecValidationData.themes.isNotEmpty) {
-        final detectedThemeLower = targetArchetype.toLowerCase();
-        final edhrecThemesLower =
-            edhrecValidationData.themes.map((t) => t.toLowerCase()).toList();
-
-        // Verificar se o tema detectado tem correspondÃªncia nos temas EDHREC
-        bool themeMatch = false;
-        for (final edhrecTheme in edhrecThemesLower) {
-          if (detectedThemeLower.contains(edhrecTheme) ||
-              edhrecTheme.contains(detectedThemeLower)) {
-            themeMatch = true;
-            break;
-          }
-        }
-
-        if (!themeMatch) {
-          validationWarnings.add(
-              'ï¿½ Tema detectado "$targetArchetype" nÃ£o corresponde aos temas populares do EDHREC (${edhrecValidationData.themes.take(3).join(", ")}). O sistema estÃ¡ usando abordagem HÃBRIDA: 70% cartas EDHREC + 30% cartas do seu tema para respeitar sua ideia.');
+        final themeWarning =
+            optimize_route_post_validation.buildThemeMismatchWarning(
+          targetArchetype: targetArchetype,
+          edhrecThemes: edhrecValidationData.themes,
+        );
+        if (themeWarning != null) {
+          validationWarnings.add(themeWarning);
         }
       }
 
@@ -2112,68 +2102,17 @@ Future<Response> onRequest(RequestContext context) async {
               DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
           postAnalysis = postAnalyzer.generateAnalysis();
 
-          // 4. Comparar Antes vs Depois â€” VALIDAÃ‡ÃƒO QUALITATIVA REAL
-          final preManaAssessment =
-              deckAnalysis['mana_base_assessment'] as String? ?? '';
-          final postManaAssessment =
-              postAnalysis['mana_base_assessment'] as String? ?? '';
-          final preManaIssues = preManaAssessment.contains('Falta mana');
-          final postManaIssues = postManaAssessment.contains('Falta mana');
+          // 4. Comparar Antes vs Depois — validação qualitativa real.
+          final postValidationSummary =
+              optimize_route_post_validation.buildPostAnalysisValidationSummary(
+            deckAnalysis: deckAnalysis,
+            postAnalysis: postAnalysis,
+            effectiveOptimizeArchetype: effectiveOptimizeArchetype,
+          );
+          validationWarnings.addAll(postValidationSummary.warnings);
 
-          if (!preManaIssues && postManaIssues) {
-            validationWarnings.add(
-                'âš ï¸ ATENÃ‡ÃƒO: As sugestÃµes da IA podem piorar sua base de mana.');
-          }
-
-          final preAvgCmc = deckAnalysis['average_cmc'] as String? ?? '0';
-          final postAvgCmc = postAnalysis['average_cmc'] as String? ?? '0';
-          final preCurve = double.tryParse(preAvgCmc) ?? 0.0;
-          final postCurve = double.tryParse(postAvgCmc) ?? 0.0;
-
-          if (effectiveOptimizeArchetype.toLowerCase() == 'aggro' &&
-              postCurve > preCurve) {
-            validationWarnings.add(
-                'âš ï¸ ATENÃ‡ÃƒO: O deck estÃ¡ ficando mais lento (CMC aumentou), o que Ã© ruim para Aggro.');
-          }
-
-          // 5. ANÃLISE DE QUALIDADE DAS TROCAS (Power Level Assessment)
-          final preTypes =
-              deckAnalysis['type_distribution'] as Map<String, dynamic>? ?? {};
-          final postTypes =
-              postAnalysis['type_distribution'] as Map<String, dynamic>? ?? {};
-
-          // Verificar se a otimizaÃ§Ã£o nÃ£o desbalanceou a distribuiÃ§Ã£o de tipos
-          final preLands = (preTypes['lands'] as int?) ?? 0;
-          final postLands = (postTypes['lands'] as int?) ?? 0;
-          if (postLands < preLands - 3) {
-            validationWarnings.add(
-                'âš ï¸ A otimizaÃ§Ã£o removeu muitos terrenos ($preLands â†’ $postLands). Isso pode causar problemas de mana.');
-          }
-
-          // Verificar se a curva melhorou para o arquÃ©tipo
-          if (effectiveOptimizeArchetype.toLowerCase() == 'control' &&
-              postCurve < preCurve - 0.5) {
-            validationWarnings.add(
-                'ðŸ’¡ O CMC mÃ©dio diminuiu significativamente ($preAvgCmc â†’ $postAvgCmc). Para Control, isso pode remover respostas de custo alto que sÃ£o importantes.');
-          }
-
-          // Gerar resumo de melhoria
-          final improvements = <String>[];
-          if (postCurve < preCurve &&
-              effectiveOptimizeArchetype.toLowerCase() != 'control') {
-            improvements
-                .add('CMC mÃ©dio otimizado: $preAvgCmc â†’ $postAvgCmc');
-          }
-          if (preManaIssues && !postManaIssues) {
-            improvements.add('Base de mana corrigida');
-          }
-          if ((postTypes['instants'] as int? ?? 0) >
-              (preTypes['instants'] as int? ?? 0)) {
-            improvements.add('Mais interaÃ§Ã£o instant-speed adicionada');
-          }
-
-          if (improvements.isNotEmpty) {
-            postAnalysis['improvements'] = improvements;
+          if (postValidationSummary.improvements.isNotEmpty) {
+            postAnalysis['improvements'] = postValidationSummary.improvements;
           }
 
           // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
