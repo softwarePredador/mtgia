@@ -84,7 +84,8 @@ do engine concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
-- `server/lib/ai/optimize_runtime_support.dart` — 2772 linhas.
+- `server/lib/ai/optimize_runtime_support.dart` — 2708 linhas após o primeiro split.
+- `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 
 **Decisão:**
 Não misturar refactors grandes com correções funcionais. A primeira extração
@@ -197,7 +198,10 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    estabilização com callbacks explícitos de replay/métricas/zone move.
 2. Extrair blocos da rota `routes/ai/optimize/index.dart` para support
    services mantendo a rota como orquestração fina.
-3. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
+3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: o
+   primeiro corte moveu assinatura de deck, cache key, load/save de cache para
+   `optimize_cache_support.dart` mantendo wrappers compatíveis.
+4. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
    quando houver corpus concreto usando essas cartas.
-4. Revalidar drift restante entre analysis/generate/optimize depois do split
+5. Revalidar drift restante entre analysis/generate/optimize depois do split
    estrutural.

@@ -8,6 +8,7 @@ import '../meta/meta_deck_reference_support.dart';
 import '../meta/meta_deck_format_support.dart';
 import 'commander_fallback_policy.dart';
 import 'optimization_functional_roles.dart';
+import 'optimize_cache_support.dart' as optimize_cache;
 import 'optimize_filler_loader_support.dart';
 export 'optimize_filler_loader_support.dart';
 
@@ -2072,14 +2073,7 @@ bool shouldRetryOptimizeWithAiFallback({
 }
 
 String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
-  final entries = <String>[];
-  for (final row in cardsResult) {
-    final cardId = row[9].toString();
-    final quantity = (row[2] as int?) ?? 1;
-    entries.add('$cardId:$quantity');
-  }
-  entries.sort();
-  return entries.join('|');
+  return optimize_cache.buildOptimizeDeckSignature(cardsResult);
 }
 
 String buildOptimizeCacheKey({
@@ -2091,52 +2085,25 @@ String buildOptimizeCacheKey({
   required String deckSignature,
   String intensity = 'focused',
 }) {
-  final base = [
-    'optimize',
-    mode.toLowerCase().trim(),
-    intensity.toLowerCase().trim(),
-    deckId,
-    archetype.toLowerCase().trim(),
-    '${bracket ?? 'none'}',
-    keepTheme ? 'keep' : 'free',
-    deckSignature,
-  ].join('::');
-  return 'v7:${_stableHash(base)}';
-}
-
-String _stableHash(String value) {
-  var hash = 2166136261;
-  for (final code in value.codeUnits) {
-    hash ^= code;
-    hash = (hash * 16777619) & 0xFFFFFFFF;
-  }
-  return hash.toRadixString(16);
+  return optimize_cache.buildOptimizeCacheKey(
+    deckId: deckId,
+    archetype: archetype,
+    mode: mode,
+    bracket: bracket,
+    keepTheme: keepTheme,
+    deckSignature: deckSignature,
+    intensity: intensity,
+  );
 }
 
 Future<Map<String, dynamic>?> loadOptimizeCache({
   required Pool pool,
   required String cacheKey,
 }) async {
-  final result = await pool.execute(
-    Sql.named('''
-      SELECT payload
-      FROM ai_optimize_cache
-      WHERE cache_key = @cache_key
-        AND expires_at > NOW()
-      ORDER BY created_at DESC
-      LIMIT 1
-    '''),
-    parameters: {
-      'cache_key': cacheKey,
-    },
+  return optimize_cache.loadOptimizeCache(
+    pool: pool,
+    cacheKey: cacheKey,
   );
-
-  if (result.isEmpty) return null;
-  final payload = result.first[0];
-  if (payload is Map<String, dynamic>)
-    return Map<String, dynamic>.from(payload);
-  if (payload is Map) return payload.cast<String, dynamic>();
-  return null;
 }
 
 Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
@@ -2443,45 +2410,14 @@ Future<void> saveOptimizeCache({
   required String deckSignature,
   required Map<String, dynamic> payload,
 }) async {
-  await pool.execute(
-    Sql.named('''
-      INSERT INTO ai_optimize_cache (
-        cache_key,
-        user_id,
-        deck_id,
-        deck_signature,
-        payload,
-        expires_at
-      ) VALUES (
-        @cache_key,
-        CAST(@user_id AS uuid),
-        CAST(@deck_id AS uuid),
-        @deck_signature,
-        @payload,
-        NOW() + INTERVAL '6 hours'
-      )
-      ON CONFLICT (cache_key)
-      DO UPDATE SET
-        user_id = EXCLUDED.user_id,
-        deck_id = EXCLUDED.deck_id,
-        deck_signature = EXCLUDED.deck_signature,
-        payload = EXCLUDED.payload,
-        expires_at = EXCLUDED.expires_at,
-        created_at = NOW()
-    '''),
-    parameters: {
-      'cache_key': cacheKey,
-      'user_id': userId,
-      'deck_id': deckId,
-      'deck_signature': deckSignature,
-      'payload': payload,
-    },
+  return optimize_cache.saveOptimizeCache(
+    pool: pool,
+    cacheKey: cacheKey,
+    userId: userId,
+    deckId: deckId,
+    deckSignature: deckSignature,
+    payload: payload,
   );
-
-  await pool.execute('''
-    DELETE FROM ai_optimize_cache
-    WHERE expires_at <= NOW()
-  ''');
 }
 
 Future<Map<String, dynamic>> loadUserAiPreferences({
