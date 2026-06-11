@@ -147,6 +147,55 @@ def register_tests(battle, player):
         assert blue_mana_payer.life == 10
         assert blue_mana_payer.mana_pool.blue == 0
 
+    def test_restricted_mana_only_pays_matching_spell_categories():
+        creature_payer = player("Creature Payer")
+        creature_payer.add_restricted_mana(
+            2,
+            "creature_spell_only",
+            color="wildcard",
+        )
+        creature_spell = {
+            "name": "Restricted Creature",
+            "cmc": 2,
+            "mana_cost": "{1}{G}",
+            "type_line": "Creature — Elf",
+        }
+        instant_spell = {
+            "name": "Restricted Instant",
+            "cmc": 2,
+            "mana_cost": "{1}{G}",
+            "type_line": "Instant",
+        }
+
+        assert creature_payer.available_mana() == 0
+        assert creature_payer.can_pay_card(creature_spell) is True
+        assert creature_payer.can_pay_card(instant_spell) is False
+        assert creature_payer.spend_card_mana(creature_spell) is True
+        assert creature_payer.restricted_mana == {}
+
+    def test_restricted_mana_combines_with_treasure_for_matching_generic_costs():
+        active = player("Active")
+        active.add_restricted_mana(1, "creature_spell_only", color="generic")
+        active.treasures = 1
+        creature_spell = {
+            "name": "Two Generic Creature",
+            "cmc": 2,
+            "mana_cost": "{2}",
+            "type_line": "Creature",
+        }
+        noncreature_spell = {
+            "name": "Two Generic Instant",
+            "cmc": 2,
+            "mana_cost": "{2}",
+            "type_line": "Instant",
+        }
+
+        assert active.can_pay_card(noncreature_spell) is False
+        assert active.can_pay_card(creature_spell) is True
+        assert active.spend_card_mana(creature_spell) is True
+        assert active.treasures == 0
+        assert active.restricted_mana == {}
+
     return [
         test_mana_sources_do_not_refill_after_spending,
         test_treasures_are_spent_without_refilling_sources,
@@ -155,4 +204,6 @@ def register_tests(battle, player):
         test_basic_lands_refresh_as_colored_sources,
         test_hybrid_and_phyrexian_mana_use_legal_payment_options,
         test_monocolored_hybrid_and_hybrid_phyrexian_mana_use_legal_payment_options,
+        test_restricted_mana_only_pays_matching_spell_categories,
+        test_restricted_mana_combines_with_treasure_for_matching_generic_costs,
     ]

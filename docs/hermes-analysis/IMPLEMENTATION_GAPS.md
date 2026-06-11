@@ -107,7 +107,7 @@
 | Custos alternativos (kicker, flashback, etc.) | ⚠️ Parcial | v9: `alternative_cost`, `additional_costs` | Suporte contextual/custo travado; falta semântica card-specific |
 | X spells | ✅ Básico | v9: `x_value` | X entra no custo travado |
 | Hybrid/Phyrexian mana | ✅ Básico | v9: `parse_mana_cost`, `Player._payment_plan` | Cobre híbrido colorido `{W/U}`, monocolored hybrid `{2/W}`, Phyrexian colorido `{W/P}` e hybrid Phyrexian `{W/U/P}`; restrições card-specific seguem pendentes |
-| Mana pool com spend restrictions | ⚠️ Parcial | 2288, 2311 | ManaPool existe mas sem restrictions |
+| Mana pool com spend restrictions | ✅ Básico | v9: `restricted_mana`, `card_spend_tags` | Cobre restrições por categoria de spell (`creature_spell_only`, `artifact_spell_only`, `instant_or_sorcery_spell_only`, `noncreature_spell_only`); restrições arbitrárias por carta ainda exigem handler dedicado |
 
 **Ações imediatas**:
 - [x] Pipeline 601.2 mínimo: lock-in de custo antes de pagar

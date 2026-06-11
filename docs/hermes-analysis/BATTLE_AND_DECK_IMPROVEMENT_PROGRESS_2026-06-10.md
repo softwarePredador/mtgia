@@ -630,8 +630,21 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     e cobre `{W/U/P}` por vida e por mana azul.
   - `IMPLEMENTATION_GAPS.md` e `PENDING_TASKS.md` deixam de listar `{2/W}` como
     pendente. `{2/P}` foi removido do backlog prático porque a CR 107.4 vigente
-    não lista esse símbolo; o gap remanescente é spend restrictions
-    card-specific.
+    não lista esse símbolo.
+- Fechamento local do gap de spend restrictions genérico:
+  - `battle_mana_cost_support.py` agora adiciona `spend_tags` ao custo travado
+    com categorias coarse (`creature_spell`, `artifact_spell`,
+    `instant_or_sorcery_spell`, `noncreature_spell`).
+  - `battle_analyst_v9.py` ganhou `restricted_mana` separado do mana pool comum,
+    `add_restricted_mana(...)` e consumo atômico no `_payment_plan`.
+  - Mana restrita não entra em `available_mana()` e, portanto, não paga custos
+    não-card como ward/tax. Ela só é usada por `can_pay_card/spend_card_mana`
+    quando a categoria do spell permite.
+  - `battle_mana_tests.py` cobre mana restrita pagando creature spell, rejeitando
+    instant incompatível e combinando mana restrita com Treasure para custo
+    genérico legal.
+  - O gap remanescente foi reduzido para restrições arbitrárias/card-specific,
+    não para restrições genéricas por categoria de spell.
 
 ## Etapa 4 — Próximas pendências reais
 

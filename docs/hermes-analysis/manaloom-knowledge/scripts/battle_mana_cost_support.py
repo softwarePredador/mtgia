@@ -96,6 +96,38 @@ def variable_mana_symbol_count(cost):
     )
 
 
+def card_spend_tags(card):
+    """Return coarse tags used by restricted mana checks.
+
+    This intentionally models only spell-category restrictions, not arbitrary
+    card text. Card-specific restrictions still need explicit handlers.
+    """
+    type_line = str(card.get("type_line") or card.get("type") or "").lower()
+    effect = str(card.get("effect") or "").lower()
+    tag = str(card.get("tag") or "").lower()
+    tags = set()
+
+    is_creature = (
+        "creature" in type_line
+        or effect == "creature"
+        or tag == "creature"
+        or bool(card.get("is_creature_permanent"))
+    )
+    is_artifact = "artifact" in type_line or effect in ("artifact", "ramp_permanent")
+    is_instant = "instant" in type_line or bool(card.get("instant"))
+    is_sorcery = "sorcery" in type_line or tag == "sorcery"
+
+    if is_creature:
+        tags.add("creature_spell")
+    else:
+        tags.add("noncreature_spell")
+    if is_artifact:
+        tags.add("artifact_spell")
+    if is_instant or is_sorcery:
+        tags.add("instant_or_sorcery_spell")
+    return sorted(tags)
+
+
 def card_mana_cost(
     card,
     additional_generic=0,
@@ -107,6 +139,7 @@ def card_mana_cost(
     cost_source = card.get("mana_cost") if alternative_cost is None else alternative_cost
     fallback_cmc = card.get("cmc", 0) if alternative_cost is None else 0
     parsed = parse_mana_cost(cost_source, fallback_cmc)
+    parsed["spend_tags"] = card_spend_tags(card)
     parsed["generic"] += max(0, int(x_value or 0)) * variable_mana_symbol_count(cost_source)
     parsed["generic"] += additional_generic
     for extra_cost in additional_costs or []:
@@ -128,4 +161,5 @@ def replay_cost_snapshot(cost):
         "phyrexian_hybrid": [
             list(options) for options in cost.get("phyrexian_hybrid", [])
         ],
+        "spend_tags": list(cost.get("spend_tags", [])),
     }

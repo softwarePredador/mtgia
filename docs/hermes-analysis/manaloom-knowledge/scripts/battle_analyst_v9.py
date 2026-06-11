@@ -2996,6 +2996,7 @@ class Player:
         self.commander_damage = defaultdict(int)
         self.commander_damage_by_source = defaultdict(int)
         self.mana_pool = ManaPool()
+        self.restricted_mana = {}
         self.lands_played_this_turn = 0
         self.max_lands_per_turn = 1
         self.is_human = is_human
@@ -3024,6 +3025,7 @@ class Player:
     def refresh_mana_sources(self, turn=None):
         """Untap mana sources once for this player's turn."""
         self.mana_pool.empty()
+        self.restricted_mana = {}
         sources = [
             source
             for source in self.battlefield
@@ -3054,6 +3056,14 @@ class Player:
     def available_mana(self):
         return self.mana_pool.total() + self.treasures
 
+    def add_restricted_mana(self, amount, restriction, color="wildcard"):
+        restriction = str(restriction or "").strip().lower()
+        if not restriction or amount <= 0:
+            return
+        color = color if color in ("generic", "white", "blue", "black", "red", "green", "colorless", "wildcard") else "generic"
+        bucket = self.restricted_mana.setdefault(restriction, defaultdict(int))
+        bucket[color] += int(amount)
+
     def _payment_plan(self, cost):
         parsed = (
             cost
@@ -3061,8 +3071,91 @@ class Player:
             else parse_mana_cost(cost, cost if isinstance(cost, (int, float)) else 0)
         )
         pool = self.mana_pool.snapshot()
+        restricted_pool = {
+            restriction: defaultdict(int, dict(colors))
+            for restriction, colors in self.restricted_mana.items()
+        }
         treasures = self.treasures
         life_payment = 0
+        spend_tags = set(parsed.get("spend_tags", []))
+        restriction_aliases = {
+            "creature_only": "creature_spell",
+            "creature_spell_only": "creature_spell",
+            "artifact_only": "artifact_spell",
+            "artifact_spell_only": "artifact_spell",
+            "instant_or_sorcery_only": "instant_or_sorcery_spell",
+            "instant_or_sorcery_spell_only": "instant_or_sorcery_spell",
+            "noncreature_only": "noncreature_spell",
+            "noncreature_spell_only": "noncreature_spell",
+        }
+
+        def allowed_restrictions():
+            allowed = []
+            for restriction in restricted_pool:
+                tag = restriction_aliases.get(restriction, restriction)
+                if tag == "any_spell" or tag in spend_tags:
+                    allowed.append(restriction)
+            return allowed
+
+        def restricted_color_available(color):
+            available = 0
+            for restriction in allowed_restrictions():
+                colors = restricted_pool[restriction]
+                available += colors[color] + colors["wildcard"]
+            return available
+
+        def spend_restricted_color_up_to(color, amount=1):
+            remaining = int(amount or 0)
+            spent = 0
+            for restriction in allowed_restrictions():
+                colors = restricted_pool[restriction]
+                for candidate in (color, "wildcard"):
+                    paid = min(colors[candidate], remaining)
+                    colors[candidate] -= paid
+                    spent += paid
+                    remaining -= paid
+                    if remaining == 0:
+                        return spent
+            return spent
+
+        def restricted_generic_available():
+            available = 0
+            for restriction in allowed_restrictions():
+                colors = restricted_pool[restriction]
+                available += sum(colors[color] for color in (
+                    "generic",
+                    "colorless",
+                    "wildcard",
+                    "white",
+                    "blue",
+                    "black",
+                    "red",
+                    "green",
+                ))
+            return available
+
+        def spend_restricted_generic_up_to(amount):
+            remaining = int(amount or 0)
+            spent = 0
+            for restriction in allowed_restrictions():
+                colors = restricted_pool[restriction]
+                for color in (
+                    "generic",
+                    "colorless",
+                    "wildcard",
+                    "white",
+                    "blue",
+                    "black",
+                    "red",
+                    "green",
+                ):
+                    paid = min(colors[color], remaining)
+                    colors[color] -= paid
+                    spent += paid
+                    remaining -= paid
+                    if remaining == 0:
+                        return spent
+            return spent
 
         def spend_generic(amount):
             nonlocal treasures
@@ -3082,6 +3175,13 @@ class Player:
                 generic_missing -= paid
                 if generic_missing == 0:
                     return True
+            restricted_available = restricted_generic_available()
+            if restricted_available:
+                if restricted_available + treasures < generic_missing:
+                    return False
+                generic_missing -= spend_restricted_generic_up_to(generic_missing)
+                if generic_missing == 0:
+                    return True
             if generic_missing > treasures:
                 return False
             treasures -= generic_missing
@@ -3094,6 +3194,11 @@ class Player:
             wildcard_paid = min(pool["wildcard"], missing)
             pool["wildcard"] -= wildcard_paid
             missing -= wildcard_paid
+            restricted_available = restricted_color_available(color)
+            if missing and restricted_available:
+                if restricted_available + treasures < missing:
+                    return None
+                missing -= spend_restricted_color_up_to(color, missing)
             if missing > treasures:
                 return None
             treasures -= missing
@@ -3103,6 +3208,8 @@ class Player:
                 pool[color] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif spend_restricted_color_up_to(color):
+                pass
             elif treasures > 0:
                 treasures -= 1
             elif self.life - life_payment >= 2:
@@ -3116,6 +3223,8 @@ class Player:
                 pool[chosen] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif any(spend_restricted_color_up_to(color) for color in options):
+                pass
             elif treasures > 0:
                 treasures -= 1
             elif self.life - life_payment >= 2:
@@ -3129,6 +3238,8 @@ class Player:
                 pool[chosen] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif any(spend_restricted_color_up_to(color) for color in options):
+                pass
             elif treasures > 0:
                 treasures -= 1
             else:
@@ -3141,6 +3252,8 @@ class Player:
                 pool[color] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif color and spend_restricted_color_up_to(color):
+                pass
             elif treasures > 0:
                 treasures -= 1
             elif not spend_generic(generic_amount):
@@ -3148,7 +3261,7 @@ class Player:
 
         if not spend_generic(parsed["generic"]):
             return None
-        return pool, treasures, life_payment
+        return pool, treasures, life_payment, restricted_pool
 
     def can_pay(self, cost):
         return self._payment_plan(cost) is not None
@@ -3161,9 +3274,21 @@ class Player:
         plan = self._payment_plan(cost)
         if plan is None:
             return False
-        pool, self.treasures, life_payment = plan
+        pool, self.treasures, life_payment, restricted_pool = plan
         for color, amount in pool.items():
             setattr(self.mana_pool, color, amount)
+        self.restricted_mana = {
+            restriction: defaultdict(
+                int,
+                {
+                    color: amount
+                    for color, amount in colors.items()
+                    if amount > 0
+                },
+            )
+            for restriction, colors in restricted_pool.items()
+            if any(amount > 0 for amount in colors.values())
+        }
         if life_payment:
             self.life -= life_payment
         return True
