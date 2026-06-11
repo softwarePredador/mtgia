@@ -33,7 +33,7 @@
 
 | Área | Status ManaLoom | Implementação | Próxima ação |
 |---|---|---|---|
-| Legendary Vehicle/Spacecraft commander | `Implemented` | `DeckRulesService` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness. | Manter teste de regra 903.3/903.12c. |
+| Legendary Vehicle/Spacecraft commander | `Implemented` | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness. | Manter teste de regra 903.3/903.12c e rota incremental. |
 | Hybrid color identity | `Implemented` | Mantida como identidade combinada, sem flexibilização. Coberta por `color_identity_test.dart` e conformance Hermes. | Não implementar modelo "or" enquanto a Wizards não alterar a regra. |
 | Warp | `Partial` | Cast por custo alternativo, exílio no end step e recast normal do exile. | Só adicionar efeitos card-specific quando aparecerem no corpus. |
 | Station/Spacecraft | `Partial` | `activate_station_ability` adiciona charge counters pelo poder de outra criatura e destrava Spacecraft como criatura. | Interação humana/escolha de criatura fica fora do mínimo atual. |
