@@ -363,6 +363,8 @@ def main() -> int:
             assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
             baseline_id = int(baseline["id"])
             baseline_hash = str(baseline["deck_hash"])
+            baseline_semantics_hash = str(baseline["semantics_hash"] or "")
+            baseline_ruleset_hash = str(baseline["ruleset_hash"] or "")
             baseline_wr = float(baseline["wr"])
 
             if args.reset_current_baseline:
@@ -395,6 +397,8 @@ def main() -> int:
             print(f"baseline_id={baseline_id}")
             print(f"baseline_wr={baseline_wr:.1f}%")
             print(f"baseline_hash={baseline_hash}")
+            print(f"baseline_semantics_hash={baseline_semantics_hash or 'legacy-missing'}")
+            print(f"baseline_ruleset_hash={baseline_ruleset_hash or 'legacy-missing'}")
             print(f"games_per_opponent={args.games}")
             print(f"max_per_category={args.max_per_category}")
             print(f"selected_candidates={total}")
@@ -446,15 +450,19 @@ def main() -> int:
                     conn.execute(
                         """
                         INSERT INTO slot_benchmarks
-                            (deck_id, baseline_id, baseline_hash, category,
+                            (deck_id, baseline_id, baseline_hash,
+                             baseline_semantics_hash, baseline_ruleset_hash,
+                             category,
                              card_added, card_removed, add_cmc, add_effect, add_tag,
                              wr, wins, losses, draws, games, delta_pp, phase, tested_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             args.deck_id,
                             baseline_id,
                             baseline_hash,
+                            baseline_semantics_hash,
+                            baseline_ruleset_hash,
                             category,
                             name,
                             target,

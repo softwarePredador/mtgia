@@ -110,6 +110,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             self.assertEqual(stats["commanders"], 1)
             self.assertEqual(len(stats["deck_hash"]), 64)
             self.assertEqual(len(stats["semantics_hash"]), 64)
+            self.assertEqual(len(stats["ruleset_hash"]), 64)
 
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
@@ -125,6 +126,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                       battle_rules_json,
                       deck_hash,
                       semantics_hash,
+                      ruleset_hash,
                       sync_run_id,
                       is_commander
                     FROM deck_cards
@@ -148,6 +150,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             self.assertEqual(len(sync.parse_json_value(rows[1]["battle_rules_json"], [])), 2)
             self.assertEqual(rows[1]["deck_hash"], stats["deck_hash"])
             self.assertEqual(rows[1]["semantics_hash"], stats["semantics_hash"])
+            self.assertEqual(rows[1]["ruleset_hash"], stats["ruleset_hash"])
             self.assertTrue(rows[1]["sync_run_id"])
 
     def test_write_sqlite_rejects_duplicate_card_id_rows(self) -> None:

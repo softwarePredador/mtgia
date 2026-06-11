@@ -204,6 +204,7 @@ def ensure_sqlite_schema(cur: sqlite3.Cursor) -> None:
             battle_rules_json TEXT DEFAULT '[]',
             deck_hash TEXT,
             semantics_hash TEXT,
+            ruleset_hash TEXT,
             sync_run_id TEXT,
             tag_confidence REAL,
             is_commander INTEGER DEFAULT 0,
@@ -226,6 +227,7 @@ def ensure_sqlite_schema(cur: sqlite3.Cursor) -> None:
             "battle_rules_json": "TEXT DEFAULT '[]'",
             "deck_hash": "TEXT",
             "semantics_hash": "TEXT",
+            "ruleset_hash": "TEXT",
             "sync_run_id": "TEXT",
         },
     )
@@ -612,9 +614,10 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
             return deck, cards
 
 
-def snapshot_hashes(cards: list[dict[str, Any]]) -> tuple[str, str]:
+def snapshot_hashes(cards: list[dict[str, Any]]) -> tuple[str, str, str]:
     deck_payload = []
     semantics_payload = []
+    ruleset_payload = []
     for card in cards:
         deck_payload.append(
             {
@@ -629,12 +632,18 @@ def snapshot_hashes(cards: list[dict[str, Any]]) -> tuple[str, str]:
                 "card_id": card["card_id"],
                 "functional_tags_json": parse_json_value(card["functional_tags_json"], []),
                 "semantic_tags_v2_json": parse_json_value(card["semantic_tags_v2_json"], []),
+            }
+        )
+        ruleset_payload.append(
+            {
+                "card_id": card["card_id"],
                 "battle_rules_json": parse_json_value(card["battle_rules_json"], []),
             }
         )
     deck_hash = hashlib.sha256(stable_json(deck_payload).encode("utf-8")).hexdigest()
     semantics_hash = hashlib.sha256(stable_json(semantics_payload).encode("utf-8")).hexdigest()
-    return deck_hash, semantics_hash
+    ruleset_hash = hashlib.sha256(stable_json(ruleset_payload).encode("utf-8")).hexdigest()
+    return deck_hash, semantics_hash, ruleset_hash
 
 
 def write_sqlite(
@@ -646,7 +655,7 @@ def write_sqlite(
     apply: bool,
 ) -> dict[str, int]:
     snapshot_cards = normalize_snapshot_cards(cards)
-    deck_hash, semantics_hash = snapshot_hashes(snapshot_cards)
+    deck_hash, semantics_hash, ruleset_hash = snapshot_hashes(snapshot_cards)
     sync_run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     deck_total_qty = int(deck.get("total_qty") or 0)
     stats = {
@@ -658,6 +667,7 @@ def write_sqlite(
         "commanders": sum(1 for card in snapshot_cards if card["is_commander"]),
         "deck_hash": deck_hash,
         "semantics_hash": semantics_hash,
+        "ruleset_hash": ruleset_hash,
         "sync_run_id": sync_run_id,
     }
     if deck_total_qty and stats["quantity_seen"] != deck_total_qty:
@@ -700,6 +710,7 @@ def write_sqlite(
                         battle_rules_json,
                         deck_hash,
                         semantics_hash,
+                        ruleset_hash,
                         sync_run_id,
                         tag_confidence,
                         is_commander,
@@ -708,7 +719,7 @@ def write_sqlite(
                         type_line,
                         oracle_text
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
                     """,
                     (
                         target_deck_id,
@@ -721,6 +732,7 @@ def write_sqlite(
                         card["battle_rules_json"],
                         deck_hash,
                         semantics_hash,
+                        ruleset_hash,
                         sync_run_id,
                         float(card.get("tag_confidence") or 0.55),
                         1 if card["is_commander"] else 0,

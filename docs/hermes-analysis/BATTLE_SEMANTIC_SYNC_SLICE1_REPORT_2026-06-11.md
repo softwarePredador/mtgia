@@ -347,19 +347,71 @@ git diff --check
 The standard changed-lines secret scan was also run locally; no new
 secret-like lines were found.
 
+## Hermes runtime apply evidence
+
+Hermes AWS pulled `master` at `bd7eb558` after stashing generated cron
+artifacts. The previous runtime SQLite was backed up before apply:
+
+`docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-semantic-bd7eb558.20260611T192016Z`
+
+Report-only gate before apply:
+
+| Check | Result |
+|---|---|
+| apply | `false` |
+| deck | `Runtime Lorehold Learned 19e93de3cca` |
+| commander | `Lorehold, the Historian` |
+| rows | `100` |
+| total quantity | `100` |
+| commanders | `1` |
+| `deck_hash` length | `64` |
+| `semantics_hash` length | `64` |
+
+Apply gate after writing the real Hermes SQLite runtime:
+
+| Check | Result |
+|---|---|
+| apply | `true` |
+| cards seen/written | `100 / 100` |
+| quantity seen/written | `100 / 100` |
+| commanders written | `1` |
+| SQLite rows | `100` |
+| SQLite quantity | `100` |
+| SQLite commanders | `1` |
+| distinct `deck_hash` values | `1` |
+| distinct `semantics_hash` values | `1` |
+| missing semantic columns | `[]` |
+| mana validator total cards | `100` |
+| mana validator role sum | `155` |
+
+Lorehold report-only baseline and slot scan after apply:
+
+| Check | Result |
+|---|---|
+| preflight | `approved` |
+| baseline games | `10` per opponent, `120` total |
+| baseline WR | `95.0%` |
+| baseline hash | `dbe24f7d5b17fbc8663afcd187d6381ccfb840f8a3b6486c4bdfad504c9d53fa` |
+| slot scan phase | `semantic_snapshot_smoke` |
+| candidates tested | `14` |
+| blocked candidates | `2` |
+| deck restored after scan | `100` rows, `100` quantity, `1` commander |
+| premium Mox policy for Lorehold | no Chrome Mox, Mox Diamond or Mox Opal present |
+
 ## Remaining work
 
 Slice 1 is not the final semantic migration. Remaining tasks:
 
-1. Apply the new snapshot to the real Hermes SQLite runtime only after a
-   controlled backup/report-only handoff.
-2. Add `semantics_hash`/`ruleset_hash` awareness to optimizer baseline and
-   quality gate.
-3. Decide whether trusted `card_battle_rules` should derive missing
+1. Apply the local Slice 2 `ruleset_hash` snapshot to Hermes AWS after backup
+   and report-only validation.
+2. Decide whether trusted `card_battle_rules` should derive missing
    `card_function_tags` through `sync_battle_card_rules_pg.py`.
-4. Formalize card semantic identity (`oracle_id`, `layout`, faces) before
+3. Formalize card semantic identity (`oracle_id`, `layout`, faces) before
    implementing split/MDFC/DFC/adventure hard behavior.
-5. Keep learned decks single-commander until partner/background corpus exists.
+4. Keep learned decks single-commander until partner/background corpus exists.
+5. Review Lorehold positive report-only candidates before any apply:
+   `Loran's Escape`, `Chain Lightning`, `Erode`, `Steelshaper's Gift`,
+   `Furygale Flocking`, and `The Battle of Bywater`.
 
 Consumer classification is now documented in
 `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`. Active
@@ -368,9 +420,19 @@ kept out of cron/apply until they receive a dedicated migration.
 
 ## Next recommended step
 
-Proceed to Slice 2 only after this report is committed:
+Proceed to Slice 2:
 
-1. run a controlled Hermes runtime backup + apply;
-2. add `semantics_hash` checks to optimizer baseline/quality-gate reports;
-3. then run Lorehold baseline/slot scan in report-only mode against the real
-   Hermes DB.
+1. pull the local `ruleset_hash` implementation into Hermes AWS;
+2. run backup + report-only + apply against the real SQLite runtime;
+3. run a second Lorehold slot scan with a larger sample only after these hashes
+   are visible in reports;
+4. keep all swaps report-only until owner review confirms candidate quality.
+
+Local Slice 2 smoke already passed before remote apply:
+
+| Check | Result |
+|---|---|
+| `ruleset_hash` length in sync stats | `64` |
+| distinct `ruleset_hash` values in SQLite smoke | `1` |
+| semantic-only test | invalidates `semantics_hash`, not `deck_hash` |
+| rules-only test | invalidates `ruleset_hash`, not `deck_hash` |

@@ -465,11 +465,16 @@ Concluído no bridge de consumidores ativos:
 
 Ainda pendente:
 
-9. Classificar scripts históricos/manuais que ainda consultam `functional_tag`
-   diretamente como ativos vs legados.
-10. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
+9. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
    for função de deck; usar essa tabela apenas como regra executável/revisável.
-11. Adicionar derivação controlada de `card_battle_rules` para
+10. Aplicar no Hermes AWS a implementação local de `semantics_hash`/`ruleset_hash`
+   em baseline, quality gate, slot scan e apply; validar com backup,
+   report-only e novo slot smoke.
+11. Revisar manualmente os candidatos positivos do slot scan Lorehold
+   `semantic_snapshot_smoke` antes de qualquer apply:
+   `Loran's Escape`, `Chain Lightning`, `Erode`, `Steelshaper's Gift`,
+   `Furygale Flocking` e `The Battle of Bywater`.
+12. Adicionar derivação controlada de `card_battle_rules` para
    `card_function_tags` somente depois de definir taxonomia canônica,
    `logical_rule_key`, gate de `source/review_status/confidence` e limpeza de
    stale tags.

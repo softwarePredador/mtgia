@@ -171,6 +171,8 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             "deck_id": "INTEGER",
             "baseline_id": "INTEGER",
             "baseline_hash": "TEXT",
+            "baseline_semantics_hash": "TEXT",
+            "baseline_ruleset_hash": "TEXT",
             "add_tag": "TEXT",
         },
     )
@@ -193,6 +195,14 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             created_at TEXT NOT NULL
         )
         """
+    )
+    _ensure_columns(
+        conn,
+        "optimizer_baseline_runs",
+        {
+            "semantics_hash": "TEXT",
+            "ruleset_hash": "TEXT",
+        },
     )
     conn.execute(
         """
@@ -225,6 +235,8 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             "deck_id": "INTEGER",
             "baseline_id": "INTEGER",
             "baseline_hash": "TEXT",
+            "baseline_semantics_hash": "TEXT",
+            "baseline_ruleset_hash": "TEXT",
         },
     )
     conn.execute(
@@ -269,6 +281,16 @@ def ensure_optimizer_tables(conn: sqlite3.Connection) -> None:
             created_at TEXT NOT NULL
         )
         """
+    )
+    _ensure_columns(
+        conn,
+        "optimizer_applied_swaps",
+        {
+            "before_semantics_hash": "TEXT",
+            "after_semantics_hash": "TEXT",
+            "before_ruleset_hash": "TEXT",
+            "after_ruleset_hash": "TEXT",
+        },
     )
     conn.execute(
         """
@@ -318,6 +340,28 @@ def deck_hash(conn: sqlite3.Connection, deck_id: int) -> str:
 def semantics_hash(conn: sqlite3.Connection, deck_id: int) -> str:
     payload = []
     for row in deck_rows(conn, deck_id):
+        if row_has_column(row, "semantic_tags_v2_json"):
+            try:
+                semantic_tags_v2 = json.loads(str(row["semantic_tags_v2_json"] or "[]"))
+            except Exception:
+                semantic_tags_v2 = []
+        else:
+            semantic_tags_v2 = []
+        payload.append(
+            {
+                "card_id": row["card_id"] if row_has_column(row, "card_id") else "",
+                "card_name": row["card_name"],
+                "functional_tags": sorted(functional_tags_for_row(row)),
+                "semantic_tags_v2": semantic_tags_v2,
+            }
+        )
+    encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def ruleset_hash(conn: sqlite3.Connection, deck_id: int) -> str:
+    payload = []
+    for row in deck_rows(conn, deck_id):
         if row_has_column(row, "battle_rules_json"):
             try:
                 battle_rules = json.loads(str(row["battle_rules_json"] or "[]"))
@@ -329,7 +373,6 @@ def semantics_hash(conn: sqlite3.Connection, deck_id: int) -> str:
             {
                 "card_id": row["card_id"] if row_has_column(row, "card_id") else "",
                 "card_name": row["card_name"],
-                "functional_tags": sorted(functional_tags_for_row(row)),
                 "battle_rules": battle_rules,
             }
         )
@@ -358,6 +401,7 @@ def get_deck_summary(conn: sqlite3.Connection, deck_id: int) -> dict[str, object
         "avg_cmc": round(avg_cmc, 3),
         "hash": deck_hash(conn, deck_id),
         "semantics_hash": semantics_hash(conn, deck_id),
+        "ruleset_hash": ruleset_hash(conn, deck_id),
     }
 
 
@@ -400,6 +444,24 @@ def assert_current_deck_matches_baseline(
             f"current={current_hash} baseline={baseline_hash}. "
             "Re-freeze the baseline before quality gate, confirmation, handoff, or apply."
         )
+    if row_has_column(baseline, "semantics_hash") and baseline["semantics_hash"]:
+        current_semantics_hash = semantics_hash(conn, deck_id)
+        baseline_semantics_hash = str(baseline["semantics_hash"])
+        if current_semantics_hash != baseline_semantics_hash:
+            raise RuntimeError(
+                "Current deck semantics hash does not match latest approved baseline. "
+                f"current={current_semantics_hash} baseline={baseline_semantics_hash}. "
+                "Re-freeze the baseline because tags/rules changed without a deck structure change."
+            )
+    if row_has_column(baseline, "ruleset_hash") and baseline["ruleset_hash"]:
+        current_ruleset_hash = ruleset_hash(conn, deck_id)
+        baseline_ruleset_hash = str(baseline["ruleset_hash"])
+        if current_ruleset_hash != baseline_ruleset_hash:
+            raise RuntimeError(
+                "Current battle ruleset hash does not match latest approved baseline. "
+                f"current={current_ruleset_hash} baseline={baseline_ruleset_hash}. "
+                "Re-freeze the baseline before comparing battle results."
+            )
 
 
 def parse_battle_output(output: str, games_per_opponent: int) -> BattleResult:

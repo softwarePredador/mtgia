@@ -1,7 +1,10 @@
 # Battle/AI Semantic Sync - Plano de Implementacao
 
-Status: Slice 1 implemented locally and validated; optimizer consumer bridge
-implemented; runtime Hermes apply still pending.
+Status: Slice 1 implemented, committed to `master` as `bd7eb558`, pulled by
+Hermes AWS and applied to the real Hermes SQLite runtime after backup. Slice 2
+hash visibility is implemented locally: optimizer baseline, slot scan, quality
+gate and apply now track `semantics_hash` and `ruleset_hash`; remote Hermes
+apply for the new `ruleset_hash` column is the next gate.
 
 Scope: battle simulator, AI deck generation, optimize, Hermes sync, Lorehold
 learned deck and semantic multi-function cards.
@@ -89,9 +92,22 @@ Current target deck cache after Slice 1:
   `semantic_tags_v2_json`, `deck_hash`, `semantics_hash` and `sync_run_id`.
 - Legacy `card_name` and `functional_tag` remain for compatibility.
 
-The next risk is runtime rollout: back up the real Hermes SQLite DB, apply the
-new snapshot in a controlled run, then execute report-only validation against
-that real DB.
+Runtime rollout status:
+
+- Backup created on Hermes before apply:
+  `docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-semantic-bd7eb558.20260611T192016Z`
+- Report-only gate passed before apply:
+  `semantic_snapshot_report_only_bd7eb558_20260611T192326Z.json`
+- Apply gate passed after writing the real runtime snapshot:
+  `semantic_snapshot_apply_bd7eb558_20260611T192404Z.json`
+- Runtime invariants after slot scan:
+  `100` rows, `100` summed quantity, `1` commander, no Chrome Mox/Mox
+  Diamond/Mox Opal in the Lorehold snapshot, `14` slot benchmarks for phase
+  `semantic_snapshot_smoke`.
+
+The next risk is replaying this local Slice 2 on Hermes AWS: backup, report-only,
+apply, then baseline/slot smoke. Once applied, semantic-only changes and
+ruleset-only changes no longer masquerade as deck structure changes.
 
 ### Backend app-facing simulator
 

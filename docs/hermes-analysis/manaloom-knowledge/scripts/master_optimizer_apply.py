@@ -17,6 +17,8 @@ from master_optimizer_common import (
     get_deck_summary,
     latest_baseline,
     quality_gate_candidate,
+    ruleset_hash,
+    semantics_hash,
     utc_now,
     write_report,
 )
@@ -85,6 +87,8 @@ def main() -> int:
 
         before_rows = [row_to_dict(row) for row in deck_rows(conn, args.deck_id)]
         before_hash = deck_hash(conn, args.deck_id)
+        before_semantics_hash = semantics_hash(conn, args.deck_id)
+        before_ruleset_hash = ruleset_hash(conn, args.deck_id)
         removed_rows = [
             row
             for row in before_rows
@@ -138,6 +142,8 @@ def main() -> int:
             insert_values,
         )
         after_hash = deck_hash(conn, args.deck_id)
+        after_semantics_hash = semantics_hash(conn, args.deck_id)
+        after_ruleset_hash = ruleset_hash(conn, args.deck_id)
         after_summary = get_deck_summary(conn, args.deck_id)
 
         REPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -149,6 +155,10 @@ def main() -> int:
             "card_removed": removed,
             "before_hash": before_hash,
             "after_hash": after_hash,
+            "before_semantics_hash": before_semantics_hash,
+            "after_semantics_hash": after_semantics_hash,
+            "before_ruleset_hash": before_ruleset_hash,
+            "after_ruleset_hash": after_ruleset_hash,
             "before_rows": before_rows,
             "created_at": utc_now(),
         }
@@ -165,8 +175,10 @@ def main() -> int:
             """
             INSERT INTO optimizer_applied_swaps
                 (deck_id, swap_benchmark_id, card_added, card_removed,
-                 before_hash, after_hash, rollback_path, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 before_hash, after_hash, before_semantics_hash,
+                 after_semantics_hash, before_ruleset_hash, after_ruleset_hash,
+                 rollback_path, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 args.deck_id,
@@ -175,6 +187,10 @@ def main() -> int:
                 removed,
                 before_hash,
                 after_hash,
+                before_semantics_hash,
+                after_semantics_hash,
+                before_ruleset_hash,
+                after_ruleset_hash,
                 str(rollback_path),
                 utc_now(),
             ),
@@ -192,6 +208,10 @@ def main() -> int:
             f"- confirmation_delta: {float(candidate['delta_pp']):+.1f}pp",
             f"- before_hash: `{before_hash}`",
             f"- after_hash: `{after_hash}`",
+            f"- before_semantics_hash: `{before_semantics_hash}`",
+            f"- after_semantics_hash: `{after_semantics_hash}`",
+            f"- before_ruleset_hash: `{before_ruleset_hash}`",
+            f"- after_ruleset_hash: `{after_ruleset_hash}`",
             f"- rollback_path: `{rollback_path}`",
             f"- deck_cards_after: {after_summary['cards']}",
             f"- lands_after: {after_summary['lands']}",
