@@ -245,7 +245,10 @@ def validate(conn: sqlite3.Connection, artifacts_dir: Path) -> list[DeckValidati
         checks: list[RoleCheck] = []
         profile = load_profile(artifacts_dir, commander)
 
-        if total_cards < 50:
+        if total_cards > 100:
+            status = "OVERFULL"
+            notes.append(f"{total_cards} cards stored; Commander learned decks should cap at 100.")
+        elif total_cards < 50:
             status = "INCOMPLETE"
             notes.append(f"Only {total_cards} cards stored; seed/partial deck, not actionable.")
         elif not profile:
@@ -344,7 +347,11 @@ def build_report(results: list[DeckValidation]) -> str:
             )
         )
 
-    flagged = [r for r in results if r.status in {"CRIT", "WARN", "INCOMPLETE", "NO_PROFILE"}]
+    flagged = [
+        r
+        for r in results
+        if r.status in {"CRIT", "WARN", "OVERFULL", "INCOMPLETE", "NO_PROFILE"}
+    ]
     lines.extend(["", "## Required Attention", ""])
     if not flagged:
         lines.append("- None.")

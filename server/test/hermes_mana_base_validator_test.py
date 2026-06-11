@@ -142,6 +142,37 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
             self.assertEqual(results[0].commander, "Lorehold, the Historian")
             self.assertEqual(results[0].status, "OK")
 
+    def test_overfull_deck_is_flagged_even_without_profile(self) -> None:
+        module = _load_module()
+        conn = sqlite3.connect(":memory:")
+        conn.execute("CREATE TABLE decks (id INTEGER PRIMARY KEY, deck_name TEXT, archetype TEXT)")
+        conn.execute(
+            """
+            CREATE TABLE deck_cards (
+                id INTEGER PRIMARY KEY,
+                deck_id INTEGER,
+                card_name TEXT,
+                quantity INTEGER,
+                functional_tag TEXT,
+                is_commander INTEGER,
+                cmc REAL
+            )
+            """
+        )
+        conn.execute("INSERT INTO decks VALUES (1, 'Overfull', 'unknown')")
+        conn.executemany(
+            "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [
+                (1, 1, "Unknown Commander", 1, "engine", 1, 4),
+                (2, 1, "Plains", 104, "land", 0, 0),
+            ],
+        )
+
+        results = module.validate(conn, Path("/tmp/no-profiles"))
+
+        self.assertEqual(results[0].status, "OVERFULL")
+        self.assertIn("cap at 100", results[0].notes[0])
+
 
 if __name__ == "__main__":
     unittest.main()
