@@ -136,42 +136,36 @@ mtgia/
 - `flutter analyze --no-pub --no-fatal-infos`: VERDE, No issues found (2026-06-04)
 - `dart test`: VERDE, 599 tests PASS (backend, 2026-06-04)
 - `dart analyze lib/`: No issues found (2026-06-04)
-  **VERMELHO** por `server/bin/local_test_server.dart:3` importar
-  `../.dart_frog/server.dart`, artefato ausente em clone limpo nesta branch.
-  A resolucao historica em `origin/master@a830f9f3` nao esta refletida aqui.
-- `flutter analyze --no-pub --no-fatal-infos` focado em `deck_analysis_tab.dart`
-  e `life_counter_screen.dart` em 2026-06-10: **BLOQUEADO/NAO CONCLUSIVO**
-  porque `app/.dart_tool/package_config.json` nao existe neste checkout; a
-  saida tambem incluiu os dois `uri_does_not_exist` locais do app.
+- `dart analyze bin/local_test_server.dart`: No issues found (2026-06-11);
+  o wrapper nao importa mais `../.dart_frog/server.dart` estaticamente.
+- `flutter analyze --no-pub --no-fatal-infos` app-side permanece dependente de
+  `app/.dart_tool/package_config.json`, ausente neste checkout; a varredura
+  local de imports de 2026-06-11 encontrou 0 imports locais quebrados em
+  `app/lib`, `server/lib`, `server/routes` e `server/bin`.
 - `flutter test`: VERDE historico; nao reexecutado integralmente nesta higiene semanal
 - Corpus estavel de resolucao Commander: 19/19 passed
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-10)
+## Achados do audit de estrutura (atualizado 2026-06-11)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
-- **P1/P2 — Imports quebrados e ciclo local fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO em 2026-06-10 11:00 UTC no checkout `89261c8d`.** O
+- **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
+  **REVALIDADO/ABERTO em 2026-06-11 11:00 UTC no checkout `372cdfca`.** O
   auditor base cobre apenas `server/lib` e `server/routes` e reportou
-  `Imports quebrados: 0`. O import historico de
-  `server/routes/ai/commander-learning/index.dart:4` para
-  `server/lib/ai/commander_learned_deck_support.dart` nao esta mais quebrado
-  neste checkout (`dart analyze routes/ai/commander-learning/index.dart`
-  retornou `No issues found`). A triagem focada em 426 arquivos
-  Dart de `app/lib`, `server/lib`, `server/routes` e `server/bin` encontrou
-  somente 3 imports locais quebrados: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
-  (`../../../../core/utils/mana_helper.dart`) resolvendo para
-  `app/core/utils/mana_helper.dart`,
-  `app/lib/features/home/life_counter_screen.dart:7` resolvendo para
-  `app/core/theme/app_theme.dart`, e `server/bin/local_test_server.dart:3`
-  resolvendo para `server/.dart_frog/server.dart`. `dart analyze
-  bin/local_test_server.dart` confirma o erro backend. `flutter analyze
-  --no-pub` focado no app foi nao conclusivo porque
-  `app/.dart_tool/package_config.json` nao existe, mas a saida incluiu os dois
-  `uri_does_not_exist` locais do app. A mesma varredura achou 1 SCC de 2
-  arquivos entre `CommunityDeckDetailScreen` e `UserProfileScreen`, e nenhum
-  ciclo local backend.
+  `Imports quebrados: 0`. A triagem focada de 409 arquivos Dart em `app/lib`,
+  `server/lib`, `server/routes` e `server/bin` tambem encontrou 0
+  imports/exports/parts locais quebrados. Claims anteriores contra
+  `deck_analysis_tab.dart`, `life_counter_screen.dart`,
+  `server/bin/local_test_server.dart` e o ciclo
+  `CommunityDeckDetailScreen`/`UserProfileScreen` estao stale nesta branch:
+  os dois app files usam `package:manaloom/...`, `dart analyze
+  bin/local_test_server.dart` e `dart analyze
+  routes/ai/commander-learning/index.dart` retornaram `No issues found`, e o
+  grafo atual nao contem o SCC Community/Social. Permanecem abertos 2 SCCs
+  atuais: `life_counter_tabletop_engine.dart` ↔
+  `life_counter_turn_tracker_engine.dart`, e
+  `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1/P2 — Coerencia app-facing `app/lib` ↔ `server/routes` ↔ `server/lib`**:
   revalidado novamente em 2026-06-10 23:00 UTC no checkout `1554a1e5`. Os
