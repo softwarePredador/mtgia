@@ -150,6 +150,34 @@ splits do engine e trinta splits da rota/runtime de optimize concluídos.
   `dart test test/ai_optimize_flow_test.dart --reporter compact`: `+10 ~1`,
   com skip esperado na stress matrix.
 
+### Revisão complementar 2026-06-11 — pairing de comandantes
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `IMPLEMENTATION_GAPS.md` ainda classificava Partner/Background/Friends
+  Forever como ausente, mas `DeckRulesService` já tinha lógica privada para
+  pares app-facing.
+- A regra ficava pouco testável fora do serviço com banco e usava comparação
+  por substring em `Partner with`, permitindo falso positivo potencial em nomes
+  parecidos.
+
+**Entregue:**
+- Criado `server/lib/commander_pairing.dart` com regra pura para Partner,
+  Partner with, Choose a Background + Background, Friends Forever, Doctor's
+  companion e normalização de nome físico.
+- `DeckRulesService` passou a reutilizar `areCommanderPairingCompatible(...)`
+  e removeu helpers privados duplicados.
+- Criado `server/test/commander_pairing_test.dart`, cobrindo pares válidos e
+  rejeição de falso positivo de substring em `Partner with`.
+- `IMPLEMENTATION_GAPS.md` agora marca o tema como parcial: servidor validado;
+  battle engine ainda sem UX/interação completa para dois commanders na command
+  zone.
+
+**Validação local:**
+- `dart analyze lib/commander_pairing.dart lib/deck_rules_service.dart test/commander_pairing_test.dart test/commander_eligibility_test.dart test/deck_rules_service_test.dart`.
+- `dart test test/commander_pairing_test.dart test/commander_eligibility_test.dart test/deck_rules_service_test.dart --reporter compact`.
+
 ### Revisão complementar 2026-06-11 — split de candidate helpers do optimize filler
 
 **Status:** concluída localmente.

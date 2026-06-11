@@ -16,7 +16,7 @@
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
 | SBAs e Triggers | 15/15 | 0/15 | 0/15 |
-| Commander Rules | 5/8 | 1/8 | 2/8 |
+| Commander Rules | 5/8 | 2/8 | 1/8 |
 | Mana e Custos | 2/6 | 4/6 | 0/6 |
 | Targeting | 5/5 | 0/5 | 0/5 |
 | Combate | 5/10 | 4/10 | 1/10 |
@@ -86,7 +86,7 @@
 | Commander replacement (GY/exile → CZ opcional) | ✅ Básico | v9: `ReplacementRegistry` | Redireciona para command zone salvo `commander_replacement_choice` |
 | Commander replacement (hand/library → CZ opcional) | ✅ Básico | v9: `ReplacementRegistry` | Coberto no mesmo pipeline de zone change |
 | Deck construction (100 cards, singleton, color ID) | ⚠️ Parcial | — | Feito no app, não no battle engine |
-| Partner/Background/Friends Forever | ❌ Ausente | — | |
+| Partner/Background/Friends Forever | ⚠️ Parcial | server: `commander_pairing.dart`; v9: damage ledger por origem | Servidor valida pares oficiais; battle engine ainda não modela UX/interação completa de dois commanders na command zone |
 | Commander ninjutsu do CZ | ❌ Ausente | — | |
 | Color identity de DFC/Adventure | ✅ Básico | v9: `compute_color_identity` | Agrega faces/partes/modos complexos |
 | Legendary Vehicle/Spacecraft com P/T como commander | ✅ Básico | server + v9 | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `is_commander_eligible_card` cobrem regra 2026 |
@@ -247,6 +247,7 @@
 | `server/lib/ai/optimize_route_rebalance_support.dart` | 128 | ✅ Extraído | Centraliza plano de reequilíbrio pós-filtros, aplicação de substitutas e truncamento final |
 | `server/lib/ai/optimize_route_final_gate_support.dart` | 156 | ✅ Extraído | Centraliza decisão final de quality gate, validação serializada e Semantic Layer v2 após o `OptimizationValidator` |
 | `server/lib/commander_eligibility.dart` | 23 | ✅ Extraído | Centraliza elegibilidade Commander 2026 para DeckRulesService e rotas incrementais |
+| `server/lib/commander_pairing.dart` | 105 | ✅ Extraído | Centraliza pares Partner, Partner with, Background, Friends Forever, Doctor's companion e normalização de nome físico |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
 | `server/lib/ai/optimization_functional_roles.dart` | 768 | Aceitável por enquanto | Manter coeso; split só se crescer com novas políticas |
 

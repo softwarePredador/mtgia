@@ -18157,6 +18157,14 @@ quando a coluna numérica vinha serializada como texto. Cobertura:
 `server/test/deck_rules_service_test.dart` e `ai_optimize_flow_test.dart` com
 servidor local em `127.0.0.1:8082`.
 
+Hardening adicional app-facing: a validação de pares de comandante foi extraída
+para `server/lib/commander_pairing.dart`. `DeckRulesService` agora reutiliza
+esse suporte para Partner, Partner with, Choose a Background + Background,
+Friends Forever, Doctor's companion e normalização de nome físico. Cobertura:
+`server/test/commander_pairing_test.dart`. A matriz Hermes deve manter o battle
+engine como parcial apenas para interação/simulação completa de dois commanders
+na command zone, não para validação de deck no servidor.
+
 ## 2026-06-11 — Optimize runtime modularization pass
 
 - Extraído `server/lib/ai/optimize_functional_role_support.dart` para

@@ -63,6 +63,15 @@
 > DB-backed de criação/validação/optimize quando a coluna numérica vem
 > serializada como texto.
 >
+> **Atualização 2026-06-11 — Commander pair validation extraído.**
+> A validação app-facing de dois comandantes deixou de ficar como helpers
+> privados em `DeckRulesService`: `commander_pairing.dart` centraliza Partner,
+> Partner with, Choose a Background + Background, Friends Forever, Doctor's
+> companion e normalização de nome físico. `DeckRulesService` reutiliza esse
+> suporte e `commander_pairing_test.dart` cobre pares válidos e falso positivo
+> de substring em `Partner with`. O battle engine segue rastreado como parcial
+> para UX/interação completa de dois commanders na command zone.
+>
 > **Atualização 2026-06-11 — CMC Hermes operational sync.**
 > O código operacional Hermes também foi fechado: `sync_pg_card_metadata_to_hermes.py`
 > sincroniza `card_oracle_cache`, faz backfill idempotente de
@@ -293,6 +302,7 @@
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 | ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + `DeckRulesService` + rota incremental |
+| ✅ | Commander pair validation compartilhada | `commander_pairing.dart` + `DeckRulesService` |
 | ✅ | Archetype resolution compartilhado | `optimize_archetype_support.dart` |
 | ✅ | Strategic role tags compartilhados | `resolveCardFunctionalRoles` em `functional_card_tags.dart` |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
@@ -607,6 +617,7 @@ Paradigm ou ability words sem pelo menos um dos sinais abaixo:
 | `battle_zone_transition_support.py` | Helpers parametrizados de zone transitions, LKI, exile e spell resolution | 118 |
 | `battle_replacement_support.py` | Replacement/prevention, vida, dano, ganho de vida e escudos de prevenção | 231 |
 | `battle_sba_support.py` | SBAs, anexos ilegais, Saga final, token lifecycle e loop de estabilização | 381 |
+| `commander_pairing.dart` | Validação pura de pares Partner/Background/Friends Forever/Doctor's companion e normalização de nome físico | 105 |
 | `optimize_cache_support.dart` | Assinatura de deck, cache key e persistência de cache do optimize | 119 |
 | `optimize_cache_support_test.dart` | Cobertura direta de cache key, hash estável e wrapper do runtime | 77 |
 | `optimize_candidate_quality_support.dart` | Sinais/ranking de qualidade agressiva, buckets e loader SQL de candidates | 327 |

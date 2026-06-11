@@ -2,17 +2,11 @@ import 'package:postgres/postgres.dart';
 
 import 'basic_land_utils.dart' as basic_lands;
 import 'commander_eligibility.dart';
+import 'commander_pairing.dart' as commander_pairing;
 import 'color_identity.dart';
 
-/// Normaliza nomes para regra de cópia física.
-///
-/// Cartas split/MDFC podem chegar como nome completo ("Face A // Face B") ou
-/// só pela face frontal ("Face A"). Para limite de cópias, ambas representam a
-/// mesma carta física e precisam compartilhar a mesma chave.
 String normalizePhysicalCardCopyName(String name) {
-  final collapsed = name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
-  final splitParts = collapsed.split(RegExp(r'\s*//\s*'));
-  return splitParts.first.trim();
+  return commander_pairing.normalizePhysicalCardCopyName(name);
 }
 
 class DeckRulesService {
@@ -313,96 +307,16 @@ class DeckRulesService {
 
   /// Verifica se a carta é um Background (encantamento lendário com subtipo Background)
   bool _isBackground(_CardData card) {
-    final typeLine = card.typeLine.toLowerCase();
-    return typeLine.contains('legendary') &&
-        typeLine.contains('enchantment') &&
-        typeLine.contains('background');
-  }
-
-  /// Verifica se a carta tem "Partner" (qualquer um) no texto
-  bool _hasPartner(_CardData card) {
-    final oracle = (card.oracleText ?? '').toLowerCase();
-    // Procura por "partner" mas não como parte de outra palavra
-    // Regex para encontrar "partner" isolado (fim de linha ou espaço)
-    return RegExp(r'\bpartner\b').hasMatch(oracle);
-  }
-
-  /// Verifica se a carta tem "Partner with [Nome Específico]"
-  String? _getPartnerWithName(_CardData card) {
-    final oracle = (card.oracleText ?? '').toLowerCase();
-    final match = RegExp(r'partner with ([^(]+)').firstMatch(oracle);
-    if (match != null) {
-      return match.group(1)?.trim();
-    }
-    return null;
-  }
-
-  /// Verifica se a carta tem "Choose a Background"
-  bool _hasChooseBackground(_CardData card) {
-    final oracle = (card.oracleText ?? '').toLowerCase();
-    return oracle.contains('choose a background');
+    return commander_pairing
+        .isBackgroundCommanderPairCard(card.toCommanderPairingCard());
   }
 
   /// Valida se dois comandantes podem ser usados juntos
   bool _validatePartnerPairing(_CardData cmd1, _CardData cmd2) {
-    // Caso 1: Ambos têm "Partner" genérico
-    final hasPartner1 = _hasPartner(cmd1);
-    final hasPartner2 = _hasPartner(cmd2);
-    final partnerWith1 = _getPartnerWithName(cmd1);
-    final partnerWith2 = _getPartnerWithName(cmd2);
-
-    // Se ambos têm Partner genérico (sem "with"), podem ser pareados
-    if (hasPartner1 &&
-        hasPartner2 &&
-        partnerWith1 == null &&
-        partnerWith2 == null) {
-      return true;
-    }
-
-    // Caso 2: Partner with [nome específico]
-    if (partnerWith1 != null) {
-      // cmd1 tem "Partner with X", verificar se cmd2 é X
-      if (cmd2.name.toLowerCase().contains(partnerWith1)) {
-        return true;
-      }
-    }
-    if (partnerWith2 != null) {
-      // cmd2 tem "Partner with X", verificar se cmd1 é X
-      if (cmd1.name.toLowerCase().contains(partnerWith2)) {
-        return true;
-      }
-    }
-
-    // Caso 3: Choose a Background + Background
-    final hasChooseBg1 = _hasChooseBackground(cmd1);
-    final hasChooseBg2 = _hasChooseBackground(cmd2);
-    final isBg1 = _isBackground(cmd1);
-    final isBg2 = _isBackground(cmd2);
-
-    if ((hasChooseBg1 && isBg2) || (hasChooseBg2 && isBg1)) {
-      return true;
-    }
-
-    // Caso 4: Friends forever (Doctor Who)
-    final oracle1 = (cmd1.oracleText ?? '').toLowerCase();
-    final oracle2 = (cmd2.oracleText ?? '').toLowerCase();
-    if (oracle1.contains('friends forever') &&
-        oracle2.contains('friends forever')) {
-      return true;
-    }
-
-    // Caso 5: Doctor's companion
-    final hasDoctor1 = oracle1.contains("doctor's companion");
-    final hasDoctor2 = oracle2.contains("doctor's companion");
-    final isTimeLord1 = cmd1.typeLine.toLowerCase().contains('time lord') &&
-        cmd1.typeLine.toLowerCase().contains('doctor');
-    final isTimeLord2 = cmd2.typeLine.toLowerCase().contains('time lord') &&
-        cmd2.typeLine.toLowerCase().contains('doctor');
-
-    if ((hasDoctor1 && isTimeLord2) || (hasDoctor2 && isTimeLord1)) {
-      return true;
-    }
-    return false;
+    return commander_pairing.areCommanderPairingCompatible(
+      cmd1.toCommanderPairingCard(),
+      cmd2.toCommanderPairingCard(),
+    );
   }
 
   /// Retorna `true` para terrenos básicos (incluindo Snow-Covered variants).
@@ -547,4 +461,12 @@ class _CardData {
   final double? cmc;
   final String? power;
   final String? toughness;
+
+  commander_pairing.CommanderPairingCard toCommanderPairingCard() {
+    return commander_pairing.CommanderPairingCard(
+      name: name,
+      typeLine: typeLine,
+      oracleText: oracleText,
+    );
+  }
 }
