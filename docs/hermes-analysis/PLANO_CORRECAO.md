@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-11 11:00 UTC
+> Data: 2026-06-11 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -13,7 +13,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-10 19:00 UTC no checkout `b0d75728`. O auditor textual executou com sucesso (`172` arquivos backend, `99` problemas textuais, `0` imports quebrados), mas a lista bruta de duplicacao continua ruidosa por capturar termos SQL/literais como funcoes. A revalidacao manual confirmou um novo cluster de risco: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore` e `assessDeckOptimizationState`/`assessDeckOptimizationStateCore` duplicam analise de deck entre rebuild e optimize. Tambem seguem abertos `resolveOptimizeArchetype`, roles funcionais altos, terrenos basicos/snow basics, trust social, logs sociais/follow, condicao de carta e CMC/tipo. Wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-11 19:00 UTC no checkout `ec573e7d`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta. A revalidacao manual confirmou que seguem abertos `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics esta stale porque `basic_land_utils.dart` centraliza regular/snow basics. Wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **RESOLVIDO/STALE no checkout local
    `372cdfca` em 2026-06-11 11:00 UTC**. `server/bin/local_test_server.dart`
    nao importa mais `../.dart_frog/server.dart` estaticamente; valida
@@ -168,46 +168,53 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-10 19:00 UTC: REVALIDADO/ABERTO no checkout `b0d75728`.**
-  O auditor textual apontou `99` problemas, mas a parte de duplicacao segue
-  limitada por falsos positivos de SQL/literais; este item usa apenas evidencia
-  revalidada por `rg` e leitura direta. A nova rodada adicionou o cluster
-  `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore` como achado confirmado.
+- **Status 2026-06-11 19:00 UTC: REVALIDADO/ABERTO no checkout `ec573e7d`.**
+  O auditor textual apontou `115` problemas em `205` arquivos backend, mas a
+  parte de duplicacao segue limitada por falsos positivos de regex e wrappers;
+  este item usa apenas evidencia revalidada por `rg` e leitura direta. A rodada
+  atual tambem marcou como stale a duplicacao antiga de basic lands, que agora
+  esta centralizada em `basic_land_utils.dart`.
 - **Evidência**:
-  - `DeckArchetypeAnalyzer` em `server/lib/ai/deck_state_analysis.dart:1`-`:279`
+  - `DeckArchetypeAnalyzer` em `server/lib/ai/deck_state_analysis.dart:1`-`:210`
     e `DeckArchetypeAnalyzerCore` em
-    `server/lib/ai/optimize_state_support.dart:6`-`:287` implementam o mesmo
+    `server/lib/ai/optimize_state_support.dart:6`-`:210` implementam o mesmo
     contrato de CMC medio, contagem de tipos, deteccao de arquetipo, analise de
-    mana base, curva e confianca. `server/lib/ai/rebuild_guided_service.dart:139`-`:141`
-    usa a primeira copia; `server/lib/ai/optimize_request_support.dart:264`
-    e `server/lib/ai/optimize_complete_support.dart:265` usam a segunda.
+    mana base, curva e confianca. `server/lib/ai/rebuild_guided_service.dart:138`-`:140`
+    usa a primeira copia; `server/lib/ai/optimize_request_support.dart:286`-`:302`
+    usa a segunda para o contexto de optimize.
   - `assessDeckOptimizationState` em
-    `server/lib/ai/deck_state_analysis.dart:308`-`:468` e
+    `server/lib/ai/deck_state_analysis.dart:308`-`:470` e
     `assessDeckOptimizationStateCore` em
-    `server/lib/ai/optimize_state_support.dart:337`-`:497` repetem a mesma
+    `server/lib/ai/optimize_state_support.dart:337`-`:500` repetem a mesma
     avaliacao de deck incompleto, formato, cores, texto do comandante,
-    severidade e plano de reparo, apenas mudando o DTO retornado. A rota
-    `server/routes/ai/optimize/index.dart:310`-`:326` e wrapper/adaptador fino
-    para a versao core, mas rebuild usa a versao antiga diretamente.
+    severidade e plano de reparo, apenas mudando o DTO retornado. Rebuild usa
+    a versao antiga diretamente em `server/lib/ai/rebuild_guided_service.dart:141`-`:147`
+    e `:263`-`:268`; a rota optimize apenas adapta a versao core em
+    `server/routes/ai/optimize/index.dart:343`-`:360`.
   - `resolveOptimizeArchetype` existe em
     `server/lib/ai/deck_state_analysis.dart:573`-`:585` e
-    `server/lib/ai/optimize_runtime_support.dart:3369`-`:3389` com contratos
+    `server/lib/ai/optimize_runtime_support.dart:1714`-`:1734` com contratos
     diferentes: uma versao aceita `requestedArchetype` nullable e trata
     `general/tempo` como genericos; a outra exige string, trata `unknown` e usa
     `goodstuff`/lista restrita de detected especificos. `optimize_request_support.dart`
-    usa a versao de optimize, enquanto `rebuild_guided_service.dart` usa a
-    versao de deck state.
+    usa a versao de optimize em `:303`-`:313`, enquanto
+    `rebuild_guided_service.dart:171`-`:174` usa a versao de deck state.
   - `_looksLikeComboPiece`, `_looksLikeEnabler`, `_looksLikeEngine`,
     `_looksLikePayoff` e `_looksLikeWincon` existem tanto em
-    `server/lib/ai/functional_card_tags.dart:859`-`:906` quanto em
-    `server/lib/ai/optimization_functional_roles.dart:529`-`:565`, mas a
-    primeira familia usa nomes conhecidos e `oracle_text`, e a segunda usa
-    padroes diferentes de `oracle_text` para um role unico do optimize.
-  - `_isBasicLandName` aparece em quatro locais com variantes para snow lands:
-    `server/lib/ai/optimize_runtime_support.dart:4184`-`:4196`,
-    `server/lib/generated_deck_validation_service.dart:752`-`:763`,
-    `server/lib/meta/meta_deck_reference_support.dart:890`-`:903` e
-    `server/routes/ai/commander-reference/index.dart:621`-`:628`.
+    `server/lib/ai/functional_card_tags.dart:872`-`:933` quanto em
+    `server/lib/ai/optimization_functional_roles.dart:387`-`:456`, mas a
+    primeira familia e a segunda mantem padroes textuais diferentes quando nao
+    ha `functional_tags`/`semantic_tags_v2`. O adapter
+    `resolveCardFunctionalRoles` em
+    `server/lib/ai/optimization_functional_roles.dart:37`-`:91` centraliza
+    precedencia de fonte, mas nao elimina os fallbacks duplicados.
+  - A claim antiga de `_isBasicLandName` duplicado esta stale:
+    `server/lib/basic_land_utils.dart:1`-`:47` centraliza nomes regulares,
+    snow basics, normalizacao e type line; consumidores atuais importam esse
+    helper em `server/lib/ai/optimize_runtime_support.dart:2`,
+    `server/lib/generated_deck_validation_service.dart:3`,
+    `server/lib/meta/meta_deck_reference_support.dart:5` e
+    `server/routes/ai/commander-reference/index.dart:17`.
   - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
     `_buildTrustInsight` duplicam o mesmo trust em listagem/detalhe de trades
     (`server/routes/trades/index.dart:557`-`:635`,
@@ -222,16 +229,18 @@ Histórico do problema:
     2026-06-01 tambem confirmou `_requestId` em
     `server/routes/trades/index.dart:330`-`:336` e
     `server/routes/users/[id]/follow/index.dart:97`-`:103`, apesar de
-    `server/lib/request_trace.dart:48`-`:57` ja expor wrappers de trace.
+    `server/lib/request_trace.dart:35`-`:49` ja expor wrappers de trace.
   - Condicoes `NM/LP/MP/HP/DMG` estao espalhadas entre mutacoes de deck,
     binder e marketplace; algumas rotas normalizam invalido para `NM`
-    (`server/routes/decks/[id]/cards/index.dart:397`-`:403`), outras rejeitam
+    (`server/routes/decks/[id]/cards/index.dart:407`-`:413`,
+    `server/routes/decks/[id]/cards/set/index.dart:247`-`:253` e
+    `server/routes/decks/[id]/index.dart:518`-`:524`), outras rejeitam
     com `400` (`server/routes/binder/index.dart:275`-`:280`) e o marketplace
     ignora filtros invalidos (`server/routes/community/marketplace/index.dart:39`-`:43`).
   - `getMainType` e `calculateCmc` aparecem duplicados em deck privado/publico
     (`server/routes/decks/[id]/index.dart:405`-`:435`,
     `server/routes/community/decks/[id].dart:91`-`:117`) e ha variante de CMC
-    em `server/routes/decks/[id]/simulate/index.dart:171`-`:186`.
+    em `server/routes/decks/[id]/simulate/index.dart:199`-`:214`.
 - **Impacto**: mudanca semantica em um ponto nao propaga automaticamente para os demais; risco de respostas inconsistentes por endpoint/fluxo. O risco mais alto e de IA: optimize, complete, rebuild, validator e deck analysis podem discordar sobre estado do deck, arquetipo efetivo e papel funcional de cartas.
 - **Ação recomendada**:
   1. priorizar uma fonte canonica para `DeckArchetypeAnalyzer*` e
@@ -242,8 +251,8 @@ Histórico do problema:
   3. criar adapter unico de roles funcionais que aceite nome, `oracle_text`,
      `type_line`, `functional_tags` e `semantic_tags_v2`, retornando conjunto
      de roles + `primary_role`;
-  4. extrair helper unico para terrenos basicos/snow basics e usar em validate,
-     optimize, meta e commander-reference;
+  4. manter `basic_land_utils.dart` como fonte canonica e remover wrappers
+     locais que nao agregam contrato;
   5. agrupar duplicacoes de menor risco por dominio (trust social, request/log,
      condicao de carta, CMC/tipo), mantendo wrappers locais so quando o contrato
      divergente for intencional e testado.
