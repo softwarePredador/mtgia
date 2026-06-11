@@ -288,6 +288,41 @@ void main() {
       expect(row![8], 'ECC');
       expect(row[7], contains('set=ECC'));
     });
+
+    test('linha operacional preserva metadados de combate usados pelo sync',
+        () {
+      final card = {
+        'name': 'Operational Creature',
+        'manaCost': '{2}{G}',
+        'type': 'Creature — Beast',
+        'text': 'Trample',
+        'colors': ['G'],
+        'colorIdentity': ['G'],
+        'power': '4',
+        'toughness': '4',
+        'keywords': ['Trample'],
+        'number': '42',
+        'hasFoil': true,
+        'hasNonFoil': false,
+        'identifiers': {
+          'scryfallOracleId': 'operational-creature-id',
+          'scryfallId': 'scryfall-printing-id',
+        },
+      };
+
+      final row = extractSetCardSyncRow(card, 'tst');
+
+      expect(row, isNotNull);
+      expect(row, hasLength(15));
+      expect(row![0], 'operational-creature-id');
+      expect(row[7], '4');
+      expect(row[8], '4');
+      expect(row[9], equals(['Trample']));
+      expect(row[10], contains('/scryfall-printing-id?format=image'));
+      expect(row[11], 'TST');
+      expect(row[13], '42');
+      expect(row[14], isTrue);
+    });
   });
 
   // ════════════════════════════════════════════════════════════════════════

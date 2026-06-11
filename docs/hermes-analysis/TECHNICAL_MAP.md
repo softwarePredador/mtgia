@@ -261,11 +261,11 @@ mantidos como texto solto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-07 07:00 UTC no checkout local `82bb454e`.
-  `server/lib/sync_cards_utils.dart` segue importado apenas por teste, enquanto
-  `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
-  contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
-  `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
+  2026-06-07 07:00 UTC no checkout local `82bb454e` e atualizado em
+  2026-06-11. `server/lib/sync_cards_utils.dart` deixou de ser test-only:
+  `server/bin/sync_cards.dart` agora importa o utilitário e usa
+  `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`.
+  Ainda seguem sem chamador runtime confirmado
   `getRequestTrace`/`tryGetRequestId`,
   `normalizedCommanderReferenceCandidate`,
   `buildLoreholdReferenceCardStatsFromProfile`,

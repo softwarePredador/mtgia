@@ -109,7 +109,7 @@ int? parseSinceDays(List<String> args) {
   return null;
 }
 
-/// Extrai dados de uma carta de um set para upsert incremental.
+/// Extrai dados de uma carta de um set para upsert incremental legado.
 ///
 /// Diferente de [extractCardRow], recebe o JSON direto do set
 /// (não do AtomicCards).
@@ -119,6 +119,32 @@ int? parseSinceDays(List<String> args) {
 /// [5] colors, [6] colorIdentity, [7] imageUrl, [8] setCode, [9] rarity,
 /// [10] collectorNumber, [11] foil
 List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
+  final syncRow = extractSetCardSyncRow(card, setCode);
+  if (syncRow == null) return null;
+  return [
+    syncRow[0],
+    syncRow[1],
+    syncRow[2],
+    syncRow[3],
+    syncRow[4],
+    syncRow[5],
+    syncRow[6],
+    syncRow[10],
+    syncRow[11],
+    syncRow[12],
+    syncRow[13],
+    syncRow[14],
+  ];
+}
+
+/// Extrai dados completos de uma carta de Set.json para o sync operacional.
+///
+/// Índices do retorno:
+/// [0] oracleId, [1] name, [2] manaCost, [3] typeLine, [4] oracleText,
+/// [5] colors, [6] colorIdentity, [7] power, [8] toughness, [9] keywords,
+/// [10] imageUrl, [11] setCode, [12] rarity, [13] collectorNumber, [14] foil
+List<Object?>? extractSetCardSyncRow(
+    Map<String, dynamic> card, String setCode) {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   final ids = card['identifiers'] as Map<String, dynamic>?;
   final oracleId = ids?['scryfallOracleId']?.toString();
@@ -131,6 +157,9 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
       const <String>[];
   final colorIdentity =
       (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
+          const <String>[];
+  final keywords =
+      (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
 
   // Use scryfallId for direct image URL (more reliable than name-based)
@@ -166,6 +195,9 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
     card['text']?.toString(),
     colors,
     colorIdentity,
+    card['power']?.toString(),
+    card['toughness']?.toString(),
+    keywords,
     imageUrl,
     canonicalSetCode,
     card['rarity']?.toString(),

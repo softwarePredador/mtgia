@@ -74,11 +74,12 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-07 07:00 UTC como **ABERTO neste checkout `82bb454e`**.
-    `sync_cards_utils.dart` segue importado apenas por teste, enquanto
-    `server/bin/sync_cards.dart` mantem copias privadas para parte do mesmo
-    contrato (`_parseSinceDays`, `_getNewSetCodesSinceFromData` e
-    `_extractCardRowFromSet`). Tambem seguem sem chamador runtime confirmado
+    2026-06-07 07:00 UTC como **ABERTO neste checkout `82bb454e`** e
+    atualizado em 2026-06-11. `sync_cards_utils.dart` deixou de ser helper
+    test-only: `server/bin/sync_cards.dart` importa o utilitário compartilhado
+    para `parseSinceDays`, `getNewSetCodesSinceFromData` e
+    `extractSetCardSyncRow`, removendo as cópias privadas do CLI operacional.
+    Ainda seguem sem chamador runtime confirmado
     wrappers/helpers em request trace, Commander Reference, MTGTop8, candidate
     quality e optimize utility samples. `MLKnowledgeService.recordFeedback`
     deixou esta lista em 2026-06-11 (`f32c0e28`): `/ai/optimize` agora chama
@@ -514,20 +515,22 @@ SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-07 07:00 UTC:** **REABERTO no checkout local
-`codex/hermes-analysis-docs@82bb454e`**. As anotacoes historicas de resolucao em
-outros SHAs nao representam o estado desta branch: os helpers abaixo continuam
-presentes e sem chamador runtime confirmado; a rodada tambem encontrou um helper
-app-side novo sem chamada.
+**Status 2026-06-11:** **PARCIAL.** O item de maior risco operacional desta
+seção foi resolvido: `sync_cards_utils.dart` agora é importado por
+`server/bin/sync_cards.dart`, e o CLI usa os helpers compartilhados para
+parsing de `--since-days`, seleção incremental de sets e extração completa de
+cards de Set.json. As anotações históricas de 2026-06-07 continuam válidas
+apenas para os demais helpers abaixo.
 
 - **Evidência**:
-  - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:116`, `:161` e
-    `:172` definem helpers cobertos por `server/test/sync_cards_test.dart`, mas
-    `rg "sync_cards_utils"` nao encontrou import desse arquivo em `server/bin`,
-    `server/lib` runtime ou rotas. `server/bin/sync_cards.dart:64` chama
-    `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
-    `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
-    `_extractCardRowFromSet`, definido em `:662`-`:710`.
+  - ✅ Resolvido 2026-06-11: `server/bin/sync_cards.dart` importa
+    `server/lib/sync_cards_utils.dart` e chama `parseSinceDays`,
+    `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`. As antigas cópias
+    privadas `_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+    `_extractCardRowFromSet` foram removidas do binário. O helper legado
+    `extractSetCardRow` foi preservado como projeção compatível de 12 colunas,
+    enquanto `extractSetCardSyncRow` expõe a linha operacional de 15 colunas
+    com `power`, `toughness` e `keywords`.
   - `server/lib/request_trace.dart:48` e `:51` definem
     `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
     `context.read<RequestTrace>()` diretamente, por exemplo
@@ -568,13 +571,13 @@ app-side novo sem chamada.
   - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
     sem chamada confirmada; `EndpointCache.instance.get/set` seguem vivos em
     rotas de cards, sets, archetypes e generate performance support.
-- **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
-  caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
-  porque o teste cobre uma copia que nao participa do CLI operacional.
+- **Impacto**: cobertura pode estar validando caminhos mortos nos helpers
+  restantes, mas o risco mais alto do sync de cartas foi fechado; os testes
+  agora cobrem o mesmo extrator usado pelo CLI operacional.
 - **Ação recomendada**:
-  1. decidir se `sync_cards_utils.dart` e fonte compartilhada real ou harness
-     legado; se for fonte real, importar no CLI e remover as copias privadas;
-  2. para cada wrapper test-only, ligar ao runner/rota esperado ou remover o
+  1. ✅ Resolvido 2026-06-11: `sync_cards_utils.dart` virou fonte
+     compartilhada real do CLI;
+  2. para cada wrapper test-only restante, ligar ao runner/rota esperado ou remover o
      helper e o teste correspondente;
   3. remover `ApiClient.loadTokenFromDisk()`/comentario ou religar
      explicitamente ao boot se esse for o contrato desejado;
@@ -586,10 +589,10 @@ app-side novo sem chamada.
   6. continuar usando busca de chamadores como guardrail antes de adicionar
      novos helpers publicos.
 - **Validação**:
-  - `grep -RIn "sync_cards_utils" server` encontra o binario ativo, ou o arquivo
-    deixa de existir;
-  - `dart analyze` e testes focados do sync/Commander Reference/meta/candidate
-    quality continuam verdes;
+  - `grep -RIn "sync_cards_utils" server` encontra o binário ativo:
+    `server/bin/sync_cards.dart`;
+  - `dart analyze lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart`;
+  - `dart test test/sync_cards_test.dart --reporter compact`;
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1 — Alinhar ownership e contratos app-facing entre `app/lib`, rotas e helpers

@@ -116,6 +116,33 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
 - `dart analyze lib/ai/optimize_feedback_support.dart lib/ml_knowledge_service.dart routes/ai/optimize/index.dart routes/ai/ml-status/index.dart bin/verify_schema.dart test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart`.
 - `dart test test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart --reporter compact`.
 
+### Revisão complementar 2026-06-11 — sync operacional de cartas usa utilitário compartilhado
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/lib/sync_cards_utils.dart` era testado por
+  `server/test/sync_cards_test.dart`, mas `server/bin/sync_cards.dart` ainda
+  mantinha cópias privadas para parsing de `--since-days`, seleção incremental
+  de sets e extração de cards de Set.json.
+- Isso permitia drift entre o que os testes validavam e o que o sync
+  operacional usava para popular `cards`, `sets` e metadados usados por
+  import, análise e optimize.
+
+**Entregue:**
+- `server/bin/sync_cards.dart` agora importa `server/lib/sync_cards_utils.dart`.
+- O CLI usa `parseSinceDays`, `getNewSetCodesSinceFromData` e
+  `extractSetCardSyncRow`.
+- As cópias privadas `_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+  `_extractCardRowFromSet` foram removidas do binário.
+- `extractSetCardSyncRow` preserva a linha operacional completa de 15 colunas,
+  incluindo `power`, `toughness` e `keywords`.
+- `extractSetCardRow` continua compatível como projeção legada de 12 colunas.
+
+**Validação local:**
+- `dart analyze lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart`.
+- `dart test test/sync_cards_test.dart --reporter compact`.
+
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py` — 101 linhas extraídas do engine.

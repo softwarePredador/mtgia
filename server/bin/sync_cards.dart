@@ -8,6 +8,7 @@ import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
 import '../lib/mtg_data_integrity_support.dart';
+import '../lib/sync_cards_utils.dart';
 
 /// Sincroniza cartas e legalidades do MTGJSON para o Postgres.
 ///
@@ -61,7 +62,7 @@ Opcoes:
 
   final force = args.contains('--force') || args.contains('-f');
   final full = args.contains('--full');
-  final sinceDays = _parseSinceDays(args) ?? 45;
+  final sinceDays = parseSinceDays(args) ?? 45;
 
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final environment = (env['ENVIRONMENT'] ??
@@ -128,7 +129,7 @@ Opcoes:
     } else {
       // INCREMENTAL SYNC
       final setCodes =
-          _getNewSetCodesSinceFromData(setListData, effectiveLastSyncAt);
+          getNewSetCodesSinceFromData(setListData, effectiveLastSyncAt);
       if (setCodes.isEmpty) {
         print(
             '✅ Nenhum set novo desde ${effectiveLastSyncAt.toIso8601String()}.');
@@ -346,16 +347,6 @@ Future<void> _logSync(
   } catch (_) {}
 }
 
-int? _parseSinceDays(List<String> args) {
-  for (final arg in args) {
-    if (arg.startsWith('--since-days=')) {
-      final parsed = int.tryParse(arg.split('=').last.trim());
-      if (parsed != null && parsed > 0) return parsed;
-    }
-  }
-  return null;
-}
-
 // ═══════════════════════════════════════════════════════════════════════
 // DOWNLOAD / FETCH
 // ═══════════════════════════════════════════════════════════════════════
@@ -380,25 +371,6 @@ Future<List<dynamic>> _fetchSetListData() async {
   final decoded =
       jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
   return decoded['data'] as List<dynamic>;
-}
-
-/// Filtra sets novos a partir dos dados ja em memoria (sem novo download).
-List<String> _getNewSetCodesSinceFromData(
-    List<dynamic> setListData, DateTime since) {
-  final cutoff = since.subtract(const Duration(days: 2));
-  final codes = <String>{};
-  for (final item in setListData) {
-    if (item is! Map) continue;
-    final code = normalizeMtgSetCode(item['code']?.toString());
-    final releaseDateStr = item['releaseDate']?.toString();
-    if (code == null || releaseDateStr == null) continue;
-    final releaseDate = DateTime.tryParse(releaseDateStr);
-    if (releaseDate != null && releaseDate.isAfter(cutoff)) {
-      codes.add(code);
-    }
-  }
-  final sorted = codes.toList()..sort();
-  return sorted;
 }
 
 Future<Map<String, dynamic>> _fetchSetJson(String setCode) async {
@@ -574,7 +546,7 @@ Future<int> _upsertCardsFromSet(
   var processed = 0;
   final rows = <List<Object?>>[];
   for (final card in cards) {
-    final row = _extractCardRowFromSet(card, canonicalSetCode);
+    final row = extractSetCardSyncRow(card, canonicalSetCode);
     if (row != null) rows.add(row);
   }
   final dedupedRows = _dedupeRowsByKey(rows, (row) => row[0]?.toString() ?? '');
@@ -656,69 +628,6 @@ Future<void> _upsertCardRowsBatch(
   await pool.runTx((session) async {
     await session.execute(Sql.named(sql), parameters: params);
   });
-}
-
-/// Extrai dados de uma carta de um Set.json incremental.
-List<Object?>? _extractCardRowFromSet(
-  Map<String, dynamic> card,
-  String canonicalSetCode,
-) {
-  final ids = card['identifiers'] as Map<String, dynamic>?;
-  final oracleId = ids?['scryfallOracleId']?.toString();
-  if (oracleId == null || oracleId.isEmpty) return null;
-
-  final name = card['name']?.toString();
-  if (name == null || name.isEmpty) return null;
-
-  final colors = (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
-      const <String>[];
-  final colorIdentity =
-      (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
-  final keywords =
-      (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
-
-  final scryfallId = ids?['scryfallId']?.toString();
-  String imageUrl;
-  if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl =
-        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
-  } else {
-    final encodedName = Uri.encodeQueryComponent(name);
-    final setParam =
-        canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
-    imageUrl =
-        'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
-  }
-
-  final collectorNumber = card['number']?.toString();
-  final hasFoil = card['hasFoil'] as bool?;
-  final hasNonFoil = card['hasNonFoil'] as bool?;
-  bool? foil;
-  if (hasFoil == true && hasNonFoil != true) {
-    foil = true;
-  } else if (hasNonFoil == true && hasFoil != true) {
-    foil = false;
-  }
-
-  return [
-    oracleId,
-    name,
-    card['manaCost']?.toString(),
-    card['type']?.toString(),
-    card['text']?.toString(),
-    colors,
-    colorIdentity,
-    card['power']?.toString(),
-    card['toughness']?.toString(),
-    keywords,
-    imageUrl,
-    canonicalSetCode,
-    card['rarity']?.toString(),
-    collectorNumber,
-    foil,
-  ];
 }
 
 List<List<Object?>> _dedupeRowsByKey(

@@ -6179,6 +6179,22 @@ TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live
   - adiciona regressao para `soc/SOC`;
   - garante URL fallback e `set_code` uppercase no full e incremental.
 
+### Atualização 2026-06-11 — utilitário compartilhado ligado ao CLI
+- `server/bin/sync_cards.dart` agora importa `server/lib/sync_cards_utils.dart`
+  diretamente.
+- O CLI operacional usa `parseSinceDays`, `getNewSetCodesSinceFromData` e
+  `extractSetCardSyncRow`; as cópias privadas equivalentes foram removidas.
+- `extractSetCardSyncRow` é o contrato operacional completo de Set.json, com
+  `power`, `toughness` e `keywords`; `extractSetCardRow` permanece como
+  projeção legada de 12 colunas para compatibilidade de testes/consumidores.
+
+Validação focada:
+```bash
+cd server
+dart analyze lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart
+dart test test/sync_cards_test.dart --reporter compact
+```
+
 ### Rotina oficial
 ```bash
 cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server

@@ -20,6 +20,13 @@
 > Referencias antigas a `server/bin/migrate_ml_knowledge.dart` tambem precisam
 > ser revalidadas, pois esse arquivo nao existe no checkout vivo atual.
 
+> Atualizacao Codex 2026-06-11: achados abaixo que dizem que
+> `sync_cards_utils.dart` e test-only ou que `server/bin/sync_cards.dart`
+> duplica `_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+> `_extractCardRowFromSet` sao historicos. O status vivo e resolvido:
+> `server/bin/sync_cards.dart` importa `server/lib/sync_cards_utils.dart` e usa
+> `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`.
+
 > Atualizacao local Codex: 2026-06-07 19:00 UTC
 > Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
