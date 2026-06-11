@@ -3064,6 +3064,29 @@ class Player:
         treasures = self.treasures
         life_payment = 0
 
+        def spend_generic(amount):
+            nonlocal treasures
+            generic_missing = int(amount or 0)
+            for color in (
+                "generic",
+                "colorless",
+                "wildcard",
+                "white",
+                "blue",
+                "black",
+                "red",
+                "green",
+            ):
+                paid = min(pool[color], generic_missing)
+                pool[color] -= paid
+                generic_missing -= paid
+                if generic_missing == 0:
+                    return True
+            if generic_missing > treasures:
+                return False
+            treasures -= generic_missing
+            return True
+
         for color, required in parsed["colored"].items():
             paid = min(pool[color], required)
             pool[color] -= paid
@@ -3087,6 +3110,19 @@ class Player:
             else:
                 return None
 
+        for options in parsed.get("phyrexian_hybrid", []):
+            chosen = next((color for color in options if pool[color] > 0), None)
+            if chosen:
+                pool[chosen] -= 1
+            elif pool["wildcard"] > 0:
+                pool["wildcard"] -= 1
+            elif treasures > 0:
+                treasures -= 1
+            elif self.life - life_payment >= 2:
+                life_payment += 2
+            else:
+                return None
+
         for options in parsed["hybrid"]:
             chosen = next((color for color in options if pool[color] > 0), None)
             if chosen:
@@ -3098,16 +3134,20 @@ class Player:
             else:
                 return None
 
-        generic = parsed["generic"]
-        for color in ("generic", "colorless", "wildcard", "white", "blue", "black", "red", "green"):
-            paid = min(pool[color], generic)
-            pool[color] -= paid
-            generic -= paid
-            if generic == 0:
-                break
-        if generic > treasures:
+        for option in parsed.get("monocolored_hybrid", []):
+            color = option.get("color")
+            generic_amount = int(option.get("generic", 2) or 2)
+            if color and pool[color] > 0:
+                pool[color] -= 1
+            elif pool["wildcard"] > 0:
+                pool["wildcard"] -= 1
+            elif treasures > 0:
+                treasures -= 1
+            elif not spend_generic(generic_amount):
+                return None
+
+        if not spend_generic(parsed["generic"]):
             return None
-        treasures -= generic
         return pool, treasures, life_payment
 
     def can_pay(self, cost):

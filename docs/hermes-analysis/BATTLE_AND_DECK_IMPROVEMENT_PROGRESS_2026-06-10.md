@@ -617,6 +617,21 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     - `dart test test/ai_optimize_flow_test.dart -p vm --plain-name 'AI optimize flow | /ai/optimize rebuild_guided preview_only rebuilds Talrand as full non-commander rebuild' --reporter compact`: passou.
     - `dart test test/ai_optimize_flow_test.dart -p vm --plain-name 'AI optimize flow | /ai/optimize rebuild_guided draft_clone creates a strict-valid commander deck' --reporter compact`: passou.
     - `dart test test/ai_optimize_flow_test.dart --reporter compact`: 10 testes passaram, 1 stress matrix skipped.
+- Fechamento local do gap de mana híbrida avançada:
+  - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py`
+    agora diferencia mana híbrida colorida, monocolored hybrid (`{2/W}`),
+    Phyrexian colorida (`{W/P}`) e hybrid Phyrexian (`{W/U/P}`).
+  - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`
+    passou a pagar monocolored hybrid como uma mana da cor ou dois manas de
+    qualquer tipo, e hybrid Phyrexian como uma mana de qualquer componente ou
+    2 de vida.
+  - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py`
+    cobre `{2/W}` por mana branca e por dois genéricos, rejeita pagamento curto
+    e cobre `{W/U/P}` por vida e por mana azul.
+  - `IMPLEMENTATION_GAPS.md` e `PENDING_TASKS.md` deixam de listar `{2/W}` como
+    pendente. `{2/P}` foi removido do backlog prático porque a CR 107.4 vigente
+    não lista esse símbolo; o gap remanescente é spend restrictions
+    card-specific.
 
 ## Etapa 4 — Próximas pendências reais
 

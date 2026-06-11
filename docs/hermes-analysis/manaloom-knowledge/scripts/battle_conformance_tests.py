@@ -75,7 +75,7 @@ BASE_CONFORMANCE_SCENARIOS = [
     {
         "id": "hybrid_phyrexian_payment_601_2h",
         "rule": "CR 601.2h, 107.4e, 107.4f",
-        "purpose": "Basic hybrid and colored Phyrexian mana are payable through legal alternatives.",
+        "purpose": "Hybrid, monocolored hybrid, Phyrexian, and hybrid Phyrexian mana are payable through legal alternatives.",
     },
 ]
 

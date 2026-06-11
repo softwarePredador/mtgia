@@ -11,6 +11,13 @@
 > Todos estão cobertos em `test_battle_analyst_v10_3.py`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 >
+> **Atualização 2026-06-11 — mana-cost conformance.**
+> Fechado o gap de mana híbrida avançada no battle analyst: `{2/W}`/monocolored
+> hybrid e `{W/U/P}`/hybrid Phyrexian agora têm parsing, pagamento e teste
+> executável. `{2/P}` foi removido do backlog prático porque não aparece como
+> símbolo oficial na CR 107.4 vigente; permanecem pendentes apenas spend
+> restrictions card-specific e APNAP/pass sequence completa.
+>
 > **Atualização 2026-06-11 — revisão estratégica oficial.**
 > A pesquisa oficial foi rechecada contra Wizards Rules, Commander, Commander
 > Brackets 2026-02-09, Edge of Eternities e Secrets of Strixhaven. O plano de
@@ -298,7 +305,7 @@
 
 **Limite restante**:
 - Targeting formal ainda fica no bloco próprio de targeting.
-- Hybrid/Phyrexian básico cobre `{W/U}` e `{W/P}`; `{2/W}`, `{2/P}` e spend restrictions seguem pendentes no bloco de mana.
+- Hybrid/Phyrexian básico cobre `{W/U}`, `{2/W}`, `{W/P}` e `{W/U/P}`; spend restrictions card-specific seguem pendentes no bloco de mana.
 
 **Regra**: CR 601.2a-601.2h
 
@@ -467,12 +474,12 @@
 - `end_of_combat_trigger_511_3`: triggers do fim do combate entram na stack em ordem APNAP e resolvem LIFO.
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.
-- `hybrid_phyrexian_payment_601_2h`: mana híbrida colorida e Phyrexian colorida usam alternativas legais de pagamento.
+- `hybrid_phyrexian_payment_601_2h`: mana híbrida colorida, monocolored hybrid, Phyrexian colorida e hybrid Phyrexian usam alternativas legais de pagamento.
 - `targeting_formal_minimal`: hexproof, protection, ward, replay metadata e partial resolution multi-target ficam isolados em `battle_targeting_tests.py`.
 
 **Limite restante**:
 - Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
-- Cenários ainda sem suporte formal, como active-player concede, `{2/W}`/`{2/P}` e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
+- Cenários ainda sem suporte formal, como active-player concede, spend restrictions card-specific e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 
 ---
 

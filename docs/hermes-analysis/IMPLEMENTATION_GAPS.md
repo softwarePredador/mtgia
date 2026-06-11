@@ -106,7 +106,7 @@
 | Pipeline 601.2 (modes→targets→cost→lock→pay) | ⚠️ Parcial | v9: `CastingContext` | Contexto captura modes/targets/X/alt/additional costs; targeting legal formal fica separado |
 | Custos alternativos (kicker, flashback, etc.) | ⚠️ Parcial | v9: `alternative_cost`, `additional_costs` | Suporte contextual/custo travado; falta semântica card-specific |
 | X spells | ✅ Básico | v9: `x_value` | X entra no custo travado |
-| Hybrid/Phyrexian mana | ⚠️ Parcial | v9: `parse_mana_cost`, `Player._payment_plan` | Cobre híbrido colorido `{W/U}` e Phyrexian colorido `{W/P}`; `{2/W}`, `{2/P}` e restrições card-specific seguem pendentes |
+| Hybrid/Phyrexian mana | ✅ Básico | v9: `parse_mana_cost`, `Player._payment_plan` | Cobre híbrido colorido `{W/U}`, monocolored hybrid `{2/W}`, Phyrexian colorido `{W/P}` e hybrid Phyrexian `{W/U/P}`; restrições card-specific seguem pendentes |
 | Mana pool com spend restrictions | ⚠️ Parcial | 2288, 2311 | ManaPool existe mas sem restrictions |
 
 **Ações imediatas**:
