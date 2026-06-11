@@ -210,6 +210,23 @@ Mudanças:
   saúde da frota. A próxima execução deve produzir tabela local com riscos
   `P0/P1/P2/P3` a partir de `jobs.json`, scripts e outputs recentes.
 
+Validação remota pós-conversão do governor (`2026-06-11T14:08Z`):
+
+- `server/bin/hermes_cron_governor_report.py` rodou no container Hermes como
+  `/opt/data/scripts/hermes_cron_governor_report.sh`, sem provider.
+- Resultado: `jobs_total=25`, `enabled=13`, `paused=12`,
+  `enabled_provider_dependent=6`, `flagged=12`.
+- Todas as crons essenciais script-only ficaram `OK`: `master-watchdog`,
+  `knowledge-import`, `auto-sync-learned-decks`, `pull-learning-events`,
+  `auto-promote-learned`, `knowncards-validator` e
+  `master-optimizer-preflight`.
+- As 6 crons ainda dependentes de provider ficaram corretamente classificadas
+  como `P2 replace_with_deterministic_report`: `commander-knowledge-deep`,
+  `gamechanger-research`, `mana-base-validator`, `knowledge-synthesis`,
+  `mtg-rules-auditor` e qualquer auditoria agent futura que seja reativada.
+- Isso confirma o próximo bloco de migração: converter esses P2 em scripts,
+  scorecards ou jobs internos antes de aposentar Hermes.
+
 ### Impacto ainda não provado
 
 Ainda falta observar uma rodada completa agendada, não apenas manual, depois da
