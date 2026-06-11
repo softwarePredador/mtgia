@@ -517,12 +517,22 @@ The next policy bridge is intentionally report-only:
 | source proposed | `card_battle_rules_v1` |
 | gate | `card_id`, `verified/active`, `manual/curated`, confidence >= `0.75`, derivable tag |
 | PG rules seen | `3156` |
-| new candidates | `102` |
-| already present | `248` |
+| new candidates | `89` |
+| already present | `261` |
 | rejected by gate | `2806` |
+| low-risk review candidates | `30` |
+| manual-review candidates | `59` |
 
 No candidate from this report should be written to `card_function_tags` until
 the sample is reviewed and stale-cleanup semantics are implemented.
+
+Follow-up review:
+
+- `docs/hermes-analysis/BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md`
+
+The review corrected the derivation taxonomy before any apply path: concrete
+recursion effects now derive `recursion` instead of broad `engine` when the
+effect is trusted and traceable.
 
 ## Next recommended step
 
@@ -531,6 +541,6 @@ Proceed to the next controlled slice:
 1. keep all Lorehold swaps report-only until owner review confirms candidate
    quality;
 2. run a larger sample before applying any candidate;
-3. review the `card_battle_rules_v1` derivation candidates and define stale
-   cleanup semantics before allowing any apply;
+3. review the `30` low-risk `card_battle_rules_v1` derivation candidates and
+   keep the `59` scope-sensitive candidates manual until taxonomy/faces improve;
 4. keep backend/product as source of truth; Hermes proposes and reports only.

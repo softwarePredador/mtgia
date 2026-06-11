@@ -32,6 +32,45 @@ DERIVABLE_TAGS = {
     "engine",
     "recursion",
 }
+FUNCTIONAL_EFFECT_TAGS = {
+    "ramp_permanent": "ramp",
+    "ramp_ritual": "ramp",
+    "ramp_engine": "ramp",
+    "land_ramp": "ramp",
+    "treasure_maker": "ramp",
+    "silence_opponents": "protection",
+    "silence_spell": "protection",
+    "indestructible": "protection",
+    "phase_out": "protection",
+    "phase_creatures": "protection",
+    "protect_creature": "protection",
+    "redirect_removal": "protection",
+    "counter": "protection",
+    "hate_artifact": "protection",
+    "life_artifact": "protection",
+    "draw_cards": "draw",
+    "draw_engine": "draw",
+    "topdeck_manipulation": "draw",
+    "loot": "draw",
+    "tutor": "tutor",
+    "finisher": "wincon",
+    "approach": "wincon",
+    "token_maker": "wincon",
+    "overload_recursion": "wincon",
+    "steal_all_creatures": "wincon",
+    "pump_all": "wincon",
+    "extra_turn": "wincon",
+    "board_wipe": "board_wipe",
+    "damage_wipe": "board_wipe",
+    "remove_creature": "removal",
+    "remove_permanent": "removal",
+    "remove_artifact_or_3dmg": "removal",
+    "deal_damage": "removal",
+    "copy_spell": "engine",
+    "recursion": "recursion",
+    "land_recursion": "recursion",
+    "land_recursion_creature": "recursion",
+}
 TAG_ALIASES = {
     "wipe": "board_wipe",
     "damage_wipe": "board_wipe",
@@ -73,15 +112,70 @@ def normalize_tag(value: Any) -> str:
     return TAG_ALIASES.get(tag, tag)
 
 
-def tag_from_rule(effect_json: dict[str, Any], deck_role_json: dict[str, Any]) -> str:
-    role_tag = normalize_tag(deck_role_json.get("category"))
-    if role_tag in DERIVABLE_TAGS:
-        return role_tag
-    effect = normalize_tag(effect_json.get("effect"))
+def normalize_rule_effect(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def functional_tag_from_effect(effect_json: dict[str, Any]) -> str:
+    effect = normalize_rule_effect(effect_json.get("effect"))
+    mapped = normalize_tag(FUNCTIONAL_EFFECT_TAGS.get(effect, ""))
+    if mapped in DERIVABLE_TAGS:
+        return mapped
     mapped = normalize_tag(battle_rule_registry.EFFECT_TO_DECK_CATEGORY.get(effect, effect))
     if mapped in DERIVABLE_TAGS:
         return mapped
     return ""
+
+
+def tag_from_rule(effect_json: dict[str, Any], deck_role_json: dict[str, Any]) -> str:
+    # Functional tags should prefer the traceable effect when it maps to a
+    # specific deckbuilding role. The battle registry can intentionally group
+    # effects like recursion as "engine" for simulation, but card_function_tags
+    # already has a more precise "recursion" role.
+    effect_tag = functional_tag_from_effect(effect_json)
+    if effect_tag:
+        return effect_tag
+    role_tag = normalize_tag(deck_role_json.get("category"))
+    if role_tag in DERIVABLE_TAGS:
+        return role_tag
+    return ""
+
+
+def review_flags(
+    *,
+    card_name: Any,
+    tag: str,
+    effect: str,
+    role_tag: str,
+    confidence: float,
+    tag_basis: str,
+) -> list[str]:
+    flags: list[str] = []
+    if " // " in str(card_name or ""):
+        flags.append("multi_face_review")
+    if confidence < 1.0:
+        flags.append("lower_confidence_review")
+    if tag_basis == "effect" and role_tag in DERIVABLE_TAGS and role_tag != tag:
+        flags.append("effect_overrode_broad_role")
+    if tag == "draw" and effect == "topdeck_manipulation":
+        flags.append("topdeck_not_direct_draw_review")
+    if tag == "protection" and effect in {
+        "counter",
+        "hate_artifact",
+        "life_artifact",
+        "phase_creatures",
+        "redirect_removal",
+        "silence_opponents",
+        "silence_spell",
+    }:
+        flags.append("protection_scope_review")
+    if tag == "ramp" and effect in {"ramp_engine", "ramp_permanent"}:
+        flags.append("conditional_ramp_review")
+    if tag == "tutor":
+        flags.append("tutor_scope_review")
+    if tag == "wincon" and effect not in {"approach", "finisher"}:
+        flags.append("wincon_scope_review")
+    return sorted(set(flags))
 
 
 def derivation_rejection_reason(
@@ -110,6 +204,10 @@ def build_candidate(row: dict[str, Any], *, min_confidence: float) -> dict[str, 
     effect_json = json_obj(row.get("effect_json"))
     deck_role_json = json_obj(row.get("deck_role_json"))
     tag = tag_from_rule(effect_json, deck_role_json)
+    effect = normalize_rule_effect(effect_json.get("effect"))
+    role_tag = normalize_tag(deck_role_json.get("category"))
+    effect_tag = functional_tag_from_effect(effect_json)
+    tag_basis = "effect" if effect_tag and effect_tag == tag else "deck_role"
     review_status = str(row.get("review_status") or "").lower()
     source = str(row.get("source") or "").lower()
     confidence = float(row.get("confidence") or 0.0)
@@ -132,6 +230,14 @@ def build_candidate(row: dict[str, Any], *, min_confidence: float) -> dict[str, 
         card_id=card_id,
         min_confidence=min_confidence,
     )
+    flags = [] if reason else review_flags(
+        card_name=row.get("card_name"),
+        tag=tag,
+        effect=effect,
+        role_tag=role_tag,
+        confidence=confidence,
+        tag_basis=tag_basis,
+    )
     return {
         "card_id": card_id,
         "card_name": row.get("card_name"),
@@ -146,9 +252,12 @@ def build_candidate(row: dict[str, Any], *, min_confidence: float) -> dict[str, 
                 "logical_rule_key": key,
                 "effect": effect_json.get("effect"),
                 "deck_role_category": deck_role_json.get("category"),
+                "functional_tag_basis": tag_basis,
             }
         ),
         "logical_rule_key": key,
+        "review_flags": flags,
+        "review_bucket": "manual_review" if flags else "low_risk_review",
         "rejection_reason": reason,
     }
 
@@ -236,6 +345,12 @@ def build_report(*, min_confidence: float, limit: int) -> dict[str, Any]:
         "new_candidates_count": len(new_candidates),
         "already_present_count": len(already_present),
         "rejected_by_gate_count": len(rejected_by_gate),
+        "manual_review_count": sum(
+            1 for candidate in new_candidates if candidate["review_bucket"] == "manual_review"
+        ),
+        "low_risk_review_count": sum(
+            1 for candidate in new_candidates if candidate["review_bucket"] == "low_risk_review"
+        ),
         "new_candidates": new_candidates,
         "already_present_sample": already_present[:25],
         "rejected_by_gate_sample": rejected_by_gate[:25],

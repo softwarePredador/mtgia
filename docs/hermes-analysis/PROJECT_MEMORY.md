@@ -95,9 +95,11 @@ Ao responder sobre o ManaLoom:
   com 36 jogos e 8 benchmarks `logical_rule_smoke` contendo hashes semântico e
   de regras.
 - `derive_functional_tags_from_battle_rules.py` existe apenas como report-only:
-  smoke PG em 2026-06-11 viu 3156 regras, propôs 102 novos candidatos
-  `card_battle_rules_v1`, encontrou 248 tags já presentes e rejeitou 2806 por
-  gate. Nenhum apply em `card_function_tags` está liberado sem revisão.
+  smoke PG em 2026-06-11 viu 3156 regras, propôs 89 novos candidatos
+  `card_battle_rules_v1`, encontrou 261 tags já presentes e rejeitou 2806 por
+  gate. A revisão `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` classificou
+  30 candidatos como low-risk review e 59 como manual-review. Nenhum apply em
+  `card_function_tags` está liberado sem revisão, allowlist e stale cleanup.
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 

@@ -509,8 +509,9 @@ Concluído no Slice 4 report-only:
     aplicar, candidatos `card_function_tags` derivados de regras confiáveis.
     Gate atual: `card_id` obrigatório, `review_status` `verified/active`,
     `source` `manual/curated`, confidence >= `0.75` e tag derivável.
-    Smoke PG report-only: `3156` regras vistas, `102` novos candidatos, `248`
-    já presentes e `2806` rejeitados por gate; `apply=false`.
+    Smoke PG report-only revisado: `3156` regras vistas, `89` novos
+    candidatos, `261` já presentes, `2806` rejeitados por gate, `30`
+    candidatos low-risk review e `59` manual-review; `apply=false`.
 
 ### Testes obrigatórios antes de merge
 
@@ -596,7 +597,7 @@ Hermes + testes.
 |---|---|---|---|
 | P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
-| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only (`102` novos no smoke PG), mas não escreve `card_function_tags` | Revisar amostra, ajustar taxonomia e só então criar caminho de apply com cleanup de stale tags |
+| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia são `89` novos candidatos: `30` low-risk review e `59` manual-review | Revisar os 30 low-risk antes de qualquer allowlist apply; manter os 59 como manual-only até existir taxonomia/faces/stale cleanup |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
@@ -621,7 +622,10 @@ Lorehold, ampliar amostra e definir política de derivação de
 sync, com smoke PG -> SQLite temporário e Hermes AWS real mantendo 100/1,
 deduplicando 2 regras equivalentes e gravando 98 regras com chave lógica.
 Slice 4 adicionou derivação report-only de `card_battle_rules_v1` para
-`card_function_tags`, sem escrita em PG.
+`card_function_tags`, sem escrita em PG. A revisão
+`BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` corrigiu o mapeamento de
+efeitos concretos de recursão para `recursion` em vez de `engine`; o relatório
+atual propõe `89` candidatos, sendo `30` low-risk review e `59` manual-review.
 
 ### Ordem recomendada de implementação
 
@@ -629,8 +633,9 @@ Slice 4 adicionou derivação report-only de `card_battle_rules_v1` para
    qualquer apply.
 2. Rodar nova amostra maior report-only para confirmar que `ruleset_hash` não
    mascara alteração semântica/regra como alteração estrutural.
-3. Revisar os 102 candidatos report-only de `card_battle_rules_v1`; ajustar
-   mapeamento/taxonomia antes de qualquer apply.
+3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; manter os 59
+   candidatos scope-sensitive como manual-only até existir taxonomia/faces
+   suficiente.
 4. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
 5. Formalizar identidade semântica de carta e faces antes de expandir regras

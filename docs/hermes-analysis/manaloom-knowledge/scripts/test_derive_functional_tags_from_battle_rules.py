@@ -17,7 +17,7 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
                 "effect_json": {"effect": "damage_wipe"},
                 "deck_role_json": {"category": "wipe"},
                 "source": "manual",
-                "confidence": 0.9,
+                "confidence": 1.0,
                 "review_status": "verified",
                 "rule_version": 2,
             },
@@ -27,8 +27,73 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
         self.assertEqual(candidate["tag"], "board_wipe")
         self.assertEqual(candidate["source"], derive.DERIVED_SOURCE)
         self.assertEqual(candidate["rejection_reason"], "")
+        self.assertEqual(candidate["review_bucket"], "low_risk_review")
         self.assertTrue(candidate["logical_rule_key"].startswith("battle_rule_v1:"))
         self.assertIn("logical_rule_key", candidate["evidence"])
+
+    def test_build_candidate_prefers_specific_effect_tag_over_broad_role(self) -> None:
+        candidate = derive.build_candidate(
+            {
+                "card_id": "card-1",
+                "card_name": "Recursion Fixture",
+                "effect_json": {"effect": "recursion"},
+                "deck_role_json": {"category": "engine"},
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "rule_version": 1,
+            },
+            min_confidence=0.75,
+        )
+
+        self.assertEqual(candidate["tag"], "recursion")
+        self.assertEqual(candidate["review_flags"], ["effect_overrode_broad_role"])
+        self.assertEqual(candidate["review_bucket"], "manual_review")
+
+    def test_build_candidate_marks_scope_sensitive_candidates_for_review(self) -> None:
+        candidate = derive.build_candidate(
+            {
+                "card_id": "card-1",
+                "card_name": "Topdeck Fixture // Land Fixture",
+                "effect_json": {"effect": "topdeck_manipulation"},
+                "deck_role_json": {"category": "draw"},
+                "source": "curated",
+                "confidence": 0.82,
+                "review_status": "active",
+                "rule_version": 1,
+            },
+            min_confidence=0.75,
+        )
+
+        self.assertEqual(candidate["tag"], "draw")
+        self.assertEqual(
+            candidate["review_flags"],
+            [
+                "lower_confidence_review",
+                "multi_face_review",
+                "topdeck_not_direct_draw_review",
+            ],
+        )
+        self.assertEqual(candidate["review_bucket"], "manual_review")
+
+    def test_build_candidate_flags_conditional_ramp_effects(self) -> None:
+        candidate = derive.build_candidate(
+            {
+                "card_id": "card-1",
+                "card_name": "Ramp Engine Fixture",
+                "effect_json": {"effect": "ramp_engine"},
+                "deck_role_json": {"category": "ramp"},
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "rule_version": 1,
+            },
+            min_confidence=0.75,
+        )
+
+        self.assertEqual(candidate["tag"], "ramp")
+        self.assertEqual(candidate["review_flags"], ["conditional_ramp_review"])
+        self.assertEqual(candidate["review_bucket"], "manual_review")
 
     def test_build_candidate_rejects_untrusted_inputs(self) -> None:
         base = {
