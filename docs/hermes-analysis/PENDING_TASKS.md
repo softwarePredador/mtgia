@@ -241,6 +241,10 @@
 > para `optimize_route_final_gate_support.dart`, cobrindo bloqueio final por
 > quality gate, validação serializada e Semantic Layer v2 sem alterar o contrato
 > HTTP da rota.
+> Vigésimo primeiro split de optimize concluído: classificação de
+> `outcome_code` foi movida para `optimize_route_outcome_support.dart`, com
+> wrapper compatível na rota e teste unitário direto para outcomes de sucesso,
+> no-op seguro, near-peak, needs-repair, execution_failed e blocked.
 > Hardening adicional: `rebuild_guided` deixou de gerar terreno básico com
 > `card_id` vazio, resolve identidade por `mana_cost/oracle_text`, carrega
 > básicos por subtipo (`Island // Island` incluso) e passa nos cenários live

@@ -93,8 +93,31 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com vinte e duas extrações/testes de suporte, seis
-splits do engine e vinte e oito splits da rota/runtime de optimize concluídos.
+**Status:** em andamento, com vinte e três extrações/testes de suporte, seis
+splits do engine e vinte e nove splits da rota/runtime de optimize concluídos.
+
+### Revisão complementar 2026-06-11 — split de outcome code do optimize
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `deriveOptimizeOutcomeCode` era uma função pura dentro de
+  `server/routes/ai/optimize/index.dart`.
+- A classificação de UX/contrato (`optimized`, `deck_completed`,
+  `near_peak`, `needs_repair`, `no_safe_upgrade_found`, `execution_failed`,
+  `blocked`) é crítica o suficiente para teste isolado sem carregar a rota.
+
+**Entregue:**
+- Criado `server/lib/ai/optimize_route_outcome_support.dart`.
+- A rota mantém wrapper compatível `deriveOptimizeOutcomeCode(...)`, delegando
+  ao support novo para não quebrar imports legados em testes.
+- Criado `server/test/optimize_route_outcome_support_test.dart` com cobertura
+  direta de sucesso, no-op seguro, near-peak, repair, execution failed e HTTP
+  blocked.
+
+**Validação local:**
+- `dart analyze lib/ai/optimize_route_outcome_support.dart routes/ai/optimize/index.dart test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart`.
+- `dart test test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart --reporter compact`.
 
 ### Revisão complementar 2026-06-11 — split de candidate helpers do optimize filler
 
@@ -198,15 +221,19 @@ splits do engine e vinte e oito splits da rota/runtime de optimize concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2521 linhas após splits de
+- `server/routes/ai/optimize/index.dart` — 2476 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
   pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
   identidade de cor/filtro de bracket/top-up determinístico do modo complete e
   proteção de remoção de lands/reequilíbrio pós-filtros/coleta EDHREC/query de
   dados completos de adições/análise virtual pós-swap/execução do
-  `OptimizationValidator`. A rota ainda deve seguir reduzindo até ficar como
-  orquestrador fino.
+  `OptimizationValidator`/outcome code. A rota ainda deve seguir reduzindo até
+  ficar como orquestrador fino.
+- `server/lib/ai/optimize_route_outcome_support.dart` — 62 linhas extraídas da
+  rota para classificação de `outcome_code`.
+- `server/test/optimize_route_outcome_support_test.dart` — 149 linhas cobrindo
+  outcomes diretos e preservando compatibilidade via wrapper da rota.
 - `server/lib/ai/optimize_runtime_support.dart` — 551 linhas após oito splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
