@@ -312,6 +312,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_diagnostics_support_test.dart test/optimize_route_warnings_support_test.dart test/optimize_route_payload_support_test.dart test/optimize_route_response_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 40 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh a526ec5c`: `PASS`; sem riscos, mudança
     classificada como extração pura sem alteração comportamental.
+- Hermes/AWS pós-push do split fallback vazio (`22bf1618`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_empty_fallback_support`, rota
+    `ai/optimize` e teste de fallback vazio: sem issues.
+  - `dart test test/optimize_route_empty_fallback_support_test.dart test/optimize_route_diagnostics_support_test.dart test/optimize_route_warnings_support_test.dart test/optimize_route_payload_support_test.dart test/optimization_pipeline_integration_test.dart test/optimize_learning_pipeline_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 57 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 22bf1618`: `PASS`; Hermes classificou
+    como extração limpa com risco baixo genérico de wiring, mitigado pela
+    rodada remota de pipeline/route contract acima.
 
 ## Etapa 4 — Próximas pendências reais
 
