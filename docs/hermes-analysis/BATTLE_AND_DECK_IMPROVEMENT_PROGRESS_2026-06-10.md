@@ -364,6 +364,13 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `manaloom-hermes-report-only.sh 92723ed4`: `PASS`; Hermes apontou risco
     baixo de wiring por extração, mitigado por teste unitário, pipeline e route
     contract remotos.
+- Hermes/AWS pós-push do split retry (`92a4083a`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_retry_support`, rota `ai/optimize` e
+    teste de retry: sem issues.
+  - `dart test test/optimize_route_retry_support_test.dart test/optimize_route_post_validation_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 34 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 92a4083a`: `PASS`; risco baixo de wiring
+    por refactor interno, sem mudança de contrato público.
 
 ## Etapa 4 — Próximas pendências reais
 
