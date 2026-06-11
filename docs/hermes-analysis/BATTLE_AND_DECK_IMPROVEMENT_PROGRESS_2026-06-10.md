@@ -86,6 +86,8 @@ do engine concluídos.
 - `server/routes/ai/optimize/index.dart` — 3092 linhas.
 - `server/lib/ai/optimize_runtime_support.dart` — 2708 linhas após o primeiro split.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
+- `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
+  direta e delegação pelo runtime.
 
 **Decisão:**
 Não misturar refactors grandes com correções funcionais. A primeira extração
