@@ -9,6 +9,16 @@ Updated: 2026-06-07
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
+## Triagens recentes
+
+- `HERMES_DOCS_TRIAGE_2026-06-11.md`
+  - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch
+    `codex/hermes-analysis-docs`.
+  - Use antes de abrir tarefas a partir de `PLANO_CORRECAO.md`,
+    `STRUCTURE_AUDIT.md` ou `TECHNICAL_MAP.md`.
+  - Nao fazer merge bruto desses relatórios na `master` sem revalidar contra o
+    código vivo.
+
 ## Fonte de verdade atual
 
 1. `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`
