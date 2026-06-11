@@ -80,6 +80,12 @@ Correção versionada:
 - `server/bin/pull_learning_events.py` agora inicializa a tabela SQLite
   `commanders`, desbloqueando importação de eventos de aprendizado em bancos
   Hermes recém-recriados.
+- `server/bin/hermes_cron_governor_report.py` substitui o governor com provider
+  por relatório determinístico de saúde das crons, evitando novo `429` em uma
+  rotina que deveria ser observabilidade básica.
+- `server/bin/hermes_master_watchdog.sh` versiona o watchdog e troca a instrução
+  antiga "rodar normal audit" por `manaloom-hermes-report-only.sh`, alinhado ao
+  fluxo Codex pós-push.
 
 Validação remota após correções (`2026-06-11T13:25Z`):
 
@@ -132,7 +138,7 @@ Novo achado no auto-sync de decks aprendidos (`2026-06-11T13:55Z`):
 | `manaloom-gamechanger-research` | 720m | Pesquisa gamechangers e gaps de ranking | Útil, mas corpus já está majoritariamente coberto | Manter baixa cadência |
 | `manaloom-mana-base-validator` | 720m | Valida base de mana dos decks | Útil para qualidade de deckbuilding | Manter baixa cadência; migrar para backend metrics |
 | `mtg-rules-auditor` | 720m | Audita regras MTG contra pipeline | Útil como guardrail técnico | Manter baixa cadência; migrar para testes/golden scenarios |
-| `manaloom-cron-governor-report` | 720m | Audita saúde da frota de crons | Útil enquanto Hermes existir | Manter até migração; depois trocar por health interno |
+| `manaloom-cron-governor-report` | 720m | Audita saúde da frota de crons sem LLM | Útil enquanto Hermes existir; agora script-only para evitar 429 | Manter até migração; depois trocar por health interno |
 
 ## Crons pausadas
 
@@ -166,6 +172,10 @@ Mudanças:
 - Habilitadas passaram de 17 para 13.
 - Pausadas passaram de 8 para 12.
 - Crons agent/provider de baixo valor ou duplicadas foram pausadas.
+- `manaloom-cron-governor-report` deve rodar via script determinístico
+  `hermes_cron_governor_report.sh`, não mais via provider.
+- `manaloom-master-watchdog` deve apontar para report-only pós-push, não para
+  `manaloom-hermes-normal-audit`, que permanece pausada.
 - Cadência das crons agent úteis foi reduzida:
   - commander knowledge: 180m → 360m
   - gamechanger research: 180m → 720m
@@ -196,6 +206,9 @@ Mudanças:
 - `manaloom-auto-sync-learned-decks` agora tem guardrail para não insistir em
   promoted rows incompletos; isso reduz ruído e evita tentativas repetidas
   contra o importador Commander.
+- `manaloom-cron-governor-report` deixa de consumir provider para detectar
+  saúde da frota. A próxima execução deve produzir tabela local com riscos
+  `P0/P1/P2/P3` a partir de `jobs.json`, scripts e outputs recentes.
 
 ### Impacto ainda não provado
 
