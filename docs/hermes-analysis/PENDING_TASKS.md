@@ -132,6 +132,9 @@
 > baixa contagem foi movida para
 > `optimize_route_land_removal_protection_support.dart`, mantendo a rota como
 > orquestração e cobrindo bloqueio/passe por contagem segura.
+> Décimo oitavo split de optimize concluído: reequilíbrio pós-filtros foi
+> movido para `optimize_route_rebalance_support.dart`, mantendo a chamada
+> SQL/IA na rota e cobrindo plano, aplicação de substitutas e truncamento.
 
 ---
 
@@ -198,7 +201,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: reequilíbrio pós-filtros/substitutas sinérgicas | 1-2 dias | Médio | `optimize_route_land_removal_protection_support.dart` verde |
+| 6 | Próximo split da rota optimize: validação EDHREC/tema pós-processamento | 1-2 dias | Médio | `optimize_route_rebalance_support.dart` verde |
 
 ---
 
@@ -481,6 +484,8 @@
 | `optimize_route_complete_top_up_support_test.dart` | Cobertura direta de singleton dedupe, cópias fora de singleton, round-robin e ausência de IDs | 72 |
 | `optimize_route_land_removal_protection_support.dart` | Proteção contra remoção de terrenos quando a contagem de lands está baixa | 62 |
 | `optimize_route_land_removal_protection_support_test.dart` | Cobertura direta de bloqueio de lands, passagem por contagem segura e nomes não-land | 62 |
+| `optimize_route_rebalance_support.dart` | Plano de reequilíbrio pós-filtros, aplicação de substitutas e truncamento final | 128 |
+| `optimize_route_rebalance_support_test.dart` | Cobertura direta de missing/excludes, substitutas válidas/inválidas e truncamentos | 92 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |

@@ -25,6 +25,8 @@ import '../../../lib/ai/optimize_route_land_removal_protection_support.dart'
     as optimize_route_land_removal_protection;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
+import '../../../lib/ai/optimize_route_rebalance_support.dart'
+    as optimize_route_rebalance;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
@@ -1685,23 +1687,18 @@ Future<Response> onRequest(RequestContext context) async {
         Log.d('Re-balanceamento pÃ³s-filtros:');
         Log.d(
             '  Antes: removals=${validRemovals.length}, additions=${validAdditions.length}');
+        final rebalancePlan =
+            optimize_route_rebalance.buildOptimizeRebalancePlan(
+          removals: validRemovals,
+          additions: validAdditions,
+          deckNamesLower: deckNamesLower,
+          filteredByColorIdentity: filteredByColorIdentity,
+        );
 
-        if (validAdditions.length < validRemovals.length) {
+        if (rebalancePlan.needsReplacements) {
           // CORREÃ‡ÃƒO REAL: Re-consultar a IA para cartas substitutas
-          final missingCount = validRemovals.length - validAdditions.length;
           Log.d(
-              '  Faltam $missingCount adiÃ§Ãµes - consultando IA para substitutas sinÃ©rgicas');
-
-          // Montar lista de cartas a excluir (jÃ¡ existentes + jÃ¡ sugeridas + filtradas)
-          final excludeNames = <String>{
-            ...deckNamesLower,
-            ...validAdditions.map((n) => n.toLowerCase()),
-            ...filteredByColorIdentity.map((n) => n.toLowerCase()),
-          };
-
-          // Categorias das cartas removidas para pedir substitutas do mesmo tipo funcional
-          final removedButUnmatched =
-              validRemovals.sublist(validAdditions.length);
+              '  Faltam ${rebalancePlan.missingCount} adiÃ§Ãµes - consultando IA para substitutas sinÃ©rgicas');
 
           try {
             final replacementResult = await findSynergyReplacements(
@@ -1713,9 +1710,9 @@ Future<Response> onRequest(RequestContext context) async {
               keepTheme: keepTheme,
               detectedTheme: themeProfile.theme,
               coreCards: themeProfile.coreCards,
-              missingCount: missingCount,
-              removedCards: removedButUnmatched,
-              excludeNames: excludeNames,
+              missingCount: rebalancePlan.missingCount,
+              removedCards: rebalancePlan.removedButUnmatched,
+              excludeNames: rebalancePlan.excludeNames,
               allCardData: allCardData,
               preferredNames: optimizeCommanderPriorityNames
                   .map((name) => name.toLowerCase())
@@ -1723,17 +1720,16 @@ Future<Response> onRequest(RequestContext context) async {
             );
 
             if (replacementResult.isNotEmpty) {
-              for (final replacement in replacementResult) {
-                final name = replacement['name'] as String;
-                final id = replacement['id'] as String;
-                validAdditions.add(name);
-                validByNameLower[name.toLowerCase()] = {
-                  'id': id,
-                  'name': name,
-                };
-              }
+              final replacementApplication =
+                  optimize_route_rebalance.applyOptimizeRebalanceReplacements(
+                additions: validAdditions,
+                replacements: replacementResult,
+              );
+              validAdditions = replacementApplication.additions;
+              validByNameLower
+                  .addAll(replacementApplication.validByNameLowerUpdates);
               Log.d(
-                  '  IA sugeriu ${replacementResult.length} substitutas sinÃ©rgicas');
+                  '  IA sugeriu ${replacementApplication.addedCount} substitutas sinÃ©rgicas');
             }
 
             // Se AINDA faltar (IA nÃ£o conseguiu preencher tudo), TRUNCAR remoÃ§Ãµes
@@ -1743,17 +1739,34 @@ Future<Response> onRequest(RequestContext context) async {
               final stillMissing = validRemovals.length - validAdditions.length;
               Log.d(
                   '  Ainda faltam $stillMissing - truncando remoÃ§Ãµes (nÃ£o preencher com bÃ¡sicos em optimize)');
-              validRemovals =
-                  validRemovals.take(validAdditions.length).toList();
+              final trimResult =
+                  optimize_route_rebalance.trimOptimizeRebalanceToPairs(
+                removals: validRemovals,
+                additions: validAdditions,
+              );
+              validRemovals = trimResult.removals;
+              validAdditions = trimResult.additions;
             }
           } catch (e) {
             Log.w('Falha ao buscar substitutas IA: $e - usando fallback');
             // Fallback: truncar remoÃ§Ãµes para nÃ£o perder cartas
-            validRemovals = validRemovals.take(validAdditions.length).toList();
+            final trimResult =
+                optimize_route_rebalance.trimOptimizeRebalanceToPairs(
+              removals: validRemovals,
+              additions: validAdditions,
+            );
+            validRemovals = trimResult.removals;
+            validAdditions = trimResult.additions;
           }
         } else {
           // Mais adiÃ§Ãµes que remoÃ§Ãµes: truncar adiÃ§Ãµes
-          validAdditions = validAdditions.take(validRemovals.length).toList();
+          final trimResult =
+              optimize_route_rebalance.trimOptimizeRebalanceToPairs(
+            removals: validRemovals,
+            additions: validAdditions,
+          );
+          validRemovals = trimResult.removals;
+          validAdditions = trimResult.additions;
         }
 
         Log.d(
