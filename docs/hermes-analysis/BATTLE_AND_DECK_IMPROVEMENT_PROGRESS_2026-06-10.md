@@ -483,6 +483,13 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_route_bracket_policy_filter_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 36 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh 8854208b`: `PASS`; risco menor apenas de
     wiring de import, mitigado pelo analyze e pela suite remota.
+- Hermes/AWS pós-push do split rebalance (`c7104a44`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_rebalance_support`, rota `ai/optimize` e
+    teste de reequilíbrio: sem issues.
+  - `dart test test/optimize_route_rebalance_support_test.dart test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 39 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh c7104a44`: `PASS`; risco baixo de wire-up,
+    mitigado por analyze/testes remotos.
 
 ## Etapa 4 — Próximas pendências reais
 
