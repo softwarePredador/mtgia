@@ -495,6 +495,12 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_rebalance_support_test.dart test/optimize_route_land_removal_protection_support_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 39 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh c7104a44`: `PASS`; risco baixo de wire-up,
     mitigado por analyze/testes remotos.
+- Hermes/AWS pós-push do split EDHREC addition checks (`247859d6`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_post_validation_support`, rota
+    `ai/optimize` e teste de pós-validação: sem issues.
+  - `dart test test/optimize_route_post_validation_support_test.dart test/optimize_route_rebalance_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 37 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 247859d6`: `PASS`; sem riscos.
 
 ## Etapa 4 — Próximas pendências reais
 
