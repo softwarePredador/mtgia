@@ -305,12 +305,32 @@ def deck_hash(conn: sqlite3.Connection, deck_id: int) -> str:
     for row in deck_rows(conn, deck_id):
         payload.append(
             {
+                "card_id": row["card_id"] if row_has_column(row, "card_id") else "",
                 "card_name": row["card_name"],
                 "quantity": row["quantity"],
-                "functional_tag": row["functional_tag"],
                 "is_commander": row["is_commander"],
-                "cmc": row["cmc"],
-                "type_line": row["type_line"],
+            }
+        )
+    encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def semantics_hash(conn: sqlite3.Connection, deck_id: int) -> str:
+    payload = []
+    for row in deck_rows(conn, deck_id):
+        if row_has_column(row, "battle_rules_json"):
+            try:
+                battle_rules = json.loads(str(row["battle_rules_json"] or "[]"))
+            except Exception:
+                battle_rules = []
+        else:
+            battle_rules = []
+        payload.append(
+            {
+                "card_id": row["card_id"] if row_has_column(row, "card_id") else "",
+                "card_name": row["card_name"],
+                "functional_tags": sorted(functional_tags_for_row(row)),
+                "battle_rules": battle_rules,
             }
         )
     encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True)
@@ -322,12 +342,12 @@ def get_deck_summary(conn: sqlite3.Connection, deck_id: int) -> dict[str, object
     lands = sum(
         1
         for row in rows
-        if row["functional_tag"] == "land" or "Land" in str(row["type_line"] or "")
+        if "land" in functional_tags_for_row(row) or "Land" in str(row["type_line"] or "")
     )
     nonlands = [
         row
         for row in rows
-        if row["functional_tag"] != "land" and "Land" not in str(row["type_line"] or "")
+        if "land" not in functional_tags_for_row(row) and "Land" not in str(row["type_line"] or "")
     ]
     avg_cmc = sum(float(row["cmc"] or 0) for row in nonlands) / max(1, len(nonlands))
     return {
@@ -337,6 +357,7 @@ def get_deck_summary(conn: sqlite3.Connection, deck_id: int) -> dict[str, object
         "nonlands": len(nonlands),
         "avg_cmc": round(avg_cmc, 3),
         "hash": deck_hash(conn, deck_id),
+        "semantics_hash": semantics_hash(conn, deck_id),
     }
 
 
@@ -498,14 +519,63 @@ def json_list(value: object) -> list[str]:
     if not value:
         return []
     if isinstance(value, list):
-        return [str(item) for item in value]
+        result = []
+        for item in value:
+            if isinstance(item, dict):
+                tag = item.get("tag") or item.get("role") or item.get("category")
+                if tag:
+                    result.append(str(tag))
+            else:
+                result.append(str(item))
+        return result
     try:
         decoded = json.loads(str(value))
     except Exception:
         return []
     if isinstance(decoded, list):
-        return [str(item) for item in decoded]
+        return json_list(decoded)
     return []
+
+
+def row_has_column(row: sqlite3.Row, column: str) -> bool:
+    return column in row.keys()
+
+
+def functional_tags_for_row(row: sqlite3.Row) -> set[str]:
+    values: list[str] = []
+    if row_has_column(row, "functional_tags_json"):
+        values.extend(json_list(row["functional_tags_json"]))
+    if row_has_column(row, "functional_tag") and row["functional_tag"]:
+        values.append(str(row["functional_tag"]))
+    return {
+        normalize_name(value).replace(" ", "_")
+        for value in values
+        if normalize_name(value) not in {"", "unknown"}
+    }
+
+
+def infer_roles(
+    functional_tags: Iterable[str],
+    type_line: str,
+    oracle_text: str,
+) -> set[str]:
+    tags = {normalize_name(tag).replace(" ", "_") for tag in functional_tags}
+    text = f"{type_line}\n{oracle_text}".lower()
+    roles: set[str] = set()
+    for role, spec in ROLE_FAMILIES.items():
+        if tags.intersection(spec["tags"]) or any(
+            re.search(pattern, text) for pattern in spec["patterns"]
+        ):
+            roles.add(role)
+    return roles
+
+
+def roles_for_row(row: sqlite3.Row) -> set[str]:
+    return infer_roles(
+        functional_tags_for_row(row),
+        str(row["type_line"] or ""),
+        str(row["oracle_text"] or ""),
+    )
 
 
 def deck_commander_identity(conn: sqlite3.Connection, deck_id: int) -> set[str]:
@@ -629,27 +699,27 @@ def quality_gate_candidate(
     if type_line and "Basic" in type_line and "Land" not in type_line:
         warnings.append("unusual_basic_type_line")
 
-    removed_role = infer_role(
-        str(removed[0]["functional_tag"] if removed else ""),
-        str(removed[0]["type_line"] if removed else ""),
-        str(removed[0]["oracle_text"] if removed else ""),
-    )
-    added_role = infer_role(
-        battle_rule_deck_category(conn, card_added) or "",
+    removed_roles = roles_for_row(removed[0]) if removed else set()
+    added_roles = infer_roles(
+        [battle_rule_deck_category(conn, card_added) or ""],
         type_line,
         str(meta["oracle_text"] if meta else ""),
     )
-    if removed_role and removed_role != added_role:
+    for removed_role in sorted(removed_roles, key=lambda role: list(ROLE_FAMILIES).index(role)):
+        if removed_role in added_roles:
+            continue
         role_count = count_role(rows, removed_role)
         minimum = ROLE_FAMILIES[removed_role]["minimum"]
         if role_count <= minimum:
             reasons.append(
                 f"cannot_cut_low_count_{removed_role}:"
-                f"{card_removed} role={removed_role} count={role_count} add_role={added_role or 'unknown'}"
+                f"{card_removed} role={removed_role} count={role_count} "
+                f"add_roles={','.join(sorted(added_roles)) or 'unknown'}"
             )
         else:
             warnings.append(
-                f"role_mismatch:{card_removed} role={removed_role} add_role={added_role or 'unknown'}"
+                f"role_mismatch:{card_removed} role={removed_role} "
+                f"add_roles={','.join(sorted(added_roles)) or 'unknown'}"
             )
 
     before = get_deck_summary(conn, deck_id)
@@ -697,27 +767,15 @@ def quality_gate_candidate(
 
 
 def infer_role(functional_tag: str, type_line: str, oracle_text: str) -> str | None:
-    tag = normalize_name(functional_tag).replace(" ", "_")
-    text = f"{type_line}\n{oracle_text}".lower()
-    for role, spec in ROLE_FAMILIES.items():
-        if tag in spec["tags"]:
-            return role
-        if any(re.search(pattern, text) for pattern in spec["patterns"]):
+    roles = infer_roles([functional_tag], type_line, oracle_text)
+    for role in ROLE_FAMILIES:
+        if role in roles:
             return role
     return None
 
 
 def count_role(rows: Iterable[sqlite3.Row], role: str) -> int:
-    return sum(
-        1
-        for row in rows
-        if infer_role(
-            str(row["functional_tag"] or ""),
-            str(row["type_line"] or ""),
-            str(row["oracle_text"] or ""),
-        )
-        == role
-    )
+    return sum(1 for row in rows if role in roles_for_row(row))
 
 
 @contextmanager
@@ -741,21 +799,40 @@ def temporary_swap(
             "DELETE FROM deck_cards WHERE deck_id=? AND lower(card_name)=lower(?)",
             (deck_id, card_removed),
         )
+        insert_columns = [
+            "deck_id",
+            "card_name",
+            "quantity",
+            "functional_tag",
+            "tag_confidence",
+            "is_commander",
+            "is_partner",
+            "cmc",
+            "type_line",
+            "oracle_text",
+        ]
+        values: list[object] = [
+            deck_id,
+            card_added,
+            1,
+            add_tag or "candidate",
+            None,
+            0,
+            0,
+            meta["cmc"] if meta else None,
+            meta["type_line"] if meta else None,
+            meta["oracle_text"] if meta else None,
+        ]
+        if "functional_tags_json" in columns:
+            insert_columns.append("functional_tags_json")
+            values.append(json.dumps([add_tag or "candidate"], ensure_ascii=True))
+        placeholders = ", ".join("?" for _ in insert_columns)
         conn.execute(
-            """
-            INSERT INTO deck_cards
-                (deck_id, card_name, quantity, functional_tag, tag_confidence,
-                 is_commander, is_partner, cmc, type_line, oracle_text)
-            VALUES (?, ?, 1, ?, NULL, 0, 0, ?, ?, ?)
+            f"""
+            INSERT INTO deck_cards ({", ".join(insert_columns)})
+            VALUES ({placeholders})
             """,
-            (
-                deck_id,
-                card_added,
-                add_tag or "candidate",
-                meta["cmc"] if meta else None,
-                meta["type_line"] if meta else None,
-                meta["oracle_text"] if meta else None,
-            ),
+            values,
         )
         conn.commit()
         yield

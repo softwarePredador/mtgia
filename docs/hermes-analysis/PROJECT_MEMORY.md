@@ -14,7 +14,8 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Master HEAD: 70e170f0 (2026-06-04, Harden Hermes learned deck sync)
+- Master HEAD observado localmente: b11456cf (2026-06-11, Record Hermes target sync validation)
+- Relatorio mestre atual: `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
 - Backend tests: 599 (2026-06-04 14:10Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
 
 ## Branch de analise
@@ -31,14 +32,15 @@ Nunca commitar diretamente na `master`. Fluxo:
 
 ## Fontes canonicas (ordem de precedencia)
 
-1. `docs/CONTEXTO_PRODUTO_ATUAL.md` — fonte de verdade operacional
-2. `server/manual-de-instrucao.md` — diario tecnico com ultimas decisoes
-3. `docs/README.md` — indice documental
-4. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` — contratos app/backend
-5. `app/doc/APP_AUDIT_2026-04-29.md` — status consolidado do app
-6. `app/doc/UI_TEST_SURFACE_MAP.md` — keys de teste para runtime
-7. `docs/hermes-analysis/*` — analise do agente (este diretorio)
-8. `git log --oneline --decorate -40` — estado atual dos commits
+1. `docs/CONTEXTO_PRODUTO_ATUAL.md` - fonte de verdade operacional
+2. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md` - mapa mestre de logica, dados, IA, Hermes e validacao
+3. `server/manual-de-instrucao.md` - diario tecnico com ultimas decisoes
+4. `docs/README.md` - indice documental
+5. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` - contratos app/backend
+6. `app/doc/APP_AUDIT_2026-04-29.md` - status consolidado do app
+7. `app/doc/UI_TEST_SURFACE_MAP.md` - keys de teste para runtime
+8. `docs/hermes-analysis/*` - analise do agente (este diretorio)
+9. `git log --oneline --decorate -40` - estado atual dos commits
 
 ## Regra de escopo
 
@@ -71,6 +73,13 @@ Ao responder sobre o ManaLoom:
 - `server/routes/ai/**` (IA: generate, optimize, rebuild)
 - `server/lib/ai/**` (logica de IA, ~30 arquivos)
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` (contratos)
+- `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md` (mapa mestre de arquitetura/logica)
+- `docs/hermes-analysis/BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md` (mapa detalhado de battle, IA, Hermes e Lorehold)
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md` (plano de implementação para agregação multi-função e sync Hermes)
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md` (evidência do Slice 1 de sync semântico local e bridge do optimizer para arrays)
+- `docs/hermes-analysis/BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` (dúvidas/decisões para validação do owner)
+- `docs/hermes-analysis/BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md` (handoff objetivo de perguntas/furos/logística antes das próximas fases)
+- `docs/hermes-analysis/HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md` (classificação dos consumidores Hermes de `functional_tag` e status de migração para arrays)
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 

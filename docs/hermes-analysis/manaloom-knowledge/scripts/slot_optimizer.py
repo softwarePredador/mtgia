@@ -26,6 +26,7 @@ from master_optimizer_common import (
     deck_commander_identity,
     deck_rows,
     ensure_optimizer_tables,
+    functional_tags_for_row,
     json_list,
     latest_baseline,
     normalize_name,
@@ -174,22 +175,24 @@ def load_real_roles(conn, deck_id: int) -> dict[str, str]:
     except Exception:
         pass
 
-    # 2. Fallback: deck_cards.functional_tag (lighter annotation)
-    if not roles:
-        try:
-            rows = conn.execute(
-                "SELECT LOWER(card_name) as name, LOWER(functional_tag) as tag FROM deck_cards WHERE deck_id = ? AND functional_tag IS NOT NULL AND functional_tag != ''",
-                (deck_id,),
-            ).fetchall()
-            for row in rows:
-                name = str(row["name"] or "").strip()
-                tag = str(row["tag"] or "").strip().lower()
-                if name and tag:
-                    mapped = REAL_ROLE_TO_CATEGORY.get(tag)
-                    if mapped:
-                        roles[name] = mapped
-        except Exception:
-            pass
+    # 2. Fallback: deck_cards functional tags. Prefer the multi-tag snapshot
+    # when present, and never overwrite the detailed card_deck_analysis role.
+    try:
+        rows = conn.execute(
+            "SELECT * FROM deck_cards WHERE deck_id = ?",
+            (deck_id,),
+        ).fetchall()
+        for row in rows:
+            name = normalize_name(row["card_name"])
+            if not name or name in roles:
+                continue
+            for tag in functional_tags_for_row(row):
+                mapped = REAL_ROLE_TO_CATEGORY.get(tag)
+                if mapped:
+                    roles[name] = mapped
+                    break
+    except Exception:
+        pass
 
     return roles
 
@@ -201,14 +204,13 @@ def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]])
     entry = known_cards.get(name, {})
     # Prioridade 1: role real do card_deck_analysis (evita swap wincon <-> removal)
     real_role = _REAL_ROLES_CACHE.get(normalize_name(name), "")
-    if real_role and real_role in REAL_ROLE_TO_CATEGORY:
-        return REAL_ROLE_TO_CATEGORY[real_role]
+    if real_role:
+        return real_role
     if entry.get("deck_category"):
         return str(entry["deck_category"])
     effect = str(entry.get("effect") or "")
     if effect in EFFECT_TO_CATEGORY:
         return EFFECT_TO_CATEGORY[effect]
-    tag = str(row["functional_tag"] or "")
     tag_map = {
         "ramp": "ramp",
         "draw": "draw",
@@ -222,8 +224,9 @@ def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]])
         "engine": "engine",
         "land": "land",
     }
-    if tag in tag_map:
-        return tag_map[tag]
+    for tag in functional_tags_for_row(row):
+        if tag in tag_map:
+            return tag_map[tag]
     return "unknown"
 
 

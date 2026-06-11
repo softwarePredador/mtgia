@@ -267,11 +267,15 @@
 
 ## Próximos Passos (Ordem de Impacto)
 
-1. **Integração avançada de tipos complexos** — efeitos específicos de Omen/Prepare/Paradigm/Station por carta concreta
-2. **Modularização segura** — continuar split do engine Hermes por domínio e depois route/runtime de optimize
-3. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas; o bloco formal mínimo já está isolado em `battle_targeting_tests.py`
-4. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
-5. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário
+1. **Rollout controlado no Hermes runtime** — fazer backup do SQLite real, aplicar snapshot agregado e rodar report-only contra o DB real
+2. **Identidade semântica de carta** — separar explicitamente printing id/oracle id/faces para DFC/MDFC, localized names, rulings e dedupe de regra
+3. **Agregação segura de multi-função por carta** — manter o sync PG -> Hermes agregado por `card_id` e aplicar no SQLite runtime real somente após consumidores críticos compatíveis
+4. **Learned decks Commander completo** — evoluir contrato de learned decks de 1 commander + 99 main para também aceitar pares oficiais quando houver corpus validado
+5. **Integração avançada de tipos complexos** — efeitos específicos de Omen/Prepare/Paradigm/Station por carta concreta
+6. **Modularização segura** — continuar split do engine Hermes por domínio e depois route/runtime de optimize
+7. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas; o bloco formal mínimo já está isolado em `battle_targeting_tests.py`
+8. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
+9. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário
 
 ---
 
@@ -337,3 +341,275 @@ Ordem de implementação quando houver corpus concreto:
 Gate obrigatório: não criar regra genérica nova para Warp, Station, Prepare,
 Omen, Paradigm ou ability words sem carta real no corpus, replay incorreto e
 teste focado. Caso contrário, manter como tracked gap.
+
+---
+
+## 11. Multi-função por carta e agregação segura PG -> Hermes (P1)
+
+### Status
+
+Partially implemented. O bug operacional de 2026-06-11 foi contido no sync do
+target deck para Hermes sem usar `LEFT JOIN LATERAL (...) LIMIT 1` para
+`card_battle_rules`. O sync agora agrega funções/regras por `card_id` e grava
+`functional_tags_json`, `semantic_tags_v2_json`, `battle_rules_json`,
+`deck_hash`, `semantics_hash` e `sync_run_id`. O gap permanece aberto porque
+nem todos os consumidores/report-only crons foram migrados para membership via
+arrays em scripts históricos/manuais, e porque a aplicação no SQLite runtime
+real do Hermes ainda não foi executada nesta rodada.
+
+### Evidência
+
+- PostgreSQL `deck_cards` é a fonte canônica de cardinalidade do deck:
+  `server/database_setup.sql` define `UNIQUE(deck_id, card_id)` e `quantity`.
+- PostgreSQL `card_battle_rules` permite múltiplas regras por carta:
+  `card_id` é indexado, mas não único; a chave primária é `normalized_name`.
+- `card_function_tags` é multi-tag por desenho:
+  a chave efetiva usada pela camada de IA é `(card_id, tag, source)`.
+- O sync Hermes corrigido tem guard de soma de quantidade e agregação semântica
+  por `card_id`; a evidência está em
+  `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`.
+
+### Invariante obrigatório
+
+Todo consumidor em contexto de deck deve preservar:
+
+```text
+SUM(deck_cards.quantity) antes do enriquecimento
+==
+SUM(deck_cards.quantity) depois do enriquecimento
+```
+
+Uma carta pode ter múltiplas funções e múltiplas regras executáveis, mas isso
+não pode criar múltiplas cartas no deck. Contadores de papel podem somar mais
+que 100 porque uma carta pode contar como `ramp` e `engine`, por exemplo; o
+total legal do deck continua vindo somente de `deck_cards.quantity`.
+
+### Modelo correto
+
+Separar três contratos:
+
+| Contrato | Fonte | Uso |
+|---|---|---|
+| Cardinalidade do deck | `deck_cards.quantity` | total 100, main 99, hash de deck, validação Commander |
+| Função de deckbuilding | `card_function_tags`, `card_semantic_tags_v2` | ramp/draw/removal/wipe/protection/engine/payoff/wincon |
+| Regra executável | `card_battle_rules` | battle engine, replay, forensic audit, simulação |
+
+Nenhum consumidor deve fazer join bruto de `deck_cards` com tabelas que possam
+ter múltiplas linhas por `card_id`. Antes de tocar `deck_cards`, essas tabelas
+devem ser reduzidas para uma linha por carta.
+
+### Fechamentos obrigatórios do contrato
+
+- **Taxonomia canônica**: normalizar categorias antes de escolher
+  `functional_tag`. Exemplo: `board_wipe` deve virar `wipe`; `unknown` não
+  deve ser promovido; tipos estruturais (`artifact`, `creature`, `land`) só
+  devem ser fallback quando não houver papel funcional real.
+- **Buckets sobrepostos**: `functional_tags_json` é membership overlay, não
+  partição. Uma carta pode contar em `ramp` e `engine`; por isso
+  `SUM(role_qty.values())` pode ser maior que `SUM(deck_cards.quantity)` sem
+  indicar deck overfull.
+- **Dedupe lógico de regras**: agregar por `card_id` evita duplicar cartas,
+  mas não impede duas regras equivalentes no mesmo `battle_rules_json`.
+  Definir `logical_rule_key` por carta/face/efeito/papel antes de agregar e
+  manter somente o melhor exemplar por chave lógica.
+- **Promoção confiável para `card_function_tags`**: tags derivadas de
+  `card_battle_rules` só podem virar fonte canônica quando passarem por gate.
+  No schema atual, `curated` é `source`, não `review_status`. Portanto, o gate
+  deve considerar algo como `review_status IN ('verified', 'active')`,
+  `source IN ('manual', 'curated')` quando aplicável e piso mínimo de
+  `confidence`.
+- **Limpeza de stale tags derivadas**: se a futura derivação usar
+  `source='card_battle_rules_v1'`, cada rodada deve remover desse source as
+  tags que não aparecem mais no conjunto derivado atual para os `card_id`
+  tocados.
+- **Hashes separados**: `deck_hash` deve representar somente estrutura do deck
+  (`card_id`, `quantity`, `is_commander`). Mudanças em tags/regras devem gerar
+  `semantics_hash` separado, para não quebrar baseline/quality gate quando só a
+  camada semântica mudou.
+- **Autoridade SQLite vs PostgreSQL**: `functional_tags_json` e
+  `battle_rules_json` no SQLite Hermes são cache/snapshot operacional. A fonte
+  de verdade continua sendo PostgreSQL (`card_function_tags`,
+  `card_semantic_tags_v2`, `card_battle_rules`). A tabela SQLite normalizada de
+  battle rules continua sendo a fonte para executor/auditor; o JSON agregado é
+  para consumidores em contexto de deck.
+
+### Próxima implementação recomendada
+
+Concluído no Slice 1:
+
+1. Criar uma query/helper compartilhado para agregação por `card_id`:
+   - `functional_tags_json`: array ordenado de tags funcionais distintas;
+   - `semantic_tags_v2_json`: JSON/array agregado quando aplicável;
+   - `battle_rules_json`: array ordenado de regras com `effect_json`,
+     `deck_role_json`, `source`, `confidence`, `review_status`,
+     `rule_version` e `normalized_name`.
+2. Usar `jsonb_agg(... ORDER BY ...)` no PostgreSQL e
+   `COALESCE(..., '[]'::jsonb)` para saída determinística.
+3. Atualizar `sync_pg_target_deck_to_hermes.py` para persistir esses campos no
+   SQLite Hermes como JSON text, mantendo campos legados somente como projeção:
+   - `functional_tag` pode continuar como primary/legacy role;
+   - `functional_tags_json` deve preservar o conjunto completo;
+   - `battle_rules_json` deve preservar todas as regras da carta.
+4. Adicionar migração idempotente no SQLite Hermes para novas colunas JSON.
+5. Validar suporte JSON do SQLite em runtime; se `json_each/json_extract` não
+   estiverem disponíveis, os scripts devem fazer parse em Python.
+
+Concluído no bridge de consumidores ativos:
+
+6. Atualizar `master_optimizer_common.py` e `slot_optimizer.py` para consumir
+   `functional_tags_json` com fallback para `functional_tag`.
+7. Separar `deck_hash` estrutural de `semantics_hash`.
+8. Atualizar `_mana_validator.py`, `_run_validation.py` e
+   `_update_cron_status.py` para usar membership de `functional_tags_json`,
+   mantendo `SUM(deck_cards.quantity)` como cardinalidade.
+
+Ainda pendente:
+
+9. Classificar scripts históricos/manuais que ainda consultam `functional_tag`
+   diretamente como ativos vs legados.
+10. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
+   for função de deck; usar essa tabela apenas como regra executável/revisável.
+11. Adicionar derivação controlada de `card_battle_rules` para
+   `card_function_tags` somente depois de definir taxonomia canônica,
+   `logical_rule_key`, gate de `source/review_status/confidence` e limpeza de
+   stale tags.
+
+### Testes obrigatórios antes de merge
+
+- Unit test do helper SQL: uma carta com duas `card_battle_rules` e duas
+  `card_function_tags` continua retornando uma linha de deck.
+- Regressão PG -> Hermes: `cards_seen`, `quantity_seen`, `quantity_written` e
+  `SUM(deck_cards.quantity)` permanecem 100 em Commander.
+- Teste de determinismo: duas execuções sem mudança geram JSON byte-identical.
+- Teste de idempotência: rerodar derivação/sync não duplica tags nem regras.
+- Teste de stale cleanup: uma tag derivada com
+  `source='card_battle_rules_v1'` some quando a regra que a originou deixa de
+  derivar essa tag.
+- Teste de gate de revisão: regra `needs_review` ou com baixa confiança aparece
+  em `battle_rules_json`, mas não é promovida para `card_function_tags`.
+- Teste de dedupe lógico: duas linhas equivalentes de regra geram uma entrada
+  canônica em `battle_rules_json`, preservando metadados suficientes para
+  auditoria.
+- Teste de preservação: `battle_rules_json` contém todas as regras esperadas da
+  carta; `functional_tags_json` contém todas as tags esperadas.
+- Teste de hash: mudar somente tags/regras altera `semantics_hash`, mas não
+  altera `deck_hash`.
+- Teste de overlay: carta multi-role conta em todos os papéis aplicáveis, mas
+  validadores não tratam `SUM(role_qty.values()) > total_cards` como overfull.
+- Teste de separação semântica: land-back MDFC pode entrar como heurística
+  `land_like`, mas não vira land real para tutor, legalidade ou castabilidade
+  zone-sensitive.
+
+### Fora de escopo desta correção
+
+- Trocar todo o battle engine para judge engine completo.
+- Achatar carta para uma única função definitiva.
+- Usar `card_battle_rules` como tabela principal de papéis de deckbuilding.
+- Criar enforcement novo de IA baseado em tags sem scorecard e replay real.
+
+### Critério de conclusão
+
+Este gap só deve ser fechado quando o sync PG -> Hermes, os scorecards e os
+consumidores de deck enriquecido estiverem usando agregados por `card_id`, sem
+`LIMIT 1` como mecanismo de preservação de cardinalidade, e com validação
+automática impedindo que qualquer enriquecimento altere o total de cartas.
+
+---
+
+## 12. Battle/AI/Hermes/Lorehold - mapa para próximas tratativas (P1)
+
+### Documento base
+
+O detalhamento atual da lógica foi consolidado em:
+
+- `docs/hermes-analysis/BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md`
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md`
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
+- `docs/hermes-analysis/BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md`
+
+Usar este documento antes de aceitar qualquer plano novo sobre:
+
+- battle simulator;
+- geração de decks com IA;
+- optimize/rebuild;
+- Hermes crons;
+- learned decks;
+- Lorehold best-of learned;
+- migração de conhecimento Hermes para backend.
+
+O deep dive descreve o estado atual. O plano de implementação define a ordem
+segura para codar. O documento de decisões separa dúvidas de produto/logística
+que precisam de validação antes de virarem comportamento de produção.
+O handoff `BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md` lista as
+perguntas que o owner deve responder quando uma fase sair dos defaults já
+aprovados.
+
+Decisão do owner em 2026-06-11: seguir com estabilidade de release primeiro,
+sem ban global de Mox, learned decks apenas single-commander por enquanto,
+duplicidade singleton Commander bloqueando save/import, metadados Hermes
+ocultos para usuários normais, Hermes propondo e backend mandando,
+`needs_review` fora de execução dura, `card_battle_rules` derivando tags só
+quando confiável/rastreável, e primeiro slice limitado a agregação + snapshot
+Hermes + testes.
+
+### Gaps adicionais derivados do deep dive
+
+| Prioridade | Gap | Evidência | Ação esperada |
+|---|---|---|---|
+| P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
+| P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
+| P1 | Hermes target sync agregado ainda não foi aplicado no runtime real | `sync_pg_target_deck_to_hermes.py` foi validado em SQLite temporário, mas aplicação real foi mantida fora do slice | Rodar apply controlado no Hermes runtime depois que consumidores críticos estiverem compatíveis |
+| P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
+| P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
+| P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
+| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline | Adicionar `card_id`, `semantic_hash`, `variant_kind`, `source_zone`, `alternative_cost_kind`, `review_status`, `rule_version` |
+| P2 | Lorehold no-mox é política manual, não heurística universal | Learned deck 82 remove `Chrome Mox`, `Mox Diamond`, `Mox Opal` por decisão do produto | Não generalizar bloqueio de Mox para todos os comandantes/brackets sem regra explícita |
+| P2 | Decisões de produto base aprovadas; exceções ainda precisam validação | `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` registra os defaults aprovados em 2026-06-11 | Seguir Slice 1; qualquer mudança fora dos defaults exige nova validação |
+
+Atualização 2026-06-11: Slice 1 foi implementado localmente em
+`sync_pg_target_deck_to_hermes.py`. O sync agora exige `card_id`, agrega
+`functional_tags_json`, `semantic_tags_v2_json` e `battle_rules_json`, grava
+`deck_hash`, `semantics_hash` e `sync_run_id`, rejeita duplicatas antes de
+escrever SQLite e não usa mais `LEFT JOIN LATERAL (...) LIMIT 1` para
+`card_battle_rules`. Evidência em
+`BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`. Pendente real: classificar
+scripts históricos/manuais restantes, fazer backup e apply controlado no Hermes
+runtime real, depois rodar report-only.
+
+### Ordem recomendada de implementação
+
+1. Fazer backup do SQLite real do Hermes e aplicar o snapshot agregado em
+   janela controlada.
+2. Rodar report-only contra o Hermes real e comparar quantidade, commander/main,
+   `deck_hash`, `semantics_hash` e ausencia de fanout.
+3. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
+   precisar ser consumido fora do sync Hermes.
+4. Formalizar identidade semântica de carta e faces antes de expandir regras
+   DFC/MDFC.
+5. Só depois evoluir learned decks para dois comandantes.
+6. Só depois usar feedback ML como input de política.
+
+### Critério de bloqueio
+
+Qualquer plano futuro deve ser rejeitado ou reescrito se:
+
+- tratar `card_battle_rules` como fonte principal de papel de deckbuilding;
+- achatar toda carta para uma única função definitiva;
+- usar `LIMIT 1` como solução final;
+- alterar total de cartas por enriquecimento semântico;
+- confundir `source='curated'` com `review_status`;
+- tratar `rule_version` como string;
+- transformar Hermes SQLite em fonte final do produto;
+- aplicar swap Lorehold direto no produto sem handoff.
+
+### Proximo handoff para validacao do owner
+
+Quando uma decisão sair dos defaults aprovados, usar:
+
+- `docs/hermes-analysis/BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md`
+
+Esse documento pergunta explicitamente sobre apply no Hermes real, migracao de
+identidade semantica, singleton por identidade, visibilidade de metadados Hermes
+no app, excecao no-mox, explicacao "por que esta carta", execucao de
+`needs_review`, automacao futura de crons e prioridade do contrato
+`deck_card_semantics_v1`.

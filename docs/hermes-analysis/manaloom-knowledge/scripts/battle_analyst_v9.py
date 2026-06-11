@@ -1159,25 +1159,70 @@ def merge_oracle_metadata(card, oracle_cache):
 # DECK LOADING
 # ═══════════════════════════════════════════
 
+def normalize_functional_tag(value):
+    return re.sub(r"\s+", "_", str(value or "").strip().lower())
+
+
+def functional_tags_from_values(tags_value=None, fallback_tag=None):
+    tags = []
+    for raw in read_json_list(tags_value):
+        tag = normalize_functional_tag(raw)
+        if tag and tag != "unknown" and tag not in tags:
+            tags.append(tag)
+    fallback = normalize_functional_tag(fallback_tag)
+    if fallback and fallback != "unknown" and fallback not in tags:
+        tags.append(fallback)
+    return tags
+
+
+def card_functional_tags(card):
+    tags = []
+    for raw in card.get("functional_tags") or []:
+        tag = normalize_functional_tag(raw)
+        if tag and tag != "unknown" and tag not in tags:
+            tags.append(tag)
+    fallback = normalize_functional_tag(card.get("tag"))
+    if fallback and fallback != "unknown" and fallback not in tags:
+        tags.append(fallback)
+    return tags
+
+
+def card_has_functional_tag(card, *tags):
+    wanted = {normalize_functional_tag(tag) for tag in tags}
+    return bool(wanted.intersection(card_functional_tags(card)))
+
+
 def load_deck(deck_id=6):
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(deck_cards)")}
+    functional_tags_expr = (
+        "functional_tags_json"
+        if "functional_tags_json" in columns
+        else "'[]' AS functional_tags_json"
+    )
     rows = conn.execute("""
         SELECT card_name, quantity, CAST(COALESCE(cmc,0) AS REAL) as cmc,
                COALESCE(functional_tag,'unknown') as functional_tag,
+               {functional_tags_expr},
                type_line, oracle_text, is_commander
         FROM deck_cards WHERE deck_id=?
-    """, (deck_id,)).fetchall()
+    """.format(functional_tags_expr=functional_tags_expr), (deck_id,)).fetchall()
     oracle_cache = load_card_oracle_cache(conn, [row["card_name"] for row in rows])
     conn.close()
     commander = None
     deck = []
     for row in rows:
         qty = row["quantity"] or 1
+        functional_tags = functional_tags_from_values(
+            row["functional_tags_json"],
+            row["functional_tag"],
+        )
         card = merge_oracle_metadata({
             "name": row["card_name"],
             "cmc": float(row["cmc"] or 0),
-            "tag": row["functional_tag"] or "unknown",
+            "tag": functional_tags[0] if functional_tags else (row["functional_tag"] or "unknown"),
+            "functional_tags": functional_tags,
             "type_line": row["type_line"] or "",
             "oracle_text": row["oracle_text"] or "",
             "is_commander": bool(row["is_commander"]),
@@ -2757,13 +2802,14 @@ def get_card_effect(card):
                 confidence=0.55,
             ),
         )
-    tag = card.get("tag", "")
-    if tag in TAG_EFFECTS:
+    for tag in card_functional_tags(card):
+        if tag not in TAG_EFFECTS:
+            continue
         return normalize_effect_by_oracle(
             card,
             with_rule_metadata(
                 TAG_EFFECTS[tag],
-                source="functional_tag",
+                source="functional_tags_json",
                 review_status="heuristic",
                 confidence=0.35,
             ),
@@ -3333,7 +3379,7 @@ class Player:
             for card in self.hand
             if get_card_effect(card).get("effect") == "counter"
             or card.get("effect") == "counter"
-            or card.get("tag") == "counter"
+            or card_has_functional_tag(card, "counter", "protection")
         ]
         if castable_only:
             counters = [
@@ -5031,8 +5077,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     is_main_phase = phase in ("precombat_main", "postcombat_main")
 
     # Track counters available (count counterspells in hand)
-    player.counters_available = sum(1 for c in player.hand
-                                    if c.get("effect") == "counter" or c.get("tag") == "counter")
+    player.counters_available = sum(
+        1 for c in player.hand
+        if c.get("effect") == "counter" or card_has_functional_tag(c, "counter", "protection")
+    )
 
     # 1. Cast commander from command zone (main phase only)
     if is_main_phase and player.command_zone:
@@ -7125,30 +7173,33 @@ def infer_strategy(archetype):
 
 
 def infer_battle_card_identity(card):
-    role = str(card.get("role") or card.get("category") or card.get("tag") or "").lower()
+    role = normalize_functional_tag(card.get("role") or card.get("category") or card.get("tag") or "")
+    roles = set(card_functional_tags(card))
+    if role:
+        roles.add(role)
     type_line = str(card.get("type_line") or "").lower()
     oracle_text = str(card.get("oracle_text") or "").lower()
     name = str(card.get("name") or "").lower()
 
-    if role == "land" or "land" in type_line or normalize_card_name(name) in KNOWN_LAND_NAMES:
+    if "land" in roles or "land" in type_line or normalize_card_name(name) in KNOWN_LAND_NAMES:
         return "land", "land"
-    if role in ("ramp", "rock") or "add " in oracle_text or "treasure token" in oracle_text:
+    if roles.intersection({"ramp", "rock", "ritual"}) or "add " in oracle_text or "treasure token" in oracle_text:
         return "ramp", "ramp"
-    if role in ("counterspell", "counter") or "counter target" in oracle_text:
+    if roles.intersection({"counterspell", "counter"}) or "counter target" in oracle_text:
         return "counter", "counter"
-    if role in ("board_wipe", "sweeper") or "destroy all" in oracle_text or "exile all" in oracle_text:
+    if roles.intersection({"board_wipe", "wipe", "sweeper"}) or "destroy all" in oracle_text or "exile all" in oracle_text:
         return "board_wipe", "board_wipe"
-    if role in ("removal",) or "destroy target" in oracle_text or "exile target" in oracle_text:
+    if "removal" in roles or "destroy target" in oracle_text or "exile target" in oracle_text:
         return "removal", "removal"
-    if role in ("draw", "cantrip", "wheel") or "draw" in oracle_text:
+    if roles.intersection({"draw", "cantrip", "wheel"}) or "draw" in oracle_text:
         return "draw", "draw"
-    if role == "tutor" or "search your library" in oracle_text:
+    if "tutor" in roles or "search your library" in oracle_text:
         return "tutor", "tutor"
-    if role == "protection" or "indestructible" in oracle_text or "protection from" in oracle_text:
+    if "protection" in roles or "indestructible" in oracle_text or "protection from" in oracle_text:
         return "protection", "protection"
-    if role in ("wincon", "combo_piece") or "you win the game" in oracle_text:
+    if roles.intersection({"wincon", "combo_piece"}) or "you win the game" in oracle_text:
         return "wincon", "wincon"
-    if role == "creature" or "creature" in type_line or "token" in name:
+    if "creature" in roles or "creature" in type_line or "token" in name:
         return "creature", "creature"
     if "instant" in type_line:
         return "spell", "instant"
@@ -7205,10 +7256,10 @@ def main():
     print("=" * 60)
 
     commander, deck = load_deck()
-    lands = sum(1 for c in deck if c.get("tag") == "land" or "Land" in c.get("type_line", ""))
-    ramp = sum(1 for c in deck if c.get("tag") in ("ramp", "ritual"))
-    removal = sum(1 for c in deck if c.get("tag") in ("removal", "board_wipe"))
-    nonlands = [c for c in deck if c.get("tag") != "land"]
+    lands = sum(1 for c in deck if card_has_functional_tag(c, "land") or "Land" in c.get("type_line", ""))
+    ramp = sum(1 for c in deck if card_has_functional_tag(c, "ramp", "ritual"))
+    removal = sum(1 for c in deck if card_has_functional_tag(c, "removal", "board_wipe"))
+    nonlands = [c for c in deck if not card_has_functional_tag(c, "land")]
     avg_cmc = sum(c["cmc"] for c in nonlands) / max(1, len(nonlands))
     instants_in_deck = sum(1 for c in deck if is_instant(c))
 

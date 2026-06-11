@@ -249,18 +249,23 @@ Validação remota pós-conversão do mana-base validator (`2026-06-11T14:20Z`):
   normalizar learned decks Commander acima de 100 antes de usar o resultado
   como deck completo no app/servidor.
 
-Correção de causa raiz (`2026-06-11T14:35Z`):
+Correção de causa raiz inicial (`2026-06-11T14:35Z`):
 
 - O deck PG alvo declarava `100` cartas, mas
   `sync_pg_target_deck_to_hermes.py` usava `LEFT JOIN card_battle_rules` direto.
   Cartas com múltiplas regras em `card_battle_rules` multiplicavam linhas antes
   da gravação no SQLite, inflando o target Hermes para `104`.
-- O sync agora usa `LEFT JOIN LATERAL (... LIMIT 1)` para manter uma linha de
-  regra por carta e recusa qualquer payload em que `sum(quantity)` das linhas
-  buscadas não bata com `deck.total_qty` antes de escrever em `deck_cards`.
-- Teste adicionado:
+- O primeiro containment usou `LEFT JOIN LATERAL (... LIMIT 1)` para manter uma
+  linha de regra por carta e recusar payload em que `sum(quantity)` das linhas
+  buscadas não batesse com `deck.total_qty` antes de escrever em `deck_cards`.
+- O Slice 1 posterior substituiu esse containment por agregação por `card_id`,
+  preservando múltiplas regras em `battle_rules_json` sem multiplicar linhas de
+  deck.
+- Teste adicionado/expandido:
   `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py`
-  cobre a rejeição de quantidade multiplicada por join.
+  cobre rejeição de quantidade multiplicada por join, rejeição de `card_id`
+  duplicado/missing e ausência de `LEFT JOIN LATERAL`/`LIMIT 1` na query
+  semântica.
 - Validação remota pós-fix em Hermes: `cards_seen=100`, `cards_written=100`,
   `quantity_seen=100`, `quantity_written=100`, `deck_cards.sum(quantity)=100`.
   O mana validator deixou de reportar `OVERFULL`; o status restante é

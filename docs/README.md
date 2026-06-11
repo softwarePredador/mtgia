@@ -6,23 +6,45 @@ as fontes canônicas abaixo.
 
 ## Fontes canônicas atuais
 
-1. `server/manual-de-instrucao.md`
+1. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
+   - relatório mestre de lógica atual do produto, app, backend, banco, IA,
+     Hermes, crons, battle engine e validações.
+2. `docs/hermes-analysis/BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md`
+   - detalhamento específico de battle simulator, geração IA, estratégia de
+     melhoria/otimização de deck, Hermes e Lorehold.
+3. `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md`
+   - plano faseado para implementar agregação multi-função, snapshot Hermes,
+     consumers set-based e validações.
+4. `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
+   - evidência do Slice 1 local: sync Hermes por `card_id`, arrays semânticos,
+     hashes, bridge do optimizer e validação anti-fanout/Lorehold.
+5. `docs/hermes-analysis/BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md`
+   - perguntas/dúvidas de produto, logística e política que precisam de validação
+     antes das próximas mudanças estruturais.
+6. `docs/hermes-analysis/BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md`
+   - handoff objetivo de perguntas, furos, decisões logísticas e ideias que o
+     owner deve validar antes das próximas fases de battle/IA/Hermes.
+7. `docs/hermes-analysis/HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`
+   - classificação dos consumidores Hermes de `functional_tag`, indicando quais
+     já usam `functional_tags_json`, quais são indiretos e quais são manuais ou
+     históricos.
+8. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
-2. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+9. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
-3. `app/doc/APP_AUDIT_2026-04-29.md`
+10. `app/doc/APP_AUDIT_2026-04-29.md`
    - status consolidado do app mobile, riscos e validacoes recentes.
-4. `app/doc/UI_TEST_SURFACE_MAP.md`
+11. `app/doc/UI_TEST_SURFACE_MAP.md`
    - keys e superficies que testes runtime devem usar.
-5. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+12. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
    - checklist para rodada interna non-scanner.
-6. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+13. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-7. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+14. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
    - veredito global atual de produto, gates restantes e ordem de execucao.
-8. `app/doc/runtime_flow_handoffs/README.md`
+15. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-9. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+16. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 

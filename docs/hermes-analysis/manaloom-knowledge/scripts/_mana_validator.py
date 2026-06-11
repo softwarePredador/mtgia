@@ -2,9 +2,16 @@
 """Mana Base Validator — validates decks against EDHREC profiles in SQLite + filesystem"""
 import sqlite3, json, os, sys, datetime
 from pathlib import Path
+from semantic_role_metrics import load_deck_metric_rows, role_sum, tag_metrics_from_deck
 
-DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
-PROFILE_BASE = '/opt/data/workspace/mtgia/server/test/artifacts'
+DB = os.environ.get(
+    'MANALOOM_KNOWLEDGE_DB',
+    '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db',
+)
+PROFILE_BASE = os.environ.get(
+    'MANALOOM_PROFILE_BASE',
+    '/opt/data/workspace/mtgia/server/test/artifacts',
+)
 
 # Commander -> (batch, filename) mapping
 PROFILE_MAP = {
@@ -111,55 +118,27 @@ def main():
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    # Get commanders
-    cur.execute("SELECT id, name FROM commanders ORDER BY id")
-    commanders = {r['id']: r['name'] for r in cur.fetchall()}
+    # Get commanders when the full Hermes DB has the table. Temporary target
+    # snapshots used in tests may not carry commander metadata.
+    has_commanders = cur.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='commanders'"
+    ).fetchone()
+    if has_commanders:
+        cur.execute("SELECT id, name FROM commanders ORDER BY id")
+        commanders = {r['id']: r['name'] for r in cur.fetchall()}
+    else:
+        commanders = {}
 
-    # Get decks with tag-based metrics
-    cur.execute("""
-    SELECT d.id, d.deck_name, d.commander_id, d.archetype, d.notes,
-      COALESCE(SUM(dc.quantity), 0) as total_cards,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='land' THEN dc.quantity ELSE 0 END), 0) as lands_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='ramp' THEN dc.quantity ELSE 0 END), 0) as ramp_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='draw' THEN dc.quantity ELSE 0 END), 0) as draw_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='removal' THEN dc.quantity ELSE 0 END), 0) as removal_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='tutor' THEN dc.quantity ELSE 0 END), 0) as tutor_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='board_wipe' THEN dc.quantity ELSE 0 END), 0) as board_wipe_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='protection' THEN dc.quantity ELSE 0 END), 0) as protection_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='recursion' THEN dc.quantity ELSE 0 END), 0) as recursion_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='wincon' THEN dc.quantity ELSE 0 END), 0) as wincon_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='engine' THEN dc.quantity ELSE 0 END), 0) as engine_tag,
-      COALESCE(SUM(CASE WHEN dc.functional_tag='unknown' THEN dc.quantity ELSE 0 END), 0) as unknown_tag,
-      ROUND(AVG(dc.cmc), 2) as avg_cmc
-    FROM decks d
-    LEFT JOIN deck_cards dc ON dc.deck_id = d.id
-    GROUP BY d.id
-    ORDER BY d.id
-    """)
+    decks = load_deck_metric_rows(conn)
 
     results = []
     now = datetime.datetime.now(datetime.timezone.utc)
 
-    for row in cur.fetchall():
-        d = dict(row)
+    for d in decks:
         deck_id = d['id']
         cmd_name = commanders.get(d['commander_id'], 'Unknown')
 
-        tag_metrics = {
-            'lands': d['lands_tag'],
-            'ramp': d['ramp_tag'],
-            'draw': d['draw_tag'],
-            'removal': d['removal_tag'],
-            'interaction': d['removal_tag'],
-            'tutor': d['tutor_tag'],
-            'board_wipe': d['board_wipe_tag'],
-            'wipe': d['board_wipe_tag'],
-            'protection': d['protection_tag'],
-            'wincon': d['wincon_tag'],
-            'finishers': d['wincon_tag'],
-            'recursion': d['recursion_tag'],
-            'engine': d['engine_tag'],
-        }
+        tag_metrics = tag_metrics_from_deck(d)
 
         total_cards = d['total_cards']
         if total_cards < 50:
@@ -263,8 +242,17 @@ def main():
             'lands_tag': d['lands_tag'],
             'ramp_tag': d['ramp_tag'],
             'draw_tag': d['draw_tag'],
+            'removal_tag': d['removal_tag'],
+            'tutor_tag': d['tutor_tag'],
+            'board_wipe_tag': d['board_wipe_tag'],
+            'protection_tag': d['protection_tag'],
+            'recursion_tag': d['recursion_tag'],
+            'wincon_tag': d['wincon_tag'],
+            'engine_tag': d['engine_tag'],
             'unknown_tag': d['unknown_tag'],
+            'role_sum': role_sum(d),
             'avg_cmc': d['avg_cmc'],
+            'role_metric_source': d['role_metric_source'],
         })
 
     conn.close()

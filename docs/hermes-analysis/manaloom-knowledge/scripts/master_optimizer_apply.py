@@ -96,25 +96,46 @@ def main() -> int:
             raise SystemExit(f"Added card already present in deck: {added}")
 
         meta = card_metadata(conn, added)
+        deck_columns = {row[1] for row in conn.execute("PRAGMA table_info(deck_cards)")}
+        added_tag = candidate["add_tag"] or candidate["add_effect"] or "candidate"
         conn.execute(
             "DELETE FROM deck_cards WHERE deck_id=? AND lower(card_name)=lower(?)",
             (args.deck_id, removed),
         )
+        insert_columns = [
+            "deck_id",
+            "card_name",
+            "quantity",
+            "functional_tag",
+            "tag_confidence",
+            "is_commander",
+            "is_partner",
+            "cmc",
+            "type_line",
+            "oracle_text",
+        ]
+        insert_values = [
+            args.deck_id,
+            added,
+            1,
+            added_tag,
+            None,
+            0,
+            0,
+            meta["cmc"] if meta else candidate["add_cmc"],
+            meta["type_line"] if meta else None,
+            meta["oracle_text"] if meta else None,
+        ]
+        if "functional_tags_json" in deck_columns:
+            insert_columns.append("functional_tags_json")
+            insert_values.append(json.dumps([added_tag], ensure_ascii=True))
+        placeholders = ", ".join("?" for _ in insert_columns)
         conn.execute(
-            """
-            INSERT INTO deck_cards
-                (deck_id, card_name, quantity, functional_tag, tag_confidence,
-                 is_commander, is_partner, cmc, type_line, oracle_text)
-            VALUES (?, ?, 1, ?, NULL, 0, 0, ?, ?, ?)
+            f"""
+            INSERT INTO deck_cards ({", ".join(insert_columns)})
+            VALUES ({placeholders})
             """,
-            (
-                args.deck_id,
-                added,
-                candidate["add_tag"] or candidate["add_effect"] or "candidate",
-                meta["cmc"] if meta else candidate["add_cmc"],
-                meta["type_line"] if meta else None,
-                meta["oracle_text"] if meta else None,
-            ),
+            insert_values,
         )
         after_hash = deck_hash(conn, args.deck_id)
         after_summary = get_deck_summary(conn, args.deck_id)

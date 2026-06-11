@@ -28,9 +28,46 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 - `HERMES_CRON_VALUE_AND_MIGRATION_AUDIT_2026-06-11.md`
   - Auditoria uma a uma das crons Hermes, com decisão de manter/pausar e plano
-    para migrar o loop para o servidor ManaLoom.
+  para migrar o loop para o servidor ManaLoom.
   - Atualizado com a primeira rodada real pós-ajuste: watchdog OK, falha de
     ownership SQLite corrigida e sync de target deck com duplicatas tratado.
+
+- `BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md`
+  - Mapa detalhado da lógica atual de battle simulator, geração IA,
+    otimização, Hermes e Lorehold.
+  - Use para comparar novos planos de implementação antes de alterar
+    `IMPLEMENTATION_GAPS.md` ou código.
+
+- `BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md`
+  - Plano de implementação faseado para agregação multi-função, snapshot
+    Hermes, tags funcionais, `card_battle_rules`, learned decks e validação.
+  - Use como checklist técnico antes de alterar schema, sync ou consumidores
+    Hermes.
+
+- `BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
+  - Evidência da implementação local do primeiro slice: agregação por
+    `card_id`, arrays JSON, hashes, testes anti-fanout e validação Lorehold em
+    SQLite temporário.
+  - Também registra o bridge de `master_optimizer_common.py` e
+    `slot_optimizer.py` para ler `functional_tags_json`.
+  - Use antes de avançar para validadores/report-only crons restantes ou apply
+    no Hermes real.
+
+- `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md`
+  - Lista de dúvidas, decisões de produto, logística e políticas que precisam
+  de validação do owner antes das próximas fases.
+  - Use quando uma alteração depender de regra de negócio e não só de código.
+
+- `BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md`
+  - Handoff direto para o owner responder dúvidas, furos, logística e ideias
+    antes das próximas fases de battle/IA/Hermes.
+  - Use para separar o que já pode ser implementado dos pontos que ainda
+    precisam de validação explícita.
+
+- `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`
+  - Classifica scripts que ainda mencionam `functional_tag` como ativos,
+    indiretos, manuais/importers ou históricos/pausados.
+  - Use antes de aplicar o snapshot agregado no Hermes runtime real.
 
 - `HERMES_DOCS_TRIAGE_2026-06-11.md`
   - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch
@@ -54,17 +91,46 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
      estado atual do Lorehold.
    - Nao use sozinho como autorizacao de apply.
 
-3. `HERMES_CRON_PIPELINE_ORDER_2026-06-07.md`
+3. `BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md`
+   - Explica a divisao entre simulador leve do backend, battle analyzer Hermes,
+     generate/optimize app-facing e pipeline Lorehold learned deck.
+   - Use como mapa atual antes de propor migracao Hermes -> backend.
+
+4. `BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md`
+   - Transforma o deep dive e as validações externas em plano executável.
+   - Use como ordem padrão para implementar agregação por `card_id`, snapshot
+     Hermes e consumidores set-based.
+
+5. `BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
+   - Evidência fresca de Slice 1 implementado localmente e validado, incluindo
+     bridge do optimizer para arrays semânticos.
+   - Use como baseline antes de aplicar no Hermes real ou migrar
+     validadores/report-only crons restantes.
+
+6. `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md`
+   - Perguntas e políticas pendentes para o owner validar.
+   - Use antes de transformar heurística/cron/Hermes em comportamento de
+     produção.
+
+7. `BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md`
+   - Lista objetiva de perguntas, furos e decisões logísticas a retornar para
+     Codex antes de promover comportamento novo.
+
+8. `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`
+   - Inventário dos consumidores Hermes de `functional_tag` e quais já foram
+     migrados para `functional_tags_json`.
+
+9. `HERMES_CRON_PIPELINE_ORDER_2026-06-07.md`
    - Snapshot da ordem e estado das crons.
    - Use para entender a frota atual, mas valide contra `/opt/data/cron/jobs.json`
      e artefatos frescos no container.
 
-4. `master_optimizer_reports/`
+10. `master_optimizer_reports/`
    - Evidencias de execucoes.
    - Use sempre o report mais fresco que bate com `baseline_id`, `baseline_hash`
      e o SQLite vivo.
 
-5. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
+11. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
    - Classificacao de todos os docs raiz desta pasta.
    - Use para saber se um arquivo e canonico, operacional, historico ou backlog.
 

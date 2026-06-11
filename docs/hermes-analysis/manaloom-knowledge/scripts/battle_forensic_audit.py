@@ -128,6 +128,7 @@ GAME_IMPACT_EFFECTS = {
 HEURISTIC_SOURCES = {
     "card_effect_field",
     "functional_tag",
+    "functional_tags_json",
     "known_cards_generated",
     "type_line_creature",
     "unknown",

@@ -1,0 +1,535 @@
+# Battle/AI Semantic Sync - Plano de Implementacao
+
+Status: Slice 1 implemented locally and validated; optimizer consumer bridge
+implemented; runtime Hermes apply still pending.
+
+Scope: battle simulator, AI deck generation, optimize, Hermes sync, Lorehold
+learned deck and semantic multi-function cards.
+
+Owner-approved scope for the first coding slice on 2026-06-11:
+
+- release stability first;
+- no global Mox ban;
+- learned decks only for single commander until partner corpus exists;
+- duplicate Commander singleton identity blocks save/import;
+- Hermes metadata hidden from normal users;
+- Hermes proposes, backend owns;
+- `needs_review` battle rules do not execute hard behavior;
+- `card_battle_rules` can derive tags only when trusted and traceable;
+- first coding slice limited to aggregation + Hermes snapshot + tests.
+
+This document converts the latest deep validations into an actionable plan. It
+must be read together with:
+
+- `docs/hermes-analysis/BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md`
+- `docs/hermes-analysis/IMPLEMENTATION_GAPS.md`
+- `docs/hermes-analysis/BATTLE_SYSTEM_LOGIC.md`
+- `docs/hermes-analysis/HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py`
+- `server/database_setup.sql`
+
+## 1. Non-negotiable rules
+
+1. `deck_cards.quantity` is the only source of deck cardinality.
+2. Enrichment must never multiply deck rows.
+3. `card_function_tags` is the canonical deckbuilding multi-function layer.
+4. `card_semantic_tags_v2` is richer semantic metadata, not a hard gate by
+   default.
+5. `card_battle_rules` is executable/reviewable battle semantics, not the main
+   deckbuilding role table.
+6. Hermes SQLite is a read model/cache. PostgreSQL remains the product source
+   of truth.
+7. `functional_tag` is legacy compatibility. `functional_tags_json` is the real
+   multi-role contract.
+8. `LIMIT 1` is not acceptable as semantic fanout containment; target sync no
+   longer uses it for battle-rule aggregation.
+9. Commander legality must be checked by Commander rules, not by display card
+   count alone.
+10. Lorehold no-mox policy is a product decision for that learned deck, not a
+    global Mox ban.
+
+## 2. Current state that matters before implementation
+
+### PostgreSQL
+
+Current relevant tables:
+
+- `cards`
+- `deck_cards`
+- `card_function_tags`
+- `card_semantic_tags_v2`
+- `card_battle_rules`
+- `commander_learned_decks`
+- `deck_learning_events`
+- `commander_card_usage`
+- `ai_optimize_cache`
+- `ai_optimize_jobs`
+- `ai_generate_jobs`
+- `ml_prompt_feedback`
+
+Current remaining risk:
+
+- `card_battle_rules` supports multiple rules per card; the Hermes target sync
+  now aggregates those rules into `battle_rules_json`, and the primary
+  validators/report-only summaries read `functional_tags_json` with fallback.
+  Remaining risk is legacy/manual scripts still querying `functional_tag`
+  directly.
+- `deck_cards` is unique by `deck_id/card_id` in PostgreSQL, but Commander
+  singleton legality is by card identity/name, not necessarily by printing id.
+- `cards.scryfall_id` is still not enough as the final semantic identity
+  contract for split/MDFC/DFC/adventure/faces.
+
+### Hermes SQLite
+
+Current target deck cache after Slice 1:
+
+- `deck_cards` exists as Hermes operational snapshot.
+- New snapshots make `card_id` explicit.
+- New snapshots persist `functional_tags_json`, `battle_rules_json`,
+  `semantic_tags_v2_json`, `deck_hash`, `semantics_hash` and `sync_run_id`.
+- Legacy `card_name` and `functional_tag` remain for compatibility.
+
+The next risk is runtime rollout: back up the real Hermes SQLite DB, apply the
+new snapshot in a controlled run, then execute report-only validation against
+that real DB.
+
+### Backend app-facing simulator
+
+`/decks/:id/simulate` and `server/lib/ai/battle_simulator.dart` are a light
+deck-consistency simulation path. They do not replace Hermes Commander battle
+analysis.
+
+Current use:
+
+- opening hand/land distribution;
+- curve/on-curve probability;
+- basic Monte Carlo support;
+- not a judge engine;
+- not the source for Lorehold battle optimization.
+
+### Hermes battle simulator
+
+`docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` is the
+active richer simulator/lab.
+
+Current role:
+
+- Commander 4-player simulation;
+- stack/priority/SBAs/replacement/prevention primitives;
+- commander damage;
+- multi-defender combat;
+- replay/forensic audit;
+- slot optimizer and quality gate support.
+
+It remains a lab/read-model consumer until knowledge is promoted back to
+PostgreSQL and backend contracts.
+
+## 3. Target architecture
+
+```mermaid
+flowchart LR
+  Deck["PG deck_cards"]
+  Cards["PG cards"]
+  Func["PG card_function_tags"]
+  SemV2["PG card_semantic_tags_v2"]
+  Rules["PG card_battle_rules"]
+  View["deck_card_semantics_v1"]
+  Hermes["Hermes SQLite snapshot"]
+  Battle["battle_analyst_v9.py"]
+  Opt["slot optimizer / quality gate"]
+  API["Backend generate/optimize"]
+  App["Flutter app"]
+
+  Deck --> View
+  Cards --> View
+  Func --> View
+  SemV2 --> View
+  Rules --> View
+  View --> Hermes
+  Hermes --> Battle
+  Hermes --> Opt
+  View --> API
+  API --> App
+```
+
+Target principle:
+
+- every consumer reads one deck row per `deck_id/card_id`;
+- all multi-role and multi-rule data are arrays attached to that one row;
+- deck quantity is never derived from tag/rule counts;
+- local Hermes tables are rebuilt from a deterministic PG snapshot.
+
+## 4. Canonical contract: `deck_card_semantics_v1`
+
+Create a shared contract, preferably a PostgreSQL view or SQL function, that
+returns one row per deck card.
+
+Required output fields:
+
+| Field | Purpose |
+|---|---|
+| `deck_id` | Source deck |
+| `card_id` | Canonical card row id from PG |
+| `card_name` | Display/debug only |
+| `quantity` | Only cardinality source |
+| `is_commander` | Commander flag from `deck_cards` |
+| `cmc` | Deck/battle support |
+| `type_line` | Display/heuristic support |
+| `oracle_text` | Fallback only; do not expose in public artifacts |
+| `functional_tags_json` | Ordered array of deckbuilding roles |
+| `functional_tag` | Legacy primary role for old consumers |
+| `semantic_tags_v2_json` | Optional richer semantic object/array |
+| `battle_rules_json` | Ordered array of executable/reviewable rules |
+| `deck_hash_input` | Deterministic deck-structure input |
+| `semantics_hash_input` | Deterministic semantic input |
+
+Required behavior:
+
+- aggregate every 1:N table before joining to deck base;
+- `COALESCE` empty arrays to `[]`;
+- deterministic `ORDER BY` inside JSON aggregation;
+- do not use `LIMIT 1`;
+- preserve multiple tags and multiple battle rules;
+- filter out rejected/deprecated rules unless explicitly requested by audit
+  mode;
+- keep `source` and `review_status` separate.
+
+## 5. Functional tag namespaces
+
+Do not keep one flat bucket forever. Introduce a documented tag namespace.
+
+| Namespace | Tags | Use |
+|---|---|---|
+| `function_core` | `ramp`, `draw`, `removal`, `wipe`, `protection`, `tutor`, `engine`, `wincon` | validator, optimize, quality gate |
+| `function_extended` | `combo_piece`, `recursion`, `token_maker`, `enabler`, `stax`, `payoff`, `mana_fixing`, `card_selection` | diagnostics, analysis, scorecards |
+| `type_fallback` | `land`, `creature`, `artifact`, `enchantment`, `planeswalker`, `utility` | UI/debug fallback only |
+
+Rules:
+
+- `functional_tags_json` can contain many roles.
+- `functional_tag` chooses one legacy-compatible role.
+- `functional_tag` must prefer `function_core`, then eligible
+  `function_extended`, then `type_fallback`.
+- `unknown` must never replace a real tag.
+- `artifact`, `creature`, `land` and similar type fallback values must not
+  become hard optimize gates.
+
+## 6. Implementation phases
+
+### Phase 0 - freeze current baseline
+
+Goal: capture current behavior before changing sync semantics.
+
+Actions:
+
+1. Run Hermes report-only/current target sync.
+2. Save current deck total, row total, commander count and Lorehold metrics.
+3. Save current failing examples around multi-function cards.
+4. Confirm no pending branch/doc divergence.
+
+Validation:
+
+```bash
+git status --short
+python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py
+```
+
+### Phase 1 - build canonical aggregation
+
+Status: implemented locally in `sync_pg_target_deck_to_hermes.py`.
+
+Goal: implement one-row-per-card semantic output.
+
+Files likely involved:
+
+- `server/database_setup.sql`
+- `server/bin/migrate.dart` or a dedicated migration path
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py`
+- new focused tests for the helper/query
+
+Expected changes:
+
+1. Add a canonical SQL view/function or shared query helper.
+2. Aggregate `card_function_tags` by `card_id`.
+3. Aggregate `card_semantic_tags_v2` by `card_id`.
+4. Aggregate `card_battle_rules` by `card_id`.
+5. Keep rejected/deprecated rules out of normal snapshot.
+6. Return `[]` for cards without tags/rules.
+
+Required tests:
+
+- one card with 2 tags and 3 rules still returns 1 row;
+- total quantity stays exactly 100 for a Commander learned deck;
+- commander stays 1;
+- main deck stays 99;
+- changing tag order does not change semantic hash;
+- no `LIMIT 1` remains in final target sync query.
+
+### Phase 2 - migrate Hermes SQLite snapshot
+
+Status: implemented locally and validated against temporary SQLite. Real Hermes
+runtime apply is pending.
+
+Goal: make Hermes snapshot explicit and deterministic.
+
+Files likely involved:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py`
+- Hermes SQLite schema creation logic
+- validator/optimizer consumers
+
+Expected SQLite fields:
+
+| Field | Requirement |
+|---|---|
+| `deck_id` | required |
+| `card_id` | required |
+| `card_name` | display/debug |
+| `quantity` | required |
+| `is_commander` | required |
+| `functional_tag` | legacy |
+| `functional_tags_json` | required JSON text |
+| `semantic_tags_v2_json` | optional JSON text |
+| `battle_rules_json` | required JSON text |
+| `deck_hash` | snapshot structure hash |
+| `semantics_hash` | snapshot semantic hash |
+| `sync_run_id` | traceability |
+
+Indexes/constraints:
+
+- prefer `UNIQUE(deck_id, card_id)`;
+- keep `card_name` only as display/debug;
+- if old consumers require `UNIQUE(deck_id, card_name)`, keep compatibility but
+  do not make it the canonical identity.
+
+Required behavior:
+
+- delete stale rows for the target deck during apply;
+- write all rows in one SQLite transaction;
+- produce a sanitized report with counts/hashes;
+- refuse partial decks below configured threshold;
+- refuse decks without commander for Commander target sync.
+
+### Phase 3 - update Hermes consumers
+
+Status: implemented for `master_optimizer_common.py`, `slot_optimizer.py`,
+`_mana_validator.py`, `_run_validation.py` and `_update_cron_status.py`.
+Historical/manual scripts remain to classify.
+
+Goal: make every relevant consumer set-based.
+
+Consumers to audit/update:
+
+- `slot_optimizer.py`
+- `loss_mode_suggester.py`
+- `hermes_mana_base_validator.py`
+- `master_optimizer_quality_gate.py`
+- battle replay/forensic scripts
+- cron reporters that count roles
+
+Rules:
+
+- count deck size from `quantity`;
+- count roles by membership in `functional_tags_json`;
+- a card can count in many role buckets;
+- role bucket totals must never be interpreted as deck size;
+- `functional_tag` can be used only when arrays are absent;
+- `battle_rules_json` can guide battle/replay, but not hard deckbuilding roles
+  unless mapped through controlled derivation.
+
+Required tests:
+
+- dual-role card counts in both role buckets;
+- role bucket sum can exceed deck size without failing;
+- no duplicate card rows after sync;
+- old SQLite without arrays uses fallback without crash.
+
+### Phase 4 - formalize card semantic identity
+
+Goal: remove ambiguity between printing, oracle identity and card faces.
+
+Likely schema additions:
+
+- `oracle_id` or equivalent canonical card identity;
+- `layout`;
+- `card_faces_json`;
+- normalized English name identity for Commander singleton validation;
+- optional face fields for battle rules.
+
+Why this matters:
+
+- split cards;
+- MDFCs/DFCs;
+- adventures;
+- localized names;
+- reprints;
+- Commander singleton by name/card identity;
+- color identity across faces.
+
+Required behavior:
+
+- app/search/import can still use localized aliases;
+- deck legality uses canonical identity;
+- battle execution can choose active face/mode/variant;
+- no silent collapse of two illegal singleton duplicates.
+
+### Phase 5 - expand `card_battle_rules` contract
+
+Goal: make rules executable enough for Hermes and future backend migration.
+
+Recommended fields:
+
+| Field | Purpose |
+|---|---|
+| `rule_id` or stable fingerprint | replay/dedupe |
+| `oracle_id` | semantic identity |
+| `layout` | split/MDFC/DFC/adventure support |
+| `face_name` | face-specific rules |
+| `face_index` | deterministic face order |
+| `variant_kind` | spell/creature/adventure/omen/warp/etc |
+| `ability_kind` | static/triggered/activated/spell/replacement/prevention |
+| `timing_window` | cast/trigger timing |
+| `source_zone` | hand/graveyard/exile/command/etc |
+| `target_schema_json` | target contract |
+| `cost_schema_json` | mana/additional/alternative costs |
+| `duration_schema_json` | continuous/delayed/until EOT |
+| `requirements_json` | restrictions/conditions |
+| `is_enabled` or `execution_status` | separates review from execution |
+
+Important:
+
+- do not overload `review_status`;
+- keep `source` as provenance;
+- keep `review_status` as review quality;
+- use a separate enabled/execution flag for battle execution.
+
+### Phase 6 - learned deck Commander contract
+
+Goal: keep current Lorehold safe while preparing future partner/background
+support.
+
+Current behavior:
+
+- learned deck validation requires exactly 1 commander and 99 main cards.
+
+Next behavior:
+
+- keep current contract for normal commanders;
+- document partner/background as explicit future mode;
+- do not accept 2 commanders until corpus and UI can show/validate both;
+- tests must prove 98 main + 2 commanders only for legal partner/background
+  situations.
+
+Lorehold current policy:
+
+- learned candidate 82 is no-premium-Mox;
+- `Chrome Mox`, `Mox Diamond`, `Mox Opal` remain excluded for that active
+  learned deck by product policy;
+- do not generalize that exclusion globally.
+
+### Phase 7 - ML feedback and prompt policy
+
+Goal: convert useful feedback into deterministic policy only after scorecards.
+
+Allowed now:
+
+- collect `ml_prompt_feedback`;
+- use reports for analysis;
+- keep diagnostics.
+
+Not allowed yet:
+
+- use feedback as hard ranking/prompt policy without scorecard;
+- let rejected battle rules redefine deckbuilding tags;
+- let Hermes-only findings change production decks automatically.
+
+Promotion rule:
+
+1. Hermes finds signal.
+2. Report-only validates.
+3. Scorecard confirms no regression.
+4. Backend contract/test is added.
+5. Production behavior changes.
+
+## 7. Implementation blockers
+
+Block implementation if any proposed patch:
+
+- joins 1:N semantic tables directly to `deck_cards` without aggregation;
+- reintroduces `LIMIT 1` as final battle rule selection;
+- removes secondary rules/tags;
+- counts `functional_tags_json.length` as deck size;
+- makes SQLite the source of truth;
+- changes Lorehold learned deck without handoff;
+- treats `card_battle_rules` as the canonical deckbuilding role table;
+- confuses `source='curated'` with `review_status`;
+- treats `rule_version` as string;
+- changes learned deck commander counts without explicit Commander mode.
+
+## 8. Validation matrix
+
+### Documentation-only
+
+```bash
+git diff --check
+# Run the project secret scan on changed lines.
+```
+
+### PostgreSQL/schema/query
+
+```bash
+cd server
+dart analyze bin lib routes test
+dart test test/*semantic* test/*battle* test/*commander* --reporter compact
+```
+
+### Hermes scripts
+
+```bash
+cd docs/hermes-analysis/manaloom-knowledge/scripts
+python3 -m py_compile sync_pg_target_deck_to_hermes.py sync_battle_card_rules_pg.py slot_optimizer.py master_optimizer_quality_gate.py
+```
+
+### Hermes runtime
+
+```bash
+# Run report-only first.
+# Then run apply only when report totals match expected deck/semantic hashes.
+```
+
+### App/runtime
+
+Use iPhone Simulator for any UX-visible learned deck change:
+
+```bash
+cd app
+flutter test integration_test/commander_learned_deck_availability_runtime_test.dart -d <IPHONE_15_SIMULATOR_ID> --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --no-version-check
+```
+
+## 9. First implementation slice
+
+Start small. Do not change battle execution first.
+
+Slice 1 implemented locally on 2026-06-11:
+
+1. Add/centralize SQL aggregation contract.
+2. Add tests for fanout and deterministic arrays.
+3. Update `sync_pg_target_deck_to_hermes.py` to consume it.
+4. Add `card_id`, arrays and hashes to SQLite snapshot.
+5. Keep old `functional_tag` fallback.
+6. Run Hermes report-only.
+
+Expected result:
+
+- same deck total;
+- same commander/main counts;
+- more semantic information preserved;
+- no fanout;
+- no battle behavior change yet.
+
+Evidence:
+
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
+
+Only after this report is reviewed should we update optimizer/validator
+consumers or apply the new snapshot shape to the real Hermes runtime database.

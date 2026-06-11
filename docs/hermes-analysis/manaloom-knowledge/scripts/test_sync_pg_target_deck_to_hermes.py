@@ -12,7 +12,7 @@ import sync_pg_target_deck_to_hermes as sync
 
 
 class SyncPgTargetDeckToHermesTests(unittest.TestCase):
-    def test_write_sqlite_collapses_duplicate_card_names(self) -> None:
+    def test_write_sqlite_persists_card_id_arrays_and_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"
 
@@ -27,51 +27,106 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                 },
                 [
                     {
+                        "card_id": "00000000-0000-0000-0000-000000000001",
                         "name": "Lorehold, the Historian",
                         "quantity": 1,
                         "is_commander": True,
                         "functional_tag": "engine",
+                        "functional_tags_json": ["engine", "wincon"],
+                        "semantic_tags_v2_json": [
+                            {
+                                "schema_version": "semantic_v2",
+                                "tags": ["engine", "wincon"],
+                            }
+                        ],
+                        "battle_rules_json": [
+                            {
+                                "rule_version": 1,
+                                "source": "curated",
+                                "review_status": "verified",
+                                "effect": {"effect": "cost_reduction"},
+                                "deck_role": {"category": "engine"},
+                            }
+                        ],
+                        "tag_confidence": 0.9,
                         "rule_review_status": "verified",
                         "cmc": 5,
                         "type_line": "Legendary Creature",
                         "oracle_text": "Fixture commander.",
                     },
                     {
-                        "name": "Sol Ring",
-                        "quantity": 1,
-                        "is_commander": False,
-                        "functional_tag": "unknown",
-                        "rule_review_status": None,
-                        "cmc": 1,
-                        "type_line": "Artifact",
-                        "oracle_text": "",
-                    },
-                    {
+                        "card_id": "00000000-0000-0000-0000-000000000002",
                         "name": "Sol Ring",
                         "quantity": 1,
                         "is_commander": False,
                         "functional_tag": "ramp",
-                        "rule_review_status": "active",
+                        "functional_tags_json": ["ramp", "artifact"],
+                        "semantic_tags_v2_json": [],
+                        "battle_rules_json": [
+                            {
+                                "rule_version": 2,
+                                "source": "manual",
+                                "review_status": "verified",
+                                "effect": {"effect": "ramp_permanent"},
+                                "deck_role": {"category": "ramp"},
+                            },
+                            {
+                                "rule_version": 1,
+                                "source": "manual",
+                                "review_status": "needs_review",
+                                "effect": {"effect": "artifact_synergy"},
+                                "deck_role": {"category": "engine"},
+                            },
+                        ],
+                        "tag_confidence": 0.8,
+                        "rule_review_status": "verified",
                         "cmc": 1,
                         "type_line": "Artifact",
                         "oracle_text": "{T}: Add {C}{C}.",
+                    },
+                    {
+                        "card_id": "00000000-0000-0000-0000-000000000003",
+                        "name": "Swords to Plowshares",
+                        "quantity": 1,
+                        "is_commander": False,
+                        "functional_tag": "removal",
+                        "functional_tags_json": ["removal"],
+                        "semantic_tags_v2_json": [],
+                        "battle_rules_json": [],
+                        "tag_confidence": 0.7,
+                        "rule_review_status": None,
+                        "cmc": 1,
+                        "type_line": "Instant",
+                        "oracle_text": "Exile target creature.",
                     },
                 ],
                 apply=True,
             )
 
             self.assertEqual(stats["cards_seen"], 3)
-            self.assertEqual(stats["cards_written"], 2)
-            self.assertEqual(stats["duplicate_rows_collapsed"], 1)
+            self.assertEqual(stats["cards_written"], 3)
+            self.assertEqual(stats["duplicate_rows_collapsed"], 0)
             self.assertEqual(stats["quantity_written"], 3)
             self.assertEqual(stats["commanders"], 1)
+            self.assertEqual(len(stats["deck_hash"]), 64)
+            self.assertEqual(len(stats["semantics_hash"]), 64)
 
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             try:
                 rows = conn.execute(
                     """
-                    SELECT card_name, quantity, functional_tag, is_commander
+                    SELECT
+                      card_id,
+                      card_name,
+                      quantity,
+                      functional_tag,
+                      functional_tags_json,
+                      battle_rules_json,
+                      deck_hash,
+                      semantics_hash,
+                      sync_run_id,
+                      is_commander
                     FROM deck_cards
                     ORDER BY is_commander DESC, card_name
                     """
@@ -79,14 +134,72 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             finally:
                 conn.close()
 
-            self.assertEqual(len(rows), 2)
+            self.assertEqual(len(rows), 3)
             self.assertEqual(rows[0]["card_name"], "Lorehold, the Historian")
+            self.assertEqual(
+                rows[0]["card_id"],
+                "00000000-0000-0000-0000-000000000001",
+            )
             self.assertEqual(rows[0]["is_commander"], 1)
             self.assertEqual(rows[1]["card_name"], "Sol Ring")
-            self.assertEqual(rows[1]["quantity"], 2)
+            self.assertEqual(rows[1]["quantity"], 1)
             self.assertEqual(rows[1]["functional_tag"], "ramp")
+            self.assertEqual(sync.parse_json_value(rows[1]["functional_tags_json"], []), ["ramp", "artifact"])
+            self.assertEqual(len(sync.parse_json_value(rows[1]["battle_rules_json"], [])), 2)
+            self.assertEqual(rows[1]["deck_hash"], stats["deck_hash"])
+            self.assertEqual(rows[1]["semantics_hash"], stats["semantics_hash"])
+            self.assertTrue(rows[1]["sync_run_id"])
 
-    def test_write_sqlite_rejects_multiplied_join_quantity(self) -> None:
+    def test_write_sqlite_rejects_duplicate_card_id_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+
+            with self.assertRaises(RuntimeError) as err:
+                sync.write_sqlite(
+                    str(db_path),
+                    6,
+                    {
+                        "name": "Runtime Lorehold Learned",
+                        "archetype": "midrange",
+                        "total_qty": 1,
+                        "pg_deck_id": "pg-deck-1",
+                    },
+                    [
+                        {
+                            "card_id": "00000000-0000-0000-0000-000000000002",
+                            "name": "Sol Ring",
+                            "quantity": 1,
+                            "is_commander": False,
+                            "functional_tag": "ramp",
+                            "functional_tags_json": ["ramp"],
+                            "semantic_tags_v2_json": [],
+                            "battle_rules_json": [],
+                            "rule_review_status": "active",
+                            "cmc": 1,
+                            "type_line": "Artifact",
+                            "oracle_text": "{T}: Add {C}{C}.",
+                        },
+                        {
+                            "card_id": "00000000-0000-0000-0000-000000000002",
+                            "name": "Sol Ring",
+                            "quantity": 1,
+                            "is_commander": False,
+                            "functional_tag": "ramp",
+                            "functional_tags_json": ["ramp"],
+                            "semantic_tags_v2_json": [],
+                            "battle_rules_json": [],
+                            "rule_review_status": "active",
+                            "cmc": 1,
+                            "type_line": "Artifact",
+                            "oracle_text": "{T}: Add {C}{C}.",
+                        },
+                    ],
+                    apply=True,
+                )
+
+            self.assertIn("duplicate card_id rows", str(err.exception))
+
+    def test_write_sqlite_rejects_missing_card_id(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"
 
@@ -106,17 +219,9 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                             "quantity": 1,
                             "is_commander": False,
                             "functional_tag": "ramp",
-                            "rule_review_status": "active",
-                            "cmc": 1,
-                            "type_line": "Artifact",
-                            "oracle_text": "{T}: Add {C}{C}.",
-                        },
-                        {
-                            "name": "Sol Ring",
-                            "quantity": 1,
-                            "is_commander": False,
-                            "functional_tag": "ramp",
-                            "rule_review_status": "active",
+                            "functional_tags_json": ["ramp"],
+                            "semantic_tags_v2_json": [],
+                            "battle_rules_json": [],
                             "cmc": 1,
                             "type_line": "Artifact",
                             "oracle_text": "{T}: Add {C}{C}.",
@@ -125,13 +230,18 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                     apply=True,
                 )
 
-            self.assertIn("join multiplied deck card rows", str(err.exception))
+            self.assertIn("missing card_id", str(err.exception))
 
-    def test_card_battle_rules_join_limits_to_one_row_per_card(self) -> None:
-        join_sql = sync.card_battle_rules_join_sql().lower()
+    def test_semantic_deck_cards_sql_aggregates_without_limit_one(self) -> None:
+        sql = sync.semantic_deck_cards_sql().lower()
 
-        self.assertIn("left join lateral", join_sql)
-        self.assertIn("limit 1", join_sql)
+        self.assertIn("function_tags_agg", sql)
+        self.assertIn("semantic_tags_v2_agg", sql)
+        self.assertIn("battle_rules_agg", sql)
+        self.assertIn("jsonb_agg", sql)
+        self.assertIn("group by cbr.card_id", sql)
+        self.assertNotIn("left join lateral", sql)
+        self.assertNotIn("limit 1", sql)
 
 
 if __name__ == "__main__":
