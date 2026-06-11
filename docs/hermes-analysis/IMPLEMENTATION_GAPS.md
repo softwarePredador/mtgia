@@ -214,7 +214,8 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` | 228 | ✅ Extraído | Mantém regressões de replay events, fim de combate, APNAP/timestamp e spell-cast trigger isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` | 198 | ✅ Extraído | Mantém regressões auxiliares de loss taxonomy, token/land recursion, proteção de jogador e auditoria isoladas |
 | `server/routes/ai/optimize/index.dart` | 3092 | ⚠️ Split necessário | Manter rota como orquestração fina e mover blocos para support services |
-| `server/lib/ai/optimize_runtime_support.dart` | 2772 | ⚠️ Split necessário | Extrair seleção de candidatos, fallback e recovery estrutural |
+| `server/lib/ai/optimize_runtime_support.dart` | 2708 | ⚠️ Split iniciado | Cache foi movido para `optimize_cache_support.dart`; ainda falta extrair seleção de candidatos, fallback e recovery estrutural |
+| `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimization_validator.dart` | 904 | Aceitável por enquanto | Não splitar antes de isolar o optimize route/runtime |
 | `server/lib/ai/optimization_functional_roles.dart` | 768 | Aceitável por enquanto | Manter coeso; split só se crescer com novas políticas |
 

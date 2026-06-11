@@ -71,6 +71,9 @@
 > movido para `battle_replacement_support.py`; SBAs, anexos ilegais, Saga final
 > e token lifecycle foram movidos para `battle_sba_support.py`, reduzindo
 > `battle_analyst_v9.py` para 7017 linhas sem alterar a suite de 130 testes.
+> Primeiro split do runtime de optimize concluído: assinatura de deck, cache key
+> estável e load/save de cache foram movidos para `optimize_cache_support.dart`,
+> mantendo wrappers públicos em `optimize_runtime_support.dart`.
 
 ---
 
@@ -392,6 +395,7 @@
 | `battle_zone_transition_support.py` | Helpers parametrizados de zone transitions, LKI, exile e spell resolution | 118 |
 | `battle_replacement_support.py` | Replacement/prevention, vida, dano, ganho de vida e escudos de prevenção | 231 |
 | `battle_sba_support.py` | SBAs, anexos ilegais, Saga final, token lifecycle e loop de estabilização | 381 |
+| `optimize_cache_support.dart` | Assinatura de deck, cache key e persistência de cache do optimize | 119 |
 | `test_battle_analyst_v10_3.py` | Runner/orquestrador fino da suite Hermes, sem `def test_` inline | 238 |
 | `battle_targeting_tests.py` | Regressões isoladas de targeting formal mínimo | 241 |
 | `battle_summoning_sickness_tests.py` | Regressões isoladas de sickness, haste, vigilance e ativações de criaturas | 362 |
