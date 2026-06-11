@@ -18,7 +18,7 @@ from typing import Any
 WORKSPACE = Path(os.environ.get("MANALOOM_WORKSPACE", "/opt/data/workspace/mtgia"))
 DEFAULT_DB = WORKSPACE / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
 DEFAULT_ARTIFACTS = WORKSPACE / "server/test/artifacts"
-DEFAULT_REPORT = WORKSPACE / "docs/hermes-analysis/manaloom-knowledge/MANA_BASE_VALIDATION_REPORT.md"
+DEFAULT_REPORT = Path("/opt/data/artifacts/hermes_mana_base_validator/latest_mana_base_validation_report.md")
 
 ROLE_TO_TAG = {
     "lands": "lands",

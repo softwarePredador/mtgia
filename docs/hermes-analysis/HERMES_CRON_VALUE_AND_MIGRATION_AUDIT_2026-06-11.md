@@ -86,6 +86,10 @@ Correção versionada:
 - `server/bin/hermes_master_watchdog.sh` versiona o watchdog e troca a instrução
   antiga "rodar normal audit" por `manaloom-hermes-report-only.sh`, alinhado ao
   fluxo Codex pós-push.
+- `server/bin/hermes_mana_base_validator.py` substitui o validador de mana com
+  provider por relatório determinístico sobre `knowledge.db`. O output padrão
+  vai para `/opt/data/artifacts/hermes_mana_base_validator/`, não para `docs/`,
+  para evitar workspace sujo a cada cron.
 
 Validação remota após correções (`2026-06-11T13:25Z`):
 
@@ -136,7 +140,7 @@ Novo achado no auto-sync de decks aprendidos (`2026-06-11T13:55Z`):
 | `manaloom-commander-knowledge-deep` | 360m | Extrai padrões por comandante | Útil, mas dependente de provider | Manter com menor cadência; migrar para mineração determinística |
 | `manaloom-knowledge-synthesis` | 360m | Transforma achados MTG em tasks | Útil como ponte Hermes → Codex | Manter com menor cadência; sempre triado por Codex |
 | `manaloom-gamechanger-research` | 720m | Pesquisa gamechangers e gaps de ranking | Útil, mas corpus já está majoritariamente coberto | Manter baixa cadência |
-| `manaloom-mana-base-validator` | 720m | Valida base de mana dos decks | Útil para qualidade de deckbuilding | Manter baixa cadência; migrar para backend metrics |
+| `manaloom-mana-base-validator` | 720m | Valida base de mana dos decks via script determinístico | Útil para qualidade de deckbuilding e detecção de decks aprendidos inválidos | Manter; migrar para backend metrics |
 | `mtg-rules-auditor` | 720m | Audita regras MTG contra pipeline | Útil como guardrail técnico | Manter baixa cadência; migrar para testes/golden scenarios |
 | `manaloom-cron-governor-report` | 720m | Audita saúde da frota de crons sem LLM | Útil enquanto Hermes existir; agora script-only para evitar 429 | Manter até migração; depois trocar por health interno |
 
@@ -179,7 +183,7 @@ Mudanças:
 - Cadência das crons agent úteis foi reduzida:
   - commander knowledge: 180m → 360m
   - gamechanger research: 180m → 720m
-  - mana base validator: 360m → 720m
+  - mana base validator: 360m → 720m e convertido para script-only
   - knowledge synthesis: 240m → 360m
   - MTG rules auditor: 180m → 720m
 
@@ -220,12 +224,30 @@ Validação remota pós-conversão do governor (`2026-06-11T14:08Z`):
   `knowledge-import`, `auto-sync-learned-decks`, `pull-learning-events`,
   `auto-promote-learned`, `knowncards-validator` e
   `master-optimizer-preflight`.
-- As 5 crons ainda dependentes de provider ficaram corretamente classificadas
-  como `P2 replace_with_deterministic_report`: `commander-knowledge-deep`,
-  `gamechanger-research`, `mana-base-validator`, `knowledge-synthesis`,
-  `mtg-rules-auditor`.
+- Após a conversão do governor, as crons ainda dependentes de provider ficaram
+  corretamente classificadas como `P2 replace_with_deterministic_report`:
+  `commander-knowledge-deep`, `gamechanger-research`, `mana-base-validator`,
+  `knowledge-synthesis` e `mtg-rules-auditor`. Depois da conversão do
+  `mana-base-validator`, a lista caiu para 4 dependências de provider.
 - Isso confirma o próximo bloco de migração: converter esses P2 em scripts,
   scorecards ou jobs internos antes de aposentar Hermes.
+
+Validação remota pós-conversão do mana-base validator (`2026-06-11T14:20Z`):
+
+- `manaloom-mana-base-validator` passou a rodar via
+  `/opt/data/scripts/hermes_mana_base_validator.sh`, sem provider.
+- O governor passou a reportar `enabled_provider_dependent=4`.
+- Dependentes de provider restantes: `manaloom-commander-knowledge-deep`,
+  `manaloom-gamechanger-research`, `manaloom-knowledge-synthesis` e
+  `mtg-rules-auditor`.
+- Achado real: o deck aprendido `Runtime Lorehold Learned 19e93de3cca` está
+  `OVERFULL`, com `104` cartas agregadas contra o limite Commander `100`.
+  O SQLite Hermes contém quatro nomes com quantidade `2`: `Birgi, God of
+  Storytelling // Harnfel, Horn of Bounty`, `Mountain // Mountain`,
+  `Plains // Plains` e `Valakut Awakening // Valakut Stoneforge`.
+- Impacto: o loop de aprendizado está funcionando, mas precisa bloquear ou
+  normalizar learned decks Commander acima de 100 antes de usar o resultado
+  como deck completo no app/servidor.
 
 ### Impacto ainda não provado
 
@@ -311,7 +333,9 @@ Próximo passo técnico:
 1. Esperar ou forçar uma rodada leve pós-ajuste.
 2. Validar outputs de `watchdog`, `pull-learning-events` e
    `knowncards-validator`.
-3. Começar migração pelo trio:
+3. Tratar o deck aprendido `OVERFULL` antes de promover novos learned decks como
+   fonte confiável de Commander completo.
+4. Começar migração pelo trio:
    - `pull-learning-events`;
    - `auto-sync-learned-decks`;
    - `auto-promote-learned`.
