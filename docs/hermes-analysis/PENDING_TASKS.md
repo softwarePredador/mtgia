@@ -204,7 +204,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: execução do `OptimizationValidator` e rejeição final | 1-2 dias | Médio | `optimize_route_virtual_analysis_support.dart` verde |
+| 6 | Próximo split da rota optimize: decisão de rejeição/retry final após `OptimizationValidator` | 1-2 dias | Médio | `optimize_route_validator_support.dart` verde |
 
 ---
 
@@ -474,6 +474,7 @@
 | `optimize_route_quality_rejection_support.dart` | Payloads de rejeição do quality gate para no-safe-swaps e quality rejected | 48 |
 | `optimize_route_addition_data_support.dart` | Query/normalização de dados completos das adições para complete/post-analysis/quality gate | 146 |
 | `optimize_route_virtual_analysis_support.dart` | Montagem do deck virtual pós-swap, análise antes/depois e warnings/improvements | 63 |
+| `optimize_route_validator_support.dart` | Execução injetável do `OptimizationValidator`, atualização de `postAnalysis.validation` e warnings finais | 74 |
 | `optimize_route_quality_rejection_support_test.dart` | Cobertura direta dos contratos `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED` | 65 |
 | `optimize_route_post_validation_support.dart` | Warnings/improvements pós-processamento de identidade de cor, coleta EDHREC, tema e análise antes/depois | 146 |
 | `optimize_route_post_validation_support_test.dart` | Cobertura direta dos builders de validação pós-processamento e coleta EDHREC | 119 |
