@@ -19,6 +19,8 @@ import '../../../lib/ai/optimize_route_bracket_policy_filter_support.dart'
     as optimize_route_bracket_policy_filter;
 import '../../../lib/ai/optimize_route_color_identity_filter_support.dart'
     as optimize_route_color_identity_filter;
+import '../../../lib/ai/optimize_route_complete_top_up_support.dart'
+    as optimize_route_complete_top_up;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
@@ -1633,63 +1635,30 @@ Future<Response> onRequest(RequestContext context) async {
         final targetAdditions = (jsonResponse['target_additions'] as int?) ?? 0;
         final desired =
             targetAdditions > 0 ? targetAdditions : validAdditions.length;
+        final basicNames = basicLandNamesForIdentity(commanderColorIdentity);
+        final topUpSeed =
+            optimize_route_complete_top_up.buildOptimizeCompleteTopUpSeed(
+          validAdditions: validAdditions,
+          desired: desired,
+          basicNames: basicNames,
+          deckFormat: deckFormat,
+        );
 
-        // Agrega as adiÃ§Ãµes atuais por nome (quantidade 1 por ocorrÃªncia)
-        final countsByName = <String, int>{};
-        final basicNamesLower =
-            basicLandNamesForIdentity(commanderColorIdentity)
-                .map((e) => e.toLowerCase())
-                .toSet();
-        for (final n in validAdditions) {
-          final lower = n.toLowerCase();
-          final current = countsByName[n] ?? 0;
-          final isBasic = basicNamesLower.contains(lower) || lower == 'wastes';
-          if (!isBasic &&
-              (deckFormat.toLowerCase() == 'commander' ||
-                  deckFormat.toLowerCase() == 'brawl') &&
-              current >= 1) {
-            continue;
-          }
-          countsByName[n] = current + 1;
-        }
-
-        // Se faltar, adiciona bÃ¡sicos para preencher
-        var missing =
-            desired - countsByName.values.fold<int>(0, (a, b) => a + b);
         Map<String, String> basicsWithIds = const {};
-        if (missing > 0) {
-          final basicNames = basicLandNamesForIdentity(commanderColorIdentity);
+        if (topUpSeed.missing > 0) {
           basicsWithIds = await loadBasicLandIds(pool, basicNames);
-
-          if (basicsWithIds.isNotEmpty) {
-            final keys = basicsWithIds.keys.toList();
-            var i = 0;
-            while (missing > 0) {
-              final name = keys[i % keys.length];
-              countsByName[name] = (countsByName[name] ?? 0) + 1;
-              missing--;
-              i++;
-            }
-          }
         }
 
-        // Converte para additions_detailed com card_id/quantity
-        for (final entry in countsByName.entries) {
-          final v = validByNameLower[entry.key.toLowerCase()];
-          final id =
-              v?['id']?.toString() ?? basicsWithIds[entry.key]?.toString();
-          final name = v?['name']?.toString() ?? entry.key;
-          if (id == null || id.isEmpty) continue;
-          additionsDetailed.add({
-            'name': name,
-            'card_id': id,
-            'quantity': entry.value,
-          });
-        }
+        final topUpResult =
+            optimize_route_complete_top_up.buildOptimizeCompleteTopUpResult(
+          seed: topUpSeed,
+          basicIdsByName: basicsWithIds,
+          validByNameLower: validByNameLower,
+        );
+        additionsDetailed.addAll(topUpResult.additionsDetailed);
 
         // MantÃ©m additions como lista simples (Ãºnica) para UI; o app aplica via additions_detailed.
-        validAdditions =
-            additionsDetailed.map((e) => e['name'] as String).toList();
+        validAdditions = topUpResult.additions;
       }
 
       // Re-aplicar equilÃ­brio apÃ³s validaÃ§Ã£o
