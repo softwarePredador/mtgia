@@ -200,4 +200,3 @@ Próximo passo técnico:
    - `pull-learning-events`;
    - `auto-sync-learned-decks`;
    - `auto-promote-learned`.
-
