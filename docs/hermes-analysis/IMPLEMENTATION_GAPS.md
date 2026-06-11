@@ -352,10 +352,12 @@ Partially implemented. O bug operacional de 2026-06-11 foi contido no sync do
 target deck para Hermes sem usar `LEFT JOIN LATERAL (...) LIMIT 1` para
 `card_battle_rules`. O sync agora agrega funções/regras por `card_id` e grava
 `functional_tags_json`, `semantic_tags_v2_json`, `battle_rules_json`,
-`deck_hash`, `semantics_hash` e `sync_run_id`. O gap permanece aberto porque
-nem todos os consumidores/report-only crons foram migrados para membership via
-arrays em scripts históricos/manuais, e porque a aplicação no SQLite runtime
-real do Hermes ainda não foi executada nesta rodada.
+`deck_hash`, `semantics_hash`, `ruleset_hash` e `sync_run_id`. A aplicação no
+SQLite runtime real do Hermes foi executada em 2026-06-11 com backup e
+validação. O gap permanece aberto por política e cobertura: scripts
+históricos/manuais ainda podem assumir `functional_tag` único, e a derivação de
+`card_battle_rules` para `card_function_tags` ainda precisa de taxonomia,
+dedupe lógico, gate de confiança/revisão e limpeza de stale tags.
 
 ### Evidência
 
@@ -467,17 +469,24 @@ Ainda pendente:
 
 9. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
    for função de deck; usar essa tabela apenas como regra executável/revisável.
-10. Aplicar no Hermes AWS a implementação local de `semantics_hash`/`ruleset_hash`
-   em baseline, quality gate, slot scan e apply; validar com backup,
-   report-only e novo slot smoke.
-11. Revisar manualmente os candidatos positivos do slot scan Lorehold
+10. Revisar manualmente os candidatos positivos do slot scan Lorehold
    `semantic_snapshot_smoke` antes de qualquer apply:
    `Loran's Escape`, `Chain Lightning`, `Erode`, `Steelshaper's Gift`,
    `Furygale Flocking` e `The Battle of Bywater`.
-12. Adicionar derivação controlada de `card_battle_rules` para
+11. Adicionar derivação controlada de `card_battle_rules` para
    `card_function_tags` somente depois de definir taxonomia canônica,
    `logical_rule_key`, gate de `source/review_status/confidence` e limpeza de
    stale tags.
+
+Concluído no Slice 2:
+
+12. Aplicar no Hermes AWS a implementação local de `semantics_hash`/`ruleset_hash`
+   em baseline, quality gate, slot scan e apply; validado com backup,
+   apply controlado e slot smoke. Evidência: backup
+   `knowledge.db.pre-ruleset-76d828d2.20260611T194820Z`, baseline `id=2` com
+   `60` jogos, `7` linhas de `slot_benchmarks` na phase `ruleset_hash_smoke`
+   contendo `baseline_semantics_hash` e `baseline_ruleset_hash`, deck restaurado
+   com `100` rows, `100` quantity e `1` commander.
 
 ### Testes obrigatórios antes de merge
 
@@ -563,7 +572,7 @@ Hermes + testes.
 |---|---|---|---|
 | P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
-| P1 | Hermes target sync agregado ainda não foi aplicado no runtime real | `sync_pg_target_deck_to_hermes.py` foi validado em SQLite temporário, mas aplicação real foi mantida fora do slice | Rodar apply controlado no Hermes runtime depois que consumidores críticos estiverem compatíveis |
+| P1 | Derivação de regra executável para função de deck ainda não tem política segura | `card_battle_rules` agora é preservado em `battle_rules_json`/`ruleset_hash`, mas ainda não deve virar `card_function_tags` automaticamente | Definir `logical_rule_key`, taxonomia canônica, gate de source/review/confidence e cleanup de stale tags antes de qualquer derivação |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
@@ -577,16 +586,21 @@ Atualização 2026-06-11: Slice 1 foi implementado localmente em
 `deck_hash`, `semantics_hash` e `sync_run_id`, rejeita duplicatas antes de
 escrever SQLite e não usa mais `LEFT JOIN LATERAL (...) LIMIT 1` para
 `card_battle_rules`. Evidência em
-`BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`. Pendente real: classificar
-scripts históricos/manuais restantes, fazer backup e apply controlado no Hermes
-runtime real, depois rodar report-only.
+`BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`. Slice 2 foi implementado
+em `76d828d2` e aplicado no Hermes AWS real: `ruleset_hash` agora é persistido
+em `deck_cards`, baseline/quality/slot/apply carregam hashes separados e o
+smoke remoto confirmou `100` rows, `100` quantity, `1` commander, um
+`deck_hash`, um `semantics_hash`, um `ruleset_hash` e `7` benchmarks
+`ruleset_hash_smoke` com ambos hashes. Pendente real: revisar candidatos
+Lorehold, ampliar amostra e definir política de derivação de
+`card_battle_rules`.
 
 ### Ordem recomendada de implementação
 
-1. Fazer backup do SQLite real do Hermes e aplicar o snapshot agregado em
-   janela controlada.
-2. Rodar report-only contra o Hermes real e comparar quantidade, commander/main,
-   `deck_hash`, `semantics_hash` e ausencia de fanout.
+1. Revisar manualmente os candidatos positivos do slot scan Lorehold antes de
+   qualquer apply.
+2. Rodar nova amostra maior report-only para confirmar que `ruleset_hash` não
+   mascara alteração semântica/regra como alteração estrutural.
 3. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
 4. Formalizar identidade semântica de carta e faces antes de expandir regras

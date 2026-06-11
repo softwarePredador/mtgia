@@ -2,9 +2,9 @@
 
 Status: Slice 1 implemented, committed to `master` as `bd7eb558`, pulled by
 Hermes AWS and applied to the real Hermes SQLite runtime after backup. Slice 2
-hash visibility is implemented locally: optimizer baseline, slot scan, quality
-gate and apply now track `semantics_hash` and `ruleset_hash`; remote Hermes
-apply for the new `ruleset_hash` column is the next gate.
+was committed as `76d828d2`, pulled by Hermes AWS and applied to the real
+Hermes SQLite runtime after backup. Optimizer baseline, slot scan, quality gate
+and apply now track separate `semantics_hash` and `ruleset_hash` values.
 
 Scope: battle simulator, AI deck generation, optimize, Hermes sync, Lorehold
 learned deck and semantic multi-function cards.
@@ -89,7 +89,8 @@ Current target deck cache after Slice 1:
 - `deck_cards` exists as Hermes operational snapshot.
 - New snapshots make `card_id` explicit.
 - New snapshots persist `functional_tags_json`, `battle_rules_json`,
-  `semantic_tags_v2_json`, `deck_hash`, `semantics_hash` and `sync_run_id`.
+  `semantic_tags_v2_json`, `deck_hash`, `semantics_hash`, `ruleset_hash` and
+  `sync_run_id`.
 - Legacy `card_name` and `functional_tag` remain for compatibility.
 
 Runtime rollout status:
@@ -104,10 +105,21 @@ Runtime rollout status:
   `100` rows, `100` summed quantity, `1` commander, no Chrome Mox/Mox
   Diamond/Mox Opal in the Lorehold snapshot, `14` slot benchmarks for phase
   `semantic_snapshot_smoke`.
+- Slice 2 backup before ruleset apply:
+  `docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-ruleset-76d828d2.20260611T194820Z`
+- Slice 2 apply gate passed:
+  `100` rows, `100` summed quantity, `1` commander, one distinct
+  `deck_hash`, one distinct `semantics_hash` and one distinct `ruleset_hash`.
+- Ruleset smoke after apply:
+  latest baseline `id=2`, `60` games, baseline `deck_hash`,
+  `semantics_hash` and `ruleset_hash` all length `64`; phase
+  `ruleset_hash_smoke` wrote `7` slot benchmark rows with both baseline
+  hashes; no Chrome Mox, Mox Diamond or Mox Opal present.
 
-The next risk is replaying this local Slice 2 on Hermes AWS: backup, report-only,
-apply, then baseline/slot smoke. Once applied, semantic-only changes and
-ruleset-only changes no longer masquerade as deck structure changes.
+The next risk is not runtime rollout of Slice 2 anymore. The remaining risk is
+semantic policy: reviewing Lorehold candidates, expanding sample size and only
+then deciding whether trusted `card_battle_rules` should derive missing
+`card_function_tags`.
 
 ### Backend app-facing simulator
 
@@ -283,8 +295,8 @@ Required tests:
 
 ### Phase 2 - migrate Hermes SQLite snapshot
 
-Status: implemented locally and validated against temporary SQLite. Real Hermes
-runtime apply is pending.
+Status: implemented locally, applied on Hermes AWS and validated against the
+real Hermes SQLite runtime after backup.
 
 Goal: make Hermes snapshot explicit and deterministic.
 
@@ -309,6 +321,7 @@ Expected SQLite fields:
 | `battle_rules_json` | required JSON text |
 | `deck_hash` | snapshot structure hash |
 | `semantics_hash` | snapshot semantic hash |
+| `ruleset_hash` | executable battle-rules hash |
 | `sync_run_id` | traceability |
 
 Indexes/constraints:
@@ -510,7 +523,7 @@ python3 -m py_compile sync_pg_target_deck_to_hermes.py sync_battle_card_rules_pg
 
 ```bash
 # Run report-only first.
-# Then run apply only when report totals match expected deck/semantic hashes.
+# Then run apply only when totals and deck/semantic/ruleset hashes match.
 ```
 
 ### App/runtime
@@ -522,9 +535,10 @@ cd app
 flutter test integration_test/commander_learned_deck_availability_runtime_test.dart -d <IPHONE_15_SIMULATOR_ID> --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host --dart-define=DISABLE_FIREBASE_STARTUP=true --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true --no-version-check
 ```
 
-## 9. First implementation slice
+## 9. Implemented slices and next controlled work
 
-Start small. Do not change battle execution first.
+Start small. Do not change battle execution before snapshot/optimizer
+invariants are stable.
 
 Slice 1 implemented locally on 2026-06-11:
 
@@ -533,7 +547,7 @@ Slice 1 implemented locally on 2026-06-11:
 3. Update `sync_pg_target_deck_to_hermes.py` to consume it.
 4. Add `card_id`, arrays and hashes to SQLite snapshot.
 5. Keep old `functional_tag` fallback.
-6. Run Hermes report-only.
+6. Run Hermes report-only and apply on Hermes AWS after backup.
 
 Expected result:
 
@@ -547,5 +561,19 @@ Evidence:
 
 - `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
 
-Only after this report is reviewed should we update optimizer/validator
-consumers or apply the new snapshot shape to the real Hermes runtime database.
+Slice 2 implemented and applied on Hermes AWS on 2026-06-11:
+
+1. Add `ruleset_hash` to the Hermes target snapshot.
+2. Keep `deck_hash` structural only.
+3. Keep `semantics_hash` for functional/semantic deckbuilding metadata.
+4. Keep `ruleset_hash` for executable/reviewable battle rules.
+5. Propagate baseline semantic/ruleset hashes through baseline, slot scan,
+   quality gate and apply rollback metadata.
+
+Current next work:
+
+1. Review Lorehold report-only candidates before any apply.
+2. Expand sample size before trusting any swap.
+3. Define `logical_rule_key` and trusted derivation policy before deriving
+   `card_function_tags` from `card_battle_rules`.
+4. Keep battle execution unchanged until these policies and tests exist.

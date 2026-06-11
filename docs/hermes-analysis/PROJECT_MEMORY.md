@@ -14,7 +14,7 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Master HEAD observado no apply Hermes: bd7eb558 (2026-06-11, Implement Hermes semantic deck snapshot)
+- Master HEAD observado no apply Hermes: 76d828d2 (2026-06-11, Track Hermes ruleset hash in optimizer)
 - Relatorio mestre atual: `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
 - Backend tests: 599 (2026-06-04 14:10Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
 
@@ -83,6 +83,11 @@ Ao responder sobre o ManaLoom:
 - Hermes AWS aplicou o snapshot semântico de Lorehold em 2026-06-11 com backup
   do `knowledge.db`; invariantes pós-scan: 100 cartas, 1 comandante, hash
   estrutural restaurado e nenhuma Chrome Mox/Mox Diamond/Mox Opal no deck.
+- Hermes AWS aplicou o Slice 2 `ruleset_hash` em 2026-06-11 com backup
+  `knowledge.db.pre-ruleset-76d828d2.20260611T194820Z`; invariantes pós-smoke:
+  100 cartas, 1 comandante, um `deck_hash`, um `semantics_hash`, um
+  `ruleset_hash`, baseline `id=2` com 60 jogos e 7 benchmarks
+  `ruleset_hash_smoke` contendo hashes semântico e de regras.
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 

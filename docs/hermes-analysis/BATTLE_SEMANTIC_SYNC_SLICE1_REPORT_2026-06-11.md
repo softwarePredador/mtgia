@@ -402,14 +402,12 @@ Lorehold report-only baseline and slot scan after apply:
 
 Slice 1 is not the final semantic migration. Remaining tasks:
 
-1. Apply the local Slice 2 `ruleset_hash` snapshot to Hermes AWS after backup
-   and report-only validation.
-2. Decide whether trusted `card_battle_rules` should derive missing
+1. Decide whether trusted `card_battle_rules` should derive missing
    `card_function_tags` through `sync_battle_card_rules_pg.py`.
-3. Formalize card semantic identity (`oracle_id`, `layout`, faces) before
+2. Formalize card semantic identity (`oracle_id`, `layout`, faces) before
    implementing split/MDFC/DFC/adventure hard behavior.
-4. Keep learned decks single-commander until partner/background corpus exists.
-5. Review Lorehold positive report-only candidates before any apply:
+3. Keep learned decks single-commander until partner/background corpus exists.
+4. Review Lorehold positive report-only candidates before any apply:
    `Loran's Escape`, `Chain Lightning`, `Erode`, `Steelshaper's Gift`,
    `Furygale Flocking`, and `The Battle of Bywater`.
 
@@ -418,17 +416,9 @@ Consumer classification is now documented in
 consumers are migrated/compatible; manual importers and historical scripts are
 kept out of cron/apply until they receive a dedicated migration.
 
-## Next recommended step
+## Slice 2 ruleset hash validation
 
-Proceed to Slice 2:
-
-1. pull the local `ruleset_hash` implementation into Hermes AWS;
-2. run backup + report-only + apply against the real SQLite runtime;
-3. run a second Lorehold slot scan with a larger sample only after these hashes
-   are visible in reports;
-4. keep all swaps report-only until owner review confirms candidate quality.
-
-Local Slice 2 smoke already passed before remote apply:
+Local Slice 2 smoke passed before remote apply:
 
 | Check | Result |
 |---|---|
@@ -436,3 +426,52 @@ Local Slice 2 smoke already passed before remote apply:
 | distinct `ruleset_hash` values in SQLite smoke | `1` |
 | semantic-only test | invalidates `semantics_hash`, not `deck_hash` |
 | rules-only test | invalidates `ruleset_hash`, not `deck_hash` |
+
+Hermes AWS then pulled `master` at `76d828d2`, created a real SQLite backup and
+applied the `ruleset_hash` migration/snapshot:
+
+`docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-ruleset-76d828d2.20260611T194820Z`
+
+Remote apply gate:
+
+| Check | Result |
+|---|---|
+| apply | `true` |
+| cards written | `100` |
+| total quantity | `100` |
+| commanders | `1` |
+| distinct `deck_hash` values | `1` |
+| distinct `semantics_hash` values | `1` |
+| distinct `ruleset_hash` values | `1` |
+| mana validator total cards | `100` |
+
+Remote baseline/slot smoke after apply:
+
+| Check | Result |
+|---|---|
+| latest baseline id | `2` |
+| baseline games | `60` |
+| baseline `deck_hash` length | `64` |
+| baseline `semantics_hash` length | `64` |
+| baseline `ruleset_hash` length | `64` |
+| slot phase | `ruleset_hash_smoke` |
+| slot rows with semantic hash | `7` |
+| slot rows with ruleset hash | `7` |
+| deck restored after smoke | `100` rows, `100` quantity, `1` commander |
+| premium Mox policy for Lorehold | no Chrome Mox, Mox Diamond or Mox Opal present |
+| remote git status after artifact stash | clean on `master...origin/master` |
+
+The generated runtime artifacts were stashed on Hermes as
+`post-ruleset-smoke-artifacts-20260611T195539Z`; the SQLite state remained
+persisted after stash.
+
+## Next recommended step
+
+Proceed to the next controlled slice:
+
+1. keep all Lorehold swaps report-only until owner review confirms candidate
+   quality;
+2. run a larger sample before applying any candidate;
+3. define `logical_rule_key` and trusted derivation policy before letting
+   `card_battle_rules` create `card_function_tags`;
+4. keep backend/product as source of truth; Hermes proposes and reports only.
