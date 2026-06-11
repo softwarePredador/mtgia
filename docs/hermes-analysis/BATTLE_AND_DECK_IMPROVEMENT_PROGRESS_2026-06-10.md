@@ -90,8 +90,8 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com dezenove extrações de testes, seis splits
-do engine e dezenove splits da rota/runtime de optimize concluídos.
+**Status:** em andamento, com vinte e uma extrações/testes de suporte, seis
+splits do engine e vinte e sete splits da rota/runtime de optimize concluídos.
 
 ### Revisão complementar 2026-06-11 — feedback ML do optimize
 
@@ -180,7 +180,7 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
   dados completos de adições/análise virtual pós-swap/execução do
   `OptimizationValidator`. A rota ainda deve seguir reduzindo até ficar como
   orquestrador fino.
-- `server/lib/ai/optimize_runtime_support.dart` — 692 linhas após seis splits.
+- `server/lib/ai/optimize_runtime_support.dart` — 551 linhas após sete splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
   direta e delegação pelo runtime.
@@ -866,6 +866,13 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - O runtime mantém export compatível; rota, complete support e testes legados
     continuam acessando a API pelo caminho antigo.
   - `optimize_runtime_support.dart` caiu para 692 linhas.
+- Sétimo split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_fallback_telemetry_support.dart` centraliza escrita
+    e agregação de `ai_optimize_fallback_telemetry`.
+  - O runtime mantém export compatível; a rota continua chamando as mesmas
+    funções pelo caminho antigo.
+  - O aggregate ganhou helper puro testável sem banco.
+  - `optimize_runtime_support.dart` caiu para 551 linhas.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -889,13 +896,12 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    execução do `OptimizationValidator` e decisão final pós-validator já foram
    feitos; o próximo corte seguro é avaliar se ainda há blocos grandes de
    orquestração que possam virar support sem esconder o fluxo principal.
-3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os seis
+3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os sete
    cortes atuais moveram assinatura/cache, quality ranking/loader,
    inferência/scoring funcional, seleção de remoções, swap building e payload/
-   response shaping para supports próprios, mantendo wrappers/exports
-   compatíveis. Próximo corte seguro: telemetry/persistência de fallback,
-   preferências de IA ou loaders de referência do comandante com teste isolado
-   antes de mover.
+   response shaping e telemetry de fallback para supports próprios, mantendo
+   wrappers/exports compatíveis. Próximo corte seguro: preferências de IA ou
+   loaders de referência do comandante com teste isolado antes de mover.
 4. Executar no Hermes/AWS a sequência operacional de seed/sync (`meta_decks` ou
    target deck real → `sync_pg_card_metadata_to_hermes.py`) e verificar o
    relatório `deck_cards_backfill` até `suspicious_nonland_zero_cmc_after=0`

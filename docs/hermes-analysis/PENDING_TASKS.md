@@ -166,6 +166,10 @@
 > intensidade, parser de sugestões, resposta determinística, retry
 > deterministic-first e recommendation detail foram movidos para
 > `optimize_payload_support.dart`, preservando export público pelo runtime.
+> Sétimo split do runtime de optimize concluído: escrita e aggregate de
+> `ai_optimize_fallback_telemetry` foram movidos para
+> `optimize_fallback_telemetry_support.dart`, com helper puro para teste sem
+> banco e export público preservado pelo runtime.
 > Terceiro split/align de optimize concluído: response/cache/diagnostics da rota
 > foram movidos para `optimize_route_response_support.dart`. A elegibilidade
 > Commander 2026 foi centralizada em `commander_eligibility.dart` e agora cobre
@@ -301,7 +305,7 @@
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
 | 3 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 4 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de telemetry/persistência de fallback, preferências de IA ou loaders de referência do comandante e extrair apenas com support test isolado | 1-2 dias | Médio | Teste de support dedicado verde antes do movimento |
+| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de preferências de IA ou loaders de referência do comandante e extrair apenas com support test isolado | 1-2 dias | Médio | Teste de support dedicado verde antes do movimento |
 
 ### Ordem revalidada 2026-06-11
 
@@ -591,6 +595,8 @@ Paradigm ou ability words sem pelo menos um dos sinais abaixo:
 | `optimize_swap_candidate_support_test.dart` | Cobertura direta do caminho sem banco e export compatível pelo runtime | 66 |
 | `optimize_payload_support.dart` | Normalização de payload, intensidade, parser de sugestões, response shaping, retry e recommendation detail | 489 |
 | `optimize_payload_support_test.dart` | Cobertura direta de payload/intensidade/response shaping e export compatível pelo runtime | 90 |
+| `optimize_fallback_telemetry_support.dart` | Escrita e aggregate de telemetry do fallback vazio do optimize | 148 |
+| `optimize_fallback_telemetry_support_test.dart` | Cobertura direta de aggregate vazio, rates por row e export compatível pelo runtime | 56 |
 | `optimize_route_warnings_support.dart` | Warnings finais de optimize para cartas inválidas, cor, bracket, tema e fallback vazio | 61 |
 | `optimize_route_warnings_support_test.dart` | Cobertura direta do contrato de warnings finais da rota optimize | 89 |
 | `optimize_route_diagnostics_support.dart` | Diagnostics finais de optimize para fallback vazio e merge incremental sem sobrescrever chaves existentes | 37 |
