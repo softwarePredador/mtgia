@@ -347,6 +347,14 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_quality_rejection_support_test.dart test/optimize_route_empty_fallback_support_test.dart test/optimize_route_diagnostics_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 38 testes, `All tests passed`.
   - `manaloom-hermes-report-only.sh 0186f6b5`: `PASS`; sem riscos aparentes,
     mudança classificada como extração com cobertura dedicada.
+- Hermes/AWS pós-push do split post-validation (`92723ed4`):
+  - `battle_passes=130`.
+  - analyze focado em `optimize_route_post_validation_support`, rota
+    `ai/optimize` e teste de validação pós-processamento: sem issues.
+  - `dart test test/optimize_route_post_validation_support_test.dart test/optimize_route_quality_rejection_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 32 testes, `All tests passed`.
+  - `manaloom-hermes-report-only.sh 92723ed4`: `PASS`; Hermes apontou risco
+    baixo de wiring por extração, mitigado por teste unitário, pipeline e route
+    contract remotos.
 
 ## Etapa 4 — Próximas pendências reais
 
