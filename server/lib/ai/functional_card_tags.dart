@@ -197,6 +197,13 @@ List<FunctionalCardTag> inferFunctionalCardTags({
   final type = typeLine.toLowerCase();
   final oracle = oracleText.toLowerCase();
   final estimatedCmc = _safeDouble(cmc, _estimateManaValue(manaCost ?? ''));
+  final strategicRoles = resolveCardFunctionalRoles(
+    oracleText: oracleText,
+    typeLine: typeLine,
+    name: name,
+    manaCost: manaCost,
+    cmc: cmc,
+  ).roles;
   final tags = <String, FunctionalCardTag>{};
 
   void add(String tag, double confidence, String evidence) {
@@ -316,26 +323,26 @@ List<FunctionalCardTag> inferFunctionalCardTags({
     add('exile_value', 0.84, 'exile_play_or_cast_value_text');
   }
 
-  if (_looksLikeWincon(oracle, normalizedName)) {
+  if (strategicRoles.contains('wincon')) {
     add('wincon', 0.78, 'explicit_win_or_finisher_text');
   }
 
-  if (_looksLikeComboPiece(oracle, normalizedName)) {
+  if (strategicRoles.contains('combo_piece')) {
     // Heurística propositalmente abaixo do limiar operacional (0.65):
     // combo_piece de alta confiança vem de card_function_tags persistido pelo
     // Commander Spellbook (sync_combos.dart), reduzindo falso positivo textual.
     add('combo_piece', 0.60, 'combo_pattern_text_or_known_name');
   }
 
-  if (_looksLikeEngine(oracle)) {
+  if (strategicRoles.contains('engine')) {
     add('engine', 0.7, 'repeatable_value_engine_text');
   }
 
-  if (_looksLikePayoff(oracle, normalizedName)) {
+  if (strategicRoles.contains('payoff')) {
     add('payoff', 0.72, 'payoff_trigger_or_scaling_text');
   }
 
-  if (_looksLikeEnabler(oracle, normalizedName)) {
+  if (strategicRoles.contains('enabler')) {
     add('enabler', 0.7, 'plan_enabler_or_setup_text');
   }
 
@@ -867,83 +874,6 @@ bool _looksLikeRitual(String oracle, String normalizedName) {
               oracle.contains('for each') ||
               oracle.contains('for every') ||
               oracle.contains('your mana pool'));
-}
-
-bool _looksLikeWincon(String oracle, String normalizedName) {
-  return normalizedName.contains('thassa\'s oracle') ||
-      oracle.contains('you win the game') ||
-      oracle.contains('loses the game') ||
-      oracle.contains('each opponent loses') ||
-      oracle.contains('damage equal to') && oracle.contains('opponent') ||
-      oracle.contains('double your life total');
-}
-
-bool _looksLikeComboPiece(String oracle, String normalizedName) {
-  return normalizedName.contains('isochron scepter') ||
-      normalizedName.contains('dramatic reversal') ||
-      normalizedName.contains('thassa\'s oracle') ||
-      oracle.contains('copy target activated or triggered ability') ||
-      oracle.contains('untap') && oracle.contains('add ') ||
-      oracle.contains('infinite');
-}
-
-bool _looksLikeEngine(String oracle) {
-  return oracle.contains('whenever') &&
-          (oracle.contains('draw') ||
-              oracle.contains('create') && oracle.contains('token') ||
-              oracle.contains('add {') ||
-              oracle.contains('put a +1/+1 counter')) ||
-      oracle.contains('at the beginning of') &&
-          (oracle.contains('draw') || oracle.contains('create'));
-}
-
-bool _looksLikePayoff(String oracle, String normalizedName) {
-  if (normalizedName == 'blood artist') return true;
-
-  final isCostReductionText =
-      RegExp(r'\bcosts?\s+\{[^}]+\}\s+less').hasMatch(oracle);
-  final isDrawScalingText = oracle.contains('draw a card for each') ||
-      oracle.contains('draw cards equal to');
-  if (oracle.contains('for each') &&
-      !isCostReductionText &&
-      !isDrawScalingText) {
-    return true;
-  }
-
-  if (!oracle.contains('whenever')) return false;
-  return oracle.contains('creature dies') ||
-      oracle.contains('creature enters') ||
-      oracle.contains('you cast') ||
-      oracle.contains('artifact enters') ||
-      oracle.contains('enchantment enters') ||
-      oracle.contains('you sacrifice');
-}
-
-bool _looksLikeEnabler(String oracle, String normalizedName) {
-  return normalizedName.contains('greaves') ||
-      normalizedName.contains('boots') ||
-      oracle.contains('costs {') && oracle.contains('less to cast') ||
-      oracle.contains('you may play an additional land') ||
-      oracle.contains('creatures you control have haste') ||
-      oracle.contains('gains haste') ||
-      oracle.contains('has haste') ||
-      _looksLikeSelfMillSetup(oracle) ||
-      oracle.contains('sacrifice another') ||
-      oracle.contains('search your library');
-}
-
-bool _looksLikeSelfMillSetup(String oracle) {
-  if (!oracle.contains('mill')) return false;
-  if (oracle.contains('target opponent') ||
-      oracle.contains('target player') ||
-      oracle.contains('each opponent') ||
-      oracle.contains('opponent mills')) {
-    return false;
-  }
-  return oracle.contains('you mill') ||
-      oracle.contains('mill cards') ||
-      oracle.contains('surveil') ||
-      oracle.contains('dredge');
 }
 
 String _inferSpeed(String typeLine, String oracle) {

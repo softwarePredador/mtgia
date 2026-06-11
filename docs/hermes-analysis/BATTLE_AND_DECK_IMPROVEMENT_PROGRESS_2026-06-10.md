@@ -756,6 +756,15 @@ fechado, com cenários próprios e sem dependência de produto mobile.
     genérica, vazia ou `unknown`.
   - Isso alinha optimize/rebuild/deck-state analysis e reduz risco de o mesmo
     deck receber target profile diferente em fluxos distintos.
+- Fechamento do drift de roles estratégicos na melhoria de deck:
+  - `functional_card_tags.dart` removeu matchers privados para `wincon`,
+    `combo_piece`, `engine`, `payoff` e `enabler`.
+  - `inferFunctionalCardTags` agora consulta `resolveCardFunctionalRoles`, o
+    mesmo adapter usado por optimize, validator e quality gate.
+  - `functional_card_tags_test.dart` cobre alinhamento direto entre tagger e
+    `optimizationFunctionalRolesForCard`, incluindo `Impact Tremors`,
+    `Isochron Scepter`, `The One Ring`, `Aetherflux Reservoir` e
+    `Demonic Tutor`.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -790,4 +799,5 @@ fechado, com cenários próprios e sem dependência de produto mobile.
 5. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
    quando houver corpus concreto usando essas cartas.
 6. Revalidar drift restante entre analysis/generate/optimize depois do split
-   estrutural.
+   estrutural, agora focando em heurísticas secundárias, endpoints legacy e
+   dados incompletos, não mais nos roles estratégicos já centralizados.

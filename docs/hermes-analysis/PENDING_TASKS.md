@@ -70,6 +70,13 @@
 > analysis agora compartilham a mesma política para request genérico versus
 > arquétipo detectado, coberta por `optimize_archetype_support_test.dart`.
 >
+> **Atualização 2026-06-11 — strategic role tags unificados.**
+> `functional_card_tags.dart` deixou de manter cópias privadas dos matchers
+> estratégicos `wincon`, `combo_piece`, `engine`, `payoff` e `enabler`.
+> `inferFunctionalCardTags` agora reutiliza `resolveCardFunctionalRoles`, o
+> mesmo adapter usado por optimize/validator/quality gate; cobertura em
+> `functional_card_tags_test.dart`.
+>
 > **Atualização 2026-06-10 — etapa deck-improvement.**
 > O diagnóstico/gate semântico do optimize deixou de depender apenas de
 > `semantic_tags_v2` para `role_delta`: agora usa a mesma precedência do produto
@@ -241,6 +248,7 @@
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
 | ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + rota incremental |
 | ✅ | Archetype resolution compartilhado | `optimize_archetype_support.dart` |
+| ✅ | Strategic role tags compartilhados | `resolveCardFunctionalRoles` em `functional_card_tags.dart` |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
 | ✅ | Segunda extração da suite Hermes | `battle_combat_tests.py` |
 | ✅ | Terceira extração da suite Hermes | `battle_replacement_tests.py` |

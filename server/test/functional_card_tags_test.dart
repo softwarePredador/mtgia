@@ -1,4 +1,5 @@
 import 'package:server/ai/functional_card_tags.dart';
+import 'package:server/ai/optimization_functional_roles.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -148,6 +149,7 @@ void main() {
 
       expect(natureLoreTags, contains('ramp'));
       expect(natureLoreTags, isNot(contains('tutor')));
+      expect(natureLoreTags, isNot(contains('enabler')));
 
       final erebosTags = inferFunctionalCardTags(
         name: 'Erebos, God of the Dead',
@@ -260,6 +262,59 @@ void main() {
       ).map((tag) => tag.tag).toSet();
 
       expect(impactTremorsTags, contains('payoff'));
+    });
+
+    test('shares strategic heuristic roles with optimize role adapter', () {
+      final samples = <String, Map<String, Object>>{
+        'Impact Tremors': {
+          'type_line': 'Enchantment',
+          'oracle_text':
+              'Whenever a creature enters the battlefield under your control, Impact Tremors deals 1 damage to each opponent.',
+          'expected_roles': {'payoff'},
+        },
+        'Isochron Scepter': {
+          'type_line': 'Artifact',
+          'oracle_text':
+              'Imprint — When Isochron Scepter enters the battlefield, you may exile an instant card with mana value 2 or less from your hand. You may copy the exiled card. If you do, you may cast the copy without paying its mana cost.',
+          'expected_roles': {'combo_piece'},
+        },
+        'The One Ring': {
+          'type_line': 'Legendary Artifact',
+          'oracle_text':
+              'When The One Ring enters, if you cast it, you gain protection from everything until your next turn. {T}: Put a burden counter on The One Ring, then draw a card for each burden counter on it.',
+          'expected_roles': {'engine'},
+        },
+        'Aetherflux Reservoir': {
+          'type_line': 'Artifact',
+          'oracle_text':
+              'Whenever you cast a spell, you gain 1 life for each spell you\'ve cast this turn. Pay 50 life: Aetherflux Reservoir deals 50 damage to any target.',
+          'expected_roles': {'wincon'},
+        },
+        'Demonic Tutor': {
+          'type_line': 'Sorcery',
+          'oracle_text':
+              'Search your library for a card, put that card into your hand, then shuffle.',
+          'expected_roles': {'enabler'},
+        },
+      };
+
+      for (final entry in samples.entries) {
+        final card = {
+          'name': entry.key,
+          'type_line': entry.value['type_line']! as String,
+          'oracle_text': entry.value['oracle_text']! as String,
+        };
+        final optimizeRoles = optimizationFunctionalRolesForCard(card);
+        final tagRoles = inferFunctionalCardTags(
+          name: entry.key,
+          typeLine: card['type_line']!,
+          oracleText: card['oracle_text']!,
+        ).map((tag) => tag.tag).toSet();
+        final expectedRoles = entry.value['expected_roles']! as Set<String>;
+
+        expect(optimizeRoles, containsAll(expectedRoles), reason: entry.key);
+        expect(tagRoles, containsAll(expectedRoles), reason: entry.key);
+      }
     });
 
     test('summarizes counts and bounded samples using quantities', () {

@@ -18,8 +18,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente em
    2026-06-11. `resolveOptimizeArchetype` foi removido do risco por delegar
-   para `optimize_archetype_support.dart`; os maiores riscos restantes são
-   roles funcionais altos, terrenos básicos/snow basics, trust social, logs
+   para `optimize_archetype_support.dart`; os roles estratégicos
+   `wincon/combo_piece/engine/payoff/enabler` também passaram a reutilizar
+   `resolveCardFunctionalRoles` em `functional_card_tags.dart`. Os maiores
+   riscos restantes são terrenos básicos/snow basics, trust social, logs
    sociais/follow, condição de carta e CMC/tipo.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
    `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
@@ -160,20 +162,23 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-11: PARCIAL.** `resolveOptimizeArchetype` foi unificado;
-  demais duplicações abaixo continuam abertas conforme domínio.
+- **Status 2026-06-11: PARCIAL.** `resolveOptimizeArchetype` foi unificado e
+  os roles estratégicos `wincon`, `combo_piece`, `engine`, `payoff` e
+  `enabler` agora usam o adapter único `resolveCardFunctionalRoles` também na
+  geração de `functional_tags`; demais duplicações abaixo continuam abertas
+  conforme domínio.
 - **Evidência**:
   - Resolvido: `resolveOptimizeArchetype` agora delega para
     `server/lib/ai/optimize_archetype_support.dart`, com teste em
     `server/test/optimize_archetype_support_test.dart` cobrindo
     `midrange`, `tempo`, `goodstuff`, `general`, `unknown`, vazio e detected
     específico em runtime e deck-state analysis.
-  - `_looksLikeComboPiece`, `_looksLikeEnabler`, `_looksLikeEngine`,
-    `_looksLikePayoff` e `_looksLikeWincon` existem tanto em
-    `server/lib/ai/functional_card_tags.dart:859`-`:905` quanto em
-    `server/lib/ai/optimization_functional_roles.dart:370`-`:397`, mas a
-    primeira familia usa nomes conhecidos e `oracle_text`, e a segunda usa
-    padroes diferentes de `oracle_text` para um role unico do optimize.
+  - Resolvido: `functional_card_tags.dart` removeu cópias privadas de
+    `_looksLikeComboPiece`, `_looksLikeEnabler`, `_looksLikeEngine`,
+    `_looksLikePayoff` e `_looksLikeWincon`; `inferFunctionalCardTags` agora
+    consulta `resolveCardFunctionalRoles` para os roles estratégicos. O teste
+    `functional_card_tags_test.dart` prova alinhamento com
+    `optimizationFunctionalRolesForCard`.
   - `_isBasicLandName` aparece em quatro locais com variantes para snow lands:
     `server/lib/ai/optimize_runtime_support.dart:4184`-`:4196`,
     `server/lib/generated_deck_validation_service.dart:752`-`:763`,
@@ -207,9 +212,8 @@ Histórico do problema:
 - **Ação recomendada**:
   1. manter `optimize_archetype_support.dart` como fonte única de arquétipo
      efetivo;
-  2. criar adapter unico de roles funcionais que aceite nome, `oracle_text`,
-     `type_line`, `functional_tags` e `semantic_tags_v2`, retornando conjunto
-     de roles + `primary_role`;
+  2. manter `resolveCardFunctionalRoles` como adapter único de roles funcionais
+     para análise, optimize, validator e quality gate;
   3. extrair helper unico para terrenos basicos/snow basics e usar em validate,
      optimize, meta e commander-reference;
   4. agrupar duplicacoes de menor risco por dominio (trust social, request/log,
@@ -219,6 +223,9 @@ Histórico do problema:
   - ✅ `optimize_archetype_support_test.dart` prova o mesmo arquetipo efetivo
     para `midrange`, `tempo`, `goodstuff`, `general`, `unknown`, vazio e
     detected especifico;
+  - ✅ `functional_card_tags_test.dart` prova que os roles estratégicos do
+    tagger (`wincon`, `combo_piece`, `engine`, `payoff`, `enabler`) seguem o
+    mesmo adapter usado pelo optimize;
   - uma carta com papeis multiplos preserva roles secundarios no validator e na
     aba de analise;
   - snow basics tem comportamento igual nos quatro fluxos;

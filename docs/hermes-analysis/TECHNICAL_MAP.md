@@ -184,11 +184,12 @@ mtgia/
   activation telemetry, não no fluxo principal de optimize.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em
   2026-06-11. `resolveOptimizeArchetype` foi removido da lista de riscos por
-  delegar para `optimize_archetype_support.dart`. Ainda persistem duplicações
-  relevantes em heuristicas semanticas (`_looksLikeComboPiece`,
-  `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`,
-  `_looksLikeWincon`), variantes de `_isBasicLandName`, utilitarios de
-  request/log e trust SQL/serializer em trades/marketplace.
+  delegar para `optimize_archetype_support.dart`. Os roles estratégicos
+  `wincon/combo_piece/engine/payoff/enabler` também deixaram de ter cópias
+  privadas em `functional_card_tags.dart` e agora consultam
+  `resolveCardFunctionalRoles`. Ainda persistem duplicações relevantes em
+  variantes de `_isBasicLandName`, utilitarios de request/log e trust
+  SQL/serializer em trades/marketplace.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
@@ -197,7 +198,7 @@ mtgia/
   2026-06-11. Deck analysis e optimize agora carregam `functional_tags` +
   `semantic_tags_v2`, e o validator/quality gate usam precedencia
   `functional_tags` persistidos -> `semantic_tags_v2` -> heuristica. O risco
-  restante mudou de threading para unificação de heurísticas secundárias e para
+  restante mudou de threading para heurísticas secundárias não estratégicas e para
   endpoints legacy/experimentais (`/decks/:id/recommendations`,
   `/ai/weakness-analysis`) que ainda precisam contrato interno explicito antes
   de serem tratados como produto principal.

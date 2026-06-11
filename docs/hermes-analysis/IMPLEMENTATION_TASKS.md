@@ -568,54 +568,37 @@ cd server && dart analyze lib/ai/functional_card_tags.dart
 > **Nota:** Task #5 complementa a task pendente P2 "Tag Accuracy Auto-Healing" — enquanto aquela foca em melhorar a precisao das tags, esta foca em reportar a AUSENCIA de tags.
 
 
-### [P1] Unificar implementações das heurísticas `_looksLikeWincon`/`_looksLikeComboPiece`/`_looksLikeEngine`/`_looksLikePayoff`/`_looksLikeEnabler` entre `functional_card_tags.dart` e `optimization_functional_roles.dart` — divergência causa classificações funcionais inconsistentes entre análise e otimização
+### [P1] ✅ Resolvido em 2026-06-11 — Unificar roles estratégicos entre `functional_card_tags.dart` e `optimization_functional_roles.dart`
 
 **Conhecimento MTG:** Cartas como Thassa's Oracle (wincon/combo), Blood Artist (aristocrat payoff), Isochron Scepter (combo piece), e Lightning Greaves (protection/enabler) têm papéis funcionais bem definidos no Commander. A classificação correta desses papéis é essencial para que o quality gate tome decisões corretas de swap — trocar um "wincon" por "engine" requer regras diferentes de trocar "utility" por "utility".
 
-**Evidencia no código:** Dois conjuntos de heurísticas semanticas com os MESMOS NOMES mas implementações DIFERENTES:
+**Status:** resolvido sem criar módulo extra: o módulo canônico já existente
+`server/lib/ai/optimization_functional_roles.dart` expõe o adapter
+`resolveCardFunctionalRoles`. `server/lib/ai/functional_card_tags.dart` removeu
+as cópias privadas de `_looksLikeWincon`, `_looksLikeComboPiece`,
+`_looksLikeEngine`, `_looksLikePayoff` e `_looksLikeEnabler` e passou a
+consultar esse adapter para `wincon`, `combo_piece`, `engine`, `payoff` e
+`enabler`.
 
-1. `server/lib/ai/optimization_functional_roles.dart:370-398` — `_looksLikeWincon`, `_looksLikeEngine`, `_looksLikeComboPiece`, `_looksLikePayoff`, `_looksLikeEnabler` usam APENAS `oracle` text:
-   - `_looksLikeWincon`: verifica "you win the game", "opponent(s) lose(s) the game"
-   - `_looksLikeEngine`: verifica "at the beginning of your upkeep" + "you may", "whenever" + "you may" + "draw"/"create"/"add"
-   - `_looksLikeComboPiece`: verifica "remove"+"counter"+"from among", "search your library"+"may cast"+"without paying"
-   - `_looksLikePayoff`: verifica "whenever"+"create token", "whenever you cast"+"copy", "whenever you cast"+"scry"
-   - `_looksLikeEnabler`: verifica "instant and sorcery spells you cast cost", "cost less to cast"
+**Evidência atual:**
+- `functional_card_tags.dart`: `inferFunctionalCardTags` chama
+  `resolveCardFunctionalRoles(...)` e usa `strategicRoles` para os cinco roles.
+- `optimization_functional_roles.dart`: continua sendo a fonte única para
+  classificação multi-role e `primary_role`.
+- `functional_card_tags_test.dart`: adiciona teste cruzado com `Impact Tremors`,
+  `Isochron Scepter`, `The One Ring`, `Aetherflux Reservoir` e `Demonic Tutor`,
+  além de impedir que `Nature's Lore` vire `enabler`.
 
-2. `server/lib/ai/functional_card_tags.dart:859-906` — mesmos nomes de função mas com assinatura DIFERENTE (`oracle, normalizedName`) e padrões MAIS ABRANGENTES:
-   - `_looksLikeWincon`: adicionalmente verifica `normalizedName` para Thassa's Oracle, "damage equal to"+"opponent", "double your life total"
-   - `_looksLikeEngine`: NÃO exige "you may" — qualquer "whenever"+"draw"/"create token"/"add {"/"put a +1/+1 counter" qualifica
-   - `_looksLikeComboPiece`: adicionalmente verifica `normalizedName` para Isochron Scepter, Dramatic Reversal, Thassa's Oracle; também "copy target activated or triggered ability", "untap"+"add", "infinite"
-   - `_looksLikePayoff`: adicionalmente verifica `normalizedName` para Blood Artist, "for each", "whenever"+"creature dies"/"you cast"/"artifact enters"/"enchantment enters"/"you sacrifice"
-   - `_looksLikeEnabler`: adicionalmente verifica `normalizedName` para greaves/boots, "haste", "mill", "sacrifice another", "search your library"
+**Impacto:** o tagger exibido na análise e o classificador usado por
+optimize/validator/quality gate deixam de discordar nesses roles estratégicos.
 
-**Drift concreto:** `classifyOptimizationFunctionalRole` (usado pelo quality gate em `optimization_quality_gate.dart:52-53`) chama a versão de `optimization_functional_roles.dart` que NÃO conhece cartas por nome. `summarizeFunctionalTagsForDeck` (usado para display/análise) chama a versão de `functional_card_tags.dart` que conhece. Resultado: uma mesma carta pode ser "wincon" na análise funcional mas "engine" no quality gate — ou vice-versa.
-
-**Exemplos de divergência provável:**
-- **Thassa's Oracle:** `functional_card_tags.dart` → `combo_piece` (via normalizedName). `optimization_functional_roles.dart` → NÃO detecta (oracle não contém "remove counter from among" nem "search...may cast...without paying")
-- **Blood Artist:** `functional_card_tags.dart` → `payoff` (via normalizedName). `optimization_functional_roles.dart` → NÃO detecta (oracle não contém "whenever create token" nem "whenever you cast copy/scry")
-- **Isochron Scepter:** `functional_card_tags.dart` → `combo_piece` (via normalizedName). `optimization_functional_roles.dart` → NÃO detecta
-- **Aetherflux Reservoir:** `functional_card_tags.dart` → `wincon` (via "loses the game" or "damage equal to"). `optimization_functional_roles.dart` → NÃO detecta (oracle não contém "you win the game" nem "opponent loses")
-
-**Gap:** O quality gate toma decisões de swap usando um classificador que é CEGO para cartas conhecidas que o classificador de análise funcional reconhece corretamente. Isso significa que o gate pode aprovar swaps que removem wincons/combo pieces (classificadas como "utility" pelo gate) ou bloquear swaps que adicionam payoffs/enablers essenciais.
-
-**Impacto:** `P1` — Decisões de swap baseadas em classificação funcional inconsistente. Cartas críticas como Thassa's Oracle, Blood Artist, e Isochron Scepter podem ser tratadas como "utility" pelo quality gate, permitindo sua remoção em swaps. O STRUCTURE_AUDIT (2026-06-05) classifica esta divergência como P1 com evidência de código em 6 locais.
-
-**Risco:** P1 — O quality gate e a análise funcional discordam sobre o papel de cartas sentinela. Swaps corretos podem ser bloqueados e incorretos aprovados porque a classificação usada para DECIDIR é diferente da usada para EXPLICAR.
-
-**Ação recomendada:**
-1. Extrair as 5 heurísticas para um módulo compartilhado `server/lib/ai/semantic_role_heuristics.dart` com assinatura unificada: `bool looksLike{Wincon,Engine,ComboPiece,Payoff,Enabler}(String oracle, [String? normalizedName])`
-2. Unificar os padrões: manter a versão mais abrangente de `functional_card_tags.dart` (com suporte a normalizedName) como implementação canônica
-3. Atualizar `optimization_functional_roles.dart:370-398` para importar e usar as funções do módulo compartilhado
-4. Atualizar `functional_card_tags.dart:859-906` para importar e usar as mesmas funções
-5. Adicionar testes cruzados com cartas sentinela (Thassa's Oracle, Blood Artist, Isochron Scepter, Aetherflux Reservoir, Lightning Greaves) para garantir classificação idêntica em ambos os pipelines
+**Próxima pendência relacionada:** centralizar basic/snow lands, descrita na
+task P2 seguinte.
 
 **Validação:**
 ```bash
-cd server && dart analyze lib/ai/semantic_role_heuristics.dart
-cd server && dart analyze lib/ai/optimization_functional_roles.dart
-cd server && dart analyze lib/ai/functional_card_tags.dart
-cd server && dart test test/ai/optimization_functional_roles_test.dart
-cd server && dart test test/ai/functional_card_tags_test.dart
+cd server && dart analyze lib/ai/functional_card_tags.dart lib/ai/optimization_functional_roles.dart test/functional_card_tags_test.dart
+cd server && dart test test/functional_card_tags_test.dart test/optimization_quality_gate_test.dart test/optimization_validator_test.dart test/optimize_runtime_support_test.dart --reporter compact
 ```
 
 ---

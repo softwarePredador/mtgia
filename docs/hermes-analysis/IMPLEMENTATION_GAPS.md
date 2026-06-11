@@ -184,6 +184,7 @@
 | Persistência operacional da telemetria | ✅ Operacional | v9: `write_engine_metrics_snapshot`, `MANALOOM_ENGINE_METRICS_DIR`, `master_optimizer_auto_cycle_cron.sh`, `engine_metrics_report.py` | Auto-cycle gera snapshots por rodada e publica `latest_engine_metrics_report.json` sanitizado |
 | Diagnóstico de roles do optimize | ✅ OK | `optimization_functional_roles.dart`, `optimization_validator_test.dart` | `role_delta` usa `functional_tags` persistido antes de `semantic_tags_v2`, alinhando decisão de swap com a análise exibida ao usuário |
 | Arquétipo efetivo do optimize/rebuild | ✅ OK | `optimize_archetype_support.dart`, `optimize_archetype_support_test.dart` | Política única para request genérico/específico e arquétipo detectado, removendo drift entre runtime e deck-state analysis |
+| Roles estratégicos de cartas | ✅ OK | `functional_card_tags.dart`, `optimization_functional_roles.dart`, `functional_card_tags_test.dart` | `wincon`, `combo_piece`, `engine`, `payoff` e `enabler` passam pelo adapter único `resolveCardFunctionalRoles` |
 
 ### 9.1 Arquivos grandes / modularização (P1)
 
