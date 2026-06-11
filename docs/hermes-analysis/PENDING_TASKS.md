@@ -147,6 +147,12 @@
 > buckets de rejeição e loader SQL foram movidos para
 > `optimize_candidate_quality_support.dart`, mantendo export público pelo
 > runtime.
+> Terceiro split do runtime de optimize concluído: inferência funcional,
+> matching de necessidades e score de substitutas foram movidos para
+> `optimize_functional_role_support.dart`; dedupe, filtro de identidade e score
+> de fillers ficaram em `optimize_filler_loader_support.dart`. Isso removeu o
+> ciclo circular `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`
+> e preservou exports compatíveis pelo runtime.
 > Terceiro split/align de optimize concluído: response/cache/diagnostics da rota
 > foram movidos para `optimize_route_response_support.dart`. A elegibilidade
 > Commander 2026 foi centralizada em `commander_eligibility.dart` e agora cobre
@@ -282,7 +288,7 @@
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
 | 3 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 4 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 5 | Próximo split da rota optimize: revisar blocos remanescentes de orquestração e extrair apenas quando houver support test isolado | 1-2 dias | Médio | `optimize_route_final_gate_support.dart` verde |
+| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de candidate selection ou fallback/recovery e extrair apenas com support test isolado | 1-2 dias | Médio | Teste de support dedicado verde antes do movimento |
 
 ### Ordem revalidada 2026-06-11
 

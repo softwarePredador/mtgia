@@ -18130,3 +18130,20 @@ multi-defender combat e ability-word telemetry já está rastreado em
 `docs/hermes-analysis/BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 Novas regras modernas só devem virar implementação card-specific com carta real
 no corpus, replay incorreto e teste focado.
+
+## 2026-06-11 — Optimize runtime modularization pass
+
+- Extraído `server/lib/ai/optimize_functional_role_support.dart` para
+  centralizar inferência funcional, matching de necessidades e score de
+  substitutas do optimize.
+- `server/lib/ai/optimize_filler_loader_support.dart` passou a concentrar
+  dedupe, filtro de identidade Commander e score de fillers, removendo o ciclo
+  circular com `optimize_runtime_support.dart`.
+- `optimize_runtime_support.dart` preserva exports compatíveis e caiu para 1941
+  linhas; próximo corte seguro é seleção de candidatos ou fallback/recovery com
+  teste isolado.
+- Validações focadas:
+  - `dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_filler_loader_support.dart lib/ai/optimize_functional_role_support.dart routes/ai/optimize/index.dart test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart`: PASS.
+  - `dart test test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
+  - `dart analyze bin lib routes test`: PASS.
+  - `dart test --concurrency=2 --reporter compact`: PASS, 630 testes.
