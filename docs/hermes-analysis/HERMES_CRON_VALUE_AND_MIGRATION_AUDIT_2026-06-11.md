@@ -261,6 +261,11 @@ Correção de causa raiz (`2026-06-11T14:35Z`):
 - Teste adicionado:
   `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py`
   cobre a rejeição de quantidade multiplicada por join.
+- Validação remota pós-fix em Hermes: `cards_seen=100`, `cards_written=100`,
+  `quantity_seen=100`, `quantity_written=100`, `deck_cards.sum(quantity)=100`.
+  O mana validator deixou de reportar `OVERFULL`; o status restante é
+  `NO_PROFILE` para `Lorehold, the Historian`, com `3` cartas sem tag funcional
+  conhecida.
 
 ### Impacto ainda não provado
 
