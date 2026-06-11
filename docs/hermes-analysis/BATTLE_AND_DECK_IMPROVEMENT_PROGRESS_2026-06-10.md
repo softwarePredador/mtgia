@@ -536,6 +536,12 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - Validação local focada:
     - `dart analyze lib/ai/optimize_route_virtual_analysis_support.dart routes/ai/optimize/index.dart test/optimize_route_virtual_analysis_support_test.dart`: sem issues.
     - `dart test test/optimize_route_virtual_analysis_support_test.dart test/optimize_route_addition_data_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 30 testes, `All tests passed`.
+- Hermes/AWS pós-push do split virtual-analysis (`0149bf18`):
+  - `git pull --ff-only origin master`: `REMOTE_HEAD=0149bf18274d1a2d3a8f8e214741707f7300c047`.
+  - `dart analyze lib/ai/optimize_route_virtual_analysis_support.dart routes/ai/optimize/index.dart test/optimize_route_virtual_analysis_support_test.dart`: sem issues.
+  - `dart test test/optimize_route_virtual_analysis_support_test.dart test/optimize_route_addition_data_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 30 testes, `All tests passed`.
+  - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
+  - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
 
 ## Etapa 4 — Próximas pendências reais
 
