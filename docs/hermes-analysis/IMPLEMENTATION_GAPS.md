@@ -218,8 +218,9 @@
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` | 228 | ✅ Extraído | Mantém regressões de replay events, fim de combate, APNAP/timestamp e spell-cast trigger isoladas |
 | `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` | 198 | ✅ Extraído | Mantém regressões auxiliares de loss taxonomy, token/land recursion, proteção de jogador e auditoria isoladas |
 | `server/routes/ai/optimize/index.dart` | 2498 | ⚠️ Split iniciado | Response/cache, envelope async, request parsing, payload final, warnings finais, diagnostics finais, fallback vazio, payloads de rejeição, validação pós-processamento, retry orchestration, filtro inicial de sugestões, filtro de identidade de cor, filtro de bracket, top-up deterministic/complete, proteção de remoção de lands, reequilíbrio pós-filtros, coleta EDHREC, query de dados completos das adições/quality gate, análise virtual pós-swap, execução do `OptimizationValidator` e decisão final pós-validator foram movidos; manter rota como orquestração fina e só extrair novos blocos quando houver teste de support isolado |
-| `server/lib/ai/optimize_runtime_support.dart` | 1941 | ⚠️ Split iniciado | Cache, quality ranking, role/scoring funcional e utilitários de filler foram movidos para support dedicado; ainda falta extrair seleção de candidatos, fallback e recovery estrutural |
+| `server/lib/ai/optimize_runtime_support.dart` | 1666 | ⚠️ Split iniciado | Cache, quality ranking, role/scoring funcional, utilitários de filler e seleção determinística de remoções foram movidos para support dedicado; ainda falta extrair swap building, fallback e recovery estrutural |
 | `server/lib/ai/optimize_functional_role_support.dart` | 323 | ✅ Extraído | Centraliza inferência funcional, matching de necessidades e score de substituta; runtime mantém export compatível |
+| `server/lib/ai/optimize_removal_candidate_support.dart` | 274 | ✅ Extraído | Centraliza seleção determinística de cartas a cortar, incluindo excesso de lands, proteção de core cards e escopo agressivo |
 | `server/lib/ai/optimize_filler_loader_support.dart` | 1419 | ⚠️ Parcial | Centraliza fillers, lands, structural recovery e utilitários de dedupe/identity/quality; ciclo circular com runtime removido |
 | `server/lib/ai/optimize_cache_support.dart` | 119 | ✅ Extraído | Centraliza assinatura de deck, cache key estável e load/save de `ai_optimize_cache` com wrappers compatíveis no runtime |
 | `server/lib/ai/optimize_candidate_quality_support.dart` | 327 | ✅ Extraído | Centraliza sinais de qualidade agressiva, ranking, buckets de rejeição e loader SQL com export compatível no runtime |
@@ -273,6 +274,9 @@ Fonte consolidada: `RULES_SOURCE_COVERAGE_AUDIT_2026-06-10.md` e
 `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 Fonte primária para números novos de Edge of Eternities:
 `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin`.
+Esta mesma fonte é também a âncora primária para Legendary Vehicle/Spacecraft
+com P/T como commander em `903.3`/`903.12c`; o artigo de mecânicas fica apenas
+como explicação operacional.
 Fonte Commander/hybrid: `https://magic.wizards.com/en/formats/commander` e
 `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026`.
 
@@ -321,3 +325,7 @@ Ordem de implementação quando houver corpus concreto:
    `cant_attack_alone` já existe como camada básica.
 5. **Ability-word telemetry** — permanecer como sinal semântico; enforcement só
    se o texto da carta tiver regra executável própria.
+
+Gate obrigatório: não criar regra genérica nova para Warp, Station, Prepare,
+Omen, Paradigm ou ability words sem carta real no corpus, replay incorreto e
+teste focado. Caso contrário, manter como tracked gap.

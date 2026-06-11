@@ -3,6 +3,7 @@
 > Data: 2026-06-11  
 > Escopo: battle engine, Hermes e gaps de regras para o horizonte prático de 20 dias.  
 > Resultado: documentação/matriz atualizadas contra fontes oficiais; sem ampliar escopo para judge engine completo.
+> Rechecagem web: 2026-06-11, usando apenas fontes oficiais Wizards para regra/formato.
 
 ## Fontes oficiais verificadas
 
@@ -11,9 +12,9 @@
 | `https://magic.wizards.com/en/rules` | Página oficial expõe downloads DOCX/PDF/TXT das Comprehensive Rules atuais. | `server/magicrules.txt` deve continuar preso ao snapshot 2026-04-17 até novo update oficial. |
 | `https://media.wizards.com/2026/downloads/MagicCompRules%2020260417.txt` / `.pdf` | Regras efetivas em 2026-04-17; contém CR 720/721/722, 702.184/702.185, 802 e 903. | Usar TXT local para testes automáticos e PDF/TXT oficial como fonte de auditoria. |
 | `https://magic.wizards.com/en/formats/commander` | Commander é 99+1, color identity, command zone, commander tax, 21 commander damage e free-for-all com ataque a múltiplos jogadores. | Produto e Hermes devem tratar multi-defender como Commander normal, não exceção. |
-| `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Hybrid mana não mudou; continua funcionando como "and" para identidade Commander. | Não implementar modelo "or" sem novo update oficial. |
-| `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Station, Spacecraft, Warp, Void, Lander e Vehicle/Spacecraft commander. | Suporte mínimo está correto; efeitos específicos por carta ficam por corpus. |
-| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Update oficial que adiciona regras de Lander `111.10u`, Station Cards `721`, Station `702.184` e Warp `702.185`. | Fonte primária para números de regra e status de conformance. |
+| `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Hybrid mana não mudou; continua funcionando como "and" para identidade Commander. | Não implementar modelo "or" sem novo update oficial. O plano externo citava 2026-02-10, mas a fonte oficial publicada é 2026-02-09. |
+| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Update oficial que adiciona Lander `111.10u`, Station Cards `721`, Station `702.184`, Warp `702.185` e Legendary Vehicle/Spacecraft com P/T como commander em `903.3`/`903.12c`. | Fonte primária para números de regra, commander legality moderno e status de conformance. |
+| `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Explicação operacional de Station, Spacecraft, Warp, Void e Lander. | Fonte suplementar; não substitui o update bulletin para números de regra. |
 | `https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes` | Release notes detalham station counters, striations, Warp e regra de Commander para Vehicle/Spacecraft. | Fonte suplementar para regressões card-specific futuras. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-mechanics` | Prepare, Repartee, Opus, Infusion, Flashback, Increment, Paradigm e Converge. | Ability words entram como telemetria; Prepare/Omen/Paradigm exigem card-specific só quando usados. |
 
@@ -27,6 +28,12 @@
   `107.4e`.
 - A política de Commander permanece estrita para mana híbrida: não aplicar a
   proposta "or" sem update oficial posterior.
+- O plano recebido citava o update Commander Brackets como 2026-02-10; a URL e
+  artigo oficial disponíveis pela Wizards estão datados como 2026-02-09, então
+  toda documentação local usa essa data.
+- Vehicle/Spacecraft commander deve ser ancorado no Edge of Eternities Update
+  Bulletin, não apenas no artigo de mecânicas, porque o bulletin cita
+  explicitamente `903.3`/`903.12c`.
 - A lista de gaps abaixo é deliberadamente uma matriz de produto/simulação, não
   uma promessa de judge engine completo.
 
@@ -58,6 +65,15 @@
 | 5. Prepare / Omen / Paradigm | Partial mínimo | helpers de characteristics/copy/exile tracking | Não implementar efeito genérico pesado sem carta concreta. |
 | 6. Multiplayer combat Commander | Implemented básico | `assign_attackers_to_defenders`, evento `multi_defender_attack` | Requirements por defensor e blockers APNAP ficam gap separado. |
 | 7. Ability words como telemetry | Implemented como sinal | `modern_ability_word_signals` | Continuar sem enforcement porque ability words não têm texto de regra próprio. |
+
+## O que não deve ser implementado agora
+
+| Pedido possível | Decisão | Motivo |
+|---|---|---|
+| Implementar todos os textos de Warp/Station/Prepare/Omen/Paradigm genericamente | Não executar | Alto risco de falso rigor; cada carta tem texto próprio e precisa de replay real. |
+| Transformar ability words em enforcement global | Não executar | Void/Repartee/Opus/Infusion/Increment/Converge são sinais; o efeito vem do texto da carta. |
+| Flexibilizar hybrid mana em Commander | Não executar | Fonte oficial de Commander Brackets confirmou que a regra não mudou. |
+| Misturar layout/UX em `IMPLEMENTATION_GAPS.md` | Não executar | Esse arquivo é para battle engine/regras; UI fica em docs de UX/QA. |
 
 ## Ordem real de execução
 

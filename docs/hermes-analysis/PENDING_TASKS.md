@@ -153,6 +153,11 @@
 > de fillers ficaram em `optimize_filler_loader_support.dart`. Isso removeu o
 > ciclo circular `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`
 > e preservou exports compatíveis pelo runtime.
+> Quarto split do runtime de optimize concluído: seleção determinística de
+> cartas a cortar foi movida para `optimize_removal_candidate_support.dart`,
+> preservando export público pelo runtime e wrappers da rota. O módulo cobre
+> proteção contra cortes indevidos de lands, corte de lands em excesso
+> off-plan, core cards e escopo agressivo.
 > Terceiro split/align de optimize concluído: response/cache/diagnostics da rota
 > foram movidos para `optimize_route_response_support.dart`. A elegibilidade
 > Commander 2026 foi centralizada em `commander_eligibility.dart` e agora cobre
@@ -288,7 +293,7 @@
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
 | 3 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 4 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de candidate selection ou fallback/recovery e extrair apenas com support test isolado | 1-2 dias | Médio | Teste de support dedicado verde antes do movimento |
+| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de swap building, fallback ou recovery e extrair apenas com support test isolado | 1-2 dias | Médio | Teste de support dedicado verde antes do movimento |
 
 ### Ordem revalidada 2026-06-11
 
