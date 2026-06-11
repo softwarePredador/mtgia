@@ -32,6 +32,37 @@
 - `dart test test/commander_eligibility_test.dart test/mtg_rules_validation_test.dart -r expanded`.
 - Hermes report-only pós-push: `PASS`.
 
+### Revisão complementar 2026-06-11 — snapshot oficial e Brawl
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/magicrules.txt` ainda carregava Comprehensive Rules efetivas em
+  `2026-02-27`, enquanto a fonte oficial atual em `magic.wizards.com/en/rules`
+  publica `MagicCompRules 20260417.txt`.
+- A elegibilidade compartilhada de commander não distinguia Brawl de Commander
+  para planeswalkers lendários, apesar de CR 903.12c permitir planeswalker como
+  comandante em Brawl.
+
+**Entregue:**
+- `server/magicrules.txt` atualizado para o snapshot oficial efetivo em
+  `2026-04-17`.
+- Novo teste guardião `server/test/magic_rules_source_test.dart`.
+- `isCommanderEligibleCard(format: ...)` mantém Commander estrito por padrão e
+  aceita planeswalker lendário somente em `brawl`.
+- `DeckRulesService` e `POST /decks/:id/cards` passam o formato real para o
+  helper compartilhado.
+- `color_identity_test.dart` agora prova diretamente que `resolveCardColorIdentity`
+  expande símbolos híbridos para todas as cores componentes.
+
+**Validação local:**
+- `dart analyze bin lib routes test`.
+- `dart test test/magic_rules_source_test.dart test/commander_eligibility_test.dart test/color_identity_test.dart test/mtg_rules_validation_test.dart test/deck_validation_test.dart --reporter compact`.
+- `dart_frog dev -p 8082` com TTY + `dart test test/decks_incremental_add_test.dart --reporter compact`.
+- `python3 -m py_compile` nos scripts do battle analyst.
+- `python3 test_battle_analyst_v10_3.py`.
+- `git diff --check`.
+
 ## Etapa 2 — Alinhamento da melhoria de deck com análise funcional
 
 **Status:** concluída.

@@ -1,6 +1,7 @@
 # Rules Source Coverage Audit — ManaLoom Battle Engine
 
 > Data: 2026-06-10
+> Atualização de fonte local: 2026-06-11
 > Escopo: battle engine/Hermes e validação Commander prática.
 > Fonte de verdade: documentação oficial Wizards vigente em 2026-06-10.
 > Objetivo: manter `IMPLEMENTATION_GAPS.md`, `PENDING_TASKS.md` e a matriz
@@ -34,6 +35,7 @@
 | Área | Status ManaLoom | Implementação | Próxima ação |
 |---|---|---|---|
 | Legendary Vehicle/Spacecraft commander | `Implemented` | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness. | Manter teste de regra 903.3/903.12c e rota incremental. |
+| Brawl legendary planeswalker commander | `Implemented` | `commander_eligibility.dart` aceita planeswalker lendário somente quando `format == brawl`; Commander padrão permanece estrito. | Manter `commander_eligibility_test.dart` e validação completa via `DeckRulesService`. |
 | Hybrid color identity | `Implemented` | Mantida como identidade combinada, sem flexibilização. Coberta por `color_identity_test.dart` e conformance Hermes. | Não implementar modelo "or" enquanto a Wizards não alterar a regra. |
 | Warp | `Partial` | Cast por custo alternativo, exílio no end step e recast normal do exile. | Só adicionar efeitos card-specific quando aparecerem no corpus. |
 | Station/Spacecraft | `Partial` | `activate_station_ability` adiciona charge counters pelo poder de outra criatura e destrava Spacecraft como criatura. | Interação humana/escolha de criatura fica fora do mínimo atual. |
@@ -70,6 +72,18 @@
 python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_targeting_tests.py
 cd docs/hermes-analysis/manaloom-knowledge/scripts && python3 test_battle_analyst_v10_3.py
 ```
+
+## Correção de drift 2026-06-11
+
+`server/magicrules.txt` estava versionado com Comprehensive Rules efetivas em
+`2026-02-27`, apesar da matriz já apontar para `2026-04-17`. O snapshot local
+foi atualizado a partir do download oficial da página `magic.wizards.com/en/rules`
+e passou a ter teste guardião em `server/test/magic_rules_source_test.dart`.
+
+Na mesma revisão foi corrigido um drift de Brawl: CR 903.12c permite
+planeswalker lendário como comandante de Brawl. O helper compartilhado agora
+recebe `format`, mantendo Commander estrito por padrão e liberando planeswalker
+apenas em `brawl`.
 
 ## Próxima auditoria obrigatória
 

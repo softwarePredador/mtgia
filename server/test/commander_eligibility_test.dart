@@ -22,6 +22,25 @@ void main() {
       );
     });
 
+    test('keeps Commander planeswalker eligibility strict by default', () {
+      expect(
+        isCommanderEligibleCard(
+          typeLine: 'Legendary Planeswalker — Chandra',
+        ),
+        isFalse,
+      );
+    });
+
+    test('accepts legendary planeswalkers for Brawl commanders', () {
+      expect(
+        isCommanderEligibleCard(
+          typeLine: 'Legendary Planeswalker — Chandra',
+          format: 'brawl',
+        ),
+        isTrue,
+      );
+    });
+
     test('accepts 2026 legendary Vehicle and Spacecraft commanders with P/T',
         () {
       expect(

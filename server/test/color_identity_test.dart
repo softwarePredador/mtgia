@@ -41,6 +41,37 @@ void main() {
       );
     });
 
+    test('infers all hybrid mana colors from mana cost', () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          manaCost: '{W/U}',
+        ),
+        equals({'W', 'U'}),
+      );
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          manaCost: '{2/B}{R/G}',
+        ),
+        equals({'B', 'R', 'G'}),
+      );
+    });
+
+    test('infers all hybrid mana colors from rules text outside reminder text',
+        () {
+      expect(
+        resolveCardColorIdentity(
+          colorIdentity: const <String>[],
+          colors: const <String>[],
+          oracleText: 'Activate only if you spent {W/U} to cast this spell.',
+        ),
+        equals({'W', 'U'}),
+      );
+    });
+
     test('treats {C} as colorless identity, not as a commander color', () {
       expect(
         resolveCardColorIdentity(
