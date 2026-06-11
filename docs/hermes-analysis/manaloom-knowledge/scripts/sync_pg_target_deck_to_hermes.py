@@ -189,8 +189,30 @@ def selected_deck_sql(args: argparse.Namespace) -> tuple[str, tuple[Any, ...]]:
     )
 
 
+def card_battle_rules_join_sql() -> str:
+    """Return a one-row-per-card battle-rules join.
+
+    `card_battle_rules` can hold multiple rows for the same card. A plain join
+    multiplies deck rows and can inflate a Commander target deck above 100
+    cards in the Hermes SQLite cache.
+    """
+    return """
+                LEFT JOIN LATERAL (
+                  SELECT
+                    cbr.effect_json,
+                    cbr.deck_role_json,
+                    cbr.source,
+                    cbr.review_status
+                  FROM card_battle_rules cbr
+                  WHERE cbr.card_id = c.id
+                  LIMIT 1
+                ) cbr ON TRUE
+    """
+
+
 def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     where_sql, params = selected_deck_sql(args)
+    battle_rules_join = card_battle_rules_join_sql()
     with connect() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -258,8 +280,7 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
                   cbr.review_status
                 FROM deck_cards dc
                 JOIN cards c ON c.id = dc.card_id
-                LEFT JOIN card_battle_rules cbr
-                  ON cbr.card_id = c.id
+                {battle_rules_join}
                 WHERE dc.deck_id = %s
                 ORDER BY dc.is_commander DESC, c.name
                 """,
@@ -295,6 +316,7 @@ def write_sqlite(
     apply: bool,
 ) -> dict[str, int]:
     aggregated_cards = aggregate_cards(cards)
+    deck_total_qty = int(deck.get("total_qty") or 0)
     stats = {
         "cards_seen": len(cards),
         "quantity_seen": sum(int(card["quantity"]) for card in cards),
@@ -303,6 +325,12 @@ def write_sqlite(
         "quantity_written": 0,
         "commanders": sum(1 for card in aggregated_cards if card["is_commander"]),
     }
+    if deck_total_qty and stats["quantity_seen"] != deck_total_qty:
+        raise RuntimeError(
+            "Fetched deck quantity mismatch before SQLite write: "
+            f"deck_total_qty={deck_total_qty}, fetched_quantity={stats['quantity_seen']}. "
+            "This usually means a join multiplied deck card rows."
+        )
     conn = sqlite3.connect(sqlite_db)
     try:
         cur = conn.cursor()

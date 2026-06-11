@@ -22,7 +22,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                 {
                     "name": "Runtime Lorehold Learned",
                     "archetype": "midrange",
-                    "total_qty": 100,
+                    "total_qty": 3,
                     "pg_deck_id": "pg-deck-1",
                 },
                 [
@@ -85,6 +85,53 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             self.assertEqual(rows[1]["card_name"], "Sol Ring")
             self.assertEqual(rows[1]["quantity"], 2)
             self.assertEqual(rows[1]["functional_tag"], "ramp")
+
+    def test_write_sqlite_rejects_multiplied_join_quantity(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+
+            with self.assertRaises(RuntimeError) as err:
+                sync.write_sqlite(
+                    str(db_path),
+                    6,
+                    {
+                        "name": "Runtime Lorehold Learned",
+                        "archetype": "midrange",
+                        "total_qty": 1,
+                        "pg_deck_id": "pg-deck-1",
+                    },
+                    [
+                        {
+                            "name": "Sol Ring",
+                            "quantity": 1,
+                            "is_commander": False,
+                            "functional_tag": "ramp",
+                            "rule_review_status": "active",
+                            "cmc": 1,
+                            "type_line": "Artifact",
+                            "oracle_text": "{T}: Add {C}{C}.",
+                        },
+                        {
+                            "name": "Sol Ring",
+                            "quantity": 1,
+                            "is_commander": False,
+                            "functional_tag": "ramp",
+                            "rule_review_status": "active",
+                            "cmc": 1,
+                            "type_line": "Artifact",
+                            "oracle_text": "{T}: Add {C}{C}.",
+                        },
+                    ],
+                    apply=True,
+                )
+
+            self.assertIn("join multiplied deck card rows", str(err.exception))
+
+    def test_card_battle_rules_join_limits_to_one_row_per_card(self) -> None:
+        join_sql = sync.card_battle_rules_join_sql().lower()
+
+        self.assertIn("left join lateral", join_sql)
+        self.assertIn("limit 1", join_sql)
 
 
 if __name__ == "__main__":

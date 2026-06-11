@@ -249,6 +249,19 @@ Validação remota pós-conversão do mana-base validator (`2026-06-11T14:20Z`):
   normalizar learned decks Commander acima de 100 antes de usar o resultado
   como deck completo no app/servidor.
 
+Correção de causa raiz (`2026-06-11T14:35Z`):
+
+- O deck PG alvo declarava `100` cartas, mas
+  `sync_pg_target_deck_to_hermes.py` usava `LEFT JOIN card_battle_rules` direto.
+  Cartas com múltiplas regras em `card_battle_rules` multiplicavam linhas antes
+  da gravação no SQLite, inflando o target Hermes para `104`.
+- O sync agora usa `LEFT JOIN LATERAL (... LIMIT 1)` para manter uma linha de
+  regra por carta e recusa qualquer payload em que `sum(quantity)` das linhas
+  buscadas não bata com `deck.total_qty` antes de escrever em `deck_cards`.
+- Teste adicionado:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py`
+  cobre a rejeição de quantidade multiplicada por join.
+
 ### Impacto ainda não provado
 
 Ainda falta observar uma rodada completa agendada, não apenas manual, depois da
