@@ -82,6 +82,9 @@
 > foram movidos para `optimize_route_response_support.dart`. A elegibilidade
 > Commander 2026 foi centralizada em `commander_eligibility.dart` e agora cobre
 > também `POST /decks/:id/cards`, não só `DeckRulesService`.
+> Quarto split de optimize concluído: envelope async da rota foi movido para
+> `optimize_route_async_support.dart`, preservando contratos `202 Accepted` de
+> optimize agressivo async e complete async.
 
 ---
 
@@ -148,7 +151,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_response_support.dart` verde |
+| 6 | Próximo split da rota optimize | 1-2 dias | Médio | `optimize_route_async_support.dart` verde |
 
 ---
 
