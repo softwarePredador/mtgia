@@ -135,6 +135,9 @@
 > Décimo oitavo split de optimize concluído: reequilíbrio pós-filtros foi
 > movido para `optimize_route_rebalance_support.dart`, mantendo a chamada
 > SQL/IA na rota e cobrindo plano, aplicação de substitutas e truncamento.
+> Décimo nono split de optimize concluído: coleta de adições ausentes no EDHREC
+> foi movida para `optimize_route_post_validation_support.dart`, mantendo o
+> serviço EDHREC na rota e cobrindo a regra por callback.
 
 ---
 
@@ -201,7 +204,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: validação EDHREC/tema pós-processamento | 1-2 dias | Médio | `optimize_route_rebalance_support.dart` verde |
+| 6 | Próximo split da rota optimize: query de dados completos das adições/quality gate | 1-2 dias | Médio | `optimize_route_post_validation_support.dart` verde |
 
 ---
 
@@ -470,8 +473,8 @@
 | `optimize_route_empty_fallback_support_test.dart` | Cobertura direta do fallback vazio sem depender de banco/OpenAI | 108 |
 | `optimize_route_quality_rejection_support.dart` | Payloads de rejeição do quality gate para no-safe-swaps e quality rejected | 48 |
 | `optimize_route_quality_rejection_support_test.dart` | Cobertura direta dos contratos `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED` | 65 |
-| `optimize_route_post_validation_support.dart` | Warnings/improvements pós-processamento de identidade de cor, EDHREC, tema e análise antes/depois | 133 |
-| `optimize_route_post_validation_support_test.dart` | Cobertura direta dos builders de validação pós-processamento da rota optimize | 106 |
+| `optimize_route_post_validation_support.dart` | Warnings/improvements pós-processamento de identidade de cor, coleta EDHREC, tema e análise antes/depois | 146 |
+| `optimize_route_post_validation_support_test.dart` | Cobertura direta dos builders de validação pós-processamento e coleta EDHREC | 119 |
 | `optimize_route_retry_support.dart` | Plano de retry deterministic-first para IA e metadata dos retornos de optimize | 64 |
 | `optimize_route_retry_support_test.dart` | Cobertura direta de retry no-safe-swaps, quality rejected e preservação de metadata explícita | 105 |
 | `optimize_route_suggestion_filter_support.dart` | Balanceamento/sanitização inicial de sugestões, proteção de comandante/core e filtro de no-op | 76 |

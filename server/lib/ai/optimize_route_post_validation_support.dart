@@ -16,6 +16,19 @@ String? buildColorIdentityValidationWarning(
   return '⚠️ ${filteredByColorIdentity.length} carta(s) sugerida(s) pela IA foram removidas por violar a identidade de cor do commander: $sample$suffix';
 }
 
+List<String> collectAdditionsNotInEdhrec({
+  required List<String> validAdditions,
+  required bool Function(String name) containsCard,
+}) {
+  final missing = <String>[];
+  for (final addition in validAdditions) {
+    if (!containsCard(addition)) {
+      missing.add(addition);
+    }
+  }
+  return missing;
+}
+
 List<String> buildEdhrecValidationWarnings({
   required String commanderName,
   required List<String> validAdditions,

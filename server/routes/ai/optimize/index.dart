@@ -1825,12 +1825,12 @@ Future<Response> onRequest(RequestContext context) async {
 
           if (edhrecValidationData != null &&
               edhrecValidationData.topCards.isNotEmpty) {
-            for (final addition in validAdditions) {
-              final card = edhrecValidationData.findCard(addition);
-              if (card == null) {
-                additionsNotInEdhrec.add(addition);
-              }
-            }
+            additionsNotInEdhrec =
+                optimize_route_post_validation.collectAdditionsNotInEdhrec(
+              validAdditions: validAdditions,
+              containsCard: (addition) =>
+                  edhrecValidationData!.findCard(addition) != null,
+            );
 
             if (additionsNotInEdhrec.isNotEmpty) {
               validationWarnings.addAll(

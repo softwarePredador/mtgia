@@ -38,6 +38,19 @@ void main() {
     expect(mildNovelty.single, contains('podem ser inovadoras'));
   });
 
+  test('collectAdditionsNotInEdhrec keeps additions missing from top cards',
+      () {
+    final missing = collectAdditionsNotInEdhrec(
+      validAdditions: const ['Sol Ring', 'Unknown Tech', 'Arcane Signet'],
+      containsCard: (name) => {
+        'sol ring',
+        'arcane signet',
+      }.contains(name.toLowerCase()),
+    );
+
+    expect(missing, ['Unknown Tech']);
+  });
+
   test('buildThemeMismatchWarning returns null for matching themes', () {
     expect(
       buildThemeMismatchWarning(
