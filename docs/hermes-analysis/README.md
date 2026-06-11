@@ -22,6 +22,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para decidir quando Hermes pode escrever docs, quando Codex deve chamar
     report-only e como transformar achados Hermes em tarefas reais.
 
+- `HERMES_RUNTIME_CRON_ALIGNMENT_2026-06-11.md`
+  - Snapshot do runtime AWS depois do prune de branches e ajuste das crons.
+  - Registra jobs habilitados/pausados, scripts alterados e validações feitas.
+
 - `HERMES_DOCS_TRIAGE_2026-06-11.md`
   - Triagem curada dos commits `13a10128`, `372cdfca` e `76ec897f` da branch
     `codex/hermes-analysis-docs`.
