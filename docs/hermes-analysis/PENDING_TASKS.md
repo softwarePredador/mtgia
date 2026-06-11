@@ -138,6 +138,14 @@
 > Décimo nono split de optimize concluído: coleta de adições ausentes no EDHREC
 > foi movida para `optimize_route_post_validation_support.dart`, mantendo o
 > serviço EDHREC na rota e cobrindo a regra por callback.
+> Vigésimo split de optimize concluído: decisão final pós-validator foi movida
+> para `optimize_route_final_gate_support.dart`, cobrindo bloqueio final por
+> quality gate, validação serializada e Semantic Layer v2 sem alterar o contrato
+> HTTP da rota.
+> Hardening adicional: `rebuild_guided` deixou de gerar terreno básico com
+> `card_id` vazio, resolve identidade por `mana_cost/oracle_text`, carrega
+> básicos por subtipo (`Island // Island` incluso) e passa nos cenários live
+> Talrand preview/draft-clone.
 
 ---
 
@@ -204,7 +212,7 @@
 | 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
 | 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
 | 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: decisão de rejeição/retry final após `OptimizationValidator` | 1-2 dias | Médio | `optimize_route_validator_support.dart` verde |
+| 6 | Próximo split da rota optimize: revisar blocos remanescentes de orquestração e extrair apenas quando houver support test isolado | 1-2 dias | Médio | `optimize_route_final_gate_support.dart` verde |
 
 ---
 
@@ -475,6 +483,7 @@
 | `optimize_route_addition_data_support.dart` | Query/normalização de dados completos das adições para complete/post-analysis/quality gate | 146 |
 | `optimize_route_virtual_analysis_support.dart` | Montagem do deck virtual pós-swap, análise antes/depois e warnings/improvements | 63 |
 | `optimize_route_validator_support.dart` | Execução injetável do `OptimizationValidator`, atualização de `postAnalysis.validation` e warnings finais | 74 |
+| `optimize_route_final_gate_support.dart` | Decisão final de rejeição por quality gate, validação serializada e Semantic Layer v2 | 156 |
 | `optimize_route_quality_rejection_support_test.dart` | Cobertura direta dos contratos `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED` | 65 |
 | `optimize_route_post_validation_support.dart` | Warnings/improvements pós-processamento de identidade de cor, coleta EDHREC, tema e análise antes/depois | 146 |
 | `optimize_route_post_validation_support_test.dart` | Cobertura direta dos builders de validação pós-processamento e coleta EDHREC | 119 |

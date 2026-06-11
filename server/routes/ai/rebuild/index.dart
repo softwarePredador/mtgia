@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../lib/ai/rebuild_guided_service.dart';
 import '../../../lib/ai/deck_state_analysis.dart';
+import '../../../lib/color_identity.dart';
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/http_responses.dart';
 
@@ -32,8 +33,8 @@ Future<Response> onRequest(RequestContext context) async {
   final requestedArchetype = body['archetype']?.toString();
   final requestedScope =
       (body['rebuild_scope']?.toString().trim().toLowerCase() ?? 'auto');
-  final saveMode = (body['save_mode']?.toString().trim().toLowerCase() ??
-      'draft_clone');
+  final saveMode =
+      (body['save_mode']?.toString().trim().toLowerCase() ?? 'draft_clone');
   final bracketRaw = body['bracket'];
   final bracket =
       bracketRaw is int ? bracketRaw : int.tryParse('${bracketRaw ?? ''}');
@@ -159,15 +160,17 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final commanderColorIdentity = <String>{};
-    for (final card in originalDeck.where((card) => card['is_commander'] == true)) {
-      final colorIdentity =
-          (card['color_identity'] as List?)?.cast<String>() ?? const <String>[];
-      final colors = (colorIdentity.isNotEmpty
-              ? colorIdentity
-              : ((card['colors'] as List?)?.cast<String>() ?? const <String>[]))
-          .map((color) => color.toUpperCase())
-          .toSet();
-      commanderColorIdentity.addAll(colors);
+    for (final card
+        in originalDeck.where((card) => card['is_commander'] == true)) {
+      commanderColorIdentity.addAll(
+        resolveCardColorIdentity(
+          colorIdentity:
+              (card['color_identity'] as List?)?.cast<String>() ?? const [],
+          colors: (card['colors'] as List?)?.cast<String>() ?? const [],
+          manaCost: card['mana_cost']?.toString(),
+          oracleText: card['oracle_text']?.toString(),
+        ),
+      );
     }
 
     final service = RebuildGuidedService(pool);

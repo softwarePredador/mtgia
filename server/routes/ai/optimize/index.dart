@@ -33,6 +33,8 @@ import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
+import '../../../lib/ai/optimize_route_final_gate_support.dart'
+    as optimize_route_final_gate;
 import '../../../lib/ai/optimize_route_quality_rejection_support.dart'
     as optimize_route_quality_rejection;
 import '../../../lib/ai/optimize_route_post_validation_support.dart'
@@ -2061,161 +2063,135 @@ Future<Response> onRequest(RequestContext context) async {
         validationWarnings.insertAll(0, qualityGateWarnings);
       }
 
-      if (!isComplete && optimizationValidationReport != null) {
-        final hardQualityRejected =
-            optimizationValidationReport.verdict != 'aprovado' ||
-                optimizationValidationReport.score < 70;
+      final preCurve =
+          double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ?? 0.0;
+      final postCurve = double.tryParse(
+            '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
+          ) ??
+          0.0;
+      final preManaAssessment =
+          deckAnalysis['mana_base_assessment']?.toString() ?? '';
+      final postManaAssessment =
+          (postAnalysis?['mana_base_assessment']?.toString()) ?? '';
 
-        final effectiveRejectionReasons = hardQualityRejected
-            ? buildOptimizationRejectionReasons(
-                validationReport: optimizationValidationReport,
-                archetype: effectiveOptimizeArchetype,
-                preCurve:
-                    double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ??
-                        0.0,
-                postCurve: double.tryParse(
-                      '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
-                    ) ??
-                    0.0,
-                preManaAssessment:
-                    deckAnalysis['mana_base_assessment']?.toString() ?? '',
-                postManaAssessment:
-                    (postAnalysis?['mana_base_assessment']?.toString()) ?? '',
-              )
-            : const <String>[];
+      final finalQualityGateDecision =
+          optimize_route_final_gate.evaluateOptimizeRouteQualityGate(
+        isComplete: isComplete,
+        validationReport: optimizationValidationReport,
+        archetype: effectiveOptimizeArchetype,
+        preCurve: preCurve,
+        postCurve: postCurve,
+        preManaAssessment: preManaAssessment,
+        postManaAssessment: postManaAssessment,
+      );
 
-        if (hardQualityRejected || effectiveRejectionReasons.isNotEmpty) {
-          final retryPlan =
-              optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
-            deterministicFirstEnabled: deterministicFirstEnabled,
-            fallbackAlreadyAttempted: optimizeFallbackAttempted,
-            strategySource: jsonResponse['strategy_source']?.toString(),
-            qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
-            isComplete: isComplete,
+      if (finalQualityGateDecision.rejected) {
+        final retryPlan = optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
+          deterministicFirstEnabled: deterministicFirstEnabled,
+          fallbackAlreadyAttempted: optimizeFallbackAttempted,
+          strategySource: jsonResponse['strategy_source']?.toString(),
+          qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
+          isComplete: isComplete,
+        );
+        if (retryPlan.shouldRetry && retryPlan.trigger != null) {
+          optimizeFallbackAttempted = true;
+          final aiFallbackResponse = await runAiOptimizeAttempt(
+            trigger: retryPlan.trigger!,
           );
-          if (retryPlan.shouldRetry && retryPlan.trigger != null) {
-            optimizeFallbackAttempted = true;
-            final aiFallbackResponse = await runAiOptimizeAttempt(
-              trigger: retryPlan.trigger!,
-            );
-            if (aiFallbackResponse != null) {
-              Log.i(retryPlan.logMessage ?? 'Retry de optimize via IA.');
-              jsonResponse = aiFallbackResponse;
-              continue optimizeAttemptLoop;
-            }
+          if (aiFallbackResponse != null) {
+            Log.i(retryPlan.logMessage ?? 'Retry de optimize via IA.');
+            jsonResponse = aiFallbackResponse;
+            continue optimizeAttemptLoop;
           }
-
-          return respondWithOptimizeTelemetry(
-            statusCode: HttpStatus.unprocessableEntity,
-            body: optimize_route_quality_rejection.buildQualityRejectedBody(
-              reasons: effectiveRejectionReasons,
-              validation: optimizationValidationReport.toJson(),
-              removals: validRemovals,
-              additions: validAdditions,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              validationWarnings: validationWarnings,
-            ),
-            postAnalysisOverride: postAnalysis,
-            validationReport: optimizationValidationReport,
-            removalsOverride: validRemovals,
-            additionsOverride: validAdditions,
-            validationWarningsOverride: validationWarnings,
-            blockedByColorIdentityOverride: filteredByColorIdentity,
-            blockedByBracketOverride: blockedByBracket,
-          );
         }
+
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: optimize_route_quality_rejection.buildQualityRejectedBody(
+            reasons: finalQualityGateDecision.reasons,
+            validation: finalQualityGateDecision.validation,
+            removals: validRemovals,
+            additions: validAdditions,
+            deckAnalysis: deckAnalysis,
+            postAnalysis: postAnalysis,
+            validationWarnings: validationWarnings,
+          ),
+          postAnalysisOverride: postAnalysis,
+          validationReport: optimizationValidationReport,
+          removalsOverride: validRemovals,
+          additionsOverride: validAdditions,
+          validationWarningsOverride: validationWarnings,
+          blockedByColorIdentityOverride: filteredByColorIdentity,
+          blockedByBracketOverride: blockedByBracket,
+        );
       }
 
       final responseValidationJson =
           (postAnalysis?['validation'] as Map?)?.cast<String, dynamic>();
-      if (!isComplete && responseValidationJson != null) {
-        final responseValidationScore =
-            (responseValidationJson['validation_score'] as num?)?.toInt() ?? 0;
-        final responseValidationVerdict =
-            responseValidationJson['verdict']?.toString() ?? '';
-
-        if (responseValidationVerdict != 'aprovado' ||
-            responseValidationScore < 70) {
-          final serializedValidationReasons = optimizationValidationReport !=
-                  null
-              ? buildOptimizationRejectionReasons(
-                  validationReport: optimizationValidationReport,
-                  archetype: effectiveOptimizeArchetype,
-                  preCurve: double.tryParse(
-                        '${deckAnalysis['average_cmc'] ?? '0'}',
-                      ) ??
-                      0.0,
-                  postCurve: double.tryParse(
-                          '${postAnalysis?['average_cmc'] ?? '0'}') ??
-                      0.0,
-                  preManaAssessment:
-                      deckAnalysis['mana_base_assessment']?.toString() ?? '',
-                  postManaAssessment:
-                      postAnalysis?['mana_base_assessment']?.toString() ?? '',
-                )
-              : <String>[
-                  'A validaÃ§Ã£o final nÃ£o fechou como "aprovado" (score $responseValidationScore/100). Optimize sÃ³ retorna sucesso quando a melhoria Ã© aprovada sem ressalvas.',
-                ];
-
-          return respondWithOptimizeTelemetry(
-            statusCode: HttpStatus.unprocessableEntity,
-            body: optimize_route_quality_rejection.buildQualityRejectedBody(
-              reasons: serializedValidationReasons,
-              validation: responseValidationJson,
-              removals: validRemovals,
-              additions: validAdditions,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              validationWarnings: validationWarnings,
-            ),
-            postAnalysisOverride: postAnalysis,
-            validationReport: optimizationValidationReport,
-            removalsOverride: validRemovals,
-            additionsOverride: validAdditions,
-            validationWarningsOverride: validationWarnings,
-            blockedByColorIdentityOverride: filteredByColorIdentity,
-            blockedByBracketOverride: blockedByBracket,
-          );
-        }
+      final serializedValidationDecision =
+          optimize_route_final_gate.evaluateSerializedOptimizeValidation(
+        isComplete: isComplete,
+        serializedValidation: responseValidationJson,
+        validationReport: optimizationValidationReport,
+        archetype: effectiveOptimizeArchetype,
+        preCurve: preCurve,
+        postCurve: postCurve,
+        preManaAssessment: preManaAssessment,
+        postManaAssessment: postManaAssessment,
+      );
+      if (serializedValidationDecision.rejected) {
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: optimize_route_quality_rejection.buildQualityRejectedBody(
+            reasons: serializedValidationDecision.reasons,
+            validation: serializedValidationDecision.validation,
+            removals: validRemovals,
+            additions: validAdditions,
+            deckAnalysis: deckAnalysis,
+            postAnalysis: postAnalysis,
+            validationWarnings: validationWarnings,
+          ),
+          postAnalysisOverride: postAnalysis,
+          validationReport: optimizationValidationReport,
+          removalsOverride: validRemovals,
+          additionsOverride: validAdditions,
+          validationWarningsOverride: validationWarnings,
+          blockedByColorIdentityOverride: filteredByColorIdentity,
+          blockedByBracketOverride: blockedByBracket,
+        );
       }
 
-      if (!isComplete && optimizationValidationReport != null) {
-        final semanticV2 =
-            optimizationValidationReport.functional.semanticLayerV2;
-        if (semanticV2.isNotEmpty) {
-          final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
-            semanticLayerV2: semanticV2,
-            mode: semanticV2OptimizeEnforcementMode,
-            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
-          );
+      final semanticV2GateDecision =
+          optimize_route_final_gate.evaluateOptimizeRouteSemanticV2Gate(
+        isComplete: isComplete,
+        validationReport: optimizationValidationReport,
+        enforcementMode: semanticV2OptimizeEnforcementMode,
+        expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
+      );
+      if (semanticV2GateDecision.rejected) {
+        final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
+          semanticLayerV2: semanticV2GateDecision.semanticLayerV2,
+          enforcementMode: semanticV2OptimizeEnforcementMode,
+          expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
+          validation: optimizationValidationReport!.toJson(),
+          removals: validRemovals,
+          additions: validAdditions,
+          deckAnalysis: deckAnalysis,
+          postAnalysis: postAnalysis,
+          validationWarnings: validationWarnings,
+        );
 
-          if (semanticV2Decision.blockedBySemanticV2) {
-            final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
-              semanticLayerV2: semanticV2,
-              enforcementMode: semanticV2OptimizeEnforcementMode,
-              expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
-              validation: optimizationValidationReport.toJson(),
-              removals: validRemovals,
-              additions: validAdditions,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              validationWarnings: validationWarnings,
-            );
-
-            return respondWithOptimizeTelemetry(
-              statusCode: HttpStatus.unprocessableEntity,
-              body: semanticRejectionBody,
-              postAnalysisOverride: postAnalysis,
-              validationReport: optimizationValidationReport,
-              removalsOverride: validRemovals,
-              additionsOverride: validAdditions,
-              validationWarningsOverride: validationWarnings,
-              blockedByColorIdentityOverride: filteredByColorIdentity,
-              blockedByBracketOverride: blockedByBracket,
-            );
-          }
-        }
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: semanticRejectionBody,
+          postAnalysisOverride: postAnalysis,
+          validationReport: optimizationValidationReport,
+          removalsOverride: validRemovals,
+          additionsOverride: validAdditions,
+          validationWarningsOverride: validationWarnings,
+          blockedByColorIdentityOverride: filteredByColorIdentity,
+          blockedByBracketOverride: blockedByBracket,
+        );
       }
 
       // Preparar resposta com avisos sobre cartas invÃ¡lidas

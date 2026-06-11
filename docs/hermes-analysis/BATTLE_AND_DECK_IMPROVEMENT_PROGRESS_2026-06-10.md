@@ -590,6 +590,33 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_validator_support_test.dart test/optimize_route_virtual_analysis_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 28 testes, `All tests passed`.
   - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
   - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
+- Split local da decisão final pós-validator:
+  - Criado `server/lib/ai/optimize_route_final_gate_support.dart`.
+  - Criado `server/test/optimize_route_final_gate_support_test.dart`.
+  - A rota `server/routes/ai/optimize/index.dart` removeu a decisão inline de
+    rejeição final por quality gate, validação serializada e Semantic Layer v2.
+    O retry deterministic-first continua orquestrado na rota para preservar o
+    fluxo `continue optimizeAttemptLoop`, mas a decisão pura agora é testável.
+  - Tamanho da rota após o corte: `2498` linhas.
+  - Validação local focada:
+    - `dart analyze lib/ai/optimize_route_final_gate_support.dart routes/ai/optimize/index.dart test/optimize_route_final_gate_support_test.dart`: sem issues.
+    - `dart test test/optimize_route_final_gate_support_test.dart test/optimize_route_validator_support_test.dart test/optimize_route_quality_rejection_support_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 10 testes, `All tests passed`.
+- Hardening live do rebuild guiado:
+  - O teste live completo de `/ai/optimize` revelou regressão real em
+    `rebuild_guided`: terreno básico sintético com `card_id: ""` causava
+    `22P02 invalid input syntax for type uuid`.
+  - A rota `server/routes/ai/rebuild/index.dart` agora resolve identidade de cor
+    do comandante via `resolveCardColorIdentity`, usando fallback por
+    `mana_cost` e `oracle_text`.
+  - `server/lib/ai/rebuild_guided_service.dart` agora carrega terrenos básicos
+    por subtipo de `type_line` e nome canônico, cobrindo bases como
+    `Island // Island`; identidade vazia completa com `Wastes`; e qualquer
+    carta sem `card_id` vira `RebuildException` controlada antes de validar ou
+    persistir.
+  - Validação live local com `dart_frog dev -p 8082`:
+    - `dart test test/ai_optimize_flow_test.dart -p vm --plain-name 'AI optimize flow | /ai/optimize rebuild_guided preview_only rebuilds Talrand as full non-commander rebuild' --reporter compact`: passou.
+    - `dart test test/ai_optimize_flow_test.dart -p vm --plain-name 'AI optimize flow | /ai/optimize rebuild_guided draft_clone creates a strict-valid commander deck' --reporter compact`: passou.
+    - `dart test test/ai_optimize_flow_test.dart --reporter compact`: 10 testes passaram, 1 stress matrix skipped.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -610,8 +637,9 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    de bracket/top-up determinístico de básicos no modo complete/proteção de
    remoção de terrenos/reequilíbrio pós-filtros/coleta EDHREC pós-processamento
    query de dados completos das adições/quality gate, análise virtual pós-swap
-   e execução do `OptimizationValidator` já foram feitos; o próximo corte
-   seguro é extrair a decisão de rejeição/retry final.
+   execução do `OptimizationValidator` e decisão final pós-validator já foram
+   feitos; o próximo corte seguro é avaliar se ainda há blocos grandes de
+   orquestração que possam virar support sem esconder o fluxo principal.
 3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
    primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
    e quality ranking/loader para `optimize_candidate_quality_support.dart`,
