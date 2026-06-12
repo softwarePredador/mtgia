@@ -142,6 +142,7 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
                 {"ambiguous front": "multiple_printings_front"},
                 {"padding card 1": "oracle-padding-1"},
                 {"padding card 1": "multiple_printings_same_oracle_exact"},
+                True,
             ),
         ), mock.patch.object(
             audit,
@@ -172,6 +173,7 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
             summary["resolver_schema_version"],
             "learned_opponent_identity_audit_v3_report_only",
         )
+        self.assertTrue(summary["oracle_id_column_present"])
         self.assertIn("do_not_apply", summary["persist_recommendation"])
         self.assertIn(("Mystery Missing", 1), summary["unresolved_top"])
         self.assertEqual(summary["ambiguous_top"], [("Ambiguous Front", 1)])

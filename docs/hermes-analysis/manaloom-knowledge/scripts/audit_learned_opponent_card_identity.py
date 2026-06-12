@@ -153,6 +153,22 @@ def _classify_candidate_groups(
     return "unresolved", None, "no_match", 0, None
 
 
+def pg_has_oracle_id_column(cur: Any) -> bool:
+    cur.execute(
+        """
+        SELECT EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND table_name = 'cards'
+            AND column_name = 'oracle_id'
+        )
+        """
+    )
+    row = cur.fetchone()
+    return bool(row and row[0])
+
+
 def load_learned_rows(
     sqlite_db: str | Path,
     *,
@@ -214,23 +230,29 @@ def resolve_names(
     dict[str, str],
     dict[str, str],
     dict[str, str],
+    bool,
 ]:
     normalized_names = sorted({normalize_card_name(name) for name in names if name})
     if not normalized_names:
-        return {}, {}, {}, {}, {}, {}
+        return {}, {}, {}, {}, {}, {}, False
     resolved: dict[str, str] = {}
     oracle_resolved: dict[str, str] = {}
     ambiguous: dict[str, int] = {}
     resolved_kind: dict[str, str] = {}
     oracle_resolved_kind: dict[str, str] = {}
     ambiguous_kind: dict[str, str] = {}
+    oracle_id_column_present = False
     with connect() as conn:
         with conn.cursor() as cur:
+            oracle_id_column_present = pg_has_oracle_id_column(cur)
+            oracle_select_sql = (
+                "oracle_id::text" if oracle_id_column_present else "NULL::text"
+            )
             for index in range(0, len(normalized_names), 500):
                 chunk = normalized_names[index : index + 500]
                 cur.execute(
-                    """
-                    SELECT id::text, name, oracle_id::text
+                    f"""
+                    SELECT id::text, name, {oracle_select_sql}
                     FROM cards
                     WHERE lower(name) = ANY(%s)
                        OR lower(split_part(name, ' // ', 1)) = ANY(%s)
@@ -285,8 +307,8 @@ def resolve_names(
                     if not token:
                         continue
                     cur.execute(
-                        """
-                        SELECT id::text, name, oracle_id::text
+                        f"""
+                        SELECT id::text, name, {oracle_select_sql}
                         FROM cards
                         WHERE lower(name) LIKE %s
                            OR lower(split_part(name, ' // ', 1)) LIKE %s
@@ -322,6 +344,7 @@ def resolve_names(
         ambiguous_kind,
         oracle_resolved,
         oracle_resolved_kind,
+        oracle_id_column_present,
     )
 
 
@@ -339,6 +362,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         ambiguous_kind,
         oracle_resolved,
         oracle_resolved_kind,
+        oracle_id_column_present,
     ) = resolve_names(unique_names)
     unresolved_names: Counter[str] = Counter()
     ambiguous_names: Counter[str] = Counter()
@@ -431,11 +455,14 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         "oracle_resolved_unique_names": len(oracle_resolved),
         "ambiguous_unique_names": len(ambiguous),
         "resolver_schema_version": "learned_opponent_identity_audit_v3_report_only",
+        "oracle_id_column_present": oracle_id_column_present,
         "candidate_identity_policy": (
             "Exact card_id is trusted only when one PG cards row matches. "
             "Multiple printings sharing one oracle_id count as semantic identity "
             "coverage but remain unsafe for card_id persistence until a canonical "
-            "printing policy exists. Accent-normalized matches are diagnostic."
+            "printing policy exists. If cards.oracle_id is absent, same-oracle "
+            "resolution is unavailable and multiple printings remain ambiguous. "
+            "Accent-normalized matches are diagnostic."
         ),
         "persist_recommendation": (
             "do_not_apply_without_canonical_oracle_or_printing_policy"
