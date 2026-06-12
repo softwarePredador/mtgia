@@ -96,6 +96,57 @@ class ScryfallClassifierMultiTagTests(unittest.TestCase):
         self.assertEqual(enriched[0]["functional_tags_json"], ["removal", "draw"])
         self.assertEqual(enriched[0]["tags"][0]["evidence"], "user_tag_comment")
 
+    def test_build_deck_json_infers_commander_color_identity(self) -> None:
+        deck = scryfall_classifier.build_deck_json(
+            "Kinnan, Bonder Prodigy",
+            [
+                {
+                    "name": "Kinnan, Bonder Prodigy",
+                    "qty": 1,
+                    "set_code": "",
+                    "tag_comment": "Commander",
+                    "functional_tag": "engine",
+                    "functional_tags_json": ["engine", "ramp"],
+                    "tags": [
+                        {
+                            "tag": "engine",
+                            "confidence": 0.9,
+                            "evidence": "fixture",
+                        },
+                        {
+                            "tag": "ramp",
+                            "confidence": 0.8,
+                            "evidence": "fixture",
+                        },
+                    ],
+                    "cmc": 2,
+                    "type_line": "Legendary Creature — Human Druid",
+                    "color_identity": ["G", "U"],
+                },
+                {
+                    "name": "Sol Ring",
+                    "qty": 1,
+                    "set_code": "",
+                    "tag_comment": "",
+                    "functional_tag": "ramp",
+                    "functional_tags_json": ["ramp"],
+                    "tags": [
+                        {
+                            "tag": "ramp",
+                            "confidence": 0.9,
+                            "evidence": "fixture",
+                        }
+                    ],
+                    "cmc": 1,
+                    "type_line": "Artifact",
+                    "color_identity": [],
+                },
+            ],
+        )
+
+        self.assertEqual(deck["color_identity"], "GU")
+        self.assertEqual(deck["cards"][0]["color_identity"], "GU")
+
 
 if __name__ == "__main__":
     unittest.main()

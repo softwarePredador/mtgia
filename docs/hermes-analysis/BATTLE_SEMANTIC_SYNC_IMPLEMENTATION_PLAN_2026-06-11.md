@@ -389,6 +389,11 @@ Scryfall classifier's `tags` and `functional_tags_json` in its generated seed,
 while keeping `functional_tag` as the legacy primary role. It remains a manual
 Lorehold reimport utility, not an automatic sync/apply source.
 
+Update 2026-06-12h: `scryfall_classifier.py` now carries Scryfall
+`color_identity` per card and `build_deck_json()` infers deck color identity
+from the commander instead of hardcoding `RW`. The `RW` fallback remains only
+for legacy Lorehold payloads without Scryfall identity data.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:

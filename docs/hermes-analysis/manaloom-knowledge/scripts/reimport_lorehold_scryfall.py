@@ -147,6 +147,7 @@ for c in parsed:
         c['_tag'] = classify_card(card_data)
         c['_cmc'] = card_data.get('cmc', 0)
         c['_type_line'] = card_data.get('type_line', '')
+        c['_color_identity'] = card_data.get('color_identity', [])
         classified += 1
     else:
         c['_scryfall'] = {}
@@ -155,6 +156,7 @@ for c in parsed:
         c['_tag'] = 'unknown'
         c['_cmc'] = 0
         c['_type_line'] = ''
+        c['_color_identity'] = []
         not_classified += 1
         print(f"  ? Not found: {c['name']}")
 
@@ -219,6 +221,7 @@ for c in parsed:
         'tags': c.get('_tags', []),
         'cmc': c.get('_cmc', 0),
         'type_line': c.get('_type_line', ''),
+        'color_identity': c.get('_color_identity', []),
         'is_commander': 1 if c == commander_card else 0,
     })
 

@@ -582,6 +582,58 @@ def _ordered_tag_names(tags: list[dict]) -> list[str]:
     return ordered
 
 
+def _normalize_color_identity(value: Any) -> str:
+    """Normalize a Scryfall color_identity payload without inventing colors."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        raw_values = list(value)
+    elif isinstance(value, list):
+        raw_values = value
+    else:
+        return ""
+
+    seen: set[str] = set()
+    colors: list[str] = []
+    for raw in raw_values:
+        color = str(raw).strip().upper()
+        if color not in {"W", "U", "B", "R", "G"} or color in seen:
+            continue
+        seen.add(color)
+        colors.append(color)
+    return "".join(colors)
+
+
+def _infer_deck_color_identity(
+    commander_name: str,
+    commander_card: dict | None,
+    enriched_cards: list[dict],
+) -> str:
+    """Prefer commander color identity; fall back to observed card identities.
+
+    The previous helper hardcoded Lorehold as RW. That remains only as a
+    compatibility fallback when legacy Lorehold payloads lack Scryfall identity.
+    """
+    if commander_card:
+        commander_identity = _normalize_color_identity(
+            commander_card.get("color_identity"),
+        )
+        if commander_identity:
+            return commander_identity
+
+    merged = _normalize_color_identity([
+        color
+        for card in enriched_cards
+        for color in _normalize_color_identity(card.get("color_identity"))
+    ])
+    if merged:
+        return merged
+
+    if commander_name.strip().lower() == "lorehold, the historian":
+        return "RW"
+    return ""
+
+
 def _merge_user_override_tag(tags: list[dict], override: str) -> list[dict]:
     if not override:
         return tags
@@ -845,6 +897,9 @@ def classify_deck(cards_list: list[dict]) -> list[dict]:
             "tags": tags,
             "cmc": cmc,
             "type_line": type_line,
+            "color_identity": _normalize_color_identity(
+                card_data.get("color_identity"),
+            ),
         })
     return enriched
 
@@ -911,6 +966,7 @@ def build_deck_json(
             "is_commander": 1 if c == commander_card else 0,
             "cmc": c["cmc"],
             "type_line": c.get("type_line", ""),
+            "color_identity": _normalize_color_identity(c.get("color_identity")),
         }
         # Include multi-tags if available
         if c.get("tags"):
@@ -923,7 +979,11 @@ def build_deck_json(
     return {
         "commander": commander_name,
         "archetype": archetype,
-        "color_identity": "RW",  # TODO: infer from Scryfall data
+        "color_identity": _infer_deck_color_identity(
+            commander_name,
+            commander_card,
+            enriched_cards,
+        ),
         "bracket": bracket,
         "source_name": source_name,
         "source_url": "",
