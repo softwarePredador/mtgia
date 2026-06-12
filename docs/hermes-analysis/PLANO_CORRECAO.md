@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-12 11:00 UTC
+> Data: 2026-06-12 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -13,7 +13,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-11 19:00 UTC no checkout `ec573e7d`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta. A revalidacao manual confirmou que seguem abertos `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics esta stale porque `basic_land_utils.dart` centraliza regular/snow basics. Wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-12 19:00 UTC no checkout `641a4b40`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta. A revalidacao manual nao encontrou novo achado confiavel alem dos clusters ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics segue stale porque `basic_land_utils.dart` centraliza regular/snow basics. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **RESOLVIDO/STALE no checkout local
    `372cdfca` em 2026-06-11 11:00 UTC**. `server/bin/local_test_server.dart`
    nao importa mais `../.dart_frog/server.dart` estaticamente; valida
@@ -163,12 +163,14 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-11 19:00 UTC: REVALIDADO/ABERTO no checkout `ec573e7d`.**
+- **Status 2026-06-12 19:00 UTC: REVALIDADO/ABERTO no checkout `641a4b40`.**
   O auditor textual apontou `115` problemas em `205` arquivos backend, mas a
   parte de duplicacao segue limitada por falsos positivos de regex e wrappers;
   este item usa apenas evidencia revalidada por `rg` e leitura direta. A rodada
-  atual tambem marcou como stale a duplicacao antiga de basic lands, que agora
-  esta centralizada em `basic_land_utils.dart`.
+  atual nao encontrou novo achado confiavel alem dos clusters ja abertos; tambem
+  manteve stale a duplicacao antiga de basic lands e descartou
+  `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` como wrappers de
+  compatibilidade sobre `optimize_cache_support.dart`.
 - **Evidência**:
   - `DeckArchetypeAnalyzer` em `server/lib/ai/deck_state_analysis.dart:1`-`:210`
     e `DeckArchetypeAnalyzerCore` em
