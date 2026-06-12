@@ -404,6 +404,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       final selectedCommanderName = _selectedCommanderName();
       final generatedCommanderName =
           commander is Map ? commander['name']?.toString().trim() : null;
+      final generatedCommanderCardId =
+          commander is Map ? commander['card_id']?.toString().trim() : null;
       final commanderNameToSave =
           (generatedCommanderName != null && generatedCommanderName.isNotEmpty)
               ? generatedCommanderName
@@ -423,21 +425,33 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                     commanderNameToSave.toLowerCase();
               })
               .map((card) {
-                return {
-                  'name': card['name'],
+                final cardId = card['card_id']?.toString().trim();
+                final payload = <String, dynamic>{
                   'quantity': card['quantity'] ?? 1,
                 };
+                if (cardId != null && cardId.isNotEmpty) {
+                  payload['card_id'] = cardId;
+                } else {
+                  payload['name'] = card['name'];
+                }
+                return payload;
               })
               .toList();
 
       // Se vier comandante explicitamente, ou se o usuario informou o comandante
       // para Commander/Brawl, salva marcado (is_commander=true) e fora das 99.
       if (commanderNameToSave != null && commanderNameToSave.isNotEmpty) {
-        cardsToAdd.insert(0, {
-          'name': commanderNameToSave,
+        final commanderPayload = <String, dynamic>{
           'quantity': 1,
           'is_commander': true,
-        });
+        };
+        if (generatedCommanderCardId != null &&
+            generatedCommanderCardId.isNotEmpty) {
+          commanderPayload['card_id'] = generatedCommanderCardId;
+        } else {
+          commanderPayload['name'] = commanderNameToSave;
+        }
+        cardsToAdd.insert(0, commanderPayload);
       }
 
       // Create deck with cards
