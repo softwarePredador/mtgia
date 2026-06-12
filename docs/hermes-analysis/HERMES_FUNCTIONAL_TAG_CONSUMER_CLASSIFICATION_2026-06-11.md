@@ -31,7 +31,7 @@ set-based ou fallback explicitamente controlado.
 | `sync_pg_target_deck_to_hermes.py` | ACTIVE / MIGRATED | Agrega por `card_id`, grava `functional_tags_json`, `semantic_tags_v2_json`, `battle_rules_json`, `deck_hash`, `semantics_hash`, `sync_run_id`; rejeita fanout antes de escrever. |
 | `semantic_role_metrics.py` | ACTIVE / NEW HELPER | Helper compartilhado para validadores/report-only; role membership overlay sem inflar cardinalidade. |
 | `master_optimizer_common.py` | ACTIVE / MIGRATED | `deck_hash` estrutural, `semantics_hash` separado, `functional_tags_for_row()` e `roles_for_row()`. |
-| `slot_optimizer.py` | ACTIVE / MIGRATED | Usa `functional_tags_for_row()` para roles reais antes de fallback por effect/category. |
+| `slot_optimizer.py` | ACTIVE / MIGRATED | Agrega `card_deck_analysis.pg_roles` por carta com prioridade deterministica, usa `functional_tags_for_row()` como fallback e nao depende de ordem de linhas/`LIMIT 1`. |
 | `_mana_validator.py` | ACTIVE / MIGRATED | Usa `load_deck_metric_rows()` e reporta `role_metric_source`. |
 | `_run_validation.py` | ACTIVE / MIGRATED | Usa membership de `functional_tags_json`; notas deixam claro que role sums podem exceder total de cartas. |
 | `_update_cron_status.py` | ACTIVE / MIGRATED | Usa membership de `functional_tags_json` e escreve status sem depender de colunas stale da tabela `decks`. |

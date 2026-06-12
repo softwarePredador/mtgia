@@ -96,6 +96,18 @@ REAL_ROLE_TO_CATEGORY = {
     "land": "land",
 }
 
+REAL_CATEGORY_PRIORITY = [
+    "wincon",
+    "wipe",
+    "removal",
+    "tutor",
+    "protection",
+    "ramp",
+    "draw",
+    "engine",
+    "land",
+]
+
 
 CATEGORY_TERMS = {
     "draw": ("draw", "card", "wheel", "discard", "exile the top", "impulse"),
@@ -133,6 +145,27 @@ EXTRA_PROTECTED = {
 
 _REAL_ROLES_CACHE = {}
 
+
+def parse_analysis_roles(raw) -> list[str]:
+    if not raw:
+        return []
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, list):
+            return [str(role).strip().lower() for role in parsed if str(role).strip()]
+    except Exception:
+        pass
+    return [str(role).strip().lower() for role in str(raw).split(",") if role.strip()]
+
+
+def choose_primary_category(categories: list[str]) -> str | None:
+    present = set(categories)
+    for category in REAL_CATEGORY_PRIORITY:
+        if category in present:
+            return category
+    return categories[0] if categories else None
+
+
 def load_known_cards() -> dict[str, dict[str, object]]:
     if KC_JSON.exists():
         with KC_JSON.open("r", encoding="utf-8") as fh:
@@ -161,17 +194,45 @@ def load_real_roles(conn, deck_id: int) -> dict[str, str]:
     roles = {}
     # 1. Try card_deck_analysis (detailed role analysis, most reliable)
     try:
+        columns = {
+            row[1]
+            for row in conn.execute("PRAGMA table_info(card_deck_analysis)").fetchall()
+        }
+        if "role_in_deck" not in columns:
+            columns = set()
+        pg_roles_expr = "pg_roles" if "pg_roles" in columns else "NULL AS pg_roles"
+        role_filter = (
+            "((role_in_deck IS NOT NULL AND role_in_deck != '') OR pg_roles IS NOT NULL)"
+            if "pg_roles" in columns
+            else "(role_in_deck IS NOT NULL AND role_in_deck != '')"
+        )
         rows = conn.execute(
-            "SELECT LOWER(card_name) as name, LOWER(role_in_deck) as role FROM card_deck_analysis WHERE deck_id = ? AND role_in_deck IS NOT NULL AND role_in_deck != ''",
+            f"""
+            SELECT LOWER(card_name) as name, LOWER(role_in_deck) as role, {pg_roles_expr}
+            FROM card_deck_analysis
+            WHERE deck_id = ?
+              AND {role_filter}
+            """,
             (deck_id,),
         ).fetchall()
+        categories_by_name = defaultdict(list)
         for row in rows:
             name = str(row["name"] or "").strip()
+            if not name:
+                continue
+            raw_roles = parse_analysis_roles(row["pg_roles"])
             role = str(row["role"] or "").strip().lower()
-            if name and role:
+            if role:
+                raw_roles.append(role)
+            for raw_role in raw_roles:
+                role = raw_role.strip().lower()
                 mapped = REAL_ROLE_TO_CATEGORY.get(role)
-                if mapped:
-                    roles[name] = mapped
+                if mapped and mapped not in categories_by_name[name]:
+                    categories_by_name[name].append(mapped)
+        for name, categories in categories_by_name.items():
+            primary = choose_primary_category(categories)
+            if primary:
+                roles[name] = primary
     except Exception:
         pass
 

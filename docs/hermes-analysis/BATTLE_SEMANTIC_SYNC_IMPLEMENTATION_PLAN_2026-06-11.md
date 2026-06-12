@@ -375,6 +375,11 @@ Update 2026-06-12d: `export_hermes_learned_deck.py` now aggregates
 arbitrary row with `LIMIT 1`. This avoids metadata fanout and preserves
 multi-role counts when exporting learned decks.
 
+Update 2026-06-12e: `slot_optimizer.py` now aggregates
+`card_deck_analysis.pg_roles` per card and chooses one optimizer category by
+explicit priority. This keeps the slot scan deterministic for multi-function
+cards while preserving `deck_cards.functional_tags_json` as fallback.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:
