@@ -591,6 +591,15 @@ ocultos para usuários normais, Hermes propondo e backend mandando,
 quando confiável/rastreável, e primeiro slice limitado a agregação + snapshot
 Hermes + testes.
 
+Triagem Hermes 2026-06-12: a branch `codex/hermes-analysis-docs` apontou
+incoerência real no funil de ativação: o app emitia `deck_rebuild_created` após
+`/ai/rebuild`, mas `POST /users/me/activation-events` rejeitava o evento por
+allowlist. A correção aceita esse evento no backend e adiciona teste de guarda.
+Os achados antigos sobre owner-scope em `/ai/optimize`, jobs async de optimize e
+jobs async de generate foram revalidados contra `master` e já estavam cobertos
+por source guards (`ai_optimize_authorization_source_test.dart` e
+`ai_generate_job_authorization_source_test.dart`).
+
 ### Gaps adicionais derivados do deep dive
 
 | Prioridade | Gap | Evidência | Ação esperada |
