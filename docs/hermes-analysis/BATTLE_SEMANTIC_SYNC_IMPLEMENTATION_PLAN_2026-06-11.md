@@ -911,3 +911,6 @@ lost. The route now detects the migrated columns through `information_schema` an
 writes `simulation_type` plus `metrics` when available, while preserving
 compatibility with legacy local schemas. The base SQL schema was aligned with the
 migration so new databases start with the same shape as production-like schemas.
+Hermes report-only then flagged that `database_indexes.sql` still missed the
+standalone `simulation_type` and `created_at` indexes from migration 005; that
+index file is now aligned as well.
