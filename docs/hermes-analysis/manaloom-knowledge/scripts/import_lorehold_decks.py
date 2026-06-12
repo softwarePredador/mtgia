@@ -69,6 +69,25 @@ ROLE_KEYWORDS = {
     'wincon': ['win the game', 'target player loses', 'double damage', 'triple damage', 'extra combat', 'extra turn'],
 }
 
+ROLE_PRIORITY = [
+    'commander',
+    'land',
+    'wincon',
+    'ramp',
+    'draw',
+    'removal',
+    'protection',
+    'tutor',
+    'recursion',
+    'engine',
+    'stax',
+    'combo',
+    'token_maker',
+    'creature',
+    'spell',
+    'unknown',
+]
+
 WINCON_NAMES = {
     'approach of the second sun', 'rise of the eldrazi', "mizzix's mastery",
     'storm herd', 'worldfire', 'rite of the dragoncaller', 'fiery emancipation',
@@ -198,26 +217,34 @@ def table_exists(cur: sqlite3.Cursor, table: str) -> bool:
 
 
 def infer_role(name: str, oracle: dict) -> str:
+    return infer_roles(name, oracle)[0]
+
+
+def infer_roles(name: str, oracle: dict) -> list[str]:
     n = name.lower()
     text = f"{oracle.get('type_line','')} {oracle.get('oracle_text','')} {oracle.get('functional_tag','')}".lower()
+    type_line = (oracle.get('type_line') or '').lower()
+    roles: set[str] = set()
     if n == COMMANDER.lower():
-        return 'commander'
-    if 'land' in (oracle.get('type_line') or '').lower():
-        return 'land'
+        roles.add('commander')
+    if 'land' in type_line:
+        roles.add('land')
     if n in WINCON_NAMES:
-        return 'wincon'
+        roles.add('wincon')
     tag = (oracle.get('functional_tag') or '').lower()
-    for role in ['wincon', 'ramp', 'draw', 'removal', 'protection', 'tutor', 'recursion', 'stax', 'combo']:
+    for role in ['wincon', 'engine', 'ramp', 'draw', 'removal', 'protection', 'tutor', 'recursion', 'stax', 'combo']:
         if role in tag:
-            return role
+            roles.add(role)
     for role, words in ROLE_KEYWORDS.items():
         if any(w in text for w in words):
-            return role
-    if 'creature' in (oracle.get('type_line') or '').lower():
-        return 'creature'
-    if any(t in (oracle.get('type_line') or '').lower() for t in ['instant', 'sorcery']):
-        return 'spell'
-    return 'unknown'
+            roles.add(role)
+    if 'creature' in type_line:
+        roles.add('creature')
+    if any(t in type_line for t in ['instant', 'sorcery']):
+        roles.add('spell')
+    if not roles:
+        roles.add('unknown')
+    return [role for role in ROLE_PRIORITY if role in roles]
 
 
 def wincon_scores(name: str, oracle: dict, role: str) -> tuple[int, int, int, int]:
@@ -286,11 +313,13 @@ def import_decks(decks: list[DeckBlock], apply: bool) -> None:
         roles = []
         for card in deck.cards:
             oracle = oracle_for(cur, card.name)
-            role = infer_role(card.name, oracle)
-            roles.append((card, oracle, role))
+            card_roles = infer_roles(card.name, oracle)
+            role = card_roles[0]
+            roles.append((card, oracle, role, card_roles))
         counts = {}
-        for _, _, role in roles:
-            counts[role] = counts.get(role, 0) + 1
+        for _, _, _, card_roles in roles:
+            for role in card_roles:
+                counts[role] = counts.get(role, 0) + 1
         print('  roles:', ', '.join(f'{k}={v}' for k, v in sorted(counts.items())))
 
         if not apply:
@@ -302,7 +331,7 @@ def import_decks(decks: list[DeckBlock], apply: bool) -> None:
             (deck.source, source_url, COMMANDER, deck.name, deck.archetype, card_list, card_count,
              f'import_lorehold_decks.py hash={h}', now))
         deck_id = cur.lastrowid
-        for card, oracle, role in roles:
+        for card, oracle, role, card_roles in roles:
             speed, resilience, stealth, total = wincon_scores(card.name, oracle, role)
             notes = 'Imported from pasted Lorehold decklist'
             why = f'Appears in imported Lorehold deck: {deck.name}'
@@ -312,7 +341,7 @@ def import_decks(decks: list[DeckBlock], apply: bool) -> None:
                      enriched, pg_roles, pg_confidence, speed_score, resilience_score, stealth_score, wincon_total_score)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)''',
                     (deck_id, card.name, oracle['oracle_text'], oracle['cmc'], oracle['type_line'], role, notes, why,
-                     json.dumps([role]), 0.70, speed, resilience, stealth, total))
+                     json.dumps(card_roles), 0.70, speed, resilience, stealth, total))
         cur.execute('''INSERT INTO lorehold_import_runs
             (deck_hash, deck_name, source, card_count, learned_deck_id)
             VALUES (?, ?, ?, ?, ?)''', (h, deck.name, deck.source, card_count, deck_id))

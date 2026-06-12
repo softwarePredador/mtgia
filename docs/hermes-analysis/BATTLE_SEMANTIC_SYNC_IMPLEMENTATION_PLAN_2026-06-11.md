@@ -360,6 +360,11 @@ also migrates an existing legacy SQLite before writing rows, so older Hermes
 knowledge caches do not crash when new multi-tag payloads arrive. They remain
 manual/support tools, not automatic sources of product truth.
 
+Update 2026-06-12b: `import_lorehold_decks.py` now preserves multiple inferred
+roles in `card_deck_analysis.pg_roles` while keeping `role_in_deck` as the
+legacy primary role. This makes manual learned-deck imports safer for
+multi-function cards without changing schemas or enabling automatic imports.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:
