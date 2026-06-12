@@ -651,7 +651,10 @@ virar hash semântico por carta.
    scope-sensitive como manual-only até existir taxonomia/faces suficiente.
 4. Adicionar IDs estáveis a learned-opponent cardlists via PG-backed resolver
    ou sync dedicado; não sintetizar IDs dentro do replay. O primeiro passo
-   report-only é `audit_learned_opponent_card_identity.py`.
+   report-only é `audit_learned_opponent_card_identity.py`. Validação Hermes
+   AWS em `191ead51`: `12` decks, `1200` instâncias, `1149` resolvidas,
+   `1` não resolvida, `50` ambíguas, cobertura `0.9575`; antes de apply,
+   resolver as ambiguidades explicitamente.
 5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato

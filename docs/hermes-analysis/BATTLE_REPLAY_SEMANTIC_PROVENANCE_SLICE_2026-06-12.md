@@ -256,3 +256,25 @@ resolves card names against PostgreSQL `cards`, and reports:
 
 The script does not write SQLite or PostgreSQL. Any future sync that persists
 resolved IDs must be a separate reviewed step with tests and a rollback path.
+
+Hermes AWS report-only validation for commit `191ead51`:
+
+```json
+{
+  "decks_seen": 12,
+  "card_instances": 1200,
+  "resolved_instances": 1149,
+  "unresolved_instances": 1,
+  "ambiguous_instances": 50,
+  "resolution_coverage": 0.9575,
+  "unique_names": 413,
+  "resolved_unique_names": 406,
+  "ambiguous_unique_names": 6,
+  "apply": false
+}
+```
+
+Interpretation: learned-opponent identity can likely be synced safely after a
+review step, but the `50` ambiguous instances must be resolved explicitly.
+The single unresolved instance should be reviewed as data quality, not silently
+dropped.
