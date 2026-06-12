@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-11 19:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-12 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-11)
+## Achados do audit de estrutura (atualizado 2026-06-12)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -215,18 +215,17 @@ mtgia/
   `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-11 03:00 UTC no checkout local `57f52c45`. `LifeCounterScreen` segue
-  legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
-  `DeckCard` e `DeckProgressChip` continuam sem uso runtime confirmado nas
-  listagens; e `LotusPresentationMode` nao e importado/chamado pelo Lotus. A
-  claim anterior contra `AuthVisualShell`, `AuthBrandHeader` e
-  `AuthFormSurface` esta stale: login/register agora importam e instanciam os
-  tres widgets. Controles positivos descartaram `LotusLifeCounterScreen`,
-  `DeckProgressIndicator`, o shell auth e candidatos backend de baixa contagem
-  (`BattleSimulator`, `DistributedRateLimiter`, `RebuildGuidedService`,
-  `SynergyEngine`). Uma varredura textual ampla de classes publicas foi usada
-  apenas como triagem; DTOs/helpers vivos dentro do proprio arquivo nao foram
-  reportados como codigo morto sem evidencia adicional.
+  2026-06-12 03:00 UTC no checkout local `fb302fd4`. O auditor textual executou
+  com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
+  mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
+  de `rg` e leitura direta. `LifeCounterScreen` segue legado/test-only enquanto
+  a rota ativa usa `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip`
+  continuam sem uso runtime confirmado nas listagens; e
+  `LotusPresentationMode` nao e importado/chamado pelo Lotus. Nao surgiram novos
+  achados confiaveis: low-counts de observabilidade, scanner, rotas, widgets de
+  deck details e backend (`BattleSimulator`, `DistributedRateLimiter`,
+  `RebuildGuidedService`, `SynergyEngine`, `PushNotificationService`,
+  `DeckThemeProfile`) foram falsificados por chamadas runtime.
 
 ## Pipeline semantico de cartas
 

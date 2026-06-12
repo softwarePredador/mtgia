@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-11 23:00 UTC
+> Data: 2026-06-12 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -57,17 +57,17 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
    `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-11 03:00 UTC no checkout `57f52c45`.
+   na rotacao local Codex de 2026-06-12 03:00 UTC no checkout `fb302fd4`.
+   O auditor textual executou com sucesso (`205` arquivos backend, `196`
+   classes, `0` imports quebrados), mas continua limitado a `server/lib` e
+   `server/routes`; a evidencia app veio de `rg` e leitura direta.
    `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
    usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
    import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
    construtor; e `LotusPresentationMode` nao tem import nem chamada para
-   `enter()`/`exit()`. A claim anterior contra `AuthVisualShell`,
-   `AuthBrandHeader` e `AuthFormSurface` esta stale: login e register agora
-   importam e instanciam os tres widgets. Controles positivos desta rodada
-   descartaram `LotusLifeCounterScreen`, `DeckProgressIndicator`, o shell auth
-   e candidatos backend de baixa contagem; a varredura textual ampla nao foi
-   usada para acusar DTOs/helpers locais sem evidencia adicional.
+   `enter()`/`exit()`. Nao surgiram novos achados confiaveis: low-counts de
+   observabilidade, scanner, rotas, widgets de deck details e backend foram
+   falsificados por chamadas runtime.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
    `f1de55ef`. Deck analysis e o contexto principal de optimize carregam
    `card_function_tags` + `semantic_tags_v2`, e validator/quality gate ja tem
@@ -850,7 +850,7 @@ builders de response do optimize que continuam fora do fluxo real.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-11 03:00 UTC: REVALIDADO/ABERTO no checkout `57f52c45`.**
+- **Status 2026-06-12 03:00 UTC: REVALIDADO/ABERTO no checkout `fb302fd4`.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:284` usa
@@ -874,17 +874,16 @@ builders de response do optimize que continuam fora do fluxo real.
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
     `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
     `app/lib`, `app/test` ou `app/integration_test`.
-  - **Stale removido:** `AuthVisualShell`, `AuthBrandHeader` e
-    `AuthFormSurface` nao fazem mais parte deste achado. `login_screen.dart:6`
-    importa `auth_visual_shell.dart` e instancia os tres widgets em `:83`,
-    `:86` e `:92`; `register_screen.dart:6` importa o mesmo arquivo e instancia
-    os tres em `:86`, `:101` e `:108`.
+  - **Sem novo achado nesta revalidacao:** low-counts app como
+    `AppObservabilityNavigatorObserver`, `PerformanceNavigatorObserver`,
+    `CardRecognitionService`, `ImagePreprocessor`, `ScannerOverlay`,
+    `LatestSetCollectionScreen`, `DeckAddCardsMenu` e widgets de
+    `deck_details_aux_widgets.dart` tem chamadas runtime confirmadas.
   - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
-    `DeckProgressIndicator` seguem ativos; o shell auth agora tambem esta
-    ativo; candidatos
-    backend de baixa contagem (`BattleSimulator`, `DistributedRateLimiter`,
-    `RebuildGuidedService`, `SynergyEngine`) tambem tem chamador runtime
-    confirmado.
+    `DeckProgressIndicator` seguem ativos; candidatos backend de baixa contagem
+    (`BattleSimulator`, `DistributedRateLimiter`, `RebuildGuidedService`,
+    `SynergyEngine`, `PushNotificationService`, `DeckThemeProfile`) tambem tem
+    chamador runtime confirmado.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
