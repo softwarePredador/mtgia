@@ -365,6 +365,11 @@ roles in `card_deck_analysis.pg_roles` while keeping `role_in_deck` as the
 legacy primary role. This makes manual learned-deck imports safer for
 multi-function cards without changing schemas or enabling automatic imports.
 
+Update 2026-06-12c: `scryfall_classifier.py` now carries its deterministic
+multi-tag inference through `classify_deck()` and `build_deck_json()`. Output
+payloads include both `tags` and `functional_tags_json`, while `functional_tag`
+remains the mapped legacy primary role for compatibility.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:
