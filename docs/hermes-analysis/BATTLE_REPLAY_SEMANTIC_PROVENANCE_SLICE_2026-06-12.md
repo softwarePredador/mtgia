@@ -162,6 +162,29 @@ Result:
 }
 ```
 
+After pushing commit `74850947`, Hermes AWS pulled `origin/master` and ran the
+same compile/test/forensic flow with the real `knowledge.db`.
+
+Result:
+
+```json
+{
+  "remote_head": "74850947",
+  "card_event_count": 45,
+  "rule_logical_key_present": 45,
+  "rule_logical_key_missing": 0,
+  "card_id_present": 24,
+  "card_id_missing": 21,
+  "semantic_hash_present": 24,
+  "semantic_hash_missing": 21
+}
+```
+
+Interpretation: rule-level provenance is complete for this seed; card identity
+provenance is now wired but still partial because some replay paths generate or
+copy card/event payloads without preserving the original snapshot identity.
+This is a concrete follow-up gap, not a blocker for this telemetry-only slice.
+
 ## Not Implemented In This Slice
 
 - `card_id` in every replay event.
@@ -169,6 +192,8 @@ Result:
 - Per-card semantic hash. The current `semantic_hash` is propagated from the
   deck snapshot `semantics_hash` when present; per-card hashing requires a
   separate schema/payload decision.
+- Replay paths that create or copy temporary card payloads without preserving
+  original snapshot identity.
 - Any global policy against Mox cards.
 - Partner/background learned deck support.
 - Any user-facing Hermes metadata.
@@ -177,8 +202,8 @@ Result:
 
 ## Next Safe Slice
 
-1. Run the updated `card_id`/`semantic_hash` coverage validation on Hermes AWS
-   against the real `knowledge.db`.
+1. Trace the 21 missing identity events from the Hermes AWS forensic seed and
+   preserve identity through copy/token/alternate-cast paths where safe.
 2. Decide whether deck-level `semantics_hash` is enough for replay diagnostics
    or whether a new per-card semantic hash field is required.
 3. Only after that, evaluate whether replay/forensic has enough provenance to
