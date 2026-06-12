@@ -48,8 +48,8 @@ Result:
 | new candidates | 89 |
 | already present | 261 |
 | rejected by gate | 2806 |
-| low-risk review candidates | 30 |
-| manual-review candidates | 59 |
+| low-risk review candidates | 27 |
+| manual-review candidates | 62 |
 
 The reduced candidate count is expected: recursion-like effects now match
 existing `recursion` tags instead of creating broad `engine` candidates.
@@ -80,6 +80,10 @@ existing `recursion` tags instead of creating broad `engine` candidates.
 | topdeck_not_direct_draw_review | 3 | Topdeck manipulation/cast-from-top is not direct card draw. |
 | multi_face_review | 2 | Split/MDFC cards need face-aware semantics before automatic apply. |
 | effect_overrode_broad_role | 1 | Concrete effect produced a more precise tag than broad deck role. |
+| card_specific_effect_scope_review | 1 | The battle rule effect is useful for simulation but too broad for a canonical function tag. |
+| combo_ramp_scope_review | 1 | Combo untap/ramp effects need board-context review before deckbuilding classification. |
+| mana_filter_not_treasure_review | 1 | Mana filtering/cantrip behavior must not be flattened into treasure/ramp automatically. |
+| mana_engine_not_draw_review | 1 | Mana engines used to enable plays across turns must not be flattened into draw automatically. |
 
 ## Low-risk candidates
 
@@ -95,7 +99,6 @@ controlled apply after stale-cleanup semantics exist.
 | ramp | Burnt Offering | ramp_ritual | 1.0 |
 | removal | Chaos Warp | remove_permanent | 1.0 |
 | engine | Double Vision | copy_spell | 1.0 |
-| ramp | Dramatic Reversal | ramp_ritual | 1.0 |
 | engine | Dualcaster Mage | copy_spell | 1.0 |
 | engine | Echoes of Eternity | copy_spell | 1.0 |
 | engine | Flare of Duplication | copy_spell | 1.0 |
@@ -103,7 +106,6 @@ controlled apply after stale-cleanup semantics exist.
 | engine | Isochron Scepter | copy_spell | 1.0 |
 | engine | Jin-Gitaxias, Progress Tyrant | copy_spell | 1.0 |
 | board_wipe | Living Death | board_wipe | 1.0 |
-| ramp | Manamorphose | treasure_maker | 1.0 |
 | draw | Peer into the Abyss | draw_cards | 1.0 |
 | removal | Pest Infestation | remove_permanent | 1.0 |
 | draw | Reforge the Soul | draw_cards | 1.0 |
@@ -114,7 +116,6 @@ controlled apply after stale-cleanup semantics exist.
 | draw | Timetwister | draw_cards | 1.0 |
 | removal | Ugin, Eye of the Storms | remove_permanent | 1.0 |
 | board_wipe | Ugin, the Spirit Dragon | board_wipe | 1.0 |
-| draw | Victory Chimes | draw_engine | 1.0 |
 | draw | Wheel of Fortune | draw_cards | 1.0 |
 | draw | Wheel of Misfortune | draw_cards | 1.0 |
 | draw | Windfall | draw_cards | 1.0 |
@@ -135,6 +136,7 @@ specific tag taxonomy, face-aware support, or card-by-card review.
 | draw | Delayed Blast Fireball | draw_cards | lower_confidence_review |
 | tutor | Demonic Consultation | tutor | tutor_scope_review |
 | protection | Displace | phase_creatures | protection_scope_review |
+| ramp | Dramatic Reversal | ramp_ritual | combo_ramp_scope_review |
 | tutor | Expedition Map | tutor | tutor_scope_review |
 | wincon | Final Fortune | extra_turn | wincon_scope_review |
 | recursion | Flashback | recursion | effect_overrode_broad_role |
@@ -150,6 +152,7 @@ specific tag taxonomy, face-aware support, or card-by-card review.
 | wincon | Last Chance | extra_turn | wincon_scope_review |
 | ramp | Magda, the Hoardmaster | ramp_engine | conditional_ramp_review, lower_confidence_review |
 | ramp | Manifold Key | ramp_engine | conditional_ramp_review |
+| ramp | Manamorphose | treasure_maker | mana_filter_not_treasure_review |
 | protection | Mindbreak Trap | counter | protection_scope_review |
 | ramp | Mirage Mirror | ramp_engine | conditional_ramp_review |
 | protection | Misdirection | redirect_removal | protection_scope_review |
@@ -181,6 +184,7 @@ specific tag taxonomy, face-aware support, or card-by-card review.
 | ramp | Training Grounds | ramp_engine | conditional_ramp_review |
 | ramp | Unwinding Clock | ramp_engine | conditional_ramp_review |
 | protection | Vexing Bauble | hate_artifact | protection_scope_review |
+| draw | Victory Chimes | draw_engine | mana_engine_not_draw_review |
 | protection | Voice of Victory | silence_opponents | protection_scope_review |
 | ramp | Wild Growth | ramp_permanent | conditional_ramp_review |
 | ramp | Xorn | ramp_engine | conditional_ramp_review, lower_confidence_review |
@@ -240,10 +244,10 @@ Local smoke:
 | allowlisted candidates | 1 |
 | manual-review candidates blocked | 1 |
 | unmatched allowlist keys | 1 |
-| low-risk candidates in full report | 30 |
-| manual-review candidates in full report | 59 |
+| low-risk candidates in full report | 27 |
+| manual-review candidates in full report | 62 |
 
-Hermes AWS smoke after commit `eba7f79f`:
+Hermes AWS smoke after commit `86ef9062`:
 
 | Check | Result |
 |---|---:|
@@ -251,18 +255,15 @@ Hermes AWS smoke after commit `eba7f79f`:
 | new candidates | 89 |
 | already present | 261 |
 | rejected by gate | 2806 |
-| low-risk review candidates | 30 |
-| manual-review candidates | 59 |
-| allowlist loaded | 3 |
-| allowlisted candidates | 1 |
-| manual-review candidates blocked | 1 |
-| unmatched allowlist keys | 1 |
+| low-risk review candidates | 27 |
+| manual-review candidates | 62 |
 
 ## Next steps
 
 1. Keep the current Slice 4 as report-only.
-2. Review the 30 low-risk candidates manually before any apply implementation.
-3. Extend taxonomy before applying the 59 manual-review candidates:
+2. Review the 27 remaining low-risk candidates manually before any apply
+   implementation.
+3. Extend taxonomy before applying the 62 manual-review candidates:
    scoped tutor, conditional ramp, protection subtype, topdeck/cast-from-top,
    broad wincon, and face-aware semantics.
 4. If apply is approved later, start with an allowlist-backed dry-run and a

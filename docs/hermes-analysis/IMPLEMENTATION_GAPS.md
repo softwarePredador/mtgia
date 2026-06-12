@@ -509,9 +509,9 @@ Concluído no Slice 4 report-only:
     aplicar, candidatos `card_function_tags` derivados de regras confiáveis.
     Gate atual: `card_id` obrigatório, `review_status` `verified/active`,
     `source` `manual/curated`, confidence >= `0.75` e tag derivável.
-    Smoke PG report-only revisado: `3156` regras vistas, `89` novos
-    candidatos, `261` já presentes, `2806` rejeitados por gate, `30`
-    candidatos low-risk review e `59` manual-review; `apply=false`.
+    Smoke PG report-only revisado em `86ef9062`: `3156` regras vistas, `89`
+    novos candidatos, `261` já presentes, `2806` rejeitados por gate, `27`
+    candidatos low-risk review e `62` manual-review; `apply=false`.
 
 ### Testes obrigatórios antes de merge
 
@@ -597,7 +597,7 @@ Hermes + testes.
 |---|---|---|---|
 | P1 | Identidade semântica de carta ainda em transição | Slice 2026-06-12 adicionou contrato/migration aditiva para `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`; `scryfall_id` passa a ser tratado como printing id nas rotas/sync alterados; `DeckRulesService` agora usa `oracle_id` quando presente para bloquear singleton Commander e comandante duplicado no main deck em save/import/validate final, com fallback por nome físico normalizado; `/import/validate` chama a regra central em modo aviso; em 2026-06-12 a migração `021` foi aplicada no PostgreSQL real e o backfill preencheu `oracle_id` em `34325/34329` cartas; o auditor learned-opponent v4 adiciona candidato de printing canônica apenas em modo report-only e somente quando há vencedor único por evidência explícita; validação Hermes AWS em `babf800c` com 50 decks/5.000 instâncias manteve `semantic_identity_coverage=1.0`, `unresolved_instances=0`, `ambiguous_instances=0` e `canonical_printing_candidate_instances=0` | Manter fallback para as 4 cartas sem `oracle_id`; não persistir learned-opponent `card_id` ainda; como o scorecard v4 não encontrou candidato único na amostra ampliada, qualquer apply segue bloqueado até existir política backend-owned/allowlist com falso positivo zero |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
-| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia são `89` novos candidatos: `30` low-risk review e `59` manual-review; modo allowlist dry-run bloqueia manual-review por padrão | Revisar os 30 low-risk; próximo passo seguro é allowlist dry-run versionada, não apply; manter os 59 como manual-only até existir taxonomia/faces/stale cleanup |
+| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia e overrides card-specific são `89` novos candidatos: `27` low-risk review e `62` manual-review; modo allowlist dry-run bloqueia manual-review por padrão | Revisar os 27 low-risk restantes; próximo passo seguro é allowlist dry-run versionada, não apply; manter os 62 como manual-only até existir taxonomia/faces/stale cleanup |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
@@ -625,7 +625,7 @@ Slice 4 adicionou derivação report-only de `card_battle_rules_v1` para
 `card_function_tags`, sem escrita em PG. A revisão
 `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` corrigiu o mapeamento de
 efeitos concretos de recursão para `recursion` em vez de `engine`; o relatório
-atual propõe `89` candidatos, sendo `30` low-risk review e `59` manual-review.
+atual propõe `89` candidatos, sendo `27` low-risk review e `62` manual-review.
 Slice 5 adicionou proveniência semântica de replay sem alterar comportamento:
 `battle_rule_registry.py` agora calcula `logical_rule_key` e carrega
 `oracle_hash`; `battle_analyst_v9.py` carrega `card_id`/`semantics_hash` do
@@ -646,8 +646,8 @@ virar hash semântico por carta.
    qualquer apply.
 2. Rodar nova amostra maior report-only para confirmar que `ruleset_hash` não
    mascara alteração semântica/regra como alteração estrutural.
-3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; usar o modo
-   `--allowlist` apenas para dry-run versionado; manter os 59 candidatos
+3. Revisar os 27 candidatos low-risk de `card_battle_rules_v1`; usar o modo
+   `--allowlist` apenas para dry-run versionado; manter os 62 candidatos
    scope-sensitive como manual-only até existir taxonomia/faces suficiente.
 4. Adicionar IDs estáveis a learned-opponent cardlists via PG-backed resolver
    ou sync dedicado; não sintetizar IDs dentro do replay. O primeiro passo

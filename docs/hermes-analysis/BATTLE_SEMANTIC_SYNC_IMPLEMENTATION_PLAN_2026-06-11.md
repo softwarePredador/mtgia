@@ -660,10 +660,10 @@ Slice 4 report-only derivation status:
 1. Added `derive_functional_tags_from_battle_rules.py` as proposal-only.
 2. Gates: `card_id` required, `review_status IN ('verified','active')`,
    `source IN ('manual','curated')`, confidence >= `0.75`, derivable tag only.
-3. PG report-only smoke after taxonomy review: `3156` rules seen, `89` new
-   candidates, `261` already present, `2806` rejected by gate, `30` low-risk
-   review candidates and `59` manual-review candidates. No PG writes were
-   performed.
+3. PG report-only smoke after taxonomy/card-specific review in `86ef9062`:
+   `3156` rules seen, `89` new candidates, `261` already present, `2806`
+   rejected by gate, `27` low-risk review candidates and `62` manual-review
+   candidates. No PG writes were performed.
 4. Review artifact:
    `docs/hermes-analysis/BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md`.
 5. Added allowlist dry-run support to the same runner. Default behavior keeps

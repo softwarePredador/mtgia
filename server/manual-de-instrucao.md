@@ -18326,3 +18326,26 @@ na command zone, não para validação de deck no servidor.
   - `canonical_printing_candidate_instances=0`;
   - recomendação mantida:
     `do_not_apply_without_canonical_oracle_or_printing_policy`.
+
+## 2026-06-12 — Derivação de tags funcionais: overrides card-specific
+
+- `derive_functional_tags_from_battle_rules.py` continua report-only e
+  `apply=false`.
+- Foram adicionados overrides de revisão manual para impedir que regras úteis
+  ao simulador virem tags canônicas sem análise card-by-card:
+  - `Dramatic Reversal` + `ramp_ritual` ->
+    `combo_ramp_scope_review`;
+  - `Manamorphose` + `treasure_maker` ->
+    `mana_filter_not_treasure_review`;
+  - `Victory Chimes` + `draw_engine` ->
+    `mana_engine_not_draw_review`.
+- Validação Hermes/AWS no commit `86ef9062`:
+  - `rules_seen=3156`;
+  - `new_candidates_count=89`;
+  - `already_present_count=261`;
+  - `rejected_by_gate_count=2806`;
+  - `low_risk_review_count=27`;
+  - `manual_review_count=62`;
+  - `apply=false`.
+- Nenhum write em `card_function_tags` está aprovado sem allowlist versionada,
+  stale cleanup e validação de falso positivo zero.

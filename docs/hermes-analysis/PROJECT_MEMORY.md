@@ -95,11 +95,13 @@ Ao responder sobre o ManaLoom:
   com 36 jogos e 8 benchmarks `logical_rule_smoke` contendo hashes semântico e
   de regras.
 - `derive_functional_tags_from_battle_rules.py` existe apenas como report-only:
-  smoke PG em 2026-06-11 viu 3156 regras, propôs 89 novos candidatos
+  smoke PG atualizado em `86ef9062` viu 3156 regras, propôs 89 novos candidatos
   `card_battle_rules_v1`, encontrou 261 tags já presentes e rejeitou 2806 por
-  gate. A revisão `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` classificou
-  30 candidatos como low-risk review e 59 como manual-review. Nenhum apply em
-  `card_function_tags` está liberado sem revisão, allowlist e stale cleanup.
+  gate. A revisão `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` classifica
+  27 candidatos como low-risk review e 62 como manual-review após mover
+  Dramatic Reversal, Manamorphose e Victory Chimes para revisão manual por
+  escopo card-specific. Nenhum apply em `card_function_tags` está liberado sem
+  revisão, allowlist e stale cleanup.
 - Identidade canônica de carta entrou em transição em 2026-06-12: backend/sync
   agora têm contrato aditivo para `cards.oracle_id`, `cards.layout` e
   `cards.card_faces_json`, tratando `scryfall_id` como printing id. Ainda falta
