@@ -424,6 +424,10 @@ Current production constraint verified on 2026-06-12 and coding status:
   blocking decision.
 - Multiple-printing learned deck matches must remain report-only until a
   backend-owned policy defines either oracle identity or canonical printing.
+- The learned-opponent identity audit now reports two coverage layers:
+  concrete `card_id` resolution and semantic `oracle_id` resolution. Multiple
+  printings sharing the same `oracle_id` improve semantic coverage but still do
+  not produce a persisted `card_id` without a canonical printing policy.
 
 Required behavior:
 

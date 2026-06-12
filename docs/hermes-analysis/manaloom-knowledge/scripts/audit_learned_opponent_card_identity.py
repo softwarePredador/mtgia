@@ -93,13 +93,29 @@ def _longest_lookup_token(key: str) -> str | None:
     return max(tokens, key=len)
 
 
+def _candidate_card_id(candidate: tuple[Any, ...]) -> str:
+    return str(candidate[0])
+
+
+def _candidate_oracle_id(candidate: tuple[Any, ...]) -> str | None:
+    if len(candidate) < 3:
+        return None
+    value = str(candidate[2] or "").strip()
+    return value or None
+
+
 def _classify_candidate_groups(
     *,
-    exact: list[tuple[str, str]],
-    front: list[tuple[str, str]],
-    accent: list[tuple[str, str]],
-) -> tuple[str, str | None, str, int]:
-    """Return `(status, card_id, kind, candidate_count)` for one name key."""
+    exact: list[tuple[Any, ...]],
+    front: list[tuple[Any, ...]],
+    accent: list[tuple[Any, ...]],
+) -> tuple[str, str | None, str, int, str | None]:
+    """Return `(status, card_id, kind, candidate_count, oracle_id)`.
+
+    A single PG row resolves to a concrete `card_id`. Multiple printings sharing
+    one `oracle_id` resolve only to semantic identity; the audit must not choose
+    an arbitrary printing for learned opponents.
+    """
 
     groups = (
         ("exact", exact),
@@ -108,10 +124,33 @@ def _classify_candidate_groups(
     )
     for kind, candidates in groups:
         if len(candidates) == 1:
-            return "resolved", candidates[0][0], kind, 1
+            return (
+                "resolved",
+                _candidate_card_id(candidates[0]),
+                kind,
+                1,
+                _candidate_oracle_id(candidates[0]),
+            )
         if len(candidates) > 1:
-            return "ambiguous", None, f"multiple_printings_{kind}", len(candidates)
-    return "unresolved", None, "no_match", 0
+            oracle_ids = {
+                oracle_id
+                for oracle_id in (
+                    _candidate_oracle_id(candidate) for candidate in candidates
+                )
+                if oracle_id
+            }
+            if len(oracle_ids) == 1 and all(
+                _candidate_oracle_id(candidate) for candidate in candidates
+            ):
+                return (
+                    "oracle_resolved",
+                    None,
+                    f"multiple_printings_same_oracle_{kind}",
+                    len(candidates),
+                    next(iter(oracle_ids)),
+                )
+            return "ambiguous", None, f"multiple_printings_{kind}", len(candidates), None
+    return "unresolved", None, "no_match", 0, None
 
 
 def load_learned_rows(
@@ -168,13 +207,22 @@ def load_learned_rows(
 
 def resolve_names(
     names: set[str],
-) -> tuple[dict[str, str], dict[str, int], dict[str, str], dict[str, str]]:
+) -> tuple[
+    dict[str, str],
+    dict[str, int],
+    dict[str, str],
+    dict[str, str],
+    dict[str, str],
+    dict[str, str],
+]:
     normalized_names = sorted({normalize_card_name(name) for name in names if name})
     if not normalized_names:
-        return {}, {}, {}, {}
+        return {}, {}, {}, {}, {}, {}
     resolved: dict[str, str] = {}
+    oracle_resolved: dict[str, str] = {}
     ambiguous: dict[str, int] = {}
     resolved_kind: dict[str, str] = {}
+    oracle_resolved_kind: dict[str, str] = {}
     ambiguous_kind: dict[str, str] = {}
     with connect() as conn:
         with conn.cursor() as cur:
@@ -182,28 +230,40 @@ def resolve_names(
                 chunk = normalized_names[index : index + 500]
                 cur.execute(
                     """
-                    SELECT id::text, name
+                    SELECT id::text, name, oracle_id::text
                     FROM cards
                     WHERE lower(name) = ANY(%s)
                        OR lower(split_part(name, ' // ', 1)) = ANY(%s)
                     """,
                     (chunk, chunk),
                 )
-                candidates_by_key: dict[str, list[tuple[str, str, bool]]] = {
+                candidates_by_key: dict[str, list[tuple[str, str, str | None, bool]]] = {
                     key: [] for key in chunk
                 }
-                for card_id, card_name in cur.fetchall():
+                for card_id, card_name, oracle_id in cur.fetchall():
                     exact_key = normalize_card_name(card_name)
                     front_key = normalize_card_name(str(card_name).split(" // ", 1)[0])
                     if exact_key in candidates_by_key:
-                        candidates_by_key[exact_key].append((card_id, card_name, True))
+                        candidates_by_key[exact_key].append(
+                            (card_id, card_name, oracle_id, True)
+                        )
                     if front_key in candidates_by_key and front_key != exact_key:
-                        candidates_by_key[front_key].append((card_id, card_name, False))
+                        candidates_by_key[front_key].append(
+                            (card_id, card_name, oracle_id, False)
+                        )
                 unresolved_for_accent: list[str] = []
                 for key, candidates in candidates_by_key.items():
-                    exact = [(card_id, name) for card_id, name, is_exact in candidates if is_exact]
-                    front = [(card_id, name) for card_id, name, is_exact in candidates if not is_exact]
-                    status, card_id, kind, count = _classify_candidate_groups(
+                    exact = [
+                        (card_id, name, oracle_id)
+                        for card_id, name, oracle_id, is_exact in candidates
+                        if is_exact
+                    ]
+                    front = [
+                        (card_id, name, oracle_id)
+                        for card_id, name, oracle_id, is_exact in candidates
+                        if not is_exact
+                    ]
+                    status, card_id, kind, count, oracle_id = _classify_candidate_groups(
                         exact=exact,
                         front=front,
                         accent=[],
@@ -211,6 +271,9 @@ def resolve_names(
                     if status == "resolved" and card_id:
                         resolved[key] = card_id
                         resolved_kind[key] = kind
+                    elif status == "oracle_resolved" and oracle_id:
+                        oracle_resolved[key] = oracle_id
+                        oracle_resolved_kind[key] = kind
                     elif status == "ambiguous":
                         ambiguous[key] = count
                         ambiguous_kind[key] = kind
@@ -223,7 +286,7 @@ def resolve_names(
                         continue
                     cur.execute(
                         """
-                        SELECT id::text, name
+                        SELECT id::text, name, oracle_id::text
                         FROM cards
                         WHERE lower(name) LIKE %s
                            OR lower(split_part(name, ' // ', 1)) LIKE %s
@@ -232,13 +295,13 @@ def resolve_names(
                         (f"%{token}%", f"%{token}%"),
                     )
                     key_accentless = accentless_name_key(key)
-                    accent_candidates: list[tuple[str, str]] = []
-                    for card_id, card_name in cur.fetchall():
+                    accent_candidates: list[tuple[str, str, str | None]] = []
+                    for card_id, card_name, oracle_id in cur.fetchall():
                         exact_key = accentless_name_key(card_name)
                         front_key = accentless_name_key(str(card_name).split(" // ", 1)[0])
                         if key_accentless in (exact_key, front_key):
-                            accent_candidates.append((card_id, card_name))
-                    status, card_id, kind, count = _classify_candidate_groups(
+                            accent_candidates.append((card_id, card_name, oracle_id))
+                    status, card_id, kind, count, oracle_id = _classify_candidate_groups(
                         exact=[],
                         front=[],
                         accent=accent_candidates,
@@ -246,10 +309,20 @@ def resolve_names(
                     if status == "resolved" and card_id:
                         resolved[key] = card_id
                         resolved_kind[key] = kind
+                    elif status == "oracle_resolved" and oracle_id:
+                        oracle_resolved[key] = oracle_id
+                        oracle_resolved_kind[key] = kind
                     elif status == "ambiguous":
                         ambiguous[key] = count
                         ambiguous_kind[key] = kind
-    return resolved, ambiguous, resolved_kind, ambiguous_kind
+    return (
+        resolved,
+        ambiguous,
+        resolved_kind,
+        ambiguous_kind,
+        oracle_resolved,
+        oracle_resolved_kind,
+    )
 
 
 def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
@@ -259,15 +332,24 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         for card in deck["cards"]
         if str(card.get("name") or "").strip()
     }
-    resolved, ambiguous, resolved_kind, ambiguous_kind = resolve_names(unique_names)
+    (
+        resolved,
+        ambiguous,
+        resolved_kind,
+        ambiguous_kind,
+        oracle_resolved,
+        oracle_resolved_kind,
+    ) = resolve_names(unique_names)
     unresolved_names: Counter[str] = Counter()
     ambiguous_names: Counter[str] = Counter()
     resolved_kind_instances: Counter[str] = Counter()
     ambiguous_kind_instances: Counter[str] = Counter()
+    oracle_resolved_kind_instances: Counter[str] = Counter()
     totals = {
         "decks_seen": len(decks),
         "card_instances": 0,
         "resolved_instances": 0,
+        "oracle_resolved_instances": 0,
         "unresolved_instances": 0,
         "ambiguous_instances": 0,
     }
@@ -275,6 +357,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
     for deck in decks:
         deck_total = 0
         deck_resolved = 0
+        deck_oracle_resolved = 0
         deck_unresolved = 0
         deck_ambiguous = 0
         for card in deck["cards"]:
@@ -287,6 +370,11 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
             if key in resolved:
                 deck_resolved += qty
                 resolved_kind_instances[resolved_kind.get(key, "unknown")] += qty
+            elif key in oracle_resolved:
+                deck_oracle_resolved += qty
+                oracle_resolved_kind_instances[
+                    oracle_resolved_kind.get(key, "unknown")
+                ] += qty
             elif key in ambiguous:
                 deck_ambiguous += qty
                 ambiguous_kind_instances[ambiguous_kind.get(key, "unknown")] += qty
@@ -296,6 +384,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
                 unresolved_names[name] += qty
         totals["card_instances"] += deck_total
         totals["resolved_instances"] += deck_resolved
+        totals["oracle_resolved_instances"] += deck_oracle_resolved
         totals["unresolved_instances"] += deck_unresolved
         totals["ambiguous_instances"] += deck_ambiguous
         deck_summaries.append(
@@ -305,6 +394,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
                 "source": deck["source"],
                 "card_instances": deck_total,
                 "resolved_instances": deck_resolved,
+                "oracle_resolved_instances": deck_oracle_resolved,
                 "unresolved_instances": deck_unresolved,
                 "ambiguous_instances": deck_ambiguous,
             }
@@ -315,24 +405,37 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         if totals["card_instances"]
         else 0.0
     )
+    semantic_coverage = (
+        (totals["resolved_instances"] + totals["oracle_resolved_instances"])
+        / totals["card_instances"]
+        if totals["card_instances"]
+        else 0.0
+    )
     return {
         "database_target": sanitized_database_target(),
         "decks_seen": totals["decks_seen"],
         "card_instances": totals["card_instances"],
         "resolved_instances": totals["resolved_instances"],
+        "oracle_resolved_instances": totals["oracle_resolved_instances"],
         "unresolved_instances": totals["unresolved_instances"],
         "ambiguous_instances": totals["ambiguous_instances"],
         "resolved_kind_instances": dict(sorted(resolved_kind_instances.items())),
+        "oracle_resolved_kind_instances": dict(
+            sorted(oracle_resolved_kind_instances.items())
+        ),
         "ambiguous_kind_instances": dict(sorted(ambiguous_kind_instances.items())),
         "resolution_coverage": round(coverage, 6),
+        "semantic_identity_coverage": round(semantic_coverage, 6),
         "unique_names": len(unique_names),
         "resolved_unique_names": len(resolved),
+        "oracle_resolved_unique_names": len(oracle_resolved),
         "ambiguous_unique_names": len(ambiguous),
-        "resolver_schema_version": "learned_opponent_identity_audit_v2_report_only",
+        "resolver_schema_version": "learned_opponent_identity_audit_v3_report_only",
         "candidate_identity_policy": (
             "Exact card_id is trusted only when one PG cards row matches. "
-            "Accent-normalized matches are diagnostic. Multiple printings remain "
-            "ambiguous because production cards has no oracle_id column."
+            "Multiple printings sharing one oracle_id count as semantic identity "
+            "coverage but remain unsafe for card_id persistence until a canonical "
+            "printing policy exists. Accent-normalized matches are diagnostic."
         ),
         "persist_recommendation": (
             "do_not_apply_without_canonical_oracle_or_printing_policy"
@@ -357,7 +460,10 @@ def main() -> int:
     if args.report:
         Path(args.report).parent.mkdir(parents=True, exist_ok=True)
         Path(args.report).write_text(payload, encoding="utf-8")
-    print("LEARNED_OPPONENT_CARD_IDENTITY_AUDIT " + json.dumps(summary, ensure_ascii=True, sort_keys=True))
+    print(
+        "LEARNED_OPPONENT_CARD_IDENTITY_AUDIT "
+        + json.dumps(summary, ensure_ascii=True, sort_keys=True)
+    )
     return 0
 
 
