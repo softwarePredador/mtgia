@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
+import '../../../lib/deck_rules_service.dart';
 import '../../../lib/import_list_service.dart';
 import '../../../lib/import_card_lookup_service.dart';
 
@@ -142,6 +143,34 @@ Future<Response> _validateList(RequestContext context) async {
     final qty = entry['qty'] as int;
     if (qty > limit) {
       warnings.add('$name tem $qty cópias (limite: $limit)');
+    }
+  }
+
+  if (consolidated.isNotEmpty) {
+    try {
+      await DeckRulesService(pool).validateAndThrow(
+        format: normalizedFormat,
+        cards: [
+          for (final card in consolidated)
+            {
+              'card_id': card['card_id'],
+              'quantity': card['quantity'],
+              'is_commander': card['is_commander'] ?? false,
+            },
+        ],
+      );
+    } on DeckRulesException catch (e) {
+      final message = e.message;
+      final cardName = e.cardName;
+      final alreadyCovered = cardName != null &&
+          warnings.any(
+            (warning) => warning.toLowerCase().contains(
+                  cardName.toLowerCase(),
+                ),
+          );
+      if (!alreadyCovered && !warnings.contains(message)) {
+        warnings.add(message);
+      }
     }
   }
 

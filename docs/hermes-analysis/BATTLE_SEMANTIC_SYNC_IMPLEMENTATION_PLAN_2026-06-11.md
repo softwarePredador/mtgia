@@ -418,10 +418,10 @@ Current production constraint verified on 2026-06-12 and coding status:
   back to normalized physical card name while production backfill is incomplete.
 - Existing production rows still need migration/backfill coverage before
   consumers can rely on `oracle_id` as complete.
-- `/import` and deck save/update paths use the final backend rule service.
-  `/import/validate` remains a preview/warnings endpoint and must not be
-  treated as the source of truth for final legality until it is wired to the
-  same canonical identity contract.
+- `/import`, `/import/validate` and deck save/update paths use the central
+  backend rule service. `/import/validate` remains non-mutating and reports
+  canonical identity conflicts as warnings; final write paths still own the
+  blocking decision.
 - Multiple-printing learned deck matches must remain report-only until a
   backend-owned policy defines either oracle identity or canonical printing.
 

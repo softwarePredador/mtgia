@@ -18249,10 +18249,10 @@ na command zone, não para validação de deck no servidor.
 - Impacto real: save/import/validate final passam a bloquear duas printings da
   mesma carta em Commander e também bloqueiam o comandante em outra printing
   dentro das 99 cartas.
-- `/import` e mutações de deck continuam usando o backend como fonte de
-  verdade via `DeckRulesService`.
-- `/import/validate` permanece prévia/aviso; não deve ser tratado como prova
-  final de legalidade até ser ligado ao mesmo contrato canônico.
+- `/import`, `/import/validate` e mutações de deck continuam usando o backend
+  como fonte de verdade via `DeckRulesService`; a prévia não grava nada e
+  expõe conflitos canônicos como warnings, enquanto os caminhos de escrita
+  continuam bloqueando a mutação inválida.
 - Validação focada:
   - `dart analyze lib/deck_rules_service.dart lib/card_identity_support.dart test/deck_rules_service_identity_test.dart`: PASS.
   - `dart test test/deck_rules_service_identity_test.dart --reporter compact`: PASS.
