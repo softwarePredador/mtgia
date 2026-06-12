@@ -39,6 +39,32 @@ def read_json_list(raw: str | None) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
+def stable_json(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def functional_tags_json_for_tag(tag: str) -> str:
+    normalized = str(tag or "").strip().lower()
+    if not normalized or normalized == "unknown":
+        return "[]"
+    return stable_json([normalized])
+
+
+def deck_card_columns(conn: sqlite3.Connection) -> set[str]:
+    return {str(row[1]) for row in conn.execute("PRAGMA table_info(deck_cards)").fetchall()}
+
+
+def ensure_column(
+    conn: sqlite3.Connection,
+    columns: set[str],
+    name: str,
+    definition: str,
+) -> None:
+    if name not in columns:
+        conn.execute(f"ALTER TABLE deck_cards ADD COLUMN {name} {definition}")
+        columns.add(name)
+
+
 def ensure_deck_cards(conn: sqlite3.Connection) -> None:
     conn.execute(
         """
@@ -48,6 +74,7 @@ def ensure_deck_cards(conn: sqlite3.Connection) -> None:
             card_name TEXT,
             quantity INTEGER DEFAULT 1,
             functional_tag TEXT,
+            functional_tags_json TEXT DEFAULT '[]',
             tag_confidence REAL DEFAULT 0.0,
             is_commander INTEGER DEFAULT 0,
             is_partner INTEGER DEFAULT 0,
@@ -58,6 +85,8 @@ def ensure_deck_cards(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    columns = deck_card_columns(conn)
+    ensure_column(conn, columns, "functional_tags_json", "TEXT DEFAULT '[]'")
 
 
 def oracle_cache(conn: sqlite3.Connection, card_names: list[str]) -> dict[str, sqlite3.Row]:
@@ -191,15 +220,17 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
             conn.execute(
                 """
                 INSERT OR REPLACE INTO deck_cards (
-                    deck_id, card_name, quantity, functional_tag, tag_confidence,
-                    is_commander, is_partner, cmc, type_line, oracle_text
-                ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                    deck_id, card_name, quantity, functional_tag,
+                    functional_tags_json, tag_confidence, is_commander,
+                    is_partner, cmc, type_line, oracle_text
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
                 """,
                 (
                     target_deck_id,
                     row["name"],
                     row["quantity"],
                     tag,
+                    functional_tags_json_for_tag(tag),
                     confidence,
                     row["is_commander"],
                     cmc,
