@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-12 03:00 UTC
+> Data: 2026-06-12 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -34,17 +34,17 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    leitura local de `commander_learned_decks`, sem chamada LLM/externa no
    handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-11 05:30 UTC no checkout `f1de55ef`. `commander_fallback_policy.dart`
-   agora existe e centraliza parte relevante das listas de optimize/complete e
-   candidate quality, com teste de versao. Ainda permanecem riscos inline em
+   2026-06-12 05:30 UTC no checkout `e09c7448`. `commander_fallback_policy.dart`
+   segue como policy versionada para parte relevante das listas de
+   optimize/complete e candidate quality. Permanecem riscos inline em
    `functional_card_tags.dart`, `optimization_functional_roles.dart`,
-   `rebuild_guided_service.dart`, `/decks/:id/recommendations`,
-   `/ai/weakness-analysis`, no mock runtime de `/ai/optimize` quando
-   `deckOptimizer == null`, em prompts runtime carregados por `otimizacao.dart`
-   e no meta shell classifier por nomes/keywords. Exemplos de UI/import,
-   fixtures, docs/artifacts e seeds Commander Reference seguem separados como
-   allowed/allowed-with-caution. `edh_bracket_policy.dart` continua excecao
-   intencional por regra externa/curadoria de bracket, com teste dedicado.
+   `candidate_quality_data_support.dart`, `rebuild_guided_service.dart`,
+   `/decks/:id/recommendations`, `/ai/weakness-analysis`, no mock runtime de
+   `/ai/optimize` quando `deckOptimizer == null`, em prompts runtime carregados
+   por `otimizacao.dart` e no meta shell classifier por nomes/keywords.
+   Exemplos de UI/import, fixtures, docs/artifacts e seeds Commander Reference
+   seguem separados como allowed/allowed-with-caution. `edh_bracket_policy.dart`
+   continua excecao intencional por regra externa/curadoria de bracket.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
    revalidado na rotacao local Codex de 2026-06-11 15:00 UTC no checkout
    `76ec897f`. As claims antigas contra `deck_matchups` e
@@ -69,10 +69,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    observabilidade, scanner, rotas, widgets de deck details e backend foram
    falsificados por chamadas runtime.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
-   `f1de55ef`. Deck analysis e o contexto principal de optimize carregam
-   `card_function_tags` + `semantic_tags_v2`, e validator/quality gate ja tem
-   cobertura para multi-role e precedencia persistida. O risco atual esta nos
-   paths legacy de optimize que colapsam o conjunto de roles em um papel unico
+   `e09c7448`. Deck analysis, `loadOptimizeDeckContext`, validator e quality
+   gate carregam ou preservam `card_function_tags` + `semantic_tags_v2`, com
+   multi-role onde essas fontes chegam ao fluxo. O risco atual esta nos paths
+   legacy de optimize que colapsam o conjunto de roles em um papel unico
    (`inferFunctionalRole`/`_legacyOptimizeRoleForResolvedRoles`), em
    `removals_detailed` sem tags persistidas, e em endpoints experimentais como
    `/decks/:id/recommendations` e `/ai/weakness-analysis`, que ainda nao
@@ -271,7 +271,7 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
-- **Status 2026-06-11 05:30 UTC: REVALIDADO/ABERTO no checkout `f1de55ef`.**
+- **Status 2026-06-12 05:30 UTC: REVALIDADO/ABERTO no checkout `e09c7448`.**
   A branch atual tem `server/lib/ai/commander_fallback_policy.dart` como policy
   versionada para denylist, premium names, staples, fallbacks e foundation
   fillers; portanto a claim antiga de policy ausente esta stale. O risco aberto
@@ -280,19 +280,17 @@ Histórico do problema:
   ser tratada como dado versionado ate virar tabela/backfill.
 - **Evidencia**:
   - `server/lib/ai/commander_fallback_policy.dart:1`-`:237` centraliza listas
-    por nome; `server/test/optimize_runtime_support_test.dart:279`-`:282`
-    valida a versao/denylist. `server/lib/ai/optimize_runtime_support.dart:669`,
-    `:1795`-`:1810` e `:1848`-`:1855`, e
-    `server/lib/ai/optimize_filler_loader_support.dart:111`-`:112` e
-    `:951`-`:968` consomem essa policy.
+    por nome; tratar essas entradas como dado versionado enquanto nao houver
+    tabela/backfill equivalente.
   - `server/lib/ai/functional_card_tags.dart:219`-`:226`, `:713`-`:731`,
     `:767`-`:778`, `:872`-`:888` e `:900`-`:932` ainda usa nomes conhecidos
     como fallback de classificacao funcional.
-  - `server/lib/ai/optimization_functional_roles.dart:176`-`:180`,
-    `:387`-`:420` e `:447`-`:529` repete parte dos checks por nomes/sets
+  - `server/lib/ai/optimization_functional_roles.dart:387`-`:420`,
+    `:447`-`:463` e `:491`-`:529` repete parte dos checks por nomes/sets
     conhecidos.
-  - `server/lib/ai/candidate_quality_data_support.dart:534`-`:545` e
-    `:586`-`:600` aplica bonus/escopo por nomes vindos da policy central.
+  - `server/lib/ai/candidate_quality_data_support.dart:376`-`:380`,
+    `:422`-`:429`, `:440`-`:449`, `:475`-`:481`, `:534`-`:545` e
+    `:586`-`:600` aplica tags, bonus ou escopo por nomes.
   - `server/lib/ai/rebuild_guided_service.dart:1226`-`:1231` classifica ramp por
     `signet`/`sol ring`/`talisman`; `:1331`-`:1338` e `:1404`-`:1411` aplica
     penalidade/prioridade a utility lands especificas.
@@ -307,6 +305,9 @@ Histórico do problema:
     `resolveCardFunctionalRoles` sem essas fontes em `:115`-`:122` e
     `:343`-`:357`, e ainda retorna listas fixas de recomendacao em
     `:186`-`:220` e `:293`-`:307`.
+  - `server/lib/ai/otimizacao.dart:856`-`:868` e `:1004`-`:1006` carrega
+    prompts runtime (`prompt.md` e `prompt_complete.md`) que citam staples por
+    nome; isso nao e branch deterministica, mas influencia a resposta de IA.
   - `server/lib/meta/meta_deck_commander_shell_support.dart:105`-`:275` deriva
     `strategy_archetype` por nomes/keywords. Risco menor que optimize direto,
     mas pode persistir sinal de meta por nome.
@@ -345,18 +346,17 @@ Histórico do problema:
 
 ### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-11 05:30 UTC: PARCIALMENTE SANEADO no checkout
-  `f1de55ef`.** A acao antiga de "carregar `card_function_tags` no contexto
+- **Status 2026-06-12 05:30 UTC: PARCIALMENTE SANEADO no checkout
+  `e09c7448`.** A acao antiga de "carregar `card_function_tags` no contexto
   principal de optimize" nao se aplica mais nesta branch.
 - **Evidencia atualizada**:
   - `GET /decks/:id/analysis` seleciona `card_function_tags` e
-    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:91`-`:96`.
+    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:34`-`:96`.
   - `POST /decks/:id/ai-analysis` tambem retorna `functional_tags` e
-    `semantic_tags_v2` em `server/routes/decks/[id]/ai-analysis/index.dart:130`-`:135`.
-  - `loadOptimizeDeckContext` agora monta a query com `$semanticV2Select` e
-    `$functionalTagsSelect` em
-    `server/lib/ai/optimize_request_support.dart:97`-`:123`, insere ambos em
-    `allCardData` em `:201`-`:214` e define os selects em `:359`-`:393`.
+    `semantic_tags_v2` em `server/routes/decks/[id]/ai-analysis/index.dart:74`-`:135`.
+  - `loadOptimizeDeckContext` insere `semantic_tags_v2` e `functional_tags` em
+    `allCardData` em `server/lib/ai/optimize_request_support.dart:201`-`:214`
+    e define os selects em `:359`-`:393`.
   - `classifyOptimizationFunctionalRole` le `functional_tags` e
     `semantic_tags_v2` em `server/lib/ai/optimization_functional_roles.dart:301`-`:315`;
     `optimizationFunctionalRolesForCard` preserva conjuntos multi-role em
