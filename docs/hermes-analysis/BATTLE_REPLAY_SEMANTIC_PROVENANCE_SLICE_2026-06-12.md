@@ -185,6 +185,36 @@ provenance is now wired but still partial because some replay paths generate or
 copy card/event payloads without preserving the original snapshot identity.
 This is a concrete follow-up gap, not a blocker for this telemetry-only slice.
 
+Follow-up inspection grouped the `21` missing identity events:
+
+```json
+{
+  "by_player": {
+    "Ral, Monsoon Mage #48 (real)": 5,
+    "Rograkh, Son of Rohgahh #119 (real)": 11,
+    "Rograkh, Son of Rohgahh #95 (real)": 5
+  },
+  "by_event": {
+    "end_step_instant": 2,
+    "land_played": 12,
+    "spell_cast": 5,
+    "spell_resolved": 2
+  },
+  "by_effect": {
+    "counter": 4,
+    "land": 12,
+    "ramp_permanent": 4,
+    "ramp_engine": 1
+  }
+}
+```
+
+Those missing identities came from learned real-opponent decks, not the synced
+Lorehold target deck. The safe rule is: do not synthesize fake `card_id` values
+for these cards. Identity should be attached only when the card came from a
+trusted snapshot or a PG-backed resolver. Until learned-opponent cardlists carry
+stable IDs, forensic should report the gap instead of masking it.
+
 ## Not Implemented In This Slice
 
 - `card_id` in every replay event.
@@ -192,8 +222,9 @@ This is a concrete follow-up gap, not a blocker for this telemetry-only slice.
 - Per-card semantic hash. The current `semantic_hash` is propagated from the
   deck snapshot `semantics_hash` when present; per-card hashing requires a
   separate schema/payload decision.
-- Replay paths that create or copy temporary card payloads without preserving
-  original snapshot identity.
+- Learned real-opponent deck cardlists without stable PG-backed `card_id`
+  values. These must stay visible as missing identity instead of receiving fake
+  IDs.
 - Any global policy against Mox cards.
 - Partner/background learned deck support.
 - Any user-facing Hermes metadata.
@@ -202,8 +233,8 @@ This is a concrete follow-up gap, not a blocker for this telemetry-only slice.
 
 ## Next Safe Slice
 
-1. Trace the 21 missing identity events from the Hermes AWS forensic seed and
-   preserve identity through copy/token/alternate-cast paths where safe.
+1. Add stable IDs to learned-opponent cardlists only through a PG-backed
+   resolver/sync. Do not synthesize IDs inside battle replay.
 2. Decide whether deck-level `semantics_hash` is enough for replay diagnostics
    or whether a new per-card semantic hash field is required.
 3. Only after that, evaluate whether replay/forensic has enough provenance to

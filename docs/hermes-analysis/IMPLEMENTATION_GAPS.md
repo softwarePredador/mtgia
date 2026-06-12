@@ -634,9 +634,11 @@ SQLite Hermes quando existem e propaga `card_id`, `semantic_hash`,
 `battle_forensic_audit.py` mede cobertura desses campos. Evidência em
 `BATTLE_REPLAY_SEMANTIC_PROVENANCE_SLICE_2026-06-12.md`. Validação no Hermes
 AWS em `74850947` mostrou `45/45` eventos com `logical_rule_key` e `24/45` com
-`card_id`/`semantic_hash`; ainda pende preservar identidade em caminhos que
-criam/copiam payloads temporários e definir se o `semantic_hash` deck-level
-atual deve virar hash semântico por carta.
+`card_id`/`semantic_hash`; inspeção posterior mostrou que os `21` ausentes
+vieram de decks reais aprendidos de oponentes, não do deck Lorehold
+sincronizado. Ainda pende resolver IDs estáveis para learned-opponent cardlists
+via PG/resolver confiável e definir se o `semantic_hash` deck-level atual deve
+virar hash semântico por carta.
 
 ### Ordem recomendada de implementação
 
@@ -647,8 +649,8 @@ atual deve virar hash semântico por carta.
 3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; usar o modo
    `--allowlist` apenas para dry-run versionado; manter os 59 candidatos
    scope-sensitive como manual-only até existir taxonomia/faces suficiente.
-4. Rastrear os eventos sem `card_id`/`semantic_hash` no forensic Hermes real e
-   preservar identidade em cópias, tokens e cast alternativo quando seguro.
+4. Adicionar IDs estáveis a learned-opponent cardlists via PG-backed resolver
+   ou sync dedicado; não sintetizar IDs dentro do replay.
 5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
