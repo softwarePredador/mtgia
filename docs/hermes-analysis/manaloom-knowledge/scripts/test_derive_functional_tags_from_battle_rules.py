@@ -95,6 +95,55 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
         self.assertEqual(candidate["review_flags"], ["conditional_ramp_review"])
         self.assertEqual(candidate["review_bucket"], "manual_review")
 
+    def test_build_candidate_flags_card_specific_scope_overrides(self) -> None:
+        cases = [
+            (
+                {
+                    "card_id": "card-1",
+                    "card_name": "Dramatic Reversal",
+                    "effect_json": {"effect": "ramp_ritual"},
+                    "deck_role_json": {"category": "ramp"},
+                    "source": "manual",
+                    "confidence": 1.0,
+                    "review_status": "verified",
+                    "rule_version": 1,
+                },
+                "combo_ramp_scope_review",
+            ),
+            (
+                {
+                    "card_id": "card-2",
+                    "card_name": "Manamorphose",
+                    "effect_json": {"effect": "treasure_maker"},
+                    "deck_role_json": {"category": "ramp"},
+                    "source": "manual",
+                    "confidence": 1.0,
+                    "review_status": "verified",
+                    "rule_version": 1,
+                },
+                "mana_filter_not_treasure_review",
+            ),
+            (
+                {
+                    "card_id": "card-3",
+                    "card_name": "Victory Chimes",
+                    "effect_json": {"effect": "draw_engine"},
+                    "deck_role_json": {"category": "draw"},
+                    "source": "manual",
+                    "confidence": 1.0,
+                    "review_status": "verified",
+                    "rule_version": 1,
+                },
+                "mana_engine_not_draw_review",
+            ),
+        ]
+
+        for row, expected_flag in cases:
+            with self.subTest(card_name=row["card_name"]):
+                candidate = derive.build_candidate(row, min_confidence=0.75)
+                self.assertIn(expected_flag, candidate["review_flags"])
+                self.assertEqual(candidate["review_bucket"], "manual_review")
+
     def test_build_candidate_rejects_untrusted_inputs(self) -> None:
         base = {
             "card_id": "card-1",

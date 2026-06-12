@@ -91,6 +91,14 @@ TAG_ALIASES = {
     "land_recursion": "recursion",
     "land_recursion_creature": "recursion",
 }
+CARD_EFFECT_REVIEW_FLAGS = {
+    # These rules are useful to the battle simulator, but too contextual to
+    # become canonical deckbuilding function tags without card-by-card review.
+    ("dramatic reversal", "draw_cards"): "card_specific_effect_scope_review",
+    ("dramatic reversal", "ramp_ritual"): "combo_ramp_scope_review",
+    ("manamorphose", "treasure_maker"): "mana_filter_not_treasure_review",
+    ("victory chimes", "draw_engine"): "mana_engine_not_draw_review",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -130,6 +138,10 @@ def normalize_tag(value: Any) -> str:
 
 def normalize_rule_effect(value: Any) -> str:
     return str(value or "").strip().lower()
+
+
+def normalize_card_key(value: Any) -> str:
+    return " ".join(str(value or "").strip().lower().split())
 
 
 def functional_tag_from_effect(effect_json: dict[str, Any]) -> str:
@@ -191,6 +203,11 @@ def review_flags(
         flags.append("tutor_scope_review")
     if tag == "wincon" and effect not in {"approach", "finisher"}:
         flags.append("wincon_scope_review")
+    card_effect_flag = CARD_EFFECT_REVIEW_FLAGS.get(
+        (normalize_card_key(card_name), effect)
+    )
+    if card_effect_flag:
+        flags.append(card_effect_flag)
     return sorted(set(flags))
 
 
