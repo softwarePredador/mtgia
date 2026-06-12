@@ -39,6 +39,27 @@ void main() {
       );
     });
 
+    test('detects unsupported raw list maps before import parsing', () {
+      expect(
+        unsupportedRawDeckSectionLabels(const [
+          {
+            'card_id': 'card-a',
+            'quantity': 1,
+            'section': 'Maybeboard',
+          },
+          '1 Sol Ring',
+          {
+            'card_id': 'card-b',
+            'quantity': 1,
+            'is_outside_game': 'true',
+          },
+        ]),
+        equals(['Maybeboard', 'outside-game']),
+      );
+
+      expect(unsupportedRawDeckSectionLabels('1 Sol Ring'), isEmpty);
+    });
+
     test('uses oracle_id to enforce Commander singleton across printings',
         () async {
       final session = _DeckRulesFakeSession(

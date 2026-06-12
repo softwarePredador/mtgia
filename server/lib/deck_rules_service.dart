@@ -432,6 +432,20 @@ List<String> unsupportedDeckSectionLabels(
   return labels;
 }
 
+List<String> unsupportedRawDeckSectionLabels(Object? rawList) {
+  if (rawList is! List) return const [];
+  final labels = <String>[];
+  for (final item in rawList) {
+    if (item is! Map) continue;
+    final card = <String, dynamic>{
+      for (final entry in item.entries) entry.key.toString(): entry.value,
+    };
+    final label = unsupportedDeckSectionLabel(card);
+    if (label != null) labels.add(label);
+  }
+  return labels;
+}
+
 String? unsupportedDeckSectionLabel(Map<String, dynamic> card) {
   const booleanFields = {
     'sideboard': 'sideboard',

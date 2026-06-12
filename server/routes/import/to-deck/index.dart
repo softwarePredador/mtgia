@@ -44,7 +44,7 @@ Future<Response> _importToDeck(RequestContext context) async {
   final format = deckCheck.first[1] as String;
   final normalizedFormat = format.trim().toLowerCase();
 
-  final unsupportedRawSections = _unsupportedRawListSections(rawList);
+  final unsupportedRawSections = unsupportedRawDeckSectionLabels(rawList);
   if (unsupportedRawSections.isNotEmpty) {
     return badRequest(
       unsupportedDeckSectionsMessage(unsupportedRawSections),
@@ -316,15 +316,4 @@ Future<Response> _importToDeck(RequestContext context) async {
     print('[ERROR] Failed to import cards: $e');
     return internalServerError('Failed to import cards');
   }
-}
-
-List<String> _unsupportedRawListSections(dynamic rawList) {
-  if (rawList is! List) return const [];
-  final labels = <String>[];
-  for (final item in rawList) {
-    if (item is! Map) continue;
-    final label = unsupportedDeckSectionLabel(item.cast<String, dynamic>());
-    if (label != null) labels.add(label);
-  }
-  return labels;
 }

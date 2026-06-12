@@ -787,3 +787,24 @@ Not implemented by this slice:
 This keeps the source-of-truth boundary intact: backend/PostgreSQL owns
 save/import legality, while Hermes battle receives a visible diagnostic when
 its operational SQLite cache is incomplete or inconsistent.
+
+### Update 2026-06-12k - unsupported-section route contract hardening
+
+Hermes report-only review of commit `fffb7ec9` passed, but correctly flagged
+a separate risk from the previous unsupported-section enforcement slice:
+route-level coverage was weaker than service-level coverage.
+
+Implemented follow-up:
+
+- moved raw import-list map detection into shared
+  `unsupportedRawDeckSectionLabels`;
+- `/import/to-deck` now uses the shared helper instead of a private duplicate;
+- added unit coverage for raw list maps carrying `section` or
+  `is_outside_game`;
+- added a route source-guard test proving deck mutation routes still call
+  `validateNoUnsupportedDeckSections` and catch `DeckRulesException`;
+- added an import route source-guard proving raw-list preflight and parser
+  fallback both remain present.
+
+This keeps the hard backend guard intentional while reducing the chance that a
+future route edit bypasses it or silently duplicates parser logic.
