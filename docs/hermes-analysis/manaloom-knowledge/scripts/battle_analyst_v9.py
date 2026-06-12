@@ -6496,18 +6496,59 @@ def declare_blockers_step(target, attackers, turn, rng):
     return block_assignments
 
 
+def combat_stat(card, key, fallback):
+    try:
+        return int(card.get(key, fallback))
+    except (TypeError, ValueError):
+        return fallback
+
+
+def combat_lethal_damage_required(attacking_creature, blocker, marked_damage=None):
+    if attacking_creature.get("deathtouch"):
+        return 1
+    marked_damage = marked_damage or {}
+    already_marked = (
+        marked_damage.get(id(blocker), 0)
+        if hasattr(marked_damage, "get")
+        else 0
+    )
+    return max(
+        0,
+        combat_stat(blocker, "toughness", combat_stat(blocker, "power", 2))
+        - already_marked,
+    )
+
+
+def combat_damage_assignment_order(attacking_creature, blockers, marked_damage=None):
+    """Deterministic attacker-side damage assignment order for multi-blocks."""
+    def explicit_order(blocker):
+        raw = blocker.get("damage_assignment_order", blocker.get("_damage_assignment_order"))
+        if raw is None:
+            return None
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return None
+
+    def order_key(blocker):
+        explicit = explicit_order(blocker)
+        return (
+            explicit is None,
+            explicit if explicit is not None else 0,
+            combat_lethal_damage_required(attacking_creature, blocker, marked_damage),
+            -combat_stat(blocker, "power", 2),
+            str(blocker.get("name", "")),
+        )
+
+    return sorted(blockers, key=order_key)
+
+
 def combat_damage_steps(attacker, opponents, target, attackers, block_assignments, turn):
     combat_target_life_before = target.life
     combat_attacker_life_before = attacker.life
 
-    def stat(card, key, fallback):
-        try:
-            return int(card.get(key, fallback))
-        except (TypeError, ValueError):
-            return fallback
-
     def deal_player_damage(creature, damage=None):
-        damage = stat(creature, "power", 2) if damage is None else damage
+        damage = combat_stat(creature, "power", 2) if damage is None else damage
         damage_dealt = deal_damage(target, damage)
         if damage_dealt and creature.get("lifelink"):
             gain_life(attacker, damage)
@@ -6536,7 +6577,11 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             for creature in list(creatures):
                 lethal = (
                     marked_damage[id(creature)]
-                    >= stat(creature, "toughness", stat(creature, "power", 2))
+                    >= combat_stat(
+                        creature,
+                        "toughness",
+                        combat_stat(creature, "power", 2),
+                    )
                     or id(creature) in deathtouch_damage
                 )
                 if lethal and not creature.get("indestructible") and creature in owner.battlefield:
@@ -6551,19 +6596,19 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             ]
 
             if deals_in_phase(attacking_creature, first_strike_phase):
-                remaining = stat(attacking_creature, "power", 2)
+                remaining = combat_stat(attacking_creature, "power", 2)
                 if not declared_blockers:
                     deal_player_damage(attacking_creature, remaining)
                 else:
-                    for blocker in surviving_blockers:
-                        lethal_needed = (
-                            1
-                            if attacking_creature.get("deathtouch")
-                            else max(
-                                0,
-                                stat(blocker, "toughness", stat(blocker, "power", 2))
-                                - marked_damage[id(blocker)],
-                            )
+                    for blocker in combat_damage_assignment_order(
+                        attacking_creature,
+                        surviving_blockers,
+                        marked_damage,
+                    ):
+                        lethal_needed = combat_lethal_damage_required(
+                            attacking_creature,
+                            blocker,
+                            marked_damage,
                         )
                         assigned_damage = min(remaining, lethal_needed)
                         mark_damage(attacking_creature, blocker, assigned_damage)
@@ -6573,7 +6618,11 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
 
             for blocker in surviving_blockers:
                 if deals_in_phase(blocker, first_strike_phase):
-                    mark_damage(blocker, attacking_creature, stat(blocker, "power", 2))
+                    mark_damage(
+                        blocker,
+                        attacking_creature,
+                        combat_stat(blocker, "power", 2),
+                    )
 
         destroy_lethal_creatures()
 

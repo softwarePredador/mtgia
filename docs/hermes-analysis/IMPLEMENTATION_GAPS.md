@@ -137,7 +137,7 @@
 | Declaração de bloqueadores | ⚠️ Parcial | 4421-4462 | Bloqueadores calculados, não declarados |
 | Blocked state persistente | ✅ OK | — | Bloqueado permanece mesmo se blocker morre |
 | First/Double strike | ✅ OK | 4576-4580 | |
-| Trample | ⚠️ Parcial | 4567-4568 | Funciona mas sem order formal |
+| Trample | ✅ Básico | v9: `combat_damage_assignment_order` | Excesso usa ordem formal determinística de damage assignment; escolha interativa/card-specific segue fora do modelo |
 | Deathtouch | ✅ OK | 4523-4528 | |
 | Lifelink | ✅ OK | 4510-4511 | |
 | Damage assignment multiplayer | ✅ Básico | v9: `assign_attackers_to_defenders`, `multi_defender_attack` | Atacantes podem ser distribuídos entre múltiplos defensores; requirements/restrictions por defensor ainda pendem |

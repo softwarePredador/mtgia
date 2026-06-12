@@ -831,3 +831,26 @@ Implemented:
 
 This keeps sideboard/wishboard support intentionally out of scope while making
 the user-facing error and maintenance surface consistent.
+
+### Update 2026-06-12m - trample damage assignment order
+
+The combat engine now has an explicit deterministic damage-assignment order for
+multi-block combat.
+
+Implemented:
+
+- added `combat_damage_assignment_order` and
+  `combat_lethal_damage_required`;
+- trample and normal combat damage now iterate through that order instead of
+  relying on the incidental blocker-list order;
+- explicit `damage_assignment_order`/`_damage_assignment_order` can be supplied
+  by future tests or card-specific logic;
+- default heuristic prioritizes blockers requiring less lethal damage, then
+  stronger blockers and stable names;
+- regression coverage proves a trampler with insufficient damage kills the
+  low-lethal blocker first instead of dumping all damage into the first blocker
+  in list order.
+
+This closes the basic "trample sem ordem formal" gap while keeping advanced
+attacker choices, blocking restrictions and card-specific combat choices as
+separate battle-engine backlog.

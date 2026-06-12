@@ -295,6 +295,48 @@ def register_tests(battle, player):
         assert defender.battlefield == []
         assert attacker.battlefield[0]["name"] == "Trampler"
 
+    def test_damage_assignment_order_prioritizes_low_lethal_blocker():
+        attacker = player("Attacker")
+        defender = player("Defender")
+        trampler = {
+            "name": "Ordering Trampler",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 5,
+            "trample": True,
+            "summoning_sick": False,
+            "tapped": True,
+        }
+        large_blocker = {
+            "name": "Large Wall",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 8,
+        }
+        small_blocker = {
+            "name": "Small Blocker",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        attacker.battlefield = [trampler]
+        defender.battlefield = [large_blocker, small_blocker]
+
+        battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [trampler],
+            [(trampler, [large_blocker, small_blocker])],
+            turn=2,
+        )
+
+        assert [creature["name"] for creature in defender.battlefield] == [
+            "Large Wall"
+        ]
+        assert attacker.battlefield[0]["name"] == "Ordering Trampler"
+        assert defender.life == 40
+
     def test_deathtouch_assigns_one_lethal_damage_per_blocker():
         attacker = player("Attacker")
         defender = player("Defender")
@@ -428,6 +470,7 @@ def register_tests(battle, player):
         test_cant_attack_alone_creature_attacks_with_another_attacker,
         test_multiple_blockers_can_gang_block,
         test_trample_assigns_excess_damage_to_defender,
+        test_damage_assignment_order_prioritizes_low_lethal_blocker,
         test_deathtouch_assigns_one_lethal_damage_per_blocker,
         test_first_strike_blocker_kills_before_regular_damage,
         test_indestructible_blocker_survives_lethal_combat_damage,
