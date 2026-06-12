@@ -384,6 +384,11 @@ Update 2026-06-12f: `wincon_pipeline.py` now treats `pg_roles` as membership
 for wincon detection and scoring. Legacy databases without `pg_roles` continue
 to use `role_in_deck='wincon'`.
 
+Update 2026-06-12g: `reimport_lorehold_scryfall.py` now preserves the
+Scryfall classifier's `tags` and `functional_tags_json` in its generated seed,
+while keeping `functional_tag` as the legacy primary role. It remains a manual
+Lorehold reimport utility, not an automatic sync/apply source.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:
