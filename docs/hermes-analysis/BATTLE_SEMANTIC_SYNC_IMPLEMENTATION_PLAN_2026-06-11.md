@@ -854,3 +854,15 @@ Implemented:
 This closes the basic "trample sem ordem formal" gap while keeping advanced
 attacker choices, blocking restrictions and card-specific combat choices as
 separate battle-engine backlog.
+
+Hermes report-only review of commit `29916949` returned `WARN`, not because of
+the trample slice itself. It confirmed the Python battle suite green and the
+basic gap closed, while keeping two separate risks active:
+
+- `/decks/:id/simulate` / `battle_simulator.dart` remains a lightweight
+  app-facing simulator and does not inherit Python battle-engine improvements;
+- the Hermes AWS workspace still has root-owned files that may block selected
+  write-oriented crons.
+
+Both risks are tracked in `IMPLEMENTATION_GAPS.md` and should be solved as
+separate slices, not by expanding this trample patch.
