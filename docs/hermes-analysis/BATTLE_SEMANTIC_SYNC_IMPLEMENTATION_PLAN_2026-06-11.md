@@ -406,6 +406,15 @@ Why this matters:
 - Commander singleton by name/card identity;
 - color identity across faces.
 
+Current production constraint verified on 2026-06-12:
+
+- `cards` has no dedicated `oracle_id` column.
+- `scryfall_id` exists, but code/docs have historically mixed whether it means
+  oracle identity or printing identity, so it must not be treated as canonical
+  semantic identity without a migration.
+- Multiple-printing learned deck matches must remain report-only until a
+  backend-owned policy defines either oracle identity or canonical printing.
+
 Required behavior:
 
 - app/search/import can still use localized aliases;

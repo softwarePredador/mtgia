@@ -14,6 +14,38 @@ import audit_learned_opponent_card_identity as audit
 
 
 class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
+    def test_candidate_classification_keeps_multiple_printings_ambiguous(self) -> None:
+        status, card_id, kind, count = audit._classify_candidate_groups(
+            exact=[
+                ("printing-1", "Sol Ring"),
+                ("printing-2", "Sol Ring"),
+            ],
+            front=[],
+            accent=[],
+        )
+
+        self.assertEqual(status, "ambiguous")
+        self.assertIsNone(card_id)
+        self.assertEqual(kind, "multiple_printings_exact")
+        self.assertEqual(count, 2)
+
+    def test_candidate_classification_accepts_single_accent_diagnostic(self) -> None:
+        self.assertEqual(
+            audit.accentless_name_key("Lim-Dûl's Vault"),
+            audit.accentless_name_key("Lim-Dul's Vault"),
+        )
+
+        status, card_id, kind, count = audit._classify_candidate_groups(
+            exact=[],
+            front=[],
+            accent=[("card-1", "Lim-Dûl's Vault")],
+        )
+
+        self.assertEqual(status, "resolved")
+        self.assertEqual(card_id, "card-1")
+        self.assertEqual(kind, "accent_normalized")
+        self.assertEqual(count, 1)
+
     def test_decode_plain_text_decklist(self) -> None:
         cards = audit.decode_card_list(
             """
@@ -88,6 +120,8 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
             return_value=(
                 {"sol ring": "card-id-sol-ring"},
                 {"ambiguous front": 2},
+                {"sol ring": "exact"},
+                {"ambiguous front": "multiple_printings_front"},
             ),
         ), mock.patch.object(
             audit,
@@ -102,7 +136,17 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
         self.assertEqual(summary["resolved_instances"], 2)
         self.assertEqual(summary["unresolved_instances"], 41)
         self.assertEqual(summary["ambiguous_instances"], 1)
+        self.assertEqual(summary["resolved_kind_instances"], {"exact": 2})
+        self.assertEqual(
+            summary["ambiguous_kind_instances"],
+            {"multiple_printings_front": 1},
+        )
         self.assertEqual(summary["resolution_coverage"], round(2 / 44, 6))
+        self.assertEqual(
+            summary["resolver_schema_version"],
+            "learned_opponent_identity_audit_v2_report_only",
+        )
+        self.assertIn("do_not_apply", summary["persist_recommendation"])
         self.assertIn(("Mystery Missing", 1), summary["unresolved_top"])
         self.assertEqual(summary["ambiguous_top"], [("Ambiguous Front", 1)])
 

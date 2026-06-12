@@ -12,6 +12,7 @@ import argparse
 import json
 import re
 import sqlite3
+import unicodedata
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -72,6 +73,47 @@ def quantity(value: Any) -> int:
         return 1
 
 
+def accentless_name_key(name: str) -> str:
+    """Normalize accents/punctuation for report-only name diagnostics.
+
+    This is intentionally not a persistence identity. It helps classify cases
+    like `Lim-Dul's Vault` vs `Lim-Dûl's Vault` without choosing an arbitrary
+    printing or mutating PostgreSQL/Hermes data.
+    """
+
+    decomposed = unicodedata.normalize("NFKD", str(name or ""))
+    ascii_text = "".join(ch for ch in decomposed if not unicodedata.combining(ch))
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", ascii_text.lower())).strip()
+
+
+def _longest_lookup_token(key: str) -> str | None:
+    tokens = [token for token in re.findall(r"[a-z0-9]+", key.lower()) if len(token) >= 4]
+    if not tokens:
+        return None
+    return max(tokens, key=len)
+
+
+def _classify_candidate_groups(
+    *,
+    exact: list[tuple[str, str]],
+    front: list[tuple[str, str]],
+    accent: list[tuple[str, str]],
+) -> tuple[str, str | None, str, int]:
+    """Return `(status, card_id, kind, candidate_count)` for one name key."""
+
+    groups = (
+        ("exact", exact),
+        ("front", front),
+        ("accent_normalized", accent),
+    )
+    for kind, candidates in groups:
+        if len(candidates) == 1:
+            return "resolved", candidates[0][0], kind, 1
+        if len(candidates) > 1:
+            return "ambiguous", None, f"multiple_printings_{kind}", len(candidates)
+    return "unresolved", None, "no_match", 0
+
+
 def load_learned_rows(
     sqlite_db: str | Path,
     *,
@@ -124,12 +166,16 @@ def load_learned_rows(
     return decks
 
 
-def resolve_names(names: set[str]) -> tuple[dict[str, str], dict[str, int]]:
+def resolve_names(
+    names: set[str],
+) -> tuple[dict[str, str], dict[str, int], dict[str, str], dict[str, str]]:
     normalized_names = sorted({normalize_card_name(name) for name in names if name})
     if not normalized_names:
-        return {}, {}
+        return {}, {}, {}, {}
     resolved: dict[str, str] = {}
     ambiguous: dict[str, int] = {}
+    resolved_kind: dict[str, str] = {}
+    ambiguous_kind: dict[str, str] = {}
     with connect() as conn:
         with conn.cursor() as cur:
             for index in range(0, len(normalized_names), 500):
@@ -153,18 +199,57 @@ def resolve_names(names: set[str]) -> tuple[dict[str, str], dict[str, int]]:
                         candidates_by_key[exact_key].append((card_id, card_name, True))
                     if front_key in candidates_by_key and front_key != exact_key:
                         candidates_by_key[front_key].append((card_id, card_name, False))
+                unresolved_for_accent: list[str] = []
                 for key, candidates in candidates_by_key.items():
                     exact = [(card_id, name) for card_id, name, is_exact in candidates if is_exact]
                     front = [(card_id, name) for card_id, name, is_exact in candidates if not is_exact]
-                    if len(exact) == 1:
-                        resolved[key] = exact[0][0]
-                    elif len(exact) > 1:
-                        ambiguous[key] = len(exact)
-                    elif len(front) == 1:
-                        resolved[key] = front[0][0]
-                    elif len(front) > 1:
-                        ambiguous[key] = len(front)
-    return resolved, ambiguous
+                    status, card_id, kind, count = _classify_candidate_groups(
+                        exact=exact,
+                        front=front,
+                        accent=[],
+                    )
+                    if status == "resolved" and card_id:
+                        resolved[key] = card_id
+                        resolved_kind[key] = kind
+                    elif status == "ambiguous":
+                        ambiguous[key] = count
+                        ambiguous_kind[key] = kind
+                    else:
+                        unresolved_for_accent.append(key)
+
+                for key in unresolved_for_accent:
+                    token = _longest_lookup_token(key)
+                    if not token:
+                        continue
+                    cur.execute(
+                        """
+                        SELECT id::text, name
+                        FROM cards
+                        WHERE lower(name) LIKE %s
+                           OR lower(split_part(name, ' // ', 1)) LIKE %s
+                        LIMIT 250
+                        """,
+                        (f"%{token}%", f"%{token}%"),
+                    )
+                    key_accentless = accentless_name_key(key)
+                    accent_candidates: list[tuple[str, str]] = []
+                    for card_id, card_name in cur.fetchall():
+                        exact_key = accentless_name_key(card_name)
+                        front_key = accentless_name_key(str(card_name).split(" // ", 1)[0])
+                        if key_accentless in (exact_key, front_key):
+                            accent_candidates.append((card_id, card_name))
+                    status, card_id, kind, count = _classify_candidate_groups(
+                        exact=[],
+                        front=[],
+                        accent=accent_candidates,
+                    )
+                    if status == "resolved" and card_id:
+                        resolved[key] = card_id
+                        resolved_kind[key] = kind
+                    elif status == "ambiguous":
+                        ambiguous[key] = count
+                        ambiguous_kind[key] = kind
+    return resolved, ambiguous, resolved_kind, ambiguous_kind
 
 
 def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
@@ -174,9 +259,11 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         for card in deck["cards"]
         if str(card.get("name") or "").strip()
     }
-    resolved, ambiguous = resolve_names(unique_names)
+    resolved, ambiguous, resolved_kind, ambiguous_kind = resolve_names(unique_names)
     unresolved_names: Counter[str] = Counter()
     ambiguous_names: Counter[str] = Counter()
+    resolved_kind_instances: Counter[str] = Counter()
+    ambiguous_kind_instances: Counter[str] = Counter()
     totals = {
         "decks_seen": len(decks),
         "card_instances": 0,
@@ -199,8 +286,10 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
             deck_total += qty
             if key in resolved:
                 deck_resolved += qty
+                resolved_kind_instances[resolved_kind.get(key, "unknown")] += qty
             elif key in ambiguous:
                 deck_ambiguous += qty
+                ambiguous_kind_instances[ambiguous_kind.get(key, "unknown")] += qty
                 ambiguous_names[name] += qty
             else:
                 deck_unresolved += qty
@@ -233,10 +322,21 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         "resolved_instances": totals["resolved_instances"],
         "unresolved_instances": totals["unresolved_instances"],
         "ambiguous_instances": totals["ambiguous_instances"],
+        "resolved_kind_instances": dict(sorted(resolved_kind_instances.items())),
+        "ambiguous_kind_instances": dict(sorted(ambiguous_kind_instances.items())),
         "resolution_coverage": round(coverage, 6),
         "unique_names": len(unique_names),
         "resolved_unique_names": len(resolved),
         "ambiguous_unique_names": len(ambiguous),
+        "resolver_schema_version": "learned_opponent_identity_audit_v2_report_only",
+        "candidate_identity_policy": (
+            "Exact card_id is trusted only when one PG cards row matches. "
+            "Accent-normalized matches are diagnostic. Multiple printings remain "
+            "ambiguous because production cards has no oracle_id column."
+        ),
+        "persist_recommendation": (
+            "do_not_apply_without_canonical_oracle_or_printing_policy"
+        ),
         "unresolved_top": unresolved_names.most_common(20),
         "ambiguous_top": ambiguous_names.most_common(20),
         "decks": deck_summaries,

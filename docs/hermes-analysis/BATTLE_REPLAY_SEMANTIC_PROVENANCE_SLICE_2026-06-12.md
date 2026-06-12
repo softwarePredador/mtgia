@@ -299,3 +299,26 @@ Interpretation: the ambiguous set is mostly multiple-printing ambiguity, not
 deck parser failure. The correct fix is an explicit oracle/canonical-printing
 identity policy for learned decks, not `LIMIT 1`. The unresolved sample is
 likely a data-normalization issue and should be checked separately.
+
+Follow-up schema inspection in production/Hermes on 2026-06-12 confirmed:
+
+- `cards` has `id`, `scryfall_id`, `name`, `set_code`, `collector_number` and
+  gameplay fields, but no dedicated `oracle_id` column.
+- PostgreSQL `unaccent` is not available.
+- The ambiguous samples are real multiple-printing matches in `cards`.
+- `Lim-Dul's Vault` only resolves by accent-insensitive comparison to
+  `Lim-Dûl's Vault`.
+
+The auditor was therefore updated to schema
+`learned_opponent_identity_audit_v2_report_only`:
+
+- `exact`: one PG `cards.id` match; safe as observed card row identity.
+- `front`: one front-face/name match; diagnostic only until face identity is
+  formalized.
+- `accent_normalized`: one accent-insensitive match; diagnostic only.
+- `multiple_printings_*`: still ambiguous; do not pick a printing.
+
+Persistence remains blocked with recommendation
+`do_not_apply_without_canonical_oracle_or_printing_policy`. This follows the
+project decision that Hermes proposes and the backend owns persistence and
+identity rules.
