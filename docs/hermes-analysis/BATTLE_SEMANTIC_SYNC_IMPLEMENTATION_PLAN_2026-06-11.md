@@ -926,3 +926,6 @@ recommendations for ramp/draw/removal/board-wipe/protection counts. The route is
 still experimental and `/ai/optimize` remains the preferred app-facing
 optimization path; the fallback recommender still has legacy hardcoded staples
 and impact proxies that should not be treated as canonical AI policy.
+Hermes report-only flagged the expected role-name seam between optimize's
+canonical `wipe` and deck-analysis `board_wipe`; the route now accepts both
+spellings for board-wipe counting.

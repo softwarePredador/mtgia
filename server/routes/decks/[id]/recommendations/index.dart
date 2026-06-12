@@ -164,7 +164,9 @@ Future<Response> _generateRecommendations(
       if (resolvedRoles.contains('removal') || heuristicRemoval) {
         removalCount += quantity;
       }
-      if (resolvedRoles.contains('board_wipe') || heuristicBoardWipe) {
+      if (resolvedRoles.contains('wipe') ||
+          resolvedRoles.contains('board_wipe') ||
+          heuristicBoardWipe) {
         boardWipeCount += quantity;
       }
       if (resolvedRoles.contains('protection') || heuristicProtection) {
