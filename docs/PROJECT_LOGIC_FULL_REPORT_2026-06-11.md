@@ -556,13 +556,16 @@ cardinalidade de `deck_cards`. Se uma tabela auxiliar tiver N linhas por carta,
 ela deve ser agregada antes do join ou via lateral/subquery que retorna JSON.
 Para identidade de carta, o contrato novo e aditivo é: preservar printing em
 `cards.scryfall_id`, gravar identidade canônica em `cards.oracle_id`, persistir
-`layout` e `card_faces_json` para faces/modos. Enquanto backfill/cobertura não
-estiverem completos, consumidores críticos devem manter fallback por nome
-normalizado e tratar múltiplas printings como ambíguas em vez de escolher
-`LIMIT 1`. Em 2026-06-12, `DeckRulesService` passou a preferir `oracle_id`
-quando a coluna existir para aplicar singleton Commander e impedir que a mesma
-identidade canônica do comandante entre no main deck; quando `oracle_id` estiver
-ausente, o fallback continua sendo o nome físico normalizado.
+`layout` e `card_faces_json` para faces/modos. Em 2026-06-12, a migração `021`
+foi aplicada no PostgreSQL real e o backfill preencheu `oracle_id` em
+`34325/34329` cartas; `layout`/`card_faces_json` permanecem parciais e só devem
+ser usados quando presentes. Consumidores críticos ainda devem manter fallback
+por nome normalizado para as 4 cartas sem `oracle_id` e tratar múltiplas
+printings como ambíguas em vez de escolher `LIMIT 1`. `DeckRulesService` passou
+a preferir `oracle_id` quando a coluna existir para aplicar singleton Commander
+e impedir que a mesma identidade canônica do comandante entre no main deck; se
+`oracle_id` estiver ausente, o fallback continua sendo o nome físico
+normalizado.
 
 Errado:
 

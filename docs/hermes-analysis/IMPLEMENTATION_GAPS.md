@@ -595,13 +595,13 @@ Hermes + testes.
 
 | Prioridade | Gap | Evidência | Ação esperada |
 |---|---|---|---|
-| P1 | Identidade semântica de carta ainda em transição | Slice 2026-06-12 adicionou contrato/migration aditiva para `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`; `scryfall_id` passa a ser tratado como printing id nas rotas/sync alterados; `DeckRulesService` agora usa `oracle_id` quando presente para bloquear singleton Commander e comandante duplicado no main deck em save/import/validate final, com fallback por nome físico normalizado; `/import/validate` chama a regra central em modo aviso | Rodar migration/backfill controlado, confirmar cobertura em produção e só depois usar `oracle_id` completo em learned-opponent sync e políticas de canonical printing |
+| P1 | Identidade semântica de carta ainda em transição | Slice 2026-06-12 adicionou contrato/migration aditiva para `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`; `scryfall_id` passa a ser tratado como printing id nas rotas/sync alterados; `DeckRulesService` agora usa `oracle_id` quando presente para bloquear singleton Commander e comandante duplicado no main deck em save/import/validate final, com fallback por nome físico normalizado; `/import/validate` chama a regra central em modo aviso; em 2026-06-12 a migração `021` foi aplicada no PostgreSQL real e o backfill preencheu `oracle_id` em `34325/34329` cartas | Manter fallback para as 4 cartas sem `oracle_id`; não persistir learned-opponent `card_id` sem política de printing canônica; próximo passo é definir canonical printing/persist policy para consumidores que exigem `card_id` concreto |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
 | P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia são `89` novos candidatos: `30` low-risk review e `59` manual-review; modo allowlist dry-run bloqueia manual-review por padrão | Revisar os 30 low-risk; próximo passo seguro é allowlist dry-run versionada, não apply; manter os 59 como manual-only até existir taxonomia/faces/stale cleanup |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
-| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash`, `card_id`, `semantic_hash` e contagem de cobertura no forensic quando esses campos já existem no snapshot, sem mudar execução; Slice 6 report-only atualizou `audit_learned_opponent_card_identity.py` para separar `card_id` resolvido de `oracle_id` resolvido por múltiplas printings do mesmo oracle, sem escolher printing arbitrária; Hermes AWS em `9c6f44c9` confirmou `oracle_id_column_present=false`, `1200` instâncias, `1150` resolvidas por `card_id`, `50` ambíguas e `0` não resolvidas | Próximo passo: aplicar migration/backfill `cards.oracle_id` no banco controlado, rerodar o audit e só então decidir persistência de identidade para learned opponents; manter `needs_review` sem comportamento hard |
+| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash`, `card_id`, `semantic_hash` e contagem de cobertura no forensic quando esses campos já existem no snapshot, sem mudar execução; Slice 6 report-only atualizou `audit_learned_opponent_card_identity.py` para separar `card_id` resolvido de `oracle_id` resolvido por múltiplas printings do mesmo oracle, sem escolher printing arbitrária; após migração/backfill, Hermes AWS confirmou `oracle_id_column_present=true`, `semantic_identity_coverage=1.0`, `oracle_resolved_instances=50`, `ambiguous_instances=0` e `unresolved_instances=0` no corpus de `1200` instâncias | Próximo passo: decidir política backend-owned para printing canônica quando learned-opponent replay precisar persistir `card_id`; até lá, usar `oracle_id` para cobertura semântica e manter `needs_review` sem comportamento hard |
 | P2 | Lorehold no-mox é política manual, não heurística universal | Learned deck 82 remove `Chrome Mox`, `Mox Diamond`, `Mox Opal` por decisão do produto | Não generalizar bloqueio de Mox para todos os comandantes/brackets sem regra explícita |
 | P2 | Decisões de produto base aprovadas; exceções ainda precisam validação | `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` registra os defaults aprovados em 2026-06-11 | Seguir Slice 1; qualquer mudança fora dos defaults exige nova validação |
 
@@ -661,29 +661,30 @@ virar hash semântico por carta.
    `card_id` até existir política de printing canônica. Validação Hermes AWS
    em `9c6f44c9`: `oracle_id_column_present=false`, `1200` instâncias, `1150`
    resolvidas por `card_id`, `50` ambíguas, `0` não resolvidas e cobertura
-   `0.958333`; portanto o próximo bloqueio real é migration/backfill do banco,
-   não o parser do auditor. Amostra `dbbf4ab1`: ambiguidades principais são
+   `0.958333`; portanto o bloqueio real era migration/backfill do banco, não o
+   parser do auditor. Em 2026-06-12, a migração `021` foi aplicada e o
+   backfill controlado preencheu `cards.oracle_id` em `34325/34329` cartas; nova
+   validação Hermes AWS retornou `oracle_id_column_present=true`,
+   `semantic_identity_coverage=1.0`, `oracle_resolved_instances=50`,
+   `ambiguous_instances=0` e `unresolved_instances=0` para `1200` instâncias.
+   Amostra `dbbf4ab1`: ambiguidades principais eram
    múltiplas printings (`Sol Ring`, `Ancient Tomb`, `Command Tower`,
    `Birds of Paradise`, `Phyrexian Metamorph`, `Cyclonic Rift`), então a
-   correção deve definir política de
-   oracle/canonical-printing identity; não usar `LIMIT 1`. Verificação em
-   produção/Hermes em 2026-06-12 confirmou que `cards` ainda não possui coluna
-   `oracle_id` dedicada e que `unaccent` não está disponível no PostgreSQL.
-   Portanto, o auditor deve separar `card_id` exato, match diagnóstico por
-   acento e ambiguidade por múltiplas printings, mas qualquer persistência
-   continua bloqueada até existir uma identidade canônica explícita. Validação
-   Hermes AWS em `91fd125f` zerou não resolvidas (`0`) e classificou `1150/1200`
-   instâncias como resolvidas para diagnóstico (`1117` exact, `32` front,
-   `1` accent-normalized); as `50` restantes são `multiple_printings_exact`.
+   próximo passo deve definir política de oracle/canonical-printing identity;
+   não usar `LIMIT 1`. `unaccent` continua indisponível no PostgreSQL, então o
+   auditor deve separar `card_id` exato, match diagnóstico por acento e
+   resolução semântica por `oracle_id`. Persistência de `card_id` continua
+   bloqueada até existir política de printing canônica.
 5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
 7. Completar a formalização de identidade semântica de carta e faces antes de
    expandir regras DFC/MDFC: colunas `oracle_id`, `layout` e
-   `card_faces_json` já foram introduzidas no backend/sync; ainda falta
-   aplicar migration/backfill, medir cobertura e ligar consumidores críticos a
-   essa identidade canônica.
+   `card_faces_json` já foram introduzidas no backend/sync e a migração/backfill
+   real preencheu `oracle_id` em `34325/34329` cartas. Ainda falta resolver ou
+   classificar as 4 cartas remanescentes e definir política de printing
+   canônica para consumidores que precisam persistir `card_id`.
 8. Só depois evoluir learned decks para dois comandantes.
 9. Só depois usar feedback ML como input de política.
 

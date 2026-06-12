@@ -416,8 +416,10 @@ Current production constraint verified on 2026-06-12 and coding status:
   the columns exist, blocking Commander singleton duplicates across printings
   and blocking a commander's canonical identity from entering the 99. It falls
   back to normalized physical card name while production backfill is incomplete.
-- Existing production rows still need migration/backfill coverage before
-  consumers can rely on `oracle_id` as complete.
+- Production migration/backfill status on 2026-06-12: migration `021` is
+  applied; `cards.oracle_id` is filled for `34325/34329` rows. Four special
+  rows remain without `oracle_id` and critical consumers must keep fallback or
+  explicit review for them.
 - `/import`, `/import/validate` and deck save/update paths use the central
   backend rule service. `/import/validate` remains non-mutating and reports
   canonical identity conflicts as warnings; final write paths still own the
@@ -428,12 +430,16 @@ Current production constraint verified on 2026-06-12 and coding status:
   concrete `card_id` resolution and semantic `oracle_id` resolution. Multiple
   printings sharing the same `oracle_id` improve semantic coverage but still do
   not produce a persisted `card_id` without a canonical printing policy.
-- Hermes AWS validation in `9c6f44c9` ran the v3 audit against the real
-  `knowledge.db` and PostgreSQL target: `oracle_id_column_present=false`,
-  `1200` learned-opponent card instances, `1150` concrete `card_id` matches,
-  `50` printing ambiguities and `0` unresolved names. The next gate is applying
-  and backfilling `cards.oracle_id` before learned-opponent replay provenance
-  can move beyond report-only.
+- Hermes AWS validation in `9c6f44c9` originally ran the v3 audit against the
+  real `knowledge.db` and PostgreSQL target with
+  `oracle_id_column_present=false`, `1200` learned-opponent card instances,
+  `1150` concrete `card_id` matches, `50` printing ambiguities and `0`
+  unresolved names. After migration/backfill on 2026-06-12, the same report-only
+  audit returned `oracle_id_column_present=true`,
+  `semantic_identity_coverage=1.0`, `oracle_resolved_instances=50`,
+  `ambiguous_instances=0` and `unresolved_instances=0`. Learned-opponent replay
+  can use semantic identity coverage, but persisted `card_id` remains blocked
+  until a backend-owned canonical printing policy exists.
 
 Required behavior:
 

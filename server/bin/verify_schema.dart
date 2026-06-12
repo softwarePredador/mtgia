@@ -36,6 +36,9 @@ void main() async {
       'cards': [
         'id',
         'scryfall_id',
+        'oracle_id',
+        'layout',
+        'card_faces_json',
         'name',
         'mana_cost',
         'type_line',

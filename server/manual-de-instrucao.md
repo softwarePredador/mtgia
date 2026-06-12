@@ -18257,3 +18257,37 @@ na command zone, não para validação de deck no servidor.
   - `dart analyze lib/deck_rules_service.dart lib/card_identity_support.dart test/deck_rules_service_identity_test.dart`: PASS.
   - `dart test test/deck_rules_service_identity_test.dart --reporter compact`: PASS.
   - `dart test test/deck_rules_service_identity_test.dart test/card_identity_support_test.dart test/import_list_service_test.dart test/import_parser_test.dart test/generated_deck_validation_service_test.dart --reporter compact`: PASS.
+
+## 2026-06-12 — Backfill controlado de identidade canônica de cartas
+
+- Migração `021 add_card_canonical_identity_columns` aplicada no PostgreSQL real.
+- `server/bin/verify_schema.dart` agora espera `cards.oracle_id`,
+  `cards.layout` e `cards.card_faces_json`; o verificador deixou de aceitar o
+  schema antigo como válido.
+- Criado `server/bin/backfill_card_identity_columns.dart`:
+  - dry-run por padrão;
+  - `--apply` explícito para persistir;
+  - usa fast-path seguro para linhas legadas de `AtomicCards` cujo `image_url`
+    é `/cards/named`, tratando `cards.scryfall_id` como `oracle_id`;
+  - usa Scryfall Collection API apenas para o restante;
+  - respeita batch máximo `75` e pausa configurável.
+- Resultado aplicado:
+  - total `34329` cartas;
+  - `oracle_id` preenchido em `34325`;
+  - `layout` preenchido em `500`;
+  - `card_faces_json` preenchido em `12`;
+  - `4` cartas ainda sem `oracle_id` (`A-Alrund's Epiphany`,
+    `A-Omnath, Locus of Creation`, `A-Unholy Heat`,
+    `Birds of Paradise // Birds of Paradise`).
+- Hermes/AWS report-only pós-backfill:
+  - `oracle_id_column_present=true`;
+  - `semantic_identity_coverage=1.0`;
+  - `oracle_resolved_instances=50`;
+  - `ambiguous_instances=0`;
+  - `unresolved_instances=0`;
+  - `1200` learned-opponent card instances auditadas.
+- Limite explícito:
+  - isso resolve identidade semântica por `oracle_id`;
+  - ainda não autoriza persistir `card_id` em learned-opponent decks sem
+    política backend-owned de printing canônica;
+  - não usar `LIMIT 1` para resolver múltiplas printings.
