@@ -18366,6 +18366,9 @@ na command zone, não para validação de deck no servidor.
   - `would_delete_stale_count=0`;
   - `rolled_back=true`;
   - `apply=false`.
-- Nenhum write real em `card_function_tags` está aprovado sem caminho separado
-  operator-controlled, allowlist `apply_approved=true` e validação de falso
-  positivo zero.
+- Caminho operator-controlled `--apply-reviewed-allowlist` existe, mas a
+  allowlist atual bloqueia apply porque `apply_approved=false`; tentativa local
+  retornou `pg_apply.blocked=true`, `pg_apply.applied=false` e
+  `allowlist_apply_approved_required`.
+- Nenhum write real em `card_function_tags` está aprovado sem nova allowlist
+  revisada com `apply_approved=true` e validação de falso positivo zero.

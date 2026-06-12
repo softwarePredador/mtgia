@@ -681,3 +681,8 @@ Slice 4 report-only derivation status:
    `existing_derived_tags_count=0`, `stale_cleanup_candidates_count=0`,
    `would_upsert_allowlisted_count=27`, `would_delete_stale_count=0`,
    `rolled_back=true`, `apply=false`.
+8. The runner now has an operator-controlled apply path, but the current
+   versioned allowlist still blocks it because `apply_approved=false`. A local
+   apply-attempt smoke returned `pg_apply.blocked=true`,
+   `pg_apply.applied=false` and
+   `reasons=["allowlist_apply_approved_required"]`.

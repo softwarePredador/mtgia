@@ -133,6 +133,22 @@ def parse_args() -> argparse.Namespace:
             "canonical card_function_tags changes."
         ),
     )
+    parser.add_argument(
+        "--apply-reviewed-allowlist",
+        action="store_true",
+        help=(
+            "Apply allowlisted low-risk candidates to PostgreSQL. This is "
+            "blocked unless the allowlist JSON has apply_approved=true and "
+            "--confirm-apply-card-battle-rules-v1 is also passed."
+        ),
+    )
+    parser.add_argument(
+        "--confirm-apply-card-battle-rules-v1",
+        action="store_true",
+        help=(
+            "Second operator confirmation required for --apply-reviewed-allowlist."
+        ),
+    )
     parser.add_argument("--output")
     return parser.parse_args()
 
@@ -281,22 +297,42 @@ def allowlist_keys_from_entry(entry: Any) -> set[str]:
     return keys
 
 
-def load_allowlist(path: str | None) -> set[str]:
-    if not path:
-        return set()
-    with open(path, encoding="utf-8") as f:
-        data = json.load(f)
-    entries: Any
+def allowlist_entries_from_data(data: Any) -> tuple[list[Any], bool]:
     if isinstance(data, dict):
         entries = data.get("approved", data.get("allowlist", []))
+        apply_approved = data.get("apply_approved") is True
     else:
         entries = data
+        apply_approved = False
     if not isinstance(entries, list):
         raise ValueError("allowlist JSON must be a list or an object with approved/allowlist list")
+    return entries, apply_approved
+
+
+def load_allowlist_data(path: str | None) -> dict[str, Any]:
+    if not path:
+        return {
+            "keys": set(),
+            "entry_count": 0,
+            "apply_approved": False,
+            "path": None,
+        }
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    entries, apply_approved = allowlist_entries_from_data(data)
     keys: set[str] = set()
     for entry in entries:
         keys.update(allowlist_keys_from_entry(entry))
-    return {key for key in keys if key}
+    return {
+        "keys": {key for key in keys if key},
+        "entry_count": len(entries),
+        "apply_approved": apply_approved,
+        "path": path,
+    }
+
+
+def load_allowlist(path: str | None) -> set[str]:
+    return set(load_allowlist_data(path)["keys"])
 
 
 def evidence_logical_rule_key(evidence: Any) -> str:
@@ -605,13 +641,36 @@ def build_report(
     }
 
 
-def run_pg_transaction_dry_run(report: dict[str, Any]) -> dict[str, Any]:
-    """Exercise PostgreSQL writes and always roll back.
+def validate_apply_preconditions(
+    report: dict[str, Any],
+    *,
+    allowlist_apply_approved: bool,
+    confirm_apply: bool,
+    allow_manual_review: bool,
+) -> list[str]:
+    errors: list[str] = []
+    if report.get("apply") is not False:
+        errors.append("report_apply_flag_must_start_false")
+    if not allowlist_apply_approved:
+        errors.append("allowlist_apply_approved_required")
+    if not confirm_apply:
+        errors.append("operator_confirmation_required")
+    if allow_manual_review:
+        errors.append("manual_review_apply_not_allowed")
+    if int(report.get("allowlisted_candidates_count") or 0) <= 0:
+        errors.append("no_allowlisted_candidates")
+    if int(report.get("allowlist_blocked_manual_review_count") or 0) != 0:
+        errors.append("blocked_manual_review_candidates_present")
+    if int(report.get("allowlist_unmatched_count") or 0) != 0:
+        errors.append("allowlist_unmatched_keys_present")
+    return errors
 
-    This deliberately does not provide an apply mode. Promotion from
-    card_battle_rules to card_function_tags must stay separately reviewed and
-    operator-controlled.
-    """
+
+def _mutate_pg_derived_tags(
+    *,
+    report: dict[str, Any],
+    commit: bool,
+) -> dict[str, Any]:
     allowlisted = list(report.get("allowlisted_candidates") or [])
     stale = list(report.get("stale_cleanup_candidates") or [])
     conn = connect()
@@ -667,7 +726,10 @@ def run_pg_transaction_dry_run(report: dict[str, Any]) -> dict[str, Any]:
             )
             row = cur.fetchone()
             source_count_after_mutation = int(row[0]) if row else 0
-        conn.rollback()
+        if commit:
+            conn.commit()
+        else:
+            conn.rollback()
     except Exception:
         conn.rollback()
         raise
@@ -675,25 +737,78 @@ def run_pg_transaction_dry_run(report: dict[str, Any]) -> dict[str, Any]:
         conn.close()
 
     return {
+        "committed": commit,
+        "rolled_back": not commit,
+        "deleted_stale_count": deleted_count,
+        "upserted_allowlisted_count": upsert_count,
+        "source_count_after_mutation": source_count_after_mutation,
+    }
+
+
+def run_pg_apply(
+    report: dict[str, Any],
+    *,
+    allowlist_apply_approved: bool,
+    confirm_apply: bool,
+    allow_manual_review: bool,
+) -> dict[str, Any]:
+    errors = validate_apply_preconditions(
+        report,
+        allowlist_apply_approved=allowlist_apply_approved,
+        confirm_apply=confirm_apply,
+        allow_manual_review=allow_manual_review,
+    )
+    if errors:
+        return {
+            "enabled": True,
+            "applied": False,
+            "blocked": True,
+            "reasons": errors,
+        }
+    mutation = _mutate_pg_derived_tags(report=report, commit=True)
+    return {
         "enabled": True,
-        "rolled_back": True,
-        "would_delete_stale_count": deleted_count,
-        "would_upsert_allowlisted_count": upsert_count,
-        "source_count_after_mutation_before_rollback": source_count_after_mutation,
+        "applied": True,
+        "blocked": False,
+        **mutation,
     }
 
 
 def main() -> int:
     args = parse_args()
-    allowlist_keys = load_allowlist(args.allowlist)
+    allowlist_data = load_allowlist_data(args.allowlist)
+    allowlist_keys = set(allowlist_data["keys"])
     report = build_report(
         min_confidence=args.min_confidence,
         limit=args.limit,
         allowlist_keys=allowlist_keys,
         allow_manual_review=args.allow_manual_review,
     )
+    report["allowlist_entry_count"] = allowlist_data["entry_count"]
+    report["allowlist_apply_approved"] = allowlist_data["apply_approved"]
     if args.pg_transaction_dry_run:
-        report["pg_transaction_dry_run"] = run_pg_transaction_dry_run(report)
+        report["pg_transaction_dry_run"] = _mutate_pg_derived_tags(
+            report=report,
+            commit=False,
+        )
+        report["pg_transaction_dry_run"]["enabled"] = True
+        report["pg_transaction_dry_run"][
+            "would_delete_stale_count"
+        ] = report["pg_transaction_dry_run"].pop("deleted_stale_count")
+        report["pg_transaction_dry_run"][
+            "would_upsert_allowlisted_count"
+        ] = report["pg_transaction_dry_run"].pop("upserted_allowlisted_count")
+        report["pg_transaction_dry_run"][
+            "source_count_after_mutation_before_rollback"
+        ] = report["pg_transaction_dry_run"].pop("source_count_after_mutation")
+    if args.apply_reviewed_allowlist:
+        report["pg_apply"] = run_pg_apply(
+            report,
+            allowlist_apply_approved=bool(allowlist_data["apply_approved"]),
+            confirm_apply=args.confirm_apply_card_battle_rules_v1,
+            allow_manual_review=args.allow_manual_review,
+        )
+        report["apply"] = bool(report["pg_apply"].get("applied"))
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)
     print(output)
     if args.output:

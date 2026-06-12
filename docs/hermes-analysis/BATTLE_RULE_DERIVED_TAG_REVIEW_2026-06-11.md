@@ -299,6 +299,21 @@ PostgreSQL transaction dry-run after stale-cleanup implementation
 | transaction rolled back | true |
 | apply | false |
 
+Operator-controlled apply path:
+
+- The runner now accepts `--apply-reviewed-allowlist`, but it is blocked unless
+  all safeguards are true:
+  - the allowlist JSON has `apply_approved=true`;
+  - `--confirm-apply-card-battle-rules-v1` is passed by the operator;
+  - manual-review candidates are not enabled;
+  - `allowlist_blocked_manual_review_count=0`;
+  - `allowlist_unmatched_count=0`;
+  - at least one allowlisted candidate exists.
+- The current allowlist intentionally has `apply_approved=false`.
+- Local apply-attempt smoke with the current allowlist returned
+  `pg_apply.blocked=true`, `pg_apply.applied=false` and
+  `reasons=["allowlist_apply_approved_required"]`.
+
 ## Next steps
 
 1. Keep the current Slice 4 as report-only.
@@ -309,6 +324,6 @@ PostgreSQL transaction dry-run after stale-cleanup implementation
    scoped tutor, conditional ramp, protection subtype, topdeck/cast-from-top,
    broad wincon, and face-aware semantics.
 4. Stale cleanup and PostgreSQL transaction dry-run now exist, but the runner
-   still has no real apply mode by design. If apply is approved later, add a
-   separate operator-controlled apply path with an `apply_approved=true`
-   allowlist, false-positive review and another rollback-first run.
+   will still block the current allowlist. If apply is approved later, create a
+   new reviewed allowlist with `apply_approved=true`, false-positive review and
+   another rollback-first run before executing the operator-controlled apply.

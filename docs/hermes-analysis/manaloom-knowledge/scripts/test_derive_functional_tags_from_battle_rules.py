@@ -31,6 +31,22 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
                 for entry in data["approved"]
             )
         )
+        allowlist_data = derive.load_allowlist_data(str(allowlist_path))
+        self.assertEqual(allowlist_data["entry_count"], 27)
+        self.assertFalse(allowlist_data["apply_approved"])
+
+    def test_allowlist_data_requires_apply_approved_true_for_apply(self) -> None:
+        entries, apply_approved = derive.allowlist_entries_from_data(
+            {"apply_approved": True, "approved": ["rule-1"]}
+        )
+
+        self.assertEqual(entries, ["rule-1"])
+        self.assertTrue(apply_approved)
+
+        entries, apply_approved = derive.allowlist_entries_from_data(["rule-2"])
+
+        self.assertEqual(entries, ["rule-2"])
+        self.assertFalse(apply_approved)
 
     def test_build_candidate_accepts_trusted_rule_and_maps_wipe_alias(self) -> None:
         candidate = derive.build_candidate(
@@ -378,6 +394,54 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
                 ("Legacy Evidence Fixture", "missing_logical_rule_key"),
             ],
         )
+
+    def test_apply_preconditions_block_unapproved_or_unsafe_reports(self) -> None:
+        report = {
+            "apply": False,
+            "allowlisted_candidates_count": 1,
+            "allowlist_blocked_manual_review_count": 0,
+            "allowlist_unmatched_count": 0,
+        }
+
+        self.assertEqual(
+            derive.validate_apply_preconditions(
+                report,
+                allowlist_apply_approved=True,
+                confirm_apply=True,
+                allow_manual_review=False,
+            ),
+            [],
+        )
+
+        errors = derive.validate_apply_preconditions(
+            report,
+            allowlist_apply_approved=False,
+            confirm_apply=False,
+            allow_manual_review=True,
+        )
+
+        self.assertIn("allowlist_apply_approved_required", errors)
+        self.assertIn("operator_confirmation_required", errors)
+        self.assertIn("manual_review_apply_not_allowed", errors)
+
+    def test_run_pg_apply_returns_blocked_without_touching_database_when_unsafe(self) -> None:
+        report = {
+            "apply": False,
+            "allowlisted_candidates_count": 27,
+            "allowlist_blocked_manual_review_count": 0,
+            "allowlist_unmatched_count": 0,
+        }
+
+        result = derive.run_pg_apply(
+            report,
+            allowlist_apply_approved=False,
+            confirm_apply=True,
+            allow_manual_review=False,
+        )
+
+        self.assertTrue(result["blocked"])
+        self.assertFalse(result["applied"])
+        self.assertEqual(result["reasons"], ["allowlist_apply_approved_required"])
 
 
 if __name__ == "__main__":
