@@ -18358,7 +18358,8 @@ na command zone, não para validação de deck no servidor.
     - `allowlist_blocked_manual_review_count=0`;
     - `allowlist_unmatched_count=0`;
     - `apply=false`.
-- Stale cleanup + PostgreSQL transaction dry-run adicionados em 2026-06-12:
+- Stale cleanup + PostgreSQL transaction dry-run adicionados em 2026-06-12 e
+  reexecutados localmente e no Hermes AWS:
   - `existing_derived_tags_count=0`;
   - `stale_cleanup_candidates_count=0`;
   - `would_upsert_allowlisted_count=27`;

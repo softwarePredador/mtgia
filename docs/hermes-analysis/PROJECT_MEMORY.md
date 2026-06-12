@@ -104,10 +104,11 @@ Ao responder sobre o ManaLoom:
   `BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json` versiona os 27
   low-risk apenas para dry-run; Hermes AWS confirmou 27 allowlisted, 0 manual
   liberado, 0 unmatched e `apply=false`. O runner agora detecta stale cleanup
-  e roda PostgreSQL transaction dry-run com rollback obrigatório; a rodada
-  atual exercitou 27 upserts allowlisted, 0 stale deletes, rollback true e
-  `apply=false`. Nenhum apply em `card_function_tags` está liberado sem um
-  caminho separado operator-controlled e allowlist `apply_approved=true`.
+  e roda PostgreSQL transaction dry-run com rollback obrigatório; as rodadas
+  local e Hermes AWS exercitaram 27 upserts allowlisted, 0 stale deletes,
+  rollback true e `apply=false`. Nenhum apply em `card_function_tags` está
+  liberado sem um caminho separado operator-controlled e allowlist
+  `apply_approved=true`.
 - Identidade canônica de carta entrou em transição em 2026-06-12: backend/sync
   agora têm contrato aditivo para `cards.oracle_id`, `cards.layout` e
   `cards.card_faces_json`, tratando `scryfall_id` como printing id. Ainda falta

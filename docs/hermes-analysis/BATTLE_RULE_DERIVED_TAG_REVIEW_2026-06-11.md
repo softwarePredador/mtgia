@@ -279,7 +279,8 @@ Hermes AWS allowlist dry-run after commit `51328ea7`:
 | unmatched allowlist keys | 0 |
 | apply | false |
 
-PostgreSQL transaction dry-run after stale-cleanup implementation:
+PostgreSQL transaction dry-run after stale-cleanup implementation
+(local and Hermes AWS produced the same counts):
 
 | Check | Result |
 |---|---:|

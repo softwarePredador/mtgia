@@ -676,7 +676,8 @@ Slice 4 report-only derivation status:
    27 entries, allowlisted 27 candidates, blocked 0 manual-review candidates,
    had 0 unmatched keys and kept `apply=false`.
 7. The runner now includes stale-cleanup detection and a PostgreSQL
-   transaction dry-run path that always rolls back. Current PG result:
+   transaction dry-run path that always rolls back. Current local and Hermes
+   AWS PG result:
    `existing_derived_tags_count=0`, `stale_cleanup_candidates_count=0`,
    `would_upsert_allowlisted_count=27`, `would_delete_stale_count=0`,
    `rolled_back=true`, `apply=false`.
