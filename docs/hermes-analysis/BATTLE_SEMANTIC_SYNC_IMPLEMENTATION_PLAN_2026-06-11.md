@@ -866,3 +866,9 @@ basic gap closed, while keeping two separate risks active:
 
 Both risks are tracked in `IMPLEMENTATION_GAPS.md` and should be solved as
 separate slices, not by expanding this trample patch.
+
+The Hermes ownership risk was mitigated operationally on 2026-06-12 by
+normalizing `/opt/data/workspace/mtgia` to `hermes:hermes` inside the container;
+the post-check returned `NON_GIT_COUNT=0` and `ROOT_ANY_COUNT=0`. Keep monitoring
+this because future `docker exec` maintenance commands run as root unless
+explicitly changed.
