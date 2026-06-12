@@ -201,6 +201,48 @@ Do not build an apply path until all of these are true:
 7. Derived tags remain additive; they cannot remove existing manual/curated
    tags without a separate review flow.
 
+## Allowlist dry-run contract
+
+The runner now supports a review allowlist, still with `apply=false`.
+
+Example:
+
+```bash
+python3 derive_functional_tags_from_battle_rules.py \
+  --allowlist /path/to/reviewed_allowlist.json \
+  --output /tmp/derived_tag_allowlist_dry_run.json
+```
+
+Allowlist JSON can be either a list or an object with `approved`/`allowlist`.
+Entries can be:
+
+- a `logical_rule_key`;
+- `{ "card_name": "...", "tag": "..." }`;
+- `{ "card_id": "...", "tag": "..." }`;
+- `{ "card_name": "...", "tag": "...", "logical_rule_key": "..." }`;
+- `{ "card_id": "...", "tag": "...", "logical_rule_key": "..." }`.
+
+Default behavior:
+
+- low-risk candidates can appear in `allowlisted_candidates`;
+- manual-review candidates are blocked into `allowlist_blocked_manual_review`;
+- missing/stale keys appear in `allowlist_unmatched`;
+- nothing writes to PostgreSQL.
+
+The `--allow-manual-review` override exists only for future explicit operator
+review. It must not be used by crons.
+
+Local smoke:
+
+| Check | Result |
+|---|---:|
+| allowlist loaded | 3 |
+| allowlisted candidates | 1 |
+| manual-review candidates blocked | 1 |
+| unmatched allowlist keys | 1 |
+| low-risk candidates in full report | 30 |
+| manual-review candidates in full report | 59 |
+
 ## Next steps
 
 1. Keep the current Slice 4 as report-only.

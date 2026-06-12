@@ -619,3 +619,6 @@ Slice 4 report-only derivation status:
    performed.
 4. Review artifact:
    `docs/hermes-analysis/BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md`.
+5. Added allowlist dry-run support to the same runner. Default behavior keeps
+   manual-review candidates blocked, reports unmatched keys, and still performs
+   no PostgreSQL writes.

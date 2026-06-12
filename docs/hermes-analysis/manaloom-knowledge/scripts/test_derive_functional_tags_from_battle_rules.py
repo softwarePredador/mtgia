@@ -185,6 +185,75 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
         self.assertEqual(len(already_present), 1)
         self.assertEqual(already_present[0]["tag"], "ramp")
 
+    def test_allowlist_selects_low_risk_and_blocks_manual_review_by_default(self) -> None:
+        low_risk = derive.build_candidate(
+            {
+                "card_id": "card-1",
+                "card_name": "Removal Fixture",
+                "effect_json": {"effect": "remove_permanent"},
+                "deck_role_json": {"category": "removal"},
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "rule_version": 1,
+            },
+            min_confidence=0.75,
+        )
+        manual = derive.build_candidate(
+            {
+                "card_id": "card-2",
+                "card_name": "Tutor Fixture",
+                "effect_json": {"effect": "tutor"},
+                "deck_role_json": {"category": "tutor"},
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "rule_version": 1,
+            },
+            min_confidence=0.75,
+        )
+        allowlist = {
+            f"{low_risk['card_name']}|{low_risk['tag']}",
+            str(manual["logical_rule_key"]),
+            "missing-key",
+        }
+
+        report = derive.apply_allowlist(
+            [low_risk, manual],
+            allowlist_keys=allowlist,
+            allow_manual_review=False,
+        )
+
+        self.assertEqual(report["allowlisted_candidates_count"], 1)
+        self.assertEqual(report["allowlisted_candidates"][0]["card_name"], "Removal Fixture")
+        self.assertEqual(report["allowlist_blocked_manual_review_count"], 1)
+        self.assertEqual(report["allowlist_blocked_manual_review"][0]["card_name"], "Tutor Fixture")
+        self.assertEqual(report["allowlist_unmatched"], ["missing-key"])
+
+    def test_allowlist_can_explicitly_include_manual_review(self) -> None:
+        manual = derive.build_candidate(
+            {
+                "card_id": "card-1",
+                "card_name": "Tutor Fixture",
+                "effect_json": {"effect": "tutor"},
+                "deck_role_json": {"category": "tutor"},
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "rule_version": 1,
+            },
+            min_confidence=0.75,
+        )
+
+        report = derive.apply_allowlist(
+            [manual],
+            allowlist_keys={str(manual["logical_rule_key"])},
+            allow_manual_review=True,
+        )
+
+        self.assertEqual(report["allowlisted_candidates_count"], 1)
+        self.assertEqual(report["allowlist_blocked_manual_review_count"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

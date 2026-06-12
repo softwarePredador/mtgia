@@ -597,7 +597,7 @@ Hermes + testes.
 |---|---|---|---|
 | P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
-| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia são `89` novos candidatos: `30` low-risk review e `59` manual-review | Revisar os 30 low-risk antes de qualquer allowlist apply; manter os 59 como manual-only até existir taxonomia/faces/stale cleanup |
+| P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia são `89` novos candidatos: `30` low-risk review e `59` manual-review; modo allowlist dry-run bloqueia manual-review por padrão | Revisar os 30 low-risk; próximo passo seguro é allowlist dry-run versionada, não apply; manter os 59 como manual-only até existir taxonomia/faces/stale cleanup |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
@@ -633,9 +633,9 @@ atual propõe `89` candidatos, sendo `30` low-risk review e `59` manual-review.
    qualquer apply.
 2. Rodar nova amostra maior report-only para confirmar que `ruleset_hash` não
    mascara alteração semântica/regra como alteração estrutural.
-3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; manter os 59
-   candidatos scope-sensitive como manual-only até existir taxonomia/faces
-   suficiente.
+3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; usar o modo
+   `--allowlist` apenas para dry-run versionado; manter os 59 candidatos
+   scope-sensitive como manual-only até existir taxonomia/faces suficiente.
 4. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
 5. Formalizar identidade semântica de carta e faces antes de expandir regras

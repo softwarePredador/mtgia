@@ -99,6 +99,22 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--min-confidence", type=float, default=MIN_CONFIDENCE)
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument(
+        "--allowlist",
+        help=(
+            "Optional JSON review allowlist. Supports a list or an object with "
+            "approved/allowlist entries. Entries can be strings or objects with "
+            "card_id, card_name, tag and/or logical_rule_key."
+        ),
+    )
+    parser.add_argument(
+        "--allow-manual-review",
+        action="store_true",
+        help=(
+            "Allow allowlist entries to include manual_review candidates. "
+            "Default false keeps scope-sensitive candidates blocked."
+        ),
+    )
     parser.add_argument("--output")
     return parser.parse_args()
 
@@ -198,6 +214,62 @@ def derivation_rejection_reason(
     if tag not in DERIVABLE_TAGS:
         return "non_derivable_tag"
     return ""
+
+
+def candidate_allowlist_keys(candidate: dict[str, Any]) -> set[str]:
+    card_id = str(candidate.get("card_id") or "")
+    card_name = str(candidate.get("card_name") or "")
+    tag = str(candidate.get("tag") or "")
+    logical_key = str(candidate.get("logical_rule_key") or "")
+    return {
+        logical_key,
+        f"{card_id}|{tag}",
+        f"{card_name}|{tag}",
+        f"{card_id}|{tag}|{logical_key}",
+        f"{card_name}|{tag}|{logical_key}",
+    }
+
+
+def allowlist_keys_from_entry(entry: Any) -> set[str]:
+    if isinstance(entry, str):
+        value = entry.strip()
+        return {value} if value else set()
+    if not isinstance(entry, dict):
+        return set()
+    card_id = str(entry.get("card_id") or "").strip()
+    card_name = str(entry.get("card_name") or "").strip()
+    tag = str(entry.get("tag") or "").strip()
+    logical_key = str(entry.get("logical_rule_key") or "").strip()
+    keys = set()
+    if logical_key:
+        keys.add(logical_key)
+    if card_id and tag:
+        keys.add(f"{card_id}|{tag}")
+    if card_name and tag:
+        keys.add(f"{card_name}|{tag}")
+    if card_id and tag and logical_key:
+        keys.add(f"{card_id}|{tag}|{logical_key}")
+    if card_name and tag and logical_key:
+        keys.add(f"{card_name}|{tag}|{logical_key}")
+    return keys
+
+
+def load_allowlist(path: str | None) -> set[str]:
+    if not path:
+        return set()
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    entries: Any
+    if isinstance(data, dict):
+        entries = data.get("approved", data.get("allowlist", []))
+    else:
+        entries = data
+    if not isinstance(entries, list):
+        raise ValueError("allowlist JSON must be a list or an object with approved/allowlist list")
+    keys: set[str] = set()
+    for entry in entries:
+        keys.update(allowlist_keys_from_entry(entry))
+    return {key for key in keys if key}
 
 
 def build_candidate(row: dict[str, Any], *, min_confidence: float) -> dict[str, Any]:
@@ -309,7 +381,56 @@ def load_existing_function_tags() -> set[tuple[str, str]]:
             return {(str(row[0]), normalize_tag(row[1])) for row in cur.fetchall()}
 
 
-def build_report(*, min_confidence: float, limit: int) -> dict[str, Any]:
+def apply_allowlist(
+    candidates: list[dict[str, Any]],
+    *,
+    allowlist_keys: set[str],
+    allow_manual_review: bool,
+) -> dict[str, Any]:
+    if not allowlist_keys:
+        return {
+            "allowlist_loaded_count": 0,
+            "allowlisted_candidates_count": 0,
+            "allowlist_blocked_manual_review_count": 0,
+            "allowlist_unmatched_count": 0,
+            "allowlisted_candidates": [],
+            "allowlist_blocked_manual_review": [],
+            "allowlist_unmatched": [],
+        }
+
+    matched_keys: set[str] = set()
+    allowlisted: list[dict[str, Any]] = []
+    blocked_manual: list[dict[str, Any]] = []
+
+    for candidate in candidates:
+        keys = candidate_allowlist_keys(candidate)
+        matching = keys & allowlist_keys
+        if not matching:
+            continue
+        matched_keys.update(matching)
+        if candidate["review_bucket"] == "manual_review" and not allow_manual_review:
+            blocked_manual.append(candidate)
+            continue
+        allowlisted.append(candidate)
+
+    return {
+        "allowlist_loaded_count": len(allowlist_keys),
+        "allowlisted_candidates_count": len(allowlisted),
+        "allowlist_blocked_manual_review_count": len(blocked_manual),
+        "allowlist_unmatched_count": len(allowlist_keys - matched_keys),
+        "allowlisted_candidates": allowlisted,
+        "allowlist_blocked_manual_review": blocked_manual,
+        "allowlist_unmatched": sorted(allowlist_keys - matched_keys),
+    }
+
+
+def build_report(
+    *,
+    min_confidence: float,
+    limit: int,
+    allowlist_keys: set[str] | None = None,
+    allow_manual_review: bool = False,
+) -> dict[str, Any]:
     existing = load_existing_function_tags()
     rules = load_battle_rules(limit)
     new_candidates: list[dict[str, Any]] = []
@@ -336,6 +457,11 @@ def build_report(*, min_confidence: float, limit: int) -> dict[str, Any]:
         else:
             new_candidates.append(candidate)
 
+    allowlist_report = apply_allowlist(
+        new_candidates,
+        allowlist_keys=allowlist_keys or set(),
+        allow_manual_review=allow_manual_review,
+    )
     return {
         "apply": False,
         "database_target": sanitized_database_target(),
@@ -354,12 +480,19 @@ def build_report(*, min_confidence: float, limit: int) -> dict[str, Any]:
         "new_candidates": new_candidates,
         "already_present_sample": already_present[:25],
         "rejected_by_gate_sample": rejected_by_gate[:25],
+        **allowlist_report,
     }
 
 
 def main() -> int:
     args = parse_args()
-    report = build_report(min_confidence=args.min_confidence, limit=args.limit)
+    allowlist_keys = load_allowlist(args.allowlist)
+    report = build_report(
+        min_confidence=args.min_confidence,
+        limit=args.limit,
+        allowlist_keys=allowlist_keys,
+        allow_manual_review=args.allow_manual_review,
+    )
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)
     print(output)
     if args.output:
