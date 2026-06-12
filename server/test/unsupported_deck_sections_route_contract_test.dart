@@ -28,15 +28,28 @@ void main() {
       }
     });
 
-    test('import-to-deck uses shared raw-list preflight and parser fallback',
-        () {
-      final source =
+    test('import routes expose friendly unsupported-section errors', () {
+      final importSource = File('routes/import/index.dart').readAsStringSync();
+      final importToDeckSource =
           File('routes/import/to-deck/index.dart').readAsStringSync();
 
-      expect(source, contains('unsupportedRawDeckSectionLabels(rawList)'));
-      expect(source, contains('parseResult.unsupportedSectionLines'));
-      expect(source, contains('unsupported_section_lines'));
-      expect(source, isNot(contains('_unsupportedRawListSections')));
+      expect(importSource, contains('parseResult.unsupportedSectionLines'));
+      expect(importSource, contains('unsupported_section_lines'));
+      expect(importSource, contains('unsupportedDeckSectionsMessage'));
+
+      expect(
+        importToDeckSource,
+        contains('unsupportedRawDeckSectionLabels(rawList)'),
+      );
+      expect(
+        importToDeckSource,
+        contains('parseResult.unsupportedSectionLines'),
+      );
+      expect(importToDeckSource, contains('unsupported_section_lines'));
+      expect(
+        importToDeckSource,
+        isNot(contains('_unsupportedRawListSections')),
+      );
     });
   });
 }

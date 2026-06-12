@@ -5,6 +5,7 @@ import 'card_identity_support.dart';
 import 'commander_eligibility.dart';
 import 'commander_pairing.dart' as commander_pairing;
 import 'color_identity.dart';
+import 'deck_section_support.dart';
 
 String normalizePhysicalCardCopyName(String name) {
   return commander_pairing.normalizePhysicalCardCopyName(name);
@@ -478,8 +479,7 @@ String? unsupportedDeckSectionLabel(Map<String, dynamic> card) {
   for (final key in sectionFields) {
     final raw = card[key];
     if (raw == null) continue;
-    final normalized = _normalizeDeckSectionValue(raw);
-    if (_unsupportedDeckSectionValues.contains(normalized)) {
+    if (isUnsupportedDeckSectionValue(raw)) {
       return raw.toString().trim();
     }
   }
@@ -506,31 +506,6 @@ String unsupportedDeckSectionsMessage(Iterable<String> labels) {
   return 'Regra violada: ManaLoom ainda não suporta sideboard, wishboard, maybeboard ou cartas "outside the game" em decks salvos$suffix '
       'Importe apenas o deck principal e marque comandante pelo campo/tag de comandante.';
 }
-
-String _normalizeDeckSectionValue(Object value) {
-  return value
-      .toString()
-      .trim()
-      .toLowerCase()
-      .replaceAll(RegExp(r'[\s_\-]+'), '');
-}
-
-const _unsupportedDeckSectionValues = {
-  'side',
-  'sideboard',
-  'sideboards',
-  'wish',
-  'wishboard',
-  'wishboards',
-  'maybe',
-  'maybeboard',
-  'maybeboards',
-  'considering',
-  'outside',
-  'outsidegame',
-  'outsidethegame',
-  'outsideboard',
-};
 
 class DeckRulesException implements Exception {
   DeckRulesException(this.message, {this.cardName});

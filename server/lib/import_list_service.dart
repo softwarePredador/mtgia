@@ -1,3 +1,5 @@
+import 'deck_section_support.dart';
+
 class ImportListParseResult {
   final List<Map<String, dynamic>> parsedItems;
   final List<String> invalidLines;
@@ -93,28 +95,7 @@ ImportListParseResult parseImportLines(List<String> lines) {
 }
 
 String? _unsupportedImportSectionLabel(String line) {
-  final normalized = line
-      .trim()
-      .toLowerCase()
-      .replaceAll(RegExp(r'[:：]+$'), '')
-      .replaceAll(RegExp(r'[\s_\-]+'), '');
-  const unsupported = {
-    'side',
-    'sideboard',
-    'sideboards',
-    'wish',
-    'wishboard',
-    'wishboards',
-    'maybe',
-    'maybeboard',
-    'maybeboards',
-    'considering',
-    'outside',
-    'outsidegame',
-    'outsidethegame',
-    'outsideboard',
-  };
-  return unsupported.contains(normalized) ? line.trim() : null;
+  return isUnsupportedDeckSectionValue(line) ? line.trim() : null;
 }
 
 String _stripCommanderMarkers(String value) {

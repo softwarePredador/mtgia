@@ -808,3 +808,26 @@ Implemented follow-up:
 
 This keeps the hard backend guard intentional while reducing the chance that a
 future route edit bypasses it or silently duplicates parser logic.
+
+### Update 2026-06-12l - unsupported-section import drift cleanup
+
+Hermes report-only follow-up flagged two remaining maintainability/UX gaps in
+the unsupported-section slice:
+
+1. `/import` returned a generic not-found style result for textual
+   `Sideboard:` sections, while `/import/to-deck` returned the clearer
+   unsupported-section message.
+2. The unsupported-section alias set existed in both `deck_rules_service.dart`
+   and `import_list_service.dart`.
+
+Implemented:
+
+- added `deck_section_support.dart` as the single source for section
+  normalization and unsupported aliases;
+- `DeckRulesService` and `parseImportLines` now use the same alias set;
+- `/import` now returns `unsupportedDeckSectionsMessage` with
+  `unsupported_section_lines`, matching `/import/to-deck`;
+- route source-guard coverage now checks both import routes.
+
+This keeps sideboard/wishboard support intentionally out of scope while making
+the user-facing error and maintenance surface consistent.

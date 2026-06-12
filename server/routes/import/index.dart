@@ -69,6 +69,14 @@ Future<Response> _importDeck(RequestContext context) async {
 
   final parseResult = parseImportLines(lines);
   final parsedItems = parseResult.parsedItems;
+  if (parseResult.unsupportedSectionLines.isNotEmpty) {
+    return badRequest(
+      unsupportedDeckSectionsMessage(parseResult.unsupportedSectionLines),
+      details: {
+        'unsupported_section_lines': parseResult.unsupportedSectionLines,
+      },
+    );
+  }
   notFoundCards.addAll(parseResult.invalidLines);
 
   final foundCardsMap = await resolveImportCardNames(
