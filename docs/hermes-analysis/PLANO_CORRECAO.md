@@ -273,11 +273,12 @@ Histórico do problema:
     buckets por `oracle_text` local; `:262`-`:268` recomenda `Command Tower`
     diretamente quando `landCount < 34`; `_findStaples` em `:408`-`:438` trata
     raridade `rare/mythic` como proxy de alto impacto sem role semantico.
-  - `server/routes/ai/weakness-analysis/index.dart:42`-`:59` nao carrega
-    `card_function_tags`, `semantic_tags_v2` nem `card_role_scores`; `:114`-`:162`
-    recalcula utilidade por heuristicas locais e dois nomes de protecao, e
-    `:206`-`:248` e `:352`-`:357` retornam listas fixas de nomes para ramp,
-    draw, removal, wipes e protecao.
+  - **Status 2026-06-12:** a parte de contagem em
+    `server/routes/ai/weakness-analysis/index.dart` foi parcialmente saneada:
+    a rota carrega `card_function_tags` e `card_semantic_tags_v2` quando as
+    tabelas existem e usa `resolveCardFunctionalRoles` antes do fallback
+    textual. Permanece pendente a troca das listas fixas de nomes retornadas
+    em recomendações por busca/policy versionada.
   - `server/lib/ai/otimizacao.dart:856`-`:865` e `:1004`-`:1009` carregam
     `server/lib/ai/prompt.md` e `prompt_complete.md`; os prompts incluem nomes
     em `prompt.md:93`-`:123`/`:158`-`:172` e
@@ -350,10 +351,11 @@ Histórico do problema:
     `server/lib/ai/optimize_runtime_support.dart:2650`-`:2658` consulta
     `card_function_tags` para sinais de candidatos. A lacuna ativa e o caminho de
     contexto/validator/role preservation e o adapter unico.
-  - `server/routes/ai/weakness-analysis/index.dart:42`-`:59` nao carrega
-    `card_function_tags`, `semantic_tags_v2` nem `card_role_scores`; `:114`-`:162`
-    recalcula utilidade por heuristicas locais e `:206`-`:248`/`:352`-`:357`
-    recomenda nomes fixos.
+  - **Status 2026-06-12:** `server/routes/ai/weakness-analysis/index.dart`
+    passou a carregar `card_function_tags`/`card_semantic_tags_v2` opcionalmente
+    e a contar funções via `resolveCardFunctionalRoles`, com fallback textual.
+    Ainda recomenda nomes fixos em alguns blocos, o que segue como pendência de
+    policy/busca versionada.
 - **Impacto**: a aba de analise pode contar uma carta por `card_function_tags`
   persistido, enquanto optimize/validator a tratam por heuristica ou role unico
   de `semantic_tags_v2`. Swaps podem parecer seguros no gate por perderem roles

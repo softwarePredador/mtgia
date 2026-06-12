@@ -929,3 +929,24 @@ and impact proxies that should not be treated as canonical AI policy.
 Hermes report-only flagged the expected role-name seam between optimize's
 canonical `wipe` and deck-analysis `board_wipe`; the route now accepts both
 spellings for board-wipe counting.
+
+### Update 2026-06-12q - `/ai/weakness-analysis` semantic role counts
+
+The advisory weakness-analysis route now follows the same semantic-role loading
+pattern used by deck analysis, optimize-adjacent recommendation counts and
+Hermes sync:
+
+- it probes `information_schema` before referencing optional
+  `card_function_tags` or `card_semantic_tags_v2`;
+- it aggregates tags per `card_id` through scalar subqueries, so deck rows are
+  not multiplied when a card has multiple functions or battle rules;
+- `resolveCardFunctionalRoles` receives persisted functional tags first,
+  semantic v2 second and oracle-text fallback third;
+- board-wipe counting accepts both canonical `wipe` and legacy `board_wipe`;
+- the public API response stays unchanged because these signals only improve
+  internal counts for weakness detection.
+
+This closes the Hermes docs gap that kept `/ai/weakness-analysis` on heuristic
+only for ramp/draw/removal/wipe/protection counts. The route remains
+experimental/advisory, and `deck_weakness_reports` is still a write-mostly
+history table until a separate consumer/update flow is implemented.

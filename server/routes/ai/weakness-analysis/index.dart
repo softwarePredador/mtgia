@@ -28,6 +28,8 @@ Future<Response> onRequest(RequestContext context) async {
 
     final pool = context.read<Pool>();
     final countersService = ArchetypeCountersService(pool);
+    final functionalTagsSelect = await _functionalTagsSelectSql(pool);
+    final semanticV2Select = await _semanticV2SelectSql(pool);
 
     // 1. Buscar informações do deck
     final deckResult = await pool.execute(
@@ -62,7 +64,9 @@ Future<Response> onRequest(RequestContext context) async {
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
                ) as cmc,
-               c.scryfall_id::text as oracle_id
+               c.scryfall_id::text as oracle_id,
+               $functionalTagsSelect,
+               $semanticV2Select
         FROM deck_cards dc 
         JOIN cards c ON c.id = dc.card_id 
         WHERE dc.deck_id = @id
@@ -95,6 +99,8 @@ Future<Response> onRequest(RequestContext context) async {
       final quantity = row[5] as int;
       final cmc = (row[6] as num?)?.toDouble() ?? 0;
       final oracleId = (row[7] as String?) ?? '';
+      final functionalTags = row[8];
+      final semanticTagsV2 = row[9];
 
       deckColors.addAll(colors);
       if (oracleId.isNotEmpty) deckOracleIds.add(oracleId);
@@ -108,12 +114,16 @@ Future<Response> onRequest(RequestContext context) async {
         'colors': colors,
         'quantity': quantity,
         'cmc': cmc,
+        'functional_tags': functionalTags,
+        'semantic_tags_v2': semanticTagsV2,
       });
 
       final typeLineLower = typeLine.toLowerCase();
 
       // Usar adapter F1 (resolveCardFunctionalRoles) em vez de heuristicas oracle_text
       final cardRoles = resolveCardFunctionalRoles(
+        functionalTags: functionalTags,
+        semanticTagsV2: semanticTagsV2,
         oracleText: oracleText,
         typeLine: typeLine,
         name: name,
@@ -133,12 +143,16 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       // Contagem via adapter F1
-      if (cardRoles.contains('ramp') || cardRoles.contains('ritual')) rampCount += quantity;
-      if (cardRoles.contains('draw') || cardRoles.contains('loot')) drawCount += quantity;
+      if (cardRoles.contains('ramp') || cardRoles.contains('ritual'))
+        rampCount += quantity;
+      if (cardRoles.contains('draw') || cardRoles.contains('loot'))
+        drawCount += quantity;
       if (cardRoles.contains('removal')) removalCount += quantity;
-      if (cardRoles.contains('wipe') || cardRoles.contains('board_wipe')) boardWipeCount += quantity;
+      if (cardRoles.contains('wipe') || cardRoles.contains('board_wipe'))
+        boardWipeCount += quantity;
       if (cardRoles.contains('protection')) protectionCount += quantity;
-      if (cardRoles.contains('recursion') || cardRoles.contains('graveyard')) graveyardInteractionCount += quantity;
+      if (cardRoles.contains('recursion') || cardRoles.contains('graveyard'))
+        graveyardInteractionCount += quantity;
     }
 
     // 3. Detectar arquétipo do deck
@@ -349,6 +363,8 @@ Future<Response> onRequest(RequestContext context) async {
       final manaCost = (card['mana_cost'] as String?) ?? '';
       final cmc = card['cmc'];
       final roles = resolveCardFunctionalRoles(
+        functionalTags: card['functional_tags'],
+        semanticTagsV2: card['semantic_tags_v2'],
         oracleText: oracle,
         typeLine: typeLine,
         name: name,
@@ -599,21 +615,81 @@ Future<Map<String, dynamic>> _loadWeaknessHistory(
     return {
       'stored_reports': bySeverity.values.fold<int>(0, (a, b) => a + b),
       'by_severity': bySeverity,
-      'recent': recentRows
-          .map((row) {
-            final m = row.toColumnMap();
-            return {
-              'type': m['weakness_type'],
-              'severity': m['severity'],
-              'description': m['description'],
-              'addressed': m['addressed'],
-              'created_at': m['created_at']?.toString(),
-            };
-          })
-          .toList(),
+      'recent': recentRows.map((row) {
+        final m = row.toColumnMap();
+        return {
+          'type': m['weakness_type'],
+          'severity': m['severity'],
+          'description': m['description'],
+          'addressed': m['addressed'],
+          'created_at': m['created_at']?.toString(),
+        };
+      }).toList(),
     };
   } catch (e) {
     print('[weakness-analysis] weakness history unavailable: $e');
     return const {'stored_reports': 0, 'by_severity': {}, 'recent': []};
   }
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = @tableName
+      )
+    '''),
+    parameters: {'tableName': tableName},
+  );
+  return result.isNotEmpty && result.first[0] == true;
+}
+
+Future<String> _functionalTagsSelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_function_tags');
+  if (!exists) return "'[]'::jsonb AS functional_tags";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tag', cft.tag,
+                       'confidence', cft.confidence,
+                       'evidence', cft.evidence,
+                       'source', cft.source
+                     )
+                     ORDER BY cft.confidence DESC, cft.tag
+                   )
+                   FROM card_function_tags cft
+                   WHERE cft.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS functional_tags''';
+}
+
+Future<String> _semanticV2SelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_semantic_tags_v2');
+  if (!exists) return "'[]'::jsonb AS semantic_tags_v2";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tags', cstv2.tags,
+                       'role_confidence', cstv2.role_confidence,
+                       'engine', cstv2.engine,
+                       'payoff', cstv2.payoff,
+                       'enabler', cstv2.enabler,
+                       'wincon', cstv2.wincon,
+                       'combo_piece', cstv2.combo_piece
+                     )
+                     ORDER BY cstv2.role_confidence DESC, cstv2.source
+                   )
+                   FROM card_semantic_tags_v2 cstv2
+                   WHERE cstv2.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS semantic_tags_v2''';
 }

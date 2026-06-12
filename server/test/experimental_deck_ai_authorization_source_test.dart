@@ -70,6 +70,12 @@ void main() {
       );
       expect(weakness, contains('final userId = context.read<String>()'));
       expect(weakness, contains('AND user_id = CAST(@user_id AS uuid)'));
+      expect(weakness, contains('resolveCardFunctionalRoles('));
+      expect(weakness, contains("'card_function_tags'"));
+      expect(weakness, contains("'card_semantic_tags_v2'"));
+      expect(weakness, contains('semantic_tags_v2'));
+      expect(weakness, contains("cardRoles.contains('wipe')"));
+      expect(weakness, contains("cardRoles.contains('board_wipe')"));
       expect(
         weakness,
         isNot(contains('SELECT name, format FROM decks WHERE id = @id')),
