@@ -46,6 +46,46 @@ def compute_score(wincon_catalog_db, wincon_primary, wincon_backup):
             count += 1
     return round(total / count, 1) if count > 0 else None
 
+
+def parse_role_list(raw):
+    roles = []
+    if raw:
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                roles.extend(str(role).strip().lower() for role in parsed if str(role).strip())
+        except Exception:
+            roles.extend(str(role).strip().lower() for role in str(raw).split(",") if role.strip())
+    return roles
+
+
+def analysis_roles_for_card(db, target_deck_id, card_name):
+    columns = {row[1] for row in db.execute("PRAGMA table_info(card_deck_analysis)").fetchall()}
+    if "role_in_deck" not in columns:
+        return []
+    pg_roles_expr = "pg_roles" if "pg_roles" in columns else "NULL AS pg_roles"
+    rows = db.execute(
+        f"""
+        SELECT role_in_deck, {pg_roles_expr}
+        FROM card_deck_analysis
+        WHERE deck_id = ? AND LOWER(card_name) = ?
+        """,
+        (target_deck_id, card_name.lower().strip()),
+    ).fetchall()
+    roles = []
+    seen = set()
+    for row in rows:
+        for role in parse_role_list(row["pg_roles"] if "pg_roles" in row.keys() else None):
+            if role not in seen:
+                seen.add(role)
+                roles.append(role)
+        role = (row["role_in_deck"] or "").strip().lower()
+        if role and role not in seen:
+            seen.add(role)
+            roles.append(role)
+    return roles
+
+
 def build_metadata(db, target_deck_id, card_list, commander):
     cards = parse_card_list(card_list)
     card_names = [c["name"].strip().lower() for c in cards]
@@ -60,14 +100,14 @@ def build_metadata(db, target_deck_id, card_list, commander):
         name = card["name"].lower().strip()
         qty = card["quantity"]
         type_line_row = None
+        role_tags = []
 
         if target_deck_id:
             type_line_row = db.execute(
-                "SELECT dc.type_line, cda.role_in_deck FROM deck_cards dc "
-                "LEFT JOIN card_deck_analysis cda ON cda.card_name = dc.card_name AND cda.deck_id = ? "
-                "WHERE LOWER(dc.card_name) = ? AND dc.deck_id = ? LIMIT 1",
-                (target_deck_id, name, target_deck_id)
+                "SELECT type_line FROM deck_cards WHERE deck_id = ? AND LOWER(card_name) = ? LIMIT 1",
+                (target_deck_id, name)
             ).fetchone()
+            role_tags = analysis_roles_for_card(db, target_deck_id, name)
 
         is_land = False
         if type_line_row and type_line_row[0]:
@@ -81,25 +121,25 @@ def build_metadata(db, target_deck_id, card_list, commander):
             total_lands += qty
             continue
 
-        role_tag = (type_line_row[1] or "").lower() if type_line_row and type_line_row[1] else ""
+        role_tag = " ".join(role_tags)
 
         if "ramp" in role_tag:
             ramp += qty
-        elif "draw" in role_tag or "card" in role_tag:
+        if "draw" in role_tag or "card" in role_tag:
             draw += qty
-        elif "removal" in role_tag:
+        if "removal" in role_tag:
             removal += qty
-        elif "tutor" in role_tag:
+        if "tutor" in role_tag:
             tutor += qty
-        elif "wipe" in role_tag or "board" in role_tag:
+        if "wipe" in role_tag or "board" in role_tag:
             wipe += qty
-        elif "protect" in role_tag:
+        if "protect" in role_tag:
             protection += qty
-        elif "recur" in role_tag:
+        if "recur" in role_tag:
             recursion += qty
-        elif "win" in role_tag or "combo" in role_tag:
+        if "win" in role_tag or "combo" in role_tag:
             wincon += qty
-        elif "engine" in role_tag or "value" in role_tag:
+        if "engine" in role_tag or "value" in role_tag:
             engine += qty
 
     return {

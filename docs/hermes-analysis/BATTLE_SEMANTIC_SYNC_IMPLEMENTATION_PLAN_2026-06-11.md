@@ -370,6 +370,11 @@ multi-tag inference through `classify_deck()` and `build_deck_json()`. Output
 payloads include both `tags` and `functional_tags_json`, while `functional_tag`
 remains the mapped legacy primary role for compatibility.
 
+Update 2026-06-12d: `export_hermes_learned_deck.py` now aggregates
+`card_deck_analysis.pg_roles` per card instead of joining and choosing an
+arbitrary row with `LIMIT 1`. This avoids metadata fanout and preserves
+multi-role counts when exporting learned decks.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:
