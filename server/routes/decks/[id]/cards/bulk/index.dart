@@ -30,21 +30,31 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       body: {'error': 'cards é obrigatório e deve ter itens'},
     );
   }
+  try {
+    validateNoUnsupportedDeckSections(
+      cards: items.map((item) => item.cast<String, dynamic>()),
+    );
+  } on DeckRulesException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {'error': e.message},
+    );
+  }
 
-  final parsed =
-      items.map((m) => m.cast<String, dynamic>()).map((m) {
-        final cardId = m['card_id']?.toString();
-        final qtyRaw = m['quantity'];
-        final qty = qtyRaw is int ? qtyRaw : int.tryParse('${qtyRaw ?? ''}');
-        final isCommander = m['is_commander'] == true;
-        return {
-          'card_id': cardId,
-          'quantity': qty,
-          'is_commander': isCommander,
-        };
-      }).toList();
+  final parsed = items.map((m) => m.cast<String, dynamic>()).map((m) {
+    final cardId = m['card_id']?.toString();
+    final qtyRaw = m['quantity'];
+    final qty = qtyRaw is int ? qtyRaw : int.tryParse('${qtyRaw ?? ''}');
+    final isCommander = m['is_commander'] == true;
+    return {
+      'card_id': cardId,
+      'quantity': qty,
+      'is_commander': isCommander,
+    };
+  }).toList();
 
-  if (parsed.any((e) => e['card_id'] == null || (e['card_id'] as String).isEmpty)) {
+  if (parsed
+      .any((e) => e['card_id'] == null || (e['card_id'] as String).isEmpty)) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': 'Todos os itens precisam de card_id válido'},
@@ -59,7 +69,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   if (parsed.any((e) => e['is_commander'] == true)) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body: {'error': 'bulk não aceita is_commander=true (use o endpoint single)'},
+      body: {
+        'error': 'bulk não aceita is_commander=true (use o endpoint single)'
+      },
     );
   }
 
@@ -169,4 +181,3 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     );
   }
 }
-

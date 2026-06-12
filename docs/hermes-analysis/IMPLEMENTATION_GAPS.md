@@ -305,7 +305,7 @@ Fonte Commander/hybrid: `https://magic.wizards.com/en/formats/commander` e
 | Multiplayer attack distribution | ✅ Básico | `assign_attackers_to_defenders` + `multi_defender_attack` | Requirements/restrictions por defensor e escolha interativa |
 | Hybrid mana em Commander | ✅ Guardado | servidor + v9 preservam identidade combinada | Não flexibilizar; Wizards confirmou que a regra não mudou em 2026-02-09 |
 | `is_commander` fora de Commander/Brawl | ✅ Guardado | `DeckRulesService.validateCommanderSlotAllowedForFormat` | Mantém todas as rotas que delegam ao serviço alinhadas com a regra de formato |
-| No sideboard/outside-game em Commander | ⚠️ Tracked Gap | gap registrado nesta seção | Validar rotas/deck construction se o produto expuser sideboard/wishboard |
+| No sideboard/outside-game em Commander | ✅ Guardado | `DeckRulesService.validateNoUnsupportedDeckSections`, parser de import e rotas de cards | ManaLoom ainda não modela sideboard/wishboard/outside-game em decks salvos; entradas com `zone/board/section=sideboard`, flags sideboard/wishboard/maybeboard ou cabeçalho textual `Sideboard` agora falham cedo em vez de serem persistidas como main deck |
 
 ### 10.1 Decisão estratégica 2026-06-11
 

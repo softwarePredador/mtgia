@@ -26,6 +26,27 @@ void main() {
         equals([true, true, true]),
       );
     });
+
+    test('rejects sideboard section instead of parsing it as main deck', () {
+      final result = parseImportLines([
+        '1 Talrand, Sky Summoner [Commander]',
+        '99 Island',
+        'Sideboard',
+        '1 Blue Elemental Blast',
+      ]);
+
+      expect(
+        result.parsedItems.map((item) => item['name']),
+        equals(['Talrand, Sky Summoner', 'Island']),
+      );
+      expect(result.invalidLines, contains('Sideboard'));
+      expect(result.invalidLines, contains('1 Blue Elemental Blast'));
+      expect(result.unsupportedSectionLines, contains('Sideboard'));
+      expect(
+        result.unsupportedSectionLines,
+        contains('1 Blue Elemental Blast'),
+      );
+    });
   });
 
   group('canonicalizeImportLookupName', () {

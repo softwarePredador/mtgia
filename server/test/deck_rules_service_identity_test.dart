@@ -4,6 +4,41 @@ import 'package:test/test.dart';
 
 void main() {
   group('DeckRulesService canonical identity', () {
+    test('detects unsupported deck sections before persistence', () {
+      expect(
+        unsupportedDeckSectionLabels(const [
+          {
+            'card_id': 'blast-id',
+            'quantity': 1,
+            'zone': 'sideboard',
+          },
+          {
+            'card_id': 'wish-id',
+            'quantity': 1,
+            'is_wishboard': true,
+          },
+        ]),
+        equals(['sideboard', 'wishboard']),
+      );
+
+      expect(
+        () => validateNoUnsupportedDeckSections(cards: const [
+          {
+            'card_id': 'blast-id',
+            'quantity': 1,
+            'zone': 'outside the game',
+          },
+        ]),
+        throwsA(
+          isA<DeckRulesException>().having(
+            (error) => error.message,
+            'message',
+            contains('outside the game'),
+          ),
+        ),
+      );
+    });
+
     test('uses oracle_id to enforce Commander singleton across printings',
         () async {
       final session = _DeckRulesFakeSession(

@@ -76,6 +76,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         throw Exception('Deck not found or permission denied.');
       }
       final format = (deckResult.first[0] as String).toLowerCase();
+      validateNoUnsupportedDeckSections(cards: [body]);
 
       final cardInfo = await session.execute(
         Sql.named(

@@ -151,6 +151,25 @@ void main() {
       );
     });
 
+    test('rejects unsupported sideboard payload before resolving cards',
+        () async {
+      final repository = _FakeGeneratedDeckRepository(cardsByName: const {});
+      final service = GeneratedDeckValidationService(repository);
+
+      final result = await service.validate(
+        format: 'commander',
+        commanderName: 'Talrand, Sky Summoner',
+        cards: [
+          {'name': 'Blue Elemental Blast', 'quantity': 1, 'zone': 'sideboard'},
+        ],
+      );
+
+      expect(result.isValid, isFalse);
+      expect(result.errors.single, contains('não suporta sideboard'));
+      expect(repository.lastResolvedItems, isEmpty);
+      expect(result.totalSuggestedCards, equals(1));
+    });
+
     test('ignores commander duplicated inside cards list', () async {
       final service = GeneratedDeckValidationService(
         _FakeGeneratedDeckRepository(

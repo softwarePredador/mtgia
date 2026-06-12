@@ -1,10 +1,12 @@
 class ImportListParseResult {
   final List<Map<String, dynamic>> parsedItems;
   final List<String> invalidLines;
+  final List<String> unsupportedSectionLines;
 
   const ImportListParseResult({
     required this.parsedItems,
     required this.invalidLines,
+    this.unsupportedSectionLines = const [],
   });
 }
 
@@ -40,11 +42,27 @@ List<String> normalizeImportLines(dynamic rawList) {
 ImportListParseResult parseImportLines(List<String> lines) {
   final parsedItems = <Map<String, dynamic>>[];
   final invalidLines = <String>[];
+  final unsupportedSectionLines = <String>[];
   final lineRegex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
+  var inUnsupportedSection = false;
 
   for (var line in lines) {
     line = line.trim();
     if (line.isEmpty) continue;
+
+    final sectionLabel = _unsupportedImportSectionLabel(line);
+    if (sectionLabel != null) {
+      inUnsupportedSection = true;
+      invalidLines.add(line);
+      unsupportedSectionLines.add(line);
+      continue;
+    }
+
+    if (inUnsupportedSection) {
+      unsupportedSectionLines.add(line);
+      invalidLines.add(line);
+      continue;
+    }
 
     final match = lineRegex.firstMatch(line);
     if (match == null) {
@@ -70,7 +88,33 @@ ImportListParseResult parseImportLines(List<String> lines) {
   return ImportListParseResult(
     parsedItems: parsedItems,
     invalidLines: invalidLines,
+    unsupportedSectionLines: unsupportedSectionLines,
   );
+}
+
+String? _unsupportedImportSectionLabel(String line) {
+  final normalized = line
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[:：]+$'), '')
+      .replaceAll(RegExp(r'[\s_\-]+'), '');
+  const unsupported = {
+    'side',
+    'sideboard',
+    'sideboards',
+    'wish',
+    'wishboard',
+    'wishboards',
+    'maybe',
+    'maybeboard',
+    'maybeboards',
+    'considering',
+    'outside',
+    'outsidegame',
+    'outsidethegame',
+    'outsideboard',
+  };
+  return unsupported.contains(normalized) ? line.trim() : null;
 }
 
 String _stripCommanderMarkers(String value) {

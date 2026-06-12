@@ -728,3 +728,30 @@ Slice 4 report-only derivation status:
    apply-attempt smoke returned `pg_apply.blocked=true`,
    `pg_apply.applied=false` and
    `reasons=["allowlist_apply_approved_required"]`.
+
+### Update 2026-06-12i - unsupported sideboard/outside-game guard
+
+ManaLoom still does not model sideboard, wishboard, maybeboard or
+outside-the-game cards in persisted decks. That is intentional for the current
+Commander-first release stability track: the saved deck model remains
+`deck_cards(card_id, quantity, is_commander, condition)`.
+
+The implementation now fails early instead of silently importing unsupported
+sections as main deck cards:
+
+- `DeckRulesService.validateNoUnsupportedDeckSections` detects explicit
+  payload fields such as `zone`, `board`, `board_type`, `section`,
+  `deck_section`, `sideboard`, `is_sideboard`, `wishboard`,
+  `is_wishboard`, `maybeboard` and `outside_game`.
+- `/decks`, `/decks/:id`, `/decks/:id/cards`, `/decks/:id/cards/bulk` and
+  `/decks/:id/cards/set` call the guard before persistence.
+- `GeneratedDeckValidationService` rejects generated decks carrying
+  unsupported sections before resolving card names.
+- `parseImportLines` marks textual `Sideboard`/`Wishboard`/`Maybeboard`/
+  `Outside the game` sections and their following lines as unsupported so
+  `/import/to-deck` can return a clear error.
+
+This closes the immediate gap without adding sideboard support. Future real
+sideboard/wishboard support must introduce explicit schema, API contracts,
+app UI, validators and Commander/non-Commander policy instead of reusing
+the current main-deck model.

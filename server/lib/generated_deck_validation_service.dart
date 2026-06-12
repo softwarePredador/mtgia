@@ -113,6 +113,20 @@ class GeneratedDeckValidationService {
 
     final sanitizedCards = <Map<String, dynamic>>[];
     final warnings = <String>[];
+    final unsupportedSections = unsupportedDeckSectionLabels(cards);
+    if (unsupportedSections.isNotEmpty) {
+      return GeneratedDeckValidationResult(
+        generatedDeck: const {'cards': <Map<String, dynamic>>[]},
+        errors: [unsupportedDeckSectionsMessage(unsupportedSections)],
+        invalidCards: const [],
+        suggestions: const {},
+        warnings: const [],
+        totalSuggestedEntries: cards.length,
+        totalSuggestedCards: _sumRawCardQuantities(cards),
+        totalResolvedEntries: 0,
+        totalResolvedCards: 0,
+      );
+    }
 
     for (final rawCard in cards) {
       final rawName = rawCard['name']?.toString() ?? '';
@@ -345,6 +359,15 @@ class GeneratedDeckValidationService {
         (sum, card) => sum + (card['quantity'] as int),
       ),
     );
+  }
+
+  int _sumRawCardQuantities(List<Map<String, dynamic>> cards) {
+    return cards.fold<int>(0, (sum, card) {
+      final raw = card['quantity'];
+      final quantity =
+          raw is int ? raw : int.tryParse(raw?.toString() ?? '') ?? 1;
+      return quantity > 0 ? sum + quantity : sum;
+    });
   }
 
   Future<List<Map<String, dynamic>>?> _tryAutoRepairCommanderOrBrawl({

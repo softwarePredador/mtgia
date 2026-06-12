@@ -22,6 +22,7 @@ class DeckRulesService {
     bool strict = false,
   }) async {
     final normalizedFormat = format.toLowerCase();
+    validateNoUnsupportedDeckSections(cards: cards);
     validateCommanderSlotAllowedForFormat(
       format: normalizedFormat,
       cards: cards,
@@ -418,6 +419,104 @@ void validateCommanderSlotAllowedForFormat({
     'Regra violada: is_commander só é permitido em Commander/Brawl.',
   );
 }
+
+List<String> unsupportedDeckSectionLabels(
+  Iterable<Map<String, dynamic>> cards,
+) {
+  final labels = <String>[];
+  for (final card in cards) {
+    final label = unsupportedDeckSectionLabel(card);
+    if (label == null) continue;
+    labels.add(label);
+  }
+  return labels;
+}
+
+String? unsupportedDeckSectionLabel(Map<String, dynamic> card) {
+  const booleanFields = {
+    'sideboard': 'sideboard',
+    'is_sideboard': 'sideboard',
+    'wishboard': 'wishboard',
+    'is_wishboard': 'wishboard',
+    'maybeboard': 'maybeboard',
+    'is_maybeboard': 'maybeboard',
+    'outside_game': 'outside-game',
+    'is_outside_game': 'outside-game',
+  };
+
+  for (final entry in booleanFields.entries) {
+    final raw = card[entry.key];
+    if (raw == true || raw?.toString().trim().toLowerCase() == 'true') {
+      return entry.value;
+    }
+  }
+
+  const sectionFields = {
+    'zone',
+    'board',
+    'board_type',
+    'section',
+    'deck_section',
+    'list_section',
+    'list_type',
+  };
+
+  for (final key in sectionFields) {
+    final raw = card[key];
+    if (raw == null) continue;
+    final normalized = _normalizeDeckSectionValue(raw);
+    if (_unsupportedDeckSectionValues.contains(normalized)) {
+      return raw.toString().trim();
+    }
+  }
+
+  return null;
+}
+
+void validateNoUnsupportedDeckSections({
+  required Iterable<Map<String, dynamic>> cards,
+}) {
+  final labels = unsupportedDeckSectionLabels(cards);
+  if (labels.isEmpty) return;
+  throw DeckRulesException(unsupportedDeckSectionsMessage(labels));
+}
+
+String unsupportedDeckSectionsMessage(Iterable<String> labels) {
+  final uniqueLabels = labels
+      .map((label) => label.trim())
+      .where((label) => label.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+  final suffix = uniqueLabels.isEmpty ? '' : ' (${uniqueLabels.join(', ')}).';
+  return 'Regra violada: ManaLoom ainda não suporta sideboard, wishboard, maybeboard ou cartas "outside the game" em decks salvos$suffix '
+      'Importe apenas o deck principal e marque comandante pelo campo/tag de comandante.';
+}
+
+String _normalizeDeckSectionValue(Object value) {
+  return value
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[\s_\-]+'), '');
+}
+
+const _unsupportedDeckSectionValues = {
+  'side',
+  'sideboard',
+  'sideboards',
+  'wish',
+  'wishboard',
+  'wishboards',
+  'maybe',
+  'maybeboard',
+  'maybeboards',
+  'considering',
+  'outside',
+  'outsidegame',
+  'outsidethegame',
+  'outsideboard',
+};
 
 class DeckRulesException implements Exception {
   DeckRulesException(this.message, {this.cardName});
