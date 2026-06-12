@@ -3,12 +3,35 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 import unittest
 
 import derive_functional_tags_from_battle_rules as derive
 
 
 class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
+    def test_versioned_low_risk_allowlist_is_dry_run_only(self) -> None:
+        allowlist_path = (
+            Path(__file__).resolve().parents[2]
+            / "BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json"
+        )
+        data = json.loads(allowlist_path.read_text(encoding="utf-8"))
+        loaded = derive.load_allowlist(str(allowlist_path))
+
+        self.assertFalse(data["apply_approved"])
+        self.assertEqual(len(data["approved"]), 27)
+        self.assertGreaterEqual(len(loaded), 27)
+        self.assertTrue(
+            all(entry["logical_rule_key"] in loaded for entry in data["approved"])
+        )
+        self.assertTrue(
+            all(
+                entry["review_status"] == "dry_run_low_risk_review_only"
+                for entry in data["approved"]
+            )
+        )
+
     def test_build_candidate_accepts_trusted_rule_and_maps_wipe_alias(self) -> None:
         candidate = derive.build_candidate(
             {
