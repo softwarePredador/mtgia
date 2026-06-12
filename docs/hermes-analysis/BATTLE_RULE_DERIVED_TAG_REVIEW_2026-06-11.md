@@ -243,6 +243,21 @@ Local smoke:
 | low-risk candidates in full report | 30 |
 | manual-review candidates in full report | 59 |
 
+Hermes AWS smoke after commit `eba7f79f`:
+
+| Check | Result |
+|---|---:|
+| rules seen | 3156 |
+| new candidates | 89 |
+| already present | 261 |
+| rejected by gate | 2806 |
+| low-risk review candidates | 30 |
+| manual-review candidates | 59 |
+| allowlist loaded | 3 |
+| allowlisted candidates | 1 |
+| manual-review candidates blocked | 1 |
+| unmatched allowlist keys | 1 |
+
 ## Next steps
 
 1. Keep the current Slice 4 as report-only.
