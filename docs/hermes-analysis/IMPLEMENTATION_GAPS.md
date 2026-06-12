@@ -663,7 +663,10 @@ virar hash semântico por carta.
    `oracle_id` dedicada e que `unaccent` não está disponível no PostgreSQL.
    Portanto, o auditor deve separar `card_id` exato, match diagnóstico por
    acento e ambiguidade por múltiplas printings, mas qualquer persistência
-   continua bloqueada até existir uma identidade canônica explícita.
+   continua bloqueada até existir uma identidade canônica explícita. Validação
+   Hermes AWS em `91fd125f` zerou não resolvidas (`0`) e classificou `1150/1200`
+   instâncias como resolvidas para diagnóstico (`1117` exact, `32` front,
+   `1` accent-normalized); as `50` restantes são `multiple_printings_exact`.
 5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato

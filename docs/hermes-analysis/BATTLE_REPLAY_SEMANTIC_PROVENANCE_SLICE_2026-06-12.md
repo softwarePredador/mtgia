@@ -322,3 +322,33 @@ Persistence remains blocked with recommendation
 `do_not_apply_without_canonical_oracle_or_printing_policy`. This follows the
 project decision that Hermes proposes and the backend owns persistence and
 identity rules.
+
+Hermes AWS validation for commit `91fd125f`:
+
+```json
+{
+  "resolver_schema_version": "learned_opponent_identity_audit_v2_report_only",
+  "decks_seen": 12,
+  "card_instances": 1200,
+  "resolved_instances": 1150,
+  "unresolved_instances": 0,
+  "ambiguous_instances": 50,
+  "resolved_kind_instances": {
+    "accent_normalized": 1,
+    "exact": 1117,
+    "front": 32
+  },
+  "ambiguous_kind_instances": {
+    "multiple_printings_exact": 50
+  },
+  "resolution_coverage": 0.958333,
+  "apply": false,
+  "persist_recommendation": "do_not_apply_without_canonical_oracle_or_printing_policy"
+}
+```
+
+Interpretation: parser/data quality for learned-opponent card names is now
+effectively clean for this sample (`0` unresolved). The remaining blocker is
+not lookup quality; it is canonical identity. The next implementation slice
+should define backend-owned `oracle_id`/canonical-printing policy before any
+write-back to Hermes SQLite or PostgreSQL.
