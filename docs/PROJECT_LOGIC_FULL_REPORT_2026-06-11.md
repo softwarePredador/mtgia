@@ -559,7 +559,10 @@ Para identidade de carta, o contrato novo e aditivo é: preservar printing em
 `layout` e `card_faces_json` para faces/modos. Enquanto backfill/cobertura não
 estiverem completos, consumidores críticos devem manter fallback por nome
 normalizado e tratar múltiplas printings como ambíguas em vez de escolher
-`LIMIT 1`.
+`LIMIT 1`. Em 2026-06-12, `DeckRulesService` passou a preferir `oracle_id`
+quando a coluna existir para aplicar singleton Commander e impedir que a mesma
+identidade canônica do comandante entre no main deck; quando `oracle_id` estiver
+ausente, o fallback continua sendo o nome físico normalizado.
 
 Errado:
 

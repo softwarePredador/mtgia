@@ -412,8 +412,16 @@ Current production constraint verified on 2026-06-12 and coding status:
   `cards.oracle_id`, `cards.layout` and `cards.card_faces_json`.
 - Updated cards resolve/printings/sync paths treat `scryfall_id` as the
   Scryfall printing id and `oracle_id` as canonical card identity when present.
+- `DeckRulesService` now prefers `oracle_id` for physical-copy identity when
+  the columns exist, blocking Commander singleton duplicates across printings
+  and blocking a commander's canonical identity from entering the 99. It falls
+  back to normalized physical card name while production backfill is incomplete.
 - Existing production rows still need migration/backfill coverage before
   consumers can rely on `oracle_id` as complete.
+- `/import` and deck save/update paths use the final backend rule service.
+  `/import/validate` remains a preview/warnings endpoint and must not be
+  treated as the source of truth for final legality until it is wired to the
+  same canonical identity contract.
 - Multiple-printing learned deck matches must remain report-only until a
   backend-owned policy defines either oracle identity or canonical printing.
 

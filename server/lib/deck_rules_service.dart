@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart';
 
 import 'basic_land_utils.dart' as basic_lands;
+import 'card_identity_support.dart';
 import 'commander_eligibility.dart';
 import 'commander_pairing.dart' as commander_pairing;
 import 'color_identity.dart';
@@ -52,7 +53,7 @@ class DeckRulesService {
       final isBasicLand = _isBasicLandTypeLine(typeLine);
       if (isBasicLand) continue;
 
-      final key = normalizePhysicalCardCopyName(info.name);
+      final key = info.physicalCopyKey;
       final existing = copiesByName[key];
       if (existing == null) {
         copiesByName[key] = _CopyCounter(info.name.trim(), quantity);
@@ -233,7 +234,7 @@ class DeckRulesService {
 
     // Calcular identidade de cor combinada de todos os comandantes
     final commanderIdentitySet = <String>{};
-    final commanderNameSet = <String>{};
+    final commanderIdentityKeys = <String>{};
     for (final cmd in commanders) {
       final cmdId = cmd['card_id'] as String?;
       if (cmdId == null) continue;
@@ -247,7 +248,7 @@ class DeckRulesService {
         );
       }
 
-      commanderNameSet.add(normalizePhysicalCardCopyName(info.name));
+      commanderIdentityKeys.add(info.physicalCopyKey);
       commanderIdentitySet.addAll(_resolvedIdentity(info));
     }
 
@@ -259,7 +260,7 @@ class DeckRulesService {
       final isCommander = item['is_commander'] as bool? ?? false;
 
       if (!isCommander &&
-          commanderNameSet.contains(normalizePhysicalCardCopyName(info.name))) {
+          commanderIdentityKeys.contains(info.physicalCopyKey)) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" já está selecionada como comandante e não pode entrar no deck principal.',
           cardName: info.name,
@@ -330,9 +331,13 @@ class DeckRulesService {
   }
 
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
+    final hasIdentityColumns = await hasCardIdentityColumns(_session);
+    final identitySelect = hasIdentityColumns
+        ? 'oracle_id::text AS oracle_id'
+        : 'NULL::text AS oracle_id';
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc, power, toughness
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc, power, toughness, $identitySelect
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -354,9 +359,11 @@ class DeckRulesService {
       final cmc = parseDeckRulesCmcValue(row[7]);
       final power = row[8] as String?;
       final toughness = row[9] as String?;
+      final oracleId = nonEmptyCardIdentityString(row[10]);
 
       map[id] = _CardData(
         id: id,
+        oracleId: oracleId,
         name: name,
         typeLine: typeLine,
         oracleText: oracleText,
@@ -440,6 +447,7 @@ class _CopyCounter {
 class _CardData {
   const _CardData({
     required this.id,
+    required this.oracleId,
     required this.name,
     required this.typeLine,
     required this.oracleText,
@@ -452,6 +460,7 @@ class _CardData {
   });
 
   final String id;
+  final String? oracleId;
   final String name;
   final String typeLine;
   final String? oracleText;
@@ -461,6 +470,12 @@ class _CardData {
   final double? cmc;
   final String? power;
   final String? toughness;
+
+  String get physicalCopyKey {
+    final canonicalId = nonEmptyCardIdentityString(oracleId);
+    if (canonicalId != null) return 'oracle:$canonicalId';
+    return 'name:${normalizePhysicalCardCopyName(name)}';
+  }
 
   commander_pairing.CommanderPairingCard toCommanderPairingCard() {
     return commander_pairing.CommanderPairingCard(

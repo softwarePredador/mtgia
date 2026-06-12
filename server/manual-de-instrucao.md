@@ -18234,10 +18234,26 @@ na command zone, não para validação de deck no servidor.
   e expõe linha operacional nova com printing id + oracle id.
 - Limites explícitos deste slice:
   - não aplica backfill completo por si só;
-  - não muda ainda save/import/singleton Commander para enforcement por
-    `oracle_id`;
   - não escolhe printing canônica para learned-opponent decks ambíguos;
   - não relaxa singleton, identidade de cor, Commander legality ou regras de
     parceiro.
 - Próximo passo seguro: aplicar migration/backfill controlado, medir cobertura
   de `oracle_id` e só depois ligar consumidores críticos a identidade canônica.
+
+## 2026-06-12 — Singleton Commander por identidade canônica
+
+- `DeckRulesService` passou a carregar `cards.oracle_id` quando as colunas de
+  identidade canônica existem no banco.
+- A chave de cópia física agora prefere `oracle_id` e cai para nome físico
+  normalizado quando a coluna/dado ainda não existe.
+- Impacto real: save/import/validate final passam a bloquear duas printings da
+  mesma carta em Commander e também bloqueiam o comandante em outra printing
+  dentro das 99 cartas.
+- `/import` e mutações de deck continuam usando o backend como fonte de
+  verdade via `DeckRulesService`.
+- `/import/validate` permanece prévia/aviso; não deve ser tratado como prova
+  final de legalidade até ser ligado ao mesmo contrato canônico.
+- Validação focada:
+  - `dart analyze lib/deck_rules_service.dart lib/card_identity_support.dart test/deck_rules_service_identity_test.dart`: PASS.
+  - `dart test test/deck_rules_service_identity_test.dart --reporter compact`: PASS.
+  - `dart test test/deck_rules_service_identity_test.dart test/card_identity_support_test.dart test/import_list_service_test.dart test/import_parser_test.dart test/generated_deck_validation_service_test.dart --reporter compact`: PASS.
