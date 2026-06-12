@@ -303,18 +303,19 @@ esse dado como sinal de produto.
   `sendToUser`, observabilidade automatica e fluxos app que usam
   `fetchBinderDirect`/`fetchPublicDecks`.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-11 15:00 UTC no checkout local `76ec897f`. As claims antigas
-  contra `deck_matchups` e `deck_weakness_reports` estao stale nesta branch:
-  ambas agora tem leitura runtime e campos retornados no payload das rotas
-  experimentais (`stored_matchup` em `/ai/simulate-matchup` e `history` em
-  `/ai/weakness-analysis`). `deck_learning_events`, `commander_card_usage` e
-  `commander_learned_decks` tambem sao controles positivos atuais por terem
-  writers/readers em rotas/jobs do loop Hermes. Permanecem como riscos menores:
-  `commander_reference_decks` e `commander_reference_deck_cards` persistem raw
-  corpus sem `SELECT/JOIN` direto confirmado, enquanto o produto le o agregado
-  `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem insert helper
-  sem chamador, leitura apenas `COUNT(*)` em `/ai/ml-status` e nenhum DDL local
-  encontrado neste checkout.
+  em 2026-06-12 15:00 UTC no checkout local `129d647f`. Nao houve novo achado
+  P1/P2 app-facing. As claims antigas contra `deck_matchups` e
+  `deck_weakness_reports` continuam stale: ambas tem leitura runtime e campos
+  retornados no payload das rotas experimentais (`stored_matchup` em
+  `/ai/simulate-matchup` e `history` em `/ai/weakness-analysis`).
+  `deck_learning_events`, `commander_card_usage`, `commander_learned_decks` e
+  `card_battle_rules` tambem sao controles positivos atuais por terem
+  writers/readers em rotas/jobs/scripts operacionais. Permanecem como riscos
+  menores: `commander_reference_decks` e `commander_reference_deck_cards`
+  persistem raw corpus sem `SELECT/JOIN` direto confirmado, enquanto o produto
+  le o agregado `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem
+  insert helper sem chamador, leitura apenas `COUNT(*)` em `/ai/ml-status` e
+  nenhum DDL local encontrado neste checkout.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

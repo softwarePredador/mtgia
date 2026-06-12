@@ -783,18 +783,20 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-11 15:00 UTC: REVALIDADO no checkout `76ec897f`.** A rodada
-  local focada em `postgresql-tables-not-used` atualizou o status dos achados
-  historicos. `deck_matchups` e `deck_weakness_reports` nao continuam
-  write-only: ambas agora possuem leitores runtime e campos retornados no
-  payload das rotas. `schema_migrations` segue fora do achado por ser tabela
-  interna do migrador. Uma varredura focada de DDL versus
-  `FROM/JOIN/INSERT/UPDATE/DELETE` encontrou 47 declaracoes de tabela no
-  recorte auditado, incluindo uma tabela SQLite local (`user_learning_events`)
-  excluida dos achados PostgreSQL. O risco remanescente fica restrito a raws do
-  Commander Reference Corpus sem leitor direto confirmado e a
-  `ml_prompt_feedback`, que nao tem DDL local no checkout atual, possui helper
-  de insert sem chamador e aparece em `/ai/ml-status` apenas como `COUNT(*)`.
+- **Status 2026-06-12 15:00 UTC: REVALIDADO no checkout `129d647f`.** A rodada
+  local focada em `postgresql-tables-not-used` revalidou os achados historicos
+  com `rg` literal e varredura whole-repo de `CREATE TABLE` versus
+  `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE` em `.dart`, `.sql`, `.py` e `.sh`.
+  Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
+  `deck_weakness_reports` nao continuam write-only: ambas possuem leitores
+  runtime e campos retornados no payload das rotas. `card_battle_rules` tambem
+  nao foi classificada como unused, porque jobs/scripts Hermes leem, atualizam
+  e sincronizam a tabela. `schema_migrations` segue fora do achado por ser
+  tabela interna do migrador, e `user_learning_events` foi excluida por ser
+  ponte SQLite local. O risco remanescente fica restrito a raws do Commander
+  Reference Corpus sem leitor direto confirmado e a `ml_prompt_feedback`, que
+  nao tem DDL local no checkout atual, possui helper de insert sem chamador e
+  aparece em `/ai/ml-status` apenas como `COUNT(*)`.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:222`; a rota
     `/ai/simulate-matchup` le o historico anterior por `_loadStoredMatchup` em
@@ -822,6 +824,13 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
     `:1200`, recebem insert/delete/insert em `:1245`, `:1329` e `:1345`, mas
     nao possuem `SELECT/JOIN` confirmado; o produto consome o agregado
     `commander_reference_deck_analysis` em `:389`.
+  - `card_battle_rules` foi descartada como achado: alem do DDL em
+    `server/database_setup.sql:109` e `server/bin/migrate.dart:493`,
+    `server/bin/auto_promote_battle_rules.py:113`-`:147` le/atualiza a tabela,
+    `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py:164`-`:175`
+    le/sincroniza, e
+    `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py:204`-`:207`
+    faz join para montar o deck alvo.
 - **Impacto**: para as raws Commander Reference, acumulacao de dados sem
   politica documentada de lineage/retencao ou reprocessamento. Para
   `ml_prompt_feedback`, risco de schema drift e falsa impressao de coleta ativa
@@ -837,11 +846,12 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
   4. se remover, criar migration/cleanup seguro e atualizar
      `API_CONTRACTS_AND_DATA_MAP.md`.
 - **Validação**:
-  - `grep -RInE "^[[:space:]]*(FROM|JOIN)[[:space:]]+(commander_reference_decks|commander_reference_deck_cards)\\b" server/routes server/lib server/bin app`
+  - `rg -n "\\b(FROM|JOIN)\\s+(commander_reference_decks|commander_reference_deck_cards)\\b" server app docs/hermes-analysis/manaloom-knowledge/scripts -g '*.dart' -g '*.py' -g '*.sh'`
     encontra consumidores reais de leitura, ou a persistencia deixa de existir
     com decisao documentada;
-  - `grep -RIn "recordFeedback" server app` encontra chamador real, caso a
-    tabela de feedback seja mantida para coleta ativa;
+  - `rg -n "recordFeedback\\(" server app docs/hermes-analysis/manaloom-knowledge/scripts`
+    encontra chamador real, caso a tabela de feedback seja mantida para coleta
+    ativa;
   - testes das rotas experimentais continuam verdes;
   - contrato app-facing deixa claro se esses dados sao historico persistido ou
     apenas resposta efemera.
