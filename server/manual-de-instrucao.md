@@ -18291,3 +18291,27 @@ na command zone, não para validação de deck no servidor.
   - ainda não autoriza persistir `card_id` em learned-opponent decks sem
     política backend-owned de printing canônica;
   - não usar `LIMIT 1` para resolver múltiplas printings.
+
+## 2026-06-12 — Auditor v4 de printing canônica report-only
+
+- `audit_learned_opponent_card_identity.py` passou para
+  `learned_opponent_identity_audit_v4_report_only`.
+- O auditor continua separando:
+  - `resolved_instances`: match concreto com uma única linha `cards.id`;
+  - `oracle_resolved_instances`: múltiplas printings compartilhando a mesma
+    identidade `oracle_id`;
+  - `ambiguous_instances`: múltiplas identidades reais conflitantes;
+  - `unresolved_instances`: nomes sem resolução.
+- Novo campo report-only:
+  - `canonical_printing_candidate_instances`;
+  - `canonical_printing_candidate_unique_names`;
+  - `canonical_printing_reason_instances`;
+  - `canonical_printing_policy`.
+- Política:
+  - só emite candidato de `card_id` quando uma printing tem pontuação de
+    evidência estritamente maior que todas as outras;
+  - sinais aceitos: `scryfall_id` de printing diferente de `oracle_id`, imagem
+    direta `cards.scryfall.io`, `layout`, `collector_number`, `set_code`,
+    `rarity`;
+  - empates permanecem semantic-only;
+  - não há apply e não há persistência em `knowledge.db`/PostgreSQL.

@@ -104,13 +104,70 @@ def _candidate_oracle_id(candidate: tuple[Any, ...]) -> str | None:
     return value or None
 
 
+def _candidate_value(candidate: tuple[Any, ...], index: int) -> str | None:
+    if len(candidate) <= index:
+        return None
+    value = str(candidate[index] or "").strip()
+    return value or None
+
+
+def _canonical_printing_candidate(
+    candidates: list[tuple[Any, ...]],
+) -> tuple[str | None, str | None]:
+    """Report a canonical printing candidate only with a unique evidence winner."""
+
+    scored: list[tuple[int, str, str]] = []
+    for candidate in candidates:
+        card_id = _candidate_card_id(candidate)
+        oracle_id = _candidate_oracle_id(candidate)
+        scryfall_id = _candidate_value(candidate, 3)
+        set_code = _candidate_value(candidate, 4)
+        collector_number = _candidate_value(candidate, 5)
+        image_url = _candidate_value(candidate, 6) or ""
+        layout = (_candidate_value(candidate, 7) or "").lower()
+        rarity = _candidate_value(candidate, 8)
+
+        score = 0
+        reasons: list[str] = []
+        if scryfall_id and oracle_id and scryfall_id != oracle_id:
+            score += 4
+            reasons.append("printing_id")
+        if image_url.startswith("https://cards.scryfall.io/"):
+            score += 3
+            reasons.append("direct_scryfall_image")
+        if layout and layout not in {"token", "art_series"}:
+            score += 2
+            reasons.append(f"layout:{layout}")
+        if collector_number:
+            score += 1
+            reasons.append("collector_number")
+        if set_code:
+            score += 1
+            reasons.append("set_code")
+        if rarity:
+            score += 1
+            reasons.append("rarity")
+        if score > 0 and reasons:
+            scored.append((score, ",".join(reasons), card_id))
+
+    if not scored:
+        return None, None
+
+    scored.sort(reverse=True)
+    best_score, best_reason, best_card_id = scored[0]
+    second_score = scored[1][0] if len(scored) > 1 else -1
+    if best_score <= second_score:
+        return None, None
+    return best_card_id, f"unique_highest_score:{best_score}:{best_reason}"
+
+
 def _classify_candidate_groups(
     *,
     exact: list[tuple[Any, ...]],
     front: list[tuple[Any, ...]],
     accent: list[tuple[Any, ...]],
-) -> tuple[str, str | None, str, int, str | None]:
-    """Return `(status, card_id, kind, candidate_count, oracle_id)`.
+) -> tuple[str, str | None, str, int, str | None, str | None, str | None]:
+    """Return classification plus optional report-only canonical printing.
 
     A single PG row resolves to a concrete `card_id`. Multiple printings sharing
     one `oracle_id` resolve only to semantic identity; the audit must not choose
@@ -130,6 +187,8 @@ def _classify_candidate_groups(
                 kind,
                 1,
                 _candidate_oracle_id(candidates[0]),
+                None,
+                None,
             )
         if len(candidates) > 1:
             oracle_ids = {
@@ -142,15 +201,28 @@ def _classify_candidate_groups(
             if len(oracle_ids) == 1 and all(
                 _candidate_oracle_id(candidate) for candidate in candidates
             ):
+                canonical_card_id, canonical_reason = _canonical_printing_candidate(
+                    candidates
+                )
                 return (
                     "oracle_resolved",
                     None,
                     f"multiple_printings_same_oracle_{kind}",
                     len(candidates),
                     next(iter(oracle_ids)),
+                    canonical_card_id,
+                    canonical_reason,
                 )
-            return "ambiguous", None, f"multiple_printings_{kind}", len(candidates), None
-    return "unresolved", None, "no_match", 0, None
+            return (
+                "ambiguous",
+                None,
+                f"multiple_printings_{kind}",
+                len(candidates),
+                None,
+                None,
+                None,
+            )
+    return "unresolved", None, "no_match", 0, None, None, None
 
 
 def pg_has_oracle_id_column(cur: Any) -> bool:
@@ -230,16 +302,20 @@ def resolve_names(
     dict[str, str],
     dict[str, str],
     dict[str, str],
+    dict[str, str],
+    dict[str, str],
     bool,
 ]:
     normalized_names = sorted({normalize_card_name(name) for name in names if name})
     if not normalized_names:
-        return {}, {}, {}, {}, {}, {}, False
+        return {}, {}, {}, {}, {}, {}, {}, {}, False
     resolved: dict[str, str] = {}
     oracle_resolved: dict[str, str] = {}
     ambiguous: dict[str, int] = {}
     resolved_kind: dict[str, str] = {}
     oracle_resolved_kind: dict[str, str] = {}
+    oracle_canonical_card_id: dict[str, str] = {}
+    oracle_canonical_reason: dict[str, str] = {}
     ambiguous_kind: dict[str, str] = {}
     oracle_id_column_present = False
     with connect() as conn:
@@ -252,40 +328,69 @@ def resolve_names(
                 chunk = normalized_names[index : index + 500]
                 cur.execute(
                     f"""
-                    SELECT id::text, name, {oracle_select_sql}
+                    SELECT
+                      id::text,
+                      name,
+                      {oracle_select_sql},
+                      scryfall_id::text,
+                      set_code,
+                      collector_number,
+                      image_url,
+                      layout,
+                      rarity
                     FROM cards
                     WHERE lower(name) = ANY(%s)
                        OR lower(split_part(name, ' // ', 1)) = ANY(%s)
                     """,
                     (chunk, chunk),
                 )
-                candidates_by_key: dict[str, list[tuple[str, str, str | None, bool]]] = {
+                candidates_by_key: dict[str, list[tuple[Any, ...]]] = {
                     key: [] for key in chunk
                 }
-                for card_id, card_name, oracle_id in cur.fetchall():
+                for row in cur.fetchall():
+                    (
+                        card_id,
+                        card_name,
+                        oracle_id,
+                        scryfall_id,
+                        set_code,
+                        collector_number,
+                        image_url,
+                        layout,
+                        rarity,
+                    ) = row
                     exact_key = normalize_card_name(card_name)
                     front_key = normalize_card_name(str(card_name).split(" // ", 1)[0])
+                    candidate = (
+                        card_id,
+                        card_name,
+                        oracle_id,
+                        scryfall_id,
+                        set_code,
+                        collector_number,
+                        image_url,
+                        layout,
+                        rarity,
+                    )
                     if exact_key in candidates_by_key:
-                        candidates_by_key[exact_key].append(
-                            (card_id, card_name, oracle_id, True)
-                        )
+                        candidates_by_key[exact_key].append((*candidate, True))
                     if front_key in candidates_by_key and front_key != exact_key:
-                        candidates_by_key[front_key].append(
-                            (card_id, card_name, oracle_id, False)
-                        )
+                        candidates_by_key[front_key].append((*candidate, False))
                 unresolved_for_accent: list[str] = []
                 for key, candidates in candidates_by_key.items():
-                    exact = [
-                        (card_id, name, oracle_id)
-                        for card_id, name, oracle_id, is_exact in candidates
-                        if is_exact
-                    ]
+                    exact = [candidate[:-1] for candidate in candidates if candidate[-1]]
                     front = [
-                        (card_id, name, oracle_id)
-                        for card_id, name, oracle_id, is_exact in candidates
-                        if not is_exact
+                        candidate[:-1] for candidate in candidates if not candidate[-1]
                     ]
-                    status, card_id, kind, count, oracle_id = _classify_candidate_groups(
+                    (
+                        status,
+                        card_id,
+                        kind,
+                        count,
+                        oracle_id,
+                        canonical_card_id,
+                        canonical_reason,
+                    ) = _classify_candidate_groups(
                         exact=exact,
                         front=front,
                         accent=[],
@@ -296,6 +401,9 @@ def resolve_names(
                     elif status == "oracle_resolved" and oracle_id:
                         oracle_resolved[key] = oracle_id
                         oracle_resolved_kind[key] = kind
+                        if canonical_card_id and canonical_reason:
+                            oracle_canonical_card_id[key] = canonical_card_id
+                            oracle_canonical_reason[key] = canonical_reason
                     elif status == "ambiguous":
                         ambiguous[key] = count
                         ambiguous_kind[key] = kind
@@ -308,7 +416,16 @@ def resolve_names(
                         continue
                     cur.execute(
                         f"""
-                        SELECT id::text, name, {oracle_select_sql}
+                        SELECT
+                          id::text,
+                          name,
+                          {oracle_select_sql},
+                          scryfall_id::text,
+                          set_code,
+                          collector_number,
+                          image_url,
+                          layout,
+                          rarity
                         FROM cards
                         WHERE lower(name) LIKE %s
                            OR lower(split_part(name, ' // ', 1)) LIKE %s
@@ -317,13 +434,46 @@ def resolve_names(
                         (f"%{token}%", f"%{token}%"),
                     )
                     key_accentless = accentless_name_key(key)
-                    accent_candidates: list[tuple[str, str, str | None]] = []
-                    for card_id, card_name, oracle_id in cur.fetchall():
+                    accent_candidates: list[tuple[Any, ...]] = []
+                    for row in cur.fetchall():
+                        (
+                            card_id,
+                            card_name,
+                            oracle_id,
+                            scryfall_id,
+                            set_code,
+                            collector_number,
+                            image_url,
+                            layout,
+                            rarity,
+                        ) = row
                         exact_key = accentless_name_key(card_name)
-                        front_key = accentless_name_key(str(card_name).split(" // ", 1)[0])
+                        front_key = accentless_name_key(
+                            str(card_name).split(" // ", 1)[0]
+                        )
                         if key_accentless in (exact_key, front_key):
-                            accent_candidates.append((card_id, card_name, oracle_id))
-                    status, card_id, kind, count, oracle_id = _classify_candidate_groups(
+                            accent_candidates.append(
+                                (
+                                    card_id,
+                                    card_name,
+                                    oracle_id,
+                                    scryfall_id,
+                                    set_code,
+                                    collector_number,
+                                    image_url,
+                                    layout,
+                                    rarity,
+                                )
+                            )
+                    (
+                        status,
+                        card_id,
+                        kind,
+                        count,
+                        oracle_id,
+                        canonical_card_id,
+                        canonical_reason,
+                    ) = _classify_candidate_groups(
                         exact=[],
                         front=[],
                         accent=accent_candidates,
@@ -334,6 +484,9 @@ def resolve_names(
                     elif status == "oracle_resolved" and oracle_id:
                         oracle_resolved[key] = oracle_id
                         oracle_resolved_kind[key] = kind
+                        if canonical_card_id and canonical_reason:
+                            oracle_canonical_card_id[key] = canonical_card_id
+                            oracle_canonical_reason[key] = canonical_reason
                     elif status == "ambiguous":
                         ambiguous[key] = count
                         ambiguous_kind[key] = kind
@@ -344,6 +497,8 @@ def resolve_names(
         ambiguous_kind,
         oracle_resolved,
         oracle_resolved_kind,
+        oracle_canonical_card_id,
+        oracle_canonical_reason,
         oracle_id_column_present,
     )
 
@@ -362,6 +517,8 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         ambiguous_kind,
         oracle_resolved,
         oracle_resolved_kind,
+        oracle_canonical_card_id,
+        oracle_canonical_reason,
         oracle_id_column_present,
     ) = resolve_names(unique_names)
     unresolved_names: Counter[str] = Counter()
@@ -369,6 +526,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
     resolved_kind_instances: Counter[str] = Counter()
     ambiguous_kind_instances: Counter[str] = Counter()
     oracle_resolved_kind_instances: Counter[str] = Counter()
+    canonical_printing_reason_instances: Counter[str] = Counter()
     totals = {
         "decks_seen": len(decks),
         "card_instances": 0,
@@ -399,6 +557,10 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
                 oracle_resolved_kind_instances[
                     oracle_resolved_kind.get(key, "unknown")
                 ] += qty
+                if key in oracle_canonical_card_id:
+                    canonical_printing_reason_instances[
+                        oracle_canonical_reason.get(key, "unknown")
+                    ] += qty
             elif key in ambiguous:
                 deck_ambiguous += qty
                 ambiguous_kind_instances[ambiguous_kind.get(key, "unknown")] += qty
@@ -453,8 +615,15 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         "unique_names": len(unique_names),
         "resolved_unique_names": len(resolved),
         "oracle_resolved_unique_names": len(oracle_resolved),
+        "canonical_printing_candidate_instances": sum(
+            canonical_printing_reason_instances.values()
+        ),
+        "canonical_printing_candidate_unique_names": len(oracle_canonical_card_id),
+        "canonical_printing_reason_instances": dict(
+            sorted(canonical_printing_reason_instances.items())
+        ),
         "ambiguous_unique_names": len(ambiguous),
-        "resolver_schema_version": "learned_opponent_identity_audit_v3_report_only",
+        "resolver_schema_version": "learned_opponent_identity_audit_v4_report_only",
         "oracle_id_column_present": oracle_id_column_present,
         "candidate_identity_policy": (
             "Exact card_id is trusted only when one PG cards row matches. "
@@ -463,6 +632,12 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
             "printing policy exists. If cards.oracle_id is absent, same-oracle "
             "resolution is unavailable and multiple printings remain ambiguous. "
             "Accent-normalized matches are diagnostic."
+        ),
+        "canonical_printing_policy": (
+            "Report-only. A card_id candidate is emitted only when one printing "
+            "has a unique highest evidence score from explicit fields such as "
+            "printing scryfall_id, direct Scryfall image, layout, collector "
+            "number, set code and rarity. Ties remain semantic-only."
         ),
         "persist_recommendation": (
             "do_not_apply_without_canonical_oracle_or_printing_policy"

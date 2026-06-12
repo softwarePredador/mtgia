@@ -440,6 +440,11 @@ Current production constraint verified on 2026-06-12 and coding status:
   `ambiguous_instances=0` and `unresolved_instances=0`. Learned-opponent replay
   can use semantic identity coverage, but persisted `card_id` remains blocked
   until a backend-owned canonical printing policy exists.
+- The v4 audit adds `canonical_printing_candidate_*` fields in report-only
+  mode. It emits a concrete `card_id` candidate only when one printing has a
+  unique highest evidence score from explicit fields (`scryfall_id` as printing
+  id, direct Scryfall image, layout, collector number, set code, rarity). Ties
+  remain semantic-only and must not be applied.
 
 Required behavior:
 

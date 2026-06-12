@@ -15,7 +15,15 @@ import audit_learned_opponent_card_identity as audit
 
 class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
     def test_candidate_classification_keeps_multiple_printings_ambiguous(self) -> None:
-        status, card_id, kind, count, oracle_id = audit._classify_candidate_groups(
+        (
+            status,
+            card_id,
+            kind,
+            count,
+            oracle_id,
+            canonical_card_id,
+            canonical_reason,
+        ) = audit._classify_candidate_groups(
             exact=[
                 ("printing-1", "Sol Ring"),
                 ("printing-2", "Sol Ring"),
@@ -27,11 +35,21 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
         self.assertEqual(status, "ambiguous")
         self.assertIsNone(card_id)
         self.assertIsNone(oracle_id)
+        self.assertIsNone(canonical_card_id)
+        self.assertIsNone(canonical_reason)
         self.assertEqual(kind, "multiple_printings_exact")
         self.assertEqual(count, 2)
 
     def test_candidate_classification_resolves_same_oracle_without_printing(self) -> None:
-        status, card_id, kind, count, oracle_id = audit._classify_candidate_groups(
+        (
+            status,
+            card_id,
+            kind,
+            count,
+            oracle_id,
+            canonical_card_id,
+            canonical_reason,
+        ) = audit._classify_candidate_groups(
             exact=[
                 ("printing-1", "Sol Ring", "oracle-sol-ring"),
                 ("printing-2", "Sol Ring", "oracle-sol-ring"),
@@ -43,6 +61,100 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
         self.assertEqual(status, "oracle_resolved")
         self.assertIsNone(card_id)
         self.assertEqual(oracle_id, "oracle-sol-ring")
+        self.assertIsNone(canonical_card_id)
+        self.assertIsNone(canonical_reason)
+        self.assertEqual(kind, "multiple_printings_same_oracle_exact")
+        self.assertEqual(count, 2)
+
+    def test_candidate_classification_reports_unique_canonical_candidate(self) -> None:
+        (
+            status,
+            card_id,
+            kind,
+            count,
+            oracle_id,
+            canonical_card_id,
+            canonical_reason,
+        ) = audit._classify_candidate_groups(
+            exact=[
+                (
+                    "legacy-row",
+                    "Lorehold, the Historian",
+                    "oracle-lorehold",
+                    "oracle-lorehold",
+                    "psos",
+                    "284",
+                    "https://api.scryfall.com/cards/named?exact=Lorehold",
+                    None,
+                    None,
+                ),
+                (
+                    "printing-row",
+                    "Lorehold, the Historian",
+                    "oracle-lorehold",
+                    "scryfall-printing-id",
+                    "sos",
+                    "201",
+                    "https://cards.scryfall.io/normal/front/x/y/card.jpg",
+                    "normal",
+                    "mythic",
+                ),
+            ],
+            front=[],
+            accent=[],
+        )
+
+        self.assertEqual(status, "oracle_resolved")
+        self.assertIsNone(card_id)
+        self.assertEqual(oracle_id, "oracle-lorehold")
+        self.assertEqual(canonical_card_id, "printing-row")
+        self.assertIn("unique_highest_score", canonical_reason or "")
+        self.assertEqual(kind, "multiple_printings_same_oracle_exact")
+        self.assertEqual(count, 2)
+
+    def test_candidate_classification_does_not_break_ties(self) -> None:
+        (
+            status,
+            card_id,
+            kind,
+            count,
+            oracle_id,
+            canonical_card_id,
+            canonical_reason,
+        ) = audit._classify_candidate_groups(
+            exact=[
+                (
+                    "printing-a",
+                    "Sol Ring",
+                    "oracle-sol-ring",
+                    "scryfall-a",
+                    "set",
+                    "1",
+                    "https://cards.scryfall.io/normal/front/a/card.jpg",
+                    "normal",
+                    "rare",
+                ),
+                (
+                    "printing-b",
+                    "Sol Ring",
+                    "oracle-sol-ring",
+                    "scryfall-b",
+                    "set",
+                    "2",
+                    "https://cards.scryfall.io/normal/front/b/card.jpg",
+                    "normal",
+                    "rare",
+                ),
+            ],
+            front=[],
+            accent=[],
+        )
+
+        self.assertEqual(status, "oracle_resolved")
+        self.assertIsNone(card_id)
+        self.assertEqual(oracle_id, "oracle-sol-ring")
+        self.assertIsNone(canonical_card_id)
+        self.assertIsNone(canonical_reason)
         self.assertEqual(kind, "multiple_printings_same_oracle_exact")
         self.assertEqual(count, 2)
 
@@ -52,7 +164,15 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
             audit.accentless_name_key("Lim-Dul's Vault"),
         )
 
-        status, card_id, kind, count, oracle_id = audit._classify_candidate_groups(
+        (
+            status,
+            card_id,
+            kind,
+            count,
+            oracle_id,
+            canonical_card_id,
+            canonical_reason,
+        ) = audit._classify_candidate_groups(
             exact=[],
             front=[],
             accent=[("card-1", "Lim-Dûl's Vault", "oracle-lim-dul")],
@@ -61,6 +181,8 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
         self.assertEqual(status, "resolved")
         self.assertEqual(card_id, "card-1")
         self.assertEqual(oracle_id, "oracle-lim-dul")
+        self.assertIsNone(canonical_card_id)
+        self.assertIsNone(canonical_reason)
         self.assertEqual(kind, "accent_normalized")
         self.assertEqual(count, 1)
 
@@ -142,6 +264,8 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
                 {"ambiguous front": "multiple_printings_front"},
                 {"padding card 1": "oracle-padding-1"},
                 {"padding card 1": "multiple_printings_same_oracle_exact"},
+                {"padding card 1": "canonical-padding-id"},
+                {"padding card 1": "unique_highest_score:9:printing_id"},
                 True,
             ),
         ), mock.patch.object(
@@ -163,6 +287,12 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
             summary["oracle_resolved_kind_instances"],
             {"multiple_printings_same_oracle_exact": 1},
         )
+        self.assertEqual(summary["canonical_printing_candidate_instances"], 1)
+        self.assertEqual(summary["canonical_printing_candidate_unique_names"], 1)
+        self.assertEqual(
+            summary["canonical_printing_reason_instances"],
+            {"unique_highest_score:9:printing_id": 1},
+        )
         self.assertEqual(
             summary["ambiguous_kind_instances"],
             {"multiple_printings_front": 1},
@@ -171,9 +301,10 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
         self.assertEqual(summary["semantic_identity_coverage"], round(3 / 44, 6))
         self.assertEqual(
             summary["resolver_schema_version"],
-            "learned_opponent_identity_audit_v3_report_only",
+            "learned_opponent_identity_audit_v4_report_only",
         )
         self.assertTrue(summary["oracle_id_column_present"])
+        self.assertIn("Report-only", summary["canonical_printing_policy"])
         self.assertIn("do_not_apply", summary["persist_recommendation"])
         self.assertIn(("Mystery Missing", 1), summary["unresolved_top"])
         self.assertEqual(summary["ambiguous_top"], [("Ambiguous Front", 1)])
