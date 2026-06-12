@@ -9,6 +9,7 @@ battle and how deckbuilding should categorize it.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -145,6 +146,77 @@ def _safe_json_loads(value: str | None) -> dict[str, Any]:
     return decoded if isinstance(decoded, dict) else {}
 
 
+def stable_json(value: Any) -> str:
+    return json.dumps(
+        value,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+
+
+def _first_present(*values: Any) -> Any:
+    for value in values:
+        if value not in (None, "", [], {}):
+            return value
+    return None
+
+
+def logical_rule_key(rule: dict[str, Any]) -> str:
+    """Return a stable key for equivalent battle-rule semantics.
+
+    Provenance/review metadata is intentionally excluded. Cards can still keep
+    multiple rules: only duplicate rows with the same face/variant/effect/deck
+    role collapse to the same key for replay/audit evidence.
+    """
+    effect = rule.get("effect_json") or rule.get("effect") or {}
+    deck_role = rule.get("deck_role_json") or rule.get("deck_role") or {}
+    if isinstance(effect, str):
+        effect = _safe_json_loads(effect)
+    if isinstance(deck_role, str):
+        deck_role = _safe_json_loads(deck_role)
+    if not isinstance(effect, dict):
+        effect = {}
+    if not isinstance(deck_role, dict):
+        deck_role = {}
+    payload = {
+        "effect": effect,
+        "deck_role": deck_role,
+        "face_name": _first_present(
+            rule.get("face_name"),
+            effect.get("face_name"),
+            deck_role.get("face_name"),
+        ),
+        "face_index": _first_present(
+            rule.get("face_index"),
+            effect.get("face_index"),
+            deck_role.get("face_index"),
+        ),
+        "variant_kind": _first_present(
+            rule.get("variant_kind"),
+            effect.get("variant_kind"),
+            deck_role.get("variant_kind"),
+        ),
+        "ability_kind": _first_present(
+            rule.get("ability_kind"),
+            effect.get("ability_kind"),
+            deck_role.get("ability_kind"),
+        ),
+        "timing_window": _first_present(
+            rule.get("timing_window"),
+            effect.get("timing_window"),
+            deck_role.get("timing_window"),
+        ),
+        "source_zone": _first_present(
+            rule.get("source_zone"),
+            effect.get("source_zone"),
+            deck_role.get("source_zone"),
+        ),
+    }
+    digest = hashlib.sha256(stable_json(payload).encode("utf-8")).hexdigest()
+    return f"battle_rule_v1:{digest[:32]}"
+
+
 def _db_mtime(db_path: Path) -> int | None:
     try:
         return int(db_path.stat().st_mtime_ns)
@@ -173,7 +245,7 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
         rows = conn.execute(
             """
             SELECT normalized_name, card_name, effect_json, deck_role_json,
-                   source, confidence, review_status, rule_version, notes
+                   source, confidence, review_status, rule_version, oracle_hash, notes
             FROM battle_card_rules
             WHERE review_status IN ('verified', 'needs_review', 'active')
             """
@@ -185,17 +257,22 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
 
     rules: dict[str, dict[str, Any]] = {}
     for row in rows:
-        rules[row["normalized_name"]] = {
+        effect_json = _safe_json_loads(row["effect_json"])
+        deck_role_json = _safe_json_loads(row["deck_role_json"])
+        rule = {
             "normalized_name": row["normalized_name"],
             "card_name": row["card_name"],
-            "effect_json": _safe_json_loads(row["effect_json"]),
-            "deck_role_json": _safe_json_loads(row["deck_role_json"]),
+            "effect_json": effect_json,
+            "deck_role_json": deck_role_json,
             "source": row["source"],
             "confidence": row["confidence"],
             "review_status": row["review_status"],
             "rule_version": row["rule_version"],
+            "oracle_hash": row["oracle_hash"],
             "notes": row["notes"],
         }
+        rule["logical_rule_key"] = logical_rule_key(rule)
+        rules[row["normalized_name"]] = rule
     _RULE_CACHE[cache_key] = (mtime, rules)
     return {key: dict(value) for key, value in rules.items()}
 

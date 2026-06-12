@@ -82,6 +82,7 @@ def register_tests(battle, player, card, module_path):
                 source="manual",
                 confidence=1.0,
                 review_status="verified",
+                oracle_hash="unit-oracle-hash",
                 notes="Unit test rule.",
             )
             conn.commit()
@@ -100,6 +101,11 @@ def register_tests(battle, player, card, module_path):
 
                 assert effect["effect"] == "counter"
                 assert effect["_rule_source"] == "manual"
+                assert effect["_rule_logical_key"].startswith("battle_rule_v1:")
+                assert effect["_rule_oracle_hash"] == "unit-oracle-hash"
+                replay_fields = battle.replay_rule_fields(effect)
+                assert replay_fields["rule_logical_key"] == effect["_rule_logical_key"]
+                assert replay_fields["rule_oracle_hash"] == "unit-oracle-hash"
                 assert battle.is_instant({"name": "Registry Counter", "type_line": "Instant"})
             finally:
                 battle.DB = old_db

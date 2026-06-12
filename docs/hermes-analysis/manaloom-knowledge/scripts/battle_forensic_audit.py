@@ -248,6 +248,10 @@ def event_effect(event: dict[str, Any], rule: dict[str, Any] | None) -> str:
     return "unknown"
 
 
+def event_logical_rule_key(event: dict[str, Any], rule: dict[str, Any] | None) -> str:
+    return str(event.get("rule_logical_key") or (rule or {}).get("logical_rule_key") or "")
+
+
 def audit_rule_provenance(
     events: list[dict[str, Any]],
     rules: dict[str, dict[str, Any]],
@@ -258,6 +262,8 @@ def audit_rule_provenance(
     by_effect: Counter[str] = Counter()
     cards_by_status: dict[str, set[str]] = defaultdict(set)
     cards_by_source: dict[str, set[str]] = defaultdict(set)
+    by_logical_rule_key: Counter[str] = Counter()
+    missing_logical_rule_key = 0
     unique_cards: set[str] = set()
 
     for event in events:
@@ -270,9 +276,14 @@ def audit_rule_provenance(
         source = event_rule_source(event, rule)
         status = event_review_status(event, rule)
         effect = event_effect(event, rule)
+        logical_key = event_logical_rule_key(event, rule)
         by_source[source] += 1
         by_status[status] += 1
         by_effect[effect] += 1
+        if logical_key:
+            by_logical_rule_key[logical_key] += 1
+        else:
+            missing_logical_rule_key += 1
         if card:
             cards_by_status[status].add(card)
             cards_by_source[source].add(card)
@@ -369,6 +380,9 @@ def audit_rule_provenance(
         "by_source": dict(sorted(by_source.items())),
         "by_status": dict(sorted(by_status.items())),
         "by_effect": dict(sorted(by_effect.items())),
+        "rule_logical_key_present": sum(by_logical_rule_key.values()),
+        "rule_logical_key_missing": missing_logical_rule_key,
+        "by_rule_logical_key": dict(by_logical_rule_key.most_common(40)),
         "cards_by_status": {
             status: sorted(cards)[:40] for status, cards in sorted(cards_by_status.items())
         },
@@ -420,6 +434,8 @@ def render_report(
         f"- structured_events: {len(events)}",
         f"- card_events: {summary.get('card_event_count', 0)}",
         f"- unique_cards_seen: {summary.get('unique_cards', 0)}",
+        f"- rule_logical_key_present: {summary.get('rule_logical_key_present', 0)}",
+        f"- rule_logical_key_missing: {summary.get('rule_logical_key_missing', 0)}",
         f"- findings_total: {len(all_findings)}",
         f"- critical: {counts.get('critical', 0)}",
         f"- high: {counts.get('high', 0)}",
@@ -440,6 +456,12 @@ def render_report(
     lines.extend(render_counter_table("Rule Sources Used", summary.get("by_source", {})))
     lines.extend(render_counter_table("Review Status Used", summary.get("by_status", {})))
     lines.extend(render_counter_table("Effects Seen", summary.get("by_effect", {})))
+    lines.extend(
+        render_counter_table(
+            "Rule Logical Keys Seen",
+            summary.get("by_rule_logical_key", {}),
+        )
+    )
 
     lines.extend(
         [

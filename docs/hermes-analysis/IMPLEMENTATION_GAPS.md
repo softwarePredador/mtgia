@@ -601,7 +601,7 @@ Hermes + testes.
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
-| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline | Adicionar `card_id`, `semantic_hash`, `variant_kind`, `source_zone`, `alternative_cost_kind`, `review_status`, `rule_version` |
+| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash` e contagem de cobertura no forensic, sem mudar execução | Próximo passo: adicionar `card_id` e `semantic_hash` por evento quando o payload de carta/replay carregar IDs estáveis; manter `needs_review` sem comportamento hard |
 | P2 | Lorehold no-mox é política manual, não heurística universal | Learned deck 82 remove `Chrome Mox`, `Mox Diamond`, `Mox Opal` por decisão do produto | Não generalizar bloqueio de Mox para todos os comandantes/brackets sem regra explícita |
 | P2 | Decisões de produto base aprovadas; exceções ainda precisam validação | `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` registra os defaults aprovados em 2026-06-11 | Seguir Slice 1; qualquer mudança fora dos defaults exige nova validação |
 
@@ -626,6 +626,13 @@ Slice 4 adicionou derivação report-only de `card_battle_rules_v1` para
 `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` corrigiu o mapeamento de
 efeitos concretos de recursão para `recursion` em vez de `engine`; o relatório
 atual propõe `89` candidatos, sendo `30` low-risk review e `59` manual-review.
+Slice 5 adicionou proveniência semântica de replay sem alterar comportamento:
+`battle_rule_registry.py` agora calcula `logical_rule_key` e carrega
+`oracle_hash`; `battle_analyst_v9.py` propaga esses campos para eventos via
+`replay_rule_fields`; `battle_forensic_audit.py` mede
+`rule_logical_key_present`, `rule_logical_key_missing` e top keys. Evidência em
+`BATTLE_REPLAY_SEMANTIC_PROVENANCE_SLICE_2026-06-12.md`. Ainda pendem
+`card_id` e `semantic_hash` por evento.
 
 ### Ordem recomendada de implementação
 
@@ -636,12 +643,14 @@ atual propõe `89` candidatos, sendo `30` low-risk review e `59` manual-review.
 3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; usar o modo
    `--allowlist` apenas para dry-run versionado; manter os 59 candidatos
    scope-sensitive como manual-only até existir taxonomia/faces suficiente.
-4. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
+4. Adicionar `card_id`/`semantic_hash` ao payload de replay sem depender de
+   nome de carta como chave.
+5. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
-5. Formalizar identidade semântica de carta e faces antes de expandir regras
+6. Formalizar identidade semântica de carta e faces antes de expandir regras
    DFC/MDFC.
-6. Só depois evoluir learned decks para dois comandantes.
-7. Só depois usar feedback ML como input de política.
+7. Só depois evoluir learned decks para dois comandantes.
+8. Só depois usar feedback ML como input de política.
 
 ### Critério de bloqueio
 

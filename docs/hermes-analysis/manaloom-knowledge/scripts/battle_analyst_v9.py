@@ -2738,6 +2738,8 @@ def with_rule_metadata(
     review_status="heuristic",
     confidence=0.0,
     rule_version=None,
+    logical_rule_key=None,
+    oracle_hash=None,
 ):
     annotated = dict(effect_data)
     annotated.setdefault("_rule_source", source)
@@ -2745,17 +2747,33 @@ def with_rule_metadata(
     annotated.setdefault("_rule_confidence", confidence)
     if rule_version is not None:
         annotated.setdefault("_rule_version", rule_version)
+    if logical_rule_key:
+        annotated.setdefault("_rule_logical_key", logical_rule_key)
+    if oracle_hash:
+        annotated.setdefault("_rule_oracle_hash", oracle_hash)
     return annotated
 
 
 def replay_rule_fields(effect_data):
     """Expose rule provenance in structured replay events."""
-    return {
+    fields = {
         "rule_source": effect_data.get("_rule_source", "unknown"),
         "rule_review_status": effect_data.get("_rule_review_status", "unknown"),
         "rule_confidence": effect_data.get("_rule_confidence", 0.0),
         "rule_version": effect_data.get("_rule_version"),
     }
+    optional_fields = {
+        "rule_logical_key": effect_data.get("_rule_logical_key"),
+        "rule_oracle_hash": effect_data.get("_rule_oracle_hash"),
+        "variant_kind": effect_data.get("variant_kind"),
+        "source_zone": effect_data.get("source_zone"),
+        "alternative_cost_kind": effect_data.get("alternative_cost_kind")
+        or effect_data.get("alternate_cost_kind"),
+    }
+    for key, value in optional_fields.items():
+        if value not in (None, "", [], {}):
+            fields[key] = value
+    return fields
 
 
 # ── KNOWN_CARDS Auto-Generator Loader (v8.4) ──
@@ -2790,6 +2808,8 @@ def get_card_effect(card):
                 review_status=rule.get("review_status", "unknown"),
                 confidence=rule.get("confidence", 0.0),
                 rule_version=rule.get("rule_version"),
+                logical_rule_key=rule.get("logical_rule_key"),
+                oracle_hash=rule.get("oracle_hash"),
             )
             return normalize_effect_by_oracle(card, effect)
     if name in KNOWN_CARDS:
