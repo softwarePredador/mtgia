@@ -26,6 +26,9 @@ void main() {
 
     test('AI matchup and weakness routes do not read private decks by id only',
         () {
+      final simulate = File(
+        'routes/ai/simulate/index.dart',
+      ).readAsStringSync();
       final matchup = File(
         'routes/ai/simulate-matchup/index.dart',
       ).readAsStringSync();
@@ -33,6 +36,13 @@ void main() {
         'routes/ai/weakness-analysis/index.dart',
       ).readAsStringSync();
 
+      expect(simulate, contains('final userId = context.read<String>()'));
+      expect(simulate, contains('JOIN decks d ON d.id = dc.deck_id'));
+      expect(simulate, contains('d.user_id = CAST(@userId AS uuid)'));
+      expect(
+        simulate,
+        contains('OR (CAST(@allowPublic AS boolean) AND d.is_public = true)'),
+      );
       expect(matchup, contains('final userId = context.read<String>()'));
       expect(matchup, contains('user_id = CAST(@user_id AS uuid)'));
       expect(

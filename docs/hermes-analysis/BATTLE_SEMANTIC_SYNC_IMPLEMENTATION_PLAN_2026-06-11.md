@@ -872,3 +872,20 @@ normalizing `/opt/data/workspace/mtgia` to `hermes:hermes` inside the container;
 the post-check returned `NON_GIT_COUNT=0` and `ROOT_ANY_COUNT=0`. Keep monitoring
 this because future `docker exec` maintenance commands run as root unless
 explicitly changed.
+
+### Update 2026-06-12n - `/ai/simulate` owner-scope hardening
+
+The app-facing `POST /ai/simulate` route remains experimental/lightweight, but
+its deck reads now follow the same source-of-truth boundary as the rest of the
+deck APIs:
+
+- the primary `deck_id` must belong to the authenticated user;
+- `opponent_deck_id`, when required by `matchup` or `battle`, can be owned by
+  the caller or public;
+- the route source guard now covers `/ai/simulate`, not only
+  `/ai/simulate-matchup` and weakness analysis;
+- API docs explicitly state that `type=battle` uses the lightweight Dart
+  simulator, not the Hermes Python Commander engine.
+
+This fixes private-deck-by-id exposure risk without changing the strategic
+decision that Hermes Python remains the richer lab engine.

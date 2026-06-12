@@ -22,13 +22,14 @@ import '../../../lib/logger.dart';
 /// Types:
 /// - goldfish: Monte Carlo de mãos iniciais (rápido, 1000 simulações)
 /// - matchup: Análise heurística de matchup entre dois decks
-/// - battle: Simulação turno-a-turno completa (lento, 1 partida detalhada)
+/// - battle: Simulação turno-a-turno simplificada/experimental
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
   }
 
   final pool = context.read<Pool>();
+  final userId = context.read<String>();
 
   try {
     final body = await context.request.body();
@@ -42,20 +43,29 @@ Future<Response> onRequest(RequestContext context) async {
     final simType = (data['type'] as String?) ?? 'goldfish';
     final simCount = (data['simulations'] as int?) ?? 1000;
 
-    // Busca cartas do deck
-    final deckCards = await _fetchDeckCards(pool, deckId);
+    // Busca cartas do deck principal sempre dentro do escopo do usuário.
+    final deckCards = await _fetchDeckCards(
+      pool,
+      deckId,
+      userId: userId,
+    );
     if (deckCards.isEmpty) {
       return notFound('Deck not found or empty');
     }
 
     if (simType == 'battle') {
-      // Simulação turno-a-turno completa
+      // Simulação turno-a-turno simplificada/experimental.
       final opponentId = data['opponent_deck_id'] as String?;
       if (opponentId == null || opponentId.isEmpty) {
         return badRequest('opponent_deck_id is required for battle simulation');
       }
 
-      final opponentCards = await _fetchDeckCards(pool, opponentId);
+      final opponentCards = await _fetchDeckCards(
+        pool,
+        opponentId,
+        userId: userId,
+        allowPublic: true,
+      );
       if (opponentCards.isEmpty) {
         return notFound('Opponent deck not found or empty');
       }
@@ -88,10 +98,16 @@ Future<Response> onRequest(RequestContext context) async {
       // Análise heurística de matchup
       final opponentId = data['opponent_deck_id'] as String?;
       if (opponentId == null || opponentId.isEmpty) {
-        return badRequest('opponent_deck_id is required for matchup simulation');
+        return badRequest(
+            'opponent_deck_id is required for matchup simulation');
       }
 
-      final opponentCards = await _fetchDeckCards(pool, opponentId);
+      final opponentCards = await _fetchDeckCards(
+        pool,
+        opponentId,
+        userId: userId,
+        allowPublic: true,
+      );
       if (opponentCards.isEmpty) {
         return notFound('Opponent deck not found or empty');
       }
@@ -146,7 +162,12 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 /// Busca cartas de um deck com todos os dados necessários
-Future<List<Map<String, dynamic>>> _fetchDeckCards(Pool pool, String deckId) async {
+Future<List<Map<String, dynamic>>> _fetchDeckCards(
+  Pool pool,
+  String deckId, {
+  required String userId,
+  bool allowPublic = false,
+}) async {
   final result = await pool.execute(
     Sql.named('''
       SELECT 
@@ -161,10 +182,19 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(Pool pool, String deckId) asy
         dc.quantity,
         dc.is_commander
       FROM deck_cards dc
+      JOIN decks d ON d.id = dc.deck_id
       JOIN cards c ON c.id = dc.card_id
-      WHERE dc.deck_id = @deckId
+      WHERE dc.deck_id = CAST(@deckId AS uuid)
+        AND (
+          d.user_id = CAST(@userId AS uuid)
+          OR (CAST(@allowPublic AS boolean) AND d.is_public = true)
+        )
     '''),
-    parameters: {'deckId': deckId},
+    parameters: {
+      'deckId': deckId,
+      'userId': userId,
+      'allowPublic': allowPublic,
+    },
   );
 
   return result.map((row) {
