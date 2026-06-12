@@ -22,6 +22,15 @@ void main() {
         recommendations,
         contains('AND user_id = CAST(@userId AS uuid)'),
       );
+      expect(
+        recommendations,
+        contains(
+            "import '../../../../lib/ai/optimization_functional_roles.dart'"),
+      );
+      expect(recommendations, contains('resolveCardFunctionalRoles('));
+      expect(recommendations, contains("'card_function_tags'"));
+      expect(recommendations, contains("'card_semantic_tags_v2'"));
+      expect(recommendations, contains('semantic_tags_v2'));
     });
 
     test('AI matchup and weakness routes do not read private decks by id only',

@@ -7,6 +7,7 @@ import 'package:dotenv/dotenv.dart';
 import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/openai_runtime_config.dart';
 import '../../../../lib/ai/edhrec_trend_service.dart';
+import '../../../../lib/ai/optimization_functional_roles.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method == HttpMethod.post) {
@@ -44,6 +45,8 @@ Future<Response> _generateRecommendations(
     final deckName = deck['name'] as String? ?? '';
     final format = deck['format'] as String? ?? 'commander';
     final description = deck['description'] as String? ?? '';
+    final functionalTagsSelect = await _functionalTagsSelectSql(pool);
+    final semanticV2Select = await _semanticV2SelectSql(pool);
 
     // ─── 2. Buscar cartas do deck com detalhes ────────────────
     final cardsResult = await pool.execute(
@@ -60,7 +63,9 @@ Future<Response> _generateRecommendations(
                    END
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
-               ) as cmc
+               ) as cmc,
+               $functionalTagsSelect,
+               $semanticV2Select
         FROM deck_cards dc
         JOIN cards c ON dc.card_id = c.id
         WHERE dc.deck_id = @deckId
@@ -93,6 +98,17 @@ Future<Response> _generateRecommendations(
       final quantity = row[5] as int;
       final isCommander = row[6] as bool? ?? false;
       final cmc = (row[7] as num?)?.toDouble() ?? 0;
+      final functionalTags = row[8];
+      final semanticTagsV2 = row[9];
+      final resolvedRoles = resolveCardFunctionalRoles(
+        functionalTags: functionalTags,
+        semanticTagsV2: semanticTagsV2,
+        oracleText: oracleText,
+        typeLine: typeLine,
+        name: name,
+        manaCost: manaCost,
+        cmc: cmc,
+      ).roles;
 
       deckColors.addAll(colors);
       deckCardNames.add(name.toLowerCase());
@@ -108,6 +124,8 @@ Future<Response> _generateRecommendations(
         'quantity': quantity,
         'is_commander': isCommander,
         'cmc': cmc,
+        'functional_tags': functionalTags,
+        'semantic_tags_v2': semanticTagsV2,
       });
 
       final tl = typeLine.toLowerCase();
@@ -119,29 +137,37 @@ Future<Response> _generateRecommendations(
       }
       if (tl.contains('creature')) creatureCount += quantity;
 
-      // Categorias funcionais
-      if (oracleText.contains('add {') ||
+      final heuristicRamp = oracleText.contains('add {') ||
           (oracleText.contains('search your library for a') &&
               oracleText.contains('land')) ||
-          oracleText.contains('put a land card')) {
-        rampCount += quantity;
-      }
-      if (oracleText.contains('draw') && oracleText.contains('card')) {
-        drawCount += quantity;
-      }
-      if (oracleText.contains('destroy target') ||
+          oracleText.contains('put a land card');
+      final heuristicDraw =
+          oracleText.contains('draw') && oracleText.contains('card');
+      final heuristicRemoval = oracleText.contains('destroy target') ||
           oracleText.contains('exile target') ||
           (oracleText.contains('deal') &&
-              oracleText.contains('damage to target'))) {
+              oracleText.contains('damage to target'));
+      final heuristicBoardWipe = oracleText.contains('destroy all') ||
+          oracleText.contains('exile all');
+      final heuristicProtection = oracleText.contains('hexproof') ||
+          oracleText.contains('indestructible') ||
+          oracleText.contains('protection from');
+
+      // Categorias funcionais: tags persistidas/semantic v2 primeiro,
+      // heurística textual apenas como fallback.
+      if (resolvedRoles.contains('ramp') || heuristicRamp) {
+        rampCount += quantity;
+      }
+      if (resolvedRoles.contains('draw') || heuristicDraw) {
+        drawCount += quantity;
+      }
+      if (resolvedRoles.contains('removal') || heuristicRemoval) {
         removalCount += quantity;
       }
-      if (oracleText.contains('destroy all') ||
-          oracleText.contains('exile all')) {
+      if (resolvedRoles.contains('board_wipe') || heuristicBoardWipe) {
         boardWipeCount += quantity;
       }
-      if (oracleText.contains('hexproof') ||
-          oracleText.contains('indestructible') ||
-          oracleText.contains('protection from')) {
+      if (resolvedRoles.contains('protection') || heuristicProtection) {
         protectionCount += quantity;
       }
     }
@@ -431,6 +457,68 @@ Future<Response> _generateRecommendations(
       body: {'error': 'Failed to generate recommendations: $e'},
     );
   }
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = @tableName
+      )
+    '''),
+    parameters: {'tableName': tableName},
+  );
+  return result.isNotEmpty && result.first[0] == true;
+}
+
+Future<String> _functionalTagsSelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_function_tags');
+  if (!exists) return "'[]'::jsonb AS functional_tags";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tag', cft.tag,
+                       'confidence', cft.confidence,
+                       'evidence', cft.evidence,
+                       'source', cft.source
+                     )
+                     ORDER BY cft.confidence DESC, cft.tag
+                   )
+                   FROM card_function_tags cft
+                   WHERE cft.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS functional_tags''';
+}
+
+Future<String> _semanticV2SelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_semantic_tags_v2');
+  if (!exists) return "'[]'::jsonb AS semantic_tags_v2";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tags', cstv2.tags,
+                       'role_confidence', cstv2.role_confidence,
+                       'engine', cstv2.engine,
+                       'payoff', cstv2.payoff,
+                       'enabler', cstv2.enabler,
+                       'wincon', cstv2.wincon,
+                       'combo_piece', cstv2.combo_piece
+                     )
+                     ORDER BY cstv2.role_confidence DESC, cstv2.source
+                   )
+                   FROM card_semantic_tags_v2 cstv2
+                   WHERE cstv2.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS semantic_tags_v2''';
 }
 
 /// Busca cartas reais do banco que preenchem uma categoria funcional

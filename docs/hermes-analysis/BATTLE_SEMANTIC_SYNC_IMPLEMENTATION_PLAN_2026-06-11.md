@@ -914,3 +914,15 @@ migration so new databases start with the same shape as production-like schemas.
 Hermes report-only then flagged that `database_indexes.sql` still missed the
 standalone `simulation_type` and `created_at` indexes from migration 005; that
 index file is now aligned as well.
+
+### Update 2026-06-12p - `/decks/:id/recommendations` semantic role counts
+
+The legacy/experimental recommendations route now joins the shared semantic
+role pipeline for its internal category counts. When `card_function_tags` and
+`card_semantic_tags_v2` exist, the route loads them per card and calls
+`resolveCardFunctionalRoles` before falling back to legacy oracle-text
+heuristics. This reduces drift between deck analysis, optimize quality gates and
+recommendations for ramp/draw/removal/board-wipe/protection counts. The route is
+still experimental and `/ai/optimize` remains the preferred app-facing
+optimization path; the fallback recommender still has legacy hardcoded staples
+and impact proxies that should not be treated as canonical AI policy.
