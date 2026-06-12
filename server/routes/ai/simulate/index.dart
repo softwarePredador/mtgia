@@ -231,15 +231,43 @@ Future<void> _saveSimulation({
     ''');
 
     if (tableExists.isNotEmpty && tableExists.first[0] == true) {
+      final columns = await pool.execute('''
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'battle_simulations'
+          AND column_name IN ('simulation_type', 'metrics')
+      ''');
+      final availableColumns =
+          columns.map((row) => row[0]?.toString()).whereType<String>().toSet();
+      final hasSimulationType = availableColumns.contains('simulation_type');
+      final hasMetrics = availableColumns.contains('metrics');
+      final payload = {'type': type, ...result};
+
       await pool.execute(
-        Sql.named('''
-          INSERT INTO battle_simulations (deck_a_id, deck_b_id, game_log)
-          VALUES (@deckAId, @deckBId, @gameLog::jsonb)
-        '''),
+        Sql.named(
+          '''
+          INSERT INTO battle_simulations (
+            deck_a_id,
+            deck_b_id,
+            game_log
+            ${hasSimulationType ? ', simulation_type' : ''}
+            ${hasMetrics ? ', metrics' : ''}
+          )
+          VALUES (
+            @deckAId,
+            @deckBId,
+            @gameLog::jsonb
+            ${hasSimulationType ? ', @simulationType' : ''}
+            ${hasMetrics ? ', @metrics::jsonb' : ''}
+          )
+          ''',
+        ),
         parameters: {
           'deckAId': deckAId,
           'deckBId': deckBId,
-          'gameLog': jsonEncode({'type': type, ...result}),
+          'gameLog': jsonEncode(payload),
+          if (hasSimulationType) 'simulationType': type,
+          if (hasMetrics) 'metrics': jsonEncode(payload),
         },
       );
     }

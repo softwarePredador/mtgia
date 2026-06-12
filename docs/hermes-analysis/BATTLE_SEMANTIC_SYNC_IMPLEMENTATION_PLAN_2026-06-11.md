@@ -891,3 +891,23 @@ deck APIs:
 
 This fixes private-deck-by-id exposure risk without changing the strategic
 decision that Hermes Python remains the richer lab engine.
+
+### Update 2026-06-12o - `/ai/simulate` live authorization and persistence proof
+
+A live local backend test now covers the app-facing `POST /ai/simulate`
+authorization boundary:
+
+- user A cannot simulate user B private deck as the primary `deck_id`;
+- user A cannot use user B private deck as `opponent_deck_id`;
+- user A can use user B public deck as `opponent_deck_id`;
+- the test creates disposable decks through the public API and removes them in
+  teardown.
+
+That live run exposed a real persistence drift: migrated PostgreSQL schemas have
+`battle_simulations.simulation_type NOT NULL`, but the route still inserted only
+`deck_a_id`, `deck_b_id` and `game_log`. The request returned success because the
+save path is intentionally best-effort, but ML/simulation telemetry was silently
+lost. The route now detects the migrated columns through `information_schema` and
+writes `simulation_type` plus `metrics` when available, while preserving
+compatibility with legacy local schemas. The base SQL schema was aligned with the
+migration so new databases start with the same shape as production-like schemas.

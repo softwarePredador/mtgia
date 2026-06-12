@@ -43,6 +43,12 @@ void main() {
         simulate,
         contains('OR (CAST(@allowPublic AS boolean) AND d.is_public = true)'),
       );
+      expect(
+          simulate, contains("column_name IN ('simulation_type', 'metrics')"));
+      expect(simulate, contains("contains('simulation_type')"));
+      expect(simulate, contains("contains('metrics')"));
+      expect(simulate, contains('@simulationType'));
+      expect(simulate, contains('@metrics::jsonb'));
       expect(matchup, contains('final userId = context.read<String>()'));
       expect(matchup, contains('user_id = CAST(@user_id AS uuid)'));
       expect(

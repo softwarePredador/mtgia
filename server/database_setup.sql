@@ -243,9 +243,11 @@ CREATE TABLE IF NOT EXISTS battle_simulations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
     deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    simulation_type TEXT NOT NULL DEFAULT 'legacy',
     winner_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
     turns_played INTEGER,
     game_log JSONB, -- Log completo passo-a-passo da partida (crucial para RL)
+    metrics JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
