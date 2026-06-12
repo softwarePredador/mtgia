@@ -176,6 +176,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
     }
     resolved, ambiguous = resolve_names(unique_names)
     unresolved_names: Counter[str] = Counter()
+    ambiguous_names: Counter[str] = Counter()
     totals = {
         "decks_seen": len(decks),
         "card_instances": 0,
@@ -200,6 +201,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
                 deck_resolved += qty
             elif key in ambiguous:
                 deck_ambiguous += qty
+                ambiguous_names[name] += qty
             else:
                 deck_unresolved += qty
                 unresolved_names[name] += qty
@@ -236,6 +238,7 @@ def audit(decks: list[dict[str, Any]]) -> dict[str, Any]:
         "resolved_unique_names": len(resolved),
         "ambiguous_unique_names": len(ambiguous),
         "unresolved_top": unresolved_names.most_common(20),
+        "ambiguous_top": ambiguous_names.most_common(20),
         "decks": deck_summaries,
         "apply": False,
     }

@@ -104,6 +104,7 @@ class LearnedOpponentCardIdentityAuditTests(unittest.TestCase):
         self.assertEqual(summary["ambiguous_instances"], 1)
         self.assertEqual(summary["resolution_coverage"], round(2 / 44, 6))
         self.assertIn(("Mystery Missing", 1), summary["unresolved_top"])
+        self.assertEqual(summary["ambiguous_top"], [("Ambiguous Front", 1)])
 
 
 if __name__ == "__main__":
