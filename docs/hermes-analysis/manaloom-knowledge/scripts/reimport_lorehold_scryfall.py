@@ -8,7 +8,15 @@ from datetime import date
 from collections import Counter
 
 sys.path.insert(0, "scripts")
-from scryfall_classifier import parse_decklist, fetch_cards, classify_card, build_deck_json
+from scryfall_classifier import (
+    _merge_user_override_tag,
+    _ordered_tag_names,
+    build_deck_json,
+    classify_card,
+    fetch_cards,
+    infer_functional_card_tags,
+    parse_decklist,
+)
 
 DECK_TEXT = """
 1x Ancient Copper Dragon (clb)
@@ -129,12 +137,21 @@ for c in parsed:
         card_data = fetched.get(clean, {})
     if card_data and card_data.get('object') == 'card':
         c['_scryfall'] = card_data
+        c['_tags'] = infer_functional_card_tags(
+            name=card_data.get('name', c['name']),
+            type_line=card_data.get('type_line', ''),
+            oracle_text=card_data.get('oracle_text', ''),
+            cmc=card_data.get('cmc', 0),
+        )
+        c['_functional_tags_json'] = _ordered_tag_names(c['_tags'])
         c['_tag'] = classify_card(card_data)
         c['_cmc'] = card_data.get('cmc', 0)
         c['_type_line'] = card_data.get('type_line', '')
         classified += 1
     else:
         c['_scryfall'] = {}
+        c['_tags'] = []
+        c['_functional_tags_json'] = []
         c['_tag'] = 'unknown'
         c['_cmc'] = 0
         c['_type_line'] = ''
@@ -167,6 +184,8 @@ for c in parsed:
         if old_tag != override:
             print(f"  Override: {c['name']:35s} {old_tag:15s} -> {override}")
         c['_tag'] = override
+        c['_tags'] = _merge_user_override_tag(c.get('_tags', []), override)
+        c['_functional_tags_json'] = _ordered_tag_names(c['_tags'])
 
 # Step 4: Build deck JSON
 print("\n[4/5] Building deck JSON...")
@@ -177,6 +196,13 @@ for c in parsed:
     if 'lorehold' in c['name'].lower() and 'historian' in c['name'].lower():
         commander_card = c
         commander_card['_tag'] = 'enabler'
+        commander_card['_tags'] = _merge_user_override_tag(
+            commander_card.get('_tags', []),
+            'enabler',
+        )
+        commander_card['_functional_tags_json'] = _ordered_tag_names(
+            commander_card['_tags'],
+        )
         c['_tag'] = 'enabler'
         break
 
@@ -189,6 +215,8 @@ for c in parsed:
         'set_code': c.get('set_code', ''),
         'tag_comment': c.get('tag_comment', ''),
         'functional_tag': c.get('_tag', 'unknown'),
+        'functional_tags_json': c.get('_functional_tags_json', []),
+        'tags': c.get('_tags', []),
         'cmc': c.get('_cmc', 0),
         'type_line': c.get('_type_line', ''),
         'is_commander': 1 if c == commander_card else 0,

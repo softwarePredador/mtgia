@@ -72,7 +72,7 @@ fase propria antes de qualquer automacao ampla de novos comandantes.
 | `wincon_pipeline.py` | MANUAL WINCON PIPELINE / COMPATIBLE | Desde 2026-06-12, hunter/scoring reconhecem wincon via membership em `card_deck_analysis.pg_roles`, com fallback para `role_in_deck='wincon'` quando `pg_roles` nao existe. |
 | `parse_collection.py` | COLLECTION IMPORT TOOL | Manter manual ate existir novo contrato de colecao multi-role. |
 | `gen_edgar_seed.py` | SEED GENERATOR | Seed historico/manual; migrar so se Edgar virar pipeline ativo. |
-| `reimport_lorehold_scryfall.py` | MANUAL REIMPORT | Pode continuar usando `functional_tag` como fallback de import. |
+| `reimport_lorehold_scryfall.py` | MANUAL REIMPORT / COMPATIBLE | Desde 2026-06-12, preserva `tags` e `functional_tags_json` no seed gerado pelo classificador Scryfall, mantendo `functional_tag` como papel primario legado. Continua manual e nao deve virar cron/apply sem gates de learned-deck. |
 | `evolve_lorehold_20260527_cycle2.py` | HISTORICAL EVOLUTION | Nao usar como automacao atual sem reescrever para arrays. |
 
 ## 5. Scripts historicos, debug ou pausados
