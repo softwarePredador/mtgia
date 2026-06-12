@@ -120,6 +120,29 @@ Result:
 }
 ```
 
+## Hermes AWS Validation
+
+After pushing commit `879644d2`, Hermes AWS pulled `origin/master` and ran:
+
+```bash
+cd /opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts
+python3 -m py_compile battle_rule_registry.py battle_analyst_v9.py battle_forensic_audit.py battle_replay_v10_3.py battle_card_import_tests.py test_battle_analyst_v10_3.py
+python3 test_battle_analyst_v10_3.py
+python3 battle_forensic_audit.py --generate 1 --seed 42 --json-report /tmp/hermes_battle_forensic_semantic_provenance.json
+```
+
+Result:
+
+```json
+{
+  "remote_head": "879644d2",
+  "card_event_count": 50,
+  "rule_logical_key_present": 49,
+  "rule_logical_key_missing": 1,
+  "by_rule_logical_key_count": 18
+}
+```
+
 ## Not Implemented In This Slice
 
 - `card_id` in every replay event.
