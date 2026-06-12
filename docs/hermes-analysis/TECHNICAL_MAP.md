@@ -204,11 +204,14 @@ mtgia/
   2026-06-12, `/decks/:id/recommendations` e `/ai/weakness-analysis` também
   passaram a carregar `card_function_tags`/`card_semantic_tags_v2` quando as
   tabelas existem e usam `resolveCardFunctionalRoles` para os contadores internos
-  de ramp/draw/removal/wipes/protection, mantendo fallback textual. O risco
-  restante ficou concentrado em heurísticas secundárias não estratégicas que
-  ainda precisam contrato interno explícito antes de serem tratadas como produto
-  principal.
-- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-07 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases localizados, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, os profiles/seeds de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, recomendacoes, mock runtime e prompt runtime por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/ai/optimize` quando `deckOptimizer == null`, `/decks/:id/recommendations`, `prompt.md` e `prompt_complete.md`). Em 2026-06-12, `/ai/weakness-analysis` deixou de retornar listas fixas de staples para fraquezas principais e passou a buscar sugestões no banco por tags/semântica/legalidade, com fallback genérico sem nomes. `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
+  de ramp/draw/removal/wipes/protection, mantendo fallback textual. No mesmo
+  ciclo, o fallback de `/decks/:id/recommendations` deixou de recomendar
+  `Command Tower` como literal fixo, deixou de usar raridade como proxy de
+  impacto e passou a buscar sugestões por tags/semântica/legalidade/identidade
+  de cor via PostgreSQL. O risco restante ficou concentrado em heurísticas
+  secundárias não estratégicas que ainda precisam contrato interno explícito
+  antes de serem tratadas como produto principal.
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-07 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases localizados, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, os profiles/seeds de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, mock runtime e prompt runtime por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/ai/optimize` quando `deckOptimizer == null`, `prompt.md` e `prompt_complete.md`). Em 2026-06-12, `/ai/weakness-analysis` deixou de retornar listas fixas de staples para fraquezas principais e `/decks/:id/recommendations` deixou de usar `Command Tower` literal e raridade como proxy; ambos passaram a buscar sugestões no banco por tags/semântica/legalidade, com fallback genérico sem nomes. `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
   2026-06-07 03:00 UTC no checkout local `ee74c6a9`. `LifeCounterScreen` segue
@@ -242,10 +245,11 @@ analysis segue mais proximo do fluxo desejado porque usa `card_function_tags` e
 delta ainda nao threadam `card_function_tags` persistidos e reduzem v2 a um
 role unico. Candidate quality tem uso parcial de `card_function_tags`, mas
 tambem usa normalizacao propria, bonus por nome e listas de escopo high-power.
-Weakness analysis continua fora do adapter compartilhado e recalcula buckets
-localmente com nomes fixos. Recommendations agora usa o adapter compartilhado
-para contar funções, mas ainda recomenda `Command Tower` diretamente e usa
-raridade como proxy de impacto no fallback. O mock de
+Weakness analysis e recommendations continuam fora de um service compartilhado,
+mas carregam dados persistidos e usam `resolveCardFunctionalRoles` para
+contadores internos. Em 2026-06-12, ambos os fallbacks deixaram de depender de
+listas fixas de staples; recommendations também deixou de recomendar
+`Command Tower` diretamente e removeu raridade como proxy de impacto. O mock de
 `/ai/optimize` sem `deckOptimizer` ainda retorna staples por nome. Os prompts
 runtime carregados por `otimizacao.dart` tambem contem exemplos fixos de cartas;
 idealmente esses exemplos devem ser gerados por policy/dados versionados, nao

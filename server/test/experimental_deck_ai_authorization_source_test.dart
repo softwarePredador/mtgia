@@ -122,6 +122,28 @@ void main() {
       }
     });
 
+    test(
+        'deck recommendations fallback is semantic DB-backed, not fixed staples',
+        () {
+      final recommendations = File(
+        'routes/decks/[id]/recommendations/index.dart',
+      ).readAsStringSync();
+
+      expect(recommendations, contains('_findCardsForCategory('));
+      expect(recommendations, contains('card_function_tags'));
+      expect(recommendations, contains('card_semantic_tags_v2'));
+      expect(recommendations, contains('card_legalities'));
+      expect(recommendations, contains('c.color_identity'));
+      expect(recommendations, contains('TypedValue(Type.textArray'));
+      expect(recommendations, contains('COALESCE(c.color_identity'));
+      expect(recommendations, contains('EXISTS ('));
+      expect(recommendations, isNot(contains("'card_name': 'Command Tower'")));
+      expect(
+          recommendations, isNot(contains("c.rarity IN ('rare', 'mythic')")));
+      expect(recommendations, isNot(contains('ARRAY[\$colorFilter]')));
+      expect(recommendations, isNot(contains('colorFilter')));
+    });
+
     test('following community feed has explicit app-facing route file', () {
       final dedicatedRoute = File(
         'routes/community/decks/following/index.dart',

@@ -77,6 +77,13 @@ Current remaining risk:
   validators/report-only summaries read `functional_tags_json` with fallback.
   Remaining risk is legacy/manual scripts still querying `functional_tag`
   directly.
+- Backend advisory routes are being reduced to PostgreSQL-backed semantics
+  without changing the app contract. In the 2026-06-12 cycle,
+  `/decks/:id/recommendations` kept its experimental response shape but moved
+  fallback additions away from fixed staple literals and rarity proxies, using
+  `card_function_tags`, `card_semantic_tags_v2`, `card_legalities` and
+  `cards.color_identity` when available. Hermes remains report-only for this
+  path; PostgreSQL/backend owns the decision returned to clients.
 - `deck_cards` is unique by `deck_id/card_id` in PostgreSQL, but Commander
   singleton legality is by card identity/name, not necessarily by printing id.
 - `cards.scryfall_id` is still not enough as the final semantic identity

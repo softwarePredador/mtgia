@@ -38,16 +38,20 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    de rodada própria os endpoints experimentais fora do caminho principal
    (`/ai/archetypes`, activation telemetry e rotas legacy/experimentais).
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-07 05:30 UTC no checkout `84a97d75`. Ainda ha excecoes por nome em
-   `functional_card_tags.dart`, `candidate_quality_data_support.dart`,
-   `optimize_runtime_support.dart`, `rebuild_guided_service.dart`,
-   `/decks/:id/recommendations`, `/ai/weakness-analysis`, no mock runtime de
-   `/ai/optimize` quando `deckOptimizer == null` e em prompts runtime carregados
-   por `otimizacao.dart`. A rodada separou exemplos de UI/import, comentarios,
-   seeds de busca, docs/corpus/artifacts/test fixtures e seeds Commander
-   Reference dos riscos reais. `edh_bracket_policy.dart` continua excecao
-   intencional por regra externa/curadoria de bracket, mas precisa manter
-   fonte/versionamento/teste dedicado.
+   2026-06-12. `/ai/weakness-analysis` e `/decks/:id/recommendations` deixaram
+   de retornar listas fixas de staples em seus fallbacks principais; a rota de
+   recommendations tambem removeu `Command Tower` literal e raridade como proxy
+   de impacto, passando a buscar sugestoes por `card_function_tags`,
+   `card_semantic_tags_v2`, `card_legalities` e `cards.color_identity` quando
+   disponiveis. Ainda ha excecoes por nome em `functional_card_tags.dart`,
+   `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`,
+   `rebuild_guided_service.dart`, no mock runtime de `/ai/optimize` quando
+   `deckOptimizer == null` e em prompts runtime carregados por `otimizacao.dart`.
+   A rodada separou exemplos de UI/import, comentarios, seeds de busca,
+   docs/corpus/artifacts/test fixtures e seeds Commander Reference dos riscos
+   reais. `edh_bracket_policy.dart` continua excecao intencional por regra
+   externa/curadoria de bracket, mas precisa manter fonte/versionamento/teste
+   dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**: revalidado na rotacao local Codex de 2026-06-07 15:00 UTC no checkout `52f6084e` e atualizado em 2026-06-11. `deck_matchups` e `deck_weakness_reports` recebem persistencia, mas nao possuem leitura/uso confirmado fora da chamada que gerou o dado. `ml_prompt_feedback` deixou de ser "helper sem chamador": `/ai/optimize` agora registra feedback automático via `optimize_feedback.recordOptimizeMlFeedback(...)`, com schema declarado em `database_setup.sql`/`verify_schema.dart` e contador em `/ai/ml-status`. O risco restante é usar esse histórico para seleção/score de prompts, não coletá-lo. `commander_reference_decks`/`commander_reference_deck_cards` sao persistidas como raw corpus, mas o produto le somente o agregado `commander_reference_deck_analysis`. A varredura focada de DDL versus operacoes SQL encontrou 53 tabelas criadas no recorte de codigo e somente `commander_reference_decks`, `deck_matchups` e `deck_weakness_reports` com write sem `SELECT/JOIN`; `commander_reference_deck_cards` foi mantida como achado manual por ser raw corpus apagado/reinserido sem leitura de produto confirmada. Nenhum novo candidato foi confirmado; `deck_learning_events` e `commander_card_usage` aparecem apenas em docs historicos neste checkout, nao em `server/database_setup.sql` ou codigo Dart runtime.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.

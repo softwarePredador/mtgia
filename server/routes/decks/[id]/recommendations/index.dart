@@ -51,7 +51,8 @@ Future<Response> _generateRecommendations(
     // ─── 2. Buscar cartas do deck com detalhes ────────────────
     final cardsResult = await pool.execute(
       Sql.named('''
-        SELECT c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, 
+        SELECT c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors,
+               c.color_identity,
                dc.quantity, dc.is_commander,
                COALESCE(
                  (SELECT SUM(
@@ -95,11 +96,12 @@ Future<Response> _generateRecommendations(
       final oracleText = ((row[2] as String?) ?? '').toLowerCase();
       final manaCost = (row[3] as String?) ?? '';
       final colors = (row[4] as List?)?.cast<String>() ?? [];
-      final quantity = row[5] as int;
-      final isCommander = row[6] as bool? ?? false;
-      final cmc = (row[7] as num?)?.toDouble() ?? 0;
-      final functionalTags = row[8];
-      final semanticTagsV2 = row[9];
+      final colorIdentity = (row[5] as List?)?.cast<String>() ?? [];
+      final quantity = row[6] as int;
+      final isCommander = row[7] as bool? ?? false;
+      final cmc = (row[8] as num?)?.toDouble() ?? 0;
+      final functionalTags = row[9];
+      final semanticTagsV2 = row[10];
       final resolvedRoles = resolveCardFunctionalRoles(
         functionalTags: functionalTags,
         semanticTagsV2: semanticTagsV2,
@@ -110,7 +112,7 @@ Future<Response> _generateRecommendations(
         cmc: cmc,
       ).roles;
 
-      deckColors.addAll(colors);
+      deckColors.addAll(colorIdentity.isNotEmpty ? colorIdentity : colors);
       deckCardNames.add(name.toLowerCase());
       totalCards += quantity;
       if (isCommander) commanderNames.add(name);
@@ -121,6 +123,7 @@ Future<Response> _generateRecommendations(
         'oracle_text': oracleText,
         'mana_cost': manaCost,
         'colors': colors,
+        'color_identity': colorIdentity,
         'quantity': quantity,
         'is_commander': isCommander,
         'cmc': cmc,
@@ -209,17 +212,18 @@ Future<Response> _generateRecommendations(
     final addRecommendations = <Map<String, String>>[];
     final removeRecommendations = <Map<String, String>>[];
 
-    // Filtro de cores: aceita incolores + cores do deck
-    final colorFilter = deckColors.isNotEmpty
-        ? deckColors.map((c) => "'$c'").join(', ')
-        : "'W','U','B','R','G'";
-
     // Falta de Ramp
     if (rampCount < 10) {
       final cards = await _findCardsForCategory(
         pool: pool,
-        oraclePatterns: ["add {%", "search your library for a%land%"],
-        colorFilter: colorFilter,
+        roles: const ['ramp', 'ritual', 'mana_fixing'],
+        oraclePatterns: const [
+          '%add {%',
+          '%add one mana%',
+          '%search your library%land%',
+          '%put%land%onto the battlefield%',
+        ],
+        deckColors: deckColors,
         excludeNames: deckCardNames,
         limit: (10 - rampCount).clamp(1, 5),
         format: format,
@@ -237,8 +241,9 @@ Future<Response> _generateRecommendations(
     if (drawCount < 8) {
       final cards = await _findCardsForCategory(
         pool: pool,
-        oraclePatterns: ["%draw%card%"],
-        colorFilter: colorFilter,
+        roles: const ['draw', 'card_selection'],
+        oraclePatterns: const ['%draw%card%'],
+        deckColors: deckColors,
         excludeNames: deckCardNames,
         limit: (8 - drawCount).clamp(1, 4),
         format: format,
@@ -256,8 +261,13 @@ Future<Response> _generateRecommendations(
     if (removalCount < 6) {
       final cards = await _findCardsForCategory(
         pool: pool,
-        oraclePatterns: ["destroy target%", "exile target%"],
-        colorFilter: colorFilter,
+        roles: const ['removal'],
+        oraclePatterns: const [
+          '%destroy target%',
+          '%exile target%',
+          '%damage%target%',
+        ],
+        deckColors: deckColors,
         excludeNames: deckCardNames,
         limit: (6 - removalCount).clamp(1, 4),
         format: format,
@@ -274,8 +284,13 @@ Future<Response> _generateRecommendations(
     if (boardWipeCount < 2) {
       final cards = await _findCardsForCategory(
         pool: pool,
-        oraclePatterns: ["destroy all%creature%", "exile all%"],
-        colorFilter: colorFilter,
+        roles: const ['wipe', 'board_wipe'],
+        oraclePatterns: const [
+          '%destroy all%creature%',
+          '%exile all%',
+          '%each creature%',
+        ],
+        deckColors: deckColors,
         excludeNames: deckCardNames,
         limit: (3 - boardWipeCount).clamp(1, 2),
         format: format,
@@ -293,8 +308,14 @@ Future<Response> _generateRecommendations(
     if (protectionCount < 3) {
       final cards = await _findCardsForCategory(
         pool: pool,
-        oraclePatterns: ["%hexproof%", "%indestructible%"],
-        colorFilter: colorFilter,
+        roles: const ['protection'],
+        oraclePatterns: const [
+          '%hexproof%',
+          '%indestructible%',
+          '%protection from%',
+          '%ward%',
+        ],
+        deckColors: deckColors,
         excludeNames: deckCardNames,
         limit: (3 - protectionCount).clamp(1, 2),
         format: format,
@@ -309,18 +330,51 @@ Future<Response> _generateRecommendations(
 
     // Falta de terrenos (Commander)
     if (isCommanderFmt && landCount < 34) {
-      addRecommendations.add({
-        'card_name': 'Command Tower',
-        'reason':
-            'Terreno essencial — deck tem apenas $landCount terrenos (recomendado: 35-38)',
-      });
+      final cards = await _findCardsForCategory(
+        pool: pool,
+        roles: const ['mana_fixing', 'land', 'ramp'],
+        oraclePatterns: const [
+          '%add one mana of any color%',
+          '%add one mana of any colour%',
+          '%mana of any color%',
+          '%mana of any colour%',
+        ],
+        deckColors: deckColors,
+        excludeNames: deckCardNames,
+        limit: (34 - landCount).clamp(1, 3),
+        format: format,
+        landOnly: true,
+      );
+      for (final c in cards) {
+        addRecommendations.add({
+          'card_name': c,
+          'reason':
+              'Terreno/fixing — deck tem apenas $landCount terrenos (recomendado: 35-38)',
+        });
+      }
     }
 
-    // Se o deck está bem, sugerir staples de alto impacto
+    // Se o deck está bem, sugerir cartas de impacto por papéis semânticos.
     if (addRecommendations.isEmpty) {
-      final staples = await _findStaples(
+      final staples = await _findCardsForCategory(
         pool: pool,
-        colorFilter: colorFilter,
+        roles: const [
+          'engine',
+          'wincon',
+          'payoff',
+          'enabler',
+          'draw',
+          'removal',
+          'protection',
+        ],
+        oraclePatterns: const [
+          '%whenever%',
+          '%you may%',
+          '%draw%card%',
+          '%destroy target%',
+          '%exile target%',
+        ],
+        deckColors: deckColors,
         excludeNames: deckCardNames,
         format: format,
         limit: 3,
@@ -526,28 +580,95 @@ Future<String> _semanticV2SelectSql(Pool pool) async {
 /// Busca cartas reais do banco que preenchem uma categoria funcional
 Future<List<String>> _findCardsForCategory({
   required Pool pool,
+  required List<String> roles,
   required List<String> oraclePatterns,
-  required String colorFilter,
+  required Set<String> deckColors,
   required Set<String> excludeNames,
   required int limit,
   required String format,
+  bool landOnly = false,
 }) async {
   try {
-    final orClauses = oraclePatterns
-        .map((p) => "LOWER(c.oracle_text) LIKE '${p.toLowerCase()}'")
-        .join(' OR ');
+    final normalizedRoles = roles
+        .map((role) => role.trim().toLowerCase())
+        .where((role) => role.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+    final predicates = <String>[];
+
+    if (normalizedRoles.isNotEmpty &&
+        await _hasTable(pool, 'card_function_tags')) {
+      predicates.add('''
+        EXISTS (
+          SELECT 1
+          FROM card_function_tags cft
+          WHERE cft.card_id = c.id
+            AND LOWER(cft.tag) = ANY(@role_tags)
+            AND COALESCE(cft.confidence, 0) >= 0.55
+        )
+      ''');
+    }
+
+    if (normalizedRoles.isNotEmpty &&
+        await _hasTable(pool, 'card_semantic_tags_v2')) {
+      predicates.add('''
+        EXISTS (
+          SELECT 1
+          FROM card_semantic_tags_v2 cstv2
+          WHERE cstv2.card_id = c.id
+            AND cstv2.role_confidence >= 0.65
+            AND cstv2.tags ?| @role_tags
+        )
+      ''');
+    }
+
+    for (final pattern in oraclePatterns) {
+      final normalized = pattern.trim().toLowerCase();
+      if (normalized.isEmpty) continue;
+      predicates.add(
+        "LOWER(COALESCE(c.oracle_text, '')) LIKE ${_sqlStringLiteral(normalized)}",
+      );
+    }
+
+    if (predicates.isEmpty) return [];
+
+    final landFilter = landOnly
+        ? '''
+          AND c.type_line ILIKE '%land%'
+          AND c.type_line NOT ILIKE '%basic%land%'
+        '''
+        : '''
+          AND c.type_line NOT ILIKE '%land%'
+        ''';
 
     final result = await pool.execute(
-      Sql('''
-        SELECT DISTINCT c.name FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = '${format.toLowerCase()}'
-        WHERE ($orClauses)
-          AND (c.colors = '{}' OR c.colors && ARRAY[$colorFilter])
+      Sql.named('''
+        SELECT c.name, MIN(COALESCE(c.cmc, 99)) AS cmc_sort
+        FROM cards c
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id
+         AND cl.format = @format
+        WHERE (${predicates.join(' OR ')})
+          AND (
+            @deck_colors IS NULL
+            OR COALESCE(c.color_identity, ARRAY[]::text[]) = ARRAY[]::text[]
+            OR COALESCE(c.color_identity, ARRAY[]::text[]) <@ @deck_colors
+          )
           AND (cl.id IS NULL OR cl.status = 'legal')
-          AND c.type_line NOT ILIKE '%land%'
-        ORDER BY c.name
-        LIMIT ${limit + 10}
+          $landFilter
+        GROUP BY c.name
+        ORDER BY cmc_sort ASC, c.name ASC
+        LIMIT @limit_plus
       '''),
+      parameters: {
+        'format': format.toLowerCase(),
+        'deck_colors': deckColors.isEmpty
+            ? null
+            : TypedValue(Type.textArray, deckColors.toList()..sort()),
+        'role_tags': TypedValue(Type.textArray, normalizedRoles),
+        'limit_plus': limit + 20,
+      },
     );
 
     final candidates = <String>[];
@@ -565,41 +686,8 @@ Future<List<String>> _findCardsForCategory({
   }
 }
 
-/// Busca staples genéricos de alto impacto
-Future<List<String>> _findStaples({
-  required Pool pool,
-  required String colorFilter,
-  required Set<String> excludeNames,
-  required String format,
-  required int limit,
-}) async {
-  try {
-    final result = await pool.execute(
-      Sql('''
-        SELECT DISTINCT c.name FROM cards c
-        LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = '${format.toLowerCase()}'
-        WHERE (c.colors = '{}' OR c.colors && ARRAY[$colorFilter])
-          AND (cl.id IS NULL OR cl.status = 'legal')
-          AND c.rarity IN ('rare', 'mythic')
-          AND c.type_line NOT ILIKE '%basic%land%'
-        ORDER BY c.name
-        LIMIT ${limit + 20}
-      '''),
-    );
-
-    final candidates = <String>[];
-    for (final row in result) {
-      final name = row[0] as String;
-      if (!excludeNames.contains(name.toLowerCase())) {
-        candidates.add(name);
-        if (candidates.length >= limit) break;
-      }
-    }
-    return candidates;
-  } catch (e) {
-    print('[WARN] _findStaples error: $e');
-    return [];
-  }
+String _sqlStringLiteral(String value) {
+  return "'${value.replaceAll("'", "''")}'";
 }
 
 /// Caminho com OpenAI (quando apiKey está configurada)

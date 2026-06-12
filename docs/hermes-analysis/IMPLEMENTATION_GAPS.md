@@ -12,6 +12,17 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-12
+
+- Incorporado no backend: `POST /decks/:id/recommendations` manteve contrato
+  experimental, mas o fallback deixou de usar `Command Tower` literal e raridade
+  como proxy de impacto. As sugestoes agora buscam cartas no PostgreSQL por
+  `card_function_tags`, `card_semantic_tags_v2`, `card_legalities` e
+  `cards.color_identity` quando disponiveis, com fallback textual parametrizado.
+- Continua pendente: consolidar esses lookups em um service compartilhado com
+  `/ai/weakness-analysis`, `/ai/optimize` e prompts runtime; remover nomes fixos
+  restantes apenas quando houver policy/dado versionado equivalente.
+
 | Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
