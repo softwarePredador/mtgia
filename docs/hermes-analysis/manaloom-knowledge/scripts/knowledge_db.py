@@ -380,6 +380,7 @@ def cmd_query_decks(commander=None):
 def cmd_insert_deck():
     data = json.load(sys.stdin)
     conn = get_conn()
+    ensure_schema_migrations(conn)
     now = datetime.now(timezone.utc).isoformat()
 
     commander_name = data.get("commander", "Unknown")

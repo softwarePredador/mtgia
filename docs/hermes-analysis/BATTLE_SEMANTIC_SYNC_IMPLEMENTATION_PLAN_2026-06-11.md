@@ -355,8 +355,10 @@ Historical/manual scripts remain to classify.
 Update 2026-06-12: `materialize_learned_deck_to_deck_cards.py` and
 `knowledge_db.py` were made compatible with the multi-tag snapshot contract.
 Both keep `functional_tag` for legacy consumers while creating/migrating and
-writing `functional_tags_json` for new consumers. They remain manual/support
-tools, not automatic sources of product truth.
+writing `functional_tags_json` for new consumers. `knowledge_db.py --insert-deck`
+also migrates an existing legacy SQLite before writing rows, so older Hermes
+knowledge caches do not crash when new multi-tag payloads arrive. They remain
+manual/support tools, not automatic sources of product truth.
 
 Goal: make every relevant consumer set-based.
 

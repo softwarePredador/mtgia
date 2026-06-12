@@ -66,7 +66,7 @@ fase propria antes de qualquer automacao ampla de novos comandantes.
 |---|---|---|
 | `import_lorehold_decks.py` | MANUAL IMPORTER | Migrar para aceitar/emitir multi-tags quando importar novos learned decks. |
 | `materialize_learned_deck_to_deck_cards.py` | MANUAL MATERIALIZER / COMPATIBLE | Desde 2026-06-12, migra `deck_cards.functional_tags_json` de forma idempotente e grava array derivado do tag inferido ao materializar learned decks. Continua manual; nao virar cron amplo sem gates de learned-deck. |
-| `knowledge_db.py` | SCHEMA/SEED HELPER / COMPATIBLE | Desde 2026-06-12, cria/migra `deck_cards.functional_tags_json` e preenche o snapshot a partir de `functional_tags_json`, `tags` ou `functional_tag` legado em inserts. |
+| `knowledge_db.py` | SCHEMA/SEED HELPER / COMPATIBLE | Desde 2026-06-12, cria/migra `deck_cards.functional_tags_json` e preenche o snapshot a partir de `functional_tags_json`, `tags` ou `functional_tag` legado em inserts. O caminho `--insert-deck` tambem executa a migracao antes de gravar, preservando bancos SQLite criados antes da coluna multi-tag. |
 | `scryfall_classifier.py` | CLASSIFIER | Ja fala de multi-tag em parte do codigo; precisa de rodada propria para alinhar saida `tags` -> `functional_tags_json`. |
 | `parse_collection.py` | COLLECTION IMPORT TOOL | Manter manual ate existir novo contrato de colecao multi-role. |
 | `gen_edgar_seed.py` | SEED GENERATOR | Seed historico/manual; migrar so se Edgar virar pipeline ativo. |
