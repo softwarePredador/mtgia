@@ -123,6 +123,16 @@ def parse_args() -> argparse.Namespace:
             "Default false keeps scope-sensitive candidates blocked."
         ),
     )
+    parser.add_argument(
+        "--pg-transaction-dry-run",
+        action="store_true",
+        help=(
+            "Exercise the PostgreSQL insert/update/delete path inside a "
+            "transaction that is always rolled back. This is the only database "
+            "mutation mode in this runner; it proves counts without applying "
+            "canonical card_function_tags changes."
+        ),
+    )
     parser.add_argument("--output")
     return parser.parse_args()
 
@@ -289,6 +299,20 @@ def load_allowlist(path: str | None) -> set[str]:
     return {key for key in keys if key}
 
 
+def evidence_logical_rule_key(evidence: Any) -> str:
+    if isinstance(evidence, dict):
+        return str(evidence.get("logical_rule_key") or "").strip()
+    if not isinstance(evidence, str):
+        return ""
+    try:
+        parsed = json.loads(evidence)
+    except json.JSONDecodeError:
+        return ""
+    if not isinstance(parsed, dict):
+        return ""
+    return str(parsed.get("logical_rule_key") or "").strip()
+
+
 def build_candidate(row: dict[str, Any], *, min_confidence: float) -> dict[str, Any]:
     effect_json = json_obj(row.get("effect_json"))
     deck_role_json = json_obj(row.get("deck_role_json"))
@@ -398,6 +422,78 @@ def load_existing_function_tags() -> set[tuple[str, str]]:
             return {(str(row[0]), normalize_tag(row[1])) for row in cur.fetchall()}
 
 
+def load_existing_derived_function_tags() -> list[dict[str, Any]]:
+    with connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                  card_id::text,
+                  card_name,
+                  LOWER(tag),
+                  confidence::float,
+                  evidence
+                FROM card_function_tags
+                WHERE source = %s
+                ORDER BY card_name, tag
+                """,
+                (DERIVED_SOURCE,),
+            )
+            return [
+                {
+                    "card_id": row[0],
+                    "card_name": row[1],
+                    "tag": normalize_tag(row[2]),
+                    "confidence": float(row[3] or 0.0),
+                    "evidence": row[4],
+                    "logical_rule_key": evidence_logical_rule_key(row[4]),
+                }
+                for row in cur.fetchall()
+            ]
+
+
+def stale_cleanup_candidates(
+    existing_derived_tags: list[dict[str, Any]],
+    valid_candidates: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    valid_keys = {
+        (
+            str(candidate.get("card_id") or ""),
+            str(candidate.get("tag") or ""),
+            str(candidate.get("logical_rule_key") or ""),
+        )
+        for candidate in valid_candidates
+        if candidate.get("card_id")
+        and candidate.get("tag")
+        and candidate.get("logical_rule_key")
+        and not candidate.get("rejection_reason")
+    }
+    stale: list[dict[str, Any]] = []
+    for tag in existing_derived_tags:
+        logical_key = str(tag.get("logical_rule_key") or "")
+        key = (
+            str(tag.get("card_id") or ""),
+            str(tag.get("tag") or ""),
+            logical_key,
+        )
+        if not logical_key:
+            reason = "missing_logical_rule_key"
+        elif key not in valid_keys:
+            reason = "logical_rule_no_longer_derivable"
+        else:
+            continue
+        stale.append(
+            {
+                "card_id": tag.get("card_id"),
+                "card_name": tag.get("card_name"),
+                "tag": tag.get("tag"),
+                "logical_rule_key": logical_key,
+                "reason": reason,
+            }
+        )
+    return stale
+
+
 def apply_allowlist(
     candidates: list[dict[str, Any]],
     *,
@@ -479,6 +575,11 @@ def build_report(
         allowlist_keys=allowlist_keys or set(),
         allow_manual_review=allow_manual_review,
     )
+    existing_derived = load_existing_derived_function_tags()
+    stale_candidates = stale_cleanup_candidates(
+        existing_derived,
+        [*already_present, *new_candidates],
+    )
     return {
         "apply": False,
         "database_target": sanitized_database_target(),
@@ -497,7 +598,88 @@ def build_report(
         "new_candidates": new_candidates,
         "already_present_sample": already_present[:25],
         "rejected_by_gate_sample": rejected_by_gate[:25],
+        "existing_derived_tags_count": len(existing_derived),
+        "stale_cleanup_candidates_count": len(stale_candidates),
+        "stale_cleanup_candidates": stale_candidates,
         **allowlist_report,
+    }
+
+
+def run_pg_transaction_dry_run(report: dict[str, Any]) -> dict[str, Any]:
+    """Exercise PostgreSQL writes and always roll back.
+
+    This deliberately does not provide an apply mode. Promotion from
+    card_battle_rules to card_function_tags must stay separately reviewed and
+    operator-controlled.
+    """
+    allowlisted = list(report.get("allowlisted_candidates") or [])
+    stale = list(report.get("stale_cleanup_candidates") or [])
+    conn = connect()
+    deleted_count = 0
+    upsert_count = 0
+    source_count_after_mutation = 0
+    try:
+        conn.autocommit = False
+        with conn.cursor() as cur:
+            for candidate in stale:
+                cur.execute(
+                    """
+                    DELETE FROM card_function_tags
+                    WHERE source = %s
+                      AND card_id::text = %s
+                      AND LOWER(tag) = %s
+                    """,
+                    (
+                        DERIVED_SOURCE,
+                        str(candidate.get("card_id") or ""),
+                        str(candidate.get("tag") or ""),
+                    ),
+                )
+                deleted_count += max(cur.rowcount, 0)
+
+            for candidate in allowlisted:
+                cur.execute(
+                    """
+                    INSERT INTO card_function_tags (
+                      card_id, card_name, tag, confidence, source, evidence, updated_at
+                    )
+                    VALUES (%s::uuid, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                    ON CONFLICT (card_id, tag, source) DO UPDATE SET
+                      card_name = EXCLUDED.card_name,
+                      confidence = EXCLUDED.confidence,
+                      evidence = EXCLUDED.evidence,
+                      updated_at = CURRENT_TIMESTAMP
+                    """,
+                    (
+                        candidate.get("card_id"),
+                        candidate.get("card_name"),
+                        candidate.get("tag"),
+                        candidate.get("confidence"),
+                        DERIVED_SOURCE,
+                        candidate.get("evidence"),
+                    ),
+                )
+                upsert_count += max(cur.rowcount, 0)
+
+            cur.execute(
+                "SELECT COUNT(*)::int FROM card_function_tags WHERE source = %s",
+                (DERIVED_SOURCE,),
+            )
+            row = cur.fetchone()
+            source_count_after_mutation = int(row[0]) if row else 0
+        conn.rollback()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+    return {
+        "enabled": True,
+        "rolled_back": True,
+        "would_delete_stale_count": deleted_count,
+        "would_upsert_allowlisted_count": upsert_count,
+        "source_count_after_mutation_before_rollback": source_count_after_mutation,
     }
 
 
@@ -510,6 +692,8 @@ def main() -> int:
         allowlist_keys=allowlist_keys,
         allow_manual_review=args.allow_manual_review,
     )
+    if args.pg_transaction_dry_run:
+        report["pg_transaction_dry_run"] = run_pg_transaction_dry_run(report)
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)
     print(output)
     if args.output:

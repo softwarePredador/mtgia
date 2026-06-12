@@ -279,6 +279,25 @@ Hermes AWS allowlist dry-run after commit `51328ea7`:
 | unmatched allowlist keys | 0 |
 | apply | false |
 
+PostgreSQL transaction dry-run after stale-cleanup implementation:
+
+| Check | Result |
+|---|---:|
+| rules seen | 3156 |
+| new candidates | 89 |
+| already present | 261 |
+| rejected by gate | 2806 |
+| existing derived tags from `card_battle_rules_v1` | 0 |
+| stale cleanup candidates | 0 |
+| allowlist key count loaded | 72 |
+| allowlisted candidates | 27 |
+| manual-review candidates blocked | 0 |
+| unmatched allowlist keys | 0 |
+| transaction would upsert | 27 |
+| transaction would delete stale | 0 |
+| transaction rolled back | true |
+| apply | false |
+
 ## Next steps
 
 1. Keep the current Slice 4 as report-only.
@@ -288,5 +307,7 @@ Hermes AWS allowlist dry-run after commit `51328ea7`:
 3. Extend taxonomy before applying the 62 manual-review candidates:
    scoped tutor, conditional ramp, protection subtype, topdeck/cast-from-top,
    broad wincon, and face-aware semantics.
-4. If apply is approved later, first implement stale cleanup and then run a
-   small PostgreSQL transaction dry-run, not a bulk write.
+4. Stale cleanup and PostgreSQL transaction dry-run now exist, but the runner
+   still has no real apply mode by design. If apply is approved later, add a
+   separate operator-controlled apply path with an `apply_approved=true`
+   allowlist, false-positive review and another rollback-first run.

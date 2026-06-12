@@ -326,6 +326,59 @@ class DeriveFunctionalTagsFromBattleRulesTests(unittest.TestCase):
         self.assertEqual(report["allowlisted_candidates_count"], 1)
         self.assertEqual(report["allowlist_blocked_manual_review_count"], 0)
 
+    def test_evidence_logical_rule_key_accepts_json_dict_and_rejects_invalid(self) -> None:
+        self.assertEqual(
+            derive.evidence_logical_rule_key({"logical_rule_key": "rule-1"}),
+            "rule-1",
+        )
+        self.assertEqual(
+            derive.evidence_logical_rule_key('{"logical_rule_key":"rule-2"}'),
+            "rule-2",
+        )
+        self.assertEqual(derive.evidence_logical_rule_key("not-json"), "")
+        self.assertEqual(derive.evidence_logical_rule_key(["rule-3"]), "")
+
+    def test_stale_cleanup_candidates_only_flags_derived_tags_without_active_rule(self) -> None:
+        valid = [
+            {
+                "card_id": "card-1",
+                "card_name": "Valid Fixture",
+                "tag": "draw",
+                "logical_rule_key": "rule-valid",
+                "rejection_reason": "",
+            }
+        ]
+        existing = [
+            {
+                "card_id": "card-1",
+                "card_name": "Valid Fixture",
+                "tag": "draw",
+                "logical_rule_key": "rule-valid",
+            },
+            {
+                "card_id": "card-2",
+                "card_name": "Missing Rule Fixture",
+                "tag": "ramp",
+                "logical_rule_key": "rule-stale",
+            },
+            {
+                "card_id": "card-3",
+                "card_name": "Legacy Evidence Fixture",
+                "tag": "removal",
+                "logical_rule_key": "",
+            },
+        ]
+
+        stale = derive.stale_cleanup_candidates(existing, valid)
+
+        self.assertEqual(
+            [(entry["card_name"], entry["reason"]) for entry in stale],
+            [
+                ("Missing Rule Fixture", "logical_rule_no_longer_derivable"),
+                ("Legacy Evidence Fixture", "missing_logical_rule_key"),
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

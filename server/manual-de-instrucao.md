@@ -18358,5 +18358,13 @@ na command zone, não para validação de deck no servidor.
     - `allowlist_blocked_manual_review_count=0`;
     - `allowlist_unmatched_count=0`;
     - `apply=false`.
-- Nenhum write em `card_function_tags` está aprovado sem allowlist versionada,
-  stale cleanup, transaction dry-run e validação de falso positivo zero.
+- Stale cleanup + PostgreSQL transaction dry-run adicionados em 2026-06-12:
+  - `existing_derived_tags_count=0`;
+  - `stale_cleanup_candidates_count=0`;
+  - `would_upsert_allowlisted_count=27`;
+  - `would_delete_stale_count=0`;
+  - `rolled_back=true`;
+  - `apply=false`.
+- Nenhum write real em `card_function_tags` está aprovado sem caminho separado
+  operator-controlled, allowlist `apply_approved=true` e validação de falso
+  positivo zero.

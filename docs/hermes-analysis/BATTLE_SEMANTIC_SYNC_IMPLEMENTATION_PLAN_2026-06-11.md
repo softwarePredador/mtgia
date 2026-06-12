@@ -651,8 +651,9 @@ Current next work:
 
 1. Review Lorehold report-only candidates before any apply.
 2. Expand sample size before trusting any swap.
-3. Review the report-only derivation candidates before any
-   `card_battle_rules_v1` write to `card_function_tags`.
+3. Keep derived `card_battle_rules_v1` function tags in rollback-only
+   validation until an explicit operator-controlled apply path and
+   `apply_approved=true` allowlist exist.
 4. Keep battle execution unchanged until these policies and tests exist.
 
 Slice 4 report-only derivation status:
@@ -674,3 +675,8 @@ Slice 4 report-only derivation status:
    low-risk candidates. Hermes AWS dry-run loaded 72 matching keys from those
    27 entries, allowlisted 27 candidates, blocked 0 manual-review candidates,
    had 0 unmatched keys and kept `apply=false`.
+7. The runner now includes stale-cleanup detection and a PostgreSQL
+   transaction dry-run path that always rolls back. Current PG result:
+   `existing_derived_tags_count=0`, `stale_cleanup_candidates_count=0`,
+   `would_upsert_allowlisted_count=27`, `would_delete_stale_count=0`,
+   `rolled_back=true`, `apply=false`.
