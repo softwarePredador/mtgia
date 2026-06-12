@@ -239,3 +239,20 @@ stable IDs, forensic should report the gap instead of masking it.
    or whether a new per-card semantic hash field is required.
 3. Only after that, evaluate whether replay/forensic has enough provenance to
    support broader battle-rule migration work.
+
+## Follow-Up Tooling
+
+`audit_learned_opponent_card_identity.py` was added as the report-only first
+step for the learned-opponent gap. It reads Hermes SQLite `learned_decks`,
+resolves card names against PostgreSQL `cards`, and reports:
+
+- deck count inspected;
+- card instances inspected;
+- resolved instances;
+- unresolved instances;
+- ambiguous instances;
+- bounded unresolved samples;
+- `apply=false`.
+
+The script does not write SQLite or PostgreSQL. Any future sync that persists
+resolved IDs must be a separate reviewed step with tests and a rollback path.

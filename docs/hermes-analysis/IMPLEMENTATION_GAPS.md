@@ -650,7 +650,8 @@ virar hash semântico por carta.
    `--allowlist` apenas para dry-run versionado; manter os 59 candidatos
    scope-sensitive como manual-only até existir taxonomia/faces suficiente.
 4. Adicionar IDs estáveis a learned-opponent cardlists via PG-backed resolver
-   ou sync dedicado; não sintetizar IDs dentro do replay.
+   ou sync dedicado; não sintetizar IDs dentro do replay. O primeiro passo
+   report-only é `audit_learned_opponent_card_identity.py`.
 5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
