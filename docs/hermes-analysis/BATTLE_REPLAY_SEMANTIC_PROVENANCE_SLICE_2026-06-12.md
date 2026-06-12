@@ -278,3 +278,24 @@ Interpretation: learned-opponent identity can likely be synced safely after a
 review step, but the `50` ambiguous instances must be resolved explicitly.
 The single unresolved instance should be reviewed as data quality, not silently
 dropped.
+
+Follow-up validation at `dbbf4ab1` exposed bounded review samples:
+
+```json
+{
+  "ambiguous_top": [
+    ["Sol Ring", 12],
+    ["Ancient Tomb", 12],
+    ["Command Tower", 12],
+    ["Birds of Paradise", 8],
+    ["Phyrexian Metamorph", 5],
+    ["Cyclonic Rift", 1]
+  ],
+  "unresolved_top": [["Lim-Dul's Vault", 1]]
+}
+```
+
+Interpretation: the ambiguous set is mostly multiple-printing ambiguity, not
+deck parser failure. The correct fix is an explicit oracle/canonical-printing
+identity policy for learned decks, not `LIMIT 1`. The unresolved sample is
+likely a data-normalization issue and should be checked separately.

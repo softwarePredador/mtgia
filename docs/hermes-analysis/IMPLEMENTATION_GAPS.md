@@ -654,7 +654,11 @@ virar hash semântico por carta.
    report-only é `audit_learned_opponent_card_identity.py`. Validação Hermes
    AWS em `191ead51`: `12` decks, `1200` instâncias, `1149` resolvidas,
    `1` não resolvida, `50` ambíguas, cobertura `0.9575`; antes de apply,
-   resolver as ambiguidades explicitamente.
+   resolver as ambiguidades explicitamente. Amostra `dbbf4ab1`: ambiguidades
+   principais são múltiplas printings (`Sol Ring`, `Ancient Tomb`,
+   `Command Tower`, `Birds of Paradise`, `Phyrexian Metamorph`,
+   `Cyclonic Rift`), então a correção deve definir política de
+   oracle/canonical-printing identity; não usar `LIMIT 1`.
 5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
