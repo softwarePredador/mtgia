@@ -95,6 +95,33 @@ void main() {
       );
     });
 
+    test('weakness-analysis recommendations use DB lookup over fixed staples',
+        () {
+      final weakness = File(
+        'routes/ai/weakness-analysis/index.dart',
+      ).readAsStringSync();
+
+      expect(weakness, contains('_findWeaknessRecommendations('));
+      for (final cardName in const [
+        "'Sol Ring'",
+        "'Arcane Signet'",
+        "'Rhystic Study'",
+        "'Mystic Remora'",
+        "'Swords to Plowshares'",
+        "'Path to Exile'",
+        "'Wrath of God'",
+        "'Damnation'",
+        "'Cyclonic Rift'",
+        "'Toxic Deluge'",
+        "'Teferi\\'s Protection'",
+        "'Heroic Intervention'",
+        "'Lightning Greaves'",
+        "'Swiftfoot Boots'",
+      ]) {
+        expect(weakness, isNot(contains(cardName)));
+      }
+    });
+
     test('following community feed has explicit app-facing route file', () {
       final dedicatedRoute = File(
         'routes/community/decks/following/index.dart',

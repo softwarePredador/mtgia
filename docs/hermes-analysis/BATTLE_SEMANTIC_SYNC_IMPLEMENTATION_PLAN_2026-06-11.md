@@ -950,3 +950,29 @@ This closes the Hermes docs gap that kept `/ai/weakness-analysis` on heuristic
 only for ramp/draw/removal/wipe/protection counts. The route remains
 experimental/advisory, and `deck_weakness_reports` is still a write-mostly
 history table until a separate consumer/update flow is implemented.
+
+### Update 2026-06-12r - `/ai/weakness-analysis` DB-backed recommendations
+
+The same advisory route no longer returns fixed staple names for the main
+weakness categories. For ramp, draw, removal, board wipes, protection,
+graveyard vulnerability, artifact/enchantment removal and instant-speed
+interaction, recommendations now come from a DB lookup that:
+
+- uses `card_function_tags` and `card_semantic_tags_v2` when available;
+- falls back to bounded oracle-text patterns for the requested role;
+- filters by deck color identity and `card_legalities`;
+- excludes cards already present in the deck;
+- preserves the existing public contract by still returning `List<String>`;
+- falls back to generic action text, not hardcoded staple names, when no card is
+  found or the lookup is unavailable.
+
+This narrows the remaining name-based risk to other legacy surfaces, especially
+`/decks/:id/recommendations`, optimize/rebuild bonus policies and prompt
+examples. It does not turn `/ai/weakness-analysis` into an app-facing product
+contract; the route remains experimental/advisory.
+
+Validation added: `server/test/ai_weakness_analysis_live_test.dart` creates a
+temporary Commander deck against a live local backend, calls
+`POST /ai/weakness-analysis`, verifies advisory weaknesses/recommendations and
+deletes the deck. This specifically exercises the SQL lookup path that depends
+on optional semantic tables, `card_legalities` and color filters.

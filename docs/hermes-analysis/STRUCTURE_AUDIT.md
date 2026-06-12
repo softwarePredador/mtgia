@@ -6188,14 +6188,19 @@ artefatos foram usados apenas para separar fixtures permitidas de logica viva.
 - **Correcao recomendada:** substituir retorno escalar por conjunto/objeto de
   roles preservados e usar a mesma normalizacao em candidate quality.
 
-#### P2 — Rotas legacy de recomendacao/weakness ainda têm recomendações name-based
+#### P2 — Rotas legacy de recomendacao ainda têm recomendações name-based
 
-- **Fluxos:** `/decks/:id/recommendations` e `/ai/weakness-analysis`.
+- **Fluxos:** `/decks/:id/recommendations`; `/ai/weakness-analysis` permanece
+  experimental, mas o risco de listas fixas nas fraquezas principais foi fechado
+  em 2026-06-12.
 - **Status 2026-06-12:** os contadores internos das duas rotas foram
   parcialmente saneados para usar `card_function_tags`/`card_semantic_tags_v2`
   quando disponíveis via `resolveCardFunctionalRoles`, sem multiplicar linhas do
-  deck. O risco remanescente desta seção são recomendações nomeadas/heurísticas
-  e proxies legados, não a contagem básica de ramp/draw/removal/wipe/protection.
+  deck. Em seguida, `/ai/weakness-analysis` passou a buscar recomendações no
+  banco com filtros de legalidade/cor/tags, retornando fallback genérico sem
+  nomes quando não há candidato. O risco remanescente desta seção ficou em
+  `/decks/:id/recommendations`: recomendações nomeadas/heurísticas e proxies
+  legados, não a contagem básica de ramp/draw/removal/wipe/protection.
 - **Evidencia:**
   - `server/routes/decks/[id]/recommendations/index.dart:110`-`:130` conta
     ramp/draw/removal/wipe/protection por `oracle_text` local, sem
@@ -6204,9 +6209,9 @@ artefatos foram usados apenas para separar fixtures permitidas de logica viva.
     recomenda `Command Tower` diretamente quando `landCount < 34`.
   - `_findStaples` em `server/routes/decks/[id]/recommendations/index.dart:408`-`:438`
     usa raridade `rare/mythic` como proxy de alto impacto, sem role semantico.
-  - `server/routes/ai/weakness-analysis/index.dart` ainda retorna listas fixas
-    de recomendacoes em blocos de fraqueza, apesar de a contagem funcional ter
-    passado a usar tags persistidas/semantic v2 antes do fallback textual.
+  - `server/routes/ai/weakness-analysis/index.dart` não mantém mais listas fixas
+    de staples para as fraquezas principais; usa `_findWeaknessRecommendations`
+    com `cards`, `card_legalities`, tags funcionais e semantic v2.
 - **Classificacao:** **Risk** se promovidas a fluxo app-facing; hoje seguem
   legacy/experimental e sem consumidor app direto confirmado nesta rodada.
 - **O que valida:** antes de exposicao, gerar nomes por consulta a `cards`,
@@ -8474,25 +8479,22 @@ somente para classificar fixtures, exemplos ou protecoes existentes.
   depois de filtros semanticos equivalentes e que cartas equivalentes fora da
   lista competem em igualdade.
 
-#### P2 — `/ai/weakness-analysis` ainda devolve sugestoes fixas
+#### P2 — `/ai/weakness-analysis` sem listas fixas nas fraquezas principais
 
 - **Status 2026-06-12:** a rota passou a carregar `card_function_tags` e
-  `card_semantic_tags_v2` opcionalmente e a contar roles com
-  `resolveCardFunctionalRoles`, preservando fallback textual. Esta seção segue
-  aberta apenas pela parte de sugestões fixas/nomeadas.
-- **Sugestoes fixas:** quando faltam categorias, a rota retorna nomes fixos
-  (`Sol Ring`, `Arcane Signet`, `Rhystic Study`, `Swords to Plowshares`,
-  `Wrath of God`, `Cyclonic Rift`) em
-  `server/routes/ai/weakness-analysis/index.dart:206`-`:249`.
-- **Por que e risco:** a rota pode divergir de deck analysis e optimize porque
-  nao usa o mesmo adapter nem os dados persistidos. O usuario pode ver
-  contagens/recomendacoes diferentes para o mesmo deck.
-- **O que valida:** reutilizar `summarizeFunctionalTagsForDeck` ou o adapter
-  unico proposto; gerar sugestoes por roles e filtros de legalidade/identidade,
-  nao por lista inline.
-- **O que falsifica:** documentar `/ai/weakness-analysis` como endpoint legado
-  nao consumido por app, ou cobrir por teste que seu output e deliberadamente
-  independente do fluxo core.
+  `card_semantic_tags_v2` opcionalmente, contar roles com
+  `resolveCardFunctionalRoles` e gerar recomendações por
+  `_findWeaknessRecommendations`, consultando `cards`, `card_legalities`, tags
+  funcionais e semantic v2. Quando a busca não encontra candidato, o fallback é
+  texto de ação genérico, não lista fixa de nomes.
+- **Risco restante:** a rota continua experimental/advisory e
+  `deck_weakness_reports` ainda não tem consumidor/update loop completo. O
+  próximo risco de sugestões name-based está em `/decks/:id/recommendations` e
+  policies/prompts de optimize/rebuild.
+- **O que valida:** source guard impede retorno de staples fixas na rota e
+  testes focados mantêm owner-scope/semantic-role loading. Uma prova live de
+  resposta com banco real ainda pode ser adicionada se a rota virar superfície
+  de produto.
 
 #### P2 — Politicas por nome existem tambem como excecoes intencionais e precisam ficar protegidas
 
@@ -9751,9 +9753,13 @@ semanticos persistidos.
   de roles preservados, mantendo um `primary_role` apenas para compatibilidade
   de resposta.
 
-#### P2 — Rotas de recomendacao ainda retornam nomes fixos por metrica simples
+#### P2 — Rota legacy de recomendacao ainda retorna nomes/proxies por métrica simples
 
-- **Fluxos:** `/decks/:id/recommendations` e `/ai/weakness-analysis`.
+- **Fluxos:** `/decks/:id/recommendations`.
+- **Status 2026-06-12:** `/ai/weakness-analysis` deixou esta categoria: as
+  fraquezas principais agora usam `_findWeaknessRecommendations` com
+  `cards`/`card_legalities`/tags funcionais/semantic v2 e fallback genérico sem
+  nomes.
 - **Evidencia:**
   - `server/routes/decks/[id]/recommendations/index.dart:262`-`:268` recomenda
     `Command Tower` quando `landCount < 34`, sem passar por busca semantica de
@@ -9761,9 +9767,6 @@ semanticos persistidos.
   - A mesma rota busca categorias por `oraclePatterns` em `:244`-`:253` e
     staples por raridade em `:408`-`:438`; isso e melhor que lista fixa, mas
     ainda nao usa `semantic_tags_v2`/`card_function_tags`.
-  - `server/routes/ai/weakness-analysis/index.dart:206`-`:285` retorna listas
-    fixas de nomes para ramp, draw, removal, wipes e protecao; `:345`-`:358`
-    tambem recomenda texto com `Swords to Plowshares`.
 - **Classificacao:** **Risk** para logica runtime; nao e fixture nem doc.
 - **Por que importa:** utilidade e inferida de buckets agregados e nomes
   genericos, sem garantir que a carta recomendada respeita identidade de cor,
