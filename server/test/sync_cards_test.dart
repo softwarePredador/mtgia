@@ -313,15 +313,32 @@ void main() {
       final row = extractSetCardSyncRow(card, 'tst');
 
       expect(row, isNotNull);
-      expect(row, hasLength(15));
-      expect(row![0], 'operational-creature-id');
-      expect(row[7], '4');
+      expect(row, hasLength(18));
+      expect(row![0], 'scryfall-printing-id');
+      expect(row[1], 'operational-creature-id');
       expect(row[8], '4');
-      expect(row[9], equals(['Trample']));
-      expect(row[10], contains('/scryfall-printing-id?format=image'));
-      expect(row[11], 'TST');
-      expect(row[13], '42');
-      expect(row[14], isTrue);
+      expect(row[9], '4');
+      expect(row[10], equals(['Trample']));
+      expect(row[11], contains('/scryfall-printing-id?format=image'));
+      expect(row[12], 'TST');
+      expect(row[14], '42');
+      expect(row[15], isTrue);
+    });
+
+    test('sync operacional cai para oracle id quando printing id esta ausente',
+        () {
+      final card = {
+        'name': 'Oracle Fallback',
+        'identifiers': {
+          'scryfallOracleId': 'oracle-only-id',
+        },
+      };
+
+      final row = extractSetCardSyncRow(card, 'tst');
+
+      expect(row, isNotNull);
+      expect(row![0], 'oracle-only-id');
+      expect(row[1], 'oracle-only-id');
     });
   });
 

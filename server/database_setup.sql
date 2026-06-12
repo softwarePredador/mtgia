@@ -37,7 +37,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE D
 -- 2. Tabela de Cartas (Otimizada para busca e dados do MTGJSON)
 	CREATE TABLE IF NOT EXISTS cards (
 	    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	    scryfall_id UUID UNIQUE NOT NULL, -- ID oficial da carta (Oracle ID)
+	    scryfall_id UUID UNIQUE NOT NULL, -- ID unico da printing no Scryfall
+	    oracle_id UUID, -- ID Oracle/Scryfall compartilhado entre printings
 	    name TEXT NOT NULL,
 	    mana_cost TEXT,
 	    type_line TEXT,
@@ -50,6 +51,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE D
 	    image_url TEXT, -- URL da imagem na Scryfall
 	    set_code TEXT,
 	    rarity TEXT,
+	    layout TEXT,
+	    card_faces_json JSONB,
 	    ai_description TEXT, -- Cache de explicações da IA
 	    price DECIMAL(10,2), -- Preço da carta (integração Scryfall)
 	    price_updated_at TIMESTAMP WITH TIME ZONE,
@@ -67,12 +70,17 @@ ALTER TABLE cards ADD COLUMN IF NOT EXISTS foil BOOLEAN;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_faces_json JSONB;
 
 -- Índice para busca rápida por nome
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);
 CREATE INDEX IF NOT EXISTS idx_cards_name_lower ON cards (LOWER(name));
 CREATE INDEX IF NOT EXISTS idx_cards_front_name_lower
 ON cards (LOWER(split_part(name, ' // ', 1)));
+CREATE INDEX IF NOT EXISTS idx_cards_oracle_id ON cards (oracle_id);
+CREATE INDEX IF NOT EXISTS idx_cards_layout ON cards (layout);
 -- Índice GIN para buscas por identidade (Commander/Brawl)
 CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity);
 CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords);

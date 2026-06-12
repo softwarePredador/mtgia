@@ -406,12 +406,14 @@ Why this matters:
 - Commander singleton by name/card identity;
 - color identity across faces.
 
-Current production constraint verified on 2026-06-12:
+Current production constraint verified on 2026-06-12 and coding status:
 
-- `cards` has no dedicated `oracle_id` column.
-- `scryfall_id` exists, but code/docs have historically mixed whether it means
-  oracle identity or printing identity, so it must not be treated as canonical
-  semantic identity without a migration.
+- A backend-owned additive migration/contract now introduces
+  `cards.oracle_id`, `cards.layout` and `cards.card_faces_json`.
+- Updated cards resolve/printings/sync paths treat `scryfall_id` as the
+  Scryfall printing id and `oracle_id` as canonical card identity when present.
+- Existing production rows still need migration/backfill coverage before
+  consumers can rely on `oracle_id` as complete.
 - Multiple-printing learned deck matches must remain report-only until a
   backend-owned policy defines either oracle identity or canonical printing.
 

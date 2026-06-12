@@ -122,33 +122,37 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
   final syncRow = extractSetCardSyncRow(card, setCode);
   if (syncRow == null) return null;
   return [
-    syncRow[0],
     syncRow[1],
     syncRow[2],
     syncRow[3],
     syncRow[4],
     syncRow[5],
     syncRow[6],
-    syncRow[10],
+    syncRow[7],
     syncRow[11],
     syncRow[12],
     syncRow[13],
     syncRow[14],
+    syncRow[15],
   ];
 }
 
 /// Extrai dados completos de uma carta de Set.json para o sync operacional.
 ///
 /// Índices do retorno:
-/// [0] oracleId, [1] name, [2] manaCost, [3] typeLine, [4] oracleText,
-/// [5] colors, [6] colorIdentity, [7] power, [8] toughness, [9] keywords,
-/// [10] imageUrl, [11] setCode, [12] rarity, [13] collectorNumber, [14] foil
+/// [0] scryfallPrintingId, [1] oracleId, [2] name, [3] manaCost,
+/// [4] typeLine, [5] oracleText, [6] colors, [7] colorIdentity, [8] power,
+/// [9] toughness, [10] keywords, [11] imageUrl, [12] setCode, [13] rarity,
+/// [14] collectorNumber, [15] foil, [16] layout, [17] cardFacesJson
 List<Object?>? extractSetCardSyncRow(
     Map<String, dynamic> card, String setCode) {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   final ids = card['identifiers'] as Map<String, dynamic>?;
   final oracleId = ids?['scryfallOracleId']?.toString();
   if (oracleId == null || oracleId.isEmpty) return null;
+  final scryfallId = ids?['scryfallId']?.toString();
+  final printingId =
+      scryfallId != null && scryfallId.isNotEmpty ? scryfallId : oracleId;
 
   final name = card['name']?.toString();
   if (name == null || name.isEmpty) return null;
@@ -162,8 +166,6 @@ List<Object?>? extractSetCardSyncRow(
       (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
           const <String>[];
 
-  // Use scryfallId for direct image URL (more reliable than name-based)
-  final scryfallId = ids?['scryfallId']?.toString();
   String imageUrl;
   if (scryfallId != null && scryfallId.isNotEmpty) {
     imageUrl =
@@ -188,6 +190,7 @@ List<Object?>? extractSetCardSyncRow(
   }
 
   return [
+    printingId,
     oracleId,
     name,
     card['manaCost']?.toString(),
@@ -203,6 +206,8 @@ List<Object?>? extractSetCardSyncRow(
     card['rarity']?.toString(),
     collectorNumber,
     foil,
+    card['layout']?.toString(),
+    null,
   ];
 }
 

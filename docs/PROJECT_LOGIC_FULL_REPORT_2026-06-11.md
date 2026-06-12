@@ -378,7 +378,7 @@ das tabelas atuais. Outras tabelas app-facing aparecem em migrações, helpers
 |---|---|---|---|
 | `users` | `id`, `username`, `email`, `password_hash`, `display_name`, `avatar_url`, `created_at`, `updated_at`, campos profile/trade/FCM adicionados por migrations | Pai de decks, follows, binder, trades, messages, notifications | Auth, perfil, social, trades, notificacoes |
 | `user_plans` | `user_id`, `plan_name`, `status`, `started_at`, `renews_at` | `user_id -> users.id` | Plano Free/Pro, limite IA |
-| `cards` | `id`, `scryfall_id`, `name`, `mana_cost`, `cmc`, `type_line`, `oracle_text`, `colors`, `color_identity`, `power`, `toughness`, `keywords`, `image_url`, `set_code`, `rarity`, `price`, `price_usd`, `price_usd_foil`, `collector_number`, `foil` | Referenciada por deck, binder, legalities, semantic/rules | Fonte central de carta |
+| `cards` | `id`, `scryfall_id`, `oracle_id`, `layout`, `card_faces_json`, `name`, `mana_cost`, `cmc`, `type_line`, `oracle_text`, `colors`, `color_identity`, `power`, `toughness`, `keywords`, `image_url`, `set_code`, `rarity`, `price`, `price_usd`, `price_usd_foil`, `collector_number`, `foil` | Referenciada por deck, binder, legalities, semantic/rules | Fonte central de carta; `scryfall_id` deve representar printing id, enquanto `oracle_id` representa identidade canônica quando preenchida |
 | `sets` | `code`, `name`, `release_date`, `type`, `block`, flags | `cards.set_code -> sets.code` por convencao | Catalogo/edicoes |
 | `card_legalities` | `id`, `card_id`, `format`, `status`, unique `(card_id, format)` | `card_id -> cards.id` | Legalidade Commander/Standard/etc |
 | `card_localized_names` | `scryfall_id`, `oracle_id`, `card_id`, `lang`, `printed_name`, `normalized_printed_name`, `canonical_name`, `set_code`, `collector_number`, `source` | `card_id -> cards.id` | Importacao por nomes localizados |
@@ -554,6 +554,12 @@ compatibilidade, mas a decisao de segurança deve preservar o conjunto de roles.
 Qualquer consulta que junte deck com regras/cartas semanticas deve manter a
 cardinalidade de `deck_cards`. Se uma tabela auxiliar tiver N linhas por carta,
 ela deve ser agregada antes do join ou via lateral/subquery que retorna JSON.
+Para identidade de carta, o contrato novo e aditivo é: preservar printing em
+`cards.scryfall_id`, gravar identidade canônica em `cards.oracle_id`, persistir
+`layout` e `card_faces_json` para faces/modos. Enquanto backfill/cobertura não
+estiverem completos, consumidores críticos devem manter fallback por nome
+normalizado e tratar múltiplas printings como ambíguas em vez de escolher
+`LIMIT 1`.
 
 Errado:
 

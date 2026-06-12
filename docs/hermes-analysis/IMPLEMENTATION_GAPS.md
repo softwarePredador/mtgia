@@ -595,7 +595,7 @@ Hermes + testes.
 
 | Prioridade | Gap | Evidência | Ação esperada |
 |---|---|---|---|
-| P1 | Identidade semântica de carta ainda ambígua | `cards.scryfall_id` é usado/documentado de forma mista entre printing e oracle em rotas de cards/localized/rulings | Planejar migração/contrato para `oracle_id`, `layout`, `card_faces_json` ou equivalente antes de regras por face |
+| P1 | Identidade semântica de carta ainda em transição | Slice 2026-06-12 adicionou contrato/migration aditiva para `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`; `scryfall_id` passa a ser tratado como printing id nas rotas/sync alterados | Rodar migration/backfill controlado, confirmar cobertura em produção e só depois usar `oracle_id`/nome canônico para singleton/import/learned-opponent sync |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
 | P1 | Derivação de regra executável para função de deck ainda não tem política de apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia são `89` novos candidatos: `30` low-risk review e `59` manual-review; modo allowlist dry-run bloqueia manual-review por padrão | Revisar os 30 low-risk; próximo passo seguro é allowlist dry-run versionada, não apply; manter os 59 como manual-only até existir taxonomia/faces/stale cleanup |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
@@ -671,8 +671,11 @@ virar hash semântico por carta.
    replay ou se o produto precisa de hash semântico por carta.
 6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
-7. Formalizar identidade semântica de carta e faces antes de expandir regras
-   DFC/MDFC.
+7. Completar a formalização de identidade semântica de carta e faces antes de
+   expandir regras DFC/MDFC: colunas `oracle_id`, `layout` e
+   `card_faces_json` já foram introduzidas no backend/sync; ainda falta
+   aplicar migration/backfill, medir cobertura e ligar consumidores críticos a
+   essa identidade canônica.
 8. Só depois evoluir learned decks para dois comandantes.
 9. Só depois usar feedback ML como input de política.
 

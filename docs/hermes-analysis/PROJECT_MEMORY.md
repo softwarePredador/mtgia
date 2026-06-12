@@ -100,6 +100,11 @@ Ao responder sobre o ManaLoom:
   gate. A revisão `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` classificou
   30 candidatos como low-risk review e 59 como manual-review. Nenhum apply em
   `card_function_tags` está liberado sem revisão, allowlist e stale cleanup.
+- Identidade canônica de carta entrou em transição em 2026-06-12: backend/sync
+  agora têm contrato aditivo para `cards.oracle_id`, `cards.layout` e
+  `cards.card_faces_json`, tratando `scryfall_id` como printing id. Ainda falta
+  migration/backfill e medição de cobertura antes de ligar singleton/import/
+  learned-opponent sync a essa identidade.
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 

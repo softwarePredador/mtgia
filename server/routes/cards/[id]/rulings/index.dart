@@ -1,12 +1,13 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../../lib/card_identity_support.dart';
 
 /// GET /cards/:id/rulings
 ///
 /// Retorna as rulings oficiais (Gatherer/Scryfall, via MTGJSON) de uma carta.
 /// `:id` é o `cards.id` (uuid). As rulings são resolvidas pelo `oracle_id`
-/// (armazenado em `cards.scryfall_id`), então todas as impressões da mesma
-/// carta compartilham as rulings.
+/// quando disponível. Dados antigos caem para `cards.scryfall_id` por
+/// compatibilidade, mas novas ingestões devem preencher `cards.oracle_id`.
 ///
 /// Response:
 /// {
@@ -27,9 +28,12 @@ Future<Response> onRequest(RequestContext context, String id) async {
   final pool = context.read<Pool>();
 
   try {
+    final hasIdentityColumns = await hasCardIdentityColumns(pool);
+    final identityExpression =
+        hasIdentityColumns ? 'COALESCE(oracle_id, scryfall_id)' : 'scryfall_id';
     final cardResult = await pool.execute(
       Sql.named('''
-        SELECT name, scryfall_id::text AS oracle_id
+        SELECT name, $identityExpression::text AS oracle_id
         FROM cards
         WHERE id = CAST(@id AS uuid)
         LIMIT 1

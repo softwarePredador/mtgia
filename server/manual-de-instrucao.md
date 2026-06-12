@@ -18218,3 +18218,26 @@ na command zone, não para validação de deck no servidor.
   - `dart test test/optimize_fallback_telemetry_support_test.dart test/optimize_payload_support_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
   - `dart analyze bin lib routes test`: PASS.
   - `dart test --concurrency=2 --reporter compact`: PASS, 630 testes.
+
+## 2026-06-12 — Identidade canônica aditiva para cartas
+
+- Primeiro slice de identidade semântica de carta implementado de forma
+  aditiva e sem enforcement duro.
+- `cards.scryfall_id` passa a ser tratado nos fluxos alterados como ID de
+  printing do Scryfall.
+- Novas colunas planejadas/aplicadas por migration:
+  `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`.
+- Rotas `/cards/resolve`, `/cards/printings`, `/cards/:id/rulings` e o sync de
+  cartas foram ajustados para preservar printing id, oracle id, layout e faces
+  quando disponíveis.
+- `sync_cards_utils.dart` mantém wrapper legado para testes/consumidores antigos
+  e expõe linha operacional nova com printing id + oracle id.
+- Limites explícitos deste slice:
+  - não aplica backfill completo por si só;
+  - não muda ainda save/import/singleton Commander para enforcement por
+    `oracle_id`;
+  - não escolhe printing canônica para learned-opponent decks ambíguos;
+  - não relaxa singleton, identidade de cor, Commander legality ou regras de
+    parceiro.
+- Próximo passo seguro: aplicar migration/backfill controlado, medir cobertura
+  de `oracle_id` e só depois ligar consumidores críticos a identidade canônica.

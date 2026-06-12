@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import '../../../lib/card_identity_support.dart';
 import '../../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -13,6 +14,7 @@ Future<Response> onRequest(RequestContext context) async {
 
   final pool = context.read<Pool>();
   final hasSets = await _hasTable(pool, 'sets');
+  final hasIdentityColumns = await hasCardIdentityColumns(pool);
 
   final params = context.request.uri.queryParameters;
   final name = params['name']?.trim();
@@ -34,19 +36,25 @@ Future<Response> onRequest(RequestContext context) async {
     name,
     safeLimit,
     hasSets,
+    hasIdentityColumns,
     deduplicate: deduplicate,
   );
 
   // Se sync=true e encontrou poucas edições, busca do Scryfall
   if (syncFromScryfall && data.length <= 1) {
     try {
-      final imported = await _syncPrintingsFromScryfall(pool, name);
+      final imported = await _syncPrintingsFromScryfall(
+        pool,
+        name,
+        hasIdentityColumns,
+      );
       if (imported > 0) {
         data = await _queryPrintings(
           pool,
           name,
           safeLimit,
           hasSets,
+          hasIdentityColumns,
           deduplicate: deduplicate,
         );
       }
@@ -67,11 +75,12 @@ Future<Response> onRequest(RequestContext context) async {
 /// Faz a query de printings no banco local
 /// Usa DISTINCT ON para retornar apenas uma carta por set_code (deduplica variantes)
 Future<List<Map<String, dynamic>>> _queryPrintings(
-    Pool pool, String name, int limit, bool hasSets,
+    Pool pool, String name, int limit, bool hasSets, bool hasIdentityColumns,
     {required bool deduplicate}) async {
   // Usamos DISTINCT ON (LOWER(c.set_code)) para deduplicar variantes do mesmo set
   // Isso garante que cada edição apareça apenas uma vez no seletor
   final String sql;
+  final identityColumns = cardIdentitySelectSql('c', hasIdentityColumns);
 
   if (!deduplicate) {
     sql = hasSets
@@ -79,6 +88,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
       SELECT
         c.id::text,
         c.scryfall_id::text,
+        $identityColumns
         c.name,
         c.mana_cost,
         c.type_line,
@@ -107,6 +117,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
       SELECT
         c.id::text,
         c.scryfall_id::text,
+        $identityColumns
         c.name,
         c.mana_cost,
         c.type_line,
@@ -133,6 +144,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         SELECT DISTINCT ON (LOWER(c.set_code))
           c.id::text,
           c.scryfall_id::text,
+          $identityColumns
           c.name,
           c.mana_cost,
           c.type_line,
@@ -162,6 +174,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         SELECT DISTINCT ON (LOWER(c.set_code))
           c.id::text,
           c.scryfall_id::text,
+          $identityColumns
           c.name,
           c.mana_cost,
           c.type_line,
@@ -195,6 +208,9 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
     return <String, dynamic>{
       'id': m['id'],
       'scryfall_id': m['scryfall_id'],
+      'oracle_id': m['oracle_id'],
+      'layout': m['layout'],
+      'card_faces': m['card_faces_json'],
       'name': m['name'],
       'mana_cost': m['mana_cost'],
       'type_line': m['type_line'],
@@ -222,7 +238,11 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
 }
 
 /// Busca todas as printings de uma carta no Scryfall e importa no banco
-Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
+Future<int> _syncPrintingsFromScryfall(
+  Pool pool,
+  String name,
+  bool hasIdentityColumns,
+) async {
   // 1. Buscar a carta principal no Scryfall
   final encoded = Uri.encodeQueryComponent(name.trim());
   final uri = Uri.parse(
@@ -268,8 +288,10 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
   var imported = 0;
 
   for (final p in filtered) {
+    final identity = scryfallIdentityPayload(p);
+
     // Usar o ID único da printing (não oracle_id, que é igual para todas as edições)
-    final scryfallId = p['id'] as String?;
+    final scryfallId = identity['scryfall_id'];
     if (scryfallId == null || scryfallId.isEmpty) continue;
 
     final cardName = p['name']?.toString() ?? '';
@@ -328,22 +350,38 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
     }
 
     try {
+      final identityInsertColumns =
+          hasIdentityColumns ? ', oracle_id, layout, card_faces_json' : '';
+      final identityInsertValues = hasIdentityColumns
+          ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
+          : '';
+      final identityUpdates = hasIdentityColumns
+          ? '''
+            oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
+            layout = COALESCE(EXCLUDED.layout, cards.layout),
+            card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
+'''
+          : '';
+
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
                              colors, color_identity, image_url, set_code, rarity, cmc,
-                             collector_number, foil)
+                             collector_number, foil$identityInsertColumns)
           VALUES (
             @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal, @collector_number, @foil
+            @cmc::decimal, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
-            foil = COALESCE(cards.foil, EXCLUDED.foil)
+            foil = COALESCE(cards.foil, EXCLUDED.foil),
+            $identityUpdates
+            created_at = cards.created_at
         '''),
         parameters: {
           'scryfall_id': scryfallId,
+          'oracle_id': identity['oracle_id'],
           'name': cardName,
           'mana_cost': manaCost,
           'type_line': typeLine,
@@ -356,6 +394,8 @@ Future<int> _syncPrintingsFromScryfall(Pool pool, String name) async {
           'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
           'collector_number': collectorNumber,
           'foil': foil,
+          'layout': identity['layout'],
+          'card_faces_json': identity['card_faces_json'],
         },
       );
       imported++;

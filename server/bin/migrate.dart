@@ -561,6 +561,28 @@ final migrations = <Migration>[
       DROP INDEX IF EXISTS idx_cards_name_lower;
     ''',
   ),
+  Migration(
+    version: '021',
+    name: 'add_card_canonical_identity_columns',
+    up: '''
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID;
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT;
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_faces_json JSONB;
+
+      CREATE INDEX IF NOT EXISTS idx_cards_oracle_id
+      ON cards (oracle_id);
+
+      CREATE INDEX IF NOT EXISTS idx_cards_layout
+      ON cards (layout);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_cards_layout;
+      DROP INDEX IF EXISTS idx_cards_oracle_id;
+      ALTER TABLE cards DROP COLUMN IF EXISTS card_faces_json;
+      ALTER TABLE cards DROP COLUMN IF EXISTS layout;
+      ALTER TABLE cards DROP COLUMN IF EXISTS oracle_id;
+    ''',
+  ),
 ];
 
 class Migration {
