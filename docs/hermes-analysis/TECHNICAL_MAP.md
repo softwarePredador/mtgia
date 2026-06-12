@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-12 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-12 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -280,30 +280,28 @@ esse dado como sinal de produto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-11 07:00 UTC no checkout local `13a10128`.
-  O auditor textual executou com sucesso (`205` arquivos backend, `0` imports
-  quebrados), mas continua sem grafo de chamadas e sobrescreve o historico manual
-  quando o marker gerado nao existe; a mutacao automatica foi restaurada antes
-  do update manual. Achados atuais: `server/lib/sync_cards_utils.dart` voltou a
-  ficar test-only enquanto `server/bin/sync_cards.dart` mantem copias privadas
-  para parte do contrato; `swap_integrity` e emitido pelo optimize, mas
-  `verifySwapIntegrity` nao e chamado no app/backend; a extracao de
-  `optimize_response_support.dart` permanece parcial (`buildOptimizeResponse` e
-  o top-level `respondWithOptimizeTelemetry` nao estao no fluxo real); wrappers
-  app sem chamador runtime (`BinderProvider.applyFilters`,
-  `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`); e helpers de
-  suporte sem chamada confirmada em request trace, Commander Reference,
-  optimize utility sample, ML feedback, `ApiClient.loadTokenFromDisk`,
-  performance manual/debug, EDHREC/cache, CMC safety/intensity/counters/push.
-  Claims antigas contra `tryGetRequestId`,
-  `normalizedCommanderReferenceCandidate`,
-  `extractMtgTop8FormatCodeFromSourceUrl` e
-  `buildCandidateQualitySamplePoolSql` estao stale porque esses simbolos nao
-  existem mais neste checkout. Controles positivos: `buildSemanticV2OptimizeRejectedBody`,
-  `attachOptimizeBracketPolicyDiagnostics`, `safeCmcForOptimization`,
-  `getHighSynergyCards`, `EndpointCache.get/set`, `sendToUser`, observabilidade
-  automatica (`init`, observer e `traceAsync`) e os fluxos app que usam
-  `fetchBinderDirect`/`fetchPublicDecks` em vez dos wrappers sem chamador.
+  novamente em 2026-06-12 07:00 UTC no checkout local `086ab624`. O auditor
+  textual executou com sucesso (`205` arquivos backend, `0` imports quebrados),
+  mas continua sem grafo de chamadas; a mutacao automatica do bloco gerado foi
+  descartada para preservar o historico manual. Permanecem abertos os achados
+  de maior impacto: `server/lib/sync_cards_utils.dart` test-only enquanto
+  `server/bin/sync_cards.dart` mantem copias privadas; `swap_integrity` e
+  emitido, mas `verifySwapIntegrity` nao e chamado no apply app/backend; e a
+  extracao de `optimize_response_support.dart` continua parcial
+  (`buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry` fora do
+  fluxo real). Seguem tambem wrappers app sem chamador
+  (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+  `DeckProvider.clearAllCache`) e conveniencias sem wiring em request trace,
+  Commander Reference, optimize utility sample, ML feedback,
+  `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
+  safety, counters, push e read-side de `AiLogService`. Correcoes de
+  classificacao: `hasSuspiciousNonLandCmc` esta test-only, mas
+  `isLikelyLandCard` e vivo via `safeCmcForOptimization`; helpers de aggressive
+  meta/candidate quality sao usados por bins operacionais e nao foram
+  promovidos. Controles positivos: semantic/bracket response helpers,
+  `safeCmcForOptimization`, `getHighSynergyCards`, `EndpointCache.get/set`,
+  `sendToUser`, observabilidade automatica e fluxos app que usam
+  `fetchBinderDirect`/`fetchPublicDecks`.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-11 15:00 UTC no checkout local `76ec897f`. As claims antigas
   contra `deck_matchups` e `deck_weakness_reports` estao stale nesta branch:

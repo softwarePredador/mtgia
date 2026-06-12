@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-12 05:30 UTC
+> Data: 2026-06-12 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -86,28 +86,21 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-11 07:00 UTC como **ABERTO neste checkout `13a10128`**.
-    O auditor textual executou com sucesso (`205` arquivos backend, `0` imports
-    quebrados), mas nao prova ausencia de chamadas e sobrescreve o historico manual
-    se o marker gerado nao existir; a saida automatica foi restaurada antes da
-    atualizacao manual. Achados atuais: `sync_cards_utils.dart` esta test-only
-    enquanto `server/bin/sync_cards.dart` mantem copias privadas/fluxo Python
-    para parte do contrato; `verifySwapIntegrity` nao e chamado apesar de
-    `swap_integrity` ser anexado pelo optimize; `buildOptimizeResponse` e o
-    top-level `respondWithOptimizeTelemetry` de `optimize_response_support.dart`
-    nao sao usados pelo fluxo real da rota; wrappers app sem chamada
-    (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+    2026-06-12 07:00 UTC como **ABERTO neste checkout `086ab624`**. O auditor
+    textual executou com sucesso (`205` arquivos backend, `0` imports
+    quebrados), mas nao prova ausencia de chamadas; a mutacao automatica do
+    bloco gerado foi descartada antes da atualizacao manual. Permanecem abertos
+    `sync_cards_utils.dart` test-only enquanto `server/bin/sync_cards.dart`
+    mantem copias privadas/fluxo Python; `verifySwapIntegrity` sem chamador
+    apesar de `swap_integrity` ser anexado; builders de
+    `optimize_response_support.dart` ainda fora do fluxo real; wrappers app sem
+    chamada (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
     `DeckProvider.clearAllCache`); e helpers de suporte sem chamada confirmada
     em request trace, Commander Reference, optimize utility sample, ML feedback,
     `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
-    safety/intensity/counters/push. As claims antigas contra `tryGetRequestId`,
-    `normalizedCommanderReferenceCandidate`,
-    `extractMtgTop8FormatCodeFromSourceUrl` e
-    `buildCandidateQualitySamplePoolSql` estao stale porque os simbolos nao
-    existem mais neste checkout. Controles positivos: semantic/bracket response
-    helpers vivos, `safeCmcForOptimization`, `getHighSynergyCards`,
-    `EndpointCache.get/set`, `sendToUser`, observabilidade automatica e fluxos
-    app que usam `fetchBinderDirect`/`fetchPublicDecks`.
+    safety/counters/push e read-side de `AiLogService`. Correcoes: helpers de
+    aggressive meta/candidate quality sao usados por bins operacionais e
+    `isLikelyLandCard` permanece vivo via `safeCmcForOptimization`.
 13. **P1/P2 — Imports quebrados e ciclos locais**: **REVALIDADO/ABERTO no
     checkout local `372cdfca` em 2026-06-11 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`, e a varredura local
@@ -595,15 +588,16 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-11 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
-`13a10128`**. As anotacoes historicas de resolucao em outros SHAs nao
-representam automaticamente o estado desta branch. A rodada atual removeu
-claims stale contra simbolos que nao existem mais (`tryGetRequestId`,
-`normalizedCommanderReferenceCandidate`,
-`extractMtgTop8FormatCodeFromSourceUrl` e
-`buildCandidateQualitySamplePoolSql`) e adicionou dois achados de maior impacto:
-`verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser emitido, e
-builders de response do optimize que continuam fora do fluxo real.
+**Status 2026-06-12 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`086ab624`**. As anotacoes historicas de resolucao em outros SHAs nao
+representam automaticamente o estado desta branch. A rodada atual manteve os
+achados de maior impacto (`sync_cards_utils.dart` test-only,
+`verifySwapIntegrity` sem chamador apesar de `swap_integrity` e builders de
+response do optimize fora do fluxo real), corrigiu classificacoes ruidosas
+(`isLikelyLandCard` e vivo; helpers de aggressive meta/candidate quality sao
+consumidos por bins operacionais) e adicionou achados menores no read-side de
+`AiLogService`, em `ArchetypeCountersService` e em
+`PushNotificationService.sendToMultipleTokens`.
 
 - **Evidência**:
   - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:121`, `:178` e
@@ -659,12 +653,12 @@ builders de response do optimize que continuam fora do fluxo real.
     confirmada; os fluxos app usam `fetchBinderDirect`, `fetchPublicDecks` e
     invalidacao especifica de deck.
   - `server/lib/ai/cmc_safety.dart:64`,
-    `server/lib/ai/optimize_runtime_support.dart:76`,
-    `server/lib/archetype_counters_service.dart:204` e
-    `server/lib/push_notification_service.dart:295` definem helpers sem chamada
-    runtime confirmada; controles vivos existem para `safeCmcForOptimization`,
-    uso de `ArchetypeCountersService` em rotas de analise/simulacao e
-    `sendToUser`.
+    `server/lib/archetype_counters_service.dart:67`/`:104`/`:204`,
+    `server/lib/push_notification_service.dart:295` e
+    `server/lib/ai_log_service.dart:120`/`:163`/`:204` definem helpers sem
+    chamada runtime confirmada; controles vivos existem para
+    `safeCmcForOptimization`, uso de `ArchetypeCountersService` em rotas de
+    analise/simulacao, `sendToUser` e escrita de logs via `_logService?.log`.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
   porque o teste cobre uma copia que nao participa do CLI operacional.
@@ -682,8 +676,8 @@ builders de response do optimize que continuam fora do fluxo real.
   6. manter `PerformanceService` como API publica apenas se houver plano de
      observabilidade mobile/manual traces; caso contrario, simplificar para
      `init` + observer + `traceAsync`;
-  7. transformar conveniencias EDHREC/cache sem consumidor em private/remover,
-     ou ligar a rotina real com teste;
+  7. transformar conveniencias EDHREC/cache/counters/push/read-side sem
+     consumidor em private/remover, ou ligar a rotina real com teste;
   8. continuar usando busca de chamadores como guardrail antes de adicionar
      novos helpers publicos.
 - **Validação**:
