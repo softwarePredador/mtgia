@@ -1192,7 +1192,115 @@ def card_has_functional_tag(card, *tags):
     return bool(wanted.intersection(card_functional_tags(card)))
 
 
-def load_deck(deck_id=6):
+def commander_deck_color_identity(cards):
+    colors = set()
+    for card in cards:
+        colors.update(compute_color_identity(card))
+    return sorted(colors)
+
+
+def card_allows_multiple_copies(card):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "")
+    if "Basic" in type_line and "Land" in type_line:
+        return True
+    if normalize_card_name(card.get("name")) in {
+        "plains",
+        "island",
+        "swamp",
+        "mountain",
+        "forest",
+        "wastes",
+    }:
+        return True
+    oracle = str(card.get("oracle_text") or "").lower()
+    return "a deck can have any number of cards named" in oracle
+
+
+def deck_card_singleton_key(card):
+    card_id = str(card.get("card_id") or "").strip()
+    if card_id:
+        return f"id:{card_id}"
+    return f"name:{normalize_card_name(card.get('oracle_name') or card.get('name'))}"
+
+
+def build_deck_construction_report(commanders, deck, expected_format="commander"):
+    commanders = list(commanders or [])
+    deck = list(deck or [])
+    commander_colors = set(commander_deck_color_identity(commanders))
+    singleton_counts = defaultdict(lambda: {"count": 0, "card": None})
+
+    for card in deck:
+        if card_allows_multiple_copies(card):
+            continue
+        key = deck_card_singleton_key(card)
+        singleton_counts[key]["count"] += 1
+        singleton_counts[key]["card"] = card
+
+    singleton_violations = []
+    for entry in singleton_counts.values():
+        if entry["count"] <= 1:
+            continue
+        card = entry["card"] or {}
+        singleton_violations.append({
+            "name": card.get("oracle_name") or card.get("name") or "Unknown",
+            "count": entry["count"],
+            "card_id": card.get("card_id") or "",
+        })
+
+    color_identity_checked = bool(commanders)
+    off_color_cards = []
+    if color_identity_checked:
+        for card in deck:
+            card_colors = set(compute_color_identity(card))
+            extra_colors = sorted(card_colors - commander_colors)
+            if not extra_colors:
+                continue
+            off_color_cards.append({
+                "name": card.get("oracle_name") or card.get("name") or "Unknown",
+                "card_id": card.get("card_id") or "",
+                "color_identity": sorted(card_colors),
+                "off_identity_colors": extra_colors,
+            })
+
+    main_quantity = len(deck)
+    commander_count = len(commanders)
+    total_quantity = main_quantity + commander_count
+    issues = []
+    if expected_format == "commander":
+        if commander_count != 1:
+            issues.append(f"expected_1_commander_found_{commander_count}")
+        if main_quantity != 99:
+            issues.append(f"expected_99_main_cards_found_{main_quantity}")
+        if total_quantity != 100:
+            issues.append(f"expected_100_total_cards_found_{total_quantity}")
+        if singleton_violations:
+            issues.append("singleton_violations")
+        if off_color_cards:
+            issues.append("off_color_cards")
+        if not color_identity_checked:
+            issues.append("color_identity_not_checked_without_commander")
+
+    return {
+        "format": expected_format,
+        "is_valid": not issues,
+        "issues": issues,
+        "commander_count": commander_count,
+        "commander_names": [
+            card.get("oracle_name") or card.get("name") or "Unknown"
+            for card in commanders
+        ],
+        "commander_color_identity": sorted(commander_colors),
+        "main_quantity": main_quantity,
+        "total_quantity": total_quantity,
+        "singleton_violations": singleton_violations,
+        "off_color_cards": off_color_cards,
+        "color_identity_checked": color_identity_checked,
+    }
+
+
+def load_deck_cards(deck_id=6):
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     columns = {row[1] for row in conn.execute("PRAGMA table_info(deck_cards)")}
@@ -1220,7 +1328,7 @@ def load_deck(deck_id=6):
     ), (deck_id,)).fetchall()
     oracle_cache = load_card_oracle_cache(conn, [row["card_name"] for row in rows])
     conn.close()
-    commander = None
+    commanders = []
     deck = []
     for row in rows:
         qty = row["quantity"] or 1
@@ -1241,10 +1349,25 @@ def load_deck(deck_id=6):
             "semantics_hash": row["semantics_hash"] or "",
         }, oracle_cache)
         card = enrich_card(card)
-        if card["is_commander"]: commander = card
+        if card["is_commander"]:
+            for _ in range(qty):
+                commanders.append(card)
         else:
             for _ in range(qty): deck.append(card)
+    return commanders, deck
+
+
+def load_deck(deck_id=6):
+    commanders, deck = load_deck_cards(deck_id)
+    commander = commanders[-1] if commanders else None
     return commander, deck
+
+
+def load_deck_with_construction_report(deck_id=6):
+    commanders, deck = load_deck_cards(deck_id)
+    commander = commanders[-1] if commanders else None
+    report = build_deck_construction_report(commanders, deck)
+    return commander, deck, report
 
 # ═══════════════════════════════════════════
 # CARD EFFECTS
@@ -7313,7 +7436,7 @@ def main():
     print("BATTLE ANALYST v8 — Interactive Commander (Priority + Stack + Miracle)")
     print("=" * 60)
 
-    commander, deck = load_deck()
+    commander, deck, construction_report = load_deck_with_construction_report()
     lands = sum(1 for c in deck if card_has_functional_tag(c, "land") or "Land" in c.get("type_line", ""))
     ramp = sum(1 for c in deck if card_has_functional_tag(c, "ramp", "ritual"))
     removal = sum(1 for c in deck if card_has_functional_tag(c, "removal", "board_wipe"))
@@ -7323,6 +7446,8 @@ def main():
 
     print(f"Commander: {commander['name'] if commander else 'NONE'}")
     print(f"Deck: 1+99 | L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}")
+    if not construction_report["is_valid"]:
+        print("Deck construction warnings: " + ", ".join(construction_report["issues"]))
     print(f"v8: Priority, Stack, Instant/Sorcery Timing, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste")
 
     # Check for learned decks first

@@ -85,7 +85,7 @@
 | Commander damage tracking | ✅ Básico | v9: `commander_damage_by_source` | Ledger por `defender::commander_origin_id`; agregado legado por defensor preservado para compatibilidade |
 | Commander replacement (GY/exile → CZ opcional) | ✅ Básico | v9: `ReplacementRegistry` | Redireciona para command zone salvo `commander_replacement_choice` |
 | Commander replacement (hand/library → CZ opcional) | ✅ Básico | v9: `ReplacementRegistry` | Coberto no mesmo pipeline de zone change |
-| Deck construction (100 cards, singleton, color ID) | ⚠️ Parcial | — | Feito no app, não no battle engine |
+| Deck construction (100 cards, singleton, color ID) | ✅ Básico/diagnóstico | v9: `load_deck_with_construction_report` | Battle engine agora emite relatório de construção Commander para quantidade 99+1, singleton e off-color sem bloquear simulação; app/backend continuam sendo fonte de verdade para save/import |
 | Partner/Background/Friends Forever | ⚠️ Parcial | server: `commander_pairing.dart`; v9: damage ledger por origem | Servidor valida pares oficiais; battle engine ainda não modela UX/interação completa de dois commanders na command zone |
 | Commander ninjutsu do CZ | ❌ Ausente | — | |
 | Color identity de DFC/Adventure | ✅ Básico | v9: `compute_color_identity` | Agrega faces/partes/modos complexos |

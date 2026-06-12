@@ -755,3 +755,35 @@ This closes the immediate gap without adding sideboard support. Future real
 sideboard/wishboard support must introduce explicit schema, API contracts,
 app UI, validators and Commander/non-Commander policy instead of reusing
 the current main-deck model.
+
+### Update 2026-06-12j - Hermes battle Commander construction report
+
+The Hermes battle simulator now has a compatibility-preserving construction
+diagnostic for the deck it loads from local SQLite.
+
+Implemented:
+
+- `load_deck()` remains backward-compatible and still returns
+  `(commander, deck)`.
+- New `load_deck_with_construction_report()` returns
+  `(commander, deck, report)`.
+- The report checks Commander shape without changing app/backend
+  persistence:
+  - exactly one commander;
+  - `99` main-deck cards;
+  - `100` total cards;
+  - singleton violations for non-basic/non-override cards;
+  - cards outside the loaded commander color identity.
+- The battle analyst CLI prints construction warnings before simulation.
+- Unit coverage proves valid Commander shape, singleton violation detection
+  and off-color detection using a temp SQLite deck plus oracle cache.
+
+Not implemented by this slice:
+
+- Partner/Background/Friends Forever as a multi-commander command-zone model.
+- Hard enforcement inside Hermes battle execution.
+- Any PostgreSQL or app contract change.
+
+This keeps the source-of-truth boundary intact: backend/PostgreSQL owns
+save/import legality, while Hermes battle receives a visible diagnostic when
+its operational SQLite cache is incomplete or inconsistent.

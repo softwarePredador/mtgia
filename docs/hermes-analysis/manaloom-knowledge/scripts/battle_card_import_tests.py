@@ -9,6 +9,112 @@ from pathlib import Path
 
 
 def register_tests(battle, player, card, module_path):
+    def _create_deck_schema(conn):
+        conn.execute(
+            """
+            CREATE TABLE deck_cards (
+                deck_id INTEGER,
+                card_id TEXT,
+                card_name TEXT,
+                quantity INTEGER,
+                cmc REAL,
+                functional_tag TEXT,
+                functional_tags_json TEXT,
+                type_line TEXT,
+                oracle_text TEXT,
+                is_commander INTEGER,
+                semantics_hash TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE card_oracle_cache (
+                normalized_name TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                mana_cost TEXT,
+                colors_json TEXT,
+                color_identity_json TEXT,
+                type_line TEXT,
+                oracle_text TEXT,
+                cmc REAL,
+                power TEXT,
+                toughness TEXT,
+                keywords_json TEXT,
+                scryfall_id TEXT
+            )
+            """
+        )
+
+    def _insert_deck_card(
+        conn,
+        name,
+        quantity=1,
+        card_id=None,
+        functional_tag="unknown",
+        type_line="",
+        oracle_text="",
+        is_commander=0,
+        cmc=0,
+    ):
+        conn.execute(
+            """
+            INSERT INTO deck_cards (
+                deck_id, card_id, card_name, quantity, cmc, functional_tag,
+                functional_tags_json, type_line, oracle_text, is_commander,
+                semantics_hash
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                6,
+                card_id or f"card-{battle.normalize_card_name(name)}",
+                name,
+                quantity,
+                cmc,
+                functional_tag,
+                json.dumps([functional_tag]) if functional_tag != "unknown" else "[]",
+                type_line,
+                oracle_text,
+                is_commander,
+                f"semantic-{battle.normalize_card_name(name)}",
+            ),
+        )
+
+    def _insert_oracle_card(
+        conn,
+        name,
+        color_identity=None,
+        type_line="",
+        oracle_text="",
+        mana_cost="",
+        cmc=0,
+        power=None,
+        toughness=None,
+    ):
+        colors = color_identity or []
+        conn.execute(
+            """
+            INSERT INTO card_oracle_cache (
+                normalized_name, name, mana_cost, colors_json, color_identity_json,
+                type_line, oracle_text, cmc, power, toughness, keywords_json, scryfall_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                battle.normalize_card_name(name),
+                name,
+                mana_cost,
+                json.dumps(colors),
+                json.dumps(colors),
+                type_line,
+                oracle_text,
+                cmc,
+                "" if power is None else str(power),
+                "" if toughness is None else str(toughness),
+                "[]",
+                f"scryfall-{battle.normalize_card_name(name)}",
+            ),
+        )
+
     def test_card_oracle_cache_enriches_battle_cards():
         conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
@@ -176,6 +282,127 @@ def register_tests(battle, player, card, module_path):
             finally:
                 battle.DB = old_db
 
+    def test_load_deck_construction_report_accepts_valid_commander_shape():
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "deck.db"
+            conn = sqlite3.connect(db_path)
+            _create_deck_schema(conn)
+            _insert_oracle_card(
+                conn,
+                "Talrand, Sky Summoner",
+                color_identity=["U"],
+                type_line="Legendary Creature - Merfolk Wizard",
+                oracle_text="Whenever you cast an instant or sorcery spell, create a Drake token.",
+                power=2,
+                toughness=2,
+            )
+            _insert_oracle_card(
+                conn,
+                "Island",
+                color_identity=[],
+                type_line="Basic Land - Island",
+                oracle_text="",
+            )
+            _insert_deck_card(
+                conn,
+                "Talrand, Sky Summoner",
+                is_commander=1,
+                type_line="Legendary Creature - Merfolk Wizard",
+            )
+            _insert_deck_card(conn, "Island", quantity=99, functional_tag="land")
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.DB = str(db_path)
+                commander, deck, report = battle.load_deck_with_construction_report()
+                assert commander["name"] == "Talrand, Sky Summoner"
+                assert len(deck) == 99
+                assert report["is_valid"] is True
+                assert report["main_quantity"] == 99
+                assert report["total_quantity"] == 100
+                assert report["commander_color_identity"] == ["blue"]
+                assert report["singleton_violations"] == []
+                assert report["off_color_cards"] == []
+            finally:
+                battle.DB = old_db
+
+    def test_load_deck_construction_report_flags_singleton_violations():
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "deck.db"
+            conn = sqlite3.connect(db_path)
+            _create_deck_schema(conn)
+            _insert_oracle_card(
+                conn,
+                "Talrand, Sky Summoner",
+                color_identity=["U"],
+                type_line="Legendary Creature - Merfolk Wizard",
+            )
+            _insert_oracle_card(conn, "Island", type_line="Basic Land - Island")
+            _insert_oracle_card(conn, "Sol Ring", type_line="Artifact")
+            _insert_deck_card(conn, "Talrand, Sky Summoner", is_commander=1)
+            _insert_deck_card(conn, "Sol Ring", quantity=2, functional_tag="ramp")
+            _insert_deck_card(conn, "Island", quantity=97, functional_tag="land")
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.DB = str(db_path)
+                _, _, report = battle.load_deck_with_construction_report()
+                assert report["is_valid"] is False
+                assert "singleton_violations" in report["issues"]
+                assert report["singleton_violations"] == [
+                    {"name": "Sol Ring", "count": 2, "card_id": "card-sol ring"}
+                ]
+                assert report["main_quantity"] == 99
+                assert report["total_quantity"] == 100
+            finally:
+                battle.DB = old_db
+
+    def test_load_deck_construction_report_flags_off_color_cards():
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "deck.db"
+            conn = sqlite3.connect(db_path)
+            _create_deck_schema(conn)
+            _insert_oracle_card(
+                conn,
+                "Talrand, Sky Summoner",
+                color_identity=["U"],
+                type_line="Legendary Creature - Merfolk Wizard",
+            )
+            _insert_oracle_card(conn, "Island", type_line="Basic Land - Island")
+            _insert_oracle_card(
+                conn,
+                "Lightning Bolt",
+                color_identity=["R"],
+                type_line="Instant",
+                oracle_text="Lightning Bolt deals 3 damage to any target.",
+            )
+            _insert_deck_card(conn, "Talrand, Sky Summoner", is_commander=1)
+            _insert_deck_card(conn, "Lightning Bolt", quantity=1, functional_tag="removal")
+            _insert_deck_card(conn, "Island", quantity=98, functional_tag="land")
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.DB = str(db_path)
+                _, _, report = battle.load_deck_with_construction_report()
+                assert report["is_valid"] is False
+                assert "off_color_cards" in report["issues"]
+                assert report["off_color_cards"] == [
+                    {
+                        "name": "Lightning Bolt",
+                        "card_id": "card-lightning bolt",
+                        "color_identity": ["red"],
+                        "off_identity_colors": ["red"],
+                    }
+                ]
+            finally:
+                battle.DB = old_db
+
     def test_lands_are_not_instant_or_sorcery_even_with_generated_metadata():
         land = {
             "name": "Mana Confluence",
@@ -340,6 +567,9 @@ def register_tests(battle, player, card, module_path):
         test_card_oracle_cache_enriches_battle_cards,
         test_battle_card_rules_table_overrides_fallbacks,
         test_load_deck_preserves_semantic_snapshot_identity_fields,
+        test_load_deck_construction_report_accepts_valid_commander_shape,
+        test_load_deck_construction_report_flags_singleton_violations,
+        test_load_deck_construction_report_flags_off_color_cards,
         test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,
         test_end_step_window_does_not_cast_lands,
         test_zuran_orb_is_life_artifact_not_mana_rock,
