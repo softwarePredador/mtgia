@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-12 19:00 UTC
+> Data: 2026-06-12 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,7 +20,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `.dart_frog/server.dart` em runtime, e `dart analyze bin/local_test_server.dart`
    retornou `No issues found`.
 5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
-   `server/lib`**: **REVALIDADO no checkout local `6ce57c64` em 2026-06-11
+   `server/lib`**: **REVALIDADO no checkout local `3d9fe518` em 2026-06-12
    23:00 UTC**. Os riscos anteriores de ownership em `POST /ai/optimize`,
    `POST /ai/archetypes` e polling de jobs async seguem stale nesta branch:
    optimize exige usuario, passa `userId` para o loader owner-scoped, jobs
@@ -698,8 +698,8 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-11 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `6ce57c64`. Os achados anteriores de ownership em `/ai/optimize`,
+- **Status 2026-06-12 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `3d9fe518`. Os achados anteriores de ownership em `/ai/optimize`,
   `/ai/archetypes` e jobs async de optimize/generate estao resolvidos nesta
   branch e foram removidos da lista de acoes abertas. A lacuna ativa agora e
   mais estreita: activation telemetry rejeita um evento emitido pelo app,
@@ -746,9 +746,9 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
   - A rota de learned decks le `commander_learned_decks` em
     `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:110`-`:132`;
     o schema/modelo fica em
-    `server/lib/ai/commander_learned_deck_support.dart:7` e `:283`-`:315`.
-    `rg "/ai/commander-learning" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
-    nao encontrou contrato, e `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:315`
+    `server/lib/ai/commander_learned_deck_support.dart:7` e `:283`-`:318`.
+    `rg "/ai/commander-learning|commander_learned_decks" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+    nao encontrou contrato nem data source, e `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:315`
     nao lista `commander_learned_decks` nos data sources.
   - `server/routes/ai/_middleware.dart:16`-`:20` aplica
     `aiPlanLimitMiddleware()` e `aiRateLimit()` a `/ai/commander-learning`.
