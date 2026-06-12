@@ -217,6 +217,13 @@ python3 derive_functional_tags_from_battle_rules.py \
   --output /tmp/derived_tag_allowlist_dry_run.json
 ```
 
+Versioned low-risk dry-run allowlist:
+
+- `docs/hermes-analysis/BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json`
+- `approved` entries: 27;
+- `apply_approved=false`;
+- status per entry: `dry_run_low_risk_review_only`.
+
 Allowlist JSON can be either a list or an object with `approved`/`allowlist`.
 Entries can be:
 
@@ -258,13 +265,28 @@ Hermes AWS smoke after commit `86ef9062`:
 | low-risk review candidates | 27 |
 | manual-review candidates | 62 |
 
+Hermes AWS allowlist dry-run after commit `51328ea7`:
+
+| Check | Result |
+|---|---:|
+| rules seen | 3156 |
+| new candidates | 89 |
+| low-risk review candidates | 27 |
+| manual-review candidates | 62 |
+| allowlist key count loaded | 72 |
+| allowlisted candidates | 27 |
+| manual-review candidates blocked | 0 |
+| unmatched allowlist keys | 0 |
+| apply | false |
+
 ## Next steps
 
 1. Keep the current Slice 4 as report-only.
-2. Review the 27 remaining low-risk candidates manually before any apply
-   implementation.
+2. The 27 remaining low-risk candidates now have a versioned dry-run allowlist,
+   but this is not apply approval; it only proves the review contract and
+   matching keys.
 3. Extend taxonomy before applying the 62 manual-review candidates:
    scoped tutor, conditional ramp, protection subtype, topdeck/cast-from-top,
    broad wincon, and face-aware semantics.
-4. If apply is approved later, start with an allowlist-backed dry-run and a
-   small PostgreSQL transaction test, not a bulk write.
+4. If apply is approved later, first implement stale cleanup and then run a
+   small PostgreSQL transaction dry-run, not a bulk write.

@@ -18347,5 +18347,16 @@ na command zone, não para validação de deck no servidor.
   - `low_risk_review_count=27`;
   - `manual_review_count=62`;
   - `apply=false`.
+- Allowlist dry-run versionada no commit `51328ea7`:
+  - arquivo:
+    `docs/hermes-analysis/BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json`;
+  - `approved` entries: 27;
+  - `apply_approved=false`;
+  - validação Hermes/AWS:
+    - `allowlist_loaded_count=72` chaves expandidas;
+    - `allowlisted_candidates_count=27`;
+    - `allowlist_blocked_manual_review_count=0`;
+    - `allowlist_unmatched_count=0`;
+    - `apply=false`.
 - Nenhum write em `card_function_tags` está aprovado sem allowlist versionada,
-  stale cleanup e validação de falso positivo zero.
+  stale cleanup, transaction dry-run e validação de falso positivo zero.

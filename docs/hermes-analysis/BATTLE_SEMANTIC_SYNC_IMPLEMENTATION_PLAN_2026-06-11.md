@@ -669,3 +669,8 @@ Slice 4 report-only derivation status:
 5. Added allowlist dry-run support to the same runner. Default behavior keeps
    manual-review candidates blocked, reports unmatched keys, and still performs
    no PostgreSQL writes.
+6. Commit `51328ea7` added the versioned dry-run allowlist
+   `BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json` for the 27
+   low-risk candidates. Hermes AWS dry-run loaded 72 matching keys from those
+   27 entries, allowlisted 27 candidates, blocked 0 manual-review candidates,
+   had 0 unmatched keys and kept `apply=false`.

@@ -100,8 +100,11 @@ Ao responder sobre o ManaLoom:
   gate. A revisão `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` classifica
   27 candidatos como low-risk review e 62 como manual-review após mover
   Dramatic Reversal, Manamorphose e Victory Chimes para revisão manual por
-  escopo card-specific. Nenhum apply em `card_function_tags` está liberado sem
-  revisão, allowlist e stale cleanup.
+  escopo card-specific. A allowlist
+  `BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json` versiona os 27
+  low-risk apenas para dry-run; Hermes AWS confirmou 27 allowlisted, 0 manual
+  liberado, 0 unmatched e `apply=false`. Nenhum apply em `card_function_tags`
+  está liberado sem stale cleanup e transaction dry-run.
 - Identidade canônica de carta entrou em transição em 2026-06-12: backend/sync
   agora têm contrato aditivo para `cards.oracle_id`, `cards.layout` e
   `cards.card_faces_json`, tratando `scryfall_id` como printing id. Ainda falta
