@@ -94,6 +94,8 @@ def register_tests(battle, player, card, module_path):
                 effect = battle.get_card_effect(
                     {
                         "name": "Registry Counter",
+                        "card_id": "unit-card-id",
+                        "semantic_hash": "unit-semantic-hash",
                         "type_line": "Instant",
                         "oracle_text": "A deliberately weird test card.",
                     }
@@ -104,12 +106,75 @@ def register_tests(battle, player, card, module_path):
                 assert effect["_rule_logical_key"].startswith("battle_rule_v1:")
                 assert effect["_rule_oracle_hash"] == "unit-oracle-hash"
                 replay_fields = battle.replay_rule_fields(effect)
+                assert replay_fields["card_id"] == "unit-card-id"
+                assert replay_fields["semantic_hash"] == "unit-semantic-hash"
                 assert replay_fields["rule_logical_key"] == effect["_rule_logical_key"]
                 assert replay_fields["rule_oracle_hash"] == "unit-oracle-hash"
                 assert battle.is_instant({"name": "Registry Counter", "type_line": "Instant"})
             finally:
                 battle.DB = old_db
                 battle.battle_rule_registry._RULE_CACHE.clear()
+
+    def test_load_deck_preserves_semantic_snapshot_identity_fields():
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "deck.db"
+            conn = sqlite3.connect(db_path)
+            conn.execute(
+                """
+                CREATE TABLE deck_cards (
+                    deck_id INTEGER,
+                    card_id TEXT,
+                    card_name TEXT,
+                    quantity INTEGER,
+                    cmc REAL,
+                    functional_tag TEXT,
+                    functional_tags_json TEXT,
+                    type_line TEXT,
+                    oracle_text TEXT,
+                    is_commander INTEGER,
+                    semantics_hash TEXT
+                )
+                """
+            )
+            conn.execute(
+                """
+                INSERT INTO deck_cards (
+                    deck_id, card_id, card_name, quantity, cmc, functional_tag,
+                    functional_tags_json, type_line, oracle_text, is_commander,
+                    semantics_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    6,
+                    "card-id-1",
+                    "Semantic Draw",
+                    1,
+                    1,
+                    "draw",
+                    json.dumps(["draw"]),
+                    "Instant",
+                    "Draw two cards.",
+                    0,
+                    "semantic-hash-1",
+                ),
+            )
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.DB = str(db_path)
+                commander, deck = battle.load_deck()
+                assert commander is None
+                assert len(deck) == 1
+                assert deck[0]["card_id"] == "card-id-1"
+                assert deck[0]["semantic_hash"] == "semantic-hash-1"
+                effect = battle.get_card_effect(deck[0])
+                replay_fields = battle.replay_rule_fields(effect)
+                assert replay_fields["card_id"] == "card-id-1"
+                assert replay_fields["semantic_hash"] == "semantic-hash-1"
+            finally:
+                battle.DB = old_db
 
     def test_lands_are_not_instant_or_sorcery_even_with_generated_metadata():
         land = {
@@ -274,6 +339,7 @@ def register_tests(battle, player, card, module_path):
     return [
         test_card_oracle_cache_enriches_battle_cards,
         test_battle_card_rules_table_overrides_fallbacks,
+        test_load_deck_preserves_semantic_snapshot_identity_fields,
         test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,
         test_end_step_window_does_not_cast_lands,
         test_zuran_orb_is_life_artifact_not_mana_rock,

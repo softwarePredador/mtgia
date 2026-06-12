@@ -252,6 +252,14 @@ def event_logical_rule_key(event: dict[str, Any], rule: dict[str, Any] | None) -
     return str(event.get("rule_logical_key") or (rule or {}).get("logical_rule_key") or "")
 
 
+def event_card_id(event: dict[str, Any]) -> str:
+    return str(event.get("card_id") or "")
+
+
+def event_semantic_hash(event: dict[str, Any]) -> str:
+    return str(event.get("semantic_hash") or event.get("semantics_hash") or "")
+
+
 def audit_rule_provenance(
     events: list[dict[str, Any]],
     rules: dict[str, dict[str, Any]],
@@ -264,6 +272,10 @@ def audit_rule_provenance(
     cards_by_source: dict[str, set[str]] = defaultdict(set)
     by_logical_rule_key: Counter[str] = Counter()
     missing_logical_rule_key = 0
+    card_id_present = 0
+    card_id_missing = 0
+    semantic_hash_present = 0
+    semantic_hash_missing = 0
     unique_cards: set[str] = set()
 
     for event in events:
@@ -277,6 +289,8 @@ def audit_rule_provenance(
         status = event_review_status(event, rule)
         effect = event_effect(event, rule)
         logical_key = event_logical_rule_key(event, rule)
+        card_id = event_card_id(event)
+        semantic_hash = event_semantic_hash(event)
         by_source[source] += 1
         by_status[status] += 1
         by_effect[effect] += 1
@@ -284,6 +298,14 @@ def audit_rule_provenance(
             by_logical_rule_key[logical_key] += 1
         else:
             missing_logical_rule_key += 1
+        if card_id:
+            card_id_present += 1
+        else:
+            card_id_missing += 1
+        if semantic_hash:
+            semantic_hash_present += 1
+        else:
+            semantic_hash_missing += 1
         if card:
             cards_by_status[status].add(card)
             cards_by_source[source].add(card)
@@ -382,6 +404,10 @@ def audit_rule_provenance(
         "by_effect": dict(sorted(by_effect.items())),
         "rule_logical_key_present": sum(by_logical_rule_key.values()),
         "rule_logical_key_missing": missing_logical_rule_key,
+        "card_id_present": card_id_present,
+        "card_id_missing": card_id_missing,
+        "semantic_hash_present": semantic_hash_present,
+        "semantic_hash_missing": semantic_hash_missing,
         "by_rule_logical_key": dict(by_logical_rule_key.most_common(40)),
         "cards_by_status": {
             status: sorted(cards)[:40] for status, cards in sorted(cards_by_status.items())
@@ -436,6 +462,10 @@ def render_report(
         f"- unique_cards_seen: {summary.get('unique_cards', 0)}",
         f"- rule_logical_key_present: {summary.get('rule_logical_key_present', 0)}",
         f"- rule_logical_key_missing: {summary.get('rule_logical_key_missing', 0)}",
+        f"- card_id_present: {summary.get('card_id_present', 0)}",
+        f"- card_id_missing: {summary.get('card_id_missing', 0)}",
+        f"- semantic_hash_present: {summary.get('semantic_hash_present', 0)}",
+        f"- semantic_hash_missing: {summary.get('semantic_hash_missing', 0)}",
         f"- findings_total: {len(all_findings)}",
         f"- critical: {counts.get('critical', 0)}",
         f"- high: {counts.get('high', 0)}",

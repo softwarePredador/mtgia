@@ -601,7 +601,7 @@ Hermes + testes.
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
-| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash` e contagem de cobertura no forensic, sem mudar execução | Próximo passo: adicionar `card_id` e `semantic_hash` por evento quando o payload de carta/replay carregar IDs estáveis; manter `needs_review` sem comportamento hard |
+| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash`, `card_id`, `semantic_hash` e contagem de cobertura no forensic quando esses campos já existem no snapshot, sem mudar execução | Próximo passo: validar cobertura no Hermes real e decidir se o `semantic_hash` deck-level atual basta ou se precisa hash semântico por carta; manter `needs_review` sem comportamento hard |
 | P2 | Lorehold no-mox é política manual, não heurística universal | Learned deck 82 remove `Chrome Mox`, `Mox Diamond`, `Mox Opal` por decisão do produto | Não generalizar bloqueio de Mox para todos os comandantes/brackets sem regra explícita |
 | P2 | Decisões de produto base aprovadas; exceções ainda precisam validação | `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` registra os defaults aprovados em 2026-06-11 | Seguir Slice 1; qualquer mudança fora dos defaults exige nova validação |
 
@@ -628,11 +628,12 @@ efeitos concretos de recursão para `recursion` em vez de `engine`; o relatório
 atual propõe `89` candidatos, sendo `30` low-risk review e `59` manual-review.
 Slice 5 adicionou proveniência semântica de replay sem alterar comportamento:
 `battle_rule_registry.py` agora calcula `logical_rule_key` e carrega
-`oracle_hash`; `battle_analyst_v9.py` propaga esses campos para eventos via
-`replay_rule_fields`; `battle_forensic_audit.py` mede
-`rule_logical_key_present`, `rule_logical_key_missing` e top keys. Evidência em
-`BATTLE_REPLAY_SEMANTIC_PROVENANCE_SLICE_2026-06-12.md`. Ainda pendem
-`card_id` e `semantic_hash` por evento.
+`oracle_hash`; `battle_analyst_v9.py` carrega `card_id`/`semantics_hash` do
+SQLite Hermes quando existem e propaga `card_id`, `semantic_hash`,
+`logical_rule_key` e `oracle_hash` para eventos via `replay_rule_fields`;
+`battle_forensic_audit.py` mede cobertura desses campos. Evidência em
+`BATTLE_REPLAY_SEMANTIC_PROVENANCE_SLICE_2026-06-12.md`. Ainda pende definir
+se o `semantic_hash` deck-level atual deve virar hash semântico por carta.
 
 ### Ordem recomendada de implementação
 
@@ -643,14 +644,16 @@ Slice 5 adicionou proveniência semântica de replay sem alterar comportamento:
 3. Revisar os 30 candidatos low-risk de `card_battle_rules_v1`; usar o modo
    `--allowlist` apenas para dry-run versionado; manter os 59 candidatos
    scope-sensitive como manual-only até existir taxonomia/faces suficiente.
-4. Adicionar `card_id`/`semantic_hash` ao payload de replay sem depender de
-   nome de carta como chave.
-5. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
+4. Validar no Hermes AWS real a cobertura de `card_id`/`semantic_hash` nos
+   replays gerados a partir do `knowledge.db`.
+5. Decidir se o `semantic_hash` deck-level atual é suficiente para auditoria de
+   replay ou se o produto precisa de hash semântico por carta.
+6. Criar helper/query de agregação por `card_id` em PG/backend se o contrato
    precisar ser consumido fora do sync Hermes.
-6. Formalizar identidade semântica de carta e faces antes de expandir regras
+7. Formalizar identidade semântica de carta e faces antes de expandir regras
    DFC/MDFC.
-7. Só depois evoluir learned decks para dois comandantes.
-8. Só depois usar feedback ML como input de política.
+8. Só depois evoluir learned decks para dois comandantes.
+9. Só depois usar feedback ML como input de política.
 
 ### Critério de bloqueio
 

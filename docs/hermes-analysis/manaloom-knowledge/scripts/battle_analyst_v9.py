@@ -1201,13 +1201,23 @@ def load_deck(deck_id=6):
         if "functional_tags_json" in columns
         else "'[]' AS functional_tags_json"
     )
+    card_id_expr = "card_id" if "card_id" in columns else "NULL AS card_id"
+    semantics_hash_expr = (
+        "semantics_hash" if "semantics_hash" in columns else "NULL AS semantics_hash"
+    )
     rows = conn.execute("""
         SELECT card_name, quantity, CAST(COALESCE(cmc,0) AS REAL) as cmc,
                COALESCE(functional_tag,'unknown') as functional_tag,
                {functional_tags_expr},
-               type_line, oracle_text, is_commander
+               type_line, oracle_text, is_commander,
+               {card_id_expr},
+               {semantics_hash_expr}
         FROM deck_cards WHERE deck_id=?
-    """.format(functional_tags_expr=functional_tags_expr), (deck_id,)).fetchall()
+    """.format(
+        functional_tags_expr=functional_tags_expr,
+        card_id_expr=card_id_expr,
+        semantics_hash_expr=semantics_hash_expr,
+    ), (deck_id,)).fetchall()
     oracle_cache = load_card_oracle_cache(conn, [row["card_name"] for row in rows])
     conn.close()
     commander = None
@@ -1226,6 +1236,9 @@ def load_deck(deck_id=6):
             "type_line": row["type_line"] or "",
             "oracle_text": row["oracle_text"] or "",
             "is_commander": bool(row["is_commander"]),
+            "card_id": row["card_id"] or "",
+            "semantic_hash": row["semantics_hash"] or "",
+            "semantics_hash": row["semantics_hash"] or "",
         }, oracle_cache)
         card = enrich_card(card)
         if card["is_commander"]: commander = card
@@ -2653,9 +2666,28 @@ TAG_EFFECTS = {
 }
 
 
+def replay_card_identity_fields(card):
+    """Return stable card identity fields already present on the card object."""
+    fields = {}
+    card_id = card.get("card_id") or card.get("card_uuid")
+    semantic_hash = card.get("semantic_hash") or card.get("semantics_hash")
+    if card_id:
+        fields["card_id"] = card_id
+    if semantic_hash:
+        fields["semantic_hash"] = semantic_hash
+    return fields
+
+
+def annotate_effect_identity(card, effect_data):
+    annotated = dict(effect_data)
+    for key, value in replay_card_identity_fields(card).items():
+        annotated.setdefault(key, value)
+    return annotated
+
+
 def normalize_effect_by_oracle(card, effect_data):
     """Correct broad generated/tag mistakes using imported oracle metadata."""
-    normalized = effect_data.copy()
+    normalized = annotate_effect_identity(card, effect_data)
     effect = normalized.get("effect", "unknown")
     type_line = str(card.get("type_line") or "")
     oracle_text = str(card.get("oracle_text") or "")
@@ -2763,6 +2795,9 @@ def replay_rule_fields(effect_data):
         "rule_version": effect_data.get("_rule_version"),
     }
     optional_fields = {
+        "card_id": effect_data.get("card_id"),
+        "semantic_hash": effect_data.get("semantic_hash")
+        or effect_data.get("semantics_hash"),
         "rule_logical_key": effect_data.get("_rule_logical_key"),
         "rule_oracle_hash": effect_data.get("_rule_oracle_hash"),
         "variant_kind": effect_data.get("variant_kind"),
@@ -2893,11 +2928,14 @@ def get_card_effect(card):
             ),
         )
     if "land" in card.get("type_line", "").lower():
-        return with_rule_metadata(
-            {"effect": "land"},
-            source="type_line_land",
-            review_status="fact",
-            confidence=0.75,
+        return annotate_effect_identity(
+            card,
+            with_rule_metadata(
+                {"effect": "land"},
+                source="type_line_land",
+                review_status="fact",
+                confidence=0.75,
+            ),
         )
     if effect == "creature" or "creature" in card.get("type_line", "").lower():
         return normalize_effect_by_oracle(

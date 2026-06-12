@@ -4,7 +4,7 @@
 
 `PASS_WITH_SCOPE_LIMITS`
 
-This slice implements replay/forensic provenance only. It does not change
+This report tracks replay/forensic provenance only. It does not change
 battle execution, deck generation, optimize enforcement, Mox policy, learned
 deck scope, or `needs_review` behavior.
 
@@ -44,10 +44,15 @@ deck scope, or `needs_review` behavior.
 
 ### `battle_analyst_v9.py`
 
+- `load_deck()` now loads optional `card_id` and `semantics_hash` from Hermes
+  SQLite `deck_cards` when those columns exist.
+- Legacy SQLite decks without those columns remain compatible.
 - `with_rule_metadata()` can now carry:
   - `_rule_logical_key`
   - `_rule_oracle_hash`
 - `replay_rule_fields()` now emits optional replay fields when available:
+  - `card_id`
+  - `semantic_hash`
   - `rule_logical_key`
   - `rule_oracle_hash`
   - `variant_kind`
@@ -61,6 +66,10 @@ deck scope, or `needs_review` behavior.
 - Adds forensic coverage counters:
   - `rule_logical_key_present`
   - `rule_logical_key_missing`
+  - `card_id_present`
+  - `card_id_missing`
+  - `semantic_hash_present`
+  - `semantic_hash_missing`
   - `by_rule_logical_key`
 - Legacy replay JSONL remains compatible. Events without logical keys are
   counted as missing instead of failing.
@@ -69,7 +78,9 @@ deck scope, or `needs_review` behavior.
 
 - `battle_card_import_tests.py` now asserts that a verified
   `battle_card_rules` rule carries `_rule_logical_key`, `_rule_oracle_hash`,
-  and exposes both in replay fields.
+  `card_id`, `semantic_hash`, and exposes them in replay fields.
+- `battle_card_import_tests.py` also asserts that `load_deck()` preserves
+  `card_id` and `semantics_hash` from Hermes SQLite snapshots.
 
 ## Validations Run Locally
 
@@ -96,6 +107,10 @@ Result:
 {
   "rule_logical_key_present": 1,
   "rule_logical_key_missing": 0,
+  "card_id_present": 1,
+  "card_id_missing": 0,
+  "semantic_hash_present": 1,
+  "semantic_hash_missing": 0,
   "by_rule_logical_key": {
     "battle_rule_v1:unit": 1
   }
@@ -116,7 +131,11 @@ Result:
 {
   "card_event_count": 73,
   "rule_logical_key_present": 0,
-  "rule_logical_key_missing": 73
+  "rule_logical_key_missing": 73,
+  "card_id_present": 0,
+  "card_id_missing": 73,
+  "semantic_hash_present": 0,
+  "semantic_hash_missing": 73
 }
 ```
 
@@ -147,6 +166,9 @@ Result:
 
 - `card_id` in every replay event.
 - `semantic_hash` in every replay event.
+- Per-card semantic hash. The current `semantic_hash` is propagated from the
+  deck snapshot `semantics_hash` when present; per-card hashing requires a
+  separate schema/payload decision.
 - Any global policy against Mox cards.
 - Partner/background learned deck support.
 - Any user-facing Hermes metadata.
@@ -155,9 +177,9 @@ Result:
 
 ## Next Safe Slice
 
-1. Add stable `card_id` and `semantic_hash` to replay events where the card
-   object already carries those fields.
-2. Extend forensic counters to measure `card_id` and `semantic_hash` coverage.
-3. Run the same validations on Hermes AWS against the real `knowledge.db`.
-4. Only after that, evaluate whether replay/forensic has enough provenance to
+1. Run the updated `card_id`/`semantic_hash` coverage validation on Hermes AWS
+   against the real `knowledge.db`.
+2. Decide whether deck-level `semantics_hash` is enough for replay diagnostics
+   or whether a new per-card semantic hash field is required.
+3. Only after that, evaluate whether replay/forensic has enough provenance to
    support broader battle-rule migration work.
