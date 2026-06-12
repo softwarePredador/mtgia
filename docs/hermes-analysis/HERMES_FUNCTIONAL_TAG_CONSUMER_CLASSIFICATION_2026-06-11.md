@@ -69,6 +69,7 @@ fase propria antes de qualquer automacao ampla de novos comandantes.
 | `knowledge_db.py` | SCHEMA/SEED HELPER / COMPATIBLE | Desde 2026-06-12, cria/migra `deck_cards.functional_tags_json` e preenche o snapshot a partir de `functional_tags_json`, `tags` ou `functional_tag` legado em inserts. O caminho `--insert-deck` tambem executa a migracao antes de gravar, preservando bancos SQLite criados antes da coluna multi-tag. |
 | `scryfall_classifier.py` | CLASSIFIER / COMPATIBLE | Desde 2026-06-12, `classify_deck()` emite `tags` e `functional_tags_json`, preserva override do usuario como tag de alta confianca e `build_deck_json()` mantem `functional_tag` como papel legado mapeado. |
 | `export_hermes_learned_deck.py` | MANUAL EXPORTER / COMPATIBLE | Desde 2026-06-12, agrega `card_deck_analysis.pg_roles` por carta sem `JOIN` com fanout e sem `LIMIT 1` arbitrario; se `pg_roles` nao existir, volta para `role_in_deck`. |
+| `wincon_pipeline.py` | MANUAL WINCON PIPELINE / COMPATIBLE | Desde 2026-06-12, hunter/scoring reconhecem wincon via membership em `card_deck_analysis.pg_roles`, com fallback para `role_in_deck='wincon'` quando `pg_roles` nao existe. |
 | `parse_collection.py` | COLLECTION IMPORT TOOL | Manter manual ate existir novo contrato de colecao multi-role. |
 | `gen_edgar_seed.py` | SEED GENERATOR | Seed historico/manual; migrar so se Edgar virar pipeline ativo. |
 | `reimport_lorehold_scryfall.py` | MANUAL REIMPORT | Pode continuar usando `functional_tag` como fallback de import. |

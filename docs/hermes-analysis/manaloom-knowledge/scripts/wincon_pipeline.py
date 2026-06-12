@@ -78,6 +78,24 @@ def ensure_table(con: sqlite3.Connection) -> None:
     )''')
 
 
+def table_columns(con: sqlite3.Connection, table_name: str) -> set[str]:
+    return {str(row[1]) for row in con.execute(f"PRAGMA table_info({table_name})").fetchall()}
+
+
+def wincon_role_filter(con: sqlite3.Connection, alias: str = "cda") -> str:
+    columns = table_columns(con, "card_deck_analysis")
+    role_check = f"{alias}.role_in_deck = 'wincon'"
+    if "pg_roles" not in columns:
+        return role_check
+    return (
+        f"({role_check} OR EXISTS ("
+        "SELECT 1 FROM json_each("
+        f"CASE WHEN json_valid({alias}.pg_roles) THEN {alias}.pg_roles ELSE '[]' END"
+        ") WHERE value = 'wincon'"
+        "))"
+    )
+
+
 def lorehold_enriched_deck_count(con: sqlite3.Connection) -> int:
     return con.execute('''
         SELECT COUNT(DISTINCT ld.id)
@@ -89,13 +107,14 @@ def lorehold_enriched_deck_count(con: sqlite3.Connection) -> int:
 
 
 def score_for_card(con: sqlite3.Connection, name: str) -> tuple[int, int, int, int]:
-    row = con.execute('''
+    role_filter = wincon_role_filter(con)
+    row = con.execute(f'''
         SELECT AVG(speed_score), AVG(resilience_score), AVG(stealth_score), AVG(wincon_total_score)
         FROM card_deck_analysis cda
         JOIN learned_decks ld ON ld.id = cda.deck_id
         WHERE lower(ld.commander) LIKE '%lorehold%'
           AND cda.enriched = 1
-          AND cda.role_in_deck = 'wincon'
+          AND {role_filter}
           AND lower(cda.card_name) = lower(?)
     ''', (name,)).fetchone()
     speed = int(round(row[0] or 5))
@@ -149,11 +168,12 @@ def hunter() -> None:
 
     deck_count = lorehold_enriched_deck_count(con)
     threshold = 3 if deck_count >= 10 else 2
-    rows = con.execute('''
+    role_filter = wincon_role_filter(con)
+    rows = con.execute(f'''
         SELECT cda.card_name, COUNT(DISTINCT cda.deck_id) AS cnt
         FROM card_deck_analysis cda
         JOIN learned_decks ld ON ld.id = cda.deck_id
-        WHERE cda.role_in_deck = 'wincon'
+        WHERE {role_filter}
           AND cda.enriched = 1
           AND lower(ld.commander) LIKE '%lorehold%'
         GROUP BY cda.card_name

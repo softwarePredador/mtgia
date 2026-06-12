@@ -380,6 +380,10 @@ Update 2026-06-12e: `slot_optimizer.py` now aggregates
 explicit priority. This keeps the slot scan deterministic for multi-function
 cards while preserving `deck_cards.functional_tags_json` as fallback.
 
+Update 2026-06-12f: `wincon_pipeline.py` now treats `pg_roles` as membership
+for wincon detection and scoring. Legacy databases without `pg_roles` continue
+to use `role_in_deck='wincon'`.
+
 Goal: make every relevant consumer set-based.
 
 Consumers to audit/update:
