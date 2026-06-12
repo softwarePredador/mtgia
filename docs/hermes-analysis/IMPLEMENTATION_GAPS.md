@@ -601,7 +601,7 @@ Hermes + testes.
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; scripts manuais/importers antigos ainda consultam `functional_tag` direto | Classificação criada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P2 | Backend tem simulador leve e Hermes tem simulador rico | `/decks/:id/simulate` mede abertura/curva; `battle_analyst_v9.py` roda Commander 4-player | Documentar contrato e não substituir um pelo outro sem API nova e testes de performance |
 | P2 | `ml_prompt_feedback` coleta, mas ainda não decide política | `/ai/optimize` registra feedback automático | Usar feedback em ranking/prompt policy somente após scorecard e teste de regressão |
-| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash`, `card_id`, `semantic_hash` e contagem de cobertura no forensic quando esses campos já existem no snapshot, sem mudar execução; Slice 6 report-only atualizou `audit_learned_opponent_card_identity.py` para separar `card_id` resolvido de `oracle_id` resolvido por múltiplas printings do mesmo oracle, sem escolher printing arbitrária | Próximo passo: validar cobertura no Hermes real, resolver ambiguidades sem `oracle_id` e decidir se o `semantic_hash` deck-level atual basta ou se precisa hash semântico por carta; manter `needs_review` sem comportamento hard |
+| P2 | Replay sem snapshot semântico completo | Hermes replays e forensic ainda dependem de nomes/effects legados em partes do pipeline; Slice 5 adicionou `logical_rule_key`, `oracle_hash`, `card_id`, `semantic_hash` e contagem de cobertura no forensic quando esses campos já existem no snapshot, sem mudar execução; Slice 6 report-only atualizou `audit_learned_opponent_card_identity.py` para separar `card_id` resolvido de `oracle_id` resolvido por múltiplas printings do mesmo oracle, sem escolher printing arbitrária; Hermes AWS em `9c6f44c9` confirmou `oracle_id_column_present=false`, `1200` instâncias, `1150` resolvidas por `card_id`, `50` ambíguas e `0` não resolvidas | Próximo passo: aplicar migration/backfill `cards.oracle_id` no banco controlado, rerodar o audit e só então decidir persistência de identidade para learned opponents; manter `needs_review` sem comportamento hard |
 | P2 | Lorehold no-mox é política manual, não heurística universal | Learned deck 82 remove `Chrome Mox`, `Mox Diamond`, `Mox Opal` por decisão do produto | Não generalizar bloqueio de Mox para todos os comandantes/brackets sem regra explícita |
 | P2 | Decisões de produto base aprovadas; exceções ainda precisam validação | `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` registra os defaults aprovados em 2026-06-11 | Seguir Slice 1; qualquer mudança fora dos defaults exige nova validação |
 
@@ -657,9 +657,13 @@ virar hash semântico por carta.
    resolver as ambiguidades explicitamente. Slice 6 atualiza o auditor para
    separar resolução concreta por `card_id` de resolução semântica por
    `oracle_id`; múltiplas printings do mesmo oracle passam a contar como
-   cobertura semântica, mas continuam não persistindo `card_id` até existir
-   política de printing canônica. Amostra `dbbf4ab1`: ambiguidades principais
-   são múltiplas printings (`Sol Ring`, `Ancient Tomb`, `Command Tower`,
+   cobertura semântica quando a coluna existe, mas continuam não persistindo
+   `card_id` até existir política de printing canônica. Validação Hermes AWS
+   em `9c6f44c9`: `oracle_id_column_present=false`, `1200` instâncias, `1150`
+   resolvidas por `card_id`, `50` ambíguas, `0` não resolvidas e cobertura
+   `0.958333`; portanto o próximo bloqueio real é migration/backfill do banco,
+   não o parser do auditor. Amostra `dbbf4ab1`: ambiguidades principais são
+   múltiplas printings (`Sol Ring`, `Ancient Tomb`, `Command Tower`,
    `Birds of Paradise`, `Phyrexian Metamorph`, `Cyclonic Rift`), então a
    correção deve definir política de
    oracle/canonical-printing identity; não usar `LIMIT 1`. Verificação em

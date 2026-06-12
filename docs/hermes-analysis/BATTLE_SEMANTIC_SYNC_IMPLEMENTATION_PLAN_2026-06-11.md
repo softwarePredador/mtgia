@@ -428,6 +428,12 @@ Current production constraint verified on 2026-06-12 and coding status:
   concrete `card_id` resolution and semantic `oracle_id` resolution. Multiple
   printings sharing the same `oracle_id` improve semantic coverage but still do
   not produce a persisted `card_id` without a canonical printing policy.
+- Hermes AWS validation in `9c6f44c9` ran the v3 audit against the real
+  `knowledge.db` and PostgreSQL target: `oracle_id_column_present=false`,
+  `1200` learned-opponent card instances, `1150` concrete `card_id` matches,
+  `50` printing ambiguities and `0` unresolved names. The next gate is applying
+  and backfilling `cards.oracle_id` before learned-opponent replay provenance
+  can move beyond report-only.
 
 Required behavior:
 
