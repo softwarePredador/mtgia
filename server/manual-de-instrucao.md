@@ -18315,3 +18315,14 @@ na command zone, não para validação de deck no servidor.
     `rarity`;
   - empates permanecem semantic-only;
   - não há apply e não há persistência em `knowledge.db`/PostgreSQL.
+- Validação Hermes/AWS no commit `babf800c`:
+  - 50 learned-opponent decks;
+  - 5.000 instâncias de cartas;
+  - `semantic_identity_coverage=1.0`;
+  - `resolved_instances=4793`;
+  - `oracle_resolved_instances=207`;
+  - `unresolved_instances=0`;
+  - `ambiguous_instances=0`;
+  - `canonical_printing_candidate_instances=0`;
+  - recomendação mantida:
+    `do_not_apply_without_canonical_oracle_or_printing_policy`.

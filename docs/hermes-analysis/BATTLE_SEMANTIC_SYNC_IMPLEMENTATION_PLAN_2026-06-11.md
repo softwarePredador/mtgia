@@ -445,6 +445,13 @@ Current production constraint verified on 2026-06-12 and coding status:
   unique highest evidence score from explicit fields (`scryfall_id` as printing
   id, direct Scryfall image, layout, collector number, set code, rarity). Ties
   remain semantic-only and must not be applied.
+- Hermes AWS validation on commit `babf800c` expanded the v4 sample to 50
+  learned-opponent decks / 5,000 card instances: `semantic_identity_coverage`
+  stayed `1.0`, `unresolved_instances=0`, `ambiguous_instances=0`,
+  `oracle_resolved_instances=207` and
+  `canonical_printing_candidate_instances=0`. This confirms the current policy
+  is conservative enough for report-only coverage, not enough for persisted
+  `card_id` apply.
 
 Required behavior:
 
