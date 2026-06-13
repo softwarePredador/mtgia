@@ -168,19 +168,21 @@ mtgia/
   `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1/P2 — Coerencia app-facing `app/lib` ↔ `server/routes` ↔ `server/lib`**:
-  revalidado novamente em 2026-06-12 23:00 UTC no checkout `3d9fe518`. O
-  auditor textual executou com sucesso (`205` arquivos backend, `115` problemas
-  textuais, `0` imports quebrados), mas nao cobre `app/lib`; a evidencia veio de
-  `rg`, `nl -ba` e leitura direta de providers/rotas/helpers/testes. Os achados anteriores de
-  ownership em `POST /ai/optimize`, `POST /ai/archetypes` e polling de jobs
-  async seguem stale: optimize exige usuario, passa `userId` para o loader
-  owner-scoped, jobs rejeitam owner vazio/diferente e archetypes busca deck por
-  `id + user_id`. O contexto principal de optimize continua carregando
-  `card_function_tags` junto de `semantic_tags_v2`. Permanecem abertos os mesmos
-  tres gaps de coerencia app/server: `deck_rebuild_created` e emitido/testado no
-  app, mas rejeitado pela allow-list de `/users/me/activation-events`; o endpoint
-  app-facing `GET /ai/commander-learning` existe, e consumido pela tela de
-  geracao e usa `commander_learned_decks`, mas nao esta documentado em
+  revalidado novamente em 2026-06-13 23:00 UTC no checkout local `2a1963d3`.
+  O auditor textual executou com sucesso (`205` arquivos backend, `115`
+  problemas textuais, `0` imports quebrados), mas nao cobre `app/lib`; a
+  evidencia veio de `rg`, `nl -ba`, leitura direta e `dart analyze
+  routes/ai/commander-learning/index.dart` (`No issues found`). Desde a rodada
+  anterior do mesmo foco (`5bfc9706..HEAD`), o delta de produto e nulo e as
+  mudancas sao somente documentais. Os achados antigos de ownership em
+  `POST /ai/optimize`, `POST /ai/archetypes` e polling de jobs async seguem
+  stale: optimize exige usuario, passa `userId` para o loader owner-scoped,
+  jobs rejeitam owner vazio/diferente e archetypes busca deck por
+  `id + user_id`. Permanecem abertos os mesmos tres gaps de coerencia
+  app/server: `deck_rebuild_created` e emitido/testado no app, mas rejeitado
+  pela allow-list de `/users/me/activation-events`; o endpoint app-facing
+  `GET /ai/commander-learning` existe, e consumido pela tela de geracao e usa
+  `commander_learned_decks`, mas nao esta documentado em
   `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; e a consulta automatica de learned
   decks herda `aiPlanLimitMiddleware` + `aiRateLimit` apesar de ser leitura local
   de PostgreSQL, sem chamada LLM/externa no handler.
