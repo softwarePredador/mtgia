@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -284,28 +284,25 @@ esse dado como sinal de produto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-12 07:00 UTC no checkout local `086ab624`. O auditor
-  textual executou com sucesso (`205` arquivos backend, `0` imports quebrados),
-  mas continua sem grafo de chamadas; a mutacao automatica do bloco gerado foi
-  descartada para preservar o historico manual. Permanecem abertos os achados
-  de maior impacto: `server/lib/sync_cards_utils.dart` test-only enquanto
-  `server/bin/sync_cards.dart` mantem copias privadas; `swap_integrity` e
-  emitido, mas `verifySwapIntegrity` nao e chamado no apply app/backend; e a
-  extracao de `optimize_response_support.dart` continua parcial
-  (`buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry` fora do
-  fluxo real). Seguem tambem wrappers app sem chamador
+  novamente em 2026-06-13 07:00 UTC no checkout local `146b16dc`. O auditor
+  textual executou com sucesso (`205` arquivos backend, `115` problemas
+  textuais, `0` imports quebrados), mas continua sem grafo de chamadas; a saida
+  automatica ruidosa foi descartada e a evidencia veio de `rg`/`nl -ba`.
+  Permanecem abertos os achados de maior impacto: `server/lib/sync_cards_utils.dart`
+  test-only enquanto `server/bin/sync_cards.dart` mantem helpers privados/inline;
+  `swap_integrity` e emitido, mas `verifySwapIntegrity` nao e chamado no apply
+  app/backend; e a extracao de `optimize_response_support.dart` continua
+  parcial (`buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry`
+  fora do fluxo real). Seguem tambem wrappers app sem chamador
   (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
   `DeckProvider.clearAllCache`) e conveniencias sem wiring em request trace,
-  Commander Reference, optimize utility sample, ML feedback,
-  `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
-  safety, counters, push e read-side de `AiLogService`. Correcoes de
-  classificacao: `hasSuspiciousNonLandCmc` esta test-only, mas
-  `isLikelyLandCard` e vivo via `safeCmcForOptimization`; helpers de aggressive
-  meta/candidate quality sao usados por bins operacionais e nao foram
-  promovidos. Controles positivos: semantic/bracket response helpers,
-  `safeCmcForOptimization`, `getHighSynergyCards`, `EndpointCache.get/set`,
-  `sendToUser`, observabilidade automatica e fluxos app que usam
-  `fetchBinderDirect`/`fetchPublicDecks`.
+  ML feedback, `ApiClient.loadTokenFromDisk`, performance manual/debug,
+  EDHREC/cache, CMC safety, archetype counters, push e read-side de
+  `AiLogService`. Correcoes de classificacao: `hasSuspiciousNonLandCmc` esta
+  test-only, mas `isLikelyLandCard` e vivo via `safeCmcForOptimization`;
+  `MLKnowledgeService`, `AiLogService`, `EndpointCache`, push e archetype
+  counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem
+  consumidor.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-12 15:00 UTC no checkout local `129d647f`. Nao houve novo achado
   P1/P2 app-facing. As claims antigas contra `deck_matchups` e

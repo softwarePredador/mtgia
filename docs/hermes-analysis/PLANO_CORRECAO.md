@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-13 05:30 UTC
+> Data: 2026-06-13 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -88,21 +88,22 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-12 07:00 UTC como **ABERTO neste checkout `086ab624`**. O auditor
-    textual executou com sucesso (`205` arquivos backend, `0` imports
-    quebrados), mas nao prova ausencia de chamadas; a mutacao automatica do
-    bloco gerado foi descartada antes da atualizacao manual. Permanecem abertos
-    `sync_cards_utils.dart` test-only enquanto `server/bin/sync_cards.dart`
-    mantem copias privadas/fluxo Python; `verifySwapIntegrity` sem chamador
-    apesar de `swap_integrity` ser anexado; builders de
-    `optimize_response_support.dart` ainda fora do fluxo real; wrappers app sem
-    chamada (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
-    `DeckProvider.clearAllCache`); e helpers de suporte sem chamada confirmada
-    em request trace, Commander Reference, optimize utility sample, ML feedback,
+    2026-06-13 07:00 UTC como **ABERTO neste checkout `146b16dc`**. O auditor
+    textual executou com sucesso (`205` arquivos backend, `115` problemas
+    textuais, `0` imports quebrados), mas nao prova ausencia de chamadas; a
+    saida automatica ruidosa foi descartada antes da atualizacao manual.
+    Permanecem abertos `sync_cards_utils.dart` test-only enquanto
+    `server/bin/sync_cards.dart` mantem helpers privados/inline;
+    `verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser anexado;
+    builders de `optimize_response_support.dart` ainda fora do fluxo real;
+    wrappers app sem chamada (`BinderProvider.applyFilters`,
+    `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`); e helpers
+    de suporte sem chamada confirmada em request trace, ML feedback,
     `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
-    safety/counters/push e read-side de `AiLogService`. Correcoes: helpers de
-    aggressive meta/candidate quality sao usados por bins operacionais e
-    `isLikelyLandCard` permanece vivo via `safeCmcForOptimization`.
+    safety/counters/push e read-side de `AiLogService`. Correcoes:
+    `isLikelyLandCard` permanece vivo via `safeCmcForOptimization`, e os
+    servicos de ML/log/cache/push/counters tem caminhos vivos parciais; so
+    metodos especificos continuam sem consumidor.
 13. **P1/P2 — Imports quebrados e ciclos locais**: **REVALIDADO/ABERTO no
     checkout local `b22063f6` em 2026-06-12 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`, e a varredura local
@@ -604,16 +605,17 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-12 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
-`086ab624`**. As anotacoes historicas de resolucao em outros SHAs nao
+**Status 2026-06-13 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`146b16dc`**. As anotacoes historicas de resolucao em outros SHAs nao
 representam automaticamente o estado desta branch. A rodada atual manteve os
 achados de maior impacto (`sync_cards_utils.dart` test-only,
 `verifySwapIntegrity` sem chamador apesar de `swap_integrity` e builders de
-response do optimize fora do fluxo real), corrigiu classificacoes ruidosas
-(`isLikelyLandCard` e vivo; helpers de aggressive meta/candidate quality sao
-consumidos por bins operacionais) e adicionou achados menores no read-side de
-`AiLogService`, em `ArchetypeCountersService` e em
-`PushNotificationService.sendToMultipleTokens`.
+response do optimize fora do fluxo real), confirmou achados menores em wrappers
+app, observabilidade/cache, `MLKnowledgeService.recordFeedback`, read-side de
+`AiLogService`, `ArchetypeCountersService` e
+`PushNotificationService.sendToMultipleTokens`, e corrigiu classificacoes
+ruidosas (`isLikelyLandCard` e vivo via `safeCmcForOptimization`; servicos de
+ML/log/cache/push/counters possuem caminhos vivos parciais).
 
 - **Evidência**:
   - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:121`, `:178` e
@@ -622,8 +624,9 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
     `server/lib` runtime ou rotas. `server/bin/sync_cards.dart:64` chama
     `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
     `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
-    `_extractCardRowFromSet`, definido em `:662`-`:710`; o full sync atual
-    delega para `server/bin/sync_cards_full_fast.py`.
+    `_extractCardRowFromSet`, definido em `:662`-`:721`; e legalidades sao
+    montadas inline em `:743`-`:784`. O full sync atual delega para
+    `server/bin/sync_cards_full_fast.py`.
   - `server/routes/ai/optimize/index.dart:752`-`:758` anexa
     `swap_integrity`, mas `verifySwapIntegrity` em
     `server/lib/ai/optimize_swap_integrity.dart:112`-`:134` nao tem chamador em
@@ -668,13 +671,18 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
     `applyFilters`, `clearFilters` e `clearAllCache` sem chamada runtime
     confirmada; os fluxos app usam `fetchBinderDirect`, `fetchPublicDecks` e
     invalidacao especifica de deck.
+  - `server/lib/ml_knowledge_service.dart:251`-`:288` define
+    `recordFeedback`, com insert em `ml_prompt_feedback`, mas busca por
+    `recordFeedback(` encontrou apenas a definicao; `MLKnowledgeService` segue
+    vivo por `getContextForDeck`/`generatePromptContext` em
+    `server/lib/ai/otimizacao.dart:165`-`:173` e `:359`-`:367`.
   - `server/lib/ai/cmc_safety.dart:64`,
     `server/lib/archetype_counters_service.dart:67`/`:104`/`:204`,
     `server/lib/push_notification_service.dart:295` e
     `server/lib/ai_log_service.dart:120`/`:163`/`:204` definem helpers sem
     chamada runtime confirmada; controles vivos existem para
-    `safeCmcForOptimization`, uso de `ArchetypeCountersService` em rotas de
-    analise/simulacao, `sendToUser` e escrita de logs via `_logService?.log`.
+    `safeCmcForOptimization`, uso parcial de `ArchetypeCountersService` em rotas
+    de analise/simulacao, `sendToUser` e escrita de logs via `_logService?.log`.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
   porque o teste cobre uma copia que nao participa do CLI operacional.
