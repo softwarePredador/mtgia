@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 07:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 11:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -151,7 +151,7 @@ mtgia/
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO em 2026-06-12 11:00 UTC no checkout `b22063f6`.** O
+  **REVALIDADO/ABERTO em 2026-06-13 11:00 UTC no checkout `538fe574`.** O
   auditor base cobre apenas `server/lib` e `server/routes` e reportou
   `Imports quebrados: 0`. A triagem focada de 409 arquivos Dart em `app/lib`,
   `server/lib`, `server/routes` e `server/bin` encontrou 1082 diretivas locais
