@@ -5,6 +5,431 @@
 > estrutural ampla e revalide achados contra codigo vivo.
 
 
+## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-13 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi feita auditoria ampla de classes sem uso, funcoes sem chamador, imports,
+ciclos, tabelas PostgreSQL ou coerencia entre camadas fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `17b7f043`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual detecta duplicacao por nomes de
+funcoes/regex e mistura helpers reais com tokens SQL, palavras de prompts e
+wrappers finos. A execucao voltou a inserir inventario gerado por causa do
+marcador historico `## Historico gerado pelo auditor estrutural anterior`; essa
+mutacao mecanica foi removida antes desta atualizacao manual. Os achados abaixo
+usam apenas `rg`, `nl -ba` e leitura direta como evidencia.
+
+### Metodo manual focado
+
+- `git diff --name-only 641a4b40..HEAD` mostrou somente mudancas em
+  `docs/hermes-analysis/PLANO_CORRECAO.md`, `STRUCTURE_AUDIT.md` e
+  `TECHNICAL_MAP.md` desde a ultima rodada focada de duplicacao; nao houve delta
+  de codigo de produto nesse intervalo.
+- Busca focada por simbolos de IA:
+  `DeckArchetypeAnalyzer`, `DeckArchetypeAnalyzerCore`,
+  `assessDeckOptimizationState`, `assessDeckOptimizationStateCore`,
+  `resolveOptimizeArchetype`, `_looksLikeComboPiece`, `_looksLikeEnabler`,
+  `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeWincon`,
+  `resolveCardFunctionalRoles`, `functional_tags` e `semantic_tags_v2`.
+- Busca focada por duplicacoes sociais:
+  `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql`,
+  `_buildTrustInsight`, `LATERAL`, `_requestId`, `_logInvalidPayload`,
+  `getRequestTrace` e `tryGetRequestId`.
+- Busca focada por helpers de carta/deck:
+  `NM|LP|MP|HP|DMG|validConditions|condition|calculateCmc|getMainType|_calculateCmc`
+  em rotas de decks, binder e marketplace.
+- Busca de controles negativos/stale:
+  `_isBasicLandName`, `isBasicLandName`, `basic_land_utils`,
+  `buildOptimizeCacheKey`, `buildOptimizeDeckSignature` e wrappers finos da
+  rota `/ai/optimize`.
+
+### Achados revalidados
+
+#### P1 - `DeckArchetypeAnalyzer*` e `assessDeckOptimizationState*` ainda duplicam analise de deck entre rebuild e optimize
+
+- **Implementacao rebuild/deck state:** `DeckArchetypeAnalyzer` em
+  `server/lib/ai/deck_state_analysis.dart:1`-`:220` calcula CMC medio,
+  distribuicao de tipos, arquetipo, mana base, curva e confianca. O mesmo
+  arquivo define `assessDeckOptimizationState` em
+  `server/lib/ai/deck_state_analysis.dart:308`-`:497`, com status
+  `incomplete/healthy/needs_repair`, razoes e plano de reparo.
+- **Implementacao optimize/core:** `DeckArchetypeAnalyzerCore` em
+  `server/lib/ai/optimize_state_support.dart:6`-`:220` repete o mesmo contrato
+  de CMC/tipos/arquetipo/mana base/curva/confianca. O helper
+  `assessDeckOptimizationStateCore` em
+  `server/lib/ai/optimize_state_support.dart:337`-`:510` repete a avaliacao de
+  deck incompleto, formato, comandante, mana, contagens e severidade, mudando o
+  DTO retornado.
+- **Consumidores divergentes:** rebuild usa a familia antiga em
+  `server/lib/ai/rebuild_guided_service.dart:138`-`:147` e `:259`-`:268`;
+  optimize usa a familia core em
+  `server/lib/ai/optimize_request_support.dart:280`-`:313`.
+- **Controle negativo:** `server/routes/ai/optimize/index.dart:319`-`:365`
+  contem wrappers/adaptadores que estendem ou delegam para
+  `optimize_state_support.dart`; esses wrappers nao foram contados como corpo
+  duplicado independente.
+- **Por que parece duplicacao real:** rebuild e optimize respondem as mesmas
+  perguntas estruturais do deck, mas a regra vive em duas familias de codigo. Um
+  ajuste em CMC, type distribution, mana base, severidade ou repair plan pode
+  entrar em um fluxo e nao no outro.
+- **O que valida:** escolher uma fonte canonica para analyzer/state assessment e
+  deixar apenas adaptadores finos de DTO; cobrir casos `incomplete`, sem
+  comandante, excesso/falta de lands, spellslinger/artifacts/enchantments e
+  identidade de cor.
+- **O que falsifica:** contrato documentado e testado dizendo que rebuild e
+  optimize devem avaliar estado de deck com regras diferentes.
+
+#### P1 - `resolveOptimizeArchetype` continua com duas semanticas runtime
+
+- **Implementacao A:** `server/lib/ai/deck_state_analysis.dart:573`-`:585`
+  aceita `requestedArchetype` nullable, trata `midrange`, `general`, `value` e
+  `tempo` como genericos e retorna `detected ?? 'midrange'` quando nao ha
+  requested.
+- **Implementacao B:** `server/lib/ai/optimize_runtime_support.dart:1714`-`:1734`
+  exige `requestedArchetype`, trata `unknown` no detected, considera
+  `midrange`, `value` e `goodstuff` como genericos e so promove detected
+  especifico em `aggro/control/combo/stax/tribal`.
+- **Consumidores confirmados:** rebuild chama a implementacao A em
+  `server/lib/ai/rebuild_guided_service.dart:171`-`:174`; optimize chama a
+  implementacao B em `server/lib/ai/optimize_request_support.dart:303`-`:313`.
+- **Controle negativo:** o wrapper da rota em
+  `server/routes/ai/optimize/index.dart:89`-`:96` apenas delega para
+  `optimize_runtime_support.dart`.
+- **Por que parece duplicacao real:** os dois helpers escolhem o arquetipo
+  efetivo do mesmo dominio, mas podem divergir para `tempo`, `general`,
+  `goodstuff`, vazio, `unknown` e detected fora da allow-list.
+- **O que valida:** extrair resolver unico com tabela de casos para
+  `null/vazio/unknown`, requested generico, requested especifico, detected
+  especifico e detected desconhecido; trocar rebuild e optimize para esse
+  contrato.
+- **O que falsifica:** testes demonstrando que a divergencia de arquetipo entre
+  rebuild e optimize e intencional e desejada.
+
+#### P1/P2 - Heuristicas de roles funcionais altos seguem em dois classificadores
+
+- **Fonte compartilhada parcial:** `resolveCardFunctionalRoles` em
+  `server/lib/ai/optimization_functional_roles.dart:37`-`:91` centraliza a
+  precedencia `functional_tags -> semantic_tags_v2 -> heuristica`. Os wrappers
+  `classifyOptimizationFunctionalRole` e `optimizationFunctionalRolesForCard`
+  delegam para esse adapter em `:301`-`:338`.
+- **Classificador de deck analysis:** `server/lib/ai/functional_card_tags.dart:319`-`:339`
+  adiciona tags de alto nivel (`wincon`, `combo_piece`, `engine`, `payoff`,
+  `enabler`) e mantem fallbacks em `:872`-`:932`.
+- **Classificador de optimize roles:** `server/lib/ai/optimization_functional_roles.dart:203`-`:207`
+  adiciona os mesmos conceitos, com helpers proprios em `:387`-`:463`.
+- **Divergencia concreta:** as duas familias usam nomes sentinela e padroes de
+  texto diferentes; por exemplo, `functional_card_tags.dart` ainda trata
+  `Blood Artist`, `greaves` e `boots` em seus fallbacks, enquanto
+  `optimization_functional_roles.dart` tem branch proprio para payoff de dano em
+  `:440`-`:444` e padroes distintos de engine/enabler.
+- **Por que parece duplicacao real:** a precedencia de fonte esta melhor
+  centralizada, mas os fallbacks heurísticos finais ainda podem classificar uma
+  carta de modo diferente entre analysis e optimize quando nao ha dado
+  persistido confiavel.
+- **O que valida:** mover os fallbacks de alto nivel para o adapter
+  compartilhado ou chamar uma unica familia de helpers nos dois caminhos; testar
+  cartas sentinela e cartas com texto equivalente/nome diferente.
+- **O que falsifica:** contrato explicito dizendo que `functional_card_tags` e
+  optimize roles usam taxonomias diferentes, com testes mostrando que isso nao
+  afeta remocoes, swaps, validator nem quality gate.
+
+#### P2 - Trust social repete SQL e serializer entre trades e marketplace
+
+- **Trades list:** `server/routes/trades/index.dart:482`-`:487` usa os LATERALs
+  de trust/response/shipping para sender/receiver; os helpers ficam em
+  `server/routes/trades/index.dart:557`-`:603`.
+- **Trade detail:** `server/routes/trades/[id]/index.dart:50`-`:55` usa o mesmo
+  padrao de LATERALs; os helpers equivalentes ficam em
+  `server/routes/trades/[id]/index.dart:260`-`:306`.
+- **Marketplace:** `server/routes/community/marketplace/index.dart:131`-`:165`
+  repete os LATERALs inline para owner, e
+  `server/routes/community/marketplace/index.dart:316`-`:348` repete
+  `_buildTrustInsight`.
+- **Por que parece duplicacao real:** listagem de trades, detalhe de trade e
+  marketplace retornam o mesmo conceito app-facing de trust, mas regras de
+  status contados, conta nova, perfil incompleto, tempo de resposta e tempo de
+  envio precisam ser alteradas em tres lugares.
+- **O que valida:** helper compartilhado de SQL/serializacao de trust social com
+  aliases/prefixos por rota e testes de shape para listagem, detalhe e
+  marketplace.
+- **O que falsifica:** diferencas app-facing intencionais por superficie,
+  documentadas e cobertas por testes.
+
+#### P2 - Request-id e log de payload invalido continuam copiados em rotas sociais
+
+- **Helper compartilhado existente:** `server/lib/request_trace.dart:48` expoe
+  `getRequestTrace`; a busca tambem confirmou wrappers de request id no mesmo
+  modulo.
+- **Copias locais:** `_requestId` aparece em
+  `server/routes/trades/index.dart:330`,
+  `server/routes/trades/[id]/respond.dart:154`,
+  `server/routes/trades/[id]/status.dart:260`,
+  `server/routes/trades/[id]/messages.dart:228`,
+  `server/routes/conversations/[id]/messages.dart:247` e
+  `server/routes/users/[id]/follow/index.dart:97`.
+- **Padrao de log repetido:** `_logInvalidPayload` repete leitura tolerante de
+  usuario e formato `[social_write] invalid_payload` em
+  `server/routes/trades/[id]/status.dart:268`-`:284`,
+  `server/routes/trades/[id]/respond.dart:162`-`:178`,
+  `server/routes/trades/[id]/messages.dart:236`-`:252` e
+  `server/routes/conversations/[id]/messages.dart:255`-`:271`.
+- **Por que parece duplicacao real:** o fallback de request id, user id
+  opcional e formato de log sao responsabilidade comum, variando apenas
+  endpoint e id de recurso.
+- **O que valida:** helper unico de logging social invalid-payload com parametros
+  para endpoint, reason e ids (`trade_id`, `conversation_id`, etc.), usando
+  `tryGetRequestId`/`RequestTrace`.
+- **O que falsifica:** formatos de log por rota documentados como intencionais e
+  travados por testes/contrato operacional.
+
+#### P2/P3 - `condition`, CMC e tipo principal continuam com regras locais
+
+- **Condition normalizada para `NM`:**
+  `server/routes/decks/[id]/cards/index.dart:408`-`:412`,
+  `server/routes/decks/[id]/cards/set/index.dart:248`-`:252` e
+  `server/routes/decks/[id]/index.dart:519`-`:523`.
+- **Condition rejeitada com `400`:** `server/routes/binder/index.dart:258`-`:281`
+  e `server/routes/binder/[id]/index.dart:339`-`:348`.
+- **Condition ignorada como filtro invalido:** `server/routes/community/marketplace/index.dart:39`-`:43`
+  so aplica o filtro se o valor estiver na allow-list.
+- **CMC/tipo duplicados:** `server/routes/decks/[id]/index.dart:405`-`:435`
+  define `getMainType` e `calculateCmc`; a rota publica repete em
+  `server/routes/community/decks/[id].dart:91`-`:117`; simulacao tem variante
+  `_calculateCmc` em `server/routes/decks/[id]/simulate/index.dart:199`-`:214`.
+- **Por que parece duplicacao real:** o mesmo dominio `NM/LP/MP/HP/DMG` tem
+  contratos locais (`normalize`, `reject`, `ignore_filter`) e CMC/tipo podem
+  divergir entre deck privado, deck publico e simulacao.
+- **O que valida:** allow-list compartilhada com helpers explicitos por modo, e
+  helper comum de CMC/tipo ou consumo de campos normalizados do banco.
+- **O que falsifica:** contrato app-facing documentando explicitamente os tres
+  comportamentos de condition e testes de equivalencia CMC/tipo para custos
+  hibridos, `X`, split/adventure e type lines complexos.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- Nao houve novo achado confiavel alem dos clusters ja abertos na rodada
+  anterior de duplicacao. O delta desde `641a4b40` ate `17b7f043` e somente em
+  documentos Hermes.
+- A claim antiga de `_isBasicLandName` duplicado segue stale:
+  `server/lib/basic_land_utils.dart:27`-`:47` centraliza nomes regulares,
+  snow basics, normalizacao e type line. Consumidores atuais importam o helper,
+  incluindo `server/lib/ai/optimize_runtime_support.dart:2`,
+  `server/lib/generated_deck_validation_service.dart:3`,
+  `server/lib/meta/meta_deck_reference_support.dart:5`,
+  `server/routes/ai/commander-reference/index.dart:17`,
+  `server/routes/import/to-deck/index.dart:3` e
+  `server/routes/import/validate/index.dart:4`.
+- `buildOptimizeDeckSignature` e `buildOptimizeCacheKey` em
+  `server/lib/ai/optimize_runtime_support.dart:1753`-`:1766` sao wrappers de
+  compatibilidade que delegam para `optimize_cache_support.dart`, nao corpos
+  duplicados independentes.
+- Wrappers finos em `server/routes/ai/optimize/index.dart:89`-`:96` e
+  `:113`-`:161` delegam para support; nao foram promovidos como duplicacao de
+  corpo.
+- Colisoes brutas do auditor como `COUNT`, `FROM`, `LATERAL`, nomes de tabelas,
+  `toString`, `add`, `set`, SQL e palavras em prompts nao foram usadas como
+  achados sem leitura direta de mesma regra de dominio.
+
+### Resultado desta revalidacao
+
+No checkout `17b7f043`, os achados confiaveis de duplicacao/similaridade seguem
+os mesmos: familias duplicadas de analise de deck em IA, duas semanticas para
+`resolveOptimizeArchetype`, fallbacks duplicados de roles funcionais altos,
+trust social repetido, request/log social copiado e regras locais de
+`condition`/CMC/tipo. Nao foi encontrado novo cluster confiavel nesta rotacao.
+
+## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-13 15:00 UTC
+
+Escopo desta rodada: somente tabelas PostgreSQL sem consumidor claro,
+write-only, count-only ou parcialmente consumidas. Nao foi feita auditoria
+ampla de classes, funcoes sem chamada, imports/ciclos, duplicacao geral ou
+coerencia entre camadas fora do necessario para validar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `eada6841`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual lista nomes de tabelas por regex,
+mas nao separa DDL, `INSERT`, `DELETE FROM`, `FROM jsonb_to_recordset(...)`,
+contagens operacionais e consumidores reais. A execucao voltou a inserir um
+inventario gerado por causa do texto historico
+`## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+foi removida antes desta atualizacao manual.
+
+### Metodo manual focado
+
+- `git diff --name-only 129d647f..HEAD` mostrou somente mudancas em
+  `docs/hermes-analysis/PLANO_CORRECAO.md`, `STRUCTURE_AUDIT.md` e
+  `TECHNICAL_MAP.md` desde a ultima rodada focada de tabelas; nao houve delta de
+  codigo de produto nesse intervalo.
+- `rg` literal para candidatos historicos e tabelas proximas:
+  `deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback`,
+  `commander_reference_decks`, `commander_reference_deck_cards`,
+  `commander_reference_deck_analysis`, `deck_learning_events`,
+  `commander_card_usage`, `commander_learned_decks` e `card_battle_rules`.
+- Varredura de ciclo de vida das tabelas declaradas em `server/database_setup.sql`
+  contra `FROM/JOIN/INSERT INTO/UPDATE/DELETE FROM/TRUNCATE TABLE` em
+  `server/lib`, `server/routes`, `server/bin`, `server/test` e scripts Hermes.
+- Varredura equivalente das tabelas criadas dinamicamente em `server/lib`,
+  `server/routes` e `server/bin`.
+- Leitura direta dos handlers/helpers/jobs que escrevem ou leem os candidatos.
+- Separacao manual de `DELETE FROM` e `FROM jsonb_to_recordset(...)`, que nao
+  sao leituras reais de tabela raw de produto. `user_learning_events` tambem foi
+  excluida do achado porque e tabela SQLite local criada em
+  `server/bin/pull_learning_events.py:143`, nao tabela PostgreSQL do produto.
+
+### Achados revalidados
+
+#### P3 - `commander_reference_decks` e `commander_reference_deck_cards` seguem como raw lineage sem leitor direto
+
+- **Tabelas:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **Definicao:** `ensureCommanderReferenceDeckCorpusTables` cria as raws em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:1175`; os DDLs
+  especificos aparecem em `:1177` e `:1200`.
+- **Escritas encontradas:** `upsertCommanderReferenceDeckCorpus` faz
+  `INSERT INTO commander_reference_decks` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:1245`, apaga
+  cartas raw por `DELETE FROM commander_reference_deck_cards` em `:1329` e
+  reinsere por `INSERT INTO commander_reference_deck_cards` em `:1345`.
+- **Leitura/consumo encontrado:** busca exata por
+  `FROM/JOIN commander_reference_decks|commander_reference_deck_cards` em
+  `server/lib`, `server/routes`, `server/bin` e `server/test` encontrou somente
+  o `DELETE FROM commander_reference_deck_cards` de `:1329`, que e escrita de
+  limpeza, nao leitura. O `FROM` proximo do insert de cards e
+  `FROM jsonb_to_recordset(@rows::jsonb)` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:1368`, nao leitura
+  de `commander_reference_deck_cards`.
+- **Controle positivo:** o produto consome o agregado
+  `commander_reference_deck_analysis`: `loadCommanderReferenceDeckCorpusGuidance`
+  le `FROM commander_reference_deck_analysis` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:389`, e o mesmo
+  helper escreve o agregado em `:1394`.
+- **Por que parece parcialmente consumida:** as raws podem ser uteis para
+  lineage, auditoria ou reprocessamento, mas o codigo vivo confirmado consome o
+  agregado, nao as raws. Sem politica explicita de retencao/reprocessamento,
+  elas seguem como persistencia raw sem consumidor direto.
+- **O que valida:** documentar as duas tabelas como lineage/audit com retencao e
+  job de reprocessamento, ou adicionar job/rota que leia as raws com teste.
+- **O que falsifica:** `SELECT/JOIN` vivo sobre as raws, fora de setup/escrita,
+  ou remocao das raws mantendo apenas o agregado consumido.
+
+#### P3 - `ml_prompt_feedback` segue sem fluxo real de feedback e sem DDL local
+
+- **Tabela/referencia:** `ml_prompt_feedback`.
+- **DDL local encontrado:** nenhum `CREATE TABLE ... ml_prompt_feedback` em
+  `server/database_setup.sql`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test`, `app/lib` ou scripts Hermes auditados nesta rodada.
+- **Escrita potencial:** `MLKnowledgeService.recordFeedback` define
+  `INSERT INTO ml_prompt_feedback` em
+  `server/lib/ml_knowledge_service.dart:251` e `:264`.
+- **Chamador encontrado:** `rg -n "recordFeedback\(|ml_prompt_feedback" server app docs/hermes-analysis/manaloom-knowledge/scripts`
+  retornou somente a definicao/insert do helper e a leitura count-only de
+  `/ai/ml-status`.
+- **Leitura encontrada:** `/ai/ml-status` executa apenas
+  `SELECT COUNT(*)::int as c FROM ml_prompt_feedback` em
+  `server/routes/ai/ml-status/index.dart:98`.
+- **Por que parece risco residual:** nao ha coleta runtime confirmada nem
+  consumidor do payload de feedback; a contagem operacional depende de schema
+  historico/externo porque o DDL nao esta no checkout atual.
+- **O que valida:** reintroduzir DDL/migration versionada, chamar
+  `recordFeedback(...)` em fluxo real e consumir o payload em treino/tuning/UX
+  com teste.
+- **O que falsifica:** remover a referencia de count/insert se a coleta foi
+  descartada, ou apontar migration externa versionada e chamador runtime real.
+
+### Suspeitas descartadas nesta rodada
+
+- A varredura de tabelas de `server/database_setup.sql` nao encontrou novo
+  candidato write-only: todas as tabelas declaradas ali tiveram ao menos uma
+  leitura `FROM/JOIN` em `server` ou scripts Hermes auditados.
+- `deck_matchups` nao esta write-only no checkout `eada6841`:
+  `/ai/simulate-matchup` chama `_loadStoredMatchup` em
+  `server/routes/ai/simulate-matchup/index.dart:382`, le
+  `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:458`-`:463`,
+  escreve o upsert em `:392`-`:403` e retorna `stored_matchup.previous` em
+  `:430`-`:435`.
+- `deck_weakness_reports` nao esta write-only:
+  `/ai/weakness-analysis` escreve reports em
+  `server/routes/ai/weakness-analysis/index.dart:484`-`:499`, chama
+  `_loadWeaknessHistory` em `:506`, le resumo por severidade em `:572`-`:579`,
+  le os ultimos 10 registros em `:588`-`:596` e retorna `history` em `:559`.
+  O campo `addressed` ainda nao teve update confirmado, mas isso nao torna a
+  tabela sem consumidor.
+- `deck_learning_events`, `commander_card_usage` e `commander_learned_decks`
+  seguem com escritores/leitores reais: `server/routes/decks/index.dart:461`-`:472`
+  atualiza `commander_card_usage` e grava `deck_learning_events`;
+  `server/bin/pull_learning_events.py:68`-`:76` le eventos pendentes e
+  `:126`-`:131` marca sincronizados;
+  `server/lib/ai/deck_learning_event_support.dart:108`-`:123` le hot cards de
+  `commander_card_usage`; `/ai/generate` chama essa leitura em
+  `server/routes/ai/generate/index.dart:107`-`:115` e registra decks gerados em
+  `:700`-`:708`; `/ai/commander-learning` le `commander_learned_decks` em
+  `server/routes/ai/commander-learning/index.dart:87` e `:129`; e
+  `/ai/commander-reference` tambem le `commander_learned_decks` em
+  `server/routes/ai/commander-reference/index.dart:533`.
+- `card_battle_rules` nao e unused: alem do DDL em
+  `server/database_setup.sql:109` e `server/bin/migrate.dart:493`,
+  `server/bin/auto_promote_battle_rules.py:116` le a tabela e `:131`, `:141`
+  e `:158` atualizam; `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py:166`,
+  `:174` e `:417` leem, e `:219`, `:240`, `:343` e `:354` atualizam/inserem;
+  `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py:206`
+  faz join para montar o deck alvo.
+- `schema_migrations` segue fora do achado por ser tabela interna do migrador, e
+  `user_learning_events` foi excluida por ser ponte SQLite local do pull Hermes,
+  nao tabela PostgreSQL do produto.
+
+### Resultado desta revalidacao
+
+No checkout `eada6841`, nao apareceu novo achado P1/P2 app-facing para tabelas
+PostgreSQL sem uso. Permanecem abertos os mesmos riscos P3: as raws
+`commander_reference_decks` / `commander_reference_deck_cards` ainda nao tem
+leitor direto confirmado, e `ml_prompt_feedback` continua sem DDL local,
+chamador runtime ou consumidor de payload alem de contagem operacional.
+
 ## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-13 11:00 UTC
 
 Escopo desta rodada: somente imports locais quebrados e ciclos de dependencia

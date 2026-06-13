@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 19:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -184,7 +184,7 @@ mtgia/
   `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; e a consulta automatica de learned
   decks herda `aiPlanLimitMiddleware` + `aiRateLimit` apesar de ser leitura local
   de PostgreSQL, sem chamada LLM/externa no handler.
-- **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em 2026-06-12 19:00 UTC no checkout local `641a4b40`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista de duplicacao segue ruidosa por regex e nao foi usada como evidencia direta. A revalidacao manual nao encontrou novo achado confiavel alem dos clusters ja abertos: em IA, `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore` e `assessDeckOptimizationState`/`assessDeckOptimizationStateCore` duplicam analise de deck entre rebuild e optimize; `resolveOptimizeArchetype` diverge entre `deck_state_analysis.dart` e `optimize_runtime_support.dart`; e os fallbacks `_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler` e `_looksLikeWincon` ainda existem em `functional_card_tags.dart` e `optimization_functional_roles.dart`, embora a precedencia de `functional_tags -> semantic_tags_v2 -> heuristica` esteja centralizada em `resolveCardFunctionalRoles`. Fora de IA, seguem abertos trust SQL/serializer em trades/marketplace, request/log social repetido, politicas divergentes de `condition` e helpers de CMC/tipo. A claim antiga de `_isBasicLandName` duplicado segue stale: `basic_land_utils.dart` centraliza regular/snow basics e os consumidores atuais importam esse helper. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers de `server/routes/ai/optimize/index.dart` delegam para support e nao foram contados como corpo duplicado independente.
+- **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em 2026-06-13 19:00 UTC no checkout local `17b7f043`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista de duplicacao segue ruidosa por regex e nao foi usada como evidencia direta. Desde a rodada anterior de duplicacao (`641a4b40..HEAD`), o delta e somente documental; nao houve novo cluster confiavel alem dos ja abertos. Em IA, `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore` e `assessDeckOptimizationState`/`assessDeckOptimizationStateCore` duplicam analise de deck entre rebuild e optimize; `resolveOptimizeArchetype` diverge entre `deck_state_analysis.dart` e `optimize_runtime_support.dart`; e os fallbacks `_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler` e `_looksLikeWincon` ainda existem em `functional_card_tags.dart` e `optimization_functional_roles.dart`, embora a precedencia de `functional_tags -> semantic_tags_v2 -> heuristica` esteja centralizada em `resolveCardFunctionalRoles`. Fora de IA, seguem abertos trust SQL/serializer em trades/marketplace, request/log social repetido, politicas divergentes de `condition` e helpers de CMC/tipo. A claim antiga de `_isBasicLandName` duplicado segue stale: `basic_land_utils.dart` centraliza regular/snow basics e os consumidores atuais importam esse helper. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers de `server/routes/ai/optimize/index.dart` delegam para support e nao foram contados como corpo duplicado independente.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
@@ -304,19 +304,21 @@ esse dado como sinal de produto.
   counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem
   consumidor.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-12 15:00 UTC no checkout local `129d647f`. Nao houve novo achado
-  P1/P2 app-facing. As claims antigas contra `deck_matchups` e
+  em 2026-06-13 15:00 UTC no checkout local `eada6841`. Desde a ultima rodada
+  focada (`129d647f`), o delta ate HEAD e somente documental. Nao houve novo
+  achado P1/P2 app-facing. As claims antigas contra `deck_matchups` e
   `deck_weakness_reports` continuam stale: ambas tem leitura runtime e campos
   retornados no payload das rotas experimentais (`stored_matchup` em
-  `/ai/simulate-matchup` e `history` em `/ai/weakness-analysis`).
-  `deck_learning_events`, `commander_card_usage`, `commander_learned_decks` e
-  `card_battle_rules` tambem sao controles positivos atuais por terem
-  writers/readers em rotas/jobs/scripts operacionais. Permanecem como riscos
-  menores: `commander_reference_decks` e `commander_reference_deck_cards`
-  persistem raw corpus sem `SELECT/JOIN` direto confirmado, enquanto o produto
-  le o agregado `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem
-  insert helper sem chamador, leitura apenas `COUNT(*)` em `/ai/ml-status` e
-  nenhum DDL local encontrado neste checkout.
+  `/ai/simulate-matchup` e `history` em `/ai/weakness-analysis`). A varredura de
+  `server/database_setup.sql` tambem nao encontrou nova tabela declarada ali sem
+  leitura. `deck_learning_events`, `commander_card_usage`,
+  `commander_learned_decks` e `card_battle_rules` seguem como controles
+  positivos por terem writers/readers em rotas, jobs ou scripts operacionais.
+  Permanecem como riscos menores: `commander_reference_decks` e
+  `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN` direto
+  confirmado, enquanto o produto le o agregado `commander_reference_deck_analysis`;
+  e `ml_prompt_feedback` tem insert helper sem chamador, leitura apenas
+  `COUNT(*)` em `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade

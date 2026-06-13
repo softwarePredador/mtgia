@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-13 11:00 UTC
+> Data: 2026-06-13 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -13,7 +13,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-12 19:00 UTC no checkout `641a4b40`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta. A revalidacao manual nao encontrou novo achado confiavel alem dos clusters ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics segue stale porque `basic_land_utils.dart` centraliza regular/snow basics. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-13 19:00 UTC no checkout `17b7f043`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta. Desde a rodada anterior de duplicacao (`641a4b40..HEAD`), o delta e somente documental; nao houve novo cluster confiavel alem dos ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics segue stale porque `basic_land_utils.dart` centraliza regular/snow basics. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **RESOLVIDO/STALE no checkout local
    `372cdfca` em 2026-06-11 11:00 UTC**. `server/bin/local_test_server.dart`
    nao importa mais `../.dart_frog/server.dart` estaticamente; valida
@@ -47,16 +47,18 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    docs/artifacts, aliases localizados e seeds Commander Reference seguem
    separados como allowed/allowed-with-caution.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-11 15:00 UTC no checkout
-   `76ec897f`. As claims antigas contra `deck_matchups` e
-   `deck_weakness_reports` estao stale: ambas agora sao lidas no runtime e
-   retornadas no payload das proprias rotas experimentais. Tambem nao devem ser
-   tratadas como sem uso `commander_learned_decks`, `deck_learning_events` e
-   `commander_card_usage`, que possuem writers/readers no loop Hermes. Restam
-   como riscos menores as raws `commander_reference_decks` /
-   `commander_reference_deck_cards` sem leitor direto confirmado e
-   `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
-   `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
+   revalidado na rotacao local Codex de 2026-06-13 15:00 UTC no checkout
+   `eada6841`. Desde `129d647f`, o delta ate HEAD e somente documental. As
+   claims antigas contra `deck_matchups` e `deck_weakness_reports` estao stale:
+   ambas agora sao lidas no runtime e retornadas no payload das proprias rotas
+   experimentais. Tambem nao devem ser tratadas como sem uso
+   `commander_learned_decks`, `deck_learning_events`, `commander_card_usage` e
+   `card_battle_rules`, que possuem writers/readers em rotas, jobs ou scripts
+   operacionais. Restam como riscos menores as raws
+   `commander_reference_decks` / `commander_reference_deck_cards` sem leitor
+   direto confirmado e `ml_prompt_feedback`, que tem helper de insert sem
+   chamador, count-only em `/ai/ml-status` e nenhum DDL local encontrado neste
+   checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-13 03:00 UTC no checkout `5bfc9706`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
@@ -166,26 +168,28 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-12 19:00 UTC: REVALIDADO/ABERTO no checkout `641a4b40`.**
+- **Status 2026-06-13 19:00 UTC: REVALIDADO/ABERTO no checkout `17b7f043`.**
   O auditor textual apontou `115` problemas em `205` arquivos backend, mas a
   parte de duplicacao segue limitada por falsos positivos de regex e wrappers;
-  este item usa apenas evidencia revalidada por `rg` e leitura direta. A rodada
-  atual nao encontrou novo achado confiavel alem dos clusters ja abertos; tambem
-  manteve stale a duplicacao antiga de basic lands e descartou
+  este item usa apenas evidencia revalidada por `rg` e leitura direta. Desde a
+  rodada anterior de duplicacao (`641a4b40..HEAD`), o delta de produto e nulo
+  e as mudancas sao somente documentais. A rodada atual nao encontrou novo
+  achado confiavel alem dos clusters ja abertos; tambem manteve stale a
+  duplicacao antiga de basic lands e descartou
   `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` como wrappers de
   compatibilidade sobre `optimize_cache_support.dart`.
 - **Evidência**:
   - `DeckArchetypeAnalyzer` em `server/lib/ai/deck_state_analysis.dart:1`-`:210`
     e `DeckArchetypeAnalyzerCore` em
-    `server/lib/ai/optimize_state_support.dart:6`-`:210` implementam o mesmo
+    `server/lib/ai/optimize_state_support.dart:6`-`:220` implementam o mesmo
     contrato de CMC medio, contagem de tipos, deteccao de arquetipo, analise de
     mana base, curva e confianca. `server/lib/ai/rebuild_guided_service.dart:138`-`:140`
     usa a primeira copia; `server/lib/ai/optimize_request_support.dart:286`-`:302`
     usa a segunda para o contexto de optimize.
   - `assessDeckOptimizationState` em
-    `server/lib/ai/deck_state_analysis.dart:308`-`:470` e
+    `server/lib/ai/deck_state_analysis.dart:308`-`:497` e
     `assessDeckOptimizationStateCore` em
-    `server/lib/ai/optimize_state_support.dart:337`-`:500` repetem a mesma
+    `server/lib/ai/optimize_state_support.dart:337`-`:510` repetem a mesma
     avaliacao de deck incompleto, formato, cores, texto do comandante,
     severidade e plano de reparo, apenas mudando o DTO retornado. Rebuild usa
     a versao antiga diretamente em `server/lib/ai/rebuild_guided_service.dart:141`-`:147`
@@ -803,32 +807,34 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-12 15:00 UTC: REVALIDADO no checkout `129d647f`.** A rodada
+- **Status 2026-06-13 15:00 UTC: REVALIDADO no checkout `eada6841`.** A rodada
   local focada em `postgresql-tables-not-used` revalidou os achados historicos
-  com `rg` literal e varredura whole-repo de `CREATE TABLE` versus
-  `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE` em `.dart`, `.sql`, `.py` e `.sh`.
-  Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
+  com `rg` literal, varredura de `server/database_setup.sql` e varredura de
+  tabelas criadas dinamicamente em `server/lib`, `server/routes` e `server/bin`,
+  cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. O delta
+  de codigo desde a ultima rodada focada (`129d647f..HEAD`) e somente
+  documental. Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
   `deck_weakness_reports` nao continuam write-only: ambas possuem leitores
   runtime e campos retornados no payload das rotas. `card_battle_rules` tambem
   nao foi classificada como unused, porque jobs/scripts Hermes leem, atualizam
   e sincronizam a tabela. `schema_migrations` segue fora do achado por ser
   tabela interna do migrador, e `user_learning_events` foi excluida por ser
-  ponte SQLite local. O risco remanescente fica restrito a raws do Commander
-  Reference Corpus sem leitor direto confirmado e a `ml_prompt_feedback`, que
-  nao tem DDL local no checkout atual, possui helper de insert sem chamador e
-  aparece em `/ai/ml-status` apenas como `COUNT(*)`.
+  ponte SQLite local, nao PostgreSQL do produto. O risco remanescente fica
+  restrito a raws do Commander Reference Corpus sem leitor direto confirmado e a
+  `ml_prompt_feedback`, que nao tem DDL local no checkout atual, possui helper
+  de insert sem chamador e aparece em `/ai/ml-status` apenas como `COUNT(*)`.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:222`; a rota
     `/ai/simulate-matchup` le o historico anterior por `_loadStoredMatchup` em
     `server/routes/ai/simulate-matchup/index.dart:382`, executa
-    `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:456`-`:463`,
-    grava o upsert em `:390`-`:403` e retorna `stored_matchup.previous` em
+    `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:458`-`:463`,
+    grava o upsert em `:392`-`:403` e retorna `stored_matchup.previous` em
     `:430`-`:435`. Portanto, a claim write-only esta stale.
   - `deck_weakness_reports` é definida em `server/database_setup.sql:484`; a
     rota `/ai/weakness-analysis` grava reports em
-    `server/routes/ai/weakness-analysis/index.dart:480`-`:499`, chama
+    `server/routes/ai/weakness-analysis/index.dart:484`-`:499`, chama
     `_loadWeaknessHistory` em `:506`, le resumo por severidade em `:572`-`:579`,
-    le recentes em `:588`-`:595` e retorna `history` em `:559`. Portanto, a
+    le recentes em `:588`-`:596` e retorna `history` em `:559`. Portanto, a
     claim write-only esta stale, embora `addressed` ainda nao tenha update
     confirmado.
   - `ml_prompt_feedback` nao tem `CREATE TABLE` local encontrado em
