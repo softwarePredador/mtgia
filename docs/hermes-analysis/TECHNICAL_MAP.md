@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-12 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-13 05:30 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-12)
+## Achados do audit de estrutura (atualizado 2026-06-13)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -190,30 +190,32 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-12 05:30 UTC no checkout local `e09c7448`. Deck analysis,
+  2026-06-13 05:30 UTC no checkout local `5f09b309`. Deck analysis,
   `loadOptimizeDeckContext`, validator e quality gate ja carregam ou preservam
   `functional_tags`, `semantic_tags_v2` e multi-role quando essas fontes chegam
-  ao fluxo; ha testes para precedencia de `functional_tags` sobre semantic v2 e
-  para role deltas multi-role. Os riscos restantes sao mais estreitos:
-  `inferFunctionalRole` ainda reduz roles para o contrato legado de optimize,
-  `removals_detailed` chama esse helper sem tags persistidas,
-  `/ai/weakness-analysis` usa o adapter em modo heuristico porque a query nao
-  carrega `card_function_tags`/`semantic_tags_v2`, e
-  `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
-- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-12
-  05:30 UTC no checkout local `e09c7448`. A claim antiga de ausencia de policy
+  ao fluxo; addition data para quality gate tambem busca essas fontes. Ha testes
+  para precedencia de `functional_tags` sobre semantic v2 e para role deltas
+  multi-role. Os riscos restantes sao mais estreitos: `inferFunctionalRole`
+  ainda reduz roles para o contrato legado de optimize, `removals_detailed` nao
+  threada as tags ja presentes em `allCardData`, `/ai/weakness-analysis` usa o
+  adapter em modo heuristico porque a query nao carrega
+  `card_function_tags`/`semantic_tags_v2`, e `/decks/:id/recommendations` segue
+  fora da camada semantica compartilhada.
+- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-13
+  05:30 UTC no checkout local `5f09b309`. A claim antiga de ausencia de policy
   versionada esta stale: `commander_fallback_policy.dart` existe, expoe versao e
   centraliza parte relevante dos fallbacks. Continuam como risco as
   decisoes inline por nome em classificadores e rotas (`functional_card_tags.dart`,
   `optimization_functional_roles.dart`, `candidate_quality_data_support.dart`,
   `optimize_runtime_support.dart`, `rebuild_guided_service.dart`,
+  `deck_advanced_analysis.dart`,
   `meta_deck_commander_shell_support.dart`, `/ai/optimize` quando
   `deckOptimizer == null`, `/decks/:id/recommendations` e
   `/ai/weakness-analysis`, alem de prompts runtime carregados por
   `otimizacao.dart`). Permanecem permitidos exemplos de UI/import,
-  docs/corpus/artifacts/test fixtures, sugestoes de busca do life counter,
-  seeds/profiles de Commander Reference e a excecao intencional de
-  `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
+  docs/corpus/artifacts/test fixtures, aliases localizados, sugestoes de busca
+  do life counter, seeds/profiles de Commander Reference e a excecao intencional
+  de `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
   2026-06-13 03:00 UTC no checkout local `5bfc9706`. O auditor textual executou
@@ -242,7 +244,7 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-12 05:30 UTC no checkout local `e09c7448`:
+Estado atual revalidado em 2026-06-13 05:30 UTC no checkout local `5f09b309`:
 deck analysis e o contexto principal de optimize carregam `card_function_tags`
 e `semantic_tags_v2`; `resolveCardFunctionalRoles` aplica precedencia
 `functional_tags -> semantic_tags_v2 -> heuristica`; validator e quality gate
@@ -253,10 +255,12 @@ nome via policy/fallback.
 
 Gaps restantes: `inferFunctionalRole` mantem colapso legado de role
 multi-tag para uma role primaria usada por partes do optimize;
-`removals_detailed` chama esse helper sem fornecer fontes persistidas;
+`removals_detailed` chama esse helper sem fornecer as fontes persistidas ja
+presentes em `allCardData`;
 `/ai/weakness-analysis` nao carrega `card_function_tags`,
 `semantic_tags_v2` nem `card_role_scores` e ainda devolve sugestoes por nomes
-fixos; `/decks/:id/recommendations` usa buckets por texto, recomenda
+fixos; `deck_advanced_analysis.dart`, chamado por weakness-analysis, tambem
+opera sem fontes persistidas e contem recomendacoes fixas; `/decks/:id/recommendations` usa buckets por texto, recomenda
 `Command Tower` diretamente quando faltam terrenos e usa raridade como proxy de
 impacto. O mock de `/ai/optimize` sem `deckOptimizer` ainda retorna staples por
 nome. Prompts runtime carregados por `otimizacao.dart` tambem citam staples por
