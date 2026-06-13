@@ -25,6 +25,30 @@ Decisão principal:
 - Manter jobs pesados de optimizer como execução manual até virarem rotinas do
   servidor ManaLoom com isolamento, locks e métricas.
 
+## Atualização 2026-06-13 — sync obrigatório da branch docs
+
+Achado novo: as auditorias de documentação/estrutura rodam na branch
+`codex/hermes-analysis-docs`, mas essa branch pode ficar atrás de
+`origin/master`. Quando isso acontece, a auditoria vê um snapshot antigo do
+código e pode publicar achados stale.
+
+Correção versionada:
+
+- `server/bin/hermes_docs_branch_sync.sh` cria a rotina segura de sincronização.
+- `docs/hermes-analysis/HERMES_DOCS_BRANCH_SYNC_CRON_2026-06-13.md` documenta
+  instalação, ordem, status permitidos e guardrails.
+
+Nova cron recomendada:
+
+| Cron | Cadência | Função real | Valor para ManaLoom | Decisão |
+|---|---:|---|---|---|
+| `manaloom-docs-branch-sync` | 20m | Mergeia `origin/master` em `codex/hermes-analysis-docs` com lock e abort seguro em conflito | Garante que auditorias de docs analisam código vivo | Adicionar antes de reativar/rodar auditorias documentais |
+
+Regra nova: qualquer auditoria que leia código vivo a partir da branch docs
+deve exigir evidência fresca de `manaloom-docs-branch-sync` com status
+`up_to_date` ou `merged`. Se a sync bloquear por conflito, worktree sujo ou push
+falho, a auditoria deve retornar `BLOCKED`, não `FINDINGS`.
+
 ## Evidência operacional
 
 Coleta feita no container Hermes:

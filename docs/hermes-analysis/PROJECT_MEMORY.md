@@ -24,11 +24,18 @@ A memoria versionada do agente vive em `codex/hermes-analysis-docs`.
 Nunca commitar diretamente na `master`. Fluxo:
 
 1. `git fetch --all --prune`
-2. `git checkout codex/hermes-analysis-docs`
-3. `git pull --ff-only origin codex/hermes-analysis-docs`
-4. Editar `docs/hermes-analysis/*`
-5. Stage apenas arquivos intencionais em `docs/hermes-analysis/**` (evitar artefatos de crons como `knowledge.db`, decks gerados e `__pycache__`) e commitar com `Update Hermes project analysis docs`
-6. `git push origin codex/hermes-analysis-docs`
+2. Rodar `/opt/data/scripts/manaloom-docs-branch-sync.sh` ou
+   `server/bin/hermes_docs_branch_sync.sh` no workspace Hermes.
+3. Prosseguir somente se a sync retornar `up_to_date` ou `merged`.
+4. Se a sync bloquear por conflito, worktree sujo ou push falho, retornar
+   `BLOCKED` e nao publicar achado novo.
+5. Editar `docs/hermes-analysis/*`
+6. Stage apenas arquivos intencionais em `docs/hermes-analysis/**` (evitar artefatos de crons como `knowledge.db`, decks gerados e `__pycache__`) e commitar com `Update Hermes project analysis docs`
+7. `git push origin codex/hermes-analysis-docs`
+
+Motivo: a branch docs e memoria/staging, mas as auditorias de codigo precisam
+ver a `master` viva. A sync mergeia `origin/master` em
+`codex/hermes-analysis-docs` antes de qualquer auditoria estrutural.
 
 ## Fontes canonicas (ordem de precedencia)
 

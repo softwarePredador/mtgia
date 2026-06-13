@@ -127,6 +127,13 @@ Regra de branch nova: scripts operacionais que executam optimizer/sync devem
 fazer checkout de `master`; apenas crons de memória, documentação e report-only
 podem trabalhar em `codex/hermes-analysis-docs`.
 
+Atualização 2026-06-13: crons de memória/documentação que leem código vivo não
+devem auditar uma branch docs stale. Antes de publicar achados, elas precisam
+confirmar que `manaloom-docs-branch-sync` rodou com status `up_to_date` ou
+`merged`, ou executar `/opt/data/scripts/manaloom-docs-branch-sync.sh`. Essa
+sync mergeia `origin/master` em `codex/hermes-analysis-docs` e falha alto em
+conflito/worktree sujo/push falho.
+
 Esses scripts não devem mascarar falha de checkout/pull com `|| true`. Se o
 checkout de `master` falhar, o job deve falhar alto para evitar execução de
 código stale da branch de memória.

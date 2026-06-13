@@ -26,6 +26,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Snapshot do runtime AWS depois do prune de branches e ajuste das crons.
   - Registra jobs habilitados/pausados, scripts alterados e validações feitas.
 
+- `HERMES_DOCS_BRANCH_SYNC_CRON_2026-06-13.md`
+  - Guardrail novo para auditorias Hermes na branch
+    `codex/hermes-analysis-docs`.
+  - Define a cron `manaloom-docs-branch-sync`, que deve mergear
+    `origin/master` na branch docs antes de qualquer auditoria publicar achados
+    sobre código vivo.
+  - Use quando uma auditoria de docs/estrutura parecer stale ou antes de
+    reativar crons como code-structure, normal-audit, weekly-audit ou
+    logic-coherence.
+
 - `HERMES_CRON_VALUE_AND_MIGRATION_AUDIT_2026-06-11.md`
   - Auditoria uma a uma das crons Hermes, com decisão de manter/pausar e plano
   para migrar o loop para o servidor ManaLoom.
