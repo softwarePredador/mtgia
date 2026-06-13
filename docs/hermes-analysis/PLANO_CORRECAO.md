@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-13 11:00 UTC
+> Data: 2026-06-13 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -47,16 +47,18 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    docs/artifacts, aliases localizados e seeds Commander Reference seguem
    separados como allowed/allowed-with-caution.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-11 15:00 UTC no checkout
-   `76ec897f`. As claims antigas contra `deck_matchups` e
-   `deck_weakness_reports` estao stale: ambas agora sao lidas no runtime e
-   retornadas no payload das proprias rotas experimentais. Tambem nao devem ser
-   tratadas como sem uso `commander_learned_decks`, `deck_learning_events` e
-   `commander_card_usage`, que possuem writers/readers no loop Hermes. Restam
-   como riscos menores as raws `commander_reference_decks` /
-   `commander_reference_deck_cards` sem leitor direto confirmado e
-   `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
-   `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
+   revalidado na rotacao local Codex de 2026-06-13 15:00 UTC no checkout
+   `eada6841`. Desde `129d647f`, o delta ate HEAD e somente documental. As
+   claims antigas contra `deck_matchups` e `deck_weakness_reports` estao stale:
+   ambas agora sao lidas no runtime e retornadas no payload das proprias rotas
+   experimentais. Tambem nao devem ser tratadas como sem uso
+   `commander_learned_decks`, `deck_learning_events`, `commander_card_usage` e
+   `card_battle_rules`, que possuem writers/readers em rotas, jobs ou scripts
+   operacionais. Restam como riscos menores as raws
+   `commander_reference_decks` / `commander_reference_deck_cards` sem leitor
+   direto confirmado e `ml_prompt_feedback`, que tem helper de insert sem
+   chamador, count-only em `/ai/ml-status` e nenhum DDL local encontrado neste
+   checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-13 03:00 UTC no checkout `5bfc9706`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
@@ -803,32 +805,34 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-12 15:00 UTC: REVALIDADO no checkout `129d647f`.** A rodada
+- **Status 2026-06-13 15:00 UTC: REVALIDADO no checkout `eada6841`.** A rodada
   local focada em `postgresql-tables-not-used` revalidou os achados historicos
-  com `rg` literal e varredura whole-repo de `CREATE TABLE` versus
-  `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE` em `.dart`, `.sql`, `.py` e `.sh`.
-  Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
+  com `rg` literal, varredura de `server/database_setup.sql` e varredura de
+  tabelas criadas dinamicamente em `server/lib`, `server/routes` e `server/bin`,
+  cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. O delta
+  de codigo desde a ultima rodada focada (`129d647f..HEAD`) e somente
+  documental. Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
   `deck_weakness_reports` nao continuam write-only: ambas possuem leitores
   runtime e campos retornados no payload das rotas. `card_battle_rules` tambem
   nao foi classificada como unused, porque jobs/scripts Hermes leem, atualizam
   e sincronizam a tabela. `schema_migrations` segue fora do achado por ser
   tabela interna do migrador, e `user_learning_events` foi excluida por ser
-  ponte SQLite local. O risco remanescente fica restrito a raws do Commander
-  Reference Corpus sem leitor direto confirmado e a `ml_prompt_feedback`, que
-  nao tem DDL local no checkout atual, possui helper de insert sem chamador e
-  aparece em `/ai/ml-status` apenas como `COUNT(*)`.
+  ponte SQLite local, nao PostgreSQL do produto. O risco remanescente fica
+  restrito a raws do Commander Reference Corpus sem leitor direto confirmado e a
+  `ml_prompt_feedback`, que nao tem DDL local no checkout atual, possui helper
+  de insert sem chamador e aparece em `/ai/ml-status` apenas como `COUNT(*)`.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:222`; a rota
     `/ai/simulate-matchup` le o historico anterior por `_loadStoredMatchup` em
     `server/routes/ai/simulate-matchup/index.dart:382`, executa
-    `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:456`-`:463`,
-    grava o upsert em `:390`-`:403` e retorna `stored_matchup.previous` em
+    `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:458`-`:463`,
+    grava o upsert em `:392`-`:403` e retorna `stored_matchup.previous` em
     `:430`-`:435`. Portanto, a claim write-only esta stale.
   - `deck_weakness_reports` é definida em `server/database_setup.sql:484`; a
     rota `/ai/weakness-analysis` grava reports em
-    `server/routes/ai/weakness-analysis/index.dart:480`-`:499`, chama
+    `server/routes/ai/weakness-analysis/index.dart:484`-`:499`, chama
     `_loadWeaknessHistory` em `:506`, le resumo por severidade em `:572`-`:579`,
-    le recentes em `:588`-`:595` e retorna `history` em `:559`. Portanto, a
+    le recentes em `:588`-`:596` e retorna `history` em `:559`. Portanto, a
     claim write-only esta stale, embora `addressed` ainda nao tenha update
     confirmado.
   - `ml_prompt_feedback` nao tem `CREATE TABLE` local encontrado em
