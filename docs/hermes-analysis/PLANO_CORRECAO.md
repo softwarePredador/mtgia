@@ -57,7 +57,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
    `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-12 03:00 UTC no checkout `fb302fd4`.
+   na rotacao local Codex de 2026-06-13 03:00 UTC no checkout `5bfc9706`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
    classes, `0` imports quebrados), mas continua limitado a `server/lib` e
    `server/routes`; a evidencia app veio de `rg` e leitura direta.
@@ -860,7 +860,7 @@ consumidos por bins operacionais) e adicionou achados menores no read-side de
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-12 03:00 UTC: REVALIDADO/ABERTO no checkout `fb302fd4`.**
+- **Status 2026-06-13 03:00 UTC: REVALIDADO/ABERTO no checkout `5bfc9706`.**
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:284` usa
