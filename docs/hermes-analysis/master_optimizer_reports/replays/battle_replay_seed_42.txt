@@ -1,0 +1,188 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Thrasios, Triton Hero #101 (real), Kraum, Ludevic's Opus #98 (real), Rograkh, Son of Rohgahh #118 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Thrasios, Triton Hero #101 (real): 1 mulligan(s), 7 cards, 4 lands
+  Kraum, Ludevic's Opus #98 (real): 2 mulligan(s), 6 cards, 2 lands
+  Rograkh, Son of Rohgahh #118 (real): 2 mulligan(s), 6 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0
+
+TURN 1 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=0
+
+TURN 1 - Kraum, Ludevic's Opus #98 (real) | Life=40 Hand=6 Board=0
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #98 (real): Life=40 Hand=6 Board=0 Grave=1 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=5 Board=0 Grave=2 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=3
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Lorehold: Life=40 Hand=4 Board=4 Grave=1 Discarded=0
+
+TURN 2 - Thrasios, Triton Hero #101 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=40 Hand=6 Board=1 Grave=2 Discarded=0
+
+TURN 2 - Kraum, Ludevic's Opus #98 (real) | Life=40 Hand=6 Board=0
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #98 (real): Life=40 Hand=6 Board=0 Grave=2 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=5 Board=0 Grave=3 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=4 Board=4
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=6 Grave=1 Discarded=0
+
+TURN 3 - Thrasios, Triton Hero #101 (real) | Life=35 Hand=6 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Lorehold: 1 player damage, target life 39, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=35 Hand=6 Board=1 Grave=3 Discarded=0
+
+TURN 3 - Kraum, Ludevic's Opus #98 (real) | Life=40 Hand=6 Board=0
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #98 (real): Life=40 Hand=7 Board=0 Grave=2 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=5 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=4 Board=1 Grave=4 Discarded=0
+
+TURN 4 - Lorehold | Life=39 Hand=4 Board=6
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 30, target_dead=False
+  END Lorehold: Life=39 Hand=3 Board=7 Grave=2 Discarded=0
+
+TURN 4 - Thrasios, Triton Hero #101 (real) | Life=30 Hand=6 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  COMBAT Thrasios, Triton Hero #101 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=39)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Lorehold: 1 player damage, target life 38, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=30 Hand=6 Board=1 Grave=4 Discarded=0
+
+TURN 4 - Kraum, Ludevic's Opus #98 (real) | Life=40 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #101 (real): Mental Misstep (CMC=1.0) [counter] rule=known_cards_manual/verified
+  END Kraum, Ludevic's Opus #98 (real): Life=40 Hand=7 Board=0 Grave=3 Discarded=1
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=4 Board=1
+  MANA Rograkh, Son of Rohgahh #118 (real): 2 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=4 Board=2 Grave=4 Discarded=0
+
+TURN 5 - Lorehold | Life=38 Hand=3 Board=7
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=25)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 20, target_dead=False
+  END Lorehold: Life=38 Hand=1 Board=8 Grave=4 Discarded=0
+
+TURN 5 - Thrasios, Triton Hero #101 (real) | Life=20 Hand=5 Board=1
+  MANA Thrasios, Triton Hero #101 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  RESOLVE Thrasios, Triton Hero #101 (real): Wishclaw Talisman (CMC=2.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Thrasios, Triton Hero #101 (real): Wishclaw Talisman found Colossal Skyturtle (any)
+  COMBAT Thrasios, Triton Hero #101 (real) -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 1 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=37)
+  DAMAGE Thrasios, Triton Hero #101 (real) -> Rograkh, Son of Rohgahh #118 (real): 0 player damage, target life 37, target_dead=False
+  END Thrasios, Triton Hero #101 (real): Life=20 Hand=5 Board=0 Grave=7 Discarded=0
+
+TURN 5 - Kraum, Ludevic's Opus #98 (real) | Life=37 Hand=7 Board=0
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kraum, Ludevic's Opus #98 (real): Life=37 Hand=6 Board=1 Grave=4 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=37 Hand=4 Board=2
+  MANA Rograkh, Son of Rohgahh #118 (real): 2 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=20)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Thrasios, Triton Hero #101 (real): 2 player damage, target life 18, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=37 Hand=3 Board=3 Grave=5 Discarded=0
+
+TURN 6 - Lorehold | Life=38 Hand=1 Board=8
+  MANA Lorehold: 7 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=18)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 13, target_dead=False
+  END Lorehold: Life=38 Hand=1 Board=9 Grave=4 Discarded=0
+
+TURN 6 - Thrasios, Triton Hero #101 (real) | Life=13 Hand=5 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=13 Hand=6 Board=0 Grave=7 Discarded=0
+
+TURN 6 - Kraum, Ludevic's Opus #98 (real) | Life=37 Hand=6 Board=1
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #98 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=13)
+  DAMAGE Kraum, Ludevic's Opus #98 (real) -> Thrasios, Triton Hero #101 (real): 2 player damage, target life 11, target_dead=False
+  END Kraum, Ludevic's Opus #98 (real): Life=37 Hand=6 Board=1 Grave=5 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=37 Hand=3 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  RESOLVE Rograkh, Son of Rohgahh #118 (real): Sylvan Scrying (CMC=2.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Rograkh, Son of Rohgahh #118 (real): Sylvan Scrying found Flooded Strand (land)
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=aggro_low_life, target_life=11)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Thrasios, Triton Hero #101 (real): 2 player damage, target life 9, target_dead=False
+  RESOLVE Kraum, Ludevic's Opus #98 (real): Swan Song (CMC=1.0) [counter] rule=known_cards_manual/verified
+  END Rograkh, Son of Rohgahh #118 (real): Life=37 Hand=4 Board=3 Grave=6 Discarded=0
+
+TURN 7 - Lorehold | Life=38 Hand=1 Board=9
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=9)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #101 (real): 5 player damage, target life 4, target_dead=False
+  END Lorehold: Life=38 Hand=1 Board=28 Grave=5 Discarded=0
+
+TURN 7 - Thrasios, Triton Hero #101 (real) | Life=4 Hand=6 Board=0
+  MANA Thrasios, Triton Hero #101 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Thrasios, Triton Hero #101 (real): Life=4 Hand=7 Board=0 Grave=7 Discarded=0
+
+TURN 7 - Kraum, Ludevic's Opus #98 (real) | Life=37 Hand=5 Board=1
+  MANA Kraum, Ludevic's Opus #98 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  COMBAT Kraum, Ludevic's Opus #98 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=4)
+  DAMAGE Kraum, Ludevic's Opus #98 (real) -> Thrasios, Triton Hero #101 (real): 2 player damage, target life 2, target_dead=False
+  END Kraum, Ludevic's Opus #98 (real): Life=37 Hand=5 Board=1 Grave=6 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=37 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Thrasios, Triton Hero #101 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=lethal, target_life=2)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Thrasios, Triton Hero #101 (real): 2 player damage, target life 0, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #101 (real) (life_zero) <<<
+
+TURN 8 - Lorehold | Life=38 Hand=1 Board=28
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  REMOVAL Lorehold: Path to Exile removed Ragavan, Nimble Pilferer from Kraum, Ludevic's Opus #98 (real)
+  COMBAT Lorehold -> Kraum, Ludevic's Opus #98 (real): 20 attackers, 0 blockers, 0 gang blocks, 43 power (reason=lethal, target_life=37)
+  DAMAGE Lorehold -> Kraum, Ludevic's Opus #98 (real): 43 player damage, target life -6, target_dead=True
+  >>> DIED: Kraum, Ludevic's Opus #98 (real) (life_zero) <<<
+
+TURN 8 - Rograkh, Son of Rohgahh #118 (real) | Life=37 Hand=4 Board=4
+  MANA Rograkh, Son of Rohgahh #118 (real): 3 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  COMBAT Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=aggro_low_life, target_life=38)
+  DAMAGE Rograkh, Son of Rohgahh #118 (real) -> Lorehold: 6 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #118 (real): Life=37 Hand=4 Board=4 Grave=8 Discarded=0
+
+TURN 9 - Lorehold | Life=32 Hand=0 Board=29
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 21 attackers, 0 blockers, 0 gang blocks, 45 power (reason=lethal, target_life=37)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 45 player damage, target life -8, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #118 (real) (life_zero) <<<
+
+GAME OVER - Turn 9
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=32 Hand=0
+Thrasios, Triton Hero #101 (real): DEAD Life=0 Hand=7
+Kraum, Ludevic's Opus #98 (real): DEAD Life=-6 Hand=5
+Rograkh, Son of Rohgahh #118 (real): DEAD Life=-8 Hand=4

@@ -1,0 +1,279 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #118 (real), Rograkh, Son of Rohgahh #95 (real), Winota, Joiner of Forces #73 (real)
+======================================================================
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #118 (real): 1 mulligan(s), 7 cards, 2 lands
+  Rograkh, Son of Rohgahh #95 (real): 0 mulligan(s), 7 cards, 2 lands
+  Winota, Joiner of Forces #73 (real): 0 mulligan(s), 7 cards, 2 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Lorehold: Life=40 Hand=6 Board=2 Grave=0 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=0
+
+TURN 1 - Rograkh, Son of Rohgahh #95 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=0
+
+TURN 1 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Winota, Joiner of Forces #73 (real): Orim's Chant (CMC=1.0) [silence_spell] rule=known_cards_manual/verified
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=0 Grave=2 Discarded=0
+
+TURN 2 - Lorehold | Life=40 Hand=6 Board=2
+  MANA Lorehold: 4 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  RESOLVE Lorehold: Aetherflux Reservoir (CMC=4.0) [finisher] rule=known_cards_manual/verified
+  END Lorehold: Life=40 Hand=4 Board=3 Grave=2 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #118 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=40 Hand=7 Board=0 Grave=2 Discarded=0
+
+TURN 2 - Rograkh, Son of Rohgahh #95 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=40 Hand=7 Board=0 Grave=2 Discarded=0
+
+TURN 2 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=0 Grave=3 Discarded=0
+
+TURN 3 - Lorehold | Life=40 Hand=4 Board=3
+  MANA Lorehold: 5 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=2 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #118 (real) | Life=35 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=35 Hand=7 Board=0 Grave=3 Discarded=0
+
+TURN 3 - Rograkh, Son of Rohgahh #95 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=40 Hand=7 Board=0 Grave=3 Discarded=1
+
+TURN 3 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=6 Board=0 Grave=4 Discarded=0
+
+TURN 4 - Lorehold | Life=40 Hand=4 Board=5
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Seething Song (CMC=3.0) [ramp_ritual] rule=known_cards_manual/verified
+  RESOLVE Lorehold: Orim's Chant (CMC=1.0) [silence_spell] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 5 player damage, target life 30, target_dead=False
+  END Lorehold: Life=40 Hand=2 Board=6 Grave=4 Discarded=0
+
+TURN 4 - Rograkh, Son of Rohgahh #118 (real) | Life=30 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=30 Hand=7 Board=0 Grave=4 Discarded=1
+
+TURN 4 - Rograkh, Son of Rohgahh #95 (real) | Life=40 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=40 Hand=7 Board=0 Grave=4 Discarded=1
+
+TURN 4 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=6 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=0 Grave=4 Discarded=0
+
+TURN 5 - Lorehold | Life=40 Hand=2 Board=6
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 5 player damage, target life 25, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=7 Grave=5 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #118 (real) | Life=25 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=25 Hand=7 Board=0 Grave=5 Discarded=0
+
+TURN 5 - Rograkh, Son of Rohgahh #95 (real) | Life=39 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #95 (real): Into the Flood Maw (CMC=1.0) [remove_permanent] rule=known_cards_manual/verified
+  REMOVAL Rograkh, Son of Rohgahh #95 (real): Into the Flood Maw removed Lorehold, the Historian from Lorehold
+  END Rograkh, Son of Rohgahh #95 (real): Life=39 Hand=6 Board=0 Grave=6 Discarded=0
+
+TURN 5 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=0 Grave=5 Discarded=1
+
+TURN 6 - Lorehold | Life=40 Hand=1 Board=6
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 2 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=25)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 1 player damage, target life 24, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 1 player damage, target life 38, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=7 Grave=5 Discarded=0
+
+TURN 6 - Rograkh, Son of Rohgahh #118 (real) | Life=24 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=24 Hand=7 Board=0 Grave=6 Discarded=1
+
+TURN 6 - Rograkh, Son of Rohgahh #95 (real) | Life=38 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=38 Hand=7 Board=0 Grave=6 Discarded=0
+
+TURN 6 - Winota, Joiner of Forces #73 (real) | Life=40 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=40 Hand=7 Board=0 Grave=6 Discarded=0
+
+TURN 7 - Lorehold | Life=40 Hand=1 Board=7
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Flawless Maneuver (CMC=3.0) [indestructible] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=24)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 22, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 1 player damage, target life 37, target_dead=False
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=7 Grave=6 Discarded=0
+
+TURN 7 - Rograkh, Son of Rohgahh #118 (real) | Life=22 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=22 Hand=7 Board=0 Grave=7 Discarded=1
+
+TURN 7 - Rograkh, Son of Rohgahh #95 (real) | Life=37 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=37 Hand=7 Board=0 Grave=7 Discarded=1
+
+TURN 7 - Winota, Joiner of Forces #73 (real) | Life=39 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=39 Hand=7 Board=0 Grave=7 Discarded=1
+
+TURN 8 - Lorehold | Life=40 Hand=1 Board=7
+  MANA Lorehold: 6 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 3 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=22)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 2 player damage, target life 20, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 1 player damage, target life 36, target_dead=False
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 1 player damage, target life 38, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=9 Grave=6 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #118 (real) | Life=20 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=20 Hand=7 Board=0 Grave=8 Discarded=0
+
+TURN 8 - Rograkh, Son of Rohgahh #95 (real) | Life=36 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=36 Hand=7 Board=0 Grave=8 Discarded=1
+
+TURN 8 - Winota, Joiner of Forces #73 (real) | Life=38 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=38 Hand=7 Board=0 Grave=8 Discarded=0
+
+TURN 9 - Lorehold | Life=40 Hand=1 Board=9
+  MANA Lorehold: 7 available (5 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=20)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 6 player damage, target life 14, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 2 player damage, target life 34, target_dead=False
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 1 player damage, target life 37, target_dead=False
+  END Lorehold: Life=40 Hand=1 Board=10 Grave=6 Discarded=0
+
+TURN 9 - Rograkh, Son of Rohgahh #118 (real) | Life=14 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=14 Hand=7 Board=0 Grave=9 Discarded=1
+
+TURN 9 - Rograkh, Son of Rohgahh #95 (real) | Life=34 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=34 Hand=7 Board=0 Grave=9 Discarded=1
+
+TURN 9 - Winota, Joiner of Forces #73 (real) | Life=37 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=37 Hand=7 Board=0 Grave=9 Discarded=1
+
+TURN 10 - Lorehold | Life=40 Hand=1 Board=10
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Gamble (CMC=1.0) [tutor] rule=known_cards_manual/verified
+  TUTOR Lorehold: Gamble found Rise of the Eldrazi (any)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=14)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 6 player damage, target life 8, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 2 player damage, target life 32, target_dead=False
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 1 player damage, target life 36, target_dead=False
+  END Lorehold: Life=40 Hand=2 Board=10 Grave=7 Discarded=0
+
+TURN 10 - Rograkh, Son of Rohgahh #118 (real) | Life=8 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #118 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #118 (real): Life=8 Hand=7 Board=0 Grave=10 Discarded=1
+
+TURN 10 - Rograkh, Son of Rohgahh #95 (real) | Life=32 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=32 Hand=7 Board=0 Grave=10 Discarded=0
+
+TURN 10 - Winota, Joiner of Forces #73 (real) | Life=36 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  RESOLVE Rograkh, Son of Rohgahh #95 (real): An Offer You Can't Refuse (CMC=1.0) [counter] rule=known_cards_manual/verified
+  END Winota, Joiner of Forces #73 (real): Life=36 Hand=7 Board=0 Grave=10 Discarded=0
+
+TURN 11 - Lorehold | Life=40 Hand=2 Board=10
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #118 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=lethal, target_life=8)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #118 (real): 9 player damage, target life -1, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #118 (real) (life_zero) <<<
+
+TURN 11 - Rograkh, Son of Rohgahh #95 (real) | Life=32 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=32 Hand=7 Board=0 Grave=10 Discarded=0
+
+TURN 11 - Winota, Joiner of Forces #73 (real) | Life=36 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=36 Hand=7 Board=0 Grave=11 Discarded=1
+
+TURN 12 - Lorehold | Life=40 Hand=3 Board=10
+  MANA Lorehold: 8 available (6 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #95 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=32)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 6 player damage, target life 26, target_dead=False
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 3 player damage, target life 33, target_dead=False
+  END Lorehold: Life=40 Hand=3 Board=11 Grave=7 Discarded=0
+
+TURN 12 - Rograkh, Son of Rohgahh #95 (real) | Life=26 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=26 Hand=7 Board=0 Grave=11 Discarded=1
+
+TURN 12 - Winota, Joiner of Forces #73 (real) | Life=33 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=33 Hand=7 Board=0 Grave=12 Discarded=1
+
+TURN 13 - Lorehold | Life=40 Hand=3 Board=11
+  MANA Lorehold: 9 available (7 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Storm Herd (CMC=10.0) [token_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #95 (real): 4 attackers, 0 blockers, 0 gang blocks, 9 power (reason=default_low_life, target_life=26)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 6 player damage, target life 20, target_dead=False
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 3 player damage, target life 30, target_dead=False
+  END Lorehold: Life=40 Hand=2 Board=32 Grave=8 Discarded=0
+
+TURN 13 - Rograkh, Son of Rohgahh #95 (real) | Life=20 Hand=7 Board=0
+  MANA Rograkh, Son of Rohgahh #95 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Rograkh, Son of Rohgahh #95 (real): Life=20 Hand=7 Board=0 Grave=12 Discarded=1
+
+TURN 13 - Winota, Joiner of Forces #73 (real) | Life=30 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=30 Hand=7 Board=0 Grave=13 Discarded=1
+
+TURN 14 - Lorehold | Life=40 Hand=2 Board=32
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Pyroblast (CMC=1.0) [counter] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #95 (real): 24 attackers, 0 blockers, 0 gang blocks, 49 power (reason=lethal, target_life=20)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #95 (real): 49 player damage, target life -29, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #95 (real) (life_zero) <<<
+
+TURN 14 - Winota, Joiner of Forces #73 (real) | Life=30 Hand=7 Board=0
+  MANA Winota, Joiner of Forces #73 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Winota, Joiner of Forces #73 (real): Life=30 Hand=7 Board=0 Grave=14 Discarded=0
+
+TURN 15 - Lorehold | Life=40 Hand=2 Board=32
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  RESOLVE Lorehold: Unexpected Windfall (CMC=4.0) [treasure_maker] rule=known_cards_manual/verified
+  COMBAT Lorehold -> Winota, Joiner of Forces #73 (real): 24 attackers, 0 blockers, 0 gang blocks, 49 power (reason=lethal, target_life=30)
+  DAMAGE Lorehold -> Winota, Joiner of Forces #73 (real): 49 player damage, target life -19, target_dead=True
+  >>> DIED: Winota, Joiner of Forces #73 (real) (life_zero) <<<
+
+GAME OVER - Turn 15
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=40 Hand=1
+Rograkh, Son of Rohgahh #118 (real): DEAD Life=-1 Hand=7
+Rograkh, Son of Rohgahh #95 (real): DEAD Life=-29 Hand=7
+Winota, Joiner of Forces #73 (real): DEAD Life=-19 Hand=7

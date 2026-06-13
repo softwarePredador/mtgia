@@ -168,10 +168,10 @@ mtgia/
   `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1/P2 — Coerencia app-facing `app/lib` ↔ `server/routes` ↔ `server/lib`**:
-  revalidado novamente em 2026-06-12 23:00 UTC no checkout `3d9fe518`. O
+  revalidado novamente em 2026-06-11 23:00 UTC no checkout `6ce57c64`. O
   auditor textual executou com sucesso (`205` arquivos backend, `115` problemas
   textuais, `0` imports quebrados), mas nao cobre `app/lib`; a evidencia veio de
-  `rg`, `nl -ba` e leitura direta de providers/rotas/helpers/testes. Os achados anteriores de
+  `rg` e leitura direta de providers/rotas/helpers. Os achados anteriores de
   ownership em `POST /ai/optimize`, `POST /ai/archetypes` e polling de jobs
   async seguem stale: optimize exige usuario, passa `userId` para o loader
   owner-scoped, jobs rejeitam owner vazio/diferente e archetypes busca deck por

@@ -4,9 +4,6 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-13 11:00 UTC
-> Rotacao: `broken-imports-and-circular-dependencies`
-> Branch de memoria: `codex/hermes-analysis-docs`
 
 ## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-13 11:00 UTC
 

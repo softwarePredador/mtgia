@@ -1,0 +1,157 @@
+{
+  "ambiguous_instances": 0,
+  "ambiguous_kind_instances": {},
+  "ambiguous_top": [],
+  "ambiguous_unique_names": 0,
+  "apply": false,
+  "candidate_identity_policy": "Exact card_id is trusted only when one PG cards row matches. Multiple printings sharing one oracle_id count as semantic identity coverage but remain unsafe for card_id persistence until a canonical printing policy exists. If cards.oracle_id is absent, same-oracle resolution is unavailable and multiple printings remain ambiguous. Accent-normalized matches are diagnostic.",
+  "canonical_printing_candidate_instances": 0,
+  "canonical_printing_candidate_unique_names": 0,
+  "canonical_printing_policy": "Report-only. A card_id candidate is emitted only when one printing has a unique highest evidence score from explicit fields such as printing scryfall_id, direct Scryfall image, layout, collector number, set code and rarity. Ties remain semantic-only.",
+  "canonical_printing_reason_instances": {},
+  "card_instances": 1200,
+  "database_target": "143.198.230.247:5433/halder",
+  "decks": [
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Kinnan, Bonder Prodigy",
+      "learned_deck_id": 120,
+      "oracle_resolved_instances": 5,
+      "resolved_instances": 95,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Rograkh, Son of Rohgahh",
+      "learned_deck_id": 119,
+      "oracle_resolved_instances": 5,
+      "resolved_instances": 95,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Rograkh, Son of Rohgahh",
+      "learned_deck_id": 118,
+      "oracle_resolved_instances": 5,
+      "resolved_instances": 95,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Rograkh, Son of Rohgahh",
+      "learned_deck_id": 117,
+      "oracle_resolved_instances": 3,
+      "resolved_instances": 97,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Tayam, Luminous Enigma",
+      "learned_deck_id": 116,
+      "oracle_resolved_instances": 4,
+      "resolved_instances": 96,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Thrasios, Triton Hero",
+      "learned_deck_id": 115,
+      "oracle_resolved_instances": 4,
+      "resolved_instances": 96,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Umbris, Fear Manifest",
+      "learned_deck_id": 114,
+      "oracle_resolved_instances": 5,
+      "resolved_instances": 95,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Kenrith, the Returned King",
+      "learned_deck_id": 113,
+      "oracle_resolved_instances": 4,
+      "resolved_instances": 96,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Kefka, Court Mage",
+      "learned_deck_id": 112,
+      "oracle_resolved_instances": 4,
+      "resolved_instances": 96,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Najeela, the Blade-Blossom",
+      "learned_deck_id": 111,
+      "oracle_resolved_instances": 4,
+      "resolved_instances": 96,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Kraum, Ludevic's Opus",
+      "learned_deck_id": 110,
+      "oracle_resolved_instances": 3,
+      "resolved_instances": 97,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    },
+    {
+      "ambiguous_instances": 0,
+      "card_instances": 100,
+      "commander": "Rograkh, Son of Rohgahh",
+      "learned_deck_id": 109,
+      "oracle_resolved_instances": 4,
+      "resolved_instances": 96,
+      "source": "pg_meta_decks",
+      "unresolved_instances": 0
+    }
+  ],
+  "decks_seen": 12,
+  "oracle_id_column_present": true,
+  "oracle_resolved_instances": 50,
+  "oracle_resolved_kind_instances": {
+    "multiple_printings_same_oracle_exact": 50
+  },
+  "oracle_resolved_unique_names": 6,
+  "persist_recommendation": "do_not_apply_without_canonical_oracle_or_printing_policy",
+  "resolution_coverage": 0.958333,
+  "resolved_instances": 1150,
+  "resolved_kind_instances": {
+    "accent_normalized": 1,
+    "exact": 1117,
+    "front": 32
+  },
+  "resolved_unique_names": 407,
+  "resolver_schema_version": "learned_opponent_identity_audit_v4_report_only",
+  "semantic_identity_coverage": 1.0,
+  "unique_names": 413,
+  "unresolved_instances": 0,
+  "unresolved_top": []
+}

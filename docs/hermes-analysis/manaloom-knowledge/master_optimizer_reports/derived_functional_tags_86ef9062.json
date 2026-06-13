@@ -1,0 +1,1850 @@
+{
+  "allowlist_blocked_manual_review": [],
+  "allowlist_blocked_manual_review_count": 0,
+  "allowlist_loaded_count": 0,
+  "allowlist_unmatched": [],
+  "allowlist_unmatched_count": 0,
+  "allowlisted_candidates": [],
+  "allowlisted_candidates_count": 0,
+  "already_present_count": 261,
+  "already_present_sample": [
+    {
+      "card_id": "4994e73c-d70c-4315-a790-5349d0c9cb17",
+      "card_name": "Abrade",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_artifact_or_3dmg\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:649824cf10ec8b6f5fbeb1c3b5223d73\"}",
+      "logical_rule_key": "battle_rule_v1:649824cf10ec8b6f5fbeb1c3b5223d73",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "e58d80c6-423e-4530-95ac-7a4e2bfbf557",
+      "card_name": "Abrupt Decay",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:d2298416c485920eec4706c429fa1ece\"}",
+      "logical_rule_key": "battle_rule_v1:d2298416c485920eec4706c429fa1ece",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "19eb4356-4947-4af9-8040-16a0934df263",
+      "card_name": "Ad Nauseam",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:d23e0f5b2f7630b7b129a3619417c6ac\"}",
+      "logical_rule_key": "battle_rule_v1:d23e0f5b2f7630b7b129a3619417c6ac",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "84c7fffe-8886-4e1f-a9cd-87f8f0472022",
+      "card_name": "Aether Spellbomb",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:d763ddc0c6b8291776b6070463473e43\"}",
+      "logical_rule_key": "battle_rule_v1:d763ddc0c6b8291776b6070463473e43",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "ae8e22bb-dacc-43f6-81ac-e3cc935941f7",
+      "card_name": "All Is Dust",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wipe\",\"effect\":\"board_wipe\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11\"}",
+      "logical_rule_key": "battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "board_wipe"
+    },
+    {
+      "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+      "card_name": "An Offer You Can't Refuse",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4e847febff98ad16558e2f8af78762ba\"}",
+      "logical_rule_key": "battle_rule_v1:4e847febff98ad16558e2f8af78762ba",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "3730958e-18ee-4dde-bd62-46a18b24bf11",
+      "card_name": "Approach of the Second Sun",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"approach\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:39acdd97c32ccb0d3b82653ace1fb4c9\"}",
+      "logical_rule_key": "battle_rule_v1:39acdd97c32ccb0d3b82653ace1fb4c9",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "c76a3b36-18c8-4c2f-a591-10466478a92d",
+      "card_name": "Arcane Denial",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4e847febff98ad16558e2f8af78762ba\"}",
+      "logical_rule_key": "battle_rule_v1:4e847febff98ad16558e2f8af78762ba",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "card_name": "Arcane Signet",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:10a1ee0f9481c036f6e7e0062cb32d09\"}",
+      "logical_rule_key": "battle_rule_v1:10a1ee0f9481c036f6e7e0062cb32d09",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "5e62c280-33b2-4e08-84b5-ab7eedff7af6",
+      "card_name": "Archdruid's Charm",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:9e6209e76966d0f1a35f21c5a3b2c759\"}",
+      "logical_rule_key": "battle_rule_v1:9e6209e76966d0f1a35f21c5a3b2c759",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "704a871d-ef31-4a1c-bc23-eaf37a29afb7",
+      "card_name": "Archivist of Oghma",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:efa484e031f3c1366084fbacf5cc1d3d\"}",
+      "logical_rule_key": "battle_rule_v1:efa484e031f3c1366084fbacf5cc1d3d",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "8a94a6e3-d4ae-461b-b4db-f5b42864342b",
+      "card_name": "Artist's Talent",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:ef0ba3fe1a54dd8417495d2092e189a7\"}",
+      "logical_rule_key": "battle_rule_v1:ef0ba3fe1a54dd8417495d2092e189a7",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "81c7e15a-04ad-46dc-80af-d475f24f8156",
+      "card_name": "Assassin's Trophy",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:d2298416c485920eec4706c429fa1ece\"}",
+      "logical_rule_key": "battle_rule_v1:d2298416c485920eec4706c429fa1ece",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "e9e00935-2090-4fd0-95a0-dc8ad9e67476",
+      "card_name": "Austere Command",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wipe\",\"effect\":\"board_wipe\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:b3c65fe201e8f4da8061217e3f55e192\"}",
+      "logical_rule_key": "battle_rule_v1:b3c65fe201e8f4da8061217e3f55e192",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "board_wipe"
+    },
+    {
+      "card_id": "53a23b08-76ac-4ae8-ba8a-4cb62a542cb9",
+      "card_name": "Aven Interrupter",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:46532ff07498f8542f4d0f7450ae6b65\"}",
+      "logical_rule_key": "battle_rule_v1:46532ff07498f8542f4d0f7450ae6b65",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "3d9cb18e-45f3-484d-8352-eb2756fc7191",
+      "card_name": "Azorius Signet",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c69b8932919e1f6f41c5e717aa9a98b7\"}",
+      "logical_rule_key": "battle_rule_v1:c69b8932919e1f6f41c5e717aa9a98b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "040b7976-58c1-4c54-b594-1c6e950a7592",
+      "card_name": "Basalt Monolith",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:72e4d0140b955dd333e77fcbd4ded0c9\"}",
+      "logical_rule_key": "battle_rule_v1:72e4d0140b955dd333e77fcbd4ded0c9",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "f6ae4d32-cbfa-479a-bb62-cf94321b5a93",
+      "card_name": "Bender's Waterskin",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:21eeb56faebfd72ee3ff096fcf0d73b3\"}",
+      "logical_rule_key": "battle_rule_v1:21eeb56faebfd72ee3ff096fcf0d73b3",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "d6d42750-281a-4f9c-8c67-6088425a48f0",
+      "card_name": "Beseech the Mirror",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:7b1efc300c303a2b54bcfc758f5698e6\"}",
+      "logical_rule_key": "battle_rule_v1:7b1efc300c303a2b54bcfc758f5698e6",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "c2081978-5136-47c8-af76-85d8d7898c2e",
+      "card_name": "Biosynthic Burst",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"protect_creature\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:ef57082371ded00baf870f5c931975ad\"}",
+      "logical_rule_key": "battle_rule_v1:ef57082371ded00baf870f5c931975ad",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "e715bdfc-8bc4-4da8-b7bf-1d6f48d5fc85",
+      "card_name": "Birgi, God of Storytelling",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:21e2eead38dc7e554a433e3d3b6bfa69\"}",
+      "logical_rule_key": "battle_rule_v1:21e2eead38dc7e554a433e3d3b6bfa69",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "e715bdfc-8bc4-4da8-b7bf-1d6f48d5fc85",
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_ritual\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c1c0185ca36901d892f46c1160113f0b\"}",
+      "logical_rule_key": "battle_rule_v1:c1c0185ca36901d892f46c1160113f0b",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review",
+        "multi_face_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "784249d7-bb93-4537-a7d4-28456c593e4a",
+      "card_name": "Bitter Downfall",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_creature\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:5c692dfddd76362160ffb7d287af62b8\"}",
+      "logical_rule_key": "battle_rule_v1:5c692dfddd76362160ffb7d287af62b8",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "5774e590-3524-463e-bb0d-88612707cc6f",
+      "card_name": "Blasphemous Act",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wipe\",\"effect\":\"board_wipe\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11\"}",
+      "logical_rule_key": "battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "board_wipe"
+    },
+    {
+      "card_id": "1442cbde-b86a-4834-a2e6-c2cfee7d8b54",
+      "card_name": "Boon of the Wish-Giver",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:0ac8c171b9a52ad10547f8921ed8acaf\"}",
+      "logical_rule_key": "battle_rule_v1:0ac8c171b9a52ad10547f8921ed8acaf",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    }
+  ],
+  "apply": false,
+  "database_target": "143.198.230.247:5433/halder",
+  "low_risk_review_count": 27,
+  "manual_review_count": 62,
+  "min_confidence": 0.75,
+  "new_candidates": [
+    {
+      "card_id": "4c1b213e-a694-49f4-9882-e774950dac55",
+      "card_name": "Aetherflux Reservoir",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"finisher\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:2d9a2f1f7842e5c722724602452fcfdb\"}",
+      "logical_rule_key": "battle_rule_v1:2d9a2f1f7842e5c722724602452fcfdb",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "aed24a55-92f5-441d-8846-413544520b1a",
+      "card_name": "Akroma's Will",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"pump_all\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:b1ccbfa1163b64441bddafa0aa8ebd61\"}",
+      "logical_rule_key": "battle_rule_v1:b1ccbfa1163b64441bddafa0aa8ebd61",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "6d3e7499-135a-4108-9360-e66ad900d59c",
+      "card_name": "Amphibian Downpour",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_creature\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:5c692dfddd76362160ffb7d287af62b8\"}",
+      "logical_rule_key": "battle_rule_v1:5c692dfddd76362160ffb7d287af62b8",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "fe36ce95-195e-4228-9ec8-ecb5fea9d224",
+      "card_name": "Analyze the Pollen",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:267d998ef42373993667b847aececaee\"}",
+      "logical_rule_key": "battle_rule_v1:267d998ef42373993667b847aececaee",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "add3d424-ca6c-4fea-959a-408c68e84bc4",
+      "card_name": "Arcane Bombardment",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4de8d3e4fbfdeac3093aca7ddc61a2b0\"}",
+      "logical_rule_key": "battle_rule_v1:4de8d3e4fbfdeac3093aca7ddc61a2b0",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "b8e07549-b9e4-4752-b869-4cb187ebc067",
+      "card_name": "Bolas's Citadel",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"topdeck_manipulation\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:9f8913ad7777d1eb0fe628d0f74a81ed\"}",
+      "logical_rule_key": "battle_rule_v1:9f8913ad7777d1eb0fe628d0f74a81ed",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "topdeck_not_direct_draw_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "f8a19716-497e-4c27-8a54-712d69989308",
+      "card_name": "Brain Freeze",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"finisher\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:2d9a2f1f7842e5c722724602452fcfdb\"}",
+      "logical_rule_key": "battle_rule_v1:2d9a2f1f7842e5c722724602452fcfdb",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "3904c1fb-4177-4b10-ba88-9e6398b1db1f",
+      "card_name": "Bridgeworks Battle // Tanglespan Bridgeworks",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:2efa4dbd568d11da821ee0284a0f0dae\"}",
+      "logical_rule_key": "battle_rule_v1:2efa4dbd568d11da821ee0284a0f0dae",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review",
+        "multi_face_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "b2168ee1-abbd-4e58-8efd-d6b640dea557",
+      "card_name": "Burnt Offering",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_ritual\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:68cf6e0c41bc9101589d8b0eac35a588\"}",
+      "logical_rule_key": "battle_rule_v1:68cf6e0c41bc9101589d8b0eac35a588",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "13aeaa4a-1027-455f-869b-1722685354b6",
+      "card_name": "Chaos Warp",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d\"}",
+      "logical_rule_key": "battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "f160a0f8-9783-4082-ad72-4219db0b7820",
+      "card_name": "Commandeer",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4e847febff98ad16558e2f8af78762ba\"}",
+      "logical_rule_key": "battle_rule_v1:4e847febff98ad16558e2f8af78762ba",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed",
+      "card_name": "Deflecting Swat",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"redirect_removal\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:a04871c14f3ca25c877adc9e870bf437\"}",
+      "logical_rule_key": "battle_rule_v1:a04871c14f3ca25c877adc9e870bf437",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "6568e598-90e7-4758-9c6d-2715fc1cffda",
+      "card_name": "Delayed Blast Fireball",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:1bd5dce7cffed8d0af007d20b15e8549\"}",
+      "logical_rule_key": "battle_rule_v1:1bd5dce7cffed8d0af007d20b15e8549",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "74ff07b2-28b4-4ed8-a0cd-a859945c2bf6",
+      "card_name": "Demonic Consultation",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:7bc994e4653e295f9c0d2ef91c2dcaa6\"}",
+      "logical_rule_key": "battle_rule_v1:7bc994e4653e295f9c0d2ef91c2dcaa6",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "42bbd1be-3ca9-483b-bfa9-288f3fe3d55b",
+      "card_name": "Displace",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"phase_creatures\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:16d95274132fdc2c7b5f68eaf7aa7c29\"}",
+      "logical_rule_key": "battle_rule_v1:16d95274132fdc2c7b5f68eaf7aa7c29",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "e92a0077-f9af-4c56-bffa-fad73c28feac",
+      "card_name": "Double Vision",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:1a98476a2542043b9e67f4601501a216\"}",
+      "logical_rule_key": "battle_rule_v1:1a98476a2542043b9e67f4601501a216",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "82c4ed2b-09ef-486c-8ebc-b471a58e5ab6",
+      "card_name": "Dramatic Reversal",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_ritual\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:dce3047a70d404cb61eb1959a14dcec4\"}",
+      "logical_rule_key": "battle_rule_v1:dce3047a70d404cb61eb1959a14dcec4",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "combo_ramp_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "8b1a072c-8a1e-4eda-9fc5-5113c0fdef98",
+      "card_name": "Dualcaster Mage",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:5d3ebd644649b6bcf02333c463132d11\"}",
+      "logical_rule_key": "battle_rule_v1:5d3ebd644649b6bcf02333c463132d11",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "88e6a069-2769-4a38-8574-ed3d9ea0cf7a",
+      "card_name": "Echoes of Eternity",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:468e6a550866c287025d0ac1b1ba6658\"}",
+      "logical_rule_key": "battle_rule_v1:468e6a550866c287025d0ac1b1ba6658",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "6bfd199a-5b67-454e-8c8a-041fc52daafe",
+      "card_name": "Expedition Map",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:267d998ef42373993667b847aececaee\"}",
+      "logical_rule_key": "battle_rule_v1:267d998ef42373993667b847aececaee",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "c6d1c380-dc9e-4e35-a822-cda83f96e02a",
+      "card_name": "Final Fortune",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"extra_turn\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:6644c53d6565fe21003c83bfc85e204f\"}",
+      "logical_rule_key": "battle_rule_v1:6644c53d6565fe21003c83bfc85e204f",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "5db3b958-031c-4fec-8784-3220bfe169a9",
+      "card_name": "Flare of Duplication",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:ed13c274dec8f6ba95496fed1196f343\"}",
+      "logical_rule_key": "battle_rule_v1:ed13c274dec8f6ba95496fed1196f343",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "d96a06bc-aa90-4837-b8ab-ad2be804641a",
+      "card_name": "Flashback",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"recursion\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:f262324813c7b8e5c60ddce567e6888d\"}",
+      "logical_rule_key": "battle_rule_v1:f262324813c7b8e5c60ddce567e6888d",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "effect_overrode_broad_role"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "recursion"
+    },
+    {
+      "card_id": "288d2255-20d0-4243-803b-12622263192d",
+      "card_name": "Force of Vigor",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d\"}",
+      "logical_rule_key": "battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "734f85cb-f173-4e0c-88e3-9a2057a9e334",
+      "card_name": "Forsaken Monument",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"pump_all\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:3738b708311e9cf2683ced1a83167048\"}",
+      "logical_rule_key": "battle_rule_v1:3738b708311e9cf2683ced1a83167048",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "c9534d56-ee06-4fa8-922e-82cfa9613c49",
+      "card_name": "Freed from the Real",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "c4feeb34-4ea6-47ca-8bcb-613b5f5efdd8",
+      "card_name": "Galadriel's Dismissal",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"phase_creatures\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:16d95274132fdc2c7b5f68eaf7aa7c29\"}",
+      "logical_rule_key": "battle_rule_v1:16d95274132fdc2c7b5f68eaf7aa7c29",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "8e03d13c-f714-4202-b606-2726f6c79cf2",
+      "card_name": "Grand Abolisher",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"silence_opponents\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:841ca05ca69e0f246289d058b2fc7741\"}",
+      "logical_rule_key": "battle_rule_v1:841ca05ca69e0f246289d058b2fc7741",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "38be080f-9ac0-46aa-9a8c-e2c27351d9c2",
+      "card_name": "Grinding Station",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:601753de1461f2f66d16bb51bd3fb408\"}",
+      "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review",
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "798e154a-7448-42b3-843c-0995494cd5d7",
+      "card_name": "Helm of Awakening",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "54ce8292-551a-4436-b50b-d741683315ff",
+      "card_name": "Hullbreaker Horror",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4e847febff98ad16558e2f8af78762ba\"}",
+      "logical_rule_key": "battle_rule_v1:4e847febff98ad16558e2f8af78762ba",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "7dda546b-357e-44b9-b802-ac07c8cd0479",
+      "card_name": "Inspiring Statuary",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "c354303a-0554-49d4-91da-4b293400a0c9",
+      "card_name": "Insurrection",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"steal_all_creatures\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:1d6a97b3585a3d889b015e9ce1377041\"}",
+      "logical_rule_key": "battle_rule_v1:1d6a97b3585a3d889b015e9ce1377041",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "40ca51ca-90c6-442f-acd4-a3911f9c14e9",
+      "card_name": "Isochron Scepter",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:1a98476a2542043b9e67f4601501a216\"}",
+      "logical_rule_key": "battle_rule_v1:1a98476a2542043b9e67f4601501a216",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "28aff59a-4a53-4ca9-bc1d-971e0f781b3e",
+      "card_name": "Jin-Gitaxias, Progress Tyrant",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:f4728e6d868b9abba11c31b6867d4574\"}",
+      "logical_rule_key": "battle_rule_v1:f4728e6d868b9abba11c31b6867d4574",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "8d822df3-82d6-4669-a78a-71d08d90c6ea",
+      "card_name": "Last Chance",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"extra_turn\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:6644c53d6565fe21003c83bfc85e204f\"}",
+      "logical_rule_key": "battle_rule_v1:6644c53d6565fe21003c83bfc85e204f",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "8b1e57b7-bce5-4ba1-af66-6d75bf6e3c3e",
+      "card_name": "Living Death",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wipe\",\"effect\":\"board_wipe\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11\"}",
+      "logical_rule_key": "battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "board_wipe"
+    },
+    {
+      "card_id": "79e096ca-5696-4428-8003-35f75d4b8df0",
+      "card_name": "Magda, the Hoardmaster",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:faf0412d36f280c62b14904ec21807cc\"}",
+      "logical_rule_key": "battle_rule_v1:faf0412d36f280c62b14904ec21807cc",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review",
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "1fce8892-a873-4778-98a9-0dad6773e27b",
+      "card_name": "Manamorphose",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"treasure_maker\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:f949d8da56ca888319696bd056607bb7\"}",
+      "logical_rule_key": "battle_rule_v1:f949d8da56ca888319696bd056607bb7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "mana_filter_not_treasure_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "ed8ddcc7-d08f-4e63-83fa-45b07d614253",
+      "card_name": "Manifold Key",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "667aba86-ab9c-4d88-a93e-53067228a757",
+      "card_name": "Mindbreak Trap",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4e847febff98ad16558e2f8af78762ba\"}",
+      "logical_rule_key": "battle_rule_v1:4e847febff98ad16558e2f8af78762ba",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "ded64c92-6782-4599-bc4e-b890eb9ddfa5",
+      "card_name": "Mirage Mirror",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "aa87fffa-1adb-4214-bfc0-edb61b771ccc",
+      "card_name": "Misdirection",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"redirect_removal\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:a04871c14f3ca25c877adc9e870bf437\"}",
+      "logical_rule_key": "battle_rule_v1:a04871c14f3ca25c877adc9e870bf437",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "c2b84ef2-328b-4090-a251-a8d173daee23",
+      "card_name": "Mizzix's Mastery",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"overload_recursion\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:9828a36dd98a8e019a261a04b1f2125e\"}",
+      "logical_rule_key": "battle_rule_v1:9828a36dd98a8e019a261a04b1f2125e",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "437a8f88-a210-4b60-9afb-8a6118767435",
+      "card_name": "Moonsilver Key",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:21897ee3b34e5f3def7234ee31603c6a\"}",
+      "logical_rule_key": "battle_rule_v1:21897ee3b34e5f3def7234ee31603c6a",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review",
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "ba07aa5d-f600-4dc8-946c-35445461b472",
+      "card_name": "Necropotence",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:99151859bece89ba3ead032e05b1f65a\"}",
+      "logical_rule_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "dcb0b2ea-f534-4b04-8f93-9ccbcb240484",
+      "card_name": "Orim's Chant",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"silence_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:803fe04890623e5ebf4abf1c992c344b\"}",
+      "logical_rule_key": "battle_rule_v1:803fe04890623e5ebf4abf1c992c344b",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "2a402d69-dc48-46b5-86b9-ed675f04eccf",
+      "card_name": "Peer into the Abyss",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:2b0f89d9cf72f86f0cb0c1b6a8820cf3\"}",
+      "logical_rule_key": "battle_rule_v1:2b0f89d9cf72f86f0cb0c1b6a8820cf3",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "ea416b5e-c0f6-4c31-8644-a75f42936ee1",
+      "card_name": "Pest Infestation",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:49b642b05385ea2bc5e7025255aa112a\"}",
+      "logical_rule_key": "battle_rule_v1:49b642b05385ea2bc5e7025255aa112a",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "02b5e14b-83c9-43df-bbe2-f3d541d2567e",
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:391550600a3e3e79a648e740dc4ffa5e\"}",
+      "logical_rule_key": "battle_rule_v1:391550600a3e3e79a648e740dc4ffa5e",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review",
+        "multi_face_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "3dd40887-a6d7-404b-91f7-77edbd50d274",
+      "card_name": "Powerbalance",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:81701a2e0221de09cf7cf5ba202a3ef0\"}",
+      "logical_rule_key": "battle_rule_v1:81701a2e0221de09cf7cf5ba202a3ef0",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "011a301e-780c-4703-99c3-88a6c589675f",
+      "card_name": "Praetor's Grasp",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:7b1efc300c303a2b54bcfc758f5698e6\"}",
+      "logical_rule_key": "battle_rule_v1:7b1efc300c303a2b54bcfc758f5698e6",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "9cad3fa9-9a8a-40ea-aeae-e2e03e6c7782",
+      "card_name": "Pyrokinesis",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:cfaee3a04aecd93f0338fdaa92787a31\"}",
+      "logical_rule_key": "battle_rule_v1:cfaee3a04aecd93f0338fdaa92787a31",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "558a8bda-ea1a-4c01-b3c2-186a2ad6478d",
+      "card_name": "Redirect Lightning",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:35f8268896dae39a71b06b17a65c6e7d\"}",
+      "logical_rule_key": "battle_rule_v1:35f8268896dae39a71b06b17a65c6e7d",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "b192e670-a234-470f-90ef-58d8bf2ebb73",
+      "card_name": "Reforge the Soul",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:132fb1a9b40732a75b8c14105ba41b19\"}",
+      "logical_rule_key": "battle_rule_v1:132fb1a9b40732a75b8c14105ba41b19",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "043fdf54-8eb1-4744-943a-6e55623ee196",
+      "card_name": "Reiterate",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:ed13c274dec8f6ba95496fed1196f343\"}",
+      "logical_rule_key": "battle_rule_v1:ed13c274dec8f6ba95496fed1196f343",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "2e5e0dcd-e79e-4d90-a279-779df200fd72",
+      "card_name": "Relic of Sauron",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:808982dca15ae6a42d804e027f09a24e\"}",
+      "logical_rule_key": "battle_rule_v1:808982dca15ae6a42d804e027f09a24e",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "af63b78d-49c1-4bdf-b8fe-44604fe6ea7d",
+      "card_name": "Reprieve",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:9a955308cc942cc9afeaf3ec5fc1a9f1\"}",
+      "logical_rule_key": "battle_rule_v1:9a955308cc942cc9afeaf3ec5fc1a9f1",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "87c949bb-1671-4fa8-affc-a97503a64ac1",
+      "card_name": "Return the Favor",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c8d028e48e7e32c3b3ace93ac91c7216\"}",
+      "logical_rule_key": "battle_rule_v1:c8d028e48e7e32c3b3ace93ac91c7216",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "32d4c974-38d5-4339-8cf7-d7a023ef5b42",
+      "card_name": "Reverberate",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"engine\",\"effect\":\"copy_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:ed13c274dec8f6ba95496fed1196f343\"}",
+      "logical_rule_key": "battle_rule_v1:ed13c274dec8f6ba95496fed1196f343",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "engine"
+    },
+    {
+      "card_id": "e10d44c3-75db-443b-823c-a937772bfba5",
+      "card_name": "Rings of Brighthearth",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591\"}",
+      "logical_rule_key": "battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review",
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "4463bb2f-eb7e-4021-b9a4-99f03a2ce969",
+      "card_name": "Ruby Medallion",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "69068091-dad4-4b43-86ee-c70d401d8b62",
+      "card_name": "Run Away Together",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_creature\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:5c692dfddd76362160ffb7d287af62b8\"}",
+      "logical_rule_key": "battle_rule_v1:5c692dfddd76362160ffb7d287af62b8",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "166c82b2-f988-4073-9cf4-73a0bf4645a6",
+      "card_name": "Scroll Rack",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"topdeck_manipulation\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:9f8913ad7777d1eb0fe628d0f74a81ed\"}",
+      "logical_rule_key": "battle_rule_v1:9f8913ad7777d1eb0fe628d0f74a81ed",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "topdeck_not_direct_draw_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "ab4a71ae-4ed7-4daa-82a4-d5375da099a4",
+      "card_name": "Sculpting Steel",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591\"}",
+      "logical_rule_key": "battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review",
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "6eac5767-386d-4c9e-a7e1-926e43e32e83",
+      "card_name": "Silence",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"silence_spell\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:803fe04890623e5ebf4abf1c992c344b\"}",
+      "logical_rule_key": "battle_rule_v1:803fe04890623e5ebf4abf1c992c344b",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "ca61f31b-1d7f-4e91-afd2-7388b07f3132",
+      "card_name": "Sink into Stupor",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"counter\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4229dbdcba69e78da55c9d6c1d128082\"}",
+      "logical_rule_key": "battle_rule_v1:4229dbdcba69e78da55c9d6c1d128082",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "f636fb2e-16cb-4807-ad94-463be361a61a",
+      "card_name": "Soul-Guide Lantern",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"hate_artifact\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:1f212bf632a57571675075efea3de9b9\"}",
+      "logical_rule_key": "battle_rule_v1:1f212bf632a57571675075efea3de9b9",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "3b3b650c-6cca-4ba7-af6f-2d08d8197dc6",
+      "card_name": "Step Through",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_creature\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:8afc9f7b14b491ecf19087aa05bda874\"}",
+      "logical_rule_key": "battle_rule_v1:8afc9f7b14b491ecf19087aa05bda874",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "d8ba5907-914d-484b-acc2-72d7059b5906",
+      "card_name": "Sylvan Scrying",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:267d998ef42373993667b847aececaee\"}",
+      "logical_rule_key": "battle_rule_v1:267d998ef42373993667b847aececaee",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "e19ebcf7-0489-4a58-84db-75931c03c6f0",
+      "card_name": "Tainted Pact",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:7bc994e4653e295f9c0d2ef91c2dcaa6\"}",
+      "logical_rule_key": "battle_rule_v1:7bc994e4653e295f9c0d2ef91c2dcaa6",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "tutor_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "de32495a-d3d3-4edb-af74-0a0e28e564a4",
+      "card_name": "Tataru Taru",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:faf0412d36f280c62b14904ec21807cc\"}",
+      "logical_rule_key": "battle_rule_v1:faf0412d36f280c62b14904ec21807cc",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review",
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "a0016988-a5e0-4bf8-9e0a-735e1052b1e1",
+      "card_name": "Thalia, Guardian of Thraben",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"protection\",\"effect\":\"silence_opponents\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:d1a8e14a0c2bd0843b00698cc0de8352\"}",
+      "logical_rule_key": "battle_rule_v1:d1a8e14a0c2bd0843b00698cc0de8352",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "lower_confidence_review",
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "05572445-b0aa-4d39-ba16-14882eac19e9",
+      "card_name": "The Reality Chip",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"topdeck_manipulation\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:0ed0175b82f99a7a0429714e4d18412e\"}",
+      "logical_rule_key": "battle_rule_v1:0ed0175b82f99a7a0429714e4d18412e",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "topdeck_not_direct_draw_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "c60af040-2038-4905-b8f7-f1c3634c9acf",
+      "card_name": "They Came from the Pipes",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wincon\",\"effect\":\"token_maker\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:09b322ad7ed82070b60f91031205eac8\"}",
+      "logical_rule_key": "battle_rule_v1:09b322ad7ed82070b60f91031205eac8",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "wincon_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "f3a5d403-5a82-4bb8-ba0a-c198a7712ccd",
+      "card_name": "Timetwister",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225\"}",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "f9809a55-586a-4e42-b04a-905f9aa47179",
+      "card_name": "Training Grounds",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:98733239f680fdef673028104fb783b7\"}",
+      "logical_rule_key": "battle_rule_v1:98733239f680fdef673028104fb783b7",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "47fb4aca-e186-421f-a631-125980a4deeb",
+      "card_name": "Ugin, Eye of the Storms",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:aa0232c55d7fd2a1f899be6002405931\"}",
+      "logical_rule_key": "battle_rule_v1:aa0232c55d7fd2a1f899be6002405931",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "fd60bf54-0ec1-4e1f-89d3-d66285823b51",
+      "card_name": "Ugin, the Spirit Dragon",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"wipe\",\"effect\":\"board_wipe\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:b3c65fe201e8f4da8061217e3f55e192\"}",
+      "logical_rule_key": "battle_rule_v1:b3c65fe201e8f4da8061217e3f55e192",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "board_wipe"
+    },
+    {
+      "card_id": "5dca96c0-f10e-4e9b-8060-ddb7dee11b3e",
+      "card_name": "Unwinding Clock",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:e71acb99b36c6c779be6d13ea0834b36\"}",
+      "logical_rule_key": "battle_rule_v1:e71acb99b36c6c779be6d13ea0834b36",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "11288e9b-9c75-41c4-a6c3-736e28687134",
+      "card_name": "Vexing Bauble",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"hate_artifact\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:fe26dc634959c6306885c5fb8a82422e\"}",
+      "logical_rule_key": "battle_rule_v1:fe26dc634959c6306885c5fb8a82422e",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "82e491ce-b461-4e87-95fb-51f3048b4c1b",
+      "card_name": "Victory Chimes",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:1b5e5a972556d30833f4aca67274b791\"}",
+      "logical_rule_key": "battle_rule_v1:1b5e5a972556d30833f4aca67274b791",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "mana_engine_not_draw_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "a66c24eb-f66a-48cb-883c-ae8a1b296e83",
+      "card_name": "Voice of Victory",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"silence_opponents\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:0ab3867d7118abc751d3258d103b8135\"}",
+      "logical_rule_key": "battle_rule_v1:0ab3867d7118abc751d3258d103b8135",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    },
+    {
+      "card_id": "534bdccc-25ac-4776-a986-4a8e943cbaa4",
+      "card_name": "Wheel of Fortune",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225\"}",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "d6e1572c-4417-46e5-a992-9c55c70fac2d",
+      "card_name": "Wheel of Misfortune",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225\"}",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "268577bd-6199-404a-975e-16143234fdcd",
+      "card_name": "Wild Growth",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:2416d3a98f1b3a126a893965ca4e3516\"}",
+      "logical_rule_key": "battle_rule_v1:2416d3a98f1b3a126a893965ca4e3516",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "8fac796c-f3c9-440b-92e9-b51cb9501a8b",
+      "card_name": "Windfall",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225\"}",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "rejection_reason": "",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "5079111c-60cf-442e-96b6-362dfa1bb76f",
+      "card_name": "Xorn",
+      "confidence": 0.82,
+      "evidence": "{\"battle_rule_confidence\":0.82,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4c6d0e500c8211803b6c7d1d3df3dced\"}",
+      "logical_rule_key": "battle_rule_v1:4c6d0e500c8211803b6c7d1d3df3dced",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "conditional_ramp_review",
+        "lower_confidence_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "2254e7f1-becd-4819-a6e6-3f7cf9170314",
+      "card_name": "Zuran Orb",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"manual\",\"deck_role_category\":\"protection\",\"effect\":\"life_artifact\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:e8f57207d4ad0a9ad308e4b900ce70b6\"}",
+      "logical_rule_key": "battle_rule_v1:e8f57207d4ad0a9ad308e4b900ce70b6",
+      "rejection_reason": "",
+      "review_bucket": "manual_review",
+      "review_flags": [
+        "protection_scope_review"
+      ],
+      "source": "card_battle_rules_v1",
+      "tag": "protection"
+    }
+  ],
+  "new_candidates_count": 89,
+  "rejected_by_gate_count": 2806,
+  "rejected_by_gate_sample": [
+    {
+      "card_id": "d9f91042-65c9-400d-8f74-082a3e10a35e",
+      "card_name": "______",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "d99a6aae-6970-4c9f-b519-23251014e3b7",
+      "card_name": "Abandoned Air Temple",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "3476392a-49a1-481a-8a65-3ed8e530c3c3",
+      "card_name": "Abandoned Campground",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "8dc522c1-1cb3-4120-aacc-9f530b816c50",
+      "card_name": "Abandoned Outpost",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "9480ac9a-abea-444d-bce3-8823f2523d5b",
+      "card_name": "A-Base Camp",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "06c7c39e-25f3-4364-92a9-825a44152b54",
+      "card_name": "Abraded Bluffs",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "5d372412-cf03-44a1-a04f-442373bcab40",
+      "card_name": "A-Bretagard Stronghold",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "e934e5d6-f834-4bab-b733-c175bd1066ca",
+      "card_name": "Abstergo Entertainment",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "6d81e420-d859-4cfc-9874-ddcf6910be42",
+      "card_name": "Abundance",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954\"}",
+      "logical_rule_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "7bac3baf-4e79-4d95-94e0-04b7d6179c20",
+      "card_name": "Abundant Countryside",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "f7b409bb-1c96-4bfb-b587-76384360ac86",
+      "card_name": "Academy Manufactor",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"ramp\",\"effect\":\"ramp_engine\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:4c6d0e500c8211803b6c7d1d3df3dced\"}",
+      "logical_rule_key": "battle_rule_v1:4c6d0e500c8211803b6c7d1d3df3dced",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "ramp"
+    },
+    {
+      "card_id": "1c52738e-9a24-4a76-9300-126f2a16dd32",
+      "card_name": "Academy Rector",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"tutor\",\"effect\":\"tutor\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:74fd67fd34a25f7e1e9641b1bfbe059a\"}",
+      "logical_rule_key": "battle_rule_v1:74fd67fd34a25f7e1e9641b1bfbe059a",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "tutor"
+    },
+    {
+      "card_id": "f7757e47-cf4e-48c7-86a8-ff42825e2468",
+      "card_name": "Academy Ruins",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "ac72a60b-ae62-472d-bcd2-88f42a8e309d",
+      "card_name": "Access Tunnel",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "1e05222a-d565-437c-b744-088758024cf6",
+      "card_name": "Accursed Duneyard",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "070675b9-0cca-4d11-9238-e380a94904d0",
+      "card_name": "Acidic Slime",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"removal\",\"effect\":\"remove_permanent\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:63a22b98f716943d2fcbaf372fe2ced6\"}",
+      "logical_rule_key": "battle_rule_v1:63a22b98f716943d2fcbaf372fe2ced6",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "removal"
+    },
+    {
+      "card_id": "4f5cf6e0-4a2f-46b5-8022-b1f12750bebd",
+      "card_name": "Adagia, Windswept Bastion",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "65cfd096-2f93-48d6-8755-9b038d8c2980",
+      "card_name": "Adarkar Wastes",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "349028da-0ae6-4cd3-8b36-f63f077a1232",
+      "card_name": "Adeline, Resplendent Cathar",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"wincon\",\"effect\":\"token_maker\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:72c04a96c5d2161987a1cbd3d9e5d9ed\"}",
+      "logical_rule_key": "battle_rule_v1:72c04a96c5d2161987a1cbd3d9e5d9ed",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "de5194f5-08ea-4739-b69d-890597da9143",
+      "card_name": "Adrix and Nev, Twincasters // Adrix and Nev, Twincasters",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"wincon\",\"effect\":\"token_maker\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d\"}",
+      "logical_rule_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    },
+    {
+      "card_id": "8d03c9e8-35f1-4f1f-aa97-2369ae5cbcb2",
+      "card_name": "A-Dungeon Descent",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "b0fd8bfa-e3de-46f9-8073-4ebafa7a2de7",
+      "card_name": "Adventurers' Guildhouse",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "54d76b05-3791-4a6e-a73b-1861f45b3b4f",
+      "card_name": "Adventurer's Inn",
+      "confidence": 1.0,
+      "evidence": "{\"battle_rule_confidence\":1.0,\"battle_rule_review_status\":\"verified\",\"battle_rule_source\":\"curated\",\"deck_role_category\":\"land\",\"effect\":\"land\",\"functional_tag_basis\":\"deck_role\",\"logical_rule_key\":\"battle_rule_v1:5f5c28a5289affadfc624c0ed212e287\"}",
+      "logical_rule_key": "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287",
+      "rejection_reason": "non_derivable_tag",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": ""
+    },
+    {
+      "card_id": "dee723b4-3126-43aa-a882-c2603f12ecd9",
+      "card_name": "Aesi, Tyrant of Gyre Strait // Aesi, Tyrant of Gyre Strait",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"draw\",\"effect\":\"draw_cards\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:b4c60a038f87f7550bf5dcff0a16d939\"}",
+      "logical_rule_key": "battle_rule_v1:b4c60a038f87f7550bf5dcff0a16d939",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "draw"
+    },
+    {
+      "card_id": "61aae8ac-4d0e-4eb1-bcee-e9d26a9a46a1",
+      "card_name": "Aether Channeler",
+      "confidence": 0.55,
+      "evidence": "{\"battle_rule_confidence\":0.55,\"battle_rule_review_status\":\"needs_review\",\"battle_rule_source\":\"generated\",\"deck_role_category\":\"wincon\",\"effect\":\"token_maker\",\"functional_tag_basis\":\"effect\",\"logical_rule_key\":\"battle_rule_v1:030b2f3e0f549a462c3c8ea429877980\"}",
+      "logical_rule_key": "battle_rule_v1:030b2f3e0f549a462c3c8ea429877980",
+      "rejection_reason": "untrusted_review_status",
+      "review_bucket": "low_risk_review",
+      "review_flags": [],
+      "source": "card_battle_rules_v1",
+      "tag": "wincon"
+    }
+  ],
+  "rules_seen": 3156,
+  "source": "card_battle_rules_v1"
+}
