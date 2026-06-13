@@ -1,360 +1,377 @@
 # Auditoria Completa — Regras MTG em Todas as Crons
 
-**Versão:** v9.0
-**Data:** 2026-06-09T13:30:00+00:00
-**Commit:** `312c44c3` (HEAD codex/hermes-analysis-docs)
-**Auditor:** MTG Rules Auditor v3 (cron `c0591cb18024`)
-**Escopo:** Auditoria completa dos 24 crons ativos + delta desde v8.0 (2026-06-07 22:00Z)
-**Status:** v8.0 → v9.0 (~36h desde última auditoria). **9ª execução consecutiva com prompt stale.**
+**Versão:** v10.0
+**Data:** 2026-06-13T01:30:00+00:00
+**Commit:** `bb134a18` (HEAD, master)
+**Auditor:** MTG Rules Auditor v3 (cron `c0591cb18024`) — execução manual
+**Escopo:** Auditoria completa linha-a-linha dos 5 crons do pipeline Lorehold descomissionado + ecossistema atual de 15 tabelas SQLite + código Dart de produto
 
 ---
 
-## ⚠️ AVISO CRÍTICO: MTG Rules Auditor CRON BROKEN (v9.0)
+## Sumário Executivo
 
-**O cron `mtg-rules-auditor` (`c0591cb18024`) está quebrado desde 2026-06-08 ~16:54Z.**
+### Pipeline Lorehold (Descomissionado v3.7, código permanece)
 
-Desde então, **7+ execuções consecutivas** produzem outputs IDÊNTICOS de 60047 bytes contendo o dump do skill `manaloom-mtg-domain` como se fosse o prompt. O status de todas é `FAILED`:
+| Cron | Nota | Confiabilidade | Gaps Críticos |
+|:-----|:----:|:--------------|:---------------|
+| Scout | 4.0/10 | BAIXA | Prompt "Wincon Hunter" desalinhado; 94% [SILENT] antes do descomissionamento |
+| Validator | 7.0/10 | MÉDIA | SYNERGY_MAP incompleto (falta stack interaction, gy hate); Archetype Mismatch não detectado |
+| Mulligan | 6.5/10 | MÉDIA | Tapped lands ignorados; T1 ramp inflado; color screw não simulado |
+| Battle | 2.0/10 | 🔴 CRÍTICA | 2-player, sem stack/priority, sem Commander damage/tax, 1 blocker |
+| Evolution Oracle | 3.5/10 | BAIXA | Death loop autossustentável; dependia de dados inválidos; prompt com Miracle errôneo |
+| **PIPELINE** | **4.5/10** | **🔴 BAIXA** | **Descomissionado — código legado sem crons ativos** |
 
-| Execução | Data | Tamanho | Status | Conteúdo |
-|:---------|:-----|:-------:|:-------|:---------|
-| 2026-06-08 13:50 | 60047 | FAILED | Skill dump |
-| 2026-06-08 16:54 | 60047 | FAILED | Skill dump |
-| 2026-06-08 19:59 | 60047 | FAILED | Skill dump |
-| 2026-06-08 23:04 | 60047 | FAILED | Skill dump |
-| 2026-06-09 02:09 | 60047 | FAILED | Skill dump |
-| 2026-06-09 05:17 | 60047 | FAILED | Skill dump |
-| 2026-06-09 08:22 | 60047 | FAILED | Skill dump |
-| 2026-06-09 11:27 | 60047 | FAILED | Skill dump |
+### Ecossistema Atual (Crons Ativos 2026-06-13)
 
-**Causa raiz:** O skill `manaloom-commander-knowledge` não é encontrado (`⚠️ Skill(s) not found and skipped: manaloom-commander-knowledge`). O agente então despeja o `manaloom-mtg-domain` inteiro como output e termina — nunca produz uma auditoria real.
-
-**Este relatório v9.0 foi gerado MANUALMENTE, não pelo cron.** O prompt do cron (`c0591cb18024`) no `jobs.json` nunca foi atualizado desde v3.7 (2026-06-04) e ainda referencia 5 IDs de crons descomissionados.
-
----
-
-## Sumário Executivo (v9.0)
-
-| Cron | ID | Status | Nota MTG | Mudança vs v8.0 |
-|:-----|:--|:-------|:--------:|:----------------|
-| **Pipeline Lorehold** | — | 🔴 DESCOMISSIONADO | N/A | — |
-| Master Watchdog | `757eefb8738b` | ✅ script-only | N/A | — |
-| Normal Audit | `660397bb97e1` | ✅ Ativo | 8.0/10 | — |
-| Weekly Parallel Audit | `aeaeb666d377` | 🔴 HTTP 429 | N/A | 🔴 (persiste) |
-| **Commander Knowledge Deep** | `75eed994c103` | 🟡 MELHOROU | 5.0/10 | — (Exec #14+ sem regressão "BATTLE-VALIDATED") |
-| Game Changer Research | `7915cc2377a0` | 🟡 Regressão | 3.0/10 | — (3 bracket categories vazias) |
-| Tag Accuracy Reporter | `b340374bc4e7` | ⏳ Pendente | 5.0/10 | — (último run 2026-06-08) |
-| Mana Base Validator | `444aa9510c2c` | ✅ Ativo | 6.0/10 | — |
-| Knowledge Import | `b2f5c21ce2d7` | ✅ script-only | N/A | — |
-| **Knowledge Synthesis** | `10a59b3bdf4d` | ✅ Funcionando | 6.0/10 | — |
-| Logic Coherence Auditor | `de6fb777f5d1` | ✅ Ativo | 8.0/10 | — |
-| Code Structure Auditor | `577a0a669714` | ✅ Ativo | N/A | — |
-| Cron Governor Report | `21fa86eb0d84` | ✅ Ativo | N/A | — |
-| Auto-sync-learned-decks | `7fcab928efd3` | 🔴 script-only | 0/10 | — (PermissionError persiste) |
-| Pull-learning-events | `262dc49e1be1` | ✅ script-only | N/A | — (UUID cast persiste) |
-| Auto-promote-learned | `104fd03a2ea2` | ✅ script-only | N/A | — |
-| Knowncards Generator | `b9c8a7d6e5f4` | 🔴 QUEBRADO | 0/10 | — (script path + root-owned) |
-| Universal Optimizer | `c8d9e0f1a2b3` | ⛔ PAUSADO | 1.0/10 | — (corta staples) |
-| Knowncards Validator | `d4e5f6a7b8c9` | ✅ OK | 7.0/10 | — |
-| Master Optimizer Preflight | `mmo-preflight01` | ✅ OK | 7.5/10 | — (estável) |
-| Master Optimizer Auto-Cycle | `mmo-auto-cycle01` | 🟡 Estabilizando | N/A | ↑ Resolvido (Exec #2+ funcionando) |
-| Manager Watchdog | `2d436c71bbf7` | ⛔ PAUSADO | N/A | — |
-| **MTG Rules Auditor** | `c0591cb18024` | 🔴 QUEBRADO | 0.0/10 | **↓ -2.0 (7+ execs FAILED)** |
-| **PIPELINE SCORE** | | | **3.5/10** 🟡 | **±0.0 vs v8.0** |
-
-**Pipeline score permanece 3.5/10.** O MTG Rules Auditor (cron responsável por esta auditoria) caiu para 0.0/10 — não produz auditoria real há 7+ execuções. Commander Knowledge Deep manteve a melhora (sem "BATTLE-VALIDATED"). Nenhum dos 11 itens do plano v4.0 foi aplicado.
+| Cron | Nota | Status |
+|:-----|:----:|::------|
+| Commander Knowledge Deep | 8.0/10 | ✅ Ativo, 109 execuções; sem referências a "BATTLE-VALIDATED" desde Exec #13 |
+| Game Changer Research | 7.0/10 | ✅ Ativo, 112 execuções; 15 GCs perdidos do card_oracle_cache 🔴 |
+| Knowledge Synthesis | 7.5/10 | ✅ Ativo, 53 execuções; HTTP 404 resolvido; provider inconsistente 🟡 |
+| MTG Rules Auditor | 0.0/10 | 🔴 CRON BROKEN — skill loading failure (referencia skill inexistente) |
+| Mana Base Validator | 7.0/10 | ✅ Ativo; confirmado estável |
+| Master Optimizer Preflight | 7.5/10 | ✅ Ativo, 207 execuções; resolveu SQLite read-only |
+| **SCORE GERAL** | **4.5/10** | **🔴 BAIXA** |
 
 ---
 
-## 🔴 NOVO: Battle Simulator Dart vs Python — Divergência Crítica
+## Scout (f20ac299992b) — Auditoria Detalhada
 
-### Dois simulares coexistem com níveis de fidelidade drasticamente diferentes
+**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório `/opt/data/cron/output/f20ac299992b/` não existe. Prompt não está mais em `jobs.json`.
 
-| Característica | Dart `battle_simulator.dart` (879 linhas) | Python `battle_analyst_v8.py` (5263 linhas) |
-|:---------------|:------------------------------------------:|:------------------------------------------:|
-| **Em produção?** | ✅ Sim — `/ai/simulate` route | ❌ Não — `docs/hermes-analysis/scripts/` |
-| **Usado por cron?** | ❌ Não | ❌ Não (script não é cron) |
-| **Priority/Stack** | ❌ Ausente | ✅ CR 117 implementado |
-| **Commander Damage** | ❌ Ausente | ✅ 21 damage tracked (linhas 2538-2550) |
-| **Commander Tax** | ❌ Ausente | ✅ +2 por cast (linhas 2253, 3532, 3550) |
-| **Multiplayer (4+)** | ❌ 2-player | ✅ N oponentes |
-| **State-Based Actions** | ❌ Ausente | ✅ CR 704 (linhas 2524-2556) |
-| **First Turn Draw** | ❌ Pula T1 no multiplayer | ✅ Correto (Commander) |
-| **London Mulligan** | ❌ Ausente | ✅ Free first, bottom N (linhas 2501-2518) |
-| **Mana Colors** | ❌ Só CMC numérico | ✅ ManaPool com cores (linhas 2206-2232) |
-| **Miracle Mechanic** | ❌ Ausente | ✅ CR 702.94 (linhas 4647-4673) |
-| **Tapped Lands** | ❌ Não modelado | ⚠️ Não verificado |
-| **Indestructible** | ❌ Ausente | ✅ Suportado |
-| **Lifelink** | ✅ Simples | ✅ Tracking completo |
+**O que fazia:** Buscar cartas na user_collection e ranquear por sinergia (Score A+B+C).
 
-**Conclusão:** O Python `battle_analyst_v8.py` implementa regras MTG de Commander COM SUBSTANCIALMENTE MAIOR FIDELIDADE que o Dart `battle_simulator.dart`. Porém, o Python está em `docs/hermes-analysis/manaloom-knowledge/scripts/` — NÃO é usado por nenhum cron ativo nem pelo endpoint de produto. O Dart continua sendo o código de produção.
+### O que fazia certo
+- Sistema de Score A (Sinergia) + B (Custo) + C (Evidência) é conceitualmente sólido
+- Busca de sinergia Token+Pump, Wipe+Proteção, Recursion são padrões reais de Commander
+- Cartas com 0% EDHREC que são boas (Spiteful Banditry, Xorn) — conceito correto, limitação de dados
 
-**Risco:** Se o Universal Optimizer ou qualquer outro componente for reativado usando o `battle_analyst_v8.py`, os resultados serão mais confiáveis que o Dart. Se for reativado com o Dart, os mesmos problemas do v3.0-v3.6 persistem.
+### O que fazia errado
+1. **Prompt virou "Wincon Hunter" (Gap 11 do MTG Domain):** Nas últimas 10 execuções antes do descomissionamento, 9 retornaram [SILENT]. O prompt original era uma busca completa EDHREC JSON → cross-ref user_collection → Score A+B+C. O "Wincon Hunter" só buscava `card_deck_analysis` com speed/resilience/stealth scoring — função radicalmente diferente.
 
----
+2. **94% [SILENT]:** O short-circuit era excessivamente agressivo. Se o deck não mudava (hash idêntico), respondia [SILENT] mesmo quando a análise anterior continha erros (Gap 17 — Short-Circuit Perpetua Erros).
 
-## 🔴 Auditoria Detalhada: Battle Simulator Dart (PRODUÇÃO)
+3. **Sem verificação de color identity (impacto ALTO):** O prompt e o código não tinham verificação explícita de color identity antes de recomendar cartas. Uma recomendação de carta que não pode estar no deck por restrição de cor é lixo — e o sistema não detectava.
 
-**Arquivo:** `/opt/data/workspace/mtgia/server/lib/ai/battle_simulator.dart` (879 linhas)
+4. **Sem verificação de banlist (impacto MÉDIO):** Não havia verificação Scryfall ou PG de legalidade Commander antes de recomendar. O banlist sync PG→SQLite (Gap 16) foi implementado posteriormente, após o descomissionamento.
 
-### O que faz certo
-| Item | CR | Status |
-|:-----|:---|:-------|
-| Untap step | CR 502 | ✅ Corrige `resetForNewTurn()` para todas as permanentes |
-| Draw step | CR 504 | ✅ 1 card por turno |
-| Main phase land drop | CR 305 | ✅ Joga 1 land por turno (se disponível) |
-| Combat damage reduz vida | CR 119.3 | ✅ `opponent.life -= damageToOpponent` |
-| Trample implementado | CR 702.19 | ✅ Excesso de dano passa (linha 497-498) |
-| First Strike | CR 702.7 | ✅ Resolve antes do dano normal (linha 474) |
-| Lifelink | CR 702.15 | ✅ Ganha vida igual ao dano |
-| Vigilance | CR 702.20 | ✅ Criatura não vira ao atacar |
-| Deathtouch | CR 702.2 | ✅ Qualquer dano = destruição (linha 476) |
-| Cleanup/discard | CR 514.1 | ✅ Descarta para 7 (linha 532) |
+5. **Score A+B+C não usava dados reais:** Dependia de cache local da user_collection que podia estar stale.
 
-### O que faz errado — VIOLAÇÕES DE REGRAS MTG
-
-| Item | CR | Problema | Severidade |
-|:-----|:---|:---------|:-----------|
-| **Sem Priority System** | CR 117.3-117.4 | Nenhum jogador recebe prioridade. Spells resolvem imediatamente. Counterspells impossíveis. | 🔴 CRÍTICA |
-| **Sem Stack** | CR 405, 117.7 | Spells não podem ser respondidas. "resolução imediata" (linha 9). | 🔴 CRÍTICA |
-| **Sem Commander Damage** | CR 903.10a | 21 dano de commander = morte não existe. Commanders são criaturas normais. | 🔴 CRÍTICA |
-| **Sem Commander Tax** | CR 903.8 | Commander sempre custa o CMC base, nunca +2 por cast anterior. | 🔴 CRÍTICA |
-| **2-player apenas** | CR 802.1a | Simula 1v1. Commander é multiplayer (4 jogadores). Split de ataque, diplomacia, archenemy inexistentes. | 🔴 CRÍTICA |
-| **Draw skip no T1** | CR 800.7 | `!_currentTurn == 1 && active == playerA` (linha 364): pula draw do primeiro turno para o primeiro jogador. **Isso é correto em 1v1 mas errado para Commander multiplayer** — onde o primeiro jogador compra normalmente no T1. | 🟡 ALTA |
-| **Summoning Sickness** | CR 302.6 | Criaturas podem atacar no turno que entram (sem haste). A propriedade `summoningSickness = true` é setada mas NUNCA verificada antes de atacar: `canAttack` (linha 93) só verifica `isTapped` e `summoningSickness`, mas `_aiDecideAttackers` (linha 722-761) usa `canAttack` **corretamente**. ✅ Na verdade, olhando melhor, `canAttack` verifica `summoningSickness`. | ✅ Correto (reavaliado) |
-| **Mana Colors ignorados** | CR 601.2f | Só checa `cmc <= manaAvailable`. Não há colored mana. Um {U}{U}{U} pode ser pago com {R}{R}{R}. | 🟡 ALTA |
-| **Tapped Lands** | CR 302.6 | Lands não entram tapped. Temples, shocklands, etc. que entram tapped são tratadas como untapped. | 🟡 ALTA |
-| **Board Wipe é simétrico** | — | `_executeDecision` (linha 665-685) destrói criaturas **de ambos os jogadores**, inclusive as do próprio atacante. Sem indestructible tracking. | 🟡 ALTA |
-| **Sorcery timing** | CR 117.1a | Todas as spells são jogadas no mesmo loop, sem diferenciar sorcery (main phase, stack vazio) de instant (qualquer priority). | 🟡 ALTA |
-| **End Step sem triggers** | CR 513.1 | Só faz discard. Nenhum trigger "at the beginning of your end step" é processado. | 🟢 MÉDIO |
-| **Upkeep step ignorado** | CR 503.1 | Fase de upkeep existe (linha 361) mas não processa triggers de upkeep. | 🟢 MÉDIO |
-| **Cleanup step** | CR 514.1 | Descarte para 7, mas não limpa dano (should be end of turn). `damage = 0` no endPhase (linha 541). Correto. | ✅ Correto |
-| **Multiple blockers** | CR 509.1b | 1 blocker por attacker apenas. | 🟢 MÉDIO |
-
-**Score estimado Dart:** 2.0/10 🔴 (similar ao v6 da Python battle_analyst_v6)
+### Recomendações
+- Se reativado, o prompt deve RESTAURAR a busca EDHREC + coleção + sinergia A+B+C
+- Adicionar verificação obrigatória de color identity e banlist antes de recomendar
+- Nunca usar pure % EDHREC como métrica única — contexto de sinergia pesa mais
+- Quebrar o short-circuit quando a última análise teve discrepâncias
 
 ---
 
-## 🟢 Auditoria Detalhada: Battle Analyst Python v8 (5263 linhas)
+## Validator (712579b15767) — Auditoria Detalhada
 
-**Arquivo:** `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
+**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório não existe. Última execução foi SILENT. Prompt não está mais em `jobs.json`.
 
-### O que faz certo — MELHORIAS SIGNIFICATIVAS vs Dart
+**O que fazia:** Análise estrutural do deck + SYNERGY_MAP (5 eixos: Token+Pump, Wipe+Proteção, Recursion, Mana Explosiva, Combo Pieces).
 
-| Item | CR | Status | Detalhes |
-|:-----|:---|:-------|:---------|
-| Priority System | CR 117.3-117.4 | ✅ | `priority_round()` (linha 2563): todos os jogadores recebem prioridade, podem responder |
-| Stack LIFO | CR 405 | ✅ | `Stack` class (linha 2477): push/pop com resolução LIFO |
-| Commander Damage | CR 903.10a | ✅ | `commander_damage[player_name]` (linha 2261), SBA verifica ≥21 (linha 2538-2550) |
-| Commander Tax | CR 903.8 | ✅ | `commander_tax` (linha 2253), incremento +2 após cast (linha 3550) |
-| Multiplayer | CR 802.1a | ✅ | `all_players = [lorehold] + opponents` (linha 4897) — N oponentes |
-| London Mulligan | CR 103.4a | ✅ | Free first (linha 2512), bottom N cards (linha 2513-2516) |
-| State-Based Actions | CR 704 | ✅ | `check_sbas()` (linha 2524): life ≤ 0, deck out, commander damage |
-| Miracle | CR 702.94 | ✅ | `miracle_cost = 2` (linha 4651-4673), Lorehold-specific |
-| Colored Mana | CR 601.2f | ✅ | `ManaPool` (linha 2206): 8 color pools + payment plan |
-| Instant-speed removal | CR 117.1a | ✅ | `combat_phase_v8` (linha 4336): oponentes podem removal antes do dano |
-| Indestructible tracking | CR 702.12b | ✅ | `player.indestructible = False` (linha 4620), reset por turno |
-| First turn draw | CR 800.7 | ✅ | **Commander multiplayer: primeiro jogador compra no T1** (correto) |
-| Extra turns | CR 500.7 | ✅ | `play_turn_sequence_v8` (linha 4789) com max 5 extra turns |
-| Smothering Tithe trigger | — | ✅ | Dispara em draws de oponentes (linha 4702-4709) |
-| End step draw engines | CR 513.1 | ✅ | Processa draw engines no end step (linha 4727-4730) |
+### O que fazia certo
+1. **SYNERGY_MAP de 5 eixos:** Cobre os principais padrões de Commander (aggro/token, control/wipe, recursion/graveyard, fast mana/ritual, combo).
+2. **Níveis de importância 1-5:** Sistema conceitual de priorização — wincon tem impacto maior que filler.
+3. **Detecção de double-null:** Identificava cartas sem função clara (ex: Scroll Rack, Penance — Gap 6). Isso é valioso mesmo que o sistema não pudesse classificá-las.
+4. **CMC curve analysis:** Monitorava distribuição de CMC e detectava anomalias (CMC=0.0, curva achatada).
 
-### Limitações conhecidas — gaps que persistem
+### O que fazia errado
+1. **SYNERGY_MAP incompleto (impacto ALTO — Gap 4):** 5 eixos não cobrem Commander completo. Faltam dimensões estratégicas essenciais:
+   - **Stack Interaction** — counterspells, responses. Deck sem counters em meta azul = grande gap
+   - **Graveyard Hate** — sem graveyard hate em meta de recursion = receita para perder
+   - **Life Gain** — relevante contra aggro/burn; relevante para ad nauseam/pay life engines
+   - **Mill Protection** — nicho, mas em meta de mill, um deck sem proteção é frágil
+   - **Stax/Tax Effects** — Rhystic Study, Smothering Tithe, Drannith Magistrate — dimensão estratégica própria
 
-| Item | CR | Problema | Severidade |
-|:-----|:---|:---------|:-----------|
-| **Tapped lands não modelados** | CR 302.6 | Terrenos como Temple of Triumph que entram tapped são tratados como untapped. Isso infla a mana disponível nos primeiros turnos. | 🟡 ALTA |
-| **Mulligan capped em 3** | CR 103.4c | O London Mulligan oficial permite mulligan até 7. O código limita em 3 (linha 2506). | 🟢 MÉDIO |
-| **AI simplificada** | — | Decisões de AI são heurísticas. O oponente não joga "como humano". WR é comparativo, não absoluto. | 🟢 MÉDIO |
-| **Sem stack interaction total** | — | Nem todas as interações de stack são simuladas (efeitos contínuos, triggers aninhados). | 🟢 MÉDIO |
+2. **Archetype Mismatch não detectado (Gap 4 — agravado 2026-06-03):** Quando o deck é reconstruído externamente para um arquétipo diferente, o validator reportava CRITs em massa (+6 a +15 em todas as métricas) porque o perfil PG pertencia ao arquétipo original. Isso gera falsos positivos que desperdiçam atenção.
 
-**Score estimado Python v8:** 7.0/10 🟡 MÉDIA-ALTA (substancialmente melhor que o Dart)
+3. **Distinção wincon vs payoff ausente (impacto MÉDIO):** O Validator tratava wincon e payoff como intercambiáveis, mas são conceitos diferentes:
+   - **Wincon:** carta que fecha o jogo (Torment of Hailfire, Approach of the Second Sun)
+   - **Payoff:** carta que se beneficia do motor do deck (Guttersnipe em spellslinger, mas não ganha o jogo)
 
----
+4. **Análise de CMC considerava dados corrompidos (impacto ALTO):** O Gap 19 (CMC corrompido — 26.6-35% das cartas com CMC=NULL/0.0) persistiu por toda a vida do Validator. A curva de mana e os ranges de perfil PG operavam com dados inválidos.
 
-## 🔴 Pipeline Lorehold — Status de Descomissionamento
-
-**5/5 crons removidos do `jobs.json` desde 2026-06-04.** Confirmado nesta execução:
-
-| Cron | ID | Último output | Status |
-|:-----|:---|:-------------|:-------|
-| lorehold-deck-scout | `f20ac299992b` | Não encontrado | 🔴 DESCOMISSIONADO |
-| lorehold-deck-validator | `712579b15767` | Não encontrado | 🔴 DESCOMISSIONADO |
-| lorehold-mulligan-analyst | `08468451a06a` | Não encontrado | 🔴 DESCOMISSIONADO |
-| lorehold-battle-analyst | `94f8590b1beb` | Não encontrado | 🔴 DESCOMISSIONADO |
-| lorehold-evolution-oracle | `a50bef4c2a59` | Não encontrado | 🔴 DESCOMISSIONADO |
-
-**Código Dart remanescente:** `battle_simulator.dart` (879 linhas) ainda importado por `server/routes/ai/simulate/index.dart` — usado pelo endpoint de produto `/ai/simulate`. Este código é severamente deficiente em regras MTG.
-
-**Código Python:** `battle_analyst_v8.py` (5263 linhas) em `docs/hermes-analysis/manaloom-knowledge/scripts/` — significativamente melhor, mas sem uso por nenhum cron ativo.
-
-**Regra:** NÃO recriar estes crons sem antes:
-1. Migrar para o Python `battle_analyst_v8.py` ou equivalente
-2. Adicionar tapped land modeling
-3. Configurar git credentials para push
+### Recomendações
+- Expandir SYNERGY_MAP para incluir Stack Interaction, Graveyard Hate, Tax/Stax, Life Gain
+- Adicionar detecção de Archetype Mismatch: comparar `decks.archetype` contra temas do perfil PG
+- Separar wincon de payoff no classificador
+- Nunca operar com CMC corrompido — rodar fix_cmc_batch.py antes de validar
+- Adicionar verificação de legalidade Commander (banlist + color identity)
 
 ---
 
-## 🟢 Commander Knowledge Deep — Auditoria Detalhada
+## Mulligan (08468451a06a) — Auditoria Detalhada
 
-**Job ID:** `75eed994c103` | **Score:** 5.0/10 🟡 (estável desde v8.0)
+**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório não existe. Prompt não está mais em `jobs.json`.
 
-### Melhoria mantida: sem "BATTLE-VALIDATED"
-Desde v8.0 (2026-06-07 21:38Z), o CKCD não usa mais o termo "BATTLE-VALIDATED". Commits recentes:
-- `312c44c3` (Jun 9): "docs: update commander deep knowledge report — **Lorehold WR collapse crisis**"
-- `f48fcac3` (Jun 8): "battle_analyst_v8 regression + KC validator settling"
+**O que fazia:** Simulação de 1.000 mãos, mede T3 consistency (Sem Play T3).
 
-### Commits recentes (codex/hermes-analysis-docs)
-```
-312c44c3 docs: update commander deep knowledge report — Lorehold WR collapse crisis (Jun 9, 2026)
-c55e0638 Explode learned decks: JSON parse fix, 65 new commanders, 60 active in PG
-0b4b0c69 Update Hermes project analysis docs — 2026-06-09 audit
-```
+### O que fazia certo
+1. **London Mulligan implementado:** 7 cards iniciais, bottom N (número igual ao número de mulligans), primeira mão grátis em multiplayer. ✅ Conforme CR 103.4c.
+2. **Definição de "jogável":** 2-4 lands + pelo menos 1 ramp, OU 3+ lands. ✅ Conceito correto para Commander.
+3. **T3 consistency:** Verifica se há spell com CMC ≤ min(terrenos desvirados, 3) no turno 3. ✅ Métrica útil.
+4. **N=1000:** Amostra estatisticamente significativa para detecção de mudanças > 1pp.
 
-**Produto (master):** avanços significativos: `c55e0638` (65 novos commanders), `6c2dd6b1` (auto-promoção de battle rules + optimizer loop). O knowledge pipeline está atrasado em relação ao produto.
+### O que fazia errado
+1. **Tapped lands ignorados (impacto ALTO — Gap 9):** Terrenos que entram tapped (Temple of Triumph, Boros Garrison, etc.) eram tratados como untapped no turno de entrada. Isso infla o T3 reportado — na realidade, o jogador teria 1 mana a menos no turno em que a land entra.
 
----
+2. **T1 ramp definition inflada (impacto ALTO — Gap 15 original):** A definição de "ramp que funciona no T1" não filtrava por CMC e função real:
+   - Sol Ring (CMC 1 → 2 mana) ✅ correto
+   - Land Tax (CMC 1 → busca 3 lands, NÃO dá mana no T1) ❌ falso ramp
+   - Weathered Wayfarer (CMC 1 → busca land, NÃO dá mana no T1) ❌ falso ramp
+   
+   Isso infla a % de mãos jogáveis no T1 em ~3-8pp. **Corrigido post-mortem** (Gap 15 resolvido em 2026-06-03, após o descomissionamento).
 
-## 🔴 Gaps Persistentes (atualizados v9.0)
+3. **Color screw não simulado (impacto MÉDIO — Gap 9):** Mão com 3 Mountains + 2 spells brancos era considerada "jogável" mesmo sem mana branca disponível. Em Commander 2-3 cores, isso é uma falha grave — mão sem a cor certa = mulligan na vida real.
 
-| Gap | Descrição | Severidade | Status | Mudança vs v8.0 |
-|:----|:----------|:-----------|:-------|:-----------------|
-| 1 | EDHREC inclusion rate não usado | 🟡 P1 | Aberto | — |
-| 2 | Single-tag vs multi-tag ordem | 🟢 P3 | Aberto | — |
-| 3 | Bracket detection incompleta (SQLite) | 🟡 P1 | Parcialmente resolvido | Código Dart OK, SQLite desatualizado |
-| 4 | Sem tema-aware validation | 🟡 P1 | Parcialmente resolvido | Theme service criado |
-| 5 | Co-pilot vs auto-pilot | 🟢 P3 | Aberto | — |
-| 6 | Classificador duplo-nulo | 🟡 P1 | Aberto | — |
-| 7 | Cartas novas fora do deck | 🟢 P3 | Maturidade atingida | — |
-| 8 | Battle Analyst não é cron | 🔴 P0 | Documentado | — |
-| 9 | Mulligan tapped lands | 🟡 P1 | Aberto | — |
-| 10 | Battle 2-player apenas | 🔴 P0 | Documentado | Python v8 resolve parcialmente |
-| 11 | Scout 94% SILENT | N/A | Cron descomissionado | — |
-| 12 | Evolution Oracle parado | N/A | Cron descomissionado | — |
-| 13 | Bulk import corruption | 🟡 P1 | Aberto | — |
-| 14 | Pipeline staleness | 🟡 P1 | Aberto | — |
-| 15 | Ramp misclassification | 🟢 P3 | **Resolvido** | ✅ |
-| 16 | Banlist blindness | 🟢 P3 | **Resolvido** | ✅ sync PG→SQLite |
-| 17 | Short-circuit perpetua erros | 🟡 P1 | Aberto | — |
-| 18 | CKC Deep cita Battle Analyst | 🔴 P0 | **Melhorou** | ✅ ausente desde v8.0 |
-| 19 | CMC corruption (26.2%) | 🔴 P0 | Parcialmente resolvido | cmc_safety.dart no produto. DB ainda corrompido |
-| 20 | Universal Optimizer corta staples | 🔴 P0 | Bloqueado (perm error) | — |
-| 21 | Knowledge Synthesis HTTP 404 | 🟡 P1 | **Resolvido** | ✅ funcional |
-| 22 | Master Optimizer Preflight SQLite | 🟢 P3 | **Resolvido** | ✅ |
-| 23 | KC Validator LOCKED | 🟢 P3 | **Resolvido** | ✅ |
-| 24 | Stored metrics não atualizam | 🔴 P0 | Aberto | — |
-| 25 | Bracket categories esvaziadas | 🔴 P0 | Aberto | Force of Will, Bolas's Citadel → `other` |
-| 26 | Auto-cycle timeout | 🟡 P1 | **Resolvido** | ✅ Exec #2+ funcionando |
-| **27** | **🔴 MTG Rules Auditor CRON BROKEN** | **🔴 P0** | **🆕 NOVO** | 7+ execs FAILED dumpando skill |
-| **28** | **🔴 Dart vs Python divergence** | **🔴 P0** | **🆕 NOVO** | Produção usa Dart (2/10), knowledge usa Python (7/10) |
+4. **Sem draws futuros (impacto BAIXO):** Só avaliava mão inicial, não draws dos turnos 1-3. Isso subestima ligeiramente a jogabilidade (draws podem consertar a mão).
+
+5. **Dependia de tags corrompidas (impacto ALTO — Gap 19):** O classificador de ramp (Gap 15 original) só detectava 6 das 16 cartas de ramp reais no deck Lorehold. O Mulligan baseava sua definição de "mão jogável" no número de cartas tagged 'ramp' — com apenas 6 tags, o T3 era drasticamente subestimado no caso real (17.7% vs 8.9% real).
+
+### Recomendações
+- Implementar tapped land tracking: se a land tem "enters the battlefield tapped" no oracle_text, não conta como mana disponível no turno em que entra
+- Filtrar T1 ramp: só cartas com CMC ≤ 1 que efetivamente produzem mana adicional no mesmo turno
+- Simular color screw: tracking de cores disponíveis vs cores necessárias para spells na mão
+- Simular draws dos turnos 1-3 para melhor precisão
+- Sincronizar definição de ramp com o classificador funcional corrigido
 
 ---
 
-## 🔴 Mapa de Regras MTG — Implementação vs Produto
+## Battle (94f8590b1beb) — Auditoria Detalhada (v8)
 
-Tabela comparativa de fidelidade das regras MTG entre os dois simuladores:
+**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório `/opt/data/cron/output/94f8590b1beb/` foi removido desde v3.4. Código `battle_simulator.dart` (879 linhas) permanece no repositório em `server/lib/ai/battle_simulator.dart`. **Endpoint de produto `/ai/simulate` usa este código.**
 
-| Regra (CR) | Dart `battle_simulator.dart` | Python `battle_analyst_v8.py` | Oficial Commander |
-|:-----------|:----------------------------:|:-----------------------------:|:-----------------:|
-| Priority System (117.3) | ❌ | ✅ | Obrigatório |
-| Stack LIFO (405) | ❌ | ✅ | Obrigatório |
-| Commander Damage (903.10a) | ❌ | ✅ | 21 dano = morte |
-| Commander Tax (903.8) | ❌ | ✅ | +2 por cast |
-| Multiplayer (802) | ❌ (2-player) | ✅ (N players) | 4 jogadores |
-| London Mulligan (103.4) | ❌ | ✅ (capped 3) | 7 mulligans |
-| State-Based Actions (704) | ❌ | ✅ | Contínuo |
-| Tapped Lands (302.6) | ❌ | ❌ | Sim |
-| Colored Mana (601.2f) | ❌ | ✅ | Sim |
-| Miracle (702.94) | ❌ | ✅ | Lorehold-specific |
-| First Turn Draw (800.7) | ❌ (pula) | ✅ (não pula) | Commander ≠ 1v1 |
-| Indestructible (702.12b) | ❌ | ✅ | Sim |
-| Lifelink (702.15) | ✅ (básico) | ✅ (tracking) | Sim |
-| Trample (702.19) | ✅ | ✅ | Sim |
-| First Strike (702.7) | ✅ | ✅ | Sim |
-| End Step Triggers (513.1) | ❌ | ✅ (parcial) | Sim |
-| Cleanup Discard (514.1) | ✅ | ✅ | 7 cards max |
-| Upkeep Triggers (503.1) | ❌ | ✅ (parcial: The One Ring) | Sim |
-| Instant-speed Interaction | ❌ | ✅ (parcial) | Sim |
+**O que afirmava fazer:** Simulação de jogo 4-player com Priority/Stack/Miracle.
+
+### Realidade — Auditoria Linha a Linha contra CR
+
+#### Estrutura Geral ✅
+- Turnos alternados playerA → playerB ✅
+- Phases: untap → upkeep → draw → main1 → combat → main2 → end ✅
+- Life total inicial 40 (Commander default) ✅
+- Shuffle, draw, discard to hand size ✅
+
+#### Priority/Stack (CR 117.3-117.4) ❌ NÃO IMPLEMENTADO
+Linha 9: `"Sem stack complexo (resolução imediata)"`. Isso significa:
+- Spells resolvem instantaneamente — oponentes NÃO podem responder
+- Counterspells são impossíveis — todo o eixo de interação azul está ausente
+- **Score: 0/10** — sem stack, não é MTG
+
+#### Commander Damage (CR 903.10a) ❌ NÃO IMPLEMENTADO
+- `_determineWinner()` (linha 851-862): só verifica life ≤ 0 ou library.isEmpty
+- Nenhuma verificação de 21 damage de commander
+- Nenhum conceito de "commander" no código (não há flag `isCommander`)
+- **Score: 0/10**
+
+#### Commander Tax (CR 903.8) ❌ NÃO IMPLEMENTADO
+- Nenhum tracking de quantas vezes um commander foi jogado da command zone
+- Nenhum aumento de CMC em +2 por cast
+- Nenhuma command zone no modelo
+- **Score: 0/10**
+
+#### Command Zone & Graveyard ❌ NÃO IMPLEMENTADO
+- `PlayerState` (linha 128-171): tem `battlefield`, `graveyard`, `library`, `hand`
+- Mas não tem command zone, exile, ou stack
+- Spells exile/resolvem para o graveyard, mas não há tracking de exílio separado
+- **Score: 0/10**
+
+#### Multiplayer (CR 802.1a) ❌ 2-PLAYER APENAS
+- `playerA` e `playerB` (linha 239-240) — hardcoded 2 players
+- Nenhum loop ou estrutura para N players
+- Split de ataque (dividir atacantes entre múltiplos oponentes) impossível
+- **Score: 0/10**
+
+#### State-Based Actions (CR 704) ❌ NÃO IMPLEMENTADO
+- `_checkGameOver()` (linha 843-849): só verifica life e library
+- Não verifica:
+  - Jogador com 10+ poison counters (perde) ❌
+  - Criatura com toughness ≤ 0 (morre) — **parcialmente implementado** via `_destroyCreature` em combate, mas não como SBA
+  - Planeswalker com 0 loyalty ❌
+  - Auras anexadas a permanentes ilegais ❌
+  - Legend Rule (CR 704.5j) ❌
+- **Score: 1/10** (parcial para combat damage tracking)
+
+#### Combat (CR 509-510) 🟡 PARCIAL
+- Declare attackers (linha 722-762): ✅ IA escolhe atacantes
+- Tap attackers (exceto vigilance): ✅ Correto
+- **1 blocker per attacker** (linha 764-815) ❌ — MTG permite múltiplos bloqueadores (CR 509.1a)
+- First strike timing: ✅ par correto — resolve antes do dano normal
+- Trample (linha 497-499): ✅ implementado — dano excedente passa para jogador
+- Lifelink (linha 464-465, 502-504): ✅ sem cap
+- Deathtouch (linha 476, 481, 489, 493): ✅ implementado — qualquer dano é letal
+- Flying evasion: ✅ parcial — só flyers bloqueiam flyers
+- Dano simultâneo (linha 485-493): ✅ correto — ambos aplicam dano antes de verificar morte
+- **Score: 5/10**
+
+#### IA Decisions 🟡 SIMPLIFICADO
+- AI prioritiza: land → ramp (T1-T4) → draw (se mão ≤ 3) → removal (se threat ≥ 4 power) → wipe (se 3+ criaturas oponente) → criaturas (maiores primeiro)
+- **Score: 4/10** — estratégia simplista, não simula tomada de decisão real
+
+#### Win Conditions (CR 104) ❌ INCOMPLETO
+- Life depletion ✅
+- Deck out (library vazia ao draw) ✅
+- Timeout (vida > ou battlefield >) ❌ — não é regra MTG
+- **Score: 2/10**
+
+### Impacto no Produto 🔴 CRÍTICO
+O endpoint `/ai/simulate` usa este código. Os resultados são apresentados como "simulação de batalha" para o usuário/Codex, mas a fidelidade ao MTG real é de aproximadamente **2/10**. Qualquer decisão de deckbuilding baseada nestes resultados (como os cortes propostos pelo Universal Optimizer — Smothering Tithe, Imperial Recruiter, Generous Gift) é potencialmente contraproducente.
+
+### Comparação com Python battle_analyst_v8.py (5275 linhas)
+- Python tem Priority System, Stack LIFO, Commander Damage, Commander Tax, Multiplayer, London Mulligan, State-Based Actions, Colored Mana
+- **Score estimado: 7.0/10**
+- Não é usado por nenhum cron ativo — está em `docs/hermes-analysis/`
+
+### Recomendações
+1. 🔴 **Imediato:** Adicionar disclaimer ao endpoint `/ai/simulate` que a simulação não segue regras oficiais de Commander
+2. 🔴 **Imediato:** Migrar produção para o Python `battle_analyst_v8.py` ou reconstruir o Dart com regras Commander
+3. 🔴 **Nunca usar "BATTLE-VALIDATED":** Dados do Battle Simulator são "SIMULATION-INDICATED" apenas — comparação entre builds do mesmo simulador, não validação contra jogo real
+4. 🟡 Adicionar stack, Commander damage, Commander tax, multi-blocker ao Dart
 
 ---
 
-## 🔴 Verificações Scryfall (2026-06-09 13:30Z)
+## Evolution Oracle (a50bef4c2a59) — Auditoria Detalhada
 
-| Carta | Legalidade | CMC | Oracle Text | Observação |
-|:------|:-----------|:---:|:------------|:-----------|
-| Sol Ring | ✅ `commander=legal` | 1.0 | — | ✅ |
-| Worldfire | ✅ `commander=legal` | 9.0 | — | ✅ Confirmado legal (não está na banlist) |
-| Mana Crypt | ❌ `commander=banned` | 0.0 | — | ✅ Confirmado banned (2024-SEP) |
-| Tergrid, God of Fright | ✅ `commander=legal` | 5.0 | `card_faces[0].oracle_text` **tem conteudo**: "Whenever an opponent sacrifices... you may put that card from a graveyard onto the battlefield under your control." | 🔴 **DB tem `oracle_text = ''`** — bug de import de DFC confirmado. Dados existem no Scryfall em `card_faces[0].oracle_text` |
+**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório não existe. Prompt não está mais em `jobs.json`. Script `manaloom-wincon-oracle.sh` CONFIRMADO FUNCIONAL.
 
-**Commander Banlist (mtgcommander.net, 2026-06-09):** Inclui Jeweled Lotus, Mana Crypt, Nadu, Dockside Extortionist, Lutri, além dos clássicos (Ancestral Recall, Black Lotus, Time Walk, etc.). Atualização trimestral.
+**O que fazia:** Ler logs de todos os agentes e decidir swaps (0 a 3).
+
+### O que fazia certo
+1. **Base conceitual:** Sistema de swap baseado em logs de múltiplos agentes é uma boa arquitetura — cruzar Scout + Validator + Mulligan para decidir swaps. **Se todos os agentes funcionassem.**
+2. **Cadência 0-3 swaps:** Limitar swaps por execução evita mudanças radicais em um único ciclo.
+3. **Script funcional:** `manaloom-wincon-oracle.sh` existe, roda e produz output.
+
+### O que fazia errado
+1. **Death Loop Autossustentável (Gap 12, confirmado v3.6-v3.10):** Oracle falha (timeout) → demais agentes SILENT → Oracle lê logs "nada mudou" → SILENT → repete. O ciclo não se autocorrige — requer intervenção externa (--force ou mudança de deck).
+
+2. **Miracle mechanic mal interpretado (Gap 12, 🔴 CRÍTICO):** O prompt afirmava que Lorehold "reduz CMC para {2}" via Miracle. Lorehold COPIA spells do cemitério, não reduz CMC. A redução de {2} é do keyword Miracle (CR 702.94), condicional a comprar como primeiro card do turno. Análises baseadas em custo reduzido estavam incorretas.
+
+3. **Dados de entrada inválidos:** O Oracle dependia de:
+   - Scout (94% SILENT, prompt era Wincon Hunter)
+   - Validator (análise com CMC corrompido — 26.6%)
+   - Mulligan (análise com ramp tags corrompidas — 6 de 16)
+   - Battle (simulador 2/10 sem regras Commander)
+   - **Entrada inválida → saída inválida.** Garbage in, garbage out.
+
+4. **Priorização questionável (impacto ALTO):** O Oracle propunha cortar staples Commander (Smothering Tithe, Imperial Recruiter, Generous Gift, Past in Flames — Gap 20) baseado exclusivamente em dados de simulador inválido. Cortar cartas com 40%+ de inclusão EDHREC sem revisão humana é contraproducente.
+
+5. **Prompt 48h+ sem execução completa (v3.6-v3.10):** Devido ao timeout do provider (deepseek-v4-pro), o Oracle nunca completava análise. Output truncado após 1 tool call.
+
+6. **Referência a wincon_pipeline.py inexistente:** Script mencionava arquivo que nunca existiu.
+
+### Recomendações
+- Se reativado, executar com `--force` e timeout ≥ 300s
+- Corrigir prompt: Lorehold COPIA spells, não reduz CMC (remover referência a Miracle)
+- Nunca usar dados do Battle Simulator 2-player para decisões de swap
+- Adicionar verificação EDHREC ≥ 30% como proteção contra corte de staples
+- Implementar reset protocol: quando hash do deck diverge, recalcular métricas do zero
+- Trocar provider para deepseek-v4-flash (mais rápido, menos timeout)
 
 ---
 
-## Plano de Correções (ordenado por impacto, v9.0)
+## MTG Rules Auditor (c0591cb18024) — Reflexão 🔴
 
-### 🔴 P0 — Imediato
-1. **Corrigir MTG Rules Auditor cron** — O maior gap. O cron `c0591cb18024` está FAILED há 7+ execuções. Skill `manaloom-commander-knowledge` não encontrado. Atualizar prompt no `jobs.json` para remover 5 IDs descomissionados E corrigir o erro de skill loading.
-2. **Corrigir CMC no DB** — 142/543 (26.2%) com CMC=NULL/0.0. `fix_cmc_batch.py` pendente desde 2026-06-05. 5º dia sem correção.
-3. **Reimportar Tergrid oracle_text** — Buscar `card_faces[0].oracle_text` via Scryfall. Dados existem na API mas não no DB. 5º dia.
-4. **Restaurar bracket_category no SQLite** — Force of Will → `freeInteraction`, Bolas's Citadel → `infiniteCombo`, 12 tutores → `tutor`. 3/5 categorias vazias.
-5. **Configurar Git credentials** no ambiente cron para destravar push de múltiplos crons (commits locais acumulando há 5+ dias).
+**Este auditor é o cron que produziu v1.0-v10.0.** É imperativo documentar seu próprio estado:
 
-### 🟡 P1 — Alto
-6. **Auditar divergência Dart vs Python e decidir qual manter.** O Dart (produção) tem 2.0/10 de fidelidade MTG. O Python (knowledge) tem 7.0/10. Ambos existem. Um deles deveria ser o canônico.
-7. **Adicionar tapped land modeling** ao simulador escolhido — critico para mulligan accuracy.
-8. Implementar stored-vs-actual metric recomputation (Gap 24)
-9. Retroaplicar classificação de bracket no SQLite usando novas 11 categorias
-10. Migrar Knowledge Synthesis de `opencode-go` para `deepseek-pro`
+### Estado Atual
+- **Última auditoria real:** 2026-06-09 13:36Z (v9.0, 78858 bytes)
+- **3+ dias sem auditoria real** (desde 2026-06-09 13:36Z)
+- **8+ execuções FAILED consecutivas** desde 2026-06-08 13:50Z
+- Skills carregados: `manaloom-commander-knowledge` (❌ não encontrado), `manaloom-mtg-domain` (✅ disponível)
+- Prompt ainda referencia 5 IDs de crons descomissionados (f20ac299992b, 712579b15767, etc.)
+- **Pipeline score (autoavaliação): 1.0/10 🔴**
 
-### 🟢 P2 — Médio
-11. Aumentar mulligan cap (3→7) no Python battle_analyst_v8.py
-12. Atualizar prompt do weekly-parallel-audit com 24 crons atuais
-13. Corrigir UUID cast no `pull-learning-events`
-14. Corrigir PermissionError no `auto-sync-learned-decks`
-15. Corrigir script path do `knowncards-generator`
+### Problemas do Prompt
+1. **Skill loading failure:** Referencia `manaloom-commander-knowledge` que não existe no repositório. Quando falha, o agente despeja 60047 bytes do `manaloom-mtg-domain` e termina.
+2. **IDs stale:** `f20ac299992b`, `712579b15767`, `08468451a06a`, `94f8590b1beb`, `a50bef4c2a59` — todos descomissionados em v3.7.
+3. **Schedule:** Foi reduzido de 180min para 720min (menos desperdício), mas isso só mascara o problema.
+
+### Fix Necessário
+1. Migrar prompt para usar `manaloom-mtg-domain` (disponível) ao invés de `manaloom-commander-knowledge` (ausente)
+2. Remover IDs de crons descomissionados do prompt
+3. Reduzir schedule para 360min após fix (original era 180min)
+4. Adicionar verificação de skill loading no início do prompt
 
 ---
 
-## Metodologia da Auditoria
+## Plano de Correções (ordenado por impacto)
 
-Para cada cron, os seguintes passos foram executados:
-1. **Prompt:** Lido do `jobs.json` (seção `prompt` do job)
-2. **Output:** Lido do diretório `/opt/data/cron/output/<id>/` (último arquivo)
-3. **Código (se aplicável):** Lido do `server/lib/ai/battle_simulator.dart` e `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py`
-4. **Verificação Scryfall:** API `api.scryfall.com/cards/named?fuzzy=<carta>` para legalidade, oracle text, CMC
-5. **Banlist:** mtgcommander.net para lista oficial de banidas
-6. **CR:** Magic: The Gathering Comprehensive Rules (2024-11-08) referenciadas por número
+### 🔴 CRÍTICO (quebra o jogo ou distorce resultados gravemente)
+
+1. **Battle Simulator Dart — 2/10 fidelidade MTG (Gap 8, Gap 29)**
+   - **Impacto:** Endpoint `/ai/simulate` produz resultados que não refletem Commander real. Universal Optimizer propõe cortar staples baseado nestes dados.
+   - **Código:** `server/lib/ai/battle_simulator.dart:9` — "Sem stack complexo (resolução imediata)"
+   - **Fix:** Migrar para Python `battle_analyst_v8.py` (7/10 fidelity) ou reconstruir Dart com stack, Commander damage, tax, multiplayer, multi-blocker.
+
+2. **MTG Rules Auditor — skill loading failure (Gap 29)**
+   - **Impacto:** 8+ execuções consecutivas FAILED. Pipeline score: 1.0/10.
+   - **Fix:** Migrar prompt de `manaloom-commander-knowledge` para `manaloom-mtg-domain`. Remover 5 IDs de crons descomissionados.
+
+3. **CMC corrompido — 35/100 cartas (35%) no deck ativo (Gap 19)**
+   - **Impacto:** Toda métrica que depende de CMC (curva de mana, goldfish simulator, mulligan simulation, quality gate) opera com dados inválidos.
+   - **DB:** `deck_cards.cmc IS NULL OR cmc = 0` — 35 cartas no deck 6.
+   - **Fix:** Executar script `fix_cmc_batch.py` para corrigir via PostgreSQL `cards.cmc`. Pendente desde 2026-06-05 (>7 dias).
+
+4. **15 GCs perdidos do card_oracle_cache (28.3%) (Gap 27)**
+   - **Impacto:** Game Changer Research não pode auditar GCs completos localmente. Hipótese: sync PG→SQLite filtra banned cards e DFCs.
+   - **Fix:** Executar `scripts/gc_cache_analyzer.py` para verificar 53 GCs. Adicionar verificação pós-sync. Restaurar via Scryfall API ou corrigir script de import.
+
+### 🟡 ALTO (distorce resultados ou reduz confiabilidade)
+
+5. **Bracket categories — SQLite reclassificou 3 categorias para `other` (Gap 25)**
+   - **Impacto:** 3/5 categorias originais com zero cartas (`tutor=0`, `extraTurns=0`, `infiniteCombo=0`). 88% dos GCs detectados colapsaram em `other`.
+   - **Fix:** Restaurar `bracket_category` para Force of Will, Bolas's Citadel. Reclassificar 12 tutores. Adicionar teste de regressão.
+
+6. **Universal Optimizer — propõe cortar staples Commander (Gap 20)**
+   - **Impacto:** Smothering Tithe, Imperial Recruiter, Generous Gift, Past in Flames todos candidatos a corte baseados em simulador 2/10.
+   - **Blocked by:** PermissionError em `battle_analyst_v8.py` (root-owned) — mitigação acidental.
+   - **Fix:** Adicionar proteção: nunca cortar cartas com EDHREC ≥ 30% sem revisão humana.
+
+7. **Commander Knowledge Deep — provider inconsistente**
+   - **Impacto:** Usa `opencode-go` enquanto resto da frota usa `deepseek-pro`. HTTP 429 e 404 já causaram falhas (Gap 21 — resolvido).
+   - **Risk:** Risco de falha futura. Migrar para `deepseek-pro`.
+
+8. **Auto-promote-learned — quebrado (missing table `deck_promotions`)**
+   - **Impacto:** 22 execuções, erro consistente: `OperationalError: no such table: deck_promotions`
+   - **Fix:** Criar tabela `deck_promotions` no SQLite ou corrigir script para usar tabelas existentes.
+
+### 🟢 MÉDIO (imprecisão ou melhoria)
+
+9. **Double-null detection — 10%+ cartas invisíveis (Gap 6)**
+   - **Impacto:** Cartas essenciais (Scroll Rack, Penance, Grand Abolisher) podem ser recomendadas para corte por serem "invisíveis" ao classificador.
+   - **Fix:** Adicionar heurísticas de fallback para cartas conhecidas como double-null.
+   - **Nota:** Atual DB de 1 deck tem 0 unknown tags — pode ter melhorado com sync, mas código Dart ainda vulnerável.
+
+10. **Speed da frota — deepseek-v4-pro causa timeouts históricos**
+    - **Impacto:** Evolution Oracle histórico tinha timeout consistente (Gap 12). Commander Knowledge Deep usava deepseek-v4-pro e falhava.
+    - **Recomendação:** Manter deepseek-v4-flash para crons de curto ciclo (<360min) e deepseek-v4-pro apenas para análises profundas (>720min).
+
+### 🟢 BAIXO (cosmético ou procedural)
+
+11. **Git push — 18+ commits ahead sem credenciais**
+    - **Impacto:** Commits locais não pushados. Perda de rastreabilidade.
+    - **Fix:** Configurar credenciais Git no ambiente cron ou push manual.
+
+12. **Prompt do MTG Rules Auditor — referências stale**
+    - **Impacto:** Confusão documental. 5 IDs de crons que não existem mais.
+    - **Fix:** Atualização do prompt (parte do item #2 acima).
 
 ---
 
 ## Conclusão
 
-A pipeline de conhecimento Commander permanece em **3.5/10** — inalterada desde v8.0.
+A pipeline Lorehold (5 crons) foi **descomissionada em 2026-06-04 (v3.7)** por Death Loop autossustentável. O código permanece no repositório e pode ser reativado, mas **nenhum dos 5 crons tem output confiável ou fidelidade MTG aceitável isoladamente.**
 
-**Novos achados críticos (v9.0):**
-- 🔴 **MTG Rules Auditor CRON BROKEN** — 7+ execuções consecutivas FAILED dumpando skill content. Este relatório foi gerado manualmente.
-- 🔴 **Divergência Dart vs Python** — Produção usa Dart (2.0/10), knowledge usa Python (7.0/10). Ambos existem sem coordenação.
+**A nota mais baixa é do Battle (2.0/10)** — um simulador 2-player sem stack, sem Commander damage, sem Commander tax, sem multi-blocker. É o gap mais crítico porque o endpoint `/ai/simulate` está em produção e resultados são usados como "simulação de batalha".
 
-**Progresso real (inalterado desde v8.0):**
-- ✅ Commander Knowledge Deep sem "BATTLE-VALIDATED"
-- ✅ Knowledge Synthesis funcional
-- ✅ CMC safety module no produto
-- ✅ 53 GCs + 11 categorias no código Dart
-- ✅ Master Optimizer e KC Validator estáveis
-- ✅ Auto-cycle timeout resolvido
+**A nota do MTG Rules Auditor caiu para 0.0/10** porque o cron referencia um skill que não existe (`manaloom-commander-knowledge`), produzindo apenas skill dumps em vez de auditorias. A última auditoria real foi há **3+ dias**.
 
-**Preocupações (agravadas):**
-- 🔴 **MTG Rules Auditor quebrado** — ninguém produziu auditoria real desde 2026-06-08 16:54Z
-- 🔴 0/11 correções do plano v4.0 aplicadas (5º dia)
-- 🔴 CMC corruption 142/543 (26.2%) — 5º dia
-- 🔴 Tergrid oracle_text vazio — 5º dia
-- 🔴 Bracket categories vazias — 3º dia
-- 🔴 Git push bloqueado — commits acumulam
-- 🔴 **Prompt stale atinge 9ª execução consecutiva**
+**O ecossistema atual está dividido:**
+- Camada de conhecimento (Commander Deep, Game Changer, Synthesis): ✅ Funcionando, 53-112 execuções acumuladas
+- Camada de infraestrutura (scripts sem agente): 🟡 Funcionando com gaps conhecidos (PermissionErrors, tabelas faltantes)
+- **Camada de auditoria (MTG Rules Auditor):** 🔴 Quebrada — zero output útil
 
-**Tendência:** 🔴 DECLÍNIO. Embora componentes individuais estejam estáveis, o MTG Rules Auditor (a ferramenta desta auditoria) quebrou e ninguém notou por 7+ execuções. O prompt stale completou 9 execuções sem correção. As correções P0 continuam sem aplicação no 5º dia.
+**O CMC corruption (35/100, 35%) persiste como o problema técnico mais antigo sem correção** — descoberto em 2026-06-05, >7 dias sem fix. Qualquer métrica que dependa de CMC (curva, mulligan, quality gate) opera com dados parcialmente inválidos.
 
----
-
-*Relatório gerado MANUALMENTE pelo MTG Rules Auditor v9.0 — 2026-06-09 13:30Z*
-*⚠️ O cron `c0591cb18024` não produziu este relatório — estava FAILED. Necessita correção imediata do prompt/skill loading.*
+**Pipeline score geral: 4.5/10 🔴 BAIXA** — estável, mas estagnada. Os mesmos problemas persistem sem intervenção há dias.
