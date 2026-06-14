@@ -210,3 +210,178 @@ See `docs/hermes-analysis/IMPLEMENTATION_TASKS.md` (version 2026-06-13) for full
 - **Previous open tasks:** 5 (all P1, unfixed)
 - **New tasks this run:** 5 (1 P1, 3 P2, 1 P3)
 - **Total open tasks:** 10 (2 P1 composite, 3 P2, 1 P3 + 4 remaining from previous)
+
+
+---
+
+## Tasks Novas (2026-06-14 @ Cron #12 — Synthesis)
+
+> **Gerado:** 2026-06-14 por ManaLoom Knowledge Synthesis (Cron #12)
+> **Branch:** codex/hermes-analysis-docs
+> **Metodo:** Cruzamento do conhecimento MTG (Domain Skill Gaps 3, 25, 28; GAMECHANGER_RESEARCH_REPORT Exec #14 — 54 official GCs, 20 missing 37.0%; edh_bracket_policy.dart analysis — 11 categories, curated name lists incomplete) com codigo Dart (edh_bracket_policy.dart, optimization_quality_gate.dart)
+> **Novas tasks nesta execucao:** 5 (4xP2, 1xP3) — Underworld Breach missing infiniteCombo, Orcish Bowmasters undetected cardAdvantage/stax, Narset/Notion Thief undetected stax, Bolas's Citadel missing infiniteCombo, tagCardForBracket warning for empty oracle GCs
+
+### [P2] Underworld Breach — official GC missing from `_knownInfiniteComboPieces` (Gap 28, Domain Skill §13)
+
+**Conhecimento MTG:** The Domain Skill explicitly documents Gap 28: "Underworld Breach em `officialGameChangerNamesForBracketPolicy` mas NÃO em `_knownInfiniteComboPieces`". Underworld Breach is an official Game Changer AND a well-known infinite combo piece. Its oracle text enables infinite combos with Lion's Eye Diamond + Grinding Station, or Brain Freeze, or any source of self-mill + mana-positive artifact. In Commander cEDH, it is a cornerstone of the turbo-combo archetype alongside Thassa's Oracle.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:347-351` — `_knownInfiniteComboPieces` has only 3 entries: `thassa's oracle`, `demonic consultation`, `tainted pact`.
+- `server/lib/edh_bracket_policy.dart:405` — `officialGameChangerNamesForBracketPolicy` includes `underworld breach`.
+- `server/lib/edh_bracket_policy.dart:125-127` — `_isOfficialGameChangerName` adds `gameChanger` category.
+- `server/lib/edh_bracket_policy.dart:162-164` — `_knownInfiniteComboPieces` check is independent, so Underworld Breach enters only as `gameChanger`, never as `infiniteCombo`.
+
+**Gap:** Underworld Breach is tagged only as `gameChanger`, not as `infiniteCombo`. In bracket 3 (max 2 infinite combos), a deck could have Underworld Breach + Thassa's Oracle + Demonic Consultation = 3 infinite combo sources. The system counts: 2 combo pieces (Thassa's + Demonic) + 3 GCs consumed. The Underworld Breach does NOT consume infiniteCombo budget, allowing a deck to exceed the intended combo density.
+
+**Impacto:** `P2` — Bracket compliance checking is incomplete for one of the most common cEDH combo engines. Affects bracket 3 decks running Underworld Breach lines. The `applyBracketPolicyToAdditions()` gate may approve swaps that add Underworld Breach on top of an already-combo-saturated deck.
+
+**Risco:** P2 — Real gap for cEDH decks at bracket 3. Not critical for casual brackets (1-2) where GCs are banned anyway.
+
+**Acao recomendada:**
+1. Add `'underworld breach'` to `_knownInfiniteComboPieces` in `server/lib/edh_bracket_policy.dart:347-351`.
+2. Verify that Underworld Breach now returns both `gameChanger` and `infiniteCombo` in `tagCardForBracket()`.
+3. Update bracket_category in SQLite game_changers table if applicable.
+4. Add test case: `tagCardForBracket(name: 'Underworld Breach', oracleText: '...')` returns `{gameChanger, infiniteCombo}`.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+cd server && dart test test/edh_bracket_policy_test.dart --reporter compact
+```
+
+---
+
+### [P2] Orcish Bowmasters — official GC not detected as cardAdvantage or stax
+
+**Conhecimento MTG:** Orcish Bowmasters is an official Game Changer and one of the most played cards in Commander (2023-2024 meta). Its effect is dual-purpose: it punishes opponents for drawing cards (stax/draw-hate) and generates card advantage (causes opponents to lose life while you get a creature). In the Commander banlist discourse, it is frequently cited alongside Rhystic Study and The One Ring as a "card advantage engine" that distorts games.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:469-491` — `_looksLikeGameChangerCardAdvantage()` checks:
+  1. Curated names: 7 cards (Rhystic, Mystic Remora, The One Ring, Smothering Tithe, Necropotence, Ad Nauseam, Consecrated Sphinx) — **Orcish Bowmasters NOT included**.
+  2. Tax-based: "unless" + "pays" + ("draw" | "create") — Oracle text: "Whenever an opponent draws a card, you may have ~ deal 1 damage to that player and you create a Food token" — **no match**.
+  3. Necropotence-style: "pay" + "life" + "draw" + "card" + "skip your draw step" — **no match**.
+- `server/lib/edh_bracket_policy.dart:493-518` — `_looksLikeGameChangerStax()` checks:
+  1. Curated names: Drannith, Opposition Agent, Grand Abolisher, Winter Orb, Static Orb, Torpor Orb, Rule of Law, Deafening Silence, etc. — **Orcish Bowmasters NOT included**.
+  2. Oracle text patterns: **Oracle text doesn't match any** (no "can't cast more than one spell", no "search...library...control", no "creatures entering...don't cause").
+- Result: `tagCardForBracket()` returns ONLY `{gameChanger}`, missing both `cardAdvantage` and `stax` secondary categories.
+
+**Gap:** One of the most impactful GCs in the format lacks any secondary categorization. The `applyBracketPolicyToAdditions()` system cannot distinguish Orcish Bowmasters (draw-hate stax) from a generic GC — it only knows it's a game changer. Budget planning for stax/cardAdvantage categories completely ignores this card.
+
+**Impacto:** `P2` — Secondary categories are used for bracket budget enforcement. A deck in bracket 3 could add Orcish Bowmasters (consumes 1 GC slot) without consuming its `stax` or `cardAdvantage` budget. If the same deck already has 4 other cardAdvantage GCs, the system doesn't flag Orcish Bowmasters as exceeding the `cardAdvantage` budget.
+
+**Risco:** P2 — Affects bracket budget tracking for one of the most prevalent GCs. The impact is hidden because this card is most often played in bracket 4 (unlimited budget).
+
+**Acao recomendada:**
+1. Add `'orcish bowmasters'` to `_looksLikeGameChangerCardAdvantage` curated names in `edh_bracket_policy.dart:469-491`.
+2. Optionally add draw-hate pattern to `_looksLikeGameChangerStax()`: `oracleLower.contains('whenever') && oracleLower.contains('opponent') && oracleLower.contains('draws a card') && oracleLower.contains('lose life')`.
+3. Verify Orcish Bowmasters returns `{gameChanger, cardAdvantage}` (and optionally `stax`).
+4. Add test: `tagCardForBracket(name: 'Orcish Bowmasters', oracleText: 'Whenever an opponent draws a card...')`.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+cd server && dart test test/edh_bracket_policy_test.dart --reporter compact
+```
+
+---
+
+### [P2] Narset, Parter of Veils and Notion Thief — official GCs missing from stax detection
+
+**Conhecimento MTG:** Narset, Parter of Veils and Notion Thief are official Game Changers that function as draw-restriction stax pieces. Narset's ability "Each opponent can't draw more than one card each turn" is a classic stax effect that shuts down wheels, Rhystic Study, and other draw engines. Notion Thief replaces opponents' draws with your own. Both are classified as stax by the Commander community.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:493-518` — `_looksLikeGameChangerStax()` checks:
+  1. Curated names: 11 stax pieces — **Narset NOT included**, **Notion Thief NOT included**.
+  2. "Can't cast more than one spell" pattern: Narset — "can't draw more than one card" = no match.
+  3. "Search library control" pattern: no match.
+  4. "Creatures entering don't cause" pattern: no match.
+- Result: Both return ONLY `{gameChanger}`, missing the `stax` secondary category.
+
+**Gap:** Two official GCs with clear stax/draw-restriction effects are invisible to the stax detection.
+
+**Impacto:** `P2` — In bracket 3 (max 3 stax), a deck could have Drannith Magistrate + Narset + Notion Thief = 3 stax pieces but the system would count only 1 (Drannith).
+
+**Risco:** P2 — Affects bracket budget for draw-restriction stax.
+
+**Acao recomendada:**
+1. Add `'narset, parter of veils'` and `'notion thief'` to curated names in `_looksLikeGameChangerStax()`.
+2. Add oracle text pattern for draw restriction: `oracleLower.contains('can\'t draw more than')`.
+3. Add test: `tagCardForBracket(name: 'Narset, Parter of Veils', ...)` returns `{gameChanger, stax}`.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+cd server && dart test test/edh_bracket_policy_test.dart --reporter compact
+```
+
+---
+
+### [P2] Bolas's Citadel — in `_knownValueEngineNames` but not `_knownInfiniteComboPieces`
+
+**Conhecimento MTG:** Bolas's Citadel is an official Game Changer AND a well-known infinite combo piece. Its ability combines with Sensei's Divining Top and Aetherflux Reservoir to create deterministic infinite life/casts. The Domain Skill (Gap 25) documents incorrect categorization.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:541-547` — `_knownValueEngineNames` includes `'bolas\'s citadel'` → tagged as `valueEngine` ✅.
+- `server/lib/edh_bracket_policy.dart:347-351` — `_knownInfiniteComboPieces` does NOT include Bolas's Citadel → NOT tagged as `infiniteCombo` ❌.
+- Result: `tagCardForBracket()` returns `{gameChanger, valueEngine}` but should return `{gameChanger, valueEngine, infiniteCombo}`.
+
+**Gap:** Bolas's Citadel is correctly detected as a value engine but not as an infinite combo piece.
+
+**Impacto:** `P2` — Bracket budget for infinite combos is under-counted when Bolas's Citadel is present.
+
+**Risco:** P2 — Affects bracket compliance for Top/Reservoir/Citadel combo decks at bracket 3.
+
+**Acao recomendada:**
+1. Add `'bolas\'s citadel'` to `_knownInfiniteComboPieces` in `server/lib/edh_bracket_policy.dart:347-351`.
+2. Keep Bolas's Citadel in `_knownValueEngineNames` — it functions as BOTH categories.
+3. Verify `tagCardForBracket()` returns `{gameChanger, valueEngine, infiniteCombo}`.
+4. Add test: `tagCardForBracket(...)` returns all three categories.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+cd server && dart test test/edh_bracket_policy_test.dart --reporter compact
+```
+
+---
+
+### [P3] `tagCardForBracket()` should emit developer warning when official GC has empty oracle_text
+
+**Conhecimento MTG:** The Gamechanger Research Report Exec #14 (2026-06-14) confirms that 20 of 54 official GCs (37.0%) are missing from `card_oracle_cache` in the SQLite. Their `oracle_text` is NULL or empty. When `tagCardForBracket()` is called for these cards, heuristic functions receive empty strings and silently return false. Only `gameChanger` is detected — all secondary categorization is lost.
+
+**Evidencia no codigo:**
+- `server/lib/edh_bracket_policy.dart:115-191` — `tagCardForBracket()` silently returns `false` for all heuristic checks when oracle text is empty.
+- No debug log/warning is emitted when an official GC has no oracle text.
+- `server/lib/edh_bracket_policy.dart:411-417` — `_isOfficialGameChangerName()` works independently of oracle text.
+
+**Gap:** No diagnostic feedback when official GCs lack oracle text.
+
+**Impacto:** `P3` — Currently diagnostic only. Secondary category budgets are under-counted for 37% of GCs silently.
+
+**Risco:** P3 — Improves operator awareness. The 20 missing GCs are covered by separate existing tasks.
+
+**Acao recomendada:**
+1. In `tagCardForBracket()`, after official GC name check passes, add developer log warning when oracle text is empty.
+2. Add test: verify that calling `tagCardForBracket(name: 'Expropriate', oracleText: '')` returns only `{gameChanger}`.
+
+**Validacao:**
+```bash
+cd server && dart analyze lib/edh_bracket_policy.dart
+cd server && dart test test/edh_bracket_policy_test.dart --reporter compact
+```
+
+---
+
+## Resumo de Tasks Novas (2026-06-14 — Cron #12)
+
+| # | Prioridade | Task | Origem |
+|:-:|:----------|:-----|:-------|
+| 1 | P2 | Underworld Breach — add to `_knownInfiniteComboPieces` (Gap 28) | Domain Skill §13 Gap 28 + edh_bracket_policy.dart analysis |
+| 2 | P2 | Orcish Bowmasters — detect as cardAdvantage (and optionally stax) | edh_bracket_policy.dart secondary category gaps |
+| 3 | P2 | Narset, Parter of Veils / Notion Thief — detect as stax | edh_bracket_policy.dart stax curated list incomplete |
+| 4 | P2 | Bolas's Citadel — add to `_knownInfiniteComboPieces` (preserve valueEngine) | Domain Skill §13 Gap 25 + combo piece classification |
+| 5 | P3 | `tagCardForBracket()` — developer warning when official GC has empty oracle_text | GAMECHANGER_RESEARCH_REPORT Exec #14 (20/54 GCs missing, 37.0%) |
+
+> **Nota:** Tasks #1 e #4 sao complementares — ambas adicionam cartas a `_knownInfiniteComboPieces`, que atualmente tem apenas 3 entradas. Isso desbloqueia a correta categorizacao de infinite combo no bracket budget.
+> **Nota:** Tasks #2, #3 abordam GCs que perderam categorizacao secundaria — todos estao em `officialGameChangerNamesForBracketPolicy` mas faltam das listas curadas de `cardAdvantage`, `stax`, e `infiniteCombo`.
+> **Nota:** Task #5 e preventiva/diagnostica — nao corrige as 20 cartas faltantes (isso e coberto pela task "GC MDFC oracle_text auto-heal" existente), mas adiciona visibilidade para o operador quando GCs secundarias estao desabilitadas.
