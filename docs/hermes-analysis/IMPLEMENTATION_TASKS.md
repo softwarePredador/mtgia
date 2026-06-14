@@ -1462,3 +1462,109 @@ cd server && dart test test/edh_bracket_policy_test.dart
 > **Nota:** Task #3 e OPERACIONAL - o codigo esta corrigido ha dias, mas a execucao do sync nunca foi aplicada aos dados reais.
 > **Nota:** Task #4 revela que o preflight check mascara cobertura baixa de keywords/power/toughness - a analise esta ok mas com dados incompletos.
 
+
+---
+
+## Synthesis Cron Run — 2026-06-14T21:00Z
+
+### Task 1 (P1) — Add `combo` case to `_criticalRolesForArchetype`
+
+**Conhecimento MTG:** learned_decks confirms `combo` is a valid archetype. Combo decks need tutor, protection, and combo_piece as critical roles. Losing these makes the deck non-functional.
+
+**Evidência no código:** `server/lib/ai/optimization_quality_gate.dart:493-500` — switch handles `aggro`, `control`, `midrange`; `combo` falls to `_` default `{'removal', 'ramp', 'wipe', 'wincon'}`.
+
+**Gap:** No `combo` case. Default `_` only has `{'removal', 'ramp', 'wipe', 'wincon'}` — missing `tutor`, `protection`, `combo_piece`, `draw`.
+
+**Impacto:** Combo deck optimization loses tutors/protection/combo_pieces without quality gate flagging critical role loss (line 440-444).
+
+**Risco:** P1 — Incoerência que leva a otimizações nocivas em combo.
+
+**Ação recomendada:** Add `'combo' => {'tutor', 'protection', 'combo_piece', 'wincon', 'ramp', 'draw'}`.
+
+**Validação:** `dart test test/optimization_quality_gate_test.dart`
+
+---
+
+### Task 2 (P1) — Add `combo` case to `_looksLikeOffThemeRoleSwap`
+
+**Conhecimento MTG:** Combo decks rely on specific pieces. Swapping combo_piece for utility destroys game plan.
+
+**Evidência no código:** `server/lib/ai/optimization_quality_gate.dart:505-529` — only `aggro`, `control`, `midrange` cases; `combo` falls through to `return false`.
+
+**Gap:** Combo decks never flagged as off-theme for any role swap.
+
+**Impacto:** Harmful swaps (combo_piece → utility) pass gate filtering unchecked.
+
+**Risco:** P1 — Incoerência que permite trocas off-theme em combo.
+
+**Ação recomendada:** Add `combo` branch protecting `{'combo_piece', 'tutor', 'wincon', 'protection', 'ramp'}`.
+
+**Validação:** `dart test test/optimization_quality_gate_test.dart`
+
+---
+
+### Task 3 (P2) — Add `creature` to midrange `_criticalRolesForArchetype`
+
+**Conhecimento MTG:** THEMES.md identifies midrange as needing creatures for board presence and value. Midrange without creatures is just control.
+
+**Evidência no código:** `optimization_quality_gate.dart:497` — midrange = `{'removal', 'ramp', 'draw', 'wipe', 'wincon'}`. No `creature`. Aggro has it.
+
+**Gap:** Midrange optimization can remove all creatures without critical role warning.
+
+**Impacto:** Violates deck's intended game plan.
+
+**Risco:** P2 — Melhoria de coerência.
+
+**Ação recomendada:** Add `'creature'` to midrange critical roles.
+
+**Validação:** `dart test test/optimization_quality_gate_test.dart`
+
+---
+
+### Task 4 (P2) — Add `wincon` to aggro off-theme role swap protection
+
+**Conhecimento MTG:** Aggro needs efficient wincons. `_criticalRolesForArchetype` lists `wincon` as critical for aggro but `_looksLikeOffThemeRoleSwap` doesn't protect it.
+
+**Evidência no código:** `optimization_quality_gate.dart:509-512` — aggro protects `{'creature', 'ramp', 'removal', 'protection', 'wipe'}` but not `'wincon'`.
+
+**Gap:** Inconsistency between gate filtering and validator for aggro wincon protection.
+
+**Impacto:** Aggro wincon swaps pass gate filtering, only caught later by validator.
+
+**Risco:** P2 — Consistência entre camadas.
+
+**Ação recomendada:** Add `'wincon'` to both sets in aggro branch.
+
+**Validação:** `dart test test/optimization_quality_gate_test.dart`
+
+---
+
+### Task 5 (P2) — Implement automatic theme detection from decklist
+
+**Conhecimento MTG:** THEMES.md documents complete methodology for detecting themes from decklists (tribal count, mechanics count, confidence scoring).
+
+**Evidência no código:** No automatic theme inference exists in pipeline. `ThemeContextualRulesService.validateDeck()` receives archetype as parameter, does not infer it.
+
+**Gap:** System can't detect themes without external input or commander reference profile (~48 commanders). Core theme enablers may be swapped out.
+
+**Impacto:** Optimizer dilutes theme packages without awareness.
+
+**Risco:** P2 — Capacidade significativa.
+
+**Ação recomendada:** Create `server/lib/ai/theme_detector.dart` implementing THEMES.md methodology. Wire into pipeline.
+
+**Validação:** Create `test/theme_detector_test.dart`.
+
+---
+
+### Summary
+
+| # | Priority | Task | File | Impact |
+|:-:|:--------:|:-----|:-----|:-------|
+| 1 | **P1** | Add `combo` case to `_criticalRolesForArchetype` | `optimization_quality_gate.dart:493` | Combo loses tutor/protection silently |
+| 2 | **P1** | Add `combo` case to `_looksLikeOffThemeRoleSwap` | `optimization_quality_gate.dart:505` | Combo swaps never off-theme flagged |
+| 3 | **P2** | Add `creature` to midrange critical roles | `optimization_quality_gate.dart:497` | Midrange loses creatures silently |
+| 4 | **P2** | Add `wincon` to aggro off-theme protection | `optimization_quality_gate.dart:509` | Gate/validator inconsistency |
+| 5 | **P2** | Automatic theme detection from decklist | New: `theme_detector.dart` | No theme awareness |
+
+**Total: 5 tasks (2 P1, 3 P2)**
