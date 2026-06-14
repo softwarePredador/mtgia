@@ -112,6 +112,7 @@ REAL_CATEGORY_PRIORITY = [
 CATEGORY_TERMS = {
     "draw": ("draw", "card", "wheel", "discard", "exile the top", "impulse"),
     "engine": ("copy", "cast", "instant", "sorcery", "graveyard", "trigger"),
+    "land": ("add", "mana", "any color", "sacrifice", "search", "draw"),
     "protection": ("prevent", "indestructible", "hexproof", "protection", "phase", "counter"),
     "ramp": ("treasure", "mana", "cost", "ritual", "artifact", "add "),
     "removal": ("destroy", "exile", "damage", "target", "permanent"),
@@ -129,17 +130,98 @@ MAX_CMC_BY_CATEGORY = {
     "tutor": 5.0,
     "wincon": 8.0,
     "wipe": 9.0,
+    "land": 99.0,
 }
 
 BASICS = {"Plains", "Mountain", "Island", "Swamp", "Forest", "Wastes"}
 EXTRA_PROTECTED = {
+    "Aetherflux Reservoir",
     "Deflecting Swat",
+    "Drannith Magistrate",
     "Esper Sentinel",
+    "Flawless Maneuver",
+    "Land Tax",
+    "Mother of Runes",
     "Smothering Tithe",
     "Dockside Extortionist",
     "Chrome Mox",
     "Mox Diamond",
+    "Ranger-Captain of Eos",
+    "Rise of the Eldrazi",
     "Sol Ring",
+    "The One Ring",
+    "Wheel of Fortune",
+    "Wheel of Misfortune",
+    "Worldfire",
+}
+
+LAND_CUT_PRIORITY = {
+    # Prefer replacing basics or lower-ceiling utility lands before touching
+    # premium fixing, fetches, artifact lands, Ancient Tomb, or Urza's Saga.
+    "Mountain // Mountain": 0,
+    "Plains // Plains": 1,
+    "Mountain": 2,
+    "Plains": 3,
+    "Hall of Heliod's Generosity": 10,
+    "Inventors' Fair": 11,
+    "War Room": 12,
+    "Sunbillow Verge": 20,
+    "Sundown Pass": 21,
+    "Inspiring Vantage": 22,
+}
+
+PREMIUM_LANDS = {
+    "Ancient Den",
+    "Ancient Tomb",
+    "Arid Mesa",
+    "Battlefield Forge",
+    "Bloodstained Mire",
+    "City of Brass",
+    "Command Tower",
+    "Elegant Parlor",
+    "Flooded Strand",
+    "Gemstone Caverns",
+    "Great Furnace",
+    "Mana Confluence",
+    "Marsh Flats",
+    "Plateau",
+    "Prismatic Vista",
+    "Rugged Prairie",
+    "Sacred Foundry",
+    "Scalding Tarn",
+    "Spectator Seating",
+    "Sunbaked Canyon",
+    "Urza's Saga",
+    "Windswept Heath",
+    "Wooded Foothills",
+}
+
+LAND_CANDIDATE_PRIORITY = {
+    "Cavern of Souls": 30.0,
+    "Eiganjo, Seat of the Empire": 26.0,
+    "Sokenzan, Crucible of Defiance": 24.0,
+    "Exotic Orchard": 23.0,
+    "Forbidden Orchard": 21.0,
+    "Command Beacon": 18.0,
+    "Fabled Passage": 16.0,
+    "Spire of Industry": 14.0,
+    "Plaza of Heroes": 10.0,
+    "Ash Barrens": 8.0,
+}
+
+LOW_CEILING_LAND_TERMS = (
+    "enters the battlefield tapped",
+    "enters tapped",
+    "depletion counter",
+    "charge counter",
+)
+
+LOW_VALUE_BOROS_LANDS = {
+    # Legal in Commander due no color identity, but they cannot fetch the
+    # Mountain/Plains dual package and should not outrank real RW fixing.
+    "Misty Rainforest",
+    "Polluted Delta",
+    "Verdant Catacombs",
 }
 
 
@@ -156,6 +238,16 @@ def parse_analysis_roles(raw) -> list[str]:
     except Exception:
         pass
     return [str(role).strip().lower() for role in str(raw).split(",") if role.strip()]
+
+
+def name_variants(name: str) -> set[str]:
+    variants = {normalize_name(name)}
+    if "//" in str(name):
+        for part in str(name).split("//"):
+            normalized = normalize_name(part)
+            if normalized:
+                variants.add(normalized)
+    return variants
 
 
 def choose_primary_category(categories: list[str]) -> str | None:
@@ -298,6 +390,25 @@ def candidate_score(name: str, entry: dict[str, object], meta, category: str) ->
     score = max(0.0, 8.0 - cmc)
     score += float(entry.get("count", 0) or 0) * 0.1
 
+    if category == "land":
+        score = 5.0
+        score += LAND_CANDIDATE_PRIORITY.get(name, 0.0)
+        if name in LOW_VALUE_BOROS_LANDS:
+            score -= 20.0
+        if "Land" in type_line:
+            score += 2.0
+        if any(term in oracle for term in LOW_CEILING_LAND_TERMS):
+            score -= 3.0
+        if "any color" in oracle or "one mana of any color" in oracle:
+            score += 2.0
+        if "search your library" in oracle:
+            score += 1.5
+        if "draw a card" in oracle:
+            score += 1.0
+        if "Artifact Land" in type_line:
+            score += 1.0
+        return score
+
     if "Instant" in type_line or "Sorcery" in type_line:
         score += 2.0
     if "Artifact" in type_line and category == "ramp":
@@ -337,7 +448,18 @@ def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> 
     protected = set(PROTECTED_CARDS) | EXTRA_PROTECTED
     targets: dict[str, str] = {}
     for category, cards in deck_categories.items():
-        if category in {"land", "unknown"} or not cards:
+        if category == "unknown" or not cards:
+            continue
+        if category == "land":
+            cuttable = [
+                (name, cmc)
+                for name, cmc in cards
+                if name not in protected and name not in PREMIUM_LANDS
+            ]
+            if not cuttable:
+                cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
+            cuttable.sort(key=lambda item: (LAND_CUT_PRIORITY.get(item[0], 100), item[0]))
+            targets[category] = cuttable[0][0]
             continue
         cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
         if not cuttable:
@@ -349,12 +471,16 @@ def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> 
 
 def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, only_category: str):
     allowed = deck_commander_identity(conn, deck_id)
-    deck_names = {normalize_name(row["card_name"]) for row in deck_rows(conn, deck_id)}
+    deck_names = {
+        variant
+        for row in deck_rows(conn, deck_id)
+        for variant in name_variants(str(row["card_name"]))
+    }
     by_category: dict[str, list[tuple[float, str, float, str, dict[str, object]]]] = defaultdict(list)
     stats = {"deck": 0, "basic": 0, "unknown_category": 0, "missing_meta": 0, "off_color": 0, "illegal": 0, "high_cmc": 0}
 
     for name, entry in known_cards.items():
-        if normalize_name(name) in deck_names:
+        if name_variants(name) & deck_names:
             stats["deck"] += 1
             continue
         if name in BASICS:
@@ -362,7 +488,7 @@ def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, onl
             continue
         effect = str(entry.get("effect") or "unknown")
         category = str(entry.get("deck_category") or EFFECT_TO_CATEGORY.get(effect, "unknown"))
-        if category == "unknown" or category == "land":
+        if category == "unknown":
             stats["unknown_category"] += 1
             continue
         if only_category and category != only_category:
@@ -466,8 +592,6 @@ def main() -> int:
             print(f"filter_stats={json.dumps(stats, sort_keys=True)}")
             print("\nCurrent deck composition:")
             for category, cards in sorted(deck_categories.items()):
-                if category == "land":
-                    continue
                 avg = sum(cmc for _, cmc in cards) / max(1, len(cards))
                 print(f"  {category:<12s} x{len(cards):<2d} avg_cmc={avg:.1f}")
             print("\nSwap targets:")

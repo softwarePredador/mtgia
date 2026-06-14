@@ -6,6 +6,8 @@ SCRIPT_DIR="$REPO/docs/hermes-analysis/manaloom-knowledge/scripts"
 REPORT_DIR="$REPO/docs/hermes-analysis/master_optimizer_reports"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-/opt/data/artifacts/hermes_master_optimizer}"
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-/opt/data/secrets/manaloom-postgres.env}"
+DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
+LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-1}"
 
 mkdir -p "$REPORT_DIR" "$ARTIFACT_DIR"
 
@@ -41,8 +43,14 @@ python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
 target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M%S).log"
 python3 "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
   --sqlite-db "$SCRIPT_DIR/knowledge.db" \
-  --target-deck-id "${MANALOOM_OPTIMIZER_DECK_ID:-6}" \
+  --target-deck-id "$DECK_ID" \
   --apply | tee "$target_deck_log"
+
+if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
+  canonical_log="$ARTIFACT_DIR/lorehold_canonical_preflight_$(date -u +%Y%m%d_%H%M%S).log"
+  python3 "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+    --apply-local-sqlite | tee "$canonical_log"
+fi
 
 sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \

@@ -25,6 +25,7 @@ FULL_CONFIRM_CANDIDATE_LIMIT="${MANALOOM_AUTO_FULL_CONFIRM_CANDIDATE_LIMIT:-10}"
 FULL_CONFIRM_MIN_SCAN_DELTA="${MANALOOM_AUTO_FULL_CONFIRM_MIN_SCAN_DELTA:-0.5}"
 APPLY_MIN_DELTA="${MANALOOM_AUTO_APPLY_MIN_DELTA:-1.0}"
 POST_APPLY_MIN_DELTA="${MANALOOM_AUTO_POST_APPLY_MIN_DELTA:-0.0}"
+LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-1}"
 LOCK_FILE="${MANALOOM_AUTO_CYCLE_LOCK:-/tmp/manaloom-master-optimizer-auto-cycle.lock}"
 RUN_STAMP="$(date -u +%Y%m%d_%H%M%S)"
 ENGINE_METRICS_DIR="${MANALOOM_ENGINE_METRICS_DIR:-$ARTIFACT_DIR/engine_metrics/$RUN_STAMP}"
@@ -108,6 +109,12 @@ apply_out="$(mktemp)"
     --apply-sqlite-from-pg \
     --include-needs-review \
     --report "$ARTIFACT_DIR/battle_card_rules_cache_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
+
+  if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
+    echo "== lorehold canonical override =="
+    python3 "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+      --apply-local-sqlite
+  fi
 
   echo "== preflight =="
   python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report

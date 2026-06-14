@@ -12,6 +12,7 @@ SLOT_GAMES="${MANALOOM_SLOT_GAMES:-10}"
 SLOT_MAX_PER_CATEGORY="${MANALOOM_SLOT_MAX_PER_CATEGORY:-15}"
 SLOT_CATEGORY="${MANALOOM_SLOT_CATEGORY:-}"
 SLOT_PHASE="${MANALOOM_SLOT_PHASE:-phase1}"
+LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-1}"
 
 mkdir -p "$ARTIFACT_DIR"
 
@@ -64,6 +65,12 @@ python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
   --apply-sqlite-from-pg \
   --include-needs-review \
   --report "$battle_rules_report"
+
+if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
+  canonical_log="$ARTIFACT_DIR/lorehold_canonical_slot_scan_$(date -u +%Y%m%d_%H%M%S).log"
+  python3 "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+    --apply-local-sqlite | tee "$canonical_log"
+fi
 
 preflight_log="$ARTIFACT_DIR/master_optimizer_slot_scan_preflight_$(date -u +%Y%m%d_%H%M%S).log"
 python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report | tee "$preflight_log"
