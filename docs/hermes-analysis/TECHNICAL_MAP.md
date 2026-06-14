@@ -220,17 +220,15 @@ mtgia/
   de `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-13 03:00 UTC no checkout local `5bfc9706`. O auditor textual executou
+  2026-06-14 03:00 UTC no checkout local `c80118e2`. O auditor textual executou
   com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg` e leitura direta. `LifeCounterScreen` segue legado/test-only enquanto
-  a rota ativa usa `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip`
-  continuam sem uso runtime confirmado nas listagens; e
+  de `rg` e leitura direta. Desde a rodada anterior de classes (`5bfc9706`), o
+  delta ate HEAD e somente documental. `LifeCounterScreen` segue legado/test-only
+  enquanto a rota ativa usa `LotusLifeCounterScreen`; `DeckCard` e
+  `DeckProgressChip` continuam sem uso runtime confirmado nas listagens; e
   `LotusPresentationMode` nao e importado/chamado pelo Lotus. Nao surgiram novos
-  achados confiaveis: low-counts de observabilidade, scanner, rotas, widgets de
-  deck details e backend (`BattleSimulator`, `DistributedRateLimiter`,
-  `RebuildGuidedService`, `SynergyEngine`, `PushNotificationService`,
-  `DeckThemeProfile`) foram falsificados por chamadas runtime.
+  achados confiaveis nesta rotacao.
 
 ## Pipeline semantico de cartas
 

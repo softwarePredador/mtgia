@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-13 23:00 UTC
+> Data: 2026-06-14 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -60,17 +60,17 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    chamador, count-only em `/ai/ml-status` e nenhum DDL local encontrado neste
    checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-13 03:00 UTC no checkout `5bfc9706`.
+   na rotacao local Codex de 2026-06-14 03:00 UTC no checkout `c80118e2`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
    classes, `0` imports quebrados), mas continua limitado a `server/lib` e
-   `server/routes`; a evidencia app veio de `rg` e leitura direta.
+   `server/routes`; a evidencia app veio de `rg` e leitura direta. Desde a
+   rodada anterior de classes (`5bfc9706`), o delta ate HEAD e somente
+   documental.
    `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
    usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
    import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
    construtor; e `LotusPresentationMode` nao tem import nem chamada para
-   `enter()`/`exit()`. Nao surgiram novos achados confiaveis: low-counts de
-   observabilidade, scanner, rotas, widgets de deck details e backend foram
-   falsificados por chamadas runtime.
+   `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta rotacao.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
    `5f09b309`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
    e addition data de quality gate carregam ou preservam `card_function_tags` +
@@ -888,40 +888,40 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-13 03:00 UTC: REVALIDADO/ABERTO no checkout `5bfc9706`.**
+- **Status 2026-06-14 03:00 UTC: REVALIDADO/ABERTO no checkout `c80118e2`.**
+  Desde a rodada anterior de classes (`5bfc9706`), o delta ate HEAD e somente
+  documental; nao houve mudanca de produto em `app/lib`, `server/lib` ou
+  `server/routes`.
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
-    `LifeCounterScreen`, mas `app/lib/main.dart:284` usa
-    `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
-    `LifeCounterScreen(` apenas no construtor da propria classe. A busca focada
-    com limite de palavra encontrou instanciacao fora do arquivo apenas em
+    `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:284` usa
+    `LotusLifeCounterScreen()` para a rota ativa. A busca focada por
+    `LifeCounterScreen(` em `app/lib`, `app/test` e `app/integration_test`
+    encontrou apenas o construtor da propria classe e duas instanciacoes em
+    teste:
     `app/test/features/home/life_counter_screen_test.dart:36` e
     `app/test/features/home/life_counter_clone_proof_test.dart:277`.
   - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
-    busca por import de `deck_card.dart` em `app/lib` nao retornou ocorrencias,
-    e a busca por `DeckCard(` em `app/lib` encontrou somente o construtor.
-    `DeckCard` aparece apenas nos testes
+    busca por `deck_card.dart`/`DeckCard` em `app/lib` encontrou somente o
+    proprio arquivo. `DeckCard` aparece apenas nos testes
     `app/test/features/decks/widgets/deck_card_test.dart:4`/`:9` e
     `app/test/features/decks/widgets/deck_card_overflow_test.dart:4`/`:47`.
     As listagens reais usam widgets privados/locais como `_RecentDeckCard`,
-    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`.
+    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`
+    (`home_screen.dart:519`, `community_screen.dart:341`/`:542`,
+    `deck_list_screen.dart:1777`).
   - `app/lib/features/decks/widgets/deck_progress_indicator.dart:295` define
     `DeckProgressChip`, sem ocorrencias alem do construtor em `app/lib`,
     `app/test` e `app/integration_test`. `DeckProgressIndicator` no mesmo
-    arquivo permanece usado e nao faz parte deste achado.
+    arquivo permanece usado em `deck_details_screen.dart:403` e
+    `deck_details_overview_tab.dart:328`, e nao faz parte deste achado.
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
     `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
     `app/lib`, `app/test` ou `app/integration_test`.
-  - **Sem novo achado nesta revalidacao:** low-counts app como
-    `AppObservabilityNavigatorObserver`, `PerformanceNavigatorObserver`,
-    `CardRecognitionService`, `ImagePreprocessor`, `ScannerOverlay`,
-    `LatestSetCollectionScreen`, `DeckAddCardsMenu` e widgets de
-    `deck_details_aux_widgets.dart` tem chamadas runtime confirmadas.
-  - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
-    `DeckProgressIndicator` seguem ativos; candidatos backend de baixa contagem
-    (`BattleSimulator`, `DistributedRateLimiter`, `RebuildGuidedService`,
-    `SynergyEngine`, `PushNotificationService`, `DeckThemeProfile`) tambem tem
-    chamador runtime confirmado.
+  - **Sem novo achado nesta revalidacao:** `LotusLifeCounterScreen` e
+    `DeckProgressIndicator` seguem ativos; a saida bruta do auditor para classes
+    backend nao foi promovida como achado porque e inventario textual, nao grafo
+    de chamadas.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
