@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-13 19:00 UTC
+Data: 2026-06-14 07:00 UTC (merged local+remote)
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -34,18 +34,15 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    leitura local de `commander_learned_decks`, sem chamada LLM/externa no
    handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-13 05:30 UTC no checkout `5f09b309`. `commander_fallback_policy.dart`
-   segue como policy versionada para parte relevante das listas de
-   optimize/complete e candidate quality, e `edh_bracket_policy.dart` continua
-   excecao intencional por regra externa/Game Changer. Permanecem riscos inline
-   em `functional_card_tags.dart`, `optimization_functional_roles.dart`,
-   `candidate_quality_data_support.dart`, `rebuild_guided_service.dart`,
-   `/decks/:id/recommendations`, `/ai/weakness-analysis`, no mock runtime de
-   `/ai/optimize` quando `deckOptimizer == null`, em prompts runtime carregados
-   por `otimizacao.dart`, em `deck_advanced_analysis.dart` e no meta shell
-   classifier por nomes/keywords. Exemplos de UI/import, fixtures,
-   docs/artifacts, aliases localizados e seeds Commander Reference seguem
-   separados como allowed/allowed-with-caution.
+   2026-06-14 05:30 UTC no checkout `da164b47`. O caminho principal
+   analysis/optimize/validator agora carrega ou preserva `functional_tags` e
+   `semantic_tags_v2`, entao a claim antiga de ausencia no optimize esta stale.
+   Permanecem riscos por nome nos fallbacks de `functional_card_tags.dart`,
+   `optimization_functional_roles.dart`, candidate quality, ranking deterministico
+   de replacements, endpoints advisory (`/ai/weakness-analysis`,
+   `/decks/:id/recommendations`) e meta shell. `edh_bracket_policy.dart` continua
+   excecao intencional por regra externa/Game Changer; `commander_fallback_policy.dart`
+   e policy versionada com risco residual se crescer sem fonte/confidence.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
    revalidado na rotacao local Codex de 2026-06-13 15:00 UTC no checkout
    `eada6841`. Desde `129d647f`, o delta ate HEAD e somente documental. As
@@ -60,27 +57,26 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    chamador, count-only em `/ai/ml-status` e nenhum DDL local encontrado neste
    checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-13 03:00 UTC no checkout `5bfc9706`.
+   na rotacao local Codex de 2026-06-14 03:00 UTC no checkout `c80118e2`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
    classes, `0` imports quebrados), mas continua limitado a `server/lib` e
-   `server/routes`; a evidencia app veio de `rg` e leitura direta.
+   `server/routes`; a evidencia app veio de `rg` e leitura direta. Desde a
+   rodada anterior de classes (`5bfc9706`), o delta ate HEAD e somente
+   documental.
    `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
    usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
    import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
    construtor; e `LotusPresentationMode` nao tem import nem chamada para
-   `enter()`/`exit()`. Nao surgiram novos achados confiaveis: low-counts de
-   observabilidade, scanner, rotas, widgets de deck details e backend foram
-   falsificados por chamadas runtime.
+   `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta rotacao.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
-   `5f09b309`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
-   e addition data de quality gate carregam ou preservam `card_function_tags` +
-   `semantic_tags_v2`, com multi-role onde essas fontes chegam ao fluxo. O risco
-   atual esta nos paths legacy de optimize que colapsam o conjunto de roles em um
-   papel unico (`inferFunctionalRole`/`_legacyOptimizeRoleForResolvedRoles`), em
-   `removals_detailed` sem threadar as tags ja presentes em `allCardData`, e em
-   endpoints experimentais como `/decks/:id/recommendations` e
-   `/ai/weakness-analysis`, que ainda nao carregam as fontes persistidas antes de
-   chamar o adapter.
+   `da164b47`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
+   e addition data de quality gate usam a ordem
+   `functional_tags -> semantic_tags_v2 -> heuristica`. O risco atual esta nos
+   paths legacy que colapsam multi-role (`inferFunctionalRole`/
+   `_legacyOptimizeRoleForResolvedRoles`), em `removals_detailed` sem threadar as
+   tags ja presentes em `allCardData`, em `findSynergyReplacements` que ranqueia
+   candidatos sem carregar semantica persistida, e em endpoints advisory que ainda
+   nao carregam as fontes persistidas antes de montar buckets/recomendacoes.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -90,10 +86,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-13 07:00 UTC como **ABERTO neste checkout `146b16dc`**. O auditor
-    textual executou com sucesso (`205` arquivos backend, `115` problemas
-    textuais, `0` imports quebrados), mas nao prova ausencia de chamadas; a
-    saida automatica ruidosa foi descartada antes da atualizacao manual.
+    2026-06-14 07:00 UTC como **ABERTO neste checkout `8bb9aff9`**. Desde a
+    rodada focada anterior (`146b16dc..HEAD`), o delta de produto e nulo e
+    apenas `docs/hermes-analysis/PLANO_CORRECAO.md`,
+    `STRUCTURE_AUDIT.md` e `TECHNICAL_MAP.md` mudaram. O auditor textual
+    executou com sucesso (`205` arquivos backend, `115` problemas textuais,
+    `0` imports quebrados), mas nao prova ausencia de chamadas; a saida
+    automatica ruidosa foi descartada antes da atualizacao manual.
     Permanecem abertos `sync_cards_utils.dart` test-only enquanto
     `server/bin/sync_cards.dart` mantem helpers privados/inline;
     `verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser anexado;
@@ -274,74 +273,66 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
-- **Status 2026-06-13 05:30 UTC: REVALIDADO/ABERTO no checkout `5f09b309`.**
-  A branch atual tem `server/lib/ai/commander_fallback_policy.dart` como policy
-  versionada para denylist, premium names, staples, fallbacks e foundation
-  fillers; portanto a claim antiga de policy ausente esta stale. O risco aberto
-  agora e menor e mais especifico: nomes ainda vivem em classificadores
-  heurísticos, endpoints experimentais e prompts, e a policy por nome ainda deve
-  ser tratada como dado versionado ate virar tabela/backfill.
+- **Status 2026-06-14 05:30 UTC: REVALIDADO/ABERTO no checkout `da164b47`.**
+  A branch atual ja tem dois tipos de excecao aceitavel: `edh_bracket_policy.dart`
+  como regra externa/Game Changer e `commander_fallback_policy.dart` como policy
+  versionada para fallbacks Commander. O risco aberto sao nomes ainda espalhados
+  em classificadores heuristics, score de candidate quality, replacement ranking,
+  endpoints advisory e meta shell.
 - **Evidencia**:
-  - `server/lib/ai/commander_fallback_policy.dart:1`-`:237` centraliza listas
-    por nome; tratar essas entradas como dado versionado enquanto nao houver
-    tabela/backfill equivalente.
-  - `server/lib/ai/functional_card_tags.dart:219`-`:226`, `:713`-`:731`,
-    `:767`-`:778`, `:872`-`:888` e `:900`-`:932` ainda usa nomes conhecidos
-    como fallback de classificacao funcional.
-  - `server/lib/ai/optimization_functional_roles.dart:387`-`:420`,
-    `:447`-`:463` e `:491`-`:529` repete parte dos checks por nomes/sets
-    conhecidos.
-  - `server/lib/ai/candidate_quality_data_support.dart:376`-`:381`,
-    `:422`-`:429`, `:440`-`:449`, `:475`-`:481`, `:534`-`:538` e
-    `:586`-`:600` aplica tags, bonus ou escopo por nomes.
-  - `server/lib/ai/rebuild_guided_service.dart:1226`-`:1231` classifica ramp por
-    `signet`/`sol ring`/`talisman`; `:1331`-`:1338` e `:1404`-`:1411` aplica
-    penalidade/prioridade a utility lands especificas.
-  - `server/routes/ai/optimize/index.dart:1063`-`:1081` ainda retorna mock
-    runtime com `Sol Ring` e `Arcane Signet` quando `deckOptimizer == null`.
-  - `server/routes/decks/[id]/recommendations/index.dart:49`-`:67` nao carrega
-    tags persistidas, recalcula buckets por `oracle_text` em `:122`-`:146`,
-    recomenda `Command Tower` diretamente em `:282`-`:289`, e `_findStaples`
-    usa raridade `rare/mythic` como proxy em `:478`-`:508`.
-  - `server/routes/ai/weakness-analysis/index.dart:51`-`:66` nao carrega
+  - `server/lib/ai/functional_card_tags.dart:219`-`:226`, `:727`-`:730`,
+    `:767`-`:793`, `:837`-`:848`, `:863`-`:884` e `:900`-`:924` usa nomes como
+    `Sol Ring`, signets/talismans, `Teferi's Protection`, `Heroic Intervention`,
+    `Swiftfoot Boots`, `Lightning Greaves`, `Blood Artist`, `Ephemerate`,
+    `Jeska's Will`, `Thassa's Oracle`, `Isochron Scepter` e
+    `Dramatic Reversal` em fallbacks funcionais.
+  - `server/lib/ai/optimization_functional_roles.dart:176`-`:179`,
+    `:228`-`:240`, `:387`-`:420` e `:447`-`:529` mantem nomes/sets conhecidos no
+    fallback do adapter de optimize.
+  - `server/lib/ai/candidate_quality_data_support.dart:336`-`:367`,
+    `:376`-`:380`, `:422`-`:448`, `:475`-`:481`, `:520`-`:545` e
+    `:586`-`:605` aplica aliases, tags, bonus ou escopo por nomes, incluindo as
+    listas de `server/lib/ai/commander_fallback_policy.dart:62`-`:89`.
+  - `server/lib/ai/optimize_runtime_support.dart:435`-`:463` e `:491`-`:500`
+    montam candidatos de replacement sem tags persistidas; `:968`-`:1045` ranqueia
+    por texto/tipo, `preferredNames`, popularidade, rejeicao, CMC e tipo.
+  - `server/routes/decks/[id]/recommendations/index.dart:48`-`:67` nao carrega
+    tags persistidas, recalcula buckets por `oracle_text` em `:122`-`:145`,
+    recomenda `Command Tower` diretamente em `:282`-`:289`, e `_findStaples` usa
+    raridade `rare/mythic` como proxy em `:478`-`:506`.
+  - `server/routes/ai/weakness-analysis/index.dart:50`-`:68` nao carrega
     `card_function_tags`, `semantic_tags_v2` nem `card_role_scores`; chama
-    `resolveCardFunctionalRoles` sem essas fontes em `:115`-`:122` e
-    `:343`-`:357`, e ainda retorna listas fixas de recomendacao em
-    `:186`-`:220` e `:293`-`:307`.
-  - `server/lib/ai/deck_advanced_analysis.dart:43`-`:57` tambem chama
-    `resolveCardFunctionalRoles` sem fontes persistidas; `:104`-`:131` e
-    `:507`-`:524` usam nomes em analises de wincon/drain/protecao, e `:457`-`:477`
-    retorna lista fixa para shallow card advantage.
-  - `server/lib/ai/otimizacao.dart:856`-`:868` e `:1004`-`:1006` carrega
-    prompts runtime (`prompt.md` e `prompt_complete.md`) que citam staples por
-    nome; isso nao e branch deterministica, mas influencia a resposta de IA.
-  - `server/lib/meta/meta_deck_commander_shell_support.dart:105`-`:275` deriva
-    `strategy_archetype` por nomes/keywords. Risco menor que optimize direto,
-    mas pode persistir sinal de meta por nome.
-  - Exemplos permitidos seguem separados: `deck_import_screen.dart:383`-`:393`
-    e `:588`-`:594`, `life_counter_native_card_search_sheet.dart:39`-`:44`,
-    fixtures/testes e artifacts de corpus.
-  - `server/lib/edh_bracket_policy.dart:335`-`:408` e `:411`-`:535` permanece
-    excecao intencional por regra externa/Game Changer, com teste em
-    `server/test/optimize_runtime_support_test.dart:434`-`:442`.
-- **Impacto**: as decisoes mais importantes ja tem parte da policy centralizada,
-  mas classificadores puros e endpoints experimentais ainda podem divergir da
-  camada persistida. Bonus por nome tambem continua dificil de auditar como
-  dado operacional.
+    `resolveCardFunctionalRoles` sem essas fontes em `:115`-`:122` e retorna
+    listas fixas de recomendacao em `:193`-`:199`, `:212`-`:217`,
+    `:230`-`:235`, `:248`-`:253`, `:299`-`:304` e `:331`-`:337`.
+  - `server/lib/ai/deck_advanced_analysis.dart:43`-`:57` chama
+    `resolveCardFunctionalRoles` sem fontes persistidas; `:104`-`:132` e
+    `:507`-`:524` usam nomes em analises de wincon/drain/protecao.
+  - `server/lib/meta/meta_deck_commander_shell_support.dart:108`-`:290` deriva
+    `strategy_archetype` por nomes/keywords. Risco menor que optimize direto, mas
+    pode persistir sinal de produto por nome.
+  - Exemplos permitidos seguem separados: import/UI examples, fixtures/testes,
+    docs/artifacts e corpus Commander Reference controlado.
+  - `server/lib/edh_bracket_policy.dart:312`-`:351`, `:353`-`:408`,
+    `:411`-`:418` e `:454`-`:530` permanece excecao intencional por regra externa
+    e lista oficial/curada.
+- **Impacto**: o core ja prefere fontes persistidas quando elas chegam, mas
+  fallbacks e rotas app-facing ainda podem inferir utilidade por nome ou por proxy
+  unidimensional. Bonus por nome continua dificil de auditar sem fonte/confidence.
 - **Acao recomendada**:
-  1. manter `commander_fallback_policy.dart` como ponto unico enquanto nao houver
-     tabela/backfill, adicionando `source`, `reason`, `confidence` e data para
-     cada entrada quando o formato sair de `const` simples;
+  1. manter `commander_fallback_policy.dart` como excecao unica e versionada
+     enquanto nao houver tabela/backfill, adicionando `source`, `reason`,
+     `confidence` e data se a lista crescer;
   2. remover checks por nome de `functional_card_tags.dart` e
      `optimization_functional_roles.dart`, ou transforma-los em backfill
      persistido/policy versionada;
-  3. migrar `/decks/:id/recommendations` e `/ai/weakness-analysis` para
+  3. threadar `card_function_tags`, `semantic_tags_v2` e role scores para
+     candidate quality e `findSynergyReplacements` antes de pontuar;
+  4. migrar `/decks/:id/recommendations` e `/ai/weakness-analysis` para
      `card_function_tags`, `semantic_tags_v2`, role scores, legalidade,
      identidade de cor, bracket e budget antes de qualquer sugestao por nome;
-  4. tratar seeds Commander Reference como corpus/profile versionado, nao
-     policy global;
   5. manter `edh_bracket_policy.dart` como excecao documentada com sync/fonte e
-     teste dedicado.
+     teste dedicado, sem reutilizar essa lista como utilidade geral.
 - **Validacao**:
   - `rg -n "Sol Ring|Command Tower|Thassa's Oracle|Isochron Scepter|Dramatic Reversal|Blood Artist" server/lib server/routes app/lib`
     so deve mostrar fixtures/docs/UI examples, seed/corpus declarado, policy
@@ -353,60 +344,58 @@ Histórico do problema:
 
 ### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-13 05:30 UTC: PARCIALMENTE SANEADO no checkout
-  `5f09b309`.** A acao antiga de "carregar `card_function_tags` no contexto
+- **Status 2026-06-14 05:30 UTC: PARCIALMENTE SANEADO no checkout
+  `da164b47`.** A acao antiga de "carregar `card_function_tags` no contexto
   principal de optimize" nao se aplica mais nesta branch.
 - **Evidencia atualizada**:
-  - `GET /decks/:id/analysis` seleciona `card_function_tags` e
-    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:34`-`:96`.
-  - `POST /decks/:id/ai-analysis` tambem retorna `functional_tags` e
-    `semantic_tags_v2` em `server/routes/decks/[id]/ai-analysis/index.dart:74`-`:135`.
-  - `loadOptimizeDeckContext` insere `semantic_tags_v2` e `functional_tags` em
-    `allCardData` em `server/lib/ai/optimize_request_support.dart:201`-`:214`
-    e define os selects em `:359`-`:393`.
-  - `classifyOptimizationFunctionalRole` le `functional_tags` e
-    `semantic_tags_v2` em `server/lib/ai/optimization_functional_roles.dart:301`-`:315`;
-    `optimizationFunctionalRolesForCard` preserva conjuntos multi-role em
-    `:317`-`:339`.
-  - `OptimizationValidator` usa roles primarios e conjuntos multi-role em
-    `server/lib/ai/optimization_validator.dart:266`-`:284` e calcula
-    `roleDelta` em `:317`-`:355`.
-  - `optimization_quality_gate.dart:159`-`:199` prefere
-    `semantic_tags_v2`, depois `functional_tags` persistidos, depois fallback
-    heuristico para roles do gate.
+  - `GET /decks/:id/analysis` seleciona e retorna `card_function_tags` e
+    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:34`-`:96`
+    e `:430`.
+  - `summarizeFunctionalTagsForDeck` prefere `functional_tags` persistidos,
+    depois `semantic_tags_v2`, depois heuristica em
+    `server/lib/ai/functional_card_tags.dart:430`-`:486`.
+  - `loadOptimizeDeckContext` define selects de `semantic_tags_v2` e
+    `functional_tags` em `server/lib/ai/optimize_request_support.dart:97`-`:123`
+    e anexa ambos a `allCardData` em `:184`-`:214`.
+  - `resolveCardFunctionalRoles` aplica precedencia
+    `functionalTags -> semanticTagsV2 -> heuristic` em
+    `server/lib/ai/optimization_functional_roles.dart:36`-`:74`;
+    `classifyOptimizationFunctionalRole` e `optimizationFunctionalRolesForCard`
+    reutilizam esse adapter em `:301`-`:338`.
+  - `OptimizationValidator` usa role primario e conjuntos multi-role em
+    `server/lib/ai/optimization_validator.dart:267`-`:270` e calcula deltas em
+    `:318`-`:358`.
+  - `optimization_quality_gate.dart:58`-`:65` e `:159`-`:200` prefere fontes
+    persistidas antes do fallback heuristico.
   - `fetchOptimizeAdditionDataForQualityGate` busca `semantic_tags_v2` e
     `functional_tags` para additions em
-    `server/lib/ai/optimize_route_addition_data_support.dart:84`-`:129`.
-  - Candidate quality consulta `card_role_scores`, `card_function_tags`,
-    `commander_card_synergy` e rejeicoes em
-    `server/lib/ai/optimize_candidate_quality_support.dart:203`-`:275`.
-- **Impacto remanescente**: a branch atual esta melhor alinhada no caminho
-  principal analysis/optimize/validator, mas `inferFunctionalRole` em
+    `server/lib/ai/optimize_route_addition_data_support.dart:84`-`:130`.
+- **Impacto remanescente**: a branch atual esta alinhada no caminho principal
+  analysis/optimize/validator, mas `inferFunctionalRole` em
   `server/lib/ai/optimize_runtime_support.dart:752`-`:859` ainda colapsa
-  conjuntos em roles legacy para ranking/removal/details. `server/routes/ai/optimize/index.dart:2257`-`:2260`
-  monta `originalCardByName` a partir de `allCardData`, mas `:2360`-`:2384`
-  monta `removals_detailed` sem passar as tags persistidas ja disponiveis. Endpoints
-  experimentais/legacy como `/decks/:id/recommendations` e
-  `/ai/weakness-analysis` ainda precisam carregar as mesmas fontes antes de
-  promocao app-facing.
+  conjuntos em roles legacy para ranking/removal/details; `server/routes/ai/optimize/index.dart:2374`-`:2383`
+  monta `removals_detailed.functionalRole` sem passar as tags persistidas ja
+  disponiveis; `findSynergyReplacements` ranqueia candidatos sem carregar fontes
+  persistidas; e `/decks/:id/recommendations` + `/ai/weakness-analysis` ainda
+  precisam usar o mesmo adapter antes de promocao app-facing.
 - **Acao recomendada**:
   1. manter um adapter unico para `functional_tags`, `semantic_tags_v2`,
      `oracle_text`, `type_line`, `mana_cost` e `cmc`;
   2. cobrir role primario e conjunto de roles em testes de analysis, optimize,
-     validator e quality gate;
+     validator, quality gate e replacement ranking;
   3. trocar os paths de optimize runtime que hoje usam `inferFunctionalRole`
      por `CardRoles` completo, mantendo `primary_role` apenas como compat;
   4. alinhar `candidate_quality_sources` com as fontes realmente consultadas ou
      documentar quais fontes sao apenas diagnostico;
-  5. antes de promover endpoints experimentais, exigir que reutilizem o mesmo
-     adapter ou declarem contrato interno separado.
+  5. antes de promover endpoints advisory, exigir que reutilizem o mesmo adapter
+     ou declarem contrato interno separado.
 - **Validacao**:
   - carta com `functional_tags=[draw]` e sem `semantic_tags_v2` e tratada como
     draw em analysis, validator e quality gate;
   - carta com `semantic_tags_v2.tags=[draw, engine]` preserva multi-role onde o
     contrato exigir;
-  - optimize deterministic removal/details preserva o conjunto
-    `draw + engine` em contagem, risco e payload app-facing;
+  - optimize deterministic replacement/removal/details preserva o conjunto
+    `draw + engine` em ranking, contagem, risco e payload app-facing;
   - testes de candidate quality mostram fontes reais em
     `candidate_quality_sources`;
 
@@ -609,17 +598,19 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-13 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
-`146b16dc`**. As anotacoes historicas de resolucao em outros SHAs nao
-representam automaticamente o estado desta branch. A rodada atual manteve os
-achados de maior impacto (`sync_cards_utils.dart` test-only,
+**Status 2026-06-14 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`8bb9aff9`**. Desde a rodada anterior de funcoes (`146b16dc..HEAD`), o delta de
+produto e nulo; mudaram somente os documentos de Hermes analysis. A rodada atual
+manteve os achados de maior impacto (`sync_cards_utils.dart` test-only,
 `verifySwapIntegrity` sem chamador apesar de `swap_integrity` e builders de
 response do optimize fora do fluxo real), confirmou achados menores em wrappers
-app, observabilidade/cache, `MLKnowledgeService.recordFeedback`, read-side de
-`AiLogService`, `ArchetypeCountersService` e
-`PushNotificationService.sendToMultipleTokens`, e corrigiu classificacoes
-ruidosas (`isLikelyLandCard` e vivo via `safeCmcForOptimization`; servicos de
-ML/log/cache/push/counters possuem caminhos vivos parciais).
+app, observabilidade/cache, `ApiClient.loadTokenFromDisk`,
+`MLKnowledgeService.recordFeedback`, read-side de `AiLogService`,
+`ArchetypeCountersService`, `PushNotificationService.sendToMultipleTokens`,
+wrapper Lorehold de Commander Reference e sample helper de aggressive optimize,
+e manteve as classificacoes ruidosas corrigidas (`isLikelyLandCard` e vivo via
+`safeCmcForOptimization`; servicos de ML/log/cache/push/counters possuem caminhos
+vivos parciais).
 
 - **Evidência**:
   - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:121`, `:178` e
@@ -629,7 +620,7 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
     `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
     `_extractCardRowFromSet`, definido em `:662`-`:721`; e legalidades sao
-    montadas inline em `:743`-`:784`. O full sync atual delega para
+    montadas inline em `:766`-`:823`. O full sync atual delega para
     `server/bin/sync_cards_full_fast.py`.
   - `server/routes/ai/optimize/index.dart:752`-`:758` anexa
     `swap_integrity`, mas `verifySwapIntegrity` em
@@ -666,6 +657,13 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     `getTopByCategory`, `calculateFitScore`, `cleanupCache` e `isHighSynergy`
     sem chamador confirmado. Controle positivo: `getHighSynergyCards` e chamado
     em `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`.
+  - `server/lib/ai/commander_reference_card_stats_support.dart:252` define
+    `buildLoreholdReferenceCardStatsFromProfile`, chamado apenas por teste e
+    pela propria delegacao para `buildCommanderReferenceCardStatsFromProfile`;
+    o builder generico segue vivo no mesmo arquivo em `:363`.
+    `server/lib/ai/optimize_runtime_support.dart:1671` define
+    `summarizeAggressiveOptimizeUtilitySamples`, com chamada encontrada apenas
+    em `server/test/optimize_runtime_support_test.dart:215`.
   - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
     sem chamada confirmada; `EndpointCache.instance.get/set` seguem vivos em
     rotas de cards, sets, archetypes e generate performance support.
@@ -679,7 +677,7 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     `recordFeedback`, com insert em `ml_prompt_feedback`, mas busca por
     `recordFeedback(` encontrou apenas a definicao; `MLKnowledgeService` segue
     vivo por `getContextForDeck`/`generatePromptContext` em
-    `server/lib/ai/otimizacao.dart:165`-`:173` e `:359`-`:367`.
+    `server/lib/ai/otimizacao.dart:167`-`:173` e `:361`-`:367`.
   - `server/lib/ai/cmc_safety.dart:64`,
     `server/lib/archetype_counters_service.dart:67`/`:104`/`:204`,
     `server/lib/push_notification_service.dart:295` e
@@ -884,40 +882,40 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-13 03:00 UTC: REVALIDADO/ABERTO no checkout `5bfc9706`.**
+- **Status 2026-06-14 03:00 UTC: REVALIDADO/ABERTO no checkout `c80118e2`.**
+  Desde a rodada anterior de classes (`5bfc9706`), o delta ate HEAD e somente
+  documental; nao houve mudanca de produto em `app/lib`, `server/lib` ou
+  `server/routes`.
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
-    `LifeCounterScreen`, mas `app/lib/main.dart:284` usa
-    `LotusLifeCounterScreen()` para a rota ativa; busca em `app/lib` encontrou
-    `LifeCounterScreen(` apenas no construtor da propria classe. A busca focada
-    com limite de palavra encontrou instanciacao fora do arquivo apenas em
+    `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:284` usa
+    `LotusLifeCounterScreen()` para a rota ativa. A busca focada por
+    `LifeCounterScreen(` em `app/lib`, `app/test` e `app/integration_test`
+    encontrou apenas o construtor da propria classe e duas instanciacoes em
+    teste:
     `app/test/features/home/life_counter_screen_test.dart:36` e
     `app/test/features/home/life_counter_clone_proof_test.dart:277`.
   - `app/lib/features/decks/widgets/deck_card.dart:17` define `DeckCard`, mas a
-    busca por import de `deck_card.dart` em `app/lib` nao retornou ocorrencias,
-    e a busca por `DeckCard(` em `app/lib` encontrou somente o construtor.
-    `DeckCard` aparece apenas nos testes
+    busca por `deck_card.dart`/`DeckCard` em `app/lib` encontrou somente o
+    proprio arquivo. `DeckCard` aparece apenas nos testes
     `app/test/features/decks/widgets/deck_card_test.dart:4`/`:9` e
     `app/test/features/decks/widgets/deck_card_overflow_test.dart:4`/`:47`.
     As listagens reais usam widgets privados/locais como `_RecentDeckCard`,
-    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`.
+    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`
+    (`home_screen.dart:519`, `community_screen.dart:341`/`:542`,
+    `deck_list_screen.dart:1777`).
   - `app/lib/features/decks/widgets/deck_progress_indicator.dart:295` define
     `DeckProgressChip`, sem ocorrencias alem do construtor em `app/lib`,
     `app/test` e `app/integration_test`. `DeckProgressIndicator` no mesmo
-    arquivo permanece usado e nao faz parte deste achado.
+    arquivo permanece usado em `deck_details_screen.dart:403` e
+    `deck_details_overview_tab.dart:328`, e nao faz parte deste achado.
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
     `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
     `app/lib`, `app/test` ou `app/integration_test`.
-  - **Sem novo achado nesta revalidacao:** low-counts app como
-    `AppObservabilityNavigatorObserver`, `PerformanceNavigatorObserver`,
-    `CardRecognitionService`, `ImagePreprocessor`, `ScannerOverlay`,
-    `LatestSetCollectionScreen`, `DeckAddCardsMenu` e widgets de
-    `deck_details_aux_widgets.dart` tem chamadas runtime confirmadas.
-  - Controles positivos desta revalidacao: `LotusLifeCounterScreen` e
-    `DeckProgressIndicator` seguem ativos; candidatos backend de baixa contagem
-    (`BattleSimulator`, `DistributedRateLimiter`, `RebuildGuidedService`,
-    `SynergyEngine`, `PushNotificationService`, `DeckThemeProfile`) tambem tem
-    chamador runtime confirmado.
+  - **Sem novo achado nesta revalidacao:** `LotusLifeCounterScreen` e
+    `DeckProgressIndicator` seguem ativos; a saida bruta do auditor para classes
+    backend nao foi promovida como achado porque e inventario textual, nao grafo
+    de chamadas.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
