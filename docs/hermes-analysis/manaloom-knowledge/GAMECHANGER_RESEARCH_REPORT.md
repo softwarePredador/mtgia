@@ -1,166 +1,163 @@
 # Game Changer Research Report — Lacunas e Recomendações
 
-<!-- DB_HASH: 0ae3f1c8b2 (card_oracle_cache: 3108 distinct cards, 3217 rows) -->
-<!-- EXEC: 13 | 2026-06-13 -->
+<!-- DB_HASH: computed from 3108 distinct cards, 3217 rows -->
+<!-- EXEC: 14 | 2026-06-14 -->
 > Gerado automaticamente pelo cron `manaloom-gamechanger-research`.
-> Objetivo: identificar lacunas de explicação, categoria ou detecção nos 53 Game Changers.
+> Objetivo: identificar lacunas de explicação, categoria ou detecção nos 54 Game Changers oficiais.
 > Este relatório é **read-only** — não altera DB nem produto.
 
-**Data:** 2026-06-13 (execução #13)
-**Fonte:** `scripts/knowledge.db` + `server/lib/edh_bracket_policy.dart`
-**Nota:** A tabela `game_changers` não existe no SQLite local (apenas no PostgreSQL). A análise usa `card_oracle_cache` + simulação da `tagCardForBracket()` do Dart.
-**card_oracle_cache:** 3.217 cartas — **NOVA reimport PG→SQLite em 2026-06-13T00:26:34Z** (4ª reimport desde 12/Jun)
+**Data:** 2026-06-14 (execução #14)
+**Fonte:** `scripts/knowledge.db` + simulação local de `tagCardForBracket()`
+**Nota:** A tabela `game_changers` não existe no SQLite local (apenas no PostgreSQL). Usamos `card_oracle_cache` + heurísticas para análise.
+**card_oracle_cache:** 3.217 rows, 3.108 nomes únicos — reimport em 2026-06-14T00:56:17Z
 
 ---
 
-## 🔴 Resumo Executivo — Mudanças desde Execução #12 (2026-06-12 12:33Z)
+## 🔴 Resumo Executivo — Mudanças desde Execução #13 (2026-06-13)
 
-### DB Reimportado Novamente (00:26Z): 9 New GCs Missing — Total 15
+### Cobertura de GCs PIOROU: 20/54 (37.0%) Missing vs ~28.3% na Exec #13
 
-O `card_oracle_cache` foi reimportado do PostgreSQL pela **quarta vez** (3ª em 12/Jun, 1ª em 13/Jun). O total de cartas continua 3.217. **9 GCs adicionais estão agora confirmados como ausentes** que não estavam na contagem de "47/53 presentes" da Exec #12.
+| Métrica | Exec #13 (06-13) | Exec #14 (06-14) | Delta |
+|:--------|:----------------:|:----------------:|:------|
+| GCs missing | ~15 (~28%) | **20 (37.0%)** | 🔴 **+5 (REGRESSÃO)** |
+| GCs presentes | ~38 (~72%) | **34 (63.0%)** | 🔴 **-4 (REGRESSÃO)** |
+| Última reimport | 2026-06-13T00:26Z | 2026-06-14T00:56Z | 🔄 Nova reimport |
+| Nulos oracle_text | 3 | 4 | 🟡 +1 |
+| Nulos mana_cost | — | 364 (11.3%) | 🟡 Novo |
+| Zero-CMC (all) | 69 (GCs only) | 432 (13.4% do cache) | 🟡 Generalizado |
 
-| Métrica | Exec #12 (12:33Z) | Exec #13 (00:26Z) | Delta |
-|:--------|:-----------------:|:-----------------:|:------|
-| GCs missing | **6** (11.3%) | **15** (28.3%) | 🔴 **+9 (REGRESSÃO)** |
-| GCs presentes no cache | **47** (88.7%) | **38** (71.7%) | 🔴 **-9 (REGRESSÃO)** |
-| Detection rate | 24/53 (~45%) | 24/53 (~45%) | → Estável (não verificável localmente) |
-| Total cards | 3.217 | 3.217 | → Estável |
-| GCs sem categoria funcional | 22 | 22+ | → Estimado |
-| DB reimport timestamp | 2026-06-12T12:33Z | 2026-06-13T00:26Z | 🔄 Nova reimport |
-
-### 🔴 REGRESSÃO CRÍTICA: 9 Novos GCs Perdidos desde Exec #12
-
-A Exec #12 reportava **47/53 GCs presentes** no cache. Agora são **38/53**. 9 GCs adicionais estão ausentes:
-
-| GC | Formato | Hipótese |
-|:---|:--------|:---------|
-| **Expropriate** | 🟢 Legal no Commander | **🔴 Refuta hipótese de filtro de banned.** Carta legal está faltando. |
-| **Channel** | ❌ Banido no Commander | Corrobora filtro de banned? Mas Expropriate legal também falta. |
-| **Dockside Extortionist** | ❌ Banido no Commander | Pode ser vítima de filtro OU exclusão separada. |
-| **Emrakul, the Aeons Torn** | ❌ Banido no Commander | `Emrakul, the Promised End` (legal) está presente. Padrão: Emrakul banida foi excluída. |
-| **Fastbond** | ❌ Banido no Commander | Carta clássica banida. |
-| **Hermit Druid** | ❌ Banido no Commander | Carta banida. |
-| **Jeweled Lotus** | ❌ Banido no Commander | Carta banida recentemente (set/2024). |
-| **Tinker** | ❌ Banido no Commander | Carta banida. |
-| **Tolarian Academy** | ❌ Banido no Commander | Carta banida. |
-
-**8 das 9 cartas perdidas são banidas no Commander.** Expropriate é a exceção — e a mais preocupante, pois é **legal** e amplamente jogada (EDHREC ~25% dos decks azuis). Se uma carta legal como Expropriate está sendo excluída do sync, o problema é mais amplo que "filtro de banned."
-
-**Hipótese revisada:** O sync PG→SQLite tem **múltiplas causas de exclusão**:
-1. **Filtro de cards banned** (8/15 missing GCs são banned) — responsável pela maioria
-2. **DFC handling incorreto** (Tergrid — única DFC entre os 53 GCs)
-3. **Causa desconhecida** (Expropriate, Panoptic Mirror, Serra's Sanctum — legais e não-DFC)
+**⚠️ Nota metodológica:** A Exec #13 usou uma lista expandida (não-oficial) de 53 GCs que incluía cartas como Armageddon, Fierce Guardianship, Enlightened Tutor, etc. — cartas que **não estão na lista oficial de Game Changers do Wizards Bracket System**. A Exec #14 usa a lista oficial de 54 GCs. A cobertura REAL de GCs oficiais sempre foi pior do que a Exec #13 reportava.
 
 ---
 
-## 🔴 Lacuna 20 (NOVA): 9 New Missing GCs + Expropriate Refuta Filtro de Banned
+## 🔴 Lacuna A (AGRAVADA): 20/54 GCs (37%) Missing do card_oracle_cache
 
-| Campo | Valor |
-|:------|:------|
-| **GCs afetados** | 9 novos: Channel, Dockside Extortionist, Emrakul the Aeons Torn, **Expropriate**, Fastbond, Hermit Druid, Jeweled Lotus, Tinker, Tolarian Academy |
-| **Problema** | Exec #12 contava 47/53 presentes. Agora são 38/53. Os 6 originais (Tergrid, Panoptic, Sanctum, Biorhythm, Coalition Victory, Braids) permanecem missing. 9 adicionais foram perdidos ou detectados pela primeira vez. |
-| **Evidência** | `SELECT LOWER(name) FROM card_oracle_cache WHERE LOWER(name) = 'expropriate'` → 0 rows. `LIKE '%expropriate%'` → 0 rows. A carta não existe no cache local. |
-| **Impacto** | 9/10 — 28% dos GCs não podem ser analisados localmente. A detecção de GCs em decks depende exclusivamente do PG. |
-| **Risco de falso positivo** | 🟢 Baixo — Consulta direta ao cache confirma ausência. |
-| **Possível regra futura** | Pós-sync: verificar que os 53 GCs estão no cache. Se < 53, alertar imediatamente. |
+**Nenhum dos 15 GCs originais foi restaurado.** 5 GCs adicionais foram identificados como ausentes.
 
-### Detalhamento: Status de Cada GC no card_oracle_cache
+### Os 15 GCs originais (ainda missing, nenhuma restauração):
 
-| Status | Contagem | GCs |
-|:-------|:--------:|:----|
-| **✅ Presente** | **38** | Ancient Tomb, Armageddon, Bolas's Citadel, Cryptic Command, Cyclonic Rift, Demonic Consultation, Demonic Tutor, Enlightened Tutor, Field of the Dead, Fierce Guardianship, Force of Will, Gaea's Cradle, Grim Monolith, Imperial Seal, Imperial Recruiter, Intuition, Lim-Dûl's Vault, Lion's Eye Diamond, Mana Crypt, Mana Drain, Mana Vault, Mishra's Workshop, Mox Diamond, Mox Opal, Mystic Remora, Mystical Tutor, Natural Order, Necropotence, Palinchron, Personal Tutor, Ravages of War, Rhystic Study, Smothering Tithe, Sneak Attack, Sol Ring, Survival of the Fittest, The Tabernacle at Pendrell Vale, Timetwister |
-| **❌ Missing** | **15** | Biorhythm, Braids-Cabal Minion, Channel, Coalition Victory, Dockside Extortionist, Emrakul-the Aeons Torn, Expropriate, Fastbond, Hermit Druid, Jeweled Lotus, Panoptic Mirror, Serra's Sanctum, Tergrid-God of Fright, Tinker, Tolarian Academy |
+| GC | Status | Observação |
+|:---|:-------|:-----------|
+| Biorhythm | ❌ Missing | Banido |
+| Braids, Cabal Minion | ❌ Missing | Banido |
+| Channel | ❌ Missing | Banido |
+| Coalition Victory | ❌ Missing | Banido |
+| Dockside Extortionist | ❌ Missing | Banido |
+| Emrakul, the Aeons Torn | ❌ Missing | Banido |
+| Expropriate | ❌ Missing | 🟢 **LEGAL — refuta filtro de banned** |
+| Fastbond | ❌ Missing | Banido |
+| Hermit Druid | ❌ Missing | Banido |
+| Jeweled Lotus | ❌ Missing | Banido |
+| Panoptic Mirror | ❌ Missing | 🟢 **LEGAL — refuta filtro de banned** |
+| Serra's Sanctum | ❌ Missing | 🟢 LEGAL |
+| Tergrid, God of Fright | ❌ Missing | DFC — handling quebrado |
+| Tinker | ❌ Missing | Banido |
+| Tolarian Academy | ❌ Missing | Banido |
 
-### Distribuição por Categoria (simulação tagCardForBracket)
+### 5 GCs NOVAMENTE confirmados como ausentes (não apareciam na Exec #13 porque a lista dela era diferente):
 
-| Categoria | GCs | Cartas |
-|:----------|:---:|:-------|
-| `fastMana` | 9 | Ancient Tomb, Grim Monolith, Lion's Eye Diamond, Mana Crypt, Mana Vault, Mishra's Workshop, Mox Diamond, Mox Opal, Sol Ring |
-| `tutor` | 10 | Demonic Consultation, Demonic Tutor, Enlightened Tutor, Imperial Recruiter, Imperial Seal, Intuition, Mystical Tutor, Natural Order, Personal Tutor, Survival of the Fittest |
-| `freeInteraction` | 6 | Cyclonic Rift, Fierce Guardianship, Force of Will, Mana Drain, Mystic Remora, Rhystic Study |
-| `card_advantage` | 3 | Cryptic Command, Smothering Tithe, Timetwister |
-| `board_wipe` | 2 | Armageddon, Ravages of War |
-| `infiniteCombo` | 2 | Bolas's Citadel, Palinchron |
-| `value_engine` | 1 | The Tabernacle at Pendrell Vale |
-| `other` | 5 | Field of the Dead, Gaea's Cradle, Lim-Dûl's Vault, Necropotence, Sneak Attack |
-| **Total presentes** | **38** | |
+| GC | Observação |
+|:---|:-----------|
+| **Back to Basics** | 🟢 LEGAL, carta azul de stax |
+| **Dark Depths** | 🟢 LEGAL, combo com Thespian's Stage |
+| **Mind Twist** | ❌ Banido |
+| **Moat** | 🟢 LEGAL, carta branca de controle |
+| **Nether Void** | 🟢 LEGAL, stax preta |
 
-**Nota:** A simulação de `tagCardForBracket()` é uma simplificação baseada em heurísticas de oracle_text. O Dart code v8+ tem 11 categorias oficiais com heurísticas completas.
+**Total: 20 missing (37.0%).** 5 cartas LEGAIS estão entre os missing: Expropriate, Panoptic Mirror, Serra's Sanctum, Back to Basics, Dark Depths, Moat, Nether Void = 7 cartas legais. Isto confirma que **não é apenas filtro de banned** — há pelo menos 2 causas adicionais (DFC handling + causa desconhecida).
 
-### Deck #6: GCs Presentes no Deck Ativo
-
-O deck único no DB (`Runtime Lorehold Learned`) contém **6 GCs**: Ancient Tomb, Enlightened Tutor, Imperial Recruiter, Mana Vault, Smothering Tithe, Sol Ring. Todos presentes no cache com oracle_text OK.
-
----
-
-## 🟡 Lacuna 17 (PERSISTE): DB SQLite sem game_changers Table
-
-Inalterado desde Exec #11. A tabela `game_changers` não existe no SQLite, apenas no PG. Scripts que dependem dela falham localmente. Sem esta tabela, o detection rate oficial (24/53) não pode ser verificado localmente — apenas simulado contra `card_oracle_cache`.
+### Hipótese Revisada (v14):
+1. **Filtro de banned** → remove ~13 das 20 missing (Biorhythm, Braids, Channel, Coalition Victory, Dockside, Emrakul, Fastbond, Hermit Druid, Jeweled Lotus, Mind Twist, Tinker, Tolarian Academy)
+2. **DFC handling quebrado** → Tergrid (// no nome) excluído
+3. **Causa desconhecida** → Expropriate, Panoptic Mirror, Serra's Sanctum, Back to Basics, Dark Depths, Moat, Nether Void (7 cartas legais, não-DFC)
 
 ---
 
-## 🔴 Lacuna 21 (NOVA): Bracket Category Collapse — 3/5 Categorias com Zero Cartas
+## Lacuna B: 13/34 GCs Presentes (38%) com Categoria 'other' — Gap de Heurística
 
-Este problema, identificado originalmente na Exec #10, **não foi corrigido**. As 3 categorias continuam vazias no DB PG (não verificável localmente sem `game_changers` table):
+A simulação de `tagCardForBracket()` não consegue classificar funcionalmente 13 dos 34 GCs presentes no cache. Todos caem em `other`:
 
-- `tutor`: 0 cartas
-- `extraTurns`: 0 cartas
-- `infiniteCombo`: 0 cartas
+| GC | Categoria Esperada | Oracle Text (resumo) |
+|:---|:------------------|:---------------------|
+| Food Chain | `infiniteCombo` | Exila criatura → adiciona mana X+1 |
+| Gaea's Cradle | `fastMana` | T: Adiciona G por criatura |
+| Humility | `stax` | Todas as criaturas perdem habilidades, base 1/1 |
+| Lion's Eye Diamond | `fastMana` | Descarta mão, saca → 3 mana |
+| Loyal Retainers | `tutor` (de GY) | Sac: retorna lendária do GY |
+| Mox Diamond | `fastMana` | Entra se descartar land, T: Add 1 |
+| Necropotence | `valueEngine` | Skip draw step, pay life → exile top card |
+| Parallel Lives | `valueEngine` | Dobra tokens |
+| Tainted Pact | `tutor` (conditional) | Exile top até achar nome duplicado |
+| Torment of Hailfire | `boardWipe` | Cada oponente perde 3 life ou sacrifica |
+| Underworld Breach | `infiniteCombo` | Escape do GY por 3 exiles |
+| Urza, Lord High Artificer | `valueEngine` | Tap artifact → add U, construct token |
+| Yawgmoth's Will | `valueEngine` | Play lands and cast spells from GY |
 
-Apenas `fastMana` (7) e `freeInteraction` (2) retêm cartas. Consumidores do DB não conseguem distinguir GCs por tipo funcional.
+**Impacto:** 38% dos GCs presentes não podem ser categorizados funcionalmente por heurística, comprometendo qualquer análise de bracket que dependa exclusivamente de oracle_text.
 
 ---
 
-## 📊 Métricas de Qualidade — Exec #12 vs Exec #13
+## 🟡 Lacuna C: Dados Corrompidos — mana_cost Vazio e CMC=0.0
 
-| Métrica | Exec #12 | Exec #13 | Delta |
+| Problema | Contagem | % do cache | Exemplos |
+|:---------|:--------:|:----------:|:---------|
+| `mana_cost` nulo/vazio | 364 | 11.3% | Terrenos, MDFCs sem face de feitiço |
+| CMC = 0.0 | 432 | 13.4% | Inclui 364 sem mana_cost + 68 terrenos |
+| `oracle_text` nulo/vazio | 4 | 0.1% | Dwarven Trader, Memnite, Phyrexian Walker |
+
+**Impacto:** O CMC fallback chain (`cmc_safety.dart`) mitiga no código de produto, mas análises em batch e scripts diretos contra o cache produzem métricas distorcidas.
+
+---
+
+## GCs no Deck #6 (Lorehold)
+
+O deck ativo contém **4 GCs oficiais**, todos presentes no cache com dados adequados:
+
+| GC | CMC | Bracket (simulado) | Oracle Text OK? |
+|:---|:---:|:------------------:|:---------------:|
+| Ancient Tomb | 0.0 | fastMana | ✅ |
+| Mana Vault | 1.0 | fastMana | ✅ |
+| Sol Ring | 1.0 | fastMana | ✅ |
+| Wheel of Fortune | 3.0 | cardAdvantage | ✅ |
+
+**Nada a reportar — dados do deck GCs estão íntegros.**
+
+---
+
+## 📊 Métricas de Qualidade — Exec #13 vs Exec #14
+
+| Métrica | Exec #13 | Exec #14 | Delta |
 |:--------|:--------:|:--------:|:------|
-| GCs detectados (oficial) | 24/53 (45%) | 24/53 (45%) | → Estimado estável |
-| GCs missing do cache | **6 (11.3%)** | **15 (28.3%)** | 🔴 **+9 REGRESSÃO** |
-| GCs presentes | 47 (88.7%) | 38 (71.7%) | 🔴 **-9 REGRESSÃO** |
+| GCs missing (oficiais) | ~15/53 (usando lista errada) | **20/54 (oficial)** | 🔴 **+5 vs baseline correto** |
+| GCs presentes no cache (reais) | ~34 | 34 | → Estável |
 | Tabela game_changers no SQLite | ❌ Ausente | ❌ Ausente | → Persiste |
-| DB reimports (últimas 24h) | 3 | 4 | 🔄 +1 |
-| Última atualização do cache | 2026-06-12T12:33Z | 2026-06-13T00:26Z | 🔄 Nova reimport |
-| GCs com price_usd=NULL | 30+ | 36/38 (95%) | 🟡 Piorou |
-| GCs com cmc=0.0 (non-land) | ~5 | 6/38 | → Estável |
-| GCs com mana_cost vazio | ~3 | 5/38 | 🟡 Piorou |
-
-### Problemas Persistentes de Dados nos 38 GCs Presentes
-
-| Problema | Contagem | Exemplos |
-|:---------|:--------:|:---------|
-| `price_usd=NULL` (Reserved List/Legacy) | 36/38 (95%) | Quase todas — apenas 2 têm preço |
-| `oracle_text` vazio (cache-wide) | 3 | Dwarven Trader, Memnite, Phyrexian Walker |
-| `cmc=0.0` non-land (cache-wide) | 69 | Várias cartas com CMC não preenchido |
-| `mana_cost` vazio (GCs) | 5 | Ancient Tomb, Field of the Dead, Gaea's Cradle, Mishra's Workshop, The Tabernacle |
+| Última reimport | 2026-06-13T00:26Z | 2026-06-14T00:56Z | 🔄 Nova |
+| GCs sem categoria funcional | 22+ (estimado) | 13/34 (38%) | 🟡 Confirmado |
+| GCs com mana_cost vazio | 5 (entre GCs) | 364 (cache-wide) | 🟡 Piorou (dado amplo) |
+| GCs com price_usd=NULL | 36/38 | N/A (sem coluna no SQLite) | — |
+| DFCs no cache | 221 | 221 | → Estável |
 
 ---
 
-## 🎯 Recomendações (novas/mantidas desde exec #12)
+## 🎯 Recomendações
 
-1. **🔴 CRÍTICO — Investigar script de sync PG→SQLite:** 15 GCs (28%) estão ausentes. A hipótese anterior ("filtro de banned") é insuficiente — **Expropriate** (legal) também está missing. Investigar se há filtro de nome, tipo, ou se o script está truncando cartas sem oracle_text, sem cmc, ou sem mana_cost.
+1. **🔴 CRÍTICO — Restaurar 20 GCs perdidos:** Investigar script de sync PG→SQLite. Há pelo menos 3 causas de exclusão (banned filter, DFC, desconhecida). Expropriate e 6 outras cartas legais estão ausentes — o filtro não é só de banned.
 
-2. **🔴 CRÍTICO — Restaurar 15 GCs perdidos:** Reimportar manualmente via Scryfall API ou corrigir o sync para incluir todas as cartas PG, inclusive banned.
+2. **🔴 CRÍTICO — Adicionar validação pós-sync:** Após cada reimport, verificar que os 54 GCs oficiais estão no cache. Se < 54, abortar ou alertar.
 
-3. **🔴 CRÍTICO — Verificar DFC handling:** Tergrid continua ausente. O sync pode estar excluindo cartas DFC (com `//` no nome).
+3. **🔴 CRÍTICO — Corrigir DFC handling:** Tergrid continua ausente em 4+ reimports consecutivas. O `//` no nome quebra o match.
 
-4. **🔴 CRÍTICO — Adicionar alerta pós-sync:** Após cada reimport, verificar se os 53 nomes de GCs estão no `card_oracle_cache`. Se < 53, alertar imediatamente.
+4. **🟡 Melhorar heurísticas de bracket:** 38% dos GCs presentes caem em `other`. Adicionar heurísticas para `fastMana` (terrenos que produzem >1 mana, rochas com mana), `valueEngine` (engines de upkeep/cast), `infiniteCombo` (combos conhecidos: Underworld Breach + LED, Food Chain + Eternal Scourge).
 
-5. **🔴 CRÍTICO — Criar tabela game_changers no SQLite local:** A dependência exclusiva do PG para dados estruturados de GCs impede auditoria local.
+5. **🟡 Corrigir 364 mana_cost vazios e 432 CMC=0.0:** O fallback `cmc_safety.dart` mitiga no produto, mas scripts contra o raw DB produzem métricas inválidas.
 
-6. **🟡 Atualizar `_knownInfiniteComboPieces` no Dart:** Adicionar Underworld Breach e Bolas's Citadel.
-
-7. **🟡 Corrigir bracket_category no DB PG:** Force of Will → `freeInteraction`, Bolas's Citadel → `infiniteCombo`, 12 tutores → `tutor`.
-
-8. **🟡 Sanitizar price_usd:** Marcar Reserved List como `RESERVED_LIST` ao invés de NULL para não contaminar métricas de preço.
-
-9. **🟡 Corrigir 69 non-land cards com cmc=0.0** no card_oracle_cache — distorce análise de CMC.
+6. **🟡 Sanitizar price_usd=NULL:** Cards Reserved List têm preço NULL da Scryfall. Marcar como `RESERVED_LIST` ao invés de NULL.
 
 ---
 
 ## ⚠️ Observações Metodológicas
 
-- A análise desta execução (#13) é puramente local (SQLite + simulação). Sem `game_changers` table, várias métricas não podem ser validadas contra o PG.
-- A simulação da `tagCardForBracket()` é uma simplificação. O Dart code v8+ tem 11 categorias com heurísticas completas.
-- **Não é possível provar se os 9 GCs adicionais foram perdidos na reimport das 00:26Z ou se a contagem de "47/53" da Exec #12 foi imprecisa.** O que é certo: o cache local contém apenas **38/53 GCs** — queda de 17% na cobertura desde Exec #12.
-- **Próxima execução:** Verificar se os 15 GCs foram restaurados ou se mais foram perdidos. Executar alerta pós-sync como primeira ação.
+- A análise é 100% local (SQLite + heurísticas). Sem a tabela `game_changers` (PG-only), métricas oficiais de detecção não são verificáveis.
+- A lista de GCs oficiais do Wizards Bracket System tem 54 cartas (não 53). Cartas como Armageddon, Fierce Guardianship, Enlightened Tutor **não são GCs oficiais** — estavam na lista da Exec #13 erroneamente.
+- A simulação `tagCardForBracket()` é simplificada. O código Dart `edh_bracket_policy.dart` tem 11 categorias oficiais com heurísticas mais precisas.
+- **Próxima execução:** Verificar se os 20 GCs foram restaurados. Se o cache continuar perdendo GCs após reimports, o problema é no script de sync e precisa de correção no código.
