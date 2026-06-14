@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-13)
+## Achados do audit de estrutura (atualizado 2026-06-14)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -282,21 +282,24 @@ Game Changer, nao um modelo geral de utilidade de carta.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-13 07:00 UTC no checkout local `146b16dc`. O auditor
-  textual executou com sucesso (`205` arquivos backend, `115` problemas
-  textuais, `0` imports quebrados), mas continua sem grafo de chamadas; a saida
-  automatica ruidosa foi descartada e a evidencia veio de `rg`/`nl -ba`.
-  Permanecem abertos os achados de maior impacto: `server/lib/sync_cards_utils.dart`
-  test-only enquanto `server/bin/sync_cards.dart` mantem helpers privados/inline;
-  `swap_integrity` e emitido, mas `verifySwapIntegrity` nao e chamado no apply
-  app/backend; e a extracao de `optimize_response_support.dart` continua
-  parcial (`buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry`
-  fora do fluxo real). Seguem tambem wrappers app sem chamador
+  novamente em 2026-06-14 07:00 UTC no checkout local `8bb9aff9`. Desde a
+  rodada focada anterior (`146b16dc..HEAD`), o delta de produto e nulo e as
+  mudancas sao somente documentais. O auditor textual executou com sucesso
+  (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados),
+  mas continua sem grafo de chamadas; a evidencia veio de buscas exatas por
+  simbolo. Permanecem abertos os achados de maior impacto:
+  `server/lib/sync_cards_utils.dart` test-only enquanto
+  `server/bin/sync_cards.dart` mantem helpers privados/inline; `swap_integrity`
+  e emitido, mas `verifySwapIntegrity` nao e chamado no apply app/backend; e a
+  extracao de `optimize_response_support.dart` continua parcial
+  (`buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry` fora do
+  fluxo real). Seguem tambem wrappers app sem chamador
   (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
   `DeckProvider.clearAllCache`) e conveniencias sem wiring em request trace,
-  ML feedback, `ApiClient.loadTokenFromDisk`, performance manual/debug,
-  EDHREC/cache, CMC safety, archetype counters, push e read-side de
-  `AiLogService`. Correcoes de classificacao: `hasSuspiciousNonLandCmc` esta
+  `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
+  safety, archetype counters, push, ML feedback, read-side de `AiLogService`,
+  wrapper Lorehold de Commander Reference e sample helper de aggressive
+  optimize. Correcoes de classificacao: `hasSuspiciousNonLandCmc` esta
   test-only, mas `isLikelyLandCard` e vivo via `safeCmcForOptimization`;
   `MLKnowledgeService`, `AiLogService`, `EndpointCache`, push e archetype
   counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem

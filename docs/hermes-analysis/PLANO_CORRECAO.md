@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-14 05:30 UTC
+> Data: 2026-06-14 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -86,10 +86,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-13 07:00 UTC como **ABERTO neste checkout `146b16dc`**. O auditor
-    textual executou com sucesso (`205` arquivos backend, `115` problemas
-    textuais, `0` imports quebrados), mas nao prova ausencia de chamadas; a
-    saida automatica ruidosa foi descartada antes da atualizacao manual.
+    2026-06-14 07:00 UTC como **ABERTO neste checkout `8bb9aff9`**. Desde a
+    rodada focada anterior (`146b16dc..HEAD`), o delta de produto e nulo e
+    apenas `docs/hermes-analysis/PLANO_CORRECAO.md`,
+    `STRUCTURE_AUDIT.md` e `TECHNICAL_MAP.md` mudaram. O auditor textual
+    executou com sucesso (`205` arquivos backend, `115` problemas textuais,
+    `0` imports quebrados), mas nao prova ausencia de chamadas; a saida
+    automatica ruidosa foi descartada antes da atualizacao manual.
     Permanecem abertos `sync_cards_utils.dart` test-only enquanto
     `server/bin/sync_cards.dart` mantem helpers privados/inline;
     `verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser anexado;
@@ -595,17 +598,19 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-13 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
-`146b16dc`**. As anotacoes historicas de resolucao em outros SHAs nao
-representam automaticamente o estado desta branch. A rodada atual manteve os
-achados de maior impacto (`sync_cards_utils.dart` test-only,
+**Status 2026-06-14 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`8bb9aff9`**. Desde a rodada anterior de funcoes (`146b16dc..HEAD`), o delta de
+produto e nulo; mudaram somente os documentos de Hermes analysis. A rodada atual
+manteve os achados de maior impacto (`sync_cards_utils.dart` test-only,
 `verifySwapIntegrity` sem chamador apesar de `swap_integrity` e builders de
 response do optimize fora do fluxo real), confirmou achados menores em wrappers
-app, observabilidade/cache, `MLKnowledgeService.recordFeedback`, read-side de
-`AiLogService`, `ArchetypeCountersService` e
-`PushNotificationService.sendToMultipleTokens`, e corrigiu classificacoes
-ruidosas (`isLikelyLandCard` e vivo via `safeCmcForOptimization`; servicos de
-ML/log/cache/push/counters possuem caminhos vivos parciais).
+app, observabilidade/cache, `ApiClient.loadTokenFromDisk`,
+`MLKnowledgeService.recordFeedback`, read-side de `AiLogService`,
+`ArchetypeCountersService`, `PushNotificationService.sendToMultipleTokens`,
+wrapper Lorehold de Commander Reference e sample helper de aggressive optimize,
+e manteve as classificacoes ruidosas corrigidas (`isLikelyLandCard` e vivo via
+`safeCmcForOptimization`; servicos de ML/log/cache/push/counters possuem caminhos
+vivos parciais).
 
 - **Evidência**:
   - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:121`, `:178` e
@@ -615,7 +620,7 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
     `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
     `_extractCardRowFromSet`, definido em `:662`-`:721`; e legalidades sao
-    montadas inline em `:743`-`:784`. O full sync atual delega para
+    montadas inline em `:766`-`:823`. O full sync atual delega para
     `server/bin/sync_cards_full_fast.py`.
   - `server/routes/ai/optimize/index.dart:752`-`:758` anexa
     `swap_integrity`, mas `verifySwapIntegrity` em
@@ -652,6 +657,13 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     `getTopByCategory`, `calculateFitScore`, `cleanupCache` e `isHighSynergy`
     sem chamador confirmado. Controle positivo: `getHighSynergyCards` e chamado
     em `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`.
+  - `server/lib/ai/commander_reference_card_stats_support.dart:252` define
+    `buildLoreholdReferenceCardStatsFromProfile`, chamado apenas por teste e
+    pela propria delegacao para `buildCommanderReferenceCardStatsFromProfile`;
+    o builder generico segue vivo no mesmo arquivo em `:363`.
+    `server/lib/ai/optimize_runtime_support.dart:1671` define
+    `summarizeAggressiveOptimizeUtilitySamples`, com chamada encontrada apenas
+    em `server/test/optimize_runtime_support_test.dart:215`.
   - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
     sem chamada confirmada; `EndpointCache.instance.get/set` seguem vivos em
     rotas de cards, sets, archetypes e generate performance support.
@@ -665,7 +677,7 @@ ML/log/cache/push/counters possuem caminhos vivos parciais).
     `recordFeedback`, com insert em `ml_prompt_feedback`, mas busca por
     `recordFeedback(` encontrou apenas a definicao; `MLKnowledgeService` segue
     vivo por `getContextForDeck`/`generatePromptContext` em
-    `server/lib/ai/otimizacao.dart:165`-`:173` e `:359`-`:367`.
+    `server/lib/ai/otimizacao.dart:167`-`:173` e `:361`-`:367`.
   - `server/lib/ai/cmc_safety.dart:64`,
     `server/lib/archetype_counters_service.dart:67`/`:104`/`:204`,
     `server/lib/push_notification_service.dart:295` e
