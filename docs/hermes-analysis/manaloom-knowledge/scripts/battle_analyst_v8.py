@@ -1680,6 +1680,17 @@ KNOWN_CARDS = {
         "produces": "G",
         "is_creature_permanent": True,
     },
+    "Gilded Goose": {
+        "effect": "creature",
+        "power": 0,
+        "toughness": 2,
+        "keywords": ["flying"],
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRGC",
+        "is_creature_permanent": True,
+        "creates_food_on_etb": True,
+    },
     "Elvish Spirit Guide": {"effect": "ramp_ritual", "mana_produced": 1, "produces": "G", "instant": True},
     "Tinder Wall": {
         "effect": "creature",

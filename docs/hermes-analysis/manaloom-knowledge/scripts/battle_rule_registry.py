@@ -125,10 +125,16 @@ def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
 def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     effect = str(effect_json.get("effect") or "unknown")
     category = EFFECT_TO_DECK_CATEGORY.get(effect, "unknown")
+    subtype = None
+    if effect == "creature" and effect_json.get("is_mana_source"):
+        category = "ramp"
+        subtype = "mana_dork"
     role = {
         "category": category,
         "effect": effect,
     }
+    if subtype:
+        role["subtype"] = subtype
     if effect_json.get("instant"):
         role["timing"] = "instant"
     if effect_json.get("target"):

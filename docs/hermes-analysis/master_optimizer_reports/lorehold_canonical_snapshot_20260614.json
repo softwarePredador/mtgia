@@ -1,0 +1,850 @@
+{
+  "generated_at": "2026-06-14T18:58:36.286852+00:00",
+  "status": "approved",
+  "local_sqlite_action": "validated_only",
+  "local_backup": null,
+  "deck_id": 6,
+  "documented_server_hash": "12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08",
+  "documented_server_wr": "87.3%",
+  "local_summary": {
+    "deck_id": 6,
+    "cards": 100,
+    "lands": 33,
+    "nonlands": 67,
+    "avg_cmc": 2.97,
+    "hash": "4549bf7d1ebd8bd665cbd79b58fff3b46601cade6fbc4f5bce24c607917ca451",
+    "semantics_hash": "c40595c29b0dea83d6f3e65a71185e865467f9a59534a72c5faa7635388b8739",
+    "ruleset_hash": "af22fd30635a4eb384f949400309762484f0c9480e453eefa912d35562a1eba1"
+  },
+  "canonical_decisions": {
+    "kept_swap": {
+      "add": "Wheel of Misfortune",
+      "remove": "Reforge the Soul"
+    },
+    "reverted_swap": {
+      "add": "Plaza of Heroes",
+      "remove": "Rise of the Eldrazi"
+    }
+  },
+  "validation_errors": [],
+  "role_counts": {
+    "board_wipe": 2,
+    "commander": 1,
+    "draw": 9,
+    "engine": 4,
+    "land": 33,
+    "protection": 14,
+    "ramp": 17,
+    "removal": 3,
+    "tutor": 5,
+    "unknown": 1,
+    "wincon": 11
+  },
+  "cards": [
+    {
+      "quantity": 1,
+      "name": "Lorehold, the Historian",
+      "role": "commander",
+      "functional_tag": "draw",
+      "cmc": 5.0,
+      "type_line": "Legendary Creature — Elder Dragon"
+    },
+    {
+      "quantity": 1,
+      "name": "Ancient Den",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Artifact Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Ancient Tomb",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Arid Mesa",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Battlefield Forge",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Bloodstained Mire",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "City of Brass",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Clifftop Retreat",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Command Tower",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Elegant Parlor",
+      "role": "land",
+      "functional_tag": "draw",
+      "cmc": 0.0,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "quantity": 1,
+      "name": "Flooded Strand",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Gemstone Caverns",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Legendary Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Great Furnace",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Artifact Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Hall of Heliod's Generosity",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Legendary Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Inspiring Vantage",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Inventors' Fair",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Legendary Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Mana Confluence",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Marsh Flats",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Mountain // Mountain",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Basic Land — Mountain"
+    },
+    {
+      "quantity": 1,
+      "name": "Needleverge Pathway // Pillarverge Pathway",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Plains // Plains",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Basic Land — Plains"
+    },
+    {
+      "quantity": 1,
+      "name": "Plateau",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "quantity": 1,
+      "name": "Prismatic Vista",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Rugged Prairie",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Sacred Foundry",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "quantity": 1,
+      "name": "Scalding Tarn",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Spectator Seating",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Sunbaked Canyon",
+      "role": "land",
+      "functional_tag": "draw",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Sunbillow Verge",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Sundown Pass",
+      "role": "land",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Urza's Saga",
+      "role": "land",
+      "functional_tag": "wincon",
+      "cmc": 0.0,
+      "type_line": "Enchantment Land — Urza's Saga"
+    },
+    {
+      "quantity": 1,
+      "name": "War Room",
+      "role": "land",
+      "functional_tag": "draw",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Windswept Heath",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Wooded Foothills",
+      "role": "land",
+      "functional_tag": "land",
+      "cmc": 0.0,
+      "type_line": "Land"
+    },
+    {
+      "quantity": 1,
+      "name": "Lotus Petal",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Mox Amber",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 0.0,
+      "type_line": "Legendary Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Enlightened Tutor",
+      "role": "tutor",
+      "functional_tag": "tutor",
+      "cmc": 1.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Esper Sentinel",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 1.0,
+      "type_line": "Artifact Creature — Human Soldier"
+    },
+    {
+      "quantity": 1,
+      "name": "Faithless Looting",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 1.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Gamble",
+      "role": "tutor",
+      "functional_tag": "tutor",
+      "cmc": 1.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Giver of Runes",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 1.0,
+      "type_line": "Creature — Kor Cleric"
+    },
+    {
+      "quantity": 1,
+      "name": "Land Tax",
+      "role": "tutor",
+      "functional_tag": "tutor",
+      "cmc": 1.0,
+      "type_line": "Enchantment"
+    },
+    {
+      "quantity": 1,
+      "name": "Mana Vault",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 1.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Mother of Runes",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 1.0,
+      "type_line": "Creature — Human Cleric"
+    },
+    {
+      "quantity": 1,
+      "name": "Orim's Chant",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 1.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Path to Exile",
+      "role": "removal",
+      "functional_tag": "removal",
+      "cmc": 1.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Pyroblast",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 1.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Rite of Flame",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 1.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Sensei's Divining Top",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 1.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Silence",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 1.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Sol Ring",
+      "role": "unknown",
+      "functional_tag": "unknown",
+      "cmc": 1.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Swords to Plowshares",
+      "role": "removal",
+      "functional_tag": "removal",
+      "cmc": 1.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Arcane Signet",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 2.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Boros Charm",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 2.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Boros Signet",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 2.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Drannith Magistrate",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 2.0,
+      "type_line": "Creature — Human Wizard"
+    },
+    {
+      "quantity": 1,
+      "name": "Fellwar Stone",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 2.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Grand Abolisher",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 2.0,
+      "type_line": "Creature — Human Cleric"
+    },
+    {
+      "quantity": 1,
+      "name": "Lightning Greaves",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 2.0,
+      "type_line": "Artifact — Equipment"
+    },
+    {
+      "quantity": 1,
+      "name": "Molten Duplication",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 2.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Reverberate",
+      "role": "engine",
+      "functional_tag": "engine",
+      "cmc": 2.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Ruby Medallion",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 2.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Scroll Rack",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 2.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Talisman of Conviction",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 2.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Twinflame",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 2.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 3.0,
+      "type_line": "Legendary Creature — God"
+    },
+    {
+      "quantity": 1,
+      "name": "Deflecting Swat",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Dualcaster Mage",
+      "role": "engine",
+      "functional_tag": "engine",
+      "cmc": 3.0,
+      "type_line": "Creature — Human Wizard"
+    },
+    {
+      "quantity": 1,
+      "name": "Electroduplicate",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 3.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Flawless Maneuver",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Generous Gift",
+      "role": "removal",
+      "functional_tag": "removal",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Guttersnipe",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 3.0,
+      "type_line": "Creature — Goblin Shaman"
+    },
+    {
+      "quantity": 1,
+      "name": "Heat Shimmer",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 3.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Imperial Recruiter",
+      "role": "tutor",
+      "functional_tag": "tutor",
+      "cmc": 3.0,
+      "type_line": "Creature — Human Advisor"
+    },
+    {
+      "quantity": 1,
+      "name": "Jeska's Will",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 3.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Monument to Endurance",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 3.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Ranger-Captain of Eos",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 3.0,
+      "type_line": "Creature — Human Soldier Ranger"
+    },
+    {
+      "quantity": 1,
+      "name": "Recruiter of the Guard",
+      "role": "tutor",
+      "functional_tag": "tutor",
+      "cmc": 3.0,
+      "type_line": "Creature — Human Soldier"
+    },
+    {
+      "quantity": 1,
+      "name": "Reiterate",
+      "role": "engine",
+      "functional_tag": "engine",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Seething Song",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Teferi's Protection",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Valakut Awakening // Valakut Stoneforge",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 3.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Victory Chimes",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 3.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Wheel of Fortune",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 3.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Wheel of Misfortune",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 3.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Aetherflux Reservoir",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 4.0,
+      "type_line": "Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Mizzix's Mastery",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 4.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Past in Flames",
+      "role": "engine",
+      "functional_tag": "engine",
+      "cmc": 4.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Smothering Tithe",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 4.0,
+      "type_line": "Enchantment"
+    },
+    {
+      "quantity": 1,
+      "name": "Storm-Kiln Artist",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 4.0,
+      "type_line": "Creature — Dwarf Shaman"
+    },
+    {
+      "quantity": 1,
+      "name": "The One Ring",
+      "role": "draw",
+      "functional_tag": "draw",
+      "cmc": 4.0,
+      "type_line": "Legendary Artifact"
+    },
+    {
+      "quantity": 1,
+      "name": "Unexpected Windfall",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 4.0,
+      "type_line": "Instant"
+    },
+    {
+      "quantity": 1,
+      "name": "Mana Geyser",
+      "role": "ramp",
+      "functional_tag": "ramp",
+      "cmc": 5.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Fiery Emancipation",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 6.0,
+      "type_line": "Enchantment"
+    },
+    {
+      "quantity": 1,
+      "name": "Rite of the Dragoncaller",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 6.0,
+      "type_line": "Enchantment"
+    },
+    {
+      "quantity": 1,
+      "name": "Approach of the Second Sun",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 7.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Blasphemous Act",
+      "role": "board_wipe",
+      "functional_tag": "board_wipe",
+      "cmc": 9.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Worldfire",
+      "role": "board_wipe",
+      "functional_tag": "board_wipe",
+      "cmc": 9.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Storm Herd",
+      "role": "wincon",
+      "functional_tag": "wincon",
+      "cmc": 10.0,
+      "type_line": "Sorcery"
+    },
+    {
+      "quantity": 1,
+      "name": "Rise of the Eldrazi",
+      "role": "protection",
+      "functional_tag": "protection",
+      "cmc": 12.0,
+      "type_line": "Sorcery"
+    }
+  ],
+  "notes": [
+    "This snapshot is Hermes-local canonical evidence, not a product apply.",
+    "Production/app mutation still requires product owner approval and backup.",
+    "The live Hermes server hash is documented separately because local ignored SQLite copies can drift."
+  ]
+}
