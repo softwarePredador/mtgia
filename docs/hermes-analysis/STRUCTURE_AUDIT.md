@@ -4,9 +4,185 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-14 11:00 UTC
-> Rotacao: `broken-imports-and-circular-dependencies`
+> Atualizacao local Codex: 2026-06-14 15:00 UTC
+> Rotacao: `postgresql-tables-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-14 15:00 UTC
+
+Escopo desta rodada: somente tabelas PostgreSQL sem consumidor claro,
+write-only, count-only ou parcialmente consumidas. Nao foi feita auditoria
+ampla de classes sem uso, funcoes sem chamada, imports/ciclos, duplicacao geral
+ou coerencia entre camadas fora do necessario para validar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `71140cbb`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar
+reabrir claims stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`,
+`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual lista nomes de tabelas por regex,
+mas nao separa DDL, `INSERT`, `DELETE FROM`, `FROM jsonb_to_recordset(...)`,
+contagens operacionais e consumidores reais. A execucao voltou a inserir um
+inventario gerado por causa do texto historico
+`## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+foi removida antes desta atualizacao manual.
+
+### Metodo manual focado
+
+- `git diff --name-status eada6841..HEAD -- app/lib server/lib server/routes server/bin server/database_setup.sql server/test docs/hermes-analysis/manaloom-knowledge/scripts`:
+  sem saida; desde a ultima rodada focada de tabelas nao houve delta de codigo
+  de produto no recorte auditado.
+- `rg` literal para candidatos historicos e tabelas proximas:
+  `deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback`,
+  `commander_reference_decks`, `commander_reference_deck_cards`,
+  `commander_reference_deck_analysis`, `deck_learning_events`,
+  `commander_card_usage`, `commander_learned_decks` e `card_battle_rules`.
+- Varredura de `server/database_setup.sql` cruzando tabelas declaradas com
+  `FROM/JOIN/INSERT INTO/UPDATE/DELETE FROM/TRUNCATE TABLE` em `server/lib`,
+  `server/routes`, `server/bin` e scripts Hermes. Todas as tabelas declaradas
+  ali tiveram ao menos uma leitura `FROM/JOIN` no recorte auditado.
+- Varredura equivalente para tabelas criadas dinamicamente em `server/lib`,
+  `server/routes` e `server/bin`. A triagem destacou
+  `commander_reference_decks reads=0 writes=1`,
+  `commander_reference_deck_cards` sem leitura runtime real confirmada e
+  `commander_reference_deck_analysis reads=1 writes=1`.
+- Separacao manual de `REFERENCES commander_reference_decks`, indices
+  `ON commander_reference_deck_cards`, `DELETE FROM` de limpeza e
+  `FROM jsonb_to_recordset(...)`, que nao sao leitores runtime das tabelas raw.
+- `user_learning_events` foi excluida do achado porque e tabela SQLite local
+  criada em `server/bin/pull_learning_events.py:143`, nao tabela PostgreSQL do
+  produto.
+
+### Achados revalidados
+
+#### P3 - `commander_reference_decks` e `commander_reference_deck_cards` seguem como raw lineage sem leitor direto
+
+- **Tabelas:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **Definicao:** `ensureCommanderReferenceDeckCorpusTables` cria as raws em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:1177` e `:1200`.
+- **Escritas encontradas:** `upsertCommanderReferenceDeckCorpus` faz
+  `INSERT INTO commander_reference_decks` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:1245`, limpa
+  cartas raw por `DELETE FROM commander_reference_deck_cards` em `:1329` e
+  reinsere por `INSERT INTO commander_reference_deck_cards` em `:1345`.
+- **Leitura/consumo encontrado:** busca exata por
+  `FROM/JOIN commander_reference_decks|commander_reference_deck_cards` em
+  `server/lib`, `server/routes`, `server/bin` e scripts Hermes encontrou apenas
+  metadados de schema/indice/FK, o `DELETE FROM` de limpeza e o insert via
+  `FROM jsonb_to_recordset(@rows::jsonb)` em `:1368`; nenhum deles le as raws
+  como fonte de produto.
+- **Controle positivo:** o produto consome o agregado
+  `commander_reference_deck_analysis`: `loadCommanderReferenceDeckCorpusGuidance`
+  le `FROM commander_reference_deck_analysis` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:389`, e o mesmo
+  helper escreve o agregado em `:1394`.
+- **Por que parece parcialmente consumida:** as raws podem ser uteis para
+  lineage, auditoria ou reprocessamento, mas o codigo vivo confirmado consome o
+  agregado, nao as raws. Sem politica explicita de retencao/reprocessamento,
+  elas seguem como persistencia raw sem consumidor direto.
+- **O que valida:** documentar as duas tabelas como lineage/audit com retencao e
+  job de reprocessamento, ou adicionar job/rota que leia as raws com teste.
+- **O que falsifica:** `SELECT/JOIN` vivo sobre as raws, fora de setup/escrita,
+  ou remocao das raws mantendo apenas o agregado consumido.
+
+#### P3 - `ml_prompt_feedback` segue sem fluxo real de feedback e sem DDL local
+
+- **Tabela/referencia:** `ml_prompt_feedback`.
+- **DDL local encontrado:** nenhum `CREATE TABLE ... ml_prompt_feedback` em
+  `server/database_setup.sql`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test`, `app/lib` ou scripts Hermes auditados nesta rodada.
+- **Escrita potencial:** `MLKnowledgeService.recordFeedback` define
+  `INSERT INTO ml_prompt_feedback` em
+  `server/lib/ml_knowledge_service.dart:251` e `:264`.
+- **Chamador encontrado:** `rg -n "recordFeedback\(|ml_prompt_feedback" server app docs/hermes-analysis/manaloom-knowledge/scripts`
+  retornou somente a definicao/insert do helper e a leitura count-only de
+  `/ai/ml-status`.
+- **Leitura encontrada:** `/ai/ml-status` executa apenas
+  `SELECT COUNT(*)::int as c FROM ml_prompt_feedback` em
+  `server/routes/ai/ml-status/index.dart:98`.
+- **Por que parece risco residual:** nao ha coleta runtime confirmada nem
+  consumidor do payload de feedback; a contagem operacional depende de schema
+  historico/externo porque o DDL nao esta no checkout atual.
+- **O que valida:** reintroduzir DDL/migration versionada, chamar
+  `recordFeedback(...)` em fluxo real e consumir o payload em treino/tuning/UX
+  com teste.
+- **O que falsifica:** remover a referencia de count/insert se a coleta foi
+  descartada, ou apontar migration externa versionada e chamador runtime real.
+
+### Suspeitas descartadas nesta rodada
+
+- Nao surgiu novo achado P1/P2 app-facing de tabela sem uso: o delta de codigo
+  de produto desde `eada6841` e nulo no recorte auditado.
+- `deck_matchups` nao esta write-only no checkout `71140cbb`:
+  `/ai/simulate-matchup` chama `_loadStoredMatchup` em
+  `server/routes/ai/simulate-matchup/index.dart:382`, le
+  `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:458`-`:463`,
+  escreve o upsert em `:392`-`:403` e retorna `stored_matchup.previous` em
+  `:430`-`:435`.
+- `deck_weakness_reports` nao esta write-only:
+  `/ai/weakness-analysis` escreve reports em
+  `server/routes/ai/weakness-analysis/index.dart:484`-`:499`, chama
+  `_loadWeaknessHistory` em `:506`, le resumo por severidade em `:572`-`:579`,
+  le os ultimos 10 registros em `:588`-`:596` e retorna `history` em `:559`.
+  O campo `addressed` ainda nao teve update confirmado, mas isso nao torna a
+  tabela sem consumidor.
+- `deck_learning_events`, `commander_card_usage` e `commander_learned_decks`
+  seguem com escritores/leitores reais: `server/bin/pull_learning_events.py:72`
+  le eventos pendentes e `:130` marca sincronizados;
+  `server/lib/ai/deck_learning_event_support.dart:59` atualiza
+  `commander_card_usage`, `:119` le hot cards, `:197` e `:225` gravam eventos;
+  `/ai/commander-learning` le `commander_learned_decks` em
+  `server/routes/ai/commander-learning/index.dart:87` e `:129`; e
+  `/ai/commander-reference` tambem le `commander_learned_decks` em
+  `server/routes/ai/commander-reference/index.dart:533`.
+- `card_battle_rules` nao e unused: alem do DDL em
+  `server/database_setup.sql:109` e `server/bin/migrate.dart:493`,
+  `server/bin/auto_promote_battle_rules.py:116` le a tabela e `:131`, `:141`
+  e `:158` atualizam; `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py:166`,
+  `:174` e `:417` leem, e `:219`, `:240`, `:343` e `:354` atualizam/inserem;
+  `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py:206`
+  faz join para montar o deck alvo.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md:285`-`:286` ainda descreve
+  `deck_matchups` e `deck_weakness_reports` como write-only, mas a evidencia de
+  codigo acima falsifica essa claim. O arquivo nao foi editado porque as regras
+  desta rotacao limitam escrita a `STRUCTURE_AUDIT.md` e, se necessario,
+  `PLANO_CORRECAO.md`/`TECHNICAL_MAP.md`.
+
+### Resultado desta revalidacao
+
+No checkout `71140cbb`, nao apareceu novo achado P1/P2 app-facing para tabelas
+PostgreSQL sem uso. Permanecem abertos os mesmos riscos P3: as raws
+`commander_reference_decks` / `commander_reference_deck_cards` ainda nao tem
+leitor direto confirmado, e `ml_prompt_feedback` continua sem DDL local,
+chamador runtime ou consumidor de payload alem de contagem operacional.
 
 ## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-14 11:00 UTC
 

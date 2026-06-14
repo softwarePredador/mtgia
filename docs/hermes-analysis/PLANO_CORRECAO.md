@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-14 11:00 UTC
+> Data: 2026-06-14 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -44,18 +44,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    excecao intencional por regra externa/Game Changer; `commander_fallback_policy.dart`
    e policy versionada com risco residual se crescer sem fonte/confidence.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-13 15:00 UTC no checkout
-   `eada6841`. Desde `129d647f`, o delta ate HEAD e somente documental. As
-   claims antigas contra `deck_matchups` e `deck_weakness_reports` estao stale:
-   ambas agora sao lidas no runtime e retornadas no payload das proprias rotas
-   experimentais. Tambem nao devem ser tratadas como sem uso
-   `commander_learned_decks`, `deck_learning_events`, `commander_card_usage` e
-   `card_battle_rules`, que possuem writers/readers em rotas, jobs ou scripts
-   operacionais. Restam como riscos menores as raws
-   `commander_reference_decks` / `commander_reference_deck_cards` sem leitor
-   direto confirmado e `ml_prompt_feedback`, que tem helper de insert sem
-   chamador, count-only em `/ai/ml-status` e nenhum DDL local encontrado neste
-   checkout.
+   revalidado na rotacao local Codex de 2026-06-14 15:00 UTC no checkout
+   `71140cbb`. Desde `eada6841`, nao houve delta de codigo de produto em
+   `app/lib`, `server/lib`, `server/routes`, `server/bin`,
+   `server/database_setup.sql` ou `server/test`. As claims antigas contra
+   `deck_matchups` e `deck_weakness_reports` estao stale: ambas agora sao lidas
+   no runtime e retornadas no payload das proprias rotas experimentais. Tambem
+   nao devem ser tratadas como sem uso `commander_learned_decks`,
+   `deck_learning_events`, `commander_card_usage` e `card_battle_rules`, que
+   possuem writers/readers em rotas, jobs ou scripts operacionais. Restam como
+   riscos menores as raws `commander_reference_decks` /
+   `commander_reference_deck_cards` sem leitor direto confirmado e
+   `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
+   `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-14 03:00 UTC no checkout `c80118e2`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
@@ -809,13 +810,15 @@ vivos parciais).
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-13 15:00 UTC: REVALIDADO no checkout `eada6841`.** A rodada
+- **Status 2026-06-14 15:00 UTC: REVALIDADO no checkout `71140cbb`.** A rodada
   local focada em `postgresql-tables-not-used` revalidou os achados historicos
   com `rg` literal, varredura de `server/database_setup.sql` e varredura de
   tabelas criadas dinamicamente em `server/lib`, `server/routes` e `server/bin`,
-  cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. O delta
-  de codigo desde a ultima rodada focada (`129d647f..HEAD`) e somente
-  documental. Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
+  cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. Desde a
+  rodada anterior (`eada6841..HEAD`), nao houve delta de codigo de produto em
+  `app/lib`, `server/lib`, `server/routes`, `server/bin`,
+  `server/database_setup.sql`, `server/test` ou scripts Hermes auditados. Nao
+  houve novo achado P1/P2 app-facing. `deck_matchups` e
   `deck_weakness_reports` nao continuam write-only: ambas possuem leitores
   runtime e campos retornados no payload das rotas. `card_battle_rules` tambem
   nao foi classificada como unused, porque jobs/scripts Hermes leem, atualizam
@@ -850,7 +853,7 @@ vivos parciais).
   - `commander_reference_decks` e `commander_reference_deck_cards` sao definidas
     em `server/lib/ai/commander_reference_deck_corpus_support.dart:1177` e
     `:1200`, recebem insert/delete/insert em `:1245`, `:1329` e `:1345`, mas
-    nao possuem `SELECT/JOIN` confirmado; o produto consome o agregado
+    nao possuem `SELECT/JOIN` runtime confirmado; o produto consome o agregado
     `commander_reference_deck_analysis` em `:389`.
   - `card_battle_rules` foi descartada como achado: alem do DDL em
     `server/database_setup.sql:109` e `server/bin/migrate.dart:493`,

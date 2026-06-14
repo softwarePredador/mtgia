@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 15:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -305,21 +305,23 @@ Game Changer, nao um modelo geral de utilidade de carta.
   counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem
   consumidor.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-13 15:00 UTC no checkout local `eada6841`. Desde a ultima rodada
-  focada (`129d647f`), o delta ate HEAD e somente documental. Nao houve novo
-  achado P1/P2 app-facing. As claims antigas contra `deck_matchups` e
-  `deck_weakness_reports` continuam stale: ambas tem leitura runtime e campos
-  retornados no payload das rotas experimentais (`stored_matchup` em
-  `/ai/simulate-matchup` e `history` em `/ai/weakness-analysis`). A varredura de
-  `server/database_setup.sql` tambem nao encontrou nova tabela declarada ali sem
-  leitura. `deck_learning_events`, `commander_card_usage`,
-  `commander_learned_decks` e `card_battle_rules` seguem como controles
-  positivos por terem writers/readers em rotas, jobs ou scripts operacionais.
-  Permanecem como riscos menores: `commander_reference_decks` e
-  `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN` direto
-  confirmado, enquanto o produto le o agregado `commander_reference_deck_analysis`;
-  e `ml_prompt_feedback` tem insert helper sem chamador, leitura apenas
-  `COUNT(*)` em `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
+  em 2026-06-14 15:00 UTC no checkout local `71140cbb`. Desde a ultima rodada
+  focada (`eada6841`), nao houve delta de codigo de produto em `app/lib`,
+  `server/lib`, `server/routes`, `server/bin`, `server/database_setup.sql` ou
+  `server/test`. Nao houve novo achado P1/P2 app-facing. As claims antigas
+  contra `deck_matchups` e `deck_weakness_reports` continuam stale: ambas tem
+  leitura runtime e campos retornados no payload das rotas experimentais
+  (`stored_matchup` em `/ai/simulate-matchup` e `history` em
+  `/ai/weakness-analysis`). A varredura de `server/database_setup.sql` tambem
+  nao encontrou nova tabela declarada ali sem leitura. `deck_learning_events`,
+  `commander_card_usage`, `commander_learned_decks` e `card_battle_rules`
+  seguem como controles positivos por terem writers/readers em rotas, jobs ou
+  scripts operacionais. Permanecem como riscos menores:
+  `commander_reference_decks` e `commander_reference_deck_cards` persistem raw
+  corpus sem `SELECT/JOIN` direto confirmado, enquanto o produto le o agregado
+  `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem insert helper
+  sem chamador, leitura apenas `COUNT(*)` em `/ai/ml-status` e nenhum DDL local
+  encontrado neste checkout.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
