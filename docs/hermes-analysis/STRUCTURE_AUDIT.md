@@ -4,9 +4,850 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-14 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-14 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre `server/lib` ↔ `server/routes` ↔ `app/lib` - revalidacao 2026-06-14 23:00 UTC
+
+Escopo desta rodada: somente coerencia de contratos, ownership e consumo entre
+helpers de `server/lib`, handlers de `server/routes` e consumidores em
+`app/lib`. Nao foi executada auditoria ampla de classes sem uso, funcoes sem
+chamador, imports/ciclos, tabelas PostgreSQL sem uso ou duplicacao geral fora
+do necessario para validar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `a81fd69a`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar claims
+stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
+`server/routes`, nao cobre consumidores Flutter em `app/lib`, nao compila a app
+e nao constroi grafo de contratos entre provider, rota e helper. Portanto, a
+evidencia abaixo veio de `rg`, `nl -ba`, leitura direta e um `dart analyze`
+focado nas rotas backend relacionadas.
+
+### Metodo manual focado
+
+- `git diff --name-status 2a1963d3..HEAD -- app/lib server/lib server/routes server/bin server/database_setup.sql server/test app/test server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/hermes-analysis`:
+  no recorte de produto app/backend, o delta desde a ultima rodada deste mesmo
+  foco continua nulo; apareceram apenas mudancas documentais em
+  `docs/hermes-analysis/PLANO_CORRECAO.md`,
+  `docs/hermes-analysis/STRUCTURE_AUDIT.md` e
+  `docs/hermes-analysis/TECHNICAL_MAP.md`.
+- `rg -n "deck_rebuild_created|_allowedEvents|activation-events" app/lib app/test server/routes server/test --glob '*.dart'`.
+- `rg -n "/ai/commander-learning|commander_learned_decks|fetchCommanderLearning|CommanderLearning|commanderLearning|learned decks|learned_deck" app/lib server/routes server/lib server/test app/test server/doc/API_CONTRACTS_AND_DATA_MAP.md --glob '*.dart' --glob '*.md'`.
+- `rg -n "/ai/commander-learning|commander_learned_decks" server/doc/API_CONTRACTS_AND_DATA_MAP.md`: sem saida.
+- `rg -n "OpenAI|openai|http|Scryfall|MTGTop8|EDHREC|client|package:http" server/routes/ai/commander-learning/index.dart`: encontrou apenas o import local de `http_responses.dart`.
+- `cd server && dart analyze routes/ai/commander-learning/index.dart routes/users/me/activation-events/index.dart routes/ai/_middleware.dart`: `No issues found!`.
+
+### Achados revalidados
+
+#### P1/P2 - `deck_rebuild_created` continua emitido/testado no app, mas rejeitado pela allow-list backend
+
+- **Emissao app:** `app/lib/features/decks/providers/deck_provider.dart:603`-`:614`
+  chama `_trackActivationEvent('deck_rebuild_created', ...)` quando
+  `rebuildDeck` cria `draftDeckId`.
+- **Teste app:** `app/test/features/decks/providers/deck_provider_test.dart:874`-`:891`
+  espera explicitamente que o provider registre `deck_rebuild_created`.
+- **Allow-list backend:** `server/routes/users/me/activation-events/index.dart:10`-`:18`
+  permite apenas `core_flow_started`, `format_selected`,
+  `base_choice_generate`, `base_choice_import`, `deck_created`,
+  `deck_optimized` e `onboarding_completed`.
+- **Rejeicao:** `server/routes/users/me/activation-events/index.dart:42`-`:48`
+  retorna `badRequest('event_name inválido')` quando o evento nao esta em
+  `_allowedEvents`.
+- **Por que e incoerente:** o provider trata o rebuild draft como evento real
+  de ativacao, mas a rota app-facing que recebe telemetria descarta o evento.
+  Como `_trackActivationEvent` e side effect auxiliar, o fluxo de rebuild pode
+  seguir e esconder a perda de telemetria.
+- **O que valida/falsifica:** adicionar `deck_rebuild_created` a
+  `_allowedEvents` com teste de rota, ou remover/renomear a emissao no app e
+  ajustar o teste do provider.
+
+#### P1/P2 - `GET /ai/commander-learning` e app-facing, mas segue ausente do API contract map
+
+- **UI app:** `app/lib/features/decks/screens/deck_generate_screen.dart:127`-`:143`
+  carrega disponibilidade de decks aprendidos no primeiro frame; `:257`-`:259`
+  chama o provider para buscar um deck aprendido por comandante.
+- **Provider app:** `app/lib/features/decks/providers/deck_provider.dart:778`-`:801`
+  chama `GET /ai/commander-learning?commander=...`; `:804`-`:824` chama
+  `GET /ai/commander-learning` e parseia `commanders[]`.
+- **Cobertura app:** `app/test/features/decks/providers/deck_provider_test.dart:352`-`:377`
+  prova a listagem do endpoint; `app/test/features/decks/screens/deck_flow_entry_screens_test.dart:16`-`:32`
+  simula as duas formas de chamada e `:179`-`:188` valida que a tela usou o
+  endpoint com query.
+- **Rota backend:** `server/routes/ai/commander-learning/index.dart:10`-`:27`
+  retorna `available`, `source`, `count` e `commanders[]` sem query; `:43`-`:53`
+  retorna `promoted_deck` e `recommended_deck` com `commander`.
+- **Fonte de dados:** `server/routes/ai/commander-learning/index.dart:67`-`:92`
+  e `:106`-`:132` leem `commander_learned_decks`; o helper/modelo declara a
+  tabela em `server/lib/ai/commander_learned_deck_support.dart:7` e o DDL em
+  `:283`-`:318`.
+- **Doc ausente:** busca literal por `/ai/commander-learning` ou
+  `commander_learned_decks` em `server/doc/API_CONTRACTS_AND_DATA_MAP.md` nao
+  retornou linhas; a lista de data sources em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:314` tambem nao inclui
+  `commander_learned_decks`.
+- **Por que e incoerente:** a rota ja e consumida por UI e provider reais, mas
+  o contrato canonico ainda nao documenta metodo, payloads, status,
+  consumidores, fonte de dados, testes ou compatibilidade.
+- **O que valida/falsifica:** adicionar o contrato de
+  `GET /ai/commander-learning` ao API map, incluindo as variantes sem/com
+  `commander`, `commander_learned_decks`, consumidores app e tests; ou remover
+  o consumo app se o endpoint nao deve ser app-facing.
+
+#### P2 - Consulta automatica de learned decks herda middleware de IA custosa apesar de ser leitura local de PostgreSQL
+
+- **Middleware global de `/ai`:** `server/routes/ai/_middleware.dart:16`-`:20`
+  aplica `authMiddleware()`, `aiPlanLimitMiddleware()` e `aiRateLimit()` a todas
+  as rotas em `server/routes/ai`.
+- **Plano:** `server/lib/plan_middleware.dart:20`-`:53` busca o snapshot do
+  plano e retorna `402` quando o plano esta inativo ou sem
+  `aiRequestsRemaining`.
+- **Rate limit IA:** `server/lib/rate_limit_middleware.dart:167`-`:174` define
+  bucket AI de 10/min em producao e 60/min em dev; `:340`-`:400` retorna `429`
+  quando o bucket estoura.
+- **Handler local:** `server/routes/ai/commander-learning/index.dart:18`-`:53`
+  abre `Pool`, consulta PostgreSQL e monta JSON; busca focada por
+  `OpenAI|openai|http|Scryfall|MTGTop8|EDHREC|client|package:http` nesse arquivo
+  encontrou apenas `http_responses.dart`, sem chamada LLM/externa.
+- **Acoplamento app:** `app/lib/features/decks/screens/deck_generate_screen.dart:127`-`:130`
+  carrega disponibilidade automaticamente ao abrir a tela de geracao.
+- **Por que e incoerente:** a disponibilidade de decks aprendidos pode falhar
+  por `402/429` de IA mesmo sendo uma leitura local de `commander_learned_decks`
+  e disparada automaticamente pela UI, sem o usuario solicitar geracao/LLM.
+- **O que valida/falsifica:** documentar/testar explicitamente que learned decks
+  sao uma capacidade de IA sujeita a `402/429`; ou mover/isentar a rota do
+  middleware de IA custosa com teste garantindo que a disponibilidade local
+  carrega sem consumir/bloquear cota.
+
+### Suspeitas revalidadas e nao reabertas
+
+- Ownership em `POST /ai/optimize`, `POST /ai/archetypes` e polling async nao
+  foi reaberto: desde a ultima rodada deste mesmo foco nao houve delta de
+  produto em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test` ou `app/test`, e os achados anteriores ja estavam marcados
+  stale por escopo `id + user_id`/job owner.
+- `/community/decks/following` tambem nao foi reaberto: o API map atual aponta
+  a rota dedicada `server/routes/community/decks/following/index.dart` como
+  contrato app-facing, mantendo a branch dinamica apenas como compatibilidade.
+
+### Resultado desta revalidacao
+
+Nao surgiu novo achado confiavel alem dos tres gaps de coerencia ja abertos.
+A diferenca desde a ultima rodada deste mesmo foco segue documental, mas os
+tres gaps foram rechecados em `HEAD=a81fd69a` com evidencia atual de
+`app/lib`, `server/routes`, `server/lib`, testes e API map.
+
+## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-14 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi feita auditoria ampla de classes sem uso, funcoes sem chamador, imports,
+ciclos, tabelas PostgreSQL ou coerencia entre camadas fora deste foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `6953df1f`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar
+reabrir claims stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`,
+`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual detecta duplicacao por nomes de
+funcoes/regex e mistura helpers reais com tokens SQL, palavras de prompts e
+wrappers finos. A execucao voltou a inserir inventario gerado por causa do
+marcador historico do arquivo; essa lista bruta nao foi usada como evidencia
+direta na rodada de duplicacao.
+
+## Historico gerado pelo auditor estrutural anterior
+
+## Arquivos Mapeados
+- `server/lib/`: 116 arquivos
+- `server/routes/`: 89 arquivos
+- **Total**: 205 arquivos
+
+## Classes por Arquivo
+- `AdvancedAnalysisResult` → `server/lib/ai/deck_advanced_analysis.dart`
+- `AggressiveCandidateQualitySignal` → `server/lib/ai/optimize_candidate_quality_support.dart`
+- `AiGenerateJob` → `server/lib/ai_generate_job.dart`
+- `AiGenerateJobStore` → `server/lib/ai_generate_job.dart`
+- `AiGenerateOpenAiTimeoutSelection` → `server/lib/ai_generate_performance_support.dart`
+- `AiLogService` → `server/lib/ai_log_service.dart`
+- `ArchetypeCountersService` → `server/lib/archetype_counters_service.dart`
+- `ArchetypePattern` → `server/lib/ml_knowledge_service.dart`
+- `AuthService` → `server/lib/auth_service.dart`
+- `BattleResult` → `server/lib/ai/battle_simulator.dart`
+- `BattleSimulator` → `server/lib/ai/battle_simulator.dart`
+- `BracketFilterDecision` → `server/lib/edh_bracket_policy.dart`
+- `BracketPolicy` → `server/lib/edh_bracket_policy.dart`
+- `BracketTagResult` → `server/lib/edh_bracket_policy.dart`
+- `CandidateFunctionTag` → `server/lib/ai/candidate_quality_data_support.dart`
+- `CandidateRoleScore` → `server/lib/ai/candidate_quality_data_support.dart`
+- `CardInsight` → `server/lib/ml_knowledge_service.dart`
+- `CardRecommendation` → `server/lib/ml_knowledge_service.dart`
+- `CardResolutionDecision` → `server/lib/card_resolution_support.dart`
+- `CardRoles` → `server/lib/ai/optimization_functional_roles.dart`
+- `CardValidationService` → `server/lib/card_validation_service.dart`
+- `ColorIdentityBackfillDecision` → `server/lib/mtg_data_integrity_support.dart`
+- `ComboVariant` → `server/lib/ai/commander_spellbook_service.dart`
+- `CommanderLearnedDeckCardLine` → `server/lib/ai/commander_learned_deck_support.dart`
+- `CommanderLearnedDeckInput` → `server/lib/ai/commander_learned_deck_support.dart`
+- `CommanderLearnedDeckValidationResult` → `server/lib/ai/commander_learned_deck_support.dart`
+- `CommanderReferenceArchetypeStatsLoadResult` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCardStat` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCardStatsLoadResult` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCardStatsResolution` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCommanderCardResolution` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `CommanderReferenceCorpusPackages` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceCorpusSummary` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckAnalysis` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckCardInput` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckCorpusGuidance` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceDeckInput` → `server/lib/ai/commander_reference_deck_corpus_support.dart`
+- `CommanderReferenceReadinessInputs` → `server/lib/ai/commander_reference_readiness_support.dart`
+- `CommanderReferenceReadinessRuntimeProof` → `server/lib/ai/commander_reference_readiness_support.dart`
+- `CommanderReferenceReadinessScorecard` → `server/lib/ai/commander_reference_readiness_support.dart`
+- `CommanderShellMetadata` → `server/lib/meta/meta_deck_commander_shell_support.dart`
+- `CommanderSpellbookService` → `server/lib/ai/commander_spellbook_service.dart`
+- `CompleteBuildAccumulator` → `server/lib/ai/optimize_complete_support.dart`
+- `Database` → `server/lib/database.dart`
+- `DeckArchetypeAnalyzer` → `server/routes/ai/optimize/index.dart`
+- `DeckArchetypeAnalyzerCore` → `server/lib/ai/optimize_state_support.dart`
+- `DeckComboMatch` → `server/lib/ai/commander_spellbook_service.dart`
+- `DeckCombosResult` → `server/lib/ai/commander_spellbook_service.dart`
+- `DeckOptimizationState` → `server/routes/ai/optimize/index.dart`
+- `DeckOptimizationStateResult` → `server/lib/ai/optimize_state_support.dart`
+- `DeckOptimizerService` → `server/lib/ai/otimizacao.dart`
+- `DeckRulesException` → `server/lib/deck_rules_service.dart`
+- `DeckRulesService` → `server/lib/deck_rules_service.dart`
+- `DeckThemeProfile` → `server/routes/ai/optimize/index.dart`
+- `DeckThemeProfileResult` → `server/lib/ai/optimize_state_support.dart`
+- `DistributedRateLimiter` → `server/lib/distributed_rate_limiter.dart`
+- `EdhTop16TournamentEntry` → `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `EdhrecAverageDeckCard` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecAverageDeckData` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecCard` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecCardTrend` → `server/lib/ai/edhrec_trend_service.dart`
+- `EdhrecCommanderData` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecService` → `server/lib/ai/edhrec_service.dart`
+- `EdhrecTrendService` → `server/lib/ai/edhrec_trend_service.dart`
+- `EmptySuggestionFallbackApplication` → `server/lib/ai/optimize_route_empty_fallback_support.dart`
+- `EndpointCache` → `server/lib/endpoint_cache.dart`
+- `EndpointMetricSnapshot` → `server/lib/request_metrics_service.dart`
+- `ExpandedDeckCard` → `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `ExpandedTopDeckDeck` → `server/lib/meta/external_commander_deck_expansion_support.dart`
+- `ExternalCommanderMetaCandidate` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateIllegalCard` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateLegalityEvidence` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateLegalityRepository` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateUnresolvedCard` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaCandidateValidationResult` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaControlledSourcePolicy` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `ExternalCommanderMetaEligibilityBatch` → `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+- `ExternalCommanderMetaEligibilityDecision` → `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+- `ExternalCommanderMetaImportConfig` → `server/lib/meta/external_commander_meta_import_support.dart`
+- `ExternalCommanderMetaOperationalConfig` → `server/lib/meta/external_commander_meta_operational_runner_support.dart`
+- `ExternalCommanderMetaPersistencePlan` → `server/lib/meta/external_commander_meta_import_support.dart`
+- `ExternalCommanderMetaPromotionConfig` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionInsertPlan` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionIssue` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionPlan` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionResult` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaPromotionSnapshot` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `ExternalCommanderMetaStagingConfig` → `server/lib/meta/external_commander_meta_staging_support.dart`
+- `ExternalCommanderMetaStagingPlan` → `server/lib/meta/external_commander_meta_staging_support.dart`
+- `ExternalCommanderMetaValidationIssue` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `FormatStaplesService` → `server/lib/ai/format_staples_service.dart`
+- `FunctionalCardTag` → `server/lib/ai/functional_card_tags.dart`
+- `FunctionalDeckSummary` → `server/lib/ai/functional_card_tags.dart`
+- `FunctionalReport` → `server/lib/ai/optimization_validator.dart`
+- `GameAction` → `server/lib/ai/battle_simulator.dart`
+- `GameCard` → `server/lib/ai/battle_simulator.dart`
+- `GeneratedDeckRepository` → `server/lib/generated_deck_validation_service.dart`
+- `GeneratedDeckValidationResult` → `server/lib/generated_deck_validation_service.dart`
+- `GeneratedDeckValidationService` → `server/lib/generated_deck_validation_service.dart`
+- `GoldfishResult` → `server/lib/ai/goldfish_simulator.dart`
+- `GoldfishSimulator` → `server/lib/ai/goldfish_simulator.dart`
+- `HateCardsService` → `server/lib/ai/hate_cards_service.dart`
+- `ImportListParseResult` → `server/lib/import_list_service.dart`
+- `InternalAiRequestToken` → `server/lib/internal_ai_request_token.dart`
+- `Log` → `server/lib/logger.dart`
+- `MLContext` → `server/lib/ml_knowledge_service.dart`
+- `MLKnowledgeService` → `server/lib/ml_knowledge_service.dart`
+- `Magic` → `server/routes/ai/generate/index.dart`
+- `ManaAnalysis` → `server/routes/decks/[id]/analysis/index.dart`
+- `MarketMoversCache` → `server/lib/market_movers.dart`
+- `MatchupAnalyzer` → `server/lib/ai/goldfish_simulator.dart`
+- `MatchupResult` → `server/lib/ai/goldfish_simulator.dart`
+- `MetaDeckAnalyticsContext` → `server/lib/meta/meta_deck_analytics_support.dart`
+- `MetaDeckFormatDescriptor` → `server/lib/meta/meta_deck_format_support.dart`
+- `MetaDeckReferenceCandidate` → `server/lib/meta/meta_deck_reference_support.dart`
+- `MetaDeckReferenceQueryParts` → `server/lib/meta/meta_deck_reference_support.dart`
+- `MetaDeckReferenceSelectionResult` → `server/lib/meta/meta_deck_reference_support.dart`
+- `MonteCarloComparison` → `server/lib/ai/optimization_validator.dart`
+- `MtgTop8EventDeckRow` → `server/lib/meta/mtgtop8_meta_support.dart`
+- `MulliganReport` → `server/lib/ai/optimization_validator.dart`
+- `NotificationService` → `server/lib/notification_service.dart`
+- `OpenAiRuntimeConfig` → `server/lib/openai_runtime_config.dart`
+- `OptimizationSemanticV2EnforcementDecision` → `server/lib/ai/optimization_functional_roles.dart`
+- `OptimizationSwapGateResult` → `server/lib/ai/optimization_quality_gate.dart`
+- `OptimizationValidator` → `server/lib/ai/optimization_validator.dart`
+- `OptimizeAiFallbackRetryPlan` → `server/lib/ai/optimize_route_retry_support.dart`
+- `OptimizeBracketPolicyFilterResult` → `server/lib/ai/optimize_route_bracket_policy_filter_support.dart`
+- `OptimizeColorIdentityFilterResult` → `server/lib/ai/optimize_route_color_identity_filter_support.dart`
+- `OptimizeCompleteTopUpResult` → `server/lib/ai/optimize_route_complete_top_up_support.dart`
+- `OptimizeCompleteTopUpSeed` → `server/lib/ai/optimize_route_complete_top_up_support.dart`
+- `OptimizeDeckContextData` → `server/lib/ai/optimize_request_support.dart`
+- `OptimizeDeckContextException` → `server/lib/ai/optimize_request_support.dart`
+- `OptimizeInitialSuggestionFilterResult` → `server/lib/ai/optimize_route_suggestion_filter_support.dart`
+- `OptimizeIntensityConfig` → `server/lib/ai/optimize_runtime_support.dart`
+- `OptimizeJob` → `server/lib/ai/optimize_job.dart`
+- `OptimizeJobStore` → `server/lib/ai/optimize_job.dart`
+- `OptimizeLandRemovalProtectionResult` → `server/lib/ai/optimize_route_land_removal_protection_support.dart`
+- `OptimizePostValidationSummary` → `server/lib/ai/optimize_route_post_validation_support.dart`
+- `OptimizeRebalancePlan` → `server/lib/ai/optimize_route_rebalance_support.dart`
+- `OptimizeRebalanceReplacementApplication` → `server/lib/ai/optimize_route_rebalance_support.dart`
+- `OptimizeRebalanceTrimResult` → `server/lib/ai/optimize_route_rebalance_support.dart`
+- `OptimizeRouteRequestData` → `server/lib/ai/optimize_route_request_support.dart`
+- `OptimizeRouteValidationResult` → `server/lib/ai/optimize_route_validator_support.dart`
+- `OptimizeStageTelemetry` → `server/lib/ai/optimize_stage_telemetry.dart`
+- `OptimizeVirtualPostAnalysisResult` → `server/lib/ai/optimize_route_virtual_analysis_support.dart`
+- `ParsedMetaDeckCardEntry` → `server/lib/meta/meta_deck_card_list_support.dart`
+- `ParsedMetaDeckCardList` → `server/lib/meta/meta_deck_card_list_support.dart`
+- `PlanService` → `server/lib/plan_service.dart`
+- `PlayerState` → `server/lib/ai/battle_simulator.dart`
+- `PostgresExternalCommanderMetaCandidateLegalityRepository` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `PostgresGeneratedDeckRepository` → `server/lib/generated_deck_validation_service.dart`
+- `PushNotificationService` → `server/lib/push_notification_service.dart`
+- `RateLimiter` → `server/lib/rate_limit_middleware.dart`
+- `RebuildException` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildGuidedService` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildResult` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildScopeDecision` → `server/lib/ai/rebuild_guided_service.dart`
+- `RebuildTargetProfile` → `server/lib/ai/rebuild_guided_service.dart`
+- `ReferenceGeneratedCardsIdentityFilterResult` → `server/lib/ai/commander_reference_generate_fallback_support.dart`
+- `ReferenceGeneratedDeckEvaluation` → `server/lib/ai/commander_reference_card_stats_support.dart`
+- `RequestMetricsService` → `server/lib/request_metrics_service.dart`
+- `RequestTrace` → `server/lib/request_trace.dart`
+- `SemanticCardAnalysisV2` → `server/lib/ai/functional_card_tags.dart`
+- `SwapFunctionalAnalysis` → `server/lib/ai/optimization_validator.dart`
+- `SwapIntegrity` → `server/lib/ai/optimize_swap_integrity.dart`
+- `SynergyEngine` → `server/lib/ai/sinergia.dart`
+- `SynergyPackage` → `server/lib/ml_knowledge_service.dart`
+- `ThemeCheck` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `ThemeContextualRule` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `ThemeContextualRulesService` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `ThemeValidationResult` → `server/lib/ai/theme_contextual_rules_service.dart`
+- `UserPlanSnapshot` → `server/lib/plan_service.dart`
+- `ValidationReport` → `server/lib/ai/optimization_validator.dart`
+- `_CacheItem` → `server/lib/endpoint_cache.dart`
+- `_CachedAverageDeckResult` → `server/lib/ai/edhrec_service.dart`
+- `_CachedResult` → `server/lib/ai/edhrec_service.dart`
+- `_Card` → `server/lib/ai/deck_advanced_analysis.dart`
+- `_CardData` → `server/lib/deck_rules_service.dart`
+- `_CopyCounter` → `server/lib/deck_rules_service.dart`
+- `_DeckMetrics` → `server/routes/decks/[id]/ai-analysis/index.dart`
+- `_DeckStats` → `server/lib/ai/goldfish_simulator.dart`
+- `_EndpointMetricBucket` → `server/lib/request_metrics_service.dart`
+- `_ExternalCommanderMetaParsedCardEntry` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `_InfluencedCardInsight` → `server/lib/meta/meta_deck_reference_support.dart`
+- `_LandTrimContext` → `server/lib/ai/optimization_quality_gate.dart`
+- `_MarketMoversCacheEntry` → `server/lib/market_movers.dart`
+- `_ParsedTradeItems` → `server/routes/trades/index.dart`
+- `_PasswordPreparation` → `server/lib/auth_service.dart`
+- `_PlayDecision` → `server/lib/ai/battle_simulator.dart`
+- `_PromotionDeckProfile` → `server/lib/meta/external_commander_meta_promotion_support.dart`
+- `_QueryBuilder` → `server/routes/cards/index.dart`
+- `_RankedMetaDeckReference` → `server/lib/meta/meta_deck_reference_support.dart`
+- `_ResolvedExternalCommanderMetaCardEntry` → `server/lib/meta/external_commander_meta_candidate_support.dart`
+- `_SimCard` → `server/routes/decks/[id]/simulate/index.dart`
+- `_TelemetryQuery` → `server/routes/ai/optimize/telemetry/index.dart`
+- `_WeightedCard` → `server/lib/ai/rebuild_guided_service.dart`
+
+## Imports Potencialmente Quebrados
+- Nenhum import quebrado encontrado
+
+## Funcoes Publicas (amostra por arquivo)
+- `server/lib/ai/aggressive_candidate_meta_signal_support.dart` (194 linhas): isCommanderCandidateLegalityAllowed, isExternalCommanderCandidateTrusted, confidenceLabel, scoreAggressiveMetaSignal, bracketScopeForMetaSignal
+- `server/lib/ai/battle_simulator.dart` (880 linhas): resetForNewTurn, copy, toString, drawCard, shuffle
+- `server/lib/ai/candidate_quality_data_support.dart` (637 linhas): card_function_tags, cards, CHECK, KEY, card_role_scores
+- `server/lib/ai/cmc_safety.dart` (81 linhas): isLikelyLandCard, safeCmcForOptimization, hasSuspiciousNonLandCmc
+- `server/lib/ai/commander_learned_deck_support.dart` (469 linhas): parseCommanderLearnedDeckInput, validateCommanderLearnedDeckInput, commander_learned_decks, gen_random_uuid, NOW
+- `server/lib/ai/commander_reference_card_stats_support.dart` (1363 linhas): normalizeCommanderReferenceCardName, findResolvedCommanderReferenceCommanderCard, commander_reference_card_stats, cards, NOW
+- `server/lib/ai/commander_reference_deck_corpus_support.dart` (1490 linhas): normalizeCommanderReferenceDeckText, buildReferenceDeckKey, parseCommanderReferenceDeckInput, buildCommanderReferenceDeckCorpusPrompt, shouldUseCompactCommanderReferenceCorpusPrompt
+- `server/lib/ai/commander_reference_generate_fallback_support.dart` (370 linhas): filterReferenceGeneratedCardsByCommanderIdentity, addCard
+- `server/lib/ai/commander_reference_helpers.dart` (151 linhas): intValue, isUndefinedLearnedDeckTableError, unnest, ON, LOWER
+- `server/lib/ai/commander_reference_profile_support.dart` (538 linhas): normalizeCommanderReferenceName, normalizeCommanderReferenceConfidence, isLoreholdCommanderReferenceCandidate, isReferenceProfileConfidenceUsable, commanderReferenceConfidenceRank
+- `server/lib/ai/commander_reference_readiness_support.dart` (495 linhas): calculateCommanderReferenceReadinessScorecard, block
+- `server/lib/ai/commander_spellbook_service.dart` (223 linhas): unnest, unnest, cardinality, unnest, unnest
+- `server/lib/ai/deck_advanced_analysis.dart` (607 linhas): DIVERSITY, analyzeWinconDiversity, analyzeRemovalToThreatRatio, analyzeDrawCompleteness, motor
+- `server/lib/ai/deck_learning_event_support.dart` (254 linhas): deck_learning_events, gen_random_uuid, NOW, deck_learning_events, commander_card_usage
+- `server/lib/ai/deck_state_analysis.dart` (586 linhas): detectArchetype, assessDeckOptimizationState, addReason, resolveOptimizeArchetype
+- `server/lib/ai/edhrec_service.dart` (489 linhas): clearCache, slugFor, cleanupCache, isHighSynergy, toString
+- `server/lib/ai/edhrec_trend_service.dart` (209 linhas): CONFLICT, é, edhrec_card_snapshots, CONFLICT
+- `server/lib/ai/format_staples_service.dart` (165 linhas): opcional, rank, ON, LOWER, EXISTS
+- `server/lib/ai/functional_card_tags.dart` (1093 linhas): count, add, Spellbook, inferSemanticCardAnalysisV2, summarizeFunctionalTagsForDeck
+- `server/lib/ai/goldfish_simulator.dart` (614 linhas): simulate, inicial, compras, mana, mana
+- `server/lib/ai/hate_cards_service.dart` (160 linhas): generatePromptContext, COUNT
+- `server/lib/ai/optimization_functional_roles.dart` (769 linhas): contains, resolveCardFunctionalRoles, classification, classifyOptimizationFunctionalRole, looksLikeOptimizationBoardWipeText
+- `server/lib/ai/optimization_quality_gate.dart` (644 linhas): filterUnsafeOptimizeSwapsByCardData
+- `server/lib/ai/optimization_validator.dart` (905 linhas): Carlo, CARLO, TEMÁTICA, OPINIÃO, COMPARISON
+- `server/lib/ai/optimize_analysis_support.dart` (295 linhas): optimization_analysis_logs
+- `server/lib/ai/optimize_cache_support.dart` (120 linhas): buildOptimizeDeckSignature, buildOptimizeCacheKey, stableOptimizeHash, ai_optimize_cache, CONFLICT
+- `server/lib/ai/optimize_candidate_quality_support.dart` (328 linhas): requested, UNNEST, LOWER, LOWER, LOWER
+- `server/lib/ai/optimize_complete_support.dart` (1563 linhas): live, calculateCompleteMaxBasicAdditions, addUnique, rebalanceCompleteDeckForLandDeficit, mergeUniqueSpells
+- `server/lib/ai/optimize_deck_support.dart` (180 linhas): commanderSignalsSpellslinger, commanderSignalsArtifacts, commanderSignalsEnchantments
+- `server/lib/ai/optimize_filler_loader_support.dart` (1307 linhas): ON, LOWER, LOWER, IN, LOWER
+- `server/lib/ai/optimize_job.dart` (365 linhas): reset, ai_optimize_jobs
+- `server/lib/ai/optimize_request_support.dart` (413 linhas): SUM, regexp_matches, m, SUM, regexp_matches
+- `server/lib/ai/optimize_response_support.dart` (142 linhas): attachOptimizeBracketPolicyDiagnostics
+- `server/lib/ai/optimize_route_addition_data_support.dart` (147 linhas): SUM, regexp_matches, m, ON, SUM
+- `server/lib/ai/optimize_route_async_support.dart` (180 linhas): startOptimizeModeAsyncJob, startCompleteModeAsyncJob
+- `server/lib/ai/optimize_route_bracket_policy_filter_support.dart` (48 linhas): filterOptimizeAdditionsByBracketPolicy
+- `server/lib/ai/optimize_route_color_identity_filter_support.dart` (39 linhas): filterOptimizeAdditionsByCommanderIdentity
+- `server/lib/ai/optimize_route_complete_top_up_support.dart` (92 linhas): buildOptimizeCompleteTopUpSeed, buildOptimizeCompleteTopUpResult
+- `server/lib/ai/optimize_route_diagnostics_support.dart` (38 linhas): attachOptimizeDiagnostic
+- `server/lib/ai/optimize_route_empty_fallback_support.dart` (104 linhas): collectCandidates, buildEmptySuggestionFallbackApplication, buildEmptySuggestionFallbackFailureReason
+- `server/lib/ai/optimize_route_internal.dart` (466 linhas): resolveInternalOptimizeUrl, jsonb_agg, jsonb_agg, to_regclass, IA
+- `server/lib/ai/optimize_route_land_removal_protection_support.dart` (63 linhas): applyOptimizeLandRemovalProtection
+- `server/lib/ai/optimize_route_payload_support.dart` (187 linhas): rebuildOptimizeRecommendations, balanceOptimizeDetailedPayload, enforceOptimizeFinalPayloadIntegrity
+- `server/lib/ai/optimize_route_post_validation_support.dart` (147 linhas): Function, buildPostAnalysisValidationSummary
+- `server/lib/ai/optimize_route_rebalance_support.dart` (129 linhas): buildOptimizeRebalancePlan, applyOptimizeRebalanceReplacements, trimOptimizeRebalanceToPairs
+- `server/lib/ai/optimize_route_request_support.dart` (66 linhas): parseOptimizeRouteRequest
+- `server/lib/ai/optimize_route_response_support.dart` (137 linhas): countOptimizeResponseSwaps, mergeOptimizeReasonBuckets
+- `server/lib/ai/optimize_route_retry_support.dart` (65 linhas): buildOptimizeAiFallbackRetryPlan
+- `server/lib/ai/optimize_route_suggestion_filter_support.dart` (77 linhas): buildInitialOptimizeSuggestionFilters
+- `server/lib/ai/optimize_route_virtual_analysis_support.dart` (64 linhas): buildOptimizeVirtualPostAnalysis
+- `server/lib/ai/optimize_runtime_support.dart` (2387 linhas): normalizeOptimizeReasoning, resolveOptimizeMode, clampRequestedSwapCount, shouldUseAsyncOptimizeExecutor, resolveOptimizeIntensity
+- `server/lib/ai/optimize_stage_telemetry.dart` (85 linhas): start, stop, logSummary
+- `server/lib/ai/optimize_state_support.dart` (982 linhas): detectArchetype, assessManaBase, assessManaCurve, calculateConfidence, assessDeckOptimizationStateCore
+- `server/lib/ai/optimize_swap_integrity.dart` (164 linhas): computeSwapIntegrity, verifySwapIntegrity
+- `server/lib/ai/otimizacao.dart` (1046 linhas): EDHREC, QUANTITATIVA, CONTEXTUAL, META, ML
+- `server/lib/ai/rebuild_guided_service.dart` (1748 linhas): decks, decks, deck_cards, addWeight, ON
+- `server/lib/ai/sinergia.dart` (150 linhas): Simplificada
+- `server/lib/ai/theme_contextual_rules_service.dart` (109 linhas): archetypeToTheme
+- `server/lib/ai_generate_internal_url_support.dart` (46 linhas): resolveInternalAiRouteUrl, resolveAiGenerateInternalUrl
+- `server/lib/ai_generate_job.dart` (294 linhas): resetSchemaFlag, ai_generate_jobs, ai_generate_jobs, users, ai_generate_jobs
+- `server/lib/ai_generate_performance_support.dart` (197 linhas): normalizeAiGeneratePrompt, normalizeAiGenerateFormat, normalizeAiGenerateBracket, normalizeAiGenerateCommanderName, buildAiGenerateCacheKey
+- `server/lib/ai_log_service.dart` (236 linhas): AiLogService, usado, ai_logs, Function, COUNT
+- `server/lib/archetype_counters_service.dart` (243 linhas): archetype_counters, CONFLICT
+- `server/lib/auth_middleware.dart` (85 linhas): middleware, authMiddleware, getUserId
+- `server/lib/auth_service.dart` (307 linhas): resetForTesting, automático, hashPassword, verifyPassword, catch
+- `server/lib/basic_land_utils.dart` (48 linhas): normalizeBasicLandName, isBasicLandName, isBasicLandTypeLine, isBasicLandCard
+- `server/lib/card_resolution_support.dart` (123 linhas): resolveCardCandidateNames
+- `server/lib/card_validation_service.dart` (251 linhas): LOWER, cópia, sanitizeCardName, Ring
+- `server/lib/color_identity.dart` (61 linhas): incolores, isWithinCommanderIdentity
+- `server/lib/commander_eligibility.dart` (32 linhas): isCommanderEligibleCard
+- `server/lib/database.dart` (138 linhas): resetForTesting, connect
+- `server/lib/deck_rules_service.dart` (529 linhas): normalizePhysicalCardCopyName, gerais, cartas, cartas, cartas
+- `server/lib/deck_schema_support.dart` (45 linhas): COUNT, COUNT
+- `server/lib/distributed_rate_limiter.dart` (54 linhas): pg_advisory_xact_lock, rate_limit_events, COUNT
+- `server/lib/edh_bracket_policy.dart` (548 linhas): Brackets, forBracket, tagCardForBracket, applyBracketPolicyToAdditions, comuns
+- `server/lib/endpoint_cache.dart` (37 linhas): set, clearExpired
+- `server/lib/generated_deck_validation_service.dart` (786 linhas): addLookupName, catch, catch, catch, carta
+- `server/lib/health_readiness_support.dart` (21 linhas): readinessStatusCode
+- `server/lib/http_responses.dart` (45 linhas): apiError, badRequest, notFound, unauthorized, internalServerError
+- `server/lib/import_card_lookup_service.dart` (451 linhas): cleanImportLookupKey, foldImportLookupKey, card_localized_names, cards, KEY
+- `server/lib/import_list_service.dart` (84 linhas): parseImportLines
+- `server/lib/internal_ai_request_token.dart` (22 linhas): matches
+- `server/lib/log_sanitizer.dart` (59 linhas): sanitizeLogMessage
+- `server/lib/logger.dart` (40 linhas): d, print, i, print, w
+- `server/lib/market_movers.dart` (240 linhas): COUNT, MATERIALIZED, MATERIALIZED, MATERIALIZED, MATERIALIZED
+- `server/lib/meta/external_commander_deck_expansion_support.dart` (638 linhas): catch, edhTop16TournamentIdFromUrl, parseTopDeckDeckObjectFromHtml, parseTopDeckDeckObject
+- `server/lib/meta/external_commander_meta_candidate_support.dart` (1333 linhas): addName, normalizeCommanderMetaFormat, normalizeExternalCommanderMetaValidationStatus, canonicalizeExternalCommanderMetaSourceName, validateExternalCommanderMetaCandidate
+- `server/lib/meta/external_commander_meta_import_support.dart` (253 linhas): buildExternalCommanderMetaPersistencePlan, external_commander_meta_candidates, CONFLICT
+- `server/lib/meta/external_commander_meta_operational_runner_support.dart` (394 linhas): buildStrictOperationalEligibilityBatch
+- `server/lib/meta/external_commander_meta_promotion_support.dart` (748 linhas): buildExternalCommanderMetaPromotionPlan, meta_decks, evaluateExternalCommanderMetaPromotionSnapshot, buildMetaDeckCardListFingerprint
+- `server/lib/meta/external_commander_meta_staging_support.dart` (441 linhas): buildExternalCommanderMetaStagingPlan
+- `server/lib/meta/meta_deck_analytics_support.dart` (85 linhas): classifyMetaDeckSource, resolveMetaDeckAnalyticsContext
+- `server/lib/meta/meta_deck_card_list_support.dart` (93 linhas): parseMetaDeckCardList, isCommanderMetaFormat, normalizeMetaDeckCardName
+- `server/lib/meta/meta_deck_commander_shell_support.dart` (356 linhas): deriveCommanderShellMetadata, resolveCommanderShellMetadata, metaDeckNeedsCommanderShellRefresh, inferCommanderStrategyArchetypeFromCardNames
+- `server/lib/meta/meta_deck_format_support.dart` (181 linhas): describeMetaDeckFormat, Commander, Commander, normalizeCommanderMetaScope, commanderMetaScopeLabel
+- `server/lib/meta/meta_deck_reference_support.dart` (923 linhas): buildMetaDeckReferenceQueryParts, ANY, ANY, ANY, ANY
+- `server/lib/meta/mtgtop8_meta_support.dart` (159 linhas): extractMtgTop8Placement, resolveMtgTop8Url
+- `server/lib/ml_knowledge_service.dart` (502 linhas): LOWER, LOWER, LOWER, LOWER, LOWER
+- `server/lib/mtg_data_integrity_support.dart` (117 linhas): decideColorIdentityBackfill
+- `server/lib/notification_service.dart` (140 linhas): notifications, createFromActorDeferred, Function
+- `server/lib/observability.dart` (249 linhas): isSentryEnabled
+- `server/lib/openai_runtime_config.dart` (150 linhas): shouldUseFallbackForInvalidApiKey, modelFor, timeoutFor, intFor
+- `server/lib/plan_middleware.dart` (68 linhas): aiPlanLimitMiddleware
+- `server/lib/plan_service.dart` (98 linhas): user_plans, CONFLICT, COUNT
+- `server/lib/push_notification_service.dart` (330 linhas): Messaging, Account, OAuth2, obtido
+- `server/lib/rate_limit_middleware.dart` (404 linhas): middleware, 429, Function, Function, buildClientIdentifierFromHeaders
+- `server/lib/request_metrics_service.dart` (107 linhas): add, snapshot, record
+- `server/lib/request_trace.dart` (50 linhas): generateRequestId, resolveRequestId, getRequestTrace
+- `server/lib/sets_catalog_contract.dart` (61 linhas): safeSetCatalogLimit, safeSetCatalogPage, resolveSetStatus
+- `server/lib/sync_cards_utils.dart` (196 linhas): pares
+- `server/routes/_middleware.dart` (223 linhas): middleware
+- `server/routes/ai/_middleware.dart` (22 linhas): limiting, middleware
+- `server/routes/ai/archetypes/index.dart` (570 linhas): consistência
+- `server/routes/ai/commander-reference/index.dart` (1209 linhas): LOWER, add, commander_reference_profiles, NOW, LOWER
+- `server/routes/ai/explain/index.dart` (187 linhas): típicas, if, Simplificada
+- `server/routes/ai/generate/index.dart` (1685 linhas): object, required, lower, lower, array_length
+- `server/routes/ai/ml-status/index.dart` (180 linhas): Learning, COUNT, COUNT, COUNT, COUNT
+- `server/routes/ai/optimize/index.dart` (2523 linhas): resolveOptimizeIntensity, resolveOptimizeArchetype, shouldRetryOptimizeWithAiFallback, matchesFunctionalNeed, scoreOptimizeReplacementCandidate
+- `server/routes/ai/optimize/telemetry/index.dart` (396 linhas): COUNT, COUNT, DATE_TRUNC, DATE_TRUNC, LOWER
+- `server/routes/ai/rebuild/index.dart` (376 linhas): SUM, regexp_matches, m, catch, catch
+- `server/routes/ai/simulate-matchup/index.dart` (506 linhas): SUM, regexp_matches, m, partidas, deck_matchups
+- `server/routes/ai/simulate/index.dart` (222 linhas): goldfish, catch, EXISTS, battle_simulations
+- `server/routes/ai/weakness-analysis/index.dart` (620 linhas): SUM, regexp_matches, m, if, avançadas
+- `server/routes/auth/_middleware.dart` (14 linhas): middleware
+- `server/routes/auth/login.dart` (90 linhas): catch
+- `server/routes/auth/register.dart` (104 linhas): catch
+- `server/routes/binder/[id]/index.dart` (453 linhas): COALESCE, COALESCE, COALESCE, COALESCE, COALESCE
+- `server/routes/binder/_middleware.dart` (7 linhas): middleware
+- `server/routes/binder/index.dart` (366 linhas): LOWER, COUNT, user_binder_items
+- `server/routes/cards/index.dart` (240 linhas): LOWER, LOWER, LOWER, LOWER, por
+- `server/routes/cards/printings/index.dart` (407 linhas): if, ON, LOWER, LOWER, LOWER
+- `server/routes/cards/resolve/batch/index.dart` (205 linhas): TRIM, unnest, TRIM, LATERAL, ON
+- `server/routes/cards/resolve/index.dart` (691 linhas): API, local, ON, LOWER, LOWER
+- `server/routes/community/_middleware.dart` (10 linhas): middleware
+- `server/routes/community/binders/[userId].dart` (136 linhas): COUNT
+- `server/routes/community/decks/[id].dart` (428 linhas): getMainType, calculateCmc, manual, decks, deck_cards
+- `server/routes/community/decks/index.dart` (140 linhas): LOWER, total, COUNT, LATERAL, LATERAL
+- `server/routes/community/marketplace/index.dart` (371 linhas): COUNT, COUNT, LATERAL, COUNT, LATERAL
+- `server/routes/community/users/[id].dart` (173 linhas): LATERAL, LATERAL
+- `server/routes/community/users/index.dart` (136 linhas): COUNT, LOWER, LOWER, LOWER, LOWER
+- `server/routes/conversations/[id]/messages.dart` (272 linhas): COUNT, direct_messages
+- `server/routes/conversations/[id]/read.dart` (82 linhas): COUNT, AND
+- `server/routes/conversations/_middleware.dart` (7 linhas): middleware
+- `server/routes/conversations/index.dart` (204 linhas): COUNT, COUNT, COALESCE, conversations, CONFLICT
+- `server/routes/conversations/unread-count.dart` (47 linhas): COUNT, AND
+- `server/routes/decks/[id]/ai-analysis/index.dart` (552 linhas): jsonb_agg, jsonb_agg, SUM, regexp_matches, m
+- `server/routes/decks/[id]/analysis/index.dart` (521 linhas): jsonb_agg, jsonb_agg, Médio, similaridade, to_regclass
+- `server/routes/decks/[id]/cards/bulk/index.dart` (173 linhas): regras, deck_cards, catch
+- `server/routes/decks/[id]/cards/index.dart` (414 linhas): AND, deck_cards, COALESCE, cópia, COALESCE
+- `server/routes/decks/[id]/cards/replace/index.dart` (229 linhas): catch
+- `server/routes/decks/[id]/cards/set/index.dart` (254 linhas): cópia, deck_cards, catch
+- `server/routes/decks/[id]/export/index.dart` (104 linhas): Name
+- `server/routes/decks/[id]/index.dart` (538 linhas): catch, LOWER, Insert, deck_cards, deck_cards
+- `server/routes/decks/[id]/pricing/index.dart` (248 linhas): ID
+- `server/routes/decks/[id]/recommendations/index.dart` (633 linhas): SUM, regexp_matches, m, INTELIGENTE, if
+- `server/routes/decks/[id]/simulate/index.dart` (215 linhas): Inicial, carta, Terreno
+- `server/routes/decks/[id]/validate/index.dart` (73 linhas): catch
+- `server/routes/decks/_middleware.dart` (10 linhas): middleware
+- `server/routes/decks/index.dart` (534 linhas): LATERAL, LATERAL, LATERAL, LATERAL, unnest
+- `server/routes/health/dashboard/index.dart` (130 linhas): COALESCE, COUNT, COUNT
+- `server/routes/health/index.dart` (31 linhas): check, onRequest
+- `server/routes/health/live/index.dart` (15 linhas): onRequest
+- `server/routes/health/metrics/index.dart` (23 linhas): onRequest
+- `server/routes/health/ready/index.dart` (73 linhas): check, COUNT
+- `server/routes/import/_middleware.dart` (10 linhas): middleware
+- `server/routes/import/index.dart` (330 linhas): catch, informado, decks, deck_cards, catch
+- `server/routes/import/to-deck/index.dart` (304 linhas): catch, deck_cards, catch
+- `server/routes/import/validate/index.dart` (223 linhas): catch, legalidades
+- `server/routes/index.dart` (6 linhas): onRequest, Builder
+- `server/routes/market/movers/index.dart` (136 linhas): catch
+- `server/routes/notifications/_middleware.dart` (7 linhas): middleware
+- `server/routes/notifications/count.dart` (42 linhas): COUNT
+- `server/routes/notifications/index.dart` (86 linhas): COUNT
+- `server/routes/sets/index.dart` (116 linhas): LOWER, LOWER
+- `server/routes/trades/[id]/index.dart` (392 linhas): permissão, mensagens, COUNT, ROUND, FROM
+- `server/routes/trades/[id]/messages.dart` (253 linhas): COUNT, attachment_type, trade_messages
+- `server/routes/trades/[id]/respond.dart` (179 linhas): trade_status_history, COALESCE
+- `server/routes/trades/[id]/status.dart` (285 linhas): NOT, IN, IN, IN, COALESCE
+- `server/routes/trades/_middleware.dart` (7 linhas): middleware
+- `server/routes/trades/index.dart` (649 linhas): EXISTS, COUNT, COUNT, AND, COUNT
+- `server/routes/users/[id]/follow/index.dart` (197 linhas): if, follow, user_follows, CONFLICT, COUNT
+- `server/routes/users/[id]/followers/index.dart` (86 linhas): COUNT
+- `server/routes/users/[id]/following/index.dart` (86 linhas): COUNT
+- `server/routes/users/_middleware.dart` (8 linhas): middleware
+- `server/routes/users/me/activation-events/index.dart` (120 linhas): activation_funnel_events
+- `server/routes/users/me/fcm-token/index.dart` (92 linhas): token
+- `server/routes/users/me/index.dart` (248 linhas): state
+
+## Tabelas PostgreSQL Referenciadas no Codigo
+- `LATERAL`: 9 referencias
+- `activation_funnel_events`: 1 referencias
+- `ai_generate_jobs`: 1 referencias
+- `ai_logs`: 3 referencias
+- `ai_optimize_cache`: 1 referencias
+- `ai_optimize_fallback_telemetry`: 3 referencias
+- `ai_optimize_jobs`: 1 referencias
+- `ai_user_preferences`: 1 referencias
+- `archetype_counters`: 2 referencias
+- `archetype_patterns`: 2 referencias
+- `canonical_sets`: 2 referencias
+- `card_combos`: 1 referencias
+- `card_function_tags`: 6 referencias
+- `card_legalities`: 13 referencias
+- `card_localized_names`: 1 referencias
+- `card_meta_insights`: 7 referencias
+- `card_role_scores`: 2 referencias
+- `card_rulings`: 1 referencias
+- `card_semantic_tags_v2`: 5 referencias
+- `cards`: 50 referencias
+- `checks`: 1 referencias
+- `commander_card_synergy`: 2 referencias
+- `commander_card_usage`: 1 referencias
+- `commander_learned_decks`: 3 referencias
+- `commander_reference_card_stats`: 1 referencias
+- `commander_reference_deck_analysis`: 1 referencias
+- `commander_reference_deck_cards`: 1 referencias
+- `commander_reference_decks`: 1 referencias
+- `commander_reference_profiles`: 5 referencias
+- `conversations`: 4 referencias
+- `current_trade`: 2 referencias
+- `deck_cards`: 25 referencias
+- `deck_learning_events`: 1 referencias
+- `deck_matchups`: 1 referencias
+- `deck_usage`: 1 referencias
+- `deck_weakness_reports`: 1 referencias
+- `decks`: 25 referencias
+- `direct_messages`: 4 referencias
+- `edhrec_card_snapshots`: 1 referencias
+- `external_commander_meta_candidates`: 1 referencias
+- `filtered_sets`: 1 referencias
+- `follower_counts`: 2 referencias
+- `following_counts`: 2 referencias
+- `format_staples`: 1 referencias
+- `have`: 1 referencias
+- `history`: 2 referencias
+- `information_schema`: 6 referencias
+- `input_names`: 2 referencias
+- `inserted`: 1 referencias
+- `jsonb_to_recordset`: 1 referencias
+- `latest`: 1 referencias
+- `meta_decks`: 6 referencias
+- `ml_learning_state`: 1 referencias
+- `ml_prompt_feedback`: 1 referencias
+- `movers`: 1 referencias
+- `notifications`: 2 referencias
+- `offer`: 1 referencias
+- `offering_items`: 1 referencias
+- `optimization_analysis_logs`: 2 referencias
+- `optimize_rejection_penalties`: 2 referencias
+- `owned`: 1 referencias
+- `paged_users`: 1 referencias
+- `penalty_rows`: 1 referencias
+- `previous_prices`: 1 referencias
+- `price_history`: 3 referencias
+- `public_deck_counts`: 2 referencias
+- `rate_limit_events`: 1 referencias
+- `regexp_matches`: 9 referencias
+- `requested`: 1 referencias
+- `requesting_items`: 1 referencias
+- `role_rows`: 1 referencias
+- `rules`: 1 referencias
+- `sets`: 6 referencias
+- `sync_state`: 1 referencias
+- `synergy_packages`: 2 referencias
+- `synergy_rows`: 1 referencias
+- `tag_rows`: 1 referencias
+- `theme_contextual_rules`: 1 referencias
+- `today_prices`: 1 referencias
+- `totals`: 1 referencias
+- `trade_items`: 2 referencias
+- `trade_messages`: 3 referencias
+- `trade_offers`: 6 referencias
+- `trade_status_history`: 3 referencias
+- `unnest`: 2 referencias
+- `updated`: 2 referencias
+- `user_binder_items`: 6 referencias
+- `user_follows`: 6 referencias
+- `user_plans`: 1 referencias
+- `users`: 19 referencias
+- `validation`: 2 referencias
+- `want`: 1 referencias
+
+## Problemas Estruturais Identificados
+- **Arquivos grandes (>500 linhas) — gargalos de manutencao:**
+  - `server/routes/ai/optimize/index.dart`: 2523 linhas
+  - `server/lib/ai/optimize_runtime_support.dart`: 2387 linhas
+  - `server/lib/ai/rebuild_guided_service.dart`: 1748 linhas
+  - `server/routes/ai/generate/index.dart`: 1685 linhas
+  - `server/lib/ai/optimize_complete_support.dart`: 1563 linhas
+  - `server/lib/ai/commander_reference_deck_corpus_support.dart`: 1490 linhas
+  - `server/lib/ai/commander_reference_card_stats_support.dart`: 1363 linhas
+  - `server/lib/meta/external_commander_meta_candidate_support.dart`: 1333 linhas
+  - `server/lib/ai/optimize_filler_loader_support.dart`: 1307 linhas
+  - `server/routes/ai/commander-reference/index.dart`: 1209 linhas
+  - `server/lib/ai/functional_card_tags.dart`: 1093 linhas
+  - `server/lib/ai/otimizacao.dart`: 1046 linhas
+  - `server/lib/ai/optimize_state_support.dart`: 982 linhas
+  - `server/lib/meta/meta_deck_reference_support.dart`: 923 linhas
+  - `server/lib/ai/optimization_validator.dart`: 905 linhas
+  - `server/lib/ai/battle_simulator.dart`: 880 linhas
+  - `server/lib/generated_deck_validation_service.dart`: 786 linhas
+  - `server/lib/ai/optimization_functional_roles.dart`: 769 linhas
+  - `server/lib/meta/external_commander_meta_promotion_support.dart`: 748 linhas
+  - `server/routes/cards/resolve/index.dart`: 691 linhas
+  - `server/routes/trades/index.dart`: 649 linhas
+  - `server/lib/ai/optimization_quality_gate.dart`: 644 linhas
+  - `server/lib/meta/external_commander_deck_expansion_support.dart`: 638 linhas
+  - `server/lib/ai/candidate_quality_data_support.dart`: 637 linhas
+  - `server/routes/decks/[id]/recommendations/index.dart`: 633 linhas
+  - `server/routes/ai/weakness-analysis/index.dart`: 620 linhas
+  - `server/lib/ai/goldfish_simulator.dart`: 614 linhas
+  - `server/lib/ai/deck_advanced_analysis.dart`: 607 linhas
+  - `server/lib/ai/deck_state_analysis.dart`: 586 linhas
+  - `server/routes/ai/archetypes/index.dart`: 570 linhas
+  - `server/routes/decks/[id]/ai-analysis/index.dart`: 552 linhas
+  - `server/lib/edh_bracket_policy.dart`: 548 linhas
+  - `server/lib/ai/commander_reference_profile_support.dart`: 538 linhas
+  - `server/routes/decks/[id]/index.dart`: 538 linhas
+  - `server/routes/decks/index.dart`: 534 linhas
+  - `server/lib/deck_rules_service.dart`: 529 linhas
+  - `server/routes/decks/[id]/analysis/index.dart`: 521 linhas
+  - `server/routes/ai/simulate-matchup/index.dart`: 506 linhas
+  - `server/lib/ml_knowledge_service.dart`: 502 linhas
+
+- **Funcoes publicas duplicadas (mesmo nome, arquivos sem import cruzado):**
+  - `AND` em: server/lib/ai/commander_learned_deck_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/routes/conversations/[id]/read.dart, server/routes/conversations/unread-count.dart, server/routes/decks/[id]/cards/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart
+  - `ANY` em: server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart, server/lib/meta/meta_deck_reference_support.dart, server/lib/meta/meta_deck_reference_support.dart, server/lib/meta/meta_deck_reference_support.dart, server/lib/meta/meta_deck_reference_support.dart, server/lib/meta/meta_deck_reference_support.dart, server/lib/meta/meta_deck_reference_support.dart, server/lib/meta/meta_deck_reference_support.dart
+  - `CHECK` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart
+  - `COALESCE` em: server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_runtime_support.dart, server/lib/ai/optimize_runtime_support.dart, server/routes/binder/[id]/index.dart, server/routes/binder/[id]/index.dart, server/routes/binder/[id]/index.dart, server/routes/binder/[id]/index.dart, server/routes/binder/[id]/index.dart, server/routes/binder/[id]/index.dart, server/routes/conversations/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/health/dashboard/index.dart, server/routes/trades/[id]/respond.dart, server/routes/trades/[id]/status.dart, server/routes/trades/[id]/status.dart, server/routes/trades/[id]/status.dart
+  - `COUNT` em: server/lib/ai/hate_cards_service.dart, server/lib/ai/optimize_runtime_support.dart, server/lib/ai_log_service.dart, server/lib/deck_schema_support.dart, server/lib/deck_schema_support.dart, server/lib/distributed_rate_limiter.dart, server/lib/market_movers.dart, server/lib/plan_service.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/ml-status/index.dart, server/routes/ai/optimize/telemetry/index.dart, server/routes/ai/optimize/telemetry/index.dart, server/routes/binder/[id]/index.dart, server/routes/binder/index.dart, server/routes/community/binders/[userId].dart, server/routes/community/decks/[id].dart, server/routes/community/decks/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/users/index.dart, server/routes/conversations/[id]/messages.dart, server/routes/conversations/[id]/read.dart, server/routes/conversations/index.dart, server/routes/conversations/index.dart, server/routes/conversations/unread-count.dart, server/routes/health/dashboard/index.dart, server/routes/health/dashboard/index.dart, server/routes/health/ready/index.dart, server/routes/notifications/count.dart, server/routes/notifications/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/[id]/messages.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart, server/routes/users/[id]/follow/index.dart, server/routes/users/[id]/follow/index.dart, server/routes/users/[id]/followers/index.dart, server/routes/users/[id]/following/index.dart
+  - `Commander` em: server/lib/meta/meta_deck_format_support.dart, server/lib/meta/meta_deck_format_support.dart
+  - `DATE_TRUNC` em: server/routes/ai/optimize/telemetry/index.dart, server/routes/ai/optimize/telemetry/index.dart
+  - `EDHREC` em: server/lib/ai/otimizacao.dart, server/lib/ai/otimizacao.dart, server/routes/decks/[id]/recommendations/index.dart
+  - `EXISTS` em: server/lib/ai/format_staples_service.dart, server/lib/ml_knowledge_service.dart, server/routes/ai/simulate/index.dart, server/routes/trades/index.dart
+  - `FROM` em: server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart
+  - `IN` em: server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_runtime_support.dart, server/lib/ml_knowledge_service.dart, server/routes/trades/[id]/status.dart, server/routes/trades/[id]/status.dart, server/routes/trades/[id]/status.dart
+  - `LATERAL` em: server/routes/cards/resolve/batch/index.dart, server/routes/community/decks/[id].dart, server/routes/community/decks/[id].dart, server/routes/community/decks/index.dart, server/routes/community/decks/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/community/users/[id].dart, server/routes/community/users/[id].dart, server/routes/decks/index.dart, server/routes/decks/index.dart, server/routes/decks/index.dart, server/routes/decks/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/index.dart
+  - `MATERIALIZED` em: server/lib/market_movers.dart, server/lib/market_movers.dart, server/lib/market_movers.dart, server/lib/market_movers.dart
+  - `ML` em: server/lib/ai/otimizacao.dart, server/lib/ai/otimizacao.dart
+  - `OK` em: server/routes/decks/[id]/ai-analysis/index.dart, server/routes/decks/[id]/ai-analysis/index.dart
+  - `ON` em: server/lib/ai/commander_reference_helpers.dart, server/lib/ai/format_staples_service.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_filler_loader_support.dart, server/lib/ai/optimize_route_addition_data_support.dart, server/lib/ai/optimize_runtime_support.dart, server/lib/ai/rebuild_guided_service.dart, server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart, server/routes/binder/[id]/index.dart, server/routes/cards/index.dart, server/routes/cards/index.dart, server/routes/cards/printings/index.dart, server/routes/cards/printings/index.dart, server/routes/cards/printings/index.dart, server/routes/cards/resolve/batch/index.dart, server/routes/cards/resolve/index.dart, server/routes/decks/[id]/index.dart
+  - `OPINIÃO` em: server/lib/ai/optimization_validator.dart, server/lib/ai/optimization_validator.dart
+  - `RANDOM` em: server/routes/ai/generate/index.dart, server/routes/ai/generate/index.dart
+  - `ROUND` em: server/routes/community/marketplace/index.dart, server/routes/community/marketplace/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/[id]/index.dart, server/routes/trades/index.dart, server/routes/trades/index.dart
+  - `Simplificada` em: server/lib/ai/sinergia.dart, server/routes/ai/explain/index.dart
+  - `TRIM` em: server/routes/cards/resolve/batch/index.dart, server/routes/cards/resolve/batch/index.dart
+  - `addReason` em: server/lib/ai/deck_state_analysis.dart, server/lib/ai/optimize_state_support.dart
+  - `addUnique` em: server/lib/ai/optimize_complete_support.dart, server/lib/ai/optimize_filler_loader_support.dart
+  - `ai_generate_jobs` em: server/lib/ai_generate_job.dart, server/lib/ai_generate_job.dart, server/lib/ai_generate_job.dart, server/lib/ai_generate_job.dart
+  - `array_length` em: server/routes/ai/generate/index.dart, server/routes/ai/generate/index.dart
+  - `assessDeckOptimizationState` em: server/lib/ai/deck_state_analysis.dart, server/routes/ai/optimize/index.dart
+  - `buildOptimizeCacheKey` em: server/lib/ai/optimize_cache_support.dart, server/lib/ai/optimize_runtime_support.dart
+  - `buildOptimizeDeckSignature` em: server/lib/ai/optimize_cache_support.dart, server/lib/ai/optimize_runtime_support.dart
+  - `calculateCmc` em: server/routes/community/decks/[id].dart, server/routes/decks/[id]/index.dart
+  - `card_function_tags` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart
+  - `card_localized_names` em: server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart, server/lib/import_card_lookup_service.dart
+  - `card_role_scores` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart
+  - `card_semantic_tags_v2` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart
+  - `carta` em: server/lib/generated_deck_validation_service.dart, server/routes/decks/[id]/simulate/index.dart
+  - `check` em: server/routes/health/index.dart, server/routes/health/ready/index.dart
+  - `commander_card_synergy` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart
+  - `commander_card_usage` em: server/lib/ai/deck_learning_event_support.dart, server/lib/ai/deck_learning_event_support.dart, server/lib/ai/deck_learning_event_support.dart
+  - `commander_learned_decks` em: server/lib/ai/commander_learned_deck_support.dart, server/lib/ai/commander_learned_deck_support.dart, server/lib/ai/commander_learned_deck_support.dart
+  - `commander_reference_card_stats` em: server/lib/ai/commander_reference_card_stats_support.dart, server/lib/ai/commander_reference_card_stats_support.dart, server/lib/ai/commander_reference_card_stats_support.dart, server/lib/ai/commander_reference_card_stats_support.dart
+  - `commander_reference_deck_analysis` em: server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_deck_corpus_support.dart
+  - `commander_reference_deck_cards` em: server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_deck_corpus_support.dart
+  - `commander_reference_decks` em: server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_deck_corpus_support.dart, server/lib/ai/commander_reference_deck_corpus_support.dart
+  - `computeOptimizeStructuralRecoverySwapTarget` em: server/lib/ai/optimize_filler_loader_support.dart, server/routes/ai/optimize/index.dart
+  - `cópia` em: server/lib/card_validation_service.dart, server/lib/generated_deck_validation_service.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/set/index.dart
+  - `deck_cards` em: server/lib/ai/rebuild_guided_service.dart, server/routes/community/decks/[id].dart, server/routes/decks/[id]/cards/bulk/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/index.dart, server/routes/decks/[id]/cards/set/index.dart, server/routes/decks/[id]/index.dart, server/routes/decks/[id]/index.dart, server/routes/decks/index.dart, server/routes/import/index.dart, server/routes/import/to-deck/index.dart
+  - `deck_learning_events` em: server/lib/ai/deck_learning_event_support.dart, server/lib/ai/deck_learning_event_support.dart, server/lib/ai/deck_learning_event_support.dart, server/lib/ai/deck_learning_event_support.dart
+  - `decks` em: server/lib/ai/rebuild_guided_service.dart, server/lib/ai/rebuild_guided_service.dart, server/routes/community/decks/[id].dart, server/routes/decks/index.dart, server/routes/decks/index.dart, server/routes/import/index.dart
+  - `detectArchetype` em: server/lib/ai/deck_state_analysis.dart, server/lib/ai/optimize_state_support.dart
+  - `error` em: server/lib/ai/otimizacao.dart, server/lib/ai/otimizacao.dart, server/lib/ai/otimizacao.dart, server/lib/ai/otimizacao.dart, server/routes/cards/printings/index.dart
+  - `fontes` em: server/routes/decks/[id]/recommendations/index.dart, server/routes/decks/[id]/recommendations/index.dart
+  - `gen_random_uuid` em: server/lib/ai/commander_learned_deck_support.dart, server/lib/ai/deck_learning_event_support.dart
+  - `if` em: server/lib/ai/battle_simulator.dart, server/lib/ai/goldfish_simulator.dart, server/lib/ai/goldfish_simulator.dart, server/lib/ml_knowledge_service.dart, server/routes/ai/explain/index.dart, server/routes/ai/optimize/index.dart, server/routes/ai/optimize/index.dart, server/routes/ai/weakness-analysis/index.dart, server/routes/cards/printings/index.dart, server/routes/decks/[id]/ai-analysis/index.dart, server/routes/decks/[id]/index.dart, server/routes/decks/[id]/recommendations/index.dart, server/routes/decks/[id]/recommendations/index.dart, server/routes/decks/[id]/recommendations/index.dart, server/routes/decks/[id]/recommendations/index.dart, server/routes/decks/[id]/recommendations/index.dart, server/routes/users/[id]/follow/index.dart
+  - `isOptimizeStructuralRecoveryScenario` em: server/lib/ai/optimize_filler_loader_support.dart, server/routes/ai/optimize/index.dart
+  - `item` em: server/routes/trades/index.dart, server/routes/trades/index.dart
+  - `jsonb_agg` em: server/lib/ai/optimize_request_support.dart, server/lib/ai/optimize_request_support.dart, server/lib/ai/optimize_route_internal.dart, server/lib/ai/optimize_route_internal.dart, server/routes/decks/[id]/ai-analysis/index.dart, server/routes/decks/[id]/ai-analysis/index.dart, server/routes/decks/[id]/analysis/index.dart, server/routes/decks/[id]/analysis/index.dart
+  - `jsonb_to_recordset` em: server/lib/ai/commander_reference_deck_corpus_support.dart, server/routes/trades/index.dart, server/routes/trades/index.dart
+  - `mana` em: server/lib/ai/goldfish_simulator.dart, server/lib/ai/goldfish_simulator.dart
+  - `manual` em: server/routes/community/decks/[id].dart, server/routes/community/decks/[id].dart
+  - `meta_decks` em: server/lib/meta/external_commander_meta_promotion_support.dart, server/routes/ai/commander-reference/index.dart
+  - `onRequest` em: server/routes/health/index.dart, server/routes/health/live/index.dart, server/routes/health/metrics/index.dart, server/routes/index.dart
+  - `optimize_rejection_penalties` em: server/lib/ai/candidate_quality_data_support.dart, server/lib/ai/candidate_quality_data_support.dart
+  - `resetForTesting` em: server/lib/auth_service.dart, server/lib/database.dart
+  - `sets` em: server/routes/cards/printings/index.dart, server/routes/cards/resolve/index.dart
+  - `simulate` em: server/lib/ai/battle_simulator.dart, server/lib/ai/goldfish_simulator.dart
+  - `terreno` em: server/lib/ai/battle_simulator.dart, server/lib/generated_deck_validation_service.dart
+  - `terrenos` em: server/routes/decks/[id]/ai-analysis/index.dart, server/routes/decks/[id]/recommendations/index.dart
+  - `to_regclass` em: server/lib/ai/optimize_request_support.dart, server/lib/ai/optimize_route_internal.dart, server/lib/import_card_lookup_service.dart, server/routes/cards/index.dart, server/routes/cards/printings/index.dart, server/routes/cards/resolve/index.dart, server/routes/decks/[id]/ai-analysis/index.dart, server/routes/decks/[id]/analysis/index.dart, server/routes/decks/[id]/index.dart
+  - `trade_items` em: server/routes/trades/index.dart, server/routes/trades/index.dart
+  - `trade_status_history` em: server/routes/trades/[id]/respond.dart, server/routes/trades/[id]/status.dart, server/routes/trades/index.dart
+  - `unnest` em: server/lib/ai/commander_reference_helpers.dart, server/lib/ai/commander_spellbook_service.dart, server/lib/ai/commander_spellbook_service.dart, server/lib/ai/commander_spellbook_service.dart, server/lib/ai/commander_spellbook_service.dart, server/lib/ml_knowledge_service.dart, server/lib/ml_knowledge_service.dart, server/routes/cards/resolve/batch/index.dart, server/routes/decks/index.dart
+  - `users` em: server/lib/ai_generate_job.dart, server/lib/auth_service.dart
+  ⚠️ Validar com grep antes de agir — pode ser falso positivo.
+
+
+## Observacoes Informativas
+- **Referencias read-only a tabelas semanticas:**
+  - `server/lib/ai/candidate_quality_data_support.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/lib/ai/candidate_quality_data_support.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/lib/ai/functional_card_tags.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/lib/ai/functional_card_tags.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/lib/ai/optimization_functional_roles.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/lib/ai/optimization_functional_roles.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/lib/ai/optimization_quality_gate.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/lib/ai/optimize_candidate_quality_support.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/lib/ai/optimize_request_support.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/lib/ai/optimize_request_support.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/lib/ai/optimize_route_addition_data_support.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/lib/ai/optimize_route_internal.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/lib/ai/optimize_route_internal.dart` referencia `card_function_tags` (apenas leitura)
+  - `server/routes/decks/[id]/analysis/index.dart` referencia `semantic_tags_v2` (apenas leitura)
+  - `server/routes/decks/[id]/analysis/index.dart` referencia `card_function_tags` (apenas leitura)
+  (Esperado para analise/consulta — nao e problema)
+
+- **Limitacao do auditor textual:** este script NAO compila codigo nem
+  constroi grafo de chamadas. 'Nao usado' requer validacao manual com
+  grep no arquivo fonte + arquivos relacionados antes de agir.
+  Use `dart analyze` e `dart test` como fonte primaria de confiabilidade.
+
+## Gaps Conhecidos (manual)
+- `card_function_tags` / `card_semantic_tags_v2`: fluxo core de analysis/optimize ja usa multi-tags; rotas experimentais de recommendations/weakness ainda precisam convergir antes de promocao app-facing
+- `card_deck_profiles`: 670 perfis, mas `filterUnsafeOptimizeSwapsByCardData` nao consulta
+- `semantic_layer_v2`: default `disabled`, modo `partial` existe e tem teste de contrato; habilitar apenas em ambiente controlado com scorecard
+- `archetype_patterns`: 69 registros, nao validado contra codigo
 
 ## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-14 19:00 UTC
 
