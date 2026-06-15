@@ -4,9 +4,257 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-15 15:00 UTC
-> Rotacao: `postgresql-tables-not-used`
+> Atualizacao local Codex: 2026-06-15 19:00 UTC
+> Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-15 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi executada auditoria ampla de classes sem uso, funcoes sem chamador,
+imports/ciclos, tabelas PostgreSQL sem uso ou coerencia app/server fora do
+necessario para validar/falsificar duplicacao.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `1c0f9b86`.
+- `git diff --name-only 6953df1f..HEAD -- app/lib server/lib server/routes server/bin server/test server/database_setup.sql`:
+  sem saida. Desde a rodada anterior deste foco, nao houve delta de codigo de
+  produto no recorte auditado; o delta acumulado ate `HEAD` e documental.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter a memoria coerente e
+evitar claims stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`,
+`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+
+### Auditor estrutural base
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`.
+- A lista de duplicacao e textual/regex; ela ainda mistura SQL keywords,
+  wrappers, nomes comuns e funcoes que apenas delegam para suporte canonico.
+- A execucao do script tentou reinserir inventario gerado por causa do marcador
+  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
+  e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- `git diff --name-only 6953df1f..HEAD -- app/lib server/lib server/routes server/bin server/test server/database_setup.sql`.
+- `rg -n "class DeckArchetypeAnalyzer|class DeckArchetypeAnalyzerCore|assessDeckOptimizationState|assessDeckOptimizationStateCore|resolveOptimizeArchetype" server/lib/ai server/routes/ai/optimize/index.dart`.
+- `rg -n "_looksLike(ComboPiece|Enabler|Engine|Payoff|Wincon)|resolveCardFunctionalRoles|classifyOptimizationFunctionalRole" server/lib/ai/functional_card_tags.dart server/lib/ai/optimization_functional_roles.dart`.
+- `rg -n "_trustStatsSql|_responseTimeSql|_shippingTimeSql|_buildTrustInsight|owner\\.trust|trust" server/routes/trades server/routes/community/marketplace/index.dart`.
+- `rg -n "String _requestId|void _logInvalidPayload|_requestId\\(|_logInvalidPayload\\(" server/routes/trades server/routes/conversations 'server/routes/users/[id]/follow/index.dart' server/lib/request_trace.dart`.
+- `rg -n "\\b(NM|LP|MP|HP|DMG)\\b|condition" 'server/routes/decks/[id]/cards/index.dart' 'server/routes/decks/[id]/cards/set/index.dart' 'server/routes/decks/[id]/index.dart' server/routes/binder/index.dart server/routes/community/marketplace/index.dart`.
+- `rg -n "getMainType|calculateCmc|safeCmcForOptimization|isLikelyLandCard" 'server/routes/decks/[id]/index.dart' 'server/routes/community/decks/[id].dart' 'server/routes/decks/[id]/simulate/index.dart' server/lib/ai/cmc_safety.dart`.
+- `rg -n "_isBasicLandName|basic_land_utils|isBasicLandName|isRegularBasicLandName|isSnowBasicLandName" server/lib server/routes/ai/commander-reference/index.dart`.
+- Leituras diretas com `nl -ba` dos handlers e helpers citados abaixo.
+
+### Achados revalidados
+
+#### P1 - Analise de estado/arquetipo continua duplicada entre rebuild e optimize
+
+- **Simbolos:** `DeckArchetypeAnalyzer`,
+  `DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`,
+  `assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`.
+- **Copia rebuild/deck-state:** `server/lib/ai/deck_state_analysis.dart:1`
+  define `DeckArchetypeAnalyzer`; `:7`-`:23` calcula CMC medio; `:25`-`:66`
+  conta tipos; `:68`-`:96` detecta arquetipo; `:308`-`:497` implementa
+  `assessDeckOptimizationState`; `:573`-`:585` implementa
+  `resolveOptimizeArchetype`.
+- **Copia optimize/core:** `server/lib/ai/optimize_state_support.dart:6`
+  define `DeckArchetypeAnalyzerCore`; `:12`-`:28` calcula CMC medio;
+  `:30`-`:71` conta tipos; `:73`-`:101` detecta arquetipo; `:337`-`:520`
+  inicia a mesma avaliacao de estado e plano de reparo com DTO proprio.
+- **Drift confirmado em arquetipo:** a versao de
+  `deck_state_analysis.dart:573`-`:585` aceita `requestedArchetype` nullable e
+  trata `general/tempo` como genericos; a versao de
+  `server/lib/ai/optimize_runtime_support.dart:1714`-`:1734` exige string,
+  trata `unknown`, usa `goodstuff` e restringe detected especificos a
+  `aggro/control/combo/stax/tribal`.
+- **Chamadores que mantem os caminhos separados:** rebuild usa
+  `DeckArchetypeAnalyzer`/`assessDeckOptimizationState`/`resolveOptimizeArchetype`
+  em `server/lib/ai/rebuild_guided_service.dart:138`-`:174` e reavalia em
+  `:259`-`:269`; optimize context usa
+  `DeckArchetypeAnalyzerCore`/`assessDeckOptimizationStateCore`/
+  `resolveOptimizeArchetype` em
+  `server/lib/ai/optimize_request_support.dart:280`-`:313`.
+- **Por que parece duplicado/similar:** os dois caminhos respondem as mesmas
+  perguntas de produto (analise de deck, estado de reparo e arquetipo efetivo),
+  mas vivem em arquivos distintos e ja divergem no contrato de
+  `resolveOptimizeArchetype`.
+- **O que valida:** mover analise/arquetipo para uma fonte canonica com
+  adapters finos de DTO e testes cobrindo `null`, vazio, `unknown`, `tempo`,
+  `goodstuff`, `midrange` e detected especifico.
+- **O que falsifica:** teste/documentacao declarando que rebuild e optimize
+  devem ter politicas de arquetipo diferentes, com casos provando cada
+  divergencia como intencional.
+
+#### P1/P2 - Fallbacks de roles funcionais seguem duplicados em dois classificadores
+
+- **Simbolos:** `_looksLikeWincon`, `_looksLikeComboPiece`,
+  `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler`,
+  `resolveCardFunctionalRoles`, `classifyOptimizationFunctionalRole`.
+- **Copia functional tags:** `server/lib/ai/functional_card_tags.dart:319`-`:339`
+  chama os cinco fallbacks; as implementacoes ficam em `:872`-`:928`.
+- **Copia optimize roles:** `server/lib/ai/optimization_functional_roles.dart:37`-`:91`
+  centraliza a precedencia `functional_tags -> semantic_tags_v2 -> heuristica`,
+  mas `_resolveHeuristicRoles` chama os mesmos cinco conceitos em `:203`-`:207`;
+  `classifyOptimizationFunctionalRole` delega para esse adapter em `:301`-`:315`;
+  as implementacoes ficam em `:387`-`:456`.
+- **Drift confirmado:** `_looksLikeEngine` em
+  `functional_card_tags.dart:890`-`:898` aceita triggers `whenever` com
+  `draw/create token/add {/+1/+1 counter`, enquanto
+  `optimization_functional_roles.dart:396`-`:404` exige `you may` ou
+  `at the beginning of your upkeep/your end step`. `_looksLikeComboPiece` em
+  `optimization_functional_roles.dart:410`-`:415` contem padroes de remover
+  counter/castar sem pagar que nao aparecem na versao de
+  `functional_card_tags.dart:881`-`:887`; `_looksLikePayoff` em
+  `optimization_functional_roles.dart:439`-`:444` inclui token/damage payoff
+  que a outra versao nao inclui em `functional_card_tags.dart:913`-`:920`.
+- **Por que parece duplicado/similar:** a precedencia de fontes foi
+  centralizada para optimize, mas as heuristicas finais ainda podem classificar
+  a mesma carta de forma diferente conforme o fluxo chegue pelo resumo
+  funcional ou pelo adapter de optimize.
+- **O que valida:** extrair uma familia unica de heuristicas finais para roles
+  com testes de cartas multi-role e de casos de borda (`Blood Artist`,
+  `Thassa's Oracle`, engines de compra, token payoff e cost reduction).
+- **O que falsifica:** uma matriz de testes que prove que as diferencas de
+  fallback sao deliberadas entre analise agregada e optimize.
+
+#### P2 - Trust de trades/marketplace continua repetindo SQL e serializer
+
+- **Simbolos:** `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql`,
+  `_buildTrustInsight` e os LATERALs `trust/response/shipping`.
+- **Trade list:** `server/routes/trades/index.dart:557`-`:601` define os tres
+  SQL snippets; `:603`-`:635` monta o serializer de trust.
+- **Trade detail:** `server/routes/trades/[id]/index.dart:260`-`:304` repete
+  os tres SQL snippets; `:306`-`:338` repete o serializer.
+- **Marketplace:** `server/routes/community/marketplace/index.dart:131`-`:166`
+  inlinha os mesmos agregados em `LEFT JOIN LATERAL`; `:316`-`:348` repete o
+  serializer com prefixo.
+- **Por que parece duplicado/similar:** os tres endpoints calculam os mesmos
+  sinais (`completed/cancelled/declined/disputed`, resposta media, shipping
+  medio, conta nova, perfil incompleto, historico insuficiente) sem helper
+  compartilhado.
+- **O que valida:** extrair helper SQL/serializer em `server/lib` e provar que
+  listagem de trades, detalhe de trade e marketplace retornam o mesmo shape de
+  `trust`.
+- **O que falsifica:** contratos diferentes e testados para `sender.trust`,
+  `receiver.trust` e `owner.trust`, com justificativa de produto para manter
+  SQL separado.
+
+#### P2 - Request-id/log social ainda tem helpers privados repetidos
+
+- **Simbolos:** `_requestId`, `_logInvalidPayload`, `RequestTrace`.
+- **Helper compartilhado existente:** `server/lib/request_trace.dart:35`-`:49`
+  ja expoe `resolveRequestId(...)` e `getRequestTrace(...)`.
+- **Copias locais:** `server/routes/trades/index.dart:330`-`:353`,
+  `server/routes/trades/[id]/status.dart:260`-`:284`,
+  `server/routes/conversations/[id]/messages.dart:247`-`:271`,
+  `server/routes/trades/[id]/messages.dart:228`-`:252`,
+  `server/routes/trades/[id]/respond.dart:154`-`:178` e
+  `server/routes/users/[id]/follow/index.dart:97`-`:103`.
+- **Por que parece duplicado/similar:** cada rota reimplementa a mesma leitura
+  tolerante de `RequestTrace` e fallback para header `x-request-id`/`n/a`; os
+  logs de payload invalido repetem formato `social_write`.
+- **O que valida:** criar helper social de trace/log com endpoint/ids
+  parametrizados e testes de fallback sem `RequestTrace` no contexto.
+- **O que falsifica:** se o formato de log por rota for uma exigencia
+  operacional distinta e coberta por teste/snapshot.
+
+#### P2 - Politica de `condition` continua espalhada e divergente
+
+- **Simbolo/regra:** condicoes TCGPlayer `NM/LP/MP/HP/DMG`.
+- **Deck cards normalizam invalido para `NM`:**
+  `server/routes/decks/[id]/cards/index.dart:406`-`:412`,
+  `server/routes/decks/[id]/cards/set/index.dart:247`-`:252` e
+  `server/routes/decks/[id]/index.dart:518`-`:523`.
+- **Binder rejeita invalido com 400:** `server/routes/binder/index.dart:258`
+  le `condition` default `NM`, e `:275`-`:280` rejeita valores fora da lista.
+- **Marketplace ignora filtro invalido:** `server/routes/community/marketplace/index.dart:39`-`:43`
+  so aplica filtro quando `condition.toUpperCase()` esta na allow-list.
+- **Por que parece duplicado/similar:** a mesma allow-list aparece em varios
+  handlers, mas o comportamento para input invalido muda entre normalizar,
+  rejeitar e ignorar.
+- **O que valida:** helper/contrato compartilhado com modos explicitos
+  `normalize`, `reject` e `ignoreFilter`, ou convergencia de comportamento
+  entre rotas app-facing com testes.
+- **O que falsifica:** documentar e testar que cada comportamento divergente e
+  intencional por tipo de endpoint.
+
+#### P2 - Helpers de tipo/CMC continuam duplicados em rotas de deck
+
+- **Simbolos:** `getMainType`, `calculateCmc`, `_calculateCmc`,
+  `safeCmcForOptimization`.
+- **Deck privado:** `server/routes/decks/[id]/index.dart:405`-`:435` define
+  `getMainType` e `calculateCmc`.
+- **Deck publico:** `server/routes/community/decks/[id].dart:91`-`:117` repete
+  a mesma classificacao de tipo e CMC.
+- **Simulacao:** `server/routes/decks/[id]/simulate/index.dart:199`-`:214`
+  tem outra variante `_calculateCmc`.
+- **Helper parcial existente:** `server/lib/ai/cmc_safety.dart:1`-`:65` existe,
+  mas e voltado a optimization safety e nao cobre o serializer de tipo principal
+  usado nessas rotas.
+- **Por que parece duplicado/similar:** rotas que serializam decks privados e
+  publicos calculam os mesmos campos por helpers locais quase iguais; a rota de
+  simulacao usa variante propria de CMC.
+- **O que valida:** helper compartilhado para tipo principal/CMC de carta de
+  rota, com snapshots de payload privado/publico/simulacao.
+- **O que falsifica:** caso as rotas precisem de aproximacoes diferentes de CMC
+  e isso esteja expresso em contrato/testes.
+
+### Suspeitas revalidadas e nao promovidas
+
+- `server/routes/ai/optimize/index.dart:89`-`:96` e `:319`-`:365` contem
+  wrappers finos/de compatibilidade para `resolveOptimizeArchetype`,
+  `DeckArchetypeAnalyzer` e `assessDeckOptimizationState`, todos delegando a
+  `optimize_support`/`optimize_state`; nao foram contados como corpo duplicado
+  independente.
+- `buildOptimizeDeckSignature` e `buildOptimizeCacheKey` tambem seguem como
+  wrappers: `server/lib/ai/optimize_cache_support.dart:3`-`:34` contem a
+  implementacao canonica e `server/lib/ai/optimize_runtime_support.dart:1753`-`:1770`
+  apenas delega.
+- A claim antiga de basic/snow basic land duplicado continua stale:
+  `server/lib/basic_land_utils.dart:1`-`:47` centraliza nomes regulares, snow
+  basics, normalizacao e type line; consumidores atuais importam ou delegam para
+  esse helper, por exemplo `server/routes/ai/commander-reference/index.dart:17`,
+  `server/lib/generated_deck_validation_service.dart:3`,
+  `server/lib/card_validation_service.dart:4`,
+  `server/lib/deck_rules_service.dart:3` e
+  `server/lib/ai/optimize_runtime_support.dart:291`-`:306`.
+
+### Resultado desta revalidacao
+
+No checkout `1c0f9b86`, nao surgiu novo cluster confiavel de duplicacao porque
+nao houve delta de codigo de produto desde a rodada anterior deste foco.
+Permanecem abertos os mesmos grupos de risco: analise/arquetipo entre rebuild e
+optimize, fallbacks de roles funcionais, trust social/marketplace,
+request-id/log social, politica de `condition` e helpers de tipo/CMC. Foram
+mantidas como stale as suspeitas contra wrappers finos de optimize, cache key e
+basic lands.
 
 ## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-15 15:00 UTC
 
