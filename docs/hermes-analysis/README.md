@@ -87,6 +87,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Nao fazer merge bruto desses relatórios na `master` sem revalidar contra o
     código vivo.
 
+- `DECISION_TRACE_V1_SLICE_2026-06-15.md`
+  - Slice Hermes-only que adiciona `decision_trace_v1` aos replays de battle.
+  - Use para auditar por que o simulador escolheu cast/resposta/ataque/pass
+    antes de confiar em WR bruto ou sugerir swaps Lorehold.
+  - Nao altera app/API/PostgreSQL; persistencia atual e JSON/MD.
+
 ## Fonte de verdade atual
 
 1. `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`
@@ -130,17 +136,21 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
    - Inventário dos consumidores Hermes de `functional_tag` e quais já foram
      migrados para `functional_tags_json`.
 
-9. `HERMES_CRON_PIPELINE_ORDER_2026-06-07.md`
+9. `DECISION_TRACE_V1_SLICE_2026-06-15.md`
+   - Contrato inicial de rastreabilidade de decisoes do battle.
+   - Use antes de tratar WR alto como evidencia confiavel.
+
+10. `HERMES_CRON_PIPELINE_ORDER_2026-06-07.md`
    - Snapshot da ordem e estado das crons.
    - Use para entender a frota atual, mas valide contra `/opt/data/cron/jobs.json`
      e artefatos frescos no container.
 
-10. `master_optimizer_reports/`
+11. `master_optimizer_reports/`
    - Evidencias de execucoes.
    - Use sempre o report mais fresco que bate com `baseline_id`, `baseline_hash`
      e o SQLite vivo.
 
-11. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
+12. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
    - Classificacao de todos os docs raiz desta pasta.
    - Use para saber se um arquivo e canonico, operacional, historico ou backlog.
 

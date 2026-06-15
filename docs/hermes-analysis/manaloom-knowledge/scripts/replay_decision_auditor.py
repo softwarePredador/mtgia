@@ -84,15 +84,37 @@ def load_events(path: Path, replay_id: str = "external") -> list[dict[str, Any]]
     return events
 
 
-def generate_replay_events(seed: int, output_dir: Path) -> tuple[list[dict[str, Any]], Path, Path]:
+def load_decision_traces(path: Path, replay_id: str = "external") -> list[dict[str, Any]]:
+    decisions: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for index, line in enumerate(handle, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                decision = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"Invalid JSONL decision at {path}:{index}: {exc}") from exc
+            decision.setdefault("replay_id", replay_id)
+            decisions.append(decision)
+    return decisions
+
+
+def decision_trace_path_for_events(path: Path) -> Path:
+    return path.with_suffix(".decision_trace.jsonl")
+
+
+def generate_replay_events(seed: int, output_dir: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], Path, Path, Path]:
     replay_txt = output_dir / f"battle_replay_seed_{seed}.txt"
     replay_jsonl = output_dir / f"battle_replay_seed_{seed}.jsonl"
+    decision_jsonl = output_dir / f"battle_replay_seed_{seed}.decision_trace.jsonl"
     env = os.environ.copy()
     env.update(
         {
             "REPLAY_SEED": str(seed),
             "REPLAY_OUT": str(replay_txt),
             "REPLAY_EVENTS_OUT": str(replay_jsonl),
+            "DECISION_TRACE_OUT": str(decision_jsonl),
         }
     )
     completed = subprocess.run(
@@ -106,7 +128,13 @@ def generate_replay_events(seed: int, output_dir: Path) -> tuple[list[dict[str, 
     if completed.returncode != 0:
         output = (completed.stdout or "") + "\n" + (completed.stderr or "")
         raise RuntimeError(f"Replay generator failed for seed {seed}:\n{output[-2000:]}")
-    return load_events(replay_jsonl, replay_id=f"seed_{seed}"), replay_txt, replay_jsonl
+    return (
+        load_events(replay_jsonl, replay_id=f"seed_{seed}"),
+        load_decision_traces(decision_jsonl, replay_id=f"seed_{seed}") if decision_jsonl.exists() else [],
+        replay_txt,
+        replay_jsonl,
+        decision_jsonl,
+    )
 
 
 def add_finding(
@@ -425,6 +453,72 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return findings
 
 
+def _option_identity(option: Any) -> str:
+    if not isinstance(option, dict):
+        return str(option)
+    return str(option.get("card") or option.get("target") or option.get("action") or option)
+
+
+def audit_decision_traces(decisions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    required = {
+        "decision_id",
+        "turn",
+        "phase",
+        "player",
+        "decision_type",
+        "available_options",
+        "chosen_option",
+        "score_components",
+        "rule_source",
+        "rule_status",
+        "confidence",
+        "expected_benefit_score",
+    }
+    for decision in decisions:
+        event = {
+            "event": f"decision:{decision.get('decision_type', '?')}",
+            "replay_id": decision.get("replay_id", "external"),
+            "turn": decision.get("turn", "?"),
+            "player": decision.get("player", "?"),
+        }
+        decision_id = str(decision.get("decision_id") or "")
+        missing = sorted(field for field in required if field not in decision)
+        if missing:
+            add_finding(findings, "high", event, f"Decision trace missing fields: {', '.join(missing)}.")
+        if not decision_id:
+            add_finding(findings, "high", event, "Decision trace has empty decision_id.")
+        elif decision_id in seen_ids:
+            add_finding(findings, "high", event, f"Duplicate decision_id: {decision_id}.")
+        else:
+            seen_ids.add(decision_id)
+
+        options = decision.get("available_options")
+        if not isinstance(options, list) or not options:
+            add_finding(findings, "high", event, "Decision trace has no available_options.")
+            options = []
+        chosen = decision.get("chosen_option")
+        chosen_key = _option_identity(chosen)
+        option_keys = {_option_identity(option) for option in options}
+        if chosen_key and chosen_key not in option_keys:
+            add_finding(findings, "high", event, "Chosen option is not present in available_options.")
+        scores = decision.get("score_components")
+        if not isinstance(scores, dict) or not scores:
+            add_finding(findings, "medium", event, "Decision trace has empty score_components.")
+        if not decision.get("rule_source") or not decision.get("rule_status"):
+            add_finding(findings, "medium", event, "Decision trace is missing rule source/status.")
+        try:
+            float(decision.get("expected_benefit_score", 0))
+        except (TypeError, ValueError):
+            add_finding(findings, "medium", event, "Decision expected_benefit_score is not numeric.")
+        if str(decision.get("rule_source") or "").lower() == "unknown":
+            add_finding(findings, "low", event, "Decision used unknown rule source; keep as audit-only.")
+        if str(decision.get("rule_status") or "").lower() == "needs_review":
+            add_finding(findings, "low", event, "Decision used needs_review rule; keep as audit-only.")
+    return findings
+
+
 def aggregate_findings(matchups: list[dict[str, Any]]) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     for matchup in matchups:
@@ -484,10 +578,14 @@ def render_report(
     baseline_id: int,
     baseline_findings: list[dict[str, Any]],
     turn_findings: list[dict[str, Any]],
+    decision_findings: list[dict[str, Any]],
     event_count: int,
-    replay_files: list[tuple[Path, Path]],
+    decision_count: int,
+    replay_files: list[tuple[Path, Path, Path | None]],
 ) -> str:
-    counts = severity_counts(turn_findings)
+    counts = severity_counts(turn_findings + decision_findings)
+    turn_counts = severity_counts(turn_findings)
+    decision_counts = severity_counts(decision_findings)
     critical_or_high = counts.get("critical", 0) + counts.get("high", 0)
     status = "blocked_turn_decisions" if critical_or_high else "turn_by_turn_clean"
     lines = [
@@ -497,7 +595,9 @@ def render_report(
         f"- baseline_id: {baseline_id}",
         f"- status: {status}",
         f"- structured_events: {event_count}",
+        f"- decision_traces: {decision_count}",
         f"- turn_findings: {len(turn_findings)}",
+        f"- decision_findings: {len(decision_findings)}",
         f"- critical: {counts.get('critical', 0)}",
         f"- high: {counts.get('high', 0)}",
         f"- medium: {counts.get('medium', 0)}",
@@ -507,9 +607,11 @@ def render_report(
         "",
     ]
     if replay_files:
-        for txt, jsonl in replay_files:
+        for txt, jsonl, decision_jsonl in replay_files:
             lines.append(f"- text: `{txt}`")
             lines.append(f"- events: `{jsonl}`")
+            if decision_jsonl:
+                lines.append(f"- decision_trace: `{decision_jsonl}`")
     else:
         lines.append("- external events file was used.")
 
@@ -535,6 +637,29 @@ def render_report(
     lines.extend(
         [
             "",
+            "## Decision Trace Findings",
+            "",
+            f"- critical/high: {decision_counts.get('critical', 0) + decision_counts.get('high', 0)}",
+            f"- medium: {decision_counts.get('medium', 0)}",
+            f"- low: {decision_counts.get('low', 0)}",
+            "",
+            "| Severity | Replay | Turn | Player | Event | Finding |",
+            "| --- | --- | ---: | --- | --- | --- |",
+        ]
+    )
+    if decision_findings:
+        for finding in decision_findings:
+            lines.append(
+                "| {severity} | {replay_id} | {turn} | {player} | {event} | {finding} |".format(
+                    **finding
+                )
+            )
+    else:
+        lines.append("| info | all | - | all | all | No decision-trace red flags found. |")
+
+    lines.extend(
+        [
+            "",
             "## Aggregate Baseline Findings",
             "",
             "| Severity | Opponent | Finding |",
@@ -555,8 +680,10 @@ def render_report(
             "## Gate Interpretation",
             "",
             "- `critical` or `high` turn findings block optimizer trust until battle logic is fixed.",
+            "- `critical` or `high` decision findings block optimizer trust until trace quality is fixed.",
             "- `medium` findings require review before product-facing deck mutation.",
             "- `low` findings are polish/heuristic notes and do not block a Hermes-local experiment.",
+            f"- Turn finding counts: {turn_counts}.",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -566,38 +693,57 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--deck-id", type=int, default=6)
     parser.add_argument("--events", type=Path)
+    parser.add_argument("--decision-trace", type=Path)
+    parser.add_argument("--require-decision-trace", action="store_true")
+    parser.add_argument("--skip-baseline", action="store_true", help="audit only replay/decision JSONL without optimizer DB")
     parser.add_argument("--generate", type=int, default=3, help="fresh replays to generate when --events is omitted")
     parser.add_argument("--seed-start", type=int, default=42)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
 
-    with connect() as conn:
-        ensure_optimizer_tables(conn)
-        baseline = latest_baseline(conn, args.deck_id)
-        if not baseline:
-            raise SystemExit("No approved baseline found. Run baseline first.")
-        payload = json.loads(baseline["result_json"])
-        matchups = payload.get("matchups", [])
+    if args.skip_baseline:
+        baseline = {"id": 0}
+        matchups = []
+    else:
+        with connect() as conn:
+            ensure_optimizer_tables(conn)
+            baseline = latest_baseline(conn, args.deck_id)
+            if not baseline:
+                raise SystemExit("No approved baseline found. Run baseline first.")
+            payload = json.loads(baseline["result_json"])
+            matchups = payload.get("matchups", [])
 
-    replay_files: list[tuple[Path, Path]] = []
+    replay_files: list[tuple[Path, Path, Path | None]] = []
     events: list[dict[str, Any]] = []
+    decisions: list[dict[str, Any]] = []
     if args.events:
         events.extend(load_events(args.events))
+        decision_path = args.decision_trace or decision_trace_path_for_events(args.events)
+        if decision_path.exists():
+            decisions.extend(load_decision_traces(decision_path))
+        elif args.require_decision_trace:
+            raise SystemExit(f"Decision trace file not found: {decision_path}")
     else:
         tmp_dir = writable_replay_dir(args.report)
         for seed in range(args.seed_start, args.seed_start + max(1, args.generate)):
-            generated, txt, jsonl = generate_replay_events(seed, tmp_dir)
+            generated, generated_decisions, txt, jsonl, decision_jsonl = generate_replay_events(seed, tmp_dir)
             events.extend(generated)
-            replay_files.append((txt, jsonl))
+            decisions.extend(generated_decisions)
+            replay_files.append((txt, jsonl, decision_jsonl if decision_jsonl.exists() else None))
+        if args.require_decision_trace and not decisions:
+            raise SystemExit("Fresh replay generation did not produce decision traces.")
 
     turn_findings = audit_turn_events(events)
+    decision_findings = audit_decision_traces(decisions)
     baseline_findings = aggregate_findings(matchups)
     markdown = render_report(
         deck_id=args.deck_id,
         baseline_id=baseline["id"],
         baseline_findings=baseline_findings,
         turn_findings=turn_findings,
+        decision_findings=decision_findings,
         event_count=len(events),
+        decision_count=len(decisions),
         replay_files=replay_files,
     )
     print(markdown)

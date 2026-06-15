@@ -23,6 +23,22 @@
   `/ai/weakness-analysis`, `/ai/optimize` e prompts runtime; remover nomes fixos
   restantes apenas quando houver policy/dado versionado equivalente.
 
+### Atualizacao de ciclo — 2026-06-15
+
+- Implementado primeiro slice Hermes-only de `decision_trace_v1`:
+  `battle_analyst_v9.py` emite decisoes auditaveis como side-channel opcional,
+  `battle_replay_v10_3.py` grava `*.decision_trace.jsonl` e
+  `replay_decision_auditor.py` passa a auditar decisoes alem dos eventos finais.
+- O trace cobre cast de spell/ramp/criatura/high-threat, respostas com
+  counter/protection, ataque/combat target e pass/no-action de prioridade.
+- `card_impact_analyzer.py` passou a expor `WR sem carta vista`,
+  `delta_vs_not_seen`, `sample_size` e `sample_quality`; `loss_mode_suggester.py`
+  bloqueia recomendacoes com amostra baixa.
+- Continua pendente: rodar o full replay no Hermes AWS com SQLite completo,
+  persistir apenas artefatos JSON/MD neste ciclo e adiar tabela SQLite/PG ate o
+  formato estabilizar. WR alto de Lorehold segue `needs_more_samples` quando
+  houver `unknown_effect`, `heuristic_effect` ou amostra baixa.
+
 | Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
@@ -197,6 +213,8 @@
 | Diagnóstico de roles do optimize | ✅ OK | `optimization_functional_roles.dart`, `optimization_validator_test.dart` | `role_delta` usa `functional_tags` persistido antes de `semantic_tags_v2`, alinhando decisão de swap com a análise exibida ao usuário |
 | Arquétipo efetivo do optimize/rebuild | ✅ OK | `optimize_archetype_support.dart`, `optimize_archetype_support_test.dart` | Política única para request genérico/específico e arquétipo detectado, removendo drift entre runtime e deck-state analysis |
 | Roles estratégicos de cartas | ✅ OK | `functional_card_tags.dart`, `optimization_functional_roles.dart`, `functional_card_tags_test.dart` | `wincon`, `combo_piece`, `engine`, `payoff` e `enabler` passam pelo adapter único `resolveCardFunctionalRoles` |
+| Decision Trace v1 | ✅ Slice inicial | `battle_analyst_v9.py`, `battle_replay_v10_3.py`, `replay_decision_auditor.py`, `battle_decision_trace_tests.py` | Side-channel opcional cobre cast/resposta/combat/pass. Ainda falta rodar batch AWS completo e ampliar para tutor, board wipe e bloqueio |
+| Estatística Commander-safe | ⚠️ Parcial | `card_impact_analyzer.py`, `loss_mode_suggester.py` | WR com/sem carta vista e sample gate existem; ainda falta baseline hash fresco por rodada e segmentação por arquétipo/turno antes de confiar em swaps |
 
 ### 9.1 Arquivos grandes / modularização (P1)
 

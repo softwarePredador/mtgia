@@ -115,6 +115,54 @@ Eventos emitidos:
 - `player_eliminated`: jogador, motivo
 - `game_ended`: resultado, turno, motivo (adicionado pelo gerador de replays)
 
+### 2.5.1 Decision Trace v1
+
+Desde 2026-06-15, o engine tambem suporta `DECISION_TRACE_HANDLER` como
+side-channel opcional. Ele nao altera ordem de prioridade, mana, stack, combate
+ou resultado da partida; apenas grava a decisao tomada.
+
+Cada decisao registra:
+- `decision_id`
+- `replay_id`
+- `turn`
+- `phase`
+- `player`
+- `decision_type`
+- `available_options`
+- `chosen_option`
+- `rejected_options`
+- `score_components`
+- `rule_source`
+- `rule_status`
+- `confidence`
+- `expected_benefit_score`
+- `actual_outcome`
+
+Cobertura inicial:
+- cast de ramp;
+- cast de spell normal;
+- cast de criatura;
+- cast high-threat/wincon;
+- resposta com protection/counter;
+- ataque/combat target;
+- pass/no-action de prioridade.
+
+Auditoria:
+
+```bash
+python3 replay_decision_auditor.py \
+  --events /path/replay.jsonl \
+  --decision-trace /path/replay.decision_trace.jsonl \
+  --require-decision-trace
+```
+
+Uso correto:
+- `unknown` e `needs_review` sao achados auditaveis, nao enforcement duro.
+- WR alto de Lorehold nao vira conclusao confiavel sem trace limpo, baseline
+  fresco e amostra minima.
+- Persistencia atual e somente artefato JSON/MD; SQLite/PG ficam fora ate o
+  formato estabilizar.
+
 ### 2.6 Carregamento de Oponentes
 
 ```python
@@ -202,6 +250,9 @@ vs Kinnan WR=0% [W:elimination=1, L:screw=4, L:out-valued=2]
 | WDWR | When Drawn Win Rate | jogos_ganhos_com_carta_na_mao / jogos_que_carta_apareceu |
 | WPWR | When Played Win Rate | jogos_ganhos_com_carta_jogada / jogos_que_carta_foi_jogada |
 | Impact Delta | WDWR - Baseline WR | Quanto a carta desvia da média |
+| WNS WR | Win Rate sem carta vista | jogos_ganhos_sem_carta_vista / jogos_sem_carta_vista |
+| Delta vs Not Seen | WDWR - WNS WR | Evita confiar apenas em WR bruto |
+| Sample Quality | `low_sample` / `usable` | Bloqueia conclusao quando a amostra nao sustenta decisao |
 
 ### 4.2 Geração de Replays (generate_card_replays.py)
 
@@ -218,6 +269,7 @@ python3 generate_card_replays.py --games 5 --opponents 6 --deck-id 6
 
 ```bash
 python3 card_impact_analyzer.py --replay-dir /path/to/replays
+python3 card_impact_analyzer.py --replay-dir /path/to/replays --json-output /tmp/card_impact.json
 ```
 
 - Lê todos os arquivos JSONL

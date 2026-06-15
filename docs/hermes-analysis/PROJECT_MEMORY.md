@@ -119,6 +119,12 @@ Ao responder sobre o ManaLoom:
   `apply_approved=false`; a tentativa local retornou `pg_apply.blocked=true`.
   Nenhum apply em `card_function_tags` está liberado sem nova allowlist
   revisada com `apply_approved=true`.
+- Decision Trace v1 entrou em 2026-06-15 como slice Hermes-only:
+  `battle_analyst_v9.py` emite decisoes por side-channel opcional,
+  `battle_replay_v10_3.py` grava `*.decision_trace.jsonl`, e
+  `replay_decision_auditor.py` audita decisoes sem alterar simulacao, API,
+  Flutter ou PostgreSQL. Fonte operacional:
+  `docs/hermes-analysis/DECISION_TRACE_V1_SLICE_2026-06-15.md`.
 - Identidade canônica de carta entrou em transição em 2026-06-12: backend/sync
   agora têm contrato aditivo para `cards.oracle_id`, `cards.layout` e
   `cards.card_faces_json`, tratando `scryfall_id` como printing id. Ainda falta

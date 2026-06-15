@@ -188,6 +188,14 @@ misc_regression_spec = importlib.util.spec_from_file_location(
 battle_misc_regression_tests = importlib.util.module_from_spec(misc_regression_spec)
 misc_regression_spec.loader.exec_module(battle_misc_regression_tests)
 
+DECISION_TRACE_TESTS_PATH = MODULE_PATH.with_name("battle_decision_trace_tests.py")
+decision_trace_spec = importlib.util.spec_from_file_location(
+    "battle_decision_trace_tests_under_test",
+    DECISION_TRACE_TESTS_PATH,
+)
+battle_decision_trace_tests = importlib.util.module_from_spec(decision_trace_spec)
+decision_trace_spec.loader.exec_module(battle_decision_trace_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -230,6 +238,7 @@ if __name__ == "__main__":
         *battle_summoning_sickness_tests.register_tests(battle, player, card),
         *battle_zone_transition_tests.register_tests(battle, player, card),
         *battle_misc_regression_tests.register_tests(battle, player, replay_auditor),
+        *battle_decision_trace_tests.register_tests(battle, replay_auditor),
     ]
     for test in tests:
         if hasattr(battle, "clear_pending_triggers"):

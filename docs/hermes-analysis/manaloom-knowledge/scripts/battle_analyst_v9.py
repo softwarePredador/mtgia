@@ -93,6 +93,9 @@ KNOWLEDGE_DIR = os.environ.get(
 LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
 
 REPLAY_EVENT_HANDLER = None
+DECISION_TRACE_HANDLER = None
+DECISION_TRACE_COUNTER = 0
+DECISION_TRACE_SCHEMA_VERSION = "decision_trace_v1"
 ENGINE_METRICS = None
 
 
@@ -107,6 +110,97 @@ def emit_replay_event(event, **data):
         return
     try:
         REPLAY_EVENT_HANDLER(event, data)
+    except Exception:
+        pass
+
+
+def reset_decision_trace_counter():
+    """Reset per-replay decision IDs without touching simulation state."""
+    global DECISION_TRACE_COUNTER
+    DECISION_TRACE_COUNTER = 0
+
+
+def _next_decision_id(replay_id=None):
+    global DECISION_TRACE_COUNTER
+    DECISION_TRACE_COUNTER += 1
+    prefix = replay_id or "decision"
+    return f"{prefix}-{DECISION_TRACE_COUNTER:06d}"
+
+
+def decision_card_option(card, effect_data=None, score=None, action=None, **extra):
+    """Small, stable card/action snapshot for decision trace JSONL."""
+    if card is None:
+        option = {"action": action or "none"}
+    elif isinstance(card, dict):
+        effect_data = effect_data or get_card_effect(card)
+        option = {
+            "card": card.get("name", "?"),
+            "action": action or "cast",
+            "effect": effect_data.get("effect", card.get("effect", "unknown")),
+            "cmc": card.get("cmc", 0),
+            "type_line": card.get("type_line", ""),
+        }
+    else:
+        option = {"action": action or str(card)}
+    if score is not None:
+        option["score"] = score
+    option.update({k: v for k, v in extra.items() if v is not None})
+    return option
+
+
+def _option_identity(option):
+    if not isinstance(option, dict):
+        return str(option)
+    return str(option.get("card") or option.get("action") or option)
+
+
+def emit_decision_trace(
+    *,
+    decision_type,
+    player,
+    turn,
+    phase,
+    available_options,
+    chosen_option,
+    rejected_options=None,
+    score_components=None,
+    rule_source="heuristic",
+    rule_status="heuristic",
+    confidence="medium",
+    expected_benefit_score=0,
+    actual_outcome=None,
+    reason=None,
+    replay_id=None,
+):
+    """Emit optional decision trace data without changing battle behavior."""
+    if DECISION_TRACE_HANDLER is None:
+        return
+    try:
+        options = list(available_options or [])
+        chosen = chosen_option or {"action": "pass"}
+        chosen_key = _option_identity(chosen)
+        if chosen_key and all(_option_identity(option) != chosen_key for option in options):
+            options.insert(0, chosen)
+        payload = {
+            "schema_version": DECISION_TRACE_SCHEMA_VERSION,
+            "decision_id": _next_decision_id(replay_id),
+            "replay_id": replay_id,
+            "turn": turn,
+            "phase": phase,
+            "player": getattr(player, "name", str(player)),
+            "decision_type": decision_type,
+            "available_options": options,
+            "chosen_option": chosen,
+            "rejected_options": list(rejected_options or []),
+            "score_components": dict(score_components or {"heuristic": 0}),
+            "rule_source": rule_source or "unknown",
+            "rule_status": rule_status or "unknown",
+            "confidence": confidence,
+            "expected_benefit_score": expected_benefit_score,
+            "actual_outcome": actual_outcome,
+            "reason": reason,
+        }
+        DECISION_TRACE_HANDLER(payload)
     except Exception:
         pass
 
@@ -4084,6 +4178,22 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             phase=phase,
             reason="empty_stack",
         )
+        emit_decision_trace(
+            decision_type="pass_no_action",
+            player=active_player,
+            turn=turn,
+            phase=phase,
+            available_options=[{"action": "pass"}],
+            chosen_option={"action": "pass"},
+            rejected_options=[],
+            score_components={"stack_empty": 1, "main_phase_action_taken": 0},
+            rule_source="battle_heuristic",
+            rule_status="heuristic",
+            confidence="medium",
+            expected_benefit_score=0,
+            actual_outcome="priority_pass",
+            reason="empty_stack_no_action",
+        )
         return False
 
     order = priority_order_from(active_player, all_players)
@@ -4114,6 +4224,41 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     eff = get_card_effect(c)
                     if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm"):
                         if player.can_pay_card(c):
+                            fields = replay_rule_fields(eff)
+                            emit_decision_trace(
+                                decision_type="response",
+                                player=player,
+                                turn=turn,
+                                phase=phase,
+                                available_options=[
+                                    decision_card_option(
+                                        option_card,
+                                        get_card_effect(option_card),
+                                        action="respond",
+                                    )
+                                    for option_card in instants[:8]
+                                ],
+                                chosen_option=decision_card_option(c, eff, action="protect"),
+                                rejected_options=[
+                                    decision_card_option(
+                                        option_card,
+                                        get_card_effect(option_card),
+                                        action="reject_response",
+                                    )
+                                    for option_card in instants
+                                    if option_card is not c
+                                ][:8],
+                                score_components={
+                                    "stack_threat_score": score,
+                                    "available_instants": len(instants),
+                                },
+                                rule_source=fields.get("rule_source", "battle_heuristic"),
+                                rule_status=fields.get("rule_review_status", "heuristic"),
+                                confidence="medium",
+                                expected_benefit_score=score,
+                                actual_outcome="protective_response_cast",
+                                reason="high_threat_stack_response",
+                            )
                             player.hand.remove(c)
                             player.spend_card_mana(c)
                             c["_response_to_effect"] = top_item.effect_data.get("effect")
@@ -4122,7 +4267,45 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
         else:
             # v8.2: Smart counter decision based on threat score
             if player != top_item.controller and counter_worth(score, player, rng):
-                if player.use_counterspell(turn, top_item.card):
+                counters = player.counterspell_cards(castable_only=True)
+                counter = player.use_counterspell(turn, top_item.card)
+                if counter:
+                    fields = replay_rule_fields(get_card_effect(counter))
+                    emit_decision_trace(
+                        decision_type="response",
+                        player=player,
+                        turn=turn,
+                        phase=phase,
+                        available_options=[
+                            decision_card_option(
+                                option_card,
+                                get_card_effect(option_card),
+                                action="counter",
+                            )
+                            for option_card in counters[:8]
+                        ],
+                        chosen_option=decision_card_option(counter, get_card_effect(counter), action="counter"),
+                        rejected_options=[
+                            decision_card_option(
+                                option_card,
+                                get_card_effect(option_card),
+                                action="reject_counter",
+                            )
+                            for option_card in counters
+                            if option_card is not counter
+                        ][:8],
+                        score_components={
+                            "stack_threat_score": score,
+                            "counter_worth": 1,
+                            "available_counters": len(counters),
+                        },
+                        rule_source=fields.get("rule_source", "battle_heuristic"),
+                        rule_status=fields.get("rule_review_status", "heuristic"),
+                        confidence="medium",
+                        expected_benefit_score=score,
+                        actual_outcome="counterspell_used",
+                        reason="counter_high_threat_spell",
+                    )
                     stack.items[-1].countered = True
                     return True
 
@@ -5414,6 +5597,42 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="ramp")
                 if not commit_cast_payment(cast_ctx):
                     continue
+                fields = replay_rule_fields(eff)
+                emit_decision_trace(
+                    decision_type="cast_spell",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            action="cast_ramp",
+                        )
+                        for option_card in ramp_cards[:8]
+                    ],
+                    chosen_option=decision_card_option(c, eff, action="cast_ramp"),
+                    rejected_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            action="defer_ramp",
+                        )
+                        for option_card in ramp_cards
+                        if option_card is not c
+                    ][:8],
+                    score_components={
+                        "role": "ramp",
+                        "mana_before": mana,
+                        "ramp_options": len(ramp_cards),
+                    },
+                    rule_source=fields.get("rule_source", "battle_heuristic"),
+                    rule_status=fields.get("rule_review_status", "heuristic"),
+                    confidence="medium",
+                    expected_benefit_score=max(1, int(c.get("cmc", 0) or 0) + 10),
+                    actual_outcome="cast_and_resolve_ramp",
+                    reason="early_mana_development",
+                )
                 player.hand.remove(c)
                 emit_replay_event(
                     "spell_cast",
@@ -5494,6 +5713,45 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="high_threat")
                 if not commit_cast_payment(cast_ctx):
                     return False
+                chosen_score = next((s for card_item, s in scored if card_item is c), scored[0][1])
+                fields = replay_rule_fields(eff)
+                emit_decision_trace(
+                    decision_type="cast_spell",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            score=option_score,
+                            action="cast",
+                        )
+                        for option_card, option_score in scored[:8]
+                    ],
+                    chosen_option=decision_card_option(c, eff, score=chosen_score, action="cast_high_threat"),
+                    rejected_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            score=option_score,
+                            action="defer_cast",
+                        )
+                        for option_card, option_score in scored
+                        if option_card is not c
+                    ][:8],
+                    score_components={
+                        "threat_score": chosen_score,
+                        "castable_count": len(scored),
+                        "mana_before": mana,
+                    },
+                    rule_source=fields.get("rule_source", "battle_heuristic"),
+                    rule_status=fields.get("rule_review_status", "heuristic"),
+                    confidence="medium",
+                    expected_benefit_score=chosen_score,
+                    actual_outcome="cast_to_stack",
+                    reason="highest_threat_main_phase_spell",
+                )
                 player.hand.remove(c)
                 emit_replay_event(
                     "spell_cast",
@@ -5545,6 +5803,49 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="creature")
                 if not commit_cast_payment(cast_ctx):
                     continue
+                fields = replay_rule_fields(eff)
+                emit_decision_trace(
+                    decision_type="cast_spell",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            score=threat_score(
+                                get_card_effect(option_card).get("effect", ""),
+                                option_card.get("name", ""),
+                                player,
+                                all_players,
+                                turn,
+                            ),
+                            action="cast",
+                        )
+                        for option_card in remaining[:8]
+                    ],
+                    chosen_option=decision_card_option(c, eff, action="cast_creature"),
+                    rejected_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            action="defer_cast",
+                        )
+                        for option_card in remaining
+                        if option_card is not c
+                    ][:8],
+                    score_components={
+                        "role": "creature",
+                        "cmc": c.get("cmc", 0),
+                        "remaining_options": len(remaining),
+                    },
+                    rule_source=fields.get("rule_source", "battle_heuristic"),
+                    rule_status=fields.get("rule_review_status", "heuristic"),
+                    confidence="medium",
+                    expected_benefit_score=max(1, int(c.get("power", 0) or 0) + int(c.get("cmc", 0) or 0)),
+                    actual_outcome="creature_to_battlefield",
+                    reason="lowest_cmc_castable_creature",
+                )
                 player.hand.remove(c)
                 c_copy = enrich_card({**c, **eff})
                 c_copy["effect"] = "creature"
@@ -5630,6 +5931,50 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="normal")
                 if not commit_cast_payment(cast_ctx):
                     continue
+                normal_score = threat_score(eff.get("effect", ""), c.get("name", ""), player, all_players, turn)
+                fields = replay_rule_fields(eff)
+                emit_decision_trace(
+                    decision_type="cast_spell",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            score=threat_score(
+                                get_card_effect(option_card).get("effect", ""),
+                                option_card.get("name", ""),
+                                player,
+                                all_players,
+                                turn,
+                            ),
+                            action="cast",
+                        )
+                        for option_card in remaining[:8]
+                    ],
+                    chosen_option=decision_card_option(c, eff, score=normal_score, action="cast_spell"),
+                    rejected_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            action="defer_cast",
+                        )
+                        for option_card in remaining
+                        if option_card is not c
+                    ][:8],
+                    score_components={
+                        "threat_score": normal_score,
+                        "cmc": c.get("cmc", 0),
+                        "remaining_options": len(remaining),
+                    },
+                    rule_source=fields.get("rule_source", "battle_heuristic"),
+                    rule_status=fields.get("rule_review_status", "heuristic"),
+                    confidence="medium",
+                    expected_benefit_score=normal_score,
+                    actual_outcome="cast_to_stack",
+                    reason="lowest_cmc_castable_spell",
+                )
                 player.hand.remove(c)
                 emit_replay_event(
                     "spell_cast",
@@ -6368,6 +6713,52 @@ def declare_attackers_step(attacker, opponents, turn):
             ),
         )
         target_reason = "default_low_life"
+
+    emit_decision_trace(
+        decision_type="combat_attack",
+        player=attacker,
+        turn=turn,
+        phase="combat",
+        available_options=[
+            {
+                "action": "attack_player",
+                "target": defender.name,
+                "life": defender.life,
+                "threat_level": defender.threat_level,
+                "creatures": len(defender.creatures_for_blocking()),
+                "approach_count": defender.approach_count,
+            }
+            for defender in alive_defenders
+        ],
+        chosen_option={
+            "action": "attack_player",
+            "target": target.name,
+            "reason": target_reason,
+        },
+        rejected_options=[
+            {
+                "action": "reject_attack_target",
+                "target": defender.name,
+                "life": defender.life,
+                "threat_level": defender.threat_level,
+            }
+            for defender in alive_defenders
+            if defender is not target
+        ],
+        score_components={
+            "attackers": len(attackers),
+            "total_power": total_power,
+            "target_life_before": target.life,
+            "target_reason": target_reason,
+            "multi_defender_available": int(len(alive_defenders) > 1),
+        },
+        rule_source="battle_heuristic",
+        rule_status="heuristic",
+        confidence="medium",
+        expected_benefit_score=total_power,
+        actual_outcome="attackers_declared",
+        reason=target_reason,
+    )
 
     emit_replay_event(
         "combat_step",

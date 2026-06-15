@@ -14,6 +14,10 @@ BATTLE_PATH = os.environ.get(
 )
 OUT = os.environ.get("REPLAY_OUT", "/tmp/battle_full_replay.txt")
 EVENTS_OUT = os.environ.get("REPLAY_EVENTS_OUT", str(Path(OUT).with_suffix(".jsonl")))
+DECISION_TRACE_OUT = os.environ.get(
+    "DECISION_TRACE_OUT",
+    str(Path(EVENTS_OUT).with_suffix(".decision_trace.jsonl")),
+)
 
 
 def load_battle():
@@ -28,12 +32,21 @@ def main():
 
     Path(OUT).parent.mkdir(parents=True, exist_ok=True)
     Path(EVENTS_OUT).parent.mkdir(parents=True, exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as replay, open(EVENTS_OUT, "w", encoding="utf-8") as events:
+    Path(DECISION_TRACE_OUT).parent.mkdir(parents=True, exist_ok=True)
+    replay_id = f"seed_{os.environ.get('REPLAY_SEED', '42')}"
+    if hasattr(battle, "reset_decision_trace_counter"):
+        battle.reset_decision_trace_counter()
+    with (
+        open(OUT, "w", encoding="utf-8") as replay,
+        open(EVENTS_OUT, "w", encoding="utf-8") as events,
+        open(DECISION_TRACE_OUT, "w", encoding="utf-8") as decisions,
+    ):
         def log(event, data):
             events.write(
                 json.dumps(
                     {
                         "event": event,
+                        "replay_id": replay_id,
                         **data,
                     },
                     ensure_ascii=True,
@@ -114,7 +127,16 @@ def main():
                 )
             replay.flush()
 
+        def log_decision(data):
+            payload = {**data, "replay_id": data.get("replay_id") or replay_id}
+            decisions.write(
+                json.dumps(payload, ensure_ascii=True, sort_keys=True, default=str)
+                + "\n"
+            )
+            decisions.flush()
+
         battle.REPLAY_EVENT_HANDLER = log
+        battle.DECISION_TRACE_HANDLER = log_decision
         commander, deck = battle.load_deck()
         learned = battle.load_learned_opponents()
         source = learned if learned and len(learned) >= 3 else battle.OPPONENT_ARCHETYPES
@@ -212,6 +234,7 @@ def main():
 
     print(f"Replay: {OUT}")
     print(f"Replay events: {EVENTS_OUT}")
+    print(f"Decision trace: {DECISION_TRACE_OUT}")
 
 
 if __name__ == "__main__":
