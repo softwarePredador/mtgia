@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-15 11:00 UTC
+> Data: 2026-06-15 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,10 +20,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `.dart_frog/server.dart` em runtime, e `dart analyze bin/local_test_server.dart`
    retornou `No issues found`.
 5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
-   `server/lib`**: **REVALIDADO no checkout local `a81fd69a` em 2026-06-14
-   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`2a1963d3..HEAD`),
-   o delta de produto no recorte app/backend continua nulo e as mudancas sao
-   somente documentais em `docs/hermes-analysis`. Os riscos
+   `server/lib`**: **REVALIDADO no checkout local `9adb0989` em 2026-06-15
+   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`53e604e9..HEAD`),
+   o delta de produto no recorte app/backend/testes/API contract continua nulo
+   e as mudancas sao somente documentais em `docs/hermes-analysis`. Os riscos
    anteriores de ownership em `POST /ai/optimize`, `POST /ai/archetypes` e
    polling de jobs async seguem stale: optimize exige usuario, passa `userId`
    para o loader owner-scoped, jobs rejeitam owner vazio/diferente, e archetypes
@@ -746,10 +746,10 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-14 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `a81fd69a`. Desde a rodada anterior deste mesmo foco (`2a1963d3..HEAD`),
-  o delta de produto no recorte app/backend continua nulo: somente
-  `docs/hermes-analysis/PLANO_CORRECAO.md`,
+- **Status 2026-06-15 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `9adb0989`. Desde a rodada anterior deste mesmo foco (`53e604e9..HEAD`),
+  o delta de produto no recorte app/backend/testes/API contract continua nulo:
+  somente `docs/hermes-analysis/PLANO_CORRECAO.md`,
   `docs/hermes-analysis/STRUCTURE_AUDIT.md` e
   `docs/hermes-analysis/TECHNICAL_MAP.md` mudaram. Os achados anteriores de
   ownership em `/ai/optimize`, `/ai/archetypes` e jobs async de
@@ -762,9 +762,9 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
   - O app envia `POST /ai/optimize` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`. A rota
     exige usuario autenticado em `server/routes/ai/optimize/index.dart:479`-`:480`
-    e passa `authenticatedUserId` para `loadOptimizeDeckContext` em `:560`-`:575`.
+    e passa `authenticatedUserId` para `loadOptimizeDeckContext` em `:560`-`:568`.
     O helper consulta `decks` por `id + user_id` em
-    `server/lib/ai/optimize_request_support.dart:64`-`:84`.
+    `server/lib/ai/optimize_request_support.dart:53`-`:83`.
   - O contexto principal de optimize carrega `$semanticV2Select` e
     `$functionalTagsSelect` em
     `server/lib/ai/optimize_request_support.dart:97`-`:123`. O classificador de
@@ -777,12 +777,12 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
     `job.userId.isEmpty || job.userId != userId` em
     `server/routes/ai/optimize/jobs/[id].dart:26`-`:47`. O mesmo padrao existe
     para generate em `server/lib/ai_generate_job.dart:18`-`:23` e
-    `server/routes/ai/generate/jobs/[id].dart:16`-`:27`.
+    `server/routes/ai/generate/jobs/[id].dart:16`-`:24`.
   - `app/lib/features/decks/providers/deck_provider.dart:603`-`:614` emite
     `deck_rebuild_created` quando rebuild cria draft; a rota
     `server/routes/users/me/activation-events/index.dart:10`-`:18` nao inclui
     esse evento em `_allowedEvents` e rejeita fora da lista em `:46`-`:48`.
-    `app/test/features/decks/providers/deck_provider_test.dart:874`-`:891`
+    `app/test/features/decks/providers/deck_provider_test.dart:888`-`:891`
     espera explicitamente esse evento no provider.
   - `app/lib/features/decks/screens/deck_generate_screen.dart:127`-`:130` carrega
     learned decks no primeiro frame; `:132`-`:143` indexa a disponibilidade por
