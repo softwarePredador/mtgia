@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-15 07:00 UTC
+> Data: 2026-06-15 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-14 11:00 UTC no checkout `af7472fc`, o auditor base reportou `Imports quebrados: 0` no recorte backend (`server/lib` e `server/routes`), e a varredura ampliada de 409 arquivos em `app/lib`, `server/lib`, `server/routes` e `server/bin` reportou 1083 diretivas locais resolvidas, 0 imports/exports/parts locais quebrados e 2 SCCs. A frente aberta agora e aciclicidade.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-15 11:00 UTC no checkout `a447b876`, o auditor base reportou `Imports quebrados: 0` no recorte backend (`server/lib` e `server/routes`), e a varredura ampliada de 409 arquivos em `app/lib`, `server/lib`, `server/routes` e `server/bin` reportou 1082 diretivas locais resolvidas, 0 imports/exports/parts locais quebrados e 2 SCCs. A frente aberta agora e aciclicidade.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -113,9 +113,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     `safeCmcForOptimization`, e os servicos de ML/log/cache/push/counters tem
     caminhos vivos parciais, so metodos especificos continuam sem consumidor.
 13. **P1/P2 — Imports quebrados e ciclos locais**: **REVALIDADO/ABERTO no
-    checkout local `af7472fc` em 2026-06-14 11:00 UTC.** O auditor base reportou
+    checkout local `a447b876` em 2026-06-15 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`, e a varredura local
-    ampliada encontrou 1083 diretivas locais resolvidas, 0 imports/exports/parts
+    ampliada encontrou 1082 diretivas locais resolvidas, 0 imports/exports/parts
     locais quebrados e 2 SCCs em 409 arquivos. Claims anteriores contra
     `deck_analysis_tab.dart`, `life_counter_screen.dart`,
     `server/bin/local_test_server.dart` e o ciclo
@@ -494,7 +494,7 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-06-11 11:00 UTC: RESOLVIDO/STALE no checkout local `372cdfca`.**
+**Status 2026-06-15 11:00 UTC: RESOLVIDO/STALE no checkout local `a447b876`.**
 As resolucoes historicas para os imports app e o entrypoint local estao
 refletidas nesta branch de memoria; nao ha import local quebrado confirmado no
 recorte auditado.
@@ -511,11 +511,9 @@ recorte auditado.
     quebrados.
   - `cd server && dart analyze bin/local_test_server.dart` retornou
     `No issues found`.
-  - O import historico de `server/routes/ai/commander-learning/index.dart:4`
-    para `server/lib/ai/commander_learned_deck_support.dart` nao esta mais
-    quebrado neste checkout; o arquivo alvo existe e
-    `dart analyze routes/ai/commander-learning/index.dart` retornou
-    `No issues found`.
+  - O import historico de `server/routes/ai/commander-learning/index.dart:8`
+    para `server/lib/http_responses.dart` nao esta quebrado neste checkout; o
+    arquivo alvo existe e o server analyze focado retornou `No issues found`.
 - **Impacto atual**: nenhuma acao de correcao de import quebrado foi confirmada
   nesta rodada. `app/.dart_tool/package_config.json` ainda esta ausente, entao
   `flutter analyze --no-pub` nao foi usado como prova limpa app-side.
@@ -534,7 +532,7 @@ recorte auditado.
 
 ### P2 — Quebrar o ciclo direto entre `CommunityDeckDetailScreen` e `UserProfileScreen`
 
-**Status 2026-06-11 11:00 UTC: RESOLVIDO/STALE no checkout local `372cdfca`.**
+**Status 2026-06-15 11:00 UTC: RESOLVIDO/STALE no checkout local `a447b876`.**
 A resolucao historica esta refletida nesta branch de memoria; o grafo local
 focado nao encontrou SCC com esses dois arquivos.
 
@@ -562,7 +560,7 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1/P2 — Quebrar ciclo entre engines do life counter
 
-**Status 2026-06-14 11:00 UTC: REVALIDADO/ABERTO no checkout local `af7472fc`.**
+**Status 2026-06-15 11:00 UTC: REVALIDADO/ABERTO no checkout local `a447b876`.**
 
 - **Evidência**:
   - `app/lib/features/home/life_counter/life_counter_tabletop_engine.dart:3`
@@ -574,7 +572,7 @@ focado nao encontrou SCC com esses dois arquivos.
   - `life_counter_turn_tracker_engine.dart:13`, `:108`, `:165` e `:268`
     chamam `LifeCounterTabletopEngine` para detectar jogadores ativos e
     normalizar o tracker.
-  - A varredura SCC de 409 arquivos/1083 diretivas locais encontrou um
+  - A varredura SCC de 409 arquivos/1082 diretivas locais encontrou um
     componente de 2 arquivos com essas engines.
 - **Impacto**: regras de mesa e regras de turno ficam acopladas
   bidirecionalmente, o que dificulta teste unitario isolado e aumenta o risco de
@@ -590,7 +588,7 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1/P2 — Quebrar ciclo entre runtime e filler loader do optimize
 
-**Status 2026-06-14 11:00 UTC: REVALIDADO/ABERTO no checkout local `af7472fc`.**
+**Status 2026-06-15 11:00 UTC: REVALIDADO/ABERTO no checkout local `a447b876`.**
 
 - **Evidência**:
   - `server/lib/ai/optimize_runtime_support.dart:13` importa e `:14` reexporta
@@ -606,7 +604,7 @@ focado nao encontrou SCC com esses dois arquivos.
     `:154`, `:650`, `:746`, `:779`, `:949`, `:983`, `:1013`, `:1068`,
     `:1090`, `:1200` e `:1305`.
   - As definicoes chamadas ficam em `optimize_runtime_support.dart:597` e `:612`.
-  - A varredura SCC de 409 arquivos/1083 diretivas locais encontrou exatamente
+  - A varredura SCC de 409 arquivos/1082 diretivas locais encontrou exatamente
     esse componente no backend e nenhum ciclo em `server/routes`.
 - **Impacto**: a extracao do filler loader ainda nao forma uma fronteira
   aciclica; o modulo extraido depende do runtime que o importa, dificultando
@@ -990,7 +988,7 @@ Resolvido em `origin/master@32418bc6`: teste de contrato de rota para
 - Os **178 imports quebrados** do relatório **não** foram validados como defeitos reais de código; a amostragem conferida aponta falso-positivo do auditor.
 - Os achados antigos contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
   `local_test_server.dart` e o ciclo Community/Social nao estao abertos no
-  checkout `538fe574`; foram substituidos pelos SCCs atuais listados acima.
+  checkout `a447b876`; foram substituidos pelos SCCs atuais listados acima.
 - A seção de "funções com nomes duplicados" mistura duplicação relevante com nomes esperados (`toString`, `print`, `add`), então precisa de triagem antes de virar tarefa de engenharia.
 - `battle_simulations` nao entrou como tabela nao usada nesta rodada: a rota
   `server/routes/ai/simulate/index.dart` escreve nela e
