@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-14 23:00 UTC
+> Data: 2026-06-15 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -59,17 +59,17 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
    `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-14 03:00 UTC no checkout `c80118e2`.
+   na rotacao local Codex de 2026-06-15 03:00 UTC no checkout `53e604e9`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
    classes, `0` imports quebrados), mas continua limitado a `server/lib` e
-   `server/routes`; a evidencia app veio de `rg` e leitura direta. Desde a
-   rodada anterior de classes (`5bfc9706`), o delta ate HEAD e somente
-   documental.
-   `LifeCounterScreen` segue como caminho legado/test-only enquanto a rota viva
-   usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
-   import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
-   construtor; e `LotusPresentationMode` nao tem import nem chamada para
-   `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta rotacao.
+   `server/routes`; a evidencia app veio de `rg`, leitura direta e triagem de
+   baixa contagem. Desde a rodada anterior de classes (`c80118e2`), o delta
+   app/backend segue somente documental. `LifeCounterScreen` segue como caminho
+   legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`; `DeckCard`
+   continua testado mas sem import/chamada na listagem real; `DeckProgressChip`
+   nao tem chamada de construtor; e `LotusPresentationMode` nao tem import nem
+   chamada para `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta
+   rotacao.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
    `da164b47`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
    e addition data de quality gate usam a ordem
@@ -892,10 +892,10 @@ vivos parciais).
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-14 03:00 UTC: REVALIDADO/ABERTO no checkout `c80118e2`.**
-  Desde a rodada anterior de classes (`5bfc9706`), o delta ate HEAD e somente
-  documental; nao houve mudanca de produto em `app/lib`, `server/lib` ou
-  `server/routes`.
+- **Status 2026-06-15 03:00 UTC: REVALIDADO/ABERTO no checkout `53e604e9`.**
+  Desde a rodada anterior de classes (`c80118e2`), o delta app/backend segue
+  somente documental; nao houve mudanca de produto em `app/lib`, `server/lib`
+  ou `server/routes`.
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:284` usa

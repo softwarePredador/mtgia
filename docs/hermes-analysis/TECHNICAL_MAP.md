@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 23:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-15 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-14)
+## Achados do audit de estrutura (atualizado 2026-06-15)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -218,15 +218,16 @@ mtgia/
   de `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-14 03:00 UTC no checkout local `c80118e2`. O auditor textual executou
+  2026-06-15 03:00 UTC no checkout local `53e604e9`. O auditor textual executou
   com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg` e leitura direta. Desde a rodada anterior de classes (`5bfc9706`), o
-  delta ate HEAD e somente documental. `LifeCounterScreen` segue legado/test-only
-  enquanto a rota ativa usa `LotusLifeCounterScreen`; `DeckCard` e
-  `DeckProgressChip` continuam sem uso runtime confirmado nas listagens; e
-  `LotusPresentationMode` nao e importado/chamado pelo Lotus. Nao surgiram novos
-  achados confiaveis nesta rotacao.
+  de `rg`, leitura direta e triagem de baixa contagem. Desde a rodada anterior
+  de classes (`c80118e2`), o delta app/backend segue somente documental.
+  `LifeCounterScreen` continua legado/test-only enquanto a rota ativa usa
+  `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip` continuam sem uso
+  runtime confirmado nas listagens; e `LotusPresentationMode` nao e
+  importado/chamado pelo Lotus. Nao surgiram novos achados confiaveis nesta
+  rotacao.
 
 ## Pipeline semantico de cartas
 
