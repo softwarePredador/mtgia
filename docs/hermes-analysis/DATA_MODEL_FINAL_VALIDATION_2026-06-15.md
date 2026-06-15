@@ -1,18 +1,22 @@
 # Data Model Final Validation — 2026-06-15
 
-Generated at: `2026-06-15T19:23:54.974222Z`
+Generated at: `2026-06-15T19:49:45.500023Z`
 
 ## Executive summary
 
-- Static inventory found `80` tables and `3` views across product backend and Hermes scripts.
+- Static inventory found `81` tables and `3` views across product backend and Hermes scripts.
 - App scan found `66` API endpoint string references in Flutter code.
 - Hermes sync scan found `20` sync/import/export/materialize scripts.
 - PostgreSQL validation was `executed`.
+- Follow-up applied in this cycle: migration
+  `022_create_card_identity_and_intelligence_views` persisted
+  `card_identity_bridge`, `card_intelligence_snapshot` and
+  `optimize_candidate_quality_summary` in PostgreSQL.
 
 ## PostgreSQL runtime validation
 
-- Public relations found: `69`.
-- Critical view presence: `{"card_identity_bridge":false,"card_intelligence_snapshot":false,"optimize_candidate_quality_summary":true}`.
+- Public relations found: `71`.
+- Critical view presence: `{"card_identity_bridge":true,"card_intelligence_snapshot":true,"optimize_candidate_quality_summary":true}`.
 - Rollback view validation:
 ```json
 {
@@ -33,6 +37,11 @@ Generated at: `2026-06-15T19:23:54.974222Z`
 - Fanout checks:
 ```json
 {
+  "deck_cards_to_card_intelligence_snapshot": {
+    "rows": 50841,
+    "distinct_deck_card_rows": 50841,
+    "extra_rows": 0
+  },
   "direct_deck_cards_to_card_battle_rules_fanout_potential": {
     "rows": 36440,
     "distinct_deck_card_rows": 35992,
@@ -107,12 +116,24 @@ Generated at: `2026-06-15T19:23:54.974222Z`
 - PostgreSQL remains the source of truth for product behavior.
 - Hermes SQLite tables are classified as cache/lab/report-only unless a backend sync explicitly promotes reviewed data.
 - Scripts with `--apply` or materialization behavior must remain opt-in and reviewed before promotion.
-- EasyPanel public health check passed on `2026-06-15T19:10:25Z`: service `mtgia-server`, environment `production`, git SHA `aeeb8d4023c8e65a4a505a303bc86154a33f853c`.
-- The public SHA is an ancestor of local `master` (`14ec51cd89b516ac514c4dbdbb631fb8fe19d171`), so production is healthy but behind the current local source.
-- Hermes AWS container `hermes_agent` is running (`Up 7 days`). With `/opt/data/.profile` loaded, the container exposes Flutter `3.44.0`, Dart `3.12.0`, and Python `3.13.5`.
-- Hermes cron registry exists at `/opt/data/cron/jobs.json` inside the container with `25` jobs, `13` enabled. This validates Hermes as an operational lab/auditor, not as a clean source of product truth.
-- Hermes workspace `/opt/data/workspace/mtgia` is present but dirty and out of sync (`ahead 1, behind 2`, plus many untracked cron artifacts). Any Hermes docs or generated reports must be triaged before copying into `master`.
-- `origin/codex/hermes-analysis-docs` advanced to `9adb0989` during this validation. The latest branch reports still repeat stale write-only claims for `deck_matchups` and `deck_weakness_reports`; current `master` code reads both tables in product routes, so those branch findings are rejected unless revalidated against current source.
+- EasyPanel public health check passed on `2026-06-15T19:54:31-03:00`: service
+  `mtgia-server`, environment `production`, git SHA
+  `aeeb8d4023c8e65a4a505a303bc86154a33f853c`.
+- The public SHA is an ancestor of local `master`
+  (`1f4f1f0994abc0d25d6a79c713aec7794e8db318` before this commit), so
+  production is healthy but behind the current local source.
+- Hermes AWS container `hermes_agent` is running (`Up 7 days`). With
+  `/opt/data/.profile` loaded, the container exposes Flutter `3.44.0`, Dart
+  `3.12.0`, and Python `3.13.5`.
+- Hermes cron registry exists at `/opt/data/cron/jobs.json` inside the
+  container with `25` jobs, `13` enabled. This validates Hermes as an
+  operational lab/auditor, not as a clean source of product truth.
+- Hermes workspace `/opt/data/workspace/mtgia` is present but dirty and out of
+  sync (`ahead 1, behind 3`, plus many untracked cron artifacts). Any Hermes
+  docs or generated reports must be triaged before copying into `master`.
+- `sync_pg_target_deck_to_hermes.py` now prefers the backend-owned
+  `card_intelligence_snapshot` when present and keeps an aggregated CTE
+  fallback for older databases.
 
 ## External source gap review
 
@@ -137,9 +158,6 @@ Generated at: `2026-06-15T19:23:54.974222Z`
 - **P1 — Clean stale Hermes docs about table usage**
   - Reason: Historical docs still claim write-only behavior for tables that now have runtime reads.
   - Action: Move stale sections to historical notes or update them with current source evidence.
-- **P1 — Persist missing internal aggregate views**
-  - Reason: Rollback compilation passed, but production does not currently expose card_identity_bridge, card_intelligence_snapshot.
-  - Action: Run the backend-owned foundation/backfill path or migration before relying on those views in production-only diagnostics.
 - **P0 — Keep battle-rule joins behind card_intelligence_snapshot**
   - Reason: Direct joins from deck_cards to card_battle_rules multiply deck rows.
   - Action: Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.

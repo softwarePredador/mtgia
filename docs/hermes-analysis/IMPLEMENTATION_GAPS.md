@@ -641,17 +641,17 @@ Concluído no Slice 5 backend snapshot:
     `card_identity_bridge=305.905` aliases/identidades e
     `card_intelligence_snapshot=34.329` cartas.
 
-Ainda pendente após Slice 5:
+Concluido no Slice 6 persistencia PostgreSQL:
 
 21.1. Resultado da validação global de dados em 2026-06-15:
    `docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md`
-   confirmou em PostgreSQL real que `card_identity_bridge` e
-   `card_intelligence_snapshot` compilam em transação rollback
-   (`305.905` aliases/identidades e `34.329` cartas), mas ainda não estão
-   persistidas no banco público. `optimize_candidate_quality_summary` já existe
-   como view persistida. Antes de qualquer diagnóstico de produção que dependa
-   dessas duas views, rodar o caminho backend-owned de fundação/backfill ou
-   migração controlada.
+   confirmou em PostgreSQL real que `card_identity_bridge`,
+   `card_intelligence_snapshot` e `optimize_candidate_quality_summary` estão
+   persistidas. A migration `022_create_card_identity_and_intelligence_views`
+   cria as dependências idempotentes, `card_meta_insights`,
+   `card_localized_names`, tabelas/índices de candidate quality e as três
+   views. Contagens pós-migração: `card_identity_bridge=305.905`
+   aliases/identidades e `card_intelligence_snapshot=34.329` cartas.
 21.2. A mesma validação confirmou que o join direto
    `deck_cards -> card_battle_rules` multiplica linhas (`36.440` rows contra
    `35.992` `deck_cards` distintos, `448` linhas extras), enquanto
@@ -671,9 +671,10 @@ Ainda pendente após Slice 5:
    `13` habilitados. Porém o workspace remoto está dirty/out-of-sync; não
    promover artefatos Hermes sem triagem e sem revalidação local/source-backed.
 
-22. Fazer loaders profundos do `optimize` e sync Hermes lerem
-    `card_intelligence_snapshot` quando isso reduzir duplicação ou
-    inconsistência.
+22. Fazer loaders profundos do `optimize` lerem `card_intelligence_snapshot`
+    quando isso reduzir duplicação ou inconsistência. O sync Hermes
+    `sync_pg_target_deck_to_hermes.py` já prefere `card_intelligence_snapshot`
+    quando a view existe e mantém fallback CTE agregado para bancos antigos.
 23. Usar `card_identity_bridge` em `commander_card_usage` e jobs Hermes que
     ainda entram por nome normalizado, reportando taxa de resolução para
     `card_id`.

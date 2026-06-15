@@ -366,16 +366,17 @@ A referencia operacional mais recente para tabelas, views, fanout,
 Hermes/AWS, EasyPanel e fontes externas e
 `docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md`.
 
-Resultado validado contra PostgreSQL real:
+Resultado validado contra PostgreSQL real após a migration
+`022_create_card_identity_and_intelligence_views`:
 
-- Banco publico possui `69` relacoes no schema `public`.
+- Banco publico possui `71` relacoes no schema `public`.
 - `cards=34.329`, `deck_cards=50.841`, `card_function_tags=112.563`,
   `card_semantic_tags_v2=24.181`, `card_battle_rules=3.158`,
   `commander_learned_decks=61` e `commander_reference_decks=121`.
-- `optimize_candidate_quality_summary` esta persistida.
-- `card_identity_bridge` e `card_intelligence_snapshot` ainda nao estao
-  persistidas no banco publico, mas compilam em transacao rollback com
-  `305.905` aliases/identidades e `34.329` cartas.
+- `card_identity_bridge`, `card_intelligence_snapshot` e
+  `optimize_candidate_quality_summary` estao persistidas no banco publico.
+  A rollback validation confirmou `305.905` aliases/identidades na bridge e
+  `34.329` cartas nas duas views de inteligencia/candidate quality.
 - Join direto `deck_cards -> card_battle_rules` multiplica linhas:
   `36.440` rows contra `35.992` linhas distintas de `deck_cards`, com
   `448` linhas extras. Portanto, consumidores de deckbuilding, optimize,

@@ -619,6 +619,47 @@ def semantic_deck_cards_sql() -> str:
     """
 
 
+def semantic_deck_cards_snapshot_sql() -> str:
+    """Return one row per card from the backend-owned aggregate snapshot."""
+    return """
+                SELECT
+                  cis.name,
+                  SUM(dc.quantity)::int AS quantity,
+                  BOOL_OR(dc.is_commander) AS is_commander,
+                  MAX(cis.cmc)::float AS cmc,
+                  MAX(cis.type_line) AS type_line,
+                  MAX(cis.oracle_text) AS oracle_text,
+                  cis.card_id::text AS card_id,
+                  to_jsonb(COALESCE(cis.function_tags, ARRAY[]::TEXT[]))
+                    AS functional_tags_json,
+                  NULL::text AS functional_tag,
+                  COALESCE(cis.max_function_tag_confidence, 0.0)
+                    AS tag_confidence,
+                  COALESCE(cis.semantic_tags_v2, '[]'::jsonb)
+                    AS semantic_tags_v2_json,
+                  COALESCE(cis.battle_rules, '[]'::jsonb)
+                    AS battle_rules_json
+                FROM deck_cards dc
+                JOIN card_intelligence_snapshot cis ON cis.id = dc.card_id
+                WHERE dc.deck_id = %s
+                GROUP BY
+                  cis.id,
+                  cis.card_id,
+                  cis.name,
+                  cis.function_tags,
+                  cis.max_function_tag_confidence,
+                  cis.semantic_tags_v2,
+                  cis.battle_rules
+                ORDER BY BOOL_OR(dc.is_commander) DESC, cis.name, cis.card_id
+    """
+
+
+def has_pg_relation(cur: Any, relation_name: str) -> bool:
+    cur.execute("SELECT to_regclass(%s) IS NOT NULL", (f"public.{relation_name}",))
+    row = cur.fetchone()
+    return bool(row and row[0])
+
+
 def selected_deck_sql(args: argparse.Namespace) -> tuple[str, tuple[Any, ...]]:
     if args.pg_deck_id:
         return "WHERE d.id = %s", (args.pg_deck_id,)
@@ -692,7 +733,18 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
                 raise RuntimeError(
                     f"Selected PG deck has no commander row: pg_deck_id={pg_deck_id}."
                 )
-            cur.execute(semantic_deck_cards_sql(), (pg_deck_id,))
+            use_snapshot = has_pg_relation(cur, "card_intelligence_snapshot")
+            deck["semantic_source"] = (
+                "card_intelligence_snapshot"
+                if use_snapshot
+                else "sync_pg_target_deck_to_hermes_cte_fallback"
+            )
+            cur.execute(
+                semantic_deck_cards_snapshot_sql()
+                if use_snapshot
+                else semantic_deck_cards_sql(),
+                (pg_deck_id,),
+            )
             cards = []
             for row in cur.fetchall():
                 battle_rules = parse_json_value(row[11], [])

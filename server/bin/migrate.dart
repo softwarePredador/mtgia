@@ -3,6 +3,8 @@
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
+import 'package:server/ai/candidate_quality_data_support.dart';
+import 'package:server/import_card_lookup_service.dart';
 
 /// Sistema de Migrações Versionado para MTG IA
 ///
@@ -581,6 +583,51 @@ final migrations = <Migration>[
       ALTER TABLE cards DROP COLUMN IF EXISTS card_faces_json;
       ALTER TABLE cards DROP COLUMN IF EXISTS layout;
       ALTER TABLE cards DROP COLUMN IF EXISTS oracle_id;
+    ''',
+  ),
+  Migration(
+    version: '022',
+    name: 'create_card_identity_and_intelligence_views',
+    up: '''
+      CREATE TABLE IF NOT EXISTS card_meta_insights (
+        card_name TEXT PRIMARY KEY,
+        usage_count INTEGER NOT NULL DEFAULT 0,
+        meta_deck_count INTEGER NOT NULL DEFAULT 0,
+        common_archetypes TEXT[] NOT NULL DEFAULT '{}',
+        common_formats TEXT[] NOT NULL DEFAULT '{}',
+        top_pairs JSONB NOT NULL DEFAULT '[]'::jsonb,
+        learned_role TEXT,
+        versatility_score NUMERIC(6,3) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        last_updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_card_meta_insights_usage
+      ON card_meta_insights (usage_count DESC);
+
+      CREATE INDEX IF NOT EXISTS idx_card_meta_insights_archetypes
+      ON card_meta_insights USING gin (common_archetypes);
+
+      $createCardLocalizedNamesTableSql;
+
+      ${createCardLocalizedNamesIndexesSql.join(';\n')};
+
+      ${candidateQualitySchemaStatements.join(';\n')};
+
+      ${candidateQualityIndexStatements.join(';\n')};
+
+      $optimizeCandidateQualitySummaryViewStatement;
+
+      $cardIntelligenceSnapshotViewStatement;
+
+      $createCardIdentityBridgeViewSql;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS card_identity_bridge;
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+      DROP INDEX IF EXISTS idx_card_meta_insights_archetypes;
+      DROP INDEX IF EXISTS idx_card_meta_insights_usage;
     ''',
   ),
 ];

@@ -186,9 +186,28 @@ void main() {
       expect(view, contains('battle_rule_count'));
       expect(view, contains('verified_battle_rules'));
       expect(view, contains('source_coverage'));
+
+      for (final source in [
+        'from card_function_tags',
+        'from card_role_scores',
+        'from commander_card_synergy',
+        'from card_semantic_tags_v2',
+        'from card_battle_rules',
+        'from card_legalities',
+        'from card_rulings',
+      ]) {
+        expect(
+          view,
+          contains(source),
+          reason: '$source must remain inside an aggregating CTE.',
+        );
+      }
+
       expect(view, isNot(contains('left join card_battle_rules')));
       expect(view, isNot(contains('left join card_function_tags')));
       expect(view, isNot(contains('left join card_semantic_tags_v2')));
+      expect(view, isNot(contains('left join card_role_scores')));
+      expect(view, isNot(contains('left join commander_card_synergy')));
     });
   });
 }

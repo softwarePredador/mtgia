@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-06-15T19:23:54.974222Z",
+  "generated_at": "2026-06-15T19:49:45.500023Z",
   "repo_root": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia",
   "git": {
-    "head": "14ec51cd89b516ac514c4dbdbb631fb8fe19d171",
+    "head": "1f4f1f0994abc0d25d6a79c713aec7794e8db318",
     "branch": "master",
-    "status_short": "M docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md\n M docs/README.md\n A docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md\n M docs/hermes-analysis/IMPLEMENTATION_GAPS.md\n A docs/hermes-analysis/data_model_final_validation_2026-06-15.json\n A server/bin/audit_data_model_links.dart\n M server/doc/API_CONTRACTS_AND_DATA_MAP.md"
+    "status_short": "M docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py\n M server/bin/migrate.dart\n M server/test/candidate_quality_data_support_test.dart\n?? server/test/data_model_migration_test.dart"
   },
   "static": {
-    "table_count": 80,
+    "table_count": 81,
     "view_count": 3,
     "tables": {
       "activation_funnel_events": {
@@ -308,7 +308,8 @@
       "card_function_tags": {
         "sources": [
           "server/lib/ai/candidate_quality_data_support.dart",
-          "server/test/candidate_quality_data_support_test.dart"
+          "server/test/candidate_quality_data_support_test.dart",
+          "server/test/data_model_migration_test.dart"
         ],
         "classification": "postgres_product",
         "read_files": [
@@ -334,7 +335,7 @@
           "server/bin/semantic_layer_v2_backfill.dart",
           "server/bin/sync_combos.dart"
         ],
-        "all_reference_count": 21,
+        "all_reference_count": 22,
         "has_runtime_read": true,
         "has_runtime_write": false,
         "hermes_files": [
@@ -372,6 +373,7 @@
           "server/routes/decks/[id]/recommendations/index.dart",
           "server/routes/decks/index.dart",
           "server/routes/import/validate/index.dart",
+          "server/test/candidate_quality_data_support_test.dart",
           "server/test/check_db_schema2.py"
         ],
         "write_files": [
@@ -393,7 +395,8 @@
       },
       "card_localized_names": {
         "sources": [
-          "server/lib/import_card_lookup_service.dart"
+          "server/lib/import_card_lookup_service.dart",
+          "server/test/data_model_migration_test.dart"
         ],
         "classification": "postgres_product",
         "read_files": [
@@ -403,7 +406,33 @@
         "write_files": [
           "server/bin/sync_localized_card_names.dart"
         ],
-        "all_reference_count": 6,
+        "all_reference_count": 7,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "card_meta_insights": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/optimize_filler_loader_support.dart",
+          "server/lib/ai/optimize_runtime_support.dart",
+          "server/lib/ai/optimize_state_support.dart",
+          "server/lib/ai/optimize_swap_candidate_support.dart",
+          "server/lib/ml_knowledge_service.dart",
+          "server/routes/ai/commander-reference/index.dart",
+          "server/routes/ai/ml-status/index.dart",
+          "server/test/check_db_schema.py"
+        ],
+        "write_files": [
+          "server/bin/extract_meta_insights.dart"
+        ],
+        "all_reference_count": 13,
         "has_runtime_read": true,
         "has_runtime_write": false,
         "hermes_files": []
@@ -460,7 +489,8 @@
           "server/bin/candidate_quality_data_foundation.dart",
           "server/bin/candidate_quality_meta_signals.dart",
           "server/lib/ai/candidate_quality_data_support.dart",
-          "server/lib/ai/optimize_candidate_quality_support.dart"
+          "server/lib/ai/optimize_candidate_quality_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
         ],
         "write_files": [
           "server/bin/candidate_quality_data_foundation.dart",
@@ -480,12 +510,13 @@
         "classification": "postgres_product",
         "read_files": [
           "server/lib/ai/candidate_quality_data_support.dart",
-          "server/routes/cards/[id]/rulings/index.dart"
+          "server/routes/cards/[id]/rulings/index.dart",
+          "server/test/candidate_quality_data_support_test.dart"
         ],
         "write_files": [
           "server/bin/sync_rulings.dart"
         ],
-        "all_reference_count": 6,
+        "all_reference_count": 7,
         "has_runtime_read": true,
         "has_runtime_write": false,
         "hermes_files": []
@@ -775,7 +806,8 @@
           "server/bin/candidate_quality_data_foundation.dart",
           "server/bin/candidate_quality_meta_signals.dart",
           "server/lib/ai/candidate_quality_data_support.dart",
-          "server/lib/ai/optimize_candidate_quality_support.dart"
+          "server/lib/ai/optimize_candidate_quality_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
         ],
         "write_files": [
           "server/bin/candidate_quality_data_foundation.dart",
@@ -2379,14 +2411,17 @@
     "views": {
       "card_identity_bridge": [
         "server/lib/import_card_lookup_service.dart",
+        "server/test/data_model_migration_test.dart",
         "server/test/import_list_service_test.dart"
       ],
       "card_intelligence_snapshot": [
         "server/lib/ai/candidate_quality_data_support.dart",
-        "server/test/candidate_quality_data_support_test.dart"
+        "server/test/candidate_quality_data_support_test.dart",
+        "server/test/data_model_migration_test.dart"
       ],
       "optimize_candidate_quality_summary": [
-        "server/lib/ai/candidate_quality_data_support.dart"
+        "server/lib/ai/candidate_quality_data_support.dart",
+        "server/test/data_model_migration_test.dart"
       ]
     },
     "app_endpoints": {
@@ -2828,7 +2863,7 @@
       "database": "halder",
       "username_present": true
     },
-    "relation_count": 69,
+    "relation_count": 71,
     "relations": {
       "activation_funnel_events": "BASE TABLE",
       "ai_generate_jobs": "BASE TABLE",
@@ -2846,6 +2881,8 @@
       "card_deck_profiles": "BASE TABLE",
       "card_extended": "BASE TABLE",
       "card_function_tags": "BASE TABLE",
+      "card_identity_bridge": "VIEW",
+      "card_intelligence_snapshot": "VIEW",
       "card_legalities": "BASE TABLE",
       "card_localized_names": "BASE TABLE",
       "card_meta_insights": "BASE TABLE",
@@ -2934,8 +2971,8 @@
       "ai_logs": 1102
     },
     "critical_view_presence": {
-      "card_identity_bridge": false,
-      "card_intelligence_snapshot": false,
+      "card_identity_bridge": true,
+      "card_intelligence_snapshot": true,
       "optimize_candidate_quality_summary": true
     },
     "rollback_view_validation": {
@@ -2953,6 +2990,11 @@
       }
     },
     "fanout_checks": {
+      "deck_cards_to_card_intelligence_snapshot": {
+        "rows": 50841,
+        "distinct_deck_card_rows": 50841,
+        "extra_rows": 0
+      },
       "direct_deck_cards_to_card_battle_rules_fanout_potential": {
         "rows": 36440,
         "distinct_deck_card_rows": 35992,
@@ -3000,12 +3042,6 @@
       "title": "Clean stale Hermes docs about table usage",
       "reason": "Historical docs still claim write-only behavior for tables that now have runtime reads.",
       "action": "Move stale sections to historical notes or update them with current source evidence."
-    },
-    {
-      "priority": "P1",
-      "title": "Persist missing internal aggregate views",
-      "reason": "Rollback compilation passed, but production does not currently expose card_identity_bridge, card_intelligence_snapshot.",
-      "action": "Run the backend-owned foundation/backfill path or migration before relying on those views in production-only diagnostics."
     },
     {
       "priority": "P0",
