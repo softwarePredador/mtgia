@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-15 03:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-15 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -291,11 +291,12 @@ Game Changer, nao um modelo geral de utilidade de carta.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-14 07:00 UTC no checkout local `8bb9aff9`. Desde a
-  rodada focada anterior (`146b16dc..HEAD`), o delta de produto e nulo e as
-  mudancas sao somente documentais. O auditor textual executou com sucesso
-  (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados),
-  mas continua sem grafo de chamadas; a evidencia veio de buscas exatas por
+  novamente em 2026-06-15 07:00 UTC no checkout local `92159f80`. Desde a
+  rodada focada anterior (`8bb9aff9..HEAD`), o delta de produto no recorte
+  app/backend e nulo e as mudancas sao somente documentais em
+  `docs/hermes-analysis`. O auditor textual executou com sucesso (`205`
+  arquivos backend, `115` problemas textuais, `0` imports quebrados), mas
+  continua sem grafo de chamadas; a evidencia veio de buscas exatas por
   simbolo. Permanecem abertos os achados de maior impacto:
   `server/lib/sync_cards_utils.dart` test-only enquanto
   `server/bin/sync_cards.dart` mantem helpers privados/inline; `swap_integrity`
@@ -312,7 +313,10 @@ Game Changer, nao um modelo geral de utilidade de carta.
   test-only, mas `isLikelyLandCard` e vivo via `safeCmcForOptimization`;
   `MLKnowledgeService`, `AiLogService`, `EndpointCache`, push e archetype
   counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem
-  consumidor.
+  consumidor. Claims antigas contra `tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`, `buildCandidateQualitySamplePoolSql`
+  e `extractMtgTop8FormatCodeFromSourceUrl` foram descartadas porque esses
+  simbolos nao existem neste checkout.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-14 15:00 UTC no checkout local `71140cbb`. Desde a ultima rodada
   focada (`eada6841`), nao houve delta de codigo de produto em `app/lib`,
