@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 19:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 23:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -105,7 +105,7 @@ mtgia/
 | AI Archetypes | /ai/archetypes | experimental | ai_archetypes_flow |
 | AI Explain | /ai/explain | experimental | (sem teste nomeado) |
 | AI Simulate | /ai/simulate, /ai/simulate-matchup | experimental | e2e_ml_tests |
-| Commander Ref | /ai/commander-reference | experimental | commander_reference_atraxa |
+| Commander Ref | /ai/commander-reference, /ai/commander-learning | experimental | commander_reference_atraxa, commander_learned_deck_support, deck_flow_entry_screens |
 | Binder | CRUD, stats | stable | binder_dashboard_runtime |
 | Market | /market/movers, /market/card/:id | stable | market_movers |
 | Trades | CRUD, respond, status, messages | stable | social_trading_live |
@@ -168,22 +168,25 @@ mtgia/
   `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1/P2 — Coerencia app-facing `app/lib` ↔ `server/routes` ↔ `server/lib`**:
-  revalidado novamente em 2026-06-11 23:00 UTC no checkout `6ce57c64`. O
-  auditor textual executou com sucesso (`205` arquivos backend, `115` problemas
-  textuais, `0` imports quebrados), mas nao cobre `app/lib`; a evidencia veio de
-  `rg` e leitura direta de providers/rotas/helpers. Os achados anteriores de
-  ownership em `POST /ai/optimize`, `POST /ai/archetypes` e polling de jobs
-  async seguem stale: optimize exige usuario, passa `userId` para o loader
-  owner-scoped, jobs rejeitam owner vazio/diferente e archetypes busca deck por
-  `id + user_id`. O contexto principal de optimize continua carregando
-  `card_function_tags` junto de `semantic_tags_v2`. Permanecem abertos os mesmos
-  tres gaps de coerencia app/server: `deck_rebuild_created` e emitido/testado no
-  app, mas rejeitado pela allow-list de `/users/me/activation-events`; o endpoint
+  revalidado novamente em 2026-06-14 23:00 UTC no checkout local `a81fd69a`.
+  O auditor textual executou com sucesso (`205` arquivos backend, `115`
+  problemas textuais, `0` imports quebrados), mas nao cobre `app/lib`; a
+  evidencia veio de `rg`, `nl -ba`, leitura direta e `dart analyze` focado nas
+  tres rotas/backend files relacionados (`No issues found`). Desde a rodada
+  anterior do mesmo foco (`2a1963d3..HEAD`), o delta de produto no recorte
+  app/backend e nulo e as mudancas sao somente documentais em
+  `docs/hermes-analysis`. Os
+  achados antigos de ownership em `POST /ai/optimize`, `POST /ai/archetypes` e
+  polling de jobs async seguem stale: optimize exige usuario, passa `userId`
+  para o loader owner-scoped, jobs rejeitam owner vazio/diferente e archetypes
+  busca deck por `id + user_id`. Permanecem abertos os mesmos tres gaps de
+  coerencia app/server: `deck_rebuild_created` e emitido/testado no app, mas
+  rejeitado pela allow-list de `/users/me/activation-events`; o endpoint
   app-facing `GET /ai/commander-learning` existe, e consumido pela tela de
   geracao e usa `commander_learned_decks`, mas nao esta documentado em
   `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; e a consulta automatica de learned
-  decks herda `aiPlanLimitMiddleware` + `aiRateLimit` apesar de ser leitura local
-  de PostgreSQL, sem chamada LLM/externa no handler.
+  decks herda `aiPlanLimitMiddleware` + `aiRateLimit` apesar de ser leitura
+  local de PostgreSQL, sem chamada LLM/externa no handler.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em 2026-06-14 19:00 UTC no checkout local `6953df1f`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista de duplicacao segue ruidosa por regex e nao foi usada como evidencia direta. Desde a rodada anterior de duplicacao (`2a1963d3..HEAD`), nao houve delta de codigo de produto no recorte auditado; nao apareceu novo cluster confiavel alem dos ja abertos. Em IA, `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore` e `assessDeckOptimizationState`/`assessDeckOptimizationStateCore` duplicam analise de deck entre rebuild e optimize; `resolveOptimizeArchetype` diverge entre `deck_state_analysis.dart` e `optimize_runtime_support.dart`; e os fallbacks `_looksLikeComboPiece`, `_looksLikeEngine`, `_looksLikePayoff`, `_looksLikeEnabler` e `_looksLikeWincon` ainda existem em `functional_card_tags.dart` e `optimization_functional_roles.dart`, embora a precedencia de `functional_tags -> semantic_tags_v2 -> heuristica` esteja centralizada em `resolveCardFunctionalRoles`. Fora de IA, seguem abertos trust SQL/serializer em trades/marketplace, request/log social repetido, politicas divergentes de `condition` e helpers de CMC/tipo. A claim antiga de `_isBasicLandName` duplicado segue stale: `basic_land_utils.dart` centraliza regular/snow basics e os consumidores atuais importam esse helper. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers de `server/routes/ai/optimize/index.dart` delegam para support e nao foram contados como corpo duplicado independente.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e

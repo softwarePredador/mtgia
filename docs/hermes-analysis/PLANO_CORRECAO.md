@@ -4,6 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
+> Data: 2026-06-14 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -19,18 +20,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `.dart_frog/server.dart` em runtime, e `dart analyze bin/local_test_server.dart`
    retornou `No issues found`.
 5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
-   `server/lib`**: **REVALIDADO no checkout local `6ce57c64` em 2026-06-11
-   23:00 UTC**. Os riscos anteriores de ownership em `POST /ai/optimize`,
-   `POST /ai/archetypes` e polling de jobs async seguem stale nesta branch:
-   optimize exige usuario, passa `userId` para o loader owner-scoped, jobs
-   rejeitam owner vazio/diferente, e archetypes escopa deck por `id + user_id`.
-   O contexto principal de optimize continua carregando `card_function_tags`
-   junto de `semantic_tags_v2`. Permanecem abertos tres gaps: o app emite/testa
-   `deck_rebuild_created`, mas `_allowedEvents` rejeita o evento; `GET
-   /ai/commander-learning` e consumido pela tela de geracao e passa por
-   rota/helper/tabela reais, mas nao esta no API contract map; e a consulta
-   automatica de learned decks herda middleware de IA custosa apesar de ser
-   leitura local de `commander_learned_decks`, sem chamada LLM/externa no
+   `server/lib`**: **REVALIDADO no checkout local `a81fd69a` em 2026-06-14
+   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`2a1963d3..HEAD`),
+   o delta de produto no recorte app/backend continua nulo e as mudancas sao
+   somente documentais em `docs/hermes-analysis`. Os riscos
+   anteriores de ownership em `POST /ai/optimize`, `POST /ai/archetypes` e
+   polling de jobs async seguem stale: optimize exige usuario, passa `userId`
+   para o loader owner-scoped, jobs rejeitam owner vazio/diferente, e archetypes
+   escopa deck por `id + user_id`. Permanecem abertos os mesmos tres gaps:
+   `deck_rebuild_created` e emitido/testado no app, mas `_allowedEvents` rejeita
+   o evento; `GET /ai/commander-learning` e consumido pela tela de geracao e
+   passa por rota/helper/tabela reais, mas nao esta no API contract map; e a
+   consulta automatica de learned decks herda middleware de IA custosa apesar de
+   ser leitura local de `commander_learned_decks`, sem chamada LLM/externa no
    handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
    2026-06-14 05:30 UTC no checkout `da164b47`. O caminho principal
@@ -718,11 +720,15 @@ vivos parciais).
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-11 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `6ce57c64`. Os achados anteriores de ownership em `/ai/optimize`,
-  `/ai/archetypes` e jobs async de optimize/generate estao resolvidos nesta
-  branch e foram removidos da lista de acoes abertas. A lacuna ativa agora e
-  mais estreita: activation telemetry rejeita um evento emitido pelo app,
+- **Status 2026-06-14 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `a81fd69a`. Desde a rodada anterior deste mesmo foco (`2a1963d3..HEAD`),
+  o delta de produto no recorte app/backend continua nulo: somente
+  `docs/hermes-analysis/PLANO_CORRECAO.md`,
+  `docs/hermes-analysis/STRUCTURE_AUDIT.md` e
+  `docs/hermes-analysis/TECHNICAL_MAP.md` mudaram. Os achados anteriores de
+  ownership em `/ai/optimize`, `/ai/archetypes` e jobs async de
+  optimize/generate continuam resolvidos/stale. A lacuna ativa permanece
+  estreita: activation telemetry rejeita um evento emitido pelo app,
   `/ai/commander-learning` e app-facing mas nao esta no API contract/data map, e
   a disponibilidade automatica de learned decks usa o mesmo middleware de IA
   custosa das rotas com LLM.
@@ -752,8 +758,8 @@ vivos parciais).
     esse evento em `_allowedEvents` e rejeita fora da lista em `:46`-`:48`.
     `app/test/features/decks/providers/deck_provider_test.dart:874`-`:891`
     espera explicitamente esse evento no provider.
-  - `app/lib/features/decks/screens/deck_generate_screen.dart:36`-`:43` carrega
-    learned decks no primeiro frame; `:127`-`:143` indexa a disponibilidade por
+  - `app/lib/features/decks/screens/deck_generate_screen.dart:127`-`:130` carrega
+    learned decks no primeiro frame; `:132`-`:143` indexa a disponibilidade por
     comandante; o provider chama
     `GET /ai/commander-learning` em
     `app/lib/features/decks/providers/deck_provider.dart:804`-`:824` e a rota
@@ -764,7 +770,7 @@ vivos parciais).
     retorna `promoted_deck`/`recommended_deck` em
     `server/routes/ai/commander-learning/index.dart:43`-`:53`.
   - A rota de learned decks le `commander_learned_decks` em
-    `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:110`-`:132`;
+    `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:106`-`:132`;
     o schema/modelo fica em
     `server/lib/ai/commander_learned_deck_support.dart:7` e `:283`-`:315`.
     `rg "/ai/commander-learning" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
@@ -777,6 +783,8 @@ vivos parciais).
     aplica bucket AI de 10/min em producao. O handler de commander-learning e
     leitura local de PG; busca focada por `OpenAI|openai|http` encontrou apenas
     o import de `http_responses.dart`.
+  - `cd server && dart analyze routes/ai/commander-learning/index.dart routes/users/me/activation-events/index.dart routes/ai/_middleware.dart`
+    retornou `No issues found!`.
 - **Impacto**: o risco de acesso cross-owner nos fluxos principais de optimize
   foi removido nesta branch. Os riscos remanescentes sao de confiabilidade e
   contrato: telemetria de rebuild some silenciosamente, um endpoint consumido
