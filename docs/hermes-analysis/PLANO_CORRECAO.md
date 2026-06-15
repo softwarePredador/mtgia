@@ -13,7 +13,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-14 19:00 UTC no checkout `6953df1f`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta. Desde a rodada anterior de duplicacao (`2a1963d3..HEAD`), nao houve delta de codigo de produto no recorte auditado; nao houve novo cluster confiavel alem dos ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics segue stale porque `basic_land_utils.dart` centraliza regular/snow basics. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
+3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-15 19:00 UTC no checkout `1c0f9b86`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta; a mutacao mecanica do bloco gerado foi descartada. Desde a rodada anterior de duplicacao (`6953df1f..HEAD`), nao houve delta de codigo de produto no recorte auditado; nao houve novo cluster confiavel alem dos ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. A claim antiga de terrenos basicos/snow basics segue stale porque `basic_land_utils.dart` centraliza regular/snow basics. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **RESOLVIDO/STALE no checkout local
    `372cdfca` em 2026-06-11 11:00 UTC**. `server/bin/local_test_server.dart`
    nao importa mais `../.dart_frog/server.dart` estaticamente; valida
@@ -47,13 +47,15 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    externa/Game Changer; `commander_fallback_policy.dart` e policy versionada e
    testada, mas nao deve virar modelo geral de utilidade.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-14 15:00 UTC no checkout
-   `71140cbb`. Desde `eada6841`, nao houve delta de codigo de produto em
+   revalidado na rotacao local Codex de 2026-06-15 15:00 UTC no checkout
+   `d6e568ac`. Desde `71140cbb`, nao houve delta de codigo de produto em
    `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-   `server/database_setup.sql` ou `server/test`. As claims antigas contra
-   `deck_matchups` e `deck_weakness_reports` estao stale: ambas agora sao lidas
-   no runtime e retornadas no payload das proprias rotas experimentais. Tambem
-   nao devem ser tratadas como sem uso `commander_learned_decks`,
+   `server/database_setup.sql`, `server/test` ou scripts Hermes auditados. As
+   claims antigas contra `deck_matchups` e `deck_weakness_reports` estao stale:
+   ambas agora sao lidas no runtime e retornadas no payload das proprias rotas
+   experimentais. O API/data map e o manual ainda contem texto stale sobre essas
+   duas tabelas, mas ficaram fora do escopo de escrita desta rodada. Tambem nao
+   devem ser tratadas como sem uso `commander_learned_decks`,
    `deck_learning_events`, `commander_card_usage` e `card_battle_rules`, que
    possuem writers/readers em rotas, jobs ou scripts operacionais. Restam como
    riscos menores as raws `commander_reference_decks` /
@@ -174,14 +176,15 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-14 19:00 UTC: REVALIDADO/ABERTO no checkout `6953df1f`.**
+- **Status 2026-06-15 19:00 UTC: REVALIDADO/ABERTO no checkout `1c0f9b86`.**
   O auditor textual apontou `115` problemas em `205` arquivos backend, mas a
   parte de duplicacao segue limitada por falsos positivos de regex e wrappers;
-  este item usa apenas evidencia revalidada por `rg` e leitura direta. Desde a
-  rodada anterior de duplicacao (`2a1963d3..HEAD`), nao houve delta de codigo de
-  produto no recorte auditado. A rodada atual nao encontrou novo
-  achado confiavel alem dos clusters ja abertos; tambem manteve stale a
-  duplicacao antiga de basic lands e descartou
+  este item usa apenas evidencia revalidada por `rg` e leitura direta. A
+  execucao do script tentou reinserir inventario gerado; essa mutacao mecanica
+  foi descartada. Desde a rodada anterior de duplicacao (`6953df1f..HEAD`), nao
+  houve delta de codigo de produto no recorte auditado. A rodada atual nao
+  encontrou novo achado confiavel alem dos clusters ja abertos; tambem manteve
+  stale a duplicacao antiga de basic lands e descartou
   `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` como wrappers de
   compatibilidade sobre `optimize_cache_support.dart`.
 - **Evidência**:
@@ -838,12 +841,12 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-14 15:00 UTC: REVALIDADO no checkout `71140cbb`.** A rodada
+- **Status 2026-06-15 15:00 UTC: REVALIDADO no checkout `d6e568ac`.** A rodada
   local focada em `postgresql-tables-not-used` revalidou os achados historicos
   com `rg` literal, varredura de `server/database_setup.sql` e varredura de
   tabelas criadas dinamicamente em `server/lib`, `server/routes` e `server/bin`,
   cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. Desde a
-  rodada anterior (`eada6841..HEAD`), nao houve delta de codigo de produto em
+  rodada anterior (`71140cbb..HEAD`), nao houve delta de codigo de produto em
   `app/lib`, `server/lib`, `server/routes`, `server/bin`,
   `server/database_setup.sql`, `server/test` ou scripts Hermes auditados. Nao
   houve novo achado P1/P2 app-facing. `deck_matchups` e
@@ -890,10 +893,17 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
     le/sincroniza, e
     `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py:204`-`:207`
     faz join para montar o deck alvo.
+  - `server/doc/API_CONTRACTS_AND_DATA_MAP.md:285`-`:286` e
+    `server/manual-de-instrucao.md:18040`-`:18045` ainda dizem que
+    `deck_matchups`/`deck_weakness_reports` sao write-only/audit logs sem
+    leitura runtime. A fonte atual falsifica esse texto, mas esses arquivos nao
+    foram editados por restricao de escrita desta rotina.
 - **Impacto**: para as raws Commander Reference, acumulacao de dados sem
   politica documentada de lineage/retencao ou reprocessamento. Para
   `ml_prompt_feedback`, risco de schema drift e falsa impressao de coleta ativa
-  de feedback quando nao ha chamador nem consumidor do payload.
+  de feedback quando nao ha chamador nem consumidor do payload. Para
+  `deck_matchups`/`deck_weakness_reports`, o risco atual e documental: contratos
+  fora de `docs/hermes-analysis` ainda podem induzir auditorias futuras ao erro.
 - **Ação recomendada**:
   1. documentar as tabelas raw do Commander Reference Corpus como lineage/audit,
      com retencao e job de reprocessamento, ou persistir apenas o agregado
