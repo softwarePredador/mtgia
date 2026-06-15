@@ -643,6 +643,34 @@ Concluído no Slice 5 backend snapshot:
 
 Ainda pendente após Slice 5:
 
+21.1. Resultado da validação global de dados em 2026-06-15:
+   `docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md`
+   confirmou em PostgreSQL real que `card_identity_bridge` e
+   `card_intelligence_snapshot` compilam em transação rollback
+   (`305.905` aliases/identidades e `34.329` cartas), mas ainda não estão
+   persistidas no banco público. `optimize_candidate_quality_summary` já existe
+   como view persistida. Antes de qualquer diagnóstico de produção que dependa
+   dessas duas views, rodar o caminho backend-owned de fundação/backfill ou
+   migração controlada.
+21.2. A mesma validação confirmou que o join direto
+   `deck_cards -> card_battle_rules` multiplica linhas (`36.440` rows contra
+   `35.992` `deck_cards` distintos, `448` linhas extras), enquanto
+   `card_battle_rules` tem `10` cards com múltiplas regras e
+   `card_function_tags` tem `22.675` cards com múltiplas tags. Portanto,
+   qualquer consumidor de deckbuilding deve usar snapshot/agregação por
+   `card_id`, nunca `LEFT JOIN` bruto em tabelas multi-linha.
+21.3. A branch `origin/codex/hermes-analysis-docs` foi triada em 2026-06-15
+   até `9adb0989`. Achados recentes sobre `deck_matchups` e
+   `deck_weakness_reports` como write-only foram rejeitados contra o `master`
+   atual porque `server/routes/ai/simulate-matchup/index.dart` lê
+   `deck_matchups` e `server/routes/ai/weakness-analysis/index.dart` lê
+   `deck_weakness_reports`. Se o Hermes repetir esse achado, a query de
+   auditoria dele precisa restringir melhor runtime/produto e branch analisada.
+21.4. Hermes AWS segue apto como laboratório: container `hermes_agent` ativo,
+   Flutter `3.44.0`, Dart `3.12.0`, Python `3.13.5`, `25` crons registrados e
+   `13` habilitados. Porém o workspace remoto está dirty/out-of-sync; não
+   promover artefatos Hermes sem triagem e sem revalidação local/source-backed.
+
 22. Fazer loaders profundos do `optimize` e sync Hermes lerem
     `card_intelligence_snapshot` quando isso reduzir duplicação ou
     inconsistência.

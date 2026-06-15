@@ -360,6 +360,35 @@ operacional de contrato app/backend.
 
 ## 6. Banco de dados
 
+### Validacao final do modelo de dados em 2026-06-15
+
+A referencia operacional mais recente para tabelas, views, fanout,
+Hermes/AWS, EasyPanel e fontes externas e
+`docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md`.
+
+Resultado validado contra PostgreSQL real:
+
+- Banco publico possui `69` relacoes no schema `public`.
+- `cards=34.329`, `deck_cards=50.841`, `card_function_tags=112.563`,
+  `card_semantic_tags_v2=24.181`, `card_battle_rules=3.158`,
+  `commander_learned_decks=61` e `commander_reference_decks=121`.
+- `optimize_candidate_quality_summary` esta persistida.
+- `card_identity_bridge` e `card_intelligence_snapshot` ainda nao estao
+  persistidas no banco publico, mas compilam em transacao rollback com
+  `305.905` aliases/identidades e `34.329` cartas.
+- Join direto `deck_cards -> card_battle_rules` multiplica linhas:
+  `36.440` rows contra `35.992` linhas distintas de `deck_cards`, com
+  `448` linhas extras. Portanto, consumidores de deckbuilding, optimize,
+  weakness-analysis, recommendations e sync Hermes devem consumir snapshots
+  agregados por `card_id`, nao joins brutos em tabelas multi-linha.
+- `card_battle_rules` preserva multiplas regras por carta; isso e correto para
+  battle/rules, mas precisa de agregacao antes de alimentar deckbuilding.
+- `card_function_tags` preserva multiplas funcoes por carta; validadores devem
+  contar papeis por membership, sem achatar a carta para uma unica funcao.
+- Hermes AWS esta operacional, mas o workspace remoto estava dirty/out-of-sync
+  na validacao. Hermes continua laboratorio/auditor; PostgreSQL/backend seguem
+  fonte de verdade.
+
 ### Observacao sobre fonte de schema
 
 O `server/database_setup.sql` contem o schema base historico e parte relevante
