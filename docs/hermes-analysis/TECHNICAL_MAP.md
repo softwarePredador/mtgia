@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-14 23:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-15 07:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-14)
+## Achados do audit de estrutura (atualizado 2026-06-15)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -193,40 +193,45 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-14 05:30 UTC no checkout local `da164b47`. Deck analysis,
+  2026-06-15 05:30 UTC no checkout local `3ad53bbf`. Deck analysis,
   `loadOptimizeDeckContext`, addition data do quality gate, validator e quality
   gate ja carregam ou preservam `functional_tags`, `semantic_tags_v2` e
   multi-role quando essas fontes chegam ao fluxo. A ordem principal e
   `functional_tags -> semantic_tags_v2 -> heuristica`. Os riscos restantes sao
   mais estreitos: `inferFunctionalRole` ainda reduz roles para o contrato legado
   de optimize, `removals_detailed.functionalRole` nao recebe as tags ja
-  presentes em `allCardData`, `findSynergyReplacements` ranqueia candidatos sem
-  carregar fontes persistidas, `/ai/weakness-analysis` usa o adapter em modo
-  heuristico porque a query nao carrega `card_function_tags`/`semantic_tags_v2`,
-  e `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
-- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-14
-  05:30 UTC no checkout local `da164b47`. A claim antiga de ausencia de policy
+  presentes em `allCardData`, `findSynergyReplacements` monta o pool inicial sem
+  tags/role scores, prompts runtime ainda contem exemplos nomeados,
+  `/ai/weakness-analysis` usa o adapter em modo heuristico porque a query nao
+  carrega `card_function_tags`/`semantic_tags_v2`, e
+  `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
+- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-15
+  05:30 UTC no checkout local `3ad53bbf`. A claim antiga de ausencia de policy
   versionada esta stale: `commander_fallback_policy.dart` existe, expoe versao e
   centraliza parte relevante dos fallbacks. Continuam como risco as decisoes por
   nome em fallbacks de `functional_card_tags.dart`,
-  `optimization_functional_roles.dart`, `candidate_quality_data_support.dart`,
-  `optimize_runtime_support.dart`, `deck_advanced_analysis.dart`,
+  `optimization_functional_roles.dart`, `candidate_quality_data_support.dart` e
+  seu job foundation, `optimize_runtime_support.dart`, `prompt.md`,
+  `prompt_complete.md`, `deck_advanced_analysis.dart`,
   `meta_deck_commander_shell_support.dart`, `/decks/:id/recommendations` e
   `/ai/weakness-analysis`. Permanecem permitidos exemplos de UI/import,
   docs/corpus/artifacts/test fixtures, aliases localizados, sugestoes de busca
-  do life counter, seeds/profiles de Commander Reference e a excecao intencional
-  de `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
+  do life counter, mock dev de optimize sem API key, seeds/profiles de Commander
+  Reference, `commander_fallback_policy.dart` como policy versionada/testada e a
+  excecao intencional de `edh_bracket_policy.dart` para regras externas de
+  bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-14 03:00 UTC no checkout local `c80118e2`. O auditor textual executou
+  2026-06-15 03:00 UTC no checkout local `53e604e9`. O auditor textual executou
   com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg` e leitura direta. Desde a rodada anterior de classes (`5bfc9706`), o
-  delta ate HEAD e somente documental. `LifeCounterScreen` segue legado/test-only
-  enquanto a rota ativa usa `LotusLifeCounterScreen`; `DeckCard` e
-  `DeckProgressChip` continuam sem uso runtime confirmado nas listagens; e
-  `LotusPresentationMode` nao e importado/chamado pelo Lotus. Nao surgiram novos
-  achados confiaveis nesta rotacao.
+  de `rg`, leitura direta e triagem de baixa contagem. Desde a rodada anterior
+  de classes (`c80118e2`), o delta app/backend segue somente documental.
+  `LifeCounterScreen` continua legado/test-only enquanto a rota ativa usa
+  `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip` continuam sem uso
+  runtime confirmado nas listagens; e `LotusPresentationMode` nao e
+  importado/chamado pelo Lotus. Nao surgiram novos achados confiaveis nesta
+  rotacao.
 
 ## Pipeline semantico de cartas
 
@@ -242,7 +247,7 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-14 05:30 UTC no checkout local `da164b47`:
+Estado atual revalidado em 2026-06-15 05:30 UTC no checkout local `3ad53bbf`:
 deck analysis, `loadOptimizeDeckContext`, addition data do quality gate,
 validator e quality gate carregam ou preservam `card_function_tags` e
 `semantic_tags_v2`. O adapter compartilhado
@@ -252,12 +257,15 @@ preservam multi-role onde o contrato usa `optimizationFunctionalRolesForCard`.
 
 Gaps restantes: classificadores heuristics ainda tem excecoes por nome como
 fallback; `candidate_quality_data_support.dart` herda parte dessas excecoes e
-ainda aplica bonuses/escopo por listas de `commander_fallback_policy.dart`;
-`findSynergyReplacements` monta e ranqueia candidatos sem carregar
+ainda aplica bonuses/escopo por listas de `commander_fallback_policy.dart`; o
+job `candidate_quality_data_foundation.dart` gera tags/scores a partir desses
+helpers heuristicos; `findSynergyReplacements` monta o pool inicial sem carregar
 `card_function_tags`, `semantic_tags_v2` ou role scores; `inferFunctionalRole`
 mantem colapso legado de role multi-tag para uma role primaria usada por partes
 do optimize; `removals_detailed.functionalRole` chama esse helper sem fornecer
-as fontes persistidas ja presentes em `allCardData`; `/ai/weakness-analysis`
+as fontes persistidas ja presentes em `allCardData`; `prompt.md` e
+`prompt_complete.md` sao system prompts de runtime e ainda contem exemplos de
+cartas nomeadas; `/ai/weakness-analysis`
 nao carrega `card_function_tags`, `semantic_tags_v2` nem `card_role_scores` e
 ainda devolve sugestoes por nomes fixos; `deck_advanced_analysis.dart`, chamado
 por weakness-analysis, tambem opera sem fontes persistidas; `/decks/:id/recommendations`
@@ -283,11 +291,12 @@ Game Changer, nao um modelo geral de utilidade de carta.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-14 07:00 UTC no checkout local `8bb9aff9`. Desde a
-  rodada focada anterior (`146b16dc..HEAD`), o delta de produto e nulo e as
-  mudancas sao somente documentais. O auditor textual executou com sucesso
-  (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados),
-  mas continua sem grafo de chamadas; a evidencia veio de buscas exatas por
+  novamente em 2026-06-15 07:00 UTC no checkout local `92159f80`. Desde a
+  rodada focada anterior (`8bb9aff9..HEAD`), o delta de produto no recorte
+  app/backend e nulo e as mudancas sao somente documentais em
+  `docs/hermes-analysis`. O auditor textual executou com sucesso (`205`
+  arquivos backend, `115` problemas textuais, `0` imports quebrados), mas
+  continua sem grafo de chamadas; a evidencia veio de buscas exatas por
   simbolo. Permanecem abertos os achados de maior impacto:
   `server/lib/sync_cards_utils.dart` test-only enquanto
   `server/bin/sync_cards.dart` mantem helpers privados/inline; `swap_integrity`
@@ -304,7 +313,10 @@ Game Changer, nao um modelo geral de utilidade de carta.
   test-only, mas `isLikelyLandCard` e vivo via `safeCmcForOptimization`;
   `MLKnowledgeService`, `AiLogService`, `EndpointCache`, push e archetype
   counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem
-  consumidor.
+  consumidor. Claims antigas contra `tryGetRequestId`,
+  `normalizedCommanderReferenceCandidate`, `buildCandidateQualitySamplePoolSql`
+  e `extractMtgTop8FormatCodeFromSourceUrl` foram descartadas porque esses
+  simbolos nao existem neste checkout.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-14 15:00 UTC no checkout local `71140cbb`. Desde a ultima rodada
   focada (`eada6841`), nao houve delta de codigo de produto em `app/lib`,
