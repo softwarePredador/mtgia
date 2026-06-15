@@ -1,16 +1,38 @@
 # Auditoria Completa — Regras MTG em Todas as Crons
 
-**Versão:** v12.0
-**Data:** 2026-06-15T02:30:00+00:00
+**Versão:** v13.0
+**Data:** 2026-06-15T14:30:00+00:00
 **Auditor:** MTG Rules Auditor v3 (cron `c0591cb18024`) — execução automática
-**Escopo:** Pipeline Lorehold descomissionado (5 crons) + ecossistema ativo (15+ crons) + linha-a-linha de 4 arquivos-fonte: `battle_simulator.dart` (879 linhas), `goldfish_simulator.dart` (613 linhas), `functional_card_tags.dart` (1092 linhas), `edh_bracket_policy.dart` (547 linhas)
+**Escopo:** Pipeline Lorehold descomissionado (5 crons) + ecossistema ativo (15+ crons) + linha-a-linha de 4 arquivos-fonte: `battle_simulator.dart` (879 linhas), `goldfish_simulator.dart` (613 linhas), `functional_card_tags.dart` (1092 linhas), `edh_bracket_policy.dart` (547 linhas, **moved** de `server/lib/ai/` para `server/lib/`)
 
 ### Metodologia
 - Leitura completa dos 4 arquivos-fonte ativos do pipeline de produto
 - Verificação linha a linha contra MTG Comprehensive Rules (CR)
 - Consulta a `jobs.json` para prompts e estado atual dos crons
-- Verificação do SQLite `knowledge.db` (345KB, 3217 cartas no oracle_cache)
-- Comparação com a auditoria v11.0 (2026-06-14) para identificar mudanças
+- Verificação do SQLite `knowledge.db` (3217 cartas no oracle_cache)
+- Comparação com a auditoria v12.0 (2026-06-15T02:30Z) para identificar mudanças
+- Verificação de diretórios de output dos crons e estado de git
+
+### Mudanças desde v12.0 (12h de intervalo)
+
+| Item | v12.0 (2026-06-15 02:30Z) | v13.0 (2026-06-15 14:30Z) | Status |
+|:-----|:--------------------------:|:--------------------------:|:-------|
+| CMC corrupted (deck único) | 35/100 (35%) | 35/100 (35%) | 🔴 Inalterado |
+| GCs missing (legais) | 3 (Panoptic, Serra's, Tergrid) | 3 | 🔴 Inalterado |
+| battle_simulator.dart score | 2.0/10 | 2.0/10 | 🔴 Inalterado |
+| goldfish_simulator.dart score | 7.0/10 | 7.0/10 | 🔴 Inalterado |
+| functional_card_tags.dart | Versão 2026-06-14 | Mesma | ✅ Estável |
+| edh_bracket_policy.dart | em `server/lib/ai/` | **em `server/lib/`** | 🟡 **NOVO: arquivo movido** |
+| Master Optimizer Preflight | 6.0/10 | 6.0/10 | 🔴 Git index error persiste |
+| Knowncards Validator | 🔴 git index error | 🔴 git index error | 🔴 Persiste |
+| MTG Rules Auditor self-score | 0.0/10 | 0.0/10 | 🔴 Cron broken persiste |
+| **Score geral** | **4.5/10** | **4.5/10** | **🔴 Estagnada pelo 6º dia** |
+
+### 🆕 Novo Achado v13.0: `edh_bracket_policy.dart` Movido
+
+O arquivo `edh_bracket_policy.dart` **não está mais em `server/lib/ai/`** como documentado em toda a base de conhecimento. Foi movido para **`server/lib/edh_bracket_policy.dart`**. O commit `7edd62ba` ("Unify strategic role tag heuristics") no master é o candidato mais recente — mas o move pode ter ocorrido em commit anterior.
+
+**Impacto:** Documentação do domínio (`manaloom-mtg-domain` §13, Gap 27) referencia `server/lib/ai/edh_bracket_policy.dart:354-408` — caminho incorreto. O conteúdo e linha de GCs são os mesmos (53 GCs, linhas 354-408 no novo arquivo). Apenas o path mudou.
 
 ---
 
@@ -24,59 +46,60 @@
 | Validator | 7.0/10 | MÉDIA | SYNERGY_MAP incompleto; Archetype Mismatch não detectado |
 | Mulligan | 6.5/10 | MÉDIA | Tapped lands ignorados; T1 ramp inflado; color screw não simulado |
 | Battle | 2.0/10 | 🔴 CRÍTICA | 2-player, sem stack/priority, sem Commander damage/tax, sem multi-blocker |
-| Evolution Oracle | 3.5/10 | BAIXA | Death loop autossustentável; dependia de dados inválidos de todos os outros crons |
+| Evolution Oracle | 3.5/10 | BAIXA | Death loop autossustentável; dependia de dados inválidos |
 | **PIPELINE** | **4.5/10** | **🔴 BAIXA** | **Descomissionado — código legado sem crons ativos** |
 
-### Ecossistema Atual (Crons Ativos 2026-06-14/15)
+### Ecossistema Atual (Crons Ativos 2026-06-15)
 
-| Cron | Nota | Mudança vs v11.0 | Status |
+| Cron | Nota | Mudança vs v12.0 | Status |
 |:-----|:----:|:----------------:|:------:|
-| Commander Knowledge Deep | 8.0/10 | ↔️ Estável | ✅ Ativo, 118 execuções |
-| Game Changer Research | 7.0/10 | ↔️ Estável | ✅ Ativo, 116 execuções; **3 GCs ainda perdidos** 🔴 |
-| Knowledge Synthesis | 7.5/10 | ↔️ Estável | ✅ Ativo, 61 execuções |
+| Commander Knowledge Deep | 8.0/10 | ↔️ Estável | ✅ Ativo, 120 execuções |
+| Game Changer Research | 7.0/10 | ↔️ Estável | ✅ Ativo, 117 execuções; **3 GCs ainda perdidos** 🔴 |
+| Knowledge Synthesis | 7.5/10 | ↔️ Estável | ✅ Ativo, 63 execuções |
 | Goldfish Simulator (prod) | 7.0/10 | ↔️ Estável | ✅ Ativo no endpoint |
-| Mana Base Validator | 7.0/10 | ↔️ Estável | ✅ Ativo (no_agent), 59 execuções |
-| Master Optimizer Preflight | 6.0/10 | 🔴 **PIOROU** | **Error: "resolve your current index first"** (3 execs consecutivas) |
-| **MTG Rules Auditor** | **0.0/10** | ↔️ **CRON BROKEN** | **Skill loading failure desde 2026-06-08** |
-| **SCORE GERAL** | **4.5/10** | ↔️ **Estagnada** | **Mesmos gaps — nenhum corrigido desde v11.0** |
+| Mana Base Validator | 7.0/10 | ↔️ Estável | ✅ Ativo (no_agent), 60 execuções |
+| Master Optimizer Preflight | 6.0/10 | 🔴 **PIOROU** | **exit code 128** — git index error persiste |
+| Knowncards Validator | 5.0/10 | 🔴 **PIOROU** | **exit code 128** — git index error |
+| **MTG Rules Auditor (auto)** | **0.0/10** | ↔️ **CRON BROKEN** | **Skill loading failure desde 2026-06-08** (7+ dias) |
+| **SCORE GERAL** | **4.5/10** | ↔️ **Estagnada pelo 6º dia** | **Nenhum gap corrigido desde v11.0** |
 
 ### Crons Ativos com Problemas Conhecidos (🔴)
 
 | Cron | ID | Problema | Desde |
 |:-----|:---|:---------|:-----|
-| MTG Rules Auditor | `c0591cb18024` | Skill `manaloom-commander-knowledge` não encontrado (4 versões de auditoria documentam sem correção) | 2026-06-08 |
-| Master Optimizer Preflight | `mmo-preflight01` | "resolve your current index first" — git index corrompido? | ~2026-06-14 |
-| Knowncards Validator | `d4e5f6a7b8c9` | "resolve your current index first" — mesmo erro do preflight | 2026-06-14/15 |
-| Knowledge Synthesis | `10a59b3bdf4d` | Skills inclui `manaloom-commander-knowledge` (inexistente) — não quebra execução (fallback funciona) | 2026-06-08 |
-| Gamechanger Research | `7915cc2377a0` | `skill: manaloom-commander-knowledge` — pode causar skill dump silencioso | 2026-06-08 |
-| Auto Promote Learned | `104fd03a2ea2` | `deck_promotions` table missing (22 execuções) | 2026-06-05+ |
-| Auto Sync Learned | `7fcab928efd3` | PermissionError (hermes_auto_sync/synced_learned_ids.txt) | ~2026-06-01 |
-| Pull Learning Events | `262dc49e1be1` | UUID cast error — `%s::uuid[]` (371 execuções, mas last_status "ok" — pode ser silencioso) | ~2026-06-01 |
+| MTG Rules Auditor | `c0591cb18024` | Skill `manaloom-commander-knowledge` não encontrado (5 versões de auditoria documentam sem correção) | 2026-06-08 |
+| Master Optimizer Preflight | `mmo-preflight01` | exit code 128 — git index corrompido (todas as execuções do dia) | ~2026-06-14 |
+| Knowncards Validator | `d4e5f6a7b8c9` | exit code 128 — mesmo erro do preflight (todas as execuções do dia) | 2026-06-14/15 |
+| Knowledge Synthesis | `10a59b3bdf4d` | skills[] inclui `manaloom-commander-knowledge` (inexistente) | 2026-06-08 |
+| Gamechanger Research | `7915cc2377a0` | `skill: manaloom-commander-knowledge` | 2026-06-08 |
+| Auto Promote Learned | `104fd03a2ea2` | `deck_promotions` table missing (último erro: 2026-06-15 12:43) | 2026-06-05+ |
+| Auto Sync Learned | `7fcab928efd3` | PermissionError (hermes_auto_sync/...) | ~2026-06-01 |
+| Pull Learning Events | `262dc49e1be1` | UUID cast error — mas last_status="ok" (pode ser silencioso) | ~2026-06-01 |
 
 ---
 
 ## 1. Scout (f20ac299992b) — Auditoria Detalhada
 
-**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório `/opt/data/cron/output/f20ac299992b/` não existe. Prompt removido de `jobs.json`.
+**Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório `/opt/data/cron/output/f20ac299992b/` **não existe**. Prompt removido de `jobs.json`. Nenhuma execução nova desde v12.0.
 
-**Mudanças desde v11.0:** Nenhuma — o cron permanece descomissionado e não houve reativação.
+**Confirmação v13.0:** O diretório continua ausente. O ID não está em jobs.json. Status inalterado.
 
 **O que fazia certo:**
-- **Score A+B+C: Sinergia + Custo + Evidência** — sistema conceitualmente sólido, inspirado em deckbuilding real
-- **Padrões de sinergia corretos:** Token+Pump, Wipe+Proteção, Recursion Chain são padrões reais de Commander
-- **Reconhecia cartas 0% EDHREC boas:** Spiteful Banditry, Xorn — conceito correto (EDHREC não é verdade absoluta)
+- **Score A+B+C: Sinergia + Custo + Evidência** — sistema conceitualmente sólido
+- **Padrões de sinergia corretos:** Token+Pump, Wipe+Proteção, Recursion Chain
+- **Reconhecia cartas 0% EDHREC boas:** Spiteful Banditry, Xorn
 
 **O que fazia errado (verificado contra CR e EDHREC):**
-1. **🔴 Prompt "Wincon Hunter" — função completamente diferente do original:** 94% [SILENT]. Perdeu a busca EDHREC + coleção + sinergia original.
-2. **🔴 Short-circuit agressivo (Gap 17):** Perpetuava erros permanentemente.
-3. **🔴 Sem verificação de color identity (CR 903.4c):** Podia recomendar cartas fora da identidade de cor do commander.
-4. **🟡 Sem verificação de banlist:** Não consultava Scryfall ou PG sync antes de recomendar.
-5. **🟡 Score A+B+C dependia de cache local stale.**
+1. **🔴 Prompt "Wincon Hunter" — função completamente diferente do original:** 94% [SILENT]
+2. **🔴 Short-circuit agressivo (Gap 17):** Perpetuava erros permanentemente
+3. **🔴 Sem verificação de color identity (CR 903.4c)**
+4. **🟡 Sem verificação de banlist**
+5. **🟡 Score A+B+C dependia de cache local stale**
 
-**Recomendações:**
-- Se reativado: restaurar prompt original (EDHREC + coleção + sinergia A+B+C)
-- Adicionar verificação: `color_identity` do commander vs carta + `card_legalities.commander != 'banned'`
-- Short-circuit deve verificar `discrepancies_found > 0` antes de decidir silêncio
+**Recomendações (inalteradas):**
+- Se reativado: restaurar prompt original EDHREC + coleção + sinergia A+B+C
+- Adicionar verificação color_identity + card_legalities.commander != 'banned'
+- Short-circuit deve verificar discrepancies_found > 0
 
 ---
 
@@ -84,24 +107,24 @@
 
 **Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório removido. Prompt removido de `jobs.json`.
 
-**Mudanças desde v11.0:** Nenhuma. Código permanece legado.
+**Confirmação v13.0:** Status inalterado. Nenhuma reativação.
 
 **O que fazia certo:**
-1. **SYNERGY_MAP (5 eixos):** Cobre os principais padrões de Commander.
-2. **Níveis 1-5 de importância:** Wincon > proteção > draw > ramp > filler.
-3. **Detecção de double-null:** Identificava cartas sem função (Scroll Rack, Penance).
-4. **CMC curve analysis:** Detectava anomalias como CMC=0.0.
+1. **SYNERGY_MAP (5 eixos):** Cobre os principais padrões de Commander
+2. **Níveis 1-5 de importância:** Wincon > proteção > draw > ramp > filler
+3. **Detecção de double-null:** Identificava cartas sem função
+4. **CMC curve analysis:** Detectava anomalias como CMC=0.0
 
 **O que fazia errado:**
-1. **🔴 SYNERGY_MAP incompleto:** Stack Interaction (CR 117), Graveyard Hate, Stax/Tax ausentes.
-2. **🔴 Archetype Mismatch não detectado:** Deck reconstruído externamente gerava CRITs falsos.
-3. **🟡 Wincon vs payoff confundidos:** Tratava wincon e payoff como intercambiáveis.
-4. **🟡 CMC corrompido (Gap 19):** 35% das cartas com CMC NULL/0.0 no deck único.
+1. **🔴 SYNERGY_MAP incompleto:** Stack Interaction (CR 117), Graveyard Hate, Stax/Tax ausentes
+2. **🔴 Archetype Mismatch não detectado**
+3. **🟡 Wincon vs payoff confundidos**
+4. **🟡 CMC corrompido (Gap 19):** 35% das cartas com CMC NULL/0.0
 
-**Recomendações:**
+**Recomendações (inalteradas):**
 - Expandir SYNERGY_MAP: Stack Interaction, Graveyard Hate, Stax/Tax
-- Detectar Archetype Mismatch: comparar `decks.archetype` vs temas do perfil PG
-- Separar wincon de payoff — são categorias diferentes no jogo real
+- Detectar Archetype Mismatch
+- Separar wincon de payoff
 
 ---
 
@@ -111,70 +134,49 @@
 
 **Estado do código ativo:** 🟢 `server/lib/ai/goldfish_simulator.dart` (613 linhas) — herdeiro funcional, endpoint ativo.
 
-**Mudanças desde v11.0:** Nenhuma alteração no código do goldfish_simulator.dart (última modificação: 2026-06-10). Os gaps persistem idênticos.
+**Confirmação v13.0:** Código do goldfish_simulator.dart não foi modificado. Todas as 613 linhas idênticas à auditoria v12.0.
 
-### Auditoria linha a linha do GoldfishSimulator ativo
+### O que faz certo
 
-#### O que faz certo (melhor que o cron original)
+1. **✅ Simula draws dos turnos 1-4** (linhas 159-205)
+2. **✅ Color source tracking** (linhas 268-290): Extrai {W}, {U}, {B}, {R}, {G} do `mana_cost`
+3. **✅ Land color detection** (linhas 293-325)
+4. **✅ N=1000 simulações** (linha 132)
+5. **✅ London Mulligan tracking** (linhas 157-161)
+6. **✅ CMC safety wrapper** (linhas 264-266, cmc_safety.dart)
+7. **✅ Mana screw/flood análise:** screwRate, floodRate
+8. **✅ Consistency Score** (linhas 36-44): 0-100 com pesos
 
-1. **✅ Simula draws dos turnos 1-4** (linhas 159-205): O cron original só via mão inicial.
-2. **✅ Color source tracking** (linhas 268-290): Extrai {W}, {U}, {B}, {R}, {G} do `mana_cost` via regex.
-3. **✅ Land color detection** (linhas 293-325): Usa tipo de terreno no type_line para determinar cores. Shocks e duals parcialmente suportados.
-4. **✅ N=1000 simulações** (linha 132): Amostra estatisticamente significativa.
-5. **✅ London Mulligan tracking** (linhas 157-161): Mão inicial de 7 cartas.
-6. **✅ CMC safety wrapper** (linhas 264-266, `safeCmcForOptimization()` do `cmc_safety.dart`): 3-tier fallback para CMC=0.0.
-7. **✅ Mana screw/flood análise:** `screwRate` (0-1 lands) e `floodRate` (6-7 lands) — métricas operacionais corretas.
-8. **✅ Consistency Score** (linhas 36-44): 0-100 com pesos (keepable 40%, T2 25%, T3 20%, screw 10%, flood 5%).
+### O que ainda faz errado (gaps confirmados)
 
-#### O que ainda faz errado (gaps identificados nesta auditoria)
+1. **🔴 Tapped lands NÃO detectados** (linhas 352-367): `_playLandIfPossible()` não verifica oracle_text para "enters the battlefield tapped". Terrenos como Temple of Triumph, Boros Garrison, Shocklands são tratados como untapped. **Impacto: T3 superestimado em ~3-8pp.**
 
-1. **🔴 Tapped lands NÃO detectados** (linhas 258-261, 352-367): `_isLand()` só verifica `typeLine.contains('land')`. Nenhum parsing de `oracle_text` para detectar "enters the battlefield tapped". Terrenos como Temple of Triumph, Boros Garrison, Shocklands (quando não pagam 2 life) são tratados como untapped. **Impacto: T3 superestimado em ~3-8pp.**
+2. **🔴 Enters-tapped oracle parsing ausente** — nenhuma verificação de `oracle_text.contains('enters the battlefield tapped') || oracle_text.contains('tapped')` para lands.
 
-2. **🔴 Enters-tapped detection gap no `_playLandIfPossible()`** (linhas 352-367): A função joga o terreno e conta +1 mana disponível imediatamente. Não verifica se o terreno entrou tapped. Em Commander com 10+ lands não-básicas que entram tapped, o simulador infla a mana disponível nos primeiros turnos.
+3. **🟡 T1 ramp detection simplificado** (linhas 176-178, 334-348): Land Tax, Weathered Wayfarer tratados como T1 ramp — não produzem mana no T1.
 
-3. **🟡 T1 ramp detection é simplificado** (linhas 176-178, 334-348): `_canPlayOnTurn()` verifica se há carta com CMC ≤ lands disponíveis. Mas não filtra se a carta realmente funciona no T1. Sol Ring (CMC 1, ativa T1) ✅ — Land Tax (CMC 1, não produz mana no T1) ❌ tratada como ramp.
+4. **🟡 Fetchlands tratados como incolores** (linhas 293-325): `_getLandColors()` não detecta fetchlands como fonte de mana colorida.
 
-4. **🟡 Fetchlands tratados como incolores** (linhas 293-325): `_getLandColors()` analisa type_line e oracle_text. Fetchlands (Arid Mesa, Polluted Delta) têm type_line "Land" e oracle "Sacrifice ~, search your library for {Mountain/Plains/etc.}..." — não contêm "Plains", "Island", etc. no type_line, e o oracle não contém "Add {X}". **Resultado: fetchlands produzem 0 mana colorida detectada.** Se o deck tem fetchlands, o simulador subestima fontes coloridas.
+5. **🟡 `_getCmc()` usa `safeCmcForOptimization()`** — mitiga CMC=0.0, mas 35/100 cartas ainda com CMC NULL/0.0 no SQLite.
 
-5. **🟡 `_getCmc()` usa `safeCmcForOptimization()`** (linha 265): Mitiga CMC=0.0 com fallback, mas **35/100 cartas ainda têm CMC NULL/0.0 no SQLite de origem**. Se uma carta tem `cmc=NULL` no DB e `mana_cost` vazio, o fallback retorna `99` — o que faz a carta ser ignorada em todas as simulações (nunca é jogável).
+6. **🟡 Hybrid mana tratado como genérico** (linhas 286-288): Correto para MVP, mas ignora restrições.
 
-6. **🟡 Hybrid mana tratado como genérico** (linhas 286-288): `// Hybrid mana (W/U) — requires EITHER, pick the one we have more of. For simulation simplicity, treat as generic (no strict color req).` — tratamento correto para MVP, mas ignora restrições de mana híbrida.
+7. **🟡 Mana cost `{S}` não suportado** (linhas 268-290): Snow mana ignorado.
 
-7. **🟡 Mana cost `{S}` não suportado** (linhas 268-290): Snow mana é ignorado (tratado como genérico). Afeta cartas com custo de snow mana em decks snow.
-
-8. **🟡 `_calculateAvgCmc()` exclui terrenos** (linhas 369-384): Correto conceitualmente, mas se `_getCmc()` retorna 99 para cartas corrompidas, o avgCmc pode ser distorcido para cima.
-
-#### Comparação direta: Mulligan Cron vs GoldfishSimulator
-
-| Característica | Cron Lorehold (descomissionado) | GoldfishSimulator (produção) | Gap |
-|:---------------|:-------------------------------:|:--------------------------:|:---:|
-| Simula draws T1-4 | ❌ Só mão inicial | ✅ Linhas 159-205 | |
-| Color screw check | ❌ | ✅ Linhas 268-290 | |
-| Tapped land detection | ❌ | ❌ | 🔴 Gap v12.0 novo |
-| Enters-tapped oracle parsing | ❌ | ❌ | 🔴 |
-| Fetchland color tracking | ❌ | ❌ | 🟡 |
-| T1 ramp filter | ❌ | 🟡 Parcial | |
-| CMC safety fallback | ❌ | ✅ cmc_safety.dart | |
-| Hybrid mana | ❌ | 🟡 Tratado genérico | |
-| N=1000 | ✅ | ✅ | |
-| London Mulligan | ✅ | ✅ | |
-| **SCORE** | **6.5/10** | **7.0/10 🟢** | |
-
-### Recomendações para GoldfishSimulator
-1. **🔴 Adicionar detecção de "enters tapped":** Verificar `oracle_text.contains('enters the battlefield tapped') || oracle_text.contains('tapped')` para terrenos jogados. Se sim, terreno não contribui mana no turno em que entra.
-2. **🔴 Verificar `fight` keyword no oracle text:** Cartas com "fight" não foram auditadas neste ciclo (Gap não documentado).
-3. **🟡 Refinar T1 ramp:** Filtrar `_canPlayOnTurn()` para só considerar ramp que efetivamente produz mana no turno (Sol Ring ✅, Land Tax ❌).
-4. **🟡 Melhorar fetchland detection:** Se o oracle contém "sacrifice" + "search" + "library" mas não "mana" nem "add", considerar como fonte de mana colorida da cor da land buscada.
+### Recomendações (inalteradas)
+1. 🔴 Adicionar detecção de "enters the battlefield tapped" em lands
+2. 🟡 Refinar T1 ramp filter
+3. 🟡 Melhorar fetchland color tracking
 
 ---
 
-## 4. Battle (94f8590b1beb) — Auditoria Detalhada (v8, battle_simulator.dart 879 linhas)
+## 4. Battle (94f8590b1beb) — Auditoria Detalhada (battle_simulator.dart 879 linhas)
 
 **Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Código `battle_simulator.dart` permanece no repo. **Endpoint de produto `/ai/simulate` usa este código.**
 
-**Mudanças desde v11.0:** Nenhuma alteração no código (última modificação: 2026-05-27). Todos os gaps permanecem idênticos.
+**Confirmação v13.0:** Código inalterado desde última modificação (2026-05-27). Todos os gaps persistem.
 
-### Matriz de Score por Componente (atualizada v12.0)
+### Matriz de Score por Componente
 
 | Componente | Score | Status | Linhas | Comentário |
 |:-----------|:-----:|:------:|:------:|:----------|
@@ -190,22 +192,13 @@
 | AI Decisions | 4/10 | 🟡 | 551-622 | Heurística linear sem contexto |
 | **SCORE GLOBAL** | **2.0/10** | **🔴 CRÍTICA** | | |
 
-### Novos achados nesta auditoria (v12.0):
+### Gaps Confirmados (inalterados)
+1. 🔴 `fight` mechanic não implementado
+2. 🔴 `canAttack` não considera defender (CR 502.3) nem "can't attack" effects
+3. 🟡 Board wipe detection: Blasphemous Act (dano massivo), Terminus (bottom), Settle the Wreckage (exile attacking) — não detectados
 
-1. **🔴 `fight` mechanic não implementado:** `_aiDecideMain()` (linha 551) não inclui lógica para jogar cartas com "fight". O engine não diferencia "target creature fights target creature" de remoção normal. Cartas como Prey Upon, Beast Within (fight) são tratadas como qualquer carta — não como interação.
-
-2. **🔴 `canAttack` (linha 93):** Verifica `!isTapped && !summoningSickness`. Correto para criaturas comuns, mas não considera:
-   - Criaturas com defender (CR 502.3) — pode atacar mesmo sendo wall
-   - Criaturas com "can't attack" (ex: Aboshan's Desire, Pacifism) — enchantments que removem habilidade de ataque
-   - Criaturas que atacam mas não podem (ex: agentes de controle mental)
-
-3. **🟡 Board wipe (linhas 665-685):** `card.isBoardWipe` (linha 88-92) detecta "destroy all" ou "exile all" em oracle_text. Mas:
-   - Blasphemous Act ("deals 13 damage to each creature") NÃO é detectado — nenhuma heurística para dano massivo
-   - Settle the Wreckage ("exile all attacking creatures") NÃO é detectado
-   - Terminus ("put all creatures on the bottom of their owners' libraries") NÃO é detectado
-
-### Recomendações para battle_simulator.dart
-- Os 2.0/10 refletem que o código não implementa regras fundamentais de Commander. A documentação (linha 9) admite "Sem stack complexo" — mas o endpoint está em `/ai/simulate` em produção. Recomendação da v11.0 permanece: **ou reconstruir o Dart com regras Commander ou documentar fidelidade de 2/10.**
+### Recomendações (inalteradas)
+- Reconstruir o Dart com regras Commander ou documentar fidelidade de 2/10 no endpoint `/ai/simulate`
 
 ---
 
@@ -213,270 +206,220 @@
 
 **Status:** 🔴 DECOMISSIONADO (v3.7, 2026-06-04). Diretório removido. Prompt removido de `jobs.json`.
 
-**Mudanças desde v11.0:** Nenhuma.
+**Confirmação v13.0:** Status inalterado.
 
 **O que fazia certo:**
-- **Pipeline de decisão:** Decidia 0-3 swaps por ciclo baseado em log de todos os agentes.
-- **Rastreamento de hash:** Verificava se deck mudou antes de decidir swaps.
-- **Categorização de swaps:** Swaps por prioridade baseada em win condition.
+- Pipeline de decisão com 0-3 swaps por ciclo
+- Rastreamento de hash
+- Categorização de swaps por prioridade
 
 **O que fazia errado:**
-1. **🔴 Death loop autossustentável (Gap 12):** Nenhum agente produzia dados novos → Oracle concluía "nada mudou" → retornava truncado → ciclo se repetia.
-2. **🔴 Dependia de Battle Analyst:** As decisões de swap consideravam dados do Battle Simulator (que é 2-player, sem stack).
-3. **🟡 Miracle mechanic mal interpretado:** Lorehold COPIA spells (não reduz CMC para {2}).
-4. **🟡 Sem fallback de provider:** Timeout do deepseek-v4-pro interrompia o agente após 1 tool call.
+1. 🔴 Death loop autossustentável (Gap 12)
+2. 🔴 Dependia de Battle Analyst (2-player, sem stack)
+3. 🟡 Miracle mechanic mal interpretado
+4. 🟡 Sem fallback de provider
 
 ---
 
 ## 6. functional_card_tags.dart — Auditoria de Heurísticas (1092 linhas)
 
-**Status:** 🟢 **ATIVO EM PRODUÇÃO.** Última modificação: 2026-06-14 (20:50).
-
-**Mudanças desde v11.0:** Alterado em 2026-06-14 (18 dias após v11.0 que examinou versão de 2026-05-27). Nova data indica modificação recente. **O conteúdo lido nesta auditoria é o código atual.**
+**Status:** 🟢 **ATIVO EM PRODUÇÃO.** Última modificação: 2026-06-14 (20:50). **Inalterado desde v12.0.**
 
 ### Heurísticas Implementadas (29 funções)
 
-| Heurística | Linha | Confiança | Funciona? | Gaps |
-|:-----------|:-----:|:---------:|:---------:|:-----|
-| land | 214-217 | 1.0 | ✅ | |
-| ramp | 220-227 | 0.88 | ✅ | Signets/Talismans/Sol Ring detectados |
-| ritual | 229-231 | 0.82 | ✅ | Mana temporária |
-| draw | 233-235 | 0.84 | ✅ | Exclui draw de oponente |
-| loot | 237-239 | 0.80 | ✅ | Draw + discard |
-| tutor | 241-243 | 0.86 | ✅ | Library search (não-land) |
-| targeted_removal | 245-252 | 0.83 | ✅ | Destroy/exile target; counterspell como removal+protection |
-| board_wipe | 254-256 | 0.90 | ✅ | Mass removal |
-| protection | 258-260 | 0.82 | ✅ | Hexproof, indestructible, ward, phase out |
-| recursion | 262-264 | 0.86 | ✅ | Graveyard return |
-| graveyard_synergy | 266-268 | 0.72 | ✅ | Mill, dredge, flashback |
-| token_maker | 270-272 | 0.82 | ✅ | Token creation |
-| sacrifice_outlet | 274-276 | 0.80 | ✅ | Rotação + "sacrifice" patterns |
-| aristocrat_payoff | 278-280 | 0.84 | ✅ | Death triggers + drain |
-| lifegain | 282-284 | 0.76 | ✅ | Exclui "can't gain life" |
-| drain | 286-288 | 0.82 | ✅ | Life loss payoff |
-| spellslinger | 290-292 | 0.84 | ✅ | Instant/sorcery payoff |
-| artifact_synergy | 294-296 | 0.74 | ✅ | Artifact payoff |
-| enchantment_synergy | 298-300 | 0.74 | ✅ | Enchantment payoff |
-| etb | 302-304 | 0.70 | ✅ | ETB effects |
-| blink | 306-309 | 0.86 | ✅ | Exile-then-return |
-| big_spell | 311-313 | 0.72 | ✅ | CMC ≥ 6 or payoff |
-| exile_value | 315-317 | 0.84 | ✅ | Exile play/cast |
-| wincon | 319-321 | 0.78 | ✅ | Win-con conditions |
-| combo_piece | 323-328 | 0.60 | 🟡 | Propositalmente baixo (Commander Spellbook sync é fonte canônica) |
-| engine | 330-332 | 0.70 | ✅ | Repeatable value |
-| payoff | 334-336 | 0.72 | ✅ | Payoff/scaling |
-| enabler | 338-340 | 0.70 | ✅ | Enabler/setup |
+| Heurística | Confiança | Status | Gaps |
+|:-----------|:---------:|:------:|:-----|
+| land | 1.0 | ✅ | |
+| ramp | 0.88 | ✅ | Signets/Talismans/Sol Ring detectados |
+| ritual | 0.82 | ✅ | |
+| draw | 0.84 | ✅ | |
+| loot | 0.80 | ✅ | |
+| tutor | 0.86 | ✅ | |
+| targeted_removal | 0.83 | ✅ | |
+| board_wipe | 0.90 | ✅ | |
+| protection | 0.82 | ✅ | |
+| recursion | 0.86 | ✅ | |
+| graveyard_synergy | 0.72 | ✅ | |
+| token_maker | 0.82 | ✅ | |
+| sacrifice_outlet | 0.80 | ✅ | |
+| aristocrat_payoff | 0.84 | ✅ | |
+| lifegain | 0.76 | ✅ | |
+| drain | 0.82 | ✅ | |
+| spellslinger | 0.84 | ✅ | |
+| artifact_synergy | 0.74 | ✅ | |
+| enchantment_synergy | 0.74 | ✅ | |
+| etb | 0.70 | ✅ | |
+| blink | 0.86 | ✅ | |
+| big_spell | 0.72 | ✅ | |
+| exile_value | 0.84 | ✅ | |
+| wincon | 0.78 | ✅ | |
+| combo_piece | 0.60 | 🟡 | Propositalmente baixo |
+| engine | 0.70 | ✅ | |
+| payoff | 0.72 | ✅ | |
+| enabler | 0.70 | ✅ | |
 
-### Gaps de Heurísticas Descobertos (v12.0)
-
-1. **🟡 `fight` não detectado como remoção:** A função `_looksLikeTargetedRemoval()` (linha 692-711) detecta "destroy target", "exile target", "return target", "-X/-X", e "deals damage to target creature". Mas **"target creature fights target creature"** ou **"fight target"** não são capturados. Cartas como Prey Upon, Prizefight são **invisíveis** como remoção — caem como double-null ou tagged incorretamente.
-
-2. **🟡 `'rather than pay'` no oracle text para counterspells:** Força de Vontade (`force of will`) detectada como `protection` (linha 258) mas não como `removal` (counterspell). O código em linha 249-251 só detecta `counter target` para adicionar tags de removal. "Rather than pay" sem "counter target" não é capturado.
-
-3. **🟡 `read` e `goad` effects não capturados:** Nenhuma heurística para:
-   - Read (linha 977: `investigate`, `connive` como selection)
-   - Goad (efeitos que forçam ataque — "goesad", "must attack" — não capturados)
-   - **Double-null conhecido para taunt/goad/redirect effects**
-
-4. **🟡 `_estimateManaValue()` (linhas 1062-1086):** Não trata `{C}` (mana incolor genérica) corretamente. `{C}` é parsing como símbolo não-numérico → `total += 1`. Mas `{C}` significa "1 mana incolor específica" — não genérica. Hybris com `{2/C}` ou `{W/U}` tratados como 1.0, que é correto para MVP.
-
-5. **🟡 `cmc_safety.dart` depende:** `safeCmcForOptimization()` é chamado via `_safeDouble(cmc, _estimateManaValue(manaCost))` (linha 199). Se `manaCost` também é NULL/vazio, o fallback retorna 0.0 — mesma corrupção do SQLite propagada para a tag.
-
-### Análise de Cobertura
-- Total de heurísticas: **29 funções** (incluindo `_looksLike*` e helpers)
-- Tags funcionais suportadas: **29** (linha 7-36)
-- Tags de buckets principais: **18** (linha 38-57)
-- Funções semânticas V2: **10** (speed, mana_efficiency, card_advantage_type, interaction_scope, combo_piece, wincon, engine, payoff, enabler, protection_type, recursion_type)
-- **Cobertura: ALTA** para um sistema baseado em oracle text puro. Expectativa de 90%+ de cartas comuns recebendo pelo menos 1 tag.
+### Gaps Confirmados (inalterados)
+1. 🟡 `fight` não detectado como remoção
+2. 🟡 `'rather than pay'` no oracle text para counterspells — Force of Will detectada como protection, não removal
+3. 🟡 `goad`/`must attack` effects não capturados
+4. 🟡 `_estimateManaValue()` não trata `{C}` (incolor genérica)
+5. 🟡 `cmc_safety.dart` dependência — se manaCost também vazio, fallback retorna 0.0
 
 ---
 
 ## 7. edh_bracket_policy.dart — Auditoria do Sistema de Bracket (547 linhas)
 
-**Status:** 🟢 **ATIVO EM PRODUÇÃO.** Última modificação: 2026-06-11 (03:24).
+**Status:** 🟢 **ATIVO EM PRODUÇÃO.** Última modificação: 2026-06-11 (03:24). **Inalterado desde v12.0.**
 
-**Mudanças desde v11.0:** Modificado em 2026-06-11. O conteúdo examinado nesta auditoria é o código mais recente.
+**🆕 NOVO v13.0: Arquivo MOVIDO** de `server/lib/ai/edh_bracket_policy.dart` para `server/lib/edh_bracket_policy.dart`. O conteúdo é idêntico. A documentação do domínio (`manaloom-mtg-domain` §13, Gap 27) referencia o caminho antigo.
 
 ### Sistema de 11 Categorias
 
 | Categoria | Heurística | Cartas curadas | Coverage |
 |:----------|:----------:|:--------------:|:--------:|
-| fastMana | Nomes curados (12) | 12 | 🟡 Mínimo viável — falta Mana Drain (contido), Lion's Eye Diamond |
-| fastManaLand | Nomes curados (5) | 5 | 🟡 Ancient Tomb, City of Traitors, Gaea's Cradle, Mishra's Workshop, Serra's Sanctum |
-| tutor | Oracle text: `search your library` NOT `land` search | Dinâmico | ✅ Boa cobertura |
+| fastMana | Nomes curados (12) | 12 | 🟡 Mínimo viável |
+| fastManaLand | Nomes curados (5) | 5 | 🟡 |
+| tutor | Oracle text: `search your library` NOT land | Dinâmico | ✅ |
 | extraTurns | Oracle: `extra turn` | Dinâmico | ✅ |
-| freeInteraction | Nomes curados (9) + oracle `without paying`/`rather than pay` | 9 + dinâmico | ✅ |
-| infiniteCombo | Nomes curados (3) | 3 | 🔴 **MUITO RESTRITIVO** — só Thassa's Oracle, Demonic Consultation, Tainted Pact |
-| boardWipe | Oracle: `exile all opponents control` + `destroy all opponents` + nomes curados (2) | 2 + dinâmico | 🟡 |
-| cardAdvantage | Nomes curados (7) + oracle `unless pays draw`/`pay life draw skip draw` | 7 + dinâmico | ✅ |
-| stax | Nomes curados (12) + oracle `cast more than one spell`/`search library control` | 12 + dinâmico | ✅ |
-| protection | Nomes curados (6) + oracle `rather than pay indestructible/hexproof/phase out` | 6 + dinâmico | ✅ |
+| freeInteraction | Nomes curados (9) + oracle `without paying` | 9 + dinâmico | ✅ |
+| infiniteCombo | Nomes curados (3) | 3 | 🔴 MUITO RESTRITIVO |
+| boardWipe | Oracle + nomes curados (2) | 2 + dinâmico | 🟡 |
+| cardAdvantage | Nomes curados (7) + oracle | 7 + dinâmico | ✅ |
+| stax | Nomes curados (12) + oracle | 12 + dinâmico | ✅ |
+| protection | Nomes curados (6) + oracle | 6 + dinâmico | ✅ |
 | valueEngine | Nomes curados (5) | 5 | 🟡 Mínimo viável |
-| **gameChanger** | **53 nomes curados** (linhas 354-408) | **53** | **✅ Definição canônica do produto** |
+| **gameChanger** | **53 nomes curados** (linhas 354-408) | **53** | **✅ Definição canônica** |
 
-### 53 Game Changers (GCs) — Validação da Lista do Produto
+### Gaps Confirmados (inalterados)
+1. 🔴 Underworld Breach não está em `_knownInfiniteComboPieces` (linhas 347-351)
+2. 🔴 `_knownInfiniteComboPieces` dramaticamente pequeno: apenas 3 cartas
+3. 🟡 `_looksLikeGameChangerBoardWipe()` não cobre Blasphemous Act, Terminus, Settle
+4. 🟡 `_looksLikeGameChangerStax()` não cobre Trinisphere, Smokestack, Tangle Wire
+5. 🟡 `_looksLikeGameChangerProtection()` não cobre Boros Charm
 
-**Fonte:** `edh_bracket_policy.dart:354-408`. **NÃO usar lista da Wizards.** A lista do produto é a fonte de verdade.
+### GC Source of Truth (reconfirmado v13.0)
 
-### Gaps Identificados
-
-1. **🔴 Underworld Breach não está em `_knownInfiniteComboPieces`** (Gap 28, linhas 347-351): Underworld Breach é GC (linha 405) mas não é reconhecido como peça de combo infinito. Com LED + Brain Freeze forma combo — mas o bracket só sabe que é "GC genérico".
-
-2. **🔴 `_knownInfiniteComboPieces` (linhas 347-351) é dramaticamente pequeno:** Apenas 3 cartas. **Missing:** Underworld Breach, Isochron Scepter + Dramatic Reversal, Kiki-Jiki + Pestermite/Zealous Conscripts, Devoted Druid + Vizier of Remedies, Heliod + Walking Ballista, etc. Não há heurística de oracle para detectar combos.
-
-3. **🟡 `_looksLikeGameChangerBoardWipe()` (linhas 454-467):** Só detecta "exile all" ou "destroy all" + "opponents control". **Missing:**
-   - Blasphemous Act (dano massivo, não "destroy all")
-   - Terminus (bottom of library, não remove)
-   - Settle the Wreckage (exile attacking, não "exile all + opponents control")
-   - Austere Command (modal, escolhe "destroy all creatures" etc.)
-
-4. **🟡 `_looksLikeGameChangerStax()` (linhas 493-518):** Boa cobertura dos nomes curados (12) + heurísticas para ETB hate, search hate, spell-per-turn restrictions. **Missing:**
-   - Trinisphere (custa pelo menos 3)
-   - Smokestack (sacrifice cumulative upkeep)
-   - Tangle Wire (fading + tap)
-
-5. **🟡 `_looksLikeGameChangerProtection()` (linhas 520-539):** 6 nomes curados + heurística para free protection. **Missing:**
-   - Boros Charm (indestructible + double strike + 4 damage — não tem "rather than pay")
-   - Heroic Intervention já está curado ✅
-
-6. **🟡 `officialGameChangerNamesForBracketPolicy` (linhas 354-408):** 53 GCs. A lista não contém:
-   - Grand Abolisher — não é GC no produto, mas é stax piece (linhas 497) como nome curado em `_looksLikeGameChangerStax`
-   - Cadaverous Bloom — combo piece, não é GC
-   - **Underworld Breach já está como GC** ✅ (linha 405)
-
-### GC Source of Truth Reconfirmation (v12.0)
-
-A lista do produto (53 GCs) foi verificada contra o `card_oracle_cache`:
+Lista do produto (53 GCs, `edh_bracket_policy.dart:354-408`) — **NÃO usar lista da Wizards.**
 
 - **47/53 (88.7%)** presentes no oracle_cache ✅
-- **3/53 (5.7%)** legais perdidos: Panoptic Mirror, Serra's Sanctum, Tergrid (DFC sync gap) **🔴**
-- **3/53 (5.7%)** banned presumivelmente filtrados: Biorhythm, Braids, Coalition Victory 🟡
-
-**🔴 NENHUMA MUDANÇA desde v11.0:** Os 3 GCs legais continuam perdidos. O sync PG→SQLite não foi corrigido.
+- **3/53 (5.7%)** legais perdidos: Panoptic Mirror, Serra's Sanctum, Tergrid 🔴
+- **3/53 (5.7%)** banned: Biorhythm, Braids, Coalition Victory 🟡
+- **🔴 NENHUMA MUDANÇA desde v12.0**
 
 ---
 
-## 8. SQLite Health Check — knowledge.db (2026-06-14T23:00Z)
+## 8. SQLite Health Check — knowledge.db (2026-06-15T14:00Z)
 
 ### Schema
-
 **15 tabelas.** Deck único: `Runtime Lorehold Learned 19e93de3cca` (id=6, 100 cartas).
 
 ### Métricas de Saúde
 
-| Métrica | v11.0 (2026-06-14) | v12.0 (2026-06-15) | Mudança |
-|:--------|:------------------:|:------------------:|:-------:|
-| CMC corrupted (NULL/0.0) | 35/100 (35%) | 35/100 (35%) | **↔️ INALTERADO** |
+| Métrica | v12.0 | v13.0 | Mudança |
+|:--------|:-----:|:-----:|:-------:|
+| CMC corrupted (NULL/0.0) | 35/100 (35%) | **35/100 (35%)** | 🔴 Inalterado |
 | Decks | 1 | 1 | ↔️ |
 | Deck cards | 100 | 100 | ↔️ |
 | Unknown functional tags | 0 | 0 | ✅ |
-| Oracle cache rows | ~3217 | **3217** | ↔️ |
-| Unique names in cache | ~3108 | **3108** | ↔️ |
-| GCs missing (legais) | 3 | **3** (Panoptic Mirror, Serra's Sanctum, Tergrid) | **🔴 INALTERADO** |
-| Slot benchmarks | ~108 | **115** (estável — 86 phase1 + outros) | ✅ Crescimento normal |
-| Quality reviews: passed | ~118 | **120** | ✅ |
-| Quality reviews: blocked | ~3 | **3** | ↔️ |
-| Battle card rules | ~3150 | **3156** | ✅ Crescimento normal |
+| Oracle cache rows | 3217 | **3217** | ↔️ |
+| GCs missing (legais) | 3 | **3** | 🔴 Inalterado |
+| Slot benchmarks | 115 | 115 | ↔️ |
+| Quality reviews: passed | 120 | 120 | ↔️ |
+| Quality reviews: blocked | 3 | 3 | ↔️ |
 
-### Achados Novos do SQLite (v12.0)
+### Achados Novos do SQLite (v13.0)
 
-1. **🔴 `knowcards-validator` erro "resolve your current index first":** O cron `lorehold-knowncards-validator` (ativo) e `manaloom-master-optimizer-preflight` (ativo) ambos falham com o mesmo erro de git. **Indica que o git index do workspace pode estar corrompido.** Última execução do preflight: `2026-06-15T00:53:48` — erro. Do validator: `2026-06-15T01:23:50` — erro.
-
-2. **🟡 `deck_promotions` table ainda ausente:** `auto_promote_learned_decks.py` falha 22 execuções consecutivas com `OperationalError: no such table: deck_promotions`.
-
-3. **🟡 `battle_card_rules` tem 3156 regras** de 3 fontes: curated (1218), generated (1469), manual (469). Crescimento orgânico normal.
+1. **🔴 Git index error persiste:** `mmo-preflight01` e `d4e5f6a7b8c9` ambos falham com exit code 128. Últimas execuções: preflight 13:26Z (579 bytes — output indicando erro), validator 13:57Z (578 bytes). **Nenhuma melhora.**
+2. **🟡 `deck_promotions` table ainda ausente:** auto-promote falhou em 2026-06-15 12:43 com `OperationalError: no such table: deck_promotions`. 34 execuções, 22+ erros.
+3. **🟡 `battle_card_rules`:** 3156 regras — estável.
 
 ---
 
-## 9. Análise de Jobs.json — Crons com Skill Loading Failure
+## 9. Análise de jobs.json — Crons com Skill Loading Failure
 
 ### Crons que Referenciam `manaloom-commander-knowledge` (inexistente)
 
 | Cron | ID | Campo | Desde | Impacto |
-|:-----|:---|:-----|:------|:--------|
-| **mtg-rules-auditor** | `c0591cb18024` | `skill` + `skills[]` | 2026-06-08 | 🔴 **CRON BROKEN** — skill dump sempre |
-| **gamechanger-research** | `7915cc2377a0` | `skill` + `skills[]` | 2026-06-08 | 🟡 Pode causar skill dump — mas execuções recentes ok (116 exec) |
-| **knowledge-synthesis** | `10a59b3bdf4d` | `skills[]` | 2026-06-08 | 🟡 Fallback funciona — 61 execuções ok |
-| **tag-accuracy-reporter** | `b340374bc4e7` | `skill` + `skills[]` | 2026-06-08 | 🟡 PAUSADO — impacto mínimo |
+|:-----|:---|:------|:------|:--------|
+| **mtg-rules-auditor** | `c0591cb18024` | `skill` + `skills[]` | 2026-06-08 | 🔴 **CRON BROKEN** — 13+ execuções falhadas |
+| **gamechanger-research** | `7915cc2377a0` | `skill` + `skills[]` | 2026-06-08 | 🟡 Pode causar skill dump — 117 execuções |
+| **knowledge-synthesis** | `10a59b3bdf4d` | `skills[]` | 2026-06-08 | 🟡 Fallback funciona — 63 execuções |
+| **tag-accuracy-reporter** | `b340374bc4e7` | `skill` + `skills[]` | 2026-06-08 | 🟡 PAUSADO |
 
-### Correção Necessária em jobs.json
+### Correção Necessária em jobs.json (idêntica à v12.0 — SEM CORREÇÃO)
 
-**Linhas a corrigir (skill → `manaloom-mtg-domain`):**
-- Linha 216-219 (gamechanger-research): `"skill": "manaloom-commander-knowledge"` → `"skill": "manaloom-mtg-domain"`, `"skills": ["manaloom-mtg-domain"]`
-- Linha 303-306 (tag-accuracy-reporter, PAUSADO): `"skill": "manaloom-commander-knowledge"` → `"skill": "manaloom-mtg-domain"`, `"skills": ["manaloom-mtg-domain"]`
-- Linha 537-539 (knowledge-synthesis): Remover `"manaloom-commander-knowledge"` de `skills[]`
-- **Linha 586-589 (mtg-rules-auditor, MEU PRÓPRIO CRON):** `"skill": "manaloom-commander-knowledge"` → `"skill": "manaloom-mtg-domain"`, `"skills": ["manaloom-mtg-domain"]`
+| Linha | Cron | Correção |
+|:-----|:-----|:---------|
+| 216-219 | gamechanger-research | `skill: "manaloom-commander-knowledge"` → `"manaloom-mtg-domain"` |
+| 303-306 | tag-accuracy-reporter (PAUSADO) | `skill: "manaloom-commander-knowledge"` → `"manaloom-mtg-domain"` |
+| 537-539 | knowledge-synthesis | Remover `"manaloom-commander-knowledge"` de `skills[]` |
+| **586-589** | **mtg-rules-auditor (ESTE CRON)** | **`skill: "manaloom-commander-knowledge"` → `"manaloom-mtg-domain"`** |
+
+**🔴 Todos os 4 crons continuam sem correção. Documentado em 5 versões consecutivas (v8.0–v13.0).**
 
 ---
 
 ## 10. Plano de Correções (ordenado por impacto)
 
 ### 🔴 CRÍTICO (1-3)
-1. **🔴 [jobs.json] Corrigir 4 crons que referenciam `manaloom-commander-knowledge`:** Trocar para `manaloom-mtg-domain`. **Incluindo este cron (mtg-rules-auditor) — 12+ execuções falhadas.**
-2. **🔴 [goldfish_simulator.dart] Adicionar detecção de "enters the battlefield tapped":** ~5 linhas de código, impacto direto na precisão do T3 em ~3-8pp. Custo de implementação: mínio.
-3. **🔴 [SQLite] Corrigir sync dos 3 GCs legais perdidos:** Panoptic Mirror, Serra's Sanctum, Tergrid (DFC). Investigar se o sync PG→SQLite filtra banned cards ou DFCs.
+1. **🔴 [jobs.json] Corrigir 4 crons que referenciam `manaloom-commander-knowledge`:** Trocar para `manaloom-mtg-domain`. **Incluindo este cron (mtg-rules-auditor) — 13+ execuções falhadas.**
+2. **🔴 [goldfish_simulator.dart] Adicionar detecção de "enters the battlefield tapped":** ~5 linhas de código, impacto direto na precisão do T3 em ~3-8pp.
+3. **🔴 [SQLite] Corrigir sync dos 3 GCs legais perdidos:** Panoptic Mirror, Serra's Sanctum, Tergrid (DFC).
 
 ### 🟡 ALTO (4-7)
-4. **🟡 [Git Workspace] Limpar git index corrompido:** O erro "resolve your current index first" afeta 2 crons ativos (master-optimizer-preflight e knowncards-validator). `git reset` ou `git stash` no workspace.
-5. **🟡 [SQLite] Criar tabela `deck_promotions`:** Script `auto_promote_learned_decks.py` precisa dela — 22 execuções falhadas.
-6. **🟡 [goldfish_simulator.dart] Refinar T1 ramp detection:** Land Tax, Weathered Wayfarer não produzem mana no T1. Sol Ring, Mana Vault, sim.
-7. **🟡 [goldfish_simulator.dart] Melhorar fetchland color tracking:** Fetchlands devem contribuir mana colorida após buscar a land básica.
+4. **🟡 [Git Workspace] Limpar git index corrompido:** exit code 128 afeta 2 crons ativos (preflight + validator).
+5. **🟡 [SQLite] Criar tabela `deck_promotions`:** Script `auto_promote_learned_decks.py` precisa dela — 34 execuções, 22+ falhas.
+6. **🟡 [goldfish_simulator.dart] Refinar T1 ramp detection:** Land Tax, Weathered Wayfarer não produzem mana no T1.
+7. **🟡 [goldfish_simulator.dart] Melhorar fetchland color tracking.**
 
 ### 🟢 MÉDIO (8-11)
-8. **🟢 [functional_card_tags.dart] Adicionar `fight` como heurística de remoção:** "target creature fights" em oracle_text → remoção.
-9. **🟢 [edh_bracket_policy.dart] Expandir `_knownInfiniteComboPieces`:** Adicionar pelo menos Underworld Breach, Isochron Scepter, Dramatic Reversal.
-10. **🟢 [edh_bracket_policy.dart] Expandir `_looksLikeGameChangerBoardWipe()`:** Incluir Blasphemous Act (dano massivo), Terminus (bottom), Settle the Wreckage (exile attacking).
-11. **🟢 [battle_simulator.dart] Adicionar flag `isCommander` em `GameCard`:** Primeiro passo para rastrear Commander damage.
+8. **🟢 [functional_card_tags.dart] Adicionar `fight` como heurística de remoção.**
+9. **🟢 [edh_bracket_policy.dart] Expandir `_knownInfiniteComboPieces`:** Underworld Breach, Isochron Scepter, Dramatic Reversal.
+10. **🟢 [edh_bracket_policy.dart] Expandir `_looksLikeGameChangerBoardWipe()`:** Blasphemous Act, Terminus, Settle.
+11. **🟢 [battle_simulator.dart] Adicionar flag `isCommander` em `GameCard`.**
 
 ### 🔵 BAIXO (12-15)
-12. **🔵 [functional_card_tags.dart] Adicionar `goad`/`must attack` heurística:** Double-null conhecido para taunt/redirect effects.
-13. **🔵 [goldfish_simulator.dart] Adicionar suporte a `{C}` (incolor) em `_getColorRequirements()`:**
-14. **🔵 [git] Resolver ahead-20:** Branch `codex/hermes-analysis-docs` está 20 commits ahead de origin. Fazer push ou rebase.
-15. **🔵 [jobs.json] Remover crons one-shot expirados:** `manaloom-master-optimizer-loop`, `manaloom-flutter-ui-auditor` — ambos one-shot com run_at no passado, PAUSADOS.
+12. **🔵 [functional_card_tags.dart] Adicionar `goad`/`must attack` heurística.**
+13. **🔵 [goldfish_simulator.dart] Adicionar suporte a `{C}` (incolor).**
+14. **🔵 [git] Resolver ahead-26:** Branch está 26 commits ahead de origin.
+15. **🔵 [docs] Atualizar `manaloom-mtg-domain` Skill:** Path do `edh_bracket_policy.dart` mudou de `server/lib/ai/` para `server/lib/`.
 
 ---
 
-## 11. Mudanças desde v11.0
+## 11. Mudanças desde v12.0
 
-| Item | v11.0 (2026-06-14) | v12.0 (2026-06-15) | Status |
-|:-----|:------------------:|:------------------:|:------:|
+| Item | v12.0 | v13.0 | Status |
+|:-----|:-----:|:-----:|:------:|
 | CMC corrupted | 35/100 | 35/100 | 🔴 Inalterado |
-| GCs missing (legais) | 3 (Panoptic, Serra's, Tergrid) | 3 | 🔴 Inalterado |
+| GCs missing (legais) | 3 | 3 | 🔴 Inalterado |
 | battle_simulator.dart score | 2.0/10 | 2.0/10 | 🔴 Inalterado |
 | goldfish_simulator.dart score | 7.0/10 | 7.0/10 | 🔴 Inalterado |
-| MTG Rules Auditor cron | 0.0/10 (broken, skill loading) | 0.0/10 | 🔴 Inalterado |
-| functional_card_tags.dart | 2026-05-27 | 2026-06-14 | 🟡 Modificado |
-| edh_bracket_policy.dart | 2026-05-27 | 2026-06-11 | 🟡 Modificado |
-| Master Optimizer Preflight | 7.5/10 | 6.0/10 (git index error) | 🔴 PIOROU |
-| Lorehold Knowncards Validator | ✅ ok | 🔴 git index error | 🔴 PIOROU |
-| **Score geral** | **4.5/10** | **4.5/10** | **🔴 Estagnada** |
+| MTG Rules Auditor cron | 0.0/10 | 0.0/10 | 🔴 Inalterado |
+| Master Optimizer Preflight | 6.0/10 (git index) | 6.0/10 (exit 128) | 🔴 Persiste |
+| Knowncards Validator | 🔴 git index | 🔴 exit 128 | 🔴 Persiste |
+| edh_bracket_policy.dart path | `server/lib/ai/` | **`server/lib/`** | 🆕 **NOVO ACHADO** |
+| **Score geral** | **4.5/10** | **4.5/10** | **🔴 Estagnada pelo 6º dia** |
 
-### Novos achados desde v11.0
-1. **🔴 `fight` mechanic não detectado em `functional_card_tags.dart`** — gap novo
-2. **🔴 `fight` não implementado em `battle_simulator.dart`** — gap novo
-3. **🔴 Git index corrompido afeta 2 crons ativos (preflight + validator)** — regressão
-4. **🟡 `_looksLikeGameChangerBoardWipe()` não cobre Blasphemous Act, Terminus** — gap novo
-5. **🟡 goldfish_simulator.dart: enters-tapped detection gap documentado pela primeira vez** — gap existente mas não documentado
+### Único novo achado desde v12.0
+1. **🆕 `edh_bracket_policy.dart` foi movido** de `server/lib/ai/` para `server/lib/`. Documentação do domínio desatualizada.
 
 ---
 
 ## 12. Conclusão
 
-**Score geral: 4.5/10 🔴 BAIXA — ESTAGNADA PELO 5º DIA CONSECUTIVO.**
+**Score geral: 4.5/10 🔴 BAIXA — ESTAGNADA PELO 6º DIA CONSECUTIVO.**
 
-O ecossistema de crons do ManaLoom não apresenta melhora material desde a v11.0. Os mesmos gaps críticos persistem:
-- **MTG Rules Auditor cron continua broken** (12+ execuções falhadas por skill loading failure)
+O ecossistema de crons do ManaLoom **não apresenta nenhuma melhora material** desde a v12.0 (12h atrás) e **nenhuma desde v11.0 (24h atrás)**. Os mesmos gaps críticos persistem:
+
+- **MTG Rules Auditor cron continua broken** (13+ execuções falhadas por skill loading failure)
 - **3 GCs do produto continuam perdidos do oracle_cache**
 - **CMC corruption continua em 35% no deck único**
-- **git index corrompido afeta agora 2 crons ativos (novo!)**
+- **Git index corrompido afeta 2 crons ativos** — nenhuma melhora
+- **jobs.json com 4 referências quebradas** a skill inexistente
 
-**2 novos gaps foram descobertos nesta auditoria** (fight mechanic, enters-tapped), e **1 regressão** (git index error) piorou o score do master-optimizer-preflight de 7.5 para 6.0.
-
-A única melhora é a constatação de que `functional_card_tags.dart` e `edh_bracket_policy.dart` foram modificados desde a v11.0 — indicando atividade de desenvolvimento — mas o conteúdo examinado não mostra correção dos gaps documentados.
-
-**Pipeline score (cron mtg-rules-auditor autoavaliação): 0.0/10 🔴** — este cron não produziu auditoria real por 7+ dias. Esta execução (v12.0) é a primeira em que o cron produz conteúdo real via execução manual do prompt (a falha de skill loading foi contornada pela execução direta do operador).
+**Pipeline score (cron mtg-rules-auditor autoavaliação): 0.0/10 🔴** — este cron não produziu auditoria real por 7+ dias. Esta execução (v13.0) é a segunda em que o cron produz conteúdo real via contorno manual do operador (a falha de skill loading foi contornada pela execução direta com o skill `manaloom-mtg-domain` disponível).
 
 ---
 
-*Auditoria gerada em 2026-06-15T02:30:00+00:00 por Hermes Agent (cron mtg-rules-auditor c0591cb18024)*
-*Branch: codex/hermes-analysis-docs | HEAD: 198e4224*
+*Auditoria gerada em 2026-06-15T14:30:00+00:00 por Hermes Agent (cron mtg-rules-auditor c0591cb18024)*
+*Branch: codex/hermes-analysis-docs | HEAD: b3008003*
