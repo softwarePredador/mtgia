@@ -706,34 +706,40 @@ grep -c "profile" docs/hermes-analysis/manaloom-knowledge/MANA_BASE_VALIDATION_R
 
 ---
 
-### [P3] Adicionar consumidor de leitura para `deck_weakness_reports` — dados persistidos nunca são lidos, anula benefício da persistência
+### [P3] Superseded 2026-06-15: `deck_weakness_reports` nao e mais ausencia total de leitura
 
-**Conhecimento MTG:** A análise de fraquezas de deck identifica gaps estruturais (falta de ramp, draw insuficiente, remoção escassa) que afetam a performance. Persistir essas análises permite tracking histórico: "esta fraqueza foi corrigida?" "o deck melhorou após swaps?" Sem leitura, a tabela é um write-only log sem valor.
+**Status atual:** o achado original dizia que `deck_weakness_reports` era um
+log sem consumidor. A validacao de modelo de dados de 2026-06-15 reclassificou
+isso como historico: a rota de weakness-analysis le/persiste historico no fluxo
+runtime. O problema remanescente e mais especifico: transformar fraquezas
+historicas em sinal de priorizacao no optimize e em resolucao/feedback loop.
 
-**Evidencia no código:**
-- `server/routes/ai/weakness-analysis/index.dart:374` — `INSERT INTO deck_weakness_reports (...) ON CONFLICT DO NOTHING` — única referência à tabela.
-- `rg "FROM deck_weakness_reports" server/lib/ server/routes/ server/bin/ app/` → **ZERO resultados**. Nenhum SELECT consulta a tabela.
-- O campo `addressed` existe no schema (`server/database_setup.sql:363`) para marcar fraquezas como resolvidas, mas não há fluxo de UPDATE porque ninguém lê a tabela para identificar o que precisa ser atualizado.
-- `server/doc/API_CONTRACTS_AND_DATA_MAP.md:286` — marca o endpoint como "experimental/not proven".
+**Evidencia atual:**
+- `server/routes/ai/weakness-analysis/index.dart` consome/persiste a tabela no
+  fluxo da propria analise.
+- `docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md` lista
+  `deck_weakness_reports` como tabela presente no PostgreSQL real, com 15
+  linhas no snapshot auditado.
+- A tarefa antiga foi mantida aqui apenas como historico para evitar reabertura
+  automatica por reports Hermes antigos.
 
-**Gap:** A rota `POST /ai/weakness-analysis` gasta recursos computacionais (análise de IA) para gerar um relatório de fraquezas, persiste o resultado... e nunca mais o consulta. O dado é efetivamente descartado após a resposta HTTP. O campo `addressed` (booleano) nunca é atualizado porque nenhum fluxo lê a tabela para verificar se fraquezas antigas foram corrigidas.
+**Gap remanescente:** usar fraquezas historicas nao resolvidas como sinal
+explicito no optimize/quality gate e marcar resolucao quando as metricas do deck
+melhorarem. Isso deve ser tratado como melhoria de aprendizado, nao como bug de
+persistencia sem consumidor.
 
-**Impacto:** `P3` — Desperdício de armazenamento e processamento. As fraquezas identificadas não retroalimentam otimizações futuras (ex: "este deck já teve warning de ramp baixo 3 vezes — priorize adicionar ramp"). O optimize pipeline não sabe que o deck tem fraquezas históricas não resolvidas.
+**Ação futura recomendada:**
+1. Criar leitura agregada segura de fraquezas recentes por `deck_id`.
+2. No optimize pipeline, priorizar categorias coerentes com fraquezas abertas
+   sem expor metadata interna Hermes ao app normal.
+3. Depois de aplicar swaps, marcar fraquezas como resolvidas apenas quando a
+   metrica correspondente melhorar em analise backend-owned.
 
-**Risco:** P3 — Baixo impacto funcional (a análise é retornada na resposta HTTP em tempo real). Mas representa custo de armazenamento sem benefício e uma oportunidade perdida de melhorar recomendações com histórico.
-
-**Ação recomendada:**
-1. Criar endpoint `GET /api/decks/:id/weakness-history` que retorna fraquezas históricas com status `addressed`
-2. No optimize pipeline (`optimize_runtime_support.dart`), consultar fraquezas não-resolvidas para priorizar categorias de swap (ex: se `addressed=false` para "falta ramp", dar +5 bonus a candidatos de ramp)
-3. Após aplicar swaps, marcar fraquezas relacionadas como `addressed=true` se as métricas melhoraram
-4. (Opcional) Adicionar dashboard no app Flutter mostrando "fraquezas resolvidas vs pendentes"
-
-**Validação:**
+**Validação futura:**
 ```bash
-cd server && dart analyze lib/ai/optimize_runtime_support.dart
-cd server && dart test test/ai/optimize_runtime_support_test.dart
-# Verificar que deck_weakness_reports é consultado:
-rg "deck_weakness_reports" server/lib/ server/routes/ --count
+cd server && dart analyze lib/ai/optimize_runtime_support.dart routes/ai/weakness-analysis/index.dart
+cd server && dart test test/ai_weakness_analysis_live_test.dart
+rg "deck_weakness_reports" server/lib server/routes server/bin
 ```
 
 ---
@@ -746,7 +752,7 @@ rg "deck_weakness_reports" server/lib/ server/routes/ --count
 | 2 | P2 | ✅ Resolvido 2026-06-11: centralizar `_isBasicLandName` em utilitário único com normalização canônica | STRUCTURE_AUDIT 2026-06-05 (4 conflicting implementations) |
 | 3 | P2 | ✅ Resolvido 2026-06-11: `MLKnowledgeService.recordFeedback` conectado ao fluxo runtime de `/ai/optimize`; `ml_prompt_feedback` declarada no schema e verificador | STRUCTURE_AUDIT 2026-06-05 (functions not called: recordFeedback) |
 | 4 | P2 | Expandir `_run_validation.py` para buscar profiles batch_c | Commander Knowledge Skill (Mana Base Validator Exec #2 limitations) |
-| 5 | P3 | Adicionar consumidor de leitura para `deck_weakness_reports` — tabela write-only | STRUCTURE_AUDIT 2026-05-28 (postgresql-tables-not-used) |
+| 5 | P3 | Superseded: `deck_weakness_reports` tem fluxo runtime; proximo gap e usar historico como sinal no optimize | DATA_MODEL_FINAL_VALIDATION 2026-06-15 |
 
 > **Nota:** Task #1 complementa a tarefa pendente P1 "classifyOptimizationFunctionalRole: Usar functional_tags persistidas como fonte primária" (Cron #7) — enquanto aquela aborda a CADEIA DE PRIORIDADE de fontes, esta aborda a DIVERGÊNCIA NAS IMPLEMENTAÇÕES das heurísticas de fallback.
 > **Nota:** Task #3 complementa a tarefa pendente P2 "deck_learning_events: Fechar o loop de aprendizado" (Cron #7) — enquanto aquela foca em eventos de gameplay, esta foca em feedback de qualidade de prompts.

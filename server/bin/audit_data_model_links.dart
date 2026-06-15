@@ -7,6 +7,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 import '../lib/ai/candidate_quality_data_support.dart';
+import '../lib/ai/commander_learning_snapshot_support.dart';
 import '../lib/import_card_lookup_service.dart';
 
 final _tableDdlPattern = RegExp(
@@ -21,6 +22,7 @@ final _viewDdlPattern = RegExp(
 const _criticalViews = <String>[
   'card_identity_bridge',
   'card_intelligence_snapshot',
+  'commander_learning_snapshot',
   'optimize_candidate_quality_summary',
 ];
 
@@ -324,6 +326,7 @@ Future<Map<String, dynamic>> _validateViewsInRollback(
         .execute(Sql.named(optimizeCandidateQualitySummaryViewStatement));
     await connection.execute(Sql.named(cardIntelligenceSnapshotViewStatement));
     await connection.execute(Sql.named(createCardIdentityBridgeViewSql));
+    await connection.execute(Sql.named(commanderLearningSnapshotViewStatement));
 
     for (final view in _criticalViews) {
       result[view] = {
@@ -480,11 +483,17 @@ List<Map<String, String>> _scanStaleDocs(Directory repoRoot) {
         'docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md') {
       continue;
     }
+    if (rel == 'docs/hermes-analysis/STRUCTURE_AUDIT.md') {
+      continue;
+    }
     final lines = entity.readAsLinesSync();
     for (var i = 0; i < lines.length; i++) {
       final line = lines[i];
       final lowerLine = line.toLowerCase();
-      if (lowerLine.contains('rejeitad')) {
+      if (lowerLine.contains('rejeitad') ||
+          lowerLine.contains('historico') ||
+          lowerLine.contains('histórico') ||
+          lowerLine.contains('superseded')) {
         continue;
       }
       if (stalePatterns.any((p) => p.hasMatch(line))) {
@@ -606,14 +615,38 @@ List<Map<String, String>> _recommendations(
     }
   }
 
-  recs.add({
-    'priority': 'P1',
-    'title': 'Add commander_learning_snapshot',
-    'reason':
-        'Learned decks, commander usage, and Hermes evidence still require multiple table-specific reads.',
-    'action':
-        'Create an internal backend-owned snapshot for commander learning, keeping Hermes metadata hidden from normal app users.',
-  });
+  if (dbAudit['skipped'] == true) {
+    recs.add({
+      'priority': 'P1',
+      'title': 'Validate commander_learning_snapshot',
+      'reason':
+          'Learned decks, commander usage, and Hermes evidence should be read through a backend-owned aggregate view.',
+      'action':
+          'Run the DB-backed auditor and confirm commander_learning_snapshot is present before building consumers on it.',
+    });
+  } else {
+    final viewPresence =
+        dbAudit['critical_view_presence'] as Map<String, dynamic>? ?? {};
+    if (viewPresence['commander_learning_snapshot'] == true) {
+      recs.add({
+        'priority': 'P1',
+        'title': 'Adopt commander_learning_snapshot in future learning loaders',
+        'reason':
+            'The backend-owned commander learning aggregate exists; new consumers should not reassemble Hermes/usage/synergy lineage ad hoc.',
+        'action':
+            'Route future learned-deck diagnostics and optimizer learning reads through commander_learning_snapshot while keeping raw Hermes metadata hidden from normal users.',
+      });
+    } else {
+      recs.add({
+        'priority': 'P1',
+        'title': 'Add commander_learning_snapshot',
+        'reason':
+            'Learned decks, commander usage, and Hermes evidence still require multiple table-specific reads.',
+        'action':
+            'Create an internal backend-owned snapshot for commander learning, keeping Hermes metadata hidden from normal app users.',
+      });
+    }
+  }
   recs.add({
     'priority': 'P2',
     'title': 'Add decision-impact metrics inspired by 17Lands methodology',

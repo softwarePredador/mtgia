@@ -440,9 +440,9 @@ foi lida até `1c0f9b86` (`docs: audit estrutura postgresql-tables-not-used
 2026-06-15`). Achados incorporados:
 
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` e `server/manual-de-instrucao.md`
-  ainda descreviam `deck_matchups` e `deck_weakness_reports` como write-only.
-  A fonte atual mostra leitura pelas próprias rotas; os textos foram corrigidos
-  para histórico/cache operacional.
+  ainda descreviam `deck_matchups` e `deck_weakness_reports` com status
+  historico de falta de consumidor. A fonte atual mostra leitura pelas próprias
+  rotas; os textos foram corrigidos para histórico/cache operacional.
 
 Achados não incorporados neste slice:
 

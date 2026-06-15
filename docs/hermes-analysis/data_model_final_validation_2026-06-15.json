@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-06-15T19:49:45.500023Z",
+  "generated_at": "2026-06-15T23:15:57.841159Z",
   "repo_root": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia",
   "git": {
-    "head": "1f4f1f0994abc0d25d6a79c713aec7794e8db318",
+    "head": "a1d7dea99baa9b7658510e31b2f7674bf0434622",
     "branch": "master",
-    "status_short": "M docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py\n M server/bin/migrate.dart\n M server/test/candidate_quality_data_support_test.dart\n?? server/test/data_model_migration_test.dart"
+    "status_short": "M docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md\n M docs/hermes-analysis/IMPLEMENTATION_GAPS.md\n M docs/hermes-analysis/IMPLEMENTATION_TASKS.md\n M docs/hermes-analysis/INFORMATION_BANK_DIAGNOSTIC_2026-06-15.md\n M docs/hermes-analysis/TECHNICAL_MAP.md\n M server/bin/audit_data_model_links.dart\n M server/bin/migrate.dart\n M server/doc/API_CONTRACTS_AND_DATA_MAP.md\n M server/test/candidate_quality_data_support_test.dart\n M server/test/data_model_migration_test.dart\n?? server/lib/ai/commander_learning_snapshot_support.dart"
   },
   "static": {
     "table_count": 81,
-    "view_count": 3,
+    "view_count": 4,
     "tables": {
       "activation_funnel_events": {
         "sources": [
@@ -685,7 +685,7 @@
           "server/test/decks_crud_test.dart",
           "server/test/import_list_service_test.dart"
         ],
-        "all_reference_count": 309,
+        "all_reference_count": 310,
         "has_runtime_read": true,
         "has_runtime_write": true,
         "hermes_files": [
@@ -806,6 +806,7 @@
           "server/bin/candidate_quality_data_foundation.dart",
           "server/bin/candidate_quality_meta_signals.dart",
           "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/commander_learning_snapshot_support.dart",
           "server/lib/ai/optimize_candidate_quality_support.dart",
           "server/test/candidate_quality_data_support_test.dart"
         ],
@@ -813,42 +814,50 @@
           "server/bin/candidate_quality_data_foundation.dart",
           "server/bin/candidate_quality_meta_signals.dart"
         ],
-        "all_reference_count": 7,
+        "all_reference_count": 8,
         "has_runtime_read": true,
         "has_runtime_write": false,
         "hermes_files": []
       },
       "commander_card_usage": {
         "sources": [
+          "server/bin/migrate.dart",
           "server/database_setup.sql",
-          "server/lib/ai/deck_learning_event_support.dart"
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/test/data_model_migration_test.dart"
         ],
         "classification": "postgres_product",
         "read_files": [
-          "server/lib/ai/deck_learning_event_support.dart"
+          "server/lib/ai/commander_learning_snapshot_support.dart",
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
         ],
         "write_files": [
           "server/lib/ai/deck_learning_event_support.dart"
         ],
-        "all_reference_count": 3,
+        "all_reference_count": 7,
         "has_runtime_read": true,
         "has_runtime_write": true,
         "hermes_files": []
       },
       "commander_learned_decks": {
         "sources": [
+          "server/bin/migrate.dart",
           "server/database_setup.sql",
-          "server/lib/ai/commander_learned_deck_support.dart"
+          "server/lib/ai/commander_learned_deck_support.dart",
+          "server/test/data_model_migration_test.dart"
         ],
         "classification": "postgres_product",
         "read_files": [
+          "server/lib/ai/commander_learning_snapshot_support.dart",
           "server/routes/ai/commander-learning/index.dart",
-          "server/routes/ai/commander-reference/index.dart"
+          "server/routes/ai/commander-reference/index.dart",
+          "server/test/candidate_quality_data_support_test.dart"
         ],
         "write_files": [
           "server/lib/ai/commander_learned_deck_support.dart"
         ],
-        "all_reference_count": 7,
+        "all_reference_count": 11,
         "has_runtime_read": true,
         "has_runtime_write": true,
         "hermes_files": []
@@ -1205,8 +1214,10 @@
       },
       "deck_learning_events": {
         "sources": [
+          "server/bin/migrate.dart",
           "server/database_setup.sql",
-          "server/lib/ai/deck_learning_event_support.dart"
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/test/data_model_migration_test.dart"
         ],
         "classification": "postgres_product",
         "read_files": [
@@ -1216,7 +1227,7 @@
           "server/bin/pull_learning_events.py",
           "server/lib/ai/deck_learning_event_support.dart"
         ],
-        "all_reference_count": 4,
+        "all_reference_count": 6,
         "has_runtime_read": false,
         "has_runtime_write": true,
         "hermes_files": []
@@ -2419,6 +2430,11 @@
         "server/test/candidate_quality_data_support_test.dart",
         "server/test/data_model_migration_test.dart"
       ],
+      "commander_learning_snapshot": [
+        "server/lib/ai/commander_learning_snapshot_support.dart",
+        "server/test/candidate_quality_data_support_test.dart",
+        "server/test/data_model_migration_test.dart"
+      ],
       "optimize_candidate_quality_summary": [
         "server/lib/ai/candidate_quality_data_support.dart",
         "server/test/data_model_migration_test.dart"
@@ -2777,83 +2793,7 @@
         }
       ]
     },
-    "stale_docs": [
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "275",
-        "text": "#### P2 — `deck_matchups` permanece write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "294",
-        "text": "#### P2/P3 — `deck_weakness_reports` tambem permanece write-only"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "1478",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "3406",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "4612",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "5691",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "6808",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "7953",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "9082",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "10553",
-        "text": "#### P2 — `deck_matchups` continua write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/STRUCTURE_AUDIT.md",
-        "line": "10986",
-        "text": "#### P2 — `deck_matchups` é write-only no produto atual"
-      },
-      {
-        "file": "docs/hermes-analysis/IMPLEMENTATION_TASKS.md",
-        "line": "709",
-        "text": "### [P3] Adicionar consumidor de leitura para `deck_weakness_reports` — dados persistidos nunca são lidos, anula benefício da persistência"
-      },
-      {
-        "file": "docs/hermes-analysis/IMPLEMENTATION_TASKS.md",
-        "line": "749",
-        "text": "| 5 | P3 | Adicionar consumidor de leitura para `deck_weakness_reports` — tabela write-only | STRUCTURE_AUDIT 2026-05-28 (postgresql-tables-not-used) |"
-      },
-      {
-        "file": "docs/hermes-analysis/INFORMATION_BANK_DIAGNOSTIC_2026-06-15.md",
-        "line": "443",
-        "text": "ainda descreviam `deck_matchups` e `deck_weakness_reports` como write-only."
-      },
-      {
-        "file": "docs/hermes-analysis/TECHNICAL_MAP.md",
-        "line": "296",
-        "text": "`deck_weakness_reports` continuam write-only no produto atual;"
-      }
-    ]
+    "stale_docs": []
   },
   "database": {
     "skipped": false,
@@ -2863,7 +2803,7 @@
       "database": "halder",
       "username_present": true
     },
-    "relation_count": 71,
+    "relation_count": 72,
     "relations": {
       "activation_funnel_events": "BASE TABLE",
       "ai_generate_jobs": "BASE TABLE",
@@ -2895,6 +2835,7 @@
       "commander_card_synergy": "BASE TABLE",
       "commander_card_usage": "BASE TABLE",
       "commander_learned_decks": "BASE TABLE",
+      "commander_learning_snapshot": "VIEW",
       "commander_reference_card_stats": "BASE TABLE",
       "commander_reference_deck_analysis": "BASE TABLE",
       "commander_reference_deck_cards": "BASE TABLE",
@@ -2973,6 +2914,7 @@
     "critical_view_presence": {
       "card_identity_bridge": true,
       "card_intelligence_snapshot": true,
+      "commander_learning_snapshot": true,
       "optimize_candidate_quality_summary": true
     },
     "rollback_view_validation": {
@@ -2983,6 +2925,10 @@
       "card_intelligence_snapshot": {
         "compiled_in_rollback": true,
         "row_count_in_rollback": 34329
+      },
+      "commander_learning_snapshot": {
+        "compiled_in_rollback": true,
+        "row_count_in_rollback": 106
       },
       "optimize_candidate_quality_summary": {
         "compiled_in_rollback": true,
@@ -3038,12 +2984,6 @@
   ],
   "recommendations": [
     {
-      "priority": "P1",
-      "title": "Clean stale Hermes docs about table usage",
-      "reason": "Historical docs still claim write-only behavior for tables that now have runtime reads.",
-      "action": "Move stale sections to historical notes or update them with current source evidence."
-    },
-    {
       "priority": "P0",
       "title": "Keep battle-rule joins behind card_intelligence_snapshot",
       "reason": "Direct joins from deck_cards to card_battle_rules multiply deck rows.",
@@ -3051,9 +2991,9 @@
     },
     {
       "priority": "P1",
-      "title": "Add commander_learning_snapshot",
-      "reason": "Learned decks, commander usage, and Hermes evidence still require multiple table-specific reads.",
-      "action": "Create an internal backend-owned snapshot for commander learning, keeping Hermes metadata hidden from normal app users."
+      "title": "Adopt commander_learning_snapshot in future learning loaders",
+      "reason": "The backend-owned commander learning aggregate exists; new consumers should not reassemble Hermes/usage/synergy lineage ad hoc.",
+      "action": "Route future learned-deck diagnostics and optimizer learning reads through commander_learning_snapshot while keeping raw Hermes metadata hidden from normal users."
     },
     {
       "priority": "P2",

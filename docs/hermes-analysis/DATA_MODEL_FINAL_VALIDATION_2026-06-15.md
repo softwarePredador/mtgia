@@ -1,22 +1,18 @@
 # Data Model Final Validation — 2026-06-15
 
-Generated at: `2026-06-15T19:49:45.500023Z`
+Generated at: `2026-06-15T23:15:57.841159Z`
 
 ## Executive summary
 
-- Static inventory found `81` tables and `3` views across product backend and Hermes scripts.
+- Static inventory found `81` tables and `4` views across product backend and Hermes scripts.
 - App scan found `66` API endpoint string references in Flutter code.
 - Hermes sync scan found `20` sync/import/export/materialize scripts.
 - PostgreSQL validation was `executed`.
-- Follow-up applied in this cycle: migration
-  `022_create_card_identity_and_intelligence_views` persisted
-  `card_identity_bridge`, `card_intelligence_snapshot` and
-  `optimize_candidate_quality_summary` in PostgreSQL.
 
 ## PostgreSQL runtime validation
 
-- Public relations found: `71`.
-- Critical view presence: `{"card_identity_bridge":true,"card_intelligence_snapshot":true,"optimize_candidate_quality_summary":true}`.
+- Public relations found: `72`.
+- Critical view presence: `{"card_identity_bridge":true,"card_intelligence_snapshot":true,"commander_learning_snapshot":true,"optimize_candidate_quality_summary":true}`.
 - Rollback view validation:
 ```json
 {
@@ -27,6 +23,10 @@ Generated at: `2026-06-15T19:49:45.500023Z`
   "card_intelligence_snapshot": {
     "compiled_in_rollback": true,
     "row_count_in_rollback": 34329
+  },
+  "commander_learning_snapshot": {
+    "compiled_in_rollback": true,
+    "row_count_in_rollback": 106
   },
   "optimize_candidate_quality_summary": {
     "compiled_in_rollback": true,
@@ -95,45 +95,13 @@ Generated at: `2026-06-15T19:49:45.500023Z`
 
 ### Stale documentation candidates
 
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:275` — #### P2 — `deck_matchups` permanece write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:294` — #### P2/P3 — `deck_weakness_reports` tambem permanece write-only
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:1478` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:3406` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:4612` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:5691` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:6808` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:7953` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:9082` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:10553` — #### P2 — `deck_matchups` continua write-only no produto atual
-- `docs/hermes-analysis/STRUCTURE_AUDIT.md:10986` — #### P2 — `deck_matchups` é write-only no produto atual
-- `docs/hermes-analysis/IMPLEMENTATION_TASKS.md:709` — ### [P3] Adicionar consumidor de leitura para `deck_weakness_reports` — dados persistidos nunca são lidos, anula benefício da persistência
-- `docs/hermes-analysis/IMPLEMENTATION_TASKS.md:749` — | 5 | P3 | Adicionar consumidor de leitura para `deck_weakness_reports` — tabela write-only | STRUCTURE_AUDIT 2026-05-28 (postgresql-tables-not-used) |
-- `docs/hermes-analysis/INFORMATION_BANK_DIAGNOSTIC_2026-06-15.md:443` — ainda descreviam `deck_matchups` e `deck_weakness_reports` como write-only.
-- `docs/hermes-analysis/TECHNICAL_MAP.md:296` — `deck_weakness_reports` continuam write-only no produto atual;
+- None found for current stale write-only patterns.
 
 ## Hermes / EasyPanel / SQL coherence
 
 - PostgreSQL remains the source of truth for product behavior.
 - Hermes SQLite tables are classified as cache/lab/report-only unless a backend sync explicitly promotes reviewed data.
 - Scripts with `--apply` or materialization behavior must remain opt-in and reviewed before promotion.
-- EasyPanel public health check passed on `2026-06-15T19:54:31-03:00`: service
-  `mtgia-server`, environment `production`, git SHA
-  `aeeb8d4023c8e65a4a505a303bc86154a33f853c`.
-- The public SHA is an ancestor of local `master`
-  (`1f4f1f0994abc0d25d6a79c713aec7794e8db318` before this commit), so
-  production is healthy but behind the current local source.
-- Hermes AWS container `hermes_agent` is running (`Up 7 days`). With
-  `/opt/data/.profile` loaded, the container exposes Flutter `3.44.0`, Dart
-  `3.12.0`, and Python `3.13.5`.
-- Hermes cron registry exists at `/opt/data/cron/jobs.json` inside the
-  container with `25` jobs, `13` enabled. This validates Hermes as an
-  operational lab/auditor, not as a clean source of product truth.
-- Hermes workspace `/opt/data/workspace/mtgia` is present but dirty and out of
-  sync (`ahead 1, behind 3`, plus many untracked cron artifacts). Any Hermes
-  docs or generated reports must be triaged before copying into `master`.
-- `sync_pg_target_deck_to_hermes.py` now prefers the backend-owned
-  `card_intelligence_snapshot` when present and keeps an aggregated CTE
-  fallback for older databases.
 
 ## External source gap review
 
@@ -155,15 +123,12 @@ Generated at: `2026-06-15T19:49:45.500023Z`
 
 ## Prioritized next actions
 
-- **P1 — Clean stale Hermes docs about table usage**
-  - Reason: Historical docs still claim write-only behavior for tables that now have runtime reads.
-  - Action: Move stale sections to historical notes or update them with current source evidence.
 - **P0 — Keep battle-rule joins behind card_intelligence_snapshot**
   - Reason: Direct joins from deck_cards to card_battle_rules multiply deck rows.
   - Action: Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.
-- **P1 — Add commander_learning_snapshot**
-  - Reason: Learned decks, commander usage, and Hermes evidence still require multiple table-specific reads.
-  - Action: Create an internal backend-owned snapshot for commander learning, keeping Hermes metadata hidden from normal app users.
+- **P1 — Adopt commander_learning_snapshot in future learning loaders**
+  - Reason: The backend-owned commander learning aggregate exists; new consumers should not reassemble Hermes/usage/synergy lineage ad hoc.
+  - Action: Route future learned-deck diagnostics and optimizer learning reads through commander_learning_snapshot while keeping raw Hermes metadata hidden from normal users.
 - **P2 — Add decision-impact metrics inspired by 17Lands methodology**
   - Reason: Raw Lorehold WR is not enough to trust deck or battle improvements.
   - Action: Track with/without-seen/cast deltas, sample size, baseline hash, and opponent archetype; do not import 17Lands Commander recommendations.

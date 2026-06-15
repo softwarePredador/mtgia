@@ -1,4 +1,5 @@
 import 'package:server/ai/commander_fallback_policy.dart';
+import 'package:server/ai/commander_learning_snapshot_support.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:test/test.dart';
 
@@ -208,6 +209,37 @@ void main() {
       expect(view, isNot(contains('left join card_semantic_tags_v2')));
       expect(view, isNot(contains('left join card_role_scores')));
       expect(view, isNot(contains('left join commander_card_synergy')));
+    });
+
+    test('commander learning snapshot aggregates safe learning signals', () {
+      final view = commanderLearningSnapshotViewStatement.toLowerCase();
+
+      expect(
+          view, contains('create or replace view commander_learning_snapshot'));
+      expect(view, contains('active_learned_decks as'));
+      expect(view, contains('usage_summary as'));
+      expect(view, contains('synergy_summary as'));
+      expect(view, contains('from commander_learned_decks'));
+      expect(view, contains('from commander_card_usage'));
+      expect(view, contains('from commander_card_synergy'));
+      expect(view, contains('card_identity_bridge'));
+      expect(view, contains('jsonb_agg'));
+      expect(view, contains('metadata_hidden'));
+      expect(view, contains('source_coverage'));
+      expect(view, contains('partition by ccu.commander_name_normalized'));
+      expect(view, contains('partition by ccs.commander_name_normalized'));
+
+      expect(
+        view,
+        isNot(contains("'metadata'")),
+        reason: 'Raw Hermes metadata must not be surfaced in the snapshot.',
+      );
+      expect(
+        view,
+        isNot(contains('cld.metadata')),
+        reason: 'Raw Hermes metadata must stay hidden from normal consumers.',
+      );
+      expect(view, isNot(contains('left join card_battle_rules')));
     });
   });
 }

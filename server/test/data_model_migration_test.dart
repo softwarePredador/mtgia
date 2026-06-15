@@ -40,5 +40,59 @@ void main() {
         ),
       );
     });
+
+    test('migration 023 persists commander learning aggregate snapshot', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '023',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('create_commander_learning_snapshot'),
+      );
+      expect(
+          up, contains('create table if not exists commander_learned_decks'));
+      expect(up, contains('create table if not exists deck_learning_events'));
+      expect(up, contains('create table if not exists commander_card_usage'));
+      expect(
+          up, contains('create or replace view commander_learning_snapshot'));
+      expect(
+        up.indexOf('create table if not exists commander_learned_decks'),
+        lessThan(
+          up.indexOf('create or replace view commander_learning_snapshot'),
+        ),
+      );
+      expect(
+        up.indexOf('create table if not exists commander_card_usage'),
+        lessThan(
+          up.indexOf('create or replace view commander_learning_snapshot'),
+        ),
+      );
+
+      final down = migration.down!.toLowerCase();
+      expect(down, contains('drop view if exists commander_learning_snapshot'));
+      expect(down, contains('drop table if exists commander_card_usage'));
+      expect(down, contains('drop table if exists deck_learning_events'));
+      expect(down, contains('drop table if exists commander_learned_decks'));
+      expect(down, isNot(contains('commander_card_synergy')));
+    });
+
+    test('migration 024 refreshes commander learning snapshot definition', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '024',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('refresh_commander_learning_snapshot_bridge_resolution'),
+      );
+      expect(
+          up, contains('create or replace view commander_learning_snapshot'));
+      expect(up, contains('bridge_names as'));
+      expect(up, contains('card_identity_bridge'));
+      expect(up, isNot(contains('left join lateral')));
+    });
   });
 }

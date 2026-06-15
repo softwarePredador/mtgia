@@ -386,6 +386,11 @@ Resultado validado contra PostgreSQL real após a migration
   battle/rules, mas precisa de agregacao antes de alimentar deckbuilding.
 - `card_function_tags` preserva multiplas funcoes por carta; validadores devem
   contar papeis por membership, sem achatar a carta para uma unica funcao.
+- `commander_learning_snapshot` foi adicionada como view interna backend-owned
+  para agregar `commander_learned_decks`, `commander_card_usage` e
+  `commander_card_synergy` por comandante. A view usa `card_identity_bridge`
+  para nomes de uso quando possivel e nao expõe `metadata` bruto do Hermes para
+  consumidores normais.
 - Hermes AWS esta operacional, mas o workspace remoto estava dirty/out-of-sync
   na validacao. Hermes continua laboratorio/auditor; PostgreSQL/backend seguem
   fonte de verdade.
@@ -423,6 +428,7 @@ das tabelas atuais. Outras tabelas app-facing aparecem em migrações, helpers
 | `commander_learned_decks` | `commander_name`, normalized, `deck_name`, `source_system`, `source_ref`, `card_list`, `card_count`, score, wincons, legal status, metadata, `is_active`, `promoted_at` | Consumida por app/backend | Decks aprendidos promovidos |
 | `deck_learning_events` | `deck_id`, `commander_name`, `format`, `card_count`, `source`, `event_data`, `synced_to_hermes` | app/backend -> Hermes | Feedback de decks criados/salvos |
 | `commander_card_usage` | `commander_name_normalized`, `card_name_normalized`, `usage_count`, `last_used_at` | agregado por commander | Hot cards por uso real |
+| `commander_learning_snapshot` | `commander_name_normalized`, counts de learned/usage/synergy, JSON seguro de decks ativos, top usage e top synergy, `source_coverage` | agrega learned/usage/synergy | View interna para leitura backend-owned de aprendizado por comandante; nao carregar `metadata` Hermes bruto |
 | `format_staples` | `card_name`, `format`, `archetype`, `color_identity`, `edhrec_rank`, `category`, `scryfall_id`, `is_banned` | cartas por nome/id | Staples por formato |
 | `sync_log` | tipo, formato, contadores, status, erro, timestamps | operacional | Auditoria de sync |
 | `sync_state` | `key`, `value`, `updated_at` | operacional | Checkpoints |

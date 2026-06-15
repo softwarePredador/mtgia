@@ -291,13 +291,14 @@ mantidos como texto solto.
   `EndpointCache.clearExpired`) seguem sem chamador confirmado. A parte
   automatica do `PerformanceService` (`init`, observer de tela e `traceAsync`
   em smoke) foi separada como controle positivo, nao como codigo morto.
-- **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-07 15:00 UTC no checkout local `52f6084e`. `deck_matchups` e
-  `deck_weakness_reports` continuam write-only no produto atual;
-  `ml_prompt_feedback` agora tem writer runtime em `/ai/optimize`, schema em
-  `database_setup.sql`/`verify_schema.dart` e contador operacional em
-  `/ai/ml-status`; o risco restante é consumir esse histórico para seleção de
-  prompt, não coletá-lo. `commander_reference_decks` e
+- **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: o achado
+  de 2026-06-07 foi superseded pela validação de 2026-06-15. `deck_matchups`
+  e `deck_weakness_reports` têm leitura runtime nas próprias rotas de
+  matchup/weakness-analysis; o risco atual é produto/retroalimentação baixa,
+  não ausência total de consumidor. `ml_prompt_feedback` agora tem writer
+  runtime em `/ai/optimize`, schema em `database_setup.sql`/`verify_schema.dart`
+  e contador operacional em `/ai/ml-status`; o risco restante é consumir esse
+  histórico para seleção de prompt, não coletá-lo. `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   runtime confirmado, enquanto o produto le o agregado
   `commander_reference_deck_analysis`. A varredura focada de DDL versus

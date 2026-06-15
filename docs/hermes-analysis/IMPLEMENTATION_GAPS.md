@@ -671,16 +671,35 @@ Concluido no Slice 6 persistencia PostgreSQL:
    `13` habilitados. Porém o workspace remoto está dirty/out-of-sync; não
    promover artefatos Hermes sem triagem e sem revalidação local/source-backed.
 
+Concluido no Slice 7 commander learning snapshot:
+
+21.5. Criada a view interna `commander_learning_snapshot` via migration
+   `023_create_commander_learning_snapshot`. A view agrega por
+   `commander_name_normalized` os sinais de `commander_learned_decks`,
+   `commander_card_usage` e `commander_card_synergy`, resolve nomes de uso por
+   `card_identity_bridge` quando possível e preserva listas como JSON agregado.
+   Ela não expõe `metadata` bruto do Hermes; apenas campos seguros como nome do
+   deck aprendido, arquétipo, contagem, score, legalidade, wincons e cobertura.
+21.6. O auditor `server/bin/audit_data_model_links.dart` passou a tratar
+   `commander_learning_snapshot` como view crítica. Se a view existir, a ação
+   recomendada muda de "criar" para "adotar em loaders futuros"; se faltar, a
+   validação aponta pendência de migration/deploy.
+21.7. Testes estáticos foram adicionados para garantir que a migration `023`
+   cria as tabelas base necessárias antes da view, que a snapshot usa
+   `card_identity_bridge`, que agrega por comandante e que não carrega
+   `metadata` bruto do Hermes.
+
 22. Fazer loaders profundos do `optimize` lerem `card_intelligence_snapshot`
     quando isso reduzir duplicação ou inconsistência. O sync Hermes
     `sync_pg_target_deck_to_hermes.py` já prefere `card_intelligence_snapshot`
     quando a view existe e mantém fallback CTE agregado para bancos antigos.
-23. Usar `card_identity_bridge` em `commander_card_usage` e jobs Hermes que
-    ainda entram por nome normalizado, reportando taxa de resolução para
-    `card_id`.
-24. Criar teste com banco temporário para provar cardinalidade real:
+23. Adotar `commander_learning_snapshot` em futuros loaders profundos de
+    aprendizado/diagnóstico em vez de remontar `commander_learned_decks`,
+    `commander_card_usage` e `commander_card_synergy` manualmente. Qualquer
+    exposição app-facing deve continuar escondendo metadata Hermes bruta.
+24. Criar teste com banco temporário para provar cardinalidade real em runtime:
     uma carta com duas tags e duas regras deve continuar retornando uma linha
-    de carta/deck.
+    de carta/deck pelos caminhos de produto.
 25. Adicionar snapshots opcionais separados para fontes que não são garantidas
     em todo ambiente local (`card_localized_names`, `price_history`,
     `commander_reference_deck_cards`) sem tornar a view principal frágil.

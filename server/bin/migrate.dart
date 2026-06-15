@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
+import 'package:server/ai/commander_learning_snapshot_support.dart';
 import 'package:server/import_card_lookup_service.dart';
 
 /// Sistema de Migrações Versionado para MTG IA
@@ -628,6 +629,88 @@ final migrations = <Migration>[
       DROP VIEW IF EXISTS optimize_candidate_quality_summary;
       DROP INDEX IF EXISTS idx_card_meta_insights_archetypes;
       DROP INDEX IF EXISTS idx_card_meta_insights_usage;
+    ''',
+  ),
+  Migration(
+    version: '023',
+    name: 'create_commander_learning_snapshot',
+    up: '''
+      CREATE TABLE IF NOT EXISTS commander_learned_decks (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        commander_name TEXT NOT NULL,
+        commander_name_normalized TEXT NOT NULL,
+        deck_name TEXT NOT NULL,
+        source_system TEXT NOT NULL,
+        source_ref TEXT NOT NULL,
+        source_url TEXT,
+        archetype TEXT,
+        card_list TEXT NOT NULL,
+        card_count INTEGER NOT NULL,
+        score NUMERIC,
+        wincon_primary TEXT,
+        wincon_backup TEXT,
+        legal_status TEXT,
+        notes TEXT,
+        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+        is_active BOOLEAN NOT NULL DEFAULT FALSE,
+        promoted_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE (source_system, source_ref)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
+      ON commander_learned_decks (
+        commander_name_normalized,
+        is_active,
+        promoted_at DESC,
+        updated_at DESC
+      );
+
+      CREATE TABLE IF NOT EXISTS deck_learning_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deck_id UUID NOT NULL,
+        commander_name TEXT,
+        format TEXT NOT NULL,
+        card_count INTEGER NOT NULL DEFAULT 0,
+        source TEXT NOT NULL DEFAULT 'user_created',
+        event_data JSONB DEFAULT '{}'::jsonb,
+        synced_to_hermes BOOLEAN NOT NULL DEFAULT FALSE,
+        synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
+      ON deck_learning_events (synced_to_hermes, created_at);
+
+      CREATE TABLE IF NOT EXISTS commander_card_usage (
+        commander_name_normalized TEXT NOT NULL,
+        card_name_normalized TEXT NOT NULL,
+        usage_count INTEGER NOT NULL DEFAULT 1,
+        last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (commander_name_normalized, card_name_normalized)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
+      ON commander_card_usage (commander_name_normalized, usage_count DESC);
+
+      $commanderLearningSnapshotViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS commander_learning_snapshot;
+      DROP TABLE IF EXISTS commander_card_usage CASCADE;
+      DROP TABLE IF EXISTS deck_learning_events CASCADE;
+      DROP TABLE IF EXISTS commander_learned_decks CASCADE;
+    ''',
+  ),
+  Migration(
+    version: '024',
+    name: 'refresh_commander_learning_snapshot_bridge_resolution',
+    up: '''
+      $commanderLearningSnapshotViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS commander_learning_snapshot;
     ''',
   ),
 ];
