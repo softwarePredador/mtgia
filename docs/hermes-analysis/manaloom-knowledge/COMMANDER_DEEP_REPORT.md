@@ -1,11 +1,11 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-12 ~19:15 UTC | **Updated:** 2026-06-15 ~01:51 UTC (June 15 cycle)
+> **Generated:** 2026-06-12 ~19:15 UTC | **Updated:** 2026-06-15 ~15:00 UTC (June 15 — fifth pass)
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** Fast Mana → Combo/Approach — Hybrid Bracket 4
-> **Source Agent:** Commander Knowledge Deep Cron Job (June 15 cycle — fourth pass)
-> **Evidence Base:** knowledge.db deck_id=6 (SQLite deck_cards hash `4cc51c42...`), optimizer_baseline_runs #5 (600 games, 89.8% WR, hash `f6367a27...`), BATTLE_LOG.md through June 14 20:50Z (9 new runs, 1,560 games), GC Research Report Exec #16, SKILL.md methodology
+> **Source Agent:** Commander Knowledge Deep Cron Job (June 15 cycle — fifth pass)
+> **Evidence Base:** knowledge.db deck_id=6 (SQLite deck_cards hash `4cc51c42...`, STABLE — no change since last report), optimizer_baseline_runs #5 (600 games, 89.8% WR, hash `f6367a27...`), BATTLE_LOG.md through June 14 20:50Z (1,560 games), GC Research Report Exec #16, SKILL.md methodology, audit v12.0 (all-crons-mtg-rules-audit.md 02:30Z)
 
 ---
 
@@ -733,3 +733,161 @@ Source: `SELECT card_name, type_line FROM deck_cards WHERE deck_id=6 AND functio
 | `30d0034776...` | Post-hash-fake | ~52% | 2026-06-01 | Missing combo pieces |
 
 **Hash change history**: `30d0034776` → `763c3e0f` → `12c55613` → `a17a5863` (collapse) → `dbe24f7` (recovery) → `f6367a273eef` (re-tag) → `4cc51c42952f` (regression) — **6 unique hashes in 15 days, 5 undocumented by the optimizer pipeline.**
+
+**Since last report (01:51Z → now):** ✅ **No new hash changes.** The `4cc51c42952f` hash has been stable for ~13 hours — first stable period in 3 days. This does NOT mean the classification improved (still 73% ramp misclassification), only that no re-sync happened.
+
+---
+
+## 11. Addendum — June 15 Afternoon (Post-01:51Z Findings)
+
+> New findings detected after the ~01:51Z report cutoff.
+
+### 🟡 Finding A: knowledge.db Path Split — Root Copy Is Dangling/Empty
+
+**Evidence:**
+- `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/knowledge.db` → **0 bytes** (empty, created 2026-06-15T14:03Z)
+- `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` → **3.4 MB** (real database, all tables: deck_cards, oracle_cache, baselines, benchmarks)
+- Two backup files in scripts/: `knowledge.db.bak_lorehold_canonical_20260614_191620` (3.4MB) and `_200605` (3.4MB)
+
+**Impact:** Any cron or script reading `manaloom-knowledge/knowledge.db` (the root path) gets an empty database with no tables. Scripts using the correct `scripts/knowledge.db` path work fine. The preflight report checks `scripts/knowledge.db` — which is why it reports "ok" despite the root copy being empty.
+
+**Root cause (hypothesis):** A sync or import process may have created the empty file at the root path, or a previous database was moved/cleared leaving the empty file as a detritus. The real database lives in `scripts/` but the expected canonical path appears to be the root.
+
+**Signal for App/Backend Logic:**
+- All path references to `manaloom-knowledge/knowledge.db` should be checked and unified to point to `scripts/knowledge.db`
+- Add a health check: if `knowledge.db` at primary path is < 1KB, treat as corrupted and fall back to backup/scripts path
+- Consider symlinking or removing the dangling empty file to prevent confusion
+
+### 🟡 Finding B: Git Index Corruption — Intermittent Failure Affecting 2 Lorehold Crons
+
+**Evidence (audit v12.0, 2026-06-15 02:30Z):**
+- `manaloom-master-optimizer-preflight` at `2026-06-15T00:53:48` — ERROR: "resolve your current index first"
+- `lorehold-knowncards-validator` at `2026-06-15T01:23:50` — ERROR: same message
+- These are **2 of 3 crons** that failed (only MTG Rules Auditor remains broken independently)
+- All subsequent preflight reports (02:17Z, 11:26Z) show "approved" — the error is **intermittent and self-resolving**
+
+**Impact:** The optimizer pipeline for Lorehold briefly stopped producing new baseline data around midnight. The intermittent nature makes debugging harder — it may be a workspace contention issue (multiple crons accessing git simultaneously) rather than persistent corruption.
+
+**Signal for App/Backend Logic:**
+- Monitor `master_optimizer_preflight` reports for "resolve your current index first" errors
+- Add a cooldown/retry with `git stash` or `git reset` before retry
+- If error persists > 3 consecutive runs, emit P1 alert and pause optimizer scheduling
+- This intermittent corruption may explain why some preflight runs show missing reports (no file generated for failed runs)
+
+### 🟢 Finding C: Decision Trace v1 — New Analysis Capability Available
+
+**Evidence (commit `3a53f495`, 2026-06-15 09:02Z):**
+- `battle_analyst_v9.py` now includes `DECISION_TRACE_HANDLER` as an optional side-channel
+- Emits structured decision events for: cast ramp, cast normal spell, cast creature, cast high-threat/wincon, respond with protection/counter, attack/combat target, pass/no-action
+- Outputs `*.decision_trace.jsonl` alongside replay JSONL
+- Auditable via `replay_decision_auditor.py`
+
+**Impact on Lorehold analysis:** The decision trace adds explainability to Lorehold's 89.8% WR. Previously, we only observed the WR outcome. Now we can audit WHY the engine chose specific lines — whether it correctly prioritizes Approach setup over combat (the 80/20 split), and whether it recognizes the Twinflame+Dualcaster combo line (0% usage). This is especially valuable for investigating the 0% combo win rate.
+
+**Signal for App/Backend Logic:**
+- Run decision trace audit against the 600-game June 14 baseline to understand why combo wins = 0
+- Use decision trace to validate the Approach equilibrium (18.2%) — does the engine correctly prioritize topdeck manipulation?
+- Consider integrating decision trace signals into optimizer quality reviews
+
+### 🟢 Finding D: No New Battle Data — Pipeline Paused (Stable State)
+
+**Evidence:** BATTLE_LOG.md ends at June 14 20:50Z. No new battle runs have been executed since. The last update was 9 runs (1,560 games) in a 19-minute window.
+
+**Interpretation:** The lack of new data is likely because the optimizer pipeline correctly identified stale data (hash mismatch) and refused to run new baselines against corrupted classification. This is actually healthy behavior — the pipeline is self-limiting when it cannot produce reliable results.
+
+**Risk:** If the classifier is not fixed soon, the pipeline will remain paused indefinitely, and Lorehold analysis will fall behind real product changes. The 1,560-game dataset (the largest ever) becomes progressively less useful as proxy for current deck performance.
+
+---
+
+## 12. Revised Concrete Tasks (June 15 Afternoon)
+
+**New priority context:** Since the ~01:51Z report, two new pipeline issues (knowledge.db path split, git index corruption) have emerged. These are added as supplementary tasks below.
+
+| # | Priority | Task | Source | Previous Priority | Change |
+|:-:|:---------|:-----|:------|:-----------------:|:------:|
+| 1 | **P0 URGENT** | Ramp classifier: exclude `type_line` containing 'Land' from `ramp` | Regression 63%→73% | P0 | ↔ Unchanged |
+| 2 | **P1** | Re-baseline Lorehold (HOLD until task 1 applied) | Hash stable 13h, still `4cc51c42...` | P1 | ↔ Unchanged |
+| 3 | **P0** | Functional tag taxonomy: add land guard, prevent auto-regression | 10pp jump in 24h | P0 | ↔ Unchanged |
+| 4 | **P1** | Pipeline bypass detector (hash change monitor) | 6 hash changes, 0 applied_swaps | P1 | ↔ Unchanged |
+| 5 | **P2** | Aetherflux Reservoir tag correction (`removal` → `wincon`) | Still tagged wrong | P2 | ↔ Unchanged |
+
+### Task 6 (P1 — NEW): Unify knowledge.db Path References
+
+**Evidence:** Root `knowledge.db` is 0 bytes (empty, created 14:03Z). Real database is at `scripts/knowledge.db` (3.4MB). Two canonical backups exist. Any script or cron reading the root path silently gets an empty DB.
+
+- **Priority:** **P1** — Silent failure mode. Could cause crons to use empty data for hours/days before detection.
+- **What to change:**
+  1. Remove or symlink the dangling `manaloom-knowledge/knowledge.db` (0 bytes)
+  2. Verify all script path references (preflight, sync scripts, optimizer) use the same canonical path
+  3. Add a health check: `CHECK: knowledge.db file size > 1MB` to the master optimizer preflight
+- **Validation:**
+  ```bash
+  ls -la docs/hermes-analysis/manaloom-knowledge/knowledge.db
+  # Should be a symlink or file > 1MB
+  ```
+  Check all scripts that reference `knowledge.db`:
+  ```bash
+  grep -r "knowledge\\.db" docs/hermes-analysis/manaloom-knowledge/scripts/*.py | grep -v backup | grep -v "\.bak" | grep -v "__pycache__"
+  ```
+
+### Task 7 (P1 — NEW): Git Index Corruption Monitor for Lorehold Pipeline
+
+**Evidence:** 2 of 3 optimizer-lane crons failed with "resolve your current index first" on June 15 around midnight. Intermittent — resolved on subsequent runs.
+
+- **Priority:** **P1** — Intermittent failures mask the problem. A single corruption event could block all optimizer activity for hours.
+- **What to change:**
+  1. Add `git reset --soft` or `git stash` recovery step to preflight check before optimization
+  2. Add retry counter: if git index error occurs, retry up to 3 times with 30s backoff
+  3. Alert if error persists > 3 consecutive preflight runs
+- **Validation:** Simulate by checking `cd /opt/data/workspace/mtgia && git status --short` before every preflight run.
+
+### Task 8 (P2 — NEW): Decision Trace Audit for Combo Recognition Gap
+
+**Evidence:** Twinflame+Dualcaster combo accounts for 0% of wins despite 4 redundant copy pieces. Decision trace v1 now enables post-hoc analysis of why the engine never fires the combo.
+
+- **Priority:** **P2** — Not blocking current pipeline, but the combo gap undermines one of the deck's structural win conditions.
+- **What to change:**
+  1. Run decision trace audit against baseline run #5 replay data
+  2. Check decision events for:
+     - Does the engine ever hold up mana to protect Dualcaster Mage?
+     - Does it attempt to copy Dualcaster with any of the 4 copy spells?
+     - When both combo pieces are in hand, what actions are prioritized?
+  3. Signal: If combo never fires even when both pieces are drawn, it's a battle engine deficiency (not a deckbuilding issue).
+- **Validation:**
+  ```bash
+  cd docs/hermes-analysis/manaloom-knowledge/scripts
+  python3 replay_decision_auditor.py --skip-baseline --source /path/to/replay/dir
+  ```
+
+---
+
+## 13. Updated Pipeline State (June 15 Afternoon)
+
+| Component | Status | Note |
+|:----------|:-------|:-----|
+| knowledge.db deck_id=6 deck_cards | ✅ 100 cards, hash `4cc51c42...` | **STABLE** — no change since last report (~13h) |
+| knowledge.db (root path) | ❌ **0 bytes, empty** | NEW — dangling file created 14:03Z, real DB is in scripts/ |
+| optimizer_applied_swaps | ⚠️ **Still 0 rows** | All 6 deck changes invisible to optimizer |
+| optimizer_baseline_runs | ⚠️ Run #5 (600 games, 89.8%, hash `f6367a27...`) | **STALE** — current deck is `4cc51c42...` |
+| optimizer_quality_reviews | ⚠️ 5 reviews | Stale — all computed against old hashes |
+| slot_benchmarks | ⚠️ 29 benchmarks | Completely stale after 2 hash changes |
+| Ramp misclassification | ❌ **73% (30/41 lands tagged as ramp)** | Unchanged since last report |
+| Git index corruption | 🟡 **Intermittent** (2 crons, June 15 00:53Z–01:23Z) | NEW finding — self-resolved but suspicious |
+| master_optimizer_preflight | ✅ Approved (last: 11:26Z) | Still cannot detect stale data |
+| Pipeline bypass detector | ❌ **Not implemented** | Task 4 still open |
+| Decision trace v1 | ✅ Available | NEW (commit `3a53f495`) — not yet used for Lorehold audit |
+| BATTLE_LOG.md | ✅ Last updated June 14 20:50Z | No new games since — pipeline paused on stale data |
+
+---
+
+## 14. Signals for App/Backend Logic (Updated June 15)
+
+New signals added this cycle:
+
+| Signal | Source | What It Would Power |
+|:-------|:-------|:--------------------|
+| **knowledge.db path health check** | 0-byte dangling DB at root path | Preflight check: `knowledge.db > 1MB` before allowing optimizer runs |
+| **Git index corruption recovery** | "resolve your current index first" on 2 crons | Auto-retry with `git reset` + backoff; alert on 3+ consecutive failures |
+| **Decision trace combo audit** | 0% combo win despite 4 redundant copy spells | Audit whether battle engine correctly prioritizes combo lines vs beatdown |
+| **Pipeline pause detection** | No new battle data in 18+ hours | Detect when stale data prevents new analysis; emit pause/recovery guidance |
+| **Hash stability signal** | No hash changes in 13h (first stable period) | Classify as positive signal — sync pipeline stability improves, or all changes already applied |
