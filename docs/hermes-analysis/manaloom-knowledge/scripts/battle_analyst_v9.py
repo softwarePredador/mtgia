@@ -96,6 +96,22 @@ REPLAY_EVENT_HANDLER = None
 DECISION_TRACE_HANDLER = None
 DECISION_TRACE_COUNTER = 0
 DECISION_TRACE_SCHEMA_VERSION = "decision_trace_v1"
+DECISION_STRATEGY_VERSION = "battle_decision_strategy_v1_2026_06_15"
+HIGH_IMPACT_PAYOFF_EFFECTS = {
+    "approach",
+    "board_wipe",
+    "copy_spell",
+    "draw_engine",
+    "finisher",
+    "overload_recursion",
+    "protection",
+    "remove_creature",
+    "remove_permanent",
+    "silence_opponents",
+    "steal_all_creatures",
+    "token_maker",
+    "wincon",
+}
 ENGINE_METRICS = None
 
 
@@ -154,6 +170,20 @@ def _option_identity(option):
     return str(option.get("card") or option.get("action") or option)
 
 
+def _default_strategic_principle(decision_type, reason=None):
+    if decision_type == "mulligan_decision":
+        return "opening_hand_must_have_mana_and_early_plan"
+    if decision_type == "cast_spell":
+        return "spend_mana_only_for_curve_plan_or_material_advantage"
+    if decision_type == "response":
+        return "use_interaction_on_lethal_engines_or_high_impact_threats"
+    if decision_type == "combat_attack":
+        return "attack_target_selected_by_lethal_threat_and_table_position"
+    if decision_type == "pass_no_action":
+        return "pass_when_no_profitable_or_legal_action_is_available"
+    return reason or decision_type or "battle_heuristic"
+
+
 def emit_decision_trace(
     *,
     decision_type,
@@ -171,6 +201,12 @@ def emit_decision_trace(
     actual_outcome=None,
     reason=None,
     replay_id=None,
+    strategic_principle=None,
+    heuristic_version=None,
+    resource_delta=None,
+    risk_flags=None,
+    alternatives_considered=None,
+    rejected_reason=None,
 ):
     """Emit optional decision trace data without changing battle behavior."""
     if DECISION_TRACE_HANDLER is None:
@@ -199,6 +235,15 @@ def emit_decision_trace(
             "expected_benefit_score": expected_benefit_score,
             "actual_outcome": actual_outcome,
             "reason": reason,
+            "strategic_principle": strategic_principle
+            or _default_strategic_principle(decision_type, reason),
+            "heuristic_version": heuristic_version or DECISION_STRATEGY_VERSION,
+            "resource_delta": dict(resource_delta or {}),
+            "risk_flags": list(risk_flags or []),
+            "alternatives_considered": list(
+                alternatives_considered if alternatives_considered is not None else options
+            ),
+            "rejected_reason": rejected_reason,
         }
         DECISION_TRACE_HANDLER(payload)
     except Exception:
@@ -1792,6 +1837,7 @@ KNOWN_CARDS = {
         "land_count": 2,
         "basic_only": True,
         "requires_sacrifice_land": True,
+        "land_enters_tapped": True,
         "instant": True,
     },
     "Echoes of Eternity": {"effect": "copy_spell", "colorless_only": True},
@@ -1847,6 +1893,7 @@ KNOWN_CARDS = {
         "land_count": 2,
         "basic_only": True,
         "requires_sacrifice_land": True,
+        "land_enters_tapped": False,
         "instant": True,
     },
     "Solemn Simulacrum": {
@@ -2056,7 +2103,12 @@ KNOWN_CARDS = {
         "is_creature_permanent": True,
     },
     "Mana Vault": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Mox Diamond": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
+    "Mox Diamond": {
+        "effect": "ramp_permanent",
+        "mana_produced": 1,
+        "produces": "WUBRGC",
+        "requires_discard_land": True,
+    },
     "Chrome Mox": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Mox Amber": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Mox Opal": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
@@ -2275,6 +2327,8 @@ KNOWN_CARDS = {
         "effect": "land_ramp",
         "land_count": 1,
         "requires_sacrifice_land": True,
+        "land_enters_tapped": False,
+        "land_target_kind": "any",
         "instant": True,
     },
     "Birgi, God of Storytelling": {
@@ -3889,25 +3943,261 @@ class Stack:
 def play_mulligan(player, rng):
     player.shuffle(rng)
     player.hand = player.draw(7, rng)
-    keep = mulligan_decision(player.hand)
+    evaluation = mulligan_evaluation(player.hand)
     mulligan_count = 0
-    while not keep[0] and mulligan_count < 3:  # v10.2 fix
+    _emit_mulligan_decision_trace(
+        player,
+        evaluation,
+        mulligan_count=mulligan_count,
+        chosen_action="keep" if evaluation["keep"] else "mulligan",
+        bottomed_cards=[],
+    )
+    while not evaluation["keep"] and mulligan_count < 3:  # v10.2 fix
         mulligan_count += 1
         player.library = player.hand + player.library
         player.hand = []
         player.shuffle(rng)
         player.hand = player.draw(7, rng)
+        bottomed_cards = []
         bottom_count = max(0, mulligan_count - 1)  # free first
         for _ in range(bottom_count):
             if player.hand:
                 c = player.hand.pop(rng.randint(0, len(player.hand) - 1))
+                bottomed_cards.append(c.get("name", "?") if isinstance(c, dict) else str(c))
                 player.library.append(c)
-        keep = mulligan_decision(player.hand)
+        evaluation = mulligan_evaluation(player.hand)
+        forced_keep = not evaluation["keep"] and mulligan_count >= 3
+        _emit_mulligan_decision_trace(
+            player,
+            evaluation,
+            mulligan_count=mulligan_count,
+            chosen_action="keep" if evaluation["keep"] or forced_keep else "mulligan",
+            bottomed_cards=bottomed_cards,
+            forced_keep=forced_keep,
+        )
     return mulligan_count
 
+
+def _opening_hand_card_cmc(card):
+    try:
+        return float(card.get("cmc") or 0)
+    except Exception:
+        return 99.0
+
+
+def _opening_hand_effect(card):
+    try:
+        return get_card_effect(card)
+    except Exception:
+        return {}
+
+
+def _opening_hand_colors(hand):
+    colors = []
+    for card in hand:
+        if not is_effective_land(card):
+            continue
+        for color in source_colors(card):
+            if color not in colors:
+                colors.append(color)
+    return sorted(colors)
+
+
+def _opening_hand_summary(hand):
+    return [
+        {
+            "name": card.get("name", "?") if isinstance(card, dict) else str(card),
+            "cmc": _opening_hand_card_cmc(card) if isinstance(card, dict) else 0,
+            "type_line": card.get("type_line", "") if isinstance(card, dict) else "",
+            "is_land": bool(is_effective_land(card)),
+            "effect": (
+                _opening_hand_effect(card).get("effect")
+                or card.get("effect")
+                or card.get("tag")
+                or "unknown"
+            ) if isinstance(card, dict) else "unknown",
+        }
+        for card in hand
+    ]
+
+
+def _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
+    if effect_data.get("requires_discard_land") and lands < 2:
+        return False
+    if effect_data.get("requires_sacrifice_land") and lands < 2:
+        return False
+    return True
+
+
+def _opening_hand_has_early_plan(hand, lands):
+    nonlands = [c for c in hand if not is_effective_land(c)]
+    if not nonlands:
+        return False, "all_lands", {}
+
+    early_turn_window = 2 if lands == 2 else (4 if lands >= 5 else 3)
+    evaluated = []
+    for card in nonlands:
+        effect_data = _opening_hand_effect(card)
+        effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
+        cmc = _opening_hand_card_cmc(card)
+        evaluated.append({
+            "card": card.get("name", "?"),
+            "cmc": cmc,
+            "effect": effect,
+        })
+        if effect in ("counter", "unknown"):
+            continue
+        if effect == "ramp_ritual":
+            continue
+        if not _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
+            continue
+        if cmc <= early_turn_window:
+            return True, f"early_play:{card.get('name', '?')}:{cmc:g}", {
+                "early_play": card.get("name", "?"),
+                "early_play_cmc": cmc,
+                "early_turn_window": early_turn_window,
+                "evaluated_nonlands": evaluated,
+            }
+
+    for card in nonlands:
+        effect_data = _opening_hand_effect(card)
+        effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
+        cmc = _opening_hand_card_cmc(card)
+        if effect in ("ramp_permanent", "land_ramp", "mana_dork") and cmc <= 2:
+            if _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
+                return True, f"early_ramp:{card.get('name', '?')}:{cmc:g}", {
+                    "early_ramp": card.get("name", "?"),
+                    "early_ramp_cmc": cmc,
+                    "early_turn_window": early_turn_window,
+                    "evaluated_nonlands": evaluated,
+                }
+
+    return False, "no_play_before_turn_3", {
+        "early_turn_window": early_turn_window,
+        "evaluated_nonlands": evaluated,
+    }
+
+
+def mulligan_evaluation(hand):
+    lands = sum(1 for c in hand if is_effective_land(c))
+    nonlands = len(hand) - lands
+    high_cost_cards = [
+        c.get("name", "?")
+        for c in hand
+        if isinstance(c, dict)
+        and not is_effective_land(c)
+        and _opening_hand_card_cmc(c) >= 7
+    ]
+    base = {
+        "lands": lands,
+        "nonlands": nonlands,
+        "colors": _opening_hand_colors(hand),
+        "hand_summary": _opening_hand_summary(hand),
+        "high_cost_cards": high_cost_cards,
+        "risk_flags": [],
+    }
+    if lands < 2:
+        base["risk_flags"].append("mana_screw")
+        return {
+            **base,
+            "keep": False,
+            "reason": "too_few_lands",
+        }
+    if lands > 5:
+        base["risk_flags"].append("mana_flood")
+        return {
+            **base,
+            "keep": False,
+            "reason": "too_many_lands",
+        }
+
+    has_plan, reason, plan_details = _opening_hand_has_early_plan(hand, lands)
+    if not has_plan:
+        base["risk_flags"].append("no_early_game_plan")
+    if len(high_cost_cards) >= 3 and not has_plan:
+        base["risk_flags"].append("expensive_dead_hand")
+    return {
+        **base,
+        **plan_details,
+        "keep": has_plan,
+        "reason": reason if has_plan else "no_early_game_plan",
+    }
+
+
 def mulligan_decision(hand):
-    lands = sum(1 for c in hand if is_land(c))  # v10.2
-    return (2 <= lands <= 5), 7
+    evaluation = mulligan_evaluation(hand)
+    return evaluation["keep"], 7
+
+
+def _emit_mulligan_decision_trace(
+    player,
+    evaluation,
+    *,
+    mulligan_count,
+    chosen_action,
+    bottomed_cards,
+    forced_keep=False,
+):
+    risk_flags = list(evaluation.get("risk_flags") or [])
+    if forced_keep:
+        risk_flags.append("forced_keep_after_mulligan_cap")
+    hand_summary = evaluation.get("hand_summary") or []
+    emit_decision_trace(
+        decision_type="mulligan_decision",
+        player=player,
+        turn=0,
+        phase="pregame",
+        available_options=[
+            {
+                "action": "keep",
+                "lands": evaluation.get("lands"),
+                "nonlands": evaluation.get("nonlands"),
+                "reason": evaluation.get("reason"),
+            },
+            {
+                "action": "mulligan",
+                "lands": evaluation.get("lands"),
+                "nonlands": evaluation.get("nonlands"),
+                "reason": evaluation.get("reason"),
+            },
+        ],
+        chosen_option={
+            "action": chosen_action,
+            "mulligan_count": mulligan_count,
+            "forced_keep": forced_keep,
+        },
+        rejected_options=[
+            {
+                "action": "keep" if chosen_action == "mulligan" else "mulligan",
+                "rejected_reason": "opening_hand_policy",
+            }
+        ],
+        score_components={
+            "lands": evaluation.get("lands"),
+            "nonlands": evaluation.get("nonlands"),
+            "colors": evaluation.get("colors"),
+            "early_play": evaluation.get("early_play"),
+            "early_ramp": evaluation.get("early_ramp"),
+            "early_turn_window": evaluation.get("early_turn_window"),
+            "high_cost_cards": evaluation.get("high_cost_cards"),
+            "keep": evaluation.get("keep"),
+        },
+        rule_source="battle_opening_hand_policy",
+        rule_status="heuristic",
+        confidence="medium",
+        expected_benefit_score=1 if evaluation.get("keep") else -1,
+        actual_outcome=chosen_action,
+        reason=evaluation.get("reason"),
+        strategic_principle="opening_hand_must_have_mana_colors_and_playable_curve",
+        resource_delta={
+            "mulligans_taken": mulligan_count,
+            "cards_in_hand": len(player.hand),
+            "bottomed_cards": bottomed_cards,
+        },
+        risk_flags=risk_flags,
+        alternatives_considered=hand_summary,
+        rejected_reason="hand_lacks_keep_criteria" if chosen_action == "mulligan" else None,
+    )
 
 def cancel_plus_minus_counters(all_players):
     return _cancel_plus_minus_counters(
@@ -4643,6 +4933,179 @@ def choose_best_creature_target(creatures):
     )
 
 
+def _land_resource_cost_option(land, color_counts, *, zone):
+    colors = list(source_colors(land)) if isinstance(land, dict) else []
+    unique_colors = [color for color in colors if color_counts.get(color, 0) <= 1]
+    type_line = str(land.get("type_line") or "") if isinstance(land, dict) else ""
+    name = land.get("name", "?") if isinstance(land, dict) else str(land)
+    is_basic = "basic" in type_line.lower() or name in BASIC_LAND_COLORS
+    is_tapped = bool(land.get("tapped")) if isinstance(land, dict) else False
+    risk_flags = []
+    if unique_colors:
+        risk_flags.append("spending_unique_color_land")
+    if not colors:
+        risk_flags.append("spending_unknown_color_land")
+    return {
+        "name": name,
+        "zone": zone,
+        "colors": colors,
+        "unique_colors": unique_colors,
+        "is_basic": is_basic,
+        "is_tapped": is_tapped,
+        "risk_flags": risk_flags,
+        "selection_rank": (
+            len(unique_colors),
+            0 if is_tapped else 1,
+            0 if is_basic else 1,
+            name,
+        ),
+    }
+
+
+def choose_land_for_resource_cost(lands, *, zone):
+    """Choose a land to discard/sacrifice while preserving unique colors when possible."""
+    candidates = [land for land in lands if isinstance(land, dict)]
+    color_counts = defaultdict(int)
+    for land in candidates:
+        for color in source_colors(land):
+            color_counts[color] += 1
+    options = [
+        _land_resource_cost_option(land, color_counts, zone=zone)
+        for land in candidates
+    ]
+    if not options:
+        return None, [], ["no_land_options"], None
+    ranked = sorted(zip(candidates, options), key=lambda pair: pair[1]["selection_rank"])
+    chosen, chosen_option = ranked[0]
+    risk_flags = list(chosen_option.get("risk_flags") or [])
+    if len(candidates) <= 1:
+        risk_flags.append("spending_last_land")
+    selection_reason = "prefer_redundant_tapped_basic_land_preserve_unique_colors"
+    return chosen, options, sorted(set(risk_flags)), selection_reason
+
+
+FETCH_LAND_NAMES = {
+    "arid mesa",
+    "bloodstained mire",
+    "fabled passage",
+    "flooded strand",
+    "marsh flats",
+    "misty rainforest",
+    "polluted delta",
+    "prismatic vista",
+    "scalding tarn",
+    "verdant catacombs",
+    "windswept heath",
+    "wooded foothills",
+}
+
+
+HIGH_VALUE_LAND_TARGETS = {
+    "ancient tomb",
+    "bojuka bog",
+    "cabal coffers",
+    "command tower",
+    "dark depths",
+    "field of the dead",
+    "gaea's cradle",
+    "nykthos, shrine to nyx",
+    "strip mine",
+    "thespian's stage",
+    "wasteland",
+}
+
+
+def estimated_land_mana_value(land, player=None):
+    name = normalize_card_name(land.get("name", "")) if isinstance(land, dict) else ""
+    if name in FETCH_LAND_NAMES:
+        return 0
+    if name == "ancient tomb":
+        return 2
+    if name == "gaea's cradle" and player is not None:
+        return max(
+            1,
+            sum(
+                1
+                for permanent in player.battlefield
+                if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+            ),
+        )
+    colors = source_colors(land) if isinstance(land, dict) else ["generic"]
+    return 1 if colors else 0
+
+
+def land_ramp_target_option(land, effect_data, player):
+    name = land.get("name", "?") if isinstance(land, dict) else str(land)
+    normalized = normalize_card_name(name)
+    colors = list(source_colors(land)) if isinstance(land, dict) else []
+    enters_tapped = bool(effect_data.get("land_enters_tapped", True))
+    mana_value = estimated_land_mana_value(land, player)
+    is_fetch = normalized in FETCH_LAND_NAMES
+    high_value = normalized in HIGH_VALUE_LAND_TARGETS
+    score = mana_value * 20
+    if not enters_tapped:
+        score += 10
+    if high_value:
+        score += 25
+    if is_fetch:
+        score -= 15
+    if "wildcard" in colors:
+        score += 8
+    if "generic" not in colors and colors:
+        score += 4
+    return {
+        "name": name,
+        "colors": colors,
+        "enters_tapped": enters_tapped,
+        "estimated_mana_value": mana_value,
+        "is_fetch_land": is_fetch,
+        "high_value_target": high_value,
+        "score": score,
+        "selection_rank": (-score, 1 if enters_tapped else 0, name),
+    }
+
+
+def choose_land_ramp_targets(player, effect_data, count):
+    candidates = []
+    for candidate in list(player.library):
+        if not isinstance(candidate, dict) or not is_effective_land(candidate):
+            continue
+        if effect_data.get("basic_only") and "basic" not in str(candidate.get("type_line") or "").lower():
+            continue
+        candidates.append(candidate)
+    options = [
+        land_ramp_target_option(candidate, effect_data, player)
+        for candidate in candidates
+    ]
+    ranked = sorted(zip(candidates, options), key=lambda pair: pair[1]["selection_rank"])
+    chosen = ranked[:max(0, count)]
+    return [pair[0] for pair in chosen], options
+
+
+def land_sacrifice_has_strategic_benefit(strategic_risk_flags, target_options, count):
+    risk = set(strategic_risk_flags or [])
+    if not ({"spending_last_land", "spending_unique_color_land"} & risk):
+        return True, "no_scarce_land_risk"
+    if count >= 2:
+        return True, "net_land_count_increase"
+    if not target_options:
+        return False, "no_land_ramp_target_context"
+    selected = sorted(target_options, key=lambda item: item["selection_rank"])[:max(1, count)]
+    best = selected[0]
+    if best.get("high_value_target") and not best.get("is_fetch_land"):
+        return True, "high_value_land_target"
+    if not best.get("enters_tapped") and int(best.get("estimated_mana_value") or 0) >= 2:
+        return True, "untapped_net_mana_upgrade"
+    if "spending_unique_color_land" in risk:
+        sacrificed_colors = set()
+        # The target context alone cannot know the sacrificed land, so this
+        # accepts only clear flexible fixing; otherwise the auditor must review.
+        if "wildcard" in set(best.get("colors") or []):
+            return True, "flexible_color_fixing"
+        return False, "unique_color_loss_without_clear_replacement"
+    return False, "last_land_spend_without_clear_payoff"
+
+
 def pay_additional_card_costs(player, card, effect_data, *, turn=None):
     """Pay non-mana costs that materially affect battlefield validity."""
     if (
@@ -4680,8 +5143,16 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             discarded=discard_any.get("name", "?"),
             turn=turn,
         )
-    discard = next((candidate for candidate in player.hand if is_land(candidate)), None)
     if effect_data.get("requires_discard_land"):
+        hand_lands = [
+            candidate
+            for candidate in player.hand
+            if isinstance(candidate, dict) and is_land(candidate)
+        ]
+        discard, land_options, strategic_risk_flags, selection_reason = choose_land_for_resource_cost(
+            hand_lands,
+            zone="hand",
+        )
         if not discard:
             emit_replay_event(
                 "additional_cost_failed",
@@ -4689,6 +5160,8 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
                 card=card.get("name", "?"),
                 cost="discard_land",
                 turn=turn,
+                land_options=land_options,
+                strategic_risk_flags=strategic_risk_flags,
             )
             return False
         player.hand.remove(discard)
@@ -4700,6 +5173,9 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             cost="discard_land",
             discarded=discard.get("name", "?"),
             turn=turn,
+            land_options=land_options,
+            selection_reason=selection_reason,
+            strategic_risk_flags=strategic_risk_flags,
         )
     if effect_data.get("requires_sacrifice_creature"):
         sacrifice = next(
@@ -4751,6 +5227,196 @@ def ritual_mana_produced(player, effect_data):
 
 def controlled_land_count(player):
     return sum(1 for permanent in player.battlefield if isinstance(permanent, dict) and is_effective_land(permanent))
+
+
+def battlefield_creature_stats(player):
+    creatures = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent)
+    ]
+    return {
+        "count": len(creatures),
+        "power": sum(int(creature.get("power") or 0) for creature in creatures),
+        "toughness": sum(int(creature.get("toughness") or 0) for creature in creatures),
+    }
+
+
+def board_wipe_decision_context(player, opponents):
+    own = battlefield_creature_stats(player)
+    opposing = [battlefield_creature_stats(opp) for opp in opponents if opp.is_alive()]
+    opponent_creatures = sum(item["count"] for item in opposing)
+    opponent_power = sum(item["power"] for item in opposing)
+    asymmetry = opponent_creatures - own["count"]
+    lethal_pressure = opponent_power >= player.life
+    behind_on_board = opponent_power > own["power"] or opponent_creatures > own["count"]
+    rebuild_cards = [
+        card
+        for card in player.hand
+        if isinstance(card, dict)
+        and not is_effective_land(card)
+        and get_card_effect(card).get("effect")
+        in {"creature", "draw_cards", "draw_engine", "token_maker", "ramp_permanent", "land_ramp"}
+    ]
+    rebuild_engines = [
+        permanent.get("name", "?")
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") in {"draw_engine", "ramp_engine", "passive"}
+    ]
+    rebuild_plan = len(rebuild_cards) >= 2 or bool(rebuild_engines)
+    justified = bool(asymmetry > 0 or lethal_pressure or behind_on_board or rebuild_plan)
+    return {
+        "own_creatures": own["count"],
+        "own_power": own["power"],
+        "opponent_creatures": opponent_creatures,
+        "opponent_power": opponent_power,
+        "asymmetry": asymmetry,
+        "lethal_pressure": lethal_pressure,
+        "behind_on_board": behind_on_board,
+        "rebuild_cards_in_hand": len(rebuild_cards),
+        "rebuild_engines": sorted(rebuild_engines)[:6],
+        "rebuild_plan": rebuild_plan,
+        "timing_justified": justified,
+    }
+
+
+def wheel_decision_context(player, opponents, draw_count):
+    hand_size = len(player.hand)
+    opponent_hands = [len(opp.hand) for opp in opponents if opp.is_alive()]
+    opponent_refill_risk = sum(1 for size in opponent_hands if size < draw_count)
+    net_cards_for_player = draw_count - hand_size
+    opponent_net_cards = [
+        draw_count - size
+        for size in opponent_hands
+    ]
+    total_opponent_net_cards = sum(max(0, value) for value in opponent_net_cards)
+    payoff_names = {
+        permanent.get("name")
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("name") in {"Smothering Tithe", "Notion Thief", "Narset, Parter of Veils"}
+    }
+    payoff_expected = bool(payoff_names)
+    timing_justified = (
+        payoff_expected
+        or (net_cards_for_player >= 4 and opponent_refill_risk == 0)
+        or (net_cards_for_player >= 5 and total_opponent_net_cards <= net_cards_for_player)
+    )
+    return {
+        "hand_size_before": hand_size,
+        "draw_count": draw_count,
+        "net_cards_for_player": net_cards_for_player,
+        "opponent_hand_sizes": opponent_hands,
+        "opponent_net_cards": opponent_net_cards,
+        "total_opponent_net_cards": total_opponent_net_cards,
+        "opponent_refill_risk": opponent_refill_risk,
+        "wheel_payoffs": sorted(payoff_names),
+        "payoff_expected": payoff_expected,
+        "timing_justified": timing_justified,
+        "model_scope": "multiplayer_discard_draw_v1",
+    }
+
+
+def should_cast_board_wipe(player, opponents):
+    return board_wipe_decision_context(player, opponents)["timing_justified"]
+
+
+def should_cast_wheel(player, opponents, effect_data):
+    return wheel_decision_context(
+        player,
+        opponents,
+        int(effect_data.get("count") or 0),
+    )["timing_justified"]
+
+
+def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng):
+    participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
+    results = []
+    total_opponent_drawn = 0
+    for participant in participants:
+        discarded_cards = list(participant.hand)
+        participant.hand = []
+        participant.graveyard.extend(discarded_cards)
+        drawn = participant.draw(draw_count, rng)
+        if participant is not player:
+            total_opponent_drawn += len(drawn)
+        results.append({
+            "player": participant.name,
+            "discarded": len(discarded_cards),
+            "drawn": len(drawn),
+            "hand_after": len(participant.hand),
+        })
+    payoff_names = {
+        permanent.get("name")
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+    }
+    treasures_created = 0
+    if "Smothering Tithe" in payoff_names and total_opponent_drawn:
+        treasures_created = min(total_opponent_drawn, 20)
+        player.treasures += treasures_created
+    emit_replay_event(
+        "wheel_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        draw_count=draw_count,
+        participants=results,
+        opponent_cards_drawn=total_opponent_drawn,
+        treasures_created=treasures_created,
+        turn=turn,
+    )
+    return results
+
+
+def is_wheel_like_card(card, effect_data):
+    name = normalize_card_name(card.get("name", "")) if isinstance(card, dict) else ""
+    count = int(effect_data.get("count") or 0)
+    return count >= 7 or any(
+        marker in name
+        for marker in ("wheel", "windfall", "timetwister", "reforge")
+    )
+
+
+def tutor_destination_for_target_type(target_type):
+    if target_type in ("graveyard", "graveyard_nonlegendary"):
+        return "graveyard"
+    if str(target_type).endswith("_to_battlefield"):
+        return "battlefield"
+    return "hand"
+
+
+def tutor_candidate_score(candidate, target_type, player, opponents, turn):
+    effect_data = get_card_effect(candidate)
+    effect = str(effect_data.get("effect") or candidate.get("effect") or "unknown")
+    cmc = int(float(candidate.get("cmc") or 0))
+    lands = controlled_land_count(player)
+    opponent_creatures = sum(
+        battlefield_creature_stats(opp)["count"]
+        for opp in opponents
+        if opp.is_alive()
+    )
+    score = threat_score(effect, candidate.get("name", ""), player, [player] + list(opponents), turn)
+    reason = "highest_contextual_value"
+    if target_type == "land" or (is_effective_land(candidate) and lands < 3):
+        score += 80 if lands < 3 else 25
+        reason = "fix_mana_or_land_drop"
+    elif effect in ("ramp_permanent", "land_ramp", "ramp_engine") and lands < 4:
+        score += 65
+        reason = "accelerate_underdeveloped_mana"
+    elif effect in ("remove_creature", "remove_permanent", "board_wipe") and opponent_creatures >= 3:
+        score += 55
+        reason = "find_interaction_for_board_pressure"
+    elif effect in ("draw_engine", "topdeck_manipulation") and turn <= 5:
+        score += 50
+        reason = "establish_value_engine"
+    elif effect in ("wincon", "approach", "finisher", "overload_recursion") and turn >= 5:
+        score += 70
+        reason = "find_closing_line"
+    elif str(target_type).endswith("_to_battlefield") and is_creature_card(candidate):
+        score += max(20, cmc * 5)
+        reason = "battlefield_tutor_prefers_material_impact"
+    return score, reason
 
 
 def create_creature_token(
@@ -4910,10 +5576,16 @@ def trigger_landfall(
     )
 
 
-def sacrifice_land_for_effect(player, card, turn, *, required=True):
-    land = next(
-        (candidate for candidate in player.battlefield if isinstance(candidate, dict) and is_effective_land(candidate)),
-        None,
+def sacrifice_land_for_effect(player, card, turn, *, required=True, effect_data=None):
+    effect_data = effect_data or {}
+    battlefield_lands = [
+        candidate
+        for candidate in player.battlefield
+        if isinstance(candidate, dict) and is_effective_land(candidate)
+    ]
+    land, land_options, strategic_risk_flags, selection_reason = choose_land_for_resource_cost(
+        battlefield_lands,
+        zone="battlefield",
     )
     if not land:
         if required:
@@ -4923,6 +5595,30 @@ def sacrifice_land_for_effect(player, card, turn, *, required=True):
                 card=card.get("name", "?"),
                 cost="sacrifice_land",
                 turn=turn,
+                land_options=land_options,
+                strategic_risk_flags=strategic_risk_flags,
+            )
+        return None
+    count = int(effect_data.get("land_count") or effect_data.get("lands_to_battlefield") or 1)
+    _targets, target_options = choose_land_ramp_targets(player, effect_data, count)
+    allowed, benefit_reason = land_sacrifice_has_strategic_benefit(
+        strategic_risk_flags,
+        target_options,
+        count,
+    )
+    if not allowed:
+        if required:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="sacrifice_land",
+                reason="strategic_guardrail",
+                turn=turn,
+                land_options=land_options,
+                land_ramp_target_options=target_options,
+                strategic_risk_flags=strategic_risk_flags,
+                strategic_guardrail_reason=benefit_reason,
             )
         return None
     player.battlefield.remove(land)
@@ -4934,24 +5630,38 @@ def sacrifice_land_for_effect(player, card, turn, *, required=True):
         cost="sacrifice_land",
         sacrificed=land.get("name", "?"),
         turn=turn,
+        land_options=land_options,
+        land_ramp_target_options=target_options,
+        selection_reason=selection_reason,
+        strategic_risk_flags=strategic_risk_flags,
+        strategic_benefit_reason=benefit_reason,
     )
     return land
 
 
 def put_lands_from_library(player, card, effect_data, turn, *, opponents=None, source_event="land_ramp"):
     count = int(effect_data.get("land_count") or effect_data.get("lands_to_battlefield") or 1)
-    if effect_data.get("requires_sacrifice_land") and not sacrifice_land_for_effect(player, card, turn, required=True):
+    if effect_data.get("requires_sacrifice_land") and not sacrifice_land_for_effect(
+        player,
+        card,
+        turn,
+        required=True,
+        effect_data=effect_data,
+    ):
         return []
     found = []
-    for candidate in list(player.library):
+    chosen_targets, target_options = choose_land_ramp_targets(player, effect_data, count)
+    for candidate in list(chosen_targets):
         if len(found) >= count:
             break
-        if not isinstance(candidate, dict) or not is_effective_land(candidate):
-            continue
-        if effect_data.get("basic_only") and "basic" not in str(candidate.get("type_line") or "").lower():
+        if candidate not in player.library:
             continue
         player.library.remove(candidate)
-        land = enrich_card({**candidate, "effect": "land", "tapped": True})
+        land = enrich_card({
+            **candidate,
+            "effect": "land",
+            "tapped": bool(effect_data.get("land_enters_tapped", True)),
+        })
         player.battlefield.append(land)
         trigger_landfall(player, land, turn, source_event, opponents=opponents)
         found.append(land)
@@ -4961,6 +5671,8 @@ def put_lands_from_library(player, card, effect_data, turn, *, opponents=None, s
         card=card.get("name", "?"),
         found=[land.get("name", "?") for land in found],
         count=len(found),
+        target_options=target_options,
+        land_enters_tapped=bool(effect_data.get("land_enters_tapped", True)),
         turn=turn,
     )
     return found
@@ -5456,7 +6168,15 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     """v8: Cast spells respecting instant/sorcery timing and stack."""
     mana = player.available_mana()
     if mana <= 0:
-        return False
+        has_free_castable = any(
+            not is_effective_land(candidate)
+            and player.can_pay_card(candidate)
+            and can_cast_in_phase(candidate, get_card_effect(candidate), phase)
+            and get_card_effect(candidate).get("effect") not in ("counter", "unknown")
+            for candidate in player.hand
+        )
+        if not has_free_castable:
+            return False
 
     actions_taken = 0
 
@@ -5467,6 +6187,190 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
 
     is_own_turn = (player == all_players[0]) or (turn > 0)
     is_main_phase = phase in ("precombat_main", "postcombat_main")
+
+    def ritual_unlocks_same_turn_action(ritual_card, ritual_effect):
+        """One-shot mana is only useful when it unlocks a new same-turn action."""
+        if ritual_effect.get("effect") != "ramp_ritual":
+            return True
+
+        def playable_candidates():
+            candidates = []
+            if is_main_phase and player.command_zone:
+                cmd = player.command_zone[0]
+                already_there = any(
+                    isinstance(permanent, dict)
+                    and permanent.get("name") == cmd.get("name")
+                    for permanent in player.battlefield
+                )
+                if not already_there:
+                    candidates.append((cmd, player.commander_tax))
+            for candidate in player.hand:
+                if candidate is ritual_card or is_effective_land(candidate):
+                    continue
+                candidate_effect = get_card_effect(candidate)
+                if candidate_effect.get("effect") in ("counter", "unknown", "ramp_ritual"):
+                    continue
+                if not can_cast_in_phase(candidate, candidate_effect, phase):
+                    continue
+                candidates.append((candidate, 0))
+            return candidates
+
+        before = {
+            id(candidate)
+            for candidate, additional_generic in playable_candidates()
+            if player.can_pay_card(candidate, additional_generic)
+        }
+        pool_snapshot = player.mana_pool.snapshot()
+        restricted_snapshot = copy.deepcopy(player.restricted_mana)
+        treasures_snapshot = player.treasures
+        life_snapshot = player.life
+        try:
+            # Keep this check aligned with the current ritual resolution path.
+            player.mana_pool.add_generic(ritual_mana_produced(player, ritual_effect))
+            for candidate, additional_generic in playable_candidates():
+                if id(candidate) in before:
+                    continue
+                if player.can_pay_card(candidate, additional_generic):
+                    return True
+            return False
+        finally:
+            for color, amount in pool_snapshot.items():
+                setattr(player.mana_pool, color, amount)
+            player.restricted_mana = restricted_snapshot
+            player.treasures = treasures_snapshot
+            player.life = life_snapshot
+
+    def playable_payoff_candidates(excluded_card=None):
+        candidates = []
+        if is_main_phase and player.command_zone:
+            cmd = player.command_zone[0]
+            already_there = any(
+                isinstance(permanent, dict)
+                and permanent.get("name") == cmd.get("name")
+                for permanent in player.battlefield
+            )
+            if not already_there:
+                candidates.append((cmd, player.commander_tax, "commander"))
+        for candidate in player.hand:
+            if candidate is excluded_card or is_effective_land(candidate):
+                continue
+            candidate_effect = get_card_effect(candidate)
+            effect_name = str(candidate_effect.get("effect") or "unknown")
+            if effect_name in ("counter", "unknown", "ramp_ritual", "ramp_permanent", "ramp_engine", "land_ramp", "land_recursion"):
+                continue
+            if effect_name not in HIGH_IMPACT_PAYOFF_EFFECTS:
+                continue
+            if not can_cast_in_phase(candidate, candidate_effect, phase):
+                continue
+            candidates.append((candidate, 0, "high_impact_spell"))
+        return candidates
+
+    def restore_mana_snapshot(pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot):
+        for color, amount in pool_snapshot.items():
+            setattr(player.mana_pool, color, amount)
+        player.restricted_mana = restricted_snapshot
+        player.treasures = treasures_snapshot
+        player.life = life_snapshot
+
+    def ramp_permanent_unlocks_meaningful_action(ramp_card, ramp_effect, *, allowed_roles=None):
+        """Permanent fast mana may spend scarce land only with immediate payoff."""
+        allowed_roles = set(allowed_roles or [])
+        produced_mana = int(ramp_effect.get("mana_produced", 1) or 1)
+        available_after_ramp = player.available_mana() + produced_mana
+
+        def payoff_is_affordable_by_count(candidate, additional_generic):
+            # Scarce-land fast mana is intentionally conservative: the
+            # simulated payoff must be affordable by raw mana count as well as
+            # by the richer payment planner, otherwise replays can claim Mox
+            # unlocked a commander that still fails to cast in the real flow.
+            locked_cost = card_mana_cost(candidate, additional_generic)
+            nominal_cost = int(locked_cost.get("generic") or 0)
+            nominal_cost += sum(int(amount or 0) for amount in (locked_cost.get("colored") or {}).values())
+            nominal_cost += len(locked_cost.get("hybrid") or [])
+            nominal_cost += len(locked_cost.get("phyrexian") or [])
+            nominal_cost += len(locked_cost.get("phyrexian_hybrid") or [])
+            nominal_cost += sum(
+                int(option.get("generic") or 1)
+                for option in (locked_cost.get("monocolored_hybrid") or [])
+            )
+            return available_after_ramp >= nominal_cost
+
+        before = {
+            (id(candidate), role)
+            for candidate, additional_generic, role in playable_payoff_candidates(ramp_card)
+            if not allowed_roles or role in allowed_roles
+            if (
+                player.can_pay_card(candidate, additional_generic)
+                and payoff_is_affordable_by_count(candidate, additional_generic)
+            )
+        }
+        pool_snapshot = player.mana_pool.snapshot()
+        restricted_snapshot = copy.deepcopy(player.restricted_mana)
+        treasures_snapshot = player.treasures
+        life_snapshot = player.life
+        try:
+            colors = source_colors(enrich_card({**ramp_card, **ramp_effect}))
+            player.mana_pool.add(colors[0] if colors else "generic", produced_mana)
+            for candidate, additional_generic, role in playable_payoff_candidates(ramp_card):
+                if allowed_roles and role not in allowed_roles:
+                    continue
+                if (id(candidate), role) in before:
+                    continue
+                if (
+                    payoff_is_affordable_by_count(candidate, additional_generic)
+                    and player.can_pay_card(candidate, additional_generic)
+                ):
+                    return True
+            return False
+        finally:
+            restore_mana_snapshot(pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot)
+
+    def ramp_resource_unlocks_same_turn_action(ramp_card, ramp_effect):
+        if ramp_effect.get("effect") == "ramp_ritual":
+            return ritual_unlocks_same_turn_action(ramp_card, ramp_effect)
+        if ramp_effect.get("requires_sacrifice_land"):
+            battlefield_lands = [
+                candidate
+                for candidate in player.battlefield
+                if isinstance(candidate, dict) and is_effective_land(candidate)
+            ]
+            sacrifice_land, _land_options, strategic_risk_flags, _selection_reason = choose_land_for_resource_cost(
+                battlefield_lands,
+                zone="battlefield",
+            )
+            if not sacrifice_land:
+                return False
+            count = int(ramp_effect.get("land_count") or ramp_effect.get("lands_to_battlefield") or 1)
+            _targets, target_options = choose_land_ramp_targets(player, ramp_effect, count)
+            allowed, _reason = land_sacrifice_has_strategic_benefit(
+                strategic_risk_flags,
+                target_options,
+                count,
+            )
+            return allowed
+        if not ramp_effect.get("requires_discard_land"):
+            return True
+        hand_lands = [
+            candidate
+            for candidate in player.hand
+            if isinstance(candidate, dict) and is_land(candidate)
+        ]
+        discard, _land_options, strategic_risk_flags, _selection_reason = choose_land_for_resource_cost(
+            hand_lands,
+            zone="hand",
+        )
+        if not discard:
+            return False
+        if not (
+            "spending_last_land" in strategic_risk_flags
+            or "spending_unique_color_land" in strategic_risk_flags
+        ):
+            return True
+        return ramp_permanent_unlocks_meaningful_action(
+            ramp_card,
+            ramp_effect,
+            allowed_roles={"commander"},
+        )
 
     # Track counters available (count counterspells in hand)
     player.counters_available = sum(
@@ -5590,10 +6494,15 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 "ramp_engine",
                 "ramp_ritual",
             )
+            and ramp_resource_unlocks_same_turn_action(c, get_card_effect(c))
         ]
         for c in ramp_cards[:2]:
-            if c in player.hand and player.can_pay_card(c):
-                eff = get_card_effect(c)
+            eff = get_card_effect(c)
+            if (
+                c in player.hand
+                and player.can_pay_card(c)
+                and ramp_resource_unlocks_same_turn_action(c, eff)
+            ):
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="ramp")
                 if not commit_cast_payment(cast_ctx):
                     continue
@@ -5625,6 +6534,11 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         "role": "ramp",
                         "mana_before": mana,
                         "ramp_options": len(ramp_cards),
+                        "unlocks_same_turn_action": 1
+                        if eff.get("effect") == "ramp_ritual"
+                        else 0,
+                        "requires_discard_land": bool(eff.get("requires_discard_land")),
+                        "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
                     },
                     rule_source=fields.get("rule_source", "battle_heuristic"),
                     rule_status=fields.get("rule_review_status", "heuristic"),
@@ -5632,6 +6546,35 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     expected_benefit_score=max(1, int(c.get("cmc", 0) or 0) + 10),
                     actual_outcome="cast_and_resolve_ramp",
                     reason="early_mana_development",
+                    strategic_principle=(
+                        "spend_ramp_resource_only_when_it_unlocks_or_accelerates_plan"
+                    ),
+                    heuristic_version=DECISION_STRATEGY_VERSION,
+                    resource_delta={
+                        "effect": eff.get("effect"),
+                        "mana_before": mana,
+                        "one_shot_mana": ritual_mana_produced(player, eff)
+                        if eff.get("effect") == "ramp_ritual"
+                        else 0,
+                        "requires_discard_land": bool(eff.get("requires_discard_land")),
+                        "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
+                    },
+                    risk_flags=[
+                        flag
+                        for flag in (
+                            "one_shot_mana"
+                            if eff.get("effect") == "ramp_ritual"
+                            else None,
+                            "requires_land_discard"
+                            if eff.get("requires_discard_land")
+                            else None,
+                            "requires_land_sacrifice"
+                            if eff.get("requires_sacrifice_land")
+                            else None,
+                        )
+                        if flag
+                    ],
+                    rejected_reason="deferred_lower_priority_ramp",
                 )
                 player.hand.remove(c)
                 emit_replay_event(
@@ -5687,7 +6630,15 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         c for c in player.hand
         if not is_effective_land(c)
         and player.can_pay_card(c)
-        and get_card_effect(c).get("effect") not in ("counter", "unknown")
+        and get_card_effect(c).get("effect") not in (
+            "counter",
+            "unknown",
+            "ramp_ritual",
+            "ramp_permanent",
+            "ramp_engine",
+            "land_ramp",
+            "land_recursion",
+        )
     ]
     # v8: Miracle check for Lorehold
     if player.is_human:
@@ -5710,6 +6661,18 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             c = wincons[0]
             if c in player.hand and player.can_pay_card(c):
                 eff = get_card_effect(c)
+                if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+                    wincons = []
+                elif (
+                    eff.get("effect") == "draw_cards"
+                    and is_wheel_like_card(c, eff)
+                    and not should_cast_wheel(player, opponents, eff)
+                ):
+                    wincons = []
+                if not wincons:
+                    c = None
+                    eff = None
+            if c is not None and c in player.hand and player.can_pay_card(c):
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="high_threat")
                 if not commit_cast_payment(cast_ctx):
                     return False
@@ -5798,6 +6761,14 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         if played >= 2: break
         if c in player.hand and player.can_pay_card(c):
             eff = get_card_effect(c)
+            if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+                continue
+            if (
+                eff.get("effect") == "draw_cards"
+                and is_wheel_like_card(c, eff)
+                and not should_cast_wheel(player, opponents, eff)
+            ):
+                continue
             if eff.get("effect") == "creature":
                 if not is_main_phase: continue  # creatures only in main phase
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="creature")
@@ -6072,7 +7043,51 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             finish_resolved_spell(player, card, turn=turn)
             return
         n = effect_data.get("count", 2)
-        player.draw(n, rng)
+        if is_wheel_like_card(card, effect_data):
+            context = wheel_decision_context(player, opponents, int(n or 0))
+            risk_flags = []
+            if (
+                context["opponent_refill_risk"] > 0
+                and not context["wheel_payoffs"]
+                and not context["timing_justified"]
+            ):
+                risk_flags.append("opponent_refill_risk")
+            if context["model_scope"] != "multiplayer_discard_draw_v1":
+                risk_flags.append("wheel_model_simplified")
+            expected_score = max(
+                0,
+                context["net_cards_for_player"] * 10
+                - context["total_opponent_net_cards"] * 4
+                + (25 if context["wheel_payoffs"] else 0),
+            )
+            emit_decision_trace(
+                decision_type="wheel",
+                player=player,
+                turn=turn,
+                phase="resolution",
+                available_options=[
+                    decision_card_option(card, effect_data, action="resolve_wheel"),
+                    {"action": "defer_wheel_not_available_after_resolution"},
+                ],
+                chosen_option=decision_card_option(card, effect_data, action="resolve_wheel"),
+                rejected_options=[{"action": "defer_wheel_not_available_after_resolution"}],
+                score_components=context,
+                rule_source=replay_rule_fields(effect_data).get("rule_source", "battle_heuristic"),
+                rule_status=replay_rule_fields(effect_data).get("rule_review_status", "heuristic"),
+                confidence="low" if "wheel_model_simplified" in risk_flags else "medium",
+                expected_benefit_score=expected_score,
+                actual_outcome="multiplayer_discard_draw_resolved",
+                reason="wheel_like_draw_resolution",
+                strategic_principle="wheel_only_when_refill_or_payoff_outweighs_opponent_refill",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta=context,
+                risk_flags=risk_flags,
+                rejected_reason="spell_already_resolving",
+            )
+        if is_wheel_like_card(card, effect_data):
+            resolve_wheel_like_draw(player, opponents, card, int(n or 0), turn, rng)
+        else:
+            player.draw(n, rng)
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "treasure_maker":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
@@ -6173,6 +7188,47 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
     elif effect == "equipment_haste_shroud":
         apply_equipment_haste_shroud(player, card, effect_data, turn)
     elif effect == "board_wipe":
+        context = board_wipe_decision_context(player, opponents)
+        risk_flags = []
+        if not context["timing_justified"]:
+            risk_flags.append("wipe_without_timing_justification")
+        elif (
+            context["asymmetry"] <= 0
+            and not context["lethal_pressure"]
+            and not context["rebuild_plan"]
+            and not context["behind_on_board"]
+        ):
+            risk_flags.append("wipe_without_clear_asymmetry")
+        fields = replay_rule_fields(effect_data)
+        emit_decision_trace(
+            decision_type="board_wipe",
+            player=player,
+            turn=turn,
+            phase="resolution",
+            available_options=[
+                decision_card_option(card, effect_data, action="resolve_board_wipe"),
+                {"action": "defer_wipe_not_available_after_resolution"},
+            ],
+            chosen_option=decision_card_option(card, effect_data, action="resolve_board_wipe"),
+            rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+            score_components=context,
+            rule_source=fields.get("rule_source", "battle_heuristic"),
+            rule_status=fields.get("rule_review_status", "heuristic"),
+            confidence="medium",
+            expected_benefit_score=(
+                max(0, context["asymmetry"] * 10)
+                + (40 if context["lethal_pressure"] else 0)
+                + (20 if context["behind_on_board"] else 0)
+                + (15 if context["rebuild_plan"] else 0)
+            ),
+            actual_outcome="board_wipe_resolved",
+            reason="reset_board_state",
+            strategic_principle="wipe_when_behind_under_lethal_pressure_or_asymmetric",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta=context,
+            risk_flags=risk_flags,
+            rejected_reason="spell_already_resolving",
+        )
         destroyed = 0
         protected = 0
         creatures_seen = 0
@@ -6418,7 +7474,86 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 if is_creature_card(c) and card_has_color(c, "G"):
                     candidates.append(c)
         if candidates:
-            found = max(candidates, key=lambda candidate: candidate.get("cmc", 0))
+            scored_candidates = [
+                (
+                    candidate,
+                    *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+                )
+                for candidate in candidates
+            ]
+            scored_candidates.sort(key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", "")))
+            found, found_score, found_reason = scored_candidates[0]
+        else:
+            scored_candidates = []
+            found_score = 0
+            found_reason = "no_candidate"
+        fields = replay_rule_fields(effect_data)
+        destination_preview = tutor_destination_for_target_type(target_type) if found else None
+        emit_decision_trace(
+            decision_type="tutor",
+            player=player,
+            turn=turn,
+            phase="resolution",
+            available_options=[
+                decision_card_option(
+                    candidate,
+                    get_card_effect(candidate),
+                    score=score,
+                    action="tutor_candidate",
+                    target_type=target_type,
+                    destination=tutor_destination_for_target_type(target_type),
+                    reason=reason,
+                )
+                for candidate, score, reason in scored_candidates[:10]
+            ],
+            chosen_option=decision_card_option(
+                found,
+                get_card_effect(found) if found else None,
+                score=found_score,
+                action="tutor_target" if found else "no_target",
+                target_type=target_type,
+                destination=destination_preview,
+                reason=found_reason,
+            ),
+            rejected_options=[
+                decision_card_option(
+                    candidate,
+                    get_card_effect(candidate),
+                    score=score,
+                    action="reject_tutor_candidate",
+                    target_type=target_type,
+                    destination=tutor_destination_for_target_type(target_type),
+                    reason=reason,
+                )
+                for candidate, score, reason in scored_candidates[1:10]
+            ],
+            score_components={
+                "target_type": target_type,
+                "candidate_count": len(candidates),
+                "selected_reason": found_reason,
+                "lands": controlled_land_count(player),
+                "opponent_creatures": sum(
+                    battlefield_creature_stats(opp)["count"]
+                    for opp in opponents
+                    if opp.is_alive()
+                ),
+            },
+            rule_source=fields.get("rule_source", "battle_heuristic"),
+            rule_status=fields.get("rule_review_status", "heuristic"),
+            confidence="medium" if found else "low",
+            expected_benefit_score=found_score,
+            actual_outcome="tutor_target_selected" if found else "no_target_found",
+            reason=found_reason,
+            strategic_principle="tutor_for_mana_interaction_engine_or_wincon_by_game_state",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "target_type": target_type,
+                "destination": destination_preview,
+                "selected": found.get("name", "?") if found else None,
+            },
+            risk_flags=[] if found else ["no_tutor_target"],
+            rejected_reason="lower_contextual_tutor_score",
+        )
         if found:
             player.library.remove(found)
             if target_type in ("graveyard", "graveyard_nonlegendary"):

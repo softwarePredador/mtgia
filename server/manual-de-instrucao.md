@@ -18053,11 +18053,11 @@ que o endpoint entrega quando a Semantic Layer v2 bloqueia uma perda crítica.
 - Quality gate bloqueia swaps que removem win conditions do deck
 - `weakness-analysis` reporta `wincon_count` via F1 adapter
 
-### Tabelas Write-only — documentadas como audit logs
+### Tabelas de histórico/cache operacional
 
-Três tabelas operam como audit logs (escritas, nunca lidas pelo runtime). Política:
-- `deck_matchups` — resultados de `POST /ai/simulate-matchup`. Uso futuro: cache de matchup.
-- `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`. Uso futuro: histórico.
+Algumas tabelas operam como histórico/cache operacional das próprias rotas. Política:
+- `deck_matchups` — resultados de `POST /ai/simulate-matchup`, lidos pela rota como histórico/cache de matchup quando disponível.
+- `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`, lidos pela rota para sumarizar histórico recente de fraquezas.
 - `ml_prompt_feedback` — alimentada por `/ai/optimize` via
   `optimize_feedback.recordOptimizeMlFeedback(...)`; segue como histórico
   operacional para futura métrica/seleção de prompts.

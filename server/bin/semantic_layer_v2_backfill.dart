@@ -250,6 +250,7 @@ Future<void> _ensureSchema(Pool pool) async {
     await pool.execute(statement);
   }
   await pool.execute(optimizeCandidateQualitySummaryViewStatement);
+  await pool.execute(cardIntelligenceSnapshotViewStatement);
 }
 
 Future<List<ResultRow>> _loadCardRows(

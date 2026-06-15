@@ -28,8 +28,17 @@ Future<Response> onRequest(RequestContext context) async {
 
     final pool = context.read<Pool>();
     final countersService = ArchetypeCountersService(pool);
-    final functionalTagsSelect = await _functionalTagsSelectSql(pool);
-    final semanticV2Select = await _semanticV2SelectSql(pool);
+    final hasCardIntelligenceSnapshot =
+        await _hasTable(pool, 'card_intelligence_snapshot');
+    final cardSourceJoin = hasCardIntelligenceSnapshot
+        ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+        : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect = hasCardIntelligenceSnapshot
+        ? 'c.function_tag_details AS functional_tags'
+        : await _functionalTagsSelectSql(pool);
+    final semanticV2Select = hasCardIntelligenceSnapshot
+        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+        : await _semanticV2SelectSql(pool);
 
     // 1. Buscar informações do deck
     final deckResult = await pool.execute(
@@ -64,11 +73,11 @@ Future<Response> onRequest(RequestContext context) async {
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
                ) as cmc,
-               c.scryfall_id::text as oracle_id,
+               COALESCE(c.oracle_id::text, c.scryfall_id::text) as oracle_id,
                $functionalTagsSelect,
                $semanticV2Select
         FROM deck_cards dc 
-        JOIN cards c ON c.id = dc.card_id 
+        $cardSourceJoin
         WHERE dc.deck_id = @id
       '''),
       parameters: {'id': deckId},

@@ -61,6 +61,61 @@ const createCardLocalizedNamesIndexesSql = [
   ''',
 ];
 
+const createCardIdentityBridgeViewSql = '''
+CREATE OR REPLACE VIEW card_identity_bridge AS
+SELECT
+  c.id AS card_id,
+  c.oracle_id,
+  c.scryfall_id,
+  c.name AS canonical_name,
+  LOWER(TRIM(c.name)) AS normalized_canonical_name,
+  c.name AS lookup_name,
+  LOWER(TRIM(c.name)) AS normalized_lookup_name,
+  c.name AS printed_name,
+  'en'::text AS lang,
+  c.type_line,
+  c.image_url,
+  c.color_identity,
+  c.colors,
+  c.oracle_text,
+  c.mana_cost,
+  c.cmc,
+  'cards'::text AS source,
+  0 AS match_priority
+FROM cards c
+UNION ALL
+SELECT
+  c.id AS card_id,
+  COALESCE(l.oracle_id, c.oracle_id) AS oracle_id,
+  COALESCE(l.scryfall_id, c.scryfall_id) AS scryfall_id,
+  c.name AS canonical_name,
+  LOWER(TRIM(c.name)) AS normalized_canonical_name,
+  l.printed_name AS lookup_name,
+  l.normalized_printed_name AS normalized_lookup_name,
+  l.printed_name,
+  l.lang,
+  c.type_line,
+  c.image_url,
+  c.color_identity,
+  c.colors,
+  c.oracle_text,
+  c.mana_cost,
+  c.cmc,
+  l.source,
+  CASE
+    WHEN c.id = l.card_id THEN 1
+    WHEN c.scryfall_id = l.scryfall_id THEN 2
+    WHEN c.scryfall_id = l.oracle_id THEN 3
+    ELSE 4
+  END AS match_priority
+FROM card_localized_names l
+JOIN cards c
+  ON c.id = l.card_id
+  OR c.scryfall_id = l.scryfall_id
+  OR c.scryfall_id = l.oracle_id
+  OR LOWER(c.name) = LOWER(l.canonical_name)
+''';
+
 String canonicalizeImportLookupName(String value) {
   final cleanKey = cleanImportLookupKey(value.trim().toLowerCase());
   final folded = foldImportLookupKey(cleanKey);
@@ -83,6 +138,7 @@ Future<void> ensureCardLocalizedNamesTable(Session session) async {
   for (final sql in createCardLocalizedNamesIndexesSql) {
     await session.execute(Sql.named(sql));
   }
+  await session.execute(Sql.named(createCardIdentityBridgeViewSql));
 }
 
 Future<bool> hasCardLocalizedNamesTable(Pool pool) async {

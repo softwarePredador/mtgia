@@ -350,6 +350,138 @@ def register_tests(battle, player):
         assert steamkin["effect"] != "ramp_ritual"
         assert steamkin["is_creature_permanent"] is True
 
+    def test_mox_diamond_discards_land_when_it_unlocks_commander():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        mox = {"name": "Mox Diamond", "cmc": 0, "type_line": "Artifact"}
+        land = {"name": "Savannah", "effect": "land", "type_line": "Land"}
+        active.hand = [mox, land]
+        active.command_zone = [
+            {
+                "name": "Cheap Commander",
+                "cmc": 1,
+                "type_line": "Legendary Creature",
+                "effect": "creature",
+                "is_commander": True,
+            }
+        ]
+
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=1,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(39),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert acted is True
+        assert mox not in active.hand
+        assert land not in active.hand
+        assert any(
+            permanent.get("name") == "Mox Diamond"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert any(card.get("name") == "Savannah" for card in active.graveyard)
+        assert any(
+            event == "additional_cost_paid"
+            and data.get("card") == "Mox Diamond"
+            and data.get("cost") == "discard_land"
+            and data.get("discarded") == "Savannah"
+            for event, data in events
+        )
+
+    def test_mox_diamond_does_not_spend_last_land_without_payoff():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        mox = {"name": "Mox Diamond", "cmc": 0, "type_line": "Artifact"}
+        land = {"name": "Savannah", "effect": "land", "type_line": "Land"}
+        expensive = {
+            "name": "Nine Mana Filler",
+            "cmc": 9,
+            "type_line": "Sorcery",
+            "effect": "draw_cards",
+        }
+        active.hand = [mox, land, expensive]
+
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=1,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(40),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert acted is False
+        assert mox in active.hand
+        assert land in active.hand
+        assert active.graveyard == []
+        assert not any(
+            event == "additional_cost_paid"
+            and data.get("card") == "Mox Diamond"
+            for event, data in events
+        )
+
+    def test_mox_diamond_does_not_claim_unaffordable_commander_payoff():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        mox = {"name": "Mox Diamond", "cmc": 0, "type_line": "Artifact"}
+        land = {"name": "Command Tower", "effect": "land", "type_line": "Land"}
+        active.hand = [mox, land]
+        active.battlefield = [
+            {
+                "name": "Wastes",
+                "effect": "land",
+                "type_line": "Land",
+                "mana_produced": 1,
+                "color_identity": ["C"],
+            }
+        ]
+        active.command_zone = [
+            {
+                "name": "Four Mana Commander",
+                "cmc": 0,
+                "mana_cost": "{2}",
+                "type_line": "Legendary Creature",
+                "effect": "creature",
+                "is_commander": True,
+            }
+        ]
+        active.commander_tax = 2
+        active.refresh_mana_sources(turn=1)
+
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=1,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(41),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert acted is False
+        assert mox in active.hand
+        assert land in active.hand
+        assert not any(
+            event == "additional_cost_paid"
+            and data.get("card") == "Mox Diamond"
+            for event, data in events
+        )
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -362,4 +494,7 @@ def register_tests(battle, player):
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
+        test_mox_diamond_discards_land_when_it_unlocks_commander,
+        test_mox_diamond_does_not_spend_last_land_without_payoff,
+        test_mox_diamond_does_not_claim_unaffordable_commander_payoff,
     ]

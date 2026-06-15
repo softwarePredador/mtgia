@@ -28,6 +28,7 @@ void main() {
             "import '../../../../lib/ai/optimization_functional_roles.dart'"),
       );
       expect(recommendations, contains('resolveCardFunctionalRoles('));
+      expect(recommendations, contains('card_intelligence_snapshot'));
       expect(recommendations, contains("'card_function_tags'"));
       expect(recommendations, contains("'card_semantic_tags_v2'"));
       expect(recommendations, contains('semantic_tags_v2'));
@@ -71,6 +72,7 @@ void main() {
       expect(weakness, contains('final userId = context.read<String>()'));
       expect(weakness, contains('AND user_id = CAST(@user_id AS uuid)'));
       expect(weakness, contains('resolveCardFunctionalRoles('));
+      expect(weakness, contains('card_intelligence_snapshot'));
       expect(weakness, contains("'card_function_tags'"));
       expect(weakness, contains("'card_semantic_tags_v2'"));
       expect(weakness, contains('semantic_tags_v2'));
@@ -93,6 +95,17 @@ void main() {
         archetypes,
         isNot(contains('SELECT name, format FROM decks WHERE id = @id')),
       );
+    });
+
+    test('deck ai-analysis uses card intelligence snapshot when available', () {
+      final aiAnalysis = File(
+        'routes/decks/[id]/ai-analysis/index.dart',
+      ).readAsStringSync();
+
+      expect(aiAnalysis, contains('card_intelligence_snapshot'));
+      expect(aiAnalysis, contains('function_tag_details'));
+      expect(aiAnalysis, contains('semantic_tags_v2'));
+      expect(aiAnalysis, contains('JOIN cards c ON c.id = dc.card_id'));
     });
 
     test('weakness-analysis recommendations use DB lookup over fixed staples',

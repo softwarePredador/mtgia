@@ -92,6 +92,79 @@ def register_tests(battle, player, card):
         assert active.eliminated is True
         assert active.life == 0
 
+    def test_one_shot_ritual_is_not_spent_without_same_turn_payoff():
+        active = player("Active")
+        opponent = player("Opponent")
+        petal = {
+            "name": "Lotus Petal",
+            "cmc": 0,
+            "type_line": "Artifact",
+            "effect": "ramp_ritual",
+            "mana_produced": 1,
+        }
+        expensive = {
+            "name": "Expensive Sorcery",
+            "cmc": 7,
+            "type_line": "Sorcery",
+            "effect": "draw",
+        }
+        active.hand = [petal, expensive]
+        active.mana_pool.add_generic(1)
+
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=1,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(91),
+        )
+
+        assert acted is False
+        assert petal in active.hand
+        assert active.graveyard == []
+
+    def test_one_shot_ritual_can_be_spent_when_it_unlocks_spell():
+        active = player("Active")
+        opponent = player("Opponent")
+        petal = {
+            "name": "Lotus Petal",
+            "cmc": 0,
+            "type_line": "Artifact",
+            "effect": "ramp_ritual",
+            "mana_produced": 1,
+        }
+        two_drop = {
+            "name": "Two Drop Creature",
+            "cmc": 2,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        active.hand = [petal, two_drop]
+        active.mana_pool.add_generic(1)
+
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=1,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(92),
+        )
+
+        assert acted is True
+        assert petal in active.graveyard
+        assert two_drop not in active.hand
+        assert any(
+            isinstance(permanent, dict)
+            and permanent.get("name") == "Two Drop Creature"
+            for permanent in active.battlefield
+        )
+
     def test_extra_turns_are_taken_before_next_player():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -202,14 +275,67 @@ def register_tests(battle, player, card):
             "Unexpected Windfall",
         ]
 
+    def test_mulligan_rejects_three_lands_with_only_expensive_spells():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+            {"name": "Nine Mana Spell", "cmc": 9, "type_line": "Creature", "effect": "creature"},
+            {"name": "Eight Mana Artifact", "cmc": 8, "type_line": "Artifact", "effect": "draw"},
+            {"name": "Nine Mana Wincon", "cmc": 9, "type_line": "Sorcery", "effect": "wincon"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is False
+        assert evaluation["reason"] == "no_early_game_plan"
+
+    def test_mulligan_keeps_three_lands_with_early_play():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Two Drop", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+            {"name": "Nine Mana Spell", "cmc": 9, "type_line": "Creature", "effect": "creature"},
+            {"name": "Seven Mana Spell", "cmc": 7, "type_line": "Sorcery", "effect": "draw"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is True
+        assert evaluation["reason"].startswith("early_play:Two Drop")
+
+    def test_mulligan_keeps_two_lands_with_cheap_ramp():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Arcane Signet", "cmc": 2, "type_line": "Artifact", "effect": "ramp_permanent"},
+            {"name": "Four Mana Spell", "cmc": 4, "type_line": "Sorcery", "effect": "draw"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+            {"name": "Nine Mana Spell", "cmc": 9, "type_line": "Creature", "effect": "creature"},
+            {"name": "Seven Mana Spell", "cmc": 7, "type_line": "Sorcery", "effect": "draw"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is True
+        assert evaluation["reason"].startswith("early_play:Arcane Signet")
+
     return [
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
         test_turn_stops_immediately_after_approach_win,
         test_conformance_failed_draw_from_empty_library_loses,
         test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
+        test_one_shot_ritual_is_not_spent_without_same_turn_payoff,
+        test_one_shot_ritual_can_be_spent_when_it_unlocks_spell,
         test_extra_turns_are_taken_before_next_player,
         test_extra_combat_effect_schedules_and_untaps_creatures,
         test_extra_combat_is_taken_before_postcombat_main,
         test_treasure_maker_can_discard_draw_and_create_treasures,
+        test_mulligan_rejects_three_lands_with_only_expensive_spells,
+        test_mulligan_keeps_three_lands_with_early_play,
+        test_mulligan_keeps_two_lands_with_cheap_ramp,
     ]

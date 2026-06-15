@@ -45,8 +45,17 @@ Future<Response> _generateRecommendations(
     final deckName = deck['name'] as String? ?? '';
     final format = deck['format'] as String? ?? 'commander';
     final description = deck['description'] as String? ?? '';
-    final functionalTagsSelect = await _functionalTagsSelectSql(pool);
-    final semanticV2Select = await _semanticV2SelectSql(pool);
+    final hasCardIntelligenceSnapshot =
+        await _hasTable(pool, 'card_intelligence_snapshot');
+    final cardSourceJoin = hasCardIntelligenceSnapshot
+        ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+        : 'JOIN cards c ON dc.card_id = c.id';
+    final functionalTagsSelect = hasCardIntelligenceSnapshot
+        ? 'c.function_tag_details AS functional_tags'
+        : await _functionalTagsSelectSql(pool);
+    final semanticV2Select = hasCardIntelligenceSnapshot
+        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+        : await _semanticV2SelectSql(pool);
 
     // ─── 2. Buscar cartas do deck com detalhes ────────────────
     final cardsResult = await pool.execute(
@@ -68,7 +77,7 @@ Future<Response> _generateRecommendations(
                $functionalTagsSelect,
                $semanticV2Select
         FROM deck_cards dc
-        JOIN cards c ON dc.card_id = c.id
+        $cardSourceJoin
         WHERE dc.deck_id = @deckId
       '''),
       parameters: {'deckId': deckId},

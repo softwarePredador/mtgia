@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-06-11
+Updated: 2026-06-15
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -93,6 +93,26 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     antes de confiar em WR bruto ou sugerir swaps Lorehold.
   - Nao altera app/API/PostgreSQL; persistencia atual e JSON/MD.
 
+- `BATTLE_DECISION_STRATEGY_AUDIT_2026-06-15.md`
+  - Complementa o trace com auditoria estrategica: mulligan, Lotus Petal,
+    Mox Diamond, sacrificio de land, tutor, board wipe/wheel,
+    removal/counter/protection, combate e pass/no-action.
+  - Use para diferenciar jogada legal de jogada estrategicamente defensavel.
+  - Estado atual: todas as categorias ficaram `coherent_in_sample` na rodada
+    `20260615_172608`; ainda falta corpus maior para tratar isso como
+    heuristica final.
+  - Fontes de comunidade/artigos calibram heuristica; comportamento duro ainda
+    exige regra oficial, replay e teste focado.
+
+- `INFORMATION_BANK_DIAGNOSTIC_2026-06-15.md`
+  - Diagnóstico do banco de informações do produto: PostgreSQL, SQLite Hermes,
+    tags funcionais, semantic v2, battle rules, learned decks, Commander
+    Reference, telemetria de IA/optimize e price history.
+  - Use antes de criar novos pipelines de IA/battle para evitar fanout, fonte
+    duplicada ou aprendizado a partir de tabela incompleta.
+  - Recomendação central: criar snapshot agregado por `card_id` e bridge de
+    identidade antes de promover novos sinais para lógica app-facing.
+
 ## Fonte de verdade atual
 
 1. `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`
@@ -140,17 +160,22 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
    - Contrato inicial de rastreabilidade de decisoes do battle.
    - Use antes de tratar WR alto como evidencia confiavel.
 
-10. `HERMES_CRON_PIPELINE_ORDER_2026-06-07.md`
+10. `BATTLE_DECISION_STRATEGY_AUDIT_2026-06-15.md`
+   - Matriz oficial de estrategia versus legalidade para decisoes do simulador.
+   - Use antes de implementar mulligan, fast mana, tutor, removal, wipe,
+     combate ou pass/no-action como heuristica dura.
+
+11. `HERMES_CRON_PIPELINE_ORDER_2026-06-07.md`
    - Snapshot da ordem e estado das crons.
    - Use para entender a frota atual, mas valide contra `/opt/data/cron/jobs.json`
      e artefatos frescos no container.
 
-11. `master_optimizer_reports/`
+12. `master_optimizer_reports/`
    - Evidencias de execucoes.
    - Use sempre o report mais fresco que bate com `baseline_id`, `baseline_hash`
      e o SQLite vivo.
 
-12. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
+13. `HERMES_DOCS_VALIDATION_MATRIX_2026-06-07.md`
    - Classificacao de todos os docs raiz desta pasta.
    - Use para saber se um arquivo e canonico, operacional, historico ou backlog.
 

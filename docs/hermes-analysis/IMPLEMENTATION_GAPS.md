@@ -39,6 +39,76 @@
   formato estabilizar. WR alto de Lorehold segue `needs_more_samples` quando
   houver `unknown_effect`, `heuristic_effect` ou amostra baixa.
 
+### Atualizacao de ciclo — 2026-06-15 / Strategy Audit v1
+
+- Implementado complemento Hermes-only para diferenciar "acao legal" de "acao
+  estrategicamente defensavel". O novo documento canônico é
+  `BATTLE_DECISION_STRATEGY_AUDIT_2026-06-15.md`.
+- `decision_trace_v1` agora possui campos de estratégia:
+  `strategic_principle`, `heuristic_version`, `resource_delta`, `risk_flags`,
+  `alternatives_considered` e `rejected_reason`.
+- Mulligan deixou de ser apenas contagem de terrenos no trace: agora registra
+  cores, curva inicial, ramp barato, cartas caras, riscos e motivo de
+  keep/mulligan. Ainda falta otimizar quais cartas vão para o fundo.
+- Mox Diamond/land discard e Crop Rotation/Harrow/land sacrifice agora
+  registram opções de land, motivo de escolha e riscos como
+  `spending_last_land` e `spending_unique_color_land`.
+- Criado `battle_decision_strategy_auditor.py` para flagar decisões legais mas
+  ruins/mal explicadas: keep sem plano inicial, one-shot mana sem payoff,
+  custo de land sem contexto e pass/no-action sem motivo.
+- Criado `battle_decision_research_review.py` para agregar replays contra matriz
+  de fontes oficiais/estratégicas e classificar cada categoria como
+  `coherent_in_sample`, `blocked_or_needs_review`, `tracked_gap_not_observed`
+  ou `not_observed`.
+- Rodada local inicial de 16 seeds (`20260615_151841`) analisou `17200` eventos e
+  `2270` decisões: mulligan, fast mana one-shot, cast, response, combat, pass e
+  sacrifice-land ficaram coerentes na amostra; `mox_land_discard` ficou
+  `blocked_or_needs_review`; `tutor` e `board_wipe_wheel` ainda não tinham
+  `decision_type` próprio naquela janela.
+- Achado P1 concreto na primeira rodada: Mox Diamond descartava última/única
+  land sem payoff imediato comprovado. O auditor diferencia o caso coerente
+  onde a land descartada destrava `commander_cast` no mesmo turno.
+- Implementado em `battle_analyst_v9.py`: permanent fast mana com
+  `requires_discard_land` agora passa exclusivamente pelo loop de ramp e só
+  pode gastar última/única land se destravar comandante ou spell de alto impacto
+  no mesmo turno. Testes focados cobrem o caso permitido e o caso bloqueado.
+- Rodada reproduzida pós-ajuste (`20260615_153120`) analisou `17295` eventos e
+  `2259` decisões: `strategy_findings=0`, `seeds_with_strategy_blockers=[]` e
+  `mox_land_discard=coherent_in_sample` naquela janela.
+- Rodada expandida depois de instrumentar tutor/board wipe/wheel
+  (`20260615_160111`) analisou `18254` eventos e `2468` decisões:
+  `tutor=coherent_in_sample`, mas `mox_land_discard=blocked_or_needs_review`
+  e `board_wipe_wheel=blocked_or_needs_review`. Achados: `spending_last_land=3`,
+  `spending_unique_color_land=3`, `board_wipe_without_clear_asymmetry=3`,
+  `wheel_model_simplified=7` e `wheel_opponent_refill_risk=5`.
+- Correção aplicada: o loop de ramp agora revalida o guardrail de resource
+  spend no momento exato do cast, e permanent fast mana que gasta land escassa
+  também precisa provar payoff por mana nominal. Esse ajuste eliminou o blocker
+  de Mox na rodada reproduzida, mas a instrumentação de tutor/wipe/wheel expôs
+  novos casos de land sacrifice sem benefício líquido claro.
+- Rodada pós-correção de land-sacrifice (`20260615_162840`) analisou `18667`
+  eventos e `2526` decisões: `strategy_findings=14`, todos `medium`,
+  `seeds_with_strategy_blockers=[]`, `mox_land_discard=coherent_in_sample` e
+  `sacrifice_land=coherent_in_sample`.
+- Correção aplicada: `Crop Rotation`/`Harrow` distinguem land untapped de
+  ramp tapped; land sacrifice agora escolhe alvo por score mínimo e bloqueia
+  fetch/tapped sem benefício claro quando gastaria última/única fonte. O replay
+  registra `land_ramp_target_options` e `strategic_benefit_reason`.
+- Continua pendente: avaliação de board wipe/wheel, pass reasons mais ricos,
+  threat assessment por player/permanent, bottom-card selection do London
+  Mulligan e ampliação de corpus para confirmar Mox/land-sacrifice.
+- Rodada pós-correção de board wipe/wheel (`20260615_172608`) analisou `19226`
+  eventos e `2564` decisões: `strategy_findings=0`,
+  `seeds_with_strategy_blockers=[]` e todas as categorias do
+  `battle_decision_research_review.py` ficaram `coherent_in_sample`.
+- Correção aplicada: board wipe agora exige timing justificado
+  (assimetria, lethal pressure, estar atrás ou plano de rebuild), e Wheel-like
+  draw usa modelo multiplayer v1 com discard/draw para todos os jogadores vivos,
+  refill risk e payoff mínimo de `Smothering Tithe`.
+- Pendente real após esse slice: ampliar corpus e melhorar hand-quality,
+  payoff-denial e score por arquétipo para Wheel/board wipe. Não tratar o batch
+  limpo como prova universal de ótima jogada.
+
 | Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
@@ -213,7 +283,7 @@
 | Diagnóstico de roles do optimize | ✅ OK | `optimization_functional_roles.dart`, `optimization_validator_test.dart` | `role_delta` usa `functional_tags` persistido antes de `semantic_tags_v2`, alinhando decisão de swap com a análise exibida ao usuário |
 | Arquétipo efetivo do optimize/rebuild | ✅ OK | `optimize_archetype_support.dart`, `optimize_archetype_support_test.dart` | Política única para request genérico/específico e arquétipo detectado, removendo drift entre runtime e deck-state analysis |
 | Roles estratégicos de cartas | ✅ OK | `functional_card_tags.dart`, `optimization_functional_roles.dart`, `functional_card_tags_test.dart` | `wincon`, `combo_piece`, `engine`, `payoff` e `enabler` passam pelo adapter único `resolveCardFunctionalRoles` |
-| Decision Trace v1 | ✅ Slice inicial | `battle_analyst_v9.py`, `battle_replay_v10_3.py`, `replay_decision_auditor.py`, `battle_decision_trace_tests.py` | Side-channel opcional cobre cast/resposta/combat/pass. Ainda falta rodar batch AWS completo e ampliar para tutor, board wipe e bloqueio |
+| Decision Trace v1 | ✅ Slice expandido | `battle_analyst_v9.py`, `battle_replay_v10_3.py`, `replay_decision_auditor.py`, `battle_decision_trace_tests.py`, `battle_decision_strategy_auditor.py` | Side-channel cobre mulligan, cast, resposta, combat, pass, tutor, land-sacrifice, board wipe e wheel. Batch local `20260615_172608` ficou com `strategy_findings=0` e todas as categorias `coherent_in_sample`; gaps restantes são corpus maior, hand-quality/payoff-denial e tuning de threat assessment |
 | Estatística Commander-safe | ⚠️ Parcial | `card_impact_analyzer.py`, `loss_mode_suggester.py` | WR com/sem carta vista e sample gate existem; ainda falta baseline hash fresco por rodada e segmentação por arquétipo/turno antes de confiar em swaps |
 
 ### 9.1 Arquivos grandes / modularização (P1)
@@ -542,6 +612,49 @@ Concluído no Slice 4 report-only:
     Smoke PG report-only revisado em `86ef9062`: `3156` regras vistas, `89`
     novos candidatos, `261` já presentes, `2806` rejeitados por gate, `27`
     candidatos low-risk review e `62` manual-review; `apply=false`.
+
+Concluído no Slice 5 backend snapshot:
+
+16. Criar `card_intelligence_snapshot` no backend como view agregada por
+    `card_id`, sem API pública nova. A view reduz previamente
+    `card_function_tags`, `card_role_scores`, `commander_card_synergy`,
+    `card_semantic_tags_v2`, `card_battle_rules`, `card_legalities` e
+    `card_rulings` para uma linha por carta antes de juntar com `cards`. Isso
+    preserva múltiplas funções/regras sem multiplicar linhas de deck.
+17. Ligar a criação da view nos scripts de fundação/backfill/meta-signals:
+    `candidate_quality_data_foundation.dart`,
+    `semantic_layer_v2_backfill.dart` e
+    `candidate_quality_meta_signals.dart`.
+18. Adicionar teste anti-fanout em `candidate_quality_data_support_test.dart`
+    para garantir que a view não faz `LEFT JOIN` bruto em
+    `card_battle_rules`, `card_function_tags` ou `card_semantic_tags_v2`.
+19. Criar `card_identity_bridge` em `import_card_lookup_service.dart`,
+    materializando aliases canônicos e localizados com `card_id`, `oracle_id`,
+    `scryfall_id`, lookup normalizado, idioma, source e prioridade de match.
+    A bridge é garantida junto de `card_localized_names`, sem substituir ainda
+    todos os consumidores históricos.
+20. Migrar consumidores seguros para `card_intelligence_snapshot` com fallback:
+    `POST /decks/:id/ai-analysis`,
+    `POST /decks/:id/recommendations` e
+    `POST /ai/weakness-analysis`.
+21. Validar SQL real das duas views em PostgreSQL com transação rollback:
+    `card_identity_bridge=305.905` aliases/identidades e
+    `card_intelligence_snapshot=34.329` cartas.
+
+Ainda pendente após Slice 5:
+
+22. Fazer loaders profundos do `optimize` e sync Hermes lerem
+    `card_intelligence_snapshot` quando isso reduzir duplicação ou
+    inconsistência.
+23. Usar `card_identity_bridge` em `commander_card_usage` e jobs Hermes que
+    ainda entram por nome normalizado, reportando taxa de resolução para
+    `card_id`.
+24. Criar teste com banco temporário para provar cardinalidade real:
+    uma carta com duas tags e duas regras deve continuar retornando uma linha
+    de carta/deck.
+25. Adicionar snapshots opcionais separados para fontes que não são garantidas
+    em todo ambiente local (`card_localized_names`, `price_history`,
+    `commander_reference_deck_cards`) sem tornar a view principal frágil.
 
 ### Testes obrigatórios antes de merge
 

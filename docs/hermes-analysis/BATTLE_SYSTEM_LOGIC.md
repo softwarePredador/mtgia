@@ -137,8 +137,15 @@ Cada decisao registra:
 - `confidence`
 - `expected_benefit_score`
 - `actual_outcome`
+- `strategic_principle`
+- `heuristic_version`
+- `resource_delta`
+- `risk_flags`
+- `alternatives_considered`
+- `rejected_reason`
 
 Cobertura inicial:
+- mulligan pregame;
 - cast de ramp;
 - cast de spell normal;
 - cast de criatura;
@@ -146,6 +153,11 @@ Cobertura inicial:
 - resposta com protection/counter;
 - ataque/combat target;
 - pass/no-action de prioridade.
+- tutor com alvo, alternativas e motivo contextual;
+- board wipe com assimetria, criaturas/poder proprio vs oponentes e pressao
+  lethal;
+- wheel-like draw com tamanho de mao, refill risk, payoff e
+  `model_scope=multiplayer_discard_draw_v1`.
 
 Auditoria:
 
@@ -156,12 +168,48 @@ python3 replay_decision_auditor.py \
   --require-decision-trace
 ```
 
+Auditoria estrategica complementar:
+
+```bash
+python3 battle_decision_strategy_auditor.py \
+  --events /path/replay.jsonl \
+  --decision-trace /path/replay.decision_trace.jsonl \
+  --output /path/strategy_audit.md \
+  --json-output /path/strategy_audit.json
+```
+
 Uso correto:
 - `unknown` e `needs_review` sao achados auditaveis, nao enforcement duro.
 - WR alto de Lorehold nao vira conclusao confiavel sem trace limpo, baseline
   fresco e amostra minima.
 - Persistencia atual e somente artefato JSON/MD; SQLite/PG ficam fora ate o
   formato estabilizar.
+- Legalidade e estrategia sao camadas diferentes: uma jogada pode ser legal
+  mas ainda ser marcada como fraca se gastar Lotus Petal sem payoff, descartar
+  land unica no Mox Diamond, sacrificar land sem alvo relevante ou manter mao
+  sem plano inicial.
+- A partir da politica `battle_decision_strategy_v1_2026_06_15`, Mox
+  Diamond/permanent fast mana que exige descarte de land nao pode contornar o
+  loop de ramp: se a escolha consumiria ultima land ou land de cor unica, o
+  cast so e permitido quando destrava comandante ou spell de alto impacto no
+  mesmo turno. Isso evita que uma jogada legal mas estrategicamente ruim vire
+  dado de aprendizado.
+- A rotina de 16 seeds `20260615_162840`, depois dos guardrails de Mox e
+  land-sacrifice, ficou sem blockers estrategicos high/critical:
+  `mox_land_discard=coherent_in_sample` e `sacrifice_land=coherent_in_sample`.
+  Esses pontos seguem monitorados por corpus maior, mas nao bloqueiam o batch
+  atual.
+- Tutor esta coerente na amostra atual: o alvo agora e escolhido por estado
+  (mana/fix, interacao, engine, wincon, impacto material ou setup), nao apenas
+  por maior CMC.
+- Board wipe/wheel deixou de ser blocker na rodada reproduzida
+  `20260615_172608`: wipe precisa justificar assimetria/lethal prevention,
+  estar atras ou ter rebuild plan; wheel-like draw descarta e compra para todos
+  os jogadores vivos no modelo `multiplayer_discard_draw_v1` e registra refill
+  risk/payoff. Ainda falta corpus maior, hand-quality e payoff-denial mais
+  completo antes de usar como heuristica final de aprendizado.
+- Forums/artigos de estrategia podem calibrar heuristicas; comportamento duro
+  continua exigindo regra oficial, replay e teste focado.
 
 ### 2.6 Carregamento de Oponentes
 

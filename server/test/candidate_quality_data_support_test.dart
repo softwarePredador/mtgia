@@ -141,6 +141,7 @@ void main() {
         ...candidateQualitySchemaStatements,
         ...candidateQualityIndexStatements,
         optimizeCandidateQualitySummaryViewStatement,
+        cardIntelligenceSnapshotViewStatement,
       ].join('\n').toLowerCase();
 
       expect(schema, contains('create table if not exists card_function_tags'));
@@ -158,6 +159,36 @@ void main() {
       expect(schema, isNot(contains('delete from cards')));
       expect(schema, isNot(contains('alter table cards')));
       expect(schema, isNot(contains('alter table card_legalities')));
+    });
+
+    test('card intelligence snapshot aggregates sources before card joins', () {
+      final view = cardIntelligenceSnapshotViewStatement.toLowerCase();
+
+      expect(
+          view, contains('create or replace view card_intelligence_snapshot'));
+      expect(view, contains('c.id as id'));
+      expect(view, contains('c.id as card_id'));
+      expect(view, contains('c.name as name'));
+      expect(view, contains('c.name as card_name'));
+      expect(view, contains('c.image_url'));
+      expect(view, contains('with function_tags as'));
+      expect(view, contains('role_scores as'));
+      expect(view, contains('commander_synergy as'));
+      expect(view, contains('semantic_v2 as'));
+      expect(view, contains('battle_rules as'));
+      expect(view, contains('legalities as'));
+      expect(view, contains('rulings as'));
+      expect(view, contains('group by card_id'));
+      expect(view, contains('from cards c'));
+      expect(view, contains('left join function_tags ft on ft.card_id = c.id'));
+      expect(view, contains('left join role_scores rs on rs.card_id = c.id'));
+      expect(view, contains('left join battle_rules br on br.card_id = c.id'));
+      expect(view, contains('battle_rule_count'));
+      expect(view, contains('verified_battle_rules'));
+      expect(view, contains('source_coverage'));
+      expect(view, isNot(contains('left join card_battle_rules')));
+      expect(view, isNot(contains('left join card_function_tags')));
+      expect(view, isNot(contains('left join card_semantic_tags_v2')));
     });
   });
 }
