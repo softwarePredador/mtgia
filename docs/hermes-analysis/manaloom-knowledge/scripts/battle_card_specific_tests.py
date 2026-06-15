@@ -315,6 +315,41 @@ def register_tests(battle, player):
         battle.clear_until_eot(active)
         assert active.silenced_opponents_until_eot is False
 
+    def test_samis_curiosity_creates_lander_token_not_tutor():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Korvold")
+        active.life = 20
+        card = {"name": "Sami's Curiosity", "cmc": 1, "type_line": "Sorcery"}
+
+        effect = battle.get_card_effect(card)
+        battle.apply_effect_immediate(active, [], card, 4, random.Random(93))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert effect["effect"] == "lander_token_maker"
+        assert effect["effect"] != "tutor"
+        assert active.life == 22
+        assert any(
+            permanent.get("name") == "Lander Token"
+            and permanent.get("lander_token") is True
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert any(event == "lander_token_created" for event, _ in events)
+
+    def test_audit_promoted_cards_keep_conservative_semantics():
+        miscast = battle.get_card_effect({"name": "Miscast", "type_line": "Instant"})
+        steamkin = battle.get_card_effect(
+            {"name": "Runaway Steam-Kin", "type_line": "Creature — Elemental"}
+        )
+
+        assert miscast["effect"] == "counter"
+        assert miscast["instant"] is True
+        assert miscast["target"] == "instant_or_sorcery"
+        assert steamkin["effect"] == "creature"
+        assert steamkin["effect"] != "ramp_ritual"
+        assert steamkin["is_creature_permanent"] is True
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -325,4 +360,6 @@ def register_tests(battle, player):
         test_lorehold_miracle_ignores_lands_and_creatures,
         test_lorehold_miracle_rejects_flash_creatures,
         test_silence_spell_blocks_responses_until_cleanup_only,
+        test_samis_curiosity_creates_lander_token_not_tutor,
+        test_audit_promoted_cards_keep_conservative_semantics,
     ]

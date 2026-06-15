@@ -35,6 +35,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "ramp_ritual": "ramp",
     "ramp_engine": "ramp",
     "land_ramp": "ramp",
+    "lander_token_maker": "ramp",
     "treasure_maker": "ramp",
     "silence_opponents": "protection",
     "silence_spell": "protection",

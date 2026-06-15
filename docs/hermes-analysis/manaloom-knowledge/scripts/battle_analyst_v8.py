@@ -528,6 +528,15 @@ KNOWN_CARDS = {
     },
     "Wheel of Misfortune": {"effect": "draw_cards", "count": 7},
     "Strike It Rich": {"effect": "treasure_maker", "treasure_count": 1},
+    "Sami's Curiosity": {"effect": "lander_token_maker", "life_gain": 2, "token_count": 1},
+    "Sticky Fingers": {
+        "effect": "ramp_engine",
+        "trigger": "combat_damage_to_player",
+        "aura": True,
+        "grants_keywords": ["menace"],
+        "treasure_on_combat_damage": 1,
+        "draw_on_enchanted_death": 1,
+    },
     "Desperate Ritual": {"effect": "ramp_ritual", "mana_produced": 3, "instant": True},
     "Diabolic Intent": {
         "effect": "tutor",
@@ -597,6 +606,7 @@ KNOWN_CARDS = {
         "is_creature_permanent": True,
     },
     "Worldly Tutor": {"effect": "tutor", "target": "creature", "instant": True},
+    "Miscast": {"effect": "counter", "target": "instant_or_sorcery", "instant": True, "tax": 3},
     "Spell Pierce": {"effect": "counter", "instant": True},
     "Mana Leak": {"effect": "counter", "instant": True},
     "The Soul Stone": {"effect": "recursion", "count": 1},
@@ -640,6 +650,13 @@ KNOWN_CARDS = {
         "mana_produced": 4,
         "instant": True,
         "restricted_to_creature_or_enchantment": True,
+    },
+    "Runaway Steam-Kin": {
+        "effect": "creature",
+        "power": 1,
+        "toughness": 1,
+        "red_spell_counter_mana_engine": True,
+        "is_creature_permanent": True,
     },
     "Jaxis, the Troublemaker": {
         "effect": "creature",
@@ -3877,6 +3894,33 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             treasures_created=treasure_count,
             treasures=player.treasures,
             cards_drawn=draw_count,
+            turn=turn,
+        )
+        player.graveyard.append(card)
+    elif effect == "lander_token_maker":
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            player.graveyard.append(card)
+            return
+        life_gain = int(effect_data.get("life_gain") or 0)
+        if life_gain > 0:
+            gain_life(player, life_gain)
+        token_count = int(effect_data.get("token_count") or 1)
+        for _ in range(max(0, min(token_count, 5))):
+            token = create_creature_token(
+                player,
+                name="Lander Token",
+                power=1,
+                toughness=1,
+                artifact=True,
+            )
+            token["subtype"] = "Lander"
+            token["lander_token"] = True
+        emit_replay_event(
+            "lander_token_created",
+            player=player.name,
+            card=card.get("name", "?"),
+            tokens_created=token_count,
+            life_gained=life_gain,
             turn=turn,
         )
         player.graveyard.append(card)
