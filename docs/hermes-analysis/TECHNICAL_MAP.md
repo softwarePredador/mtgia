@@ -193,29 +193,33 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-14 05:30 UTC no checkout local `da164b47`. Deck analysis,
+  2026-06-15 05:30 UTC no checkout local `3ad53bbf`. Deck analysis,
   `loadOptimizeDeckContext`, addition data do quality gate, validator e quality
   gate ja carregam ou preservam `functional_tags`, `semantic_tags_v2` e
   multi-role quando essas fontes chegam ao fluxo. A ordem principal e
   `functional_tags -> semantic_tags_v2 -> heuristica`. Os riscos restantes sao
   mais estreitos: `inferFunctionalRole` ainda reduz roles para o contrato legado
   de optimize, `removals_detailed.functionalRole` nao recebe as tags ja
-  presentes em `allCardData`, `findSynergyReplacements` ranqueia candidatos sem
-  carregar fontes persistidas, `/ai/weakness-analysis` usa o adapter em modo
-  heuristico porque a query nao carrega `card_function_tags`/`semantic_tags_v2`,
-  e `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
-- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-14
-  05:30 UTC no checkout local `da164b47`. A claim antiga de ausencia de policy
+  presentes em `allCardData`, `findSynergyReplacements` monta o pool inicial sem
+  tags/role scores, prompts runtime ainda contem exemplos nomeados,
+  `/ai/weakness-analysis` usa o adapter em modo heuristico porque a query nao
+  carrega `card_function_tags`/`semantic_tags_v2`, e
+  `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
+- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-15
+  05:30 UTC no checkout local `3ad53bbf`. A claim antiga de ausencia de policy
   versionada esta stale: `commander_fallback_policy.dart` existe, expoe versao e
   centraliza parte relevante dos fallbacks. Continuam como risco as decisoes por
   nome em fallbacks de `functional_card_tags.dart`,
-  `optimization_functional_roles.dart`, `candidate_quality_data_support.dart`,
-  `optimize_runtime_support.dart`, `deck_advanced_analysis.dart`,
+  `optimization_functional_roles.dart`, `candidate_quality_data_support.dart` e
+  seu job foundation, `optimize_runtime_support.dart`, `prompt.md`,
+  `prompt_complete.md`, `deck_advanced_analysis.dart`,
   `meta_deck_commander_shell_support.dart`, `/decks/:id/recommendations` e
   `/ai/weakness-analysis`. Permanecem permitidos exemplos de UI/import,
   docs/corpus/artifacts/test fixtures, aliases localizados, sugestoes de busca
-  do life counter, seeds/profiles de Commander Reference e a excecao intencional
-  de `edh_bracket_policy.dart` para regras externas de bracket/Game Changer.
+  do life counter, mock dev de optimize sem API key, seeds/profiles de Commander
+  Reference, `commander_fallback_policy.dart` como policy versionada/testada e a
+  excecao intencional de `edh_bracket_policy.dart` para regras externas de
+  bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
   2026-06-15 03:00 UTC no checkout local `53e604e9`. O auditor textual executou
@@ -243,7 +247,7 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-14 05:30 UTC no checkout local `da164b47`:
+Estado atual revalidado em 2026-06-15 05:30 UTC no checkout local `3ad53bbf`:
 deck analysis, `loadOptimizeDeckContext`, addition data do quality gate,
 validator e quality gate carregam ou preservam `card_function_tags` e
 `semantic_tags_v2`. O adapter compartilhado
@@ -253,12 +257,15 @@ preservam multi-role onde o contrato usa `optimizationFunctionalRolesForCard`.
 
 Gaps restantes: classificadores heuristics ainda tem excecoes por nome como
 fallback; `candidate_quality_data_support.dart` herda parte dessas excecoes e
-ainda aplica bonuses/escopo por listas de `commander_fallback_policy.dart`;
-`findSynergyReplacements` monta e ranqueia candidatos sem carregar
+ainda aplica bonuses/escopo por listas de `commander_fallback_policy.dart`; o
+job `candidate_quality_data_foundation.dart` gera tags/scores a partir desses
+helpers heuristicos; `findSynergyReplacements` monta o pool inicial sem carregar
 `card_function_tags`, `semantic_tags_v2` ou role scores; `inferFunctionalRole`
 mantem colapso legado de role multi-tag para uma role primaria usada por partes
 do optimize; `removals_detailed.functionalRole` chama esse helper sem fornecer
-as fontes persistidas ja presentes em `allCardData`; `/ai/weakness-analysis`
+as fontes persistidas ja presentes em `allCardData`; `prompt.md` e
+`prompt_complete.md` sao system prompts de runtime e ainda contem exemplos de
+cartas nomeadas; `/ai/weakness-analysis`
 nao carrega `card_function_tags`, `semantic_tags_v2` nem `card_role_scores` e
 ainda devolve sugestoes por nomes fixos; `deck_advanced_analysis.dart`, chamado
 por weakness-analysis, tambem opera sem fontes persistidas; `/decks/:id/recommendations`
