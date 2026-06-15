@@ -1,193 +1,141 @@
 # Game Changer Research Report — Lacunas e Recomendações
 
-<!-- DB_HASH: computed from 3217 rows, 3108 distinct cards -->
-<!-- EXEC: 15 | 2026-06-14 14:00Z -->
+<!-- DB_HASH: product-check from 3217 rows, 3108 distinct cards -->
+<!-- EXEC: 16 | 2026-06-15 -->
 > Gerado automaticamente pelo cron `manaloom-gamechanger-research`.
-> Objetivo: identificar lacunas de explicação, categoria ou detecção nos 54 Game Changers oficiais.
+> Objetivo: identificar lacunas de explicação, categoria ou detecção nos 53 Game Changers oficiais do produto (`edh_bracket_policy.dart`).
 > Este relatório é **read-only** — não altera DB nem produto.
 
-**Data:** 2026-06-14 (execução #15)
-**Fonte:** `scripts/knowledge.db` + análise local de `card_oracle_cache`
+**Data:** 2026-06-15 (execução #16)
+**Fonte:** `scripts/knowledge.db` + `edh_bracket_policy.dart` + análise local de `card_oracle_cache`
 **Nota:** A tabela `game_changers` não existe no SQLite local (apenas no PostgreSQL). Usamos `card_oracle_cache` + heurísticas para análise.
-**card_oracle_cache:** 3.217 rows, ~3.108 nomes únicos — última reimport em 2026-06-14T00:56:17Z
+**card_oracle_cache:** 3.217 rows, 3.108 nomes únicos
 
 ---
 
-## 🔴 Resumo Executivo — Mudanças desde Execução #14
+## 🔴 CRÍTICO: Relatório Anterior Usava Lista de GCs EQUIVOCADA
 
-### Cobertura de GCs PIOROU: 22/54 (40.7%) Missing vs 20/54 (37.0%)
+**As execuções #10-#15 do gamechanger-research usavam uma lista de "54 GCs oficiais do Wizards" que NÃO corresponde à lista real do produto.**
 
-| Métrica | Exec #14 (06-14) | Exec #15 (06-14) | Delta |
-|:--------|:----------------:|:----------------:|:------|
-| GCs missing (oficial) | 20/54 (37.0%) | **22/54 (40.7%)** | 🔴 **+2 (REGRESSÃO)** |
-| GCs presentes no cache | 34/54 (63.0%) | **32/54 (59.3%)** | 🔴 **-2 (REGRESSÃO)** |
-| Última reimport | 2026-06-14T00:56Z | Mesma | 🔄 Sem nova reimport |
-| Nulos oracle_text (cache) | 4 | 4 | ✅ Estável |
-| Nulos mana_cost (cache) | 364 (11.3%) | 364 (11.3%) | ✅ Idêntico |
-| Zero-CMC (cache all) | 432 (13.4%) | **431 (13.4%)** | 🟡 -1 marginal |
-| Deck #6 GCs | 4/4 íntegros | 4/4 íntegros | ✅ OK |
+O produto (`edh_bracket_policy.dart` linhas 354-408) define **53 Game Changers** — uma lista CUSTOM que difere significativamente da lista standard da Wizards. Das cartas que o relatório anterior considerava "missing":
 
-**⚠️ AGRAVAMENTO:** Sem nova reimport do PostgreSQL, 2 GCs adicionais desapareceram do cache (Aeon Engine, Library of Alexandria). Isto sugere que o cache está **perdendo cartas por expulsão/sobrescrição**, não por falha isolada de import. **Suspeita:** limite de linhas (3217) pode estar próximo de um teto, e cartas estão sendo expulsas quando o sync tenta adicionar novas.
+| Cartas na lista "22 missing" do Exec #15 | Na lista do produto? |
+|:------------------------------------------|:-------------------:|
+| Biorhythm | ✅ Sim — mas BANIDO |
+| Braids, Cabal Minion | ✅ Sim — mas BANIDO |
+| Coalition Victory | ✅ Sim — mas BANIDO |
+| Panoptic Mirror | ✅ Sim — 🟢 LEGAL |
+| Serra's Sanctum | ✅ Sim — 🟢 LEGAL |
+| Tergrid, God of Fright | ✅ Sim — mas como DFC |
+| Aeon Engine | ❌ **Não é GC do produto** |
+| Back to Basics | ❌ **Não é GC do produto** |
+| Channel | ❌ **Não é GC do produto** |
+| Dark Depths | ❌ **Não é GC do produto** |
+| Dockside Extortionist | ❌ **Não é GC do produto** |
+| Emrakul, the Aeons Torn | ❌ **Não é GC do produto** |
+| Expropriate | ❌ **Não é GC do produto** |
+| Fastbond | ❌ **Não é GC do produto** |
+| Hermit Druid | ❌ **Não é GC do produto** |
+| Jeweled Lotus | ❌ **Não é GC do produto** |
+| Library of Alexandria | ❌ **Não é GC do produto** |
+| Mind Twist | ❌ **Não é GC do produto** |
+| Moat | ❌ **Não é GC do produto** |
+| Nether Void | ❌ **Não é GC do produto** |
+| Tinker | ❌ **Não é GC do produto** |
+| Tolarian Academy | ❌ **Não é GC do produto** |
 
----
-
-## 🔴 Lacuna A (AGRAVADA): 22/54 GCs (40.7%) Missing do card_oracle_cache
-
-**Mudanças:** 2 GCs adicionais perdidos. Nenhuma restauração dos 15 GCs originais.
-
-### 🆕 GCs adicionalmente ausentes desde Exec #14:
-
-| GC | Status em Exec #14 | Status em Exec #15 | Observação |
-|:---|:------------------:|:------------------:|:-----------|
-| **Aeon Engine** | ✅ Presente | ❌ Missing | Desapareceu sem reimport |
-| **Library of Alexandria** | ✅ Presente | ❌ Missing | Desapareceu sem reimport |
-
-**Hipótese:** Cache com limite de linhas. Ao inserir novas cartas (ex: novas coleções/learned decks), linhas antigas são sobrescritas em FIFO ou LRU. O sync não protege GCs contra expulsão.
-
-### Os 15 GCs originais (ainda missing, nenhuma restauração):
-
-| GC | Status | Observação |
-|:---|:-------|:-----------|
-| Biorhythm | ❌ Missing | Banido |
-| Braids, Cabal Minion | ❌ Missing | Banido |
-| Channel | ❌ Missing | ⚠️ **Falso positivo: "Channeled Force" NÃO é Channel** |
-| Coalition Victory | ❌ Missing | Banido |
-| Dockside Extortionist | ❌ Missing | Banido |
-| Emrakul, the Aeons Torn | ❌ Missing | Banido |
-| Expropriate | ❌ Missing | 🟢 **LEGAL — refuta filtro de banned** |
-| Fastbond | ❌ Missing | Banido |
-| Hermit Druid | ❌ Missing | Banido |
-| Jeweled Lotus | ❌ Missing | Banido |
-| Panoptic Mirror | ❌ Missing | 🟢 **LEGAL — refuta filtro de banned** |
-| Serra's Sanctum | ❌ Missing | 🟢 LEGAL |
-| Tergrid, God of Fright | ❌ Missing | DFC — handling quebrado |
-| Tinker | ❌ Missing | Banido |
-| Tolarian Academy | ❌ Missing | Banido |
-
-### 5 GCs adicionais confirmados desde Exec #13 (devido à correção da lista para oficial):
-
-| GC | Observação |
-|:---|:-----------|
-| **Back to Basics** | 🟢 LEGAL, carta azul de stax |
-| **Dark Depths** | 🟢 LEGAL, combo com Thespian's Stage |
-| **Mind Twist** | ❌ Banido |
-| **Moat** | 🟢 LEGAL, carta branca de controle |
-| **Nether Void** | 🟢 LEGAL, stax preta |
-
-**Total: 22 missing (40.7%).** 7 cartas LEGAIS estão entre os missing: Expropriate, Panoptic Mirror, Serra's Sanctum, Back to Basics, Dark Depths, Moat, Nether Void.
-
-### Hipótese Revisada (v15):
-
-1. **Filtro de banned** → remove ~14 das 22 missing (Biorhythm, Braids, Channel, Coalition Victory, Dockside, Emrakul, Fastbond, Hermit Druid, Jeweled Lotus, Mind Twist, Tinker, Tolarian Academy + Aeon Engine e Library of Alexandria — ambos LEGAIS, mas que desapareceram)
-2. **DFC handling quebrado** → Tergrid (// no nome) excluído
-3. **Limite de cache** → Aeon Engine e Library of Alexandria foram expulsos por sobrescrita
-4. **Causa desconhecida** → Expropriate, Panoptic Mirror, Serra's Sanctum, Back to Basics, Dark Depths, Moat, Nether Void (7 cartas legais, não-DFC) — ainda não explicadas
+**17/22 cartas que o relatório antigo reportava como "missing" simplesmente não são Game Changers no produto ManaLoom.** A cobertura REAL é **88.7% (47/53)** — não 59.3%.
 
 ---
 
-## Lacuna B: 12/32 GCs Presentes (37.5%) sem Categoria Funcional — Estável
+## Cobertura Real: 47/53 (88.7%) dos GCs do Produto
 
-A simulação de heurística não consegue classificar funcionalmente 12 dos 32 GCs presentes no cache. Todos caem em `other`:
-
-| GC | Categoria Esperada | Oracle Text (resumo) |
-|:---|:------------------|:---------------------|
-| Food Chain | `infiniteCombo` | Exila criatura → adiciona mana X+1 |
-| Gaea's Cradle | `fastMana` | T: Adiciona G por criatura |
-| Humility | `stax` | Todas as criaturas perdem habilidades, base 1/1 |
-| Lion's Eye Diamond | `fastMana` | Descarta mão, saca → 3 mana |
-| Loyal Retainers | `tutor` (de GY) | Sac: retorna lendária do GY |
-| Mox Diamond | `fastMana` | Entra se descartar land, T: Add 1 |
-| Necropotence | `valueEngine` | Skip draw step, pay life → exile top card |
-| Parallel Lives | `valueEngine` | Dobra tokens |
-| Tainted Pact | `tutor` (conditional) | Exile top até achar nome duplicado |
-| Torment of Hailfire | `boardWipe` | Cada oponente perde 3 life ou sacrifica |
-| Underworld Breach | `infiniteCombo` | Escape do GY por 3 exiles |
-| Urza, Lord High Artificer | `valueEngine` | Tap artifact → add U, construct token |
-
-**Impacto:** 37.5% dos GCs presentes não podem ser categorizados funcionalmente por heurística.
+| Métrica | Valor |
+|:--------|:-----|
+| GCs do produto (Dart code) | 53 |
+| Presentes no card_oracle_cache | **47 (88.7%)** |
+| Missing | **6 (11.3%)** |
+| Tabela game_changers no SQLite | ❌ Ausente (PG-only) |
+| Cache rows | 3.217 |
+| mana_cost null/empty | 364 (11.3%) |
+| CMC=0.0 | 431 (13.4%) |
+| oracle_text null/empty | 4 (0.1%) |
 
 ---
 
-## 🟡 Lacuna C: Dados Corrompidos — mana_cost Vazio e CMC=0.0 (ESTÁVEL)
+## 🔴 Lacuna A: 6 GCs do Produto Missing do card_oracle_cache
 
-| Problema | Contagem | % do cache | Exemplos |
-|:---------|:--------:|:----------:|:---------|
-| `mana_cost` nulo/vazio | 364 | 11.3% | Terrenos, MDFCs sem face de feitiço |
-| CMC = 0.0 | 431 | 13.4% | Inclui 364 sem mana_cost + 67 terrenos/0-cost |
-| `oracle_text` nulo/vazio | 4 | 0.1% | Dwarven Trader, Memnite, Phyrexian Walker |
+| GC | Status Legal | Causa Provável |
+|:---|:-----------:|:---------------|
+| Biorhythm | ❌ BANIDO | Removido por filtro de banned no sync |
+| Braids, Cabal Minion | ❌ BANIDO | Removido por filtro de banned. "Braids, Arisen Nightmare" (carta diferente) existe no cache |
+| Coalition Victory | ❌ BANIDO | Removido por filtro de banned |
+| Panoptic Mirror | 🟢 **LEGAL** | Causa desconhecida — não é banned, não é DFC. SYNCHRONIZATION GAP |
+| Serra's Sanctum | 🟢 **LEGAL** | Causa desconhecida — não é banned, não é DFC. SYNCHRONIZATION GAP |
+| Tergrid, God of Fright // Tergrid's Lantern | 🟢 LEGAL | DFC — `//` no nome quebra sincronização. NENHUM registro "tergrid*" existe no cache |
 
-**Nota:** CMC=0.0 caiu de 432 para 431 entre Exec #14 e #15 — marginal, pode ser artefato de query ou 1 carta corrigida.
-
-**GCs com dados corrompidos (presentes no cache):**
-| GC | Problema | Justificativa |
-|:---|:---------|:--------------|
-| Ancient Tomb | mana_cost vazio, CMC=0.0 | ✅ Esperado — land sem mana_cost |
-| Gaea's Cradle | mana_cost vazio, CMC=0.0 | ✅ Esperado — land sem mana_cost |
-| Mishra's Workshop | mana_cost vazio, CMC=0.0 | ✅ Esperado — land sem mana_cost |
-| Tabernacle | mana_cost vazio, CMC=0.0 | ✅ Esperado — land sem mana_cost |
-| Lion's Eye Diamond | CMC=0.0 | 🟡 Artefato de 0 mana — CMC 0 é correto |
-| Mana Crypt | CMC=0.0 | ✅ Esperado — artefato de 0 mana |
-| Mox Diamond | CMC=0.0 | ✅ Esperado — artefato de 0 mana |
-| Mox Opal | CMC=0.0 | ✅ Esperado — artefato de 0 mana |
+**3/6 missing são cartas BANIDAS** — podem estar sendo removidas intencionalmente pelo script de sync PG→SQLite (se o sync filtra banned cards). **Mas 3/6 são LEGAIS** e deveriam estar no cache: Panoptic Mirror, Serra's Sanctum, Tergrid. A ausência delas é um bug.
 
 ---
 
-## GCs no Deck #6 (Lorehold)
+## Lacuna B: Cobertura de Categorias Funcionais
 
-O deck ativo contém **4 GCs oficiais**, todos presentes no cache com dados adequados:
+Os 47 GCs presentes foram verificados no cache. Destes:
+- **Todos têm oracle_text** (0 GCs com oracle_text nulo)
+- **Todos têm nome correto no cache** (case-insensitive match OK)
+- **DFCs**: Apenas Tergrid está missing (confirmado). Os outros DFCs não estão na lista de GCs.
 
-| GC | CMC | Oracle Text OK? | Nota |
-|:---|:---:|:---------------:|:-----|
-| Ancient Tomb | 0.0 | ✅ | mana_cost vazio (land) — normal |
-| Mana Vault | 1.0 | ✅ | ✅ |
-| Sol Ring | 1.0 | ✅ | ✅ |
-| Wheel of Fortune | 3.0 | ✅ | ✅ |
+**Cartas notáveis presentes no cache:**
+- `Force of Will`, `Fierce Guardianship` — free interaction spells
+- `Cyclonic Rift`, `Rhystic Study`, `Smothering Tithe` — staples do formato
+- `Thassa's Oracle`, `Demonic Tutor`, `Vampiric Tutor` — combos e tutores
+- `The One Ring`, `Orcish Bowmasters` — cartas recentes de alto impacto
 
-**Nada a reportar — dados do deck GCs estão íntegros.**
+**Cartas LEGAIS e de alto valor no cache:**
+- `Gaea's Cradle` ($500+), `Mishra's Workshop` ($2000+), `The Tabernacle at Pendrell Vale` ($2000+)
+- Todas as 8 cartas tipo "fast mana" (Mox Diamond, Mana Crypt, Mana Vault, Chrome Mox, Lion's Eye Diamond, Grim Monolith, Ancient Tomb, Mishra's Workshop)
+- Todos os 7 tutores (Vampiric, Demonic, Enlightened, Mystical, Worldly, Gamble, Imperial Seal)
 
 ---
 
-## 📊 Métricas de Qualidade — Exec #14 vs Exec #15
+## 📊 Comparação: Exec #15 (relatório antigo) vs Exec #16 (corrigido)
 
-| Métrica | Exec #14 | Exec #15 | Delta |
-|:--------|:--------:|:--------:|:------|
-| GCs missing (oficiais) | 20/54 (37.0%) | **22/54 (40.7%)** | 🔴 **+2** |
-| GCs presentes no cache | 34/54 (63.0%) | **32/54 (59.3%)** | 🔴 **-2** |
-| Tabela game_changers no SQLite | ❌ Ausente | ❌ Ausente | → Persiste |
-| Última reimport | 2026-06-14T00:56Z | Mesma | 🔄 Sem nova reimport |
-| GCs sem categoria funcional | 13/34 (38%) | 12/32 (37.5%) | 🟡 Estável |
+| Métrica | Exec #15 (antigo) | Exec #16 (corrigido) | Delta |
+|:--------|:-----------------:|:--------------------:|:------|
+| Lista de GCs usada | 54 "Wizards oficiais" | **53 do produto (Dart)** | 🔴 Lista errada corrigida |
+| GCs missing | 22 (40.7%) | **6 (11.3%)** | ✅ Dramaticamente melhor |
+| GCs cobertos | 32 (59.3%) | **47 (88.7%)** | ✅ Realidade muito melhor |
 | Cache rows | 3.217 | 3.217 | → Idêntico |
-| GCs com mana_cost vazio (cache-wide) | 364 | 364 | → Idêntico |
-| CMC=0.0 (cache) | 432 | 431 | 🟡 -1 |
-| `oracle_text` nulo | 4 | 4 | → Idêntico |
-| Deck #6 GCs | 4 | 4 | ✅ Íntegro |
+| Cache expulsão | Aeon Engine + Library of Alexandria sumiram | Aeon Engine e Library NÃO SÃO GCs do produto | ⚠️ Falso alarme |
+| mana_cost null | 364 (11.3%) | 364 (11.3%) | → Idêntico |
+| CMC=0.0 | 431 (13.4%) | 431 (13.4%) | → Idêntico |
+| oracle_text null | 4 (0.1%) | 4 (0.1%) | → Idêntico |
 
 ---
 
 ## 🎯 Recomendações
 
-1. **🔴 CRÍTICO — Investigar expulsão de cache:** Aeon Engine e Library of Alexandria desapareceram SEM reimport. Provar hipótese de limite de linhas (3217 pode ser o teto). Adicionar proteção para GCs no cache.
+### 🔴 Prioridade Crítica
 
-2. **🔴 CRÍTICO — Restaurar 22 GCs perdidos:** Investigar script de sync PG→SQLite. Há pelo menos 4 causas de exclusão (banned filter, DFC, expulsão de cache, desconhecida).
+1. **Corrigir metodologia do relatório**: A fonte de verdade para GCs é `edh_bracket_policy.dart` (linhas 354-408), NÃO uma lista externa da Wizards. O relatório anterior gerou 6+ execuções de falsos alarmes.
+2. **Adicionar Panoptic Mirror e Serra's Sanctum ao card_oracle_cache**: Ambas são legais e parte da lista de GCs do produto. A ausência afeta detecção de GCs.
+3. **Corrigir DFC handling para Tergrid**: Tergrid está completamente ausente (nem no cache). A função `_isOfficialGameChangerName()` no Dart lida com `//` no nome, mas o script de sync não importa a carta. O problema não é do software — é de sincronização PG→SQLite.
 
-3. **🔴 CRÍTICO — Corrigir DFC handling:** Tergrid continua ausente em 5+ reimports consecutivas. O `//` no nome quebra o match.
+### 🟡 Prioridade Média
 
-4. **🔴 CRÍTICO — Adicionar validação pós-sync:** Após cada reimport, verificar que os 54 GCs oficiais estão no cache. Se < 54, abortar ou alertar.
+4. **Sincronizar documentação**: `manaloom-mtg-domain` §Gap 27, 29 e o relatório `GAMECHANGER_RESEARCH_REPORT.md` antigo devem ser corrigidos para refletir a lista real do produto.
+5. **Verificar filtro de banned no sync**: Se o sync PG→SQLite remove cartas banned antes de inserir no `card_oracle_cache`, isso explica Biorhythm, Braids, e Coalition Victory. Mas é um design questionável — o cache de oracle card deve ter TODAS as cartas, independente de banlist.
+6. **Auditar game_changers no SQLite**: A tabela `game_changers` é PG-only. Se um dia for sincronizada para SQLite, deve usar a lista do Dart, não a lista Wizards.
 
-5. **🟡 Corrigir falso positivo "Channel":** A busca parcial por `Channel` retorna "Channeled Force" (card diferente). O GC real Channel está missing e deve ser incluído no cache.
+### 🟢 Baixa Prioridade
 
-6. **🟡 Melhorar heurísticas de bracket:** 37.5% dos GCs presentes caem em `other`. Adicionar heurísticas para `fastMana` (terrenos que produzem >1 mana), `valueEngine`, `infiniteCombo`.
-
-7. **🟡 Corrigir 364 mana_cost vazios e 431 CMC=0.0:** O fallback `cmc_safety.dart` mitiga no produto, mas scripts contra o raw DB produzem métricas inválidas.
-
-8. **🟡 Sanitizar price_usd=NULL:** Cards Reserved List têm preço NULL da Scryfall. Marcar como `RESERVED_LIST` ao invés de NULL.
+7. **Os 3 GCs banned (Biorhythm, Braids, Coalition Victory) não são urgentes** — estão banned e não impactam análise de legalidade. Mas idealmente deveriam estar no cache para análises completas de conjunto.
 
 ---
 
 ## ⚠️ Observações Metodológicas
 
+- **Fonte de verdade para GCs:** `edh_bracket_policy.dart:354-408` — 53 cartas em lower case.
 - A análise é 100% local (SQLite + heurísticas). Sem a tabela `game_changers` (PG-only), métricas oficiais de detecção não são verificáveis.
-- A lista de GCs oficiais do Wizards Bracket System tem **54 cartas**. Cartas como Armageddon, Fierce Guardianship, Enlightened Tutor **não são GCs oficiais**.
-- A busca por GCs usa `LOWER(name)` para match case-insensitive. DFCs com `//` precisam de busca parcial.
-- **Cache row count locked at 3.217** entre Exec #14 e #15 — sugere que o cache tem um limite e está expulsando linhas antigas para acomodar novas inserções. GCs perdidos desse modo (Aeon Engine, Library of Alexandria) indicam fragilidade na política de retenção.
-- **Próxima execução:** Verificar se os 22 GCs foram restaurados. Monitorar contagem total de linhas do cache — se permanecer em 3.217, confirmar hipótese de teto.
+- **Cache row count em 3.217** — estável desde Exec #14.
+- **Próxima execução:** Repetir contra a lista de 53 GCs do produto. Verificar se os 6 missing foram restaurados.
