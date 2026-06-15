@@ -4,9 +4,186 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-15 11:00 UTC
-> Rotacao: `broken-imports-and-circular-dependencies`
+> Atualizacao local Codex: 2026-06-15 15:00 UTC
+> Rotacao: `postgresql-tables-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-15 15:00 UTC
+
+Escopo desta rodada: somente tabelas PostgreSQL sem uso, write-only ou com uso
+persistente incoerente. Nao foi executada auditoria ampla de classes, funcoes
+sem chamador, imports/ciclos, duplicacao geral ou coerencia entre camadas fora
+do necessario para validar/falsificar uso de tabelas.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `d6e568ac`.
+- `git diff --name-only 71140cbb..HEAD -- app/lib server/lib server/routes server/bin server/database_setup.sql server/test docs/hermes-analysis/manaloom-knowledge/scripts`:
+  sem saida. Desde a ultima rodada focada neste tema, nao houve delta de codigo
+  de produto, DB setup, testes backend ou scripts Hermes sincronizadores no
+  recorte usado para classificar tabelas.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter a memoria coerente e
+evitar claims stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`,
+`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+
+### Auditor estrutural base
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`.
+- A extracao de tabelas e textual e ruidosa; ela nao diferencia DDL, CTEs,
+  SQL keywords, inserts, leituras app-facing, jobs operacionais ou tabelas raw
+  mantidas como lineage.
+- A execucao do script tentou reinserir inventario gerado por causa do marcador
+  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
+  e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- `rg -n "CREATE TABLE(?: IF NOT EXISTS)?\s+([A-Za-z_][A-Za-z0-9_]*)|CREATE TABLE IF NOT EXISTS ([A-Za-z_][A-Za-z0-9_]*)" server/database_setup.sql server/lib server/routes server/bin docs/hermes-analysis/manaloom-knowledge/scripts -g '*.dart' -g '*.py' -g '*.sql' -g '*.sh'`.
+- `rg -n "\b(deck_matchups|deck_weakness_reports|ml_prompt_feedback|recordFeedback|commander_reference_decks|commander_reference_deck_cards|commander_reference_deck_analysis|card_battle_rules)\b" server app docs/hermes-analysis/manaloom-knowledge/scripts -g '*.dart' -g '*.py' -g '*.sql' -g '*.sh'`.
+- `rg -n "\b(FROM|JOIN|INSERT INTO|UPDATE|DELETE FROM|TRUNCATE)\s+(ml_prompt_feedback|commander_reference_decks|commander_reference_deck_cards|deck_matchups|deck_weakness_reports|card_battle_rules)\b" server app docs/hermes-analysis/manaloom-knowledge/scripts -g '*.dart' -g '*.py' -g '*.sql' -g '*.sh'`.
+- `rg -n "recordFeedback\(" server app docs/hermes-analysis/manaloom-knowledge/scripts -g '*.dart' -g '*.py' -g '*.sh'`.
+- `rg -n "\b(FROM|JOIN)\s+(commander_reference_decks|commander_reference_deck_cards)\b|commander_reference_decks|commander_reference_deck_cards" server app docs/hermes-analysis/manaloom-knowledge/scripts -g '*.dart' -g '*.py' -g '*.sh'`.
+- Leituras diretas com `nl -ba` dos handlers e helpers citados abaixo.
+
+### Achados revalidados
+
+#### P3 - `ml_prompt_feedback` continua sem fluxo de coleta/consumo real
+
+- **Tabela/simbolo:** `ml_prompt_feedback` e
+  `MLKnowledgeService.recordFeedback`.
+- **DDL local:** nenhum `CREATE TABLE` local foi encontrado em
+  `server/database_setup.sql`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test` ou `app/lib` neste checkout; a busca focada retornou apenas o
+  insert helper e o contador de status.
+- **Escrita potencial:** `server/lib/ml_knowledge_service.dart:251` define
+  `recordFeedback`, e o SQL em `server/lib/ml_knowledge_service.dart:264`
+  executa `INSERT INTO ml_prompt_feedback (...)`.
+- **Chamador encontrado:** nenhum. `rg -n "recordFeedback\(" server app docs/hermes-analysis/manaloom-knowledge/scripts`
+  encontrou somente a propria definicao em `server/lib/ml_knowledge_service.dart:251`.
+- **Leitura encontrada:** `server/routes/ai/ml-status/index.dart:98` executa
+  apenas `SELECT COUNT(*)::int as c FROM ml_prompt_feedback`.
+- **Por que parece nao usada:** nao ha endpoint/app/job gravando feedback de
+  usuario, nao ha DDL versionado local neste checkout, e o unico uso runtime
+  confirmado e contagem operacional, sem consumir payload para prompt, ranking,
+  scorecard ou produto.
+- **O que valida:** adicionar DDL/migration versionada e um fluxo real que chame
+  `recordFeedback(...)`, ou um job/endpoint que leia os campos de feedback para
+  avaliacao operacional.
+- **O que falsifica:** uma chamada runtime existente a `recordFeedback(...)`
+  nao capturada pela busca, uma migration local para `ml_prompt_feedback`, ou
+  query que leia payload da tabela alem de `COUNT(*)`.
+
+#### P3 - Raws do Commander Reference Corpus seguem como lineage, sem leitor raw direto
+
+- **Tabelas:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **Definicao:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1177`
+  cria `commander_reference_decks`; `:1200` cria
+  `commander_reference_deck_cards`; `:1215` cria o agregado
+  `commander_reference_deck_analysis`.
+- **Escritas encontradas:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1245`
+  faz `INSERT INTO commander_reference_decks`; `:1329` faz
+  `DELETE FROM commander_reference_deck_cards`; `:1345` faz
+  `INSERT INTO commander_reference_deck_cards`.
+- **Leitura raw nao encontrada:** a busca por `FROM/JOIN` das duas tabelas raw
+  em `server`, `app` e scripts Hermes encontrou somente constantes, DDL,
+  indices e manutencao do apply; nao encontrou consumidor runtime direto.
+- **Caminho consumido pelo produto:** `server/lib/ai/commander_reference_deck_corpus_support.dart:389`
+  le `FROM commander_reference_deck_analysis`; `server/routes/ai/generate/index.dart:82`
+  chama `loadCommanderReferenceDeckCorpusGuidance(...)`, e
+  `server/lib/ai/commander_reference_readiness_support.dart:338` tambem chama o
+  mesmo loader.
+- **Contexto documental:** `server/manual-de-instrucao.md:1440`-`:1441` e
+  `:1947`-`:1948` registram applies/idempotencia e contagens das raws, mas nao
+  comprovam leitor raw runtime.
+- **Por que parece uso parcial:** as tabelas raw preservam decks/cartas de
+  origem para auditoria, idempotencia e possivel reprocessamento, enquanto o
+  guidance app/backend atual usa o agregado.
+- **O que valida:** documentar essas raws como lineage/audit com politica de
+  retencao e job de reprocessamento, ou adicionar leitor operacional direto.
+- **O que falsifica:** `SELECT/JOIN` runtime novo sobre as raws para guidance,
+  diagnostico, reprocessamento incremental ou auditoria operacional.
+
+### Suspeitas revalidadas e nao promovidas
+
+- `deck_matchups` nao e write-only neste checkout. A tabela e definida em
+  `server/database_setup.sql:222`; `/ai/simulate-matchup` carrega historico por
+  `_loadStoredMatchup` em `server/routes/ai/simulate-matchup/index.dart:382`,
+  le `SELECT win_rate, notes, updated_at FROM deck_matchups` em `:458`-`:463`,
+  grava upsert em `:392`-`:403` e retorna `stored_matchup.previous` em
+  `:430`-`:435`.
+- `deck_weakness_reports` nao e write-only neste checkout. A tabela e definida
+  em `server/database_setup.sql:484`; `/ai/weakness-analysis` grava reports em
+  `server/routes/ai/weakness-analysis/index.dart:484`-`:488`, chama
+  `_loadWeaknessHistory` em `:506`, le resumo por severidade em `:574`-`:578`,
+  le recentes em `:590`-`:594` e retorna `history` em `:559`. O campo
+  `addressed` ainda nao tem update confirmado, mas isso e risco de ciclo de
+  resolucao, nao ausencia de leitura.
+- `card_battle_rules` nao foi classificada como nao usada: alem do DDL em
+  `server/database_setup.sql:109`, ha leitura/update em
+  `server/bin/auto_promote_battle_rules.py:113`-`:162` e leitura/sync nos
+  scripts Hermes `sync_battle_card_rules_pg.py` e
+  `sync_pg_target_deck_to_hermes.py`.
+- `deck_learning_events`, `commander_card_usage`, `commander_learned_decks`,
+  `commander_reference_deck_analysis`, `card_function_tags`,
+  `card_role_scores`, `card_semantic_tags_v2`,
+  `commander_reference_card_stats`, `commander_reference_profiles`,
+  `ai_optimize_cache`, `ai_optimize_jobs`, `ai_generate_jobs`,
+  `ai_user_preferences`, `ai_logs`, `battle_simulations`, `format_staples`,
+  `rules`, `sync_state`, `sync_log`, `rate_limit_events`,
+  `activation_funnel_events` e `schema_migrations` nao foram promovidas a
+  achados porque ha leitura/escrita operacional confirmada, uso app/backend
+  conhecido, ou finalidade interna explicita.
+
+### Documentacao stale fora do escopo de escrita
+
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md:285` ainda descreve
+  `deck_matchups` como "still write-only", e `:286` faz o mesmo para
+  `deck_weakness_reports`. A leitura de fonte acima falsifica essa parte do
+  texto.
+- `server/manual-de-instrucao.md:18040`-`:18045` ainda lista
+  `deck_matchups` e `deck_weakness_reports` como audit logs nunca lidos pelo
+  runtime. A leitura de fonte acima tambem falsifica essa claim.
+- Estes arquivos foram lidos conforme o protocolo, mas nao editados nesta rodada
+  porque as regras de escrita deste job permitem alterar apenas
+  `docs/hermes-analysis/STRUCTURE_AUDIT.md` e, se necessario,
+  `PLANO_CORRECAO.md`/`TECHNICAL_MAP.md`.
+
+### Resultado desta revalidacao
+
+No checkout `d6e568ac`, nao surgiu novo achado P1/P2 app-facing de tabela
+PostgreSQL nao usada. Permanecem como riscos P3 os mesmos pontos estreitos:
+`ml_prompt_feedback` sem fluxo real de coleta/consumo e sem DDL local
+confirmado; e `commander_reference_decks` /
+`commander_reference_deck_cards` como raws de lineage sem leitor raw direto.
+As claims antigas de `deck_matchups` e `deck_weakness_reports` como write-only
+continuam stale.
 
 ## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-15 11:00 UTC
 

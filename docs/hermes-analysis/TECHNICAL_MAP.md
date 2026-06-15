@@ -319,15 +319,19 @@ Game Changer, nao um modelo geral de utilidade de carta.
   e `extractMtgTop8FormatCodeFromSourceUrl` foram descartadas porque esses
   simbolos nao existem neste checkout.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-14 15:00 UTC no checkout local `71140cbb`. Desde a ultima rodada
-  focada (`eada6841`), nao houve delta de codigo de produto em `app/lib`,
-  `server/lib`, `server/routes`, `server/bin`, `server/database_setup.sql` ou
-  `server/test`. Nao houve novo achado P1/P2 app-facing. As claims antigas
+  em 2026-06-15 15:00 UTC no checkout local `d6e568ac`. Desde a ultima rodada
+  focada (`71140cbb`), nao houve delta de codigo de produto em `app/lib`,
+  `server/lib`, `server/routes`, `server/bin`, `server/database_setup.sql`,
+  `server/test` ou scripts Hermes auditados. Nao houve novo achado P1/P2
+  app-facing. As claims antigas
   contra `deck_matchups` e `deck_weakness_reports` continuam stale: ambas tem
   leitura runtime e campos retornados no payload das rotas experimentais
   (`stored_matchup` em `/ai/simulate-matchup` e `history` em
-  `/ai/weakness-analysis`). A varredura de `server/database_setup.sql` tambem
-  nao encontrou nova tabela declarada ali sem leitura. `deck_learning_events`,
+  `/ai/weakness-analysis`). `server/doc/API_CONTRACTS_AND_DATA_MAP.md` e
+  `server/manual-de-instrucao.md` ainda contem texto stale sobre essas duas
+  tabelas, mas ficaram fora do escopo de escrita desta rodada. A varredura de
+  `server/database_setup.sql` tambem nao encontrou nova tabela declarada sem
+  leitura. `deck_learning_events`,
   `commander_card_usage`, `commander_learned_decks` e `card_battle_rules`
   seguem como controles positivos por terem writers/readers em rotas, jobs ou
   scripts operacionais. Permanecem como riscos menores:
