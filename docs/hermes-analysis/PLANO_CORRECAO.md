@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-16 19:00 UTC
+> Data: 2026-06-16 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,10 +20,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `.dart_frog/server.dart` em runtime, e `dart analyze bin/local_test_server.dart`
    retornou `No issues found`.
 5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
-   `server/lib`**: **REVALIDADO no checkout local `a81fd69a` em 2026-06-14
-   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`2a1963d3..HEAD`),
-   o delta de produto no recorte app/backend continua nulo e as mudancas sao
-   somente documentais em `docs/hermes-analysis`. Os riscos
+   `server/lib`**: **REVALIDADO no checkout local `5ce943fa` em 2026-06-16
+   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`9adb0989..HEAD`),
+   o delta de produto/testes/API contract no recorte app/backend continua nulo.
+   Os riscos
    anteriores de ownership em `POST /ai/optimize`, `POST /ai/archetypes` e
    polling de jobs async seguem stale: optimize exige usuario, passa `userId`
    para o loader owner-scoped, jobs rejeitam owner vazio/diferente, e archetypes
@@ -796,12 +796,11 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-14 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `a81fd69a`. Desde a rodada anterior deste mesmo foco (`2a1963d3..HEAD`),
-  o delta de produto no recorte app/backend continua nulo: somente
-  `docs/hermes-analysis/PLANO_CORRECAO.md`,
-  `docs/hermes-analysis/STRUCTURE_AUDIT.md` e
-  `docs/hermes-analysis/TECHNICAL_MAP.md` mudaram. Os achados anteriores de
+- **Status 2026-06-16 23:00 UTC:** REVALIDADO/ABERTO no checkout local
+  `5ce943fa`. Desde a rodada anterior deste mesmo foco (`9adb0989..HEAD`),
+  nao houve delta em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
+  `server/database_setup.sql`, testes app/server ou
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. Os achados anteriores de
   ownership em `/ai/optimize`, `/ai/archetypes` e jobs async de
   optimize/generate continuam resolvidos/stale. A lacuna ativa permanece
   estreita: activation telemetry rejeita um evento emitido pelo app,
