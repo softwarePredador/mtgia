@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-15 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-15 23:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -169,14 +169,14 @@ mtgia/
   `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1/P2 — Coerencia app-facing `app/lib` ↔ `server/routes` ↔ `server/lib`**:
-  revalidado novamente em 2026-06-14 23:00 UTC no checkout local `a81fd69a`.
+  revalidado novamente em 2026-06-15 23:00 UTC no checkout local `9adb0989`.
   O auditor textual executou com sucesso (`205` arquivos backend, `115`
   problemas textuais, `0` imports quebrados), mas nao cobre `app/lib`; a
   evidencia veio de `rg`, `nl -ba`, leitura direta e `dart analyze` focado nas
   tres rotas/backend files relacionados (`No issues found`). Desde a rodada
-  anterior do mesmo foco (`2a1963d3..HEAD`), o delta de produto no recorte
-  app/backend e nulo e as mudancas sao somente documentais em
-  `docs/hermes-analysis`. Os
+  anterior do mesmo foco (`53e604e9..HEAD`), o delta de produto no recorte
+  app/backend/testes/API contract e nulo e as mudancas sao somente documentais
+  em `docs/hermes-analysis`. Os
   achados antigos de ownership em `POST /ai/optimize`, `POST /ai/archetypes` e
   polling de jobs async seguem stale: optimize exige usuario, passa `userId`
   para o loader owner-scoped, jobs rejeitam owner vazio/diferente e archetypes
