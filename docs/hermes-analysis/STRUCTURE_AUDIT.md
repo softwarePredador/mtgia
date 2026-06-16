@@ -4,9 +4,165 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-16 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-16 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-16 11:00 UTC
+
+Escopo desta rodada: somente imports/exports/parts locais quebrados e ciclos de
+dependencia entre arquivos Dart locais. Nao foi executada auditoria ampla de
+classes sem uso, funcoes sem chamador, tabelas PostgreSQL sem uso, duplicacao ou
+coerencia entre camadas fora do necessario para validar/falsificar imports e
+SCCs.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `ea37f3cf`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar claims
+stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante aqui e
+tratar Hermes como laboratorio/cache/auditor, nao fonte final de verdade.
+
+### Auditor estrutural base
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas textuais identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`.
+- O script valida imports relativos locais nesse recorte, mas nao monta grafo
+  SCC, nao cobre `app/lib` nem `server/bin`, e nao trata `export`/`part` como
+  grafo completo de dependencia.
+- A execucao tentou reinserir o inventario gerado dentro da primeira secao
+  manual por causa do marcador historico
+  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+  mecanica foi descartada antes desta atualizacao. Foram mantidos apenas os
+  numeros do auditor e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- `git diff --name-only a447b876..HEAD -- app/lib server/lib server/routes server/bin server/test app/test app/integration_test server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/hermes-analysis/manaloom-knowledge/scripts server/database_setup.sql`:
+  apenas `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`
+  mudou desde a rodada anterior deste mesmo foco; nao houve delta de produto em
+  `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
+  database setup ou API contract.
+- Varredura local de 409 arquivos Dart em `app/lib`, `server/lib`,
+  `server/routes` e `server/bin`, resolvendo diretivas `import`, `export` e
+  `part` locais. Imports relativos foram resolvidos a partir do diretorio do
+  arquivo origem; `package:manaloom/...`, `package:server/...` e o alias
+  historico `package:ai/...` foram mapeados para os roots locais; imports
+  externos foram ignorados.
+- SCCs foram calculados por Tarjan no mesmo grafo de dependencias locais.
+- `cd server && dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_filler_loader_support.dart`:
+  `No issues found!`.
+- `cd app && flutter analyze --no-pub --no-fatal-infos lib/features/home/life_counter/life_counter_tabletop_engine.dart lib/features/home/life_counter/life_counter_turn_tracker_engine.dart`:
+  `No issues found!`.
+
+Resumo da varredura:
+
+- Arquivos Dart analisados: 409.
+- Diretivas Dart totais encontradas: 1924.
+- Diretivas locais resolvidas: 1082.
+- Imports/exports/parts locais quebrados: 0.
+- SCCs locais com mais de um arquivo: 2.
+
+### Achados revalidados
+
+#### P1/P2 - Ciclo entre engines do life counter continua aberto
+
+- **Aresta 1:** `app/lib/features/home/life_counter/life_counter_tabletop_engine.dart:3`
+  importa `life_counter_turn_tracker_engine.dart`.
+- **Aresta 2:** `app/lib/features/home/life_counter/life_counter_turn_tracker_engine.dart:2`
+  importa `life_counter_tabletop_engine.dart`.
+- **Evidencia do grafo:** a varredura local encontrou um SCC composto exatamente
+  por esses dois arquivos.
+- **Analyzer focado:** `flutter analyze` nos dois arquivos retornou
+  `No issues found!`; portanto o ciclo nao aparece como erro de compilacao, mas
+  mantem acoplamento bidirecional entre calculo de mesa/status e controle de
+  turno.
+- **Por que importa:** dificulta extrair/testar o turn tracker sem carregar a
+  engine inteira de mesa, e qualquer novo helper de turno pode reforcar a
+  dependencia circular.
+- **O que valida:** mover o predicado compartilhado de jogadores ativos para
+  `life_counter_session.dart`, um helper neutro ou outro modulo sem dependencia
+  reversa; depois rerodar a varredura SCC e obter 0 nesse par.
+- **O que falsifica:** provar que o import reverso foi removido ou documentar
+  explicitamente esse par como fachada deliberada com teste de arquitetura.
+
+#### P1/P2 - Ciclo entre runtime e filler loader do optimize continua aberto
+
+- **Aresta 1:** `server/lib/ai/optimize_runtime_support.dart:13` importa
+  `optimize_filler_loader_support.dart`.
+- **Aresta 2:** `server/lib/ai/optimize_runtime_support.dart:14` tambem exporta
+  `optimize_filler_loader_support.dart`.
+- **Aresta 3:** `server/lib/ai/optimize_filler_loader_support.dart:6` importa
+  `optimize_runtime_support.dart`.
+- **Evidencia do grafo:** a varredura local encontrou um SCC composto exatamente
+  por `server/lib/ai/optimize_runtime_support.dart` e
+  `server/lib/ai/optimize_filler_loader_support.dart`; nao foram encontrados
+  ciclos em `server/routes`.
+- **Analyzer focado:** `dart analyze` nos dois arquivos retornou
+  `No issues found!`; portanto o ciclo nao e erro estatico atual.
+- **Por que importa:** `optimize_filler_loader_support.dart` e uma extracao que
+  ainda depende do proprio modulo runtime que a importa/exporta. A fronteira do
+  otimizador segue bidirecional, o que enfraquece a modularizacao e aumenta risco
+  de regressao quando novos fillers ou helpers runtime forem movidos.
+- **O que valida:** mover os tipos/helpers compartilhados para um terceiro modulo
+  neutro ou inverter a dependencia para que filler loader nao importe runtime;
+  depois rerodar SCC e analyzer/testes focados de optimize.
+- **O que falsifica:** documentar esse ciclo como fachada deliberada e provar
+  com teste de arquitetura que nao ha crescimento do SCC.
+
+### Suspeitas antigas revalidadas como stale
+
+- `app/lib/features/decks/widgets/deck_analysis_tab.dart:3`-`:4` usa
+  `package:manaloom/core/...`; `app/lib/core/theme/app_theme.dart` e
+  `app/lib/core/utils/mana_helper.dart` existem. A claim antiga de import
+  relativo quebrado segue stale.
+- `app/lib/features/home/life_counter_screen.dart:5` usa
+  `package:manaloom/core/theme/app_theme.dart`, tambem resolvido no checkout
+  atual.
+- `server/bin/local_test_server.dart:5`-`:9` valida
+  `.dart_frog/server.dart` em runtime e nao tem import estatico para
+  `../.dart_frog/server.dart`.
+- `server/routes/ai/commander-learning/index.dart:8` importa
+  `../../../lib/http_responses.dart`, resolvido pela varredura local; nao ha
+  import quebrado confirmado nessa rota.
+- O ciclo historico `CommunityDeckDetailScreen`/`UserProfileScreen` continua
+  stale: `app/lib/features/community/screens/community_deck_detail_screen.dart:1`-`:10`
+  e `app/lib/features/social/screens/user_profile_screen.dart:1`-`:12` nao
+  importam um ao outro, e a varredura SCC nao encontrou esse par.
+
+### Resultado desta revalidacao
+
+No checkout `ea37f3cf`, nao ha import/export/part local quebrado confirmado em
+`app/lib`, `server/lib`, `server/routes` ou `server/bin`. A frente aberta segue
+restrita aos mesmos dois SCCs atuais: `life_counter_tabletop_engine.dart` <->
+`life_counter_turn_tracker_engine.dart`, e `optimize_runtime_support.dart` <->
+`optimize_filler_loader_support.dart`. Nao surgiu novo achado nesta rotacao.
 
 ## Rodada focada: Funcoes nao chamadas - revalidacao 2026-06-16 07:00 UTC
 

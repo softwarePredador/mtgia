@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-16 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-16 11:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -151,22 +151,25 @@ mtgia/
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO em 2026-06-15 11:00 UTC no checkout `a447b876`.** O
+  **REVALIDADO/ABERTO em 2026-06-16 11:00 UTC no checkout `ea37f3cf`.** O
   auditor base cobre apenas `server/lib` e `server/routes` e reportou
-  `Imports quebrados: 0`. A triagem focada de 409 arquivos Dart em `app/lib`,
-  `server/lib`, `server/routes` e `server/bin` encontrou 1082 diretivas locais
-  resolvidas, 0 imports/exports/parts locais quebrados e 2 SCCs. Claims
-  anteriores contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
-  `server/bin/local_test_server.dart` e o ciclo
-  `CommunityDeckDetailScreen`/`UserProfileScreen` seguem stale nesta branch:
-  os dois app files usam `package:manaloom/...`, o server analyze focado para
-  `optimize_runtime_support.dart`, `optimize_filler_loader_support.dart`,
-  `bin/local_test_server.dart` e `routes/ai/commander-learning/index.dart`
-  retornou `No issues found`, e o grafo atual nao contem o SCC
-  Community/Social. Permanecem abertos os mesmos 2 SCCs atuais:
-  `life_counter_tabletop_engine.dart` ↔
-  `life_counter_turn_tracker_engine.dart`, e
-  `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart`.
+  `Imports quebrados: 0`. Desde a rodada anterior deste foco (`a447b876..HEAD`),
+  nao houve delta de produto em `app/lib`, `server/lib`, `server/routes`,
+  `server/bin`, testes app/server, database setup ou API contract; o unico delta
+  no recorte foi o script Hermes
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
+  A triagem focada de 409 arquivos Dart em `app/lib`, `server/lib`,
+  `server/routes` e `server/bin` encontrou 1082 diretivas locais resolvidas,
+  0 imports/exports/parts locais quebrados e 2 SCCs. `dart analyze` focado para
+  `optimize_runtime_support.dart`/`optimize_filler_loader_support.dart` e
+  `flutter analyze --no-pub --no-fatal-infos` focado para os dois arquivos
+  `life_counter_*_engine.dart` retornaram `No issues found!`. Claims anteriores
+  contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
+  `server/bin/local_test_server.dart`, `server/routes/ai/commander-learning` e o
+  ciclo `CommunityDeckDetailScreen`/`UserProfileScreen` seguem stale. Permanecem
+  abertos os mesmos 2 SCCs atuais: `life_counter_tabletop_engine.dart` ↔
+  `life_counter_turn_tracker_engine.dart`, e `optimize_runtime_support.dart` ↔
+  `optimize_filler_loader_support.dart`.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem concentrando regra de negócio. A duplicacao direta anterior entre rota e support para helpers como `matchesFunctionalNeed` e `scoreOptimizeReplacementCandidate` foi revalidada em 2026-05-28 como wrappers finos que delegam para `optimize_support`, mas ainda ha drift similar em `resolveOptimizeArchetype` entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
 - **P1/P2 — Coerencia app-facing `app/lib` ↔ `server/routes` ↔ `server/lib`**:
   revalidado novamente em 2026-06-15 23:00 UTC no checkout local `9adb0989`.
