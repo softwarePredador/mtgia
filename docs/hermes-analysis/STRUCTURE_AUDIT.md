@@ -4,9 +4,203 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-16 15:00 UTC
-> Rotacao: `postgresql-tables-not-used`
+> Atualizacao local Codex: 2026-06-16 19:00 UTC
+> Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-16 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi executada auditoria ampla de classes sem uso, funcoes sem chamador,
+imports/ciclos, tabelas PostgreSQL sem uso ou coerencia app/server fora do
+necessario para validar/falsificar duplicacao.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa; o checkout
+  informou que havia 1 commit local ainda nao publicado antes desta rodada.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `41e681a0`.
+- `git diff --name-only 1c0f9b86..HEAD -- app/lib server/lib server/routes server/bin server/test app/test app/integration_test server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/hermes-analysis/manaloom-knowledge/scripts server/database_setup.sql`:
+  apenas `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`
+  mudou desde a rodada anterior deste foco. Nao houve delta de produto em
+  `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
+  database setup ou API contract.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter a memoria coerente e
+evitar claims stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`,
+`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante aqui e
+tratar Hermes como laboratorio/cache/auditor, nao fonte final de verdade.
+
+### Auditor estrutural base
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`.
+- A lista de duplicacao e textual/regex; ela ainda mistura SQL keywords,
+  wrappers, nomes comuns e funcoes que apenas delegam para suporte canonico.
+- A execucao do script tentou reinserir inventario gerado por causa do marcador
+  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
+  e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- Comparacao de delta desde a ultima rodada deste foco (`1c0f9b86..HEAD`) no
+  recorte `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes
+  app/server, API contract, `server/database_setup.sql` e scripts Hermes.
+- `git diff --unified=80 1c0f9b86..HEAD -- docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
+- `rg -n "def (table_exists|column_exists|parse_role_list|analysis_roles_for_card|parse_card_list|normalize_commander|learned_deck_completeness)|table_exists\\(|column_exists\\(|parse_role_list\\(|normalize_commander\\(" docs/hermes-analysis/manaloom-knowledge/scripts server/bin server/lib server/routes -g '*.py' -g '*.dart'`.
+- `rg -n "learned_deck_completeness|class .*Completeness|def .*completeness|commander_quantity_in_list|main_quantity|total_with_commander" docs/hermes-analysis/manaloom-knowledge/scripts server/lib server/routes server/bin -g '*.py' -g '*.dart'`.
+- Rechecagem dos anchors dos clusters de produto ja abertos com `rg` nos
+  simbolos de analise/arquetipo, roles funcionais, trust social/marketplace,
+  request-id/log social, `condition` e tipo/CMC.
+- Leituras diretas com `nl -ba` dos scripts/handlers/helpers citados abaixo.
+
+### Achados revalidados
+
+#### P2 - Exporter Hermes de learned deck agora esta bifurcado entre `server/bin` e scripts Hermes
+
+- **Arquivos/simbolos:** `server/bin/export_hermes_learned_deck.py` e
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`;
+  funcoes `parse_card_list`, `normalize_commander`, `compute_score`,
+  `build_metadata` e `export_learned_deck`.
+- **Base duplicada:** os dois scripts tem o mesmo prologo/uso em
+  `server/bin/export_hermes_learned_deck.py:1`-`:11` e
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:1`-`:13`;
+  ambos exportam SQLite Hermes para o JSON aceito por
+  `dart run bin/commander_learned_deck.dart --input-json=<path>`.
+- **Funcoes equivalentes:** `parse_card_list` aparece em
+  `server/bin/export_hermes_learned_deck.py:13`-`:41` e
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:32`-`:56`;
+  `normalize_commander` aparece em `server/bin/export_hermes_learned_deck.py:43`
+  e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:58`;
+  `compute_score` aparece em `server/bin/export_hermes_learned_deck.py:66`-`:82`
+  e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:61`-`:77`.
+- **Drift de completude:** `server/bin/export_hermes_learned_deck.py:46`-`:64`
+  usa `validate_commander_100`, permite bypass por
+  `HERMES_EXPORT_ALLOW_INCOMPLETE` em `:193`-`:202`, normaliza a lista em
+  `:204`-`:206` e grava `card_count` como `len(parsed_cards)` em `:235`-`:236`.
+  O script Hermes novo importa `learned_deck_completeness` em
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:13`,
+  bloqueia incompletos sem bypass em `:233`-`:246`, injeta o comandante quando
+  ele nao esta na lista em `:248`-`:251` e grava `card_count` como
+  `completeness.total_with_commander` em `:249`/`:299`.
+- **Drift de metadata:** `server/bin/export_hermes_learned_deck.py:84`-`:151`
+  calcula metadata com `deck_cards` + `card_deck_analysis.role_in_deck` e uma
+  cadeia `elif`, atribuindo cada carta a no maximo um bucket. O script Hermes
+  novo adiciona `parse_role_list`/`analysis_roles_for_card` em
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:80`-`:118`,
+  consulta `pg_roles` quando existir, usa varios `if` independentes em
+  `:158`-`:175` e pode contar uma carta em multiplos buckets.
+- **Drift de compatibilidade de schema:** o script Hermes novo protege
+  `table_exists`/`column_exists` em
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:15`-`:30`
+  e so seleciona metricas de `decks` quando todas as colunas existem em
+  `:253`-`:275`; o `server/bin` assume schema completo em
+  `server/bin/export_hermes_learned_deck.py:208`-`:213`.
+- **Por que parece duplicado/similar:** os scripts tem o mesmo objetivo
+  operacional e ainda compartilham grande parte do fluxo, mas agora divergem em
+  regra de completude, contagem, schema fallback e classificacao multi-role.
+  Uma promocao executada pelo binario de `server/bin` pode aceitar/emitir JSON
+  diferente da mesma promocao executada pelo script Hermes.
+- **O que valida:** consolidar o exporter em uma unica fonte ou fazer um wrapper
+  chamar a outra implementacao; depois rodar ambos sobre um fixture SQLite com
+  lista texto, lista JSON, comandante ausente/presente, `pg_roles` e colunas de
+  metricas ausentes, exigindo o mesmo JSON ou divergencias documentadas.
+- **O que falsifica:** decisao explicita de que `server/bin` e legado ou
+  ambiente diferente do script Hermes, com teste/README declarando qual
+  exporter e canonico e quando o outro pode divergir.
+
+#### P1/P2 - Clusters de duplicacao de produto permanecem abertos sem novo delta
+
+- **Sem delta de produto:** a comparacao `1c0f9b86..HEAD` nao encontrou mudanca
+  em `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes, database
+  setup ou API contract; portanto nao surgiu evidencia nova para abrir ou fechar
+  clusters de produto nesta rodada.
+- **Analise/arquetipo rebuild vs optimize:** anchors rechecados em
+  `server/lib/ai/deck_state_analysis.dart:1`, `:308`, `:573`;
+  `server/lib/ai/optimize_state_support.dart:6`, `:337`;
+  `server/lib/ai/optimize_runtime_support.dart:1714`;
+  chamadores em `server/lib/ai/rebuild_guided_service.dart:141`, `:171`,
+  `:263` e `server/lib/ai/optimize_request_support.dart:288`, `:296`,
+  `:305`, `:310`.
+- **Roles funcionais:** anchors rechecados em
+  `server/lib/ai/functional_card_tags.dart:319`-`:338`, `:872`-`:922` e
+  `server/lib/ai/optimization_functional_roles.dart:37`, `:203`-`:207`,
+  `:301`, `:387`-`:447`.
+- **Trust social/marketplace:** anchors rechecados em
+  `server/routes/trades/index.dart:557`-`:635`,
+  `server/routes/trades/[id]/index.dart:260`-`:338` e
+  `server/routes/community/marketplace/index.dart:131`-`:166`, `:316`.
+- **Request-id/log social:** anchors rechecados em
+  `server/lib/request_trace.dart:35`/`:48`,
+  `server/routes/trades/index.dart:330`/`:338`,
+  `server/routes/trades/[id]/status.dart:260`/`:268`,
+  `server/routes/trades/[id]/messages.dart:228`/`:236`,
+  `server/routes/trades/[id]/respond.dart:154`/`:162`,
+  `server/routes/conversations/[id]/messages.dart:247`/`:255` e
+  `server/routes/users/[id]/follow/index.dart:97`.
+- **`condition` TCGPlayer:** anchors rechecados em
+  `server/routes/decks/[id]/cards/index.dart:407`-`:412`,
+  `server/routes/decks/[id]/cards/set/index.dart:249`-`:252`,
+  `server/routes/decks/[id]/index.dart:520`-`:523`,
+  `server/routes/binder/index.dart:275`-`:280` e
+  `server/routes/community/marketplace/index.dart:39`-`:43`.
+- **Tipo/CMC:** anchors rechecados em
+  `server/routes/decks/[id]/index.dart:405`/`:419`,
+  `server/routes/community/decks/[id].dart:91`/`:104`,
+  `server/routes/decks/[id]/simulate/index.dart:199` e
+  `server/lib/ai/cmc_safety.dart:44`.
+- **O que valida/falsifica:** permanecem os criterios da rodada de
+  2026-06-15 19:00 UTC: extrair helpers canonicos com adapters finos e testes
+  cross-flow, ou documentar/testar divergencias intencionais por endpoint.
+
+### Suspeitas revalidadas e nao promovidas
+
+- `table_exists` aparece tambem em
+  `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py:197`
+  e `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py:87`,
+  mas nao foi promovido isoladamente: e um helper pequeno de introspeccao SQLite.
+  O risco real esta no exporter inteiro bifurcado.
+- `learned_deck_completeness` aparece somente no script Hermes novo
+  (`docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:13`,
+  `:233`) e nao cria duplicacao propria nesta rodada.
+- A claim antiga de basic/snow basic land duplicado continua stale:
+  `server/lib/basic_land_utils.dart` segue sendo a fonte canonica local.
+
+### Resultado desta revalidacao
+
+No checkout `41e681a0`, nao houve delta de codigo de produto desde a rodada
+anterior de duplicacao. Permanecem abertos os mesmos clusters de produto ja
+documentados: analise/arquetipo entre rebuild e optimize, fallbacks de roles
+funcionais, trust social/marketplace, request-id/log social, politica de
+`condition` e helpers de tipo/CMC. O unico novo achado confiavel desta rotacao
+e script-level: o exporter Hermes de learned decks esta bifurcado entre
+`server/bin/export_hermes_learned_deck.py` e
+`docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`,
+com drift concreto de completude, contagem, schema fallback e metadata
+multi-role.
 
 ## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-16 15:00 UTC
 
