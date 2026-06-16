@@ -122,6 +122,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para decidir proximos applies controlados: candidate quality, auto
     promote learned decks e metricas de decision impact.
 
+- `BATTLE_AUDIT_COVERAGE_STATUS_2026-06-16.md`
+  - Status pos-correcao da auditoria de battle: 16 seeds, 17069 eventos,
+    2301 decision traces, 0 high/critical, 0 strategy blockers e apenas
+    3 findings low `review_rule_used`.
+  - Use para responder se cada etapa/jogada esta sendo auditada e quais gaps
+    reais ainda impedem usar WR bruto como aprendizado forte.
+
 ## Fonte de verdade atual
 
 1. `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`

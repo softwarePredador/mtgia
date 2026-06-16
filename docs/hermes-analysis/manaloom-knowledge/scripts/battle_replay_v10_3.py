@@ -225,6 +225,16 @@ def main():
         reason = winner.win_reason if winner and winner.win_reason else (
             "elimination" if winner else "stall"
         )
+        if winner and not winner.win_reason:
+            log(
+                "game_won",
+                {
+                    "player": winner.name,
+                    "reason": reason,
+                    "turn": turn,
+                    "source": "replay_wrapper_survivor_inference",
+                },
+            )
         replay.write(f"Winner: {winner.name if winner else 'none'} ({reason})\n")
         for player in all_players:
             replay.write(

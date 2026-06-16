@@ -95,6 +95,7 @@ LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
 REPLAY_EVENT_HANDLER = None
 DECISION_TRACE_HANDLER = None
 DECISION_TRACE_COUNTER = 0
+CURRENT_REPLAY_TURN = None
 DECISION_TRACE_SCHEMA_VERSION = "decision_trace_v1"
 DECISION_STRATEGY_VERSION = "battle_decision_strategy_v1_2026_06_15"
 HIGH_IMPACT_PAYOFF_EFFECTS = {
@@ -117,6 +118,8 @@ ENGINE_METRICS = None
 
 def emit_replay_event(event, **data):
     """Emit optional structured replay events without affecting simulation."""
+    if "turn" not in data and CURRENT_REPLAY_TURN is not None:
+        data["turn"] = CURRENT_REPLAY_TURN
     if ENGINE_METRICS is not None:
         try:
             ENGINE_METRICS.record_event(event, data)
@@ -4552,6 +4555,19 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                             player.hand.remove(c)
                             player.spend_card_mana(c)
                             c["_response_to_effect"] = top_item.effect_data.get("effect")
+                            emit_replay_event(
+                                "spell_cast",
+                                player=player.name,
+                                card=c.get("name", "?"),
+                                effect=eff.get("effect", "unknown"),
+                                type_line=c.get("type_line", ""),
+                                cmc=c.get("cmc", 0),
+                                turn=turn,
+                                phase=phase,
+                                role="response",
+                                response_to=top_item.card.get("name", "?"),
+                                **replay_rule_fields(eff),
+                            )
                             apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
                             return True
         else:
@@ -6440,6 +6456,41 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             if cmd_eff.get("effect") != "land_recursion_creature":
                 player.battlefield.append(cmd_copy)
             player.commander_tax += 2
+            fields = replay_rule_fields(cmd_eff)
+            commander_score = max(20, int(cost or 0) * 5)
+            emit_decision_trace(
+                decision_type="cast_spell",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        cmd,
+                        cmd_eff,
+                        score=commander_score,
+                        action="cast_commander",
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    cmd,
+                    cmd_eff,
+                    score=commander_score,
+                    action="cast_commander",
+                ),
+                rejected_options=[],
+                score_components={
+                    "commander_tax": player.commander_tax - 2,
+                    "effective_cost": cost,
+                    "mana_after_payment": player.available_mana(),
+                },
+                rule_source=fields.get("rule_source", "battle_heuristic"),
+                rule_status=fields.get("rule_review_status", "heuristic"),
+                confidence="medium",
+                expected_benefit_score=commander_score,
+                actual_outcome="commander_cast",
+                reason="commander_available_and_affordable",
+                strategic_principle="cast_commander_when_affordable_and_plan_relevant",
+            )
             emit_replay_event(
                 "commander_cast",
                 player=player.name,
@@ -8428,6 +8479,8 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
 
 def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     """v8: Full turn with priority windows between phases."""
+    global CURRENT_REPLAY_TURN
+    CURRENT_REPLAY_TURN = turn
     if game_winner(all_players):
         return
     emit_replay_event(
