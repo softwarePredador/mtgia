@@ -59,6 +59,36 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         filtered = sync_pg.filter_rows_by_card_names(rows, ["lightning greaves"])
         self.assertEqual(filtered, [{"card_name": "Lightning Greaves"}])
 
+    def test_export_canonical_snapshot_writes_metadata_rich_payload(self) -> None:
+        rows = [
+            {
+                "card_name": "Lightning Greaves",
+                "effect_json": {"effect": "equipment_haste_shroud"},
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "rule_version": 3,
+                "oracle_hash": "abc123",
+                "logical_rule_key": "battle_rule_v1:deadbeef",
+            }
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_path = Path(tmpdir) / "knowledge.db"
+            sqlite_path.touch()
+            snapshot_path = Path(tmpdir) / "known_cards_canonical_snapshot.json"
+            exported = sync_pg.export_canonical_snapshot(
+                rows,
+                sqlite_db=str(sqlite_path),
+                output_path=snapshot_path,
+            )
+            payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(exported, 1)
+        self.assertEqual(payload["Lightning Greaves"]["effect"], "equipment_haste_shroud")
+        self.assertEqual(payload["Lightning Greaves"]["battle_rule_source"], "manual")
+        self.assertEqual(payload["Lightning Greaves"]["battle_rule_review_status"], "verified")
+        self.assertEqual(payload["Lightning Greaves"]["battle_rule_logical_key"], "battle_rule_v1:deadbeef")
+
 
 if __name__ == "__main__":
     unittest.main()

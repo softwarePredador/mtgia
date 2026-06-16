@@ -106,6 +106,12 @@ try:
 except Exception:
     battle_rule_registry = None
 
+from known_cards_fallback_snapshot import (
+    extract_snapshot_effect_and_metadata,
+    load_snapshot_file,
+    resolve_canonical_snapshot_path,
+)
+
 DB = os.environ.get(
     "MANALOOM_KNOWLEDGE_DB",
     str(_resolve_knowledge_db()),
@@ -1249,6 +1255,31 @@ def is_mana_source_permanent(source):
     return source.get("effect") == "ramp_engine" and source.get("mana_produced") is not None
 
 
+def is_legendary_creature_or_planeswalker_permanent(card):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    return "legendary" in type_line and (
+        "creature" in type_line or "planeswalker" in type_line
+    )
+
+
+def mana_source_production_for_state(player, source):
+    if source == "land":
+        return 1
+    if not isinstance(source, dict):
+        return 0
+    normalized_name = normalize_card_name(source.get("name", ""))
+    if normalized_name == "mox amber":
+        if not any(
+            is_legendary_creature_or_planeswalker_permanent(permanent)
+            for permanent in player.battlefield
+            if isinstance(permanent, dict)
+        ):
+            return 0
+    return int(source.get("mana_produced", 1) or 0)
+
+
 def numeric_stat(value):
     if value is None or value == "":
         return None
@@ -2113,7 +2144,12 @@ KNOWN_CARDS = {
         "is_creature_permanent": True,
     },
     "Mana Vault": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Mox Amber": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
+    "Mox Amber": {
+        "effect": "ramp_permanent",
+        "mana_produced": 1,
+        "produces": "WUBRGC",
+        "requires_legendary_creature_or_planeswalker_for_mana": True,
+    },
     "Mox Opal": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Fellwar Stone": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Ruby Medallion": {"effect": "ramp_engine"},
@@ -2921,7 +2957,8 @@ KNOWN_CARDS = {
     },
 }
 
-HANDCRAFTED_KNOWN_CARDS = set(KNOWN_CARDS)
+HANDCRAFTED_KNOWN_CARD_RULES = dict(KNOWN_CARDS)
+HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 # Canonicalized card rules now live in PostgreSQL/SQLite. The legacy literal is
 # stripped from the active runtime inventory immediately after import so manual
 # rules only exist when explicitly injected into HANDCRAFTED_KNOWN_CARDS as an
@@ -2933,6 +2970,9 @@ HANDCRAFTED_KNOWN_CARDS = set()
 # Cards listed here intentionally bypass card_battle_rules and resolve from the
 # handcrafted table first. Keep this empty by default and require an explicit
 # operational waiver for any temporary runtime-first exception.
+# Runtime hotfixes for cards whose reviewed battle semantics need to override
+# stale promoted rows until the canonical snapshot/SQLite pipeline is refreshed.
+# Keep empty by default; any temporary waiver must be audited and short-lived.
 MANUAL_RULE_RUNTIME_WAIVERS = set()
 
 TAG_EFFECTS = {
@@ -2974,6 +3014,7 @@ def normalize_effect_by_oracle(card, effect_data):
     """Correct broad generated/tag mistakes using imported oracle metadata."""
     normalized = annotate_effect_identity(card, effect_data)
     effect = normalized.get("effect", "unknown")
+    normalized_name = normalize_card_name(card.get("name", ""))
     type_line = str(card.get("type_line") or "")
     oracle_text = str(card.get("oracle_text") or "")
     text = f"{type_line}\n{oracle_text}".lower()
@@ -2987,6 +3028,16 @@ def normalize_effect_by_oracle(card, effect_data):
         normalized["effect"] = "land"
         normalized.pop("instant", None)
         normalized.pop("miracle", None)
+        if normalized_name == "ancient tomb":
+            # Under the current pooled-mana abstraction, Ancient Tomb cannot
+            # expose {C}{C} passively or it becomes free fast mana. Model it as
+            # one baseline colorless source plus one contextual bonus mana that
+            # costs life only when the simulator chooses to use it.
+            normalized["produces"] = "C"
+            normalized["mana_produced"] = 1
+            normalized["ancient_tomb_bonus_mana"] = 1
+            normalized["ancient_tomb_bonus_life_cost"] = 2
+            normalized["utility_land_profile"] = "ancient_tomb_contextual_fast_mana_v1"
         return normalized
 
     if "counter target" in text:
@@ -3101,24 +3152,48 @@ def replay_rule_fields(effect_data):
     return fields
 
 
-# ── KNOWN_CARDS Auto-Generator Loader (v8.4) ──
-# Loads generated entries from known_cards_generated.json (handcrafted takes priority)
-_gen_json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'known_cards_generated.json')
-if os.path.exists(_gen_json_path):
+CANONICAL_FALLBACK_KNOWN_CARDS = set()
+
+
+def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[str] | None = None) -> None:
     try:
-        with open(_gen_json_path) as _f:
-            _generated = json.load(_f)
-        for _name, _entry in _generated.items():
-            if _name not in KNOWN_CARDS:  # never override handcrafted
-                KNOWN_CARDS[_name] = _entry
-    except Exception: pass
+        decoded = load_snapshot_file(path)
+    except Exception:
+        return
+    for card_name, entry in decoded.items():
+        if card_name in KNOWN_CARDS:
+            continue
+        KNOWN_CARDS[card_name] = entry
+        if bucket is not None:
+            bucket.add(card_name)
+
+
+# ── KNOWN_CARDS fallback loaders ──
+# The canonical snapshot mirrors reviewed SQLite battle_card_rules for degraded
+# runtime operation. The older generated JSON remains as the last fallback only.
+_canonical_snapshot_path = resolve_canonical_snapshot_path()
+if _canonical_snapshot_path.exists():
+    _load_known_cards_into_runtime(
+        _canonical_snapshot_path,
+        bucket=CANONICAL_FALLBACK_KNOWN_CARDS,
+    )
+
+_gen_json_path = Path(
+    os.environ.get(
+        "MANALOOM_KNOWN_CARDS_JSON",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "known_cards_generated.json"),
+    )
+)
+if _gen_json_path.exists():
+    _load_known_cards_into_runtime(_gen_json_path)
+
 def get_card_effect(card):
     name = card.get("name", "")
-    if name in MANUAL_RULE_RUNTIME_WAIVERS and name in HANDCRAFTED_KNOWN_CARDS:
+    if name in MANUAL_RULE_RUNTIME_WAIVERS and name in HANDCRAFTED_KNOWN_CARD_RULES:
         return normalize_effect_by_oracle(
             card,
             with_rule_metadata(
-                KNOWN_CARDS[name],
+                HANDCRAFTED_KNOWN_CARD_RULES[name],
                 source="known_cards_manual",
                 review_status="verified",
                 confidence=1.0,
@@ -3138,13 +3213,30 @@ def get_card_effect(card):
             )
             return normalize_effect_by_oracle(card, effect)
     if name in HANDCRAFTED_KNOWN_CARDS:
+        handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name, KNOWN_CARDS.get(name))
+        if handcrafted_effect is None:
+            handcrafted_effect = {}
         return normalize_effect_by_oracle(
             card,
             with_rule_metadata(
-                KNOWN_CARDS[name],
+                handcrafted_effect,
                 source="known_cards_manual",
                 review_status="verified",
                 confidence=1.0,
+            ),
+        )
+    if name in CANONICAL_FALLBACK_KNOWN_CARDS:
+        effect_json, metadata = extract_snapshot_effect_and_metadata(KNOWN_CARDS[name])
+        return normalize_effect_by_oracle(
+            card,
+            with_rule_metadata(
+                effect_json,
+                source="known_cards_canonical_snapshot",
+                review_status=str(metadata.get("battle_rule_review_status") or "unknown"),
+                confidence=float(metadata.get("battle_rule_confidence") or 0.0),
+                rule_version=metadata.get("battle_rule_version"),
+                logical_rule_key=metadata.get("battle_rule_logical_key"),
+                oracle_hash=metadata.get("battle_rule_oracle_hash"),
             ),
         )
     if name in KNOWN_CARDS:
@@ -3455,18 +3547,22 @@ class Player:
                 and source.get("summoning_sick")
             )
         ]
+        active_sources = 0
         for source in sources:
-            produced = source.get("mana_produced", 1) if isinstance(source, dict) else 1
+            produced = mana_source_production_for_state(self, source)
+            if produced <= 0:
+                continue
             colors = source_colors(source)
             # A source with multiple options is treated as flexible generic unless
             # the imported data specifies one concrete produced color.
             color = colors[0] if len(colors) == 1 else "generic"
             self.mana_pool.add(color, produced)
+            active_sources += 1
         emit_replay_event(
             "mana_refreshed",
             player=self.name,
             mana=self.available_mana(),
-            sources=len(sources),
+            sources=active_sources,
             mana_pool=self.mana_pool.snapshot(),
             treasures=self.treasures,
             turn=turn,
@@ -4030,6 +4126,24 @@ def _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
     return True
 
 
+def _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_window):
+    if not _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
+        return False
+    if not effect_data.get("requires_legendary_creature_or_planeswalker_for_mana"):
+        return True
+    for candidate in hand:
+        if candidate is card or not isinstance(candidate, dict):
+            continue
+        type_line = str(candidate.get("type_line") or "").lower()
+        if "legendary" not in type_line:
+            continue
+        if "creature" not in type_line and "planeswalker" not in type_line:
+            continue
+        if _opening_hand_card_cmc(candidate) <= max(2, early_turn_window):
+            return True
+    return False
+
+
 def _opening_hand_has_early_plan(hand, lands):
     nonlands = [c for c in hand if not is_effective_land(c)]
     if not nonlands:
@@ -4050,6 +4164,8 @@ def _opening_hand_has_early_plan(hand, lands):
             continue
         if effect == "ramp_ritual":
             continue
+        if effect in ("ramp_permanent", "land_ramp", "mana_dork"):
+            continue
         if not _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
             continue
         if cmc <= early_turn_window:
@@ -4065,7 +4181,7 @@ def _opening_hand_has_early_plan(hand, lands):
         effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
         cmc = _opening_hand_card_cmc(card)
         if effect in ("ramp_permanent", "land_ramp", "mana_dork") and cmc <= 2:
-            if _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
+            if _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_window):
                 return True, f"early_ramp:{card.get('name', '?')}:{cmc:g}", {
                     "early_ramp": card.get("name", "?"),
                     "early_ramp_cmc": cmc,
@@ -5398,6 +5514,34 @@ def battlefield_creature_stats(player):
     }
 
 
+def controlled_artifact_count(player):
+    return sum(
+        1
+        for permanent in player.battlefield
+        if isinstance(permanent, dict) and is_artifact_permanent(permanent)
+    )
+
+
+def is_urzas_saga(permanent):
+    return (
+        isinstance(permanent, dict)
+        and normalize_card_name(permanent.get("name", "")) == "urza's saga"
+    )
+
+
+def initialize_special_land_runtime_state(permanent, turn=None):
+    if not isinstance(permanent, dict):
+        return permanent
+    if is_urzas_saga(permanent):
+        permanent.setdefault("lore_counters", 1)
+        permanent.setdefault("current_chapter", 1)
+        permanent.setdefault("final_chapter", 3)
+        if turn is not None:
+            permanent.setdefault("saga_last_lore_turn", turn)
+        permanent.setdefault("chapter_ability_pending", False)
+    return permanent
+
+
 def board_wipe_decision_context(player, opponents):
     own = battlefield_creature_stats(player)
     opposing = [battlefield_creature_stats(opp) for opp in opponents if opp.is_alive()]
@@ -5474,6 +5618,175 @@ def wheel_decision_context(player, opponents, draw_count):
     }
 
 
+def process_upkeep_utility_lands(player, turn):
+    """Resolve passive utility-land text that is low-risk under the current model."""
+    triggers = 0
+    artifact_count = controlled_artifact_count(player)
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict) or not is_effective_land(permanent):
+            continue
+        initialize_special_land_runtime_state(permanent, turn=None)
+        if is_urzas_saga(permanent):
+            current_chapter = max(
+                int(permanent.get("current_chapter") or 1),
+                int(permanent.get("lore_counters") or 0),
+            )
+            if permanent.get("saga_last_lore_turn") != turn and current_chapter < 3:
+                next_chapter = current_chapter + 1
+                permanent["current_chapter"] = next_chapter
+                permanent["lore_counters"] = next_chapter
+                permanent["saga_last_lore_turn"] = turn
+                permanent["chapter_ability_pending"] = True
+                emit_replay_event(
+                    "saga_chapter_progressed",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    chapter=next_chapter,
+                    turn=turn,
+                )
+                if next_chapter == 3:
+                    candidates = [
+                        candidate
+                        for candidate in player.library
+                        if isinstance(candidate, dict)
+                        and "artifact" in str(candidate.get("type_line") or "").lower()
+                        and int(float(candidate.get("cmc") or 0)) <= 1
+                        and "discard a land card" not in str(candidate.get("oracle_text") or "").lower()
+                        and "imprint" not in str(candidate.get("oracle_text") or "").lower()
+                    ]
+                    scored_candidates = [
+                        (
+                            candidate,
+                            *tutor_candidate_score(candidate, "artifact", player, [], turn),
+                        )
+                        for candidate in candidates
+                    ]
+                    scored_candidates.sort(
+                        key=lambda item: (
+                            -item[1],
+                            int(float(item[0].get("cmc") or 0)),
+                            item[0].get("name", ""),
+                        )
+                    )
+                    found = None
+                    found_score = 0
+                    found_reason = "no_safe_artifact_target"
+                    if scored_candidates:
+                        found, found_score, found_reason = scored_candidates[0]
+                        player.library.remove(found)
+                        permanent_effect = get_card_effect(found)
+                        found_permanent = prepare_entering_permanent(
+                            enrich_card({**found, **permanent_effect})
+                        )
+                        if is_creature_card(found_permanent):
+                            found_permanent["effect"] = "creature"
+                        player.battlefield.append(found_permanent)
+                    emit_decision_trace(
+                        decision_type="saga_chapter_resolution",
+                        player=player,
+                        turn=turn,
+                        phase="upkeep",
+                        available_options=[
+                            decision_card_option(
+                                candidate,
+                                get_card_effect(candidate),
+                                score=score,
+                                action="tutor_to_battlefield",
+                                reason=reason,
+                                target_type="artifact_cmc_1_or_less",
+                            )
+                            for candidate, score, reason in scored_candidates[:10]
+                        ],
+                        chosen_option=(
+                            decision_card_option(
+                                found,
+                                get_card_effect(found),
+                                score=found_score,
+                                action="tutor_to_battlefield",
+                                reason=found_reason,
+                                target_type="artifact_cmc_1_or_less",
+                            )
+                            if found is not None
+                            else {
+                                "action": "resolve_without_target",
+                                "target_type": "artifact_cmc_1_or_less",
+                                "reason": found_reason,
+                            }
+                        ),
+                        rejected_options=[
+                            decision_card_option(
+                                candidate,
+                                get_card_effect(candidate),
+                                score=score,
+                                action="reject_tutor_target",
+                                reason=reason,
+                                target_type="artifact_cmc_1_or_less",
+                            )
+                            for candidate, score, reason in scored_candidates[1:10]
+                        ],
+                        score_components={
+                            "chapter": 3,
+                            "candidate_count": len(scored_candidates),
+                            "selected_reason": found_reason,
+                        },
+                        rule_source="utility_land_activation_v1",
+                        rule_status="verified",
+                        confidence="medium",
+                        expected_benefit_score=found_score,
+                        reason="convert_final_saga_chapter_into_best_safe_artifact",
+                        strategic_principle="tutor_best_low_cost_artifact_before_saga_leaves",
+                        resource_delta={
+                            "cards": 1 if found is not None else 0,
+                            "lands": 0,
+                            "selected": found.get("name", "?") if found is not None else None,
+                            "zone_move": "library_to_battlefield",
+                        },
+                        risk_flags=[] if found is not None else ["no_safe_target"],
+                        rejected_reason="lower_contextual_tutor_score",
+                    )
+                    emit_replay_event(
+                        "saga_chapter_resolved",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        chapter=3,
+                        found=found.get("name", "?") if found is not None else None,
+                        turn=turn,
+                    )
+                permanent["chapter_ability_pending"] = False
+                triggers += 1
+        if normalize_card_name(permanent.get("name", "")) == "inventors' fair":
+            if artifact_count >= 3:
+                gain_life(player, 1, cap=999)
+                emit_replay_event(
+                    "utility_land_triggered",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger_kind="upkeep_life_gain",
+                    life_gained=1,
+                    artifact_count=artifact_count,
+                    turn=turn,
+                )
+                triggers += 1
+    return triggers
+
+
+def graveyard_enchantment_recovery_score(card, player, turn):
+    effect_data = get_card_effect(card)
+    effect = str(effect_data.get("effect") or card.get("effect") or "unknown")
+    score = threat_score(effect, card.get("name", "?"), player, [player], turn)
+    reason = "highest_contextual_enchantment_recovery_value"
+    if effect in ("ramp_engine", "draw_engine", "topdeck_manipulation"):
+        score += 30
+        reason = "recover_engine_enchantment"
+    elif effect in ("token_maker", "finisher", "approach", "wincon"):
+        score += 25
+        reason = "recover_closing_enchantment"
+    elif effect == "passive":
+        score += 18
+        reason = "recover_static_value_enchantment"
+    return score, reason
+
+
 def should_cast_board_wipe(player, opponents):
     return board_wipe_decision_context(player, opponents)["timing_justified"]
 
@@ -5532,6 +5845,917 @@ def is_wheel_like_card(card, effect_data):
         marker in name
         for marker in ("wheel", "windfall", "timetwister", "reforge")
     )
+
+
+def commander_color_identity_count(player):
+    commander = player.commander if isinstance(player.commander, dict) else None
+    if commander is None and player.command_zone:
+        first = player.command_zone[0]
+        if isinstance(first, dict):
+            commander = first
+    if commander is None:
+        return 1
+    colors = compute_color_identity(commander)
+    return len(colors) if colors else 1
+
+
+def _can_pay_card_with_bonus_mana(
+    player,
+    card,
+    *,
+    bonus_amount=1,
+    bonus_color="colorless",
+    additional_generic=0,
+):
+    if bonus_amount <= 0:
+        return player.can_pay_card(card, additional_generic=additional_generic)
+    current = getattr(player.mana_pool, bonus_color, 0)
+    setattr(player.mana_pool, bonus_color, current + int(bonus_amount))
+    try:
+        return player.can_pay_card(card, additional_generic=additional_generic)
+    finally:
+        setattr(player.mana_pool, bonus_color, current)
+
+
+def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
+    candidates = []
+
+    if player.command_zone:
+        commander = player.command_zone[0]
+        commander_tax = int(player.commander_tax or 0)
+        already_on_board = any(
+            isinstance(permanent, dict)
+            and permanent.get("name") == commander.get("name")
+            for permanent in player.battlefield
+        )
+        if (
+            not already_on_board
+            and not player.can_pay_card(commander, additional_generic=commander_tax)
+            and _can_pay_card_with_bonus_mana(
+                player,
+                commander,
+                additional_generic=commander_tax,
+            )
+        ):
+            effective_cost = int(float(commander.get("cmc") or 0)) + commander_tax
+            score = max(36, effective_cost * 6)
+            candidates.append(
+                {
+                    "card": commander,
+                    "effect_data": get_card_effect(commander),
+                    "score": score,
+                    "reason": "unlock_commander_cast",
+                    "unlock_type": "commander",
+                    "cmc": effective_cost,
+                }
+            )
+
+    for card in player.hand:
+        if not isinstance(card, dict) or is_effective_land(card):
+            continue
+        effect_data = get_card_effect(card)
+        effect = effect_data.get("effect", "unknown")
+        if effect == "unknown":
+            continue
+        if player.can_pay_card(card):
+            continue
+        if not _can_pay_card_with_bonus_mana(player, card):
+            continue
+        if effect == "board_wipe" and not should_cast_board_wipe(player, opponents):
+            continue
+        if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
+            if not should_cast_wheel(player, opponents, effect_data):
+                continue
+
+        cmc = int(float(card.get("cmc") or 0))
+        score = threat_score(effect, card.get("name", "?"), player, all_players, turn)
+        reason = "unlock_contextual_spell"
+        if effect in ("ramp_permanent", "ramp_engine", "land_ramp", "ramp_ritual"):
+            score += 26 if turn <= 4 else 14
+            reason = "unlock_ramp_curve_step"
+        elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature"):
+            score += 22
+            reason = "unlock_interaction"
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation"):
+            score += 18 if cmc <= 4 else 10
+            reason = "unlock_board_or_engine_development"
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe"):
+            score += 24
+            reason = "unlock_high_impact_spell"
+        else:
+            score += max(6, 14 - cmc)
+
+        candidates.append(
+            {
+                "card": card,
+                "effect_data": effect_data,
+                "score": score,
+                "reason": reason,
+                "unlock_type": "spell",
+                "cmc": cmc,
+            }
+        )
+
+    candidates.sort(
+        key=lambda item: (
+            -int(item.get("score") or 0),
+            int(item.get("cmc") or 0),
+            item["card"].get("name", ""),
+        )
+    )
+    return candidates
+
+
+def activate_precombat_utility_mana_lands(
+    player,
+    opponents,
+    all_players,
+    turn,
+    *,
+    phase="precombat_main",
+):
+    if not player.is_alive():
+        return 0
+
+    battlefield_lands = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict) and is_effective_land(permanent)
+    ]
+    if not battlefield_lands:
+        return 0
+
+    ancient_tomb = next(
+        (
+            permanent
+            for permanent in battlefield_lands
+            if normalize_card_name(permanent.get("name", "")) == "ancient tomb"
+            and not permanent.get("utility_land_used_this_turn")
+        ),
+        None,
+    )
+    if ancient_tomb is None:
+        return 0
+
+    if player.life <= 8:
+        _utility_land_skip_event(
+            player,
+            ancient_tomb,
+            turn,
+            "life_too_low_for_ancient_tomb_acceleration",
+            phase=phase,
+            risk_flags=["low_life"],
+        )
+        return 0
+
+    candidates = ancient_tomb_unlock_candidates(player, opponents, all_players, turn)
+    if not candidates:
+        _utility_land_skip_event(
+            player,
+            ancient_tomb,
+            turn,
+            "no_contextual_unlock_for_ancient_tomb",
+            phase=phase,
+        )
+        return 0
+
+    chosen = candidates[0]
+    change_life(player, -2)
+    player.mana_pool.add("colorless", 1)
+    ancient_tomb["utility_land_used_this_turn"] = True
+
+    available_options = [
+        decision_card_option(
+            item["card"],
+            item["effect_data"],
+            score=item["score"],
+            action="unlock_with_ancient_tomb",
+            unlock_type=item["unlock_type"],
+            reason=item["reason"],
+        )
+        for item in candidates[:8]
+    ]
+
+    emit_decision_trace(
+        decision_type="utility_land_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=available_options,
+        chosen_option=decision_card_option(
+            chosen["card"],
+            chosen["effect_data"],
+            score=chosen["score"],
+            action="activate_ancient_tomb",
+            unlock_type=chosen["unlock_type"],
+            reason=chosen["reason"],
+        ),
+        rejected_options=[
+            decision_card_option(
+                item["card"],
+                item["effect_data"],
+                score=item["score"],
+                action="defer_unlock_with_ancient_tomb",
+                unlock_type=item["unlock_type"],
+                reason=item["reason"],
+            )
+            for item in candidates[1:8]
+        ],
+        score_components={
+            "life_before": player.life + 2,
+            "mana_before": player.available_mana() - 1,
+            "mana_after": player.available_mana(),
+            "candidate_count": len(candidates),
+            "chosen_unlock_reason": chosen["reason"],
+        },
+        rule_source="utility_land_activation_v1",
+        rule_status="verified",
+        confidence="medium",
+        expected_benefit_score=chosen["score"],
+        actual_outcome="contextual_fast_mana_enabled",
+        reason="pay_life_only_when_ancient_tomb_unlocks_relevant_action",
+        strategic_principle="convert_life_into_mana_only_for_material_unlock",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "life": -2,
+            "mana": 1,
+            "unlock_target": chosen["card"].get("name", "?"),
+            "unlock_type": chosen["unlock_type"],
+        },
+        risk_flags=["life_payment", "fast_mana_land"],
+        rejected_reason="lower_contextual_unlock_score",
+    )
+    emit_replay_event(
+        "utility_land_activated",
+        player=player.name,
+        card=ancient_tomb.get("name", "?"),
+        activation_kind="contextual_fast_mana",
+        life_paid=2,
+        bonus_mana=1,
+        unlock_target=chosen["card"].get("name", "?"),
+        unlock_reason=chosen["reason"],
+        mana_after=player.available_mana(),
+        life_after=player.life,
+        phase=phase,
+        turn=turn,
+    )
+    return 1
+
+
+def _utility_land_skip_event(player, permanent, turn, reason, *, phase, risk_flags=None):
+    emit_replay_event(
+        "activated_ability_skipped",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        reason="strategic_guardrail",
+        strategic_guardrail_reason=reason,
+        strategic_risk_flags=list(risk_flags or []),
+        phase=phase,
+        turn=turn,
+    )
+
+
+def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
+    """Use safe card-draw utility lands without pretending to judge every spot.
+
+    This is intentionally narrow: prefer card advantage only when the hand is
+    low and the land either preserves board resources (War Room) or is clearly
+    expendable (Sunbaked Canyon).
+    """
+    if not player.is_alive():
+        return 0
+
+    battlefield_lands = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict) and is_effective_land(permanent)
+    ]
+    if not battlefield_lands:
+        return 0
+
+    hand_size = len(player.hand)
+    land_count = len(battlefield_lands)
+    activations = 0
+
+    preferred_order = [
+        "urza's saga",
+        "war room",
+        "sunbaked canyon",
+        "inventors' fair",
+        "hall of heliod's generosity",
+    ]
+    permanents_by_name = {
+        normalize_card_name(permanent.get("name", "")): permanent
+        for permanent in battlefield_lands
+    }
+
+    for normalized_name in preferred_order:
+        permanent = permanents_by_name.get(normalized_name)
+        if permanent is None or permanent.get("utility_land_used_this_turn"):
+            continue
+
+        if normalized_name == "urza's saga":
+            initialize_special_land_runtime_state(permanent, turn=None)
+            current_chapter = max(
+                int(permanent.get("current_chapter") or 1),
+                int(permanent.get("lore_counters") or 0),
+            )
+            if current_chapter != 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "urzas_saga_not_on_construct_chapter",
+                    phase=phase,
+                )
+                continue
+            if player.available_mana() < 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_urzas_saga_construct",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana(2):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_generic_cost",
+                    phase=phase,
+                )
+                continue
+            token = create_creature_token(
+                player,
+                name="Construct Token",
+                power=0,
+                toughness=0,
+                artifact=True,
+            )
+            token["type_line"] = "Artifact Creature Token — Construct"
+            token["subtype"] = "Construct"
+            artifact_count_after = controlled_artifact_count(player)
+            token["power"] = artifact_count_after
+            token["toughness"] = artifact_count_after
+            token["urzas_saga_construct"] = True
+            permanent["utility_land_used_this_turn"] = True
+            emit_decision_trace(
+                decision_type="utility_land_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="activate_construct_token",
+                        score=34,
+                        effect="token_maker",
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="activate_construct_token",
+                    score=34,
+                    effect="token_maker",
+                ),
+                score_components={
+                    "chapter": current_chapter,
+                    "artifact_count_after": artifact_count_after,
+                    "mana_spend_penalty": -2,
+                },
+                rule_source="utility_land_activation_v1",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=34,
+                reason="convert_limited_saga_window_into_board_material",
+                strategic_principle="use_chapter_two_window_for_construct_pressure",
+                resource_delta={
+                    "tokens": 1,
+                    "mana": -2,
+                    "artifact_count_after": artifact_count_after,
+                },
+                risk_flags=[],
+            )
+            emit_replay_event(
+                "utility_land_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="construct_token",
+                token=token.get("name", "?"),
+                token_power=token.get("power"),
+                token_toughness=token.get("toughness"),
+                artifact_count_after=artifact_count_after,
+                mana_paid=2,
+                phase=phase,
+                turn=turn,
+            )
+            activations += 1
+            break
+
+        if normalized_name == "war room":
+            if not player.library:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_library_for_card_draw_land",
+                    phase=phase,
+                )
+                continue
+            life_cost = commander_color_identity_count(player)
+            if hand_size > 3:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_card_draw_land",
+                    phase=phase,
+                )
+                continue
+            if player.available_mana() < 4:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_card_draw_land",
+                    phase=phase,
+                )
+                continue
+            if player.life <= life_cost + 4:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "life_too_low_for_war_room_activation",
+                    phase=phase,
+                    risk_flags=["low_life"],
+                )
+                continue
+            if not player.spend_mana(3):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_generic_cost",
+                    phase=phase,
+                )
+                continue
+            change_life(player, -life_cost)
+            drawn = player.draw(1, rng)
+            permanent["utility_land_used_this_turn"] = True
+            emit_decision_trace(
+                decision_type="utility_land_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="activate",
+                        score=38,
+                        effect="card_draw_land",
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="activate",
+                    score=38,
+                    effect="card_draw_land",
+                ),
+                score_components={
+                    "hand_low_bonus": 18,
+                    "resource_preservation_bonus": 12,
+                    "life_cost_penalty": -life_cost,
+                    "mana_spend_penalty": -3,
+                },
+                rule_source="utility_land_activation_v1",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=38,
+                reason="convert_safe_mana_into_card_without_losing_land",
+                strategic_principle="convert_safe_resource_into_cards",
+                resource_delta={"cards": len(drawn), "life": -life_cost, "mana": -3, "lands": 0},
+                risk_flags=["life_payment"],
+            )
+            emit_replay_event(
+                "utility_land_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="draw_card",
+                cards_drawn=len(drawn),
+                life_paid=life_cost,
+                mana_paid=3,
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                lands_after=controlled_land_count(player),
+                phase=phase,
+                turn=turn,
+            )
+            activations += 1
+            break
+
+        if normalized_name == "sunbaked canyon":
+            if not player.library:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_library_for_sacrifice_draw_land",
+                    phase=phase,
+                )
+                continue
+            if hand_size > 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_sacrifice_draw_land",
+                    phase=phase,
+                )
+                continue
+            if land_count <= 3:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "too_few_lands_to_sacrifice_draw_land",
+                    phase=phase,
+                    risk_flags=["spending_last_safe_land_slot"],
+                )
+                continue
+            if player.available_mana() < 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_sacrifice_draw_land",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana(1):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_generic_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            drawn = player.draw(1, rng)
+            emit_decision_trace(
+                decision_type="utility_land_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="activate",
+                        score=28,
+                        effect="sacrifice_draw_land",
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="activate",
+                    score=28,
+                    effect="sacrifice_draw_land",
+                ),
+                score_components={
+                    "hand_low_bonus": 18,
+                    "flood_relief_bonus": 10 if land_count >= 5 else 4,
+                    "land_loss_penalty": -12,
+                    "mana_spend_penalty": -1,
+                },
+                rule_source="utility_land_activation_v1",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=28,
+                reason="cash_in_expendable_land_for_card",
+                strategic_principle="convert_expendable_land_into_card",
+                resource_delta={"cards": len(drawn), "life": 0, "mana": -1, "lands": -1},
+                risk_flags=["sacrifice_land"],
+            )
+            emit_replay_event(
+                "utility_land_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="sacrifice_draw",
+                cards_drawn=len(drawn),
+                mana_paid=1,
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                lands_after=controlled_land_count(player),
+                phase=phase,
+                turn=turn,
+            )
+            activations += 1
+            break
+
+        if normalized_name == "inventors' fair":
+            if not player.library:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_library_for_inventors_fair_tutor",
+                    phase=phase,
+                )
+                continue
+            artifact_count = controlled_artifact_count(player)
+            if artifact_count < 3:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "artifact_threshold_not_met_for_inventors_fair",
+                    phase=phase,
+                    risk_flags=["artifact_threshold_missing"],
+                )
+                continue
+            if hand_size > 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_inventors_fair_tutor",
+                    phase=phase,
+                )
+                continue
+            if player.available_mana() < 5:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_inventors_fair_tutor",
+                    phase=phase,
+                )
+                continue
+            candidates = [
+                candidate
+                for candidate in player.library
+                if isinstance(candidate, dict)
+                and "artifact" in str(candidate.get("type_line") or "").lower()
+            ]
+            if not candidates:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_artifact_tutor_target",
+                    phase=phase,
+                )
+                continue
+            scored_candidates = [
+                (
+                    candidate,
+                    *tutor_candidate_score(candidate, "artifact_or_enchantment", player, [], turn),
+                )
+                for candidate in candidates
+            ]
+            scored_candidates.sort(
+                key=lambda item: (
+                    -item[1],
+                    -int(float(item[0].get("cmc") or 0)),
+                    item[0].get("name", ""),
+                )
+            )
+            found, found_score, found_reason = scored_candidates[0]
+            if not player.spend_mana(4):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_generic_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            player.library.remove(found)
+            player.hand.append(found)
+            emit_decision_trace(
+                decision_type="utility_land_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="activate_tutor_target",
+                        reason=reason,
+                        target_type="artifact",
+                    )
+                    for candidate, score, reason in scored_candidates[:10]
+                ],
+                chosen_option=decision_card_option(
+                    found,
+                    get_card_effect(found),
+                    score=found_score,
+                    action="activate_tutor_target",
+                    reason=found_reason,
+                    target_type="artifact",
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="reject_tutor_target",
+                        reason=reason,
+                        target_type="artifact",
+                    )
+                    for candidate, score, reason in scored_candidates[1:10]
+                ],
+                score_components={
+                    "artifact_threshold_bonus": 12,
+                    "hand_low_bonus": 16,
+                    "selected_reason": found_reason,
+                    "artifact_count": artifact_count,
+                    "mana_spend_penalty": -4,
+                    "land_loss_penalty": -1,
+                },
+                rule_source="utility_land_activation_v1",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=found_score,
+                reason="convert_boarded_artifact_threshold_into_best_artifact",
+                strategic_principle="cash_in_utility_land_for_contextual_artifact",
+                resource_delta={
+                    "cards": 1,
+                    "mana": -4,
+                    "lands": -1,
+                    "selected": found.get("name", "?"),
+                },
+                risk_flags=["sacrifice_land"],
+                rejected_reason="lower_contextual_tutor_score",
+            )
+            emit_replay_event(
+                "utility_land_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="artifact_tutor",
+                found=found.get("name", "?"),
+                artifact_count=artifact_count,
+                mana_paid=4,
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                lands_after=controlled_land_count(player),
+                phase=phase,
+                turn=turn,
+            )
+            activations += 1
+            break
+
+        if normalized_name == "hall of heliod's generosity":
+            if hand_size > 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_hall_recursion",
+                    phase=phase,
+                )
+                continue
+            if player.available_mana() < 3:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_hall_recursion",
+                    phase=phase,
+                )
+                continue
+            if not player.can_pay("{1}{W}"):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "missing_white_mana_for_hall_recursion",
+                    phase=phase,
+                    risk_flags=["color_requirement_unmet"],
+                )
+                continue
+            candidates = [
+                candidate
+                for candidate in player.graveyard
+                if isinstance(candidate, dict)
+                and "enchantment" in str(candidate.get("type_line") or "").lower()
+            ]
+            if not candidates:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_enchantment_to_recover",
+                    phase=phase,
+                )
+                continue
+            scored_candidates = [
+                (
+                    candidate,
+                    *graveyard_enchantment_recovery_score(candidate, player, turn),
+                )
+                for candidate in candidates
+            ]
+            scored_candidates.sort(
+                key=lambda item: (
+                    -item[1],
+                    -int(float(item[0].get("cmc") or 0)),
+                    item[0].get("name", ""),
+                )
+            )
+            found, found_score, found_reason = scored_candidates[0]
+            if not player.spend_mana("{1}{W}"):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_colored_cost",
+                    phase=phase,
+                )
+                continue
+            player.graveyard.remove(found)
+            player.library.insert(0, found)
+            permanent["utility_land_used_this_turn"] = True
+            emit_decision_trace(
+                decision_type="utility_land_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="recover_to_top",
+                        reason=reason,
+                    )
+                    for candidate, score, reason in scored_candidates[:10]
+                ],
+                chosen_option=decision_card_option(
+                    found,
+                    get_card_effect(found),
+                    score=found_score,
+                    action="recover_to_top",
+                    reason=found_reason,
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="reject_recovery_target",
+                        reason=reason,
+                    )
+                    for candidate, score, reason in scored_candidates[1:10]
+                ],
+                score_components={
+                    "hand_low_bonus": 14,
+                    "engine_or_value_bonus": found_score,
+                    "mana_spend_penalty": -2,
+                },
+                rule_source="utility_land_activation_v1",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=found_score,
+                reason="secure_next_draw_with_best_graveyard_enchantment",
+                strategic_principle="convert_idle_land_slot_into_next_draw_quality",
+                resource_delta={
+                    "cards": 0,
+                    "mana": -2,
+                    "lands": 0,
+                    "selected": found.get("name", "?"),
+                    "zone_move": "graveyard_to_library_top",
+                },
+                risk_flags=[],
+                rejected_reason="lower_contextual_recovery_score",
+            )
+            emit_replay_event(
+                "utility_land_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="graveyard_enchantment_to_top",
+                found=found.get("name", "?"),
+                mana_paid=2,
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                library_top=found.get("name", "?"),
+                phase=phase,
+                turn=turn,
+            )
+            activations += 1
+            break
+
+    return activations
 
 
 def tutor_destination_for_target_type(target_type):
@@ -6668,7 +7892,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     def ramp_permanent_unlocks_meaningful_action(ramp_card, ramp_effect, *, allowed_roles=None):
         """Permanent fast mana may spend scarce land only with immediate payoff."""
         allowed_roles = set(allowed_roles or [])
-        produced_mana = int(ramp_effect.get("mana_produced", 1) or 1)
+        produced_mana = mana_source_production_for_state(
+            player,
+            enrich_card({**ramp_card, **ramp_effect}),
+        )
+        if produced_mana <= 0:
+            return False
         available_after_ramp = player.available_mana() + produced_mana
 
         def payoff_is_affordable_by_count(candidate, additional_generic):
@@ -6972,6 +8201,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 and ramp_cast_plan(c, eff) is not None
                 and ramp_resource_unlocks_same_turn_action(c, eff)
             ):
+                same_turn_unlock = ramp_resource_unlocks_same_turn_action(c, eff)
                 cast_plan = ramp_cast_plan(c, eff) or {}
                 cast_ctx = begin_cast_context(
                     player,
@@ -7012,9 +8242,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         "role": "ramp",
                         "mana_before": mana,
                         "ramp_options": len(ramp_cards),
-                        "unlocks_same_turn_action": 1
-                        if eff.get("effect") == "ramp_ritual"
-                        else 0,
+                        "unlocks_same_turn_action": 1 if same_turn_unlock else 0,
                         "requires_discard_land": bool(eff.get("requires_discard_land")),
                         "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
                         "requires_imprint_nonartifact_nonland": bool(
@@ -7127,7 +8355,9 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     player.battlefield.append(permanent)
                     if is_mana_source_permanent(permanent):
                         colors = source_colors(permanent)
-                        player.mana_pool.add(colors[0], permanent.get("mana_produced", 1))
+                        produced = mana_source_production_for_state(player, permanent)
+                        if produced > 0:
+                            player.mana_pool.add(colors[0], produced)
                 mana = player.available_mana()
                 if note_action():
                     return True
@@ -8932,6 +10162,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     for c in player.battlefield:
         if isinstance(c, dict):
             c["tapped"] = False
+            c["utility_land_used_this_turn"] = False
             if is_battlefield_creature(c):
                 c["summoning_sick"] = False
     # Return phased out permanents (v7 fix: should be upkeep, keeping simple here)
@@ -8940,6 +10171,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.life_cant_change = False
     player.protection_from_everything = False
     player.refresh_mana_sources(turn)
+    process_upkeep_utility_lands(player, turn)
 
     # ── UPKEEP (v8.3: The One Ring burden = draw 1 per turn if on board) ──
     for c in player.battlefield:
@@ -8989,6 +10221,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         eff = get_card_effect(land)
         player.hand.remove(land)
         land_permanent = enrich_card({**land, **eff, "effect": "land"})
+        initialize_special_land_runtime_state(land_permanent, turn)
         player.battlefield.append(land_permanent)
         player.lands_played_this_turn += 1
         player.mana_pool.add(
@@ -9024,6 +10257,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         while not stack.empty() or _pending_triggers:
             priority_round(player, all_players, stack, turn, rng)
     activate_land_tutor_creatures(player, turn)
+    activate_precombat_utility_mana_lands(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
     run_priority_loop(player, all_players, stack, turn, "precombat_main", rng)
     if game_winner(all_players):
         return
@@ -9077,6 +10317,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # ── POSTCOMBAT MAIN ──
     total_mana = player.available_mana()
     run_priority_loop(player, all_players, stack, turn, "postcombat_main", rng)
+    activate_utility_lands(player, turn, rng, phase="postcombat_main")
     if game_winner(all_players):
         return
     if check_sbas(all_players): return

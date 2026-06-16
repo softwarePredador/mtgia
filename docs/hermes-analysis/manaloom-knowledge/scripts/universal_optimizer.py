@@ -5,8 +5,18 @@ Phase 1 (QUICK): 10 games/archetype → all candidates → ~3h
 Phase 2 (FULL):  25 games/archetype → promising candidates (WR >= baseline - 2pp)
 Auto-applies winning swaps. Cron-safe: skip already-tested, lock file prevents concurrency.
 """
-import sqlite3, subprocess, os, json, re, time, sys
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import time
 from datetime import datetime, timezone
+from pathlib import Path
+
+import battle_rule_registry
+from known_cards_fallback_snapshot import load_layered_known_cards
 
 DB = os.environ.get('MANALOOM_KNOWLEDGE_DB', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
 BATTLE = os.environ.get('MANALOOM_BATTLE_SCRIPT', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py')
@@ -16,6 +26,28 @@ LOCK_FILE = '/tmp/optimizer.lock'
 GAMES_QUICK = 10
 GAMES_FULL = 25
 BASELINE_WR = 81.8
+
+
+def load_known_cards(kc_json_path: str, db_path: str) -> dict[str, dict[str, object]]:
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards(
+        generated_path=kc_json_path,
+    )
+
+    rules = battle_rule_registry.load_active_battle_card_rules(db_path)
+    for rule in rules.values():
+        name = str(rule.get("card_name") or "")
+        effect = dict(rule.get("effect_json") or {})
+        if not name or not effect:
+            continue
+        role = dict(rule.get("deck_role_json") or {})
+        merged = dict(known_cards.get(name, {}))
+        merged.update(effect)
+        if role.get("category"):
+            merged["deck_category"] = role["category"]
+        merged["battle_rule_source"] = rule.get("source")
+        merged["battle_rule_review_status"] = rule.get("review_status")
+        known_cards[name] = merged
+    return known_cards
 
 # ── Concurrency lock ──
 if os.path.exists(LOCK_FILE):
@@ -49,9 +81,8 @@ try:
     current = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6").fetchall()
     current_names = set(c[0] for c in current)
     
-    # Load KNOWN_CARDS
-    with open(KC_JSON) as f:
-        kc = json.load(f)
+    # Load KNOWN_CARDS with SQLite battle rules taking precedence over legacy JSON.
+    kc = load_known_cards(KC_JSON, DB)
     
     # Load candidates
     all_lorehold = set()

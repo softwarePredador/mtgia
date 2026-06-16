@@ -28,7 +28,12 @@ from urllib.parse import urlparse
 
 import battle_rule_registry
 from battle_rule_registry import DEFAULT_DB, normalize_card_name, upsert_battle_card_rule
-from sync_battle_card_rules import build_rows
+from known_cards_fallback_snapshot import (
+    build_snapshot_payload,
+    resolve_canonical_snapshot_path,
+    write_snapshot_payload,
+)
+from sync_battle_card_rules import _oracle_normalized_rows, build_rows
 
 try:
     from db_helper import connect, sanitized_database_target
@@ -114,6 +119,11 @@ def parse_args() -> argparse.Namespace:
         "--apply-sqlite-from-pg",
         action="store_true",
         help="Refresh SQLite battle_card_rules from PostgreSQL.",
+    )
+    parser.add_argument(
+        "--export-canonical-fallback-json",
+        default=str(resolve_canonical_snapshot_path()),
+        help="Write a canonical fallback JSON snapshot after PG -> SQLite refresh.",
     )
     parser.add_argument(
         "--only-card",
@@ -527,6 +537,18 @@ def mirror_pg_rules_to_sqlite(sqlite_db: str, rows: list[dict[str, Any]]) -> int
     return changed
 
 
+def export_canonical_snapshot(
+    rows: list[dict[str, Any]],
+    *,
+    sqlite_db: str,
+    output_path: str | Path,
+) -> int:
+    normalized_rows = _oracle_normalized_rows(sqlite_db, rows)
+    payload = build_snapshot_payload(normalized_rows)
+    write_snapshot_payload(output_path, payload)
+    return len(payload)
+
+
 def main() -> int:
     args = parse_args()
     seed_rows = build_rows(
@@ -543,6 +565,7 @@ def main() -> int:
         "apply_sqlite_from_pg": bool(args.apply_sqlite_from_pg),
         "include_generated": not args.skip_generated,
         "include_needs_review": bool(args.include_needs_review),
+        "export_canonical_fallback_json": args.export_canonical_fallback_json,
         "selected_card_count": len(selected_card_names),
         "selected_cards": selected_card_names,
         "only_summary_json": args.only_summary_json,
@@ -558,6 +581,7 @@ def main() -> int:
         "pg_skipped_lower_priority": 0,
         "pg_rows_loaded": 0,
         "sqlite_inserted_or_updated": 0,
+        "canonical_snapshot_rows_exported": 0,
     }
 
     if args.apply_pg or args.apply_sqlite_from_pg:
@@ -581,6 +605,11 @@ def main() -> int:
         report["sqlite_inserted_or_updated"] = mirror_pg_rules_to_sqlite(
             args.sqlite_db,
             rows,
+        )
+        report["canonical_snapshot_rows_exported"] = export_canonical_snapshot(
+            rows,
+            sqlite_db=args.sqlite_db,
+            output_path=args.export_canonical_fallback_json,
         )
 
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)

@@ -207,6 +207,15 @@ Uso correto:
   mas ainda ser marcada como fraca se gastar Lotus Petal sem payoff, descartar
   land unica no Mox Diamond, sacrificar land sem alvo relevante ou manter mao
   sem plano inicial.
+- A politica atual de opening hand precisa continuar alinhada a fontes externas
+  estaveis: a regra dura e London Mulligan, e a heuristica minima de Commander
+  precisa avaliar `curve + color + plan + sequencing + interaction`, nao apenas
+  contagem de lands.
+- Fast mana condicional conta como recurso inicial apenas quando a condicao de
+  producao esta ativa no estado da partida ou na linha inicial prevista. Exemplo
+  concreto ja fechado localmente: `Mox Amber` nao pode justificar keep nem
+  entrar no score de ramp sem uma criatura lendaria ou planeswalker relevante
+  que realmente ligue sua mana no early game.
 - A partir da politica `battle_decision_strategy_v1_2026_06_15`, Mox
   Diamond/permanent fast mana que exige descarte de land nao pode contornar o
   loop de ramp: se a escolha consumiria ultima land ou land de cor unica, o
@@ -492,9 +501,19 @@ Replay JSONL
   ├→ classify_replays_by_turn() → loss_tags {screw: 6, combat-damage: 5}
   ├→ compute_impact_from_replays() → card_impact {Mox Opal: {wdwr: 80}, ...}
   └→ suggest_swaps_by_loss_mode()
-       ├→ Sugestão principal: adicionar {category} com alto WDWR
-       └→ Cut candidates: cartas com WDWR mais baixo
+       ├→ Sugestão principal: adicionar {category} / reforçar tipo funcional
+       └→ Cut candidates: cartas com WDWR mais baixo observadas no proprio corpus
 ```
+
+Leitura correta:
+
+- `loss_mode_suggester.py` nao consome `known_cards_generated.json`;
+- ele tambem nao consulta `battle_card_rules`;
+- hoje ele usa apenas loss tags e `card_impact` derivados dos replays para
+  sugerir categorias e candidatos observados no proprio corpus;
+- se no futuro ele for promovido para sugerir candidatos externos de verdade,
+  deve ler pool canonico agregado (`battle_card_rules`/snapshot/bridge), nao o
+  JSON legado cru.
 
 ### 8.2 Mapeamento Loss Mode → Solução
 
@@ -584,23 +603,54 @@ CUT: Arcane Signet                  WDWR=0.0%
 
 ---
 
-## 11. Card Pool (known_cards_generated.json)
+## 11. Card Pool e precedencia de regras
 
-Fonte de cartas para o slot optimizer. Contém para cada carta:
+O runtime atual nao usa mais `known_cards_generated.json` como fonte principal de
+efeito de batalha.
+
+Precedencia real do battle runtime e dos consumidores Hermes alinhados:
+
+1. waiver manual explicito de emergencia;
+2. `card_battle_rules` / cache SQLite `battle_card_rules`;
+3. `known_cards_canonical_snapshot.json` exportado do cache canonico;
+4. `known_cards_generated.json` apenas como ultimo fallback historico;
+5. tags/heuristicas quando nao ha regra estruturada melhor.
+
+Leitura correta:
+
+- `card_battle_rules` e o inventario operacional canonico de efeito executavel;
+- `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
+  proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
+- `known_cards_generated.json` continua no repositorio apenas como compatibilidade
+  historica e seed de fallback, nao como verdade principal;
+- `HANDCRAFTED_KNOWN_CARDS` e `MANUAL_RULE_RUNTIME_WAIVERS` devem permanecer
+  vazios no runtime normal e so podem ser preenchidos em incidentes controlados.
+
+Campos tipicos encontrados no snapshot/fallback legado:
+
 - `name`: nome da carta
-- `effect`: efeito de batalha (ramp_permanent, remove_creature, etc.)
-- `deck_category`: categoria no deck
-- `cmc`: converted mana cost
+- `effect`: efeito de batalha (`ramp_permanent`, `remove_creature`, etc.)
+- `deck_category`: categoria de deckbuilding historica
+- `cmc`: mana value / custo convertido
 - `color_identity`: identidade de cor
-- `battle_rule_source`: fonte da regra (known_cards_manual, curated, generated, heuristic)
-- `battle_rule_review_status`: status da regra (verified, needs_review, active)
+- `battle_rule_source`: proveniencia da regra (`manual`, `curated`, `generated`, `heuristic`)
+- `battle_rule_review_status`: status da regra (`verified`, `needs_review`, etc.)
 
-Filtros aplicados pelo slot optimizer:
+Filtros aplicados pelo slot optimizer e consumidores equivalentes:
+
 - `off_color`: identidade de cor fora da do commander
-- `illegal`: commander_legality != "legal"
-- `high_cmc`: CMC > MAX_CMC_BY_CATEGORY
-- `deck`: já está no deck atual
-- `basic`: terra básica
+- `illegal`: `commander_legality != "legal"`
+- `high_cmc`: `CMC > MAX_CMC_BY_CATEGORY`
+- `deck`: carta ja esta no deck atual
+- `basic`: terra basica
+
+Risco operacional remanescente:
+
+- o conflito principal ja nao e de precedencia no runtime;
+- o risco real virou drift do fallback legado: o JSON historico ainda cobre menos
+  cartas e pode divergir semanticamente do snapshot canonico em modo degradado;
+- por isso, qualquer auditoria ou scorecard deve preferir `battle_card_rules` ou
+  o snapshot canonico antes de confiar no JSON legado.
 
 ---
 

@@ -3,10 +3,13 @@
 
 from __future__ import annotations
 
+import json
+import os
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import sync_pg_card_metadata_to_hermes as sync
 
@@ -159,6 +162,41 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
                 )
             finally:
                 conn.close()
+
+    def test_collect_requested_names_includes_canonical_snapshot_cards(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            canonical_path = Path(tmp) / "known_cards_canonical_snapshot.json"
+            generated_path = Path(tmp) / "known_cards_generated.json"
+            canonical_path.write_text(
+                json.dumps(
+                    {
+                        "Canonical Only": {
+                            "effect": "counter",
+                            "battle_rule_source": "manual",
+                            "battle_rule_review_status": "verified",
+                            "battle_rule_confidence": 1.0,
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            generated_path.write_text(
+                json.dumps({"Legacy Only": {"effect": "tutor"}}),
+                encoding="utf-8",
+            )
+
+            with mock.patch.dict(
+                os.environ,
+                {
+                    "MANALOOM_CANONICAL_KNOWN_CARDS_JSON": str(canonical_path),
+                    "MANALOOM_KNOWN_CARDS_JSON": str(generated_path),
+                },
+                clear=False,
+            ):
+                names = sync.collect_requested_names(self.cur)
+
+        self.assertIn("Canonical Only", names)
+        self.assertIn("Legacy Only", names)
 
 
 if __name__ == "__main__":

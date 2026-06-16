@@ -33,6 +33,7 @@ SUPPORTED_EFFECTS = {
     "board_wipe",
     "combo",
     "commander",
+    "copy_creature_token",
     "copy_spell",
     "counter",
     "creature",
@@ -46,6 +47,7 @@ SUPPORTED_EFFECTS = {
     "exile_value",
     "extra_turn",
     "finisher",
+    "hand_filter",
     "hate_artifact",
     "indestructible",
     "land",
@@ -134,6 +136,11 @@ HEURISTIC_SOURCES = {
     "known_cards_generated",
     "type_line_creature",
     "unknown",
+}
+
+LEGACY_FALLBACK_SOURCES = {
+    "known_cards_manual",
+    "known_cards_generated",
 }
 
 
@@ -354,13 +361,22 @@ def audit_rule_provenance(
                 "Move this card into card_battle_rules with verified/active status.",
             )
 
-        if rule is None and source in {"known_cards_manual", "known_cards_generated"}:
+        if rule is None and source in LEGACY_FALLBACK_SOURCES:
             add_finding(
                 findings,
                 "medium",
                 event,
                 "Card used legacy known-cards fallback but is absent from battle_card_rules cache.",
                 "Sync card_battle_rules from PG and confirm the card exists in card_battle_rules.",
+            )
+
+        if rule is None and source == "known_cards_canonical_snapshot":
+            add_finding(
+                findings,
+                "low",
+                event,
+                "Card used canonical snapshot fallback but is absent from live battle_card_rules cache.",
+                "Refresh the SQLite/PG rule cache and regenerate the canonical snapshot if drift is expected.",
             )
 
         if rule:

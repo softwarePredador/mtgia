@@ -135,6 +135,96 @@
   upkeep generico, attack/block restrictions avancadas e threat assessment por
   player/permanent.
 
+### Atualizacao de ciclo — 2026-06-16 / Known Cards Runtime Fallback Audit
+
+- Criado `audit_known_cards_runtime_fallback.py` para medir a distancia real
+  entre `known_cards_generated.json` e o cache canonico `battle_card_rules`.
+- Resultado validado nesta rodada:
+  - `3158` regras canonicas em SQLite;
+  - `1970` nomes em overlap com o JSON legado;
+  - `1457` matches exatos de runtime;
+  - `297` diferencas apenas estruturais apos normalizacao;
+  - `216` diferencas reais de `effect` apos a mesma normalizacao aplicada aos
+    dois lados;
+  - `1188` cartas existem no cache canonico e nao existem no JSON legado.
+- Isso confirma que o problema residual nao e mais "conflito ativo de
+  precedencia" no battle runtime, e sim "fallback degradado semanticamente mais
+  pobre" quando algum fluxo cai no JSON legado.
+- Revalidado tambem:
+  - `test_runtime_pg_rule_fallback_for_promoted_hotfixes.py`;
+  - `test_sync_battle_card_rules_manual_preserve.py`;
+  - override de `battle_card_rules` sobre fallback dentro de
+    `battle_card_specific_tests`.
+- Ajuste aplicado:
+  - `universal_optimizer.py` deixou de consumir `known_cards_generated.json`
+    cru e agora sobrepoe `battle_card_rules`, igual ao `slot_optimizer.py`.
+- Reclassificacao aplicada nesta rodada:
+  - `server/bin/loss_mode_suggester.py` nao deve mais ser tratado como
+    consumidor ativo do fallback legado; o script hoje usa apenas `loss_tags`
+    e `card_impact` derivados de replay, e o texto antigo que mencionava
+    `known_cards_generated.json` era apenas drift documental.
+- Guardrail aplicado nesta rodada:
+  - `test_known_cards_consumer_guardrail.py` passou a proteger a fronteira de
+    consumidores ativos: `slot_optimizer.py`, `universal_optimizer.py`,
+    `battle_effect_coverage_audit.py` e `sync_pg_card_metadata_to_hermes.py`
+    agora ficam cobertos contra regressao para leitura crua do fallback legado,
+    e `battle_analyst_v9.py` fica coberto quanto a ordem
+    `battle_card_rules -> snapshot canonico -> legado`.
+- Ajuste aplicado nesta continuidade:
+  - `battle_analyst_v9.py` agora tenta `known_cards_canonical_snapshot.json`
+    antes do fallback legado;
+  - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` agora exporta o
+    snapshot canonico junto com o refresh do cache SQLite;
+  - `battle_forensic_audit.py` passou a distinguir snapshot canonico de fallback
+    legado, reduzindo falso positivo de drift quando o runtime degradado ainda
+    esta semanticamente alinhado ao cache.
+- Pendente correto daqui para frente:
+  - garantir rollout Hermes/AWS desse snapshot nos jobs reais;
+  - manter o JSON legado apenas como ultimo historico/seed ate a troca completa;
+  - auditar outros consumidores secundarios para garantir que nao restou leitura
+    crua do fallback em caminhos ativos.
+
+### Atualizacao de ciclo — 2026-06-16 / Generator Ownership + Learned Deck Boundary
+
+- Revalidado o pipeline real de `server/routes/ai/generate/index.dart`.
+  O fluxo atual usa:
+  - `commander_reference_profiles`;
+  - `commander_reference_card_stats`;
+  - `commander_reference_deck_corpus`;
+  - `commander_card_usage` como guidance textual;
+  - filtro/refill deterministico;
+  - `GeneratedDeckValidationService` + `DeckRulesService`.
+- Confirmado tecnicamente: `/ai/generate` **nao** usa
+  `commander_learned_decks` nem `commander_learning_snapshot` como fonte
+  primaria de montagem do deck.
+- Learned deck hoje e um canal de produto separado:
+  `GET /ai/commander-learning` entrega `recommended_deck` validado para o app
+  revisar/salvar, com metadata Hermes escondida do usuario comum.
+- Ajuste aplicado nesta continuidade:
+  - `buildCommanderReferenceDiagnostics()` passou a expor
+    `runtime_profile_origin` e `runtime_profile_reason` quando o profile
+    utilizavel vier do fallback runtime, sem alterar decklist nem exigir
+    consumo app-facing obrigatorio.
+- `commander_learning_snapshot` existe e consolida:
+  - learned decks ativos;
+  - `commander_card_usage`;
+  - `commander_card_synergy`;
+  mas ainda nao foi adotado como loader analitico unificado nos pipelines
+  internos de generate/optimize/diagnostics.
+- Lorehold permanece parcialmente fallback-curated:
+  `buildDeterministicReferenceDeck()` ainda injeta
+  `loreholdDeterministicReferenceFallbackCards` como rede de seguranca depois de
+  stats/corpus/expected packages.
+- Gaps corretos abertos a partir desta revalidacao:
+  1. definir fronteira explicita entre "deck gerado" e "deck carregado de
+     learned deck" para scorecards nao misturarem canais;
+  2. promover explainability backend-owned por carta gerada com provenance
+     (`profile`, `corpus`, `usage`, `learned_rank`, `fallback`, `repair`);
+  3. decidir se learned decks entram como ranking interno opcional no
+     `/ai/generate` ou continuam estritamente como fluxo paralelo;
+  4. adotar `commander_learning_snapshot` como fonte diagnostica agregada,
+     evitando consumidores paralelos recalculando learned/usage/synergy.
+
 | Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |
@@ -1089,6 +1179,75 @@ virar hash semântico por carta.
    contrato runtime.
 8. Só depois evoluir learned decks para dois comandantes.
 9. Só depois usar feedback ML como input de política.
+
+### Atualizacao 2026-06-16 - estudo profundo battle + generator + Lorehold
+
+Estudo canônico novo:
+
+- `docs/hermes-analysis/BATTLE_GENERATOR_LOREHOLD_TRUTH_STUDY_2026-06-16.md`
+
+Conclusao operacional consolidada:
+
+- battle nao e mais o blocker principal para focar em geracao/optimize;
+- o battle atual serve como laboratorio auditavel e gate de regressao para as
+  decisoes ja modeladas, mas ainda nao como verdade final de qualidade de
+  jogada;
+- o generator ja e hibrido e usa PG/reference/corpus/usage/validation, mas
+  ainda depende de fallback curado literal, especialmente no caso Lorehold;
+- Lorehold ja e caso de controle valido para medir criacao, optimize e replay,
+  mas ainda nao pode ser tratado como prova universal de qualidade por causa de
+  utility lands parciais, cobertura incompleta de cartas de oponentes e
+  ausencia de metricas fortes de decisao.
+- revalidacao source-backed desta continuidade:
+  - regra oficial de mulligan continua sendo London Mulligan, sem "free
+    mulligan" embutido no formato;
+  - Commander oficial continua exigindo 99+1, singleton, identidade de cor,
+    commander tax, commander damage e combate multiplayer com ataques
+    distribuidos;
+  - a calibracao estrategica minima de mulligan segue `curve + color + plan +
+    sequencing + interaction`, nao apenas numero de lands;
+  - `Mox Amber` so pode contar como aceleração inicial quando a mana condicional
+    estiver realmente "live" com lendaria/planeswalker relevante.
+- correcao local validada nesta continuidade:
+  - o seed problematico de Lorehold que antes mantinha `4 lands + Mox Amber +
+    Mizzix's Mastery + Rise of the Eldrazi` agora mulliga com
+    `reason=no_early_game_plan`;
+  - os falsos criticos do auditor forense para `copy_creature_token`
+    (`Electroduplicate`) e `hand_filter`
+    (`Valakut Awakening // Valakut Stoneforge`) foram removidos ao alinhar a
+    lista de `SUPPORTED_EFFECTS` com o engine real;
+  - o runtime local de `known_cards` continua `PASS` com
+    `known_cards_count=3158`, `canonical_fallback_count=3158` e sem waiver
+    manual ativo depois de promover a regra canônica local de `Mox Amber` para
+    SQLite + snapshot com
+    `requires_legendary_creature_or_planeswalker_for_mana=true`.
+
+Tasks priorizadas derivadas do estudo:
+
+| Prioridade | Task | Motivo real | Resultado esperado |
+|---|---|---|---|
+| P1 | Refinar `Urza's Saga` depois do slice minimo ja implementado | Em 2026-06-16 o battle passou a inicializar capitulo/lore, avancar no upkeep, criar Construct no capitulo II e tutorar artefato cmc<=1 seguro no capitulo III antes do SBA. O gap remanescente e de refinamento: sizing dinamico do Construct e generalizacao prudente do fluxo de Saga | Menos ambiguidade medium-risk no Lorehold sem abrir uma engine de Saga agressiva demais |
+| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review` |
+| P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
+| P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | WR bruto continua fraco como sinal de verdade | Aprendizado menos enganado por variance e jogos longos |
+| P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |
+| P1 | Formalizar a politica de mulligan Commander no auditor/trace como `curve + color + plan + sequencing + interaction` | A parte legal ja esta fechada, mas a explicacao estrategica ainda esta curta e o London Mulligan ainda nao bottoma cartas com criterio auditavel | Abertura de maos mais reproduzivel e melhor rastreabilidade do porquê keep/mull/bottom |
+| P1 | Promover `card_role_scores` em janela controlada com stale prune revisado | O slice EDHREC bounded ja existe, mas ainda nao foi aplicado como base mais forte do pipeline | Candidate pool mais data-backed para generate/optimize |
+| P1 | Provar consumo live do profile persistido do Lorehold e reduzir fallback literal | Em 2026-06-16 o recheck read-only de `commander_reference_profile_lorehold.dart --dry-run` fechou com `usable_after_run=true`, `confidence=high`, `source_count=4` e `34/34` reference stats resolvidos; o `commander_generate_provenance_audit.dart` revalidado no mesmo dia retornou `profile_usable=true`, `deterministic_main_count=99` e `active_learned_deck_exists=true` | Fecha a prova operacional de que `/ai/generate` pode usar a pilha estruturada do backend para Lorehold; depois disso o alvo vira telemetry/explainability e reducao do `loreholdDeterministicReferenceFallbackCards`, nao mais upsert do row |
+| P1 | Fechar paridade entre banco auditado localmente e backend publico no generator Lorehold | Em 2026-06-16 o banco auditado read-only mostrou `profile_usable=true` para Lorehold, mas a prova publica de `POST /ai/generate` no SHA `9c1ca349` retornou `diagnostics.reference_profile_used=false`, `reference_card_stats_used=false`, `archetype_reference_used=true` e fallback mock de `50x Mountain // Mountain` + `49x Plains // Plains`; `GET /ai/commander-learning` no mesmo ambiente retornou `source=pg_commander_learned_decks`, porem `profile=null`, `card_stats=null` e `deck_corpus=null` | Sem essa paridade, qualquer scorecard sobre o generator publico continua misturando "codigo certo" com "dados/config errados"; o proximo slice precisa provar qual banco/config o deploy publico esta usando e alinhar o caminho live do Lorehold |
+| P1 | Reduzir dependencia do fallback literal Lorehold no builder deterministico | A lista `loreholdDeterministicReferenceFallbackCards` e util, mas ancora a criacao em preset historico | Decks mais explicaveis e mais dependentes de profile/stats/corpus/usage |
+| P1 | Fechar rollout/versionamento do snapshot canonico de `known_cards` | O suporte local ja foi implementado: `battle_analyst_v9.py` consulta `known_cards_canonical_snapshot.json` antes do JSON legado, `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` exporta o snapshot e a auditoria local fechou em `PASS` com `canonical_fallback_count=3158`. O ponto aberto agora e decidir se o snapshot fica versionado, sempre regenerado por sync, ou ambos | Menor degradacao semantica quando SQLite/PG nao estiverem disponiveis; reproducao local e remota mais previsivel; menos ambiguidade operacional |
+| P1 | Formalizar por commit/deploy o rollout do snapshot canonico de `known_cards` no Hermes AWS | Em 2026-06-16 o `master` local validou `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, precedencia `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`, snapshot materializado localmente e auditoria `PASS` com `known_cards_count=3158`. A rodada operacional no Hermes AWS evoluiu em tres passos comprovados: (1) o script ativo `/opt/data/scripts/known_cards_validator_cron.sh` ja faz `git checkout master`; (2) apos hotfix no cron + `sync_battle_card_rules_pg.py`, o ambiente remoto passou a materializar `known_cards_canonical_snapshot.json` com `canonical_snapshot_rows_exported=3158`; (3) apos roll-out tambem de `battle_analyst_v9.py` + `known_cards_fallback_snapshot.py`, o auditor remoto fechou `branch=master`, `head=9c1ca349`, `known_cards_count=3158`, `canonical_fallback_count=3158`, `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, `status=PASS` | O risco de logica/runtime foi reduzido; o risco restante agora e operacional: esse alinhamento remoto ainda esta como hotfix manual e precisa virar estado versionado/deployavel para nao regredir em rebuild, troca de container ou reposicionamento do workspace Hermes |
+| P1 | Adicionar explainability backend-owned por carta gerada | O produto ainda nao responde bem "por que essa carta entrou?" | Transparencia de criacao, QA melhor e comparacao de fontes por carta |
+| P1 | Higienizar proveniencia das regras promovidas hoje marcadas como `source='manual'` em PG/SQLite | Runtime manual ativo ja esta zerado, mas a proveniencia historica ainda confunde auditoria | Menos ruido conceitual sem mudar comportamento de runtime |
+
+Regras mantidas por este estudo:
+
+- nao fazer ban global de Mox;
+- nao promover SQLite Hermes a fonte final;
+- nao usar WR bruto como verdade;
+- nao usar join cru `deck_cards -> card_battle_rules`;
+- nao reescrever o battle do zero neste ciclo.
 
 ### Critério de bloqueio
 

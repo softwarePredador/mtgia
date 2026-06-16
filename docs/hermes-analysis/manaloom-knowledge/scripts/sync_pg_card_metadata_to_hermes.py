@@ -28,6 +28,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from known_cards_fallback_snapshot import load_layered_known_cards
+
 try:
     from db_helper import connect, sanitized_database_target
 except Exception as exc:  # pragma: no cover - exercised in lean containers.
@@ -202,14 +204,8 @@ def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
             if removed:
                 names.add(str(removed))
 
-    known_cards_path = Path(__file__).resolve().parent / "known_cards_generated.json"
-    if known_cards_path.exists():
-        try:
-            decoded = json.loads(known_cards_path.read_text(encoding="utf-8"))
-        except Exception:
-            decoded = {}
-        if isinstance(decoded, dict):
-            names.update(str(name) for name in decoded.keys() if name)
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
+    names.update(str(name) for name in known_cards.keys() if name)
 
     return {name.strip() for name in names if name and name.strip()}
 

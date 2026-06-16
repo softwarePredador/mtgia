@@ -25,6 +25,10 @@ from battle_rule_registry import (
     ensure_battle_card_rules,
     upsert_battle_card_rule,
 )
+from known_cards_fallback_snapshot import (
+    build_snapshot_payload,
+    write_snapshot_payload,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -47,6 +51,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
     parser.add_argument("--skip-generated", action="store_true")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument(
+        "--export-canonical-fallback-json",
+        default=str(SCRIPT_DIR / "known_cards_canonical_snapshot.json"),
+    )
     parser.add_argument("--report")
     return parser.parse_args()
 
@@ -116,7 +124,23 @@ def build_rows(
     # After the 2026-06-16 canonicalization cleanup, active handwritten rules
     # should normally be empty. This loop remains only for explicit temporary
     # runtime waivers injected by tests or incident response.
+    for name in sorted(getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set())):
+        effect = dict(getattr(battle, "HANDCRAFTED_KNOWN_CARD_RULES", {}).get(name) or {})
+        if not effect:
+            continue
+        rows.append(
+            {
+                "card_name": name,
+                "effect_json": effect,
+                "source": "manual",
+                "confidence": 1.0,
+                "review_status": "verified",
+                "notes": "Seeded from MANUAL_RULE_RUNTIME_WAIVERS.",
+            }
+        )
     for name in sorted(battle.HANDCRAFTED_KNOWN_CARDS):
+        if name in getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set()):
+            continue
         effect = dict(battle.KNOWN_CARDS[name])
         rows.append(
             {
@@ -154,12 +178,14 @@ def main() -> int:
     report = {
         "sqlite_db": args.sqlite_db,
         "apply": bool(args.apply),
+        "export_canonical_fallback_json": args.export_canonical_fallback_json,
         "input_rows": len(rows),
         "manual_rows": sum(1 for row in rows if row["source"] == "manual"),
         "generated_rows": sum(1 for row in rows if row["source"] == "generated"),
         "oracle_normalized_rows": sum(1 for row in rows if row.get("_oracle_normalized")),
         "inserted_or_updated": 0,
         "skipped_lower_priority": 0,
+        "canonical_snapshot_rows_exported": 0,
     }
 
     if args.apply:
@@ -181,6 +207,37 @@ def main() -> int:
                 report["skipped_lower_priority"] += 1
         conn.commit()
         conn.close()
+
+        with sqlite3.connect(args.sqlite_db) as conn:
+            conn.row_factory = sqlite3.Row
+            active_rows = []
+            for row in conn.execute(
+                """
+                SELECT
+                    card_name,
+                    effect_json,
+                    source,
+                    confidence,
+                    review_status,
+                    rule_version,
+                    oracle_hash
+                FROM battle_card_rules
+                """
+            ):
+                active_rows.append(
+                    {
+                        "card_name": row["card_name"],
+                        "effect_json": json.loads(row["effect_json"]),
+                        "source": row["source"],
+                        "confidence": row["confidence"],
+                        "review_status": row["review_status"],
+                        "rule_version": row["rule_version"],
+                        "oracle_hash": row["oracle_hash"],
+                    }
+                )
+        payload = build_snapshot_payload(active_rows)
+        write_snapshot_payload(args.export_canonical_fallback_json, payload)
+        report["canonical_snapshot_rows_exported"] = len(payload)
 
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)
     print(output)

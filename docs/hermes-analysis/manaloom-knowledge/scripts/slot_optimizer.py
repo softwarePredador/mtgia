@@ -15,6 +15,7 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 
+from known_cards_fallback_snapshot import load_layered_known_cards
 from master_optimizer_common import (
     DEFAULT_DB,
     PROTECTED_CARDS,
@@ -273,11 +274,9 @@ def choose_primary_category(categories: list[str]) -> str | None:
 
 
 def load_known_cards() -> dict[str, dict[str, object]]:
-    if KC_JSON.exists():
-        with KC_JSON.open("r", encoding="utf-8") as fh:
-            known_cards = json.load(fh)
-    else:
-        known_cards = {}
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards(
+        generated_path=KC_JSON,
+    )
     rules = battle_rule_registry.load_active_battle_card_rules(DEFAULT_DB)
     for rule in rules.values():
         name = str(rule.get("card_name") or "")
@@ -353,11 +352,14 @@ def load_real_roles(conn, deck_id: int) -> dict[str, str]:
             name = normalize_name(row["card_name"])
             if not name or name in roles:
                 continue
+            categories: list[str] = []
             for tag in functional_tags_for_row(row):
                 mapped = REAL_ROLE_TO_CATEGORY.get(tag)
-                if mapped:
-                    roles[name] = mapped
-                    break
+                if mapped and mapped not in categories:
+                    categories.append(mapped)
+            primary = choose_primary_category(categories)
+            if primary:
+                roles[name] = primary
     except Exception:
         pass
 

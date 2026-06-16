@@ -3,8 +3,13 @@
 
 from __future__ import annotations
 
+import json
+import os
 import sqlite3
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
 import slot_optimizer
 
@@ -90,6 +95,52 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
         roles = slot_optimizer.load_real_roles(conn, 6)
 
         self.assertEqual(roles["snapshot only"], "draw")
+
+    def test_load_known_cards_prefers_canonical_snapshot_over_legacy_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            generated_path = Path(tmpdir) / "known_cards_generated.json"
+            canonical_path = Path(tmpdir) / "known_cards_canonical_snapshot.json"
+            generated_path.write_text(
+                json.dumps(
+                    {
+                        "Alpha Card": {"effect": "remove_creature"},
+                        "Beta Card": {"effect": "tutor"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            canonical_path.write_text(
+                json.dumps(
+                    {
+                        "Alpha Card": {
+                            "effect": "counter",
+                            "battle_rule_source": "manual",
+                            "battle_rule_review_status": "verified",
+                            "battle_rule_confidence": 1.0,
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with (
+                mock.patch.object(slot_optimizer, "KC_JSON", generated_path),
+                mock.patch.dict(
+                    os.environ,
+                    {"MANALOOM_CANONICAL_KNOWN_CARDS_JSON": str(canonical_path)},
+                    clear=False,
+                ),
+                mock.patch.object(
+                    slot_optimizer.battle_rule_registry,
+                    "load_active_battle_card_rules",
+                    return_value={},
+                ),
+            ):
+                known_cards = slot_optimizer.load_known_cards()
+
+        self.assertEqual(known_cards["Alpha Card"]["effect"], "counter")
+        self.assertEqual(known_cards["Alpha Card"]["battle_rule_source"], "manual")
+        self.assertEqual(known_cards["Beta Card"]["effect"], "tutor")
 
 
 if __name__ == "__main__":
