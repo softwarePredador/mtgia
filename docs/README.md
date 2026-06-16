@@ -32,23 +32,27 @@ as fontes canônicas abaixo.
    - classificação dos consumidores Hermes de `functional_tag`, indicando quais
      já usam `functional_tags_json`, quais são indiretos e quais são manuais ou
      históricos.
-9. `server/manual-de-instrucao.md`
+9. `docs/hermes-analysis/DECK_GENERATION_FOCUS_READINESS_2026-06-16.md`
+   - decisão operacional atual: battle/Hermes não bloqueia foco em geração e
+     optimize; primeiro slice seguro adiciona sinal EDHREC bounded ao pipeline
+     interno de candidate quality.
+10. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
-10. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+11. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
-11. `app/doc/APP_AUDIT_2026-04-29.md`
+12. `app/doc/APP_AUDIT_2026-04-29.md`
    - status consolidado do app mobile, riscos e validacoes recentes.
-12. `app/doc/UI_TEST_SURFACE_MAP.md`
+13. `app/doc/UI_TEST_SURFACE_MAP.md`
    - keys e superficies que testes runtime devem usar.
-13. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+14. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
    - checklist para rodada interna non-scanner.
-14. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+15. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-15. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+16. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
    - veredito global atual de produto, gates restantes e ordem de execucao.
-16. `app/doc/runtime_flow_handoffs/README.md`
+17. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-17. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+18. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 

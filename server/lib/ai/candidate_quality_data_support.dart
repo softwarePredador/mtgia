@@ -705,6 +705,8 @@ List<CandidateRoleScore> buildCandidateRoleScores({
   Object? cmc,
   int metaUsageCount = 0,
   int metaDeckCount = 0,
+  double edhrecInclusionRate = 0,
+  int edhrecSampleDecks = 0,
 }) {
   final tags = inferCandidateFunctionTags(
     name: name,
@@ -719,19 +721,31 @@ List<CandidateRoleScore> buildCandidateRoleScores({
     priceUsdFoil: priceUsdFoil,
   );
   final estimatedCmc = safeToDouble(cmc, _estimateManaCostCmc(manaCost ?? ''));
+  final normalizedEdhrecRate =
+      _normalizeEdhrecInclusionRate(edhrecInclusionRate);
+  final edhrecInclusionBonus =
+      (normalizedEdhrecRate * 18).round().clamp(0, 18).toInt();
+  final edhrecSampleBonus = _edhrecSampleBonus(edhrecSampleDecks);
   final roleBest = <String, CandidateRoleScore>{};
   for (final tag in tags) {
     final role = normalizeCandidateQualityRole(tag.tag);
-    final popularityBonus =
-        (metaDeckCount * 3 + metaUsageCount ~/ 12).clamp(0, 20).toInt();
+    final popularityBonus = (metaDeckCount * 3 +
+            metaUsageCount ~/ 12 +
+            edhrecInclusionBonus +
+            edhrecSampleBonus)
+        .clamp(0, 30)
+        .toInt();
     final curvePenalty = estimatedCmc >= 7
         ? 16
         : estimatedCmc >= 6
             ? 9
             : 0;
     final confidenceScore = (tag.confidence * 72).round();
-    final premiumBonus =
-        isPremiumCommanderCandidateName(name) || metaDeckCount >= 12 ? 8 : 0;
+    final premiumBonus = isPremiumCommanderCandidateName(name) ||
+            metaDeckCount >= 12 ||
+            (normalizedEdhrecRate >= 0.35 && edhrecSampleDecks >= 1000)
+        ? 8
+        : 0;
     final score =
         (confidenceScore + popularityBonus + premiumBonus - curvePenalty)
             .clamp(1, 100)
@@ -747,7 +761,11 @@ List<CandidateRoleScore> buildCandidateRoleScores({
       score: score,
       bracketScope: bracketScope,
       budgetTier: budgetTier,
-      evidence: tag.evidence,
+      evidence: _withEdhrecEvidence(
+        baseEvidence: tag.evidence,
+        inclusionRate: normalizedEdhrecRate,
+        sampleDecks: edhrecSampleDecks,
+      ),
     );
     final current = roleBest[role];
     if (current == null || candidate.score > current.score) {
@@ -762,6 +780,34 @@ List<CandidateRoleScore> buildCandidateRoleScores({
       return a.role.compareTo(b.role);
     });
   return output;
+}
+
+double _normalizeEdhrecInclusionRate(double value) {
+  if (!value.isFinite || value <= 0) return 0;
+  if (value <= 1) return value;
+  if (value <= 100) return value / 100;
+  return 1;
+}
+
+int _edhrecSampleBonus(int sampleDecks) {
+  if (sampleDecks >= 5000) return 6;
+  if (sampleDecks >= 1000) return 4;
+  if (sampleDecks >= 250) return 2;
+  if (sampleDecks > 0) return 1;
+  return 0;
+}
+
+String _withEdhrecEvidence({
+  required String baseEvidence,
+  required double inclusionRate,
+  required int sampleDecks,
+}) {
+  if (inclusionRate <= 0 && sampleDecks <= 0) return baseEvidence;
+  return [
+    baseEvidence,
+    'edhrec_inclusion_rate=${inclusionRate.toStringAsFixed(3)}',
+    'edhrec_sample_decks=$sampleDecks',
+  ].join(';');
 }
 
 String inferCandidateBudgetTier({

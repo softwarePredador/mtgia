@@ -88,6 +88,7 @@ Ao responder sobre o ManaLoom:
 - `docs/hermes-analysis/BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` (dúvidas/decisões para validação do owner)
 - `docs/hermes-analysis/BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md` (handoff objetivo de perguntas/furos/logística antes das próximas fases)
 - `docs/hermes-analysis/HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md` (classificação dos consumidores Hermes de `functional_tag` e status de migração para arrays)
+- `docs/hermes-analysis/DECK_GENERATION_FOCUS_READINESS_2026-06-16.md` (triagem atual: battle nao bloqueia foco em geracao/optimize; candidate quality usa sinal EDHREC bounded em dry-run validado)
 - Hermes AWS aplicou o snapshot semântico de Lorehold em 2026-06-11 com backup
   do `knowledge.db`; invariantes pós-scan: 100 cartas, 1 comandante, hash
   estrutural restaurado e nenhuma Chrome Mox/Mox Diamond/Mox Opal no deck.

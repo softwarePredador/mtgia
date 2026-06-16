@@ -121,6 +121,38 @@ void main() {
       expect(ramp.score, greaterThanOrEqualTo(70));
     });
 
+    test(
+        'role scores use bounded EDHREC inclusion evidence as a ranking signal',
+        () {
+      final baseline = buildCandidateRoleScores(
+        name: 'Arcane Signet',
+        typeLine: 'Artifact',
+        oracleText:
+            '{T}: Add one mana of any color in your commander\'s color identity.',
+        manaCost: '{2}',
+        priceUsd: 1.5,
+        priceUsdFoil: null,
+        cmc: 2,
+      ).firstWhere((score) => score.role == 'ramp');
+
+      final withEdhrec = buildCandidateRoleScores(
+        name: 'Arcane Signet',
+        typeLine: 'Artifact',
+        oracleText:
+            '{T}: Add one mana of any color in your commander\'s color identity.',
+        manaCost: '{2}',
+        priceUsd: 1.5,
+        priceUsdFoil: null,
+        cmc: 2,
+        edhrecInclusionRate: 0.42,
+        edhrecSampleDecks: 4200,
+      ).firstWhere((score) => score.role == 'ramp');
+
+      expect(withEdhrec.score, greaterThan(baseline.score));
+      expect(withEdhrec.evidence, contains('edhrec_inclusion_rate=0.420'));
+      expect(withEdhrec.evidence, contains('edhrec_sample_decks=4200'));
+    });
+
     test('uses versioned high-power and premium name policy', () {
       expect(candidateQualityHighPowerNames, contains('thassa\'s oracle'));
       expect(candidateQualityPremiumNames, contains('sol ring'));

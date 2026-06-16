@@ -123,6 +123,8 @@ Future<void> main(List<String> args) async {
         cmc: card.cmc,
         metaUsageCount: card.metaUsageCount,
         metaDeckCount: card.metaDeckCount,
+        edhrecInclusionRate: card.edhrecInclusionRate,
+        edhrecSampleDecks: card.edhrecSampleDecks,
       );
       for (final score in scores) {
         roleRows.add({
@@ -246,6 +248,10 @@ Future<void> main(List<String> args) async {
       'role_score_rows_planned': roleRows.length,
       'commander_synergy_rows_planned': synergyRows.length,
       'rejection_penalty_rows_planned': penaltyRows.length,
+      'cards_with_edhrec_signal': cards
+          .where((card) =>
+              card.edhrecInclusionRate > 0 || card.edhrecSampleDecks > 0)
+          .length,
       'function_tag_coverage_pct': cards.isEmpty
           ? 0
           : (tagRows.map((r) => r['card_id']).toSet().length /
@@ -354,6 +360,8 @@ class CandidateQualityCard {
     required this.priceUsdFoil,
     required this.metaUsageCount,
     required this.metaDeckCount,
+    required this.edhrecInclusionRate,
+    required this.edhrecSampleDecks,
   });
 
   final String id;
@@ -368,6 +376,8 @@ class CandidateQualityCard {
   final Object? priceUsdFoil;
   final int metaUsageCount;
   final int metaDeckCount;
+  final double edhrecInclusionRate;
+  final int edhrecSampleDecks;
 
   Set<String> get resolvedIdentity => resolveCandidateQualityIdentity(
         colorIdentity: colorIdentity,
@@ -381,6 +391,7 @@ Future<Map<String, int>> _loadPreCounts(Pool pool) async {
   final tables = [
     'cards',
     'card_meta_insights',
+    'edhrec_card_snapshots',
     'meta_decks',
     'optimization_analysis_logs',
     'card_function_tags',
@@ -402,8 +413,51 @@ Future<Map<String, int>> _loadPreCounts(Pool pool) async {
 
 Future<List<CandidateQualityCard>> _loadCandidateCards(Pool pool) async {
   final hasMetaInsights = await _hasTable(pool, 'card_meta_insights');
-  final sql = hasMetaInsights
+  final hasEdhrecSnapshots = await _hasTable(pool, 'edhrec_card_snapshots');
+  final edhrecCte = hasEdhrecSnapshots
       ? '''
+WITH edhrec_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(COALESCE(inclusion, 0))::double precision AS edhrec_inclusion_rate,
+    MAX(COALESCE(num_decks, 0))::int AS edhrec_sample_decks
+  FROM edhrec_card_snapshots
+  WHERE card_name IS NOT NULL
+    AND TRIM(card_name) <> ''
+  GROUP BY LOWER(card_name)
+)
+'''
+      : '';
+  final metaJoin = hasMetaInsights
+      ? 'LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)'
+      : '';
+  final edhrecJoin = hasEdhrecSnapshots
+      ? 'LEFT JOIN edhrec_insights ei ON ei.normalized_card_name = LOWER(c.name)'
+      : '';
+  final metaUsageSelect =
+      hasMetaInsights ? 'COALESCE(cmi.usage_count, 0)::int' : '0::int';
+  final metaDeckSelect =
+      hasMetaInsights ? 'COALESCE(cmi.meta_deck_count, 0)::int' : '0::int';
+  final edhrecRateSelect = hasEdhrecSnapshots
+      ? 'COALESCE(ei.edhrec_inclusion_rate, 0)::double precision'
+      : '0::double precision';
+  final edhrecSampleSelect = hasEdhrecSnapshots
+      ? 'COALESCE(ei.edhrec_sample_decks, 0)::int'
+      : '0::int';
+  final edhrecOrder = hasEdhrecSnapshots
+      ? '''
+  COALESCE(ei.edhrec_inclusion_rate, 0) DESC,
+  COALESCE(ei.edhrec_sample_decks, 0) DESC,
+'''
+      : '';
+  final metaOrder = hasMetaInsights
+      ? '''
+  COALESCE(cmi.meta_deck_count, 0) DESC,
+  COALESCE(cmi.usage_count, 0) DESC,
+'''
+      : '';
+  final sql = '''
+$edhrecCte
 SELECT DISTINCT ON (LOWER(c.name))
   c.id::text,
   c.name,
@@ -415,42 +469,22 @@ SELECT DISTINCT ON (LOWER(c.name))
   c.cmc,
   c.price_usd,
   c.price_usd_foil,
-  COALESCE(cmi.usage_count, 0)::int AS usage_count,
-  COALESCE(cmi.meta_deck_count, 0)::int AS meta_deck_count
+  $metaUsageSelect AS usage_count,
+  $metaDeckSelect AS meta_deck_count,
+  $edhrecRateSelect AS edhrec_inclusion_rate,
+  $edhrecSampleSelect AS edhrec_sample_decks
 FROM cards c
-LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+$metaJoin
+$edhrecJoin
 WHERE c.name IS NOT NULL
   AND c.name NOT LIKE 'A-%'
   AND c.name NOT LIKE '\\_%' ESCAPE '\\'
   AND c.name NOT LIKE '%World Champion%'
   AND c.name NOT LIKE '%Heroes of the Realm%'
 ORDER BY LOWER(c.name),
-  COALESCE(cmi.meta_deck_count, 0) DESC,
-  COALESCE(cmi.usage_count, 0) DESC,
+$edhrecOrder$metaOrder
   c.set_code ASC NULLS LAST,
   c.id ASC
-'''
-      : '''
-SELECT DISTINCT ON (LOWER(c.name))
-  c.id::text,
-  c.name,
-  COALESCE(c.type_line, '') AS type_line,
-  COALESCE(c.oracle_text, '') AS oracle_text,
-  COALESCE(c.mana_cost, '') AS mana_cost,
-  COALESCE(c.colors, ARRAY[]::text[]) AS colors,
-  COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity,
-  c.cmc,
-  c.price_usd,
-  c.price_usd_foil,
-  0::int AS usage_count,
-  0::int AS meta_deck_count
-FROM cards c
-WHERE c.name IS NOT NULL
-  AND c.name NOT LIKE 'A-%'
-  AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-  AND c.name NOT LIKE '%World Champion%'
-  AND c.name NOT LIKE '%Heroes of the Realm%'
-ORDER BY LOWER(c.name), c.set_code ASC NULLS LAST, c.id ASC
 ''';
 
   final rows = await pool.execute(sql);
@@ -470,6 +504,8 @@ ORDER BY LOWER(c.name), c.set_code ASC NULLS LAST, c.id ASC
       priceUsdFoil: row[9],
       metaUsageCount: (row[10] as int?) ?? 0,
       metaDeckCount: (row[11] as int?) ?? 0,
+      edhrecInclusionRate: (row[12] as num?)?.toDouble() ?? 0,
+      edhrecSampleDecks: (row[13] as int?) ?? 0,
     );
   }).toList(growable: false);
 }
