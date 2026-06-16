@@ -211,6 +211,18 @@ print(f'SQLite GC count: {db_count} (Dart: 53)')
 
 ### [P1] Deck Promotion: Adicionar verificacao de migracao de cartas pos-promocao — `deck_promotions` registra sucesso mas `deck_cards` fica vazio (4/4 decks promovidos quebrados)
 
+**Atualizacao Codex 2026-06-16:** RESOLVIDO para o slice operacional seguro.
+`server/bin/auto_promote_learned_decks.py` agora cria/atualiza o schema
+`deck_promotions` de forma idempotente, suporta o schema Hermes reduzido sem
+`decks.commander_id`, e só grava promoção quando o deck alvo materializado tem
+contagem compatível e `migration_verified=1`. `auto_sync_learned_decks.py` e
+`export_hermes_learned_deck.py` passaram a ignorar promoções não verificadas
+quando a coluna `migration_verified` existe. No Hermes AWS, o script corrigido
+compilou e rodou contra o `knowledge.db` operacional: criou a tabela
+`deck_promotions`, promoveu `0` decks e classificou candidatos não-Lorehold como
+`no_target_deck`, evitando dados fantasmas. O status antigo do job no
+`jobs.json` só será limpo na próxima execução agendada do scheduler.
+
 **Conhecimento MTG:** O Commander Knowledge Deep Report S44 (2026-06-05) documenta uma crise de integridade de dados: o Multi-Commander Evolution promoveu 4 decks em 24 minutos (2026-06-04), mas NENHUM teve as cartas migradas completamente:
 - Winota: claim=100, actual=85 (-15)
 - Atraxa: claim=100, actual=91 (-9)  

@@ -84,19 +84,34 @@ def _table_exists(db, table_name):
     )
 
 
+def _column_exists(db, table_name, column_name):
+    if not _table_exists(db, table_name):
+        return False
+    return any(
+        row[1] == column_name
+        for row in db.execute(f"PRAGMA table_info({table_name})")
+    )
+
+
 def _find_promoted_rows(db):
     if not _table_exists(db, "learned_decks") or not _table_exists(
         db,
         "deck_promotions",
     ):
         return []
+    verified_filter = (
+        "AND COALESCE(dp.migration_verified, 0) = 1"
+        if _column_exists(db, "deck_promotions", "migration_verified")
+        else ""
+    )
     return db.execute(
-        """
+        f"""
         SELECT ld.id, ld.commander, ld.deck_name, ld.card_count, dp.promoted_at
         FROM learned_decks ld
         JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
         WHERE ld.card_count = ?
           AND ld.commander != ''
+          {verified_filter}
         ORDER BY dp.promoted_at DESC
         """,
         (REQUIRED_CARD_COUNT,),
@@ -109,13 +124,19 @@ def _count_invalid_promoted_rows(db):
         "deck_promotions",
     ):
         return 0
+    unverified_filter = (
+        "OR COALESCE(dp.migration_verified, 0) != 1"
+        if _column_exists(db, "deck_promotions", "migration_verified")
+        else ""
+    )
     return db.execute(
-        """
+        f"""
         SELECT COUNT(*)
         FROM learned_decks ld
         JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
         WHERE COALESCE(ld.card_count, 0) != ?
            OR ld.commander = ''
+           {unverified_filter}
         """,
         (REQUIRED_CARD_COUNT,),
     ).fetchone()[0]

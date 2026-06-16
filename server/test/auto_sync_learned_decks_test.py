@@ -90,6 +90,62 @@ class AutoSyncLearnedDecksTest(unittest.TestCase):
             finally:
                 conn.close()
 
+    def test_unverified_promotions_are_not_synced_when_column_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            module = _load_module(tmp)
+            conn = sqlite3.connect(":memory:")
+            try:
+                conn.execute(
+                    """
+                    CREATE TABLE learned_decks (
+                        id INTEGER PRIMARY KEY,
+                        commander TEXT,
+                        deck_name TEXT,
+                        card_count INTEGER
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    CREATE TABLE deck_promotions (
+                        id INTEGER PRIMARY KEY,
+                        learned_deck_id INTEGER,
+                        promoted_at TEXT,
+                        migration_verified INTEGER DEFAULT 0
+                    )
+                    """
+                )
+                conn.executemany(
+                    """
+                    INSERT INTO learned_decks (
+                        id, commander, deck_name, card_count
+                    ) VALUES (?, ?, ?, ?)
+                    """,
+                    [
+                        (1, "Talrand, Sky Summoner", "Verified", 100),
+                        (2, "Krenko, Mob Boss", "Unverified", 100),
+                    ],
+                )
+                conn.executemany(
+                    """
+                    INSERT INTO deck_promotions (
+                        learned_deck_id, promoted_at, migration_verified
+                    ) VALUES (?, ?, ?)
+                    """,
+                    [
+                        (1, "2026-06-01T00:00:00Z", 1),
+                        (2, "2026-06-02T00:00:00Z", 0),
+                    ],
+                )
+
+                rows = module._find_promoted_rows(conn)
+
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0][0], 1)
+                self.assertEqual(module._count_invalid_promoted_rows(conn), 1)
+            finally:
+                conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,23 @@ Uso:
 import json, sqlite3, sys, os, re
 from datetime import datetime, timezone
 
+def table_exists(db, table_name):
+    return (
+        db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            (table_name,),
+        ).fetchone()
+        is not None
+    )
+
+def column_exists(db, table_name, column_name):
+    if not table_exists(db, table_name):
+        return False
+    return any(
+        row[1] == column_name
+        for row in db.execute(f"PRAGMA table_info({table_name})")
+    )
+
 def parse_card_list(card_list_text):
     """Parse card list: aceita formato '1 Card Name' ou JSON array."""
     text = card_list_text.strip()
@@ -96,12 +113,18 @@ def build_metadata(db, target_deck_id, card_list, commander):
         qty = card["quantity"]
         type_line_row = None
 
-        if target_deck_id:
+        if target_deck_id and table_exists(db, "card_deck_analysis"):
             type_line_row = db.execute(
                 "SELECT dc.type_line, cda.role_in_deck FROM deck_cards dc "
                 "LEFT JOIN card_deck_analysis cda ON cda.card_name = dc.card_name AND cda.deck_id = ? "
                 "WHERE LOWER(dc.card_name) = ? AND dc.deck_id = ? LIMIT 1",
                 (target_deck_id, name, target_deck_id)
+            ).fetchone()
+        elif target_deck_id and table_exists(db, "deck_cards"):
+            type_line_row = db.execute(
+                "SELECT type_line, functional_tag FROM deck_cards "
+                "WHERE LOWER(card_name) = ? AND deck_id = ? LIMIT 1",
+                (name, target_deck_id)
             ).fetchone()
 
         is_land = False
@@ -155,6 +178,10 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     db.row_factory = sqlite3.Row
 
     # Find the active learned + promoted deck
+    clauses = []
+    params = []
+    if column_exists(db, "deck_promotions", "migration_verified"):
+        clauses.append("COALESCE(dp.migration_verified, 0) = 1")
     query = """
         SELECT ld.*, dp.promoted_at, dp.target_deck_id,
                d.deck_name as active_deck_name, d.total_cards as active_card_count
@@ -162,13 +189,14 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
         JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
         JOIN decks d ON d.id = dp.target_deck_id
     """
-    params = []
     if learned_id:
-        query += " WHERE ld.id = ?"
+        clauses.append("ld.id = ?")
         params.append(learned_id)
     elif commander_filter:
-        query += " WHERE LOWER(ld.commander) LIKE ?"
+        clauses.append("LOWER(ld.commander) LIKE ?")
         params.append(f"%{commander_filter.lower()}%")
+    if clauses:
+        query += " WHERE " + " AND ".join(clauses)
     query += " ORDER BY dp.promoted_at DESC LIMIT 1"
 
     row = db.execute(query, params).fetchone()
@@ -206,11 +234,28 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     )
 
     # Metadata do deck alvo
-    deck_row = db.execute(
-        "SELECT total_lands, ramp_count, draw_count, removal_count, tutor_count, "
-        "board_wipe_count, protection_count, recursion_count, wincon_count, engine_count "
-        "FROM decks WHERE id = ?", (target_deck_id,)
-    ).fetchone()
+    deck_columns = {
+        row[1] for row in db.execute("PRAGMA table_info(decks)")
+    } if table_exists(db, "decks") else set()
+    metric_columns = {
+        "total_lands",
+        "ramp_count",
+        "draw_count",
+        "removal_count",
+        "tutor_count",
+        "board_wipe_count",
+        "protection_count",
+        "recursion_count",
+        "wincon_count",
+        "engine_count",
+    }
+    deck_row = None
+    if metric_columns.issubset(deck_columns):
+        deck_row = db.execute(
+            "SELECT total_lands, ramp_count, draw_count, removal_count, tutor_count, "
+            "board_wipe_count, protection_count, recursion_count, wincon_count, engine_count "
+            "FROM decks WHERE id = ?", (target_deck_id,)
+        ).fetchone()
     if deck_row:
         metadata = {
             "total_lands": deck_row["total_lands"] or 0,
