@@ -497,7 +497,8 @@ Future<Map<String, dynamic>> _loadUsageStatsSafe({
     return {
       'available': true,
       'hot_cards': hotCards,
-      'total_users': hotCards.fold<int>(0, (sum, c) => sum + intValue(c['usage_count'])),
+      'total_users':
+          hotCards.fold<int>(0, (sum, c) => sum + intValue(c['usage_count'])),
     };
   } catch (_) {
     return {'available': false, 'hot_cards': const <Map<String, dynamic>>[]};
@@ -584,7 +585,6 @@ Map<String, dynamic> _promotedLearnedDeckSummary(
     'legal_status': learnedDeck['legal_status'],
     'promoted_at': learnedDeck['promoted_at'],
     'updated_at': learnedDeck['updated_at'],
-    'metadata': learnedDeck['metadata'],
   };
 }
 
@@ -684,7 +684,6 @@ Future<Map<String, dynamic>> _buildPromotedCommanderLearningDeck({
     'cards': mainDecklist,
     'legality': legality,
     'validation': validation.validationSummary(),
-    'metadata': learnedDeck['metadata'],
   };
 }
 

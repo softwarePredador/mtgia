@@ -106,16 +106,25 @@ void main() {
           File('routes/ai/commander-learning/index.dart').readAsStringSync();
 
       expect(route, contains('commander_learned_decks'));
+      expect(route, contains('commander_learning_snapshot'));
+      expect(route, contains("'source': 'pg_commander_learning_snapshot'"));
       expect(route, contains("'source': 'pg_commander_learned_decks'"));
-      expect(
-          route,
-          contains(
-              "'commanders': activeDecks.map(_promotedDeckSummary).toList()"));
+      expect(route, contains("'commanders': activeDecks"));
       expect(route, contains("'recommended_deck': recommendedDeck"));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
       expect(route, contains("'source_confidence': _sourceConfidence"));
       expect(route, contains("'win_conditions': _winConditions"));
       expect(route, contains("'role_summary': _roleSummary"));
+      expect(route, isNot(contains("'metadata': learnedDeck.metadata")));
+      expect(route, isNot(contains("'metadata': deck.metadata")));
+    });
+
+    test('commander reference does not expose raw learned deck metadata', () {
+      final route =
+          File('routes/ai/commander-reference/index.dart').readAsStringSync();
+
+      expect(route, contains("'source': 'promoted_learned_deck_pg'"));
+      expect(route, isNot(contains("'metadata': learnedDeck['metadata']")));
     });
 
     test('commander learning route stays auth-only in AI middleware', () {

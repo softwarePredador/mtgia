@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
@@ -18,12 +20,12 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     final pool = context.read<Pool>();
     if (commander.isEmpty) {
-      final activeDecks = await _loadActiveLearnedDecks(pool);
+      final activeDecks = await _loadActiveLearnedDeckSummaries(pool);
       return Response.json(body: {
         'available': activeDecks.isNotEmpty,
-        'source': 'pg_commander_learned_decks',
+        'source': 'pg_commander_learning_snapshot',
         'count': activeDecks.length,
-        'commanders': activeDecks.map(_promotedDeckSummary).toList(),
+        'commanders': activeDecks,
       });
     }
 
@@ -139,6 +141,58 @@ Future<List<CommanderLearnedDeckInput>> _loadActiveLearnedDecks(
   }
 }
 
+Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries(
+  Pool pool,
+) async {
+  try {
+    final result = await pool.execute('''
+      SELECT
+        commander_name,
+        active_learned_deck_count,
+        best_learned_score,
+        latest_promoted_at,
+        latest_learned_updated_at,
+        learned_legal_statuses,
+        learned_archetypes,
+        active_learned_decks
+      FROM commander_learning_snapshot
+      WHERE active_learned_deck_count > 0
+      ORDER BY commander_name ASC
+    ''');
+
+    return result.map((row) {
+      final activeDecks = _jsonList(row[7]);
+      final primary = activeDecks.isNotEmpty && activeDecks.first is Map
+          ? (activeDecks.first as Map).cast<String, dynamic>()
+          : const <String, dynamic>{};
+      final legalStatuses = _stringList(row[5]);
+      final archetypes = _stringList(row[6]);
+      return <String, dynamic>{
+        'commander': row[0]?.toString(),
+        'deck_name': primary['deck_name']?.toString(),
+        'source_system': 'postgres_snapshot',
+        'archetype': primary['archetype']?.toString() ??
+            (archetypes.isEmpty ? null : archetypes.first),
+        'card_count': intValue(primary['card_count']),
+        'score': nullableDouble(primary['score']) ?? nullableDouble(row[2]),
+        'legal_status': primary['legal_status']?.toString() ??
+            (legalStatuses.isEmpty ? null : legalStatuses.first),
+        'promoted_at': primary['promoted_at']?.toString() ?? row[3]?.toString(),
+        'last_synced_at':
+            primary['updated_at']?.toString() ?? row[4]?.toString(),
+        'active_learned_deck_count': intValue(row[1]),
+        'learned_archetypes': archetypes,
+      };
+    }).toList(growable: false);
+  } catch (error) {
+    if (_isUndefinedCommanderLearningSnapshotError(error)) {
+      final activeDecks = await _loadActiveLearnedDecks(pool);
+      return activeDecks.map(_promotedDeckSummary).toList(growable: false);
+    }
+    rethrow;
+  }
+}
+
 CommanderLearnedDeckInput _learnedDeckFromRow(
   ResultRow row, {
   String fallbackCommanderName = '',
@@ -242,7 +296,6 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
     'cards': mainDecklist,
     'legality': legality,
     'validation': validationSummary,
-    'metadata': learnedDeck.metadata,
   };
 }
 
@@ -260,7 +313,6 @@ Map<String, dynamic> _promotedDeckSummary(CommanderLearnedDeckInput deck) => {
       'last_synced_at': deck.updatedAt?.toIso8601String(),
       'win_conditions': _winConditions(deck),
       'role_summary': _roleSummary(deck),
-      'metadata': deck.metadata,
     };
 
 List<Map<String, dynamic>> _winConditions(CommanderLearnedDeckInput deck) {
@@ -320,4 +372,54 @@ String _sourceConfidence({
   }
   if (isValid && noBanned) return 'medium';
   return 'low';
+}
+
+List<dynamic> _jsonList(Object? value) {
+  if (value is List) return List<dynamic>.from(value);
+  final text = value?.toString().trim();
+  if (text != null && text.isNotEmpty && text != 'null') {
+    try {
+      final decoded = jsonDecode(text);
+      if (decoded is List) return List<dynamic>.from(decoded);
+    } catch (_) {}
+  }
+  return const <dynamic>[];
+}
+
+List<String> _stringList(Object? value) {
+  if (value is List) {
+    return value
+        .map((entry) => entry?.toString().trim() ?? '')
+        .where((entry) => entry.isNotEmpty)
+        .toList(growable: false);
+  }
+  final text = value?.toString().trim();
+  if (text != null && text.isNotEmpty && text != 'null') {
+    try {
+      final decoded = jsonDecode(text);
+      if (decoded is List) {
+        return decoded
+            .map((entry) => entry?.toString().trim() ?? '')
+            .where((entry) => entry.isNotEmpty)
+            .toList(growable: false);
+      }
+    } catch (_) {}
+    final normalized = text.startsWith('{') && text.endsWith('}')
+        ? text.substring(1, text.length - 1)
+        : text;
+    return normalized
+        .split(RegExp(r'\s*,\s*'))
+        .map((entry) => entry.trim())
+        .where((entry) => entry.isNotEmpty)
+        .toList(growable: false);
+  }
+  return const <String>[];
+}
+
+bool _isUndefinedCommanderLearningSnapshotError(Object error) {
+  final text = error.toString().toLowerCase();
+  return text.contains('commander_learning_snapshot') &&
+      (text.contains('does not exist') ||
+          text.contains('undefined_table') ||
+          text.contains('42p01'));
 }

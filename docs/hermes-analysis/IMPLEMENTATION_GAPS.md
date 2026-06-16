@@ -718,6 +718,21 @@ Concluido no Slice 9 commander learning contract/middleware:
    chama OpenAI/fonte externa. `commander_learned_deck_support_test.dart`
    recebeu guarda estática para esse comportamento.
 
+Concluido no Slice 10 commander learning snapshot/runtime adoption:
+
+21.13. O caminho sem `commander` de `GET /ai/commander-learning` passou a ler
+   `commander_learning_snapshot` como fonte primária para disponibilidade/lista
+   de comandantes aprendidos. A rota mantém fallback interno para
+   `commander_learned_decks` apenas para bancos antigos sem a view.
+21.14. O caminho com `commander` continua lendo `commander_learned_decks`,
+   porque precisa do `card_list` persistido para montar o preview/salvamento
+   do deck aprendido. Isso preserva a arquitetura: snapshot para agregados,
+   tabela bruta para detalhe operacional controlado.
+21.15. Payloads públicos de `commander-learning` e `commander-reference`
+   deixaram de expor `metadata` bruto do Hermes. Metadata segue disponível
+   internamente para `role_summary`/contagens, mas usuários normais recebem
+   apenas campos agregados seguros.
+
 22. Fazer loaders profundos do `optimize` lerem `card_intelligence_snapshot`
     quando isso reduzir duplicação ou inconsistência. O sync Hermes
     `sync_pg_target_deck_to_hermes.py` já prefere `card_intelligence_snapshot`
