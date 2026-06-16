@@ -4,9 +4,257 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-16 03:00 UTC
-> Rotacao: `classes-not-used`
+> Atualizacao local Codex: 2026-06-16 07:00 UTC
+> Rotacao: `functions-not-called`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Funcoes nao chamadas - revalidacao 2026-06-16 07:00 UTC
+
+Escopo desta rodada: somente funcoes, metodos ou helpers declarados sem
+chamador runtime confirmado. Nao foi executada auditoria ampla de classes sem
+uso, imports/ciclos, tabelas PostgreSQL sem uso, duplicacao geral ou coerencia
+entre modulos fora do necessario para validar/falsificar candidatos de funcao.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `ae65f536`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar claims
+stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante aqui e
+tratar Hermes como laboratorio/cache/auditor, nao fonte final de verdade.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`.
+- O script e textual/regex; ele nao compila o projeto nem constroi grafo de
+  chamadas.
+- A execucao tentou reinserir o inventario gerado dentro da primeira secao
+  manual por causa do marcador historico
+  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+  mecanica foi descartada antes desta atualizacao, mantendo apenas os numeros
+  do auditor e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- `git diff --name-only 92159f80..HEAD -- app/lib server/lib server/routes server/bin server/test app/test app/integration_test server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/hermes-analysis/manaloom-knowledge/scripts server/database_setup.sql`:
+  apenas `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`
+  mudou desde a rodada anterior de funcoes; nao houve delta de produto em
+  `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
+  database setup ou API contract.
+- Buscas exatas por simbolo com `rg`, separando definicoes, chamadas em
+  `app/lib`/`server` e chamadas apenas em testes.
+- Leitura direta com `nl -ba` dos arquivos citados abaixo.
+- Suspeitas antigas foram rechecadas antes de reaproveitar o achado; a nota
+  historica de `sync_cards_utils.dart` ligado ao sync operacional foi tratada
+  como stale neste checkout quando a busca atual falsificou o import.
+
+### Achados revalidados
+
+#### P1 - `sync_cards_utils.dart` segue test-only neste checkout
+
+- **Helpers exportados:** `server/lib/sync_cards_utils.dart:16`,
+  `:82`, `:102`, `:121`, `:178` e `:189` definem `extractCardRow`,
+  `getNewSetCodesSinceFromData`, `parseSinceDays`, `extractSetCardRow`,
+  `extractOracleIds` e `extractLegalities`.
+- **Unico import encontrado:** `server/test/sync_cards_test.dart:3` importa
+  `../lib/sync_cards_utils.dart`; a busca por `sync_cards_utils` nao encontrou
+  import em `server/bin`, `server/lib` runtime ou `server/routes`.
+- **CLI real ainda usa copias locais:** `server/bin/sync_cards.dart:64` chama
+  `_parseSinceDays` definido em `:349`-`:357`; `:131` chama
+  `_getNewSetCodesSinceFromData` definido em `:386`-`:402`; `:577` chama
+  `_extractCardRowFromSet` definido em `:662`-`:722`; legalidades ainda sao
+  montadas inline em `:766`-`:771`.
+- **Nota historica stale:** a secao antiga
+  `Revalidacao pos-correcao: sync_cards_utils.dart ligado ao sync operacional`
+  descreve uma correcao em `origin/master@2396956e`, mas essa correcao nao esta
+  presente no checkout `codex/hermes-analysis-docs@ae65f536`.
+- **Por que parece sem chamador runtime:** a suite valida os helpers
+  compartilhados, mas o binario operacional continua usando copias privadas e
+  loops inline.
+- **O que valida:** importar `sync_cards_utils.dart` no CLI real e substituir as
+  copias privadas, ou remover o helper/teste compartilhado se ele for somente
+  harness legado.
+- **O que falsifica:** um import runtime atual de `sync_cards_utils.dart` em
+  `server/bin`, `server/lib` ou `server/routes`, ou um commit nesta branch que
+  religue o binario aos helpers exportados.
+
+#### P1 - `verifySwapIntegrity` ainda nao protege o caminho de aplicacao
+
+- **Assinatura emitida:** `server/routes/ai/optimize/index.dart:752`-`:758`
+  anexa `swap_integrity` usando `buildSwapIntegrityForResponse`.
+- **Verificador sem chamada:** `server/lib/ai/optimize_swap_integrity.dart:112`
+  -`:134` define `verifySwapIntegrity`, mas busca por `verifySwapIntegrity` em
+  `server` e `app` encontrou apenas a propria definicao.
+- **Controle positivo:** `computeSwapIntegrity` e
+  `buildSwapIntegrityForResponse` sao vivos no caminho de resposta:
+  `optimize_swap_integrity.dart:84`-`:106`, `:139`-`:163` e rota em
+  `server/routes/ai/optimize/index.dart:753`.
+- **Por que parece sem chamador runtime:** o backend gera hash de integridade,
+  mas nenhum apply app/backend o recalcula para rejeitar `hash` adulterado ou
+  `deck_signature` antigo.
+- **O que valida:** chamar `verifySwapIntegrity` no caminho que aplica swaps e
+  adicionar teste que falhe com hash/deck antigo.
+- **O que falsifica:** decisao documentada de `swap_integrity` ser apenas
+  diagnostico informativo, ou chamador real fora das buscas acima.
+
+#### P1/P2 - Extracao de `optimize_response_support.dart` permanece parcial
+
+- **Helpers extraidos sem chamador runtime:** `server/lib/ai/optimize_response_support.dart:92`
+  define `buildOptimizeResponse`; `:125` define top-level
+  `respondWithOptimizeTelemetry`.
+- **Rota usa funcao local homonima:** `server/routes/ai/optimize/index.dart:689`
+  -`:801` define `respondWithOptimizeTelemetry` local, e as chamadas em
+  `:804`, `:815`, `:1065`, `:1135`, `:1756`, `:1929`, `:2004`, `:2032`,
+  `:2108`, `:2161`, `:2206` e `:2498` resolvem para essa funcao local.
+- **Controles positivos no mesmo arquivo extraido:** `buildSemanticV2OptimizeRejectedBody`
+  e chamado pela rota em `server/routes/ai/optimize/index.dart:2194`, e
+  `attachOptimizeBracketPolicyDiagnostics` em `:2440`.
+- **Por que parece sem chamador runtime:** a extracao ja reduziu alguns helpers,
+  mas o builder geral de response e o responder top-level nao participam do
+  fluxo real de optimize.
+- **O que valida:** remover esses exports ou migrar a rota para o helper unico
+  com teste de telemetry/outcome/swap-integrity.
+- **O que falsifica:** busca por `buildOptimizeResponse` e pelo top-level
+  `optimize_response_support.respondWithOptimizeTelemetry` encontrar chamadas
+  runtime reais.
+
+#### P2 - Wrappers e conveniencias app/backend sem chamada runtime confirmada
+
+- **Request trace:** `server/lib/request_trace.dart:48`-`:49` define
+  `getRequestTrace`, mas consumidores atuais usam `context.read<RequestTrace>()`
+  diretamente, por exemplo `server/lib/auth_middleware.dart:57`,
+  `server/lib/observability.dart:225`, `server/routes/trades/index.dart:332` e
+  `server/routes/conversations/[id]/messages.dart:249`.
+- **Token app:** `app/lib/core/api/api_client.dart:139`-`:143` define
+  `ApiClient.loadTokenFromDisk()`, com comentario de boot, mas busca em
+  `app/lib`, `app/test` e `app/integration_test` encontrou somente a definicao.
+  O boot real de auth carrega `auth_token` em
+  `app/lib/features/auth/providers/auth_provider.dart:37`-`:45`.
+- **Performance manual/debug:** `app/lib/core/services/performance_service.dart:115`,
+  `:135`, `:205`, `:215`, `:225` e `:253` expoem `startTrace`, `stopTrace`,
+  `addMetric`, `addAttribute`, `getLocalStats` e `printLocalStats` sem chamada
+  app confirmada. Controles vivos: `init` em `app/lib/main.dart:119`-`:123`,
+  `PerformanceNavigatorObserver` em `app/lib/main.dart:205`-`:210`, e
+  `traceAsync` no smoke de observabilidade.
+- **Providers app:** `BinderProvider.applyFilters` em
+  `app/lib/features/binder/providers/binder_provider.dart:639` e chamado apenas
+  por teste; a tela usa `_applyFilters` e `fetchBinderDirect`. `CommunityProvider.clearFilters`
+  em `app/lib/features/community/providers/community_provider.dart:179` nao tem
+  chamada app confirmada; `fetchPublicDecks` e vivo. `DeckProvider.clearAllCache`
+  em `app/lib/features/decks/providers/deck_provider.dart:1067` nao tem chamada
+  confirmada, enquanto `invalidateDeckCache` e vivo em `:1170` e `:1205`.
+- **Por que parece sem chamador runtime:** sao APIs publicas que parecem
+  contrato de consumo, mas as telas/boot atuais usam caminhos diretos ou
+  alternativas privadas.
+- **O que valida:** ligar cada wrapper ao fluxo esperado ou reduzir visibilidade/
+  remover metodo e teste correspondente.
+- **O que falsifica:** chamada em `app/lib`, `server/lib`, `server/routes` ou
+  bootstrap real fora das buscas acima.
+
+#### P2/P3 - Servicos backend vivos mantem metodos publicos sem consumidor
+
+- **`MLKnowledgeService.recordFeedback`:** `server/lib/ml_knowledge_service.dart:251`
+  -`:288` insere em `ml_prompt_feedback`, mas `recordFeedback(` aparece apenas
+  na definicao. O servico segue vivo por `getContextForDeck` e
+  `generatePromptContext` em `server/lib/ai/otimizacao.dart:167`-`:173` e
+  `:361`-`:367`.
+- **`EndpointCache.clearExpired`:** `server/lib/endpoint_cache.dart:32` define o
+  metodo sem chamada; `EndpointCache.instance.get/set` seguem vivos em
+  `/cards`, `/sets`, `/ai/archetypes` e generate performance support.
+- **`EdhrecService`:** `getHighSynergyCards` e vivo em
+  `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`; ja
+  `getTopByCategory`, `calculateFitScore`, `cleanupCache` e
+  `isHighSynergy` aparecem somente nas definicoes de
+  `server/lib/ai/edhrec_service.dart:350`, `:372`, `:380` e `:416`.
+- **`ArchetypeCountersService`:** a classe e viva em
+  `/ai/weakness-analysis` e `/ai/simulate-matchup`; `detectDeckArchetype` e
+  `getHateCards` sao chamados em `server/routes/ai/weakness-analysis/index.dart:146`
+  /`:474` e `server/routes/ai/simulate-matchup/index.dart:255`/`:265`/`:270`.
+  Ja `getCounterStrategy`, `getAvailableArchetypes` e `upsertCounter` aparecem
+  somente nas definicoes de `server/lib/archetype_counters_service.dart:67`,
+  `:104` e `:204`.
+- **`AiLogService`:** `log` e vivo em `server/lib/ai/otimizacao.dart:807`,
+  `:824`, `:839`, `:955`, `:973` e `:987`; `getRecentLogs`, `getStats` e
+  `getStatsByEndpoint` aparecem somente em `server/lib/ai_log_service.dart:120`,
+  `:163` e `:204`.
+- **`PushNotificationService.sendToMultipleTokens`:**
+  `server/lib/push_notification_service.dart:295` nao tem chamador confirmado,
+  enquanto envio individual por usuario segue fora deste achado.
+- **Por que parece sem chamador runtime:** os servicos existem e partes sao
+  usadas, mas metodos publicos restantes parecem APIs planejadas/debug sem rota,
+  job ou consumidor atual.
+- **O que valida:** criar rota/job consumidor com teste, ou reduzir/remover
+  metodos publicos nao usados.
+- **O que falsifica:** chamador runtime real nos recortes buscados.
+
+#### P3 - Helper `normalize_commander` no export Hermes permanece sem chamada
+
+- **Funcao:** `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:58`
+  define `normalize_commander`.
+- **Busca focada:** `rg -n "normalize_commander\\(" docs/hermes-analysis/manaloom-knowledge/scripts --glob '*.py'`
+  encontrou apenas a propria definicao.
+- **Controle positivo no script alterado desde a ultima rodada:** os novos
+  helpers `table_exists`, `column_exists`, `parse_role_list`,
+  `analysis_roles_for_card` e `build_metadata` sao chamados pelo caminho de
+  `export_learned_deck` em `export_hermes_learned_deck.py:25`, `:93`,
+  `:110`, `:142`, `:197`, `:256` e `:291`.
+- **Por que parece sem chamador:** o filtro por comandante usa
+  `commander_filter.lower()` diretamente em `:210`-`:211`, sem passar pelo
+  normalizador.
+- **O que valida:** usar `normalize_commander` no filtro/comparacao de commander
+  ou remover o helper.
+- **O que falsifica:** chamada externa/import desse helper por outro script ou
+  execucao dinamica documentada.
+
+### Suspeitas revalidadas e nao reabertas
+
+- `isLikelyLandCard` nao esta morto: e chamado por `safeCmcForOptimization` em
+  `server/lib/ai/cmc_safety.dart:48`, e esse helper e usado por
+  `optimization_quality_gate.dart:607`, `optimization_validator.dart:737` e
+  `goldfish_simulator.dart:265`/`:577`. `hasSuspiciousNonLandCmc` segue
+  test-only, mas nao foi promovido acima por ser helper de diagnostico/safety.
+- `ArchetypeCountersService` nao esta morto como classe; somente metodos
+  especificos permanecem sem consumidor confirmado.
+- O delta desde a ultima rodada de funcoes nao trouxe novo achado app/server de
+  produto. A unica mudanca fora de docs de auditoria no recorte comparado foi
+  `export_hermes_learned_deck.py`, e nela apenas `normalize_commander` aparece
+  como helper sem chamada.
+
+### Resultado desta revalidacao
+
+No checkout `ae65f536`, os achados principais da rodada anterior seguem abertos
+com evidencia atual: `sync_cards_utils.dart` test-only neste branch,
+`verifySwapIntegrity` sem uso no caminho de apply, extracao parcial de
+`optimize_response_support.dart`, wrappers app/backend sem chamada e metodos
+publicos residuais em servicos vivos. Nao surgiu novo achado P1/P2 em codigo de
+produto. Novo achado menor: `normalize_commander` no script Hermes de export de
+learned decks permanece sem chamada.
 
 ## Rodada focada: Classes sem uso - revalidacao 2026-06-16 03:00 UTC
 
@@ -19129,6 +19377,12 @@ migrations/verificadores quando o objetivo era achar consumo runtime.
 > Commit verificado: `origin/master@2396956e`
 
 ## Revalidacao pos-correcao: `sync_cards_utils.dart` ligado ao sync operacional
+
+> Status 2026-06-16 07:00 UTC: **STALE no checkout
+> `codex/hermes-analysis-docs@ae65f536`**. A correcao descrita abaixo pode ter
+> existido em `origin/master`, mas a branch de memoria atual nao importa
+> `server/lib/sync_cards_utils.dart` em `server/bin/sync_cards.dart`; a rodada
+> focada de funcoes no topo deste arquivo reabriu o achado para este checkout.
 
 O Copilot cruzou o achado de helper testado sem chamador runtime contra a
 `master` real e aplicou correcao segura em `origin/master@2396956e`.

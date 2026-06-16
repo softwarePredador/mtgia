@@ -293,32 +293,32 @@ Game Changer, nao um modelo geral de utilidade de carta.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-15 07:00 UTC no checkout local `92159f80`. Desde a
-  rodada focada anterior (`8bb9aff9..HEAD`), o delta de produto no recorte
-  app/backend e nulo e as mudancas sao somente documentais em
-  `docs/hermes-analysis`. O auditor textual executou com sucesso (`205`
-  arquivos backend, `115` problemas textuais, `0` imports quebrados), mas
-  continua sem grafo de chamadas; a evidencia veio de buscas exatas por
-  simbolo. Permanecem abertos os achados de maior impacto:
-  `server/lib/sync_cards_utils.dart` test-only enquanto
-  `server/bin/sync_cards.dart` mantem helpers privados/inline; `swap_integrity`
-  e emitido, mas `verifySwapIntegrity` nao e chamado no apply app/backend; e a
-  extracao de `optimize_response_support.dart` continua parcial
-  (`buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry` fora do
-  fluxo real). Seguem tambem wrappers app sem chamador
-  (`BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
-  `DeckProvider.clearAllCache`) e conveniencias sem wiring em request trace,
-  `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache, CMC
-  safety, archetype counters, push, ML feedback, read-side de `AiLogService`,
-  wrapper Lorehold de Commander Reference e sample helper de aggressive
-  optimize. Correcoes de classificacao: `hasSuspiciousNonLandCmc` esta
-  test-only, mas `isLikelyLandCard` e vivo via `safeCmcForOptimization`;
-  `MLKnowledgeService`, `AiLogService`, `EndpointCache`, push e archetype
-  counters tem caminhos vivos parciais, so alguns metodos publicos seguem sem
-  consumidor. Claims antigas contra `tryGetRequestId`,
-  `normalizedCommanderReferenceCandidate`, `buildCandidateQualitySamplePoolSql`
-  e `extractMtgTop8FormatCodeFromSourceUrl` foram descartadas porque esses
-  simbolos nao existem neste checkout.
+  novamente em 2026-06-16 07:00 UTC no checkout local `ae65f536`. Desde a
+  rodada focada anterior (`92159f80..HEAD`), nao houve delta de produto em
+  `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
+  database setup ou API contract; o unico delta no recorte foi
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
+  O auditor textual executou com sucesso (`205` arquivos backend, `115`
+  problemas textuais, `0` imports quebrados), mas continua sem grafo de
+  chamadas; a evidencia veio de buscas exatas por simbolo. Permanecem abertos
+  os achados de maior impacto: `server/lib/sync_cards_utils.dart` test-only
+  neste branch enquanto `server/bin/sync_cards.dart` mantem helpers
+  privados/inline; `swap_integrity` e emitido, mas `verifySwapIntegrity` nao e
+  chamado no apply app/backend; e a extracao de
+  `optimize_response_support.dart` continua parcial (`buildOptimizeResponse` e
+  o top-level `respondWithOptimizeTelemetry` fora do fluxo real). Seguem tambem
+  wrappers app sem chamador (`BinderProvider.applyFilters`,
+  `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`) e
+  conveniencias sem wiring em request trace, `ApiClient.loadTokenFromDisk`,
+  performance manual/debug, EDHREC/cache, metodos parciais de archetype
+  counters, push, ML feedback, read-side de `AiLogService`, wrapper Lorehold de
+  Commander Reference e sample helper de aggressive optimize. A nota historica
+  de `sync_cards_utils.dart` ligado ao sync operacional foi marcada como stale
+  para `codex/hermes-analysis-docs@ae65f536`. Novo achado menor:
+  `normalize_commander` no export Hermes permanece sem chamada. `isLikelyLandCard`
+  continua vivo via `safeCmcForOptimization`; `MLKnowledgeService`,
+  `AiLogService`, `EndpointCache`, push e archetype counters tem caminhos vivos
+  parciais, so alguns metodos publicos seguem sem consumidor.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-15 15:00 UTC no checkout local `d6e568ac`. Desde a ultima rodada
   focada (`71140cbb`), nao houve delta de codigo de produto em `app/lib`,
