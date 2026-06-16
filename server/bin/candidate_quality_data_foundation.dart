@@ -11,6 +11,7 @@ const _defaultArtifactDir =
 const _heuristicSource = 'deterministic_heuristic_v1';
 const _metaSynergySource = 'meta_decks_cooccurrence_v1';
 const _rejectionPenaltySource = 'quality_gate_history_v1';
+const _defaultMaxStalePruneOnApply = 100;
 const _staleGeneratedRowsCsvHeaders = <String>[
   'table',
   'card_id',
@@ -53,6 +54,13 @@ Future<void> main(List<String> args) async {
   }
   final pruneTarget = _readArg(args, '--target=');
   final maxPrune = int.tryParse(_readArg(args, '--max-prune=') ?? '') ?? 1;
+  final maxStalePruneOnApply =
+      int.tryParse(_readArg(args, '--max-stale-prune-on-apply=') ?? '') ??
+          _defaultMaxStalePruneOnApply;
+  final allowLargeStalePrune = args.contains('--allow-large-stale-prune');
+  if (maxStalePruneOnApply < 0) {
+    throw ArgumentError('--max-stale-prune-on-apply deve ser >= 0.');
+  }
   if (pruneStaleOnly) {
     if (pruneTarget != 'card_role_scores') {
       throw ArgumentError(
@@ -178,6 +186,13 @@ Future<void> main(List<String> args) async {
     final staleRowsBeforeApply = staleGeneratedRowsBeforeApply.map(
       (table, rows) => MapEntry(table, rows.length),
     );
+    if (apply) {
+      _guardApplyStalePrune(
+        staleRowsByTable: staleRowsBeforeApply,
+        maxRowsPerTable: maxStalePruneOnApply,
+        allowLargeStalePrune: allowLargeStalePrune,
+      );
+    }
     final flattenedStaleRows =
         _flattenStaleGeneratedRows(staleGeneratedRowsBeforeApply);
     await _writeJson(
@@ -239,6 +254,10 @@ Future<void> main(List<String> args) async {
       'artifact_dir': artifactDir.path,
       'prune_target': pruneTarget,
       'max_prune': maxPrune,
+      'apply_stale_prune_guard': {
+        'max_stale_prune_on_apply': maxStalePruneOnApply,
+        'allow_large_stale_prune': allowLargeStalePrune,
+      },
       'pre_counts': preCounts,
       'post_counts': postCounts,
       'cards_scanned': cards.length,
@@ -339,6 +358,9 @@ Opcoes:
   --prune-stale-only           Remove somente stale generated rows do target explicitado
   --target=<table>             Target do prune-only; atualmente card_role_scores
   --max-prune=<N>              Limite de rows deletaveis no prune-only (default: 1)
+  --max-stale-prune-on-apply=<N>
+                               Limite por tabela para prune automatico no --apply (default: $_defaultMaxStalePruneOnApply)
+  --allow-large-stale-prune    Permite --apply mesmo quando stale prune passa do limite
   --artifact-dir=<path>        Diretorio de artefatos
   --min-synergy-evidence=<N>   Minimo de ocorrencias por commander/card (default: 2)
   --max-synergy-rows=<N>       Limite de rows de synergy a materializar (default: 5000)
@@ -1086,6 +1108,27 @@ List<Map<String, dynamic>> _flattenStaleGeneratedRows(
     }
   }
   return rows;
+}
+
+void _guardApplyStalePrune({
+  required Map<String, int> staleRowsByTable,
+  required int maxRowsPerTable,
+  required bool allowLargeStalePrune,
+}) {
+  if (allowLargeStalePrune) return;
+  final oversized = staleRowsByTable.entries
+      .where((entry) => entry.value > maxRowsPerTable)
+      .toList(growable: false);
+  if (oversized.isEmpty) return;
+
+  final details =
+      oversized.map((entry) => '${entry.key}=${entry.value}').join(', ');
+  throw StateError(
+    'Apply abortado: stale prune acima do limite por tabela '
+    '($details; limite=$maxRowsPerTable). Revise '
+    'stale_generated_rows_preview.* e rerode com '
+    '--allow-large-stale-prune apenas em janela controlada.',
+  );
 }
 
 Future<List<Map<String, dynamic>>> _loadStaleFunctionTags(

@@ -37,6 +37,9 @@ qualidade de candidatos:
   - se a tabela nao existir, cai para `0` e preserva comportamento antigo;
   - agrega por `LOWER(card_name)` antes de juntar com `cards`, evitando fanout;
   - adiciona `cards_with_edhrec_signal` ao resumo de dry-run.
+  - `--apply` agora aborta stale prune grande por padrao; para ultrapassar o
+    limite por tabela e obrigatorio passar `--allow-large-stale-prune` depois
+    de revisar `stale_generated_rows_preview.*`.
 - `server/test/candidate_quality_data_support_test.dart`
   - cobre que o sinal EDHREC aumenta score de forma bounded e aparece na
     evidencia.
@@ -82,9 +85,19 @@ dart test test/candidate_quality_data_support_test.dart -r expanded
 dart run bin/candidate_quality_data_foundation.dart \
   --dry-run \
   --artifact-dir=/tmp/mtgia_candidate_quality_edhrec_dry_run_20260616
+dart run bin/candidate_quality_data_foundation.dart \
+  --apply \
+  --max-stale-prune-on-apply=0 \
+  --artifact-dir=/tmp/mtgia_candidate_quality_apply_guard_20260616
 ```
 
-Resultado: analyze sem issues, teste focado com 9/9 passando, dry-run concluido.
+Resultado: analyze sem issues, testes focados passando, dry-run concluido e
+guard de apply confirmado. Com limite zero, o comando abortou antes de mutar o
+banco com:
+
+```text
+Apply abortado: stale prune acima do limite por tabela
+```
 
 ## Riscos restantes
 
@@ -99,6 +112,7 @@ Resultado: analyze sem issues, teste focado com 9/9 passando, dry-run concluido.
 
 1. Rodar dry-run ampliado e revisar os role scores com maior delta EDHREC.
 2. Se aprovado, executar `candidate_quality_data_foundation.dart --apply` em
-   janela controlada.
+   janela controlada. Se o stale prune continuar acima do limite, usar
+   `--allow-large-stale-prune` somente apos revisar o preview.
 3. Rodar scorecard de optimize/generate com Lorehold e outros comandantes.
 4. Manter Hermes em report-only para decision trace e estrategia de jogadas.
