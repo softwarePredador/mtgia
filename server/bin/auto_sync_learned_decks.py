@@ -62,11 +62,6 @@ def _load_env():
 
 _load_env()
 
-os.makedirs(ARTIFACT_DIR, exist_ok=True)
-if not os.path.exists(TRACKING_FILE):
-    open(TRACKING_FILE, "w").close()
-
-
 def _export_script_path():
     for candidate in EXPORT_SCRIPT_CANDIDATES:
         if candidate and os.path.exists(candidate):
@@ -142,10 +137,17 @@ def _count_invalid_promoted_rows(db):
     ).fetchone()[0]
 
 
+def _ensure_artifact_storage():
+    os.makedirs(ARTIFACT_DIR, exist_ok=True)
+    if not os.path.exists(TRACKING_FILE):
+        open(TRACKING_FILE, "w").close()
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Auto-sync Hermes learned decks")
     parser.add_argument("--apply", action="store_true", help="Aplica no PG")
     args = parser.parse_args(argv)
+    _ensure_artifact_storage()
     apply = args.apply or os.environ.get("HERMES_AUTO_SYNC_APPLY") == "1"
     export_script = _export_script_path()
     print("=== Auto-sync find_promoted ===")

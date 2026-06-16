@@ -224,6 +224,14 @@
      `/ai/generate` ou continuam estritamente como fluxo paralelo;
   4. adotar `commander_learning_snapshot` como fonte diagnostica agregada,
      evitando consumidores paralelos recalculando learned/usage/synergy.
+- Ajuste aplicado nesta continuidade:
+  - `server/bin/export_hermes_learned_deck.py` voltou como wrapper de
+    compatibilidade apontando para
+    `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`;
+  - o exporter canonico continua unico e compartilhado entre Hermes e
+    tooling operacional do repo;
+  - teste de paridade protege contra reintroducao de drift entre entrypoint de
+    `server/bin` e implementacao Hermes.
 
 | Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|

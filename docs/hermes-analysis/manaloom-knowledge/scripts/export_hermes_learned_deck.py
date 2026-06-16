@@ -318,15 +318,31 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
         json.dump(output, f, indent=2, ensure_ascii=False, default=str)
     print(f"Exported to {out_path}")
 
-if __name__ == "__main__":
+def main(argv=None):
     import argparse
-    parser = argparse.ArgumentParser(description="Export Hermes learned deck to PG import JSON")
+
+    parser = argparse.ArgumentParser(
+        description="Export Hermes learned deck to PG import JSON",
+    )
     parser.add_argument("--db", default="knowledge.db", help="SQLite database path")
     parser.add_argument("--out", default=None, help="Output JSON path")
-    parser.add_argument("--commander", default=None, help="Commander name filter")
-    parser.add_argument("--learned-id", type=int, default=None, help="Specific learned deck ID")
-    parser.add_argument("--dry-run", action="store_true", help="Print JSON to stdout only")
-    args = parser.parse_args()
+    parser.add_argument(
+        "--commander",
+        default=None,
+        help="Commander name filter",
+    )
+    parser.add_argument(
+        "--learned-id",
+        type=int,
+        default=None,
+        help="Specific learned deck ID",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print JSON to stdout only",
+    )
+    args = parser.parse_args(argv)
 
     if not args.out and not args.dry_run:
         args.out = "hermes_export.json"
@@ -335,4 +351,15 @@ if __name__ == "__main__":
     if not os.path.isabs(db_path):
         db_path = os.path.join(os.path.dirname(__file__), db_path)
 
-    export_learned_deck(db_path, args.out, args.commander, args.learned_id, args.dry_run)
+    export_learned_deck(
+        db_path,
+        args.out,
+        args.commander,
+        args.learned_id,
+        args.dry_run,
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
