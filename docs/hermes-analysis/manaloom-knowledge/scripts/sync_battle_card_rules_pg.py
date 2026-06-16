@@ -9,8 +9,10 @@ Typical Hermes cron flow:
     python3 sync_battle_card_rules_pg.py --apply-pg
     python3 sync_battle_card_rules_pg.py --apply-sqlite-from-pg --include-needs-review
 
-The first command seeds/updates PG from current manual/generated rules. The
-second command refreshes the local SQLite cache from PG before simulations.
+The first command now mainly mirrors generated rules or explicit temporary
+runtime waivers into PG. Canonical card-specific manual inventory was removed
+from the active runtime on 2026-06-16. The second command refreshes the local
+SQLite cache from PG before simulations.
 """
 
 from __future__ import annotations
@@ -106,12 +108,34 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--apply-pg",
         action="store_true",
-        help="Upsert current manual/generated rules into PostgreSQL.",
+        help="Upsert current generated rules and explicit runtime waivers into PostgreSQL.",
     )
     parser.add_argument(
         "--apply-sqlite-from-pg",
         action="store_true",
         help="Refresh SQLite battle_card_rules from PostgreSQL.",
+    )
+    parser.add_argument(
+        "--only-card",
+        action="append",
+        default=[],
+        help="Restrict apply/mirror to specific card names. Can be repeated.",
+    )
+    parser.add_argument(
+        "--only-summary-json",
+        help="Audit summary JSON to derive a card subset.",
+    )
+    parser.add_argument(
+        "--only-classification",
+        action="append",
+        default=[],
+        help="When used with --only-summary-json, restrict to matching classifications.",
+    )
+    parser.add_argument(
+        "--only-recommended-action",
+        action="append",
+        default=[],
+        help="When used with --only-summary-json, restrict to matching recommended actions.",
     )
     parser.add_argument("--report")
     return parser.parse_args()
@@ -137,6 +161,48 @@ def safe_database_target() -> str:
 
 def json_obj(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
+
+
+def load_summary_entries(path: str | Path | None) -> list[dict[str, Any]]:
+    if not path:
+        return []
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    entries = payload.get("entries")
+    return entries if isinstance(entries, list) else []
+
+
+def resolve_selected_card_names(args: argparse.Namespace) -> list[str]:
+    selected = {str(name).strip() for name in (args.only_card or []) if str(name).strip()}
+    summary_entries = load_summary_entries(args.only_summary_json)
+    if summary_entries:
+        classifications = {str(value).strip() for value in (args.only_classification or []) if str(value).strip()}
+        actions = {
+            str(value).strip()
+            for value in (args.only_recommended_action or [])
+            if str(value).strip()
+        }
+        for entry in summary_entries:
+            if not isinstance(entry, dict):
+                continue
+            if classifications and str(entry.get("classification") or "") not in classifications:
+                continue
+            if actions and str(entry.get("recommended_action") or "") not in actions:
+                continue
+            card_name = str(entry.get("card_name") or "").strip()
+            if card_name:
+                selected.add(card_name)
+    return sorted(selected)
+
+
+def filter_rows_by_card_names(rows: list[dict[str, Any]], card_names: list[str]) -> list[dict[str, Any]]:
+    if not card_names:
+        return rows
+    allowed = {normalize_card_name(name) for name in card_names}
+    return [
+        row
+        for row in rows
+        if normalize_card_name(str(row.get("card_name") or "")) in allowed
+    ]
 
 
 def ensure_pg_table(cur: Any) -> None:
@@ -467,6 +533,8 @@ def main() -> int:
         include_generated=not args.skip_generated,
         sqlite_db=args.sqlite_db,
     )
+    selected_card_names = resolve_selected_card_names(args)
+    seed_rows = filter_rows_by_card_names(seed_rows, selected_card_names)
     report: dict[str, Any] = {
         "generated_at": utc_now(),
         "database_target": safe_database_target(),
@@ -475,6 +543,11 @@ def main() -> int:
         "apply_sqlite_from_pg": bool(args.apply_sqlite_from_pg),
         "include_generated": not args.skip_generated,
         "include_needs_review": bool(args.include_needs_review),
+        "selected_card_count": len(selected_card_names),
+        "selected_cards": selected_card_names,
+        "only_summary_json": args.only_summary_json,
+        "only_classification": args.only_classification,
+        "only_recommended_action": args.only_recommended_action,
         "input_rows": len(seed_rows),
         "manual_rows": sum(1 for row in seed_rows if row["source"] == "manual"),
         "generated_rows": sum(1 for row in seed_rows if row["source"] == "generated"),
@@ -503,6 +576,7 @@ def main() -> int:
             with conn.cursor() as cur:
                 ensure_pg_table(cur)
                 rows = load_pg_rules(cur, include_needs_review=args.include_needs_review)
+        rows = filter_rows_by_card_names(rows, selected_card_names)
         report["pg_rows_loaded"] = len(rows)
         report["sqlite_inserted_or_updated"] = mirror_pg_rules_to_sqlite(
             args.sqlite_db,
@@ -512,7 +586,9 @@ def main() -> int:
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)
     print(output)
     if args.report:
-        Path(args.report).write_text(output + "\n", encoding="utf-8")
+        report_path = Path(args.report)
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(output + "\n", encoding="utf-8")
     return 0
 
 

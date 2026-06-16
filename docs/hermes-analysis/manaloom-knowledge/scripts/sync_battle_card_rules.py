@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Sync canonical battle/deckbuilding rules into Hermes SQLite.
 
-This does not infer new rules from scratch. It takes the current manual rules
-and generated rules, stores them in `battle_card_rules`, and makes their source
-and review state explicit for battle/optimizer consumers.
+This does not infer new rules from scratch. It takes the currently available
+generated rules plus any explicitly injected runtime waivers, stores them in
+`battle_card_rules`, and makes their source and review state explicit for
+battle/optimizer consumers.
 
 For production/Hermes crons, prefer `sync_battle_card_rules_pg.py`: Postgres
 stores the reviewable source of truth and this SQLite table acts as the fast
@@ -87,6 +88,9 @@ def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> l
 
     normalized_rows: list[dict] = []
     for row in rows:
+        if row.get("source") == "manual":
+            normalized_rows.append(dict(row))
+            continue
         card_name = str(row.get("card_name") or "")
         card = battle.merge_oracle_metadata({"name": card_name}, oracle_cache)
         effect_before = dict(row.get("effect_json") or {})
@@ -109,6 +113,9 @@ def build_rows(
     sqlite_db: str | Path | None = None,
 ) -> list[dict]:
     rows: list[dict] = []
+    # After the 2026-06-16 canonicalization cleanup, active handwritten rules
+    # should normally be empty. This loop remains only for explicit temporary
+    # runtime waivers injected by tests or incident response.
     for name in sorted(battle.HANDCRAFTED_KNOWN_CARDS):
         effect = dict(battle.KNOWN_CARDS[name])
         rows.append(

@@ -221,6 +221,59 @@ def register_tests(battle, player, card, module_path):
                 battle.DB = old_db
                 battle.battle_rule_registry._RULE_CACHE.clear()
 
+    def test_manual_runtime_waiver_can_override_registry_rule():
+        if battle.battle_rule_registry is None:
+            raise AssertionError("battle_rule_registry failed to import")
+        old_db = battle.DB
+        old_known = battle.KNOWN_CARDS.get("Waived Manual Card")
+        had_handcrafted = "Waived Manual Card" in battle.HANDCRAFTED_KNOWN_CARDS
+        had_waiver = "Waived Manual Card" in battle.MANUAL_RULE_RUNTIME_WAIVERS
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "rules.db"
+            conn = sqlite3.connect(db_path)
+            battle.battle_rule_registry.upsert_battle_card_rule(
+                conn,
+                "Waived Manual Card",
+                {"effect": "counter", "instant": True},
+                source="manual",
+                confidence=1.0,
+                review_status="verified",
+                notes="Registry rule for waiver precedence test.",
+            )
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.KNOWN_CARDS["Waived Manual Card"] = {
+                    "effect": "draw_cards",
+                    "count": 2,
+                }
+                battle.HANDCRAFTED_KNOWN_CARDS.add("Waived Manual Card")
+                battle.MANUAL_RULE_RUNTIME_WAIVERS.add("Waived Manual Card")
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                effect = battle.get_card_effect(
+                    {
+                        "name": "Waived Manual Card",
+                        "type_line": "Sorcery",
+                        "oracle_text": "Draw two cards.",
+                    }
+                )
+
+                assert effect["effect"] == "draw_cards"
+                assert effect["_rule_source"] == "known_cards_manual"
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                if old_known is None:
+                    battle.KNOWN_CARDS.pop("Waived Manual Card", None)
+                else:
+                    battle.KNOWN_CARDS["Waived Manual Card"] = old_known
+                if not had_handcrafted:
+                    battle.HANDCRAFTED_KNOWN_CARDS.discard("Waived Manual Card")
+                if not had_waiver:
+                    battle.MANUAL_RULE_RUNTIME_WAIVERS.discard("Waived Manual Card")
+
     def test_load_deck_preserves_semantic_snapshot_identity_fields():
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmp:

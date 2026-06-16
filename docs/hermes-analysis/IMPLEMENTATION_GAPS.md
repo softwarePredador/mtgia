@@ -563,6 +563,112 @@ devem ser reduzidas para uma linha por carta.
   battle rules continua sendo a fonte para executor/auditor; o JSON agregado é
   para consumidores em contexto de deck.
 
+### Task aberta - canonização de `card_battle_rules`
+
+Problema original:
+
+- a arquitetura documentada diz que PostgreSQL `card_battle_rules` é a fonte
+  de verdade revisável;
+- o runtime de battle resolvia `HANDCRAFTED_KNOWN_CARDS` antes do registry PG;
+- hotfixes recentes de cartas críticas foram promovidos diretamente em código
+  para fechar coerência do simulador rápido, o que era aceitável como
+  contenção, mas não como modelo permanente.
+
+Task:
+
+1. Inventariar todo o conteúdo de `HANDCRAFTED_KNOWN_CARDS`.
+2. Classificar cada entrada em:
+   - `engine_primitive`
+   - `card_rule_promotable`
+   - `temporary_hotfix`
+3. Migrar para `card_battle_rules` todas as `card_rule_promotable` estáveis,
+   com `source`, `review_status`, `confidence`, `oracle_hash` e
+   `logical_rule_key`.
+4. Sincronizar PG -> SQLite Hermes e provar que o replay continua coerente sem
+   depender do override manual para essas cartas.
+5. Adicionar guard rail que falha quando carta auditada/promovível fica só no
+   código sem waiver explícito.
+
+Primeira rodada executada em 2026-06-16:
+
+- auditor: `audit_handcrafted_battle_rule_canonicalization.py`
+- artefato: `server/test/artifacts/handcrafted_battle_rule_canonicalization_2026-06-16/summary.json`
+- resumo: `486` overrides manuais, `456` já batem com PG, `30` ainda estão em
+  drift, sendo `17` classificados como `temporary_hotfix` e `13` como
+  `card_rule_promotable` legados a reconciliar
+- refresh-only no SQLite: `Crop Rotation`, `Harrow`, `Mox Diamond`,
+  `Roiling Regrowth`
+
+Segunda rodada executada em 2026-06-16:
+
+- os `17` hotfixes foram reconciliados seletivamente para PostgreSQL
+  `card_battle_rules` e SQLite `battle_card_rules`
+- auditor pós-sync: `473` `pg_state=exact_match`, `13` `pg_state=drift`,
+  `469` `sqlite_state=exact_match`, `17` `sqlite_state=drift`
+- o runtime local do `battle_analyst_v9.py` foi corrigido para resolver
+  `MANALOOM_KNOWLEDGE_DB`/`MANALOOM_KNOWLEDGE_DIR`, depois `/opt/...` se existir,
+  e cair para `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
+  quando estiver fora do Hermes AWS
+- teste focado
+  `test_runtime_pg_rule_fallback_for_promoted_hotfixes.py` passou, provando
+  que as `17` cartas promovidas resolvem via SQLite/PG sem depender do override
+  manual em `KNOWN_CARDS`
+
+Terceira rodada executada em 2026-06-16:
+
+- a tentativa inicial de promover os `13` drifts legados expôs um bug no sync:
+  `sync_battle_card_rules.py` estava aplicando oracle normalization tambem em
+  `source='manual'`, distorcendo a semantica antes de persistir
+- o sync foi corrigido para normalizar apenas regras `generated`
+- depois disso, os `13` drifts legados foram promovidos corretamente e os `4`
+  casos SQLite-only receberam refresh
+- auditor final:
+  - `486` `pg_state=exact_match`
+  - `486` `sqlite_state=exact_match`
+  - `486` `already_canonicalized`
+- o guard rail do fallback runtime foi expandido para cobrir os `17` hotfixes,
+  os `13` drifts legados e os `4` casos refresh-only dentro do regression pack
+  principal `test_battle_analyst_v10_3.py`
+
+Quarta rodada executada em 2026-06-16:
+
+- o runtime foi limpo do primeiro lote seguro de overrides canonizados;
+- `34` cartas sairam de `KNOWN_CARDS` / `HANDCRAFTED_KNOWN_CARDS` e agora
+  resolvem exclusivamente via SQLite/PG no fluxo normal;
+- o teste
+  `test_runtime_pg_rule_fallback_for_promoted_hotfixes.py` foi atualizado para
+  exigir ausencia em `HANDCRAFTED_KNOWN_CARDS` e equivalencia direta com o
+  `logical_rule_key` do registry;
+- o auditor pos-limpeza fechou em:
+  - `452` overrides manuais restantes
+  - `452` `pg_state=exact_match`
+  - `452` `sqlite_state=exact_match`
+  - `452` `already_canonicalized`
+
+Quinta rodada executada em 2026-06-16:
+
+- o runtime deixou de manter inventario manual ativo;
+- `HANDCRAFTED_KNOWN_CARDS` passa a ser zerado no import e so volta a conter
+  entradas em cenarios de teste ou waiver operacional explicito;
+- `sync_battle_card_rules.py --skip-generated` agora produz `0` linhas
+  manuais no estado normal;
+- auditor final pos-remocao total do inventario ativo:
+  - `0` overrides manuais restantes
+  - `0` classificacoes pendentes
+  - runtime battle dependente apenas de SQLite/PG para regras canonizadas
+- o regression pack principal `test_battle_analyst_v10_3.py` permaneceu verde
+  nesse estado.
+
+Critério de pronto:
+
+- cartas promovidas passam a resolver via `card_battle_rules`;
+- overrides em código ficam limitados a primitivas do motor e hotfixes
+  temporários documentados;
+- existe relatório de inventário `primitive/promotable/hotfix`;
+- battle tests e replay audit passam antes e depois da migração;
+- docs Hermes e docs locais deixam claro que override manual é exceção, não
+  caminho normal.
+
 ### Próxima implementação recomendada
 
 Concluído no Slice 1:
@@ -883,6 +989,7 @@ com sinal EDHREC e planejou `54417` role scores sem mutacao. Evidencia:
 | P1 | Identidade semântica de carta ainda em transição | Slice 2026-06-12 adicionou contrato/migration aditiva para `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`; `scryfall_id` passa a ser tratado como printing id nas rotas/sync alterados; `DeckRulesService` agora usa `oracle_id` quando presente para bloquear singleton Commander e comandante duplicado no main deck em save/import/validate final, com fallback por nome físico normalizado; `/import/validate` chama a regra central em modo aviso; em 2026-06-12 a migração `021` foi aplicada no PostgreSQL real e o backfill preencheu `oracle_id` em `34325/34329` cartas; o auditor learned-opponent v4 adiciona candidato de printing canônica apenas em modo report-only e somente quando há vencedor único por evidência explícita; validação Hermes AWS em `babf800c` com 50 decks/5.000 instâncias manteve `semantic_identity_coverage=1.0`, `unresolved_instances=0`, `ambiguous_instances=0` e `canonical_printing_candidate_instances=0` | Manter fallback para as 4 cartas sem `oracle_id`; não persistir learned-opponent `card_id` ainda; como o scorecard v4 não encontrou candidato único na amostra ampliada, qualquer apply segue bloqueado até existir política backend-owned/allowlist com falso positivo zero |
 | P1 | Learned deck ainda é single-commander | `validateCommanderLearnedDeckInput` exige `commanderQuantity == 1` e `mainQuantity == 99` | Evoluir contrato para pares oficiais somente quando houver corpus partner/background validado |
 | P1 | Candidate quality agora usa EDHREC, mas apply ainda nao foi promovido | `buildCandidateRoleScores` aceita `edhrecInclusionRate`/`edhrecSampleDecks`; `candidate_quality_data_foundation.dart --dry-run` confirmou `4183` cartas com sinal EDHREC e `3263` stale `card_role_scores` heurísticos antes do apply; em 2026-06-16 o `--apply` passou a abortar stale prune grande por padrao e exigir `--allow-large-stale-prune` para janela controlada | Revisar preview/stale rows e executar `--apply` somente em janela controlada; depois rodar scorecard generate/optimize com Lorehold e comandantes de controle |
+| P1 | Mecanismo de waiver manual ainda existe como fallback de resiliência | Em 2026-06-16 `battle_analyst_v9.py#get_card_effect` foi invertido para consultar waiver manual-first explicito, depois `battle_rule_registry.lookup_battle_card_rule(DB, name)`, e so entao cair em `HANDCRAFTED_KNOWN_CARDS`. Na quinta rodada do mesmo dia, o inventario manual ativo foi zerado: `HANDCRAFTED_KNOWN_CARDS=[]` no runtime normal, `sync_battle_card_rules.py --skip-generated` gera `0` linhas manuais e o auditor `audit_handcrafted_battle_rule_canonicalization.py` fechou `handcrafted_count=0`. O regression pack principal continuou verde sem depender do seed manual | Manter apenas o mecanismo de waiver explicito para incidentes/testes; proxima melhoria real e remover o snapshot legado do arquivo ou migrá-lo para artefato historico fora do runtime quando for conveniente |
 | P1 | Derivação de regra executável para função de deck ainda não tem aprovação de dados para apply | `derive_functional_tags_from_battle_rules.py` agora propõe candidatos report-only; após correção de taxonomia e overrides card-specific são `89` novos candidatos: `27` low-risk review e `62` manual-review; `BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json` versiona os 27 low-risk para dry-run; validação Hermes AWS em `51328ea7` retornou `allowlisted_candidates_count=27`, `allowlist_blocked_manual_review_count=0`, `allowlist_unmatched_count=0`, `apply=false`; o dry-run transacional PostgreSQL posterior foi reexecutado localmente e no Hermes AWS, exercitando stale cleanup + upsert em rollback: `would_upsert_allowlisted_count=27`, `would_delete_stale_count=0`, `rolled_back=true`, `apply=false`; o caminho `--apply-reviewed-allowlist` existe, mas a allowlist atual bloqueia apply por `apply_approved=false` | O próximo passo seguro é revisão de falso positivo e criação de uma nova allowlist operator-controlled com `apply_approved=true`, se o produto aprovar. Os 62 candidatos seguem manual-only até existir taxonomia/faces suficiente |
 | P1 | Consumidores Hermes históricos ainda podem assumir papel único | Consumidores ativos (`master_optimizer_common.py`, `slot_optimizer.py`, `_mana_validator.py`, `_run_validation.py`, `_update_cron_status.py`, `battle_analyst_v9.py`, `master_optimizer_apply.py`) já leem arrays; em 2026-06-12 `materialize_learned_deck_to_deck_cards.py`, `knowledge_db.py`, `import_lorehold_decks.py`, `scryfall_classifier.py`, `export_hermes_learned_deck.py`, `wincon_pipeline.py` e `reimport_lorehold_scryfall.py` passaram a preservar multi-tags mantendo campos legados (`functional_tag` ou `role_in_deck`) para compatibilidade; scripts históricos ainda consultam `functional_tag` direto | Classificação atualizada em `HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`; migrar só scripts que virarem ativos |
 | P1 | Seed/classifier manual podia fixar identidade `RW` fora de Lorehold | `scryfall_classifier.py` usava `color_identity: "RW"` em `build_deck_json()`, o que contaminaria qualquer reuso manual para Kinnan/Atraxa/etc. | Em 2026-06-12, o classifier passou a carregar `color_identity` por carta e inferir a identidade do deck a partir do comandante; `RW` permanece apenas como fallback legado para Lorehold sem dados Scryfall |

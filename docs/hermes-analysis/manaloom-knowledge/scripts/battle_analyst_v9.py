@@ -21,10 +21,34 @@ Regras implementadas agora:
 import sqlite3, random, json, os, re, copy, sys
 from datetime import datetime, timezone
 from collections import defaultdict
+from pathlib import Path
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR and SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
+
+SCRIPT_DIR_PATH = Path(SCRIPT_DIR)
+LOCAL_KNOWLEDGE_DIR = SCRIPT_DIR_PATH.parent
+REMOTE_KNOWLEDGE_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge")
+
+
+def _resolve_knowledge_dir() -> Path:
+    env_dir = os.environ.get("MANALOOM_KNOWLEDGE_DIR")
+    if env_dir:
+        return Path(env_dir)
+    if REMOTE_KNOWLEDGE_DIR.exists():
+        return REMOTE_KNOWLEDGE_DIR
+    return LOCAL_KNOWLEDGE_DIR
+
+
+def _resolve_knowledge_db() -> Path:
+    env_db = os.environ.get("MANALOOM_KNOWLEDGE_DB")
+    if env_db:
+        return Path(env_db)
+    remote_db = REMOTE_KNOWLEDGE_DIR / "scripts" / "knowledge.db"
+    if remote_db.exists():
+        return remote_db
+    return SCRIPT_DIR_PATH / "knowledge.db"
 
 from battle_mana_cost_support import (
     MANA_SYMBOL_TO_POOL,
@@ -84,11 +108,11 @@ except Exception:
 
 DB = os.environ.get(
     "MANALOOM_KNOWLEDGE_DB",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    str(_resolve_knowledge_db()),
 )
 KNOWLEDGE_DIR = os.environ.get(
     "MANALOOM_KNOWLEDGE_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge",
+    str(_resolve_knowledge_dir()),
 )
 LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
 
@@ -101,6 +125,7 @@ DECISION_STRATEGY_VERSION = "battle_decision_strategy_v1_2026_06_15"
 HIGH_IMPACT_PAYOFF_EFFECTS = {
     "approach",
     "board_wipe",
+    "copy_creature_token",
     "copy_spell",
     "draw_engine",
     "finisher",
@@ -1527,7 +1552,6 @@ KNOWN_CARDS = {
     "Insurrection": {"effect": "steal_all_creatures"},
     "Mizzix's Mastery": {"effect": "overload_recursion"},
     "Storm Herd": {"effect": "token_maker", "token_count": "life_total"},
-    "Surge to Victory": {"effect": "pump_all", "recursion": True},
     "Rite of the Dragoncaller": {"effect": "token_maker", "token_count": 4, "token_power": 5},
     "Brass's Bounty": {"effect": "token_maker", "token_count": "lands"},
     "Akroma's Will": {"effect": "pump_all", "instant": True,
@@ -1688,7 +1712,6 @@ KNOWN_CARDS = {
     "Lively Dirge": {"effect": "recursion", "count": 1},
     "Glaring Fleshraker": {"effect": "token_maker", "token_count": 1, "token_power": 0, "token_toughness": 1},
     "Forsaken Monument": {"effect": "pump_all", "keywords": [], "power_multiplier": 1},
-    "Hullbreaker Horror": {"effect": "remove_permanent"},
     "Windfall": {"effect": "draw_cards", "count": 7},
     "Wan Shi Tong, Librarian": {"effect": "draw_engine", "trigger": "historic_spell"},
     "Mirage Mirror": {"effect": "ramp_engine"},
@@ -1835,14 +1858,6 @@ KNOWN_CARDS = {
         "landfall_second_draw": True,
     },
     "Commandeer": {"effect": "counter", "instant": True},
-    "Roiling Regrowth": {
-        "effect": "land_ramp",
-        "land_count": 2,
-        "basic_only": True,
-        "requires_sacrifice_land": True,
-        "land_enters_tapped": True,
-        "instant": True,
-    },
     "Echoes of Eternity": {"effect": "copy_spell", "colorless_only": True},
     "Pest Infestation": {
         "effect": "remove_permanent",
@@ -1891,14 +1906,6 @@ KNOWN_CARDS = {
         "produces": "URC",
     },
     "Mishra's Bauble": {"effect": "draw_cards", "count": 1},
-    "Harrow": {
-        "effect": "land_ramp",
-        "land_count": 2,
-        "basic_only": True,
-        "requires_sacrifice_land": True,
-        "land_enters_tapped": False,
-        "instant": True,
-    },
     "Solemn Simulacrum": {
         "effect": "creature",
         "power": 2,
@@ -2106,13 +2113,6 @@ KNOWN_CARDS = {
         "is_creature_permanent": True,
     },
     "Mana Vault": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Mox Diamond": {
-        "effect": "ramp_permanent",
-        "mana_produced": 1,
-        "produces": "WUBRGC",
-        "requires_discard_land": True,
-    },
-    "Chrome Mox": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Mox Amber": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Mox Opal": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
     "Fellwar Stone": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
@@ -2132,7 +2132,6 @@ KNOWN_CARDS = {
     "Consider": {"effect": "draw_cards", "count": 1, "instant": True},
     "Expedite": {"effect": "draw_cards", "count": 1},
     "Crimson Wisps": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Valakut Awakening": {"effect": "draw_cards", "count": 3, "instant": True},
     "Underworld Breach": {"effect": "passive"},
     "Past in Flames": {"effect": "recursion", "target": "instant_or_sorcery", "count": 3},
     "Sevinne's Reclamation": {"effect": "recursion", "count": 1},
@@ -2168,7 +2167,6 @@ KNOWN_CARDS = {
     "Flusterstorm": {"effect": "counter", "instant": True},
     "Flare of Denial": {"effect": "counter", "instant": True},
     "Daze": {"effect": "counter", "instant": True},
-    "Sink into Stupor": {"effect": "remove_permanent", "instant": True, "target": "nonland"},
     "Finale of Devastation": {"effect": "tutor", "target": "green_creature_to_battlefield"},
     "Longshot, Rebel Bowman": {
         "effect": "creature",
@@ -2202,7 +2200,6 @@ KNOWN_CARDS = {
         "is_creature_permanent": True,
         "etb_tutor_target": "small_creature",
     },
-    "Snap": {"effect": "remove_creature", "instant": True, "target": "creature"},
     "Transmute Artifact": {"effect": "tutor", "target": "artifact_or_enchantment"},
     "Urza, Lord High Artificer": {
         "effect": "creature",
@@ -2300,7 +2297,6 @@ KNOWN_CARDS = {
         "toughness": 1,
         "is_creature_permanent": True,
     },
-    "Aether Spellbomb": {"effect": "passive"},
     "Thrasios, Triton Hero": {
         "effect": "creature",
         "power": 1,
@@ -2308,7 +2304,6 @@ KNOWN_CARDS = {
         "is_creature_permanent": True,
     },
     "Urza's Bauble": {"effect": "passive"},
-    "Emerald Charm": {"effect": "remove_permanent", "instant": True, "target": "enchantment"},
     "Sewer-veillance Cam": {"effect": "passive"},
     "Metalworker": {
         "effect": "creature",
@@ -2319,29 +2314,12 @@ KNOWN_CARDS = {
         "produces": "C",
         "is_creature_permanent": True,
     },
-    "Scour for Scrap": {"effect": "tutor", "target": "artifact_or_enchantment", "instant": True},
     "Demonic Collusion": {"effect": "tutor", "target": "any"},
     "Borne Upon a Wind": {"effect": "draw_cards", "count": 1, "instant": True},
     "Ad Nauseam": {"effect": "draw_cards", "count": 5, "instant": True},
     "Demonic Consultation": {"effect": "tutor", "target": "any", "instant": True},
     "Tainted Pact": {"effect": "tutor", "target": "any", "instant": True},
     "Chord of Calling": {"effect": "tutor", "target": "creature_to_battlefield", "instant": True},
-    "Crop Rotation": {
-        "effect": "land_ramp",
-        "land_count": 1,
-        "requires_sacrifice_land": True,
-        "land_enters_tapped": False,
-        "land_target_kind": "any",
-        "instant": True,
-    },
-    "Birgi, God of Storytelling": {
-        "effect": "ramp_engine",
-        "mana_produced": 1,
-        "produces": "R",
-        "power": 3,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
     "Culling the Weak": {
         "effect": "ramp_ritual",
         "mana_produced": 4,
@@ -2516,12 +2494,9 @@ KNOWN_CARDS = {
         "effect": "draw_engine",
         "trigger": "begin_combat",
     },
-    "Feed the Swarm": {"effect": "remove_permanent", "target": "creature_or_enchantment"},
     "Bitter Downfall": {"effect": "remove_creature", "target": "creature", "instant": True},
     "Seedship Impact": {"effect": "remove_permanent", "target": "artifact_or_enchantment", "instant": True},
     "Cyclonic Rift": {"effect": "remove_permanent", "target": "nonland", "instant": True},
-    "Snapback": {"effect": "remove_creature", "target": "creature", "instant": True},
-    "Eldrazi Confluence": {"effect": "remove_permanent", "target": "nonland", "instant": True},
     "Spine of Ish Sah": {"effect": "remove_permanent", "target": "permanent"},
     "Analyze the Pollen": {"effect": "tutor", "target": "land"},
     "Gifts Ungiven": {"effect": "tutor", "target": "any", "instant": True},
@@ -2532,7 +2507,6 @@ KNOWN_CARDS = {
     "Boon of the Wish-Giver": {"effect": "draw_cards", "count": 4},
     "Timetwister": {"effect": "draw_cards", "count": 7},
     "Roiling Dragonstorm": {"effect": "draw_cards", "count": 2},
-    "Rise of the Eldrazi": {"effect": "extra_turn", "turns": 1, "exiles_self": True},
     "Living Death": {"effect": "board_wipe"},
     "Legolas's Quick Reflexes": {
         "effect": "protect_creature",
@@ -2546,8 +2520,6 @@ KNOWN_CARDS = {
         "power_boost": 1,
         "toughness_boost": 1,
     },
-    "Momentary Blink": {"effect": "phase_creatures", "instant": True},
-    "Turn to Mist": {"effect": "phase_creatures", "instant": True},
     "Fiery Inscription": {"effect": "passive"},
     "Prismatic Undercurrents": {"effect": "passive"},
     "Necrodominance": {"effect": "passive"},
@@ -2707,7 +2679,6 @@ KNOWN_CARDS = {
     "Fractured Powerstone": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "C"},
     "Worn Powerstone": {"effect": "ramp_permanent", "mana_produced": 2, "produces": "C"},
     "Basalt Monolith": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Everflowing Chalice": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "C"},
     "Wayfarer's Bauble": {"effect": "land_ramp", "land_count": 1, "basic_only": True},
     "Manamorphose": {
         "effect": "treasure_maker",
@@ -2951,6 +2922,18 @@ KNOWN_CARDS = {
 }
 
 HANDCRAFTED_KNOWN_CARDS = set(KNOWN_CARDS)
+# Canonicalized card rules now live in PostgreSQL/SQLite. The legacy literal is
+# stripped from the active runtime inventory immediately after import so manual
+# rules only exist when explicitly injected into HANDCRAFTED_KNOWN_CARDS as an
+# audited temporary waiver.
+for _legacy_manual_name in list(HANDCRAFTED_KNOWN_CARDS):
+    KNOWN_CARDS.pop(_legacy_manual_name, None)
+HANDCRAFTED_KNOWN_CARDS = set()
+
+# Cards listed here intentionally bypass card_battle_rules and resolve from the
+# handcrafted table first. Keep this empty by default and require an explicit
+# operational waiver for any temporary runtime-first exception.
+MANUAL_RULE_RUNTIME_WAIVERS = set()
 
 TAG_EFFECTS = {
     "ramp": {"effect": "ramp_permanent", "mana_produced": 1},
@@ -2995,7 +2978,12 @@ def normalize_effect_by_oracle(card, effect_data):
     oracle_text = str(card.get("oracle_text") or "")
     text = f"{type_line}\n{oracle_text}".lower()
 
-    if "land" in type_line.lower():
+    type_line_lower = type_line.lower()
+    is_split_spell_land = "//" in type_line and any(
+        spell_kind in type_line_lower
+        for spell_kind in ("instant", "sorcery", "creature", "artifact", "enchantment")
+    )
+    if "land" in type_line_lower and not is_split_spell_land:
         normalized["effect"] = "land"
         normalized.pop("instant", None)
         normalized.pop("miracle", None)
@@ -3126,7 +3114,7 @@ if os.path.exists(_gen_json_path):
     except Exception: pass
 def get_card_effect(card):
     name = card.get("name", "")
-    if name in HANDCRAFTED_KNOWN_CARDS:
+    if name in MANUAL_RULE_RUNTIME_WAIVERS and name in HANDCRAFTED_KNOWN_CARDS:
         return normalize_effect_by_oracle(
             card,
             with_rule_metadata(
@@ -3149,6 +3137,16 @@ def get_card_effect(card):
                 oracle_hash=rule.get("oracle_hash"),
             )
             return normalize_effect_by_oracle(card, effect)
+    if name in HANDCRAFTED_KNOWN_CARDS:
+        return normalize_effect_by_oracle(
+            card,
+            with_rule_metadata(
+                KNOWN_CARDS[name],
+                source="known_cards_manual",
+                review_status="verified",
+                confidence=1.0,
+            ),
+        )
     if name in KNOWN_CARDS:
         return normalize_effect_by_oracle(
             card,
@@ -3935,7 +3933,7 @@ class Stack:
         if not self.items: return False
         effect = self.items[-1].effect_data.get("effect", "")
         threats = {"board_wipe", "finisher", "approach", "steal_all_creatures",
-                   "overload_recursion", "pump_all", "token_maker"}
+                   "overload_recursion", "pump_all", "token_maker", "copy_creature_token"}
         return effect in threats
     def empty(self): return len(self.items) == 0
 
@@ -4713,6 +4711,10 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
             return 50
         return 30
 
+    if effect_name == "copy_creature_token":
+        creatures = [c for c in controller.battlefield if is_battlefield_creature(c)]
+        return 45 if creatures else 10
+
     if effect_name == "token_maker":
         # How many tokens? If Storm Herd (life_total/2), it's a lot
         if controller.life > 30:
@@ -4749,7 +4751,7 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
     if effect_name == "draw_engine":
         return controller.approach_count > 0 and 50 or 25  # higher threat if Approach was cast
 
-    if effect_name == "draw_cards":
+    if effect_name in ("draw_cards", "hand_filter"):
         count = 2
         if controller.approach_count > 0 and count >= 2:
             return 45  # digging for Approach
@@ -5231,6 +5233,144 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             turn=turn,
         )
     return True
+
+
+def chrome_mox_imprint_colors(card):
+    """Return colors Chrome Mox can produce from a candidate imprint card."""
+    if not isinstance(card, dict):
+        return []
+    explicit = card.get("colors") or card.get("color_identity")
+    if isinstance(explicit, str):
+        explicit = re.findall(r"[WUBRG]", explicit.upper())
+    colors = [
+        MANA_SYMBOL_TO_POOL.get(str(color).upper(), str(color).lower())
+        for color in (explicit or [])
+    ]
+    return [
+        color
+        for color in colors
+        if color in {"white", "blue", "black", "red", "green"}
+    ]
+
+
+def is_chrome_mox_imprint_candidate(card):
+    if not isinstance(card, dict):
+        return False
+    if card.get("is_commander"):
+        return False
+    if is_effective_land(card) or is_land(card):
+        return False
+    if "artifact" in str(card.get("type_line") or "").lower():
+        return False
+    return bool(chrome_mox_imprint_colors(card))
+
+
+def choose_chrome_mox_imprint_card(player, source_card):
+    candidates = [
+        candidate
+        for candidate in player.hand
+        if candidate is not source_card
+        and is_chrome_mox_imprint_candidate(candidate)
+    ]
+    options = []
+    critical_effects = {
+        "approach",
+        "board_wipe",
+        "counter",
+        "finisher",
+        "protection",
+        "remove_creature",
+        "remove_permanent",
+        "tutor",
+        "wincon",
+    }
+    for candidate in candidates:
+        effect_data = get_card_effect(candidate)
+        effect = str(effect_data.get("effect") or candidate.get("effect") or "unknown")
+        cmc = _opening_hand_card_cmc(candidate)
+        rank = 100
+        if effect in {"unknown", "passive"}:
+            rank -= 25
+        if cmc >= 5:
+            rank -= min(20, int(cmc) * 2)
+        if effect in {"draw_cards", "ramp_ritual", "ramp_permanent"}:
+            rank += 15
+        if effect in critical_effects:
+            rank += 60
+        risk_flags = []
+        if effect in critical_effects:
+            risk_flags.append("imprinting_high_value_card")
+        options.append(
+            {
+                "card": candidate.get("name", "?"),
+                "cmc": cmc,
+                "effect": effect,
+                "colors": chrome_mox_imprint_colors(candidate),
+                "selection_rank": rank,
+                "risk_flags": risk_flags,
+            }
+        )
+    options.sort(key=lambda option: (option["selection_rank"], option["cmc"], option["card"]))
+    if not options:
+        return None, [], ["no_valid_imprint_card"], "no_nonartifact_nonland_colored_card"
+    chosen_name = options[0]["card"]
+    chosen = next(candidate for candidate in candidates if candidate.get("name") == chosen_name)
+    return (
+        chosen,
+        options,
+        list(options[0].get("risk_flags") or []),
+        "prefer_lowest_strategic_value_colored_nonartifact_nonland",
+    )
+
+
+def resolve_chrome_mox_imprint(player, permanent, source_card, *, turn=None):
+    imprint, options, risk_flags, reason = choose_chrome_mox_imprint_card(player, source_card)
+    if not imprint:
+        permanent["mana_produced"] = 0
+        emit_replay_event(
+            "imprint_failed",
+            player=player.name,
+            card=source_card.get("name", "?"),
+            cost="imprint_nonartifact_nonland",
+            reason=reason,
+            turn=turn,
+            imprint_options=options,
+            strategic_risk_flags=risk_flags,
+        )
+        return False
+    player.hand.remove(imprint)
+    player.exile.append(imprint)
+    colors = chrome_mox_imprint_colors(imprint)
+    permanent["imprinted_card"] = imprint.get("name", "?")
+    permanent["imprinted_colors"] = colors
+    permanent["produces"] = "".join(
+        {
+            "white": "W",
+            "blue": "U",
+            "black": "B",
+            "red": "R",
+            "green": "G",
+        }[color]
+        for color in ["white", "blue", "black", "red", "green"]
+        if color in colors
+    )
+    permanent["mana_produced"] = 1 if colors else 0
+    emit_replay_event(
+        "imprint_resolved",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        imprinted=imprint.get("name", "?"),
+        imprinted_colors=colors,
+        turn=turn,
+        imprint_options=options,
+        selection_reason=reason,
+        strategic_risk_flags=risk_flags,
+    )
+    return True
+
+
+def everflowing_chalice_additional_costs(kicker_count):
+    return ["{2}" for _ in range(max(0, int(kicker_count or 0)))]
 
 
 def ritual_mana_produced(player, effect_data):
@@ -5924,6 +6064,170 @@ def apply_equipment_haste_shroud(player, card, effect_data, turn):
     )
 
 
+def resolve_hand_filter(player, card, effect_data, turn, rng):
+    """Resolve Valakut Awakening-style bottom-then-draw filtering."""
+    max_bottom = int(effect_data.get("max_bottom") or 3)
+    draw_extra = int(effect_data.get("draw_extra") or 1)
+    candidates = [
+        candidate
+        for candidate in player.hand
+        if isinstance(candidate, dict)
+        and candidate is not card
+    ]
+    land_count = sum(1 for candidate in candidates if is_effective_land(candidate))
+
+    def candidate_bottom_profile(candidate):
+        effect = get_card_effect(candidate).get("effect", candidate.get("effect", "unknown"))
+        cmc = _opening_hand_card_cmc(candidate)
+        is_land_card = is_effective_land(candidate)
+        keep_effects = {
+            "counter",
+            "remove_creature",
+            "remove_permanent",
+            "protection",
+            "phase_out",
+            "tutor",
+            "ramp_permanent",
+            "land_ramp",
+        }
+        should_bottom = False
+        urgency = 99
+        reason = "keep"
+        if effect in keep_effects:
+            should_bottom = False
+            urgency = 99
+            reason = "keep_interaction_or_setup"
+        elif is_land_card and land_count >= 4:
+            should_bottom = True
+            urgency = 20
+            reason = "excess_land"
+        elif cmc >= 7:
+            should_bottom = True
+            urgency = 10
+            reason = "dead_high_cmc"
+        elif cmc >= 5 and effect not in {"draw_cards", "hand_filter"}:
+            should_bottom = True
+            urgency = 30
+            reason = "slow_noncritical_spell"
+        elif effect in {"draw_cards", "hand_filter"} and cmc >= 5:
+            should_bottom = True
+            urgency = 25
+            reason = "expensive_refill_spell"
+        return {
+            "candidate": candidate,
+            "should_bottom": should_bottom,
+            "urgency": urgency,
+            "reason": reason,
+            "cmc": cmc,
+            "is_land_card": is_land_card,
+            "effect": effect,
+        }
+
+    bottom_profiles = [
+        profile
+        for profile in (candidate_bottom_profile(candidate) for candidate in candidates)
+        if profile["should_bottom"]
+    ]
+    bottom_profiles.sort(
+        key=lambda profile: (
+            profile["urgency"],
+            0 if profile["is_land_card"] else 1,
+            -profile["cmc"],
+            profile["candidate"].get("name", "?"),
+        )
+    )
+    to_bottom = [
+        profile["candidate"]
+        for profile in bottom_profiles[:max_bottom]
+    ]
+    for bottomed in to_bottom:
+        if bottomed in player.hand:
+            player.hand.remove(bottomed)
+            player.library.append(bottomed)
+    drawn = player.draw(len(to_bottom) + draw_extra, rng)
+    emit_replay_event(
+        "hand_filter_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        bottomed=[bottomed.get("name", "?") for bottomed in to_bottom],
+        cards_drawn=[drawn_card.get("name", "?") for drawn_card in drawn if isinstance(drawn_card, dict)],
+        draw_count=len(drawn),
+        bottom_reasons=[
+            {
+                "card": profile["candidate"].get("name", "?"),
+                "reason": profile["reason"],
+            }
+            for profile in bottom_profiles[:max_bottom]
+        ],
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def resolve_copy_creature_token(player, card, effect_data, turn):
+    """Create a temporary token copy of one of the controller's creatures."""
+    targets = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent)
+    ]
+    if not targets:
+        emit_replay_event(
+            "copy_creature_token_failed",
+            player=player.name,
+            card=card.get("name", "?"),
+            reason="no_creature_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return None
+    target = choose_best_creature_target(targets)
+    token = copy.deepcopy(target)
+    token["name"] = f"{target.get('name', 'Creature')} token"
+    token["token"] = True
+    token["copy_of"] = target.get("name", "?")
+    token["is_commander"] = False
+    token["haste"] = bool(effect_data.get("token_haste", True))
+    token["summoning_sick"] = not token["haste"]
+    token["tapped"] = False
+    if effect_data.get("sacrifice_token_at_end_step"):
+        token["sacrifice_at_end_step"] = True
+    player.battlefield.append(token)
+    emit_replay_event(
+        "copy_creature_token_created",
+        player=player.name,
+        card=card.get("name", "?"),
+        target=target.get("name", "?"),
+        token=token.get("name", "?"),
+        haste=token.get("haste"),
+        sacrifice_at_end_step=bool(token.get("sacrifice_at_end_step")),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+    return token
+
+
+def process_end_step_token_sacrifices(player, turn):
+    sacrificed = []
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict) or not permanent.get("sacrifice_at_end_step"):
+            continue
+        player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        sacrificed.append(permanent)
+    if sacrificed:
+        emit_replay_event(
+            "end_step_token_sacrificed",
+            player=player.name,
+            tokens=[token.get("name", "?") for token in sacrificed],
+            turn=turn,
+        )
+    return sacrificed
+
+
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
     if raw_amount == "x_available":
@@ -5979,6 +6283,48 @@ def trigger_spell_cast_engines(
     stack=None,
     active_player=None,
 ):
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("trigger") != "spell_cast":
+            continue
+        mana_amount = int(permanent.get("spell_cast_add_mana") or 0)
+        if mana_amount <= 0:
+            continue
+        mana_color = source_colors({"produces": permanent.get("spell_cast_mana_color") or permanent.get("produces")})
+        color = mana_color[0] if mana_color else "generic"
+
+        def resolve_spell_cast_mana_trigger(
+            permanent=permanent,
+            mana_amount=mana_amount,
+            color=color,
+        ):
+            player.mana_pool.add(color, mana_amount)
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="spell_cast",
+                trigger_spell=spell.get("name", "?"),
+                effect="add_mana",
+                mana_added=mana_amount,
+                mana_color=color,
+                mana_pool=player.mana_pool.snapshot(),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+
+        resolve_or_enqueue_trigger(
+            player,
+            permanent,
+            "spell_cast",
+            resolve_spell_cast_mana_trigger,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
+        )
+
     if not (is_instant(spell) or is_sorcery(spell)):
         return
     for permanent in list(player.battlefield):
@@ -6372,7 +6718,45 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         finally:
             restore_mana_snapshot(pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot)
 
+    def ramp_cast_plan(ramp_card, ramp_effect):
+        """Build a payable cast plan for ramp cards with card-specific costs."""
+        additional_costs = []
+        modes = []
+        metadata = {}
+        if ramp_effect.get("multikicker_generic_cost"):
+            cost = int(ramp_effect.get("multikicker_generic_cost") or 0)
+            min_kicks = int(ramp_effect.get("min_kicker_count_for_mana") or 1)
+            max_kicks = min(2, player.available_mana() // max(1, cost))
+            kicker_count = 0
+            for candidate_count in range(max_kicks, min_kicks - 1, -1):
+                candidate_costs = everflowing_chalice_additional_costs(candidate_count)
+                if player.can_pay(card_mana_cost(ramp_card, additional_costs=candidate_costs)):
+                    kicker_count = candidate_count
+                    additional_costs = candidate_costs
+                    break
+            if kicker_count < min_kicks:
+                return None
+            modes.append(f"multikicker:{kicker_count}")
+            metadata["kicker_count"] = kicker_count
+        if not player.can_pay(card_mana_cost(ramp_card, additional_costs=additional_costs)):
+            return None
+        return {
+            "additional_costs": additional_costs,
+            "modes": modes,
+            **metadata,
+        }
+
     def ramp_resource_unlocks_same_turn_action(ramp_card, ramp_effect):
+        if ramp_cast_plan(ramp_card, ramp_effect) is None:
+            return False
+        if ramp_effect.get("requires_imprint_nonartifact_nonland"):
+            imprint, _options, _risk_flags, _reason = choose_chrome_mox_imprint_card(
+                player,
+                ramp_card,
+            )
+            if not imprint:
+                return False
+            return ramp_permanent_unlocks_meaningful_action(ramp_card, ramp_effect)
         if ramp_effect.get("effect") == "ramp_ritual":
             return ritual_unlocks_same_turn_action(ramp_card, ramp_effect)
         if ramp_effect.get("requires_sacrifice_land"):
@@ -6503,6 +6887,9 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 **cast_ctx.to_replay_fields(),
                 **replay_rule_fields(cmd_eff),
             )
+            trigger_spell_cast_engines(
+                player, all_players, cmd, turn, phase, stack=stack, active_player=player
+            )
             if cmd_eff.get("effect") == "land_recursion_creature":
                 resolve_land_recursion_creature(player, cmd_copy, cmd_eff, turn)
             mana = player.available_mana()
@@ -6568,7 +6955,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     if is_main_phase:
         ramp_cards = [
             c for c in player.hand
-            if player.can_pay_card(c)
+            if ramp_cast_plan(c, get_card_effect(c)) is not None
             and get_card_effect(c).get("effect") in (
                 "land_ramp",
                 "land_recursion",
@@ -6582,10 +6969,19 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             eff = get_card_effect(c)
             if (
                 c in player.hand
-                and player.can_pay_card(c)
+                and ramp_cast_plan(c, eff) is not None
                 and ramp_resource_unlocks_same_turn_action(c, eff)
             ):
-                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="ramp")
+                cast_plan = ramp_cast_plan(c, eff) or {}
+                cast_ctx = begin_cast_context(
+                    player,
+                    c,
+                    phase,
+                    effect_data=eff,
+                    role="ramp",
+                    modes=cast_plan.get("modes"),
+                    additional_costs=cast_plan.get("additional_costs"),
+                )
                 if not commit_cast_payment(cast_ctx):
                     continue
                 fields = replay_rule_fields(eff)
@@ -6621,6 +7017,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         else 0,
                         "requires_discard_land": bool(eff.get("requires_discard_land")),
                         "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
+                        "requires_imprint_nonartifact_nonland": bool(
+                            eff.get("requires_imprint_nonartifact_nonland")
+                        ),
+                        "multikicker_count": int(cast_plan.get("kicker_count") or 0),
                     },
                     rule_source=fields.get("rule_source", "battle_heuristic"),
                     rule_status=fields.get("rule_review_status", "heuristic"),
@@ -6640,6 +7040,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         else 0,
                         "requires_discard_land": bool(eff.get("requires_discard_land")),
                         "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
+                        "requires_imprint_nonartifact_nonland": bool(
+                            eff.get("requires_imprint_nonartifact_nonland")
+                        ),
+                        "multikicker_count": int(cast_plan.get("kicker_count") or 0),
                     },
                     risk_flags=[
                         flag
@@ -6652,6 +7056,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                             else None,
                             "requires_land_sacrifice"
                             if eff.get("requires_sacrifice_land")
+                            else None,
+                            "requires_imprint"
+                            if eff.get("requires_imprint_nonartifact_nonland")
+                            else None,
+                            "multikicker_paid"
+                            if cast_plan.get("kicker_count")
                             else None,
                         )
                         if flag
@@ -6699,6 +7109,21 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     player.graveyard.append(c)
                 else:
                     permanent = prepare_entering_permanent(enrich_card({**c, **eff}))
+                    if eff.get("multikicker_generic_cost"):
+                        kicker_count = int(cast_plan.get("kicker_count") or 0)
+                        permanent["charge_counters"] = kicker_count
+                        permanent["mana_produced"] = kicker_count
+                        emit_replay_event(
+                            "multikicker_paid",
+                            player=player.name,
+                            card=c.get("name", "?"),
+                            kicker_count=kicker_count,
+                            additional_costs=cast_plan.get("additional_costs") or [],
+                            turn=turn,
+                            phase=phase,
+                        )
+                    if eff.get("requires_imprint_nonartifact_nonland"):
+                        resolve_chrome_mox_imprint(player, permanent, c, turn=turn)
                     player.battlefield.append(permanent)
                     if is_mana_source_permanent(permanent):
                         colors = source_colors(permanent)
@@ -7171,6 +7596,11 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         else:
             player.draw(n, rng)
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "hand_filter":
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn)
+            return
+        resolve_hand_filter(player, card, effect_data, turn, rng)
     elif effect == "treasure_maker":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
@@ -7453,6 +7883,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 artifact=artifact_tokens,
             )
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "copy_creature_token":
+        resolve_copy_creature_token(player, card, effect_data, turn)
     elif effect == "overload_recursion":
         spells = [c for c in player.graveyard if isinstance(c, dict) and c.get("cmc", 0) > 0]
         if player.copy_engines > 0: spells = spells * 2
@@ -8556,10 +8988,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         land = lands_in_hand[0]
         eff = get_card_effect(land)
         player.hand.remove(land)
-        land_permanent = enrich_card({**land, "effect": "land"})
+        land_permanent = enrich_card({**land, **eff, "effect": "land"})
         player.battlefield.append(land_permanent)
         player.lands_played_this_turn += 1
-        player.mana_pool.add(source_colors(land_permanent)[0], 1)
+        player.mana_pool.add(
+            source_colors(land_permanent)[0],
+            int(land_permanent.get("mana_produced") or 1),
+        )
         trigger_landfall(
             player,
             land_permanent,
@@ -8652,6 +9087,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and not c.get("burden"):
             player.draw(1, rng)
     process_warp_end_step(player, turn)
+    process_end_step_token_sacrifices(player, turn)
     
     # ── OPPONENT END STEP INTERACTION (NEW) ──
     # All opponents can cast instants on this player's end step

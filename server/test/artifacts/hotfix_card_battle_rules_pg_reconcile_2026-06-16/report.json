@@ -1,0 +1,44 @@
+{
+  "apply_pg": true,
+  "apply_sqlite_from_pg": true,
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at": "2026-06-16T12:14:42.439460+00:00",
+  "generated_rows": 0,
+  "include_generated": true,
+  "include_needs_review": false,
+  "input_rows": 17,
+  "manual_rows": 17,
+  "only_classification": [
+    "temporary_hotfix"
+  ],
+  "only_recommended_action": [
+    "reconcile_pg_rule"
+  ],
+  "only_summary_json": "server/test/artifacts/handcrafted_battle_rule_canonicalization_2026-06-16/summary.json",
+  "oracle_normalized_rows": 0,
+  "pg_inserted_or_updated": 17,
+  "pg_rows_loaded": 17,
+  "pg_skipped_lower_priority": 0,
+  "selected_card_count": 17,
+  "selected_cards": [
+    "Ancient Den",
+    "Ancient Tomb",
+    "Birgi, God of Storytelling",
+    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+    "Chrome Mox",
+    "Electroduplicate",
+    "Everflowing Chalice",
+    "Gemstone Caverns",
+    "Great Furnace",
+    "Hall of Heliod's Generosity",
+    "Inventors' Fair",
+    "Lightning Greaves",
+    "Sunbaked Canyon",
+    "Urza's Saga",
+    "Valakut Awakening",
+    "Valakut Awakening // Valakut Stoneforge",
+    "War Room"
+  ],
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "sqlite_inserted_or_updated": 17
+}
