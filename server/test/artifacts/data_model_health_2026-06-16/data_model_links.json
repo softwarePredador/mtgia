@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-06-16T03:40:00.776818Z",
+  "generated_at": "2026-06-16T04:00:29.614024Z",
   "repo_root": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia",
   "git": {
-    "head": "5ec4002cff88ba6da6fdb8ed3f0ad543b9006156",
+    "head": "93f5ac26c9824e18430ac97584665037eb1b682f",
     "branch": "master",
-    "status_short": "?? server/test/artifacts/data_model_health_2026-06-16/"
+    "status_short": "?? server/test/artifacts/data_model_health_2026-06-16/candidate_quality_meta_signals_apply/\n?? server/test/artifacts/data_model_health_2026-06-16/candidate_quality_meta_signals_post_apply/"
   },
   "static": {
     "table_count": 81,
@@ -2899,7 +2899,7 @@
       "card_legalities": 324538,
       "card_localized_names": 251107,
       "card_function_tags": 112563,
-      "card_role_scores": 46335,
+      "card_role_scores": 46598,
       "card_semantic_tags_v2": 24181,
       "card_battle_rules": 3158,
       "decks": 1337,
@@ -2910,7 +2910,7 @@
       "commander_learned_decks": 61,
       "deck_learning_events": 107,
       "commander_card_usage": 912,
-      "commander_card_synergy": 7179,
+      "commander_card_synergy": 7796,
       "commander_reference_profiles": 50,
       "commander_reference_card_stats": 1606,
       "commander_reference_decks": 121,

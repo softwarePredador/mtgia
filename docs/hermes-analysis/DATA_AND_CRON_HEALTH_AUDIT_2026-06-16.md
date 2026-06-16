@@ -8,7 +8,7 @@
 ## Resumo executivo
 
 - Deploy publico esta saudavel e alinhado ao `master`:
-  `5ec4002cff88ba6da6fdb8ed3f0ad543b9006156`.
+  `93f5ac26c9824e18430ac97584665037eb1b682f`.
 - PostgreSQL esta coerente para seguir: `25/25` migracoes aplicadas, `72`
   relacoes publicas e as quatro views criticas presentes.
 - As views agregadas estao cumprindo o papel anti-fanout:
@@ -18,9 +18,9 @@
   deck-card rows.
 - Candidate Quality esta melhorando a base: o dry-run escaneou `33.839` cartas,
   planejou `54.417` role scores e usou `4.183` cartas com sinal EDHREC.
-- Meta signals tambem agregam valor: `385` meta decks escaneados, `363` com
-  identidade resolvida, `2.796` commander signal rows planejadas e `1.173`
-  role score rows planejados.
+- Meta signals tambem agregam valor e foram aplicados em janela controlada:
+  `385` meta decks escaneados, `363` com identidade resolvida, `2.796`
+  commander signal rows aplicadas e `1.173` role score rows aplicados.
 - Hermes AWS esta operacional com `25` jobs cadastrados e `13` habilitados.
   `12/13` jobs habilitados estavam `ok`; o unico erro observado
   (`manaloom-auto-promote-learned`) foi revalidado por dry-run e nao quebrou.
@@ -46,6 +46,8 @@ Artefatos gerados nesta rodada:
 - `server/test/artifacts/data_model_health_2026-06-16/data_model_links.json`
 - `server/test/artifacts/data_model_health_2026-06-16/data_model_links.md`
 - `server/test/artifacts/data_model_health_2026-06-16/candidate_quality_meta_signals/`
+- `server/test/artifacts/data_model_health_2026-06-16/candidate_quality_meta_signals_apply/`
+- `server/test/artifacts/data_model_health_2026-06-16/candidate_quality_meta_signals_post_apply/`
 
 ## Estado PostgreSQL
 
@@ -53,7 +55,7 @@ Artefatos gerados nesta rodada:
 
 - Migracoes: `25` totais, `25` executadas, `0` pendentes.
 - Health publico: `healthy`.
-- Git SHA publico: `5ec4002cff88ba6da6fdb8ed3f0ad543b9006156`.
+- Git SHA publico: `93f5ac26c9824e18430ac97584665037eb1b682f`.
 
 ### Row counts criticos
 
@@ -65,7 +67,7 @@ Artefatos gerados nesta rodada:
 | `card_legalities` | 324.538 | Forte para Commander/legalidade. |
 | `card_localized_names` | 251.107 | Forte para import PT/outros idiomas. |
 | `card_function_tags` | 112.563 | Multi-tag correto e util para analise/optimize. |
-| `card_role_scores` | 46.335 | Base de ranking por papel ja materializada. |
+| `card_role_scores` | 46.598 | Base de ranking por papel ja materializada. |
 | `card_semantic_tags_v2` | 24.181 | Sinal semantico parcial, ainda complementar. |
 | `card_battle_rules` | 3.158 | Regras criticas, nao cobertura global. |
 | `decks` | 1.337 | Decks de produto. |
@@ -73,7 +75,7 @@ Artefatos gerados nesta rodada:
 | `commander_learned_decks` | 61 | Learned decks backend-owned. |
 | `deck_learning_events` | 107 | Eventos de aprendizado. |
 | `commander_card_usage` | 912 | Ainda pequeno e parcialmente name-based. |
-| `commander_card_synergy` | 7.179 | Sinal util para aprendizado/optimize. |
+| `commander_card_synergy` | 7.796 | Sinal util para aprendizado/optimize. |
 | `meta_decks` | 653 | Corpus externo/metagame. |
 | `ai_logs` | 1.102 | Telemetria AI preenchida. |
 | `ai_generate_jobs` | 4 | Baixo volume. |
@@ -131,10 +133,12 @@ Stale antes de apply:
 Diagnostico:
 
 - A cron/foundation esta agregando dados reais.
-- Ainda nao deve rodar `--apply` sem revisar o prune stale, porque ha `3.263`
-  role scores antigos para remover/substituir.
+- O apply controlado foi feito somente para `candidate_quality_meta_signals`,
+  porque o stale era pequeno e source-isolado.
+- `candidate_quality_data_foundation --apply` ainda nao deve rodar sem revisar
+  o prune stale, porque ha `3.263` role scores antigos para remover/substituir.
 
-### Meta signals dry-run
+### Meta signals apply controlado
 
 | Metrica | Valor |
 |---|---:|
@@ -142,8 +146,24 @@ Diagnostico:
 | Candidatos externos confiaveis escaneados | 9 |
 | Decks com identidade resolvida | 363 |
 | Decks com identidade desconhecida | 31 |
-| Commander signal rows planejadas | 2.796 |
-| Role score rows planejados | 1.173 |
+| Commander signal rows aplicadas | 2.796 |
+| Role score rows aplicados | 1.173 |
+| Stale `commander_card_synergy` removido | 14 |
+| Stale `card_role_scores` removido | 14 |
+
+Efeito no banco:
+
+| Tabela | Antes | Depois |
+|---|---:|---:|
+| `commander_card_synergy` | 7.179 | 7.796 |
+| `card_role_scores` | 46.335 | 46.598 |
+
+Dry-run pos-apply:
+
+| Fonte | Rows stale |
+|---|---:|
+| `commander_card_synergy` | 0 |
+| `card_role_scores` | 0 |
 
 Guardrails confirmados:
 
@@ -297,7 +317,7 @@ Diagnostico:
 | Import localizado | Sim: `card_localized_names` forte. | Indireto. | Forte, ainda ha lacuna de cobertura. |
 | Deck save/import | Sim: `decks`, `deck_cards`, validadores. | Nao depende de cron. | Forte. |
 | Deck analysis | Sim: `card_intelligence_snapshot`, tags e scores. | Sim: candidate quality. | Forte se usar snapshot. |
-| Optimize/generate | Parcial: tags/scores existem, feedback ainda pequeno. | Sim, dry-runs mostram ganho planejado. | Bom, mas aplicar com janela controlada. |
+| Optimize/generate | Parcial: tags/scores existem, feedback ainda pequeno. | Sim, meta-signal ja aplicado; foundation maior segue pendente. | Bom, mas medir scorecard pos-apply. |
 | Learned decks | Parcial: PG tem 61, SQLite tem corpus maior. | Sim, mas auto-promote nao promove sem target deck. | Util, com gap operacional. |
 | Battle simulator | Parcial: battle rules 9,16% global, alta precisao em cartas criticas. | Sim: strategy audit e rules auditor. | Bom para replay controlado, nao judge engine completo. |
 | Decision trace/statistics | Parcial. | Sim via auditorias recentes. | Ainda precisa mais amostra e metricas com/sem carta. |
@@ -315,7 +335,18 @@ Acao:
   `optimize_candidate_quality_summary`.
 - Qualquer novo consumidor deve provar `extra_rows=0` em fanout check.
 
-### P1 — Planejar apply controlado de candidate quality
+### P1 — Medir scorecard pos-apply de meta signals
+
+Motivo: `candidate_quality_meta_signals --apply` foi executado e precisa ser
+medido contra optimize/generate antes de qualquer novo apply maior.
+
+Acao:
+
+- Rodar scorecard optimize/generate focado em Commander.
+- Confirmar que os novos `aggressive_meta_signal_v1` rows melhoram candidatos
+  sem aumentar false positives.
+
+### P1 — Planejar apply controlado de candidate quality foundation
 
 Motivo: dry-run mostra ganho real, mas ha stale prune significativo.
 
@@ -324,7 +355,6 @@ Acao:
 - Revisar amostra das `3.263` `card_role_scores` stale.
 - Rodar `candidate_quality_data_foundation --apply` somente com janela e
   rollback/log.
-- Depois rodar scorecard optimize/generate para medir efeito.
 
 ### P1 — Resolver target deck do auto-promote
 
@@ -381,7 +411,8 @@ multi-linha. As crons estao melhorando o projeto em duas frentes:
    meta signals e preflight.
 2. Auditoria/qualidade: battle strategy, semantics, structure e rules.
 
-O sistema ainda nao esta em estado "autoaprendizado 100% fechado". Os tres
-bloqueios reais sao: aplicar candidate quality com rollback controlado, resolver
-target decks do auto-promote e substituir WR bruto por metricas de impacto por
-decisao/carta.
+O sistema ainda nao esta em estado "autoaprendizado 100% fechado". O apply
+controlado de meta signals foi concluido, mas os bloqueios reais restantes sao:
+medir scorecard pos-apply, aplicar a foundation maior com rollback controlado,
+resolver target decks do auto-promote e substituir WR bruto por metricas de
+impacto por decisao/carta.

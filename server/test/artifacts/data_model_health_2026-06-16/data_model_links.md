@@ -1,6 +1,6 @@
 # Data Model Final Validation — 2026-06-15
 
-Generated at: `2026-06-16T03:40:00.776818Z`
+Generated at: `2026-06-16T04:00:29.614024Z`
 
 ## Executive summary
 
@@ -60,7 +60,7 @@ Generated at: `2026-06-16T03:40:00.776818Z`
   "card_legalities": 324538,
   "card_localized_names": 251107,
   "card_function_tags": 112563,
-  "card_role_scores": 46335,
+  "card_role_scores": 46598,
   "card_semantic_tags_v2": 24181,
   "card_battle_rules": 3158,
   "decks": 1337,
@@ -71,7 +71,7 @@ Generated at: `2026-06-16T03:40:00.776818Z`
   "commander_learned_decks": 61,
   "deck_learning_events": 107,
   "commander_card_usage": 912,
-  "commander_card_synergy": 7179,
+  "commander_card_synergy": 7796,
   "commander_reference_profiles": 50,
   "commander_reference_card_stats": 1606,
   "commander_reference_decks": 121,
