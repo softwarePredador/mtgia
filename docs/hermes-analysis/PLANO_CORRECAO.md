@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-16 11:00 UTC
+> Data: 2026-06-16 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 11:00 UTC no checkout `ea37f3cf`, o auditor base reportou `Imports quebrados: 0` no recorte backend (`server/lib` e `server/routes`), e a varredura ampliada de 409 arquivos em `app/lib`, `server/lib`, `server/routes` e `server/bin` reportou 1082 diretivas locais resolvidas, 0 imports/exports/parts locais quebrados e 2 SCCs. A frente aberta agora e aciclicidade.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 15:00 UTC no checkout `0feacae2`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em tabelas PostgreSQL sem uso nao encontrou novo achado P1/P2 app-facing; seguem apenas os P3 ja conhecidos para `ml_prompt_feedback` e raws do Commander Reference Corpus. A frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -47,15 +47,17 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    externa/Game Changer; `commander_fallback_policy.dart` e policy versionada e
    testada, mas nao deve virar modelo geral de utilidade.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-15 15:00 UTC no checkout
-   `d6e568ac`. Desde `71140cbb`, nao houve delta de codigo de produto em
+   revalidado na rotacao local Codex de 2026-06-16 15:00 UTC no checkout
+   `0feacae2`. Desde `d6e568ac`, nao houve delta de codigo de produto em
    `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-   `server/database_setup.sql`, `server/test` ou scripts Hermes auditados. As
-   claims antigas contra `deck_matchups` e `deck_weakness_reports` estao stale:
-   ambas agora sao lidas no runtime e retornadas no payload das proprias rotas
-   experimentais. O API/data map e o manual ainda contem texto stale sobre essas
-   duas tabelas, mas ficaram fora do escopo de escrita desta rodada. Tambem nao
-   devem ser tratadas como sem uso `commander_learned_decks`,
+   `server/database_setup.sql` ou `server/test`; o unico delta no recorte foi
+   `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`,
+   que usa SQLite Hermes local e nao referencia os candidatos PostgreSQL do
+   produto. As claims antigas contra `deck_matchups` e `deck_weakness_reports`
+   estao stale: ambas agora sao lidas no runtime e retornadas no payload das
+   proprias rotas experimentais. O API/data map e o manual ainda contem texto
+   stale sobre essas duas tabelas, mas ficaram fora do escopo de escrita desta
+   rodada. Tambem nao devem ser tratadas como sem uso `commander_learned_decks`,
    `deck_learning_events`, `commander_card_usage` e `card_battle_rules`, que
    possuem writers/readers em rotas, jobs ou scripts operacionais. Restam como
    riscos menores as raws `commander_reference_decks` /
@@ -859,15 +861,17 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-15 15:00 UTC: REVALIDADO no checkout `d6e568ac`.** A rodada
+- **Status 2026-06-16 15:00 UTC: REVALIDADO no checkout `0feacae2`.** A rodada
   local focada em `postgresql-tables-not-used` revalidou os achados historicos
   com `rg` literal, varredura de `server/database_setup.sql` e varredura de
   tabelas criadas dinamicamente em `server/lib`, `server/routes` e `server/bin`,
   cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. Desde a
-  rodada anterior (`71140cbb..HEAD`), nao houve delta de codigo de produto em
+  rodada anterior (`d6e568ac..HEAD`), nao houve delta de codigo de produto em
   `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-  `server/database_setup.sql`, `server/test` ou scripts Hermes auditados. Nao
-  houve novo achado P1/P2 app-facing. `deck_matchups` e
+  `server/database_setup.sql` ou `server/test`; o unico delta no recorte foi
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`,
+  que usa SQLite Hermes local e nao referencia os candidatos PostgreSQL do
+  produto. Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
   `deck_weakness_reports` nao continuam write-only: ambas possuem leitores
   runtime e campos retornados no payload das rotas. `card_battle_rules` tambem
   nao foi classificada como unused, porque jobs/scripts Hermes leem, atualizam
