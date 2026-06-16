@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-16 03:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-16 05:30 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-15)
+## Achados do audit de estrutura (atualizado 2026-06-16)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -194,7 +194,7 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-15 05:30 UTC no checkout local `3ad53bbf`. Deck analysis,
+  2026-06-16 05:30 UTC no checkout local `e458c074`. Deck analysis,
   `loadOptimizeDeckContext`, addition data do quality gate, validator e quality
   gate ja carregam ou preservam `functional_tags`, `semantic_tags_v2` e
   multi-role quando essas fontes chegam ao fluxo. A ordem principal e
@@ -206,8 +206,8 @@ mtgia/
   `/ai/weakness-analysis` usa o adapter em modo heuristico porque a query nao
   carrega `card_function_tags`/`semantic_tags_v2`, e
   `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
-- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-15
-  05:30 UTC no checkout local `3ad53bbf`. A claim antiga de ausencia de policy
+- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-16
+  05:30 UTC no checkout local `e458c074`. A claim antiga de ausencia de policy
   versionada esta stale: `commander_fallback_policy.dart` existe, expoe versao e
   centraliza parte relevante dos fallbacks. Continuam como risco as decisoes por
   nome em fallbacks de `functional_card_tags.dart`,
@@ -249,7 +249,7 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-15 05:30 UTC no checkout local `3ad53bbf`:
+Estado atual revalidado em 2026-06-16 05:30 UTC no checkout local `e458c074`:
 deck analysis, `loadOptimizeDeckContext`, addition data do quality gate,
 validator e quality gate carregam ou preservam `card_function_tags` e
 `semantic_tags_v2`. O adapter compartilhado

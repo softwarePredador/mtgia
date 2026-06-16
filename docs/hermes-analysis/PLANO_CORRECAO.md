@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-16 03:00 UTC
+> Data: 2026-06-16 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -35,7 +35,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    ser leitura local de `commander_learned_decks`, sem chamada LLM/externa no
    handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-15 05:30 UTC no checkout `3ad53bbf`. O caminho principal
+   2026-06-16 05:30 UTC no checkout `e458c074`. O caminho principal
    analysis/optimize/validator/quality gate carrega ou preserva
    `functional_tags` e `semantic_tags_v2`, entao a claim antiga de ausencia no
    optimize segue stale. Permanecem riscos por nome nos fallbacks de
@@ -76,7 +76,7 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    chamada para `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta
    rotacao.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
-   `3ad53bbf`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
+   `e458c074`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
    e addition data de quality gate usam a ordem
    `functional_tags -> semantic_tags_v2 -> heuristica`. O risco atual esta nos
    paths legacy que colapsam multi-role (`inferFunctionalRole`/
@@ -284,7 +284,7 @@ Histórico do problema:
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
-- **Status 2026-06-15 05:30 UTC: REVALIDADO/ABERTO no checkout `3ad53bbf`.**
+- **Status 2026-06-16 05:30 UTC: REVALIDADO/ABERTO no checkout `e458c074`.**
   A branch atual ja tem excecoes aceitaveis e testadas:
   `edh_bracket_policy.dart` como regra externa/Game Changer e
   `commander_fallback_policy.dart` como policy versionada para fallbacks
@@ -369,8 +369,8 @@ Histórico do problema:
 
 ### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-15 05:30 UTC: PARCIALMENTE SANEADO no checkout
-  `3ad53bbf`.** A acao antiga de "carregar `card_function_tags` no contexto
+- **Status 2026-06-16 05:30 UTC: PARCIALMENTE SANEADO no checkout
+  `e458c074`.** A acao antiga de "carregar `card_function_tags` no contexto
   principal de optimize" nao se aplica mais nesta branch.
 - **Evidencia atualizada**:
   - `GET /decks/:id/analysis` seleciona e retorna `card_function_tags` e
@@ -398,7 +398,7 @@ Histórico do problema:
 - **Impacto remanescente**: a branch atual esta alinhada no caminho principal
   analysis/optimize/validator, mas `inferFunctionalRole` em
   `server/lib/ai/optimize_runtime_support.dart:752`-`:859` ainda colapsa
-  conjuntos em roles legacy para ranking/removal/details; `server/routes/ai/optimize/index.dart:2359`-`:2383`
+  conjuntos em roles legacy para ranking/removal/details; `server/routes/ai/optimize/index.dart:2364`-`:2383`
   monta `removals_detailed.functionalRole` sem passar as tags persistidas ja
   disponiveis; `findSynergyReplacements` monta o pool inicial sem carregar fontes
   persistidas, embora aggressive mode possa reranquear com quality signals; os

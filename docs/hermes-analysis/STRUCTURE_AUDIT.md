@@ -20985,8 +20985,8 @@ rotas chamadas por `app/lib` e em endpoints experimentais documentados como
   `id + user_id` antes de carregar cartas e criar draft para o usuario.
 
 ## Rodada focada: Local ManaLoom Card Semantics Audit
-> Data: 2026-06-15 05:30 UTC
-> Checkout local: `3ad53bbf`
+> Data: 2026-06-16 05:30 UTC
+> Checkout local: `e458c074`
 > Rotacao local Codex: `local-manaloom-card-semantics-audit`
 
 Escopo desta rodada: hardcoded Magic card names em codigo de produto/runtime,
@@ -21109,7 +21109,7 @@ optimize, e sinais de utilidade inferidos por nome em vez de
 #### P1/P2 — Optimize ainda tem paths parciais que colapsam ou perdem fonte semantica
 
 - **Classificacao:** Risk.
-- **Evidencia removals payload:** `server/routes/ai/optimize/index.dart:2359`-`:2383`
+- **Evidencia removals payload:** `server/routes/ai/optimize/index.dart:2364`-`:2383`
   monta `removals_detailed.functionalRole` chamando `inferFunctionalRole` somente
   com `name`, `typeLine` e `oracleText`, apesar de `allCardData` ja conter
   `functional_tags` e `semantic_tags_v2`.
