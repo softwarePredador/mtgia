@@ -718,16 +718,20 @@ Concluido no Slice 9 commander learning contract/middleware:
    chama OpenAI/fonte externa. `commander_learned_deck_support_test.dart`
    recebeu guarda estática para esse comportamento.
 
-Concluido no Slice 10 commander learning snapshot/runtime adoption:
+Concluido no Slice 10 commander learning safe summary/runtime adoption:
 
-21.13. O caminho sem `commander` de `GET /ai/commander-learning` passou a ler
-   `commander_learning_snapshot` como fonte primária para disponibilidade/lista
-   de comandantes aprendidos. A rota mantém fallback interno para
-   `commander_learned_decks` apenas para bancos antigos sem a view.
+21.13. O caminho sem `commander` de `GET /ai/commander-learning` foi validado
+   no iPhone Simulator contra produção em 2026-06-16. A tentativa de usar a
+   view completa `commander_learning_snapshot` no hot path levou cerca de
+   13,9s-15,3s e estourou o timeout mobile de 15s em prova viva. A rota agora
+   usa uma agregação leve e segura de `commander_learned_decks` ativos, sem
+   `metadata`, com `source=pg_commander_learned_deck_summary`.
 21.14. O caminho com `commander` continua lendo `commander_learned_decks`,
    porque precisa do `card_list` persistido para montar o preview/salvamento
-   do deck aprendido. Isso preserva a arquitetura: snapshot para agregados,
-   tabela bruta para detalhe operacional controlado.
+   do deck aprendido. A arquitetura prática fica: tabela PostgreSQL como fonte
+   operacional controlada para disponibilidade/detalhe, e
+   `commander_learning_snapshot` como snapshot interna de linhagem/diagnóstico
+   até ser materializada ou otimizada para uso em hot path.
 21.15. Payloads públicos de `commander-learning` e `commander-reference`
    deixaram de expor `metadata` bruto do Hermes. Metadata segue disponível
    internamente para `role_summary`/contagens, mas usuários normais recebem

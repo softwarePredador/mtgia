@@ -106,10 +106,11 @@ void main() {
           File('routes/ai/commander-learning/index.dart').readAsStringSync();
 
       expect(route, contains('commander_learned_decks'));
-      expect(route, contains('commander_learning_snapshot'));
-      expect(route, contains("'source': 'pg_commander_learning_snapshot'"));
+      expect(route, contains("'source': 'pg_commander_learned_deck_summary'"));
       expect(route, contains("'source': 'pg_commander_learned_decks'"));
       expect(route, contains("'commanders': activeDecks"));
+      expect(route, contains('WITH active AS'));
+      expect(route, isNot(contains('FROM commander_learning_snapshot')));
       expect(route, contains("'recommended_deck': recommendedDeck"));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
       expect(route, contains("'source_confidence': _sourceConfidence"));
