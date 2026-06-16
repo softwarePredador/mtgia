@@ -94,5 +94,28 @@ void main() {
       expect(up, contains('card_identity_bridge'));
       expect(up, isNot(contains('left join lateral')));
     });
+
+    test('migration 025 refreshes candidate quality anti-fanout view', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '025',
+      );
+      final up = migration.up.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('refresh_optimize_candidate_quality_summary_anti_fanout'),
+      );
+      expect(
+        up,
+        contains('create or replace view optimize_candidate_quality_summary'),
+      );
+      expect(up, contains('with meta_insights as'));
+      expect(up, contains('function_tags as'));
+      expect(up, contains('role_scores as'));
+      expect(up, contains('semantic_v2 as'));
+      expect(up, isNot(contains('left join card_function_tags')));
+      expect(up, isNot(contains('left join card_semantic_tags_v2')));
+      expect(up, isNot(contains('left join card_role_scores')));
+    });
   });
 }

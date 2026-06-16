@@ -713,6 +713,16 @@ final migrations = <Migration>[
       DROP VIEW IF EXISTS commander_learning_snapshot;
     ''',
   ),
+  Migration(
+    version: '025',
+    name: 'refresh_optimize_candidate_quality_summary_anti_fanout',
+    up: '''
+      $optimizeCandidateQualitySummaryViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+    ''',
+  ),
 ];
 
 class Migration {

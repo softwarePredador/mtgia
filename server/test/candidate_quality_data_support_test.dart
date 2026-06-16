@@ -211,6 +211,27 @@ void main() {
       expect(view, isNot(contains('left join commander_card_synergy')));
     });
 
+    test('candidate quality summary aggregates multi-row sources first', () {
+      final view = optimizeCandidateQualitySummaryViewStatement.toLowerCase();
+
+      expect(
+        view,
+        contains('create or replace view optimize_candidate_quality_summary'),
+      );
+      expect(view, contains('with meta_insights as'));
+      expect(view, contains('function_tags as'));
+      expect(view, contains('role_scores as'));
+      expect(view, contains('semantic_v2 as'));
+      expect(view, contains('group by card_id'));
+      expect(view, contains('from cards c'));
+      expect(view, contains('left join function_tags ft on ft.card_id = c.id'));
+      expect(view, contains('left join role_scores rs on rs.card_id = c.id'));
+      expect(view, contains('left join semantic_v2 sv2 on sv2.card_id = c.id'));
+      expect(view, isNot(contains('left join card_function_tags')));
+      expect(view, isNot(contains('left join card_semantic_tags_v2')));
+      expect(view, isNot(contains('left join card_role_scores')));
+    });
+
     test('commander learning snapshot aggregates safe learning signals', () {
       final view = commanderLearningSnapshotViewStatement.toLowerCase();
 

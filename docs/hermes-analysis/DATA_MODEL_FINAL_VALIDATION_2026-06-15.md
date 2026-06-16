@@ -126,6 +126,10 @@ Generated at: `2026-06-15T23:15:57.841159Z`
 - **P0 — Keep battle-rule joins behind card_intelligence_snapshot**
   - Reason: Direct joins from deck_cards to card_battle_rules multiply deck rows.
   - Action: Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.
+  - Update 2026-06-15: `optimize_candidate_quality_summary` now also
+    pre-aggregates function tags, role scores and semantic v2 rows by `card_id`
+    before joining `cards`, preserving multi-function signals without internal
+    cross-product.
 - **P1 — Adopt commander_learning_snapshot in future learning loaders**
   - Reason: The backend-owned commander learning aggregate exists; new consumers should not reassemble Hermes/usage/synergy lineage ad hoc.
   - Action: Route future learned-deck diagnostics and optimizer learning reads through commander_learning_snapshot while keeping raw Hermes metadata hidden from normal users.

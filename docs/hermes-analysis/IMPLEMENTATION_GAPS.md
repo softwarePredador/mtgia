@@ -689,6 +689,35 @@ Concluido no Slice 7 commander learning snapshot:
    `card_identity_bridge`, que agrega por comandante e que não carrega
    `metadata` bruto do Hermes.
 
+Concluido no Slice 8 candidate quality anti-fanout:
+
+21.8. A view interna `optimize_candidate_quality_summary` deixou de juntar
+   diretamente `card_function_tags`, `card_role_scores` e
+   `card_semantic_tags_v2` em `cards`. Ela agora agrega cada fonte em CTE por
+   `card_id` antes do join final, mantendo o mesmo shape (`function_tags`,
+   `best_role_score`, `scored_roles`, `semantic_tags_v2`) sem cross-product
+   interno entre fontes multi-linha.
+21.9. `candidate_quality_data_support_test.dart` recebeu guarda estática para
+   impedir regressão para `LEFT JOIN` bruto nessas tabelas multi-linha dentro
+   de `optimize_candidate_quality_summary`.
+
+Concluido no Slice 9 commander learning contract/middleware:
+
+21.10. A rodada Hermes `module-coherence-server-lib-routes-app-lib`
+   (`22ba2e62`) foi triada contra o `master`. O achado sobre
+   `deck_rebuild_created` foi rejeitado como stale porque
+   `server/routes/users/me/activation-events/index.dart` já aceita o evento e
+   `activation_events_contract_test.dart` cobre a emissão app/backend.
+21.11. O endpoint app-facing `GET /ai/commander-learning` foi documentado em
+   `server/doc/API_CONTRACTS_AND_DATA_MAP.md` com consumidores Flutter, payloads
+   sem/com `commander`, fonte `commander_learned_decks` e restrição de não
+   expor `metadata` bruto do Hermes.
+21.12. `server/routes/ai/_middleware.dart` agora mantém
+   `/ai/commander-learning` autenticado, mas fora de `aiPlanLimitMiddleware` e
+   `aiRateLimit`, pois o handler atual faz leitura local de PostgreSQL e não
+   chama OpenAI/fonte externa. `commander_learned_deck_support_test.dart`
+   recebeu guarda estática para esse comportamento.
+
 22. Fazer loaders profundos do `optimize` lerem `card_intelligence_snapshot`
     quando isso reduzir duplicação ou inconsistência. O sync Hermes
     `sync_pg_target_deck_to_hermes.py` já prefere `card_intelligence_snapshot`

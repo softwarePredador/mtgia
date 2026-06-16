@@ -191,6 +191,55 @@ ON card_semantic_tags_v2 (LOWER(card_name))
 
 const optimizeCandidateQualitySummaryViewStatement = '''
 CREATE OR REPLACE VIEW optimize_candidate_quality_summary AS
+WITH meta_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(usage_count)::int AS usage_count,
+    MAX(meta_deck_count)::int AS meta_deck_count
+  FROM card_meta_insights
+  GROUP BY LOWER(card_name)
+),
+function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL)
+      AS function_tags
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL)
+      AS scored_roles
+  FROM card_role_scores
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+)
 SELECT
   c.id AS card_id,
   c.name AS card_name,
@@ -205,55 +254,15 @@ SELECT
   c.set_code,
   COALESCE(cmi.usage_count, 0) AS meta_usage_count,
   COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
-  COALESCE(
-    ARRAY_REMOVE(ARRAY_AGG(DISTINCT cft.tag), NULL),
-    ARRAY[]::TEXT[]
-  ) AS function_tags,
-  COALESCE(MAX(crs.score), 0)::int AS best_role_score,
-  COALESCE(
-    ARRAY_REMOVE(ARRAY_AGG(DISTINCT crs.role), NULL),
-    ARRAY[]::TEXT[]
-  ) AS scored_roles,
-  COALESCE(
-    jsonb_agg(DISTINCT jsonb_build_object(
-      'schema_version', cstv2.schema_version,
-      'source', cstv2.source,
-      'speed', cstv2.speed,
-      'mana_efficiency', cstv2.mana_efficiency,
-      'card_advantage_type', cstv2.card_advantage_type,
-      'interaction_scope', cstv2.interaction_scope,
-      'combo_piece', cstv2.combo_piece,
-      'wincon', cstv2.wincon,
-      'engine', cstv2.engine,
-      'payoff', cstv2.payoff,
-      'enabler', cstv2.enabler,
-      'protection_type', cstv2.protection_type,
-      'recursion_type', cstv2.recursion_type,
-      'role_confidence', cstv2.role_confidence,
-      'explanation_reason', cstv2.explanation_reason,
-      'tags', cstv2.tags
-    )) FILTER (WHERE cstv2.card_id IS NOT NULL),
-    '[]'::jsonb
-  ) AS semantic_tags_v2
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(rs.best_role_score, 0)::int AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2
 FROM cards c
-LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-LEFT JOIN card_function_tags cft ON cft.card_id = c.id
-LEFT JOIN card_role_scores crs ON crs.card_id = c.id
-LEFT JOIN card_semantic_tags_v2 cstv2 ON cstv2.card_id = c.id
-GROUP BY
-  c.id,
-  c.name,
-  c.type_line,
-  c.mana_cost,
-  c.oracle_text,
-  c.colors,
-  c.color_identity,
-  c.cmc,
-  c.price_usd,
-  c.price_usd_foil,
-  c.set_code,
-  cmi.usage_count,
-  cmi.meta_deck_count
+LEFT JOIN meta_insights cmi ON cmi.normalized_card_name = LOWER(c.name)
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
 ''';
 
 const cardIntelligenceSnapshotViewStatement = '''

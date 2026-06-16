@@ -817,7 +817,7 @@ Se surgir P0, ele precisa ter:
 |---|---|---|
 | Migrar sync/learning Hermes para backend jobs | Hermes ainda e ponte externa com crons e SQLite | Planejar jobs server-owned para learned decks, learning events, mana validator e governor |
 | Reduzir gargalos de optimize | `server/routes/ai/optimize/index.dart` e `server/lib/ai/optimize_runtime_support.dart` seguem grandes | Continuar split incremental com testes por helper |
-| Garantir multi-funcao sem multiplicar deck rows | bug recente em sync PG -> Hermes | Materializar JSON agregada por `card_id` para `card_battle_rules` e tags |
+| Garantir multi-funcao sem multiplicar deck rows | bug recente em sync PG -> Hermes e risco de cross-product em views internas | Manter `card_intelligence_snapshot`, `optimize_candidate_quality_summary` e syncs Hermes com agregação por `card_id`; nunca escolher uma regra única quando a carta possui múltiplas funções |
 | Manter docs Hermes sem conflito com master | historico de branch/docs conflitantes | Codex deve triagear achados antes de importar para master |
 | Prova visual recorrente de layout | muitas telas ajustadas recentemente | manter iPhone Simulator como gate para UI |
 

@@ -117,5 +117,17 @@ void main() {
       expect(route, contains("'win_conditions': _winConditions"));
       expect(route, contains("'role_summary': _roleSummary"));
     });
+
+    test('commander learning route stays auth-only in AI middleware', () {
+      final middleware = File('routes/ai/_middleware.dart').readAsStringSync();
+
+      expect(middleware, contains("'/ai/commander-learning'"));
+      expect(middleware, contains('authOnlyHandler'));
+      expect(middleware, contains('costlyAiHandler'));
+      expect(
+        middleware.indexOf("'/ai/commander-learning'"),
+        lessThan(middleware.indexOf('return costlyAiHandler(context)')),
+      );
+    });
   });
 }
