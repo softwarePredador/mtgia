@@ -24,7 +24,10 @@ Veredito curto:
 3. Lorehold ja serve como deck de controle real para medir geracao, validacao,
    optimize e battle, mas o valor de aprendizado continua bloqueado por lacunas
    de cobertura em utility lands, cartas de oponentes e metricas de decisao.
-4. A branch `origin/codex/hermes-analysis-docs` segue util apenas como staging
+4. O optimize de Lorehold nao cai mais em um quality gate generico de
+   `removal/ramp`: o arquétipo `combo` agora protege explicitamente
+   `tutor`, `engine`, `wincon`, `protection` e `combo_piece`.
+5. A branch `origin/codex/hermes-analysis-docs` segue util apenas como staging
    Hermes. Para battle/generator/Lorehold, ela esta atrasada frente ao
    `master` local e nao deve ser tratada como fonte primaria.
 
@@ -835,6 +838,18 @@ movimento errado neste momento.
      - com limite por pacote/role;
      - sem quebrar legalidade, curva e estrutura.
    - Ganho: generator mais conectado ao comportamento real de usuarios.
+
+8.1. Sair do bucket hardcoded de arquétipo no quality gate e passar a usar
+     `role_targets`/assinatura do profile quando disponivel.
+   - O fix de `combo` resolveu o erro mais gritante de Lorehold:
+     `tutor/engine/wincon/protection` nao caem mais no fallback de
+     `removal/ramp`.
+   - O gap remanescente agora e mais fino:
+     - contagem de lands ainda sai de bucket fixo;
+     - ranges por papel ainda nao leem o profile persistido;
+     - `combo`/`control`/`midrange` ainda resumem estrategias diferentes demais.
+   - Ganho: quality gate mais aderente ao profile real do comandante sem
+     reintroduzir prompt-ownership no backend.
 
 9. Promover `card_role_scores` com janela controlada.
    - Revisar stale prune;
