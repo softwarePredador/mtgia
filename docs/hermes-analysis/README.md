@@ -113,6 +113,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Recomendação central: criar snapshot agregado por `card_id` e bridge de
     identidade antes de promover novos sinais para lógica app-facing.
 
+- `DATA_AND_CRON_HEALTH_AUDIT_2026-06-16.md`
+  - Validação source-backed do preenchimento de dados e da efetividade das
+    crons locais/Hermes AWS.
+  - Confirma que PostgreSQL/views criticas estao coerentes, candidate quality e
+    meta signals geram dados uteis, e o principal risco segue sendo join direto
+    de deck com fontes multi-linha.
+  - Use para decidir proximos applies controlados: candidate quality, auto
+    promote learned decks e metricas de decision impact.
+
 ## Fonte de verdade atual
 
 1. `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`
