@@ -12,9 +12,39 @@ from datetime import datetime, timezone
 
 from learned_deck_completeness import learned_deck_completeness
 
+def table_exists(db, table_name):
+    return (
+        db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            (table_name,),
+        ).fetchone()
+        is not None
+    )
+
+def column_exists(db, table_name, column_name):
+    if not table_exists(db, table_name):
+        return False
+    return any(
+        row[1] == column_name
+        for row in db.execute(f"PRAGMA table_info({table_name})")
+    )
+
 def parse_card_list(card_list_text):
+    text = str(card_list_text or "").strip()
+    if text.startswith("["):
+        try:
+            cards_json = json.loads(text)
+            cards = []
+            for item in cards_json:
+                name = item.get("name", "")
+                qty = item.get("quantity", 1)
+                if name:
+                    cards.append({"name": name, "quantity": int(qty or 1)})
+            return cards
+        except Exception:
+            pass
     cards = []
-    for line in card_list_text.strip().split("\n"):
+    for line in text.split("\n"):
         line = line.strip()
         if not line:
             continue
@@ -60,6 +90,8 @@ def parse_role_list(raw):
 
 
 def analysis_roles_for_card(db, target_deck_id, card_name):
+    if not table_exists(db, "card_deck_analysis"):
+        return []
     columns = {row[1] for row in db.execute("PRAGMA table_info(card_deck_analysis)").fetchall()}
     if "role_in_deck" not in columns:
         return []
@@ -102,7 +134,7 @@ def build_metadata(db, target_deck_id, card_list, commander):
         type_line_row = None
         role_tags = []
 
-        if target_deck_id:
+        if target_deck_id and table_exists(db, "deck_cards"):
             type_line_row = db.execute(
                 "SELECT type_line FROM deck_cards WHERE deck_id = ? AND LOWER(card_name) = ? LIMIT 1",
                 (target_deck_id, name)
@@ -160,6 +192,10 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     db.row_factory = sqlite3.Row
 
     # Find the active learned + promoted deck
+    clauses = []
+    params = []
+    if column_exists(db, "deck_promotions", "migration_verified"):
+        clauses.append("COALESCE(dp.migration_verified, 0) = 1")
     query = """
         SELECT ld.*, dp.promoted_at, dp.target_deck_id,
                d.deck_name as active_deck_name, d.total_cards as active_card_count
@@ -167,13 +203,14 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
         JOIN deck_promotions dp ON dp.learned_deck_id = ld.id
         JOIN decks d ON d.id = dp.target_deck_id
     """
-    params = []
     if learned_id:
-        query += " WHERE ld.id = ?"
+        clauses.append("ld.id = ?")
         params.append(learned_id)
     elif commander_filter:
-        query += " WHERE LOWER(ld.commander) LIKE ?"
+        clauses.append("LOWER(ld.commander) LIKE ?")
         params.append(f"%{commander_filter.lower()}%")
+    if clauses:
+        query += " WHERE " + " AND ".join(clauses)
     query += " ORDER BY dp.promoted_at DESC LIMIT 1"
 
     row = db.execute(query, params).fetchone()
@@ -213,12 +250,29 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     if completeness.commander_quantity_in_list == 0:
         output_card_list = f"1 {commander}\n{str(card_list or '').strip()}"
 
-    # Prefer decks table counts if available
-    deck_row = db.execute(
-        "SELECT total_lands, ramp_count, draw_count, removal_count, tutor_count, "
-        "board_wipe_count, protection_count, recursion_count, wincon_count, engine_count "
-        "FROM decks WHERE id = ?", (target_deck_id,)
-    ).fetchone()
+    # Prefer decks table counts if available.
+    deck_columns = {
+        row[1] for row in db.execute("PRAGMA table_info(decks)")
+    } if table_exists(db, "decks") else set()
+    metric_columns = {
+        "total_lands",
+        "ramp_count",
+        "draw_count",
+        "removal_count",
+        "tutor_count",
+        "board_wipe_count",
+        "protection_count",
+        "recursion_count",
+        "wincon_count",
+        "engine_count",
+    }
+    deck_row = None
+    if metric_columns.issubset(deck_columns):
+        deck_row = db.execute(
+            "SELECT total_lands, ramp_count, draw_count, removal_count, tutor_count, "
+            "board_wipe_count, protection_count, recursion_count, wincon_count, engine_count "
+            "FROM decks WHERE id = ?", (target_deck_id,)
+        ).fetchone()
 
     if deck_row:
         metadata = {
