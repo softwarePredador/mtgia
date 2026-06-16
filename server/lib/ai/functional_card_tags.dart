@@ -873,7 +873,13 @@ bool _looksLikeRitual(String oracle, String normalizedName) {
           (oracle.contains('until end of turn') ||
               oracle.contains('for each') ||
               oracle.contains('for every') ||
-              oracle.contains('your mana pool'));
+              oracle.contains('your mana pool') ||
+              (!oracle.contains('{t}:') &&
+                  !oracle.contains('at the beginning') &&
+                  !oracle.contains('each upkeep') &&
+                  !oracle.contains('each combat') &&
+                  !oracle.contains('whenever') &&
+                  !oracle.contains('mana of any color')));
 }
 
 String _inferSpeed(String typeLine, String oracle) {

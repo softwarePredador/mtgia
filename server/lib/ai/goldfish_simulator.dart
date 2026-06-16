@@ -167,30 +167,39 @@ class GoldfishSimulator {
 
       // Simula jogabilidade por turno
       var cardsAvailable = List<Map<String, dynamic>>.from(hand);
-      var landsPlayed = 0;
-      final colorSources = <String, int>{}; // Rastreia fontes de mana colorida
+      final manaState = _GoldfishManaState();
 
       // Turno 1
-      landsPlayed = _playLandIfPossible(cardsAvailable, landsPlayed,
-          colorSources: colorSources);
-      if (_canPlayOnTurn(cardsAvailable, 1, landsPlayed,
-          colorSources: colorSources)) {
+      _playLandIfPossible(cardsAvailable, manaState);
+      if (_canPlayOnTurn(
+        cardsAvailable,
+        manaState.availableSources,
+        colorSources: manaState.availableColorSources,
+      )) {
         turn1Plays++;
       }
 
       // Turno 2
+      manaState.untapDelayedSources();
       if (draws.isNotEmpty) cardsAvailable.add(draws[0]);
-      landsPlayed = _playLandIfPossible(cardsAvailable, landsPlayed,
-          colorSources: colorSources);
-      if (_canPlayOnTurn(cardsAvailable, 2, landsPlayed,
-          colorSources: colorSources)) turn2Plays++;
+      _playLandIfPossible(cardsAvailable, manaState);
+      if (_canPlayOnTurn(
+        cardsAvailable,
+        manaState.availableSources,
+        colorSources: manaState.availableColorSources,
+      )) {
+        turn2Plays++;
+      }
 
       // Turno 3
+      manaState.untapDelayedSources();
       if (draws.length > 1) cardsAvailable.add(draws[1]);
-      landsPlayed = _playLandIfPossible(cardsAvailable, landsPlayed,
-          colorSources: colorSources);
-      final hasTurn3Play = _canPlayOnTurn(cardsAvailable, 3, landsPlayed,
-          colorSources: colorSources);
+      _playLandIfPossible(cardsAvailable, manaState);
+      final hasTurn3Play = _canPlayOnTurn(
+        cardsAvailable,
+        manaState.availableSources,
+        colorSources: manaState.availableColorSources,
+      );
       if (hasTurn3Play) {
         turn3Plays++;
       } else {
@@ -198,11 +207,16 @@ class GoldfishSimulator {
       }
 
       // Turno 4
+      manaState.untapDelayedSources();
       if (draws.length > 2) cardsAvailable.add(draws[2]);
-      landsPlayed = _playLandIfPossible(cardsAvailable, landsPlayed,
-          colorSources: colorSources);
-      if (_canPlayOnTurn(cardsAvailable, 4, landsPlayed,
-          colorSources: colorSources)) turn4Plays++;
+      _playLandIfPossible(cardsAvailable, manaState);
+      if (_canPlayOnTurn(
+        cardsAvailable,
+        manaState.availableSources,
+        colorSources: manaState.availableColorSources,
+      )) {
+        turn4Plays++;
+      }
     }
 
     return GoldfishResult(
@@ -325,11 +339,10 @@ class GoldfishSimulator {
   }
 
   /// Verifica se há jogada válida no turno, considerando mana colorida
-  bool _canPlayOnTurn(
-      List<Map<String, dynamic>> cards, int turn, int landsPlayed,
+  bool _canPlayOnTurn(List<Map<String, dynamic>> cards, int availableSources,
       {Map<String, int> colorSources = const {}}) {
-    // Mana total disponível = terrenos jogados
-    final manaAvailable = turn == 1 ? 1 : landsPlayed;
+    // Mana total disponível = fontes que já podem gerar mana neste turno.
+    final manaAvailable = availableSources;
 
     return cards.any((c) {
       if (_isLand(c)) return false;
@@ -349,21 +362,26 @@ class GoldfishSimulator {
   }
 
   /// Simula jogar um terreno se possível, rastreando cores produzidas
-  int _playLandIfPossible(List<Map<String, dynamic>> cards, int landsPlayed,
-      {Map<String, int>? colorSources}) {
+  void _playLandIfPossible(
+    List<Map<String, dynamic>> cards,
+    _GoldfishManaState manaState,
+  ) {
     final landIndex = cards.indexWhere(_isLand);
     if (landIndex != -1) {
       final land = cards.removeAt(landIndex);
-      // Rastrear que cores este terreno produz
-      if (colorSources != null) {
-        final colors = _getLandColors(land);
-        for (final color in colors) {
-          colorSources[color] = (colorSources[color] ?? 0) + 1;
-        }
+      final colors = _getLandColors(land);
+      if (_landEntersTapped(land)) {
+        manaState.addDelayedLand(colors);
+      } else {
+        manaState.addAvailableLand(colors);
       }
-      return landsPlayed + 1;
     }
-    return landsPlayed;
+  }
+
+  bool _landEntersTapped(Map<String, dynamic> card) {
+    final oracle = (card['oracle_text'] ?? '').toString().toLowerCase();
+    return oracle.contains('enters the battlefield tapped') ||
+        oracle.contains('enters tapped');
   }
 
   /// Calcula CMC médio (excluindo terrenos)
@@ -404,6 +422,40 @@ class GoldfishSimulator {
       dist[cmc] = (dist[cmc] ?? 0) + qty;
     }
     return dist;
+  }
+}
+
+class _GoldfishManaState {
+  int availableSources = 0;
+  int _delayedSources = 0;
+  final availableColorSources = <String, int>{};
+  final _delayedColorSources = <String, int>{};
+
+  void addAvailableLand(Set<String> colors) {
+    availableSources++;
+    _addColors(availableColorSources, colors);
+  }
+
+  void addDelayedLand(Set<String> colors) {
+    _delayedSources++;
+    _addColors(_delayedColorSources, colors);
+  }
+
+  void untapDelayedSources() {
+    if (_delayedSources == 0 && _delayedColorSources.isEmpty) return;
+    availableSources += _delayedSources;
+    _delayedSources = 0;
+    for (final entry in _delayedColorSources.entries) {
+      availableColorSources[entry.key] =
+          (availableColorSources[entry.key] ?? 0) + entry.value;
+    }
+    _delayedColorSources.clear();
+  }
+
+  static void _addColors(Map<String, int> target, Set<String> colors) {
+    for (final color in colors) {
+      target[color] = (target[color] ?? 0) + 1;
+    }
   }
 }
 

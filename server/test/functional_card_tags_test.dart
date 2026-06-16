@@ -100,6 +100,18 @@ void main() {
               'Choose one. If you control a commander as you cast this spell, you may choose both. Add {R} for each card in target opponent\'s hand. Exile the top three cards of your library. You may play them this turn.',
           expected: const {'ritual', 'big_spell', 'exile_value'},
         ),
+        'Seething Song': _card(
+          typeLine: 'Instant',
+          manaCost: '{2}{R}',
+          oracleText: 'Add {R}{R}{R}{R}{R}.',
+          expected: const {'ramp', 'ritual'},
+        ),
+        'Pyretic Ritual': _card(
+          typeLine: 'Instant',
+          manaCost: '{1}{R}',
+          oracleText: 'Add {R}{R}{R}.',
+          expected: const {'ramp', 'ritual'},
+        ),
       };
 
       for (final entry in cases.entries) {
