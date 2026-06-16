@@ -36,9 +36,12 @@ generate_card_replays.py
 
 ## 2. Battle Engine (battle_analyst_v9.py)
 
-`battle_analyst_v9.py` é o engine ativo. `battle_analyst_v8.py` permanece
-versionado apenas como legado histórico/comparação forense e não deve ser usado
-como default de cron ou optimizer.
+`battle_analyst_v9.py` é o único engine ativo e versionado no diretório
+operacional. Os arquivos `battle_analyst.py`, `battle_analyst_v6.py`,
+`battle_analyst_v7.py` e `battle_analyst_v8.py` foram removidos para evitar
+divergência de fonte de verdade. Relatórios antigos ainda podem mencionar v8,
+mas isso é histórico e não deve orientar implementação, cron, optimizer ou
+auditoria atual.
 
 ### 2.1 Arquitetura de Turno
 
@@ -238,6 +241,29 @@ Uso correto:
   completo antes de usar como heuristica final de aprendizado.
 - Forums/artigos de estrategia podem calibrar heuristicas; comportamento duro
   continua exigindo regra oficial, replay e teste focado.
+
+### 2.5.2 Runtime rule provenance and fallback order
+
+O runtime atual do battle nao deve mais resolver regras de carta a partir de um
+inventario manual oculto.
+
+Ordem correta de resolucao:
+
+1. waiver manual explicito e temporario (`MANUAL_RULE_RUNTIME_WAIVERS`);
+2. `battle_card_rules` via registry/cache SQLite/PG;
+3. `known_cards_canonical_snapshot.json` como fallback canonico degradado;
+4. `known_cards_generated.json` apenas como ultimo fallback historico;
+5. `functional_tags_json` / heuristicas / `unknown`.
+
+Guardrails operacionais atuais:
+
+- `HANDCRAFTED_KNOWN_CARDS` deve permanecer vazio por padrao;
+- `MANUAL_RULE_RUNTIME_WAIVERS` deve permanecer vazio por padrao;
+- qualquer carta em `generated/needs_review` ou `unknown` e um gap de
+  modelagem/cobertura, nao autorizacao para reintroduzir override manual como
+  fonte primaria;
+- suites de fallback/promoted hotfix existem para garantir que cartas
+  canonizadas resolvam pelo registry e nao pelo legado manual.
 
 ### 2.6 Carregamento de Oponentes
 
@@ -623,8 +649,11 @@ Leitura correta:
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade
   historica e seed de fallback, nao como verdade principal;
+- `KNOWN_CARDS` em `battle_analyst_v9.py` começa vazio; o antigo dicionario
+  literal manual foi removido do codigo ativo;
 - `HANDCRAFTED_KNOWN_CARDS` e `MANUAL_RULE_RUNTIME_WAIVERS` devem permanecer
-  vazios no runtime normal e so podem ser preenchidos em incidentes controlados.
+  vazios no runtime normal e so podem ser preenchidos em incidentes controlados
+  ou testes focados.
 
 Campos tipicos encontrados no snapshot/fallback legado:
 
@@ -651,6 +680,23 @@ Risco operacional remanescente:
   cartas e pode divergir semanticamente do snapshot canonico em modo degradado;
 - por isso, qualquer auditoria ou scorecard deve preferir `battle_card_rules` ou
   o snapshot canonico antes de confiar no JSON legado.
+- a promocao de casos relevantes agora deve acontecer por uma camada versionada
+  de regras revisadas, nao por novo crescimento de hardcode runtime. Exemplo ja
+  validado nesta rodada: `Angel's Grace` foi promovida para
+  `curated/verified`, enquanto `Chromatic Star` entrou como
+  `curated/active` com
+  `effect=cantrip_mana_filter_artifact` e
+  `battle_model_scope=sacrifice_mana_filter_cantrip_v2`.
+- leitura correta desses dois casos:
+  - o runtime esta coerente e consome a camada revisada sem conflito;
+  - `Angel's Grace` saiu de drift de fallback e ganhou semantica executavel
+    minima (`cannot_lose_turn`);
+  - `Chromatic Star` deixou de ser `unknown` e saiu do surrogate puro de
+    `draw_cards`; hoje ela entra como artefato utilitario sacrificavel que pode
+    corrigir cor no precombat e virar draw no postcombat;
+  - mesmo assim, ela ainda nao deve ser tratada como regra totalmente
+    verificada enquanto a mana ability completa e todos os edge cases de combo
+    nao estiverem modelados com fidelidade maior.
 
 ---
 

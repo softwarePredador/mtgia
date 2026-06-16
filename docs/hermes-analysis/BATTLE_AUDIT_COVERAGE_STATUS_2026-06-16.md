@@ -18,6 +18,10 @@ Regras oficiais usadas como referencia:
 
 - Wizards Comprehensive Rules: <https://magic.wizards.com/en/rules>
 - Commander oficial: <https://magic.wizards.com/en/formats/commander>
+- London Mulligan oficial:
+  <https://magic.wizards.com/en/news/announcements/london-mulligan-2019-06-03>
+- Oracle/rulings de cartas sensiveis via Scryfall: `Mox Diamond`,
+  `Lotus Petal`, `Crop Rotation` e `Harrow`.
 
 Politica operacional:
 
@@ -26,12 +30,38 @@ Politica operacional:
   replay, teste e regra/fontes rastreaveis.
 - `needs_review` continua auditavel/report-only.
 - WR bruto nao deve alimentar aprendizado sozinho.
+- Pesquisa estrategica de comunidade/artigos e usada apenas como calibragem de
+  heuristica. Ela nao substitui regra oficial, oracle/ruling, replay e teste.
 
 ## Rodada integrada validada
 
 Artefato local:
 
 - `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260616_041540`
+
+Rodada manual de reconfirmacao no mesmo dia:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260616_050231`
+- Start seed: `63170452`
+- Seeds: `16/16`
+- Eventos: `17630`
+- Decision traces: `2300`
+- Action findings: `3 low`
+- Strategy findings: `0`
+- Action high/critical seeds: `[]`
+- Strategy blocked seeds: `[]`
+
+Rodada pos-ajuste card-specific:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260616_053212`
+- Start seed: `63170452`
+- Seeds: `16/16`
+- Eventos: `17655`
+- Decision traces: `2302`
+- Action findings: `3 low`
+- Strategy findings: `0`
+- Action high/critical seeds: `[]`
+- Strategy blocked seeds: `[]`
 
 Parametros:
 
@@ -86,6 +116,31 @@ Correcoes feitas:
 - `battle_replay_v10_3.py`
   - Quando o wrapper detecta vencedor por eliminacao, emite `game_won` com
     `source=replay_wrapper_survivor_inference`.
+- `battle_analyst_v9.py` card-specific
+  - `Chrome Mox` deixou de ser tratado como ramp generico: agora so vira fonte
+    se resolver imprint de carta colorida, nao artefato e nao terreno, com
+    evento `imprint_resolved`/`imprint_failed`.
+  - `Everflowing Chalice` deixou de ser tratado como ramp de custo zero: agora
+    precisa pagar pelo menos um multikicker `{2}`, registra `multikicker_paid`
+    e entra com `charge_counters`/`mana_produced` coerentes.
+  - `Lightning Greaves` deixou de colapsar em `indestructible`: agora modela
+    equipamento com `haste` + `shroud`.
+  - `Birgi, God of Storytelling // Harnfel, Horn of Bounty` deixou de colapsar
+    em ritual: a face frontal agora registra trigger em `spell_cast` que gera
+    mana vermelha; a face traseira fica descrita como engine metadata.
+  - `Electroduplicate` deixou de colapsar em `token_maker`: agora cria copia
+    hasty do melhor alvo e sacrifica no fim do turno.
+  - `Valakut Awakening // Valakut Stoneforge` deixou de colapsar em
+    `draw_cards`: agora usa `hand_filter` seletivo e preserva metadata do lado
+    terreno MDFC.
+  - `Ancient Den`, `Ancient Tomb`, `Gemstone Caverns`, `Great Furnace`,
+    `Hall of Heliod's Generosity`, `Inventors' Fair`, `Sunbaked Canyon`,
+    `Urza's Saga` e `War Room` sairam de heuristica gerada para baseline manual
+    de land/mana/static metadata.
+- `battle_card_specific_tests.py`
+  - Cobertura adicionada para Chrome Mox com/sem imprint valido, Everflowing
+    Chalice com/sem multikicker pago, Lightning Greaves, Birgi,
+    Electroduplicate, Valakut Awakening e lands especiais/MDFC.
 
 ## Cobertura de decisoes auditadas
 
@@ -164,14 +219,39 @@ depende de corpus maior antes de virar heuristica final de aprendizado.
 
 ### P1 - verificar regras `needs_review`
 
-Restaram 3 findings `review_rule_used` em cartas de oponentes:
+Na rodada manual de reconfirmacao, restaram 3 findings `review_rule_used` em
+cartas de oponentes:
 
-- Tayam, Luminous Enigma #25, `spell_cast`, seed `61616005`, turno 5.
-- Dargo, the Shipwrecker #74, `spell_cast`, seed `61616012`, turno 13.
-- Dargo, the Shipwrecker #74, `spell_resolved`, seed `61616012`, turno 13.
+- `Ashnod's Altar`, `spell_cast`, Tayam, Luminous Enigma #25, seed
+  `63170452`, turno 7.
+- `Ashnod's Altar`, `spell_cast`, Tayam, Luminous Enigma #25, seed
+  `63170457`, turno 17.
+- `Incubation Druid`, `spell_cast`, Tayam, Luminous Enigma #25, seed
+  `63170462`, turno 4.
 
 Acao: revisar `card_battle_rules`/oracle dessas cartas, promover apenas se a
 regra for trusted/traceable e mantiver teste focado.
+
+### P1 - utility lands ainda parciais
+
+O pacote Lorehold nao tem mais nonlands `high risk`, mas alguns terrenos
+especiais continuam apenas com baseline manual. Isso significa:
+
+- mana profile e identidade estao corretos o suficiente para replay coarse;
+- metadata estatica esta trusted/traceable;
+- habilidades ativadas/disparadas ainda nao estao todas executadas de ponta a
+  ponta.
+
+Casos mais sensiveis: `Urza's Saga` em primeiro lugar, e em grau menor
+`Hall of Heliod's Generosity`, `Inventors' Fair`, `Sunbaked Canyon`, `War Room`
+e `Ancient Tomb`. Estes cinco ultimos ja possuem linha executavel minima com
+guardrails; `Urza's Saga` tambem saiu do estado puramente baseline, mas ainda
+precisa de refinamento para sizing dinamico do Construct e para evitar que
+futuros Sagas dependam da mesma linha especifica.
+
+Acao: manter replay focado e teste unitario antes de promover qualquer novo uso
+de learning forte; o gap real restante aqui nao e mais "falta total de
+comportamento", e sim refinamento das linhas especiais ainda medium-risk.
 
 ### P1 - aumentar corpus
 
@@ -203,6 +283,14 @@ alterar estrategia de jogo. O unico risco remanescente da rodada e o uso
 pontual de regras `needs_review`, que deve continuar bloqueando aprendizado
 forte ate verificacao.
 
-Proximo passo recomendado: tratar os 3 `review_rule_used`, depois rodar corpus
-maior com decision-impact metrics antes de usar resultado de battle para
-alterar Lorehold ou promover heuristicas.
+Resposta operacional para o produto: nao existe blocker estrategico conhecido no
+fluxo atualmente auditado. Tambem nao e correto afirmar que "pesquisou tudo" no
+sentido absoluto ou que o battle virou judge engine 100%. O que foi coberto e
+pesquisado ate aqui sao as decisoes implementadas e observadas: mulligan, fast
+mana one-shot, Mox Diamond/land discard, land sacrifice, cast, response, tutor,
+board wipe/wheel, combate e pass/no-action. Essas categorias estao
+`coherent_in_sample` na rodada reproduzida.
+
+Proximo passo recomendado: tratar os 3 `review_rule_used` de cartas de oponentes
+e rodar corpus maior com decision-impact metrics antes de usar resultado de
+battle para alterar Lorehold ou promover heuristicas como definitivas.

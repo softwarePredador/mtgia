@@ -46,7 +46,7 @@ void main() {
 
   group('Commander Reference Profile v1 live generate', () {
     test(
-      'Lorehold request uses profile diagnostics and other commanders do not',
+      'Lorehold request exposes profile diagnostics without assuming other commanders lack profiles',
       () async {
         final token = await authToken();
         final response = await http
@@ -73,6 +73,13 @@ void main() {
         expect(diagnostics!['reference_profile_used'], isTrue);
         expect(diagnostics['profile_confidence'], equals('high'));
         expect(diagnostics['source_count'], greaterThanOrEqualTo(4));
+        expect(
+          diagnostics.containsKey('runtime_profile_origin'),
+          isFalse,
+          reason:
+              'Lorehold deve usar o profile persistido quando ele estiver utilizavel; '
+              'se runtime_profile_origin aparecer, o generator ainda caiu no fallback runtime.',
+        );
         expect(diagnostics, contains('reference_card_stats_used'));
         expect(diagnostics, contains('on_theme_candidate_count'));
         expect(diagnostics, contains('unresolved_reference_cards'));
@@ -110,10 +117,12 @@ void main() {
         final otherBody = decodeJson(otherResponse);
         final otherDiagnostics =
             (otherBody['diagnostics'] as Map?)?.cast<String, dynamic>();
-        expect(
-          otherDiagnostics?['reference_profile_used'] == true,
-          isFalse,
-        );
+        expect(otherDiagnostics, isNotNull, reason: otherBody.toString());
+        expect(otherDiagnostics, contains('reference_profile_used'));
+        if (otherDiagnostics?['reference_profile_used'] == true) {
+          expect(otherDiagnostics, contains('profile_confidence'));
+          expect(otherDiagnostics, contains('source_count'));
+        }
       },
       skip: skipReason,
       timeout: const Timeout(Duration(minutes: 4)),

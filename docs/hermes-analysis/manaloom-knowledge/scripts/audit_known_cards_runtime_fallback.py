@@ -16,6 +16,7 @@ import json
 import os
 import sqlite3
 from collections import Counter
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -64,47 +65,43 @@ def load_generated_rules(path: str | Path) -> dict[str, dict[str, Any]]:
 
 
 def load_sqlite_rules(sqlite_db: str | Path) -> list[dict[str, Any]]:
-    conn = sqlite3.connect(str(sqlite_db))
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT normalized_name, card_name, effect_json, source, confidence,
-               review_status, rule_version, oracle_hash
-        FROM battle_card_rules
-        ORDER BY normalized_name
-        """
-    )
     rows = []
-    for row in cur.fetchall():
-        effect_json = row["effect_json"]
-        if isinstance(effect_json, str):
-            effect_json = json.loads(effect_json)
-        if not isinstance(effect_json, dict):
-            effect_json = {}
-        rule_row = {
-            "normalized_name": str(row["normalized_name"]),
-            "card_name": str(row["card_name"]),
-            "effect_json": effect_json,
-            "source": str(row["source"]),
-            "confidence": float(row["confidence"] or 0.0),
-            "review_status": str(row["review_status"]),
-            "rule_version": int(row["rule_version"] or 0),
-            "oracle_hash": row["oracle_hash"],
-        }
-        rule_row["logical_rule_key"] = logical_rule_key(rule_row)
-        rows.append(rule_row)
-    conn.close()
+    with closing(sqlite3.connect(str(sqlite_db))) as conn:
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT normalized_name, card_name, effect_json, source, confidence,
+                   review_status, rule_version, oracle_hash
+            FROM battle_card_rules
+            ORDER BY normalized_name
+            """
+        )
+        for row in cur.fetchall():
+            effect_json = row["effect_json"]
+            if isinstance(effect_json, str):
+                effect_json = json.loads(effect_json)
+            if not isinstance(effect_json, dict):
+                effect_json = {}
+            rule_row = {
+                "normalized_name": str(row["normalized_name"]),
+                "card_name": str(row["card_name"]),
+                "effect_json": effect_json,
+                "source": str(row["source"]),
+                "confidence": float(row["confidence"] or 0.0),
+                "review_status": str(row["review_status"]),
+                "rule_version": int(row["rule_version"] or 0),
+                "oracle_hash": row["oracle_hash"],
+            }
+            rule_row["logical_rule_key"] = logical_rule_key(rule_row)
+            rows.append(rule_row)
     return rows
 
 
 def build_oracle_cache(sqlite_db: str | Path, card_names: list[str]) -> dict[str, dict[str, Any]]:
-    conn = sqlite3.connect(str(sqlite_db))
-    conn.row_factory = sqlite3.Row
-    try:
+    with closing(sqlite3.connect(str(sqlite_db))) as conn:
+        conn.row_factory = sqlite3.Row
         return battle.load_card_oracle_cache(conn, card_names)
-    finally:
-        conn.close()
 
 
 def runtime_normalize_effect(

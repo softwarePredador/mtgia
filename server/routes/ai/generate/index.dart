@@ -104,14 +104,15 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     var usageHotCardsPrompt = '';
+    var usageHotCards = const <Map<String, dynamic>>[];
     if (requestedCommanderName != null && requestedCommanderName.isNotEmpty) {
       try {
-        final hotCards = await loadUsageHotCards(
+        usageHotCards = await loadUsageHotCards(
           pool: pool,
           commanderName: requestedCommanderName,
-          limit: 12,
+          limit: 24,
         );
-        usageHotCardsPrompt = buildUsageHotCardsPrompt(hotCards);
+        usageHotCardsPrompt = buildUsageHotCardsPrompt(usageHotCards);
       } catch (_) {}
     }
     timings['reference_profile_ms'] =
@@ -176,6 +177,7 @@ Future<Response> onRequest(RequestContext context) async {
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+        usageHotCards: usageHotCards,
         warningCode: 'openai_api_key_missing',
         warningMessage:
             'OPENAI_API_KEY nao configurada. Retornando deck mock para desenvolvimento.',
@@ -216,6 +218,7 @@ Future<Response> onRequest(RequestContext context) async {
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+        usageHotCards: usageHotCards,
       );
       timings['reference_deterministic_ms'] =
           fastPathStopwatch.elapsedMilliseconds;
@@ -465,6 +468,7 @@ $metaContext
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+        usageHotCards: usageHotCards,
         warningCode: 'openai_timeout_deterministic_fallback',
         warningMessage:
             'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',
@@ -517,6 +521,7 @@ $metaContext
           archetypeReferenceStats: archetypeReferenceStats,
           archetypeSourceCommanderNames: archetypeSourceCommanderNames,
           archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+          usageHotCards: usageHotCards,
           warningCode: 'openai_api_key_invalid_dev_fallback',
           warningMessage:
               'OPENAI_API_KEY invalida no ambiente atual. Retornando deck mock para manter o fluxo local utilizavel.',
@@ -611,6 +616,7 @@ $metaContext
         referenceProfile: referenceProfile,
         referenceCardStats: referenceCardStats,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
       );
       timings['reference_identity_filter_ms'] =
           identityFilterStopwatch.elapsedMilliseconds;
@@ -741,6 +747,7 @@ $metaContext
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
+        usageHotCards: usageHotCards,
         warningCode: fallbackWarningCode,
         warningMessage: fallbackWarningMessage,
       );
@@ -1142,6 +1149,7 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
   required Map<String, dynamic> referenceProfile,
   required List<CommanderReferenceCardStat> referenceCardStats,
   required CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> usageHotCardNames = const [],
 }) async {
   final normalizedFormat = normalizeAiGenerateFormat(format);
   if (normalizedFormat != 'commander' && normalizedFormat != 'brawl') {
@@ -1185,6 +1193,7 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
     profile: referenceProfile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    usageHotCardNames: usageHotCardNames,
     targetMainQuantity: targetMainQuantity,
   );
   final filled = filtered.map(Map<String, dynamic>.from).toList();
@@ -1243,9 +1252,19 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
   List<String> archetypeSourceCommanderNames = const [],
   List<String> archetypeCommanderColorIdentity = const [],
+  List<Map<String, dynamic>> usageHotCards = const [],
   String? warningCode,
   String? warningMessage,
 }) async {
+  final usageHotCardNames = usageHotCardCanonicalNames(usageHotCards);
+  final referenceDeterministicDeck = referenceProfile == null
+      ? null
+      : buildDeterministicReferenceDeckResult(
+          profile: referenceProfile,
+          referenceCardStats: referenceCardStats,
+          referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          usageHotCardNames: usageHotCardNames,
+        );
   final mockDeck = await _mockGeneratedDeck(
     pool,
     format,
@@ -1253,6 +1272,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
     referenceProfile: referenceProfile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    usageHotCardNames: usageHotCardNames,
   );
 
   String? commanderName;
@@ -1340,6 +1360,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           ),
           referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeckEvaluation: referenceDeckEvaluation,
+          referenceDeterministicDeckDiagnostics:
+              referenceDeterministicDeck?.toDiagnosticsJson(),
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
@@ -1379,6 +1401,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
             generatedDeck: mockDeck,
             guidance: referenceDeckCorpusGuidance,
           ),
+          referenceDeterministicDeckDiagnostics:
+              referenceDeterministicDeck?.toDiagnosticsJson(),
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
@@ -1456,6 +1480,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> usageHotCardNames = const [],
 }) async {
   final normalized = format.trim().toLowerCase();
 
@@ -1465,6 +1490,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
         referenceProfile,
         referenceCardStats: referenceCardStats,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        usageHotCardNames: usageHotCardNames,
       );
     }
     final requestedCommander = requestedCommanderName?.trim();
@@ -1537,6 +1563,7 @@ Map<String, dynamic> _mockReferenceProfileDeck(
   Map<String, dynamic> profile, {
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> usageHotCardNames = const [],
 }) {
   final commanderName =
       (profile['commander'] ?? profile['commander_name'] ?? '')
@@ -1554,6 +1581,7 @@ Map<String, dynamic> _mockReferenceProfileDeck(
     profile: profile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    usageHotCardNames: usageHotCardNames,
   );
 }
 

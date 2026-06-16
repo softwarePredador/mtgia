@@ -36,10 +36,39 @@ ALLOWED_DIRECT_REFERENCES = {
     SCRIPT_DIR / "audit_known_cards_runtime_fallback.py",
 }
 
-ALLOWED_HISTORICAL_OR_TEST = {
+FORBIDDEN_LEGACY_ENGINES = {
+    SCRIPT_DIR / "battle_analyst.py",
     SCRIPT_DIR / "battle_analyst_v6.py",
     SCRIPT_DIR / "battle_analyst_v7.py",
     SCRIPT_DIR / "battle_analyst_v8.py",
+}
+
+FORBIDDEN_LEGACY_PATCHER_DIR = REPO_ROOT / "server" / "bin" / "legacy" / "hermes_battle_patchers"
+
+FORBIDDEN_ONE_SHOT_RULE_PATCHERS = {
+    SCRIPT_DIR / "_mulligan_exec15.py",
+    SCRIPT_DIR / "_prepend_mulligan.py",
+    SCRIPT_DIR / "compare_snapshots.py",
+    SCRIPT_DIR / "debug_card_list.py",
+    SCRIPT_DIR / "find_dina_profile.py",
+    SCRIPT_DIR / "find_thassa.py",
+    SCRIPT_DIR / "seed_cyclonic_rift.py",
+    SCRIPT_DIR / "update_ad_nauseam.py",
+    SCRIPT_DIR / "update_ad_nauseam_real_sources.py",
+    SCRIPT_DIR / "update_ancient_tomb.py",
+    SCRIPT_DIR / "update_cyclonic_rift.py",
+    SCRIPT_DIR / "update_cyclonic_rift_20260527.py",
+    SCRIPT_DIR / "update_index.py",
+    SCRIPT_DIR / "update_index2.py",
+    SCRIPT_DIR / "update_log.py",
+    SCRIPT_DIR / "update_rhystic_study.py",
+    SCRIPT_DIR / "update_smothering_tithe.py",
+    SCRIPT_DIR / "update_thassa_oracle.py",
+    SCRIPT_DIR / "update_thassa_oracle2.py",
+    SCRIPT_DIR / "update_thassa_oracle_20260527.py",
+    SCRIPT_DIR / "update_underworld_breach.py",
+    SCRIPT_DIR / "verify_thassa_update.py",
+    SCRIPT_DIR / "verify_update.py",
 }
 
 
@@ -68,6 +97,13 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
         self.assertLess(handcrafted_idx, canonical_idx)
         self.assertLess(canonical_idx, legacy_idx)
 
+    def test_battle_runtime_does_not_embed_manual_known_cards_snapshot(self) -> None:
+        path = SCRIPT_DIR / "battle_analyst_v9.py"
+        source = path.read_text(encoding="utf-8")
+        self.assertIn("KNOWN_CARDS = {}", source)
+        self.assertNotIn("\"Teferi's Protection\":", source)
+        self.assertNotIn('"Sol Ring": {"effect": "ramp_permanent"', source)
+
     def test_no_unclassified_active_python_consumer_reads_legacy_json(self) -> None:
         candidates = list((SCRIPT_DIR).glob("*.py")) + list((REPO_ROOT / "server" / "bin").glob("*.py"))
         unexpected: list[str] = []
@@ -77,8 +113,6 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
             if path in ACTIVE_LAYERED_CONSUMERS:
                 continue
             if path in ALLOWED_DIRECT_REFERENCES:
-                continue
-            if path in ALLOWED_HISTORICAL_OR_TEST:
                 continue
             try:
                 source = path.read_text(encoding="utf-8")
@@ -94,6 +128,28 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
                 "Unexpected active consumers reference known_cards_generated.json "
                 "without explicit guardrail classification: "
                 + ", ".join(unexpected)
+            ),
+        )
+
+    def test_legacy_battle_engines_and_patchers_are_not_restored(self) -> None:
+        restored = [repo_rel(path) for path in sorted(FORBIDDEN_LEGACY_ENGINES) if path.exists()]
+        restored += [
+            repo_rel(path)
+            for path in sorted(FORBIDDEN_ONE_SHOT_RULE_PATCHERS)
+            if path.exists()
+        ]
+        if FORBIDDEN_LEGACY_PATCHER_DIR.exists():
+            restored.append(repo_rel(FORBIDDEN_LEGACY_PATCHER_DIR))
+
+        self.assertEqual(
+            restored,
+            [],
+            msg=(
+                "Legacy battle engines, v8 patchers or one-shot card rule "
+                "patchers were restored into the operational tree. Use "
+                "battle_analyst_v9.py, reviewed_battle_card_rules.json, "
+                "sync_battle_card_rules*.py and focused tests instead: "
+                + ", ".join(restored)
             ),
         )
 

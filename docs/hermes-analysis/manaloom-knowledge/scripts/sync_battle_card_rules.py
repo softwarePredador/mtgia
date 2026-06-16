@@ -18,6 +18,7 @@ import importlib.util
 import json
 import os
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from battle_rule_registry import (
@@ -28,6 +29,10 @@ from battle_rule_registry import (
 from known_cards_fallback_snapshot import (
     build_snapshot_payload,
     write_snapshot_payload,
+)
+from reviewed_battle_card_rules import (
+    DEFAULT_REVIEWED_RULES_PATH,
+    load_reviewed_rule_rows,
 )
 
 
@@ -50,6 +55,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
     parser.add_argument("--skip-generated", action="store_true")
+    parser.add_argument(
+        "--reviewed-rules-json",
+        default=str(DEFAULT_REVIEWED_RULES_PATH),
+    )
     parser.add_argument("--apply", action="store_true")
     parser.add_argument(
         "--export-canonical-fallback-json",
@@ -84,13 +93,12 @@ def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> l
         return rows
 
     try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        oracle_cache = battle.load_card_oracle_cache(
-            conn,
-            [str(row.get("card_name") or "") for row in rows],
-        )
-        conn.close()
+        with closing(sqlite3.connect(db_path)) as conn:
+            conn.row_factory = sqlite3.Row
+            oracle_cache = battle.load_card_oracle_cache(
+                conn,
+                [str(row.get("card_name") or "") for row in rows],
+            )
     except Exception:
         return rows
 
@@ -119,6 +127,7 @@ def build_rows(
     include_generated: bool,
     *,
     sqlite_db: str | Path | None = None,
+    reviewed_rules_path: str | Path = DEFAULT_REVIEWED_RULES_PATH,
 ) -> list[dict]:
     rows: list[dict] = []
     # After the 2026-06-16 canonicalization cleanup, active handwritten rules
@@ -153,6 +162,8 @@ def build_rows(
             }
         )
 
+    rows.extend(load_reviewed_rule_rows(reviewed_rules_path))
+
     if include_generated:
         for name, effect in sorted(load_generated_rules().items()):
             if name in battle.HANDCRAFTED_KNOWN_CARDS:
@@ -174,13 +185,19 @@ def build_rows(
 
 def main() -> int:
     args = parse_args()
-    rows = build_rows(include_generated=not args.skip_generated, sqlite_db=args.sqlite_db)
+    rows = build_rows(
+        include_generated=not args.skip_generated,
+        sqlite_db=args.sqlite_db,
+        reviewed_rules_path=args.reviewed_rules_json,
+    )
     report = {
         "sqlite_db": args.sqlite_db,
         "apply": bool(args.apply),
         "export_canonical_fallback_json": args.export_canonical_fallback_json,
+        "reviewed_rules_json": args.reviewed_rules_json,
         "input_rows": len(rows),
         "manual_rows": sum(1 for row in rows if row["source"] == "manual"),
+        "curated_rows": sum(1 for row in rows if row["source"] == "curated"),
         "generated_rows": sum(1 for row in rows if row["source"] == "generated"),
         "oracle_normalized_rows": sum(1 for row in rows if row.get("_oracle_normalized")),
         "inserted_or_updated": 0,
@@ -189,24 +206,23 @@ def main() -> int:
     }
 
     if args.apply:
-        conn = sqlite3.connect(args.sqlite_db)
-        ensure_battle_card_rules(conn)
-        for row in rows:
-            changed = upsert_battle_card_rule(
-                conn,
-                row["card_name"],
-                row["effect_json"],
-                source=row["source"],
-                confidence=row["confidence"],
-                review_status=row["review_status"],
-                notes=row["notes"],
-            )
-            if changed:
-                report["inserted_or_updated"] += 1
-            else:
-                report["skipped_lower_priority"] += 1
-        conn.commit()
-        conn.close()
+        with closing(sqlite3.connect(args.sqlite_db)) as conn:
+            ensure_battle_card_rules(conn)
+            for row in rows:
+                changed = upsert_battle_card_rule(
+                    conn,
+                    row["card_name"],
+                    row["effect_json"],
+                    source=row["source"],
+                    confidence=row["confidence"],
+                    review_status=row["review_status"],
+                    notes=row["notes"],
+                )
+                if changed:
+                    report["inserted_or_updated"] += 1
+                else:
+                    report["skipped_lower_priority"] += 1
+            conn.commit()
 
         with sqlite3.connect(args.sqlite_db) as conn:
             conn.row_factory = sqlite3.Row

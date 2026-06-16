@@ -129,6 +129,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para responder se cada etapa/jogada esta sendo auditada e quais gaps
     reais ainda impedem usar WR bruto como aprendizado forte.
 
+- `BATTLE_GENERATOR_LOREHOLD_TRUTH_STUDY_2026-06-16.md`
+  - Consolidacao canônica do estado real do battle simulator, do generator e do
+    caso Lorehold.
+  - Use quando a pergunta for "o que ja esta suficientemente certo?" versus
+    "o que ainda precisa virar dado util para criacao/optimize?".
+  - Mantem a separacao entre laboratorio auditavel, fallback curado e verdade
+    de produto/backend.
+
 ## Fonte de verdade atual
 
 1. `HERMES_E2E_SYSTEM_CONTRACT_2026-06-07.md`

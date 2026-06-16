@@ -18,6 +18,7 @@ Regras implementadas agora:
 - Lifelink: life gain ao causar dano
 - Haste: Lorehold nao tem summoning sickness
 """
+import argparse
 import sqlite3, random, json, os, re, copy, sys
 from datetime import datetime, timezone
 from collections import defaultdict
@@ -1571,1400 +1572,12 @@ def load_deck_with_construction_report(deck_id=6):
 # CARD EFFECTS
 # ═══════════════════════════════════════════
 
-KNOWN_CARDS = {
-    "Teferi's Protection": {"effect": "phase_out", "instant": True},
-    "Boros Charm": {"effect": "modal_boros_charm", "instant": True},
-    "Deflecting Swat": {"effect": "redirect_removal", "instant": True},
-    "Grand Abolisher": {"effect": "silence_opponents"},
-    "Austere Command": {"effect": "board_wipe", "selective": True},
-    "Blasphemous Act": {"effect": "board_wipe"},
-    "Call Forth the Tempest": {"effect": "damage_wipe", "token_maker": True},
-    "Approach of the Second Sun": {"effect": "approach", "gain_life": 7},
-    "Insurrection": {"effect": "steal_all_creatures"},
-    "Mizzix's Mastery": {"effect": "overload_recursion"},
-    "Storm Herd": {"effect": "token_maker", "token_count": "life_total"},
-    "Rite of the Dragoncaller": {"effect": "token_maker", "token_count": 4, "token_power": 5},
-    "Brass's Bounty": {"effect": "token_maker", "token_count": "lands"},
-    "Akroma's Will": {"effect": "pump_all", "instant": True,
-        "keywords": ["flying","double_strike","vigilance","lifelink","protection_all","indestructible"]},
-    "The One Ring": {"effect": "draw_engine", "burden": True},
-    "Wedding Ring": {"effect": "draw_engine", "symmetric": True},
-    "Victory Chimes": {"effect": "draw_engine", "untap": True},
-    "Sensei's Divining Top": {"effect": "topdeck_manipulation"},
-    "Scroll Rack": {"effect": "topdeck_manipulation"},
-    "Sol Ring": {"effect": "ramp_permanent", "mana_produced": 2},
-    "Arcane Signet": {"effect": "ramp_permanent", "mana_produced": 1},
-    "Boros Signet": {"effect": "ramp_permanent", "mana_produced": 1},
-    "Talisman of Conviction": {"effect": "ramp_permanent", "mana_produced": 1},
-    "Double Vision": {"effect": "copy_spell"},
-    "Arcane Bombardment": {"effect": "copy_spell", "repeatable": True},
-    "Enlightened Tutor": {"effect": "tutor", "target": "artifact_or_enchantment", "instant": True},
-    "Gamble": {"effect": "tutor", "target": "any", "discard_risk": True},
-    "Smothering Tithe": {"effect": "ramp_engine", "trigger": "opponent_draw"},
-    "Jeska's Will": {"effect": "ramp_ritual", "mana_produced": 7},
-    "Esper Sentinel": {"effect": "draw_engine", "trigger": "opponent_spell"},
-    "Lorehold, the Historian": {"effect": "commander", "is_commander": True, "haste": True},
-    "Chaos Warp": {"effect": "remove_permanent", "instant": True},
-    "Path to Exile": {"effect": "remove_creature", "instant": True},
-    "Swords to Plowshares": {"effect": "remove_creature", "instant": True},
-    "Abrade": {"effect": "remove_artifact_or_3dmg", "instant": True},
-    "Generous Gift": {"effect": "remove_permanent", "instant": True},
-    "Deflecting Swat": {"effect": "redirect_removal", "instant": True},
-    "Dragon's Approach": {"effect": "dragons_approach", "damage": 3},
-    "Dance with Calamity": {"effect": "exile_value", "miracle": True},
-    "Reforge the Soul": {"effect": "draw_cards", "count": 7, "miracle": "1R"},
-    "Lumra, Bellow of the Woods": {
-        "effect": "land_recursion_creature",
-        "mill_count": 4,
-        "power_equals_lands": True,
-        "toughness_equals_lands": True,
-        "keywords": ["vigilance", "reach"],
-    },
-    "Walking Ballista": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "activated_damage": True,
-        "is_creature_permanent": True,
-    },
-    "Springheart Nantuko": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "landfall_token_maker": True,
-        "token_power": 1,
-        "token_toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Stridehangar Automaton": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 4,
-        "keywords": ["flying"],
-        "artifact_token_replacement": True,
-        "thopter_lord": True,
-        "is_creature_permanent": True,
-    },
-    "Demand Answers": {"effect": "draw_cards", "count": 2, "instant": True},
-    "Reckless Impulse": {"effect": "draw_cards", "count": 2},
-    "Food Chain": {"effect": "ramp_engine", "requires_creature_resource": True},
-    "Chromatic Orrery": {
-        "effect": "ramp_permanent",
-        "mana_produced": 5,
-        "produces": "WUBRGC",
-    },
-    "Wheel of Misfortune": {"effect": "draw_cards", "count": 7},
-    "Strike It Rich": {"effect": "treasure_maker", "treasure_count": 1},
-    "Sami's Curiosity": {"effect": "lander_token_maker", "life_gain": 2, "token_count": 1},
-    "Sticky Fingers": {
-        "effect": "ramp_engine",
-        "trigger": "combat_damage_to_player",
-        "aura": True,
-        "grants_keywords": ["menace"],
-        "treasure_on_combat_damage": 1,
-        "draw_on_enchanted_death": 1,
-    },
-    "Desperate Ritual": {"effect": "ramp_ritual", "mana_produced": 3, "instant": True},
-    "Diabolic Intent": {
-        "effect": "tutor",
-        "target": "any",
-        "requires_sacrifice_creature": True,
-    },
-    "Noxious Revival": {"effect": "recursion", "count": 1, "instant": True},
-    "Burgeoning": {"effect": "ramp_engine", "trigger": "opponent_land_play"},
-    "Last Chance": {"effect": "extra_turn", "turns": 1, "lose_after_extra_turn": True},
-    "Shore Up": {"effect": "protect_creature", "instant": True, "power_boost": 1, "toughness_boost": 1, "untap": True},
-    "Goblin Engineer": {"effect": "creature", "power": 1, "toughness": 2, "is_creature_permanent": True},
-    "Ugin, the Spirit Dragon": {"effect": "board_wipe", "selective": True},
-    "Sylvan Safekeeper": {"effect": "creature", "power": 1, "toughness": 1, "is_creature_permanent": True},
-    "Sowing Mycospawn": {"effect": "creature", "power": 3, "toughness": 3, "is_creature_permanent": True},
-    "Force of Negation": {"effect": "counter", "instant": True},
-    "Staff of Compleation": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "All Is Dust": {"effect": "board_wipe"},
-    "Ruthless Technomancer": {"effect": "creature", "power": 2, "toughness": 4, "is_creature_permanent": True},
-    "Deathrite Shaman": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "WUBRG",
-        "is_creature_permanent": True,
-    },
-    "Summon: Bahamut": {"effect": "creature", "power": 9, "toughness": 9, "keywords": ["flying"], "is_creature_permanent": True},
-    "The Eternity Elevator": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Hedron Archive": {"effect": "ramp_permanent", "mana_produced": 2, "produces": "C"},
-    "Staff of Domination": {"effect": "draw_cards", "count": 1},
-    "Manifold Key": {"effect": "ramp_engine"},
-    "Unwinding Clock": {"effect": "ramp_engine", "trigger": "artifact_untap"},
-    "Misdirection": {"effect": "redirect_removal", "instant": True},
-    "Bloom Tender": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 2,
-        "produces": "WUBRG",
-        "is_creature_permanent": True,
-    },
-    "Pyretic Ritual": {"effect": "ramp_ritual", "mana_produced": 3, "instant": True},
-    "Devoted Druid": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 2,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "G",
-        "is_creature_permanent": True,
-    },
-    "Krark-Clan Ironworks": {"effect": "ramp_engine", "requires_artifact_resource": True},
-    "Talisman of Indulgence": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "BRC"},
-    "Spider-Punk": {"effect": "creature", "power": 2, "toughness": 1, "keywords": ["haste"], "is_creature_permanent": True},
-    "Thran Dynamo": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Altar of Dementia": {"effect": "unknown"},
-    "Impulsive Pilferer": {"effect": "creature", "power": 1, "toughness": 1, "is_creature_permanent": True},
-    "Elves of Deep Shadow": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "B",
-        "is_creature_permanent": True,
-    },
-    "Worldly Tutor": {"effect": "tutor", "target": "creature", "instant": True},
-    "Miscast": {"effect": "counter", "target": "instant_or_sorcery", "instant": True, "tax": 3},
-    "Spell Pierce": {"effect": "counter", "instant": True},
-    "Mana Leak": {"effect": "counter", "instant": True},
-    "The Soul Stone": {"effect": "recursion", "count": 1},
-    "Trophy Mage": {"effect": "tutor", "target": "artifact_or_enchantment"},
-    "Fabricate": {"effect": "tutor", "target": "artifact_or_enchantment"},
-    "Expedition Map": {"effect": "tutor", "target": "land"},
-    "Lively Dirge": {"effect": "recursion", "count": 1},
-    "Glaring Fleshraker": {"effect": "token_maker", "token_count": 1, "token_power": 0, "token_toughness": 1},
-    "Forsaken Monument": {"effect": "pump_all", "keywords": [], "power_multiplier": 1},
-    "Windfall": {"effect": "draw_cards", "count": 7},
-    "Wan Shi Tong, Librarian": {"effect": "draw_engine", "trigger": "historic_spell"},
-    "Mirage Mirror": {"effect": "ramp_engine"},
-    "Force of Vigor": {"effect": "remove_permanent", "instant": True},
-    "Training Grounds": {"effect": "ramp_engine"},
-    "Freed from the Real": {"effect": "ramp_engine"},
-    "Bolas's Citadel": {"effect": "topdeck_manipulation"},
-    "Dimir Signet": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "UB"},
-    "Bender's Waterskin": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "Isochron Scepter": {"effect": "copy_spell"},
-    "Inspiring Statuary": {"effect": "ramp_engine"},
-    "Praetor's Grasp": {"effect": "tutor", "target": "any"},
-    "Sylvan Scrying": {"effect": "tutor", "target": "land"},
-    "Wild Growth": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "G"},
-    "Counterspell": {"effect": "counter", "instant": True},
-    "Nature's Claim": {
-        "effect": "remove_permanent",
-        "instant": True,
-        "target": "artifact_or_enchantment",
-        "target_controller_gains_life": 4,
-    },
-    "Formidable Speaker": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 4,
-        "is_creature_permanent": True,
-    },
-    "Soul-Guide Lantern": {"effect": "hate_artifact", "sacrifice_draw": 1},
-    "Open the Omenpaths": {
-        "effect": "ramp_ritual",
-        "mana_produced": 4,
-        "instant": True,
-        "restricted_to_creature_or_enchantment": True,
-    },
-    "Runaway Steam-Kin": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "red_spell_counter_mana_engine": True,
-        "is_creature_permanent": True,
-    },
-    "Jaxis, the Troublemaker": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Jin-Gitaxias, Progress Tyrant": {
-        "effect": "copy_spell",
-        "power": 5,
-        "toughness": 5,
-        "is_creature_permanent": True,
-    },
-    "Mirrormade": {"effect": "unknown"},
-    "Nezahal, Primal Tide": {
-        "effect": "draw_engine",
-        "trigger": "opponent_noncreature_spell",
-        "power": 7,
-        "toughness": 7,
-        "is_creature_permanent": True,
-        "uncounterable": True,
-    },
-    "Ugin, Eye of the Storms": {
-        "effect": "remove_permanent",
-        "target": "colored_permanent",
-    },
-    "Squee, the Immortal": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Fierce Empath": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-        "etb_tutor_target": "creature_cmc_6_plus",
-    },
-    "Rionya, Fire Dancer": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 4,
-        "is_creature_permanent": True,
-        "begin_combat_copy_engine": True,
-    },
-    "Cursed Mirror": {
-        "effect": "ramp_permanent",
-        "mana_produced": 1,
-        "produces": "R",
-    },
-    "Mystic Forge": {"effect": "topdeck_manipulation"},
-    "Sneak Attack": {"effect": "unknown"},
-    "Eldritch Evolution": {
-        "effect": "tutor",
-        "target": "creature_to_battlefield",
-        "requires_sacrifice_creature": True,
-        "exiles_self": True,
-    },
-    "Stoneforge Mystic": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "is_creature_permanent": True,
-        "etb_tutor_target": "equipment",
-    },
-    "Reprieve": {"effect": "counter", "instant": True, "draw_on_counter": 1},
-    "Splendid Reclamation": {"effect": "land_recursion"},
-    "Vandalblast": {"effect": "remove_permanent", "target": "artifact"},
-    "Delivery Moogle": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 2,
-        "keywords": ["flying"],
-        "is_creature_permanent": True,
-        "etb_tutor_target": "cheap_artifact",
-    },
-    "Galadriel's Dismissal": {"effect": "phase_creatures", "instant": True},
-    "Bottle-Cap Blast": {"effect": "deal_damage", "amount": 5, "instant": True},
-    "Mechanized Warfare": {"effect": "unknown"},
-    "Cloud of Faeries": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "keywords": ["flying"],
-        "is_creature_permanent": True,
-    },
-    "Rampant Growth": {"effect": "land_ramp", "land_count": 1, "basic_only": True},
-    "Springbloom Druid": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-        "etb_land_ramp_count": 2,
-        "etb_requires_sacrifice_land": True,
-        "basic_only": True,
-    },
-    "Tannuk, Memorial Ensign": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 4,
-        "is_creature_permanent": True,
-        "landfall_damage_each_opponent": 1,
-        "landfall_second_draw": True,
-    },
-    "Commandeer": {"effect": "counter", "instant": True},
-    "Echoes of Eternity": {"effect": "copy_spell", "colorless_only": True},
-    "Pest Infestation": {
-        "effect": "remove_permanent",
-        "target": "artifact_or_enchantment",
-    },
-    "Reckless Handling": {"effect": "tutor", "target": "artifact_or_enchantment"},
-    "Spellseeker": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-        "etb_tutor_target": "cheap_instant_or_sorcery",
-    },
-    "Snakeskin Veil": {
-        "effect": "protect_creature",
-        "instant": True,
-        "power_boost": 1,
-        "toughness_boost": 1,
-    },
-    "Omnath, Locus of Rage": {
-        "effect": "creature",
-        "power": 5,
-        "toughness": 5,
-        "is_creature_permanent": True,
-        "landfall_token_maker": True,
-        "token_power": 5,
-        "token_toughness": 5,
-    },
-    "Fog": {"effect": "unknown", "instant": True},
-    "Grist, the Hunger Tide": {"effect": "commander", "is_commander": True},
-    "Amphibian Downpour": {
-        "effect": "remove_creature",
-        "instant": True,
-        "target": "creature",
-    },
-    "Oswald Fiddlebender": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Brainstorm": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Talisman of Creativity": {
-        "effect": "ramp_permanent",
-        "mana_produced": 1,
-        "produces": "URC",
-    },
-    "Mishra's Bauble": {"effect": "draw_cards", "count": 1},
-    "Solemn Simulacrum": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-        "etb_land_ramp_count": 1,
-        "basic_only": True,
-    },
-    "Snake Umbra": {"effect": "unknown"},
-    "Sakura-Tribe Elder": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Explore": {"effect": "draw_cards", "count": 1},
-    "Gitaxian Probe": {"effect": "draw_cards", "count": 1},
-    "Artist's Talent": {"effect": "draw_engine"},
-    "Helm of Awakening": {"effect": "ramp_engine"},
-    "Dragon's Rage Channeler": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Migration Path": {
-        "effect": "land_ramp",
-        "land_count": 2,
-        "basic_only": True,
-    },
-    "Cryptolith Rite": {"effect": "ramp_engine"},
-    "Tireless Tracker": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Gravecrawler": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_creature_permanent": True,
-        "cant_block": True,
-    },
-    "Kozilek's Command": {
-        "effect": "remove_creature",
-        "target": "creature",
-        "instant": True,
-    },
-    "Demonic Counsel": {"effect": "tutor", "target": "any"},
-    "Assassin's Trophy": {
-        "effect": "remove_permanent",
-        "target": "nonland",
-        "instant": True,
-    },
-    "Deadly Rollick": {
-        "effect": "remove_creature",
-        "target": "creature",
-        "instant": True,
-    },
-    "Persist": {
-        "effect": "recursion",
-        "target": "creature",
-        "destination": "battlefield",
-        "count": 1,
-    },
-    "Cityscape Leveler": {
-        "effect": "creature",
-        "power": 8,
-        "toughness": 8,
-        "keywords": ["trample"],
-        "is_creature_permanent": True,
-    },
-    "Skullclamp": {"effect": "passive"},
-    "Reanimate": {
-        "effect": "recursion",
-        "target": "creature",
-        "destination": "battlefield",
-        "count": 1,
-    },
-    "Harmonize": {"effect": "draw_cards", "count": 3},
-    "Wheel of Fate": {"effect": "draw_cards", "count": 7},
-    "Search for Tomorrow": {
-        "effect": "land_ramp",
-        "land_count": 1,
-        "basic_only": True,
-    },
-    "Blind Obedience": {"effect": "passive"},
-    "Cultivate": {
-        "effect": "land_ramp",
-        "land_count": 1,
-        "basic_only": True,
-    },
-    "Monologue Tax": {"effect": "ramp_engine", "trigger": "opponent_second_spell"},
-    "Talisman of Resilience": {
-        "effect": "ramp_permanent",
-        "mana_produced": 1,
-        "produces": "BGC",
-    },
-    "Sylvan Library": {"effect": "passive"},
-    "Entomb": {"effect": "tutor", "target": "graveyard", "instant": True},
-    "Explosive Vegetation": {
-        "effect": "land_ramp",
-        "land_count": 2,
-        "basic_only": True,
-    },
-    "Necromancy": {
-        "effect": "recursion",
-        "target": "creature",
-        "destination": "battlefield",
-        "count": 1,
-    },
-    "Unmarked Grave": {"effect": "tutor", "target": "graveyard_nonlegendary"},
-    "Carpet of Flowers": {"effect": "ramp_engine"},
-    "Teferi, Time Raveler": {"effect": "passive"},
-    "Plague Myr": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "keywords": ["infect"],
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "C",
-        "is_creature_permanent": True,
-    },
-    "Elvish Reclaimer": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "land_tutor_activated": True,
-        "is_creature_permanent": True,
-    },
-    "Zuran Orb": {"effect": "life_artifact", "sacrifice_land_gain_life": 2},
-    "Vexing Bauble": {
-        "effect": "hate_artifact",
-        "counters_free_spells": True,
-        "sacrifice_draw": 1,
-    },
-    # Runtime Commander/cEDH staples promoted after Hermes forensic audit.
-    "Pact of Negation": {"effect": "counter", "instant": True},
-    "Force of Will": {"effect": "counter", "instant": True},
-    "Mindbreak Trap": {"effect": "counter", "instant": True},
-    "Swan Song": {"effect": "counter", "instant": True},
-    "Pyroblast": {"effect": "counter", "instant": True, "target": "blue_spell_or_permanent"},
-    "Red Elemental Blast": {"effect": "counter", "instant": True, "target": "blue_spell_or_permanent"},
-    "Mental Misstep": {"effect": "counter", "instant": True},
-    "An Offer You Can't Refuse": {"effect": "counter", "instant": True},
-    "Silence": {"effect": "silence_spell", "instant": True},
-    "Orim's Chant": {"effect": "silence_spell", "instant": True},
-    "Demonic Tutor": {"effect": "tutor", "target": "any"},
-    "Vampiric Tutor": {"effect": "tutor", "target": "any", "instant": True},
-    "Imperial Seal": {"effect": "tutor", "target": "any"},
-    "Mystical Tutor": {"effect": "tutor", "target": "instant_or_sorcery", "instant": True},
-    "Green Sun's Zenith": {"effect": "tutor", "target": "green_creature_to_battlefield"},
-    "Beseech the Mirror": {"effect": "tutor", "target": "any"},
-    "Wishclaw Talisman": {"effect": "tutor", "target": "any"},
-    "Land Tax": {"effect": "passive"},
-    "Weathered Wayfarer": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Imperial Recruiter": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-        "etb_tutor_target": "small_creature",
-    },
-    "Recruiter of the Guard": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-        "etb_tutor_target": "small_creature",
-    },
-    "Mother of Runes": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Giver of Runes": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Drannith Magistrate": {
-        "effect": "passive",
-        "power": 1,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Grafdigger's Cage": {"effect": "passive"},
-    "Rapid Hybridization": {"effect": "remove_creature", "instant": True, "target": "creature"},
-    "Into the Flood Maw": {"effect": "remove_permanent", "instant": True, "target": "nonland"},
-    "Chain of Vapor": {"effect": "remove_permanent", "instant": True, "target": "nonland"},
-    "Orcish Bowmasters": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "keywords": ["flash"],
-        "is_creature_permanent": True,
-    },
-    "Mana Vault": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Mox Amber": {
-        "effect": "ramp_permanent",
-        "mana_produced": 1,
-        "produces": "WUBRGC",
-        "requires_legendary_creature_or_planeswalker_for_mana": True,
-    },
-    "Mox Opal": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "Fellwar Stone": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "Ruby Medallion": {"effect": "ramp_engine"},
-    "Grim Monolith": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Lotus Petal": {"effect": "ramp_ritual", "mana_produced": 1, "produces": "WUBRGC"},
-    "Lion's Eye Diamond": {"effect": "ramp_ritual", "mana_produced": 3, "produces": "WUBRGC"},
-    "Rite of Flame": {"effect": "ramp_ritual", "mana_produced": 2},
-    "Dark Ritual": {"effect": "ramp_ritual", "mana_produced": 3},
-    "Seething Song": {"effect": "ramp_ritual", "mana_produced": 5},
-    "Cabal Ritual": {"effect": "ramp_ritual", "mana_produced": 3},
-    "Brightstone Ritual": {"effect": "ramp_ritual", "mana_produced": 3},
-    "Mystic Remora": {"effect": "draw_engine", "trigger": "opponent_noncreature_spell"},
-    "Rhystic Study": {"effect": "draw_engine", "trigger": "opponent_spell"},
-    "Wheel of Fortune": {"effect": "draw_cards", "count": 7},
-    "Faithless Looting": {"effect": "draw_cards", "count": 2},
-    "Consider": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Expedite": {"effect": "draw_cards", "count": 1},
-    "Crimson Wisps": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Underworld Breach": {"effect": "passive"},
-    "Past in Flames": {"effect": "recursion", "target": "instant_or_sorcery", "count": 3},
-    "Sevinne's Reclamation": {"effect": "recursion", "count": 1},
-    "Nature's Rhythm": {"effect": "recursion", "count": 1},
-    "Twinflame": {"effect": "token_maker", "token_count": 1, "token_power": 2, "token_haste": True},
-    "Heat Shimmer": {"effect": "token_maker", "token_count": 1, "token_power": 2, "token_haste": True},
-    "Hangarback Walker": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Aetherflux Reservoir": {"effect": "finisher"},
-    "Thassa's Oracle": {"effect": "finisher"},
-    "Brain Freeze": {"effect": "finisher"},
-    "Grapeshot": {"effect": "deal_damage", "amount": 1},
-    "Guttersnipe": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "trigger": "instant_sorcery_cast",
-        "trigger_effect": "damage_each_opponent",
-        "damage": 2,
-        "is_creature_permanent": True,
-    },
-    "Fiery Emancipation": {"effect": "passive"},
-    "Final Fortune": {"effect": "extra_turn", "turns": 1, "lose_after_extra_turn": True},
-    "Flawless Maneuver": {"effect": "indestructible", "instant": True},
-    "Tezzeret, Cruel Captain": {"effect": "passive"},
-    "Agatha's Soul Cauldron": {"effect": "passive"},
-    "Retraction Helix": {"effect": "remove_permanent", "target": "nonland", "instant": True},
-    "Fierce Guardianship": {"effect": "counter", "instant": True},
-    "Flusterstorm": {"effect": "counter", "instant": True},
-    "Flare of Denial": {"effect": "counter", "instant": True},
-    "Daze": {"effect": "counter", "instant": True},
-    "Finale of Devastation": {"effect": "tutor", "target": "green_creature_to_battlefield"},
-    "Longshot, Rebel Bowman": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 3,
-        "keywords": ["reach"],
-        "trigger": "instant_sorcery_cast",
-        "trigger_effect": "damage_each_opponent",
-        "damage": 2,
-        "is_creature_permanent": True,
-    },
-    "Insidious Roots": {"effect": "passive"},
-    "Pinnacle Monk": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "keywords": ["prowess"],
-        "is_creature_permanent": True,
-    },
-    "Flashback": {"effect": "recursion", "target": "instant_or_sorcery", "count": 1, "instant": True},
-    "Eternal Witness": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Ranger-Captain of Eos": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 3,
-        "is_creature_permanent": True,
-        "etb_tutor_target": "small_creature",
-    },
-    "Transmute Artifact": {"effect": "tutor", "target": "artifact_or_enchantment"},
-    "Urza, Lord High Artificer": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 4,
-        "is_creature_permanent": True,
-    },
-    "Chains of Mephistopheles": {"effect": "passive"},
-    "Might of the Meek": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Overmaster": {"effect": "draw_cards", "count": 1},
-    "Repurposing Bay": {"effect": "passive"},
-    "Molten Duplication": {"effect": "token_maker", "token_count": 1, "token_power": 2, "token_haste": True},
-    "Muse Seeker": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Ashling, Flame Dancer": {
-        "effect": "creature",
-        "power": 4,
-        "toughness": 4,
-        "is_creature_permanent": True,
-    },
-    "Simulacrum Synthesizer": {"effect": "passive"},
-    "Knight of the Reliquary": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "land_tutor_activated": True,
-        "is_creature_permanent": True,
-    },
-    "Touch the Spirit Realm": {"effect": "remove_permanent", "target": "artifact_or_creature"},
-    "Survival of the Fittest": {"effect": "passive"},
-    "Kozilek, Butcher of Truth": {
-        "effect": "creature",
-        "power": 12,
-        "toughness": 12,
-        "is_creature_permanent": True,
-    },
-    "Ulamog, the Infinite Gyre": {
-        "effect": "creature",
-        "power": 10,
-        "toughness": 10,
-        "keywords": ["indestructible"],
-        "is_creature_permanent": True,
-    },
-    "Forensic Gadgeteer": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Abrupt Decay": {"effect": "remove_permanent", "instant": True, "target": "nonland"},
-    "Invasion of Ikoria": {"effect": "tutor", "target": "green_creature_to_battlefield"},
-    "Intuition": {"effect": "tutor", "target": "any", "instant": True},
-    "Fell the Profane": {"effect": "remove_creature", "instant": True, "target": "creature"},
-    "Seal of Primordium": {"effect": "passive"},
-    "Worldfire": {"effect": "board_wipe"},
-    "Voice of Victory": {
-        "effect": "silence_opponents",
-        "power": 1,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Grim Tutor": {"effect": "tutor", "target": "any"},
-    "Archdruid's Charm": {"effect": "remove_permanent", "instant": True, "target": "artifact_or_enchantment"},
-    "Summoner's Pact": {"effect": "tutor", "target": "green_creature", "instant": True},
-    "Step Through": {"effect": "remove_creature", "target": "creature"},
-    "Illicit Shipment": {"effect": "tutor", "target": "any"},
-    "Electro, Assaulting Battery": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 3,
-        "keywords": ["flying"],
-        "is_creature_permanent": True,
-    },
-    "Vilis, Broker of Blood": {
-        "effect": "creature",
-        "power": 8,
-        "toughness": 8,
-        "keywords": ["flying"],
-        "is_creature_permanent": True,
-    },
-    "Boggart Trawler": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Guild Artisan": {"effect": "passive"},
-    "Golgari Grave-Troll": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Thrasios, Triton Hero": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Urza's Bauble": {"effect": "passive"},
-    "Sewer-veillance Cam": {"effect": "passive"},
-    "Metalworker": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "is_mana_source": True,
-        "mana_produced": 2,
-        "produces": "C",
-        "is_creature_permanent": True,
-    },
-    "Demonic Collusion": {"effect": "tutor", "target": "any"},
-    "Borne Upon a Wind": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Ad Nauseam": {"effect": "draw_cards", "count": 5, "instant": True},
-    "Demonic Consultation": {"effect": "tutor", "target": "any", "instant": True},
-    "Tainted Pact": {"effect": "tutor", "target": "any", "instant": True},
-    "Chord of Calling": {"effect": "tutor", "target": "creature_to_battlefield", "instant": True},
-    "Culling the Weak": {
-        "effect": "ramp_ritual",
-        "mana_produced": 4,
-        "produces": "B",
-        "requires_sacrifice_creature": True,
-        "instant": True,
-    },
-    "Culling Ritual": {"effect": "ramp_ritual", "mana_produced": 4, "produces": "BG"},
-    "Mana Geyser": {"effect": "ramp_ritual", "mana_produced": 7, "produces": "R"},
-    "Rain of Filth": {"effect": "ramp_ritual", "mana_produced": 3, "produces": "B", "instant": True},
-    "Simian Spirit Guide": {"effect": "ramp_ritual", "mana_produced": 1, "produces": "R", "instant": True},
-    "Unexpected Windfall": {
-        "effect": "treasure_maker",
-        "treasure_count": 2,
-        "draw_count": 2,
-        "requires_discard_card": True,
-        "instant": True,
-    },
-    "Birds of Paradise": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 1,
-        "keywords": ["flying"],
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "WUBRGC",
-        "is_creature_permanent": True,
-    },
-    "Delighted Halfling": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "C",
-        "is_creature_permanent": True,
-    },
-    "Fyndhorn Elves": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "G",
-        "is_creature_permanent": True,
-    },
-    "Wall of Roots": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 5,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "G",
-        "is_creature_permanent": True,
-    },
-    "Relic of Legends": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "Springleaf Drum": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "Ragavan, Nimble Pilferer": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "keywords": ["haste"],
-        "is_creature_permanent": True,
-    },
-    "Professional Face-Breaker": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 3,
-        "keywords": ["menace"],
-        "is_creature_permanent": True,
-    },
-    "Storm-Kiln Artist": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "The Gitrog Monster": {
-        "effect": "creature",
-        "power": 6,
-        "toughness": 6,
-        "keywords": ["deathtouch"],
-        "is_creature_permanent": True,
-    },
-    "Faerie Mastermind": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "keywords": ["flash", "flying"],
-        "is_creature_permanent": True,
-    },
-    "Dualcaster Mage": {
-        "effect": "copy_spell",
-        "power": 2,
-        "toughness": 2,
-        "keywords": ["flash"],
-        "is_creature_permanent": True,
-    },
-    "Hexing Squelcher": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Allosaurus Shepherd": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Enduring Vitality": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 3,
-        "keywords": ["vigilance"],
-        "is_creature_permanent": True,
-    },
-    "Badgermole Cub": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "The Cabbage Merchant": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Tavern Scoundrel": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Copy Enchantment": {"effect": "passive"},
-    "Thousand-Year Elixir": {"effect": "passive"},
-    "Clock of Omens": {"effect": "passive"},
-    "The Reality Chip": {
-        "effect": "topdeck_manipulation",
-        "power": 0,
-        "toughness": 4,
-        "is_creature_permanent": True,
-    },
-    "Mnemonic Betrayal": {"effect": "passive"},
-    "Reverberate": {"effect": "copy_spell", "instant": True},
-    "Reiterate": {"effect": "copy_spell", "instant": True},
-    "Arcane Denial": {"effect": "counter", "instant": True},
-    "Negate": {"effect": "counter", "instant": True},
-    "Wash Away": {"effect": "counter", "instant": True},
-    "Power Sink": {"effect": "counter", "instant": True},
-    "Louisoix's Sacrifice": {"effect": "counter", "instant": True},
-    "Condescend": {"effect": "counter", "instant": True},
-    "Twisted Image": {"effect": "draw_cards", "count": 1, "instant": True},
-    "Drift of Phantasms": {
-        "effect": "tutor",
-        "target": "cmc_3",
-        "power": 0,
-        "toughness": 5,
-        "keywords": ["flying"],
-        "is_creature_permanent": True,
-    },
-    "Tymna the Weaver": {
-        "effect": "draw_engine",
-        "trigger": "combat_damage_to_player",
-        "power": 2,
-        "toughness": 2,
-        "keywords": ["lifelink"],
-        "is_creature_permanent": True,
-    },
-    "Nexus of Becoming": {
-        "effect": "draw_engine",
-        "trigger": "begin_combat",
-    },
-    "Bitter Downfall": {"effect": "remove_creature", "target": "creature", "instant": True},
-    "Seedship Impact": {"effect": "remove_permanent", "target": "artifact_or_enchantment", "instant": True},
-    "Cyclonic Rift": {"effect": "remove_permanent", "target": "nonland", "instant": True},
-    "Spine of Ish Sah": {"effect": "remove_permanent", "target": "permanent"},
-    "Analyze the Pollen": {"effect": "tutor", "target": "land"},
-    "Gifts Ungiven": {"effect": "tutor", "target": "any", "instant": True},
-    "Eladamri's Call": {"effect": "tutor", "target": "creature", "instant": True},
-    "Tezzeret the Seeker": {"effect": "tutor", "target": "artifact_or_enchantment"},
-    "Dryad's Revival": {"effect": "recursion", "count": 1},
-    "Deep Analysis": {"effect": "draw_cards", "count": 2},
-    "Boon of the Wish-Giver": {"effect": "draw_cards", "count": 4},
-    "Timetwister": {"effect": "draw_cards", "count": 7},
-    "Roiling Dragonstorm": {"effect": "draw_cards", "count": 2},
-    "Living Death": {"effect": "board_wipe"},
-    "Legolas's Quick Reflexes": {
-        "effect": "protect_creature",
-        "instant": True,
-        "untap": True,
-    },
-    "Biosynthic Burst": {
-        "effect": "protect_creature",
-        "instant": True,
-        "untap": True,
-        "power_boost": 1,
-        "toughness_boost": 1,
-    },
-    "Fiery Inscription": {"effect": "passive"},
-    "Prismatic Undercurrents": {"effect": "passive"},
-    "Necrodominance": {"effect": "passive"},
-    "Altar of the Wretched": {"effect": "passive"},
-    "Skyclave Apparition": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Karmic Guide": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "keywords": ["flying"],
-        "etb_recursion_count": 1,
-        "etb_recursion_target": "creature",
-        "etb_recursion_destination": "battlefield",
-        "is_creature_permanent": True,
-    },
-    "Archaeomancer": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "etb_recursion_count": 1,
-        "etb_recursion_target": "instant_or_sorcery",
-        "is_creature_permanent": True,
-    },
-    "Dawnbringer Cleric": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Restoration Angel": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 4,
-        "keywords": ["flash", "flying"],
-        "is_creature_permanent": True,
-    },
-    "Myr Battlesphere": {
-        "effect": "creature",
-        "power": 4,
-        "toughness": 7,
-        "etb_token_count": 4,
-        "etb_token_power": 1,
-        "etb_token_toughness": 1,
-        "etb_token_name": "Myr",
-        "etb_artifact_tokens": True,
-        "is_creature_permanent": True,
-    },
-    "Goblin Cratermaker": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Monstrosity of the Lake": {
-        "effect": "creature",
-        "power": 4,
-        "toughness": 6,
-        "is_creature_permanent": True,
-    },
-    "Glacier Godmaw": {
-        "effect": "creature",
-        "power": 6,
-        "toughness": 6,
-        "keywords": ["trample", "vigilance", "haste"],
-        "is_creature_permanent": True,
-    },
-    "Disciple of Freyalise": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Fiend Artisan": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Scryb Ranger": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "keywords": ["flash", "flying"],
-        "is_creature_permanent": True,
-    },
-    "Shelob, Dread Weaver": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Rampaging War Mammoth": {
-        "effect": "creature",
-        "power": 9,
-        "toughness": 7,
-        "keywords": ["trample"],
-        "is_creature_permanent": True,
-    },
-    "Duplicant": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 4,
-        "is_creature_permanent": True,
-    },
-    "Rydia, Summoner of Mist": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 2,
-        "keywords": ["haste"],
-        "is_creature_permanent": True,
-    },
-    "Knuckles the Echidna": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 4,
-        "keywords": ["double_strike", "trample", "haste"],
-        "is_creature_permanent": True,
-    },
-    "Shambling Ghast": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "They Came from the Pipes": {
-        "effect": "token_maker",
-        "token_count": 2,
-        "token_power": 2,
-        "token_toughness": 2,
-    },
-    "Map the Frontier": {"effect": "land_ramp", "land_count": 2, "basic_only": True},
-    "Metamorphosis": {
-        "effect": "ramp_ritual",
-        "mana_produced": 4,
-        "requires_sacrifice_creature": True,
-    },
-    "Far Wanderings": {"effect": "land_ramp", "land_count": 1, "basic_only": True},
-    "Herigast, Erupting Nullkite": {
-        "effect": "creature",
-        "power": 6,
-        "toughness": 6,
-        "keywords": ["flying"],
-        "etb_draw_count": 3,
-        "is_creature_permanent": True,
-    },
-    "Mind Stone": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "C"},
-    "Commander's Sphere": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WUBRGC"},
-    "Azorius Signet": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WU"},
-    "Talisman of Progress": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "WU"},
-    "Talisman of Dominance": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "UB"},
-    "Talisman of Impulse": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "RG"},
-    "Fractured Powerstone": {"effect": "ramp_permanent", "mana_produced": 1, "produces": "C"},
-    "Worn Powerstone": {"effect": "ramp_permanent", "mana_produced": 2, "produces": "C"},
-    "Basalt Monolith": {"effect": "ramp_permanent", "mana_produced": 3, "produces": "C"},
-    "Wayfarer's Bauble": {"effect": "land_ramp", "land_count": 1, "basic_only": True},
-    "Manamorphose": {
-        "effect": "treasure_maker",
-        "treasure_count": 2,
-        "draw_count": 1,
-        "instant": True,
-    },
-    "Thrill of Possibility": {
-        "effect": "draw_cards",
-        "count": 2,
-        "requires_discard_card": True,
-        "instant": True,
-    },
-    "Fact or Fiction": {"effect": "draw_cards", "count": 3, "instant": True},
-    "Peer into the Abyss": {"effect": "draw_cards", "count": 10},
-    "Relic of Sauron": {"effect": "ramp_permanent", "mana_produced": 2, "produces": "UBR"},
-    "Dramatic Reversal": {"effect": "ramp_ritual", "mana_produced": 2, "instant": True},
-    "Flare of Duplication": {"effect": "copy_spell", "instant": True},
-    "Run Away Together": {"effect": "remove_creature", "target": "creature", "instant": True},
-    "Deafening Silence": {"effect": "passive"},
-    "Monument to Endurance": {"effect": "passive"},
-    "Growing Rites of Itlimoc": {"effect": "topdeck_manipulation"},
-    "In the Darkness Bind Them": {
-        "effect": "token_maker",
-        "token_count": 3,
-        "token_power": 3,
-        "token_toughness": 3,
-    },
-    "Kinnan, Bonder Prodigy": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Ignoble Hierarch": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "BRG",
-        "is_creature_permanent": True,
-    },
-    "Noble Hierarch": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "GWU",
-        "is_creature_permanent": True,
-    },
-    "Avacyn's Pilgrim": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "W",
-        "is_creature_permanent": True,
-    },
-    "Elvish Mystic": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "G",
-        "is_creature_permanent": True,
-    },
-    "Gilded Goose": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 2,
-        "keywords": ["flying"],
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "WUBRGC",
-        "is_creature_permanent": True,
-        "creates_food_on_etb": True,
-    },
-    "Elvish Spirit Guide": {"effect": "ramp_ritual", "mana_produced": 1, "produces": "G", "instant": True},
-    "Tinder Wall": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 3,
-        "is_mana_source": True,
-        "mana_produced": 2,
-        "produces": "R",
-        "is_creature_permanent": True,
-    },
-    "Ornithopter of Paradise": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 2,
-        "keywords": ["flying"],
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "WUBRGC",
-        "is_creature_permanent": True,
-    },
-    "Myr Convert": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "WUBRGC",
-        "is_creature_permanent": True,
-    },
-    "Circle of Dreams Druid": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 3,
-        "produces": "G",
-        "is_creature_permanent": True,
-    },
-    "Selvala, Heart of the Wilds": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 3,
-        "is_mana_source": True,
-        "mana_produced": 3,
-        "produces": "WUBRGC",
-        "is_creature_permanent": True,
-    },
-    "Magda, Brazen Outlaw": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Lotho, Corrupt Shirriff": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Notion Thief": {
-        "effect": "creature",
-        "power": 3,
-        "toughness": 1,
-        "keywords": ["flash"],
-        "is_creature_permanent": True,
-    },
-    "Charming Prince": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "is_creature_permanent": True,
-    },
-    "Mulldrifter": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 2,
-        "keywords": ["flying"],
-        "etb_draw_count": 2,
-        "is_creature_permanent": True,
-    },
-    "Treasonous Ogre": {
-        "effect": "creature",
-        "power": 2,
-        "toughness": 3,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "R",
-        "is_creature_permanent": True,
-    },
-    "Cavern-Hoard Dragon": {
-        "effect": "creature",
-        "power": 6,
-        "toughness": 6,
-        "keywords": ["flying", "haste", "trample"],
-        "is_creature_permanent": True,
-    },
-    "Voltaic Key": {"effect": "passive"},
-    "Lavaspur Boots": {"effect": "equipment_haste_shroud"},
-    "Defense Grid": {"effect": "passive"},
-    "Imposter Mech": {"effect": "passive"},
-    "Page, Loose Leaf": {
-        "effect": "creature",
-        "power": 0,
-        "toughness": 2,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "C",
-        "is_creature_permanent": True,
-    },
-    "\"Name Sticker\" Goblin": {"effect": "ramp_ritual", "mana_produced": 4, "produces": "R"},
-    "The Balrog of Moria": {
-        "effect": "creature",
-        "power": 8,
-        "toughness": 8,
-        "is_creature_permanent": True,
-    },
-    "Burnt Offering": {
-        "effect": "ramp_ritual",
-        "mana_produced": 4,
-        "produces": "BR",
-        "requires_sacrifice_creature": True,
-        "instant": True,
-    },
-    "Sylvan Tutor": {"effect": "tutor", "target": "creature"},
-    "Gene Pollinator": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_mana_source": True,
-        "mana_produced": 1,
-        "produces": "G",
-        "is_creature_permanent": True,
-    },
-    "Deadpool, Trading Card": {
-        "effect": "creature",
-        "power": 5,
-        "toughness": 3,
-        "is_creature_permanent": True,
-    },
-    "Displace": {"effect": "phase_creatures", "instant": True},
-    "Goblin Welder": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Greedy Freebooter": {
-        "effect": "creature",
-        "power": 1,
-        "toughness": 1,
-        "is_creature_permanent": True,
-    },
-    "Splinter's Technique": {"effect": "tutor", "target": "any"},
-    "Vibrance": {
-        "effect": "creature",
-        "power": 4,
-        "toughness": 4,
-        "is_creature_permanent": True,
-    },
-}
-
-HANDCRAFTED_KNOWN_CARD_RULES = dict(KNOWN_CARDS)
-HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
-# Canonicalized card rules now live in PostgreSQL/SQLite. The legacy literal is
-# stripped from the active runtime inventory immediately after import so manual
-# rules only exist when explicitly injected into HANDCRAFTED_KNOWN_CARDS as an
-# audited temporary waiver.
-for _legacy_manual_name in list(HANDCRAFTED_KNOWN_CARDS):
-    KNOWN_CARDS.pop(_legacy_manual_name, None)
+KNOWN_CARDS = {}
+# Manual runtime rules are intentionally empty in normal operation. Tests or
+# incident waivers may inject explicit entries, but production semantics must
+# come from battle_card_rules, the canonical snapshot, or the generated legacy
+# fallback in that order.
+HANDCRAFTED_KNOWN_CARD_RULES = {}
 HANDCRAFTED_KNOWN_CARDS = set()
 
 # Cards listed here intentionally bypass card_battle_rules and resolve from the
@@ -3514,6 +2127,8 @@ class Player:
         self.indestructible = False
         self.life_cant_change = False
         self.protection_from_everything = False
+        self.cannot_lose_this_turn = False
+        self.damage_life_floor = None
         self.damage_prevention_shields = []
         self.silenced_opponents = False
         self.silenced_opponents_until_eot = False
@@ -3811,7 +2426,10 @@ class Player:
     def spend_card_mana(self, card, additional_generic=0):
         return self.spend_mana(card_mana_cost(card, additional_generic))
 
-    def is_alive(self): return self.life > 0
+    def is_alive(self):
+        return not self.eliminated and (
+            self.life > 0 or self.cannot_lose_this_turn
+        )
 
     def has_won(self): return self.win_reason is not None
 
@@ -4521,7 +3139,18 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
     return True
 
 def game_winner(all_players):
-    return next((player for player in all_players if player.has_won()), None)
+    for player in all_players:
+        if not player.has_won():
+            continue
+        blocked = any(
+            opponent is not player
+            and opponent.is_alive()
+            and getattr(opponent, "cannot_lose_this_turn", False)
+            for opponent in all_players
+        )
+        if not blocked:
+            return player
+    return None
 
 
 MAIN_PHASES = {"precombat_main", "postcombat_main"}
@@ -4629,7 +3258,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 instants = [c for c in player.hand if is_instant(c) and player.can_pay_card(c)]
                 for c in instants:
                     eff = get_card_effect(c)
-                    if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm"):
+                    if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm", "cannot_lose_turn"):
                         if player.can_pay_card(c):
                             fields = replay_rule_fields(eff)
                             emit_decision_trace(
@@ -4867,7 +3496,7 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
     if effect_name == "draw_engine":
         return controller.approach_count > 0 and 50 or 25  # higher threat if Approach was cast
 
-    if effect_name in ("draw_cards", "hand_filter"):
+    if effect_name in ("draw_cards", "hand_filter", "cantrip_mana_filter_artifact"):
         count = 2
         if controller.approach_count > 0 and count >= 2:
             return 45  # digging for Approach
@@ -4951,6 +3580,8 @@ def clear_until_eot(player):
             card.pop("_landfall_triggers_this_turn", None)
     player.indestructible = False
     player.silenced_opponents_until_eot = False
+    player.cannot_lose_this_turn = False
+    player.damage_life_floor = None
     player.damage_prevention_shields = []
 
 
@@ -5240,12 +3871,94 @@ def land_sacrifice_has_strategic_benefit(strategic_risk_flags, target_options, c
     return False, "last_land_spend_without_clear_payoff"
 
 
+def choose_creature_for_resource_cost(player, *, required_color=None):
+    candidates = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent)
+    ]
+    if required_color:
+        candidates = [
+            permanent
+            for permanent in candidates
+            if card_has_color(permanent, required_color)
+        ]
+    if not candidates:
+        return None, [], "no_matching_creature"
+
+    def selection_key(permanent):
+        return (
+            1 if permanent.get("is_commander") else 0,
+            int(float(permanent.get("power") or 0)),
+            int(float(permanent.get("toughness") or 0)),
+            int(float(permanent.get("cmc") or 0)),
+            permanent.get("name", ""),
+        )
+
+    ranked = sorted(candidates, key=selection_key)
+    option_rows = []
+    for rank, permanent in enumerate(ranked, start=1):
+        option_rows.append(
+            {
+                "name": permanent.get("name", "?"),
+                "selection_rank": rank,
+                "is_commander": bool(permanent.get("is_commander")),
+                "power": int(float(permanent.get("power") or 0)),
+                "toughness": int(float(permanent.get("toughness") or 0)),
+                "cmc": int(float(permanent.get("cmc") or 0)),
+                "required_color": required_color,
+            }
+        )
+    selection_reason = (
+        "lowest_board_value_matching_required_color"
+        if required_color
+        else "lowest_board_value_creature"
+    )
+    return ranked[0], option_rows, selection_reason
+
+
+def additional_card_costs_are_payable(player, card, effect_data):
+    if effect_data.get("requires_discard_card"):
+        discardable = [
+            candidate
+            for candidate in player.hand
+            if isinstance(candidate, dict)
+            and candidate is not card
+            and not candidate.get("is_commander")
+        ]
+        if not discardable:
+            return False
+    if effect_data.get("requires_discard_land"):
+        discardable_lands = [
+            candidate
+            for candidate in player.hand
+            if isinstance(candidate, dict)
+            and candidate is not card
+            and is_land(candidate)
+        ]
+        if not discardable_lands:
+            return False
+    if effect_data.get("requires_sacrifice_green_creature"):
+        creature, _options, _reason = choose_creature_for_resource_cost(
+            player,
+            required_color="G",
+        )
+        if creature is None:
+            return False
+    elif effect_data.get("requires_sacrifice_creature"):
+        creature, _options, _reason = choose_creature_for_resource_cost(player)
+        if creature is None:
+            return False
+    return True
+
+
 def pay_additional_card_costs(player, card, effect_data, *, turn=None):
     """Pay non-mana costs that materially affect battlefield validity."""
     if (
         not effect_data.get("requires_discard_card")
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_sacrifice_creature")
+        and not effect_data.get("requires_sacrifice_green_creature")
     ):
         return True
     if effect_data.get("requires_discard_card"):
@@ -5311,30 +4024,20 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             selection_reason=selection_reason,
             strategic_risk_flags=strategic_risk_flags,
         )
-    if effect_data.get("requires_sacrifice_creature"):
-        sacrifice = next(
-            (
-                permanent
-                for permanent in player.battlefield
-                if is_battlefield_creature(permanent)
-                and not permanent.get("is_commander")
-            ),
-            None,
+    required_color = "G" if effect_data.get("requires_sacrifice_green_creature") else None
+    if effect_data.get("requires_sacrifice_creature") or required_color:
+        sacrifice, creature_options, selection_reason = choose_creature_for_resource_cost(
+            player,
+            required_color=required_color,
         )
-        sacrifice = sacrifice or next(
-            (
-                permanent
-                for permanent in player.battlefield
-                if is_battlefield_creature(permanent)
-            ),
-            None,
-        )
+        cost_name = "sacrifice_green_creature" if required_color else "sacrifice_creature"
         if not sacrifice:
             emit_replay_event(
                 "additional_cost_failed",
                 player=player.name,
                 card=card.get("name", "?"),
-                cost="sacrifice_creature",
+                cost=cost_name,
+                required_color=required_color,
                 turn=turn,
             )
             return False
@@ -5343,9 +4046,12 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             "additional_cost_paid",
             player=player.name,
             card=card.get("name", "?"),
-            cost="sacrifice_creature",
+            cost=cost_name,
             sacrificed=sacrifice.get("name", "?"),
             destination=destination,
+            creature_options=creature_options,
+            selection_reason=selection_reason,
+            required_color=required_color,
             turn=turn,
         )
     return True
@@ -5933,7 +4639,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         if effect in ("ramp_permanent", "ramp_engine", "land_ramp", "ramp_ritual"):
             score += 26 if turn <= 4 else 14
             reason = "unlock_ramp_curve_step"
-        elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature"):
+        elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
             score += 22
             reason = "unlock_interaction"
         elif effect in ("creature", "draw_engine", "topdeck_manipulation"):
@@ -6113,6 +4819,368 @@ def _utility_land_skip_event(player, permanent, turn, reason, *, phase, risk_fla
         phase=phase,
         turn=turn,
     )
+
+
+def _utility_artifact_skip_event(player, permanent, turn, reason, *, phase, risk_flags=None):
+    emit_replay_event(
+        "activated_ability_skipped",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        reason="strategic_guardrail",
+        strategic_guardrail_reason=reason,
+        strategic_risk_flags=list(risk_flags or []),
+        phase=phase,
+        turn=turn,
+    )
+
+
+def _capture_player_resource_state(player):
+    return (
+        player.mana_pool.snapshot(),
+        copy.deepcopy(player.restricted_mana),
+        player.treasures,
+        player.life,
+    )
+
+
+def _restore_player_resource_state(player, snapshot):
+    pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot = snapshot
+    for color, amount in pool_snapshot.items():
+        setattr(player.mana_pool, color, amount)
+    player.restricted_mana = restricted_snapshot
+    player.treasures = treasures_snapshot
+    player.life = life_snapshot
+
+
+def _cantrip_filter_candidate_score(card, effect_data, player, turn):
+    effect_name = str(effect_data.get("effect") or card.get("effect") or "unknown")
+    score = threat_score(effect_name, card.get("name", ""), player, [player], turn)
+    if effect_name in HIGH_IMPACT_PAYOFF_EFFECTS:
+        score += 18
+    elif effect_name in ("draw_cards", "draw_engine", "hand_filter", "cantrip_mana_filter_artifact"):
+        score += 10
+    elif effect_name in ("ramp_permanent", "ramp_engine", "land_ramp", "ramp_ritual"):
+        score += 6
+    score += min(6, int(float(card.get("cmc") or 0)))
+    return max(score, 8)
+
+
+def cantrip_mana_filter_unlock_options(player, permanent, turn, *, phase="precombat_main"):
+    if phase != "precombat_main":
+        return []
+    activation_cost = int(permanent.get("activation_cost_generic") or 1)
+    activation_colors = list(permanent.get("activation_add_colors") or [])
+    if activation_cost <= 0 or not activation_colors:
+        return []
+    activation_cost_text = "{%d}" % activation_cost
+    if not player.can_pay(activation_cost_text):
+        return []
+
+    options = []
+
+    def maybe_add_option(card, effect_data, *, role, additional_generic=0, reason):
+        if card is None:
+            return
+        if not can_cast_in_phase(card, effect_data, phase):
+            return
+        if player.can_pay_card(card, additional_generic):
+            return
+        chosen_color = None
+        for color in activation_colors:
+            snapshot = _capture_player_resource_state(player)
+            try:
+                if not player.spend_mana(activation_cost_text):
+                    continue
+                player.mana_pool.add(color, 1)
+                if player.can_pay_card(card, additional_generic):
+                    chosen_color = color
+                    break
+            finally:
+                _restore_player_resource_state(player, snapshot)
+        if chosen_color is None:
+            return
+        score = _cantrip_filter_candidate_score(card, effect_data, player, turn)
+        if role == "commander":
+            score += 12
+        options.append(
+            {
+                "card": card,
+                "effect_data": effect_data,
+                "score": score,
+                "color": chosen_color,
+                "role": role,
+                "reason": reason,
+                "additional_generic": additional_generic,
+            }
+        )
+
+    if player.command_zone:
+        commander = player.command_zone[0]
+        commander_present = any(
+            isinstance(permanent_card, dict)
+            and permanent_card.get("name") == commander.get("name")
+            for permanent_card in player.battlefield
+        )
+        if not commander_present:
+            commander_effect = get_card_effect(commander)
+            maybe_add_option(
+                commander,
+                commander_effect,
+                role="commander",
+                additional_generic=player.commander_tax,
+                reason="fix_color_for_commander_cast",
+            )
+
+    for card in player.hand:
+        if not isinstance(card, dict) or is_effective_land(card):
+            continue
+        effect_data = get_card_effect(card)
+        effect_name = str(effect_data.get("effect") or card.get("effect") or "unknown")
+        if effect_name in ("unknown", "counter"):
+            continue
+        maybe_add_option(
+            card,
+            effect_data,
+            role="hand_spell",
+            reason="fix_color_for_contextual_spell",
+        )
+
+    options.sort(
+        key=lambda item: (
+            -item["score"],
+            0 if item["role"] == "commander" else 1,
+            int(float(item["card"].get("cmc") or 0)),
+            item["card"].get("name", ""),
+        )
+    )
+    return options
+
+
+def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
+    if not player.is_alive():
+        return 0
+
+    utility_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") == "cantrip_mana_filter_artifact"
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if not utility_artifacts:
+        return 0
+
+    hand_size = len(player.hand)
+    preferred_order = ["chromatic star"]
+    permanents_by_name = {
+        normalize_card_name(permanent.get("name", "")): permanent
+        for permanent in utility_artifacts
+    }
+
+    for normalized_name in preferred_order:
+        permanent = permanents_by_name.get(normalized_name)
+        if permanent is None:
+            continue
+        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        activation_cost_text = "{%d}" % activation_cost
+        draw_count = int(permanent.get("draw_on_self_sacrifice") or 1)
+
+        if phase == "precombat_main":
+            unlock_options = cantrip_mana_filter_unlock_options(
+                player,
+                permanent,
+                turn,
+                phase=phase,
+            )
+            if not unlock_options:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_contextual_unlock_for_cantrip_filter_artifact",
+                    phase=phase,
+                )
+                continue
+            chosen = unlock_options[0]
+            if not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_activation_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            player.mana_pool.add(chosen["color"], 1)
+            drawn = player.draw(draw_count, rng)
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        option["card"],
+                        option["effect_data"],
+                        score=option["score"],
+                        action="activate_filter_draw",
+                        chosen_color=option["color"],
+                        unlock_reason=option["reason"],
+                        unlock_role=option["role"],
+                    )
+                    for option in unlock_options[:8]
+                ],
+                chosen_option=decision_card_option(
+                    chosen["card"],
+                    chosen["effect_data"],
+                    score=chosen["score"],
+                    action="activate_filter_draw",
+                    chosen_color=chosen["color"],
+                    unlock_reason=chosen["reason"],
+                    unlock_role=chosen["role"],
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        option["card"],
+                        option["effect_data"],
+                        score=option["score"],
+                        action="defer_filter_draw",
+                        chosen_color=option["color"],
+                        unlock_reason=option["reason"],
+                        unlock_role=option["role"],
+                    )
+                    for option in unlock_options[1:8]
+                ],
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "cards_drawn": draw_count,
+                    "unlock_target": chosen["card"].get("name", "?"),
+                    "unlock_role": chosen["role"],
+                },
+                rule_source="utility_artifact_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=chosen["score"],
+                reason="cash_in_color_filter_cantrip_for_contextual_unlock",
+                strategic_principle="convert_low_impact_artifact_into_color_fix_and_card_flow",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "cards": len(drawn),
+                    "mana": 0,
+                    "artifacts": -1,
+                    "graveyard": 1,
+                    "chosen_color": chosen["color"],
+                    "unlock_target": chosen["card"].get("name", "?"),
+                },
+                risk_flags=["sacrifice_artifact", "temporary_color_fix"],
+                rejected_reason="lower_contextual_unlock_score",
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="filter_draw_unlock",
+                chosen_color=chosen["color"],
+                unlock_target=chosen["card"].get("name", "?"),
+                unlock_role=chosen["role"],
+                mana_paid=activation_cost,
+                cards_drawn=len(drawn),
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                phase=phase,
+                turn=turn,
+            )
+            return 1
+
+        if phase == "postcombat_main":
+            if hand_size > 2:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_cantrip_filter_cash_in",
+                    phase=phase,
+                )
+                continue
+            if player.available_mana() < activation_cost:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_cantrip_filter_cash_in",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_activation_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            drawn = player.draw(draw_count, rng)
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="cash_in_for_draw",
+                        effect="cantrip_mana_filter_artifact",
+                        score=26,
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="cash_in_for_draw",
+                    effect="cantrip_mana_filter_artifact",
+                    score=26,
+                ),
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "cards_drawn": draw_count,
+                    "hand_before": hand_size,
+                    "hand_after": len(player.hand),
+                },
+                rule_source="utility_artifact_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=26,
+                reason="convert_idle_cantrip_artifact_into_refill",
+                strategic_principle="cash_in_low_board_impact_artifact_when_hand_is_low",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "cards": len(drawn),
+                    "mana": -activation_cost,
+                    "artifacts": -1,
+                    "graveyard": 1,
+                },
+                risk_flags=["sacrifice_artifact"],
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="cash_in_draw",
+                mana_paid=activation_cost,
+                cards_drawn=len(drawn),
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                phase=phase,
+                turn=turn,
+            )
+            return 1
+    return 0
 
 
 def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
@@ -7329,11 +6397,11 @@ def resolve_hand_filter(player, card, effect_data, turn, rng):
             should_bottom = True
             urgency = 10
             reason = "dead_high_cmc"
-        elif cmc >= 5 and effect not in {"draw_cards", "hand_filter"}:
+        elif cmc >= 5 and effect not in {"draw_cards", "hand_filter", "cantrip_mana_filter_artifact"}:
             should_bottom = True
             urgency = 30
             reason = "slow_noncritical_spell"
-        elif effect in {"draw_cards", "hand_filter"} and cmc >= 5:
+        elif effect in {"draw_cards", "hand_filter", "cantrip_mana_filter_artifact"} and cmc >= 5:
             should_bottom = True
             urgency = 25
             reason = "expensive_refill_spell"
@@ -8311,7 +7379,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 )
                 if not pay_additional_card_costs(player, c, eff, turn=turn):
                     player.graveyard.append(c)
-                    continue
+                    return False
                 trigger_spell_cast_engines(
                     player, all_players, c, turn, phase, stack=stack, active_player=player
                 )
@@ -8406,6 +7474,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     and not should_cast_wheel(player, opponents, eff)
                 ):
                     wincons = []
+                elif not additional_card_costs_are_payable(player, c, eff):
+                    wincons = []
                 if not wincons:
                     c = None
                     eff = None
@@ -8466,6 +7536,9 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
+                if not pay_additional_card_costs(player, c, eff, turn=turn):
+                    player.graveyard.append(c)
+                    return False
                 trigger_spell_cast_engines(
                     player, all_players, c, turn, phase, stack=stack, active_player=player
                 )
@@ -8636,6 +7709,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if note_action():
                     return True
             else:
+                if not additional_card_costs_are_payable(player, c, eff):
+                    continue
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="normal")
                 if not commit_cast_payment(cast_ctx):
                     continue
@@ -8696,6 +7771,9 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
+                if not pay_additional_card_costs(player, c, eff, turn=turn):
+                    player.graveyard.append(c)
+                    continue
                 trigger_spell_cast_engines(
                     player, all_players, c, turn, phase, stack=stack, active_player=player
                 )
@@ -8773,6 +7851,19 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.battlefield.append(permanent)
         player.draw_engines += 1
         player.draw(1, rng)
+    elif effect == "cantrip_mana_filter_artifact":
+        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "cantrip_mana_filter_artifact"
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "cantrip_mana_filter_artifact_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            activation_cost_generic=effect_data.get("activation_cost_generic"),
+            draw_on_self_sacrifice=effect_data.get("draw_on_self_sacrifice"),
+            battle_model_scope=effect_data.get("battle_model_scope"),
+            turn=turn,
+        )
     elif effect == "land_recursion_creature":
         resolve_land_recursion_creature(player, card, effect_data, turn)
     elif effect == "draw_cards":
@@ -9020,6 +8111,18 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             turn=turn,
         )
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "cannot_lose_turn":
+        player.cannot_lose_this_turn = True
+        player.damage_life_floor = int(effect_data.get("life_floor_on_damage") or 1)
+        emit_replay_event(
+            "cannot_lose_turn_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            life_floor_on_damage=player.damage_life_floor,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "silence_opponents":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "silence_opponents"
@@ -9070,13 +8173,26 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             if player.name not in opp.approach_revealed:
                 opp.approach_revealed.append(player.name)
         if player.approach_count >= 2:
-            player.win_reason = "approach"
-            emit_replay_event(
-                "game_won",
-                player=player.name,
-                reason="approach",
-                turn=turn,
+            blocked_by_grace = any(
+                opp.is_alive() and getattr(opp, "cannot_lose_this_turn", False)
+                for opp in opponents
             )
+            if not blocked_by_grace:
+                player.win_reason = "approach"
+                emit_replay_event(
+                    "game_won",
+                    player=player.name,
+                    reason="approach",
+                    turn=turn,
+                )
+            else:
+                emit_replay_event(
+                    "game_win_prevented",
+                    player=player.name,
+                    reason="opponents_cannot_win_this_turn",
+                    card=card.get("name", "?"),
+                    turn=turn,
+                )
             finish_resolved_spell(player, card, turn=turn)
             return
         if len(player.library) >= 7:
@@ -10264,6 +9380,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         turn,
         phase="precombat_main",
     )
+    activate_utility_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase="precombat_main",
+    )
     run_priority_loop(player, all_players, stack, turn, "precombat_main", rng)
     if game_winner(all_players):
         return
@@ -10317,6 +9441,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # ── POSTCOMBAT MAIN ──
     total_mana = player.available_mana()
     run_priority_loop(player, all_players, stack, turn, "postcombat_main", rng)
+    activate_utility_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase="postcombat_main",
+    )
     activate_utility_lands(player, turn, rng, phase="postcombat_main")
     if game_winner(all_players):
         return
@@ -10810,7 +9942,30 @@ def real_opponent_seed():
     return int(datetime.now(timezone.utc).strftime("%Y%m%d%H"))
 
 
-def main():
+def parse_cli_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description=(
+            "Run the active ManaLoom Commander battle simulator against learned "
+            "or generic opponents and print the aggregate results."
+        )
+    )
+    parser.add_argument(
+        "--games",
+        type=int,
+        default=50,
+        help="games to run against each sampled opponent profile (default: 50)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="RNG seed for reproducible opponent sampling (default: 42)",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_cli_args(argv)
     metrics_path = os.environ.get("MANALOOM_ENGINE_METRICS_OUT")
     if metrics_path:
         set_engine_metrics(EngineMetrics())
@@ -10844,8 +9999,8 @@ def main():
         opponent_kind = "generic"
         print(f"\nUsing {len(OPPONENT_ARCHETYPES)} generic archetype profiles")
 
-    GAMES = 50
-    rng = random.Random(42)
+    GAMES = max(1, int(args.games))
+    rng = random.Random(args.seed)
 
     results = []
     total_wins = total_losses = total_stalls = 0

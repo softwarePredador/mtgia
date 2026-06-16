@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Loss-Mode-Driven Swap Suggester.
 
-Cruza dados de 3 fontes para sugerir swaps direcionados:
-1. Loss tags do baseline (screw, flood, out-valued, etc.)
-2. Card impact WDWR (cartas que correlacionam com vitoria/derrota)
-3. Card pool disponivel (known_cards_generated.json)
+Gera sugestoes heuristicas a partir de duas fontes locais:
+1. loss tags extraidas do baseline/replays;
+2. card impact WDWR derivado dos mesmos replays.
+
+Importante:
+- este script nao consome o fallback legado de known-cards;
+- ele nao consulta `battle_card_rules`;
+- ele sugere categorias/cuts com base no que ja apareceu nos replays, e nao um
+  pool externo canonico de candidatos.
 """
 
 import argparse, json, os, sqlite3, sys

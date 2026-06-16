@@ -14,6 +14,7 @@ import json
 import os
 import re
 import sqlite3
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -43,10 +44,12 @@ EFFECT_TO_DECK_CATEGORY = {
     "phase_out": "protection",
     "phase_creatures": "protection",
     "protect_creature": "protection",
+    "cannot_lose_turn": "protection",
     "redirect_removal": "protection",
     "counter": "protection",
     "hate_artifact": "protection",
     "draw_cards": "draw",
+    "cantrip_mana_filter_artifact": "draw",
     "draw_engine": "draw",
     "topdeck_manipulation": "draw",
     "loot": "draw",
@@ -243,21 +246,19 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
         return {}
 
     try:
-        conn = sqlite3.connect(path)
-        conn.row_factory = sqlite3.Row
-        if not table_exists(conn, "battle_card_rules"):
-            conn.close()
-            _RULE_CACHE[cache_key] = (mtime, {})
-            return {}
-        rows = conn.execute(
-            """
-            SELECT normalized_name, card_name, effect_json, deck_role_json,
-                   source, confidence, review_status, rule_version, oracle_hash, notes
-            FROM battle_card_rules
-            WHERE review_status IN ('verified', 'needs_review', 'active')
-            """
-        ).fetchall()
-        conn.close()
+        with closing(sqlite3.connect(path)) as conn:
+            conn.row_factory = sqlite3.Row
+            if not table_exists(conn, "battle_card_rules"):
+                _RULE_CACHE[cache_key] = (mtime, {})
+                return {}
+            rows = conn.execute(
+                """
+                SELECT normalized_name, card_name, effect_json, deck_role_json,
+                       source, confidence, review_status, rule_version, oracle_hash, notes
+                FROM battle_card_rules
+                WHERE review_status IN ('verified', 'needs_review', 'active')
+                """
+            ).fetchall()
     except sqlite3.Error:
         _RULE_CACHE[cache_key] = (mtime, {})
         return {}

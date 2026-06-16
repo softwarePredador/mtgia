@@ -27,7 +27,8 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
             include_generated=False,
             sqlite_db=str(sync_rules.DEFAULT_DB),
         )
-        self.assertEqual(rows, [])
+        self.assertEqual(sum(1 for row in rows if row["source"] == "manual"), 0)
+        self.assertGreaterEqual(sum(1 for row in rows if row["source"] == "curated"), 1)
 
     def test_runtime_waiver_is_promoted_into_manual_rows_when_injected(self) -> None:
         injected_rule = {
@@ -46,11 +47,11 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
                     include_generated=False,
                     sqlite_db=str(sync_rules.DEFAULT_DB),
                 )
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0]["card_name"], "Mox Amber")
-        self.assertEqual(rows[0]["source"], "manual")
-        self.assertEqual(rows[0]["review_status"], "verified")
-        self.assertEqual(rows[0]["effect_json"], injected_rule)
+        manual_rows = [row for row in rows if row["source"] == "manual"]
+        self.assertEqual(len(manual_rows), 1)
+        self.assertEqual(manual_rows[0]["card_name"], "Mox Amber")
+        self.assertEqual(manual_rows[0]["review_status"], "verified")
+        self.assertEqual(manual_rows[0]["effect_json"], injected_rule)
 
 
 if __name__ == "__main__":

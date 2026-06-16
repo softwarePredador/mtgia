@@ -321,7 +321,24 @@ def register_tests(battle, player, card):
         evaluation = battle.mulligan_evaluation(hand)
 
         assert evaluation["keep"] is True
-        assert evaluation["reason"].startswith("early_play:Arcane Signet")
+        assert evaluation["reason"].startswith("early_ramp:Arcane Signet")
+
+    def test_mulligan_rejects_dead_mox_amber_hand_without_live_legend():
+        hand = [
+            {"name": "Mana Confluence", "cmc": 0, "type_line": "Land"},
+            {"name": "Command Tower", "cmc": 0, "type_line": "Land"},
+            {"name": "Inspiring Vantage", "cmc": 0, "type_line": "Land"},
+            {"name": "Scalding Tarn", "cmc": 0, "type_line": "Land"},
+            {"name": "Mox Amber", "cmc": 0, "type_line": "Legendary Artifact", "effect": "ramp_permanent"},
+            {"name": "Mizzix's Mastery", "cmc": 4, "type_line": "Sorcery", "effect": "overload_recursion"},
+            {"name": "Rise of the Eldrazi", "cmc": 12, "type_line": "Sorcery", "effect": "extra_turn"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is False
+        assert evaluation["reason"] == "no_early_game_plan"
+        assert "no_early_game_plan" in evaluation["risk_flags"]
 
     return [
         test_draw_step_runs_once_with_multiple_permanents,
@@ -338,4 +355,5 @@ def register_tests(battle, player, card):
         test_mulligan_rejects_three_lands_with_only_expensive_spells,
         test_mulligan_keeps_three_lands_with_early_play,
         test_mulligan_keeps_two_lands_with_cheap_ramp,
+        test_mulligan_rejects_dead_mox_amber_hand_without_live_legend,
     ]

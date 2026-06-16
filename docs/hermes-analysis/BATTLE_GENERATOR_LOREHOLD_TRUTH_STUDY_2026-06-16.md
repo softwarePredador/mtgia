@@ -170,6 +170,72 @@ Lacunas reais:
    - delta contra baseline congelado;
    - impacto por oponente/arquetipo.
 
+## Known cards / battle rules — estado real apos revalidacao
+
+Nesta continuidade foi revalidado o risco de conflito entre:
+
+- `card_battle_rules` / registry canônico;
+- `known_cards_canonical_snapshot.json`;
+- `known_cards_generated.json`;
+- overrides manuais historicos do runtime.
+
+Veredito tecnico:
+
+1. nao existe conflito estrutural ativo no runtime atual;
+2. o inventario manual legado continua desativado por padrao;
+3. o snapshot canonico continua sendo o fallback degradado preferencial;
+4. o JSON legado continua apenas como ultimo fallback historico;
+5. o risco residual agora e cobertura incompleta de cartas, nao colisao de
+   precedencia.
+
+Evidencias objetivas desta rodada:
+
+- `HANDCRAFTED_KNOWN_CARDS == set()`;
+- `MANUAL_RULE_RUNTIME_WAIVERS == set()`;
+- auditoria de ambiente do runtime: `PASS`;
+- recheck do fallback canonico: snapshot canonico com `3159` linhas, sem
+  nomes exclusivos no `known_cards_generated.json`;
+- suite de regressao de battle/hotfix fallback permanecendo verde;
+- suite focada de `known_cards`/snapshot/reviewed layer fechou com `29` testes
+  Python `OK`, sem `ResourceWarning` residual de SQLite depois da troca para
+  fechamento explicito de conexoes no harness e nos auditores/sync helpers.
+
+Casos de amostra validados no runtime atual:
+
+- `Mox Amber` resolve hoje como `manual/verified` a partir da regra canonica,
+  sem waiver runtime;
+- `Lotus Petal` resolve como `manual/verified`;
+- `Angel's Grace` resolve como `curated/verified` com
+  `effect=cannot_lose_turn`;
+- `Chromatic Star` resolve como `curated/active` com
+  `effect=cantrip_mana_filter_artifact`,
+  `battle_model_scope=sacrifice_mana_filter_cantrip_v2`,
+  `activation_cost_generic=1` e `draw_on_self_sacrifice=1`.
+- `Natural Order` resolve agora como `curated/verified` com
+  `effect=tutor`,
+  `target=green_creature_to_battlefield`,
+  `requires_sacrifice_green_creature=true` e
+  `battle_model_scope=green_creature_pod_tutor_v1`; o runtime local tambem
+  passou a pagar o custo adicional no cast e a bloquear o cast quando nao
+  houver criatura verde sacrificavel.
+
+Implicacao correta:
+
+- o battle nao esta mais aprendendo de uma fonte manual escondida ou
+  conflitante;
+- o proximo trabalho certo e promover cartas ainda `generated/needs_review`,
+  `heuristic` ou `active` simplificado para regras trusted/traceable quando forem
+  relevantes ao corpus;
+- findings como `Chromatic Star` agora sao gaps de fidelidade/completude de
+  modelagem, nao regressao de precedence.
+
+Risco operacional adicional encontrado:
+
+- `battle_analyst_v9.py --help` estava executando simulacao em vez de apenas
+  imprimir uso. Isso nao alterava resultado de battle, mas atrapalhava
+  auditoria e automacao. O ajuste correto e manter parse de CLI antes do load
+  do deck e da simulacao.
+
 Implicacao pratica:
 
 - WR bruto de Lorehold nao pode ser tratado como verdade.
@@ -311,36 +377,46 @@ Foi criado e executado o auditor read-only:
 
 - `server/bin/commander_generate_provenance_audit.dart`
 - artefato:
-  `server/test/artifacts/commander_generate_provenance_2026-06-16/commander_generate_provenance_summary.json`
+  `server/test/artifacts/commander_generate_provenance_2026-06-16_current/commander_generate_provenance_summary.json`
 
 Resultado medido no banco real:
 
 - `profile.row_exists = true`
-- `profile.row_source = aggregate_reference_profile_v1`
-- `profile.row_confidence = high`
-- `profile.row_source_count = 4`
+- `profile.row_source = edhrec`
+- `profile.row_confidence = null`
+- `profile.row_source_count = null`
 - `profile.usable = true`
+- `profile.usable_runtime_origin = built_in_fallback`
+- `profile.usable_runtime_reason = persisted_profile_missing_or_not_usable`
 - `reference_card_stats.usable_count = 34`
 - `reference_corpus.accepted_deck_count = 3`
 - `usage_hot_cards.count = 50`
 - `active_learned_deck.exists = true`
 - `deterministic_deck.built = true`
 - `deterministic_deck.main_count = 99`
+- `deterministic_deck.runtime_build_diagnostics.built_in_fallback_used_count = 62`
+- `deterministic_deck.runtime_build_diagnostics.built_in_fallback_only_count = 25`
 
 Leitura correta:
 
 1. Lorehold **nao esta sem dados**.
    Ele tem stats, corpus, usage e learned deck ativo.
 2. O problema atual e mais especifico:
-   o profile persistido ja ficou utilizavel no banco real, entao o gap deixou de
-   ser "aplicar/upsert do row" e passou a ser provar que o `/ai/generate` live
-   realmente esta consumindo esse caminho de forma consistente.
+   o row persistido atual ainda nao carrega sozinho a forma estruturada esperada
+   pelo runtime (`confidence/source_count`), entao o profile utilizavel local
+   continua sendo reconstruido via `built_in_fallback`.
 3. Como consequencia direta, o fast-path deterministico do generator **ja liga**
-   no banco real revalidado, montando `99` cartas no main deck com `34`
-   reference stats resolvidos e `3` decks aceitos no corpus.
+   na pilha local revalidada, montando `99` cartas no main deck com `34`
+   reference stats resolvidos, `3` decks aceitos no corpus e forte mistura de
+   profile/stats/corpus/fallback.
 4. O canal de produto `commander-learning` continua separado por arquitetura,
    mas agora ele concorre com um `/ai/generate` estruturalmente muito mais forte
    para Lorehold do que no snapshot inicial desta auditoria.
+5. O problema aberto deixou de ser so "falta profile". A verdade atual e mais
+   dura: o builder deterministico ainda usa `62` cartas tocadas pelo
+   `built_in_fallback`, sendo `25` delas fallback puro. Ou seja, o Lorehold
+   local ainda nao esta pronto para ser tratado como deck gerado apenas por
+   sinais aprendidos/estruturados.
 
 ## Revalidacao publica do `/ai/generate` e `commander-learning`
 
@@ -452,6 +528,31 @@ Interpretacao:
 - stats + fallback ainda carregam uma parte importante do pacote estrutural;
 - corpus ja aparece, mas nao domina sozinho a identidade da lista.
 
+Recheck de explainability instrumentado nesta continuidade:
+
+- `source_usage_counts.reference_card_stats = 34`
+- `source_usage_counts.reference_corpus_packages = 36`
+- `source_usage_counts.profile_expected_packages = 34`
+- `source_usage_counts.usage_hot_cards = 24`
+- `source_usage_counts.deterministic_fallback = 59`
+- `built_in_fallback_only_count` caiu de `25` para `16`
+- `built_in_fallback_only_sample` inclui:
+  `Boros Signet`, `Talisman of Conviction`, `Mind Stone`, `Fellwar Stone`,
+  `Wayfarer's Bauble`, `Thought Vessel`, `Commander's Sphere`,
+  `Marble Diamond`, `Fire Diamond`, `Thrill of Possibility`, `Big Score`
+
+Leitura correta desse recheck:
+
+- o generator local agora expõe proveniência do deck determinístico por carta e
+  por bucket;
+- `usage_hot_cards` agora entra no builder determinístico antes do
+  `loreholdDeterministicReferenceFallbackCards`, sem ler `learned_deck`
+  diretamente;
+- a hipótese "fallback quase não entra mais" continua errada, mas ela ficou
+  menos ruim: o fallback puro residual caiu para `16` cartas;
+- o próximo slice seguro para Lorehold continua não sendo remover fallback às
+  cegas, e sim atacar primeiro esse bucket residual `fallback_only`.
+
 ### Bug real encontrado e corrigido nesta rodada
 
 `loadUsageHotCards()` estava multiplicando cartas por printings ao fazer join
@@ -522,12 +623,12 @@ Resultado local em 2026-06-16:
 
 - `1970` nomes existem tanto no fallback gerado quanto no cache canonico
   `battle_card_rules`;
-- `1386` ja batem exatamente em bruto;
-- `1457` batem exatamente depois da normalizacao real de runtime;
+- `1385` ja batem exatamente em bruto;
+- `1456` batem exatamente depois da normalizacao real de runtime;
 - `297` ainda diferem apenas estruturalmente apos a normalizacao;
-- `216` continuam com `effect` realmente diferente mesmo apos a mesma
+- `217` continuam com `effect` realmente diferente mesmo apos a mesma
   normalizacao de runtime aplicada nos dois lados;
-- `1188` cartas existem no cache canonico SQLite e nem sequer aparecem no
+- `1189` cartas existem no cache canonico SQLite e nem sequer aparecem no
   `known_cards_generated.json`.
 
 Interpretacao correta:
@@ -593,7 +694,7 @@ Estado correto apos a validacao:
 - o snapshot canonico tambem foi materializado localmente em
   `known_cards_canonical_snapshot.json` e a auditoria
   `audit_known_cards_runtime_environment.py` fechou com `status=PASS`
-  (`canonical_fallback_count=3158`, `handcrafted_count=0`,
+  (`canonical_fallback_count=3159`, `handcrafted_count=0`,
   `manual_waiver_count=0`);
 - o pendente restante virou rollout operacional:
   garantir que os jobs Hermes efetivamente refresquem esse snapshot no ambiente
@@ -608,8 +709,8 @@ Drift operacional observado no Hermes AWS:
   - ordem `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`.
 - apos export local do snapshot canonico:
   - `known_cards_canonical_snapshot.json` presente;
-  - `canonical_fallback_count=3158`;
-  - `known_cards_count=3158`;
+  - `canonical_fallback_count=3159`;
+  - `known_cards_count=3159`;
   - auditoria de ambiente local em `PASS`.
 - a primeira leitura remota induzia que o problema principal era branch errada,
   porque o workspace `/opt/data/workspace/mtgia` estava parado em
@@ -900,8 +1001,12 @@ movimento errado neste momento.
 15. Adotar `commander_learning_snapshot` como loader diagnostico/analitico
     unico, evitando consumidores paralelos montando agregados diferentes sobre
     learned decks, usage e synergy.
-16. Remover snapshot legado de `KNOWN_CARDS` do arquivo Python e mover para
-    artefato historico, mantendo apenas mecanismo de waiver.
+16. Concluído em 2026-06-16: o snapshot legado embutido em
+    `battle_analyst_v9.py` foi removido do código ativo. O runtime mantém
+    apenas `KNOWN_CARDS = {}` para carregamento posterior de registry/snapshot
+    canonico/fallback gerado e para waivers explícitos de teste/incidente. O
+    guardrail `test_known_cards_consumer_guardrail.py` falha se o dicionário
+    manual ou engines antigos forem restaurados.
 17. Formalizar em backend mais sinais de `why this card` para app/admin/debug.
 
 ## O que nao deve ser feito agora

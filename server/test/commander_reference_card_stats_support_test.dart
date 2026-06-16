@@ -202,7 +202,7 @@ void main() {
       final profile = buildLoreholdReferenceProfilePayload(
         updatedAt: DateTime.utc(2026, 5, 11, 12),
       );
-      final deck = buildDeterministicReferenceDeck(
+      final result = buildDeterministicReferenceDeckResult(
         profile: profile,
         referenceCardStats: [
           _stat(
@@ -253,6 +253,7 @@ void main() {
           themeCounts: {'topdeck_big_spells': 3},
         ),
       );
+      final deck = result.deck;
 
       expect((deck['commander'] as Map)['name'],
           equals('Lorehold, the Historian'));
@@ -277,6 +278,129 @@ void main() {
       expect(
           cards.where((card) => card['name'] == 'Mountain').single['quantity'],
           greaterThan(0));
+      expect(result.mainDeckQuantity, equals(99));
+      expect(result.builtInFallbackEnabled, isTrue);
+      expect(result.builtInFallbackUsedCount, greaterThan(0));
+      expect(
+        result.sourceUsageCounts['reference_card_stats'],
+        greaterThanOrEqualTo(2),
+      );
+      expect(
+        result.sourceUsageCounts['reference_corpus_packages'],
+        greaterThanOrEqualTo(1),
+      );
+      expect(
+        result.sourceUsageCounts['deterministic_fallback'],
+        greaterThan(0),
+      );
+      expect(
+        result.toDiagnosticsJson()['built_in_fallback_only_count'],
+        isA<int>(),
+      );
+    });
+
+    test('captures deterministic source provenance for overlap cards', () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Arcane Signet',
+            cardId: 'signet-id',
+            packageKey: 'ramp_package',
+            role: 'ramp',
+            score: 80,
+            confidence: 'high',
+          ),
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(result.basicLandQuantity, equals(0));
+      expect(result.builtInFallbackEnabled, isTrue);
+      expect(result.builtInFallbackUsedCount, equals(6));
+      expect(
+        result.sourceMixCounts['deterministic_fallback + reference_card_stats'],
+        equals(1),
+      );
+      final arcaneSignet = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Arcane Signet',
+      );
+      expect(
+        arcaneSignet.sources,
+        equals(['deterministic_fallback', 'reference_card_stats']),
+      );
+    });
+
+    test('captures fallback-only provenance when only built-in cards are used',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_fallback_only_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(result.basicLandQuantity, equals(0));
+      expect(result.builtInFallbackEnabled, isTrue);
+      expect(result.builtInFallbackUsedCount, equals(6));
+      expect(result.builtInFallbackOnlyCount, equals(6));
+      expect(result.sourceMixCounts['deterministic_fallback'], equals(6));
+    });
+
+    test('uses aggregated usage hot cards before built-in fallback', () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_usage_hot_cards_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        usageHotCardNames: const [
+          'Jeska\'s Will',
+          'Unexpected Windfall',
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName),
+        containsAll(['Jeska\'s Will', 'Unexpected Windfall']),
+      );
+      expect(result.sourceUsageCounts['usage_hot_cards'], equals(2));
+      final jeskasWill = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Jeska\'s Will',
+      );
+      expect(jeskasWill.sources, equals(['usage_hot_cards']));
+      expect(result.builtInFallbackOnlyCount, equals(4));
     });
 
     test('filters off-color generated cards before reference validation repair',

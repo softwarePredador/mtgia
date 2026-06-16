@@ -639,11 +639,12 @@
   },
   "Angel's Grace": {
     "cmc": 1.0,
-    "effect": "silence_opponents",
+    "effect": "cannot_lose_turn",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_confidence": 0.55,
+    "life_floor_on_damage": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1
   },
   "Anguished Unmaking": {
@@ -3506,6 +3507,24 @@
     "battle_rule_source": "manual",
     "battle_rule_review_status": "verified",
     "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1
+  },
+  "Chromatic Star": {
+    "activation_add_colors": [
+      "white",
+      "blue",
+      "black",
+      "red",
+      "green"
+    ],
+    "activation_cost_generic": 1,
+    "battle_model_scope": "sacrifice_mana_filter_cantrip_v2",
+    "cmc": 1.0,
+    "draw_on_self_sacrifice": 1,
+    "effect": "cantrip_mana_filter_artifact",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "active",
+    "battle_rule_confidence": 0.81,
     "battle_rule_version": 1
   },
   "Chrome Mox": {
@@ -14319,12 +14338,15 @@
     "battle_rule_version": 1
   },
   "Natural Order": {
+    "battle_model_scope": "green_creature_pod_tutor_v1",
     "cmc": 4.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_confidence": 0.55,
+    "effect": "tutor",
+    "requires_sacrifice_green_creature": true,
+    "sorcery": true,
+    "target": "green_creature_to_battlefield",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_confidence": 0.96,
     "battle_rule_version": 1
   },
   "Naturalize": {

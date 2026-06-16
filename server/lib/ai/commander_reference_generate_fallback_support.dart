@@ -18,6 +18,66 @@ class ReferenceGeneratedCardsIdentityFilterResult {
   int get removedUnresolvedCount => removedUnresolvedNames.length;
 }
 
+class DeterministicReferenceDeckCardProvenance {
+  const DeterministicReferenceDeckCardProvenance({
+    required this.cardName,
+    required this.sources,
+  });
+
+  final String cardName;
+  final List<String> sources;
+
+  Map<String, dynamic> toJson() => {
+        'card_name': cardName,
+        'sources': sources,
+      };
+}
+
+class DeterministicReferenceDeckBuildResult {
+  const DeterministicReferenceDeckBuildResult({
+    required this.deck,
+    required this.cardProvenance,
+    required this.sourceMixCounts,
+    required this.sourceUsageCounts,
+    required this.mainDeckQuantity,
+    required this.distinctCardCount,
+    required this.basicLandQuantity,
+    required this.builtInFallbackEnabled,
+    required this.builtInFallbackUsedCount,
+    required this.builtInFallbackOnlyCount,
+    required this.builtInFallbackOnlySample,
+  });
+
+  final Map<String, dynamic> deck;
+  final List<DeterministicReferenceDeckCardProvenance> cardProvenance;
+  final Map<String, int> sourceMixCounts;
+  final Map<String, int> sourceUsageCounts;
+  final int mainDeckQuantity;
+  final int distinctCardCount;
+  final int basicLandQuantity;
+  final bool builtInFallbackEnabled;
+  final int builtInFallbackUsedCount;
+  final int builtInFallbackOnlyCount;
+  final List<String> builtInFallbackOnlySample;
+
+  Map<String, dynamic> toDiagnosticsJson({int sampleLimit = 10}) => {
+        'main_deck_quantity': mainDeckQuantity,
+        'distinct_card_count': distinctCardCount,
+        'basic_land_quantity': basicLandQuantity,
+        'built_in_fallback_enabled': builtInFallbackEnabled,
+        'built_in_fallback_used_count': builtInFallbackUsedCount,
+        'built_in_fallback_only_count': builtInFallbackOnlyCount,
+        'built_in_fallback_only_sample':
+            builtInFallbackOnlySample.take(sampleLimit).toList(growable: false),
+        'source_mix_counts': sourceMixCounts,
+        'source_usage_counts': sourceUsageCounts,
+        'card_provenance_sample': cardProvenance
+            .take(sampleLimit)
+            .map((entry) => entry.toJson())
+            .toList(growable: false),
+      };
+}
+
 ReferenceGeneratedCardsIdentityFilterResult
     filterReferenceGeneratedCardsByCommanderIdentity({
   required Map<String, dynamic> profile,
@@ -80,6 +140,22 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
   required Map<String, dynamic> profile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> usageHotCardNames = const [],
+  int targetMainQuantity = 99,
+}) =>
+    buildDeterministicReferenceDeckResult(
+      profile: profile,
+      referenceCardStats: referenceCardStats,
+      referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+      usageHotCardNames: usageHotCardNames,
+      targetMainQuantity: targetMainQuantity,
+    ).deck;
+
+DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
+  required Map<String, dynamic> profile,
+  List<CommanderReferenceCardStat> referenceCardStats = const [],
+  CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
 }) {
   final commanderName =
@@ -88,9 +164,12 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
           .trim();
   final nonLands = <String>[];
   final seen = <String>{};
+  final sourceLabelsByName = <String, Set<String>>{};
   final avoidedExampleNames = _profileAvoidExampleNames(profile);
+  final builtInFallbackEnabled =
+      isLoreholdCommanderReferenceCandidate(commanderName);
 
-  void addCard(String? rawName) {
+  void addCard(String? rawName, String source) {
     final name = rawName?.trim();
     if (name == null || name.isEmpty) return;
     final normalizedName = normalizeCommanderReferenceCardName(name);
@@ -103,6 +182,9 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
     if (basicLandNames.contains(normalizedName)) {
       return;
     }
+    sourceLabelsByName
+        .putIfAbsent(normalizedName, () => <String>{})
+        .add(source);
     if (!seen.add(normalizedName)) return;
     nonLands.add(name);
   }
@@ -117,7 +199,7 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
       return a.cardName.compareTo(b.cardName);
     });
   for (final stat in stats) {
-    addCard(stat.cardName);
+    addCard(stat.cardName, 'reference_card_stats');
   }
 
   final corpusPackages = referenceDeckCorpusGuidance?.packages;
@@ -127,7 +209,7 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
     if (corpusPackages != null) corpusPackages.supportPackage,
   ]) {
     for (final card in package) {
-      addCard(card['card_name']?.toString());
+      addCard(card['card_name']?.toString(), 'reference_corpus_packages');
     }
   }
 
@@ -150,14 +232,18 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
     for (final entry in entries) {
       if (entry.value is! List) continue;
       for (final rawCard in entry.value as List) {
-        addCard(rawCard.toString());
+        addCard(rawCard.toString(), 'profile_expected_packages');
       }
     }
   }
 
-  if (isLoreholdCommanderReferenceCandidate(commanderName)) {
+  for (final rawName in usageHotCardNames) {
+    addCard(rawName, 'usage_hot_cards');
+  }
+
+  if (builtInFallbackEnabled) {
     for (final name in loreholdDeterministicReferenceFallbackCards) {
-      addCard(name);
+      addCard(name, 'deterministic_fallback');
     }
   }
 
@@ -167,8 +253,37 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
     total: targetMainQuantity - cappedNonLands.length,
     colors: colors.isEmpty ? const ['W'] : colors,
   );
+  final provenance = <DeterministicReferenceDeckCardProvenance>[];
+  final sourceMixCounts = <String, int>{};
+  final sourceUsageCounts = <String, int>{};
+  final builtInFallbackOnlyNames = <String>[];
 
-  return {
+  for (final name in cappedNonLands) {
+    final normalizedName = normalizeCommanderReferenceCardName(name);
+    final sources = (sourceLabelsByName[normalizedName] ?? const <String>{})
+        .toList(growable: false)
+      ..sort();
+    provenance.add(
+      DeterministicReferenceDeckCardProvenance(
+        cardName: name,
+        sources: sources,
+      ),
+    );
+    final mixKey = sources.join(' + ');
+    sourceMixCounts[mixKey] = (sourceMixCounts[mixKey] ?? 0) + 1;
+    for (final source in sources) {
+      sourceUsageCounts[source] = (sourceUsageCounts[source] ?? 0) + 1;
+    }
+    if (sources.length == 1 && sources.first == 'deterministic_fallback') {
+      builtInFallbackOnlyNames.add(name);
+    }
+  }
+
+  final basicLandQuantity = basics.fold<int>(
+    0,
+    (total, card) => total + ((card['quantity'] as int?) ?? 0),
+  );
+  final deck = {
     'commander': {
       'name': commanderName.isEmpty ? 'Isamaru, Hound of Konda' : commanderName
     },
@@ -177,6 +292,23 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
       ...basics,
     ],
   };
+
+  return DeterministicReferenceDeckBuildResult(
+    deck: deck,
+    cardProvenance: provenance,
+    sourceMixCounts: sourceMixCounts,
+    sourceUsageCounts: sourceUsageCounts,
+    mainDeckQuantity: cappedNonLands.length + basicLandQuantity,
+    distinctCardCount: cappedNonLands.length + basics.length,
+    basicLandQuantity: basicLandQuantity,
+    builtInFallbackEnabled: builtInFallbackEnabled,
+    builtInFallbackUsedCount: provenance
+        .where((entry) => entry.sources.contains('deterministic_fallback'))
+        .length,
+    builtInFallbackOnlyCount: builtInFallbackOnlyNames.length,
+    builtInFallbackOnlySample:
+        builtInFallbackOnlyNames.take(12).toList(growable: false),
+  );
 }
 
 const loreholdDeterministicReferenceFallbackCards = [

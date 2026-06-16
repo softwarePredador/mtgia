@@ -1,0 +1,64 @@
+{
+  "Angel's Grace": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "cannot_lose_turn",
+      "instant": true,
+      "life_floor_on_damage": 1
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "cannot_lose_turn",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 1.0,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-16 against official Gatherer/Scryfall: player cannot lose this turn and damage cannot reduce life below 1."
+  },
+  "Chromatic Star": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "cantrip_mana_filter_artifact",
+      "activation_cost_generic": 1,
+      "activation_add_colors": [
+        "white",
+        "blue",
+        "black",
+        "red",
+        "green"
+      ],
+      "draw_on_self_sacrifice": 1,
+      "battle_model_scope": "sacrifice_mana_filter_cantrip_v2"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "cantrip_mana_filter_artifact",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.81,
+    "review_status": "active",
+    "notes": "Reviewed generic battle model. Official card is a mana-filtering artifact that cantrips when put into a graveyard from the battlefield. Runtime now models it as a sacrifice-to-filter-and-draw utility artifact, but still does not implement full mana-ability timing or every combo edge case."
+  },
+  "Natural Order": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "tutor",
+      "target": "green_creature_to_battlefield",
+      "requires_sacrifice_green_creature": true,
+      "sorcery": true,
+      "battle_model_scope": "green_creature_pod_tutor_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "tutor",
+      "target": "green_creature_to_battlefield",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield."
+  }
+}

@@ -18,6 +18,7 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
     def _conn(self, *, include_pg_roles: bool = True) -> sqlite3.Connection:
         conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
+        self.addCleanup(conn.close)
         pg_roles_column = ", pg_roles TEXT" if include_pg_roles else ""
         conn.execute(
             f"""

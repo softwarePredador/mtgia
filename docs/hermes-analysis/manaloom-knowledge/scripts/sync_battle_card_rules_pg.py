@@ -33,6 +33,7 @@ from known_cards_fallback_snapshot import (
     resolve_canonical_snapshot_path,
     write_snapshot_payload,
 )
+from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH
 from sync_battle_card_rules import _oracle_normalized_rows, build_rows
 
 try:
@@ -105,6 +106,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
     parser.add_argument("--skip-generated", action="store_true")
+    parser.add_argument(
+        "--reviewed-rules-json",
+        default=str(DEFAULT_REVIEWED_RULES_PATH),
+        help="Versioned reviewed battle rule layer to seed before generated rules.",
+    )
     parser.add_argument(
         "--include-needs-review",
         action="store_true",
@@ -554,6 +560,7 @@ def main() -> int:
     seed_rows = build_rows(
         include_generated=not args.skip_generated,
         sqlite_db=args.sqlite_db,
+        reviewed_rules_path=args.reviewed_rules_json,
     )
     selected_card_names = resolve_selected_card_names(args)
     seed_rows = filter_rows_by_card_names(seed_rows, selected_card_names)
@@ -564,6 +571,7 @@ def main() -> int:
         "apply_pg": bool(args.apply_pg),
         "apply_sqlite_from_pg": bool(args.apply_sqlite_from_pg),
         "include_generated": not args.skip_generated,
+        "reviewed_rules_json": args.reviewed_rules_json,
         "include_needs_review": bool(args.include_needs_review),
         "export_canonical_fallback_json": args.export_canonical_fallback_json,
         "selected_card_count": len(selected_card_names),
@@ -573,6 +581,7 @@ def main() -> int:
         "only_recommended_action": args.only_recommended_action,
         "input_rows": len(seed_rows),
         "manual_rows": sum(1 for row in seed_rows if row["source"] == "manual"),
+        "curated_rows": sum(1 for row in seed_rows if row["source"] == "curated"),
         "generated_rows": sum(1 for row in seed_rows if row["source"] == "generated"),
         "oracle_normalized_rows": sum(
             1 for row in seed_rows if row.get("_oracle_normalized")

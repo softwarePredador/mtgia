@@ -33,6 +33,69 @@ void main() {
       expect(isReferenceProfileConfidenceUsable('unknown'), isFalse);
     });
 
+    test('prefers a usable persisted profile when it exists', () {
+      final persisted = buildCommanderReferenceProfilePayload(
+        commanderName: 'Test Commander',
+        version: 'persisted_v1',
+        source: 'persisted_profile',
+        confidence: 'high',
+        sourceCount: 2,
+        colorIdentity: const ['U'],
+        themes: const [
+          {'name': 'value', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+      );
+
+      final resolved = resolveRuntimeCommanderReferenceProfile(
+        commanderName: 'Test Commander',
+        persistedProfile: persisted,
+      );
+
+      expect(resolved, isNotNull);
+      expect(resolved!['version'], equals('persisted_v1'));
+      expect(resolved['source'], equals('persisted_profile'));
+      expect(resolved.containsKey('runtime_profile_origin'), isFalse);
+    });
+
+    test(
+        'falls back to the built-in Lorehold profile when persisted row is weak',
+        () {
+      final resolved = resolveRuntimeCommanderReferenceProfile(
+        commanderName: loreholdReferenceCommanderName,
+        persistedProfile: {
+          'commander': loreholdReferenceCommanderName,
+          'confidence': 'low',
+          'source_count': 0,
+        },
+        fallbackUpdatedAt: DateTime.utc(2026, 6, 16, 18),
+      );
+
+      expect(resolved, isNotNull);
+      expect(resolved!['commander'], equals(loreholdReferenceCommanderName));
+      expect(resolved['confidence'], equals('high'));
+      expect(resolved['source_count'], equals(4));
+      expect(resolved['runtime_profile_origin'], equals('built_in_fallback'));
+      expect(
+        resolved['runtime_profile_reason'],
+        equals('persisted_profile_missing_or_not_usable'),
+      );
+    });
+
+    test('does not invent a built-in fallback for unrelated commanders', () {
+      final resolved = resolveRuntimeCommanderReferenceProfile(
+        commanderName: 'Atraxa, Praetors\' Voice',
+        persistedProfile: {
+          'commander': 'Atraxa, Praetors\' Voice',
+          'confidence': 'low',
+        },
+      );
+
+      expect(resolved, isNull);
+    });
+
     test('builds the persisted aggregate profile without copied decklists', () {
       final profile = buildLoreholdReferenceProfilePayload(
         updatedAt: DateTime.utc(2026, 5, 11, 12),
@@ -135,7 +198,14 @@ void main() {
       final profile = buildLoreholdReferenceProfilePayload(
         updatedAt: DateTime.utc(2026, 5, 11, 12),
       );
-      final diagnostics = buildCommanderReferenceDiagnostics(profile);
+      final diagnostics = buildCommanderReferenceDiagnostics(
+        profile,
+        referenceDeterministicDeckDiagnostics: const {
+          'built_in_fallback_enabled': true,
+          'built_in_fallback_used_count': 12,
+          'built_in_fallback_only_count': 4,
+        },
+      );
 
       expect(diagnostics['reference_profile_used'], isTrue);
       expect(diagnostics['reference_card_stats_used'], isFalse);
@@ -145,7 +215,37 @@ void main() {
       expect(diagnostics['profile_confidence'], equals('high'));
       expect(diagnostics['source_count'], equals(4));
       expect(diagnostics['themes'], isA<List>());
+      expect(
+        (diagnostics['reference_deterministic_deck']
+            as Map)['built_in_fallback_enabled'],
+        isTrue,
+      );
       expect(diagnostics.keys, isNot(contains('profile_json')));
+      expect(diagnostics.toString().toLowerCase(), isNot(contains('secret')));
+    });
+
+    test(
+        'diagnostics expose runtime fallback origin only when profile carries it',
+        () {
+      final resolved = resolveRuntimeCommanderReferenceProfile(
+        commanderName: loreholdReferenceCommanderName,
+        persistedProfile: {
+          'commander': loreholdReferenceCommanderName,
+          'confidence': 'low',
+          'source_count': 0,
+        },
+      );
+
+      expect(resolved, isNotNull);
+      final diagnostics = buildCommanderReferenceDiagnostics(resolved!);
+
+      expect(diagnostics['reference_profile_used'], isTrue);
+      expect(
+          diagnostics['runtime_profile_origin'], equals('built_in_fallback'));
+      expect(
+        diagnostics['runtime_profile_reason'],
+        equals('persisted_profile_missing_or_not_usable'),
+      );
       expect(diagnostics.toString().toLowerCase(), isNot(contains('secret')));
     });
   });

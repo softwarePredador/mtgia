@@ -4,6 +4,27 @@ import 'package:postgres/postgres.dart';
 
 import 'commander_reference_profile_support.dart';
 
+const loadUsageHotCardsSql = '''
+  SELECT
+    ccu.card_name_normalized,
+    COALESCE(card_lookup.canonical_name, ccu.card_name_normalized)
+      AS canonical_name,
+    ccu.usage_count,
+    ccu.last_used_at
+  FROM commander_card_usage ccu
+  LEFT JOIN LATERAL (
+    SELECT c.name AS canonical_name
+    FROM cards c
+    WHERE LOWER(SPLIT_PART(c.name, ' // ', 1)) = ccu.card_name_normalized
+    ORDER BY c.name ASC
+    LIMIT 1
+  ) card_lookup ON TRUE
+  WHERE ccu.commander_name_normalized = @commander
+    AND ccu.card_name_normalized <> @commander
+  ORDER BY ccu.usage_count DESC, ccu.last_used_at DESC, ccu.card_name_normalized
+  LIMIT @limit
+''';
+
 Future<void> ensureDeckLearningEventsTable(Pool pool) async {
   await pool.execute('''
     CREATE TABLE IF NOT EXISTS deck_learning_events (
@@ -113,16 +134,7 @@ Future<List<Map<String, dynamic>>> loadUsageHotCards({
   final normalized = normalizeCommanderReferenceName(commanderName);
   try {
     final result = await pool.execute(
-      Sql.named('''
-        SELECT ccu.card_name_normalized, c.name AS canonical_name,
-               ccu.usage_count, ccu.last_used_at
-        FROM commander_card_usage ccu
-        JOIN cards c ON LOWER(SPLIT_PART(c.name, ' // ', 1)) = ccu.card_name_normalized
-        WHERE ccu.commander_name_normalized = @commander
-          AND ccu.card_name_normalized <> @commander
-        ORDER BY ccu.usage_count DESC
-        LIMIT @limit
-      '''),
+      Sql.named(loadUsageHotCardsSql),
       parameters: {
         'commander': normalized,
         'limit': limit,
@@ -152,6 +164,21 @@ String buildUsageHotCardsPrompt(List<Map<String, dynamic>> hotCards) {
     'Prefer these cards only when legal, on-color, and structurally appropriate for the deck.',
   ];
   return lines.join('\n');
+}
+
+List<String> usageHotCardCanonicalNames(
+  List<Map<String, dynamic>> hotCards, {
+  int limit = 24,
+}) {
+  return hotCards
+      .take(limit)
+      .map(
+        (card) => card['canonical_name']?.toString().trim().isNotEmpty == true
+            ? card['canonical_name']!.toString().trim()
+            : (card['card_name_normalized']?.toString().trim() ?? ''),
+      )
+      .where((name) => name.isNotEmpty)
+      .toList(growable: false);
 }
 
 Future<void> logGeneratedDeckForLearning({

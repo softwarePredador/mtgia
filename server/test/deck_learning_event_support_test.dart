@@ -1,41 +1,43 @@
-import 'package:server/ai/deck_learning_event_support.dart';
 import 'package:test/test.dart';
 
+import '../lib/ai/deck_learning_event_support.dart';
+
 void main() {
-  group('deck learning event support', () {
-    test('filters commander and duplicate cards from usage hot-card input', () {
-      final cards = learningUsageCardsForCommander(
-        commanderName: 'Lorehold, the Historian',
-        cards: [
-          {
-            'name': 'Lorehold, the Historian',
-            'quantity': 1,
-            'is_commander': true,
-          },
-          {'name': 'Sol Ring', 'quantity': 1},
-          {'name': 'sol ring', 'quantity': 1},
-          {'name': 'Arcane Signet', 'quantity': 1},
-          {'name': 'Lorehold, the Historian', 'quantity': 1},
-          {'quantity': 1},
-        ],
-      );
+  test(
+      'loadUsageHotCards SQL avoids cards join fanout across multiple printings',
+      () {
+    final sql = loadUsageHotCardsSql.toLowerCase();
 
-      expect(
-        cards.map((card) => card['name']),
-        equals(['Sol Ring', 'Arcane Signet']),
-      );
-    });
+    expect(sql, contains('left join lateral'));
+    expect(sql, contains('limit 1'));
+    expect(sql, contains('coalesce(card_lookup.canonical_name'));
+    expect(
+      sql,
+      isNot(contains(
+        "join cards c on lower(split_part(c.name, ' // ', 1)) = ccu.card_name_normalized",
+      )),
+    );
+  });
 
-    test('quantity total sums card quantities for learning events', () {
-      expect(
-        learningCardQuantityTotal([
-          {'name': 'Commander', 'quantity': 1, 'is_commander': true},
-          {'name': 'Mountain', 'quantity': 37},
-          {'name': 'Sol Ring', 'quantity': '1'},
-          {'name': 'Bad Input', 'quantity': 0},
-        ]),
-        equals(40),
-      );
-    });
+  test('usageHotCardCanonicalNames caps and prefers canonical names', () {
+    final names = usageHotCardCanonicalNames(
+      [
+        {
+          'canonical_name': 'Jeska\'s Will',
+          'card_name_normalized': 'jeskas will',
+        },
+        {
+          'canonical_name': '',
+          'card_name_normalized': 'unexpected windfall',
+        },
+        {
+          'canonical_name': 'Arcane Signet',
+          'card_name_normalized': 'arcane signet',
+        },
+      ],
+      limit: 2,
+    );
+
+    expect(names, equals(['Jeska\'s Will', 'unexpected windfall']));
   });
 }
