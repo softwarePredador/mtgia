@@ -496,6 +496,9 @@ Leitura correta pós-correção:
 - Registrar por que uma spell jogável foi rejeitada.
 - Ampliar score de alvo de tutor e land-ramp com mais tipos de utility lands e
   estado de mesa; o slice mínimo já cobre high-value/untapped/fetch.
+- Land-tutor activated abilities agora usam o mesmo guardrail de sacrifice-land
+  e target scoring; manter monitoramento em corpus maior para confirmar que
+  utility lands/fronteiras de risco seguem coerentes.
 - Adicionar reason estruturado para pass/no-action em todos os passes de prioridade.
 - Ampliar `decision_type=board_wipe`/`wheel` para corpus maior e melhorar
   hand-quality/payoff-denial: o gate mínimo de timing e o modelo multiplayer v1

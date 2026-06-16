@@ -42,17 +42,36 @@ como default de cron ou optimizer.
 
 ### 2.1 Arquitetura de Turno
 
-Cada turno de cada jogador segue a sequência:
+Cada turno de cada jogador segue a sequência operacional abaixo. O nome
+`play_turn_v8`/`play_turn_sequence_v8` permanece por compatibilidade historica,
+mas o arquivo ativo e `battle_analyst_v9.py`.
 
 ```
 play_turn_sequence_v8(player, opponents, all_players, turn, rng, stack):
-  1. untap_step()       — desvira permanentes
-  2. draw_step()        — compra 1 carta
-  3. precombat_main()   — conjura spells (instants, sorceries, artifacts, creatures)
-  4. combat_step()      — declara atacantes, bloqueadores, dano
-  5. postcombat_main()  — segunda janela de conjuração
-  6. end_step()         — fim do turno, descarte se >7 cartas
+  1. turn_start         — reset de contadores de turno e protecoes temporarias
+  2. untap             — desvira permanentes; sem prioridade
+  3. upkeep            — triggers simplificados, como burden/draw engine
+  4. draw              — compra de turno, miracle/Lorehold e deck-out SBA
+  5. precombat_main    — land drop, triggers de landfall/opponent land play,
+                         ativacoes land-tutor e priority loop de spells
+  6. combat            — beginning of combat, declare attackers, declare blockers,
+                         first strike/regular damage e end of combat
+  7. extra_combat      — ate o cap anti-loop quando efeito agenda combate extra
+  8. postcombat_main   — segunda priority loop de spells
+  9. end_step          — triggers simplificados, warp e uma janela limitada de
+                         instant por oponente
+ 10. cleanup           — descarte ate 7, clear until-EOT e SBA final
 ```
+
+Limitacoes conhecidas desta arquitetura:
+
+- Upkeep ainda nao e uma fila generica completa de todos os triggers possiveis.
+- Cleanup descarta ate sete e roda SBA final, mas ainda nao modela
+  integralmente a excecao CR 514.3a em que SBA/trigger no cleanup gera
+  prioridade e outro cleanup.
+- End-step interaction e limitada por heuristica para evitar loops.
+- O engine e simulador Commander heuristico/auditavel, nao judge engine
+  competitivo completo.
 
 ### 2.2 Sistema de Prioridade (CR 117)
 

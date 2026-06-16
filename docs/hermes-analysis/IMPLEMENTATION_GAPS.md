@@ -109,6 +109,32 @@
   payoff-denial e score por arquétipo para Wheel/board wipe. Não tratar o batch
   limpo como prova universal de ótima jogada.
 
+### Atualizacao de ciclo — 2026-06-16 / Battle Phase Rules Deep Audit
+
+- Criado `BATTLE_PHASE_RULES_DEEP_AUDIT_2026-06-16.md` para cruzar regras
+  oficiais atuais (CR 103/117/500-514/Commander) com o `battle_analyst_v9.py`.
+- Confirmado que o engine ativo esta mais avancado que a descricao historica:
+  possui priority loop APNAP, passos formais de combate, multi-defender,
+  end-of-combat triggers, decision trace e suite de regressao focada.
+- Achado P1 concreto: `activate_land_tutor_creatures()` ainda sacrificava a
+  primeira land e buscava a primeira land da biblioteca, bypassando os
+  guardrails recentes de land-sacrifice/target scoring usados por
+  Crop Rotation/Harrow.
+- Implementado em `battle_analyst_v9.py`: criatura land-tutor agora usa
+  `choose_land_for_resource_cost()`, `choose_land_ramp_targets()` e
+  `land_sacrifice_has_strategic_benefit()`. Jogadas legais porem ruins emitem
+  `activated_ability_skipped` com motivo e contexto auditavel.
+- Testes adicionados em `battle_summoning_sickness_tests.py`:
+  `test_elvish_reclaimer_does_not_sacrifice_unique_color_for_tapped_basic` e
+  `test_elvish_reclaimer_prefers_redundant_tapped_land_for_high_value_target`.
+- Validacao: `python3 -m py_compile` nos arquivos alterados e
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passaram.
+- Pendencias restantes apos esta auditoria: bottom-card selection do London
+  Mulligan, pass/no-action reasons mais ricos, cleanup 514.3a completo,
+  upkeep generico, attack/block restrictions avancadas e threat assessment por
+  player/permanent.
+
 | Categoria | Implementado | Parcial | Ausente/Tracked |
 |---|---|---|---|
 | Turno e Prioridade | 4/10 | 4/10 | 2/10 |

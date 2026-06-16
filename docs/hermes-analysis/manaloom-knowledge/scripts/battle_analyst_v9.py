@@ -5764,16 +5764,42 @@ def activate_land_tutor_creatures(player, turn):
             continue
         if player.available_mana() < 2 or controlled_land_count(player) <= 1:
             continue
-        land_to_sacrifice = next(
-            (land for land in player.battlefield if isinstance(land, dict) and is_effective_land(land)),
-            None,
+        effect_data = {
+            **get_card_effect(permanent),
+            **permanent,
+            "land_count": 1,
+            "lands_to_battlefield": 1,
+            "land_enters_tapped": True,
+        }
+        battlefield_lands = [
+            land for land in player.battlefield
+            if isinstance(land, dict) and is_effective_land(land)
+        ]
+        land_to_sacrifice, land_options, strategic_risk_flags, selection_reason = choose_land_for_resource_cost(
+            battlefield_lands,
+            zone="battlefield",
         )
-        land_to_find = next(
-            (candidate for candidate in player.library if isinstance(candidate, dict) and is_effective_land(candidate)),
-            None,
+        chosen_targets, target_options = choose_land_ramp_targets(player, effect_data, 1)
+        allowed, benefit_reason = land_sacrifice_has_strategic_benefit(
+            strategic_risk_flags,
+            target_options,
+            1,
         )
-        if not land_to_sacrifice or not land_to_find:
+        if not land_to_sacrifice or not chosen_targets or not allowed:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="land_tutor",
+                reason="strategic_guardrail" if land_to_sacrifice and chosen_targets else "missing_land_or_target",
+                land_options=land_options,
+                land_ramp_target_options=target_options,
+                strategic_risk_flags=strategic_risk_flags,
+                strategic_guardrail_reason=benefit_reason,
+                turn=turn,
+            )
             continue
+        land_to_find = chosen_targets[0]
         player.spend_mana(2)
         permanent["tapped"] = True
         player.battlefield.remove(land_to_sacrifice)
@@ -5789,6 +5815,11 @@ def activate_land_tutor_creatures(player, turn):
             effect="land_tutor",
             sacrificed=land_to_sacrifice.get("name", "?"),
             found=found_land.get("name", "?"),
+            land_options=land_options,
+            land_ramp_target_options=target_options,
+            selection_reason=selection_reason,
+            strategic_risk_flags=strategic_risk_flags,
+            strategic_benefit_reason=benefit_reason,
             turn=turn,
         )
         return
