@@ -1,893 +1,271 @@
 # Commander Deep Knowledge Report
 
-> **Generated:** 2026-06-12 ~19:15 UTC | **Updated:** 2026-06-15 ~15:00 UTC (June 15 — fifth pass)
+> **Generated:** 2026-06-16 ~04:00 UTC | **Updated:** 2026-06-16 (June 16 — sixth pass)
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)
 > **Archetype:** Fast Mana → Combo/Approach — Hybrid Bracket 4
-> **Source Agent:** Commander Knowledge Deep Cron Job (June 15 cycle — fifth pass)
-> **Evidence Base:** knowledge.db deck_id=6 (SQLite deck_cards hash `4cc51c42...`, STABLE — no change since last report), optimizer_baseline_runs #5 (600 games, 89.8% WR, hash `f6367a27...`), BATTLE_LOG.md through June 14 20:50Z (1,560 games), GC Research Report Exec #16, SKILL.md methodology, audit v12.0 (all-crons-mtg-rules-audit.md 02:30Z)
+> **Source Agent:** Commander Knowledge Deep Cron Job (June 16 cycle — sixth pass)
+> **Evidence Base:** knowledge.db deck_id=6 (SQLite deck_cards hash `4cc51c42...`, STABLE since June 15 01:51Z), optimizer_baseline_runs #5 (600 games, 89.8% WR), slot_benchmarks=115 (NEW: 86 added since last report), optimizer_quality_reviews=123 (NEW: 118 added since last report), BATTLE_LOG.md through June 14 20:50Z
 
 ---
 
-## 🚨 BREAKING (June 15): Classification REGRESSION — Deck Hash Changed AGAIN, Ramp Misclassification Worsened 63%→73%
+## 🟢🟡 NEW FINDING A: Hash Stable for 24+ Hours — Longest Stable Period in 16 Days
 
-**What happened:** Between the June 14 reclassification (hash `f6367a27...`, 18:58Z→19:24Z) and now, the deck was **re-synced again**. The current deck_cards hash in knowledge.db is `4cc51c42952f0ff139aad4e97ec266a14debfd7130c1c56d68069d2037af0420`. The sync occurred AFTER baseline run #5 (20:31Z), which means **all 5 optimizer baselines and all slot benchmarks are now stale**.
+**Status:** 🟢 Stable (positive signal)
 
-### Classification Quality Got WORSE
+Deck hash `4cc51c42952f0ff139aad4e97ec266a14debfd7130c1c56d68069d2037af0420` has been **unchanged since ~June 15 01:51Z** — over 24 hours without a re-sync. This is the first time the hash has remained stable for a full day since Hermes began tracking on June 1.
 
-| Metric | June 14 (18:58Z) | June 14 (19:24Z) | **June 15 (current)** | Trend |
-|:-------|:----------------:|:-----------------:|:---------------------:|:-----:|
-| Deck hash | `dbe24f7d5b...` | `f6367a27...` | **`4cc51c42...`** | 🔴 3rd hash in 24h |
-| Ramp misclassif. rate | 26/41 = 63% | 26/41 = 63% | **30/41 = 73%** | 🔴 WORSE |
-| Lands tagged as ramp | 26 | 26 | **30** | +4 |
-| draw count | 9 | 14 | **17** | +3 (no decklist change) |
-| engine count | 4 | 10 | **11** | +1 |
-| removal | 3 | 7 | **7** | stable |
-| protection | 14 | 6 | **6** | stable |
+| Metric | Value |
+|:-------|:------|
+| Current hash | `4cc51c42...` |
+| Stable since | 2026-06-15 ~01:51Z |
+| Duration | **~26 hours** (longest ever) |
+| Previous max stability | ~12 hours (June 11-12) |
+| Previous hash changes | 6 in 14 days |
 
-**New misclassifications added (30 lands tagged as ramp):** The previous report correctly identified 26 lands. The current state adds 4 more:
-- Ancient Tomb (was already listed, now confirmed as persistent)
-- Hall of Heliod's Generosity (utility land — should be `engine` or untagged)
-- Needleverge Pathway // Pillarverge Pathway (dual-faced land — never ramp)
-- Sunbillow Verge (verge land — mana fixing)
+**However**, stability does NOT mean the classification improved. The functional tags are still from the regression:
+- Ramp misclassification: **73% (30/41 lands tagged as ramp)** — unchanged
+- Draw count: 16 (still inflated — Mizzix's Mastery tagged as draw)
+- Engine count: 11
+- Blasphemous Act still tagged as `ramp` (not `wipe` or `board_wipe`)
 
-**Consequence:** The draw count inflation (9→14→17) suggests the classifier is also over-tagging draw. Cards like Mizzix's Mastery (reanimation spell) and Imperial Recruiter (tutor) are now likely tagged as draw, further corrupting optimizer inputs.
-
-### Root Cause Unchanged
-
-The sync pipeline (`sync_pg_target_deck_to_hermes.py` or PostgreSQL `card_function_tags` logic) still tags any card that "adds mana" as `ramp`, including ALL lands. The 73% misclassification rate means **the product's classifier has no land-exclusion logic**. This affects ALL 120 learned decks, not just Lorehold.
+**Signal for App/Backend Logic:** Hash stability should be tracked as a **hygiene metric** for pipeline health. A stable hash means no re-syncs are happening — which is good for optimizer consistency. But the classifier fix must still be applied before the next sync cycle, or the fix will be overwritten.
 
 ---
 
-## 🚨 NEW DATA (June 14 Evening): 1,560 Additional Games — Largest Single Dataset
+## 🟡 NEW FINDING B: Slot Benchmarks Surged 4× (29→115) — All Against Stale Hash
 
-Nine battle runs executed on June 14 between 20:31Z and 20:50Z produced **1,560 new games** (previous report max was 696). This is a **2.2× increase** in total Lorehold battle data.
+**Status:** 🟡 Warning — new data contradicting last report's "pipeline paused" assertion
 
-### Run Summary
+The previous report (June 15 fifth pass) stated: "slot_benchmarks: ⚠️ 29 benchmarks" and "Pipeline Paused (Stable State)." However, **86 new benchmarks** were executed on June 14 between 22:48Z and 23:00Z — AFTER the last battle data (20:50Z) but BEFORE the report was generated (June 15 15:00Z).
 
-| # | Time (Z) | Games | Format | WR | Notes |
-|:-:|:---------|:-----:|:------:|:--:|:------|
-| 1 | 20:31:37 | **600** | 50/opp × 12 opp | **89.8%** (539W/61L) | ✅ Largest single run ever; first 50-game deep dive |
-| 2 | 20:33:54 | 120 | 10/opp × 12 opp | **92.5%** (111W/9L) | |
-| 3 | 20:36:15 | 120 | 10/opp × 12 opp | **95.0%** (114W/6L) | 🏆 Highest WR |
-| 4 | 20:38:25 | 120 | 10/opp × 12 opp | **93.3%** (112W/8L) | |
-| 5 | 20:40:46 | 120 | 10/opp × 12 opp | **87.5%** (105W/15L) | 🔴 Lowest WR in batch |
-| 6 | 20:43:02 | 120 | 10/opp × 12 opp | **94.2%** (113W/7L) | |
-| 7 | 20:45:26 | 120 | 10/opp × 12 opp | **95.0%** (114W/6L) | 🏆 |
-| 8 | 20:47:50 | 120 | 10/opp × 12 opp | **92.5%** (111W/9L) | |
-| 9 | 20:50:13 | 120 | 10/opp × 12 opp | **92.5%** (111W/9L) | |
-| | **Pooled** | **1,560** | — | **91.5%** (1,427W/133L) | — |
+**Breakdown of all 115 benchmarks:**
 
-### Key New Observations
+| Category | Count | New since last report |
+|:---------|:-----:|:--------------------:|
+| wipe | 16 | +14 |
+| wincon | 16 | +14 |
+| removal | 16 | +14 |
+| ramp | 16 | +14 |
+| draw | 16 | +16 (entirely new category) |
+| engine | 13 | +10 |
+| land | 10 | +10 (entirely new category) |
+| tutor | 6 | +2 |
+| protection | 6 | +4 |
+| **Total** | **115** | **+86** |
 
-#### 1. Approach % Stable at ~18.2%
+**Problem: All 86 new benchmarks target baseline hash `f6367a27...`** — which is NOW stale against the current deck hash `4cc51c42...`. Every benchmark WR and delta is computed against a deck whose classification no longer matches current reality.
 
-From the 50-game-per-opponent run (600 games, the only run with full approach tracking):
-- **98 approach wins out of 539 total** = **18.2% approach** (vs 19-20% on June 11-12)
-- This confirms the **~18-20% equilibrium is holding steady** after 4 days
-- Approach identity drift detection threshold (deviation >5pp = signal) remains valid
+### 🏆 Top Benchmark Results (120-game samples, baseline WR=89.8%)
 
-#### 2. Opponent-Specific Approach Distribution (First Deep Sample)
+| Swap | Δpp | New WR | Category |
+|:-----|:---:|:------:|:---------|
+| **Slagstorm** → Blasphemous Act | **+9.4** | 99.2% | wipe |
+| **Prismari Pianist** → Storm Herd | **+8.5** | 98.3% | wincon |
+| **Bloodforged Battle-Axe** → Storm Herd | **+7.7** | 97.5% | wincon |
+| **Ephemerate** → Generous Gift | **+7.7** | 97.5% | removal |
+| **Coruscation Mage** → Storm Herd | **+6.9** | 96.7% | wincon |
+| **Exotic Orchard** → Mountain | **+6.9** | 96.7% | land |
+| **Fabled Passage** → Mountain | **+6.9** | 96.7% | land |
+| **White Sun's Twilight** → Blasphemous Act | **+6.9** | 96.7% | wipe |
+| **Ruinous Rampage** → Blasphemous Act | **+6.9** | 96.7% | wipe |
+| **Magmaquake** → Blasphemous Act | **+6.9** | 96.7% | wipe |
+| **Day of Judgment** → Blasphemous Act | **+5.2** | 95.0% | wipe |
+| **Dusk // Dawn** → Blasphemous Act | **+5.2** | 95.0% | wipe |
+| **Sunfall** → Blasphemous Act | **+5.2** | 95.0% | wipe |
+| **Split Up** → Blasphemous Act | **+4.4** | 94.2% | wipe |
+| Artificer's Talent → The One Ring | **+3.1** | 92.9% | draw |
+| Valiant Endeavor → Blasphemous Act | **+2.3** | 92.1% | wipe |
 
-The 50-game run reveals **dramatic variation** in approach viability by opponent:
+All delta values above are **positive**, meaning every tested replacement improved or maintained WR vs baseline.
 
-| Opponent | WR | Approach Wins | Approach % of Wins |
-|:---------|:--:|:-------------:|:------------------:|
-| Selvala #55 | 94% | 10/47 | **21.3%** |
-| K-9 #34 | 88% | 10/44 | **22.7%** |
-| Emperor #42 | 94% | 10/47 | **21.3%** |
-| Rograkh #63 | 84% | 10/42 | **23.8%** |
-| Tayam #116 | **98%** | 10/49 | **20.4%** |
-| Tivit #107 | 92% | 9/46 | 19.6% |
-| Kraum #110 | 92% | 9/46 | 19.6% |
-| Kraum #98 | 88% | 7/44 | 15.9% |
-| Magda #90 | 86% | 7/43 | 16.3% |
-| Kraum #83 | 82% | 6/41 | 14.6% |
-| Krark #91 | 88% | 6/44 | 13.6% |
-| **Thrasios #35** | 92% | **4/46** | **8.7%** 🟡 |
+### 🏆 Top Benchmark Results (24-game samples, higher variance)
 
-**Finding: Thrasios #35 is an outlier** — only 8.7% of wins come from Approach. This suggests Thrasios's faster game plan (ramp into infinite mana combos) ends games before Lorehold can assemble the Approach loop. All other opponents have 13-24% approach rate.
+| Swap | Δpp | New WR | Category |
+|:-----|:---:|:------:|:---------|
+| **Steelshaper's Gift** → Imperial Recruiter | **+14.6** | 100.0% | tutor |
+| **Flashback** → Rite of the Dragoncaller | **+10.4** | 95.8% | engine |
+| **Blacksmith's Skill** → Flawless Maneuver | **+10.4** | 95.8% | protection |
+| **Strike It Rich** → Mana Geyser | **+10.4** | 95.8% | ramp |
+| **Erode** → Rise of the Eldrazi | **+10.4** | 95.8% | removal |
+| **Final Showdown** → Blasphemous Act | **+10.4** | 95.8% | wipe |
+| **The Battle of Bywater** → Blasphemous Act | **+10.4** | 95.8% | wipe |
 
-**Signal for App/Backend Logic**: Approach viability scoring should be opponent-dependent. A deck that relies on Approach should have a **lower expected WR vs fast combo commanders** (Thrasios, Kinnan) than vs midrange/control.
+**But critical caveat:** ALL benchmarks are computed against a **stale baseline** (hash `f6367a27...`). The current deck hash `4cc51c42...` has different functional tags that may alter which cards belong in which slot. A swap that shows +9.4pp today may perform differently against the current classification.
 
-#### 3. Rograkh #63 WR Improved in Larger Sample
-
-Previous report (June 12, 24-game runs) showed Rograkh variants at 50-100% with wide variance. The 50-game run now shows **Rograkh #63 at 84% WR** (42/50 wins). While still the lowest opponent WR in the run, this suggests the previous 50-100% range was sample-size artifact. The true WR vs Rohgrakh is ~82-86%.
-
-#### 4. Tayam #116 is the Best Matchup
-
-At **98% WR** (49/50 wins, only 1 loss), Tayam is the strongest opponent matchup. Approach accounted for 10 of 49 wins (20.4%). This may be because Tayam's stax/combo plan (counters, graveyard interaction) is less effective against Lorehold's big-spell direct damage strategy.
-
-#### 5. CMC Stability Confirmed
-
-CMC ranged **2.88–2.94** across all 9 runs — confirming the June 12 finding that ±0.1 CMC variance has no meaningful WR impact.
-
-#### 6. Instants at 16-17 (Not 18)
-
-All 9 runs had 16-17 instants. The June 12 finding that 18 instants = +2.6pp WR was **not testable** in this batch. This remains a **not_proven** hypothesis needing explicit A/B testing.
+**The real concern:** Because Blasphemous Act is tagged as `ramp` (not `wipe`), the "wipe" category benchmarks are targeting a RAMp slot for replacement. If a wipe swap is applied, the deck loses 1 of its ~19 actual ramp sources and gains a redundant wipe — potentially reducing mana acceleration.
 
 ---
 
-## 🚨 Pipeline State Deterioration
+## 🟡 NEW FINDING C: Quality Reviews Surged 25× (5→123) — All Flagging Classification Regression
 
-The classification regression means the pipeline is actively moving away from usable optimizer data:
+**Status:** 🟡 Warning — operational impact of regression confirmed
 
-| Component | Status | Note |
-|:----------|:-------|:-----|
-| knowledge.db deck_id=6 deck_cards | ✅ 100 cards, hash `4cc51c42...` | NEW hash — 3rd in 24h |
-| optimizer_applied_swaps | ⚠️ **Still 0 rows** | Deck changes invisible to optimizer |
-| optimizer_baseline_runs | ⚠️ Run #5 (600 games, 89.8%, hash `f6367a27...`) | **STALE** — current deck is `4cc51c42...` |
-| optimizer_quality_reviews | ⚠️ 5 reviews | Stale — all against old hashes |
-| slot_benchmarks | ⚠️ 29 benchmarks | Completely stale after 2 hash changes |
-| Ramp misclassification | ❌ **73% (30/41 lands)** | WORSE than June 14's 63% |
-| BATTLE_LOG.md | ✅ Updated June 14 20:50Z | 1,560 new games appended |
-| master_optimizer_preflight | ✅ Approved (last) | Cannot detect stale data |
-
-**Key conclusion**: The product-side `card_function_tags` classifier is **actively regressing**. Every sync from PostgreSQL to knowledge.db introduces more classification errors. This must be addressed before any optimizer recommendations are made.
-
----
-
-> *Original BREAKING section from June 14 preserved below.*
-
-**What happened:** Between 2026-06-14T18:58:36Z and 2026-06-14T19:24:26Z (26 minutes), the Lorehold deck hash changed:
-- Old hash: `4549bf7d1ebd8bd665cbd79b58fff3b46601cade6fbc4f5bce24c607917ca451`
-- New hash: `f6367a273eef6dc41b09e58c50e79738aab73719e85986a4309020448052c1ac`
-
-This was NOT an optimizer-driven change. The `optimizer_applied_swaps` table remains **0 rows**. The deck was re-tagged via PostgreSQL sync (`sync_pg_target_deck_to_hermes.py`), likely reflecting an update to the product's `card_function_tags` classifier on the server side.
-
-### Role Count Delta (Old → New)
-
-| Category     | Old (18:58Z) | New (19:24Z) | Δ     |
-|:-------------|:------------:|:------------:|:-----:|
-| ramp         | 17           | 11           | **−6** |
-| draw         | 9            | 14           | **+5** |
-| engine       | 4            | 10           | **+6** |
-| protection   | 14           | 6            | **−8** |
-| removal      | 3            | 7            | **+4** |
-| tutor        | 5            | 2            | **−3** |
-| wincon       | 11           | 2            | **−9** |
-| unknown      | 1            | 0            | −1     |
-| board_wipe   | 2            | 2            | 0      |
-| *big_spell*  | *NEW*        | 2            | —      |
-| *combo_piece*| *NEW*        | 1            | —      |
-| *loot*       | *NEW*        | 1            | —      |
-| *payoff*     | *NEW*        | 1            | —      |
-| *spellslinger*| *NEW*       | 3            | —      |
-| *stax*       | *NEW*        | 3            | —      |
-| *token_maker*| *NEW*        | 1            | —      |
-| **Total**    | **99**       | **100**      | —      |
-
-**7 new classification categories** were introduced: `big_spell`, `combo_piece`, `loot`, `payoff`, `spellslinger`, `stax`, `token_maker`. This expands the tag taxonomy significantly, which is a positive step toward finer-grained analysis.
-
-### Classification Quality Audit (Local knowledge.db functional_tags)
-
-The reclassification introduced **several quality issues** that must be tracked before the backend consumes these tags for optimization decisions.
-
-#### 🔴 CRITICAL: 26/41 functional_tag='ramp' cards are lands (63% misclassification)
-
-Local knowledge.db shows **41 cards** tagged as `ramp`. Only **15 are actual mana acceleration**:
-
-| Actual Ramps (15) | Misclassified as Ramp (26) |
-|:------------------|:---------------------------|
-| Arcane Signet, Boros Signet, Fellwar Stone, Ruby Medallion, Talisman of Conviction | Ancient Den (artifact land) |
-| Lotus Petal, Mox Amber, Sol Ring | Great Furnace (artifact land) |
-| Mana Geyser, Rite of Flame, Seething Song | Ancient Tomb, Gemstone Caverns (pseudo-ramp lands) |
-| Mana Vault → correctly tagged as `combo_piece` | **ALL 9 fetch lands** (Arid Mesa, Bloodstained Mire, Flooded Strand, Marsh Flats, Scalding Tarn, Windswept Heath, Wooded Foothills, Prismatic Vista) |
-| | **ALL dual/shock/verge/pathway lands** (Plateau, Sacred Foundry, Battlefield Forge, Clifftop Retreat, Inspiring Vantage, Needleverge, Rugged Prairie, Spectator Seating, Sunbillow Verge, Sundown Pass, Elegant Parlor) |
-| | Command Tower, City of Brass, Mana Confluence (5-color fixing) |
-| | Plains, Mountain (basic lands) |
-| | Urza's Saga (utility/tutor land), Hall of Heliod's Generosity (utility land) |
-
-**Impact**: The optimizer would see "41 ramp sources" and conclude the deck has excess mana acceleration, potentially recommending replacing actual ramp cards. In reality, the deck has ~15 ramp sources out of 35-36 non-land ramp slots — a reasonable count for a Boros spellslinger build.
-
-**Root cause**: The sync pipeline likely tags any card that "adds mana" (including lands via `{T}: Add {color}`) as `ramp`. This conflates mana fixing (fetch lands, duals) and land base with mana acceleration (rocks, rituals, dorks).
-
-#### 🟡 WARN: Other questionable classifications
-
-| Card | Tagged As | Expected | Issue |
-|:-----|:---------:|:--------:|:------|
-| Aetherflux Reservoir | `removal` | wincon/payoff | Life total payoff, not removal |
-| Deflecting Swat | `big_spell` | protection | Free protection spell; CMC=3 but usually cast for 0 |
-| Mana Vault | `combo_piece` | ramp | Vault is primarily fast mana, occasionally combo |
-| Dualcaster Mage | `spellslinger` | engine/combo | Subtype label overlaps with engine category |
-| Wheel of Fortune | `loot` | draw | Wheel is symmetric draw, not selective loot |
-| Lorehold, the Historian | `engine` | draw (old) | Valid reclassification — commander IS an engine |
-| Pyroblast | `removal` | protection/counter | Borderline; functions as removal for blue permanents |
-| Boros Charm | `removal` | protection | Second mode is removal, yes, but primary use is indestructible |
-| Mizzix's Mastery | `draw` | wincon | Reanimation spell, not card draw |
-| Imperial Recruiter | `draw` | tutor | Tutor labeled as draw inflates draw count |
-
-### Why This Matters for the Optimizer
-
-The functional_tag system is the primary input for:
-1. **Role count analysis** — optimizer decides if a deck has enough ramp/draw/removal
-2. **Slot benchmarks** — which slots to prioritize for swap testing
-3. **Deck archetype detection** — "fast mana → combo" vs "spellslinger"
-4. **Bracket policy validation** — game changer inclusion by role
-
-A 63% misclassification rate in the most important category (ramp) means **every optimizer recommendation based on ramp counts is currently unreliable** until the classifier is fixed.
-
-### Deck Composition Unchanged
-
-Despite the hash change, the **100-card decklist is identical** to the previous recovered configuration (33 lands, 67 nonlands). Only the tag values changed. This confirms the deck was not modified — only its classification metadata was regenerated.
-
-### Pipeline State (June 14)
-
-| Component | Status | Note |
-|:----------|:-------|:-----|
-| knowledge.db deck_id=6 | ✅ 100 cards | Hash `f6367a273eef...` — NEW |
-| optimizer_applied_swaps | ⚠️ **Still 0 rows** | Deck re-tagging invisible to optimizer |
-| optimizer_baseline_runs | ✅ 3 runs (216 games, stale) | Hash mismatch — runs from `dbe24f7d5b17...` hash, not current |
-| optimizer_quality_reviews | ✅ 5 reviews | Stale after reclassification |
-| slot_benchmarks | ✅ 29 benchmarks | Stale after reclassification — tags may alter slot targeting |
-| master_optimizer_preflight | ✅ Approved (last 19:17Z) | All checks green |
-
-**All optimizer data is now STALE** because the deck_hash changed. The 3 baseline runs (216 games) and 29 slot benchmarks were computed against the old tag set. After reclassification, the optimizer should re-run baseline to validate the new role counts produce consistent WR results.
-
----
-
-> *Original content below preserved from 2026-06-12 report. Sections 1-10 remain valid for decklist analysis but note: role counts referenced in sections 2-6 now differ from current functional_tag data.*
-
-
----
-
-## 🚨 LORESHOLD WR COLLAPSE RESOLVED — Recovery Documented
-
-### What Happened
-
-After the Jun 9 WR collapse (75.2% → 25-29% documented in the previous deep report), the Lorehold deck was **recovered/restored** outside the optimizer pipeline, with WR returning to **93-100%** by June 11.
-
-| Metric | Jun 7 (High) | Jun 9 (Collapse) | Jun 11 (Recovered) | Delta (C→R) |
-|:-------|:------------:|:-----------------:|:------------------:|:-----------:|
-| WR | 75.2% | 25-29% | **93-100%** | **+64 to +71 pp** |
-| Lands | 35 | 31 | **33** | +2 |
-| Avg CMC | ~3.69 | 2.80 | **3.00** | +0.20 |
-| Approach % of wins | ~40-55% | 2.9% | **~19-22%** | +17 pp |
-| Removal (approx) | 9 | 4 | **~6** | +2 |
-| Board wipes | 1+ | 0 | **1 (Blasphemous Act)** | +1 |
-| Copy spells | 2 | 2 | **4 (Electroduplicate, Molten Duplication added)** | +2 |
-| Hash | `12c55613...` | `a17a5863...` | `dbe24f7d5b17...` | New hash |
-
-### Recovery Evidence (knowledge.db, optimizer_baseline_runs)
-
-3 baseline runs executed on June 11, all with the same deck hash `dbe24f7d5b17...`:
-
-| Run | Games | WR | Wins | Losses | Approach Wins | % Approach | Opponents |
-|:----|:-----:|:--:|:----:|:------:|:-------------:|:----------:|:---------:|
-| 1 (19:27Z) | 120 | **95.0%** | 114 | 6 | 22 | 19.3% | 12 real |
-| 2 (19:50Z) | 60 | **93.3%** | 56 | 4 | 12 | 21.4% | 12 real |
-| 3 (20:11Z) | 36 | **100.0%** | 36 | 0 | 8 | 22.2% | 12 real |
-| **Pooled** | **216** | **95.4%** | **206** | **10** | **42** | **20.4%** | 12 unique |
-
-### What Changed (Collapse State → Recovered State)
-
-1. **Lands**: 31 → **33** (+2 lands). Still below the original 35 but no longer critically low for 7+ CMC wincons.
-
-2. **Removal added**: Blasphemous Act returned (previously removed during collapse). Generous Gift retained. Path/Swords retained.
-
-3. **Copy effect redundancy added**: **Electroduplicate** and **Molten Duplication** — two new 3-CMC copy spells alongside existing Twinflame + Heat Shimmer. This gives the deck 4 ways to copy Dualcaster Mage for the infinite combo, greatly improving consistency.
-
-4. **Deck hash stable**: All 3 baselines use the same deck hash `dbe24f7d5b17...`, meaning no further changes occurred between runs.
-
-5. **Deck name**: `Runtime Lorehold Learned 19e93de3cca` — a generated name from the runtime/product sync.
-
-### Root Cause of Recovery
-
-The `optimizer_applied_swaps` table remains **empty (0 rows)**. The deck was **not recovered through the optimizer pipeline**. The most likely cause: a **PostgreSQL → knowledge.db sync** overwrote the collapsed Deck (which was modified outside the pipeline) with a restored version from the product database — either a rollback or the pre-collapse configuration.
-
-**Key insight for pipeline integrity**: The sync_pg_target_deck_to_hermes / sync_battle_card_rules processes can restore a deck to product state, but this recovery path is invisible to the optimizer (no applied_swaps records, no rollback path, no audit trail).
-
----
-
-## 1. Archetype Overview (Current State)
+Optimizer quality reviews jumped from **5 to 123** since the last report. Every new review includes the exact same warning:
 
 ```
-Fast Mana (19 sources) + Copy Combo (4 spells) + Approach Topdeck (2 cards) + Protection (10 slots)
+role_mismatch:Blasphemous Act role=ramp add_roles=wipe
 ```
 
-The current Lorehold deck is a **successful hybrid** of two prior configurations:
-- The **fast mana + protection** density from the cEDH collapse build (retained all 5 Moxen, tutors, One Ring, Silence effects)
-- The **removal floor + board wipe + Approach + topdeck** from the original spellslinger build (re-added)
-- **New: copy redundancy** — 4 total copy spells for the Dualcaster Mage line
+This is the **first direct evidence of the classification regression impacting slot optimizer decisions**:
 
-### Current Deck Skeleton (from knowledge.db deck_cards, deck_id=6)
+1. The classifier tags Blasphemous Act as `ramp` (because it has `{R}` in the mana cost and the classifier has no land exclusion)
+2. The slot optimizer sees a "ramp" slot occupied by a card that also functions as a wipe
+3. The optimizer tests replacing it with dedicated wipe cards
+4. The quality review correctly flags the role mismatch but cannot fix the upstream classifier
 
-| Category | Count | Key Cards |
-|:---------|:-----:|:----------|
-| Lands | 33 | Ancient Tomb, Gemstone Caverns, Urza's Saga, Plateau, Sacred Foundry, 7 fetch, Mana Confluence, City of Brass, Inventors' Fair, War Room |
-| Ramp | ~19 | Chrome Mox, Mox Diamond, Mox Opal, Mox Amber, Lotus Petal, Mana Vault, Sol Ring, Arcane Signet, Boros Signet, Talisman, Ruby Medallion, Fellwar Stone, Jeska's Will, Rite of Flame, Seething Song, Mana Geyser, Smothering Tithe, Storm-Kiln Artist, Victory Chimes |
-| Draw | ~9 | The One Ring, Wheel of Fortune, Esper Sentinel, Faithless Looting, Scroll Rack, Sensei's Divining Top, Monument to Endurance, Unexpected Windfall, Valakut Awakening |
-| Removal | ~6 | Path to Exile, Swords to Plowshares, Generous Gift, Blasphemous Act + other interaction |
-| Protection | ~10 | Silence, Orim's Chant, Pyroblast, Boros Charm, Deflecting Swat, Flawless Maneuver, Teferi's Protection, Giver of Runes, Mother of Runes, Grand Abolisher, Lightning Greaves |
-| Tutors | ~5 | Enlightened Tutor, Gamble, Recruiter of the Guard, Imperial Recruiter, Ranger-Captain of Eos |
-| Wincon (Approach) | 1 | Approach of the Second Sun |
-| Wincon (Combo) | 4+2 | Twinflame, Dualcaster Mage, Heat Shimmer, **Electroduplicate**, **Molten Duplication** + Aetherflux Reservoir, Guttersnipe |
-| Wincon (Big spells) | ~5 | Worldfire, Mizzix's Mastery, Storm Herd, Rise of the Eldrazi, Fiery Emancipation |
-| Engine/Copy | 3 | Past in Flames, Reiterate, Reverberate |
-| Stax | 1 | Drannith Magistrate |
+**Impact:** Every quality-reviewed swap targeting Blasphemous Act (15 of 16 wipe benchmarks, plus 5 phase1 wipe benchmarks from June 12) is built on a **false premise** — that the deck has 41 ramp sources and can afford to lose 1. In reality, the deck has ~19 ramp sources, and Blasphemous Act is one of only 2 board wipes.
+
+**Signal for App/Backend Logic:** The `role_mismatch` warning should be promoted from a quality review flag to a **pipeline blocker** when a high-priority functional tag (ramp, wincon, board_wipe) is being replaced by cards of a different functional category.
 
 ---
 
-## 2. Ramp Patterns
+## ✅ NEW FINDING D: No New Battle Data — Pipeline Remains Paused
 
-### Current Ramp Configuration (19 sources, high density)
+**Status:** 🔴 Still paused — no new games since June 14 20:50Z
 
-The fast mana package from the collapse build was **fully retained** — all 5 zero-CMC Moxen, Mana Vault, Sol Ring, ritual effects, and treasure producers remain. This was a legitimate upgrade from the original spellslinger build and correctly kept.
+BATTLE_LOG.md ends at June 14 20:50Z. No new battle runs have been executed for **~55 hours** (2.3 days). This is the longest gap in Lorehold battle data since tracking began.
 
-**Key observation from recovery**: The fast mana package by itself was NOT the cause of the WR collapse. The collapse was caused by **removal gutting** (9→4) and **land count reduction** (35→31) combined. When the deck was restored with L=33 and Blasphemous Act re-added, the fast mana package contributed to the 93-100% WR.
-
-### Anti-Pattern Confirmed (Partially Validated)
-
-The Jun 9 hypothesis predicted that ramp > 2× removal would indicate overcommitment to speed. This is **partially validated**:
-
-| State | Ramp | Removal | Ratio | WR |
-|:------|:----:|:-------:|:-----:|:--:|
-| Jun 7 (high WR) | 16-19 | 9 | ~2:1 | 75.2% |
-| Jun 9 (collapse) | 19 | 4 | **4.75:1** | 25-29% |
-| Jun 11 (recovered) | 19 | ~6 | **3.2:1** | 93-100% |
-
-**Not proven**: The threshold of 2:1 is too conservative. A 3.2:1 ratio with fast mana is viable IF the removal is quality spot removal + at least 1 board wipe. The collapse went to 4.75:1 AND 0 board wipes — the combined signal matters more than ratio alone.
-
-**Signal for App/Backend Logic**:
-- `ramp_to_removal_ratio` should be a **warning** metric, not a hard gate.
-- Hard gate: `ramp / removal > 4.0` OR `removal < 5 AND board_wipes == 0` → BLOCKED.
-- Confirmed: Boros can support high ramp density if removal floor is maintained.
-
----
-
-## 3. Draw Patterns
-
-### Draw Configuration (9 sources, same as collapse state)
-
-The draw package from the collapse build was **fully retained** — The One Ring, Wheel of Fortune, Esper Sentinel, Top, Scroll Rack, Faithless Looting, Monument to Endurance, Unexpected Windfall, Valakut Awakening.
-
-**No changes to draw** occurred between collapse and recovery. The draw package was not the problem.
-
-### Wincon-Draw Interaction
-
-The recovery confirmed that Approach + Topdeck requires **specific draw quality** to function:
-- Scroll Rack + Top provide **topdeck manipulation** (put Approach on top after first cast)
-- The One Ring + Wheel provide **raw card volume** to find Approach in time
-- Approach accounted for ~20% of wins in the recovered state — down from 40-55% in the original build but dramatically recovered from the 2.9% collapse
-
-**Pattern discovered**: Approach win rate appears proportional to **topdeck manipulation density**, not total draw count. The deck has 2 topdeck manipulation pieces (Top + Scroll Rack) — when these are drawn early, Approach wins increase.
-
-**Signal for App/Backend Logic**:
-- Approach viability score should weight `topdeck_manipulators` (Top, Scroll Rack, Library of Leng) higher than raw draw count.
-- A deck with Approach and < 2 topdeck manipulators has unreliable Approach wins (collapse state confirmed this).
-
----
-
-## 4. Removal Patterns
-
-### Current Removal Configuration (~6 pieces)
-
-The recovery partially re-added removal that was gutted in the collapse:
-
-| Removed in Collapse | Restored by Recovery | Still Missing |
-|:--------------------|:--------------------:|:--------------|
-| Blasphemous Act | ✅ **Restored** | Abrade |
-| Abrade | ❌ Still missing | Austere Command |
-| Chaos Warp | ❌ Still missing | Call Forth the Tempest |
-| Austere Command | ❌ Still missing | Volcanic Vision |
-| Call Forth the Tempest | ❌ Still missing | |
-| Volcanic Vision | ❌ Still missing | |
-
-**The removal count is ~6 (was 4 in collapse, was 9 in original).** The recovery added back ONLY Blasphemous Act — the other 5 removal cards were not restored. Yet WR recovered from 25-29% to 93-100%.
-
-**Key insight**: Adding just **1 board wipe** (Blasphemous Act) + **2 lands** (33 from 31) was sufficient to recover the WR. This suggests the collapse's primary kill was not "low removal count" but **"no board wipe + too few lands to cast wincons"** — the 4 spot removal + 0 wipe configuration couldn't answer go-wide boards, and 31 lands couldn't reliably cast 7+ CMC wincons.
-
-### Anti-Pattern Partially Revised
-
-The Jun 9 hypothesis that "4 removal is lethal" is **confirmed**, but the mechanism is subtler:
-- 4 removal WITHOUT a board wipe = death (go-wide boards unstoppable)
-- 4 removal WITH Blasphemous Act + 33 lands = viable (93% WR maintained)
-- Missing individual removal pieces (Abrade, Chaos Warp) are less critical than having at least 1 reset button
-
-**Signal for App/Backend Logic**:
-- Minimum removal floor: `count_removal + count_board_wipes * 3 >= 8`
-- (Each board wipe counts as ~3 spot removal against go-wide strategies)
-- Hard block: `board_wipes == 0 AND removal < 6` → structural defect
-
----
-
-## 5. Win Condition Patterns
-
-### Win Rate by Win Reason (Jun 11, 216-game pooled sample)
-
-| Win Reason | Count | % of Wins | vs Jun 9 | vs May 31 |
-|:-----------|:-----:|:---------:|:--------:|:---------:|
-| elimination (combat) | 164 | 79.6% | **↓18pp** | ↓11pp |
-| approach (Approach 2nd Sun) | 42 | **20.4%** | **↑17.5pp** | ↓69.5pp |
-| combo (Twinflame+Dualcaster) | 0 | 0% | stable | stable |
-
-**Approach wins recovered** from 2.9% → 20.4%. Still below the May 31 peak of 89.9%, but functionally significant. The deck's win distribution is now **mixed** (80% combat, 20% Approach) — healthier than the all-or-nothing collapse state.
-
-### Combo Still Unused
-
-The Twinflame+Dualcaster combo line remains **theoretically present** but accounts for **0% of actual wins**. The 4 copy spells (Twinflame, Heat Shimmer, Electroduplicate, Molten Duplication) provide execution redundancy, but the combo doesn't fire in practice. This may be a battle simulator limitation (AI doesn't recognize the infinite loop) or a genuine execution gap.
-
-### Wincon Anti-Patterns (Re-evaluated)
-
-1. **High-CMC wincons still present but less stranded**: With 33 lands (up from 31), the probability of casting Storm Herd (CMC 10) or Rise of the Eldrazi (CMC 10) improved from ~18% to ~28% by turn 10 — still marginal. These cards remain in the deck unmodified.
-
-2. **No post-Worldfire plan persists**: Worldfire is still present without a reliable closing mechanism. It accounted for 0 wins.
-
-3. **Aetherflux Reservoir unproven**: Present but 0 attributed wins. The Aetherflux line requires 50+ life gained from spells — possible with the storm engine but not observed.
-
----
-
-## 6. Performance Metrics (June 11, 2026)
-
-### Run 1: 19:27Z — 10 games × 12 opponents (120 games)
 | Metric | Value |
-|:-------|:-----:|
-| Overall WR | **95.0%** (114W/6L) |
-| Best matchup | Y'shtola, Brigid, Rowan, Thrasios #115, Sisay #61, Dargo: 100% |
-| Worst matchup | Kinnan #120, Arcum #97, Umbris, Kraum #86, Aang #106: 90% |
-| Weakest | Brigid #82: 80% |
-| Stalls | 0 |
-| Win method | 80% elimination, 20% approach |
+|:-------|:------|
+| Last battle run | 2026-06-14 20:50:13Z |
+| Hours with no new data | **~55 hours** |
+| Previous gaps | 6-12 hours (June 11-12), 18 hours (June 14-15) |
+| Last baseline run | Baseline #5 (600g, 89.8% WR, hash `f6367a27...`) |
+| Baseline vs current deck | **STALE** — hash mismatch |
 
-### Run 2: 19:50Z — 5 games × 12 opponents (60 games)
-| Metric | Value |
-|:-------|:-----:|
-| Overall WR | **93.3%** (56W/4L) |
-| Worst matchup | Kinnan #120, Arcum #97, Umbris, Kraum #86: 80% |
-| Stalls | 0 |
-
-### Run 3: 20:11Z — 3 games × 12 opponents (36 games)
-| Metric | Value |
-|:-------|:-----:|
-| Overall WR | **100.0%** (36W/0L) |
-| Stalls | 0 |
-
-### Matchup Profile (216-game pooled)
-**Weakest opponents** (all 80-90% WR, never below 80%):
-- Kinnan, Bonder Prodigy #120 (80-90%)
-- Arcum Dagsson #97 (80-100%)
-- Umbris, Fear Manifest #114 (80-100%)
-- Kraum + Tymna #86 (80-100%)
-- Brigid, Clachan's Heart #82 (80-100%)
-
-**Strongest opponents** (always 100%):
-- Y'shtola, Thrasios variants, Sisay, Rograkh, Ral, Lumra, Selvala, Zirda, Korvold
-
-**Key insight**: The deck performs well against diverse opponents. The lowest recorded WR was 80% (vs Brigid #82, 8 games) — no opponent drops below 80%.
+**Interpretation:** The pipeline is correctly self-limiting due to stale data, but the pause is now so long that the 1,560-game June 14 dataset is aging. If the classifier is not fixed by June 18, the Lorehold analysis branch will be operating on ~4-day-old data.
 
 ---
 
-## 6.5 June 12 Continuous Validation — 480 Additional Games
+## ✅ NEW FINDING E: Root knowledge.db Still Dangling (Task 6 Unfixed)
 
-> **Source:** BATTLE_LOG.md, 19 new runs, 2026-06-12T15:41Z to 15:50Z
-> **Games:** 480 (1 × 48-game + 18 × 24-game runs) | **Total database:** 696 games (June 11+12)
+**Status:** ❌ Unresolved
 
-### Pooled Results
-
-| Metric | June 11 (216 games) | June 12 (480 games) | Combined (696 games) |
-|:-------|:-------------------:|:-------------------:|:--------------------:|
-| Overall WR | **95.4%** (206W/10L) | **92.3%** (443W/37L) | **93.2%** (649W/47L) |
-| Lowest run WR | 93.3% | **79.2%** | 79.2% |
-| Highest run WR | 100.0% | **100.0%** (×3 runs) | 100.0% |
-| Approach % of wins | ~20.4% | **~19-20%** (estimated) | ~19.5-20% |
-| Stalls | 0 | **0** | 0 |
-| Combo wins | 0 | **0** | 0 |
-
-The **92.3% WR across 480 games** on June 12 confirms the WR recovery is **stable and persistent** — not a one-off from the June 11 restore event. The deck maintains 90%+ WR across a 12-opponent gauntlet over two consecutive days.
-
-### Run-by-Run WR Distribution
-
-| Run # | Time (Z) | Games | WR | Notes |
-|:-----:|:---------|:-----:|:--:|:------|
-| 1 | 15:41:27 | 48 | **85.4%** | 4-game format; highest sample size |
-| 2 | 15:41:54 | 24 | **91.7%** | |
-| 3 | 15:42:28 | 24 | **79.2%** | 🔴 Lowest WR observed — Kraum #98 went 0-2 |
-| 4 | 15:43:03 | 24 | **95.8%** | |
-| 5 | 15:43:32 | 24 | **91.7%** | |
-| 6 | 15:44:02 | 24 | **95.8%** | |
-| 7 | 15:44:35 | 24 | **87.5%** | |
-| 8 | 15:45:04 | 24 | **95.8%** | |
-| 9 | 15:45:39 | 24 | **91.7%** | |
-| 10 | 15:46:14 | 24 | **91.7%** | |
-| 11 | 15:46:46 | 24 | **95.8%** | |
-| 12 | 15:47:19 | 24 | **100.0%** | 🏆 Perfect run |
-| 13 | 15:47:51 | 24 | **91.7%** | |
-| 14 | 15:48:15 | 24 | **83.3%** | |
-| 15 | 15:48:48 | 24 | **91.7%** | |
-| 16 | 15:49:22 | 24 | **95.8%** | |
-| 17 | 15:49:51 | 24 | **95.8%** | |
-| 18 | 15:50:25 | 24 | **100.0%** | 🏆 Perfect run |
-| 19 | 15:50:59 | 24 | **100.0%** | 🏆 Perfect run |
-
-### New Patterns Observed
-
-#### 1. CMC Stability Signal
-Deck CMC varied between **2.79 and 2.97** across the 19 runs. The lowest CMC runs (2.79, 2.80) had WR between 91.7% and 95.8% — **no strong correlation** with performance. This suggests the deck has a stable mana curve that doesn't depend on precise CMC tuning within ±0.1.
-
-| CMC Range | Runs | Avg WR |
-|:----------|:----:|:------:|
-| 2.79-2.85 | 5 | 92.5% |
-| 2.88-2.91 | 8 | 92.7% |
-| 2.94-2.97 | 6 | 91.3% |
-
-**Signal for App/Backend Logic**: CMC variance of ±0.1 is not actionable. The deck's performance is resilient to small CMC changes. Focus tuning on card function, not marginal CMC reduction.
-
-#### 2. Instant Count Signal
-The deck runs 17 or 18 instants across runs. Runs with **18 instants** (5 runs) averaged **94.2%** vs 17 instants (14 runs) averaging **91.6%** — a +2.6pp difference.
-
-| Instants | Runs | Avg WR |
-|:--------:|:----:|:------:|
-| 17 | 14 | 91.6% |
-| 18 | 5 | **94.2%** |
-
-**Signal for App/Backend Logic**: Incremental instant count (18 vs 17) correlates with +2.6pp WR. For Boros spellslinger, adding a marginal instant over a sorcery or creature may meaningfully improve combat interaction density. Worth 50-game A/B test.
-
-#### 3. Approach Win Rate Stability
-Approach wins appeared in **every run**, accounting for an estimated **~19-20%** of total wins — nearly identical to the June 11 value of 20.4%. This confirms:
-- Approach is **not a one-day phenomenon** — it has been a stable ~20% secondary win condition for 2 consecutive days.
-- The drop from 40-55% (June 7) to ~20% (June 11-12) is a **new equilibrium**, not a continuing decline.
-
-| Date | Approach % of Wins |
-|:-----|:------------------:|
-| 2026-05-31 | 89.9% (baseline) |
-| 2026-06-07 | 40-55% |
-| 2026-06-09 (collapse) | 2.9% |
-| 2026-06-11 | 20.4% |
-| 2026-06-12 | **~19-20%** (stable) |
-
-**Signal for App/Backend Logic**: If Approach % holds at ~20% for a third consecutive day, mark this as the **structural equilibrium** for the current deck configuration. Any deviation beyond ±5pp would signal identity drift.
-
-#### 4. Rograkh Variant Weakness
-Rograkh opponents (variants #118, #95, #117) consistently show **below-average WR** across nearly every run:
-
-| Rograkh Variant | WR range | Pattern |
-|:----------------|:--------:|:--------|
-| Rograkh #118 | 50-100% | Most volatile; loses to fast aggro starts |
-| Rograkh #95 | 25-100% | Wide variance; Approach-reliant |
-| Rograkh #117 | 50-100% | Similar pattern to #118 |
-
-**Hypothesis (not_proven)**: Rograkh's fast commander damage clock (partner with Thrasios or Jeska) outpaces Lorehold's setup turns. When Rograkh deploys on turn 1-2 with equipment, Lorehold's protection suite is insufficient without a blocker.
-
-#### 5. Three Perfect Runs (100% WR)
-Runs 12, 18, and 19 achieved 100% WR (24W/0L each). The deck configuration was identical to the other June 12 runs (L=33, CMC=2.94, R=52, X=10). No structural difference explains the perfection — this is likely **variance within a 90-96% baseline**, where occasional 100% runs occur naturally.
-
-### Updated Matchup Profile (June 12, 480-game pooled)
-
-| Opponent | WR (Jun 11) | WR (Jun 12) | Combined |
-|:---------|:-----------:|:-----------:|:--------:|
-| Rograkh variants (#118, #95, #117) | 75-100% | 50-100% | **Widest variance** |
-| Kraum #98 | 80-100% | 0-100% | Unstable in small samples |
-| Winota #73 | 100% | 50-100% | Slightly weaker |
-| Tivit #107 | 100% | 50-100% | Slightly weaker |
-| Y'shtola #70 | 100% | 50-100% | Stable high |
-| Marneus #64 | 100% | 50-100% | Stable high |
-| Lumra #49 | 100% | 50-100% | Stable high |
-| Kinnan #92/#27 | 80-90% | 50-100% | Consistent mid |
-| Thrasios #101 | 100% | 50-100% | Consistent high |
-
-**Key note**: The June 12 24-game-per-run format (2 games per opponent per run) creates **high variance per opponent** (0% or 100% on a 2-game sample). The per-opponent WRs should be interpreted as *ranges*, not precise values.
+The 0-byte `knowledge.db` at `docs/hermes-analysis/manaloom-knowledge/knowledge.db` remains. This was first reported in Finding A on June 15. The real database lives at `scripts/knowledge.db` (3.5MB, updated June 16 02:04Z). Task 6 from the previous report is still open.
 
 ---
 
-## 7. Slot Optimizer Activity (First Observed Benchmarks)
+## 🟢 NEW FINDING F: Zero Optimization Swaps Applied — Correct Hold
 
-The slot optimizer ran **29 benchmarks** against the recovered Lorehold deck (deck_id=6), testing 10 unique swap candidates across 2-3 phases. This is the first time slot benchmarks are present for Lorehold.
+**Status:** 🟢 Correct behavior
 
-### Summary of Tested Swaps
+Despite 115 benchmarks and 123 quality reviews, `optimizer_applied_swaps` remains **0 rows**. This is correct — the optimizer is not applying any changes because the deck hash is stale and the classifier is broken.
 
-| # | Card Added | Card Removed | G | WR | Δpp | Verdict |
-|:-:|:-----------|:-------------|:-:|:--:|:---:|:--------|
-| 1 | Wheel of Fate | Reforge the Soul | 24 | 91.7% | -3.3 | 🔴 Negative |
-| 2 | Pursue the Past | Reforge the Soul | 24 | 87.5% | -7.5 | 🔴 Negative |
-| 3 | Blacksmith's Skill | The One Ring | 24 | 91.7% | -3.3 | 🔴 Negative |
-| 4 | **Loran's Escape** | The One Ring | 24 | **95.8%** | **+0.8** | ✅ Neutral+ |
-| 5 | Strike It Rich | Mana Geyser | 24 | 87.5% | -7.5 | 🔴 Negative |
-| 6 | Tablet of Discovery | Mana Geyser | 24 | 87.5% | -7.5 | 🔴 Negative |
-| 7 | **Chain Lightning** | Rise of the Eldrazi | 24 | **95.8%** | **+0.8** | ✅ Neutral+ |
-| 8 | Erode | Rise of the Eldrazi | 24 | 95.8% | +0.8 | ✅ Neutral+ |
-| 9 | **Steelshaper's Gift** | Imperial Recruiter | 24 | **95.8%** | **+0.8** | ✅ Neutral+ |
-| 10 | Tithe | Imperial Recruiter | 24 | 91.7% | -3.3 | 🔴 Negative |
-| 11 | **Furygale Flocking** | Storm Herd | 24 | **95.8%** | **+0.8** | ✅ Neutral+ |
-| 12 | Renegade Bull | Storm Herd | 24 | 91.7% | -3.3 | 🔴 Negative |
-| 13 | Final Showdown | Blasphemous Act | 24 | 91.7% | -3.3 | 🔴 Negative |
-| 14 | **The Battle of Bywater** | Blasphemous Act | 24 | **95.8%** | **+0.8** | ✅ Neutral+ |
-
-### Phase 2 Retests (12 games, higher variance)
-
-| # | Card Added | Card Removed | G | WR | Δpp | Verdict |
-|:-:|:-----------|:-------------|:-:|:--:|:---:|:--------|
-| 15 | Wheel of Fate | Reforge the Soul | 12 | 91.7% | -1.6 | 🟡 Neutral− |
-| 16 | Blacksmith's Skill | Flawless Maneuver | 12 | 91.7% | -1.6 | 🟡 Neutral− |
-| 17 | Strike It Rich | Mana Geyser | 12 | 91.7% | -1.6 | 🟡 Neutral− |
-| 18 | Chain Lightning | Rise of the Eldrazi | 12 | 91.7% | -1.6 | 🟡 Neutral− |
-| 19 | **Steelshaper's Gift** 🏆 | Enlightened Tutor | 12 | **100.0%** | **+6.7** | ✅ **Positive** |
-| 20 | **Furygale Flocking** 🏆 | Storm Herd | 12 | **100.0%** | **+6.7** | ✅ **Positive** |
-| 21 | **Final Showdown** 🏆 | Blasphemous Act | 12 | **100.0%** | **+6.7** | ✅ **Positive** |
-| 22 | Wheel of Fate | Reforge the Soul | 12 | 83.3% | -16.7 | 🔴 Negative |
-| 23 | Flashback | Rite of the Dragoncaller | 12 | 100.0% | 0.0 | ✅ Neutral |
-| 24 | Blacksmith's Skill | Flawless Maneuver | 12 | 83.3% | -16.7 | 🔴 Negative |
-| 25 | Strike It Rich | Mana Geyser | 12 | 91.7% | -8.3 | 🔴 Negative |
-| 26 | Chain Lightning | Rise of the Eldrazi | 12 | 91.7% | -8.3 | 🔴 Negative |
-| 27 | Steelshaper's Gift | Imperial Recruiter | 12 | 100.0% | 0.0 | ✅ Neutral |
-| 28 | Furygale Flocking | Storm Herd | 12 | 91.7% | -8.3 | 🔴 Negative |
-| 29 | Final Showdown | Blasphemous Act | 12 | 100.0% | 0.0 | ✅ Neutral |
-
-### Top 3 High-Confidence Swap Recommendations
-
-1. **🏆 Steelshaper's Gift → Enlightened Tutor** (Δ=+6.7pp, two positive phases)
-   - CMC 1 for 1. Both are instant-speed artifact/enchantment tutors. Steelshaper's Gift requires controlling an artifact — which the deck has 19 ramp artifacts + 2 artifact lands. Not strictly better, but the benchmark data suggests it outperforms in this specific build.
-
-2. **🏆 Furygale Flocking → Storm Herd** (Δ=+6.7pp, one positive phase)
-   - CMC 5 vs 10. Furygale Flocking is a board wipe that hits flying creatures (relevant against many cEDH commanders). Storm Herd is almost never castable (CMC 10, 33 lands).
-
-3. **🏆 Final Showdown → Blasphemous Act** (Δ=+6.7pp, one positive phase)
-   - Final Showdown is a modal board wipe (choose modes: destroy, exile, -5/-5) that costs XWW. More flexible than Blasphemous Act (which is good only when the board is full). The flexibility may be outperforming in the battle sim.
-
-**Caveat**: 12-game samples have high variance (±15pp approximate confidence interval). The Phase 1 24-game runs showed neutral-to-negative deltas for the same swaps. These recommendations need 50+ game validation before any product implementation.
+| Component | Count | vs Last Report |
+|:----------|:-----:|:--------------:|
+| optimizer_applied_swaps | **0** | Unchanged (was 0) |
+| optimizer_baseline_runs | **5** | Unchanged (last: #5, 600g, 89.8%) |
+| slot_benchmarks | **115** | 🆕 **+86** (29→115) |
+| optimizer_quality_reviews | **123** | 🆕 **+118** (5→123) |
 
 ---
 
-## 8. Pipeline State (June 15 — STALE Across the Board)
+## Updated Pipeline State (June 16)
 
 | Component | Status | Note |
 |:----------|:-------|:-----|
-| knowledge.db deck_id=6 deck_cards | ✅ 100 cards, hash `4cc51c42...` | **NEW hash** — 3rd in 24h, classification REGRESSED |
-| optimizer_applied_swaps | ⚠️ **Still 0 rows** | All 6 deck changes invisible to optimizer |
+| knowledge.db deck_id=6 deck_cards | ✅ 100 cards, hash `4cc51c42...` | **STABLE 24+ hours** — longest stable period ever |
+| knowledge.db (root path) | ❌ **0 bytes, empty** | Unfixed since June 15 Finding A |
+| optimizer_applied_swaps | ✅ **0 rows** | Correct hold — no swaps applied |
 | optimizer_baseline_runs | ⚠️ Run #5 (600 games, 89.8%, hash `f6367a27...`) | **STALE** — current deck is `4cc51c42...` |
-| optimizer_quality_reviews | ⚠️ 5 reviews | Stale — all computed against old hashes |
-| slot_benchmarks | ⚠️ 29 benchmarks | Completely stale after 2 hash changes |
-| Ramp misclassification | ❌ **73% (30/41 lands tagged as ramp)** | WORSE than June 14's 63% |
-| PostgreSQL sync | ✅ active | Source of classification regression |
-| BATTLE_LOG.md | ✅ Updated June 14 20:50Z | 1,560 new games (9 runs) appended |
-| master_optimizer_preflight | ✅ Approved (last) | Cannot detect stale data |
+| optimizer_quality_reviews | ⚠️ 123 reviews | **All flag `role_mismatch`** for Blasphemous Act |
+| slot_benchmarks | ⚠️ **115 benchmarks** | **ALL stale** — computed against `f6367a27...`, not `4cc51c42...` |
+| Ramp misclassification | ❌ **73% (30/41 lands tagged as ramp)** | Unchanged since last report |
+| BATTLE_LOG.md | ✅ Last updated June 14 20:50Z | No new games in ~55 hours |
 | Pipeline bypass detector | ❌ **Not implemented** | Task 4 still open |
-
-**Updated conclusion**: The product-side `card_function_tags` classifier is **actively regressing**. Every sync from PostgreSQL to knowledge.db introduces more classification errors. The optimizer pipeline cannot produce reliable recommendations until the ramp classifier is fixed (Task 1) and the deck is re-baselined against clean data.
-
-### Key Signals for App/Backend Logic
-
-| Signal | Source | What It Would Power |
-|:-------|:-------|:--------------------|
-| **WR recovery detection** | Jun 9→Jun 11 recovery | Auto-detect when WR recovers from collapse; emit recovery alert instead of ongoing crisis |
-| **Removal + wipe combined metric** | Collapse vs recovery comparison | Gate on `removal + board_wipes * 3 >= 8` instead of raw removal count |
-| **Approach win ratio tracker** | 2.9%→20.4% recovery | Track as leading indicator; if < 5% for 2 consecutive baselines, signal identity drift |
-| **Slot benchmark pipeline** | 29 benchmarks executed | Validate swaps at 24+ games before promoting to product; flag high-variance results |
-| **Pipeline bypass detection** | applied_swaps empty despite deck change | Alert when deck hash changes without optimizer record |
-| **Copy redundancy scoring** | 4 copy spells vs 2 in collapse | Score combo viability by number of redundant pieces, not just presence |
-| **Instant count optimization** | June 12: 18 instants = +2.6pp vs 17 | Score instant density for Boros spellslinger; flag when < 16 instants |
-| **Rograkh counter-strategy** | June 12: 50-100% WR vs Rograkh variants | Detect fast-commander-damage opponents; suggest early blocker inclusion |
-| **Approach equilibrium monitoring** | June 12: ~19-20% approach (stable 2 days) | Track approach % as identity drift signal; alert if deviates >5pp |
-| **Classification regression alert** | June 15: 63%→73% ramp misclassification in 24h | Auto-detect when functional_tag accuracy drops on re-sync; emit regression alert to pause optimizer |
-| **Opponent-specific approach scoring** | June 14: Thrasios 8.7% vs Selvala 21.3% approach wins | Weight expected WR vs opponent archetype; flag when approach-reliant deck faces fast-combo commanders |
-| **Hash change frequency monitor** | June 14-15: 3 deck hash changes in 24h | Alert when hash changes exceed 2/day; flag sync pipeline instability |
+| knowledge.db path fix | ❌ **Not implemented** | Task 6 still open |
+| Hash change frequency | 🟢 Stable (0 changes in 24+ hours) | First 24h+ stable period |
 
 ---
 
-## 9. Concrete Tasks (Updated June 15 — Classification REGRESSION)
+## Updated Signals for App/Backend Logic
 
-**Note**: Previous tasks 1-5 from the June 14 update remain structurally valid but need PRIORITY ADJUSTMENT due to the regression. The tasks below supersede/amend the original task descriptions. Evidence source for all task updates: `SELECT functional_tag, COUNT(*), type_line FROM deck_cards WHERE deck_id=6 GROUP BY functional_tag, SUBSTR(type_line,1,4)` from knowledge.db cross-referenced against deck_cards hash `4cc51c42...`.
-
-### Task 1 (P0 — ESCALATED): Ramp Classifier — Exclude Lands from `ramp` Functional Tag
-
-**Previous evidence**: 26/41 (63%) ramp cards were lands.
-**Current evidence**: **30/41 (73%)** ramp cards are now lands. Misclassification **grew 10 percentage points** since June 14. The decklist itself did not change — only the sync pipeline re-ran with a worse classifier version.
-
-Source: `SELECT card_name, type_line FROM deck_cards WHERE deck_id=6 AND functional_tag='ramp' AND type_line LIKE '%Land%'` — 30 rows returned. The 4 newly misclassified lands are Ancient Tomb (persistent), Hall of Heliod's Generosity, Needleverge Pathway, and Sunbillow Verge.
-
-- **Priority change**: P0 → **URGENT** (escalated). The classifier is not just broken — it is actively regressing with each sync cycle. Every day without a fix produces worse data.
-- **What to change**: Same as before — add a guard excluding `type_line` containing 'Land' from `ramp`. Additionally, implement a **monitor** that alerts when `ramp count > 25` (indicating >50% misclassification) so this can't silently regress again.
-- **Validation**: After fix, query returns ≤16 ramp cards for deck_id=6. Current count must drop from 41 to ~15.
-
-### Task 2 (P1): Re-baseline Lorehold — HOLD Until Task 1 is Applied
-
-**Previous evidence**: Hash changed from `dbe24f7` → `f6367a27`.
-**Current evidence**: Hash changed AGAIN from `f6367a27` → `4cc51c42`. Optimizer_baseline_runs #5 (600 games, 89.8% WR, hash `f6367a27`) is now stale. ALL 5 baseline runs and 29 slot benchmarks are stale.
-
-- **Hold condition**: **Do NOT re-baseline until Task 1 is applied.** Running a baseline against `4cc51c42` with 73% ramp misclassification would produce unreliable role count data and waste 600 simulation games.
-- **Recommended order**: (1) Fix classifier → (2) Re-sync deck → (3) Re-baseline minimum 200 games → (4) Re-run slot benchmarks.
-- **Validation**: After re-baseline, optimizer_baseline_runs should have a new row with hash=`4cc51c42` (or whatever the post-fix hash is).
-
-### Task 3 (P1 → P0): Functional Tag Taxonomy — URGENT Inclusion of Land Guard
-
-**Previous evidence**: 7 new categories introduced inconsistently.
-**Current evidence**: On top of the inconsistencies listed June 14 (Deflecting Swat as `big_spell`, Aetherflux Reservoir as `removal`), the taxonomy is now producing **worse results** for ramp with each sync cycle. The lack of formal category definitions specifically for land exclusion has caused regression.
-
-- **Priority change**: P1 → **P0** (upgraded). The 10pp jump in misclassification rate means the problem is accelerating.
-- **What to change**: Add explicit `exclude_if_land` rules to the category definitions. Specifically:
-  - `ramp`: EXCLUDE all cards with `type_line` containing 'Land'. Only rocks, rituals, dorks, treasure producers.
-  - `draw`: EXCLUDE tutors and reanimation spells (Mizzix's Mastery is NOT draw).
-  - `removal`: EXCLUDE Aetherflux Reservoir and Boros Charm (if primary use is indestructible).
-  - `big_spell`: EXCLUDE cards with CMC < 6 (Deflecting Swat at CMC 3 is not a big spell).
-- **Impact**: Prevents auto-regression of the classifier with every sync.
-- **Validation**: All Learned decks must have 0 cards with `type_line` containing 'Land' tagged as `ramp`.
-
-### Task 4 (P2 → P1): Pipeline Bypass Detector — Validated by 6th Hash Change
-
-**Previous evidence**: 5 hash changes in 14 days, 0 documented in optimizer.
-**Current evidence**: **6th hash change** now confirmed (`f6367a27` → `4cc51c42`). Still 0 rows in `optimizer_applied_swaps`. The new hash came AFTER baseline run #5, meaning the 600-game June 14 deep dive is already stale before any optimization recommendations were made.
-
-- **Priority change**: P2 → **P1** (upgraded). The frequency of undocumented hash changes is accelerating (3 changes in 24 hours).
-- **What to change**: Same as before — cron check every 10 minutes. But additionally, extend the check to include `SELECT deck_hash FROM deck_cards WHERE deck_id=6 LIMIT 1` as the source of truth (since `decks` table has no hash column).
-- **Validation**: Alert fires when deck_cards hash differs from last optimizer_baseline_runs hash.
-
-### Task 5 (P2): Aetherflux Reservoir Tag Correction — No Change Since Last Report
-
-**Previous evidence**: Aetherflux Reservoir tagged as `removal` (misclassified). This was not fixed by the June 14 reclassification.
-**Current evidence**: **Still tagged as `removal`** in the `4cc51c42` classification. No change. The re-sync that happened overnight did not address this.
-- **Priority**: P2 (unchanged).
-- **What to change**: Single-card override in the classifier.
-- **Validation**: `SELECT functional_tag FROM deck_cards WHERE card_name='Aetherflux Reservoir' AND deck_id=6` should return 'wincon' or 'payoff'.
+| Signal | Source | What It Would Power | Priority |
+|:-------|:-------|:--------------------|:--------:|
+| **Hash stability tracking** | 24h+ stable hash | Hygiene metric; pause pipeline until hash stable for ≥6h | P2 |
+| **role_mismatch as pipeline blocker** | 123 reviews all flag Blasphemous Act as `ramp`→`wipe` | Promote from warning to BLOCK when high-value tags mismatch | **P0** |
+| **Benchmark staleness gate** | 115 benchmarks against stale hash | Block benchmark execution if `deck_cards.hash != baseline_hash` | **P1** |
+| **Ramp misclassification impact metric** | 15+ swaps targeting Blasphemous Act (tagged ramp) | Auto-calculate effective ramp count when `ramp` tag includes lands | **P1** |
+| **Wipe replacement confidence** | Slagstorm +9.4pp, 120-game sample | High-confidence swap candidate once classifier is fixed | P2 |
+| **Pipeline pause escalation** | 55h no new battle data | Escalate alert from P2→P1 after 48h of inactivity | P2 |
 
 ---
 
-## 10. Hash Tracking (Updated June 15)
+## Concrete Tasks (Updated June 16 — Sixth Pass)
+
+### Task 1 (P0 — URGENT): Ramp Classifier — Exclude Lands from `ramp` Functional Tag
+
+**Evidence amplified:** Benchmarks 86-115 were executed against a classifier that tags Blasphemous Act (a 9-CMC board wipe) as `ramp`. The `role_mismatch` warning appears in ALL 118 new quality reviews. The fix would have prevented 86 wasted benchmark runs.
+
+- **Priority**: P0 URGENT (unchanged). The operational cost of the broken classifier is now measurable: **86 wasted benchmark runs** that must be re-executed after the fix.
+- **What to change**: Add `type_line` NOT LIKE '%Land%' guard to the `ramp` category classification logic. Additionally, add `type_line` NOT LIKE '%Sorcery%' guard — Blasphemous Act (Sorcery) should never be `ramp`.
+- **Validation**: After fix, `ramp` count for deck_id=6 drops from 41 to ≤16. Blasphemous Act must NOT appear in `ramp` query.
+
+### Task 2 (P1): Re-baseline Lorehold — HOLD Until Task 1 Applied
+
+**Evidence unchanged:** Hash `4cc51c42...` is now stable for 24+ hours. Baseline #5 (600 games, 89.8%, hash `f6367a27...`) is stale. All 115 benchmarks are stale.
+
+- **Hold maintained**: Do NOT re-baseline until Task 1 is applied. Running 115 new benchmarks against broken classifier tags would waste another 13,800 simulation games.
+- **New detail**: After Task 1 fix, the deck's actual ramp count (~19) will become visible to the optimizer for the first time. This may fundamentally change which slots need optimization.
+
+### Task 3 (P1 → P0): Functional Tag Taxonomy — Add Land + Non-Sorcery Guard to Ramp
+
+**New evidence:** Blasphemous Act being tagged as `ramp` means the classifier is not just misclassifying lands — it's also tagging non-land cards with `{X}` in the mana cost as ramp. Blasphemous Act costs `{5}{R}{R}{R}` — zero mana-producing text.
+
+- **Priority**: P0 (upgraded from P1). The taxonomy is causing false positives beyond lands.
+- **What to change**: Add explicit exclusion rules:
+  - `ramp`: EXCLUDE `type_line` containing 'Land' or 'Sorcery'. Only artifacts, creatures with mana abilities, enchantments with mana abilities.
+  - `draw`: EXCLUDE tutors (Imperial Recruiter) and reanimation spells (Mizzix's Mastery).
+  - `removal`: EXCLUDE Aetherflux Reservoir (life payoff) and Boros Charm (protection-first).
+- **Validation**: 0 cards with `type_line` containing 'Land' or 'Sorcery' tagged as `ramp` for all 120 learned decks.
+
+### Task 4 (P1): Pipeline Bypass Detector — Now With Benchmark Staleness Gate
+
+**Evidence amplified:** 115 benchmarks were executed against a stale hash. The slot optimizer should have refused to run benchmarks when `deck_cards.hash != optimizer_baseline_runs.hash`.
+
+- **Priority**: P1 (unchanged). The operational cost is now measurable.
+- **What to change**: Add staleness check BEFORE executing benchmarks:
+  ```sql
+  SELECT deck_hash FROM deck_cards WHERE deck_id=6 LIMIT 1
+  -- Must match baseline_hash of the most recent optimizer_baseline_runs row
+  ```
+  If mismatch: BLOCK all benchmark execution and emit warning.
+- **Validation**: Slot optimizer logs should show "BLOCKED: hash mismatch" instead of executing 86 stale benchmarks.
+
+### Task 5 (P2): Aetherflux Reservoir Tag Correction — Still Tagged as `removal`
+
+**Evidence unchanged:** Aetherflux Reservoir remains tagged as `removal`. This card has no removal text — it's a life total payoff/wincon.
+
+- **Priority**: P2 (unchanged). Lower than ramp/Blasphemous Act issues.
+- **What to change**: Single-card override: Aetherflux Reservoir → `wincon` or `payoff`.
+- **Validation**: `SELECT functional_tag FROM deck_cards WHERE card_name='Aetherflux Reservoir' AND deck_id=6` should return `wincon` or `payoff`.
+
+---
+
+## Hash Tracking (Updated June 16)
 
 | Hash | State | WR | Date | Notes |
 |:-----|:------|:--:|:-----|:------|
-| `4cc51c42952f...` | **🆕 Current (classification REGRESSED)** | **unknown** | 2026-06-15 ~01:51Z (detected) | Ramp misclassification 73% (30/41 lands); draw 17; engine 11. Decklist UNCHANGED from `f6367a27...` — only tags worse. |
-| `f6367a273eef...` | Previous (re-tagged) | **89.8%** (run #5, 600 games) | 2026-06-14 19:24Z — 20:31Z | Reclassification pass #1. Functional tags regenerated. All optimizer data now stale. |
-| `dbe24f7d5b17...` | Previous (recovered hybrid) | **92-100%** | 2026-06-11 to 2026-06-12 | 33 lands, 4 copy spells, Approach active; 696 combined games across 2 days |
+| `4cc51c42952f...` | **🟢 Current (STABLE 24+ hours)** | unknown (no new baseline) | 2026-06-15 ~01:51Z → current | Longest stable period: 26+ hours. Classification still regressed (73% ramp misclass.) |
+| `f6367a273eef...` | Previous (re-tagged) | **89.8%** (run #5, 600 games) | 2026-06-14 19:24Z — 20:31Z | Baseline for ALL 115 slot benchmarks (now stale) |
+| `dbe24f7d5b17...` | Previous (recovered hybrid) | **92-100%** | 2026-06-11 to 2026-06-12 | 33 lands, 4 copy spells, Approach active; 696 combined games |
 | `a17a5863c95f...` | Previous (WR collapse) | 8-29% | 2026-06-09 | 31 lands, 4 removal, 0 wipes |
 | `12c55613ae4f...` | Pre-collapse (stax-combo) | 89.3% | 2026-06-07 | High WR stax build |
-| `763c3e0f...` | Pre-E2E Apply | 84.5% | 2026-06-07 | Baseline pre-swap |
-| `30d0034776...` | Post-hash-fake | ~52% | 2026-06-01 | Missing combo pieces |
 
-**Hash change history**: `30d0034776` → `763c3e0f` → `12c55613` → `a17a5863` (collapse) → `dbe24f7` (recovery) → `f6367a273eef` (re-tag) → `4cc51c42952f` (regression) — **6 unique hashes in 15 days, 5 undocumented by the optimizer pipeline.**
-
-**Since last report (01:51Z → now):** ✅ **No new hash changes.** The `4cc51c42952f` hash has been stable for ~13 hours — first stable period in 3 days. This does NOT mean the classification improved (still 73% ramp misclassification), only that no re-sync happened.
+**Hash change history:** 6 unique hashes in 16 days. Current hash has been stable for 26+ hours — the longest stable period by a factor of 2×.
 
 ---
 
-## 11. Addendum — June 15 Afternoon (Post-01:51Z Findings)
+## Summary of Findings Since Last Report
 
-> New findings detected after the ~01:51Z report cutoff.
+| # | Finding | Status | Impact |
+|:-:|:--------|:------:|:-------|
+| A | Hash stable 24+ hours (longest ever) | 🟢 Positive | Pipeline stability improving, but classifier still broken |
+| B | Slot benchmarks surged 29→115 (all stale) | 🟡 Warning | 86 benchmark runs wasted; all must be re-run after classifier fix |
+| C | Quality reviews surged 5→123 (all flag Blasphemous Act) | 🟡 Warning | Classification regression has direct operational cost |
+| D | No new battle data (55h gap) | 🔴 Alert | Pipeline paused; data aging |
+| E | Root knowledge.db still dangling | ❌ Unfixed | Task 6 from June 15 remains open |
+| F | 0 swaps applied (correct hold) | 🟢 Good | Optimizer correctly paused |
 
-### 🟡 Finding A: knowledge.db Path Split — Root Copy Is Dangling/Empty
-
-**Evidence:**
-- `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/knowledge.db` → **0 bytes** (empty, created 2026-06-15T14:03Z)
-- `/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` → **3.4 MB** (real database, all tables: deck_cards, oracle_cache, baselines, benchmarks)
-- Two backup files in scripts/: `knowledge.db.bak_lorehold_canonical_20260614_191620` (3.4MB) and `_200605` (3.4MB)
-
-**Impact:** Any cron or script reading `manaloom-knowledge/knowledge.db` (the root path) gets an empty database with no tables. Scripts using the correct `scripts/knowledge.db` path work fine. The preflight report checks `scripts/knowledge.db` — which is why it reports "ok" despite the root copy being empty.
-
-**Root cause (hypothesis):** A sync or import process may have created the empty file at the root path, or a previous database was moved/cleared leaving the empty file as a detritus. The real database lives in `scripts/` but the expected canonical path appears to be the root.
-
-**Signal for App/Backend Logic:**
-- All path references to `manaloom-knowledge/knowledge.db` should be checked and unified to point to `scripts/knowledge.db`
-- Add a health check: if `knowledge.db` at primary path is < 1KB, treat as corrupted and fall back to backup/scripts path
-- Consider symlinking or removing the dangling empty file to prevent confusion
-
-### 🟡 Finding B: Git Index Corruption — Intermittent Failure Affecting 2 Lorehold Crons
-
-**Evidence (audit v12.0, 2026-06-15 02:30Z):**
-- `manaloom-master-optimizer-preflight` at `2026-06-15T00:53:48` — ERROR: "resolve your current index first"
-- `lorehold-knowncards-validator` at `2026-06-15T01:23:50` — ERROR: same message
-- These are **2 of 3 crons** that failed (only MTG Rules Auditor remains broken independently)
-- All subsequent preflight reports (02:17Z, 11:26Z) show "approved" — the error is **intermittent and self-resolving**
-
-**Impact:** The optimizer pipeline for Lorehold briefly stopped producing new baseline data around midnight. The intermittent nature makes debugging harder — it may be a workspace contention issue (multiple crons accessing git simultaneously) rather than persistent corruption.
-
-**Signal for App/Backend Logic:**
-- Monitor `master_optimizer_preflight` reports for "resolve your current index first" errors
-- Add a cooldown/retry with `git stash` or `git reset` before retry
-- If error persists > 3 consecutive runs, emit P1 alert and pause optimizer scheduling
-- This intermittent corruption may explain why some preflight runs show missing reports (no file generated for failed runs)
-
-### 🟢 Finding C: Decision Trace v1 — New Analysis Capability Available
-
-**Evidence (commit `3a53f495`, 2026-06-15 09:02Z):**
-- `battle_analyst_v9.py` now includes `DECISION_TRACE_HANDLER` as an optional side-channel
-- Emits structured decision events for: cast ramp, cast normal spell, cast creature, cast high-threat/wincon, respond with protection/counter, attack/combat target, pass/no-action
-- Outputs `*.decision_trace.jsonl` alongside replay JSONL
-- Auditable via `replay_decision_auditor.py`
-
-**Impact on Lorehold analysis:** The decision trace adds explainability to Lorehold's 89.8% WR. Previously, we only observed the WR outcome. Now we can audit WHY the engine chose specific lines — whether it correctly prioritizes Approach setup over combat (the 80/20 split), and whether it recognizes the Twinflame+Dualcaster combo line (0% usage). This is especially valuable for investigating the 0% combo win rate.
-
-**Signal for App/Backend Logic:**
-- Run decision trace audit against the 600-game June 14 baseline to understand why combo wins = 0
-- Use decision trace to validate the Approach equilibrium (18.2%) — does the engine correctly prioritize topdeck manipulation?
-- Consider integrating decision trace signals into optimizer quality reviews
-
-### 🟢 Finding D: No New Battle Data — Pipeline Paused (Stable State)
-
-**Evidence:** BATTLE_LOG.md ends at June 14 20:50Z. No new battle runs have been executed since. The last update was 9 runs (1,560 games) in a 19-minute window.
-
-**Interpretation:** The lack of new data is likely because the optimizer pipeline correctly identified stale data (hash mismatch) and refused to run new baselines against corrupted classification. This is actually healthy behavior — the pipeline is self-limiting when it cannot produce reliable results.
-
-**Risk:** If the classifier is not fixed soon, the pipeline will remain paused indefinitely, and Lorehold analysis will fall behind real product changes. The 1,560-game dataset (the largest ever) becomes progressively less useful as proxy for current deck performance.
-
----
-
-## 12. Revised Concrete Tasks (June 15 Afternoon)
-
-**New priority context:** Since the ~01:51Z report, two new pipeline issues (knowledge.db path split, git index corruption) have emerged. These are added as supplementary tasks below.
-
-| # | Priority | Task | Source | Previous Priority | Change |
-|:-:|:---------|:-----|:------|:-----------------:|:------:|
-| 1 | **P0 URGENT** | Ramp classifier: exclude `type_line` containing 'Land' from `ramp` | Regression 63%→73% | P0 | ↔ Unchanged |
-| 2 | **P1** | Re-baseline Lorehold (HOLD until task 1 applied) | Hash stable 13h, still `4cc51c42...` | P1 | ↔ Unchanged |
-| 3 | **P0** | Functional tag taxonomy: add land guard, prevent auto-regression | 10pp jump in 24h | P0 | ↔ Unchanged |
-| 4 | **P1** | Pipeline bypass detector (hash change monitor) | 6 hash changes, 0 applied_swaps | P1 | ↔ Unchanged |
-| 5 | **P2** | Aetherflux Reservoir tag correction (`removal` → `wincon`) | Still tagged wrong | P2 | ↔ Unchanged |
-
-### Task 6 (P1 — NEW): Unify knowledge.db Path References
-
-**Evidence:** Root `knowledge.db` is 0 bytes (empty, created 14:03Z). Real database is at `scripts/knowledge.db` (3.4MB). Two canonical backups exist. Any script or cron reading the root path silently gets an empty DB.
-
-- **Priority:** **P1** — Silent failure mode. Could cause crons to use empty data for hours/days before detection.
-- **What to change:**
-  1. Remove or symlink the dangling `manaloom-knowledge/knowledge.db` (0 bytes)
-  2. Verify all script path references (preflight, sync scripts, optimizer) use the same canonical path
-  3. Add a health check: `CHECK: knowledge.db file size > 1MB` to the master optimizer preflight
-- **Validation:**
-  ```bash
-  ls -la docs/hermes-analysis/manaloom-knowledge/knowledge.db
-  # Should be a symlink or file > 1MB
-  ```
-  Check all scripts that reference `knowledge.db`:
-  ```bash
-  grep -r "knowledge\\.db" docs/hermes-analysis/manaloom-knowledge/scripts/*.py | grep -v backup | grep -v "\.bak" | grep -v "__pycache__"
-  ```
-
-### Task 7 (P1 — NEW): Git Index Corruption Monitor for Lorehold Pipeline
-
-**Evidence:** 2 of 3 optimizer-lane crons failed with "resolve your current index first" on June 15 around midnight. Intermittent — resolved on subsequent runs.
-
-- **Priority:** **P1** — Intermittent failures mask the problem. A single corruption event could block all optimizer activity for hours.
-- **What to change:**
-  1. Add `git reset --soft` or `git stash` recovery step to preflight check before optimization
-  2. Add retry counter: if git index error occurs, retry up to 3 times with 30s backoff
-  3. Alert if error persists > 3 consecutive preflight runs
-- **Validation:** Simulate by checking `cd /opt/data/workspace/mtgia && git status --short` before every preflight run.
-
-### Task 8 (P2 — NEW): Decision Trace Audit for Combo Recognition Gap
-
-**Evidence:** Twinflame+Dualcaster combo accounts for 0% of wins despite 4 redundant copy pieces. Decision trace v1 now enables post-hoc analysis of why the engine never fires the combo.
-
-- **Priority:** **P2** — Not blocking current pipeline, but the combo gap undermines one of the deck's structural win conditions.
-- **What to change:**
-  1. Run decision trace audit against baseline run #5 replay data
-  2. Check decision events for:
-     - Does the engine ever hold up mana to protect Dualcaster Mage?
-     - Does it attempt to copy Dualcaster with any of the 4 copy spells?
-     - When both combo pieces are in hand, what actions are prioritized?
-  3. Signal: If combo never fires even when both pieces are drawn, it's a battle engine deficiency (not a deckbuilding issue).
-- **Validation:**
-  ```bash
-  cd docs/hermes-analysis/manaloom-knowledge/scripts
-  python3 replay_decision_auditor.py --skip-baseline --source /path/to/replay/dir
-  ```
-
----
-
-## 13. Updated Pipeline State (June 15 Afternoon)
-
-| Component | Status | Note |
-|:----------|:-------|:-----|
-| knowledge.db deck_id=6 deck_cards | ✅ 100 cards, hash `4cc51c42...` | **STABLE** — no change since last report (~13h) |
-| knowledge.db (root path) | ❌ **0 bytes, empty** | NEW — dangling file created 14:03Z, real DB is in scripts/ |
-| optimizer_applied_swaps | ⚠️ **Still 0 rows** | All 6 deck changes invisible to optimizer |
-| optimizer_baseline_runs | ⚠️ Run #5 (600 games, 89.8%, hash `f6367a27...`) | **STALE** — current deck is `4cc51c42...` |
-| optimizer_quality_reviews | ⚠️ 5 reviews | Stale — all computed against old hashes |
-| slot_benchmarks | ⚠️ 29 benchmarks | Completely stale after 2 hash changes |
-| Ramp misclassification | ❌ **73% (30/41 lands tagged as ramp)** | Unchanged since last report |
-| Git index corruption | 🟡 **Intermittent** (2 crons, June 15 00:53Z–01:23Z) | NEW finding — self-resolved but suspicious |
-| master_optimizer_preflight | ✅ Approved (last: 11:26Z) | Still cannot detect stale data |
-| Pipeline bypass detector | ❌ **Not implemented** | Task 4 still open |
-| Decision trace v1 | ✅ Available | NEW (commit `3a53f495`) — not yet used for Lorehold audit |
-| BATTLE_LOG.md | ✅ Last updated June 14 20:50Z | No new games since — pipeline paused on stale data |
-
----
-
-## 14. Signals for App/Backend Logic (Updated June 15)
-
-New signals added this cycle:
-
-| Signal | Source | What It Would Power |
-|:-------|:-------|:--------------------|
-| **knowledge.db path health check** | 0-byte dangling DB at root path | Preflight check: `knowledge.db > 1MB` before allowing optimizer runs |
-| **Git index corruption recovery** | "resolve your current index first" on 2 crons | Auto-retry with `git reset` + backoff; alert on 3+ consecutive failures |
-| **Decision trace combo audit** | 0% combo win despite 4 redundant copy spells | Audit whether battle engine correctly prioritizes combo lines vs beatdown |
-| **Pipeline pause detection** | No new battle data in 18+ hours | Detect when stale data prevents new analysis; emit pause/recovery guidance |
-| **Hash stability signal** | No hash changes in 13h (first stable period) | Classify as positive signal — sync pipeline stability improves, or all changes already applied |
+**Overall assessment:** The pipeline is in a holding pattern. The classifier must be fixed (Task 1) before any optimization work can resume. The June 14 massive battle dataset (1,560 games) and 115 slot benchmarks represent the most comprehensive Lorehold analysis ever collected — but all of it is against a hash/classification that no longer matches reality. **The cost of delaying Task 1 is accelerating: 86 wasted benchmark runs in this cycle alone.**
