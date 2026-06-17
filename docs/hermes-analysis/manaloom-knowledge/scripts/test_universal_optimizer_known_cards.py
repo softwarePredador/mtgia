@@ -47,12 +47,12 @@ class UniversalOptimizerKnownCardsTests(unittest.TestCase):
         conn.close()
         return handle.name
 
-    def build_generated_json(self, payload: dict[str, dict[str, object]]) -> str:
+    def build_canonical_json(self, payload: dict[str, dict[str, object]]) -> str:
         handle = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
         Path(handle.name).write_text(json.dumps(payload), encoding="utf-8")
         return handle.name
 
-    def test_sqlite_rules_override_legacy_json(self) -> None:
+    def test_sqlite_rules_override_canonical_snapshot(self) -> None:
         sqlite_db = self.build_sqlite(
             [
                 {
@@ -62,36 +62,16 @@ class UniversalOptimizerKnownCardsTests(unittest.TestCase):
                 }
             ]
         )
-        generated_json = self.build_generated_json(
-            {
-                "Alpha Card": {"effect": "remove_creature"},
-                "Beta Card": {"effect": "tutor"},
-            }
-        )
-
-        known_cards = load_known_cards(generated_json, sqlite_db)
-
-        self.assertEqual(known_cards["Alpha Card"]["effect"], "counter")
-        self.assertEqual(known_cards["Alpha Card"]["battle_rule_source"], "manual")
-        self.assertEqual(known_cards["Alpha Card"]["battle_rule_review_status"], "verified")
-        self.assertEqual(known_cards["Beta Card"]["effect"], "tutor")
-
-    def test_canonical_snapshot_overrides_legacy_json_before_sqlite_overlay(self) -> None:
-        sqlite_db = self.build_sqlite([])
-        generated_json = self.build_generated_json(
-            {
-                "Alpha Card": {"effect": "remove_creature"},
-                "Beta Card": {"effect": "tutor"},
-            }
-        )
-        canonical_json = self.build_generated_json(
+        canonical_json = self.build_canonical_json(
             {
                 "Alpha Card": {
-                    "effect": "counter",
-                    "battle_rule_source": "manual",
-                    "battle_rule_review_status": "verified",
-                    "battle_rule_confidence": 1.0,
-                }
+                    "effect": "remove_creature",
+                    "battle_rule_source": "canonical_snapshot",
+                },
+                "Beta Card": {
+                    "effect": "tutor",
+                    "battle_rule_source": "canonical_snapshot",
+                },
             }
         )
 
@@ -100,10 +80,39 @@ class UniversalOptimizerKnownCardsTests(unittest.TestCase):
             {"MANALOOM_CANONICAL_KNOWN_CARDS_JSON": canonical_json},
             clear=False,
         ):
-            known_cards = load_known_cards(generated_json, sqlite_db)
+            known_cards = load_known_cards(sqlite_db)
 
         self.assertEqual(known_cards["Alpha Card"]["effect"], "counter")
         self.assertEqual(known_cards["Alpha Card"]["battle_rule_source"], "manual")
+        self.assertEqual(known_cards["Alpha Card"]["battle_rule_review_status"], "verified")
+        self.assertEqual(known_cards["Beta Card"]["effect"], "tutor")
+
+    def test_canonical_snapshot_loads_when_sqlite_has_no_rule(self) -> None:
+        sqlite_db = self.build_sqlite([])
+        canonical_json = self.build_canonical_json(
+            {
+                "Alpha Card": {
+                    "effect": "counter",
+                    "battle_rule_source": "canonical_snapshot",
+                    "battle_rule_review_status": "verified",
+                    "battle_rule_confidence": 1.0,
+                },
+                "Beta Card": {"effect": "tutor"},
+            }
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            {"MANALOOM_CANONICAL_KNOWN_CARDS_JSON": canonical_json},
+            clear=False,
+        ):
+            known_cards = load_known_cards(sqlite_db)
+
+        self.assertEqual(known_cards["Alpha Card"]["effect"], "counter")
+        self.assertEqual(
+            known_cards["Alpha Card"]["battle_rule_source"],
+            "canonical_snapshot",
+        )
         self.assertEqual(known_cards["Beta Card"]["effect"], "tutor")
 
 

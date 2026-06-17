@@ -77,6 +77,7 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
                     confidence=0.9,
                     review_status="verified",
                 )
+                conn.commit()
                 rows = conn.execute(
                     """
                     SELECT normalized_name, logical_rule_key, effect_json
@@ -87,12 +88,23 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
                 ).fetchall()
 
             rules = battle_rule_registry.load_active_battle_card_rules(sqlite_db)
+            rule_lists = battle_rule_registry.load_active_battle_card_rule_lists(sqlite_db)
+            lookup_rules = battle_rule_registry.lookup_battle_card_rule_list(
+                sqlite_db,
+                "Modal Test Card",
+            )
 
         self.assertTrue(first_changed)
         self.assertTrue(second_changed)
         self.assertEqual(len(rows), 2)
         self.assertEqual(len({row[1] for row in rows}), 2)
         self.assertIn("modal test card", rules)
+        self.assertEqual(len(rule_lists["modal test card"]), 2)
+        self.assertEqual(len(lookup_rules), 2)
+        self.assertEqual(
+            {rule["effect_json"]["effect"] for rule in lookup_rules},
+            {"draw_cards", "remove_creature"},
+        )
         self.assertIn(
             rules["modal test card"]["effect_json"]["effect"],
             {"draw_cards", "remove_creature"},

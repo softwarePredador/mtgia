@@ -59,6 +59,11 @@ Generated at: `2026-06-15T23:15:57.841159Z`
   executable rules for the same normalized card name. Product consumers must
   still keep aggregating by `card_id`; storing multiple rules correctly does
   not make raw `deck_cards -> card_battle_rules` joins safe.
+- Clarification added later on 2026-06-17: Hermes registry now exposes both
+  primary-rule compatibility lookups and all-active-rules list lookups. Active
+  optimizer consumers that need strategy roles use the multi-rule path; battle
+  execution still resolves one primary effect per cast and records alternatives
+  for audit until mode/trigger/static/activated behavior is explicitly modeled.
 - Critical row counts:
 ```json
 {

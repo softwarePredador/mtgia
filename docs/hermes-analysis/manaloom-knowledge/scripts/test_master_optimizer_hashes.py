@@ -139,6 +139,34 @@ class MasterOptimizerHashTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "ruleset hash"):
             optimizer.assert_current_deck_matches_baseline(self.conn, 6, baseline)
 
+    def test_battle_rule_deck_categories_preserve_multiple_roles_same_name(self) -> None:
+        optimizer.battle_rule_registry.ensure_battle_card_rules(self.conn)
+        optimizer.battle_rule_registry.upsert_battle_card_rule(
+            self.conn,
+            "Modal Test Card",
+            {"effect": "draw_cards", "amount": 2},
+            source="curated",
+            confidence=0.95,
+            review_status="verified",
+        )
+        optimizer.battle_rule_registry.upsert_battle_card_rule(
+            self.conn,
+            "Modal Test Card",
+            {"effect": "remove_creature", "target": "creature"},
+            source="curated",
+            confidence=0.95,
+            review_status="verified",
+        )
+        self.conn.commit()
+
+        categories = optimizer.battle_rule_deck_categories(self.conn, "Modal Test Card")
+
+        self.assertEqual(categories, {"draw", "removal"})
+        self.assertEqual(
+            optimizer.battle_rule_deck_category(self.conn, "Modal Test Card"),
+            "removal",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

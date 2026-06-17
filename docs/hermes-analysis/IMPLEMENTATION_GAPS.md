@@ -640,11 +640,14 @@ validação. Em 2026-06-17 a parte estrutural foi fechada: PostgreSQL
 `card_battle_rules` e SQLite Hermes `battle_card_rules` passaram a persistir
 `logical_rule_key` e usar chave composta `(normalized_name, logical_rule_key)`,
 permitindo múltiplas regras executáveis para o mesmo nome normalizado sem
-overwrite. O gap permanece aberto por política e cobertura: scripts
-históricos/manuais ainda podem assumir `functional_tag` único, a execução do
-battle runtime ainda escolhe uma regra primária de compatibilidade por nome, e
-a derivação de `card_battle_rules` para `card_function_tags` ainda precisa de
-taxonomia, gate de confiança/revisão e limpeza de stale tags.
+overwrite. Em 2026-06-17 o registry Hermes passou a expor também listas de
+regras ativas por nome, e os consumidores ativos de optimizer/runtime que
+precisavam de papel estratégico passaram a preservar categorias/regras
+agregadas. O gap permanece aberto por política e cobertura: scripts históricos
+podem assumir `functional_tag` único, o battle runtime ainda executa uma regra
+primária por cast para compatibilidade e apenas expõe alternativas em metadata
+de replay, e a derivação de `card_battle_rules` para `card_function_tags` ainda
+precisa de taxonomia, gate de confiança/revisão e limpeza de stale tags.
 
 ### Evidência
 
@@ -709,6 +712,14 @@ devem ser reduzidas para uma linha por carta.
   chave primária é `(normalized_name, logical_rule_key)`. O lookup legado do
   battle runtime ainda retorna uma regra primária por `normalized_name` para
   compatibilidade, mas o armazenamento já não perde regras modais/multifunção.
+- **Estado real dos consumidores em 2026-06-17 apos Slice 2**:
+  `battle_rule_registry.py` expoe `load_active_battle_card_rule_lists()` e
+  `lookup_battle_card_rule_list()`. `master_optimizer_common.py`,
+  `slot_optimizer.py`, `universal_optimizer.py` e
+  `lorehold_canonical_deck_snapshot.py` nao usam mais `LIMIT 1`/primeira regra
+  para inferir papel estratégico. `battle_analyst_v9.py#get_card_effect` ainda
+  resolve uma regra primária para execução, mas adiciona `_rule_alternatives`
+  e `rule_alternative_count` aos metadados de replay quando há múltiplas regras.
 - **Promoção confiável para `card_function_tags`**: tags derivadas de
   `card_battle_rules` só podem virar fonte canônica quando passarem por gate.
   No schema atual, `curated` é `source`, não `review_status`. Portanto, o gate
@@ -865,12 +876,22 @@ Concluído no bridge de consumidores ativos:
 8. Atualizar `_mana_validator.py`, `_run_validation.py` e
    `_update_cron_status.py` para usar membership de `functional_tags_json`,
    mantendo `SUM(deck_cards.quantity)` como cardinalidade.
+9. Atualizar o bridge multi-regra em 2026-06-17:
+   - `battle_rule_registry.py` carrega lista completa e mantém primary lookup
+     apenas como compatibilidade;
+   - `master_optimizer_common.py` usa todas as categorias de
+     `battle_card_rules` para o quality gate;
+   - `slot_optimizer.py` e `universal_optimizer.py` agregam
+     `battle_rules`/`battle_rule_categories` e preservam `deck_category`
+     primária determinística;
+   - `battle_analyst_v9.py` expõe alternativas da regra no replay sem executar
+     efeitos múltiplos automaticamente.
 
 Ainda pendente:
 
-9. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
+10. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
    for função de deck; usar essa tabela apenas como regra executável/revisável.
-10. Revisar manualmente os candidatos positivos do slot scan Lorehold
+11. Revisar manualmente os candidatos positivos do slot scan Lorehold
    `semantic_snapshot_smoke` antes de qualquer apply:
    `Loran's Escape`, `Chain Lightning`, `Erode`, `Steelshaper's Gift`,
    `Furygale Flocking` e `The Battle of Bywater`.
@@ -1375,7 +1396,7 @@ Tasks priorizadas derivadas do estudo:
 | P1 | Promover reviewed rules de cartas recorrentes que ainda caiam em `unknown`/heuristica apesar de terem semantica oficial clara | O conflito estrutural de fontes foi fechado, e o runtime da batalha nao usa mais `known_cards_generated.json`. `Natural Order` ja foi promovido para `curated/verified` com custo verde sacrificavel e tutor verde ao campo. Em 2026-06-17, `Dismember` tambem foi promovido para `curated/verified` como modificador `-5/-5` ate EOT, e o SBA foi corrigido para matar criatura com resistencia `<= 0` mesmo se for indestrutivel; a rodada `20260617_005901` ficou com `action_findings=0` e `strategy_findings=0`. O mesmo criterio deve ser aplicado aos proximos outliers recorrentes dos replays/auditorias | Menos distorcoes de battle e de scorecard causadas por cartas reais que ainda nao possuem regra revisada; ausencia agora vira `unknown` auditavel em vez de efeito gerado incorreto |
 | P1 | Adicionar explainability backend-owned por carta gerada | O produto ainda nao responde bem "por que essa carta entrou?" | Transparencia de criacao, QA melhor e comparacao de fontes por carta |
 | P1 | Higienizar proveniencia das regras promovidas hoje marcadas como `source='manual'` em PG/SQLite | Runtime manual ativo ja esta zerado. Em 2026-06-17 o schema/default de `card_battle_rules` passou a nascer como `source='curated'`, o sync PG/Hermes tambem usa `curated` como fallback, e `sync_battle_card_rules.py` deixou de semear `HANDCRAFTED_KNOWN_CARDS` nao-waiver. A migration `027` normaliza linhas historicas `source='manual'` com notas `HANDCRAFTED_KNOWN_CARDS` para `source='curated'`. `manual` continua reservado para `MANUAL_RULE_RUNTIME_WAIVERS` explicitos | Reduz ruido conceitual sem mudar comportamento de runtime; proximo passo operacional e refrescar o cache SQLite Hermes a partir do PG normalizado |
-| P1 | Fechar consumo multi-regra no battle runtime apos persistencia de `logical_rule_key` | Em 2026-06-17 a migration `028` foi aplicada no PostgreSQL real: `card_battle_rules.logical_rule_key` e `battle_card_rules.logical_rule_key` existem, a PK passou para `(normalized_name, logical_rule_key)`, `3158` regras PG->SQLite sincronizaram com `0` chaves ausentes e o teste de registry prova duas regras distintas para o mesmo nome. O armazenamento nao sobrescreve mais regras modais/multifunção | Próximo slice: manter lookup primário por compatibilidade, mas adicionar consumidores que leiam array de regras por nome/card quando a decisão de battle precisar compor múltiplos efeitos; nunca voltar a `LIMIT 1` como solução de fanout |
+| P1 | Fechar consumo multi-regra no battle runtime apos persistencia de `logical_rule_key` | Em 2026-06-17 a migration `028` foi aplicada no PostgreSQL real: `card_battle_rules.logical_rule_key` e `battle_card_rules.logical_rule_key` existem, a PK passou para `(normalized_name, logical_rule_key)`, `3158` regras PG->SQLite sincronizaram com `0` chaves ausentes e o teste de registry prova duas regras distintas para o mesmo nome. No slice seguinte do mesmo dia, `battle_rule_registry.py` passou a expor lookup/lista multi-regra, `master_optimizer_common.py`, `slot_optimizer.py`, `universal_optimizer.py` e `lorehold_canonical_deck_snapshot.py` passaram a preservar categorias/regras agregadas, e `battle_analyst_v9.py` passou a registrar `_rule_alternatives`/`rule_alternative_count` no replay | Parcialmente fechado para armazenamento e consumo estratégico. Pendente real: executar múltiplos efeitos automaticamente só quando o efeito tiver modelagem explícita de modo/trigger/habilidade estática/ativada e teste focado; nunca voltar a `LIMIT 1` como solução de fanout |
 | P2 | Manter scripts one-shot fora do tree operacional | Em 2026-06-17 foram removidos `_gc_check.py` (raiz `manaloom-knowledge/` e `scripts/`), `_scout_report.py`, `_update_logs.py` e `validate_patches.py`. Eles continham caminhos/ids/hashes hardcoded ou validavam patches antigos fora da suite atual. O guardrail `test_known_cards_consumer_guardrail.py` agora falha se eles voltarem | Reduz ruido, evita execucao acidental de diagnosticos antigos e obriga novas correcoes a entrar por script operacional testado ou por teste versionado |
 
 Regras mantidas por este estudo:

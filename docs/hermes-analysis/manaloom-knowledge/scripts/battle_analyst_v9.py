@@ -1763,6 +1763,9 @@ def replay_rule_fields(effect_data):
     for key, value in optional_fields.items():
         if value not in (None, "", [], {}):
             fields[key] = value
+    rule_alternative_count = len(effect_data.get("_rule_alternatives") or [])
+    if rule_alternative_count:
+        fields["rule_alternative_count"] = rule_alternative_count
     return fields
 
 
@@ -1807,8 +1810,13 @@ def get_card_effect(card):
             ),
         )
     if battle_rule_registry is not None:
-        rule = battle_rule_registry.lookup_battle_card_rule(DB, name)
-        if rule and rule.get("effect_json"):
+        if hasattr(battle_rule_registry, "lookup_battle_card_rule_list"):
+            rules = battle_rule_registry.lookup_battle_card_rule_list(DB, name)
+        else:
+            rule = battle_rule_registry.lookup_battle_card_rule(DB, name)
+            rules = [rule] if rule else []
+        if rules and rules[0] and rules[0].get("effect_json"):
+            rule = rules[0]
             effect = with_rule_metadata(
                 rule["effect_json"],
                 source=rule.get("source", "battle_card_rules"),
@@ -1818,6 +1826,18 @@ def get_card_effect(card):
                 logical_rule_key=rule.get("logical_rule_key"),
                 oracle_hash=rule.get("oracle_hash"),
             )
+            if len(rules) > 1:
+                effect["_rule_alternatives"] = [
+                    {
+                        "logical_rule_key": item.get("logical_rule_key"),
+                        "effect": (item.get("effect_json") or {}).get("effect"),
+                        "category": (item.get("deck_role_json") or {}).get("category"),
+                        "source": item.get("source"),
+                        "review_status": item.get("review_status"),
+                    }
+                    for item in rules
+                    if item
+                ]
             return normalize_effect_by_oracle(card, effect)
     if name in HANDCRAFTED_KNOWN_CARDS:
         handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name)

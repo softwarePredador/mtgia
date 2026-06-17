@@ -387,9 +387,11 @@ Resultado validado contra PostgreSQL real após a migration
   schema PostgreSQL e o cache SQLite Hermes persistem `logical_rule_key` e usam
   chave composta `(normalized_name, logical_rule_key)`, permitindo múltiplas
   regras executáveis para o mesmo nome normalizado sem sobrescrever linhas. O
-  próximo slice não é mais persistência; é consumo multi-regra no battle runtime
-  onde uma decisão precise compor efeitos em vez de usar apenas a regra
-  primária de compatibilidade.
+  consumo Hermes ativo agora tem dois contratos: primary lookup para
+  compatibilidade e list lookup para preservar todas as regras/categorias.
+  Otimizadores usam a lista quando precisam avaliar papel estratégico; o battle
+  runtime ainda executa uma regra primária por cast e registra alternativas no
+  replay, até existir modelagem explícita de modo/trigger/habilidade.
 - `card_function_tags` preserva multiplas funcoes por carta; validadores devem
   contar papeis por membership, sem achatar a carta para uma unica funcao.
 - `commander_learning_snapshot` foi adicionada como view interna backend-owned

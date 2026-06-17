@@ -274,17 +274,27 @@ def choose_primary_category(categories: list[str]) -> str | None:
 
 def load_known_cards() -> dict[str, dict[str, object]]:
     known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
-    rules = battle_rule_registry.load_active_battle_card_rules(DEFAULT_DB)
-    for rule in rules.values():
+    rule_lists = battle_rule_registry.load_active_battle_card_rule_lists(DEFAULT_DB)
+    for rules in rule_lists.values():
+        if not rules:
+            continue
+        rule = rules[0]
         name = str(rule.get("card_name") or "")
         effect = dict(rule.get("effect_json") or {})
         if not name or not effect:
             continue
-        role = dict(rule.get("deck_role_json") or {})
+        categories = [
+            str(role.get("category"))
+            for role in (dict(item.get("deck_role_json") or {}) for item in rules)
+            if role.get("category")
+        ]
         merged = dict(known_cards.get(name, {}))
         merged.update(effect)
-        if role.get("category"):
-            merged["deck_category"] = role["category"]
+        primary_category = choose_primary_category(categories)
+        if primary_category:
+            merged["deck_category"] = primary_category
+        merged["battle_rules"] = [dict(item.get("effect_json") or {}) for item in rules]
+        merged["battle_rule_categories"] = sorted(set(categories))
         merged["battle_rule_source"] = rule.get("source")
         merged["battle_rule_review_status"] = rule.get("review_status")
         known_cards[name] = merged

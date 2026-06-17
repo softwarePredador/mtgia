@@ -674,6 +674,18 @@ Leitura correta:
   regras por mesmo nome normalizado sem overwrite. O sistema ainda deve agregar
   por `card_id` para evitar fanout em contexto de deck e nao deve tentar
   corrigir isso escolhendo uma unica regra com `LIMIT 1`;
+- desde o Slice 2 de 2026-06-17, o registry Hermes possui dois contratos:
+  `load_active_battle_card_rules()`/`lookup_battle_card_rule()` retornam uma
+  regra primária para compatibilidade, enquanto
+  `load_active_battle_card_rule_lists()`/`lookup_battle_card_rule_list()`
+  retornam todas as regras ativas por nome normalizado. Otimizadores e
+  snapshots estratégicos devem usar o contrato de lista quando precisam
+  entender todos os papéis de uma carta;
+- `battle_analyst_v9.py#get_card_effect` ainda executa uma regra primária por
+  cast, mas registra `_rule_alternatives` e `rule_alternative_count` no replay
+  quando a carta possui múltiplas regras ativas. Executar múltiplos efeitos em
+  sequência só deve ser implementado quando houver modelagem explícita de
+  modo, trigger, habilidade ativada ou efeito estático, com teste focado;
 - `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade

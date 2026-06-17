@@ -87,6 +87,7 @@ EFFECT_TO_DECK_CATEGORY = {
 }
 
 _RULE_CACHE: dict[str, tuple[int | None, dict[str, dict[str, Any]]]] = {}
+_RULE_LIST_CACHE: dict[str, tuple[int | None, dict[str, list[dict[str, Any]]]]] = {}
 
 
 def utc_now() -> str:
@@ -346,22 +347,36 @@ def _db_mtime(db_path: Path) -> int | None:
         return None
 
 
-def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str, dict[str, Any]]:
+def _invalidate_rule_caches_for_connection(conn: sqlite3.Connection) -> None:
+    # Upserts are rare and rule correctness is more important than keeping a
+    # small in-process cache warm. SQLite temp paths can differ by spelling
+    # between `PRAGMA database_list` and caller-provided paths, so clear both
+    # caches globally instead of risking stale multi-rule reads.
+    _RULE_CACHE.clear()
+    _RULE_LIST_CACHE.clear()
+
+
+def load_active_battle_card_rule_lists(
+    db_path: str | Path = DEFAULT_DB,
+) -> dict[str, list[dict[str, Any]]]:
     path = Path(db_path)
     mtime = _db_mtime(path)
     cache_key = str(path)
-    cached = _RULE_CACHE.get(cache_key)
+    cached = _RULE_LIST_CACHE.get(cache_key)
     if cached and cached[0] == mtime:
-        return {key: dict(value) for key, value in cached[1].items()}
+        return {
+            key: [dict(rule) for rule in value]
+            for key, value in cached[1].items()
+        }
     if not path.exists():
-        _RULE_CACHE[cache_key] = (mtime, {})
+        _RULE_LIST_CACHE[cache_key] = (mtime, {})
         return {}
 
     try:
         with closing(sqlite3.connect(path)) as conn:
             conn.row_factory = sqlite3.Row
             if not table_exists(conn, "battle_card_rules"):
-                _RULE_CACHE[cache_key] = (mtime, {})
+                _RULE_LIST_CACHE[cache_key] = (mtime, {})
                 return {}
             rows = conn.execute(
                 """
@@ -372,10 +387,10 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
                 """
             ).fetchall()
     except sqlite3.Error:
-        _RULE_CACHE[cache_key] = (mtime, {})
+        _RULE_LIST_CACHE[cache_key] = (mtime, {})
         return {}
 
-    rules: dict[str, dict[str, Any]] = {}
+    rules: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         effect_json = _safe_json_loads(row["effect_json"])
         deck_role_json = _safe_json_loads(row["deck_role_json"])
@@ -392,9 +407,32 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
             "oracle_hash": row["oracle_hash"],
             "notes": row["notes"],
         }
-        current = rules.get(row["normalized_name"])
-        if current is None or _rule_rank(rule) < _rule_rank(current):
-            rules[row["normalized_name"]] = rule
+        rules.setdefault(row["normalized_name"], []).append(rule)
+
+    for normalized_name, values in rules.items():
+        values.sort(key=_rule_rank)
+
+    _RULE_LIST_CACHE[cache_key] = (mtime, rules)
+    return {
+        key: [dict(rule) for rule in value]
+        for key, value in rules.items()
+    }
+
+
+def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str, dict[str, Any]]:
+    path = Path(db_path)
+    mtime = _db_mtime(path)
+    cache_key = str(path)
+    cached = _RULE_CACHE.get(cache_key)
+    if cached and cached[0] == mtime:
+        return {key: dict(value) for key, value in cached[1].items()}
+
+    rule_lists = load_active_battle_card_rule_lists(path)
+    rules = {
+        normalized_name: values[0]
+        for normalized_name, values in rule_lists.items()
+        if values
+    }
     _RULE_CACHE[cache_key] = (mtime, rules)
     return {key: dict(value) for key, value in rules.items()}
 
@@ -414,6 +452,24 @@ def lookup_battle_card_rule(
         None,
     )
     return dict(rule) if rule else None
+
+
+def lookup_battle_card_rule_list(
+    db_path: str | Path,
+    card_name: str,
+) -> list[dict[str, Any]]:
+    rules = load_active_battle_card_rule_lists(db_path)
+    normalized = normalize_card_name(card_name)
+    values = rules.get(normalized)
+    if values:
+        return [dict(rule) for rule in values]
+    face_prefix = f"{normalized} //"
+    matches: list[dict[str, Any]] = []
+    for key, value in rules.items():
+        if key.startswith(face_prefix):
+            matches.extend(dict(rule) for rule in value)
+    matches.sort(key=_rule_rank)
+    return matches
 
 
 def upsert_battle_card_rule(
@@ -457,6 +513,7 @@ def upsert_battle_card_rule(
                 """,
                 (now, normalized, rule_key),
             )
+            _invalidate_rule_caches_for_connection(conn)
             return False
 
     conn.execute(
@@ -495,4 +552,5 @@ def upsert_battle_card_rule(
             now,
         ),
     )
+    _invalidate_rule_caches_for_connection(conn)
     return True

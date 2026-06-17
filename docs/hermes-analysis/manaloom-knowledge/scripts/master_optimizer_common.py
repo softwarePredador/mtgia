@@ -21,6 +21,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+import battle_rule_registry
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
@@ -557,24 +559,56 @@ def card_metadata(conn: sqlite3.Connection, card_name: str) -> sqlite3.Row | Non
     ).fetchone()
 
 
-def battle_rule_deck_category(conn: sqlite3.Connection, card_name: str) -> str | None:
+def _role_sort_key(role: str) -> int:
+    try:
+        return list(ROLE_FAMILIES).index(role)
+    except ValueError:
+        return len(ROLE_FAMILIES)
+
+
+def battle_rule_deck_categories(conn: sqlite3.Connection, card_name: str) -> set[str]:
     table = conn.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='battle_card_rules'"
     ).fetchone()
     if not table:
-        return None
-    row = conn.execute(
-        "SELECT deck_role_json FROM battle_card_rules WHERE normalized_name=?",
+        return set()
+    rows = conn.execute(
+        """
+        SELECT deck_role_json, effect_json
+        FROM battle_card_rules
+        WHERE normalized_name=?
+          AND review_status IN ('verified', 'needs_review', 'active')
+        """,
         (normalize_name(card_name),),
-    ).fetchone()
-    if not row:
+    ).fetchall()
+    categories: set[str] = set()
+    for row in rows:
+        try:
+            role = json.loads(str(row["deck_role_json"] or "{}"))
+        except Exception:
+            role = {}
+        category = role.get("category") if isinstance(role, dict) else None
+        if not category:
+            try:
+                effect = json.loads(str(row["effect_json"] or "{}"))
+            except Exception:
+                effect = {}
+            if isinstance(effect, dict):
+                category = battle_rule_registry.EFFECT_TO_DECK_CATEGORY.get(
+                    str(effect.get("effect") or "")
+                )
+        if category:
+            normalized = normalize_name(str(category)).replace(" ", "_")
+            if normalized and normalized != "unknown":
+                categories.add(normalized)
+    return categories
+
+
+def battle_rule_deck_category(conn: sqlite3.Connection, card_name: str) -> str | None:
+    categories = battle_rule_deck_categories(conn, card_name)
+    if not categories:
         return None
-    try:
-        role = json.loads(str(row["deck_role_json"] or "{}"))
-    except Exception:
-        return None
-    category = role.get("category") if isinstance(role, dict) else None
-    return str(category) if category else None
+    return sorted(categories, key=_role_sort_key)[0]
 
 
 def json_list(value: object) -> list[str]:
@@ -763,7 +797,7 @@ def quality_gate_candidate(
 
     removed_roles = roles_for_row(removed[0]) if removed else set()
     added_roles = infer_roles(
-        [battle_rule_deck_category(conn, card_added) or ""],
+        battle_rule_deck_categories(conn, card_added),
         type_line,
         str(meta["oracle_text"] if meta else ""),
     )

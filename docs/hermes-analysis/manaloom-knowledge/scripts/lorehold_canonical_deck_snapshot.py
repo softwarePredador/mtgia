@@ -79,21 +79,24 @@ def load_card_metadata(conn: sqlite3.Connection, card_name: str) -> dict[str, ob
         raise RuntimeError(f"Missing card_oracle_cache metadata for {card_name}")
 
     tag = "draw"
-    rule = fetch_one(
-        conn,
+    rules = conn.execute(
         """
         SELECT deck_role_json
         FROM battle_card_rules
         WHERE lower(card_name)=lower(?)
-        LIMIT 1
         """,
         (card_name,),
-    )
-    if rule and rule["deck_role_json"]:
+    ).fetchall()
+    tags: list[str] = []
+    for rule in rules:
         try:
-            tag = str(json.loads(rule["deck_role_json"]).get("category") or tag)
+            category = str(json.loads(rule["deck_role_json"]).get("category") or "")
         except Exception:
-            tag = "draw"
+            category = ""
+        if category:
+            tags.append(category)
+    if tags:
+        tag = tags[0]
 
     return {
         "card_name": row["name"],
