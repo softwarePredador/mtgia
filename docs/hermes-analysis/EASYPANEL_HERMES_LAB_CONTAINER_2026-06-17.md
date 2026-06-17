@@ -23,6 +23,7 @@ Camada adicional do projeto:
 - `server/bin/hermes_lab_entrypoint.sh`
 - `server/bin/hermes_lab_cron_bootstrap.py`
 - `server/bin/hermes_docs_branch_sync.sh`
+- `server/bin/hermes_lab_healthcheck.sh`
 
 O bootstrap precisa garantir:
 
@@ -55,6 +56,10 @@ O bootstrap precisa garantir:
    - `server/bin/reconcile_easypanel_services.py`
    - env mínima do `hermes-lab`
    - deploy controlado com espera do action e checagem de SHA
+10. materializar observabilidade local do startup:
+   - `startup_status.json` em `/opt/data/artifacts/hermes_lab_runtime/`
+   - log de bootstrap em `/opt/data/logs/hermes_lab_bootstrap.log`
+   - `HEALTHCHECK` Docker apontando para `hermes_lab_healthcheck.sh`
 
 ## O que o container precisa para funcionar
 
@@ -97,6 +102,10 @@ Observação de runtime:
   (`MANALOOM_REPO`/`MANALOOM_WORKSPACE`/`HERMES_REPO_DIR`) e mantém fallback
   empacotado de `hermes_docs_branch_sync.sh`; sem isso o `hermes-lab` entra em
   restart loop ainda no cont-init.
+- o entrypoint agora emite linhas estruturadas `HERMES_LAB_RUNTIME_STATUS ...`
+  para o stdout do container e grava um snapshot persistente do último estado de
+  startup; isso reduz o tempo de triagem quando o painel não mostra métricas ou
+  logs confiáveis.
 - o bootstrap também precisa persistir `.env` dentro do volume; depender só de
   env injetado pelo orchestrator deixa `hermes status` e a CLI interativa fora
   de sincronia com o provider real do serviço.
@@ -176,6 +185,9 @@ Removida por bootstrap por ser legado ou duplicação já aposentada:
 5. Só expor domínio público quando houver auth do dashboard ou política clara
    de reverse proxy privado.
 6. Só depois desligar a AWS.
+7. Validar que o healthcheck do container fica `healthy` após o bootstrap e que
+   o arquivo `startup_status.json` termina em `phase=gateway`, `status=starting`
+   ou estado posterior coerente.
 
 ## Script canônico de reconciliação
 
