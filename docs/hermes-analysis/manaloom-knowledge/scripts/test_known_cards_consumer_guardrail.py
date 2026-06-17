@@ -50,6 +50,7 @@ FORBIDDEN_SERVER_PATCHERS = {
 }
 
 FORBIDDEN_ONE_SHOT_RULE_PATCHERS = {
+    SCRIPT_DIR.parent / "_gc_check.py",
     SCRIPT_DIR / "_gc_check.py",
     SCRIPT_DIR / "_mulligan_exec15.py",
     SCRIPT_DIR / "_prepend_mulligan.py",
