@@ -627,6 +627,44 @@ Leitura correta desse recheck:
   slots como camada auxiliar. A ação correta continua sendo reduzir/explicar a
   dependência auxiliar, não apagar o fallback no escuro.
 
+Atualização operacional validada em 2026-06-17:
+
+- a row real em `commander_reference_profiles` para `Lorehold, the Historian`
+  ainda estava legada antes desta rodada:
+  `source=edhrec`, sem `confidence`, sem `source_count`, sem `version` e sem
+  `expected_packages`;
+- por isso o loader local reconstituía o profile como
+  `runtime_profile_origin=built_in_fallback`, mesmo com stats/corpus/usage
+  suficientes;
+- o utilitário canônico
+  `server/bin/commander_reference_profile_lorehold.dart --apply`
+  foi executado contra o PostgreSQL real e substituiu a row por shape
+  runtime-ready:
+  `source=aggregate_reference_profile_v1`,
+  `confidence=high`,
+  `source_count=4`,
+  `version=lorehold_reference_profile_v1_2026-05-11`;
+- no recheck local `commander_generate_provenance_2026-06-17_live5`,
+  `profile.row_confidence=high`, `profile.row_source_count=4`,
+  `profile.usable_runtime_origin=null` e
+  `profile.usable_runtime_reason=null`;
+- no recheck público
+  `lorehold_public_generator_parity_2026-06-17_post_profile_fix`,
+  `POST /ai/generate` passou a responder com
+  `diagnostics.reference_profile_used=true`,
+  `diagnostics.reference_card_stats_used=true` e
+  `diagnostics.runtime_profile_origin=null`.
+
+Leitura correta dessa atualização:
+
+- o problema do profile persistido do Lorehold não era mais lógica do loader; a
+  row persistida estava realmente em shape antiga;
+- o canal público agora enxerga o profile persistido canônico e não depende
+  mais do built-in fallback para ativar o path de referência;
+- o próximo gap do generator deixou de ser “fazer o profile funcionar” e passou
+  a ser “reduzir a participação auxiliar de `deterministic_fallback=42` sem
+  perder cobertura”.
+
 ### Bug real encontrado e corrigido nesta rodada
 
 `loadUsageHotCards()` estava multiplicando cartas por printings ao fazer join
