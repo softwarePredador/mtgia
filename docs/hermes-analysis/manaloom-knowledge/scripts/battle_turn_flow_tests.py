@@ -340,6 +340,54 @@ def register_tests(battle, player, card):
         assert evaluation["reason"] == "no_early_game_plan"
         assert "no_early_game_plan" in evaluation["risk_flags"]
 
+    def test_mulligan_bottoms_expensive_cards_before_lands_and_early_play():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Arcane Signet", "cmc": 2, "type_line": "Artifact", "effect": "ramp_permanent"},
+            {"name": "Cheap Removal", "cmc": 1, "type_line": "Instant", "effect": "remove_creature"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+            {"name": "Nine Mana Wincon", "cmc": 9, "type_line": "Sorcery", "effect": "wincon"},
+        ]
+
+        bottomed = battle.choose_mulligan_bottom_cards(hand, 2)
+
+        assert [card["name"] for card in bottomed] == [
+            "Nine Mana Wincon",
+            "Eight Mana Spell",
+        ]
+
+    def test_mulligan_bottoms_expensive_card_even_in_land_heavy_hand():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Clifftop Retreat", "cmc": 0, "type_line": "Land"},
+            {"name": "Battlefield Forge", "cmc": 0, "type_line": "Land"},
+            {"name": "Two Drop", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+        ]
+
+        bottomed = battle.choose_mulligan_bottom_cards(hand, 1)
+
+        assert bottomed[0]["name"] == "Eight Mana Spell"
+
+    def test_mulligan_bottoms_excess_land_when_no_dead_spell_exists():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Clifftop Retreat", "cmc": 0, "type_line": "Land"},
+            {"name": "Battlefield Forge", "cmc": 0, "type_line": "Land"},
+            {"name": "Two Drop", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+            {"name": "Three Drop", "cmc": 3, "type_line": "Creature", "effect": "creature"},
+        ]
+
+        bottomed = battle.choose_mulligan_bottom_cards(hand, 1)
+
+        assert battle.is_effective_land(bottomed[0])
+
     return [
         test_draw_step_runs_once_with_multiple_permanents,
         test_approach_sets_explicit_win_state,
@@ -356,4 +404,7 @@ def register_tests(battle, player, card):
         test_mulligan_keeps_three_lands_with_early_play,
         test_mulligan_keeps_two_lands_with_cheap_ramp,
         test_mulligan_rejects_dead_mox_amber_hand_without_live_legend,
+        test_mulligan_bottoms_expensive_cards_before_lands_and_early_play,
+        test_mulligan_bottoms_expensive_card_even_in_land_heavy_hand,
+        test_mulligan_bottoms_excess_land_when_no_dead_spell_exists,
     ]

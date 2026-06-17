@@ -49,7 +49,10 @@
   `alternatives_considered` e `rejected_reason`.
 - Mulligan deixou de ser apenas contagem de terrenos no trace: agora registra
   cores, curva inicial, ramp barato, cartas caras, riscos e motivo de
-  keep/mulligan. Ainda falta otimizar quais cartas vão para o fundo.
+  keep/mulligan. Em 2026-06-17 o bottom do London Mulligan tambem deixou de
+  ser aleatorio: cartas caras/mortas sao priorizadas para o fundo, lands
+  necessarias e jogadas iniciais sao preservadas, e excesso de land so vai para
+  o fundo quando nao houver spell morta melhor.
 - Mox Diamond/land discard e Crop Rotation/Harrow/land sacrifice agora
   registram opções de land, motivo de escolha e riscos como
   `spending_last_land` e `spending_unique_color_land`.
@@ -94,9 +97,10 @@
   ramp tapped; land sacrifice agora escolhe alvo por score mínimo e bloqueia
   fetch/tapped sem benefício claro quando gastaria última/única fonte. O replay
   registra `land_ramp_target_options` e `strategic_benefit_reason`.
-- Continua pendente: avaliação de board wipe/wheel, pass reasons mais ricos,
-  threat assessment por player/permanent, bottom-card selection do London
-  Mulligan e ampliação de corpus para confirmar Mox/land-sacrifice.
+- Continua pendente: avaliação de board wipe/wheel em corpus maior, pass
+  reasons mais ricos, threat assessment por player/permanent, explicacao
+  comparativa mais completa do bottom do London Mulligan e ampliação de corpus
+  para confirmar Mox/land-sacrifice.
 - Rodada pós-correção de board wipe/wheel (`20260615_172608`) analisou `19226`
   eventos e `2564` decisões: `strategy_findings=0`,
   `seeds_with_strategy_blockers=[]` e todas as categorias do
@@ -130,8 +134,8 @@
 - Validacao: `python3 -m py_compile` nos arquivos alterados e
   `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
   passaram.
-- Pendencias restantes apos esta auditoria: bottom-card selection do London
-  Mulligan, pass/no-action reasons mais ricos, cleanup 514.3a completo,
+- Pendencias restantes apos esta auditoria: explicacao comparativa mais rica do
+  London Mulligan, pass/no-action reasons mais ricos, cleanup 514.3a completo,
   upkeep generico, attack/block restrictions avancadas e threat assessment por
   player/permanent.
 
@@ -1284,7 +1288,7 @@ Tasks priorizadas derivadas do estudo:
 | P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
 | P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | WR bruto continua fraco como sinal de verdade | Aprendizado menos enganado por variance e jogos longos |
 | P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |
-| P1 | Formalizar a politica de mulligan Commander no auditor/trace como `curve + color + plan + sequencing + interaction` | A parte legal ja esta fechada, mas a explicacao estrategica ainda esta curta e o London Mulligan ainda nao bottoma cartas com criterio auditavel | Abertura de maos mais reproduzivel e melhor rastreabilidade do porquê keep/mull/bottom |
+| P1 | Formalizar a politica de mulligan Commander no auditor/trace como `curve + color + plan + sequencing + interaction` | A parte legal ja esta fechada; em 2026-06-17 o London Mulligan passou a escolher bottom por politica auditavel, preservando lands necessarias/early plays e priorizando bombas mortas. O gap restante e enriquecer o trace comparativo com alternativas rejeitadas e calibrar em corpus maior | Abertura de maos mais reproduzivel e melhor rastreabilidade do porquê keep/mull/bottom |
 | P1 | Sair do bucket hardcoded de arquétipo no quality gate e passar a usar `role_targets`/assinatura do profile | O erro mais gritante de `combo` ja foi corrigido, mas o gate ainda usa buckets grossos e land counts genericos por arquétipo | Optimize mais aderente ao profile real do comandante, inclusive Lorehold |
 | P1 | Promover `card_role_scores` em janela controlada com stale prune revisado | O slice EDHREC bounded ja existe, mas ainda nao foi aplicado como base mais forte do pipeline | Candidate pool mais data-backed para generate/optimize |
 | P1 | Provar consumo live do profile persistido do Lorehold e reduzir fallback literal | Em 2026-06-16 o recheck read-only de `commander_reference_profile_lorehold.dart --dry-run` fechou com `usable_after_run=true`, `confidence=high`, `source_count=4` e `34/34` reference stats resolvidos; em 2026-06-17 o auditor local com `usage_hot_cards` ampliado para 50 manteve `profile_usable=true`, `stats_count=34`, `corpus_accepted_deck_count=3` e reduziu `built_in_fallback_only_count` para `2` cartas (`Mind Stone`, `Fellwar Stone`) | O consumo ainda materializa `usable_runtime_origin=built_in_fallback` quando a row persistida não é considerada usável pelo loader; o próximo passo não é remover fallback, e sim tornar o profile persistido canônico/usável e curar o residual de 2 cartas por evidência de uso/corpus |

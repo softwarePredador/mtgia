@@ -214,6 +214,11 @@ Uso correto:
   estaveis: a regra dura e London Mulligan, e a heuristica minima de Commander
   precisa avaliar `curve + color + plan + sequencing + interaction`, nao apenas
   contagem de lands.
+- O bottom do London Mulligan nao deve ser aleatorio. Desde 2026-06-17,
+  `choose_mulligan_bottom_cards()` prioriza cartas caras/mortas para o fundo,
+  preserva lands necessarias quando a mao tem ate 3 lands, preserva ramp/early
+  interaction live e so bottoma land em excesso quando nao existe spell morta
+  melhor. Isso ainda e heuristica, mas torna a decisao reproduzivel e testavel.
 - Fast mana condicional conta como recurso inicial apenas quando a condicao de
   producao esta ativa no estado da partida ou na linha inicial prevista. Exemplo
   concreto ja fechado localmente: `Mox Amber` nao pode justificar keep nem

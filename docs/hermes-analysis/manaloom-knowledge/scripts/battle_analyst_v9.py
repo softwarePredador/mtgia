@@ -2675,9 +2675,9 @@ def play_mulligan(player, rng):
         player.hand = player.draw(7, rng)
         bottomed_cards = []
         bottom_count = max(0, mulligan_count - 1)  # free first
-        for _ in range(bottom_count):
-            if player.hand:
-                c = player.hand.pop(rng.randint(0, len(player.hand) - 1))
+        for c in choose_mulligan_bottom_cards(player.hand, bottom_count):
+            if c in player.hand:
+                player.hand.remove(c)
                 bottomed_cards.append(c.get("name", "?") if isinstance(c, dict) else str(c))
                 player.library.append(c)
         evaluation = mulligan_evaluation(player.hand)
@@ -2811,6 +2811,65 @@ def _opening_hand_has_early_plan(hand, lands):
         "early_turn_window": early_turn_window,
         "evaluated_nonlands": evaluated,
     }
+
+
+def _mulligan_bottom_priority(card, hand, land_count):
+    if not isinstance(card, dict):
+        return 0
+    if is_effective_land(card):
+        if land_count <= 3:
+            return -100
+        return 35 + max(0, land_count - 4) * 20
+
+    effect_data = _opening_hand_effect(card)
+    effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
+    cmc = _opening_hand_card_cmc(card)
+    priority = cmc * 8
+
+    if cmc >= 7:
+        priority += 60
+    elif cmc >= 5:
+        priority += 25
+
+    early_window = 2 if land_count == 2 else (4 if land_count >= 5 else 3)
+    if cmc <= early_window and effect not in ("counter", "unknown"):
+        priority -= 70
+
+    if effect in ("ramp_permanent", "land_ramp", "mana_dork") and cmc <= 2:
+        if _opening_hand_ramp_card_is_live(card, effect_data, hand, land_count, early_window):
+            priority -= 90
+        else:
+            priority += 30
+
+    if effect in ("remove_creature", "remove_permanent", "counter", "protection") and cmc <= 2:
+        priority -= 45
+
+    if effect in HIGH_IMPACT_PAYOFF_EFFECTS and cmc <= 4:
+        priority -= 20
+
+    if not _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, land_count):
+        priority += 55
+
+    return priority
+
+
+def choose_mulligan_bottom_cards(hand, bottom_count):
+    """Choose London Mulligan bottom cards by strategic opening-hand policy."""
+    if bottom_count <= 0:
+        return []
+    candidates = [card for card in hand if isinstance(card, dict)]
+    if not candidates:
+        return list(hand[:bottom_count])
+
+    land_count = sum(1 for card in hand if is_effective_land(card))
+    ranked = sorted(
+        enumerate(candidates),
+        key=lambda item: (
+            -_mulligan_bottom_priority(item[1], hand, land_count),
+            item[0],
+        ),
+    )
+    return [card for _index, card in ranked[:bottom_count]]
 
 
 def mulligan_evaluation(hand):

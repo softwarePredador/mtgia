@@ -908,10 +908,16 @@ movimento errado neste momento.
      - Commander oficial;
      - EDHREC para `curve`, `color`, `plan`, `sequencing` e necessidade
        eventual de `interaction`.
+   - Status 2026-06-17:
+     - `choose_mulligan_bottom_cards()` substituiu o bottom aleatorio;
+     - bombas 7+/8+ sem curva/ramp/selecao passam a ir para o fundo antes de
+       lands necessarias e jogadas iniciais;
+     - excesso de land so vai para o fundo quando nao ha spell morta melhor;
+     - fast mana morta continua fora do plano inicial.
    - Proximo passo correto:
-     - manter trace com `why keep`, `why mull`, `why bottom`;
-     - penalizar maos com bombas 7+/8+ sem curva/ramp/seleção;
-     - nao tratar fast mana morta como plano inicial.
+     - manter trace com `why keep`, `why mull`, `why bottom` e alternativas
+       rejeitadas;
+     - medir a politica em corpus maior contra baseline fixo.
    - Ganho: Lorehold para de inflar dados por maos "legais" mas
      estrategicamente ruins.
 
