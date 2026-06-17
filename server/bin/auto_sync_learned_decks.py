@@ -4,49 +4,48 @@ Default seguro: dry-run estrito. Use --apply ou HERMES_AUTO_SYNC_APPLY=1 para mu
 Regras: Lorehold -> PULA; qualquer outro -> export JSON e importador Commander 100/99+1.
 """
 
-import argparse, os, sqlite3, subprocess, sys
+import argparse, os, shutil, sqlite3, subprocess, sys
+from pathlib import Path
 from datetime import datetime, timezone
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.environ.get(
-    "MTGIA_HOME",
-    "/opt/data/workspace/mtgia",
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[1]
+PROJECT_DIR = Path(os.environ.get("MTGIA_HOME", str(REPO_ROOT)))
+SYNC_PROJECT_DIR = Path(os.environ.get("MTGIA_SYNC_HOME", str(PROJECT_DIR)))
+DART_BIN = os.environ.get(
+    "MANALOOM_DART_BIN",
+    os.environ.get("DART_BIN", shutil.which("dart") or "dart"),
 )
-SYNC_PROJECT_DIR = os.environ.get(
-    "MTGIA_SYNC_HOME",
-    "/opt/data/workspace/mtgia-sync",
-)
-DART_BIN = "/opt/data/tools/flutter/bin/dart"
 SQLITE_DB = os.environ.get(
     "HERMES_KNOWLEDGE_DB",
-    os.path.join(PROJECT_DIR, "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"),
+    str(PROJECT_DIR / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"),
 )
 EXPORT_SCRIPT_CANDIDATES = [
     os.environ.get("HERMES_EXPORT_SCRIPT"),
-    os.path.join(PROJECT_DIR, "server/bin/export_hermes_learned_deck.py"),
-    os.path.join(
-        PROJECT_DIR,
-        "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
-    ),
+    str(PROJECT_DIR / "server/bin/export_hermes_learned_deck.py"),
+    str(PROJECT_DIR / "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py"),
 ]
-ARTIFACT_DIR = os.environ.get(
+ARTIFACT_DIR = Path(os.environ.get(
     "HERMES_ARTIFACT_DIR",
-    "/opt/data/artifacts/hermes_auto_sync",
-)
-TRACKING_FILE = os.path.join(ARTIFACT_DIR, "synced_learned_ids.txt")
-SERVER_DIR = os.path.join(SYNC_PROJECT_DIR, "server")
+    str(PROJECT_DIR / "server/test/artifacts/hermes_auto_sync"),
+))
+TRACKING_FILE = ARTIFACT_DIR / "synced_learned_ids.txt"
+SERVER_DIR = Path(os.environ.get("MTGIA_SYNC_SERVER_DIR", str(SYNC_PROJECT_DIR / "server")))
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 REQUIRED_CARD_COUNT = int(os.environ.get("HERMES_AUTO_SYNC_REQUIRED_CARD_COUNT", "100"))
+ALLOW_RUNTIME_GIT_PULL = os.environ.get("MTGIA_SYNC_GIT_PULL", "0") == "1"
 
 ENV_FILES = [
-    os.path.join(SERVER_DIR, ".env"),
+    os.environ.get("MTGIA_ENV_FILE"),
+    str(SERVER_DIR / ".env"),
+    os.environ.get("MANALOOM_POSTGRES_ENV"),
     "/opt/data/secrets/manaloom-postgres.env",
 ]
 
 
 def _load_env():
     for env_file in ENV_FILES:
-        if not os.path.isfile(env_file):
+        if not env_file or not os.path.isfile(env_file):
             continue
         with open(env_file) as f:
             for line in f:
@@ -138,9 +137,9 @@ def _count_invalid_promoted_rows(db):
 
 
 def _ensure_artifact_storage():
-    os.makedirs(ARTIFACT_DIR, exist_ok=True)
-    if not os.path.exists(TRACKING_FILE):
-        open(TRACKING_FILE, "w").close()
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    if not TRACKING_FILE.exists():
+        TRACKING_FILE.write_text("")
 
 
 def main(argv=None):
@@ -154,9 +153,9 @@ def main(argv=None):
     print(f"mode={'apply' if apply else 'dry_run'} export_script={export_script}")
 
     # Pull latest sync copy
-    if os.path.isdir(SYNC_PROJECT_DIR):
+    if ALLOW_RUNTIME_GIT_PULL and SYNC_PROJECT_DIR.is_dir():
         subprocess.run(
-            ["git", "-C", SYNC_PROJECT_DIR, "pull", "--ff-only", "origin", "master"],
+            ["git", "-C", str(SYNC_PROJECT_DIR), "pull", "--ff-only", "origin", "master"],
             capture_output=True, timeout=30,
         )
 
@@ -176,7 +175,7 @@ def main(argv=None):
         return 0
 
     synced_ids = set()
-    with open(TRACKING_FILE) as f:
+    with TRACKING_FILE.open() as f:
         for line in f:
             line = line.strip()
             if line.isdigit():
@@ -197,12 +196,12 @@ def main(argv=None):
             continue
 
         print(f'SYNC commander={commander} learned_id={deck_id} "{deck_name}"')
-        json_path = os.path.join(ARTIFACT_DIR, f"auto_export_{deck_id}_{TIMESTAMP}.json")
+        json_path = ARTIFACT_DIR / f"auto_export_{deck_id}_{TIMESTAMP}.json"
 
         # Export
         exp = subprocess.run(
             [sys.executable, export_script, "--db", SQLITE_DB,
-             "--learned-id", str(deck_id), "--out", json_path],
+             "--learned-id", str(deck_id), "--out", str(json_path)],
             capture_output=True, text=True, timeout=30,
         )
         if exp.returncode != 0:
@@ -216,7 +215,7 @@ def main(argv=None):
              f"--input-json={json_path}", mode_arg, "--strict",
              f"--artifact-dir={ARTIFACT_DIR}"],
             capture_output=True, text=True, timeout=60,
-            cwd=SERVER_DIR,
+            cwd=str(SERVER_DIR),
         )
         if app.returncode != 0:
             app_error = (app.stderr or "") + "\n" + (app.stdout or "")
@@ -241,7 +240,7 @@ def main(argv=None):
             print("  DRY_RUN_OK")
 
     # Persiste tracking
-    with open(TRACKING_FILE, "w") as f:
+    with TRACKING_FILE.open("w") as f:
         for sid in sorted(synced_ids):
             f.write(f"{sid}\n")
 

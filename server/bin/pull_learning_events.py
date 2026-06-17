@@ -6,25 +6,28 @@ Faz parte do loop App → Hermes:
 
 Execucao idempotente: eventos ja sincronizados sao ignorados.
 """
-
 import json, os, sqlite3, sys
+from pathlib import Path
 from datetime import datetime, timezone
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_KNOWLEDGE_DB = (
+    REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+)
+SYNC_HOME = Path(os.environ.get("MTGIA_SYNC_HOME", str(REPO_ROOT)))
+SYNC_SERVER_DIR = Path(os.environ.get("MTGIA_SYNC_SERVER_DIR", str(SYNC_HOME / "server")))
+ENV_FILE = Path(os.environ.get("MTGIA_ENV_FILE", str(SYNC_SERVER_DIR / ".env")))
 
 SQLITE_DB = os.environ.get(
     "HERMES_KNOWLEDGE_DB",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    str(DEFAULT_KNOWLEDGE_DB),
 )
-
-SYNC_DIR = os.path.join(
-    os.environ.get("MTGIA_SYNC_HOME", "/opt/data/workspace/mtgia-sync"), "server"
-)
-ENV_FILE = os.path.join(SYNC_DIR, ".env")
 
 def _load_env():
     """Carrega variaveis do .env para os.environ se ainda nao definidas."""
-    if not os.path.isfile(ENV_FILE):
+    if not ENV_FILE.is_file():
         return
-    with open(ENV_FILE) as f:
+    with ENV_FILE.open() as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#") or "=" not in line:

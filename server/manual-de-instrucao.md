@@ -3,6 +3,58 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-17 — Cutover Hermes AWS -> EasyPanel (slice server-owned)
+
+Motivo:
+
+- O que sera desligado e a AWS que hoje hospeda o Hermes. O produto nao precisa
+  do Hermes inteiro em producao; precisa apenas dos jobs operacionais que
+  realmente alimentam `learned decks`, sync e preflight.
+- O EasyPanel atual tem folga de host, mas ja roda muitos servicos e quase
+  todos estao sem limites explicitos de CPU/RAM. Migrar o Hermes inteiro seria
+  mistura indevida de laboratorio com runtime do produto.
+
+Patch aplicado:
+
+- `server/bin/pull_learning_events.py` e
+  `server/bin/auto_sync_learned_decks.py` deixaram de depender de paths
+  hardcoded de `/opt/data/...` e agora derivam defaults do repo/ambiente.
+- `server/bin/auto_sync_learned_decks.py` parou de fazer `git pull` em runtime
+  por default; isso so volta se `MTGIA_SYNC_GIT_PULL=1`.
+- wrappers portaveis:
+  - `server/bin/pull_learning_events.sh`
+  - `server/bin/auto_sync_learned_decks.sh`
+  - `server/bin/master_optimizer_preflight.sh`
+- novo runtime server-owned:
+  - `server/Dockerfile.manaloom-ops`
+  - `server/bin/manaloom_ops_entrypoint.sh`
+- documentacao de deploy/cutover:
+  - `docs/hermes-analysis/EASYPANEL_CRON_MIGRATION_SLICE1_2026-06-17.md`
+  - `docs/hermes-analysis/EASYPANEL_MANALOOM_OPS_CUTOVER_2026-06-17.md`
+
+Desenho aprovado:
+
+- manter `cartinhas` como backend publico;
+- criar servico separado `manaloom-ops` no projeto `evolution`;
+- migrar agora apenas:
+  - `pull_learning_events`
+  - `auto_sync_learned_decks`
+  - `master_optimizer_preflight`
+- manter jobs exploratorios/provider-heavy fora do runtime principal.
+
+Validacao:
+
+- `bash -n server/bin/master_optimizer_preflight.sh server/bin/manaloom_ops_entrypoint.sh`
+- `sh -n server/bin/pull_learning_events.sh server/bin/auto_sync_learned_decks.sh`
+- `python3 -m py_compile server/bin/pull_learning_events.py server/bin/auto_sync_learned_decks.py`
+
+Risco remanescente:
+
+- antes do cutover real, o servico `manaloom-ops` deve receber limites
+  explicitos de CPU/RAM e volume proprio para `knowledge.db`/artifacts;
+- o token de operador do EasyPanel tem privilegio alto e deve ser tratado como
+  segredo operacional, idealmente com rotacao apos a fase de migracao.
+
 ## 2026-06-04 — Gate premium de validacao visual
 
 Motivo:
@@ -18372,3 +18424,54 @@ na command zone, não para validação de deck no servidor.
   `allowlist_apply_approved_required`.
 - Nenhum write real em `card_function_tags` está aprovado sem nova allowlist
   revisada com `apply_approved=true` e validação de falso positivo zero.
+
+## 2026-06-17 — Slice local Lorehold miracle/topdeck no battle
+
+- `battle_analyst_v9.py` recebeu o primeiro slice seguro para aproximar o
+  battle do plano real do `Lorehold, the Historian`.
+- Entraram no runtime local:
+  - upkeep rummage do Lorehold em turno de oponente com `decision_trace_v1`;
+  - reset de `cards_drawn_this_turn` por turno global;
+  - `Library of Leng` como `no_max_hand_size` +
+    `discard_effect_to_top_replacement`;
+  - `Library of Leng` tambem passou a cobrir os caminhos ja modelados de
+    discard por efeito em `wheel_resolved`;
+  - `Sensei's Divining Top` com reorder de topo para melhorar first
+    draw/miracle e linha segura de `draw -> put self on top` quando o topo
+    atual ja e o melhor miracle castavel;
+  - `Scroll Rack` com slice seguro de upkeep: troca de uma instant/sorcery
+    forte da mao para o topo para preparar a proxima draw step de miracle;
+  - helper reaproveitável de `miracle_cast` fora do draw step próprio.
+- Ajuste estrutural complementar:
+  - `known_cards_canonical_snapshot.json` deixou de ser exportado por ordem
+    incidental de linha; agora usa prioridade canonica de regra para nao
+    degradar cartas multi-fonte como `Approach of the Second Sun` e
+    `Library of Leng` no fallback JSON.
+  - `sync_battle_card_rules.py` passou a limpar linhas `manual` obsoletas e
+    regras `curated` superseded do mesmo card antes de reexportar o snapshot
+    local, evitando drift silencioso no cache SQLite/Hermes.
+  - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` passou a filtrar
+    linhas `curated` historicas que nao pertencem mais ao reviewed layer atual
+    antes de refreshar o SQLite Hermes, reaplicando tambem a limpeza de
+    `manual` obsoleto e `curated` superseded no espelho PG -> cache.
+- Guardrail mantido:
+  - o runtime ainda aceita fallback por nome para `Lorehold, the Historian`
+    quando o permanente antigo não vier enriquecido, mas a fonte principal passa
+    a ser a regra revisada canônica.
+- Fechamento adicional validado no mesmo ciclo:
+  - `Ashnod's Altar` saiu de metadata-only e ganhou um slice seguro de
+    ativacao contextual para `sacrifice_creature -> mana unlock`, limitado ao
+    `precombat_main`, sem sacrificar comandante e sem abrir combo engine
+    generica.
+- Validação local:
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+    -> `Ran 15 tests ... OK`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_manual_preserve.py`
+    -> `Ran 5 tests ... OK`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py`
+    -> `Ran 4 tests ... OK`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+    -> `PASS`
+- Evidência controlada gerada em:
+  - `server/test/artifacts/lorehold_battle_validation_2026-06-17/`
+    com cenários de upkeep/topdeck e upkeep+miracle cast.

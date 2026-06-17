@@ -1,0 +1,31 @@
+FROM dart:stable
+
+WORKDIR /app
+
+ENV PATH="$PATH:/root/.pub-cache/bin"
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    busybox-static \
+    ca-certificates \
+    git \
+    python3 \
+    util-linux \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY pubspec.yaml ./
+RUN dart pub get
+
+COPY . .
+
+RUN chmod +x \
+  /app/server/bin/pull_learning_events.sh \
+  /app/server/bin/auto_sync_learned_decks.sh \
+  /app/server/bin/master_optimizer_preflight.sh \
+  /app/server/bin/manaloom_ops_entrypoint.sh
+
+ENV MANALOOM_OPS_DATA_DIR=/data/manaloom-ops
+VOLUME ["/data/manaloom-ops"]
+
+CMD ["/bin/bash", "/app/server/bin/manaloom_ops_entrypoint.sh"]

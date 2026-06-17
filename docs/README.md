@@ -40,23 +40,31 @@ as fontes canônicas abaixo.
    - estudo consolidado do estado real do battle simulator, da geracao de
      decks e do caso Lorehold; separa o que ja e dado util, o que ainda e
      heuristica operacional e a ordem correta dos proximos slices.
-11. `server/manual-de-instrucao.md`
+11. `docs/hermes-analysis/EASYPANEL_MANALOOM_OPS_CUTOVER_2026-06-17.md`
+   - desenho operacional do cutover AWS Hermes -> EasyPanel para os jobs
+     críticos do produto, com serviço `manaloom-ops`, volume, envs, limites e
+     sequência de migração controlada.
+12. `docs/hermes-analysis/EASYPANEL_CRON_MIGRATION_SLICE1_2026-06-17.md`
+   - slice 1 de portabilidade dos entrypoints críticos (`pull-learning-events`,
+     `auto-sync-learned-decks`, `master-optimizer-preflight`) para runtime
+     server-owned.
+13. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
-12. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+14. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
-13. `app/doc/APP_AUDIT_2026-04-29.md`
+15. `app/doc/APP_AUDIT_2026-04-29.md`
    - status consolidado do app mobile, riscos e validacoes recentes.
-14. `app/doc/UI_TEST_SURFACE_MAP.md`
+16. `app/doc/UI_TEST_SURFACE_MAP.md`
    - keys e superficies que testes runtime devem usar.
-15. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+17. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
    - checklist para rodada interna non-scanner.
-16. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+18. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-17. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+19. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
    - veredito global atual de produto, gates restantes e ordem de execucao.
-18. `app/doc/runtime_flow_handoffs/README.md`
+20. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-19. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+21. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 
@@ -71,6 +79,12 @@ as fontes canônicas abaixo.
 - Gate visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md` e
   baseline gerada em `docs/qa/manaloom_premium_visual_audit_latest.md`
 - Prova runtime visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_RUNTIME_PROOF_2026-06-04.md`
+- Battle/generator truth (2026-06-17):
+  `docs/hermes-analysis/BATTLE_GENERATOR_TRUTH_STUDY_2026-06-17.md`,
+  `docs/hermes-analysis/BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md`,
+  `docs/hermes-analysis/BATTLE_GENERATOR_IMPLEMENTATION_SLICE_SPEC_2026-06-17.md`
+- Lorehold miracle/topdeck audit (2026-06-17):
+  `docs/hermes-analysis/LOREHOLD_MIRACLE_TOPDECK_READINESS_AUDIT_2026-06-17.md`
 - Icone do app: `docs/qa/manaloom_app_icon_contact_sheet_2026-05-21.png`
 - Splash art: `docs/qa/manaloom_splash_art_preview_2026-05-21.png`
 - Auditoria de docs/artefatos: `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
