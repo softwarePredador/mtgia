@@ -200,6 +200,7 @@ Future<void> main(List<String> args) async {
             profile: usableProfile,
             referenceCardStats: statsLoad.stats,
             referenceDeckCorpusGuidance: corpus,
+            promotedLearnedCardNames: learnedNames,
             usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
           );
     final deterministicDeck = deterministicDeckResult?.deck;
@@ -251,12 +252,13 @@ Future<void> main(List<String> args) async {
       'artifact_dir': artifactDir.path,
       'generator_truth': {
         'learned_deck_route_is_parallel_product_channel': true,
-        'ai_generate_reads_learned_decks_directly': false,
+        'ai_generate_reads_learned_decks_directly': learnedNames.isNotEmpty,
         'backend_ownership': [
           'commander_reference_profiles',
           'commander_reference_card_stats',
           'commander_reference_deck_analysis',
           'commander_card_usage',
+          if (learnedNames.isNotEmpty) 'commander_learned_decks',
           if (isLoreholdCommanderReferenceCandidate(commander))
             'loreholdDeterministicReferenceFallbackCards',
         ],

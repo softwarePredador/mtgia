@@ -140,6 +140,7 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
   required Map<String, dynamic> profile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
 }) =>
@@ -147,6 +148,7 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
       profile: profile,
       referenceCardStats: referenceCardStats,
       referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+      promotedLearnedCardNames: promotedLearnedCardNames,
       usageHotCardNames: usageHotCardNames,
       targetMainQuantity: targetMainQuantity,
     ).deck;
@@ -155,6 +157,7 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   required Map<String, dynamic> profile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
 }) {
@@ -235,6 +238,10 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
         addCard(rawCard.toString(), 'profile_expected_packages');
       }
     }
+  }
+
+  for (final rawName in promotedLearnedCardNames) {
+    addCard(rawName, 'active_learned_deck');
   }
 
   for (final rawName in usageHotCardNames) {

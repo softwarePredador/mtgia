@@ -234,6 +234,111 @@ class BattleRuleAlternativesTests(unittest.TestCase):
             "activated_ability_requires_executor",
         )
 
+    def test_review_only_rule_is_audited_but_does_not_block_executable_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                battle.battle_rule_registry.ensure_battle_card_rules(conn)
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Review Only Test Spell",
+                    {
+                        "effect": "draw_cards",
+                        "count": 2,
+                    },
+                    source="curated",
+                    confidence=0.99,
+                    review_status="verified",
+                    execution_status="review_only",
+                )
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Review Only Test Spell",
+                    {
+                        "effect": "remove_creature",
+                        "target": "creature",
+                    },
+                    source="curated",
+                    confidence=0.95,
+                    review_status="verified",
+                    execution_status="executable",
+                )
+                conn.commit()
+            old_db = battle.DB
+            try:
+                battle.DB = str(sqlite_db)
+                resolved = battle.get_card_effect(
+                    {
+                        "name": "Review Only Test Spell",
+                        "type_line": "Instant",
+                        "oracle_text": "",
+                    }
+                )
+            finally:
+                battle.DB = old_db
+
+        blocked = resolved.get("_rule_blocked_alternatives") or []
+        self.assertEqual(resolved.get("effect"), "remove_creature")
+        self.assertEqual(resolved.get("_rule_execution_status"), "executable")
+        self.assertEqual(len(blocked), 1)
+        self.assertEqual(
+            blocked[0].get("runtime_reason"),
+            "execution_status_review_only",
+        )
+
+    def test_annotation_only_rule_can_merge_safe_metadata_without_executing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                battle.battle_rule_registry.ensure_battle_card_rules(conn)
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Annotation Only Test Spell",
+                    {
+                        "effect": "draw_cards",
+                        "count": 2,
+                        "target": "self",
+                    },
+                    source="curated",
+                    confidence=0.96,
+                    review_status="verified",
+                    execution_status="executable",
+                )
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Annotation Only Test Spell",
+                    {
+                        "effect": "draw_cards",
+                        "target": "self",
+                        "requires_discard_land": True,
+                        "battle_model_scope": "additional_cost_annotation_v1",
+                    },
+                    source="curated",
+                    confidence=0.99,
+                    review_status="verified",
+                    execution_status="annotation_only",
+                )
+                conn.commit()
+            old_db = battle.DB
+            try:
+                battle.DB = str(sqlite_db)
+                resolved = battle.get_card_effect(
+                    {
+                        "name": "Annotation Only Test Spell",
+                        "type_line": "Sorcery",
+                        "oracle_text": "",
+                    }
+                )
+            finally:
+                battle.DB = old_db
+
+        merged = resolved.get("_rule_merged_alternatives") or []
+        self.assertEqual(resolved.get("effect"), "draw_cards")
+        self.assertEqual(resolved.get("_rule_execution_status"), "executable")
+        self.assertTrue(resolved.get("requires_discard_land"))
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0].get("execution_status"), "annotation_only")
+
     def test_runtime_merges_safe_additional_cost_annotation_from_secondary_rule(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"

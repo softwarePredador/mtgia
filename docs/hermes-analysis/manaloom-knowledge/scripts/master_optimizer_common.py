@@ -578,6 +578,7 @@ def battle_rule_deck_categories(conn: sqlite3.Connection, card_name: str) -> set
         FROM battle_card_rules
         WHERE normalized_name=?
           AND review_status IN ('verified', 'needs_review', 'active')
+          AND execution_status != 'disabled'
         """,
         (normalize_name(card_name),),
     ).fetchall()

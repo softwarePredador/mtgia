@@ -444,6 +444,58 @@ void main() {
       );
     });
 
+    test('promoted learned deck cards are consumed before usage hot cards and fallback',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_active_learned_deck_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        promotedLearnedCardNames: const [
+          'Fellwar Stone',
+          'Smuggler\'s Share',
+        ],
+        usageHotCardNames: const [
+          'Smuggler\'s Share',
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName),
+        containsAll(['Fellwar Stone', 'Smuggler\'s Share']),
+      );
+      expect(result.sourceUsageCounts['active_learned_deck'], equals(2));
+      final fellwarStone = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Fellwar Stone',
+      );
+      expect(
+        fellwarStone.sources,
+        equals(['active_learned_deck', 'deterministic_fallback']),
+      );
+      final smugglersShare = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Smuggler\'s Share',
+      );
+      expect(
+        smugglersShare.sources,
+        equals(['active_learned_deck', 'usage_hot_cards']),
+      );
+      expect(result.builtInFallbackOnlyCount, equals(4));
+    });
+
     test('filters off-color generated cards before reference validation repair',
         () {
       final profile = buildLoreholdReferenceProfilePayload(

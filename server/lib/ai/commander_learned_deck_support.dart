@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 
+import 'commander_reference_helpers.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderLearnedDecksTable = 'commander_learned_decks';
@@ -255,6 +256,86 @@ List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCards(
   String cardList,
 ) =>
     parseCommanderLearnedDeckCardList(cardList);
+
+Future<CommanderLearnedDeckInput?> loadActiveCommanderLearnedDeck({
+  required Pool pool,
+  required String commanderName,
+}) async {
+  final commander = commanderName.trim();
+  if (commander.isEmpty) return null;
+  try {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          commander_name,
+          deck_name,
+          source_system,
+          source_ref,
+          source_url,
+          archetype,
+          card_list,
+          card_count,
+          score,
+          wincon_primary,
+          wincon_backup,
+          legal_status,
+          notes,
+          metadata,
+          is_active,
+          promoted_at,
+          updated_at
+        FROM commander_learned_decks
+        WHERE commander_name_normalized = @commander
+          AND is_active = TRUE
+        ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
+        LIMIT 1
+      '''),
+      parameters: {
+        'commander': normalizeCommanderReferenceName(commander),
+      },
+    );
+    if (result.isEmpty) return null;
+    final row = result.first;
+    return CommanderLearnedDeckInput(
+      commanderName: row[0]?.toString() ?? commander,
+      deckName: row[1]?.toString() ?? commander,
+      sourceSystem: row[2]?.toString() ?? 'hermes',
+      sourceRef: row[3]?.toString() ?? 'learned_deck:unknown',
+      sourceUrl: row[4]?.toString(),
+      archetype: row[5]?.toString(),
+      cardList: row[6]?.toString() ?? '',
+      cardCount: _intValue(row[7]),
+      score: _nullableDouble(row[8]),
+      winconPrimary: row[9]?.toString(),
+      winconBackup: row[10]?.toString(),
+      legalStatus: row[11]?.toString(),
+      notes: row[12]?.toString(),
+      metadata: _jsonObject(row[13]),
+      isActive: row[14] == true,
+      promotedAt: _dateTimeValue(row[15]),
+      updatedAt: _dateTimeValue(row[16]),
+    );
+  } catch (error) {
+    if (isUndefinedLearnedDeckTableError(error)) return null;
+    rethrow;
+  }
+}
+
+List<String> activeCommanderLearnedDeckCardNames(
+  CommanderLearnedDeckInput? deck,
+) {
+  if (deck == null) return const [];
+  final normalizedCommander = deck.commanderNameNormalized;
+  final seen = <String>{};
+  final names = <String>[];
+  for (final card in deck.cards) {
+    final normalized = normalizeCommanderReferenceName(card.name);
+    if (normalized.isEmpty || normalized == normalizedCommander) continue;
+    if (!seen.add(normalized)) continue;
+    names.add(card.name);
+  }
+  return names;
+}
 
 CommanderLearnedDeckCardLine? _parseCommanderLearnedDeckCardLine(String line) {
   final withoutBullet = line.replaceFirst(RegExp(r'^[-*]\s+'), '').trim();

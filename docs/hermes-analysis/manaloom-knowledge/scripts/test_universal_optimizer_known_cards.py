@@ -85,6 +85,7 @@ class UniversalOptimizerKnownCardsTests(unittest.TestCase):
         self.assertEqual(known_cards["Alpha Card"]["effect"], "counter")
         self.assertEqual(known_cards["Alpha Card"]["battle_rule_source"], "manual")
         self.assertEqual(known_cards["Alpha Card"]["battle_rule_review_status"], "verified")
+        self.assertEqual(known_cards["Alpha Card"]["battle_rule_execution_status"], "auto")
         self.assertEqual(known_cards["Beta Card"]["effect"], "tutor")
 
     def test_canonical_snapshot_loads_when_sqlite_has_no_rule(self) -> None:

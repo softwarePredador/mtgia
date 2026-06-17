@@ -7,6 +7,7 @@ import '../generated_deck_validation_service.dart';
 import 'commander_reference_card_stats_support.dart';
 import 'commander_reference_deck_corpus_support.dart';
 import 'commander_reference_generate_fallback_support.dart';
+import 'commander_learned_deck_support.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderReferenceReadinessVersion =
@@ -339,6 +340,12 @@ Future<CommanderReferenceReadinessScorecard>
     pool: pool,
     commanderName: commanderName,
   );
+  final activeLearnedDeck = await loadActiveCommanderLearnedDeck(
+    pool: pool,
+    commanderName: commanderName,
+  );
+  final promotedLearnedCardNames =
+      activeCommanderLearnedDeckCardNames(activeLearnedDeck);
 
   var commanderResolved = false;
   var deterministicValid = false;
@@ -357,6 +364,7 @@ Future<CommanderReferenceReadinessScorecard>
         profile: profile,
         referenceCardStats: statsLoad.stats,
         referenceDeckCorpusGuidance: corpus,
+        promotedLearnedCardNames: promotedLearnedCardNames,
       );
       final cards = (deck['cards'] as List?)
               ?.whereType<Map>()

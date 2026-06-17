@@ -595,6 +595,22 @@ generator:
 - `built_in_fallback_only_count` caiu de `16` para `2`
 - `built_in_fallback_only_sample = [Mind Stone, Fellwar Stone]`
 
+Addendum validado localmente em 2026-06-17 (`commander_generate_provenance_2026-06-17_live4`):
+
+- `profile.usable = true`
+- `profile.usable_runtime_origin = built_in_fallback`
+- `reference_card_stats.usable_count = 34`
+- `reference_corpus.accepted_deck_count = 3`
+- `usage_hot_cards.count = 50`
+- `active_learned_deck.exists = true`
+- `deterministic_deck.runtime_build_diagnostics.source_usage_counts.active_learned_deck = 68`
+- `deterministic_deck.runtime_build_diagnostics.source_usage_counts.reference_corpus_packages = 36`
+- `deterministic_deck.runtime_build_diagnostics.source_usage_counts.reference_card_stats = 34`
+- `deterministic_deck.runtime_build_diagnostics.source_usage_counts.usage_hot_cards = 22`
+- `deterministic_deck.runtime_build_diagnostics.source_usage_counts.deterministic_fallback = 42`
+- `deterministic_deck.runtime_build_diagnostics.built_in_fallback_only_count = 0`
+- `findings = []`
+
 Leitura correta desse recheck:
 
 - o PostgreSQL ja tinha 50 sinais de uso real para Lorehold, mas o caminho live
@@ -602,10 +618,14 @@ Leitura correta desse recheck:
   determinístico;
 - ampliar o consumo para 50 não muda contrato publico, não lê SQLite Hermes como
   fonte final e não copia o learned deck diretamente;
-- a dependência residual de fallback literal ficou pequena e explícita, mas ela
-  ainda existe e não deve ser apagada sem cobertura por stats/corpus/uso;
-- o próximo ajuste de código deve mirar `Mind Stone`/`Fellwar Stone` ou o
-  consumo direto controlado do learned deck, não uma remoção ampla do fallback.
+- o gap “learned deck paralelo nao ranqueado no generate” desapareceu nesse
+  recheck local; isso mostra que o builder determinístico já absorve o learned
+  deck promovido como sinal real de ranking, sem precisar copiar o deck
+  aprendido inteiro;
+- a dependência residual de fallback literal deixou de existir como origem
+  exclusiva no caso de controle atual, mas o fallback ainda participa de `42`
+  slots como camada auxiliar. A ação correta continua sendo reduzir/explicar a
+  dependência auxiliar, não apagar o fallback no escuro.
 
 ### Bug real encontrado e corrigido nesta rodada
 

@@ -504,6 +504,7 @@ final migrations = <Migration>[
         confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
           CHECK (confidence >= 0 AND confidence <= 1),
         review_status TEXT NOT NULL DEFAULT 'verified',
+        execution_status TEXT NOT NULL DEFAULT 'auto',
         rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
         oracle_hash TEXT,
         notes TEXT,
@@ -522,6 +523,15 @@ final migrations = <Migration>[
             'needs_review',
             'rejected',
             'deprecated'
+          )
+        ),
+        CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+          execution_status IN (
+            'auto',
+            'executable',
+            'annotation_only',
+            'review_only',
+            'disabled'
           )
         )
       );
@@ -832,6 +842,53 @@ final migrations = <Migration>[
 
       ALTER TABLE card_battle_rules
       DROP COLUMN IF EXISTS logical_rule_key;
+    ''',
+  ),
+  Migration(
+    version: '029',
+    name: 'add_card_battle_rules_execution_status',
+    up: '''
+      ALTER TABLE card_battle_rules
+      ADD COLUMN IF NOT EXISTS execution_status TEXT;
+
+      UPDATE card_battle_rules
+      SET execution_status = CASE
+        WHEN review_status IN ('rejected', 'deprecated') THEN 'disabled'
+        WHEN review_status = 'needs_review' THEN 'review_only'
+        ELSE 'auto'
+      END
+      WHERE execution_status IS NULL OR execution_status = '';
+
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN execution_status SET DEFAULT 'auto';
+
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN execution_status SET NOT NULL;
+
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS chk_card_battle_rules_execution_status;
+
+      ALTER TABLE card_battle_rules
+      ADD CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+        execution_status IN (
+          'auto',
+          'executable',
+          'annotation_only',
+          'review_only',
+          'disabled'
+        )
+      );
+
+      $cardIntelligenceSnapshotViewStatement;
+      $optimizeCandidateQualitySummaryViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS chk_card_battle_rules_execution_status;
+      ALTER TABLE card_battle_rules
+      DROP COLUMN IF EXISTS execution_status;
     ''',
   ),
 ];

@@ -73,6 +73,7 @@ def load_known_cards(db_path: str) -> dict[str, dict[str, object]]:
         merged["battle_rule_categories"] = sorted(set(categories))
         merged["battle_rule_source"] = rule.get("source")
         merged["battle_rule_review_status"] = rule.get("review_status")
+        merged["battle_rule_execution_status"] = rule.get("execution_status")
         known_cards[name] = merged
     return known_cards
 

@@ -218,6 +218,7 @@ void main() {
       expect(view, contains('left join battle_rules br on br.card_id = c.id'));
       expect(view, contains('battle_rule_count'));
       expect(view, contains('verified_battle_rules'));
+      expect(view, contains("'execution_status', execution_status"));
       expect(view, contains('source_coverage'));
 
       for (final source in [

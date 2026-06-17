@@ -703,6 +703,21 @@ Leitura correta:
   `rule_runtime_selection_mode=single_selected_with_safe_annotations` e
   `rule_merged_annotation_count`; isso cobre o caso de multi-rule “efeito
   principal + custo/guardrail” sem reabrir execução cega por nome;
+- no fechamento desse slice em 2026-06-17, PG `card_battle_rules`, SQLite
+  Hermes `battle_card_rules`, snapshot canônico e runtime passaram a carregar
+  `execution_status` com os estados
+  `auto|executable|annotation_only|review_only|disabled`. A partir daí,
+  “múltiplas regras por carta” deixou de significar implicitamente “múltiplas
+  regras executáveis por carta”;
+- `load_active_battle_card_rule_lists()` e os consumidores secundários do pool
+  canônico passaram a excluir `execution_status='disabled'` do contrato ativo.
+  `annotation_only` e `review_only` continuam úteis para auditoria e
+  explainability, mas não podem voltar a contaminar runtime como se fossem
+  regras duras;
+- `server/bin/auto_promote_battle_rules.py` também foi ajustado para não
+  promover linhas por `normalized_name` quando existir multi-rule ativa para a
+  mesma carta. Nesses casos ele atualiza rastreamento, mas bloqueia promoção e
+  exige evidência row-level em vez de promover todas as regras silenciosamente;
 - `Worldfire` deixou de ser modelado como `board_wipe` genérico. O runtime
   agora o trata como `worldfire_reset`: exila permanentes, exila mãos e
   cemitérios, ajusta vidas para `1` e respeita replacement de comandante para

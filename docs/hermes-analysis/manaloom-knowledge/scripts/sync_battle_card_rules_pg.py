@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
   confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
     CHECK (confidence >= 0 AND confidence <= 1),
   review_status TEXT NOT NULL DEFAULT 'verified',
+  execution_status TEXT NOT NULL DEFAULT 'auto',
   rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
   oracle_hash TEXT,
   notes TEXT,
@@ -92,6 +93,15 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
       'needs_review',
       'rejected',
       'deprecated'
+    )
+  ),
+  CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+    execution_status IN (
+      'auto',
+      'executable',
+      'annotation_only',
+      'review_only',
+      'disabled'
     )
   ),
   PRIMARY KEY (normalized_name, logical_rule_key)
@@ -228,6 +238,30 @@ def ensure_pg_table(cur: Any) -> None:
     for statement in [part.strip() for part in PG_SCHEMA.split(";") if part.strip()]:
         cur.execute(statement)
     cur.execute("ALTER TABLE card_battle_rules ADD COLUMN IF NOT EXISTS logical_rule_key TEXT")
+    cur.execute("ALTER TABLE card_battle_rules ADD COLUMN IF NOT EXISTS execution_status TEXT")
+    cur.execute(
+        """
+        UPDATE card_battle_rules
+        SET execution_status = CASE
+          WHEN review_status IN ('rejected', 'deprecated') THEN 'disabled'
+          WHEN review_status = 'needs_review' THEN 'review_only'
+          ELSE 'auto'
+        END
+        WHERE execution_status IS NULL OR execution_status = ''
+        """
+    )
+    cur.execute(
+        """
+        ALTER TABLE card_battle_rules
+        ALTER COLUMN execution_status SET DEFAULT 'auto'
+        """
+    )
+    cur.execute(
+        """
+        ALTER TABLE card_battle_rules
+        ALTER COLUMN execution_status SET NOT NULL
+        """
+    )
     cur.execute(
         """
         UPDATE card_battle_rules
@@ -373,6 +407,7 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
     card_name = str(row["card_name"])
     normalized_name = normalize_card_name(card_name)
     source = str(row.get("source") or "curated")
+    execution_status = str(row.get("execution_status") or "auto")
     card_id = resolve_card_id(cur, card_name)
     effect = json_obj(row.get("effect_json"))
     deck_role = row.get("deck_role_json")
@@ -415,6 +450,7 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
           source,
           confidence,
           review_status,
+          execution_status,
           rule_version,
           oracle_hash,
           notes,
@@ -424,7 +460,7 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
           last_seen_at
         )
         VALUES (
-          %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, 1, %s, %s,
+          %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, %s, 1, %s, %s,
           CASE WHEN %s IN ('verified', 'active') THEN CURRENT_TIMESTAMP ELSE NULL END,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
@@ -436,6 +472,7 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
           source = EXCLUDED.source,
           confidence = EXCLUDED.confidence,
           review_status = EXCLUDED.review_status,
+          execution_status = EXCLUDED.execution_status,
           oracle_hash = EXCLUDED.oracle_hash,
           notes = EXCLUDED.notes,
           reviewed_at = CASE
@@ -455,6 +492,7 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
             source,
             float(row.get("confidence", 1.0)),
             str(row.get("review_status") or "verified"),
+            execution_status,
             row.get("oracle_hash"),
             str(row.get("notes") or ""),
             str(row.get("review_status") or "verified"),
@@ -592,6 +630,7 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
           source,
           confidence::float,
           review_status,
+          execution_status,
           rule_version,
           oracle_hash,
           notes
@@ -613,9 +652,10 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
                 "source": row[5],
                 "confidence": float(row[6]),
                 "review_status": row[7],
-                "rule_version": int(row[8]),
-                "oracle_hash": row[9],
-                "notes": row[10] or "",
+                "execution_status": row[8],
+                "rule_version": int(row[9]),
+                "oracle_hash": row[10],
+                "notes": row[11] or "",
             }
         )
     return loaded
@@ -633,6 +673,7 @@ def mirror_pg_rules_to_sqlite(sqlite_db: str, rows: list[dict[str, Any]]) -> int
                 source=row["source"],
                 confidence=row["confidence"],
                 review_status=row["review_status"],
+                execution_status=str(row.get("execution_status") or "auto"),
                 deck_role_json=row["deck_role_json"],
                 notes=row["notes"],
                 oracle_hash=row["oracle_hash"],

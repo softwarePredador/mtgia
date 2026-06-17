@@ -39,6 +39,14 @@ REVIEW_STATUS_PRIORITY = {
     "rejected": 9,
 }
 
+EXECUTION_STATUS_PRIORITY = {
+    "executable": 0,
+    "auto": 1,
+    "annotation_only": 2,
+    "review_only": 3,
+    "disabled": 4,
+}
+
 EFFECT_TO_DECK_CATEGORY = {
     "ramp_permanent": "ramp",
     "ramp_ritual": "ramp",
@@ -122,6 +130,7 @@ def _create_battle_card_rules_table(
             source TEXT NOT NULL DEFAULT 'curated',
             confidence REAL NOT NULL DEFAULT 1.0,
             review_status TEXT NOT NULL DEFAULT 'verified',
+            execution_status TEXT NOT NULL DEFAULT 'auto',
             rule_version INTEGER NOT NULL DEFAULT 1,
             oracle_hash TEXT,
             notes TEXT,
@@ -154,6 +163,25 @@ def _migrate_battle_card_rules_schema(conn: sqlite3.Connection) -> None:
         return
 
     columns = _battle_rule_table_columns(conn)
+    if "execution_status" not in columns:
+        conn.execute(
+            """
+            ALTER TABLE battle_card_rules
+            ADD COLUMN execution_status TEXT NOT NULL DEFAULT 'auto'
+            """
+        )
+        conn.execute(
+            """
+            UPDATE battle_card_rules
+            SET execution_status = CASE
+                WHEN review_status IN ('rejected', 'deprecated') THEN 'disabled'
+                WHEN review_status = 'needs_review' THEN 'review_only'
+                ELSE 'auto'
+            END
+            WHERE execution_status IS NULL OR execution_status = ''
+            """
+        )
+        columns = _battle_rule_table_columns(conn)
     pk_columns = [
         name
         for name, meta in sorted(columns.items(), key=lambda item: int(item[1]["pk"] or 0))
@@ -170,7 +198,7 @@ def _migrate_battle_card_rules_schema(conn: sqlite3.Connection) -> None:
     existing_rows = conn.execute(
         """
         SELECT normalized_name, card_name, effect_json, deck_role_json, source,
-               confidence, review_status, rule_version, oracle_hash, notes,
+               confidence, review_status, execution_status, rule_version, oracle_hash, notes,
                created_at, updated_at, last_seen_at
         FROM battle_card_rules
         """
@@ -188,9 +216,9 @@ def _migrate_battle_card_rules_schema(conn: sqlite3.Connection) -> None:
             """
             INSERT OR REPLACE INTO battle_card_rules_v2_migration (
                 normalized_name, logical_rule_key, card_name, effect_json,
-                deck_role_json, source, confidence, review_status, rule_version,
+                deck_role_json, source, confidence, review_status, execution_status, rule_version,
                 oracle_hash, notes, created_at, updated_at, last_seen_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 row[0],
@@ -207,6 +235,7 @@ def _migrate_battle_card_rules_schema(conn: sqlite3.Connection) -> None:
                 row[10],
                 row[11],
                 row[12],
+                row[13],
             ),
         )
     conn.execute("DROP TABLE battle_card_rules")
@@ -331,9 +360,10 @@ def logical_rule_key(rule: dict[str, Any]) -> str:
     return f"battle_rule_v1:{digest[:32]}"
 
 
-def _rule_rank(rule: dict[str, Any]) -> tuple[int, int, float, int, str]:
+def _rule_rank(rule: dict[str, Any]) -> tuple[int, int, int, float, int, str]:
     return (
         REVIEW_STATUS_PRIORITY.get(str(rule.get("review_status") or "").lower(), 7),
+        EXECUTION_STATUS_PRIORITY.get(str(rule.get("execution_status") or "").lower(), 9),
         -SOURCE_PRIORITY.get(str(rule.get("source") or "").lower(), 0),
         -float(rule.get("confidence") or 0.0),
         -int(rule.get("rule_version") or 1),
@@ -382,9 +412,10 @@ def load_active_battle_card_rule_lists(
             rows = conn.execute(
                 """
                 SELECT normalized_name, logical_rule_key, card_name, effect_json, deck_role_json,
-                       source, confidence, review_status, rule_version, oracle_hash, notes
+                       source, confidence, review_status, execution_status, rule_version, oracle_hash, notes
                 FROM battle_card_rules
                 WHERE review_status IN ('verified', 'needs_review', 'active')
+                  AND execution_status != 'disabled'
                 """
             ).fetchall()
     except sqlite3.Error:
@@ -404,6 +435,7 @@ def load_active_battle_card_rule_lists(
             "source": row["source"],
             "confidence": row["confidence"],
             "review_status": row["review_status"],
+            "execution_status": row["execution_status"],
             "rule_version": row["rule_version"],
             "oracle_hash": row["oracle_hash"],
             "notes": row["notes"],
@@ -481,6 +513,7 @@ def upsert_battle_card_rule(
     source: str,
     confidence: float,
     review_status: str,
+    execution_status: str = "auto",
     deck_role_json: dict[str, Any] | None = None,
     notes: str = "",
     oracle_hash: str | None = None,
@@ -521,10 +554,10 @@ def upsert_battle_card_rule(
         """
         INSERT INTO battle_card_rules (
             normalized_name, logical_rule_key, card_name, effect_json,
-            deck_role_json, source, confidence, review_status, rule_version,
+            deck_role_json, source, confidence, review_status, execution_status, rule_version,
             oracle_hash, notes,
             created_at, updated_at, last_seen_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
         ON CONFLICT(normalized_name, logical_rule_key) DO UPDATE SET
             card_name=excluded.card_name,
             effect_json=excluded.effect_json,
@@ -532,6 +565,7 @@ def upsert_battle_card_rule(
             source=excluded.source,
             confidence=excluded.confidence,
             review_status=excluded.review_status,
+            execution_status=excluded.execution_status,
             oracle_hash=excluded.oracle_hash,
             notes=excluded.notes,
             updated_at=excluded.updated_at,
@@ -546,6 +580,7 @@ def upsert_battle_card_rule(
             source,
             confidence,
             review_status,
+            execution_status,
             oracle_hash,
             notes,
             now,

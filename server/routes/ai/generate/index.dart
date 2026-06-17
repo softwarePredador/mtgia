@@ -13,6 +13,7 @@ import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
+import '../../../lib/ai/commander_learned_deck_support.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/functional_card_tags.dart';
@@ -105,6 +106,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     var usageHotCardsPrompt = '';
     var usageHotCards = const <Map<String, dynamic>>[];
+    var promotedLearnedCardNames = const <String>[];
     if (requestedCommanderName != null && requestedCommanderName.isNotEmpty) {
       try {
         usageHotCards = await loadUsageHotCards(
@@ -113,6 +115,14 @@ Future<Response> onRequest(RequestContext context) async {
           limit: usageHotCardsGenerationCandidateLimit,
         );
         usageHotCardsPrompt = buildUsageHotCardsPrompt(usageHotCards);
+      } catch (_) {}
+      try {
+        final activeLearnedDeck = await loadActiveCommanderLearnedDeck(
+          pool: pool,
+          commanderName: requestedCommanderName,
+        );
+        promotedLearnedCardNames =
+            activeCommanderLearnedDeckCardNames(activeLearnedDeck);
       } catch (_) {}
     }
     timings['reference_profile_ms'] =
@@ -174,6 +184,7 @@ Future<Response> onRequest(RequestContext context) async {
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        promotedLearnedCardNames: promotedLearnedCardNames,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -617,6 +628,7 @@ $metaContext
         referenceCardStats: referenceCardStats,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
         usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
+        promotedLearnedCardNames: promotedLearnedCardNames,
       );
       timings['reference_identity_filter_ms'] =
           identityFilterStopwatch.elapsedMilliseconds;
@@ -1149,6 +1161,7 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
   required Map<String, dynamic> referenceProfile,
   required List<CommanderReferenceCardStat> referenceCardStats,
   required CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
 }) async {
   final normalizedFormat = normalizeAiGenerateFormat(format);
@@ -1193,6 +1206,7 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
     profile: referenceProfile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
     targetMainQuantity: targetMainQuantity,
   );
@@ -1252,6 +1266,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
   List<String> archetypeSourceCommanderNames = const [],
   List<String> archetypeCommanderColorIdentity = const [],
+  List<String> promotedLearnedCardNames = const [],
   List<Map<String, dynamic>> usageHotCards = const [],
   String? warningCode,
   String? warningMessage,
@@ -1263,6 +1278,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           profile: referenceProfile,
           referenceCardStats: referenceCardStats,
           referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          promotedLearnedCardNames: promotedLearnedCardNames,
           usageHotCardNames: usageHotCardNames,
         );
   final mockDeck = await _mockGeneratedDeck(
@@ -1272,6 +1288,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
     referenceProfile: referenceProfile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
   );
 
@@ -1480,6 +1497,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
 }) async {
   final normalized = format.trim().toLowerCase();
@@ -1490,6 +1508,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
         referenceProfile,
         referenceCardStats: referenceCardStats,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        promotedLearnedCardNames: promotedLearnedCardNames,
         usageHotCardNames: usageHotCardNames,
       );
     }
@@ -1563,6 +1582,7 @@ Map<String, dynamic> _mockReferenceProfileDeck(
   Map<String, dynamic> profile, {
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
 }) {
   final commanderName =
@@ -1581,6 +1601,7 @@ Map<String, dynamic> _mockReferenceProfileDeck(
     profile: profile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
   );
 }

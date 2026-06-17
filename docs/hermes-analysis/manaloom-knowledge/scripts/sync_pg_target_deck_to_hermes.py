@@ -73,6 +73,14 @@ REVIEW_STATUS_PRIORITY = {
     "deprecated": 9,
 }
 
+EXECUTION_STATUS_PRIORITY = {
+    "executable": 0,
+    "auto": 1,
+    "annotation_only": 2,
+    "review_only": 3,
+    "disabled": 4,
+}
+
 SOURCE_PRIORITY = {
     "manual": 0,
     "curated": 1,
@@ -193,11 +201,13 @@ def logical_rule_key(rule: dict[str, Any]) -> str:
 
 def _rule_rank(rule: dict[str, Any]) -> tuple[Any, ...]:
     review_status = str(rule.get("review_status") or "").lower()
+    execution_status = str(rule.get("execution_status") or "").lower()
     source = str(rule.get("source") or "").lower()
     confidence = float(rule.get("confidence") or 0.0)
     rule_version = int(rule.get("rule_version") or 0)
     return (
         REVIEW_STATUS_PRIORITY.get(review_status, 7),
+        EXECUTION_STATUS_PRIORITY.get(execution_status, 9),
         SOURCE_PRIORITY.get(source, 7),
         -confidence,
         -rule_version,
@@ -224,6 +234,7 @@ def normalize_battle_rules(value: Any) -> list[dict[str, Any]]:
         selected.values(),
         key=lambda rule: (
             REVIEW_STATUS_PRIORITY.get(str(rule.get("review_status") or "").lower(), 7),
+            EXECUTION_STATUS_PRIORITY.get(str(rule.get("execution_status") or "").lower(), 9),
             SOURCE_PRIORITY.get(str(rule.get("source") or "").lower(), 7),
             str(rule.get("logical_rule_key") or ""),
         ),
@@ -571,6 +582,7 @@ def semantic_deck_cards_sql() -> str:
                           'rule_version', cbr.rule_version,
                           'source', cbr.source,
                           'review_status', cbr.review_status,
+                          'execution_status', cbr.execution_status,
                           'confidence', cbr.confidence,
                           'effect', cbr.effect_json,
                           'deck_role', cbr.deck_role_json,
@@ -768,6 +780,7 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
                     "battle_effect": effect_json.get("effect"),
                     "battle_role": role_json,
                     "rule_review_status": first_rule.get("review_status"),
+                    "rule_execution_status": first_rule.get("execution_status"),
                 }
                 tags = normalize_functional_tags(card["functional_tags_json"], card["functional_tag"])
                 inferred_tag = infer_tag(card)

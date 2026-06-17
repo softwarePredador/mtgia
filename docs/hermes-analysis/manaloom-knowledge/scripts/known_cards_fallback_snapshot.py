@@ -27,6 +27,7 @@ DEFAULT_CANONICAL_SNAPSHOT_PATH = Path(
 SNAPSHOT_META_KEYS = {
     "battle_rule_source",
     "battle_rule_review_status",
+    "battle_rule_execution_status",
     "battle_rule_confidence",
     "battle_rule_version",
     "battle_rule_logical_key",
@@ -105,6 +106,7 @@ def snapshot_entry(
     *,
     rule_source: str,
     review_status: str,
+    execution_status: str = "auto",
     confidence: float,
     rule_version: int | None = None,
     logical_rule_key: str | None = None,
@@ -113,6 +115,7 @@ def snapshot_entry(
     payload = dict(effect_json or {})
     payload["battle_rule_source"] = str(rule_source or "unknown")
     payload["battle_rule_review_status"] = str(review_status or "unknown")
+    payload["battle_rule_execution_status"] = str(execution_status or "auto")
     payload["battle_rule_confidence"] = float(confidence or 0.0)
     if rule_version is not None:
         payload["battle_rule_version"] = int(rule_version)
@@ -146,6 +149,7 @@ def build_snapshot_payload(rows: list[dict[str, Any]]) -> dict[str, dict[str, An
             effect_json,
             rule_source=str(row.get("source") or "unknown"),
             review_status=str(row.get("review_status") or "unknown"),
+            execution_status=str(row.get("execution_status") or "auto"),
             confidence=float(row.get("confidence") or 0.0),
             rule_version=(
                 int(row["rule_version"])

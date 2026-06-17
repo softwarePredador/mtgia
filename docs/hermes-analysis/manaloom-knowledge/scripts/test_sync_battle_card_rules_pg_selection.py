@@ -87,6 +87,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(payload["Lightning Greaves"]["effect"], "equipment_haste_shroud")
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_source"], "manual")
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_review_status"], "verified")
+        self.assertEqual(payload["Lightning Greaves"]["battle_rule_execution_status"], "auto")
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_logical_key"], "battle_rule_v1:deadbeef")
 
 

@@ -1734,6 +1734,7 @@ def with_rule_metadata(
     *,
     source,
     review_status="heuristic",
+    execution_status="auto",
     confidence=0.0,
     rule_version=None,
     logical_rule_key=None,
@@ -1742,6 +1743,7 @@ def with_rule_metadata(
     annotated = dict(effect_data)
     annotated.setdefault("_rule_source", source)
     annotated.setdefault("_rule_review_status", review_status)
+    annotated.setdefault("_rule_execution_status", execution_status)
     annotated.setdefault("_rule_confidence", confidence)
     if rule_version is not None:
         annotated.setdefault("_rule_version", rule_version)
@@ -1757,6 +1759,7 @@ def replay_rule_fields(effect_data):
     fields = {
         "rule_source": effect_data.get("_rule_source", "unknown"),
         "rule_review_status": effect_data.get("_rule_review_status", "unknown"),
+        "rule_execution_status": effect_data.get("_rule_execution_status", "auto"),
         "rule_confidence": effect_data.get("_rule_confidence", 0.0),
         "rule_version": effect_data.get("_rule_version"),
     }
@@ -1850,13 +1853,39 @@ def _battle_rule_summary(rule):
         "category": deck_role.get("category"),
         "source": rule.get("source"),
         "review_status": rule.get("review_status"),
+        "execution_status": rule.get("execution_status", "auto"),
         "confidence": rule.get("confidence"),
     }
+
+
+def _rule_execution_status(rule):
+    return str(rule.get("execution_status") or "auto").lower()
+
+
+def _select_primary_runtime_rule(rules):
+    for rule in rules:
+        if not rule or not rule.get("effect_json"):
+            continue
+        execution_status = _rule_execution_status(rule)
+        if execution_status in {"annotation_only", "review_only", "disabled"}:
+            continue
+        review_status = str(rule.get("review_status") or "").lower()
+        if review_status not in {"verified", "active"}:
+            continue
+        return rule
+    return None
 
 
 def _runtime_rule_skip_reason(rule):
     """Explain why a second rule for the same card is not auto-executed."""
     effect = rule.get("effect_json") or {}
+    execution_status = _rule_execution_status(rule)
+    if execution_status == "disabled":
+        return "execution_status_disabled"
+    if execution_status == "review_only":
+        return "execution_status_review_only"
+    if execution_status == "annotation_only":
+        return "execution_status_annotation_only"
     review_status = str(rule.get("review_status") or "").lower()
     if review_status not in {"verified", "active"}:
         return "review_status_not_runtime_safe"
@@ -1941,6 +1970,7 @@ def _annotated_battle_rule_effect(rule):
         rule.get("effect_json") or {},
         source=rule.get("source", "battle_card_rules"),
         review_status=rule.get("review_status", "unknown"),
+        execution_status=rule.get("execution_status", "auto"),
         confidence=rule.get("confidence", 0.0),
         rule_version=rule.get("rule_version"),
         logical_rule_key=rule.get("logical_rule_key"),
@@ -1951,6 +1981,9 @@ def _annotated_battle_rule_effect(rule):
 def _extract_runtime_safe_secondary_annotations(primary_effect, rule):
     """Allow secondary rules to contribute only non-executable cost metadata."""
     effect = rule.get("effect_json") or {}
+    execution_status = _rule_execution_status(rule)
+    if execution_status in {"disabled", "review_only"}:
+        return None
     review_status = str(rule.get("review_status") or "").lower()
     if review_status not in {"verified", "active"}:
         return None
@@ -1989,6 +2022,9 @@ def _extract_runtime_safe_secondary_annotations(primary_effect, rule):
 def _is_composable_resolution_rule(rule):
     """Only opt-in, trusted same-resolution components can execute together."""
     effect = rule.get("effect_json") or {}
+    execution_status = _rule_execution_status(rule)
+    if execution_status not in {"auto", "executable"}:
+        return False
     review_status = str(rule.get("review_status") or "").lower()
     if review_status not in {"verified", "active"}:
         return False
@@ -2005,7 +2041,12 @@ def _is_composable_resolution_rule(rule):
 
 
 def _build_composite_battle_rule_effect(card, rules):
-    if len(rules) < 2 or not _is_composable_resolution_rule(rules[0]):
+    composable_rules = [
+        rule
+        for rule in rules
+        if rule and rule.get("effect_json") and _is_composable_resolution_rule(rule)
+    ]
+    if len(composable_rules) < 2:
         return None
     components = []
     skipped = []
@@ -2048,16 +2089,22 @@ def _build_composite_battle_rule_effect(card, rules):
 
 
 def _build_primary_effect_with_safe_secondary_annotations(card, rules):
-    if len(rules) < 2 or not rules[0] or not rules[0].get("effect_json"):
+    if len(rules) < 2:
+        return None
+    primary_rule = _select_primary_runtime_rule(rules)
+    if primary_rule is None:
         return None
     primary = normalize_effect_by_oracle(
         card,
-        _annotated_battle_rule_effect(rules[0]),
+        _annotated_battle_rule_effect(primary_rule),
     )
     merged_rules = []
     blocked_rules = []
-    for rule in rules[1:]:
+    selected_key = str(primary.get("_rule_logical_key") or "")
+    for rule in rules:
         if not rule:
+            continue
+        if str(rule.get("logical_rule_key") or "") == selected_key:
             continue
         annotations = _extract_runtime_safe_secondary_annotations(primary, rule)
         if annotations:
@@ -2121,20 +2168,21 @@ def get_card_effect(card):
         else:
             rule = battle_rule_registry.lookup_battle_card_rule(DB, name)
             rules = [rule] if rule else []
-        if rules and rules[0] and rules[0].get("effect_json"):
+        if any(rule and rule.get("effect_json") for rule in rules):
             composite_effect = _build_composite_battle_rule_effect(card, rules)
             if composite_effect is not None:
                 return composite_effect
             enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
             if enriched_effect is not None:
                 return enriched_effect
-            rule = rules[0]
-            effect = _annotate_runtime_rule_selection(
-                _annotated_battle_rule_effect(rule),
-                rules,
-                selection_mode="single_selected",
-            )
-            return normalize_effect_by_oracle(card, effect)
+            rule = _select_primary_runtime_rule(rules)
+            if rule is not None:
+                effect = _annotate_runtime_rule_selection(
+                    _annotated_battle_rule_effect(rule),
+                    rules,
+                    selection_mode="single_selected",
+                )
+                return normalize_effect_by_oracle(card, effect)
     if name in HANDCRAFTED_KNOWN_CARDS:
         handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name)
         if handcrafted_effect is None:
@@ -2156,6 +2204,7 @@ def get_card_effect(card):
                 effect_json,
                 source="known_cards_canonical_snapshot",
                 review_status=str(metadata.get("battle_rule_review_status") or "unknown"),
+                execution_status=str(metadata.get("battle_rule_execution_status") or "auto"),
                 confidence=float(metadata.get("battle_rule_confidence") or 0.0),
                 rule_version=metadata.get("battle_rule_version"),
                 logical_rule_key=metadata.get("battle_rule_logical_key"),

@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
     confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
       CHECK (confidence >= 0 AND confidence <= 1),
     review_status TEXT NOT NULL DEFAULT 'verified',
+    execution_status TEXT NOT NULL DEFAULT 'auto',
     rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
     oracle_hash TEXT,
     notes TEXT,
@@ -143,6 +144,15 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
         'needs_review',
         'rejected',
         'deprecated'
+      )
+    ),
+    CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+      execution_status IN (
+        'auto',
+        'executable',
+        'annotation_only',
+        'review_only',
+        'disabled'
       )
     ),
     PRIMARY KEY (normalized_name, logical_rule_key)
