@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-17 03:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-17 11:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,18 +147,16 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-16)
+## Achados do audit de estrutura (atualizado 2026-06-17)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO em 2026-06-16 11:00 UTC no checkout `ea37f3cf`.** O
+  **REVALIDADO/ABERTO em 2026-06-17 11:00 UTC no checkout `a96bffd6`.** O
   auditor base cobre apenas `server/lib` e `server/routes` e reportou
-  `Imports quebrados: 0`. Desde a rodada anterior deste foco (`a447b876..HEAD`),
+  `Imports quebrados: 0`. Desde a rodada anterior deste foco (`ea37f3cf..HEAD`),
   nao houve delta de produto em `app/lib`, `server/lib`, `server/routes`,
-  `server/bin`, testes app/server, database setup ou API contract; o unico delta
-  no recorte foi o script Hermes
-  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
-  A triagem focada de 409 arquivos Dart em `app/lib`, `server/lib`,
+  `server/bin`, testes app/server, database setup, API contract, contexto de
+  produto ou manual. A triagem focada de 409 arquivos Dart em `app/lib`, `server/lib`,
   `server/routes` e `server/bin` encontrou 1082 diretivas locais resolvidas,
   0 imports/exports/parts locais quebrados e 2 SCCs. `dart analyze` focado para
   `optimize_runtime_support.dart`/`optimize_filler_loader_support.dart` e
