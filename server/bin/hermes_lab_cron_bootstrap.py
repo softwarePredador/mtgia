@@ -19,8 +19,12 @@ from pathlib import Path
 
 
 def _resolve_repo_root() -> Path:
-    if os.environ.get("MANALOOM_REPO"):
-        return Path(os.environ["MANALOOM_REPO"]).resolve()
+    for key in ("MANALOOM_REPO", "MANALOOM_WORKSPACE", "HERMES_REPO_DIR"):
+        value = os.environ.get(key)
+        if value:
+            candidate = Path(value).resolve()
+            if candidate.exists():
+                return candidate
     return Path(__file__).resolve().parents[2]
 
 
@@ -412,9 +416,21 @@ def _script_path(name: str) -> Path:
     return HERMES_SCRIPTS_DIR / name
 
 
+def _resolve_docs_branch_sync_source() -> Path:
+    candidates = [
+        REPO_ROOT / "server" / "bin" / "hermes_docs_branch_sync.sh",
+        Path("/opt/bootstrap/hermes_docs_branch_sync.sh"),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    searched = ", ".join(str(candidate) for candidate in candidates)
+    raise FileNotFoundError(f"hermes_docs_branch_sync.sh not found in: {searched}")
+
+
 def _install_scripts() -> None:
     HERMES_SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
-    source_docs_sync = REPO_ROOT / "server" / "bin" / "hermes_docs_branch_sync.sh"
+    source_docs_sync = _resolve_docs_branch_sync_source()
     target_docs_sync = _script_path("manaloom-docs-branch-sync.sh")
     shutil.copy2(source_docs_sync, target_docs_sync)
     target_docs_sync.chmod(0o755)

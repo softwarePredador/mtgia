@@ -35,7 +35,11 @@ RUN mkdir -p /opt/tools \
 
 COPY server/bin/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_entrypoint.sh
 COPY server/bin/hermes_lab_cron_bootstrap.py /opt/bootstrap/hermes_lab_cron_bootstrap.py
-RUN chmod +x /opt/bootstrap/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_cron_bootstrap.py
+COPY server/bin/hermes_docs_branch_sync.sh /opt/bootstrap/hermes_docs_branch_sync.sh
+RUN chmod +x \
+  /opt/bootstrap/hermes_lab_entrypoint.sh \
+  /opt/bootstrap/hermes_lab_cron_bootstrap.py \
+  /opt/bootstrap/hermes_docs_branch_sync.sh
 
 VOLUME ["/opt/data"]
 

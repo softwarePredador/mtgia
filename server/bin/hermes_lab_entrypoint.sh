@@ -66,6 +66,7 @@ upsert_env_file "API_SERVER_KEY" "${API_SERVER_KEY:-}"
 
 export HOME="$HERMES_HOME"
 export PATH="$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
+export MANALOOM_REPO="$REPO_DIR"
 
 cd "$HERMES_HOME"
 

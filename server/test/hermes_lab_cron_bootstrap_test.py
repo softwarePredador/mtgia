@@ -63,6 +63,75 @@ def _run_bootstrap(env: dict[str, str]) -> subprocess.CompletedProcess[str]:
 
 
 class HermesLabCronBootstrapTest(unittest.TestCase):
+    def test_resolve_repo_root_prefers_workspace_and_repo_dir(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            repo = _make_repo(root)
+            previous_repo = os.environ.get("MANALOOM_REPO")
+            previous_workspace = os.environ.get("MANALOOM_WORKSPACE")
+            previous_hermes_repo = os.environ.get("HERMES_REPO_DIR")
+            try:
+                os.environ.pop("MANALOOM_REPO", None)
+                os.environ["MANALOOM_WORKSPACE"] = str(repo)
+                os.environ["HERMES_REPO_DIR"] = str(repo)
+                self.assertEqual(module._resolve_repo_root(), repo.resolve())
+            finally:
+                if previous_repo is None:
+                    os.environ.pop("MANALOOM_REPO", None)
+                else:
+                    os.environ["MANALOOM_REPO"] = previous_repo
+                if previous_workspace is None:
+                    os.environ.pop("MANALOOM_WORKSPACE", None)
+                else:
+                    os.environ["MANALOOM_WORKSPACE"] = previous_workspace
+                if previous_hermes_repo is None:
+                    os.environ.pop("HERMES_REPO_DIR", None)
+                else:
+                    os.environ["HERMES_REPO_DIR"] = previous_hermes_repo
+
+    def test_install_scripts_uses_bootstrap_fallback_when_repo_script_missing(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            fallback = root / "opt" / "bootstrap" / "hermes_docs_branch_sync.sh"
+            fallback.parent.mkdir(parents=True, exist_ok=True)
+            fallback.write_text("#!/usr/bin/env bash\nexit 0\n")
+            fallback.chmod(0o755)
+
+            scripts_dir = root / "home" / ".hermes" / "scripts"
+            previous_repo_root = module.REPO_ROOT
+            previous_scripts_dir = module.HERMES_SCRIPTS_DIR
+            original_exists = module.Path.exists
+            try:
+                module.REPO_ROOT = root / "missing-repo"
+                module.HERMES_SCRIPTS_DIR = scripts_dir
+
+                def patched_exists(path_self):
+                    if str(path_self) == "/opt/bootstrap/hermes_docs_branch_sync.sh":
+                        return fallback.exists()
+                    return original_exists(path_self)
+
+                module.Path.exists = patched_exists
+                original_resolve = module._resolve_docs_branch_sync_source
+
+                def patched_resolve():
+                    repo_candidate = module.REPO_ROOT / "server" / "bin" / "hermes_docs_branch_sync.sh"
+                    if repo_candidate.exists():
+                        return repo_candidate
+                    if fallback.exists():
+                        return fallback
+                    raise FileNotFoundError("missing fallback")
+
+                module._resolve_docs_branch_sync_source = patched_resolve
+                module._install_scripts()
+                self.assertTrue((scripts_dir / "manaloom-docs-branch-sync.sh").exists())
+            finally:
+                module.REPO_ROOT = previous_repo_root
+                module.HERMES_SCRIPTS_DIR = previous_scripts_dir
+                module.Path.exists = original_exists
+                module._resolve_docs_branch_sync_source = original_resolve
+
     def test_bootstrap_installs_scripts_and_reconciles_jobs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

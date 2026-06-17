@@ -22,6 +22,7 @@ Camada adicional do projeto:
 - `server/Dockerfile.hermes-lab`
 - `server/bin/hermes_lab_entrypoint.sh`
 - `server/bin/hermes_lab_cron_bootstrap.py`
+- `server/bin/hermes_docs_branch_sync.sh`
 
 O bootstrap precisa garantir:
 
@@ -92,6 +93,10 @@ Observação de runtime:
 - o bootstrap local preserva `HERMES_HOME=/opt/data` e evita reencadear o
   `main-wrapper` depois do `/init`, porque essa cadeia já teve regressões de
   env/workdir no upstream Docker do Hermes.
+- o bootstrap resolve o repo pelo ambiente canônico
+  (`MANALOOM_REPO`/`MANALOOM_WORKSPACE`/`HERMES_REPO_DIR`) e mantém fallback
+  empacotado de `hermes_docs_branch_sync.sh`; sem isso o `hermes-lab` entra em
+  restart loop ainda no cont-init.
 - o bootstrap também precisa persistir `.env` dentro do volume; depender só de
   env injetado pelo orchestrator deixa `hermes status` e a CLI interativa fora
   de sincronia com o provider real do serviço.
