@@ -7,7 +7,7 @@
 
 ## Objetivo
 
-Transformar `app/lib/features/home/life_counter_screen.dart` em um clone funcional e visual do benchmark local armazenado em `dddddd/`.
+Transformar `app/lib/features/home/life_counter_screen.dart` em um clone funcional e visual do benchmark historico. O dump bruto antigo `dddddd/` foi removido do versionamento em 2026-06-17; revalidacoes atuais devem usar goldens/provas runtime ou um pacote arquivado externo, nao um caminho versionado.
 
 Decisao explicitamente assumida nesta sprint:
 
@@ -70,34 +70,36 @@ Criterio executivo novo:
 
 ## Fonte de verdade visual
 
-As capturas abaixo formam o benchmark oficial desta sprint:
+As capturas abaixo formavam o benchmark oficial desta sprint. Os arquivos
+brutos nao ficam mais versionados; manter aqui apenas a descricao funcional de
+cada referencia:
 
-1. `dddddd/WhatsApp Image 2026-03-25 at 12.13.00.jpeg`
+1. Captura historica 2026-03-25 12.13.00
    - mesa em 4 quadrantes
    - numero central dominante
    - estado especial `DECKED OUT.`
-2. `dddddd/WhatsApp Image 2026-03-25 at 12.13.09.jpeg`
+2. Captura historica 2026-03-25 12.13.09
    - hub central expandido
    - barra utilitaria inferior
    - estado especial `ANSWER LEFT.`
-3. `dddddd/WhatsApp Image 2026-03-25 at 12.13.21.jpeg`
+3. Captura historica 2026-03-25 12.13.21
    - `High Roll` dominante por jogador
    - vencedor com fundo comemorativo
    - estado `KO'D!`
-4. `dddddd/WhatsApp Image 2026-03-25 at 12.13.41.jpeg`
+4. Captura historica 2026-03-25 12.13.41
    - seletor de quantidade/layout de jogadores
-5. `dddddd/WhatsApp Image 2026-03-25 at 12.13.54.jpeg`
+5. Captura historica 2026-03-25 12.13.54
    - overlay de configuracoes por cima da mesa
-6. `dddddd/WhatsApp Image 2026-03-25 at 12.14.07.jpeg`
+6. Captura historica 2026-03-25 12.14.07
    - estado especial `COMMANDER DOWN.`
-7. `dddddd/WhatsApp Image 2026-03-25 at 13.50.23.jpeg`
+7. Captura historica 2026-03-25 13.50.23
    - estado normal com valores baixos
    - reforco da geometria base da mesa
-8. `dddddd/WhatsApp Image 2026-03-25 at 13.50.32.jpeg`
+8. Captura historica 2026-03-25 13.50.32
    - keypad numerico flutuante para `set life`
-9. `dddddd/WhatsApp Image 2026-03-25 at 13.50.47.jpeg`
+9. Captura historica 2026-03-25 13.50.47
    - `High Roll` com numero gigante e vencedor obvio
-10. `dddddd/WhatsApp Image 2026-03-25 at 13.51.38.jpeg`
+10. Captura historica 2026-03-25 13.51.38
    - repeticao consistente do hub expandido + rail inferior
 
 Essas 10 imagens deixam claro que o benchmark nao e uma tela isolada: ele e uma linguagem completa de mesa.
@@ -804,7 +806,7 @@ Tasks:
 5. migrar counters/commander damage para overlay
 6. completar estados especiais faltantes
 7. revisar motion e transicoes
-8. revalidar side-by-side com `dddddd/`
+8. revalidar side-by-side com benchmark arquivado/goldens atuais
 
 ## Termos de aceite
 
@@ -916,7 +918,7 @@ Ela tentou:
 - manter linguagem propria
 - superar benchmark por refinamento
 
-O benchmark, pelas imagens em `dddddd/`, mostrou que o ganho real dele nao esta no refinamento; esta na brutalidade de mesa, na obviedade e na falta de vergonha de transformar cada painel em um placar temporario de jogo.
+O benchmark historico mostrou que o ganho real dele nao esta no refinamento; esta na brutalidade de mesa, na obviedade e na falta de vergonha de transformar cada painel em um placar temporario de jogo.
 
 A decisao desta sprint e simples:
 

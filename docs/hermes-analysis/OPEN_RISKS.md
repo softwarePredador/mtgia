@@ -101,7 +101,9 @@ Status granular:
   history overlay, settings overlay e card search overlay com CSS premium
   e smoke tests dedicados.
 - **NEEDS_BENCHMARK_COMPARISON:** todos os itens ainda precisam de comparacao
-  lado a lado com `dddddd/` antes de marcar a task como DONE.
+  lado a lado com as referencias consolidadas da sprint e provas visuais atuais
+  antes de marcar a task como DONE. O dump bruto antigo `dddddd/` nao e mais
+  fonte operacional versionada.
 
 ### Arquivos criticos continuam grandes
 Validacao em `origin/master` 771c9318 (2026-05-28) confirmou os maiores gargalos

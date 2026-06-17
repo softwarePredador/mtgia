@@ -583,8 +583,10 @@ superficies do app. O arquivo `lotus_visual_skin.dart` continua sendo CSS
 injetado no WebView, fora do sistema de tema Flutter.
 
 **Status dos overlays**: settings, history e card search agora tem skin
-premium, mas ainda precisam de prova viva lado a lado com `dddddd/` (baseline
-pre-skin) para cada overlay antes de considerar a task de perfeicao fechada.
+premium, mas ainda precisam de prova viva lado a lado com as referencias
+consolidadas da sprint/goldens atuais para cada overlay antes de considerar a
+task de perfeicao fechada. Referencias antigas ao dump bruto `dddddd/` sao
+historicas; esse material nao deve voltar ao versionamento.
 
 ## Analise do commit 91885194 — Polish secondary shell headers
 

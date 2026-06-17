@@ -27,6 +27,7 @@ wget-log
 # Copilot/agent local configs
 
 # Local QA / visual proof artifacts (do not commit)
+dddddd/
 app/doc/*proofs*/
 app/doc/*_proof_*/
 app/doc/visual_qa_*/
