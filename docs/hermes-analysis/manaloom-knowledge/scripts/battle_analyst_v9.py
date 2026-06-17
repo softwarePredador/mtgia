@@ -1766,10 +1766,126 @@ def replay_rule_fields(effect_data):
     rule_alternative_count = len(effect_data.get("_rule_alternatives") or [])
     if rule_alternative_count:
         fields["rule_alternative_count"] = rule_alternative_count
+    composite_component_count = len(effect_data.get("_composite_rule_components") or [])
+    if composite_component_count:
+        fields["composite_rule_component_count"] = composite_component_count
     return fields
 
 
 CANONICAL_FALLBACK_KNOWN_CARDS = set()
+
+
+COMPOSABLE_RESOLUTION_EFFECTS = {
+    "draw_cards",
+    "remove_creature",
+    "remove_permanent",
+    "remove_artifact_or_3dmg",
+    "ramp_ritual",
+    "treasure_maker",
+    "token_maker",
+    "extra_turn",
+    "extra_combat",
+}
+
+COMPOSITE_BLOCKING_EFFECT_KEYS = {
+    "additional_cost",
+    "sacrifice",
+    "sacrifice_land",
+    "sacrifice_creature",
+    "sacrifice_artifact",
+    "discard_land",
+    "exiles_self",
+    "trigger",
+    "activated",
+    "static",
+}
+
+
+def _battle_rule_summary(rule):
+    effect = rule.get("effect_json") or {}
+    deck_role = rule.get("deck_role_json") or {}
+    return {
+        "logical_rule_key": rule.get("logical_rule_key"),
+        "effect": effect.get("effect"),
+        "category": deck_role.get("category"),
+        "source": rule.get("source"),
+        "review_status": rule.get("review_status"),
+        "confidence": rule.get("confidence"),
+    }
+
+
+def _annotated_battle_rule_effect(rule):
+    return with_rule_metadata(
+        rule.get("effect_json") or {},
+        source=rule.get("source", "battle_card_rules"),
+        review_status=rule.get("review_status", "unknown"),
+        confidence=rule.get("confidence", 0.0),
+        rule_version=rule.get("rule_version"),
+        logical_rule_key=rule.get("logical_rule_key"),
+        oracle_hash=rule.get("oracle_hash"),
+    )
+
+
+def _is_composable_resolution_rule(rule):
+    """Only opt-in, trusted same-resolution components can execute together."""
+    effect = rule.get("effect_json") or {}
+    review_status = str(rule.get("review_status") or "").lower()
+    if review_status not in {"verified", "active"}:
+        return False
+    if effect.get("compose_on_resolution") is not True:
+        return False
+    if effect.get("effect") not in COMPOSABLE_RESOLUTION_EFFECTS:
+        return False
+    for key in COMPOSITE_BLOCKING_EFFECT_KEYS:
+        if effect.get(key):
+            return False
+    if effect.get("ability_kind") in {"triggered", "activated", "static"}:
+        return False
+    return True
+
+
+def _build_composite_battle_rule_effect(card, rules):
+    if len(rules) < 2 or not _is_composable_resolution_rule(rules[0]):
+        return None
+    components = []
+    skipped = []
+    for rule in rules:
+        if not rule or not rule.get("effect_json"):
+            continue
+        if not _is_composable_resolution_rule(rule):
+            skipped.append(_battle_rule_summary(rule))
+            continue
+        components.append(
+            normalize_effect_by_oracle(
+                card,
+                _annotated_battle_rule_effect(rule),
+            )
+        )
+    if len(components) < 2:
+        return None
+    confidence_values = [
+        float(component.get("_rule_confidence") or 0.0)
+        for component in components
+    ]
+    logical_keys = [
+        str(component.get("_rule_logical_key") or "")
+        for component in components
+        if component.get("_rule_logical_key")
+    ]
+    composite = dict(components[0])
+    composite["effect"] = "composite_resolution"
+    composite["_rule_source"] = "battle_card_rules_composite"
+    composite["_rule_review_status"] = "verified"
+    composite["_rule_confidence"] = min(confidence_values) if confidence_values else 0.0
+    composite["_rule_logical_key"] = "+".join(logical_keys)
+    composite["_composite_rule_components"] = components
+    composite["_composite_skipped_rules"] = skipped
+    composite["_rule_alternatives"] = [
+        _battle_rule_summary(rule)
+        for rule in rules
+        if rule
+    ]
+    return composite
 
 
 def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[str] | None = None) -> None:
@@ -1816,25 +1932,14 @@ def get_card_effect(card):
             rule = battle_rule_registry.lookup_battle_card_rule(DB, name)
             rules = [rule] if rule else []
         if rules and rules[0] and rules[0].get("effect_json"):
+            composite_effect = _build_composite_battle_rule_effect(card, rules)
+            if composite_effect is not None:
+                return composite_effect
             rule = rules[0]
-            effect = with_rule_metadata(
-                rule["effect_json"],
-                source=rule.get("source", "battle_card_rules"),
-                review_status=rule.get("review_status", "unknown"),
-                confidence=rule.get("confidence", 0.0),
-                rule_version=rule.get("rule_version"),
-                logical_rule_key=rule.get("logical_rule_key"),
-                oracle_hash=rule.get("oracle_hash"),
-            )
+            effect = _annotated_battle_rule_effect(rule)
             if len(rules) > 1:
                 effect["_rule_alternatives"] = [
-                    {
-                        "logical_rule_key": item.get("logical_rule_key"),
-                        "effect": (item.get("effect_json") or {}).get("effect"),
-                        "category": (item.get("deck_role_json") or {}).get("category"),
-                        "source": item.get("source"),
-                        "review_status": item.get("review_status"),
-                    }
+                    _battle_rule_summary(item)
                     for item in rules
                     if item
                 ]
@@ -7867,6 +7972,138 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             return True
     return actions_taken > 0
 
+
+def resolve_composite_resolution_effect(player, opponents, card, effect_data, turn, rng):
+    """Resolve opt-in same-spell components without moving the source card twice."""
+    applied = []
+    skipped = []
+    components = effect_data.get("_composite_rule_components") or []
+    for index, component in enumerate(components):
+        component_effect = component.get("effect")
+        component_fields = replay_rule_fields(component)
+        outcome = "unsupported_component"
+        if component_effect == "draw_cards":
+            count = int(component.get("count") or component.get("amount") or component.get("draw_count") or 1)
+            player.draw(max(0, count), rng)
+            outcome = "cards_drawn"
+            applied.append({"effect": component_effect, "count": count})
+        elif component_effect == "ramp_ritual":
+            produced = ritual_mana_produced(player, component)
+            player.mana_pool.add_generic(produced)
+            outcome = "ritual_mana_added"
+            applied.append({"effect": component_effect, "mana_added": produced})
+        elif component_effect == "treasure_maker":
+            treasure_count = int(component.get("treasure_count") or 1)
+            draw_count = int(component.get("draw_count") or 0)
+            player.treasures += treasure_count
+            if draw_count > 0:
+                player.draw(draw_count, rng)
+            outcome = "treasure_created"
+            applied.append({
+                "effect": component_effect,
+                "treasures_created": treasure_count,
+                "cards_drawn": draw_count,
+            })
+        elif component_effect == "token_maker":
+            token_count = int(component.get("token_count") or 1)
+            token_haste = bool(component.get("token_haste") or component.get("haste"))
+            artifact_tokens = bool(component.get("artifact_tokens"))
+            for _ in range(min(max(0, token_count), 20)):
+                create_creature_token(
+                    player,
+                    power=component.get("token_power", 2),
+                    toughness=component.get("token_toughness", component.get("token_power", 2)),
+                    haste=token_haste,
+                    artifact=artifact_tokens,
+                )
+            outcome = "tokens_created"
+            applied.append({"effect": component_effect, "tokens_created": token_count})
+        elif component_effect == "extra_turn":
+            turns = int(component.get("turns") or 1)
+            player.extra_turns += turns
+            if component.get("lose_after_extra_turn"):
+                player.extra_turn_loss_pending += turns
+            outcome = "extra_turn_scheduled"
+            applied.append({"effect": component_effect, "extra_turns": turns})
+        elif component_effect == "extra_combat":
+            combats = int(component.get("combats") or component.get("extra_combats") or 1)
+            player.extra_combats += max(0, combats)
+            if component.get("untap_creatures", True):
+                for permanent in player.battlefield:
+                    if is_battlefield_creature(permanent):
+                        permanent["tapped"] = False
+            outcome = "extra_combat_scheduled"
+            applied.append({"effect": component_effect, "extra_combats": combats})
+        elif component_effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
+            removed = False
+            if resolve_multi_target_removal(player, opponents, card, component, turn, rng):
+                removed = True
+            else:
+                for opp in opponents:
+                    target_type = str(component.get("target") or "").lower()
+                    if not target_type:
+                        target_type = "creature" if component_effect == "remove_creature" else "nonland_permanent"
+                    targets = removal_target_candidates(opp, component, controller=player, source=card)
+                    if not targets:
+                        continue
+                    target = choose_best_creature_target(targets)
+                    decision = targeting_decision(
+                        card,
+                        target,
+                        player,
+                        target_controller=opp,
+                        target_type=target_type,
+                    )
+                    if check_ward(target, card, player, rng):
+                        emit_replay_event(
+                            "removal_countered_by_ward",
+                            player=player.name,
+                            card=card.get("name", "?"),
+                            target_player=opp.name,
+                            target=target.get("name", "?"),
+                            component_index=index,
+                            turn=turn,
+                            **decision,
+                        )
+                        break
+                    destination = move_creature_from_battlefield(opp, target)
+                    emit_replay_event(
+                        "removal_resolved",
+                        player=player.name,
+                        card=card.get("name", "?"),
+                        target_player=opp.name,
+                        target=target.get("name", "?"),
+                        target_effect=get_card_effect(target).get("effect", target.get("effect")),
+                        target_power=target.get("power"),
+                        target_toughness=target.get("toughness"),
+                        target_is_creature=is_battlefield_creature(target),
+                        target_type_line=target.get("type_line", ""),
+                        available_targets=len(targets),
+                        destination=destination,
+                        component_index=index,
+                        turn=turn,
+                        **decision,
+                    )
+                    removed = True
+                    break
+            outcome = "removal_resolved" if removed else "no_legal_target"
+            applied.append({"effect": component_effect, "removed": removed})
+        else:
+            skipped.append({"effect": component_effect, "reason": "unsupported_component"})
+
+        emit_replay_event(
+            "composite_rule_component_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            component_index=index,
+            component_effect=component_effect,
+            outcome=outcome,
+            turn=turn,
+            **component_fields,
+        )
+    return {"applied": applied, "skipped": skipped}
+
+
 def apply_effect_immediate(player, opponents, card, turn, rng):
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = get_card_effect(card)
@@ -7882,7 +8119,28 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         **replay_rule_fields(effect_data),
     )
 
-    if effect == "land": pass
+    if effect == "composite_resolution":
+        summary = resolve_composite_resolution_effect(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+        )
+        emit_replay_event(
+            "composite_rule_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            components_applied=len(summary["applied"]),
+            components_skipped=len(summary["skipped"]),
+            applied=summary["applied"],
+            skipped=summary["skipped"],
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+    elif effect == "land": pass
     elif effect == "passive":
         if is_instant(card) or is_sorcery(card):
             finish_resolved_spell(player, card, turn=turn)

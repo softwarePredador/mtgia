@@ -681,11 +681,16 @@ Leitura correta:
   retornam todas as regras ativas por nome normalizado. Otimizadores e
   snapshots estratégicos devem usar o contrato de lista quando precisam
   entender todos os papéis de uma carta;
-- `battle_analyst_v9.py#get_card_effect` ainda executa uma regra primária por
-  cast, mas registra `_rule_alternatives` e `rule_alternative_count` no replay
-  quando a carta possui múltiplas regras ativas. Executar múltiplos efeitos em
-  sequência só deve ser implementado quando houver modelagem explícita de
-  modo, trigger, habilidade ativada ou efeito estático, com teste focado;
+- desde o Slice 3 de 2026-06-17, `battle_analyst_v9.py#get_card_effect` pode
+  compor múltiplas regras executáveis no mesmo spell quando todas as linhas
+  ativas são `verified`/`active`, possuem `compose_on_resolution=true` e
+  pertencem ao conjunto seguro de efeitos de resolução imediata. O replay passa
+  a registrar `effect=composite_resolution`, `composite_rule_component_count`,
+  `composite_rule_component_resolved` e `composite_rule_resolved`;
+- regras sem opt-in, `needs_review`, triggers, habilidades ativadas, efeitos
+  estáticos, custos adicionais/sacrifícios e outros componentes sem executor
+  explícito continuam preservados em `_rule_alternatives`, mas não executam
+  comportamento duro automaticamente;
 - `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade

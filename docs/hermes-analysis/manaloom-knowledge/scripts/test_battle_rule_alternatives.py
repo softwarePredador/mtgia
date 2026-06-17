@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import random
 import sqlite3
 import tempfile
 import unittest
@@ -74,6 +75,92 @@ class BattleRuleAlternativesTests(unittest.TestCase):
             battle.replay_rule_fields(resolved).get("rule_alternative_count"),
             2,
         )
+
+    def test_runtime_composes_opt_in_resolution_rules(self) -> None:
+        events: list[tuple[str, dict]] = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                battle.battle_rule_registry.ensure_battle_card_rules(conn)
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Composite Test Spell",
+                    {
+                        "effect": "draw_cards",
+                        "count": 1,
+                        "compose_on_resolution": True,
+                    },
+                    source="curated",
+                    confidence=0.95,
+                    review_status="verified",
+                )
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Composite Test Spell",
+                    {
+                        "effect": "remove_creature",
+                        "target": "creature",
+                        "compose_on_resolution": True,
+                    },
+                    source="curated",
+                    confidence=0.95,
+                    review_status="verified",
+                )
+                conn.commit()
+
+            old_db = battle.DB
+            old_handler = battle.REPLAY_EVENT_HANDLER
+            try:
+                battle.DB = str(sqlite_db)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                player = battle.Player(
+                    "Tester",
+                    None,
+                    [{"name": "Drawn Card", "type_line": "Instant", "cmc": 1}],
+                )
+                opponent = battle.Player("Opponent", None, [])
+                opponent.battlefield.append(
+                    {
+                        "name": "Target Creature",
+                        "type_line": "Creature",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                    }
+                )
+                spell = {
+                    "name": "Composite Test Spell",
+                    "type_line": "Sorcery",
+                    "oracle_text": "",
+                    "cmc": 2,
+                }
+
+                resolved = battle.get_card_effect(spell)
+                self.assertEqual(resolved.get("effect"), "composite_resolution")
+                self.assertEqual(
+                    battle.replay_rule_fields(resolved).get("composite_rule_component_count"),
+                    2,
+                )
+
+                battle.apply_effect_immediate(
+                    player,
+                    [opponent],
+                    spell,
+                    turn=1,
+                    rng=random.Random(7),
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+
+        self.assertEqual([card["name"] for card in player.hand], ["Drawn Card"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Creature"])
+        self.assertEqual(
+            len([event for event, _ in events if event == "composite_rule_component_resolved"]),
+            2,
+        )
+        self.assertTrue(any(event == "composite_rule_resolved" for event, _ in events))
 
 
 if __name__ == "__main__":

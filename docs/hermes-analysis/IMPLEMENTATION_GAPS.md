@@ -712,14 +712,17 @@ devem ser reduzidas para uma linha por carta.
   chave primária é `(normalized_name, logical_rule_key)`. O lookup legado do
   battle runtime ainda retorna uma regra primária por `normalized_name` para
   compatibilidade, mas o armazenamento já não perde regras modais/multifunção.
-- **Estado real dos consumidores em 2026-06-17 apos Slice 2**:
+- **Estado real dos consumidores em 2026-06-17 apos Slice 2/3**:
   `battle_rule_registry.py` expoe `load_active_battle_card_rule_lists()` e
   `lookup_battle_card_rule_list()`. `master_optimizer_common.py`,
   `slot_optimizer.py`, `universal_optimizer.py` e
   `lorehold_canonical_deck_snapshot.py` nao usam mais `LIMIT 1`/primeira regra
-  para inferir papel estratégico. `battle_analyst_v9.py#get_card_effect` ainda
-  resolve uma regra primária para execução, mas adiciona `_rule_alternatives`
-  e `rule_alternative_count` aos metadados de replay quando há múltiplas regras.
+  para inferir papel estratégico. `battle_analyst_v9.py#get_card_effect`
+  mantém lookup primário para compatibilidade, mas agora também executa
+  composição opt-in quando regras múltiplas `verified`/`active` trazem
+  `compose_on_resolution=true` e pertencem aos efeitos seguros de resolução
+  imediata. As demais múltiplas regras seguem preservadas em
+  `_rule_alternatives`/`rule_alternative_count` sem execução dura automática.
 - **Promoção confiável para `card_function_tags`**: tags derivadas de
   `card_battle_rules` só podem virar fonte canônica quando passarem por gate.
   No schema atual, `curated` é `source`, não `review_status`. Portanto, o gate
@@ -884,18 +887,23 @@ Concluído no bridge de consumidores ativos:
    - `slot_optimizer.py` e `universal_optimizer.py` agregam
      `battle_rules`/`battle_rule_categories` e preservam `deck_category`
      primária determinística;
-   - `battle_analyst_v9.py` expõe alternativas da regra no replay sem executar
-     efeitos múltiplos automaticamente.
+   - `battle_analyst_v9.py` expõe alternativas da regra no replay e executa
+     composição apenas para componentes de resolução opt-in
+     `compose_on_resolution=true`.
 
 Ainda pendente:
 
 10. Manter `card_battle_rules` fora da contagem de deckbuilding quando o objetivo
    for função de deck; usar essa tabela apenas como regra executável/revisável.
-11. Revisar manualmente os candidatos positivos do slot scan Lorehold
+11. Promover dados reais para `compose_on_resolution=true` somente depois de
+   revisão por carta: modos alternativos, triggers, habilidades ativadas,
+   efeitos estáticos, custos adicionais e sacrifícios continuam exigindo
+   executor próprio/teste focado.
+12. Revisar manualmente os candidatos positivos do slot scan Lorehold
    `semantic_snapshot_smoke` antes de qualquer apply:
    `Loran's Escape`, `Chain Lightning`, `Erode`, `Steelshaper's Gift`,
    `Furygale Flocking` e `The Battle of Bywater`.
-11. Adicionar derivação controlada de `card_battle_rules` para
+13. Adicionar derivação controlada de `card_battle_rules` para
    `card_function_tags` somente depois de definir taxonomia canônica,
    gate de `source/review_status/confidence` e limpeza de stale tags.
 
