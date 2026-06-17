@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-17 05:30 UTC
+> Data: 2026-06-17 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-17 07:00 UTC no checkout `caeade55` nao encontrou delta de produto desde `ae65f536` e manteve abertos os mesmos candidatos principais, estreitando apenas o achado menor de `normalize_commander` para a copia Hermes docs.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -100,14 +100,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-16 07:00 UTC como **ABERTO neste checkout `ae65f536`**. Desde a
-    rodada focada anterior (`92159f80..HEAD`), nao houve delta de produto em
+    2026-06-17 07:00 UTC como **ABERTO neste checkout `caeade55`**. Desde a
+    rodada focada anterior (`ae65f536..HEAD`), nao houve delta de produto em
     `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
-    database setup ou API contract; o unico delta no recorte foi
-    `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
-    O auditor textual executou com sucesso (`205` arquivos backend, `115`
-    problemas textuais, `0` imports quebrados), mas nao prova ausencia de
-    chamadas; a evidencia veio de buscas exatas por simbolo. Permanecem abertos
+    database setup, API contract, contexto de produto ou manual. O auditor
+    textual executou com sucesso (`205` arquivos backend, `115` problemas
+    textuais, `0` imports quebrados), mas nao prova ausencia de chamadas; a
+    evidencia veio de buscas exatas por simbolo. Permanecem abertos
     `sync_cards_utils.dart` test-only neste branch enquanto
     `server/bin/sync_cards.dart` mantem helpers privados/inline;
     `verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser anexado;
@@ -117,12 +116,11 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     de suporte sem chamada confirmada em request trace, ML feedback,
     `ApiClient.loadTokenFromDisk`, performance manual/debug, EDHREC/cache,
     metodos parciais de `ArchetypeCountersService`, push e read-side de
-    `AiLogService`. A nota historica de `sync_cards_utils.dart` ligado ao sync
-    operacional foi marcada como stale para `codex/hermes-analysis-docs@ae65f536`.
-    Novo achado menor: `normalize_commander` no export Hermes permanece sem
-    chamada. `isLikelyLandCard` permanece vivo via `safeCmcForOptimization`, e
-    os servicos de ML/log/cache/push/counters tem caminhos vivos parciais, so
-    metodos especificos continuam sem consumidor.
+    `AiLogService`. `isLikelyLandCard` permanece vivo via
+    `safeCmcForOptimization`, e os servicos de ML/log/cache/push/counters tem
+    caminhos vivos parciais, so metodos especificos continuam sem consumidor.
+    O achado menor de `normalize_commander` foi estreitado: a copia Hermes docs
+    continua sem chamada, mas a copia `server/bin` chama sua propria versao.
 13. **P1/P2 — Imports quebrados e ciclos locais**: **REVALIDADO/ABERTO no
     checkout local `ea37f3cf` em 2026-06-16 11:00 UTC.** O auditor base reportou
     `Imports quebrados: 0` em `server/lib`/`server/routes`. Desde a rodada
@@ -689,11 +687,10 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-16 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
-`ae65f536`**. Desde a rodada anterior de funcoes (`92159f80..HEAD`), nao houve
+**Status 2026-06-17 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`caeade55`**. Desde a rodada anterior de funcoes (`ae65f536..HEAD`), nao houve
 delta de produto em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-testes app/server, database setup ou API contract; o unico delta no recorte foi
-`docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
+testes app/server, database setup, API contract, contexto de produto ou manual.
 A rodada atual manteve os achados de maior impacto (`sync_cards_utils.dart`
 test-only neste branch, `verifySwapIntegrity` sem chamador apesar de
 `swap_integrity` e builders de response do optimize fora do fluxo real),
@@ -701,12 +698,11 @@ confirmou achados menores em wrappers app, observabilidade/cache,
 `ApiClient.loadTokenFromDisk`, `MLKnowledgeService.recordFeedback`, read-side de
 `AiLogService`, metodos parciais de `ArchetypeCountersService`,
 `PushNotificationService.sendToMultipleTokens`, wrapper Lorehold de Commander
-Reference e sample helper de aggressive optimize, e marcou como stale para este
-checkout a nota historica de `sync_cards_utils.dart` ligado ao sync operacional
-em `origin/master`. Novo achado menor: `normalize_commander` no export Hermes
-permanece sem chamada. Classificacoes ruidosas seguem corrigidas:
-`isLikelyLandCard` e vivo via `safeCmcForOptimization`; servicos de
-ML/log/cache/push/counters possuem caminhos vivos parciais.
+Reference e sample helper de aggressive optimize. O achado menor de
+`normalize_commander` foi estreitado: a copia Hermes docs permanece sem chamada,
+mas a copia `server/bin` chama sua propria versao. Classificacoes ruidosas
+seguem corrigidas: `isLikelyLandCard` e vivo via `safeCmcForOptimization`;
+servicos de ML/log/cache/push/counters possuem caminhos vivos parciais.
 
 - **Evidência**:
   - `server/lib/sync_cards_utils.dart:16`, `:82`, `:102`, `:121`, `:178` e
@@ -715,12 +711,8 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
     `server/lib` runtime ou rotas. `server/bin/sync_cards.dart:64` chama
     `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
     `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
-    `_extractCardRowFromSet`, definido em `:662`-`:721`; e legalidades sao
-    montadas inline em `:766`-`:823`. O full sync atual delega para
-    `server/bin/sync_cards_full_fast.py`.
-    A secao historica de pos-correcao em `STRUCTURE_AUDIT.md` foi marcada como
-    stale neste checkout porque descreve um estado de `origin/master` que nao
-    esta presente na branch de memoria.
+    `_extractCardRowFromSet`, definido em `:662`-`:722`; e legalidades sao
+    montadas inline em `:766`-`:770`.
   - `server/routes/ai/optimize/index.dart:752`-`:758` anexa
     `swap_integrity`, mas `verifySwapIntegrity` em
     `server/lib/ai/optimize_swap_integrity.dart:112`-`:134` nao tem chamador em
@@ -785,9 +777,11 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
     `safeCmcForOptimization`, uso parcial de `ArchetypeCountersService` em rotas
     de analise/simulacao, `sendToUser` e escrita de logs via `_logService?.log`.
   - `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:58`
-    define `normalize_commander`, mas busca por `normalize_commander(` no
-    diretorio de scripts encontrou apenas a definicao. Os novos helpers de
-    completeness/metadata do mesmo script sao chamados pelo caminho de export.
+    define `normalize_commander`, mas busca por `normalize_commander(` nesse
+    script encontrou apenas a definicao. Controle positivo: a copia operacional
+    `server/bin/export_hermes_learned_deck.py:43` chama sua propria versao em
+    `:48` e `:52`; portanto o achado nao deve ser generalizado para
+    `server/bin`.
 - **Impacto**: cobertura pode estar validando caminhos mortos, especialmente no
   caso de helpers publicos test-only. O risco mais alto e o sync de cartas,
   porque o teste cobre uma copia que nao participa do CLI operacional.

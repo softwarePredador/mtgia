@@ -307,32 +307,32 @@ de utilidade de carta.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-16 07:00 UTC no checkout local `ae65f536`. Desde a
-  rodada focada anterior (`92159f80..HEAD`), nao houve delta de produto em
+  novamente em 2026-06-17 07:00 UTC no checkout local `caeade55`. Desde a
+  rodada focada anterior (`ae65f536..HEAD`), nao houve delta de produto em
   `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
-  database setup ou API contract; o unico delta no recorte foi
-  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
-  O auditor textual executou com sucesso (`205` arquivos backend, `115`
-  problemas textuais, `0` imports quebrados), mas continua sem grafo de
-  chamadas; a evidencia veio de buscas exatas por simbolo. Permanecem abertos
-  os achados de maior impacto: `server/lib/sync_cards_utils.dart` test-only
-  neste branch enquanto `server/bin/sync_cards.dart` mantem helpers
-  privados/inline; `swap_integrity` e emitido, mas `verifySwapIntegrity` nao e
-  chamado no apply app/backend; e a extracao de
-  `optimize_response_support.dart` continua parcial (`buildOptimizeResponse` e
-  o top-level `respondWithOptimizeTelemetry` fora do fluxo real). Seguem tambem
-  wrappers app sem chamador (`BinderProvider.applyFilters`,
+  database setup, API contract, contexto de produto ou manual. O auditor
+  textual executou com sucesso (`205` arquivos backend, `115` problemas
+  textuais, `0` imports quebrados), mas continua sem grafo de chamadas; a
+  evidencia veio de buscas exatas por simbolo. Permanecem abertos os achados de
+  maior impacto: `server/lib/sync_cards_utils.dart` test-only neste branch
+  enquanto `server/bin/sync_cards.dart` mantem helpers privados/inline;
+  `swap_integrity` e emitido, mas `verifySwapIntegrity` nao e chamado no apply
+  app/backend; e a extracao de `optimize_response_support.dart` continua
+  parcial (`buildOptimizeResponse` e o top-level
+  `respondWithOptimizeTelemetry` fora do fluxo real). Seguem tambem wrappers app
+  sem chamador (`BinderProvider.applyFilters`,
   `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`) e
   conveniencias sem wiring em request trace, `ApiClient.loadTokenFromDisk`,
   performance manual/debug, EDHREC/cache, metodos parciais de archetype
   counters, push, ML feedback, read-side de `AiLogService`, wrapper Lorehold de
-  Commander Reference e sample helper de aggressive optimize. A nota historica
-  de `sync_cards_utils.dart` ligado ao sync operacional foi marcada como stale
-  para `codex/hermes-analysis-docs@ae65f536`. Novo achado menor:
-  `normalize_commander` no export Hermes permanece sem chamada. `isLikelyLandCard`
+  Commander Reference e sample helper de aggressive optimize. `isLikelyLandCard`
   continua vivo via `safeCmcForOptimization`; `MLKnowledgeService`,
   `AiLogService`, `EndpointCache`, push e archetype counters tem caminhos vivos
-  parciais, so alguns metodos publicos seguem sem consumidor.
+  parciais, so alguns metodos publicos seguem sem consumidor. O achado menor de
+  `normalize_commander` foi estreitado: a copia de
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`
+  continua sem chamada, mas `server/bin/export_hermes_learned_deck.py` chama sua
+  propria versao e nao deve ser citado como funcao morta.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
   em 2026-06-16 15:00 UTC no checkout local `0feacae2`. Desde a ultima rodada
   focada (`d6e568ac`), nao houve delta de codigo de produto em `app/lib`,
