@@ -332,19 +332,17 @@ de utilidade de carta.
   continua sem chamada, mas `server/bin/export_hermes_learned_deck.py` chama sua
   propria versao e nao deve ser citado como funcao morta.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-16 15:00 UTC no checkout local `0feacae2`. Desde a ultima rodada
-  focada (`d6e568ac`), nao houve delta de codigo de produto em `app/lib`,
-  `server/lib`, `server/routes`, `server/bin`, `server/database_setup.sql` ou
-  `server/test`; o unico delta no recorte foi o script Hermes
-  `export_hermes_learned_deck.py`, que usa SQLite local e nao referencia os
-  candidatos PostgreSQL do produto. Nao houve novo achado P1/P2 app-facing. As
-  claims antigas contra `deck_matchups` e `deck_weakness_reports` continuam
-  stale: ambas tem leitura runtime e campos retornados no payload das rotas
-  experimentais (`stored_matchup` em `/ai/simulate-matchup` e `history` em
+  em 2026-06-17 15:00 UTC no checkout local `c33e15ba`. Desde a ultima rodada
+  focada (`41e681a0..HEAD`), nao houve delta de codigo de produto, setup DB,
+  testes, API contract, contexto, manual ou scripts Hermes no recorte usado para
+  classificar tabelas. Nao houve novo achado P1/P2 app-facing. As claims antigas
+  contra `deck_matchups` e `deck_weakness_reports` continuam stale: ambas tem
+  leitura runtime e campos retornados no payload das rotas experimentais
+  (`stored_matchup` em `/ai/simulate-matchup` e `history` em
   `/ai/weakness-analysis`). `deck_learning_events`, `commander_card_usage`,
   `commander_learned_decks` e `card_battle_rules` seguem como controles
   positivos por terem writers/readers em rotas, jobs ou scripts operacionais.
-  Permanecem como riscos menores: `commander_reference_decks` e
+  Permanecem como riscos P3: `commander_reference_decks` e
   `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
   direto confirmado, enquanto o produto le o agregado
   `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem insert helper

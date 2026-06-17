@@ -9,7 +9,7 @@
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade foi revalidada em 2026-06-17 11:00 UTC no checkout `a96bffd6`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-17 07:00 UTC no checkout `caeade55` nao encontrou delta de produto desde `ae65f536` e manteve abertos os mesmos candidatos principais, estreitando apenas o achado menor de `normalize_commander` para a copia Hermes docs.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 2026-06-17 15:00 UTC no checkout `c33e15ba` nao encontrou delta de produto desde a rodada anterior deste foco nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-17 11:00 UTC no checkout `a96bffd6`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-17 07:00 UTC no checkout `caeade55` nao encontrou delta de produto desde `ae65f536` e manteve abertos os mesmos candidatos principais, estreitando apenas o achado menor de `normalize_commander` para a copia Hermes docs.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -50,21 +50,19 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    Basic lands sao excecao intencional de regra de deckbuilding quando passam por
    `basic_land_utils.dart`; listas locais fora dele seguem gap estreito.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado na rotacao local Codex de 2026-06-16 15:00 UTC no checkout
-   `0feacae2`. Desde `d6e568ac`, nao houve delta de codigo de produto em
-   `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-   `server/database_setup.sql` ou `server/test`; o unico delta no recorte foi
-   `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`,
-   que usa SQLite Hermes local e nao referencia os candidatos PostgreSQL do
-   produto. As claims antigas contra `deck_matchups` e `deck_weakness_reports`
-   estao stale: ambas agora sao lidas no runtime e retornadas no payload das
-   proprias rotas experimentais. O API/data map e o manual ainda contem texto
-   stale sobre essas duas tabelas, mas ficaram fora do escopo de escrita desta
-   rodada. Tambem nao devem ser tratadas como sem uso `commander_learned_decks`,
+   revalidado na rotacao local Codex de 2026-06-17 15:00 UTC no checkout
+   `c33e15ba`. Desde a rodada anterior deste foco (`41e681a0..HEAD`), nao
+   houve delta de codigo de produto, setup DB, testes, API contract, contexto,
+   manual ou scripts Hermes no recorte usado para classificar tabelas. As
+   claims antigas contra `deck_matchups` e `deck_weakness_reports` seguem
+   stale: ambas sao lidas no runtime e retornadas no payload das proprias rotas
+   experimentais. O API/data map e o manual ainda contem texto stale sobre essas
+   duas tabelas, mas ficaram fora do escopo de escrita desta rotina. Tambem nao
+   devem ser tratadas como sem uso `commander_learned_decks`,
    `deck_learning_events`, `commander_card_usage` e `card_battle_rules`, que
    possuem writers/readers em rotas, jobs ou scripts operacionais. Restam como
-   riscos menores as raws `commander_reference_decks` /
-   `commander_reference_deck_cards` sem leitor direto confirmado e
+   riscos P3 as raws `commander_reference_decks` /
+   `commander_reference_deck_cards` sem leitor raw direto confirmado e
    `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
    `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
@@ -910,26 +908,25 @@ servicos de ML/log/cache/push/counters possuem caminhos vivos parciais.
     disponibilidade sem consumir/bloquear cota de IA custosa;
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-16 15:00 UTC: REVALIDADO no checkout `0feacae2`.** A rodada
+- **Status 2026-06-17 15:00 UTC: REVALIDADO no checkout `c33e15ba`.** A rodada
   local focada em `postgresql-tables-not-used` revalidou os achados historicos
-  com `rg` literal, varredura de `server/database_setup.sql` e varredura de
+  com `rg` literal, varredura de `server/database_setup.sql`, varredura de
   tabelas criadas dinamicamente em `server/lib`, `server/routes` e `server/bin`,
-  cruzando `CREATE TABLE` com `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. Desde a
-  rodada anterior (`d6e568ac..HEAD`), nao houve delta de codigo de produto em
-  `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-  `server/database_setup.sql` ou `server/test`; o unico delta no recorte foi
-  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`,
-  que usa SQLite Hermes local e nao referencia os candidatos PostgreSQL do
-  produto. Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
+  e cruzamento `CREATE TABLE` contra
+  `FROM/JOIN/INSERT/UPDATE/DELETE/TRUNCATE`. Desde a rodada anterior deste foco
+  (`41e681a0..HEAD`), nao houve delta de codigo de produto, setup DB, testes,
+  API contract, contexto, manual ou scripts Hermes no recorte usado para
+  classificar tabelas. Nao houve novo achado P1/P2 app-facing. `deck_matchups` e
   `deck_weakness_reports` nao continuam write-only: ambas possuem leitores
   runtime e campos retornados no payload das rotas. `card_battle_rules` tambem
   nao foi classificada como unused, porque jobs/scripts Hermes leem, atualizam
   e sincronizam a tabela. `schema_migrations` segue fora do achado por ser
   tabela interna do migrador, e `user_learning_events` foi excluida por ser
   ponte SQLite local, nao PostgreSQL do produto. O risco remanescente fica
-  restrito a raws do Commander Reference Corpus sem leitor direto confirmado e a
-  `ml_prompt_feedback`, que nao tem DDL local no checkout atual, possui helper
-  de insert sem chamador e aparece em `/ai/ml-status` apenas como `COUNT(*)`.
+  restrito a raws do Commander Reference Corpus sem leitor raw direto confirmado
+  e a `ml_prompt_feedback`, que nao tem DDL local no checkout atual, possui
+  helper de insert sem chamador e aparece em `/ai/ml-status` apenas como
+  `COUNT(*)`.
 - **Evidência**:
   - `deck_matchups` é definida em `server/database_setup.sql:222`; a rota
     `/ai/simulate-matchup` le o historico anterior por `_loadStoredMatchup` em
