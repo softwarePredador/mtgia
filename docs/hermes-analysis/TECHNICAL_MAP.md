@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-16 23:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-17 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -225,12 +225,12 @@ mtgia/
   bracket/Game Changer.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-16 03:00 UTC no checkout local `2edcc757`. O auditor textual executou
+  2026-06-17 03:00 UTC no checkout local `b53295fe`. O auditor textual executou
   com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg`, leitura direta e triagem de baixa contagem. Desde a rodada anterior
-  de classes (`53e604e9`), nao houve delta de codigo de produto, testes ou
-  contrato API no recorte app/backend.
+  de `rg`, leitura direta e triagem do delta. Desde a rodada anterior de
+  classes (`2edcc757..HEAD`), nao houve delta de codigo de produto, testes,
+  contrato API, contexto de produto ou manual no recorte app/backend.
   `LifeCounterScreen` continua legado/test-only enquanto a rota ativa usa
   `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip` continuam sem uso
   runtime confirmado nas listagens; e `LotusPresentationMode` nao e

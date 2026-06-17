@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-16 23:00 UTC
+> Data: 2026-06-17 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -65,12 +65,13 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `ml_prompt_feedback`, que tem helper de insert sem chamador, count-only em
    `/ai/ml-status` e nenhum DDL local encontrado neste checkout.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-16 03:00 UTC no checkout `2edcc757`.
+   na rotacao local Codex de 2026-06-17 03:00 UTC no checkout `b53295fe`.
    O auditor textual executou com sucesso (`205` arquivos backend, `196`
    classes, `0` imports quebrados), mas continua limitado a `server/lib` e
-   `server/routes`; a evidencia app veio de `rg`, leitura direta e triagem de
-   baixa contagem. Desde a rodada anterior de classes (`53e604e9`), nao houve
-   delta de codigo de produto, testes ou contrato API no recorte app/backend.
+   `server/routes`; a evidencia app veio de `rg`, leitura direta e triagem do
+   delta. Desde a rodada anterior de classes (`2edcc757..HEAD`), nao houve
+   delta de codigo de produto, testes, contrato API, contexto de produto ou
+   manual no recorte app/backend.
    `LifeCounterScreen` segue como caminho
    legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`; `DeckCard`
    continua testado mas sem import/chamada na listagem real; `DeckProgressChip`
@@ -976,9 +977,10 @@ ML/log/cache/push/counters possuem caminhos vivos parciais.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-16 03:00 UTC: REVALIDADO/ABERTO no checkout `2edcc757`.**
-  Desde a rodada anterior de classes (`53e604e9`), nao houve delta de codigo de
-  produto, testes ou contrato API no recorte app/backend.
+- **Status 2026-06-17 03:00 UTC: REVALIDADO/ABERTO no checkout `b53295fe`.**
+  Desde a rodada anterior de classes (`2edcc757..HEAD`), nao houve delta de
+  codigo de produto, testes, contrato API, contexto de produto ou manual no
+  recorte app/backend.
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:284` usa
