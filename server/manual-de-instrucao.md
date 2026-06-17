@@ -55,6 +55,9 @@ Hardening posterior do runtime:
   quando o `knowledge.db` ainda nao contem `decks`/`deck_cards`;
 - `hermes_mana_base_validator.py` nao encerra mais com erro estrutural quando o
   SQLite ainda nao recebeu deck alvo; gera relatorio com `runtime_note`.
+- `server/bin/reconcile_easypanel_services.py` virou o caminho canônico para
+  reconciliar env mínima de `manaloom-ops`/`hermes-lab` e disparar deploy
+  controlado no EasyPanel.
 
 Risco remanescente:
 

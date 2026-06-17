@@ -50,6 +50,10 @@ O bootstrap precisa garantir:
    - instalar gates de delta para os jobs provider-heavy restantes;
    - remover legados `lorehold-*` e watchdogs já substituídos;
    - pausar auditorias amplas que devem ficar só on-demand.
+9. reconciliar também a configuração do serviço no painel:
+   - `server/bin/reconcile_easypanel_services.py`
+   - env mínima do `hermes-lab`
+   - deploy controlado com espera do action e checagem de SHA
 
 ## O que o container precisa para funcionar
 
@@ -167,3 +171,21 @@ Removida por bootstrap por ser legado ou duplicação já aposentada:
 5. Só expor domínio público quando houver auth do dashboard ou política clara
    de reverse proxy privado.
 6. Só depois desligar a AWS.
+
+## Script canônico de reconciliação
+
+Para revisar ou aplicar a configuração mínima do `hermes-lab` e do
+`manaloom-ops` no EasyPanel:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+python3 server/bin/reconcile_easypanel_services.py --apply --deploy
+```
+
+O script:
+
+- lê `EASYPANEL_*` de `.env`, `server/.env` ou ambiente;
+- aplica apenas o subset canônico dos dois serviços;
+- não imprime segredo cru;
+- espera o action de deploy concluir;
+- compara o SHA final do serviço com o `HEAD` local.

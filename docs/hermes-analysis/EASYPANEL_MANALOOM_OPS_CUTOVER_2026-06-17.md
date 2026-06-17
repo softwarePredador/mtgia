@@ -295,6 +295,23 @@ O cutover deste slice é considerado pronto quando:
 4. os artifacts e logs ficam persistidos fora do container efêmero;
 5. o Hermes AWS pode ser desligado para esses três jobs sem perda de função.
 
+## Script canônico de reconciliação
+
+Para evitar drift manual de cron/env no EasyPanel, a reconciliação do serviço
+passou a ser versionada:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+python3 server/bin/reconcile_easypanel_services.py --apply --deploy
+```
+
+No `manaloom-ops`, esse script garante:
+
+- `PULL_LEARNING_EVENTS_CRON=0 * * * *`;
+- `MTGIA_ENV_FILE=/app/server/.env`;
+- manutenção da cadência canônica dos seis jobs críticos;
+- deploy seguido de espera do action até conclusão.
+
 ## Estado validado em 2026-06-17
 
 - commit do serviço no deploy: `d3e9de20`
