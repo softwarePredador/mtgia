@@ -25,6 +25,8 @@ const loadUsageHotCardsSql = '''
   LIMIT @limit
 ''';
 
+const usageHotCardsGenerationCandidateLimit = 50;
+
 Future<void> ensureDeckLearningEventsTable(Pool pool) async {
   await pool.execute('''
     CREATE TABLE IF NOT EXISTS deck_learning_events (
@@ -168,7 +170,7 @@ String buildUsageHotCardsPrompt(List<Map<String, dynamic>> hotCards) {
 
 List<String> usageHotCardCanonicalNames(
   List<Map<String, dynamic>> hotCards, {
-  int limit = 24,
+  int limit = usageHotCardsGenerationCandidateLimit,
 }) {
   return hotCards
       .take(limit)

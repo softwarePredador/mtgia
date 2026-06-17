@@ -110,7 +110,7 @@ Future<Response> onRequest(RequestContext context) async {
         usageHotCards = await loadUsageHotCards(
           pool: pool,
           commanderName: requestedCommanderName,
-          limit: 24,
+          limit: usageHotCardsGenerationCandidateLimit,
         );
         usageHotCardsPrompt = buildUsageHotCardsPrompt(usageHotCards);
       } catch (_) {}

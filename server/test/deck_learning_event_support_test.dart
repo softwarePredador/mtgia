@@ -40,4 +40,25 @@ void main() {
 
     expect(names, equals(['Jeska\'s Will', 'unexpected windfall']));
   });
+
+  test('usageHotCardCanonicalNames defaults to generation candidate limit', () {
+    final hotCards = [
+      for (var index = 0;
+          index < usageHotCardsGenerationCandidateLimit + 5;
+          index++)
+        {
+          'canonical_name': 'Usage Card $index',
+          'card_name_normalized': 'usage card $index',
+        },
+    ];
+
+    final names = usageHotCardCanonicalNames(hotCards);
+
+    expect(names, hasLength(usageHotCardsGenerationCandidateLimit));
+    expect(names.first, equals('Usage Card 0'));
+    expect(
+      names.last,
+      equals('Usage Card ${usageHotCardsGenerationCandidateLimit - 1}'),
+    );
+  });
 }

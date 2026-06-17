@@ -553,6 +553,29 @@ Leitura correta desse recheck:
 - o próximo slice seguro para Lorehold continua não sendo remover fallback às
   cegas, e sim atacar primeiro esse bucket residual `fallback_only`.
 
+Recheck 2026-06-17 após ampliar o limite de hot cards aprendidos para 50 no
+generator:
+
+- `source_usage_counts.reference_card_stats = 34`
+- `source_usage_counts.reference_corpus_packages = 36`
+- `source_usage_counts.profile_expected_packages = 34`
+- `source_usage_counts.usage_hot_cards = 50`
+- `source_usage_counts.deterministic_fallback = 45`
+- `built_in_fallback_only_count` caiu de `16` para `2`
+- `built_in_fallback_only_sample = [Mind Stone, Fellwar Stone]`
+
+Leitura correta desse recheck:
+
+- o PostgreSQL ja tinha 50 sinais de uso real para Lorehold, mas o caminho live
+  de `/ai/generate` cortava a amostra em 24 antes de montar o deck
+  determinístico;
+- ampliar o consumo para 50 não muda contrato publico, não lê SQLite Hermes como
+  fonte final e não copia o learned deck diretamente;
+- a dependência residual de fallback literal ficou pequena e explícita, mas ela
+  ainda existe e não deve ser apagada sem cobertura por stats/corpus/uso;
+- o próximo ajuste de código deve mirar `Mind Stone`/`Fellwar Stone` ou o
+  consumo direto controlado do learned deck, não uma remoção ampla do fallback.
+
 ### Bug real encontrado e corrigido nesta rodada
 
 `loadUsageHotCards()` estava multiplicando cartas por printings ao fazer join
@@ -1030,8 +1053,9 @@ movimento errado neste momento.
 5. Executar apply controlado de `card_role_scores` com stale prune revisado.
 6. Definir explicitamente a fronteira entre `/ai/generate` e
    `/ai/commander-learning`, para learned deck nao contaminar scorecards errados.
-7. Reordenar o builder de deck para depender mais de stats/corpus/usage antes
-   do fallback literal Lorehold.
+7. Reordenar/parametrizar o builder de deck para depender mais de
+   stats/corpus/usage antes do fallback literal Lorehold. O slice 2026-06-17 ja
+   ampliou `usage_hot_cards` para 50 e reduziu `fallback_only` para 2 cartas.
 8. Adicionar explainability backend-owned por carta gerada.
 9. So depois considerar nova rodada forte de learned deck promotion.
 

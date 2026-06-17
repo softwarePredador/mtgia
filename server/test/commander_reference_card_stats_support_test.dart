@@ -403,6 +403,47 @@ void main() {
       expect(result.builtInFallbackOnlyCount, equals(4));
     });
 
+    test(
+        'usage hot cards can satisfy deterministic slots without fallback-only cards',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_usage_hot_cards_full_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        usageHotCardNames: const [
+          'Laelia, the Blade Reforged',
+          'Smuggler\'s Share',
+          'Quintorius Kand',
+          'Sun Titan',
+          'Dockside Extortionist',
+          'Warleader\'s Call',
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(result.sourceUsageCounts['usage_hot_cards'], equals(6));
+      expect(result.sourceUsageCounts['deterministic_fallback'], isNull);
+      expect(result.builtInFallbackOnlyCount, equals(0));
+      expect(
+        result.cardProvenance.map((entry) => entry.sources),
+        everyElement(equals(['usage_hot_cards'])),
+      );
+    });
+
     test('filters off-color generated cards before reference validation repair',
         () {
       final profile = buildLoreholdReferenceProfilePayload(
