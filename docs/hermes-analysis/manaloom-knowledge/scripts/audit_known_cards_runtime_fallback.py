@@ -72,7 +72,7 @@ def load_sqlite_rules(sqlite_db: str | Path) -> list[dict[str, Any]]:
         cur.execute(
             """
             SELECT normalized_name, card_name, effect_json, source, confidence,
-                   review_status, rule_version, oracle_hash
+                   review_status, rule_version, oracle_hash, updated_at, last_seen_at
             FROM battle_card_rules
             ORDER BY normalized_name
             """
@@ -92,6 +92,8 @@ def load_sqlite_rules(sqlite_db: str | Path) -> list[dict[str, Any]]:
                 "review_status": str(row["review_status"]),
                 "rule_version": int(row["rule_version"] or 0),
                 "oracle_hash": row["oracle_hash"],
+                "updated_at": row["updated_at"],
+                "last_seen_at": row["last_seen_at"],
             }
             rule_row["logical_rule_key"] = logical_rule_key(rule_row)
             rows.append(rule_row)

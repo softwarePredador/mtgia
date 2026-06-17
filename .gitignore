@@ -44,5 +44,8 @@ server/test/artifacts/*.port
 # AI optimize debug artifacts (generated during HTTP optimize flow tests)
 server/test/artifacts/ai_optimize/source_deck_optimize_*.json
 !server/test/artifacts/ai_optimize/source_deck_optimize_latest.json
+
+# Accidental local SQLite created outside the canonical Hermes scripts path
+docs/hermes-analysis/manaloom-knowledge/knowledge.db
 *.pyc
 __pycache__/

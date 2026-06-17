@@ -90,6 +90,67 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_execution_status"], "auto")
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_logical_key"], "battle_rule_v1:deadbeef")
 
+    def test_filter_rows_for_current_reviewed_curated_drops_superseded_pg_curated_row(self) -> None:
+        rows = [
+            {
+                "card_name": "Scroll Rack",
+                "logical_rule_key": "old",
+                "effect_json": {
+                    "effect": "topdeck_manipulation",
+                    "activation_cost_generic": 1,
+                    "hand_to_top_exchange": True,
+                    "battle_model_scope": "scroll_rack_exchange_unexecuted_v1",
+                },
+                "deck_role_json": {"category": "draw", "effect": "topdeck_manipulation"},
+                "source": "curated",
+            },
+            {
+                "card_name": "Scroll Rack",
+                "logical_rule_key": "new",
+                "effect_json": {
+                    "effect": "topdeck_manipulation",
+                    "activation_cost_generic": 1,
+                    "hand_to_top_exchange": True,
+                    "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+                },
+                "deck_role_json": {"category": "draw", "effect": "topdeck_manipulation"},
+                "source": "curated",
+            },
+            {
+                "card_name": "Scroll Rack",
+                "logical_rule_key": "generated",
+                "effect_json": {"effect": "ramp_permanent", "mana_produced": 1},
+                "deck_role_json": {"category": "ramp", "effect": "ramp_permanent"},
+                "source": "generated",
+            },
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Scroll Rack",
+                "logical_rule_key": "new",
+                "effect_json": {
+                    "effect": "topdeck_manipulation",
+                    "activation_cost_generic": 1,
+                    "hand_to_top_exchange": True,
+                    "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+                },
+                "deck_role_json": {"category": "draw", "effect": "topdeck_manipulation"},
+                "source": "curated",
+            }
+        ]
+
+        filtered = sync_pg.filter_rows_for_current_reviewed_curated(rows, reviewed_rows)
+
+        self.assertEqual(len(filtered), 2)
+        self.assertEqual(
+            [row["logical_rule_key"] for row in filtered if row["source"] == "curated"],
+            ["new"],
+        )
+        self.assertEqual(
+            [row["logical_rule_key"] for row in filtered if row["source"] == "generated"],
+            ["generated"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2152,65 +2152,77 @@ if _canonical_snapshot_path.exists():
 
 def get_card_effect(card):
     name = card.get("name", "")
-    if name in MANUAL_RULE_RUNTIME_WAIVERS and name in HANDCRAFTED_KNOWN_CARD_RULES:
-        return normalize_effect_by_oracle(
-            card,
-            with_rule_metadata(
-                HANDCRAFTED_KNOWN_CARD_RULES[name],
-                source="known_cards_manual",
-                review_status="verified",
-                confidence=1.0,
-            ),
-        )
+    lookup_names = [name]
+    if isinstance(name, str) and " // " in name:
+        front_face = name.split(" // ", 1)[0].strip()
+        if front_face and front_face not in lookup_names:
+            lookup_names.append(front_face)
+    for lookup_name in lookup_names:
+        if (
+            lookup_name in MANUAL_RULE_RUNTIME_WAIVERS
+            and lookup_name in HANDCRAFTED_KNOWN_CARD_RULES
+        ):
+            return normalize_effect_by_oracle(
+                card,
+                with_rule_metadata(
+                    HANDCRAFTED_KNOWN_CARD_RULES[lookup_name],
+                    source="known_cards_manual",
+                    review_status="verified",
+                    confidence=1.0,
+                ),
+            )
     if battle_rule_registry is not None:
-        if hasattr(battle_rule_registry, "lookup_battle_card_rule_list"):
-            rules = battle_rule_registry.lookup_battle_card_rule_list(DB, name)
-        else:
-            rule = battle_rule_registry.lookup_battle_card_rule(DB, name)
-            rules = [rule] if rule else []
-        if any(rule and rule.get("effect_json") for rule in rules):
-            composite_effect = _build_composite_battle_rule_effect(card, rules)
-            if composite_effect is not None:
-                return composite_effect
-            enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
-            if enriched_effect is not None:
-                return enriched_effect
-            rule = _select_primary_runtime_rule(rules)
-            if rule is not None:
-                effect = _annotate_runtime_rule_selection(
-                    _annotated_battle_rule_effect(rule),
-                    rules,
-                    selection_mode="single_selected",
-                )
-                return normalize_effect_by_oracle(card, effect)
-    if name in HANDCRAFTED_KNOWN_CARDS:
-        handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name)
-        if handcrafted_effect is None:
-            handcrafted_effect = {}
-        return normalize_effect_by_oracle(
-            card,
-            with_rule_metadata(
-                handcrafted_effect,
-                source="known_cards_manual",
-                review_status="verified",
-                confidence=1.0,
-            ),
-        )
-    if name in CANONICAL_FALLBACK_KNOWN_CARDS:
-        effect_json, metadata = extract_snapshot_effect_and_metadata(KNOWN_CARDS[name])
-        return normalize_effect_by_oracle(
-            card,
-            with_rule_metadata(
-                effect_json,
-                source="known_cards_canonical_snapshot",
-                review_status=str(metadata.get("battle_rule_review_status") or "unknown"),
-                execution_status=str(metadata.get("battle_rule_execution_status") or "auto"),
-                confidence=float(metadata.get("battle_rule_confidence") or 0.0),
-                rule_version=metadata.get("battle_rule_version"),
-                logical_rule_key=metadata.get("battle_rule_logical_key"),
-                oracle_hash=metadata.get("battle_rule_oracle_hash"),
-            ),
-        )
+        for lookup_name in lookup_names:
+            if hasattr(battle_rule_registry, "lookup_battle_card_rule_list"):
+                rules = battle_rule_registry.lookup_battle_card_rule_list(DB, lookup_name)
+            else:
+                rule = battle_rule_registry.lookup_battle_card_rule(DB, lookup_name)
+                rules = [rule] if rule else []
+            if any(rule and rule.get("effect_json") for rule in rules):
+                composite_effect = _build_composite_battle_rule_effect(card, rules)
+                if composite_effect is not None:
+                    return composite_effect
+                enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
+                if enriched_effect is not None:
+                    return enriched_effect
+                rule = _select_primary_runtime_rule(rules)
+                if rule is not None:
+                    effect = _annotate_runtime_rule_selection(
+                        _annotated_battle_rule_effect(rule),
+                        rules,
+                        selection_mode="single_selected",
+                    )
+                    return normalize_effect_by_oracle(card, effect)
+    for lookup_name in lookup_names:
+        if lookup_name in HANDCRAFTED_KNOWN_CARDS:
+            handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(lookup_name)
+            if handcrafted_effect is None:
+                handcrafted_effect = {}
+            return normalize_effect_by_oracle(
+                card,
+                with_rule_metadata(
+                    handcrafted_effect,
+                    source="known_cards_manual",
+                    review_status="verified",
+                    confidence=1.0,
+                ),
+            )
+    for lookup_name in lookup_names:
+        if lookup_name in CANONICAL_FALLBACK_KNOWN_CARDS:
+            effect_json, metadata = extract_snapshot_effect_and_metadata(KNOWN_CARDS[lookup_name])
+            return normalize_effect_by_oracle(
+                card,
+                with_rule_metadata(
+                    effect_json,
+                    source="known_cards_canonical_snapshot",
+                    review_status=str(metadata.get("battle_rule_review_status") or "unknown"),
+                    execution_status=str(metadata.get("battle_rule_execution_status") or "auto"),
+                    confidence=float(metadata.get("battle_rule_confidence") or 0.0),
+                    rule_version=metadata.get("battle_rule_version"),
+                    logical_rule_key=metadata.get("battle_rule_logical_key"),
+                    oracle_hash=metadata.get("battle_rule_oracle_hash"),
+                ),
+            )
     for tag in card_functional_tags(card):
         if tag not in TAG_EFFECTS:
             continue
@@ -2443,6 +2455,10 @@ class Player:
 
     def draw(self, n=1, rng=None):
         drawn = []
+        turn_marker = CURRENT_REPLAY_TURN
+        if turn_marker is not None and getattr(self, "_cards_drawn_turn_marker", None) != turn_marker:
+            self.cards_drawn_this_turn = 0
+            self._cards_drawn_turn_marker = turn_marker
         for _ in range(n):
             if self.library:
                 c = self.library.pop(0)
@@ -2495,6 +2511,7 @@ class Player:
         self.poison = 0  # v9
         self.win_reason = None
         self.cards_drawn_this_turn = 0
+        self._cards_drawn_turn_marker = None
         self.failed_draw_from_empty_library = False
 
     def refresh_mana_sources(self, turn=None):
@@ -4279,7 +4296,29 @@ def land_sacrifice_has_strategic_benefit(strategic_risk_flags, target_options, c
         # accepts only clear flexible fixing; otherwise the auditor must review.
         if "wildcard" in set(best.get("colors") or []):
             return True, "flexible_color_fixing"
-        return False, "unique_color_loss_without_clear_replacement"
+    return False, "unique_color_loss_without_clear_replacement"
+
+
+def self_sacrifice_land_tutor_has_strategic_benefit(player, target_options):
+    if not target_options:
+        return False, "no_land_ramp_target_context"
+
+    current_lands = controlled_land_count(player)
+    if current_lands <= 4:
+        return True, "early_land_development"
+
+    selected = sorted(target_options, key=lambda item: item["selection_rank"])[0]
+    if selected.get("high_value_target"):
+        return True, "high_value_land_target"
+
+    target_colors = set(selected.get("colors") or [])
+    if "wildcard" in target_colors:
+        return True, "flexible_color_fixing"
+
+    if current_lands <= 5:
+        return True, "baseline_land_development"
+
+    return False, "land_tutor_artifact_low_payoff"
     return False, "last_land_spend_without_clear_payoff"
 
 
@@ -4893,15 +4932,23 @@ def graveyard_enchantment_recovery_score(card, player, turn):
     effect_data = get_card_effect(card)
     effect = str(effect_data.get("effect") or card.get("effect") or "unknown")
     score = threat_score(effect, card.get("name", "?"), player, [player], turn)
+    cmc = int(float(card.get("cmc") or 0))
+    expected_next_turn_mana = max(controlled_land_count(player), 1) if player is not None else 1
     reason = "highest_contextual_enchantment_recovery_value"
     if effect in ("ramp_engine", "draw_engine", "topdeck_manipulation"):
-        score += 30
+        score = max(score, 70)
+        if cmc <= expected_next_turn_mana + 1:
+            score += 8
         reason = "recover_engine_enchantment"
     elif effect in ("token_maker", "finisher", "approach", "wincon"):
-        score += 25
+        score = max(score, 35)
+        if cmc > expected_next_turn_mana + 1:
+            score -= min((cmc - (expected_next_turn_mana + 1)) * 8, 32)
         reason = "recover_closing_enchantment"
     elif effect == "passive":
-        score += 18
+        score = max(score, 48)
+        if cmc <= expected_next_turn_mana + 1:
+            score += 6
         reason = "recover_static_value_enchantment"
     return score, reason
 
@@ -4974,13 +5021,21 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng):
     for participant in participants:
         discarded_cards = list(participant.hand)
         participant.hand = []
-        participant.graveyard.extend(discarded_cards)
+        discard_resolution = resolve_effect_discard_cards(
+            participant,
+            discarded_cards,
+            top_limit=draw_count,
+        )
         drawn = participant.draw(draw_count, rng)
         if participant is not player:
             total_opponent_drawn += len(drawn)
         results.append({
             "player": participant.name,
             "discarded": len(discarded_cards),
+            "discarded_to_top": [entry.get("name", "?") for entry in discard_resolution["to_top"]],
+            "discarded_to_graveyard": [
+                entry.get("name", "?") for entry in discard_resolution["to_graveyard"]
+            ],
             "drawn": len(drawn),
             "hand_after": len(participant.hand),
         })
@@ -5185,6 +5240,110 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
     return candidates
 
 
+def sacrifice_mana_unlock_candidates(
+    player,
+    opponents,
+    all_players,
+    turn,
+    *,
+    bonus_amount,
+    bonus_color="colorless",
+):
+    candidates = []
+
+    if player.command_zone:
+        commander = player.command_zone[0]
+        commander_tax = int(player.commander_tax or 0)
+        already_on_board = any(
+            isinstance(permanent, dict)
+            and permanent.get("name") == commander.get("name")
+            for permanent in player.battlefield
+        )
+        if (
+            not already_on_board
+            and not player.can_pay_card(commander, additional_generic=commander_tax)
+            and _can_pay_card_with_bonus_mana(
+                player,
+                commander,
+                bonus_amount=bonus_amount,
+                bonus_color=bonus_color,
+                additional_generic=commander_tax,
+            )
+        ):
+            effective_cost = int(float(commander.get("cmc") or 0)) + commander_tax
+            score = max(40, effective_cost * 6)
+            candidates.append(
+                {
+                    "card": commander,
+                    "effect_data": get_card_effect(commander),
+                    "score": score,
+                    "reason": "unlock_commander_cast",
+                    "unlock_type": "commander",
+                    "cmc": effective_cost,
+                }
+            )
+
+    for card in player.hand:
+        if not isinstance(card, dict) or is_effective_land(card):
+            continue
+        effect_data = get_card_effect(card)
+        effect = effect_data.get("effect", "unknown")
+        if effect == "unknown":
+            continue
+        if player.can_pay_card(card):
+            continue
+        if not _can_pay_card_with_bonus_mana(
+            player,
+            card,
+            bonus_amount=bonus_amount,
+            bonus_color=bonus_color,
+        ):
+            continue
+        if effect == "board_wipe" and not should_cast_board_wipe(player, opponents):
+            continue
+        if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
+            if not should_cast_wheel(player, opponents, effect_data):
+                continue
+
+        cmc = int(float(card.get("cmc") or 0))
+        score = threat_score(effect, card.get("name", "?"), player, all_players, turn)
+        reason = "unlock_contextual_spell"
+        if effect in ("ramp_permanent", "ramp_engine", "land_ramp", "ramp_ritual"):
+            score += 24 if turn <= 4 else 12
+            reason = "unlock_ramp_curve_step"
+        elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
+            score += 20
+            reason = "unlock_interaction"
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation"):
+            score += 16 if cmc <= 4 else 8
+            reason = "unlock_board_or_engine_development"
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "worldfire_reset"):
+            score += 26
+            reason = "unlock_high_impact_spell"
+        else:
+            score += max(6, 14 - cmc)
+
+        candidates.append(
+            {
+                "card": card,
+                "effect_data": effect_data,
+                "score": score,
+                "reason": reason,
+                "unlock_type": "spell",
+                "cmc": cmc,
+            }
+        )
+
+    candidates.sort(
+        key=lambda item: (
+            -int(item.get("score") or 0),
+            int(item.get("cmc") or 0),
+            item["card"].get("name", ""),
+        )
+    )
+    return candidates
+
+
 def activate_precombat_utility_mana_lands(
     player,
     opponents,
@@ -5347,6 +5506,53 @@ def _utility_artifact_skip_event(player, permanent, turn, reason, *, phase, risk
     )
 
 
+def creature_sacrifice_has_strategic_benefit(player, creature, chosen_unlock):
+    if not isinstance(creature, dict) or chosen_unlock is None:
+        return False, ["missing_context"], "missing_context"
+    risk_flags = []
+    if creature.get("is_commander"):
+        risk_flags.append("sacrificing_commander")
+    if creature.get("is_mana_source"):
+        risk_flags.append("sacrificing_mana_creature")
+    power = int(float(creature.get("power") or 0))
+    toughness = int(float(creature.get("toughness") or 0))
+    cmc = int(float(creature.get("cmc") or 0))
+    type_line = str(creature.get("type_line") or "").lower()
+    is_token = creature.get("tag") == "token" or "token" in type_line
+    remaining_creatures = max(
+        0,
+        len(
+            [
+                permanent
+                for permanent in player.battlefield
+                if is_battlefield_creature(permanent)
+            ]
+        ) - 1,
+    )
+    if remaining_creatures <= 0:
+        risk_flags.append("empty_board_after_sacrifice")
+    if power >= 4 or toughness >= 4 or cmc >= 5:
+        risk_flags.append("high_board_value_creature")
+
+    creature_value = power * 4 + toughness * 3 + cmc * 2
+    if creature.get("is_commander"):
+        creature_value += 24
+    if creature.get("is_mana_source"):
+        creature_value += 8
+    if is_token:
+        creature_value = max(0, creature_value - 14)
+    unlock_score = int(chosen_unlock.get("score") or 0)
+    unlock_reason = str(chosen_unlock.get("reason") or "")
+
+    if "sacrificing_commander" in risk_flags:
+        return False, risk_flags, "commander_sacrifice_not_allowed_for_generic_unlock"
+    if unlock_reason in {"unlock_high_impact_spell", "unlock_commander_cast"} and unlock_score >= max(18, creature_value):
+        return True, risk_flags, "high_impact_unlock_outweighs_creature_cost"
+    if unlock_score >= creature_value + 12:
+        return True, risk_flags, "unlock_score_outweighs_creature_cost"
+    return False, risk_flags, "creature_cost_outweighs_unlock"
+
+
 def _capture_player_resource_state(player):
     return (
         player.mana_pool.snapshot(),
@@ -5376,6 +5582,181 @@ def _cantrip_filter_candidate_score(card, effect_data, player, turn):
         score += 6
     score += min(6, int(float(card.get("cmc") or 0)))
     return max(score, 8)
+
+
+def activate_sacrifice_mana_artifacts(
+    player,
+    opponents,
+    all_players,
+    turn,
+    *,
+    phase="precombat_main",
+):
+    if not player.is_alive() or phase not in MAIN_PHASES:
+        return 0
+
+    utility_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("activated_mana_ability")
+        and permanent.get("activation_cost") == "sacrifice_creature"
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if not utility_artifacts:
+        return 0
+
+    for permanent in utility_artifacts:
+        bonus_amount = int(permanent.get("mana_produced") or 0)
+        bonus_colors = source_colors(permanent)
+        bonus_color = bonus_colors[0] if len(bonus_colors) == 1 else "colorless"
+        if bonus_amount <= 0:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_bonus_mana_to_generate",
+                phase=phase,
+            )
+            continue
+
+        candidates = sacrifice_mana_unlock_candidates(
+            player,
+            opponents,
+            all_players,
+            turn,
+            bonus_amount=bonus_amount,
+            bonus_color=bonus_color,
+        )
+        if not candidates:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_contextual_unlock_for_sacrifice_mana_artifact",
+                phase=phase,
+            )
+            continue
+
+        creature, creature_options, selection_reason = choose_creature_for_resource_cost(player)
+        if creature is None:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_creature_available_to_pay_activation_cost",
+                phase=phase,
+            )
+            continue
+        chosen = candidates[0]
+        allowed, risk_flags, benefit_reason = creature_sacrifice_has_strategic_benefit(
+            player,
+            creature,
+            chosen,
+        )
+        if not allowed:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                benefit_reason,
+                phase=phase,
+                risk_flags=risk_flags,
+            )
+            continue
+
+        destination = move_creature_from_battlefield(player, creature)
+        player.mana_pool.add(bonus_color, bonus_amount)
+        permanent["utility_artifact_used_this_turn"] = True
+
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    option["card"],
+                    option["effect_data"],
+                    score=option["score"],
+                    action="activate_sacrifice_mana_artifact",
+                    unlock_reason=option["reason"],
+                    unlock_type=option["unlock_type"],
+                    produced_mana=bonus_amount,
+                )
+                for option in candidates[:8]
+            ],
+            chosen_option=decision_card_option(
+                chosen["card"],
+                chosen["effect_data"],
+                score=chosen["score"],
+                action="activate_sacrifice_mana_artifact",
+                unlock_reason=chosen["reason"],
+                unlock_type=chosen["unlock_type"],
+                produced_mana=bonus_amount,
+            ),
+            rejected_options=[
+                decision_card_option(
+                    option["card"],
+                    option["effect_data"],
+                    score=option["score"],
+                    action="defer_sacrifice_mana_artifact",
+                    unlock_reason=option["reason"],
+                    unlock_type=option["unlock_type"],
+                    produced_mana=bonus_amount,
+                )
+                for option in candidates[1:8]
+            ],
+            score_components={
+                "activation_cost": "sacrifice_creature",
+                "sacrificed_creature": creature.get("name", "?"),
+                "creature_selection_reason": selection_reason,
+                "produced_mana": bonus_amount,
+                "unlock_target": chosen["card"].get("name", "?"),
+                "unlock_type": chosen["unlock_type"],
+            },
+            rule_source="utility_artifact_activation_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=chosen["score"],
+            actual_outcome="creature_sacrificed_for_contextual_mana_unlock",
+            reason="convert_low_value_creature_into_mana_only_when_unlock_is_real",
+            strategic_principle="spend_creature_resource_only_for_material_unlock",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "creatures": -1,
+                "mana": bonus_amount,
+                "graveyard": 1,
+                "unlock_target": chosen["card"].get("name", "?"),
+                "unlock_type": chosen["unlock_type"],
+                "destination": destination,
+            },
+            risk_flags=["sacrifice_creature", *risk_flags],
+            rejected_reason="lower_contextual_unlock_score",
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="sacrifice_creature_for_mana_unlock",
+            sacrificed=creature.get("name", "?"),
+            destination=destination,
+            unlock_target=chosen["card"].get("name", "?"),
+            unlock_type=chosen["unlock_type"],
+            unlock_reason=chosen["reason"],
+            mana_added=bonus_amount,
+            mana_color=bonus_color,
+            available_mana_after=player.available_mana(),
+            creature_options=creature_options,
+            selection_reason=selection_reason,
+            strategic_risk_flags=risk_flags,
+            strategic_benefit_reason=benefit_reason,
+            phase=phase,
+            turn=turn,
+        )
+        return 1
+
+    return 0
 
 
 def cantrip_mana_filter_unlock_options(player, permanent, turn, *, phase="precombat_main"):
@@ -5480,8 +5861,6 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         and permanent.get("effect") == "cantrip_mana_filter_artifact"
         and not permanent.get("utility_artifact_used_this_turn")
     ]
-    if not utility_artifacts:
-        return 0
 
     hand_size = len(player.hand)
     preferred_order = ["chromatic star"]
@@ -5693,7 +6072,897 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 turn=turn,
             )
             return 1
+
+    self_sacrifice_draw_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") != "cantrip_mana_filter_artifact"
+        and (
+            permanent.get("activated_self_sacrifice_draw")
+            or permanent.get("activated_draw_on_self_sacrifice")
+        )
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase != "postcombat_main" or not self_sacrifice_draw_artifacts:
+        return 0
+
+    for permanent in self_sacrifice_draw_artifacts:
+        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "artifact_already_tapped_for_self_sacrifice_draw",
+                phase=phase,
+            )
+            continue
+        if not player.library:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_library_for_self_sacrifice_draw_artifact",
+                phase=phase,
+            )
+            continue
+        if hand_size > 2:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "hand_not_low_enough_for_self_sacrifice_draw_artifact",
+                phase=phase,
+            )
+            continue
+        if player.available_mana() < activation_cost:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "insufficient_mana_for_self_sacrifice_draw_artifact",
+                phase=phase,
+            )
+            continue
+        if not player.spend_mana("{%d}" % activation_cost):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "failed_to_pay_activation_cost",
+                phase=phase,
+            )
+            continue
+        if permanent.get("activation_requires_tap"):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        drawn = player.draw(1, rng)
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="cash_in_for_draw",
+                    effect=permanent.get("effect", "artifact"),
+                    score=24,
+                )
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="cash_in_for_draw",
+                effect=permanent.get("effect", "artifact"),
+                score=24,
+            ),
+            score_components={
+                "activation_cost_generic": activation_cost,
+                "cards_drawn": len(drawn),
+                "hand_before": hand_size,
+                "hand_after": len(player.hand),
+            },
+            rule_source="utility_artifact_activation_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=24,
+            reason="cash_in_low_impact_artifact_for_card_when_hand_is_low",
+            strategic_principle="convert_low_board_impact_artifact_into_refill_after_main_actions",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "cards": len(drawn),
+                "mana": -activation_cost,
+                "artifacts": -1,
+                "graveyard": 1,
+            },
+            risk_flags=["sacrifice_artifact"],
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="self_sacrifice_draw",
+            mana_paid=activation_cost,
+            cards_drawn=len(drawn),
+            hand_before=hand_size,
+            hand_after=len(player.hand),
+            phase=phase,
+            turn=turn,
+        )
+        return 1
+
     return 0
+
+
+def _player_permanents_with_flag(player, flag):
+    return [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict) and permanent.get(flag)
+    ]
+
+
+def _player_has_named_permanent(player, expected_name):
+    normalized_expected = normalize_card_name(expected_name)
+    for permanent in player.battlefield:
+        if not isinstance(permanent, dict):
+            continue
+        if normalize_card_name(permanent.get("name", "")) == normalized_expected:
+            return True
+    return False
+
+
+def player_has_no_maximum_hand_size(player):
+    return bool(_player_permanents_with_flag(player, "no_max_hand_size"))
+
+
+def player_has_discard_to_top_replacement(player):
+    return bool(_player_permanents_with_flag(player, "discard_effect_to_top_replacement"))
+
+
+def discard_replacement_priority(card, player):
+    if not isinstance(card, dict):
+        return -999
+    if player_has_lorehold_miracle_engine(player):
+        return lorehold_draw_priority(card, player)
+    effect_data = get_card_effect(card)
+    effect = str(effect_data.get("effect") or card.get("effect") or "unknown")
+    cmc = int(_opening_hand_card_cmc(card) or 0)
+    is_land_card = is_effective_land(card)
+    if effect in {
+        "counter",
+        "remove_creature",
+        "remove_permanent",
+        "board_wipe",
+        "protection",
+        "phase_out",
+        "tutor",
+    }:
+        return 140 + min(cmc, 6) * 3
+    if effect in {"draw_cards", "draw_engine", "hand_filter", "cantrip_mana_filter_artifact"}:
+        return 118 + min(cmc, 6) * 2
+    if effect in {"ramp_permanent", "land_ramp", "ramp_ritual"}:
+        return 108 + min(cmc, 5) * 2
+    if is_instant_or_sorcery_spell(card):
+        return 92 + min(cmc, 7) * 2
+    if is_land_card:
+        if controlled_land_count(player) <= 3:
+            return 88
+        return 18
+    if effect == "finisher":
+        return 72 + min(cmc, 8)
+    if cmc >= 6:
+        return 44
+    return 58
+
+
+def resolve_effect_discard_cards(player, discarded_cards, *, top_limit=None):
+    cards = [card for card in discarded_cards if isinstance(card, dict)]
+    if not cards:
+        return {
+            "to_top": [],
+            "to_graveyard": [],
+            "used_replacement": False,
+        }
+
+    if not player_has_discard_to_top_replacement(player):
+        player.graveyard.extend(cards)
+        return {
+            "to_top": [],
+            "to_graveyard": cards,
+            "used_replacement": False,
+        }
+
+    scored_cards = sorted(
+        cards,
+        key=lambda card: (
+            -discard_replacement_priority(card, player),
+            -int(_opening_hand_card_cmc(card) or 0),
+            card.get("name", "?"),
+        ),
+    )
+    threshold = 90 if top_limit and top_limit > 0 else 110
+    chosen_to_top = []
+    for card in scored_cards:
+        if discard_replacement_priority(card, player) < threshold:
+            continue
+        if top_limit is not None and len(chosen_to_top) >= top_limit:
+            break
+        chosen_to_top.append(card)
+
+    top_keys = {id(card) for card in chosen_to_top}
+    to_graveyard = [card for card in cards if id(card) not in top_keys]
+    player.graveyard.extend(to_graveyard)
+    for card in reversed(chosen_to_top):
+        player.library.insert(0, card)
+    return {
+        "to_top": chosen_to_top,
+        "to_graveyard": to_graveyard,
+        "used_replacement": bool(chosen_to_top),
+    }
+
+
+def player_has_lorehold_miracle_engine(player):
+    return bool(_player_permanents_with_flag(player, "opponent_upkeep_rummage")) or _player_has_named_permanent(
+        player,
+        "Lorehold, the Historian",
+    )
+
+
+def lorehold_miracle_cost(player):
+    permanents = _player_permanents_with_flag(player, "grants_miracle_cost")
+    if not permanents:
+        return 2 if _player_has_named_permanent(player, "Lorehold, the Historian") else None
+    costs = [
+        int(permanent.get("grants_miracle_cost") or 0)
+        for permanent in permanents
+        if int(permanent.get("grants_miracle_cost") or 0) > 0
+    ]
+    return min(costs) if costs else None
+
+
+def lorehold_draw_priority(card, player):
+    if not isinstance(card, dict):
+        return -999
+    effect_data = get_card_effect(card)
+    effect = str(effect_data.get("effect") or card.get("effect") or "unknown")
+    cmc = int(_opening_hand_card_cmc(card) or 0)
+    normalized_name = normalize_card_name(card.get("name", ""))
+    if normalized_name == "approach of the second sun":
+        return 220
+    if is_instant_or_sorcery_spell(card):
+        base = 140 + min(cmc, 8) * 5
+        if effect in {
+            "board_wipe",
+            "draw_cards",
+            "remove_creature",
+            "remove_permanent",
+            "tutor",
+            "worldfire_reset",
+        }:
+            base += 12
+        return base
+    if effect in {"draw_cards", "draw_engine", "hand_filter", "topdeck_manipulation"}:
+        return 70
+    if effect in {"ramp_permanent", "land_ramp", "ramp_engine"}:
+        return 48
+    if is_effective_land(card):
+        return 18 if controlled_land_count(player) < 4 else 4
+    return 20 + min(cmc, 6)
+
+
+def activate_lorehold_topdeck_artifacts(
+    player,
+    turn,
+    rng,
+    *,
+    phase="opponent_upkeep",
+    all_players=None,
+    stack=None,
+):
+    if not player.is_alive() or not player_has_lorehold_miracle_engine(player):
+        return 0
+
+    exchange_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") == "topdeck_manipulation"
+        and permanent.get("hand_to_top_exchange")
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase == "upkeep" and exchange_artifacts and player.library:
+        for permanent in exchange_artifacts:
+            activation_cost = int(permanent.get("activation_cost_generic") or 1)
+            if player.available_mana() < activation_cost:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_scroll_rack_exchange",
+                    phase=phase,
+                )
+                continue
+
+            hand_candidates = [
+                card
+                for card in player.hand
+                if isinstance(card, dict) and is_instant_or_sorcery_spell(card)
+            ]
+            if not hand_candidates:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_hand_spell_worth_setting_as_first_draw",
+                    phase=phase,
+                )
+                continue
+
+            top_before = player.library[0]
+            top_before_score = lorehold_draw_priority(top_before, player)
+            scored_hand = sorted(
+                (
+                    {
+                        "card": card,
+                        "score": lorehold_draw_priority(card, player),
+                    }
+                    for card in hand_candidates
+                ),
+                key=lambda item: (
+                    -item["score"],
+                    int(_opening_hand_card_cmc(item["card"]) or 0),
+                    item["card"].get("name", "?"),
+                ),
+            )
+            chosen_hand = scored_hand[0]
+            if (
+                chosen_hand["score"] < 130
+                or chosen_hand["score"] <= top_before_score
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "top_library_card_already_good_enough_for_first_draw",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana(activation_cost):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_scroll_rack_exchange_cost",
+                    phase=phase,
+                )
+                continue
+
+            player.hand.remove(chosen_hand["card"])
+            gained_from_top = player.library.pop(0)
+            player.hand.append(gained_from_top)
+            player.library.insert(0, chosen_hand["card"])
+            permanent["utility_artifact_used_this_turn"] = True
+            permanent["tapped"] = True
+
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        item["card"],
+                        score=item["score"],
+                        action="set_hand_spell_as_next_draw",
+                        effect="topdeck_manipulation",
+                    )
+                    for item in scored_hand
+                ],
+                chosen_option=decision_card_option(
+                    chosen_hand["card"],
+                    score=chosen_hand["score"],
+                    action="activate_scroll_rack_exchange",
+                    effect="topdeck_manipulation",
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        item["card"],
+                        score=item["score"],
+                        action="leave_in_hand",
+                        effect="topdeck_manipulation",
+                    )
+                    for item in scored_hand[1:]
+                ],
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "cards_exchanged": 1,
+                    "top_before": top_before.get("name", "?"),
+                    "top_after": chosen_hand["card"].get("name", "?"),
+                    "hand_to_top": chosen_hand["card"].get("name", "?"),
+                },
+                rule_source="lorehold_topdeck_support_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=chosen_hand["score"],
+                actual_outcome="hand_spell_moved_to_top_for_next_draw",
+                reason="convert_high_priority_hand_spell_into_next_first_draw",
+                strategic_principle="spend_small_mana_only_when_scroll_rack materially upgrades the next Lorehold draw",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "mana": -activation_cost,
+                    "top_before": top_before.get("name", "?"),
+                    "top_after": chosen_hand["card"].get("name", "?"),
+                    "hand_gained": gained_from_top.get("name", "?"),
+                },
+                risk_flags=["upkeep_mana_spend", "delayed_first_draw_setup", "engine_piece_tapped"],
+                rejected_reason="lower_first_draw_priority_than_selected_hand_spell",
+            )
+            emit_replay_event(
+                "topdeck_manipulation_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="scroll_rack_single_exchange_for_lorehold",
+                top_before=top_before.get("name", "?"),
+                top_after=chosen_hand["card"].get("name", "?"),
+                hand_to_top=chosen_hand["card"].get("name", "?"),
+                hand_gained=gained_from_top.get("name", "?"),
+                exchange_count=1,
+                phase=phase,
+                turn=turn,
+            )
+            return 1
+
+    utility_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") == "topdeck_manipulation"
+        and permanent.get("peek_top_count")
+        and permanent.get("reorder_top")
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if not utility_artifacts or len(player.library) < 2:
+        return 0
+
+    for permanent in utility_artifacts:
+        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        if player.available_mana() < activation_cost:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "insufficient_mana_for_topdeck_reorder",
+                phase=phase,
+            )
+            continue
+
+        peek_count = max(2, int(permanent.get("peek_top_count") or 3))
+        visible = [card for card in player.library[:peek_count] if isinstance(card, dict)]
+        if len(visible) < 2:
+            continue
+
+        scored = [
+            {"card": card, "score": lorehold_draw_priority(card, player)}
+            for card in visible
+        ]
+        current_top_score = scored[0]["score"]
+        scored_sorted = sorted(
+            scored,
+            key=lambda item: (
+                -item["score"],
+                int(_opening_hand_card_cmc(item["card"]) or 0),
+                item["card"].get("name", "?"),
+            ),
+        )
+        best = scored_sorted[0]
+        miracle_cost = lorehold_miracle_cost(player)
+        can_draw_put_self_for_miracle = (
+            all_players is not None
+            and stack is not None
+            and bool(permanent.get("activated_draw_put_self_on_top"))
+            and player.cards_drawn_this_turn == 0
+            and miracle_cost is not None
+            and is_instant_or_sorcery_spell(visible[0])
+            and current_top_score >= 130
+            and player.available_mana() >= miracle_cost
+        )
+        if can_draw_put_self_for_miracle:
+            drawn = player.draw(1, rng)
+            relocated_permanent = {
+                key: value
+                for key, value in dict(permanent).items()
+                if key not in {"utility_artifact_used_this_turn", "tapped"}
+            }
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.library.insert(0, relocated_permanent)
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        item["card"],
+                        score=item["score"],
+                        action="draw_first_card_for_miracle",
+                        effect="topdeck_manipulation",
+                    )
+                    for item in scored_sorted
+                ],
+                chosen_option=decision_card_option(
+                    visible[0],
+                    score=current_top_score,
+                    action="activate_topdeck_draw_put_self_on_top",
+                    effect="topdeck_manipulation",
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        item["card"],
+                        score=item["score"],
+                        action="leave_below_top",
+                        effect="topdeck_manipulation",
+                    )
+                    for item in scored_sorted[1:]
+                ],
+                score_components={
+                    "activation_cost_generic": 0,
+                    "peek_top_count": len(visible),
+                    "top_before": visible[0].get("name", "?"),
+                    "top_after": relocated_permanent.get("name", "?"),
+                    "miracle_cost": miracle_cost,
+                },
+                rule_source="lorehold_topdeck_support_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=current_top_score,
+                actual_outcome="top_card_drawn_for_miracle_window",
+                reason="use_top_draw_mode_when_top_card_is_already_best_and_castable",
+                strategic_principle="consume_topdeck_engine_piece_only_when_it_immediately_unlocks_a_high_priority_miracle_draw",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "mana": 0,
+                    "top_before": visible[0].get("name", "?"),
+                    "top_after": relocated_permanent.get("name", "?"),
+                    "drawn": drawn[-1].get("name", "?") if drawn else None,
+                },
+                risk_flags=["topdeck_draw", "engine_piece_relocated_to_library"],
+                rejected_reason="top_card_not_good_enough_to_consume_engine_piece",
+            )
+            emit_replay_event(
+                "topdeck_manipulation_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="draw_put_self_on_top_for_miracle",
+                top_before=visible[0].get("name", "?"),
+                top_after=relocated_permanent.get("name", "?"),
+                drawn=drawn[-1].get("name", "?") if drawn else None,
+                peek_count=len(visible),
+                phase=phase,
+                turn=turn,
+            )
+            try_lorehold_miracle_cast(
+                player,
+                drawn,
+                turn,
+                phase,
+                all_players,
+                rng,
+                stack,
+                source="senseis_top_draw",
+            )
+            return 1
+        if best["score"] <= current_top_score or best["card"] is visible[0]:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "top_card_already_best_for_lorehold_draw",
+                phase=phase,
+            )
+            continue
+        if not player.spend_mana(activation_cost):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "failed_to_pay_topdeck_reorder_cost",
+                phase=phase,
+            )
+            continue
+
+        player.library = [item["card"] for item in scored_sorted] + player.library[len(visible):]
+        permanent["utility_artifact_used_this_turn"] = True
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    item["card"],
+                    score=item["score"],
+                    action="reorder_topdeck_for_miracle",
+                    effect="topdeck_manipulation",
+                )
+                for item in scored_sorted
+            ],
+            chosen_option=decision_card_option(
+                best["card"],
+                score=best["score"],
+                action="activate_topdeck_reorder",
+                effect="topdeck_manipulation",
+            ),
+            rejected_options=[
+                decision_card_option(
+                    item["card"],
+                    score=item["score"],
+                    action="leave_below_top",
+                    effect="topdeck_manipulation",
+                )
+                for item in scored_sorted[1:]
+            ],
+            score_components={
+                "activation_cost_generic": activation_cost,
+                "peek_top_count": len(visible),
+                "top_before": visible[0].get("name", "?"),
+                "top_after": best["card"].get("name", "?"),
+            },
+            rule_source="lorehold_topdeck_support_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=best["score"],
+            actual_outcome="topdeck_reordered_for_first_draw",
+            reason="reorder_top_cards_to_improve_lorehold_first_draw",
+            strategic_principle="spend_small_mana_only_when_topdeck_tool_materially_improves_first_draw",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "mana": -activation_cost,
+                "top_before": visible[0].get("name", "?"),
+                "top_after": best["card"].get("name", "?"),
+            },
+            risk_flags=["upkeep_mana_spend", "topdeck_reorder"],
+            rejected_reason="lower_first_draw_priority",
+        )
+        emit_replay_event(
+            "topdeck_manipulation_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="peek_reorder_for_lorehold",
+            top_before=visible[0].get("name", "?"),
+            top_after=best["card"].get("name", "?"),
+            peek_count=len(visible),
+            phase=phase,
+            turn=turn,
+        )
+        return 1
+    return 0
+
+
+def choose_lorehold_rummage_discard(player):
+    candidates = [card for card in player.hand if isinstance(card, dict)]
+    if not candidates:
+        return None, None, [], False, []
+
+    lands_in_hand = sum(1 for card in candidates if is_effective_land(card))
+    battlefield_lands = controlled_land_count(player)
+    can_replace_to_top = player_has_discard_to_top_replacement(player)
+    scored = []
+    for card in candidates:
+        cmc = int(_opening_hand_card_cmc(card) or 0)
+        effect = get_card_effect(card).get("effect", card.get("effect", "unknown"))
+        is_land_card = is_effective_land(card)
+        instant_or_sorcery = is_instant_or_sorcery_spell(card)
+        score = 0
+        reason = "keep_card"
+        use_top_replacement = False
+        risk_flags = []
+        if can_replace_to_top and instant_or_sorcery:
+            score = 130 + min(cmc, 8) * 4
+            reason = "redraw_spell_as_first_draw_for_miracle"
+            use_top_replacement = True
+        elif is_land_card and lands_in_hand >= 2 and battlefield_lands >= 4:
+            score = 88
+            reason = "discard_excess_land_for_new_draw"
+        elif not is_land_card and cmc >= 7:
+            score = 72
+            reason = "pitch_dead_high_cmc_spell"
+        elif not is_land_card and cmc >= 5 and effect not in {"draw_cards", "topdeck_manipulation"}:
+            score = 54
+            reason = "pitch_slow_noncritical_spell"
+        elif is_land_card and battlefield_lands >= 5:
+            score = 34
+            reason = "discard_flood_land"
+        else:
+            risk_flags.append("card_may_be_too_valuable_to_pitch")
+        if score <= 0:
+            continue
+        scored.append(
+            {
+                "card": card,
+                "score": score,
+                "reason": reason,
+                "use_top_replacement": use_top_replacement,
+                "risk_flags": risk_flags,
+            }
+        )
+    if not scored:
+        return None, None, [], False, []
+    scored.sort(
+        key=lambda item: (
+            -item["score"],
+            0 if item["use_top_replacement"] else 1,
+            -int(_opening_hand_card_cmc(item["card"]) or 0),
+            item["card"].get("name", "?"),
+        )
+    )
+    chosen = scored[0]
+    return (
+        chosen["card"],
+        chosen["reason"],
+        chosen["risk_flags"],
+        bool(chosen["use_top_replacement"]),
+        scored,
+    )
+
+
+def try_lorehold_miracle_cast(player, drawn_for_turn, turn, phase, all_players, rng, stack, *, source):
+    if not player.is_human or not drawn_for_turn or player.cards_drawn_this_turn != 1:
+        return False
+    miracle_cost = lorehold_miracle_cost(player)
+    if miracle_cost is None:
+        return False
+    last_drawn = drawn_for_turn[-1]
+    if not last_drawn or not is_instant_or_sorcery_spell(last_drawn):
+        return False
+    if player.available_mana() < miracle_cost:
+        return False
+    eff = get_card_effect(last_drawn)
+    if last_drawn not in player.hand:
+        return False
+    player.hand.remove(last_drawn)
+    player.spend_mana(miracle_cost)
+    emit_replay_event(
+        "miracle_cast",
+        player=player.name,
+        card=last_drawn.get("name", "?"),
+        effect=eff.get("effect", "unknown"),
+        type_line=last_drawn.get("type_line", ""),
+        miracle_cost=miracle_cost,
+        lorehold_on_board=True,
+        cards_drawn_this_turn=player.cards_drawn_this_turn,
+        phase=phase,
+        source=source,
+        turn=turn,
+        **replay_rule_fields(eff),
+    )
+    stack.push(last_drawn, player, eff)
+    while not stack.empty():
+        priority_round(player, all_players, stack, turn, rng)
+    return True
+
+
+def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, rng, stack):
+    triggered = 0
+    for player in all_players:
+        if player is active_player or not player.is_alive():
+            continue
+        if not player_has_lorehold_miracle_engine(player):
+            continue
+
+        activate_lorehold_topdeck_artifacts(
+            player,
+            turn,
+            rng,
+            phase="opponent_upkeep",
+            all_players=all_players,
+            stack=stack,
+        )
+        discarded, discard_reason, risk_flags, use_top_replacement, scored_options = choose_lorehold_rummage_discard(player)
+        if discarded is None:
+            emit_replay_event(
+                "lorehold_upkeep_rummage_skipped",
+                player=player.name,
+                active_player=active_player.name,
+                reason="no_strategic_discard_candidate",
+                turn=turn,
+            )
+            continue
+        if discarded not in player.hand:
+            continue
+
+        player.hand.remove(discarded)
+        if use_top_replacement:
+            player.library.insert(0, discarded)
+            discard_destination = "top_of_library"
+        else:
+            player.graveyard.append(discarded)
+            discard_destination = "graveyard"
+        drawn = player.draw(1, rng)
+        drawn_name = drawn[-1].get("name", "?") if drawn else None
+        available_options = []
+        seen_option_keys = set()
+        for scored in scored_options:
+            card = scored["card"]
+            option = decision_card_option(
+                card,
+                score=scored["score"],
+                action="discard_for_lorehold_rummage",
+                effect=get_card_effect(card).get("effect", card.get("effect", "unknown")),
+            )
+            option_key = (
+                option.get("card"),
+                option.get("action"),
+                option.get("effect"),
+                option.get("cmc"),
+                option.get("type_line"),
+            )
+            if option_key in seen_option_keys:
+                continue
+            seen_option_keys.add(option_key)
+            available_options.append(option)
+        emit_decision_trace(
+            decision_type="lorehold_upkeep_rummage",
+            player=player,
+            turn=turn,
+            phase="opponent_upkeep",
+            available_options=available_options,
+            chosen_option=decision_card_option(
+                discarded,
+                score=lorehold_draw_priority(discarded, player),
+                action="discard_for_lorehold_rummage",
+                effect=get_card_effect(discarded).get("effect", discarded.get("effect", "unknown")),
+            ),
+            score_components={
+                "discard_destination": discard_destination,
+                "drawn_card": drawn_name,
+                "miracle_cost": lorehold_miracle_cost(player),
+            },
+            rule_source="lorehold_opponent_upkeep_rummage_v1",
+            rule_status="active",
+            confidence="medium",
+            expected_benefit_score=lorehold_draw_priority(discarded, player),
+            actual_outcome="discard_then_draw",
+            reason=discard_reason,
+            strategic_principle="convert_opponent_upkeep_draw_into_miracle_window_only_when_discard_is_contextually_defensible",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "hand": 0,
+                "graveyard": 0 if use_top_replacement else 1,
+                "library_top": discarded.get("name", "?") if use_top_replacement else None,
+                "drawn": drawn_name,
+            },
+            risk_flags=risk_flags,
+            rejected_reason="lower_lorehold_rummage_value",
+        )
+        emit_replay_event(
+            "lorehold_upkeep_rummage",
+            player=player.name,
+            active_player=active_player.name,
+            discarded=discarded.get("name", "?"),
+            discard_destination=discard_destination,
+            drawn=drawn_name,
+            replacement_used=use_top_replacement,
+            reason=discard_reason,
+            turn=turn,
+        )
+        try_lorehold_miracle_cast(
+            player,
+            drawn,
+            turn,
+            "opponent_upkeep",
+            all_players,
+            rng,
+            stack,
+            source="lorehold_opponent_upkeep_rummage",
+        )
+        triggered += 1
+    return triggered
 
 
 def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
@@ -6719,12 +7988,22 @@ def trigger_opponent_land_play_engines(
 
 def activate_land_tutor_creatures(player, turn):
     for permanent in list(player.battlefield):
-        if not isinstance(permanent, dict) or not permanent.get("land_tutor_activated"):
+        if not isinstance(permanent, dict):
             continue
-        if permanent.get("tapped") or permanent.get("summoning_sick"):
+        land_tutor_creature = bool(permanent.get("land_tutor_activated"))
+        self_sacrifice_land_tutor = bool(permanent.get("activated_self_sacrifice_land_tutor"))
+        if not land_tutor_creature and not self_sacrifice_land_tutor:
             continue
-        if player.available_mana() < 2 or controlled_land_count(player) <= 1:
+        if permanent.get("tapped"):
             continue
+        if land_tutor_creature and permanent.get("summoning_sick"):
+            continue
+        activation_cost = int(permanent.get("activation_cost_generic") or 2)
+        if player.available_mana() < activation_cost:
+            continue
+
+        type_line = str(permanent.get("type_line") or "").lower()
+        is_creature = "creature" in type_line or permanent.get("effect") == "creature"
         effect_data = {
             **get_card_effect(permanent),
             **permanent,
@@ -6732,6 +8011,109 @@ def activate_land_tutor_creatures(player, turn):
             "lands_to_battlefield": 1,
             "land_enters_tapped": True,
         }
+        chosen_targets, target_options = choose_land_ramp_targets(player, effect_data, 1)
+        if self_sacrifice_land_tutor:
+            current_lands = controlled_land_count(player)
+            allowed, benefit_reason = self_sacrifice_land_tutor_has_strategic_benefit(
+                player,
+                target_options,
+            )
+            if not chosen_targets or not allowed:
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="land_tutor",
+                    reason="strategic_guardrail" if chosen_targets else "missing_land_or_target",
+                    land_ramp_target_options=target_options,
+                    strategic_guardrail_reason=benefit_reason,
+                    turn=turn,
+                )
+                continue
+            land_to_find = chosen_targets[0]
+            if not player.spend_mana(activation_cost):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="land_tutor",
+                    reason="failed_to_pay_activation_cost",
+                    land_ramp_target_options=target_options,
+                    strategic_guardrail_reason=benefit_reason,
+                    turn=turn,
+                )
+                continue
+            if permanent.get("activation_requires_tap"):
+                permanent["tapped"] = True
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            player.library.remove(land_to_find)
+            found_land = enrich_card({**land_to_find, "effect": "land", "tapped": True})
+            player.battlefield.append(found_land)
+            trigger_landfall(player, found_land, turn, "land_tutor_activated")
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase="precombat_main",
+                available_options=[
+                    decision_card_option(
+                        {"name": option["name"]},
+                        score=option["score"],
+                        action="activate_land_tutor_artifact",
+                        effect="land_tutor",
+                    )
+                    for option in sorted(target_options, key=lambda item: item["selection_rank"])[:8]
+                ],
+                chosen_option=decision_card_option(
+                    land_to_find,
+                    score=next(
+                        (option["score"] for option in target_options if option["name"] == land_to_find.get("name", "?")),
+                        0,
+                    ),
+                    action="activate_land_tutor_artifact",
+                    effect="land_tutor",
+                ),
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "found_land": land_to_find.get("name", "?"),
+                    "current_lands": current_lands,
+                },
+                rule_source="utility_artifact_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=next(
+                    (option["score"] for option in target_options if option["name"] == land_to_find.get("name", "?")),
+                    0,
+                ),
+                actual_outcome="artifact_converted_into_tapped_land",
+                reason="convert_low_impact_artifact_into_structural_land_development",
+                strategic_principle="cash_in_land_tutor_artifact_when_it_improves_real_mana_development",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "artifacts": -1,
+                    "graveyard": 1,
+                    "lands": 1,
+                    "found_land": land_to_find.get("name", "?"),
+                },
+                risk_flags=["sacrifice_artifact", "land_tutor"],
+            )
+            emit_replay_event(
+                "activated_ability",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="land_tutor",
+                activation_kind="self_sacrifice_land_tutor_artifact",
+                found=found_land.get("name", "?"),
+                land_ramp_target_options=target_options,
+                strategic_benefit_reason=benefit_reason,
+                turn=turn,
+            )
+            return
+
+        if controlled_land_count(player) <= 1:
+            continue
         battlefield_lands = [
             land for land in player.battlefield
             if isinstance(land, dict) and is_effective_land(land)
@@ -6740,7 +8122,6 @@ def activate_land_tutor_creatures(player, turn):
             battlefield_lands,
             zone="battlefield",
         )
-        chosen_targets, target_options = choose_land_ramp_targets(player, effect_data, 1)
         allowed, benefit_reason = land_sacrifice_has_strategic_benefit(
             strategic_risk_flags,
             target_options,
@@ -6761,8 +8142,9 @@ def activate_land_tutor_creatures(player, turn):
             )
             continue
         land_to_find = chosen_targets[0]
-        player.spend_mana(2)
-        permanent["tapped"] = True
+        player.spend_mana(activation_cost)
+        if is_creature:
+            permanent["tapped"] = True
         player.battlefield.remove(land_to_sacrifice)
         player.graveyard.append(land_to_sacrifice)
         player.library.remove(land_to_find)
@@ -8494,6 +9876,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "creature"
         player.battlefield.append(permanent)
+        if effect_data.get("etb_draw_count"):
+            player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
         emit_replay_event(
             "creature_to_battlefield",
             player=player.name,
@@ -9295,10 +10679,25 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         )
     elif effect == "loot":
         n = effect_data.get("count", 1)
-        player.draw(n, rng)
+        drawn = player.draw(n, rng)
+        discarded_cards = []
         for _ in range(min(n, len(player.hand))):
             if player.hand:
-                player.graveyard.append(player.hand.pop(rng.randint(0, len(player.hand) - 1)))
+                discarded_cards.append(player.hand.pop(rng.randint(0, len(player.hand) - 1)))
+        discard_resolution = resolve_effect_discard_cards(player, discarded_cards)
+        emit_replay_event(
+            "loot_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            cards_drawn=[drawn_card.get("name", "?") for drawn_card in drawn if isinstance(drawn_card, dict)],
+            discarded_to_top=[entry.get("name", "?") for entry in discard_resolution["to_top"]],
+            discarded_to_graveyard=[
+                entry.get("name", "?") for entry in discard_resolution["to_graveyard"]
+            ],
+            replacement_used=discard_resolution["used_replacement"],
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     elif effect == "finisher":
         creatures = [c for c in player.battlefield if is_battlefield_creature(c)]
         total_power = sum(c.get("power", 2) for c in creatures)
@@ -10097,6 +11496,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         if isinstance(c, dict):
             c["tapped"] = False
             c["utility_land_used_this_turn"] = False
+            c["utility_artifact_used_this_turn"] = False
             if is_battlefield_creature(c):
                 c["summoning_sick"] = False
     # Return phased out permanents (v7 fix: should be upkeep, keeping simple here)
@@ -10112,40 +11512,31 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and c.get("burden"):
             for _ in range(sum(1 for _ in player.battlefield if isinstance(_, dict) and _.get("effect") == "draw_engine")):
                 player.draw(1, rng)
+    process_lorehold_opponent_upkeep_rummage(player, all_players, turn, rng, stack)
+    activate_lorehold_topdeck_artifacts(
+        player,
+        turn,
+        rng,
+        phase="upkeep",
+        all_players=all_players,
+        stack=stack,
+    )
 
     # ── DRAW ──
     drawn_for_turn = player.draw(1, rng)
     if check_sbas(all_players):
         return
 
-    # v8: MIRACLE check
-    if player.is_human and drawn_for_turn and player.cards_drawn_this_turn == 1:
-        lorehold_on_board = any(isinstance(c, dict) and c.get("name") == "Lorehold, the Historian" for c in player.battlefield)
-        last_drawn = drawn_for_turn[-1]
-        if last_drawn and is_instant_or_sorcery_spell(last_drawn):
-            miracle_cost = 2  # Lorehold gives miracle {2}
-            if last_drawn.get("name") == "Reforge the Soul":
-                miracle_cost = 2  # 1R but simplified
-            mana = player.available_mana()
-            if mana >= miracle_cost and lorehold_on_board:
-                eff = get_card_effect(last_drawn)
-                player.hand.remove(last_drawn)
-                player.spend_mana(miracle_cost)
-                emit_replay_event(
-                    "miracle_cast",
-                    player=player.name,
-                    card=last_drawn.get("name", "?"),
-                    effect=eff.get("effect", "unknown"),
-                    type_line=last_drawn.get("type_line", ""),
-                    miracle_cost=miracle_cost,
-                    lorehold_on_board=lorehold_on_board,
-                    cards_drawn_this_turn=player.cards_drawn_this_turn,
-                    turn=turn,
-                    **replay_rule_fields(eff),
-                )
-                stack.push(last_drawn, player, eff)
-                while not stack.empty():
-                    priority_round(player, all_players, stack, turn, rng)
+    try_lorehold_miracle_cast(
+        player,
+        drawn_for_turn,
+        turn,
+        "draw_step",
+        all_players,
+        rng,
+        stack,
+        source="draw_step",
+    )
 
     # ── PRECOMBAT MAIN ──
     total_mana = player.available_mana()
@@ -10192,6 +11583,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             priority_round(player, all_players, stack, turn, rng)
     activate_land_tutor_creatures(player, turn)
     activate_precombat_utility_mana_lands(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
+    activate_sacrifice_mana_artifacts(
         player,
         opponents,
         all_players,
@@ -10313,7 +11711,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── CLEANUP ──
     discarded = 0
-    while len(player.hand) > 7:
+    while len(player.hand) > 7 and not player_has_no_maximum_hand_size(player):
         worst = max(player.hand, key=lambda c: c.get("cmc", 0))
         player.hand.remove(worst)
         player.graveyard.append(worst)

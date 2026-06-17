@@ -12,6 +12,197 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-17 / Battle + Generator Truth Consolidation
+
+- Documento canônico desta rodada:
+  `BATTLE_GENERATOR_TRUTH_STUDY_2026-06-17.md`.
+- Matriz acionável derivada desta rodada:
+  `BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md`.
+- A triagem desta rodada separou tres coisas que estavam misturadas:
+  - battle runtime quebrado;
+  - generator sem fonte canônica;
+  - relatórios Hermes remotos historicamente úteis, mas stale para o `master`
+    atual.
+- Reclassificação importante:
+  - battle runtime não está mais em estado "quebrado por precedence";
+  - `/ai/generate` não é fluxo prompt-only e já é backend-owned com validação,
+    refill por identidade e fallback determinístico;
+  - Lorehold já possui profile persistido canônico (`aggregate_reference_profile_v1`)
+    e utilizável em runtime.
+- O backlog real desta camada ficou reduzido aos pontos abaixo.
+
+#### P1 — Evoluir `decision_trace_v1` de coerência para decisão comparativa
+
+- Hoje o battle já prova legalidade e coerência das decisões modeladas, mas
+  ainda não prova por que a ação escolhida foi melhor que as rejeitadas.
+- Implementar:
+  - ranking explícito de `available_options`;
+  - `chosen_option_score`;
+  - `rejected_option_score`;
+  - `expected_payoff_reason`;
+  - motivo de `pass/no-action` quando havia linha jogável.
+- Validação:
+  - corpus pequeno com zero findings `critical/high` no auditor forense;
+  - auditor estratégico apontando decisões sem justificativa comparativa.
+
+#### P1 — Substituir WR bruto por scorecard Commander-safe
+
+- O battle/Lorehold ainda não tem uma métrica canônica equivalente a:
+  - WR com carta vista;
+  - WR sem carta vista;
+  - WR com carta castada;
+  - WR sem carta castada;
+  - delta contra baseline fresco por `baseline_hash`;
+  - impacto por arquétipo e turno médio.
+- Isso continua sendo gap real de confiança. WR alto isolado não fecha verdade.
+- Implementar no laboratório Hermes, sem promover nada ao app/API pública.
+
+#### P1 — Materializar casos reais multi-row em `card_battle_rules`
+
+- A arquitetura para múltiplas regras executáveis/alternativas já está pronta,
+  mas o PostgreSQL canônico ainda não tem casos ativos multi-row
+  (`multi_rule_card_count = 0` na auditoria desta rodada).
+- O próximo passo correto não é abrir "executa tudo por nome", e sim:
+  - promover um primeiro lote pequeno de cartas com modalidades reais;
+  - marcar quais combinações são `safe composite`, `selector required`,
+    `annotation only` ou `executor gap`;
+  - cobrir com teste focado por carta.
+- Guardrail:
+  - `needs_review` não executa comportamento duro;
+  - `card_battle_rules` só deriva tags quando trusted e traceable.
+
+#### P1 — Expandir executor contextual de sacrifice-for-mana sem abrir combo engine
+
+- `Ashnod's Altar` deixou de ser metadata-only: o runtime agora suporta um
+  primeiro slice seguro para `activated_mana_ability` com
+  `activation_cost=sacrifice_creature`, limitado a unlock contextual real no
+  `precombat_main`, sem sacrificar comandante e sem gerar mana gratis na
+  resolucao do permanente.
+- O gap real mudou:
+  - falta ampliar a capability para outros permanentes recorrentes do corpus;
+  - falta modelar melhor valor da criatura sacrificada vs payoff real;
+  - falta decidir quando a habilidade pode ser usada fora do unlock imediato,
+    por exemplo em linhas de resposta/combo sem abrir heuristica perigosa.
+- Estratégia:
+  - continuar subindo capability generica por tipo de custo/efeito, nao por
+    hardcode de nome;
+  - manter guardrail de "ativar so com unlock contextual rastreavel" ate haver
+    corpus e testes para algo mais forte.
+
+#### P1 — Decidir política explícita de precedência do builder determinístico
+
+- O caminho determinístico hoje inclui fontes nesta ordem:
+  `reference_card_stats -> reference_corpus_packages -> profile_expected_packages -> active_learned_deck -> usage_hot_cards -> deterministic_fallback`.
+- Isso é verdade operacional, mas ainda não é política de produto documentada.
+- Falta decidir e congelar:
+  - se `active_learned_deck` deve continuar apenas preenchendo slots;
+  - se pode reordenar picks frente a `profile_expected_packages`;
+  - quando learned deck pode ganhar prioridade controlada.
+- Regra vigente mantida:
+  - learned decks continuam single-commander até existir corpus confiável de
+    Partner/Background.
+
+#### P1 — Curar dependência residual do fallback no Lorehold
+
+- A auditoria de source mix desta rodada confirmou:
+  - `fallback_without_profile_or_stats_count = 9`;
+  - `learned_plus_fallback_only_count = 2`;
+  - `fallback_profile_stats_no_empirical_support_count = 18`.
+- Isso não significa que o deck está quebrado, mas mostra exatamente onde o
+  builder ainda depende de heurística/fallback ou de fontes sem suporte
+  empírico suficiente.
+- Próximo passo correto:
+  - curar primeiro as 9 cartas sem profile/stats;
+  - depois revisar as 2 cartas `learned_plus_fallback_only`;
+  - por fim auditar as 18 `fallback_profile_stats_no_empirical_support`.
+
+#### P1 — Fechar o gap entre o plano real do Lorehold e o battle runtime
+
+- A auditoria canônica desta rodada
+  (`LOREHOLD_MIRACLE_TOPDECK_READINESS_AUDIT_2026-06-17.md`) mostrou que o
+  generator já está mais próximo da verdade temática do comandante do que o
+  battle.
+- O núcleo do gap não é mais "lista errada", e sim "execução rasa":
+  - o profile/reference data já injeta `Sensei's Divining Top`, `Scroll Rack`,
+    `Brainstone`, `Mikokoro` e `Library of Leng`;
+  - o battle ainda não modela o pacote inteiro de topo/engine do comandante;
+  - `topdeck_manipulation` ainda está genérico demais para representar `Top` e
+    `Rack`;
+  - o fallback canônico precisava parar de escolher regras por ordem incidental
+    de linha quando havia múltiplas alternativas por carta.
+- Próximo passo correto:
+  - fechado localmente nesta continuidade:
+    - `Lorehold, the Historian` promovido para regra expressiva com
+      `grants_miracle_cost=2` e `opponent_upkeep_rummage=true`;
+    - trigger de upkeep do oponente com `decision_trace_v1`;
+    - `Library of Leng` corrigida para
+      `no_max_hand_size + discard_effect_to_top_replacement`;
+    - `Library of Leng` aplicada também aos caminhos já modelados de discard por
+      efeito (`wheel_resolved` / helper canônico de discard);
+    - `Sensei's Divining Top` com reorder de topo para first-draw e linha segura
+      de `draw -> put self on top` quando o topo atual já é o melhor miracle
+      castável;
+    - `Scroll Rack` com slice seguro de upkeep: troca de 1
+      instant/sorcery forte da mão para o topo para preparar a próxima draw step.
+    - `known_cards_canonical_snapshot.json` deixou de usar o bug "last row wins"
+      e passou a escolher a melhor regra por prioridade de
+      `review_status/execution_status/source/confidence`.
+    - `sync_battle_card_rules.py` passou a limpar linhas `manual` obsoletas e
+      regras `curated` superseded do mesmo card antes de reexportar o snapshot
+      local, evitando que `Top`/`Scroll Rack` continuassem degradando por ordem
+      incidental no SQLite Hermes.
+    - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` passou a filtrar
+      linhas `curated` históricas que não pertencem mais ao corpus reviewed
+      atual antes de refreshar o SQLite Hermes, além de reaplicar a mesma
+      limpeza de `manual` obsoleto e `curated` superseded no espelho PG -> cache
+      operacional.
+- permanece aberto:
+  - `Scroll Rack` multi-card/full exchange;
+  - policy genérica do draw mode do `Sensei's Divining Top`;
+  - migrar futuros fluxos de discard por efeito para o mesmo helper canônico;
+  - transformar o trace do Lorehold em decisão mais comparativa
+    (por que descartar A e não B).
+- fechamento adicional do slice local de 2026-06-17:
+  - o bloco de regressões de zona/recursion/tutor/permanente passivo foi
+    fechado com promoção para `reviewed_battle_card_rules.json` de:
+    `Crop Rotation`, `Rampant Growth`, `Splendid Reclamation`, `Entomb`,
+    `Reanimate`, `Skullclamp`, `Mystical Tutor` e
+    `Lumra, Bellow of the Woods`;
+  - efeito prático:
+    - `Crop Rotation` deixou de cair como `ramp_permanent`;
+    - `Rampant Growth` deixou de ficar na mesa em vez de ir ao cemitério;
+    - `Splendid Reclamation` passou a devolver lands tapped do grave;
+    - `Entomb` deixou de comprar carta e passou a tutorar para o grave;
+    - `Reanimate` voltou a reanimar criatura para o battlefield;
+    - `Skullclamp` deixou de comprar carta na resolução;
+    - `Mystical Tutor` deixou de pegar criatura fora do escopo;
+    - `Lumra` voltou a entrar como permanente, milar 4 e retornar lands;
+  - validação local:
+    - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py` -> `15 tests OK`;
+    - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py` -> `PASS`.
+- gap remanescente após esse fechamento:
+  - não é mais um problema de precedence/fallback para esse lote de cartas;
+  - o backlog real continua sendo executor genérico de habilidades ativadas e
+    triggers complexos recorrentes (`Ashnod's Altar`, pacotes futuros de
+    equipment/death draw, etc.), além da evolução do `decision_trace_v1`.
+  - validação desta rodada:
+    - `test_reviewed_battle_card_rules.py` -> `15 tests OK`;
+    - `test_sync_battle_card_rules_manual_preserve.py` -> `5 tests OK`;
+    - `test_battle_analyst_v10_3.py` -> `PASS`;
+    - provas controladas de upkeep/topdeck/miracle geradas em
+      `server/test/artifacts/lorehold_battle_validation_2026-06-17/`.
+
+#### P1 — Revalidar relatórios Hermes antigos antes de transformar em task
+
+- `COMMANDER_DEEP_REPORT.md`, `TAG_ACCURACY_REPORT.md`,
+  `MANA_BASE_VALIDATION_REPORT.md` e battle logs antigos continuam úteis como
+  histórico de sintomas, mas não devem ser tratados como verdade atual sem
+  rerun contra o `master` atual.
+- Regra de trabalho:
+  - Hermes propõe;
+  - backend/código atual decide;
+  - relatório antigo sem rerun vale como pista, não como fato.
+
 ### Atualizacao de ciclo — 2026-06-12
 
 - Incorporado no backend: `POST /decks/:id/recommendations` manteve contrato
@@ -179,6 +370,10 @@
     antes do fallback legado;
   - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` agora exporta o
     snapshot canonico junto com o refresh do cache SQLite;
+  - o mesmo caminho PG -> SQLite agora filtra linhas `curated` históricas que
+    já foram superseded no reviewed layer, para o cache Hermes refletir apenas
+    a versão revisada corrente quando houver irmãs antigas ainda materializadas
+    no PostgreSQL;
   - `battle_forensic_audit.py` passou a distinguir snapshot canonico de fallback
     legado, reduzindo falso positivo de drift quando o runtime degradado ainda
     esta semanticamente alinhado ao cache.
@@ -232,9 +427,14 @@
     `mana_produced=2`,
     `produces=C`,
     `battle_model_scope=activated_creature_sacrifice_mana_source_unexecuted_v1`);
-  - a carta deixou de usar o surrogate incorreto `ramp_ritual` no cast. O
-    comportamento duro continua pendente ate existir executor generico para
-    permanentes/artefatos que sacrificam criatura para gerar mana;
+  - a carta deixou de usar o surrogate incorreto `ramp_ritual` no cast;
+  - no fechamento adicional do slice local, `battle_analyst_v9.py` ganhou
+    `activate_sacrifice_mana_artifacts()`: um executor contextual minimo que
+    so sacrifica criatura quando a mana extra destrava uma jogada real,
+    preserva comandante e grava `decision_trace`/`utility_artifact_activated`;
+  - o comportamento completo continua pendente: ainda nao existe executor
+    generico de combo/sacrifice loops nem heuristica madura para custo de
+    oportunidade fora de unlock imediato;
   - `test_reviewed_battle_card_rules.py` passou a cobrir esses dois casos e a
     provar que `Ashnod's Altar` nao gera mana gratis no resolve do spell,
     enquanto `Incubation Druid` so entra como mana source depois que perde
@@ -1409,7 +1609,7 @@ Tasks priorizadas derivadas do estudo:
 | Prioridade | Task | Motivo real | Resultado esperado |
 |---|---|---|---|
 | P1 | Refinar `Urza's Saga` depois do slice minimo ja implementado | Em 2026-06-16 o battle passou a inicializar capitulo/lore, avancar no upkeep, criar Construct no capitulo II e tutorar artefato cmc<=1 seguro no capitulo III antes do SBA. O gap remanescente e de refinamento: sizing dinamico do Construct e generalizacao prudente do fluxo de Saga | Menos ambiguidade medium-risk no Lorehold sem abrir uma engine de Saga agressiva demais |
-| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; o proximo outlier principal virou `Ashnod's Altar`, que ja tem metadata revisada mas ainda nao possui executor generico de habilidade ativada com custo `sacrifice_creature` | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review` |
+| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; `Ashnod's Altar` tambem avancou e ja tem executor contextual minimo para `sacrifice_creature -> mana unlock`, mas o proximo gap e generalizar essa capability sem abrir combo engine ou heuristica por nome | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review` |
 | P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
 | P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | WR bruto continua fraco como sinal de verdade | Aprendizado menos enganado por variance e jogos longos |
 | P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |
@@ -1421,7 +1621,7 @@ Tasks priorizadas derivadas do estudo:
 | P1 | Reduzir dependencia do fallback literal Lorehold no builder deterministico | Em 2026-06-16 o builder passou a consumir `usage_hot_cards` antes do fallback literal, reduzindo `fallback_only` de `25` para `16`; em 2026-06-17 o limite de candidatos aprendidos do generator subiu para `50`, o recheck local `live4` zerou `built_in_fallback_only_count`, e após normalizar a row persistida do Lorehold o recheck `live5` manteve `built_in_fallback_only_count=0`, `profile.usable_runtime_origin=null` e `source_usage_counts.deterministic_fallback=42`. A auditoria `LOREHOLD_GENERATOR_SOURCE_MIX_AUDIT_2026-06-17.md` refinou esse bucket: `fallback_only=0`, `learned_plus_fallback_only=2`, `fallback_without_profile_or_stats=9` e `fallback_profile_stats_no_empirical_support=18` | O problema deixou de ser “fallback puro residual” e virou “fallback auxiliar por bucket de evidência”. O próximo slice deve atacar primeiro staples/interaction sem profile/stats, depois slots `learned+fallback`, e só então o grupo `fallback+profile/stats` sem corroboracão empírica |
 | P1 | Manter explainability backend-owned do deck determinístico | Em 2026-06-16 o builder passou a emitir `reference_deterministic_deck` com `source_mix_counts`, `source_usage_counts`, `built_in_fallback_used_count` e `built_in_fallback_only_count`; se isso regredir, voltamos a perder a distinção entre profile/stats/corpus e preset | Preserva QA real do generator e impede que Lorehold pareça “aprendido” quando ainda estiver fortemente ancorado em fallback |
 | P1 | Curar os buckets residuais do Lorehold por evidência, não por nome solto | A leitura antiga de `fallback_only=2` ficou obsoleta. Em 2026-06-17 o auditor canônico de source-mix mostrou `fallback_only=0`, `learned_plus_fallback_only=[Fellwar Stone, Lightning Greaves]`, `fallback_without_profile_or_stats=[Arcane Signet, Boros Charm, Boros Signet, Esper Sentinel, Faithless Looting, Fellwar Stone, Generous Gift, Lightning Greaves, Sol Ring]` e `fallback_profile_stats_no_empirical_support=18` cartas de payoff/engine | Próximo slice seguro: 1) backfill profile/stats para staples e interaction; 2) corroborar `Fellwar Stone`/`Lightning Greaves` com corpus/usage ou manter fallback explícito; 3) revisar o bloco de 18 payoffs/engines por pacote temático antes de tentar reduzir `deterministic_fallback` globalmente |
-| P1 | Fechar rollout/versionamento do snapshot canonico de `known_cards` | O suporte local ja foi implementado: `battle_analyst_v9.py` consulta `known_cards_canonical_snapshot.json` como unico fallback JSON executavel, `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` exporta o snapshot e a auditoria local fechou em `PASS` com `canonical_fallback_count=3159`. Em 2026-06-17, como `known_cards_generated.json` nao tinha nomes exclusivos e ainda tinha `219` efeitos divergentes, ele foi removido do runtime da batalha e dos consumidores operacionais do optimizer/sync | Menor degradacao semantica quando SQLite/PG nao estiverem disponiveis; replay local/remoto cai para snapshot canonico ou `unknown` auditavel, nao para regra gerada antiga |
+| P1 | Fechar rollout/versionamento do snapshot canonico de `known_cards` | O suporte local ja foi implementado: `battle_analyst_v9.py` consulta `known_cards_canonical_snapshot.json` como unico fallback JSON executavel, `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` exporta o snapshot e, desde 2026-06-17, filtra linhas `curated` históricas fora do reviewed layer antes de refreshar o SQLite Hermes. A auditoria local fechou em `PASS` com `canonical_fallback_count=3159`. Como `known_cards_generated.json` nao tinha nomes exclusivos e ainda tinha `219` efeitos divergentes, ele foi removido do runtime da batalha e dos consumidores operacionais do optimizer/sync | Menor degradacao semantica quando SQLite/PG nao estiverem disponiveis; replay local/remoto cai para snapshot canonico ou `unknown` auditavel, nao para regra gerada antiga |
 | P1 | Formalizar por commit/deploy o rollout do snapshot canonico de `known_cards` no Hermes AWS | Em 2026-06-16 o `master` local validou `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, precedencia `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`, snapshot materializado localmente e auditoria `PASS` com `known_cards_count=3159`. Em 2026-06-17 a precedencia versionada mudou para `battle_card_rules -> known_cards_canonical_snapshot -> heuristicas/unknown`, sem fallback gerado executavel. A rodada operacional no Hermes AWS anterior ja comprovou materializacao do snapshot, mas precisa absorver essa nova remocao do fallback gerado no proximo deploy/cron | O risco de logica/runtime foi reduzido; o risco restante agora e operacional: garantir que rebuild/container Hermes rode o SHA com fallback gerado removido e mantenha snapshot canonico materializado |
 | P1 | Promover reviewed rules de cartas recorrentes que ainda caiam em `unknown`/heuristica apesar de terem semantica oficial clara | O conflito estrutural de fontes foi fechado, e o runtime da batalha nao usa mais `known_cards_generated.json`. `Natural Order` ja foi promovido para `curated/verified` com custo verde sacrificavel e tutor verde ao campo. Em 2026-06-17, `Dismember` tambem foi promovido para `curated/verified` como modificador `-5/-5` ate EOT, e o SBA foi corrigido para matar criatura com resistencia `<= 0` mesmo se for indestrutivel; a rodada `20260617_005901` ficou com `action_findings=0` e `strategy_findings=0`. O mesmo criterio deve ser aplicado aos proximos outliers recorrentes dos replays/auditorias | Menos distorcoes de battle e de scorecard causadas por cartas reais que ainda nao possuem regra revisada; ausencia agora vira `unknown` auditavel em vez de efeito gerado incorreto |
 | P1 | Adicionar explainability backend-owned por carta gerada | O produto ainda nao responde bem "por que essa carta entrou?" | Transparencia de criacao, QA melhor e comparacao de fontes por carta |

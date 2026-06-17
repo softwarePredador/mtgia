@@ -335,6 +335,92 @@ def register_tests(battle, player, card):
         assert wheel_events
         assert wheel_events[0]["opponent_cards_drawn"] == 7
 
+    def test_wheel_uses_library_of_leng_replacement_for_effect_discard():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        library_of_leng = battle.enrich_card(
+            {
+                **battle.get_card_effect({"name": "Library of Leng", "type_line": "Artifact"}),
+                "name": "Library of Leng",
+                "type_line": "Artifact",
+            }
+        )
+        active.battlefield = [library_of_leng]
+        active.hand = [
+            {
+                "name": "Swords to Plowshares",
+                "cmc": 1,
+                "type_line": "Instant",
+                "effect": "remove_creature",
+            },
+            {
+                "name": "Big Spell",
+                "cmc": 8,
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+            },
+        ]
+        active.library = [card(f"Draw {index}", cmc=1) for index in range(8)]
+        opponent.library = [card(f"Opponent Draw {index}", cmc=1) for index in range(8)]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Wheel of Fortune", "cmc": 3, "type_line": "Sorcery"},
+            turn=3,
+            rng=random.Random(801),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        hand_names = [entry.get("name") for entry in active.hand if isinstance(entry, dict)]
+        graveyard_names = [entry.get("name") for entry in active.graveyard if isinstance(entry, dict)]
+        wheel_events = [data for event, data in events if event == "wheel_resolved"]
+
+        assert "Swords to Plowshares" in hand_names
+        assert "Big Spell" in hand_names
+        assert "Swords to Plowshares" not in graveyard_names
+        assert "Big Spell" not in graveyard_names
+        assert wheel_events
+        participant = next(item for item in wheel_events[0]["participants"] if item["player"] == "Active")
+        assert participant["discarded_to_top"] == ["Swords to Plowshares", "Big Spell"]
+        assert participant["discarded_to_graveyard"] == []
+
+    def test_effect_discard_replacement_prefers_keepable_spells_over_graveyard():
+        active = player("Active")
+        library_of_leng = battle.enrich_card(
+            {
+                **battle.get_card_effect({"name": "Library of Leng", "type_line": "Artifact"}),
+                "name": "Library of Leng",
+                "type_line": "Artifact",
+            }
+        )
+        active.battlefield = [library_of_leng]
+        swords = {
+            "name": "Swords to Plowshares",
+            "cmc": 1,
+            "type_line": "Instant",
+            "effect": "remove_creature",
+        }
+        filler_land = {
+            "name": "Plains",
+            "cmc": 0,
+            "type_line": "Basic Land — Plains",
+            "effect": "land",
+        }
+
+        resolution = battle.resolve_effect_discard_cards(
+            active,
+            [swords, filler_land],
+            top_limit=1,
+        )
+
+        assert [entry.get("name") for entry in resolution["to_top"]] == ["Swords to Plowshares"]
+        assert [entry.get("name") for entry in resolution["to_graveyard"]] == ["Plains"]
+        assert [entry.get("name") for entry in active.library[:1]] == ["Swords to Plowshares"]
+        assert [entry.get("name") for entry in active.graveyard] == ["Plains"]
+
     def test_wheel_cast_guard_blocks_opponent_refill_without_payoff():
         active = player("Active")
         opponent = player("Opponent")
@@ -383,6 +469,8 @@ def register_tests(battle, player, card):
         test_tutor_trace_uses_contextual_target_scoring,
         test_board_wipe_trace_records_asymmetry_context,
         test_wheel_trace_uses_multiplayer_discard_draw_model,
+        test_wheel_uses_library_of_leng_replacement_for_effect_discard,
+        test_effect_discard_replacement_prefers_keepable_spells_over_graveyard,
         test_wheel_cast_guard_blocks_opponent_refill_without_payoff,
         test_reanimation_recursion_returns_creature_to_battlefield,
     ]

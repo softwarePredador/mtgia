@@ -3,7 +3,7 @@
 > Documento canônico da lógica de simulação de batalha, otimização e validação.
 > Tudo que é usado e pensado em cada etapa do pipeline de análise de deck.
 
-Última atualização: 2026-06-11
+Última atualização: 2026-06-17
 
 Revisão estratégica oficial: 2026-06-11
 (`BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`).
@@ -54,6 +54,8 @@ play_turn_sequence_v8(player, opponents, all_players, turn, rng, stack):
   1. turn_start         — reset de contadores de turno e protecoes temporarias
   2. untap             — desvira permanentes; sem prioridade
   3. upkeep            — triggers simplificados, como burden/draw engine
+                         e, quando aplicável, upkeep rummage do Lorehold
+                         em turnos de oponentes
   4. draw              — compra de turno, miracle/Lorehold e deck-out SBA
   5. precombat_main    — land drop, triggers de landfall/opponent land play,
                          ativacoes land-tutor e priority loop de spells
@@ -100,6 +102,7 @@ Verificadas após cada spell resolver:
 | Mecânica | Descrição |
 |---|---|
 | Miracle (CR 702.94) | Lorehold reduz custo de instants/sorceries em {2} + pips |
+| Lorehold upkeep rummage | upkeep de oponente pode descartar/comprar com trace auditável e abrir janela de miracle |
 | Boros Charm modal | Escolhe indestructible ou double strike por contexto |
 | Double Strike | 2x dano total (corrigido de implementações anteriores) |
 | Indestructible per-creature | Board wipe respeita indestructible individual |
@@ -181,6 +184,8 @@ Cobertura inicial:
   lethal;
 - wheel-like draw com tamanho de mao, refill risk, payoff e
   `model_scope=multiplayer_discard_draw_v1`.
+- upkeep do Lorehold com `lorehold_upkeep_rummage`, replacement de
+  `Library of Leng` e reorder parcial de `Sensei's Divining Top`.
 
 Auditoria:
 
@@ -736,6 +741,27 @@ Leitura correta:
   entram como metadata segura fundida a uma regra primária já executável;
 - `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
+- desde a rodada local de 2026-06-17, o export do
+  `known_cards_canonical_snapshot.json` deixou de depender de ordem incidental
+  de linhas e passou a escolher uma regra fallback por carta usando a mesma
+  prioridade base de `review_status`, `execution_status`, `source`,
+  `confidence` e `rule_version`. Isso evita degradar cartas como
+  `Approach of the Second Sun` ou `Library of Leng` quando coexistem linhas
+  `manual/curated/generated` no cache canonico;
+- no fechamento adicional de 2026-06-17, o sync local SQLite
+  `sync_battle_card_rules.py` passou a remover dois tipos de drift antes de
+  reexportar o snapshot canônico:
+  - linhas `source='manual'` obsoletas, já que `manual` agora é reservado a
+    `MANUAL_RULE_RUNTIME_WAIVERS` explícitos e o runtime normal deve mantê-los
+    vazios;
+  - linhas `curated` superseded do mesmo card quando o reviewed JSON mudou a
+    `logical_rule_key`, evitando que o snapshot continue escolhendo uma versão
+    antiga de cartas como `Scroll Rack` por empate lexical entre irmãs
+    `curated/active`;
+- no mesmo fechamento, o espelho `sync_battle_card_rules_pg.py` passou a
+  filtrar linhas `curated` históricas do PostgreSQL que já não pertencem ao
+  reviewed layer atual antes de repovoar o SQLite Hermes, para o cache
+  operacional não reintroduzir uma irmã antiga logo após o cleanup local;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade
   historica, seed de sync/auditoria e comparacao de drift, nao como fallback
   executavel do battle runtime;
@@ -785,9 +811,12 @@ Risco operacional remanescente:
     passou a suportar esse caminho diretamente em `apply_effect_immediate()`;
   - `Ashnod's Altar` entrou como `curated/active` com metadata revisada de
     habilidade ativada (`activated_mana_ability`, `activation_cost`,
-    `mana_produced`), mas continua sem executor completo para a habilidade de
-    sacrificar criatura por mana. A regra correta no momento e manter metadata
-    rastreavel sem transformar isso em mana gratis no resolve do spell.
+    `mana_produced`). No incremento validado do mesmo dia, o runtime ganhou um
+    slice seguro e contextual para habilidades de mana com custo
+    `sacrifice_creature`: a ativacao so ocorre quando destrava uma jogada real
+    no precombat main e sem sacrificar comandante. A regra correta no momento
+    ainda e manter isso fora de qualquer executor generico/combo engine e nunca
+    transformar a habilidade em mana gratis no resolve do spell.
 - leitura correta desses dois casos:
   - o runtime esta coerente e consome a camada revisada sem conflito;
   - `Angel's Grace` saiu de drift de fallback e ganhou semantica executavel
@@ -797,12 +826,41 @@ Risco operacional remanescente:
     corrigir cor no precombat e virar draw no postcombat;
   - `Incubation Druid` deixou de depender de `needs_review` generico e passou a
     ter comportamento parcial coerente com summoning sickness e mana baseline;
-  - `Ashnod's Altar` deixou de colapsar em `ramp_ritual`, mas o custo
-    `sacrifice_creature` ainda exige executor proprio antes de virar semantica
-    completa;
+  - `Ashnod's Altar` deixou de colapsar em `ramp_ritual` e passou a ter
+    ativacao contextual minima para `sacrifice_creature -> mana unlock`, mas o
+    custo ainda nao esta coberto por executor generico completo nem por
+    heuristica de combo;
   - mesmo assim, ela ainda nao deve ser tratada como regra totalmente
     verificada enquanto a mana ability completa e todos os edge cases de combo
     nao estiverem modelados com fidelidade maior.
+  - fechamento adicional do mesmo slice:
+    - `Crop Rotation` foi promovida para `curated/verified` como
+      `land_ramp` com `requires_sacrifice_land=true`, impedindo que o runtime a
+      tratasse como `ramp_permanent`;
+    - `Rampant Growth` passou a `curated/verified` como `land_ramp` de
+      `basic land` entrando tapped, corrigindo a ida do spell ao cemitério em
+      vez de virar permanente;
+    - `Splendid Reclamation` passou a `curated/verified` como
+      `land_recursion`, evitando degradação para `recursion` genérica;
+    - `Entomb` passou a `curated/verified` como `tutor` para `graveyard`,
+      impedindo colapso em `draw_cards`;
+    - `Reanimate` passou a `curated/active` como `recursion` para
+      `destination=battlefield`, preservando o comportamento central sem ainda
+      fechar toda a paridade de life loss;
+    - `Skullclamp` passou a `curated/active` como `passive` de equipamento com
+      trigger de draw em morte, deixando de comprar carta na resolução;
+    - `Mystical Tutor` passou a `curated/active` com filtro
+      `target=instant_or_sorcery`, impedindo que tutorasse criatura por falta
+      de restrição;
+    - `Lumra, Bellow of the Woods` passou a `curated/verified` como
+      `land_recursion_creature` com `mill_count=4` e
+      `power/toughness = lands`, ativando o executor dedicado que já existia no
+      runtime;
+    - `get_card_effect()` também ganhou fallback por face frontal para MDFC e
+      split names, o que fechou o caso
+      `Valakut Awakening // Valakut Stoneforge` sem novo hardcode por nome;
+    - com esse lote sincronizado, a suíte agregada
+      `test_battle_analyst_v10_3.py` voltou a `PASS` no ambiente local.
 
 ---
 

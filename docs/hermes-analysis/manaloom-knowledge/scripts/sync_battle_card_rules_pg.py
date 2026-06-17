@@ -35,7 +35,12 @@ from known_cards_fallback_snapshot import (
     write_snapshot_payload,
 )
 from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH
-from sync_battle_card_rules import _oracle_normalized_rows, build_rows
+from sync_battle_card_rules import (
+    _oracle_normalized_rows,
+    build_rows,
+    cleanup_obsolete_manual_rows,
+    cleanup_stale_reviewed_rows,
+)
 
 try:
     from db_helper import connect, sanitized_database_target
@@ -633,7 +638,9 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
           execution_status,
           rule_version,
           oracle_hash,
-          notes
+          notes,
+          updated_at,
+          last_seen_at
         FROM card_battle_rules
         WHERE review_status = ANY(%s)
         ORDER BY normalized_name, logical_rule_key
@@ -656,16 +663,86 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
                 "rule_version": int(row[9]),
                 "oracle_hash": row[10],
                 "notes": row[11] or "",
+                "updated_at": row[12],
+                "last_seen_at": row[13],
             }
         )
     return loaded
 
 
-def mirror_pg_rules_to_sqlite(sqlite_db: str, rows: list[dict[str, Any]]) -> int:
+def filter_rows_for_current_reviewed_curated(
+    rows: list[dict[str, Any]],
+    reviewed_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Keep reviewed curated cards aligned with the current reviewed corpus.
+
+    PostgreSQL may temporarily contain historical curated siblings for the same
+    card while the reviewed JSON has already moved to a newer logical rule. For
+    the SQLite runtime cache we prefer the current reviewed layer for those
+    cards, while preserving generated/manual rows and any cards outside the
+    reviewed set.
+    """
+    allowed_by_name: dict[str, set[str]] = {}
+    for row in reviewed_rows:
+        if str(row.get("source") or "") != "curated":
+            continue
+        card_name = str(row.get("card_name") or "").strip()
+        effect_json = dict(row.get("effect_json") or {})
+        if not card_name or not effect_json:
+            continue
+        normalized = normalize_card_name(card_name)
+        allowed_by_name.setdefault(normalized, set()).add(
+            str(
+                row.get("logical_rule_key")
+                or battle_rule_registry.logical_rule_key(
+                    {
+                        "effect_json": effect_json,
+                        "deck_role_json": row.get("deck_role_json"),
+                    }
+                )
+            )
+        )
+
+    filtered: list[dict[str, Any]] = []
+    for row in rows:
+        normalized = normalize_card_name(str(row.get("card_name") or ""))
+        if str(row.get("source") or "") != "curated":
+            filtered.append(row)
+            continue
+        allowed_keys = allowed_by_name.get(normalized)
+        if not allowed_keys:
+            filtered.append(row)
+            continue
+        logical_key = str(
+            row.get("logical_rule_key")
+            or battle_rule_registry.logical_rule_key(
+                {
+                    "effect_json": json_obj(row.get("effect_json")),
+                    "deck_role_json": row.get("deck_role_json"),
+                }
+            )
+        )
+        if logical_key in allowed_keys:
+            filtered.append(row)
+    return filtered
+
+
+def mirror_pg_rules_to_sqlite(
+    sqlite_db: str,
+    rows: list[dict[str, Any]],
+    *,
+    reviewed_rows: list[dict[str, Any]] | None = None,
+) -> int:
     changed = 0
+    filtered_rows = filter_rows_for_current_reviewed_curated(
+        rows,
+        reviewed_rows or [],
+    )
     with closing(sqlite3.connect(sqlite_db)) as conn:
         battle_rule_registry.ensure_battle_card_rules(conn)
-        for row in rows:
+        cleanup_obsolete_manual_rows(conn)
+        cleanup_stale_reviewed_rows(conn, reviewed_rows or [])
+        for row in filtered_rows:
             did_change = upsert_battle_card_rule(
                 conn,
                 row["card_name"],
@@ -755,6 +832,7 @@ def main() -> int:
         report["sqlite_inserted_or_updated"] = mirror_pg_rules_to_sqlite(
             args.sqlite_db,
             rows,
+            reviewed_rows=seed_rows,
         )
         report["canonical_snapshot_rows_exported"] = export_canonical_snapshot(
             rows,

@@ -110,6 +110,128 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
             {"draw_cards", "remove_creature"},
         )
 
+    def test_cleanup_obsolete_manual_rows_removes_stale_shadowing_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                sync_rules.ensure_battle_card_rules(conn)
+                sync_rules.upsert_battle_card_rule(
+                    conn,
+                    "Scroll Rack",
+                    {"effect": "topdeck_manipulation"},
+                    source="manual",
+                    confidence=1.0,
+                    review_status="verified",
+                )
+                sync_rules.upsert_battle_card_rule(
+                    conn,
+                    "Scroll Rack",
+                    {
+                        "effect": "topdeck_manipulation",
+                        "activation_cost_generic": 1,
+                        "hand_to_top_exchange": True,
+                    },
+                    source="curated",
+                    confidence=0.8,
+                    review_status="active",
+                )
+                conn.commit()
+
+                deleted = sync_rules.cleanup_obsolete_manual_rows(conn)
+                conn.commit()
+                remaining = conn.execute(
+                    """
+                    SELECT source, effect_json
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'scroll rack'
+                    ORDER BY source
+                    """
+                ).fetchall()
+
+            rules = battle_rule_registry.load_active_battle_card_rules(sqlite_db)
+
+        self.assertEqual(deleted, 1)
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0][0], "curated")
+        self.assertEqual(
+            rules["scroll rack"]["effect_json"]["activation_cost_generic"],
+            1,
+        )
+        self.assertTrue(rules["scroll rack"]["effect_json"]["hand_to_top_exchange"])
+
+    def test_cleanup_stale_reviewed_rows_replaces_old_curated_shape(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                sync_rules.ensure_battle_card_rules(conn)
+                sync_rules.upsert_battle_card_rule(
+                    conn,
+                    "Scroll Rack",
+                    {
+                        "effect": "topdeck_manipulation",
+                        "activation_cost_generic": 1,
+                        "hand_to_top_exchange": True,
+                        "battle_model_scope": "scroll_rack_exchange_unexecuted_v1",
+                    },
+                    source="curated",
+                    confidence=0.8,
+                    review_status="active",
+                )
+                conn.commit()
+
+                deleted = sync_rules.cleanup_stale_reviewed_rows(
+                    conn,
+                    [
+                        {
+                            "card_name": "Scroll Rack",
+                            "effect_json": {
+                                "effect": "topdeck_manipulation",
+                                "activation_cost_generic": 1,
+                                "hand_to_top_exchange": True,
+                                "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+                            },
+                            "deck_role_json": {
+                                "category": "draw",
+                                "effect": "topdeck_manipulation",
+                            },
+                            "source": "curated",
+                        }
+                    ],
+                )
+                sync_rules.upsert_battle_card_rule(
+                    conn,
+                    "Scroll Rack",
+                    {
+                        "effect": "topdeck_manipulation",
+                        "activation_cost_generic": 1,
+                        "hand_to_top_exchange": True,
+                        "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+                    },
+                    source="curated",
+                    confidence=0.8,
+                    review_status="active",
+                )
+                conn.commit()
+
+                remaining = conn.execute(
+                    """
+                    SELECT source, effect_json
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'scroll rack'
+                    ORDER BY source
+                    """
+                ).fetchall()
+
+            rules = battle_rule_registry.load_active_battle_card_rules(sqlite_db)
+
+        self.assertEqual(deleted, 1)
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0][0], "curated")
+        self.assertEqual(
+            rules["scroll rack"]["effect_json"]["battle_model_scope"],
+            "scroll_rack_upkeep_single_exchange_v1",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

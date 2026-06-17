@@ -10,10 +10,16 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from battle_rule_registry import normalize_card_name
+from battle_rule_registry import (
+    EXECUTION_STATUS_PRIORITY,
+    REVIEW_STATUS_PRIORITY,
+    SOURCE_PRIORITY,
+    normalize_card_name,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -139,12 +145,46 @@ def extract_snapshot_effect_and_metadata(
 
 
 def build_snapshot_payload(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    payload: dict[str, dict[str, Any]] = {}
+    def _timestamp_rank(value: Any) -> float:
+        if value in (None, ""):
+            return 0.0
+        if isinstance(value, (int, float)):
+            return float(value)
+        text = str(value).strip()
+        if not text:
+            return 0.0
+        try:
+            return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
+        except ValueError:
+            return 0.0
+
+    def _snapshot_row_rank(row: dict[str, Any]) -> tuple[int, int, int, float, int, float, int, str]:
+        effect_json = row.get("effect_json")
+        effect_size = len(effect_json) if isinstance(effect_json, dict) else 0
+        return (
+            REVIEW_STATUS_PRIORITY.get(str(row.get("review_status") or "").lower(), 7),
+            EXECUTION_STATUS_PRIORITY.get(str(row.get("execution_status") or "").lower(), 9),
+            -SOURCE_PRIORITY.get(str(row.get("source") or "").lower(), 0),
+            -float(row.get("confidence") or 0.0),
+            -int(row.get("rule_version") or 1),
+            -_timestamp_rank(row.get("updated_at") or row.get("last_seen_at")),
+            -effect_size,
+            str(row.get("logical_rule_key") or ""),
+        )
+
+    best_rows: dict[str, dict[str, Any]] = {}
     for row in rows:
         card_name = str(row.get("card_name") or "").strip()
         effect_json = row.get("effect_json")
         if not card_name or not isinstance(effect_json, dict) or not effect_json:
             continue
+        previous = best_rows.get(card_name)
+        if previous is None or _snapshot_row_rank(row) < _snapshot_row_rank(previous):
+            best_rows[card_name] = row
+
+    payload: dict[str, dict[str, Any]] = {}
+    for card_name, row in best_rows.items():
+        effect_json = row["effect_json"]
         payload[card_name] = snapshot_entry(
             effect_json,
             rule_source=str(row.get("source") or "unknown"),

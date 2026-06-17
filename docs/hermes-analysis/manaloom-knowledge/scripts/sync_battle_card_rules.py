@@ -18,9 +18,11 @@ import importlib.util
 import json
 import os
 import sqlite3
+from collections import defaultdict
 from contextlib import closing
 from pathlib import Path
 
+import battle_rule_registry
 from battle_rule_registry import (
     DEFAULT_DB,
     ensure_battle_card_rules,
@@ -168,6 +170,71 @@ def build_rows(
     return _oracle_normalized_rows(sqlite_db, rows)
 
 
+def cleanup_obsolete_manual_rows(conn: sqlite3.Connection) -> int:
+    """Purge stale persisted manual overrides before reseeding current waivers.
+
+    `source='manual'` is reserved for explicit `MANUAL_RULE_RUNTIME_WAIVERS`
+    injected into the active runtime. Historical handcrafted/manual rows should
+    not continue shadowing curated/generated rules in the long-lived SQLite
+    cache once the runtime inventory has been canonicalized.
+    """
+    ensure_battle_card_rules(conn)
+    deleted = conn.execute(
+        """
+        DELETE FROM battle_card_rules
+        WHERE source = 'manual'
+        """
+    ).rowcount
+    battle_rule_registry._invalidate_rule_caches_for_connection(conn)
+    return int(deleted or 0)
+
+
+def cleanup_stale_reviewed_rows(
+    conn: sqlite3.Connection,
+    reviewed_rows: list[dict],
+) -> int:
+    """Drop stale curated reviewed rows superseded by the current reviewed file.
+
+    When a reviewed rule changes its logical shape, the old `(normalized_name,
+    logical_rule_key)` row can survive beside the new one because both are
+    `curated/active`. That leaves the canonical snapshot free to pick the wrong
+    sibling by lexical tie-break. Reviewed rows should therefore be treated as a
+    replace-set per card name.
+    """
+    ensure_battle_card_rules(conn)
+    allowed_by_name: dict[str, set[str]] = defaultdict(set)
+    for row in reviewed_rows:
+        if str(row.get("source") or "") != "curated":
+            continue
+        card_name = str(row.get("card_name") or "").strip()
+        effect_json = dict(row.get("effect_json") or {})
+        if not card_name or not effect_json:
+            continue
+        normalized = battle_rule_registry.normalize_card_name(card_name)
+        allowed_by_name[normalized].add(
+            battle_rule_registry.logical_rule_key(
+                {
+                    "effect_json": effect_json,
+                    "deck_role_json": row.get("deck_role_json"),
+                }
+            )
+        )
+
+    deleted = 0
+    for normalized_name, allowed_keys in allowed_by_name.items():
+        placeholders = ",".join("?" for _ in allowed_keys)
+        query = f"""
+            DELETE FROM battle_card_rules
+            WHERE normalized_name = ?
+              AND source = 'curated'
+              AND logical_rule_key NOT IN ({placeholders})
+        """
+        deleted += conn.execute(query, (normalized_name, *sorted(allowed_keys))).rowcount or 0
+
+    battle_rule_registry._invalidate_rule_caches_for_connection(conn)
+    return int(deleted or 0)
+
+
 def main() -> int:
     args = parse_args()
     rows = build_rows(
@@ -187,12 +254,16 @@ def main() -> int:
         "oracle_normalized_rows": sum(1 for row in rows if row.get("_oracle_normalized")),
         "inserted_or_updated": 0,
         "skipped_lower_priority": 0,
+        "deleted_stale_manual_rows": 0,
+        "deleted_stale_reviewed_rows": 0,
         "canonical_snapshot_rows_exported": 0,
     }
 
     if args.apply:
         with closing(sqlite3.connect(args.sqlite_db)) as conn:
             ensure_battle_card_rules(conn)
+            report["deleted_stale_manual_rows"] = cleanup_obsolete_manual_rows(conn)
+            report["deleted_stale_reviewed_rows"] = cleanup_stale_reviewed_rows(conn, rows)
             for row in rows:
                 changed = upsert_battle_card_rule(
                     conn,
@@ -221,7 +292,9 @@ def main() -> int:
                     confidence,
                     review_status,
                     rule_version,
-                    oracle_hash
+                    oracle_hash,
+                    updated_at,
+                    last_seen_at
                 FROM battle_card_rules
                 """
             ):
@@ -234,6 +307,8 @@ def main() -> int:
                         "review_status": row["review_status"],
                         "rule_version": row["rule_version"],
                         "oracle_hash": row["oracle_hash"],
+                        "updated_at": row["updated_at"],
+                        "last_seen_at": row["last_seen_at"],
                     }
                 )
         payload = build_snapshot_payload(active_rows)
