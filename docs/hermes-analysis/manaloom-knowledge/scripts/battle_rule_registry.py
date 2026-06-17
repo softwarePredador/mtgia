@@ -69,6 +69,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "steal_all_creatures": "wincon",
     "pump_all": "wincon",
     "extra_turn": "wincon",
+    "worldfire_reset": "wincon",
     "board_wipe": "wipe",
     "damage_wipe": "wipe",
     "remove_creature": "removal",

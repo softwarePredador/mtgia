@@ -696,6 +696,11 @@ Leitura correta:
   `activated_ability_requires_executor`, `trigger_requires_event_hook`,
   `static_effect_requires_state_layer`, `blocked_by_<cost_or_clause>` e
   `multi_rule_requires_explicit_selector`;
+- `Worldfire` deixou de ser modelado como `board_wipe` genérico. O runtime
+  agora o trata como `worldfire_reset`: exila permanentes, exila mãos e
+  cemitérios, ajusta vidas para `1` e respeita replacement de comandante para
+  `command_zone`. O cast automático continua bloqueado por padrão até existir
+  uma heurística confiável de linha vencedora pós-reset;
 - regras sem opt-in, `needs_review`, triggers, habilidades ativadas, efeitos
   estáticos, custos adicionais/sacrifícios e outros componentes sem executor
   explícito continuam preservados em `_rule_alternatives`, mas não executam

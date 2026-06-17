@@ -124,5 +124,26 @@
     "confidence": 0.96,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield."
+  },
+  "Worldfire": {
+    "effect_json": {
+      "cmc": 9.0,
+      "effect": "worldfire_reset",
+      "sorcery": true,
+      "exile_all_permanents": true,
+      "exile_all_hands": true,
+      "exile_all_graveyards": true,
+      "set_life_total": 1,
+      "battle_model_scope": "worldfire_total_reset_v1"
+    },
+    "deck_role_json": {
+      "category": "wincon",
+      "effect": "worldfire_reset",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.99,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: exile all permanents, exile all cards from all hands and graveyards, and set each player's life total to 1. Runtime must treat this as a dedicated reset-finisher, not as a generic board wipe."
   }
 }

@@ -278,6 +278,33 @@ def test_strategy_auditor_accepts_multiplayer_wheel_with_payoff():
     assert result["summary"]["findings"] == 0
 
 
+def test_strategy_auditor_flags_worldfire_without_known_follow_up():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "d-worldfire",
+                "decision_type": "worldfire_reset",
+                "chosen_option": {"card": "Worldfire", "effect": "worldfire_reset"},
+                "score_components": {
+                    "model_scope": "worldfire_total_reset_v1",
+                    "known_follow_up_line": False,
+                    "timing_justified": False,
+                    "commander_redeploy_available": False,
+                },
+                "strategic_principle": "resolve_worldfire_only_with_known_post_reset_win_line",
+                "heuristic_version": "test",
+                "resource_delta": {"known_follow_up_line": False},
+                "risk_flags": ["worldfire_without_known_win_line"],
+                "alternatives_considered": [{"card": "Worldfire"}],
+            },
+        ],
+    )
+
+    codes = {finding["code"] for finding in result["findings"]}
+    assert "worldfire_without_known_win_line" in codes
+
+
 def test_strategy_auditor_renders_markdown():
     result = auditor.audit_strategy(events=[], decisions=[])
     markdown = auditor.render_markdown(result)
@@ -297,6 +324,7 @@ if __name__ == "__main__":
         test_strategy_auditor_still_blocks_last_land_spend_without_payoff,
         test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel,
         test_strategy_auditor_accepts_multiplayer_wheel_with_payoff,
+        test_strategy_auditor_flags_worldfire_without_known_follow_up,
         test_strategy_auditor_renders_markdown,
     ]
     for test in tests:

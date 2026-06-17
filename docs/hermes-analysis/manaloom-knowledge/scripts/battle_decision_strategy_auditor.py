@@ -45,6 +45,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "steal_all_creatures",
     "token_maker",
     "wincon",
+    "worldfire_reset",
 }
 
 RESOURCE_BENEFIT_REASONS = {
@@ -225,6 +226,16 @@ def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
                 "board_wipe_without_clear_asymmetry",
                 "Board wipe resolved without positive creature asymmetry or lethal-pressure reason.",
                 "Use wipes when behind, preventing lethal, asymmetric, or backed by a clear post-wipe plan.",
+                decision_id=decision_id,
+            ))
+
+    if decision_type == "worldfire_reset":
+        if not score.get("known_follow_up_line") or "worldfire_without_known_win_line" in risk_flags:
+            findings.append(finding(
+                "medium",
+                "worldfire_without_known_win_line",
+                "Worldfire-style reset resolved without a recorded post-reset win line.",
+                "Only trust Worldfire decisions when the trace proves an immediate post-reset line such as damage on resolution or another modeled deterministic closer.",
                 decision_id=decision_id,
             ))
 

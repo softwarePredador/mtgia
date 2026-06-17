@@ -42,6 +42,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Dismember", by_name)
         self.assertIn("Incubation Druid", by_name)
         self.assertIn("Natural Order", by_name)
+        self.assertIn("Worldfire", by_name)
         self.assertEqual(by_name["Ashnod's Altar"]["source"], "curated")
         self.assertEqual(by_name["Ashnod's Altar"]["review_status"], "active")
         self.assertEqual(by_name["Ashnod's Altar"]["effect_json"]["effect"], "passive")
@@ -78,6 +79,10 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(
             by_name["Natural Order"]["effect_json"]["requires_sacrifice_green_creature"]
         )
+        self.assertEqual(by_name["Worldfire"]["source"], "curated")
+        self.assertEqual(by_name["Worldfire"]["review_status"], "verified")
+        self.assertEqual(by_name["Worldfire"]["effect_json"]["effect"], "worldfire_reset")
+        self.assertEqual(by_name["Worldfire"]["effect_json"]["set_life_total"], 1)
 
     def test_sync_build_rows_includes_reviewed_rules_without_generated_layer(self) -> None:
         rows = sync_rules.build_rows(
@@ -111,6 +116,8 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Natural Order"]["effect_json"]["target"],
             "green_creature_to_battlefield",
         )
+        self.assertEqual(by_name["Worldfire"]["source"], "curated")
+        self.assertEqual(by_name["Worldfire"]["effect_json"]["effect"], "worldfire_reset")
 
     def test_runtime_prefers_reviewed_curated_rule_after_sync(self) -> None:
         old_db = battle.DB
@@ -151,6 +158,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                 dismember = battle.get_card_effect(
                     {"name": "Dismember", "type_line": "Instant", "mana_cost": "{1}{B/P}{B/P}"}
                 )
+                worldfire = battle.get_card_effect({"name": "Worldfire", "type_line": "Sorcery"})
             finally:
                 battle.DB = old_db
                 battle.battle_rule_registry._RULE_CACHE.clear()
@@ -183,6 +191,10 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(dismember["effect"], "remove_creature")
         self.assertEqual(dismember["toughness_boost"], -5)
         self.assertTrue(dismember["uses_stat_modifier_removal"])
+        self.assertEqual(worldfire["_rule_source"], "curated")
+        self.assertEqual(worldfire["_rule_review_status"], "verified")
+        self.assertEqual(worldfire["effect"], "worldfire_reset")
+        self.assertEqual(worldfire["battle_model_scope"], "worldfire_total_reset_v1")
 
     def test_ashnods_altar_resolves_without_free_mana_until_activation_executor_exists(self) -> None:
         old_db = battle.DB
@@ -262,6 +274,77 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(player.battlefield[0]["mana_produced"], 1)
         self.assertEqual(same_turn_mana, 0)
         self.assertEqual(player.available_mana(), 1)
+
+    def test_worldfire_uses_reset_rule_and_preserves_commander_replacement(self) -> None:
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            with closing(sqlite3.connect(db_path)) as conn:
+                battle_rule_registry.ensure_battle_card_rules(conn)
+                for row in load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH):
+                    battle_rule_registry.upsert_battle_card_rule(
+                        conn,
+                        row["card_name"],
+                        row["effect_json"],
+                        source=row["source"],
+                        confidence=row["confidence"],
+                        review_status=row["review_status"],
+                        deck_role_json=row.get("deck_role_json"),
+                        notes=row.get("notes", ""),
+                    )
+                conn.commit()
+
+            try:
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                rng = __import__("random").Random(7)
+                commander = {
+                    "name": "Lorehold, the Historian",
+                    "type_line": "Legendary Creature — Elder Dragon",
+                    "cmc": 4,
+                    "power": 2,
+                    "toughness": 5,
+                    "is_commander": True,
+                    "commander_replacement_choice": "command_zone",
+                }
+                player = battle.Player("Caster", commander, [])
+                player.command_zone = []
+                player.battlefield = [
+                    commander,
+                    {"name": "Sol Ring", "type_line": "Artifact", "cmc": 1, "effect": "ramp_permanent"},
+                    {"name": "Treasure Token", "type_line": "Artifact Token", "tag": "token", "effect": "creature", "power": 0, "toughness": 0},
+                ]
+                player.hand = [{"name": "Boros Charm", "type_line": "Instant", "cmc": 2}]
+                player.graveyard = [{"name": "Faithless Looting", "type_line": "Sorcery", "cmc": 1}]
+                player.treasures = 2
+                player.life = 23
+
+                opponent = battle.Player("Opponent", None, [])
+                opponent.battlefield = [
+                    {"name": "Bear", "type_line": "Creature", "effect": "creature", "power": 2, "toughness": 2},
+                ]
+                opponent.hand = [{"name": "Counterspell", "type_line": "Instant", "cmc": 2}]
+                opponent.graveyard = [{"name": "Ponder", "type_line": "Sorcery", "cmc": 1}]
+                opponent.life = 11
+
+                spell = {"name": "Worldfire", "type_line": "Sorcery", "cmc": 9}
+                battle.apply_effect_immediate(player, [opponent], spell, turn=5, rng=rng)
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        self.assertEqual(player.life, 1)
+        self.assertEqual(opponent.life, 1)
+        self.assertEqual(player.battlefield, [])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual(player.hand, [])
+        self.assertEqual(opponent.hand, [])
+        self.assertEqual(player.treasures, 0)
+        self.assertEqual(player.command_zone[0]["name"], "Lorehold, the Historian")
+        self.assertTrue(any(card.get("name") == "Sol Ring" for card in player.exile))
+        self.assertTrue(any(card.get("name") == "Boros Charm" for card in player.exile))
+        self.assertTrue(any(card.get("name") == "Faithless Looting" for card in player.exile))
+        self.assertTrue(any(card.get("name") == "Worldfire" for card in player.graveyard))
 
 
 if __name__ == "__main__":

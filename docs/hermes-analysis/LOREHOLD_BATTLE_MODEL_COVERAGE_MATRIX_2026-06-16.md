@@ -185,7 +185,7 @@ than manually verified:
 | 95 | Rite of the Dragoncaller | Enchantment | wincon | token_maker | known_cards_manual | verified | hard_modelled | low |
 | 96 | Approach of the Second Sun | Sorcery | wincon | approach | known_cards_manual | verified | hard_modelled | low |
 | 97 | Blasphemous Act | Sorcery | board_wipe | board_wipe | known_cards_manual | verified | hard_modelled | low |
-| 98 | Worldfire | Sorcery | board_wipe | board_wipe | known_cards_manual | verified | hard_modelled | low |
+| 98 | Worldfire | Sorcery | wincon | worldfire_reset | curated | verified | hard_modelled | medium |
 | 99 | Storm Herd | Sorcery | wincon | token_maker | known_cards_manual | verified | hard_modelled | low |
 | 100 | Rise of the Eldrazi | Sorcery | protection | extra_turn | known_cards_manual | verified | hard_modelled | low |
 

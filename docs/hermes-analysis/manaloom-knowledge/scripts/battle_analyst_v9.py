@@ -1633,6 +1633,17 @@ def normalize_effect_by_oracle(card, effect_data):
     oracle_text = str(card.get("oracle_text") or "")
     text = f"{type_line}\n{oracle_text}".lower()
 
+    if effect == "worldfire_reset":
+        return normalized
+
+    if (
+        "exile all permanents" in text
+        and "exile all cards from all hands and graveyards" in text
+        and "life total becomes 1" in text
+    ):
+        normalized["effect"] = "worldfire_reset"
+        return normalized
+
     type_line_lower = type_line.lower()
     is_split_spell_land = "//" in type_line and any(
         spell_kind in type_line_lower
@@ -2809,7 +2820,8 @@ class Stack:
         if not self.items: return False
         effect = self.items[-1].effect_data.get("effect", "")
         threats = {"board_wipe", "finisher", "approach", "steal_all_creatures",
-                   "overload_recursion", "pump_all", "token_maker", "copy_creature_token"}
+                   "overload_recursion", "pump_all", "token_maker", "copy_creature_token",
+                   "worldfire_reset"}
         return effect in threats
     def empty(self): return len(self.items) == 0
 
@@ -3648,6 +3660,9 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
             return 100  # MUST counter (2nd cast = instant win)
         return 85  # v10.2: was 70 — higher counter priority
 
+    if effect_name == "worldfire_reset":
+        return 92
+
     # ── MASSIVE BOARD IMPACT ──
     if effect_name == "board_wipe":
         # Higher threat if caster has protection (asymmetric wipe)
@@ -4326,6 +4341,7 @@ def choose_chrome_mox_imprint_card(player, source_card):
         "remove_permanent",
         "tutor",
         "wincon",
+        "worldfire_reset",
     }
     for candidate in candidates:
         effect_data = get_card_effect(candidate)
@@ -4718,6 +4734,55 @@ def should_cast_board_wipe(player, opponents):
     return board_wipe_decision_context(player, opponents)["timing_justified"]
 
 
+def worldfire_decision_context(player, opponents):
+    commander = None
+    if player.command_zone:
+        first = player.command_zone[0]
+        if isinstance(first, dict):
+            commander = first
+    commander_tax = int(player.commander_tax or 0)
+    floating_mana_after_reset = int(player.available_mana())
+    treasures_before_reset = int(player.treasures or 0)
+    commander_redeploy_available = False
+    commander_name = None
+    commander_effect = {}
+    if commander is not None:
+        commander_name = commander.get("name", "?")
+        commander_effect = get_card_effect(commander)
+        saved_treasures = player.treasures
+        try:
+            player.treasures = 0
+            commander_redeploy_available = player.can_pay_card(
+                commander,
+                additional_generic=commander_tax,
+            )
+        finally:
+            player.treasures = saved_treasures
+    commander_immediate_damage = False
+    if commander_redeploy_available:
+        commander_immediate_damage = (
+            commander_effect.get("effect") == "deal_damage"
+            or int(commander_effect.get("damage") or 0) >= 1
+            or int(commander_effect.get("etb_damage") or 0) >= 1
+        )
+    return {
+        "model_scope": "worldfire_total_reset_v1",
+        "floating_mana_after_reset": floating_mana_after_reset,
+        "treasures_lost_to_reset": treasures_before_reset,
+        "commander_name": commander_name,
+        "commander_tax": commander_tax,
+        "commander_redeploy_available": commander_redeploy_available,
+        "commander_immediate_damage": commander_immediate_damage,
+        "known_follow_up_line": commander_immediate_damage,
+        "timing_justified": commander_immediate_damage,
+        "opponents_alive": sum(1 for opp in opponents if opp.is_alive()),
+    }
+
+
+def should_cast_worldfire_reset(player, opponents):
+    return worldfire_decision_context(player, opponents)["timing_justified"]
+
+
 def should_cast_wheel(player, opponents, effect_data):
     return wheel_decision_context(
         player,
@@ -4772,6 +4837,57 @@ def is_wheel_like_card(card, effect_data):
         marker in name
         for marker in ("wheel", "windfall", "timetwister", "reforge")
     )
+
+
+def move_zone_object_to_exile(owner, zone_name, card, *, reason=None, source=None, turn=None):
+    if not isinstance(card, dict):
+        zone = getattr(owner, zone_name, None)
+        if isinstance(zone, list) and card in zone:
+            zone.remove(card)
+        move_to_exile(owner, card, reason=reason, turn=turn)
+        return "exile"
+
+    zone = getattr(owner, zone_name, None)
+    if isinstance(zone, list) and card in zone:
+        zone.remove(card)
+
+    if zone_name == "battlefield":
+        card["_lki_snapshot"] = {
+            "name": card.get("name", card.get("card_name", "")),
+            "power": card.get("power", 0),
+            "toughness": card.get("toughness", 0),
+            "cmc": card.get("cmc", 0),
+            "type_line": card.get("type_line", ""),
+            "is_commander": card.get("is_commander", False),
+            "owner": card.get("owner", card.get("controller", "")),
+        }
+        card["_zone_id"] = card.get("_zone_id", 0) + 1
+        card["_last_zone"] = "battlefield"
+
+    if card.get("is_commander"):
+        event = ReplacementRegistry.process_event(
+            ReplacementEvent(
+                "zone_change",
+                affected_player=owner,
+                card=card,
+                from_zone=zone_name,
+                to_zone="exile",
+                source=source,
+                reason=reason,
+            )
+        )
+        if event.to_zone == "command_zone":
+            owner.command_zone.append(card)
+            return "command_zone"
+
+    if zone_name == "battlefield" and (
+        card.get("tag") == "token"
+        or "token" in str(card.get("type_line") or "").lower()
+    ):
+        return "vanished_token"
+
+    move_to_exile(owner, card, reason=reason, turn=turn)
+    return "exile"
 
 
 def commander_color_identity_count(player):
@@ -4866,7 +4982,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         elif effect in ("creature", "draw_engine", "topdeck_manipulation"):
             score += 18 if cmc <= 4 else 10
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe"):
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "worldfire_reset"):
             score += 24
             reason = "unlock_high_impact_spell"
         else:
@@ -6079,7 +6195,7 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     elif effect in ("draw_engine", "topdeck_manipulation") and turn <= 5:
         score += 50
         reason = "establish_value_engine"
-    elif effect in ("wincon", "approach", "finisher", "overload_recursion") and turn >= 5:
+    elif effect in ("wincon", "approach", "finisher", "overload_recursion", "worldfire_reset") and turn >= 5:
         score += 70
         reason = "find_closing_line"
     elif str(target_type).endswith("_to_battlefield") and is_creature_card(candidate):
@@ -7689,6 +7805,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 eff = get_card_effect(c)
                 if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
                     wincons = []
+                elif eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
+                    wincons = []
                 elif (
                     eff.get("effect") == "draw_cards"
                     and is_wheel_like_card(c, eff)
@@ -7793,6 +7911,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         if c in player.hand and player.can_pay_card(c):
             eff = get_card_effect(c)
             if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+                continue
+            if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                 continue
             if (
                 eff.get("effect") == "draw_cards"
@@ -8510,6 +8630,109 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             creatures_seen=creatures_seen,
             unprotected_seen=unprotected_seen,
             turn=turn,
+        )
+        finish_resolved_spell(player, card, turn=turn)
+    elif effect == "worldfire_reset":
+        context = worldfire_decision_context(player, opponents)
+        risk_flags = []
+        if not context["known_follow_up_line"]:
+            risk_flags.append("worldfire_without_known_win_line")
+        if context["treasures_lost_to_reset"] > 0:
+            risk_flags.append("worldfire_exiles_treasure_stockpile")
+        fields = replay_rule_fields(effect_data)
+        emit_decision_trace(
+            decision_type="worldfire_reset",
+            player=player,
+            turn=turn,
+            phase="resolution",
+            available_options=[
+                decision_card_option(card, effect_data, action="resolve_worldfire_reset"),
+                {"action": "defer_worldfire_not_available_after_resolution"},
+            ],
+            chosen_option=decision_card_option(card, effect_data, action="resolve_worldfire_reset"),
+            rejected_options=[{"action": "defer_worldfire_not_available_after_resolution"}],
+            score_components=context,
+            rule_source=fields.get("rule_source", "battle_heuristic"),
+            rule_status=fields.get("rule_review_status", "heuristic"),
+            confidence="medium" if context["known_follow_up_line"] else "low",
+            expected_benefit_score=95 if context["known_follow_up_line"] else 5,
+            actual_outcome="worldfire_reset_resolved",
+            reason="global_reset_requires_post_reset_win_line",
+            strategic_principle="resolve_worldfire_only_with_known_post_reset_win_line",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta=context,
+            risk_flags=risk_flags,
+            rejected_reason="spell_already_resolving",
+        )
+        participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
+        summary = []
+        for participant in participants:
+            zone_summary = {
+                "player": participant.name,
+                "battlefield_exiled": 0,
+                "hand_exiled": 0,
+                "graveyard_exiled": 0,
+                "commanders_to_command_zone": 0,
+                "tokens_vanished": 0,
+                "life_before": participant.life,
+                "life_after": participant.life,
+            }
+            for permanent in list(participant.battlefield):
+                destination = move_zone_object_to_exile(
+                    participant,
+                    "battlefield",
+                    permanent,
+                    reason="worldfire",
+                    source=card,
+                    turn=turn,
+                )
+                if destination == "command_zone":
+                    zone_summary["commanders_to_command_zone"] += 1
+                elif destination == "vanished_token":
+                    zone_summary["tokens_vanished"] += 1
+                else:
+                    zone_summary["battlefield_exiled"] += 1
+            for hand_card in list(participant.hand):
+                destination = move_zone_object_to_exile(
+                    participant,
+                    "hand",
+                    hand_card,
+                    reason="worldfire",
+                    source=card,
+                    turn=turn,
+                )
+                if destination == "command_zone":
+                    zone_summary["commanders_to_command_zone"] += 1
+                else:
+                    zone_summary["hand_exiled"] += 1
+            for grave_card in list(participant.graveyard):
+                destination = move_zone_object_to_exile(
+                    participant,
+                    "graveyard",
+                    grave_card,
+                    reason="worldfire",
+                    source=card,
+                    turn=turn,
+                )
+                if destination == "command_zone":
+                    zone_summary["commanders_to_command_zone"] += 1
+                else:
+                    zone_summary["graveyard_exiled"] += 1
+            participant.treasures = 0
+            if participant.life != 1:
+                change_life(participant, 1 - participant.life)
+            zone_summary["life_after"] = participant.life
+            participant.draw_engines = 0
+            participant.copy_engines = 0
+            participant.counters_available = 0
+            summary.append(zone_summary)
+        emit_replay_event(
+            "worldfire_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            participants=summary,
+            turn=turn,
+            **replay_rule_fields(effect_data),
         )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "phase_out":
@@ -10302,6 +10525,12 @@ def infer_battle_card_identity(card):
         return "ramp", "ramp"
     if roles.intersection({"counterspell", "counter"}) or "counter target" in oracle_text:
         return "counter", "counter"
+    if (
+        "exile all permanents" in oracle_text
+        and "exile all cards from all hands and graveyards" in oracle_text
+        and "life total becomes 1" in oracle_text
+    ):
+        return "wincon", "worldfire_reset"
     if roles.intersection({"board_wipe", "wipe", "sweeper"}) or "destroy all" in oracle_text or "exile all" in oracle_text:
         return "board_wipe", "board_wipe"
     if "removal" in roles or "destroy target" in oracle_text or "exile target" in oracle_text:
