@@ -48,6 +48,14 @@ Validacao:
 - `sh -n server/bin/pull_learning_events.sh server/bin/auto_sync_learned_decks.sh`
 - `python3 -m py_compile server/bin/pull_learning_events.py server/bin/auto_sync_learned_decks.py`
 
+Hardening posterior do runtime:
+
+- `server/Dockerfile.manaloom-ops` passou a instalar `python3-psycopg2`;
+- `manaloom_ops_daemon.py` passou a rodar `master_optimizer_preflight` no boot
+  quando o `knowledge.db` ainda nao contem `decks`/`deck_cards`;
+- `hermes_mana_base_validator.py` nao encerra mais com erro estrutural quando o
+  SQLite ainda nao recebeu deck alvo; gera relatorio com `runtime_note`.
+
 Risco remanescente:
 
 - antes do cutover real, o servico `manaloom-ops` deve receber limites

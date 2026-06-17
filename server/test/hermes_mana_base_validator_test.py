@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import importlib.util
+import contextlib
+import io
 import json
 import sqlite3
 import sys
@@ -172,6 +174,27 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
 
         self.assertEqual(results[0].status, "OVERFULL")
         self.assertIn("cap at 100", results[0].notes[0])
+
+    def test_main_emits_runtime_note_when_validator_tables_are_missing(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            sqlite3.connect(db_path).close()
+
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                exit_code = module.main(
+                    [
+                        f"--db={db_path}",
+                        f"--artifacts-dir={tmp}",
+                        "--stdout-only",
+                    ]
+                )
+
+            rendered = stdout.getvalue()
+            self.assertEqual(exit_code, 0)
+            self.assertIn("runtime_note", rendered)
+            self.assertIn("missing required decks/deck_cards tables", rendered)
 
 
 if __name__ == "__main__":

@@ -185,6 +185,26 @@ do repo em `/app`.
 Todos os jobs rodam sem `git pull`, `git checkout` ou mutação de branch em
 runtime.
 
+## Hardening adicional aplicado no runtime
+
+- `server/Dockerfile.manaloom-ops` instala `python3-psycopg2`, eliminando o
+  erro estrutural de `pull_learning_events.py` por falta do driver PostgreSQL.
+- `server/bin/manaloom_ops_daemon.py` agora dispara
+  `master_optimizer_preflight` no boot quando `knowledge.db` ainda nao tem
+  `decks`/`deck_cards`, mesmo com `MANALOOM_RUN_PREFLIGHT_ON_BOOT=0`.
+- `server/bin/hermes_mana_base_validator.py` deixou de derrubar a cron quando o
+  SQLite ainda nao tem deck alvo sincronizado; nesses casos ele grava um
+  relatorio com `runtime_note` em vez de `RuntimeError`.
+
+Consequencia pratica:
+
+- `pull_learning_events` deve conseguir conectar ao PostgreSQL assim que as
+  credenciais do serviço estiverem corretas;
+- `hermes_mana_base_validator` nao deve mais falhar por tabela ausente logo
+  apos deploy frio;
+- o primeiro boot do worker prepara automaticamente o SQLite operacional para as
+  crons que dependem de snapshot de deck.
+
 ## Estado operacional materializado pelo daemon
 
 O `manaloom_ops_daemon.py` agora escreve estado local do scheduler no próprio

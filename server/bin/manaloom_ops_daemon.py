@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import json
+import sqlite3
 import subprocess
 import sys
 import time
@@ -75,6 +76,22 @@ def _base_env() -> dict[str, str]:
         }
     )
     return env
+
+
+def _knowledge_db_has_validator_tables(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        with sqlite3.connect(path) as conn:
+            tables = {
+                row[0]
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+        return {"decks", "deck_cards"}.issubset(tables)
+    except sqlite3.Error:
+        return False
 
 
 JOBS = [
@@ -272,9 +289,18 @@ def main() -> int:
             flush=True,
         )
 
-    if RUN_PREFLIGHT_ON_BOOT:
+    if RUN_PREFLIGHT_ON_BOOT or not _knowledge_db_has_validator_tables(KNOWLEDGE_DB):
         preflight = next((job for job in JOBS if job.name == "master_optimizer_preflight"), None)
         if preflight is not None:
+            reason = (
+                "env_enabled"
+                if RUN_PREFLIGHT_ON_BOOT
+                else "knowledge_db_missing_validator_tables"
+            )
+            print(
+                f"[manaloom-ops] boot preflight trigger reason={reason}",
+                flush=True,
+            )
             _run_job(preflight, env, state)
 
     last_minute: str | None = None

@@ -382,6 +382,19 @@ def build_report(results: list[DeckValidation]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def build_unavailable_report(reason: str) -> str:
+    return (
+        "# Mana Base Validation Report\n\n"
+        f"Generated: {datetime.now(timezone.utc).isoformat()}\n\n"
+        "## Summary\n\n"
+        "- decks_analyzed: 0\n"
+        "- status_counts: {}\n"
+        f"- runtime_note: {reason}\n\n"
+        "## Required Attention\n\n"
+        f"- Runtime note: {reason}\n"
+    )
+
+
 def write_report(path: Path, report: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(report)
@@ -395,9 +408,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stdout-only", action="store_true")
     args = parser.parse_args(argv)
 
-    with sqlite3.connect(args.db) as conn:
-        results = validate(conn, Path(args.artifacts_dir))
-    report = build_report(results)
+    try:
+        with sqlite3.connect(args.db) as conn:
+            results = validate(conn, Path(args.artifacts_dir))
+        if results:
+            report = build_report(results)
+        else:
+            report = build_unavailable_report(
+                "No synced target decks found in Hermes SQLite yet."
+            )
+    except RuntimeError as exc:
+        report = build_unavailable_report(str(exc))
     if not args.stdout_only:
         write_report(Path(args.output), report)
     print(report, end="")
