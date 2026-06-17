@@ -69,10 +69,15 @@ def load_layered_known_cards(
     *,
     canonical_path: str | Path | None = None,
     generated_path: str | Path | None = None,
+    include_generated: bool = False,
 ) -> tuple[dict[str, dict[str, Any]], set[str], set[str]]:
-    """Load canonical snapshot first, then legacy generated JSON as last fallback.
+    """Load canonical snapshot and optionally overlay legacy generated JSON.
 
     Returns `(payload, canonical_names, generated_only_names)`.
+
+    Runtime consumers must keep `include_generated=False`. The legacy generated
+    JSON is only for sync/audit tools that need drift measurement or historical
+    bootstrap visibility.
     """
 
     layered: dict[str, dict[str, Any]] = {}
@@ -82,12 +87,15 @@ def load_layered_known_cards(
     for name, entry in canonical.items():
         layered[name] = dict(entry)
 
-    generated = load_snapshot_file(generated_path or resolve_generated_known_cards_path())
     generated_only_names: set[str] = set()
-    for name, entry in generated.items():
-        if name not in layered:
-            layered[name] = dict(entry)
-            generated_only_names.add(name)
+    if include_generated:
+        generated = load_snapshot_file(
+            generated_path or resolve_generated_known_cards_path()
+        )
+        for name, entry in generated.items():
+            if name not in layered:
+                layered[name] = dict(entry)
+                generated_only_names.add(name)
 
     return layered, canonical_names, generated_only_names
 

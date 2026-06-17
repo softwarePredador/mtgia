@@ -271,6 +271,14 @@ Ordem correta de resolucao:
 `battle_analyst_v9.py`. Ele fica no repositorio apenas como input historico de
 sync/auditoria ate a limpeza completa dos consumidores secundarios.
 
+Atualizacao 2026-06-17: o loader compartilhado
+`known_cards_fallback_snapshot.load_layered_known_cards()` tambem passou a ser
+canonico por padrao. Consumidores operacionais como `slot_optimizer.py`,
+`universal_optimizer.py`, `battle_effect_coverage_audit.py` e
+`sync_pg_card_metadata_to_hermes.py` nao optam mais por
+`known_cards_generated.json`; apenas scripts de geracao, sync seed e auditoria
+de drift podem pedir explicitamente esse arquivo.
+
 Guardrails operacionais atuais:
 
 - `HANDCRAFTED_KNOWN_CARDS` deve permanecer vazio por padrao;

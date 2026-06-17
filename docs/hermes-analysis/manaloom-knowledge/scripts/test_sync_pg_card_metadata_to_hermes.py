@@ -163,7 +163,7 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
             finally:
                 conn.close()
 
-    def test_collect_requested_names_includes_canonical_snapshot_cards(self) -> None:
+    def test_collect_requested_names_includes_canonical_snapshot_not_generated_legacy(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             canonical_path = Path(tmp) / "known_cards_canonical_snapshot.json"
             generated_path = Path(tmp) / "known_cards_generated.json"
@@ -196,7 +196,7 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
                 names = sync.collect_requested_names(self.cur)
 
         self.assertIn("Canonical Only", names)
-        self.assertIn("Legacy Only", names)
+        self.assertNotIn("Legacy Only", names)
 
 
 if __name__ == "__main__":

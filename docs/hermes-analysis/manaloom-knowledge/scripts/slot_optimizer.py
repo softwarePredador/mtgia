@@ -38,7 +38,6 @@ from master_optimizer_common import (
 )
 import battle_rule_registry
 
-KC_JSON = SCRIPT_DIR / "known_cards_generated.json"
 LOCK_FILE = Path(
     os.environ.get("MANALOOM_SLOT_SCAN_LOCK", str(Path(tempfile.gettempdir()) / "optimizer_v3.lock"))
 )
@@ -274,9 +273,7 @@ def choose_primary_category(categories: list[str]) -> str | None:
 
 
 def load_known_cards() -> dict[str, dict[str, object]]:
-    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards(
-        generated_path=KC_JSON,
-    )
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
     rules = battle_rule_registry.load_active_battle_card_rules(DEFAULT_DB)
     for rule in rules.values():
         name = str(rule.get("card_name") or "")

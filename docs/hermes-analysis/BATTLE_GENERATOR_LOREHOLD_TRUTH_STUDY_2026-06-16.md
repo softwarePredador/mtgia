@@ -729,6 +729,10 @@ Estado correto apos a validacao:
 - `known_cards_generated.json` deixou de ser fallback executavel do
   `battle_analyst_v9.py` porque o audit mostrou `generated_only_names=0` e
   `runtime_effect_different=219`;
+- o loader compartilhado de conhecidos passou a ser canonico por padrao, e
+  `slot_optimizer.py`, `universal_optimizer.py`,
+  `battle_effect_coverage_audit.py` e `sync_pg_card_metadata_to_hermes.py`
+  deixaram de optar pelo JSON gerado em consumo operacional;
 - o snapshot canonico tambem foi materializado localmente em
   `known_cards_canonical_snapshot.json` e a auditoria
   `audit_known_cards_runtime_environment.py` fechou com `status=PASS`

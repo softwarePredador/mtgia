@@ -85,6 +85,21 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
                 source,
                 msg=f"{repo_rel(path)} must use load_layered_known_cards()",
             )
+            self.assertNotIn(
+                "generated_path=",
+                source,
+                msg=f"{repo_rel(path)} must not opt into generated known-cards fallback",
+            )
+            self.assertNotIn(
+                "include_generated=True",
+                source,
+                msg=f"{repo_rel(path)} must not opt into generated known-cards fallback",
+            )
+            self.assertNotIn(
+                "MANALOOM_KNOWN_CARDS_JSON",
+                source,
+                msg=f"{repo_rel(path)} must not read generated known-cards env",
+            )
 
     def test_battle_runtime_keeps_registry_then_snapshot_and_no_legacy_generated(self) -> None:
         path = SCRIPT_DIR / "battle_analyst_v9.py"

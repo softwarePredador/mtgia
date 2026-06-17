@@ -97,7 +97,7 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
 
         self.assertEqual(roles["snapshot only"], "draw")
 
-    def test_load_known_cards_prefers_canonical_snapshot_over_legacy_json(self) -> None:
+    def test_load_known_cards_ignores_legacy_generated_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             generated_path = Path(tmpdir) / "known_cards_generated.json"
             canonical_path = Path(tmpdir) / "known_cards_canonical_snapshot.json"
@@ -125,10 +125,12 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
             )
 
             with (
-                mock.patch.object(slot_optimizer, "KC_JSON", generated_path),
                 mock.patch.dict(
                     os.environ,
-                    {"MANALOOM_CANONICAL_KNOWN_CARDS_JSON": str(canonical_path)},
+                    {
+                        "MANALOOM_CANONICAL_KNOWN_CARDS_JSON": str(canonical_path),
+                        "MANALOOM_KNOWN_CARDS_JSON": str(generated_path),
+                    },
                     clear=False,
                 ),
                 mock.patch.object(
@@ -141,7 +143,7 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
 
         self.assertEqual(known_cards["Alpha Card"]["effect"], "counter")
         self.assertEqual(known_cards["Alpha Card"]["battle_rule_source"], "manual")
-        self.assertEqual(known_cards["Beta Card"]["effect"], "tutor")
+        self.assertNotIn("Beta Card", known_cards)
 
 
 if __name__ == "__main__":
