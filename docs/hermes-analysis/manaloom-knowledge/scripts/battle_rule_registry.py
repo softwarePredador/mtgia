@@ -3,8 +3,8 @@
 
 The battle engine can still use heuristic fallbacks, but this table is the
 intended source of truth for card semantics that must be trusted by the
-optimizer. One row represents what Hermes currently believes a card does in
-battle and how deckbuilding should categorize it.
+optimizer. Rows are keyed by `(normalized_name, logical_rule_key)` so a card can
+carry multiple executable semantics without multiplying deck rows.
 """
 
 from __future__ import annotations
@@ -29,6 +29,14 @@ SOURCE_PRIORITY = {
     "generated": 40,
     "imported": 30,
     "heuristic": 20,
+}
+
+REVIEW_STATUS_PRIORITY = {
+    "verified": 0,
+    "active": 1,
+    "needs_review": 2,
+    "deprecated": 8,
+    "rejected": 9,
 }
 
 EFFECT_TO_DECK_CATEGORY = {
@@ -97,14 +105,18 @@ def table_exists(conn: sqlite3.Connection, table: str) -> bool:
     return bool(row)
 
 
-def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
+def _create_battle_card_rules_table(
+    conn: sqlite3.Connection,
+    table_name: str = "battle_card_rules",
+) -> None:
     conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS battle_card_rules (
-            normalized_name TEXT PRIMARY KEY,
+        f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            normalized_name TEXT NOT NULL,
+            logical_rule_key TEXT NOT NULL,
             card_name TEXT NOT NULL,
-            effect_json TEXT NOT NULL DEFAULT '{}',
-            deck_role_json TEXT NOT NULL DEFAULT '{}',
+            effect_json TEXT NOT NULL DEFAULT '{{}}',
+            deck_role_json TEXT NOT NULL DEFAULT '{{}}',
             source TEXT NOT NULL DEFAULT 'curated',
             confidence REAL NOT NULL DEFAULT 1.0,
             review_status TEXT NOT NULL DEFAULT 'verified',
@@ -113,8 +125,98 @@ def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
             notes TEXT,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
-            last_seen_at TEXT
+            last_seen_at TEXT,
+            PRIMARY KEY (normalized_name, logical_rule_key)
         )
+        """
+    )
+
+
+def _battle_rule_table_columns(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
+    rows = conn.execute("PRAGMA table_info(battle_card_rules)").fetchall()
+    return {
+        str(row[1]): {
+            "cid": row[0],
+            "type": row[2],
+            "notnull": row[3],
+            "default": row[4],
+            "pk": row[5],
+        }
+        for row in rows
+    }
+
+
+def _migrate_battle_card_rules_schema(conn: sqlite3.Connection) -> None:
+    if not table_exists(conn, "battle_card_rules"):
+        _create_battle_card_rules_table(conn)
+        return
+
+    columns = _battle_rule_table_columns(conn)
+    pk_columns = [
+        name
+        for name, meta in sorted(columns.items(), key=lambda item: int(item[1]["pk"] or 0))
+        if int(meta["pk"] or 0) > 0
+    ]
+    if "logical_rule_key" in columns and pk_columns == [
+        "normalized_name",
+        "logical_rule_key",
+    ]:
+        return
+
+    conn.execute("DROP TABLE IF EXISTS battle_card_rules_v2_migration")
+    _create_battle_card_rules_table(conn, "battle_card_rules_v2_migration")
+    existing_rows = conn.execute(
+        """
+        SELECT normalized_name, card_name, effect_json, deck_role_json, source,
+               confidence, review_status, rule_version, oracle_hash, notes,
+               created_at, updated_at, last_seen_at
+        FROM battle_card_rules
+        """
+    ).fetchall()
+    for row in existing_rows:
+        effect_json = _safe_json_loads(row[2])
+        deck_role_json = _safe_json_loads(row[3])
+        logical_key = logical_rule_key(
+            {
+                "effect_json": effect_json,
+                "deck_role_json": deck_role_json,
+            }
+        )
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO battle_card_rules_v2_migration (
+                normalized_name, logical_rule_key, card_name, effect_json,
+                deck_role_json, source, confidence, review_status, rule_version,
+                oracle_hash, notes, created_at, updated_at, last_seen_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                row[0],
+                logical_key,
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+                row[6],
+                row[7],
+                row[8],
+                row[9],
+                row[10],
+                row[11],
+                row[12],
+            ),
+        )
+    conn.execute("DROP TABLE battle_card_rules")
+    conn.execute("ALTER TABLE battle_card_rules_v2_migration RENAME TO battle_card_rules")
+
+
+def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
+    _migrate_battle_card_rules_schema(conn)
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_battle_card_rules_normalized_name
+        ON battle_card_rules(normalized_name)
         """
     )
     conn.execute(
@@ -227,6 +329,16 @@ def logical_rule_key(rule: dict[str, Any]) -> str:
     return f"battle_rule_v1:{digest[:32]}"
 
 
+def _rule_rank(rule: dict[str, Any]) -> tuple[int, int, float, int, str]:
+    return (
+        REVIEW_STATUS_PRIORITY.get(str(rule.get("review_status") or "").lower(), 7),
+        -SOURCE_PRIORITY.get(str(rule.get("source") or "").lower(), 0),
+        -float(rule.get("confidence") or 0.0),
+        -int(rule.get("rule_version") or 1),
+        str(rule.get("logical_rule_key") or ""),
+    )
+
+
 def _db_mtime(db_path: Path) -> int | None:
     try:
         return int(db_path.stat().st_mtime_ns)
@@ -253,7 +365,7 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
                 return {}
             rows = conn.execute(
                 """
-                SELECT normalized_name, card_name, effect_json, deck_role_json,
+                SELECT normalized_name, logical_rule_key, card_name, effect_json, deck_role_json,
                        source, confidence, review_status, rule_version, oracle_hash, notes
                 FROM battle_card_rules
                 WHERE review_status IN ('verified', 'needs_review', 'active')
@@ -269,6 +381,7 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
         deck_role_json = _safe_json_loads(row["deck_role_json"])
         rule = {
             "normalized_name": row["normalized_name"],
+            "logical_rule_key": row["logical_rule_key"],
             "card_name": row["card_name"],
             "effect_json": effect_json,
             "deck_role_json": deck_role_json,
@@ -279,8 +392,9 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
             "oracle_hash": row["oracle_hash"],
             "notes": row["notes"],
         }
-        rule["logical_rule_key"] = logical_rule_key(rule)
-        rules[row["normalized_name"]] = rule
+        current = rules.get(row["normalized_name"])
+        if current is None or _rule_rank(rule) < _rule_rank(current):
+            rules[row["normalized_name"]] = rule
     _RULE_CACHE[cache_key] = (mtime, rules)
     return {key: dict(value) for key, value in rules.items()}
 
@@ -317,11 +431,19 @@ def upsert_battle_card_rule(
     ensure_battle_card_rules(conn)
     normalized = normalize_card_name(card_name)
     now = utc_now()
+    role = deck_role_json or deck_role_from_effect(effect_json)
+    rule_key = logical_rule_key(
+        {
+            "effect_json": effect_json,
+            "deck_role_json": role,
+        }
+    )
     current = conn.execute(
         """
-        SELECT source FROM battle_card_rules WHERE normalized_name=?
+        SELECT source FROM battle_card_rules
+        WHERE normalized_name=? AND logical_rule_key=?
         """,
-        (normalized,),
+        (normalized, rule_key),
     ).fetchone()
     if current:
         incoming_priority = SOURCE_PRIORITY.get(source, 0)
@@ -331,21 +453,21 @@ def upsert_battle_card_rule(
                 """
                 UPDATE battle_card_rules
                 SET last_seen_at=?
-                WHERE normalized_name=?
+                WHERE normalized_name=? AND logical_rule_key=?
                 """,
-                (now, normalized),
+                (now, normalized, rule_key),
             )
             return False
 
-    role = deck_role_json or deck_role_from_effect(effect_json)
     conn.execute(
         """
         INSERT INTO battle_card_rules (
-            normalized_name, card_name, effect_json, deck_role_json, source,
-            confidence, review_status, rule_version, oracle_hash, notes,
+            normalized_name, logical_rule_key, card_name, effect_json,
+            deck_role_json, source, confidence, review_status, rule_version,
+            oracle_hash, notes,
             created_at, updated_at, last_seen_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
-        ON CONFLICT(normalized_name) DO UPDATE SET
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+        ON CONFLICT(normalized_name, logical_rule_key) DO UPDATE SET
             card_name=excluded.card_name,
             effect_json=excluded.effect_json,
             deck_role_json=excluded.deck_role_json,
@@ -359,6 +481,7 @@ def upsert_battle_card_rule(
         """,
         (
             normalized,
+            rule_key,
             card_name,
             json.dumps(effect_json, ensure_ascii=True, sort_keys=True),
             json.dumps(role, ensure_ascii=True, sort_keys=True),

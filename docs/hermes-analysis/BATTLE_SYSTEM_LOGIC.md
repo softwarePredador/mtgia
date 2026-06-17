@@ -668,11 +668,12 @@ Precedencia real do battle runtime:
 Leitura correta:
 
 - `card_battle_rules` e o inventario operacional canonico de efeito executavel;
-- no PostgreSQL atual, `card_battle_rules.normalized_name` ainda e chave
-  primaria. O `logical_rule_key` e calculado por scripts/snapshots para
-  auditoria e dedupe, mas ainda nao esta persistido como coluna canônica.
-  Portanto, o sistema deve agregar por `card_id` para evitar fanout e nao deve
-  tentar corrigir isso escolhendo uma unica regra com `LIMIT 1`;
+- desde a migration `028`, PostgreSQL `card_battle_rules` e SQLite Hermes
+  `battle_card_rules` persistem `logical_rule_key` e usam chave composta
+  `(normalized_name, logical_rule_key)`. Isso permite armazenar múltiplas
+  regras por mesmo nome normalizado sem overwrite. O sistema ainda deve agregar
+  por `card_id` para evitar fanout em contexto de deck e nao deve tentar
+  corrigir isso escolhendo uma unica regra com `LIMIT 1`;
 - `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade

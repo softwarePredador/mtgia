@@ -353,6 +353,7 @@ battle_rules AS (
     (COUNT(*) FILTER (WHERE review_status = 'verified'))::int
       AS verified_battle_rule_count,
     jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
       'source', source,
       'confidence', confidence,
       'review_status', review_status,
@@ -364,6 +365,7 @@ battle_rules AS (
     ) ORDER BY (review_status = 'verified') DESC, confidence DESC, source)
       AS battle_rules,
     jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
       'source', source,
       'confidence', confidence,
       'review_status', review_status,

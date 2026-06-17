@@ -497,6 +497,7 @@ final migrations = <Migration>[
         normalized_name TEXT PRIMARY KEY,
         card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
         card_name TEXT NOT NULL,
+        logical_rule_key TEXT,
         effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
         deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
         source TEXT NOT NULL DEFAULT 'curated',
@@ -771,6 +772,66 @@ final migrations = <Migration>[
         updated_at = CURRENT_TIMESTAMP
       WHERE source = 'curated'
         AND notes ILIKE '%legacy HANDCRAFTED_KNOWN_CARDS provenance%';
+    ''',
+  ),
+  Migration(
+    version: '028',
+    name: 'persist_card_battle_rules_logical_rule_key',
+    up: '''
+      ALTER TABLE card_battle_rules
+      ADD COLUMN IF NOT EXISTS logical_rule_key TEXT;
+
+      UPDATE card_battle_rules
+      SET logical_rule_key = 'battle_rule_v1:' || substring(md5(
+        jsonb_build_object(
+          'effect', COALESCE(effect_json, '{}'::jsonb),
+          'deck_role', COALESCE(deck_role_json, '{}'::jsonb),
+          'face_name', COALESCE(effect_json->>'face_name', deck_role_json->>'face_name'),
+          'face_index', COALESCE(effect_json->>'face_index', deck_role_json->>'face_index'),
+          'variant_kind', COALESCE(effect_json->>'variant_kind', deck_role_json->>'variant_kind'),
+          'ability_kind', COALESCE(effect_json->>'ability_kind', deck_role_json->>'ability_kind'),
+          'timing_window', COALESCE(effect_json->>'timing_window', deck_role_json->>'timing_window'),
+          'source_zone', COALESCE(effect_json->>'source_zone', deck_role_json->>'source_zone')
+        )::text
+      ) from 1 for 32)
+      WHERE logical_rule_key IS NULL OR logical_rule_key = '';
+
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN logical_rule_key SET NOT NULL;
+
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS card_battle_rules_pkey;
+
+      ALTER TABLE card_battle_rules
+      ADD CONSTRAINT card_battle_rules_pkey
+      PRIMARY KEY (normalized_name, logical_rule_key);
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
+      ON card_battle_rules (normalized_name);
+
+      $cardIntelligenceSnapshotViewStatement;
+      $optimizeCandidateQualitySummaryViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+
+      DELETE FROM card_battle_rules a
+      USING card_battle_rules b
+      WHERE a.ctid < b.ctid
+        AND a.normalized_name = b.normalized_name;
+
+      DROP INDEX IF EXISTS idx_card_battle_rules_normalized_name;
+
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS card_battle_rules_pkey;
+
+      ALTER TABLE card_battle_rules
+      ADD CONSTRAINT card_battle_rules_pkey
+      PRIMARY KEY (normalized_name);
+
+      ALTER TABLE card_battle_rules
+      DROP COLUMN IF EXISTS logical_rule_key;
     ''',
   ),
 ];

@@ -21,6 +21,7 @@ import argparse
 import json
 import os
 import sqlite3
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -63,7 +64,8 @@ SOURCE_PRIORITY = {
 
 PG_SCHEMA = """
 CREATE TABLE IF NOT EXISTS card_battle_rules (
-  normalized_name TEXT PRIMARY KEY,
+  normalized_name TEXT NOT NULL,
+  logical_rule_key TEXT NOT NULL,
   card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
   card_name TEXT NOT NULL,
   effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -91,7 +93,8 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
       'rejected',
       'deprecated'
     )
-  )
+  ),
+  PRIMARY KEY (normalized_name, logical_rule_key)
 );
 """
 
@@ -224,6 +227,76 @@ def filter_rows_by_card_names(rows: list[dict[str, Any]], card_names: list[str])
 def ensure_pg_table(cur: Any) -> None:
     for statement in [part.strip() for part in PG_SCHEMA.split(";") if part.strip()]:
         cur.execute(statement)
+    cur.execute("ALTER TABLE card_battle_rules ADD COLUMN IF NOT EXISTS logical_rule_key TEXT")
+    cur.execute(
+        """
+        UPDATE card_battle_rules
+        SET logical_rule_key = 'battle_rule_v1:' || substring(md5(
+          jsonb_build_object(
+            'effect', COALESCE(effect_json, '{}'::jsonb),
+            'deck_role', COALESCE(deck_role_json, '{}'::jsonb),
+            'face_name', COALESCE(effect_json->>'face_name', deck_role_json->>'face_name'),
+            'face_index', COALESCE(effect_json->>'face_index', deck_role_json->>'face_index'),
+            'variant_kind', COALESCE(effect_json->>'variant_kind', deck_role_json->>'variant_kind'),
+            'ability_kind', COALESCE(effect_json->>'ability_kind', deck_role_json->>'ability_kind'),
+            'timing_window', COALESCE(effect_json->>'timing_window', deck_role_json->>'timing_window'),
+            'source_zone', COALESCE(effect_json->>'source_zone', deck_role_json->>'source_zone')
+          )::text
+        ) from 1 for 32)
+        WHERE logical_rule_key IS NULL OR logical_rule_key = ''
+        """
+    )
+    cur.execute(
+        """
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_card_battle_rules_name_rule_key
+        ON card_battle_rules (normalized_name, logical_rule_key)
+        """
+    )
+    cur.execute(
+        """
+        ALTER TABLE card_battle_rules
+        ALTER COLUMN logical_rule_key SET NOT NULL
+        """
+    )
+    cur.execute(
+        """
+        DO $$
+        DECLARE
+          pk_name text;
+          pk_cols text[];
+        BEGIN
+          SELECT conname,
+                 array_agg(att.attname ORDER BY ord.ordinality)
+            INTO pk_name, pk_cols
+          FROM pg_constraint con
+          JOIN unnest(con.conkey) WITH ORDINALITY AS ord(attnum, ordinality)
+            ON true
+          JOIN pg_attribute att
+            ON att.attrelid = con.conrelid
+           AND att.attnum = ord.attnum
+          WHERE con.conrelid = 'card_battle_rules'::regclass
+            AND con.contype = 'p'
+          GROUP BY con.conname;
+
+          IF pk_name IS NOT NULL AND pk_cols <> ARRAY['normalized_name', 'logical_rule_key'] THEN
+            EXECUTE format('ALTER TABLE card_battle_rules DROP CONSTRAINT %I', pk_name);
+            pk_name := NULL;
+          END IF;
+
+          IF pk_name IS NULL THEN
+            ALTER TABLE card_battle_rules
+            ADD CONSTRAINT card_battle_rules_pkey
+            PRIMARY KEY (normalized_name, logical_rule_key);
+          END IF;
+        END $$;
+        """
+    )
+    cur.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
+        ON card_battle_rules (normalized_name)
+        """
+    )
 
 
 def resolve_card_id(cur: Any, card_name: str) -> str | None:
@@ -243,18 +316,27 @@ def resolve_card_id(cur: Any, card_name: str) -> str | None:
     return row[0] if row else None
 
 
-def current_pg_source(cur: Any, normalized_name: str) -> str | None:
+def current_pg_source(
+    cur: Any,
+    normalized_name: str,
+    logical_rule_key: str,
+) -> str | None:
     cur.execute(
-        "SELECT source FROM card_battle_rules WHERE normalized_name = %s",
-        (normalized_name,),
+        """
+        SELECT source
+        FROM card_battle_rules
+        WHERE normalized_name = %s
+          AND logical_rule_key = %s
+        """,
+        (normalized_name, logical_rule_key),
     )
     row = cur.fetchone()
     return str(row[0]) if row else None
 
 
-def load_current_sources(cur: Any) -> dict[str, str]:
-    cur.execute("SELECT normalized_name, source FROM card_battle_rules")
-    return {str(row[0]): str(row[1]) for row in cur.fetchall()}
+def load_current_sources(cur: Any) -> dict[tuple[str, str], str]:
+    cur.execute("SELECT normalized_name, logical_rule_key, source FROM card_battle_rules")
+    return {(str(row[0]), str(row[1])): str(row[2]) for row in cur.fetchall()}
 
 
 def load_card_id_lookup(cur: Any, card_names: list[str]) -> dict[str, str]:
@@ -291,7 +373,18 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
     card_name = str(row["card_name"])
     normalized_name = normalize_card_name(card_name)
     source = str(row.get("source") or "curated")
-    current_source = current_pg_source(cur, normalized_name)
+    card_id = resolve_card_id(cur, card_name)
+    effect = json_obj(row.get("effect_json"))
+    deck_role = row.get("deck_role_json")
+    if not isinstance(deck_role, dict):
+        deck_role = battle_rule_registry.deck_role_from_effect(effect)
+    logical_rule_key = str(
+        row.get("logical_rule_key")
+        or battle_rule_registry.logical_rule_key(
+            {"effect_json": effect, "deck_role_json": deck_role}
+        )
+    )
+    current_source = current_pg_source(cur, normalized_name, logical_rule_key)
     if current_source:
         incoming_priority = SOURCE_PRIORITY.get(source, 0)
         current_priority = SOURCE_PRIORITY.get(current_source, 0)
@@ -301,26 +394,20 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
                 UPDATE card_battle_rules
                 SET last_seen_at = CURRENT_TIMESTAMP
                 WHERE normalized_name = %s
+                  AND logical_rule_key = %s
                 """,
-                (normalized_name,),
+                (normalized_name, logical_rule_key),
             )
             return False
 
-    card_id = resolve_card_id(cur, card_name)
-    effect_json = json.dumps(
-        json_obj(row.get("effect_json")),
-        ensure_ascii=True,
-        sort_keys=True,
-    )
-    deck_role = row.get("deck_role_json")
-    if not isinstance(deck_role, dict):
-        deck_role = battle_rule_registry.deck_role_from_effect(json_obj(row.get("effect_json")))
+    effect_json = json.dumps(effect, ensure_ascii=True, sort_keys=True)
     deck_role_json = json.dumps(deck_role, ensure_ascii=True, sort_keys=True)
 
     cur.execute(
         """
         INSERT INTO card_battle_rules (
           normalized_name,
+          logical_rule_key,
           card_id,
           card_name,
           effect_json,
@@ -337,11 +424,11 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
           last_seen_at
         )
         VALUES (
-          %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, 1, %s, %s,
+          %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, 1, %s, %s,
           CASE WHEN %s IN ('verified', 'active') THEN CURRENT_TIMESTAMP ELSE NULL END,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
-        ON CONFLICT (normalized_name) DO UPDATE SET
+        ON CONFLICT (normalized_name, logical_rule_key) DO UPDATE SET
           card_id = COALESCE(EXCLUDED.card_id, card_battle_rules.card_id),
           card_name = EXCLUDED.card_name,
           effect_json = EXCLUDED.effect_json,
@@ -360,6 +447,7 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
         """,
         (
             normalized_name,
+            logical_rule_key,
             card_id,
             card_name,
             effect_json,
@@ -384,28 +472,35 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
         [str(row["card_name"]) for row in rows if row.get("card_name")],
     )
     values: list[tuple[Any, ...]] = []
-    skipped_names: list[str] = []
+    skipped_keys: list[tuple[str, str]] = []
     for row in rows:
         card_name = str(row["card_name"])
         normalized_name = normalize_card_name(card_name)
         source = str(row.get("source") or "curated")
-        current_source = current_sources.get(normalized_name)
-        if current_source:
-            incoming_priority = SOURCE_PRIORITY.get(source, 0)
-            current_priority = SOURCE_PRIORITY.get(current_source, 0)
-            if incoming_priority < current_priority:
-                skipped_names.append(normalized_name)
-                continue
-
         effect = json_obj(row.get("effect_json"))
         deck_role = row.get("deck_role_json")
         if not isinstance(deck_role, dict):
             deck_role = battle_rule_registry.deck_role_from_effect(effect)
+        logical_rule_key = str(
+            row.get("logical_rule_key")
+            or battle_rule_registry.logical_rule_key(
+                {"effect_json": effect, "deck_role_json": deck_role}
+            )
+        )
+        current_source = current_sources.get((normalized_name, logical_rule_key))
+        if current_source:
+            incoming_priority = SOURCE_PRIORITY.get(source, 0)
+            current_priority = SOURCE_PRIORITY.get(current_source, 0)
+            if incoming_priority < current_priority:
+                skipped_keys.append((normalized_name, logical_rule_key))
+                continue
+
         review_status = str(row.get("review_status") or "verified")
         reviewed_at = datetime.now(timezone.utc) if review_status in ("verified", "active") else None
         values.append(
             (
                 normalized_name,
+                logical_rule_key,
                 card_lookup.get(normalized_name),
                 card_name,
                 json.dumps(effect, ensure_ascii=True, sort_keys=True),
@@ -419,15 +514,17 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
             )
         )
 
-    if skipped_names:
-        cur.execute(
-            """
-            UPDATE card_battle_rules
-            SET last_seen_at = CURRENT_TIMESTAMP
-            WHERE normalized_name = ANY(%s)
-            """,
-            (skipped_names,),
-        )
+    if skipped_keys:
+        for normalized_name, logical_rule_key in skipped_keys:
+            cur.execute(
+                """
+                UPDATE card_battle_rules
+                SET last_seen_at = CURRENT_TIMESTAMP
+                WHERE normalized_name = %s
+                  AND logical_rule_key = %s
+                """,
+                (normalized_name, logical_rule_key),
+            )
 
     if values:
         execute_values(
@@ -435,6 +532,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
             """
             INSERT INTO card_battle_rules (
               normalized_name,
+              logical_rule_key,
               card_id,
               card_name,
               effect_json,
@@ -451,7 +549,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
               last_seen_at
             )
             VALUES %s
-            ON CONFLICT (normalized_name) DO UPDATE SET
+            ON CONFLICT (normalized_name, logical_rule_key) DO UPDATE SET
               card_id = COALESCE(EXCLUDED.card_id, card_battle_rules.card_id),
               card_name = EXCLUDED.card_name,
               effect_json = EXCLUDED.effect_json,
@@ -471,12 +569,12 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
             """,
             values,
             template=(
-                "(%s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, 1, %s, %s, "
+                "(%s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, 1, %s, %s, "
                 "%s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
             ),
             page_size=250,
         )
-    return len(values), len(skipped_names)
+    return len(values), len(skipped_keys)
 
 
 def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any]]:
@@ -487,6 +585,7 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
         """
         SELECT
           normalized_name,
+          logical_rule_key,
           card_name,
           effect_json,
           deck_role_json,
@@ -498,7 +597,7 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
           notes
         FROM card_battle_rules
         WHERE review_status = ANY(%s)
-        ORDER BY normalized_name
+        ORDER BY normalized_name, logical_rule_key
         """,
         (statuses,),
     )
@@ -507,15 +606,16 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
         loaded.append(
             {
                 "normalized_name": row[0],
-                "card_name": row[1],
-                "effect_json": json_obj(row[2]),
-                "deck_role_json": json_obj(row[3]),
-                "source": row[4],
-                "confidence": float(row[5]),
-                "review_status": row[6],
-                "rule_version": int(row[7]),
-                "oracle_hash": row[8],
-                "notes": row[9] or "",
+                "logical_rule_key": row[1],
+                "card_name": row[2],
+                "effect_json": json_obj(row[3]),
+                "deck_role_json": json_obj(row[4]),
+                "source": row[5],
+                "confidence": float(row[6]),
+                "review_status": row[7],
+                "rule_version": int(row[8]),
+                "oracle_hash": row[9],
+                "notes": row[10] or "",
             }
         )
     return loaded
@@ -523,7 +623,7 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
 
 def mirror_pg_rules_to_sqlite(sqlite_db: str, rows: list[dict[str, Any]]) -> int:
     changed = 0
-    with sqlite3.connect(sqlite_db) as conn:
+    with closing(sqlite3.connect(sqlite_db)) as conn:
         battle_rule_registry.ensure_battle_card_rules(conn)
         for row in rows:
             did_change = upsert_battle_card_rule(

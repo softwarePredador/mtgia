@@ -567,6 +567,7 @@ def semantic_deck_cards_sql() -> str:
                     COALESCE(
                       jsonb_agg(
                         jsonb_strip_nulls(jsonb_build_object(
+                          'logical_rule_key', cbr.logical_rule_key,
                           'rule_version', cbr.rule_version,
                           'source', cbr.source,
                           'review_status', cbr.review_status,

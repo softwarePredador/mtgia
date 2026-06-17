@@ -115,7 +115,8 @@ CREATE TABLE IF NOT EXISTS card_legalities (
 -- Fatos oficiais ficam em cards/card_rulings; esta tabela guarda a interpretacao
 -- revisavel que o battle/optimizer consegue executar.
 CREATE TABLE IF NOT EXISTS card_battle_rules (
-    normalized_name TEXT PRIMARY KEY,
+    normalized_name TEXT NOT NULL,
+    logical_rule_key TEXT NOT NULL,
     card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
     card_name TEXT NOT NULL,
     effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -143,8 +144,12 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
         'rejected',
         'deprecated'
       )
-    )
+    ),
+    PRIMARY KEY (normalized_name, logical_rule_key)
 );
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
+ON card_battle_rules (normalized_name);
 
 CREATE INDEX IF NOT EXISTS idx_card_battle_rules_card_id
 ON card_battle_rules (card_id);

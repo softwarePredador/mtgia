@@ -53,12 +53,12 @@ Generated at: `2026-06-15T23:15:57.841159Z`
 ```
 - Clarification added 2026-06-17: `cards_with_multiple_battle_rules` is a
   fanout warning by `card_id`, mostly caused by aliases/faces/printing rows
-  pointing at the same card id. The current PostgreSQL table still uses
-  `normalized_name` as its primary key and does not yet persist
-  `logical_rule_key` as a first-class column. Therefore, product consumers must
-  keep aggregating by `card_id`, and the next structural battle-rule slice must
-  add persisted `logical_rule_key` before allowing multiple executable rules
-  for the same normalized card name.
+  pointing at the same card id. After migration `028`,
+  `card_battle_rules.logical_rule_key` is now persisted and the primary key is
+  `(normalized_name, logical_rule_key)`, so storage supports multiple
+  executable rules for the same normalized card name. Product consumers must
+  still keep aggregating by `card_id`; storing multiple rules correctly does
+  not make raw `deck_cards -> card_battle_rules` joins safe.
 - Critical row counts:
 ```json
 {

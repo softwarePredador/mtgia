@@ -152,5 +152,28 @@ void main() {
       expect(down, contains("source = 'manual'"));
       expect(down, contains("source = 'curated'"));
     });
+
+    test('migration 028 persists battle rule logical keys', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '028',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('persist_card_battle_rules_logical_rule_key'),
+      );
+      expect(up, contains('add column if not exists logical_rule_key'));
+      expect(up, contains('primary key (normalized_name, logical_rule_key)'));
+      expect(up, contains('idx_card_battle_rules_normalized_name'));
+      expect(up, contains('create or replace view card_intelligence_snapshot'));
+      expect(
+        up,
+        contains('create or replace view optimize_candidate_quality_summary'),
+      );
+      expect(down, contains('drop column if exists logical_rule_key'));
+      expect(down, contains('primary key (normalized_name)'));
+    });
   });
 }
