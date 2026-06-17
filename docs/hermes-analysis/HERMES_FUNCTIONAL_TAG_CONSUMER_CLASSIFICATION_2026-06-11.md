@@ -85,7 +85,7 @@ nem ser usados para decidir swaps/produto.
 | `battle_analyst.py`, `battle_analyst_v6.py`, `battle_analyst_v7.py`, `battle_analyst_v8.py` | Versoes antigas; `battle_analyst_v9.py` e o engine ativo. |
 | `universal_optimizer.py` | Pausado por comportamento antigo de auto-apply; substituido pelo master optimizer flow. |
 | `_mulligan_exec15.py`, `mulligan_sim_ciclo3.py` | Experimentos antigos de mulligan. |
-| `_scout_report.py`, `deep_analysis.py`, `cross_ref.py`, `verify_matches.py` | Debug/report manual historico. |
+| `deep_analysis.py`, `cross_ref.py`, `verify_matches.py` | Debug/report manual historico. `_scout_report.py` foi removido em 2026-06-17 por conter deck/hash hardcoded e nao ser pipeline ativo. |
 | `ciclo4_swaps.py`, `apply_evolution.py`, `build_optimized_deck.py` | Fluxos antigos de evolucao/apply; nao usar como pipeline atual. |
 | `_prepend_mulligan.py` | Documento/snippet antigo com referencias a `functional_tag`. |
 

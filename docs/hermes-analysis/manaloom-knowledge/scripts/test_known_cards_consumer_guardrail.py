@@ -50,8 +50,11 @@ FORBIDDEN_SERVER_PATCHERS = {
 }
 
 FORBIDDEN_ONE_SHOT_RULE_PATCHERS = {
+    SCRIPT_DIR / "_gc_check.py",
     SCRIPT_DIR / "_mulligan_exec15.py",
     SCRIPT_DIR / "_prepend_mulligan.py",
+    SCRIPT_DIR / "_scout_report.py",
+    SCRIPT_DIR / "_update_logs.py",
     SCRIPT_DIR / "compare_snapshots.py",
     SCRIPT_DIR / "debug_card_list.py",
     SCRIPT_DIR / "find_dina_profile.py",
@@ -73,6 +76,7 @@ FORBIDDEN_ONE_SHOT_RULE_PATCHERS = {
     SCRIPT_DIR / "update_underworld_breach.py",
     SCRIPT_DIR / "verify_thassa_update.py",
     SCRIPT_DIR / "verify_update.py",
+    SCRIPT_DIR / "validate_patches.py",
 }
 
 

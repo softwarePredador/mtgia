@@ -12,24 +12,20 @@ class BattleEffectCoverageKnownCardsTests(unittest.TestCase):
     def test_effect_source_prefers_canonical_snapshot_over_generated(self) -> None:
         source = audit.effect_source(
             {"name": "Alpha Card", "type_line": "Instant"},
-            {"Alpha Card": {"effect": "counter"}},
             {"Alpha Card"},
-            set(),
             {},
         )
 
         self.assertEqual(source, "known_cards_canonical_snapshot")
 
-    def test_effect_source_uses_generated_when_card_is_legacy_only(self) -> None:
+    def test_effect_source_rejects_legacy_only_generated_fallback_as_runtime_truth(self) -> None:
         source = audit.effect_source(
             {"name": "Beta Card", "type_line": "Instant"},
-            {"Beta Card": {"effect": "tutor"}},
             set(),
-            {"Beta Card"},
             {},
         )
 
-        self.assertEqual(source, "generated")
+        self.assertEqual(source, "unknown")
 
 
 if __name__ == "__main__":

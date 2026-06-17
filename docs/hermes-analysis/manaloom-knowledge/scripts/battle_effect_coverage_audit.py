@@ -68,15 +68,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def fallback_known_cards() -> tuple[dict[str, Any], set[str], set[str]]:
-    return load_layered_known_cards()
+def fallback_known_cards() -> set[str]:
+    _fallback_cards, canonical_names, _generated_only_names = load_layered_known_cards()
+    return canonical_names
 
 
 def effect_source(
     card: dict[str, Any],
-    fallback_cards: dict[str, Any],
     canonical_names: set[str],
-    generated_only_names: set[str],
     rules: dict[str, dict[str, Any]],
 ) -> str:
     name = card.get("name", "")
@@ -89,8 +88,6 @@ def effect_source(
         return "handcrafted"
     if name in canonical_names:
         return "known_cards_canonical_snapshot"
-    if name in generated_only_names or name in fallback_cards:
-        return "generated"
     if card.get("tag") in battle.TAG_EFFECTS:
         return "tag"
     effect = card.get("effect", "")
@@ -167,7 +164,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(args.opponent_limit)
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(args.seed)
 
-    fallback_cards, canonical_names, generated_only_names = fallback_known_cards()
+    canonical_names = fallback_known_cards()
     rules = battle_rule_registry.load_active_battle_card_rules(args.sqlite_db)
     commander, lorehold_deck = battle.load_deck(args.deck_id)
     lorehold_cards = ([commander] if commander else []) + lorehold_deck
@@ -191,9 +188,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
         effect = battle.get_card_effect(card).get("effect", "unknown")
         source = effect_source(
             card,
-            fallback_cards,
             canonical_names,
-            generated_only_names,
             rules,
         )
         flags = risk_flags(card, effect, source)

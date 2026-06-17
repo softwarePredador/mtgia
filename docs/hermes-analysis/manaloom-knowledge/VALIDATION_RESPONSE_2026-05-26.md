@@ -73,7 +73,7 @@ Tambem foi tentado `--limit 3`. Ambas as execucoes ficaram sem artifact/saida de
 **SIM.** Validado em `codex/hermes-analysis-docs`:
 - `PATCH_PLAN.md` tem secao "Status de aplicacao no produto" com hash, descricao e resultados
 - `VALIDATION_AUDIT.md` documenta as discrepancias encontradas
-- `validate_patches.py` confirma 10/10 (100%) de acerto apos patch
+- Historicamente, `validate_patches.py` confirmou 10/10 (100%) de acerto apos patch. Em 2026-06-17 o executor foi removido do tree operacional; validacao atual deve passar pelos testes versionados do backend/Hermes.
 
 ### 10. O que falta antes de ativar SEMANTIC_LAYER_V2_OPTIMIZE_ENFORCEMENT=partial?
 
@@ -102,7 +102,7 @@ Tambem foi tentado `--limit 3`. Ambas as execucoes ficaram sem artifact/saida de
 | Sem mecher em enforcement | PASS | Nenhuma linha em semantic_v2_enforcement |
 | Backend publico contem patch | PASS | 7329fbbd contem f57bb8d3 por ancestralidade Git |
 | Scorecard publico pos-patch | INCONCLUSIVO | Tentado com expected-sha 7329fbbd; sem artifact/saida na janela local |
-| Docs Hermes consistentes | PASS | PATCH_PLAN.md, VALIDATION_AUDIT.md, validate_patches.py |
+| Docs Hermes consistentes | PASS | PATCH_PLAN.md, VALIDATION_AUDIT.md; `validate_patches.py` permanece apenas como referencia historica removida |
 
 ## Risco / Limites
 

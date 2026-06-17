@@ -208,7 +208,7 @@ Last update: 2026-06-01T16:46:31Z. No cron maintains it.
 - `M docs/hermes-analysis/FLUTTER_UI_AUDIT.md` — uncommitted UI audit update from flutter-ui-auditor cron
 - `M docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` — SQLite modifications
 - `M docs/hermes-analysis/manaloom-knowledge/scripts/__pycache__/db_helper.cpython-313.pyc` — bytecode changes
-- `?? docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py` — untracked script
+- `docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py` — removido em 2026-06-17; era diagnostico manual/historico de `game_changers`, nao cron ativo.
 
 These are cron artifacts from other crons operating on the shared branch, not product drift.
 
