@@ -687,6 +687,15 @@ Leitura correta:
   pertencem ao conjunto seguro de efeitos de resolução imediata. O replay passa
   a registrar `effect=composite_resolution`, `composite_rule_component_count`,
   `composite_rule_component_resolved` e `composite_rule_resolved`;
+- desde o slice incremental seguinte, quando uma carta possui múltiplas regras
+  mas não entra no caminho de `composite_resolution`, o runtime não “executa
+  tudo pelo nome”. Ele seleciona uma regra primária e preserva as demais como
+  alternativas auditáveis via `_rule_runtime_selection`,
+  `rule_runtime_selection_mode` e `_rule_blocked_alternatives`. Os principais
+  motivos explícitos de bloqueio hoje são:
+  `activated_ability_requires_executor`, `trigger_requires_event_hook`,
+  `static_effect_requires_state_layer`, `blocked_by_<cost_or_clause>` e
+  `multi_rule_requires_explicit_selector`;
 - regras sem opt-in, `needs_review`, triggers, habilidades ativadas, efeitos
   estáticos, custos adicionais/sacrifícios e outros componentes sem executor
   explícito continuam preservados em `_rule_alternatives`, mas não executam

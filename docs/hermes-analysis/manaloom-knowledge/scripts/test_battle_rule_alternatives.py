@@ -64,9 +64,15 @@ class BattleRuleAlternativesTests(unittest.TestCase):
                 battle.DB = old_db
 
         alternatives = resolved.get("_rule_alternatives")
+        runtime_selection = resolved.get("_rule_runtime_selection") or {}
+        blocked = resolved.get("_rule_blocked_alternatives") or []
         self.assertEqual(resolved.get("_rule_source"), "curated")
         self.assertIsInstance(alternatives, list)
         self.assertEqual(len(alternatives), 2)
+        self.assertEqual(runtime_selection.get("selection_mode"), "single_selected")
+        self.assertEqual(runtime_selection.get("blocked_alternative_count"), 1)
+        self.assertEqual(len(blocked), 1)
+        self.assertEqual(blocked[0].get("runtime_reason"), "multi_rule_requires_explicit_selector")
         self.assertEqual(
             {item["effect"] for item in alternatives},
             {"draw_cards", "remove_creature"},
@@ -74,6 +80,14 @@ class BattleRuleAlternativesTests(unittest.TestCase):
         self.assertEqual(
             battle.replay_rule_fields(resolved).get("rule_alternative_count"),
             2,
+        )
+        self.assertEqual(
+            battle.replay_rule_fields(resolved).get("rule_blocked_alternative_count"),
+            1,
+        )
+        self.assertEqual(
+            battle.replay_rule_fields(resolved).get("rule_runtime_selection_mode"),
+            "single_selected",
         )
 
     def test_runtime_composes_opt_in_resolution_rules(self) -> None:
@@ -138,8 +152,16 @@ class BattleRuleAlternativesTests(unittest.TestCase):
                 resolved = battle.get_card_effect(spell)
                 self.assertEqual(resolved.get("effect"), "composite_resolution")
                 self.assertEqual(
+                    resolved.get("_rule_runtime_selection", {}).get("selection_mode"),
+                    "composite_resolution",
+                )
+                self.assertEqual(
                     battle.replay_rule_fields(resolved).get("composite_rule_component_count"),
                     2,
+                )
+                self.assertEqual(
+                    battle.replay_rule_fields(resolved).get("rule_runtime_selection_mode"),
+                    "composite_resolution",
                 )
 
                 battle.apply_effect_immediate(
@@ -161,6 +183,56 @@ class BattleRuleAlternativesTests(unittest.TestCase):
             2,
         )
         self.assertTrue(any(event == "composite_rule_resolved" for event, _ in events))
+
+    def test_runtime_marks_activated_alternative_as_executor_gap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                battle.battle_rule_registry.ensure_battle_card_rules(conn)
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Artifact Test Card",
+                    {"effect": "passive"},
+                    source="curated",
+                    confidence=0.96,
+                    review_status="active",
+                )
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Artifact Test Card",
+                    {
+                        "effect": "passive",
+                        "activated_mana_ability": True,
+                        "activation_cost": "sacrifice_creature",
+                        "mana_produced": 2,
+                        "produces": "C",
+                    },
+                    source="curated",
+                    confidence=0.95,
+                    review_status="active",
+                )
+                conn.commit()
+            old_db = battle.DB
+            try:
+                battle.DB = str(sqlite_db)
+                resolved = battle.get_card_effect(
+                    {
+                        "name": "Artifact Test Card",
+                        "type_line": "Artifact",
+                        "oracle_text": "",
+                    }
+                )
+            finally:
+                battle.DB = old_db
+
+        blocked = resolved.get("_rule_blocked_alternatives") or []
+        self.assertEqual(resolved.get("effect"), "passive")
+        self.assertEqual(resolved.get("_rule_runtime_selection", {}).get("selection_mode"), "single_selected")
+        self.assertEqual(len(blocked), 1)
+        self.assertEqual(
+            blocked[0].get("runtime_reason"),
+            "activated_ability_requires_executor",
+        )
 
 
 if __name__ == "__main__":

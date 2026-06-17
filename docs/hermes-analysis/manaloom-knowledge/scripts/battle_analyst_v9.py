@@ -1766,6 +1766,13 @@ def replay_rule_fields(effect_data):
     rule_alternative_count = len(effect_data.get("_rule_alternatives") or [])
     if rule_alternative_count:
         fields["rule_alternative_count"] = rule_alternative_count
+    blocked_alternative_count = len(effect_data.get("_rule_blocked_alternatives") or [])
+    if blocked_alternative_count:
+        fields["rule_blocked_alternative_count"] = blocked_alternative_count
+    runtime_selection = effect_data.get("_rule_runtime_selection") or {}
+    selection_mode = runtime_selection.get("selection_mode")
+    if selection_mode:
+        fields["rule_runtime_selection_mode"] = selection_mode
     composite_component_count = len(effect_data.get("_composite_rule_components") or [])
     if composite_component_count:
         fields["composite_rule_component_count"] = composite_component_count
@@ -1812,6 +1819,55 @@ def _battle_rule_summary(rule):
         "review_status": rule.get("review_status"),
         "confidence": rule.get("confidence"),
     }
+
+
+def _runtime_rule_skip_reason(rule):
+    """Explain why a second rule for the same card is not auto-executed."""
+    effect = rule.get("effect_json") or {}
+    review_status = str(rule.get("review_status") or "").lower()
+    if review_status not in {"verified", "active"}:
+        return "review_status_not_runtime_safe"
+    if effect.get("activated_mana_ability") or effect.get("ability_kind") == "activated":
+        return "activated_ability_requires_executor"
+    if effect.get("trigger") or effect.get("ability_kind") == "triggered":
+        return "trigger_requires_event_hook"
+    if effect.get("ability_kind") == "static":
+        return "static_effect_requires_state_layer"
+    for key in COMPOSITE_BLOCKING_EFFECT_KEYS:
+        if effect.get(key):
+            return f"blocked_by_{key}"
+    if effect.get("compose_on_resolution") is True and effect.get("effect") in COMPOSABLE_RESOLUTION_EFFECTS:
+        return "composable_but_not_opted_as_primary"
+    return "multi_rule_requires_explicit_selector"
+
+
+def _annotate_runtime_rule_selection(effect, rules, *, selection_mode):
+    annotated = dict(effect)
+    annotated["_rule_runtime_selection"] = {
+        "selection_mode": selection_mode,
+        "selected_logical_rule_key": annotated.get("_rule_logical_key"),
+        "selected_effect": annotated.get("effect"),
+        "rule_count": len(rules),
+    }
+    annotated["_rule_alternatives"] = [
+        _battle_rule_summary(rule)
+        for rule in rules
+        if rule
+    ]
+    blocked = []
+    selected_key = str(annotated.get("_rule_logical_key") or "")
+    for rule in rules:
+        if not rule:
+            continue
+        if str(rule.get("logical_rule_key") or "") == selected_key:
+            continue
+        summary = _battle_rule_summary(rule)
+        summary["runtime_reason"] = _runtime_rule_skip_reason(rule)
+        blocked.append(summary)
+    if blocked:
+        annotated["_rule_blocked_alternatives"] = blocked
+        annotated["_rule_runtime_selection"]["blocked_alternative_count"] = len(blocked)
+    return annotated
 
 
 def _annotated_battle_rule_effect(rule):
@@ -1880,12 +1936,11 @@ def _build_composite_battle_rule_effect(card, rules):
     composite["_rule_logical_key"] = "+".join(logical_keys)
     composite["_composite_rule_components"] = components
     composite["_composite_skipped_rules"] = skipped
-    composite["_rule_alternatives"] = [
-        _battle_rule_summary(rule)
-        for rule in rules
-        if rule
-    ]
-    return composite
+    return _annotate_runtime_rule_selection(
+        composite,
+        rules,
+        selection_mode="composite_resolution",
+    )
 
 
 def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[str] | None = None) -> None:
@@ -1936,13 +1991,11 @@ def get_card_effect(card):
             if composite_effect is not None:
                 return composite_effect
             rule = rules[0]
-            effect = _annotated_battle_rule_effect(rule)
-            if len(rules) > 1:
-                effect["_rule_alternatives"] = [
-                    _battle_rule_summary(item)
-                    for item in rules
-                    if item
-                ]
+            effect = _annotate_runtime_rule_selection(
+                _annotated_battle_rule_effect(rule),
+                rules,
+                selection_mode="single_selected",
+            )
             return normalize_effect_by_oracle(card, effect)
     if name in HANDCRAFTED_KNOWN_CARDS:
         handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name)
