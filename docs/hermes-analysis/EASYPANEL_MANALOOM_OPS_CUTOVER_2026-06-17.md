@@ -59,6 +59,7 @@ Isso não deve virar serviço de produção.
 
 - `server/Dockerfile.manaloom-ops`
 - `server/bin/manaloom_ops_entrypoint.sh`
+- `server/bin/manaloom_ops_daemon.py`
 - `server/bin/pull_learning_events.sh`
 - `server/bin/auto_sync_learned_decks.sh`
 - `server/bin/master_optimizer_preflight.sh`
@@ -74,7 +75,6 @@ Montar um volume persistente exclusivo:
 Estrutura usada:
 
 - `/data/manaloom-ops/knowledge.db`
-- `/data/manaloom-ops/logs/`
 - `/data/manaloom-ops/locks/`
 - `/data/manaloom-ops/artifacts/`
 
@@ -93,38 +93,54 @@ Usar o mesmo `server/.env` do ManaLoom como base e acrescentar no serviço:
 
 Opcional:
 
-- `MANALOOM_OPS_LOG_DIR=/data/manaloom-ops/logs`
 - `MANALOOM_OPS_LOCK_DIR=/data/manaloom-ops/locks`
 - `MANALOOM_OPS_ARTIFACT_DIR=/data/manaloom-ops/artifacts`
 
-## Limites recomendados
+## Runtime final aplicado
 
-Como o host já roda vários serviços e quase todos estão sem limites, o cutover
-seguro exige limites explícitos neste novo serviço.
+O serviço não usa mais `cron`/`crond`. O runtime final é:
 
-Começo recomendado:
+- `server/bin/manaloom_ops_entrypoint.sh`
+- `server/bin/manaloom_ops_daemon.py`
+- loop foreground em Python
+- `flock` por job
+- logs no `stdout/stderr` do container
+- sem porta pública
+- sem domínio atrelado ao serviço
+- `deploy.command=/bin/bash /app/server/bin/manaloom_ops_entrypoint.sh`
 
-- CPU reservation: `0.50`
-- CPU limit: `1.00`
-- Memory reservation: `512 MB`
-- Memory limit: `1024 MB`
+Isso foi necessário porque o serviço criado como `app` no EasyPanel estava
+concluindo o build, mas não estabilizava task em runtime com a configuração
+anterior baseada em `cron` dentro do container.
 
-Se o preflight ficar pesado:
+## Recursos
 
-- manter `manaloom-ops` com `512 MB`
-- criar depois um serviço separado `manaloom-preflight` com:
-  - CPU limit: `1.00`
-  - Memory limit: `1536 MB`
+Configuração final aplicada no serviço:
+
+- CPU reservation: `0`
+- CPU limit: `0`
+- Memory reservation: `0`
+- Memory limit: `0`
+
+Motivo:
+
+- havia indício de *placement/runtime ambiguity* no Swarm;
+- o job é leve na maior parte do tempo;
+- o objetivo do slice era primeiro estabilizar o worker.
+
+Se o preflight crescer materialmente, o próximo passo é separar `manaloom-preflight`
+em outro serviço, em vez de reapertar limites cedo demais.
 
 ## Schedules usados
 
-O entrypoint gera o crontab em runtime:
+O daemon faz polling de minuto e avalia expressões cron simples em runtime:
 
 - `pull_learning_events`: `*/30 * * * *`
 - `auto_sync_learned_decks`: `0 */2 * * *`
 - `master_optimizer_preflight`: `15 * * * *`
 
-Todos os jobs usam `flock` para evitar overlap.
+Todos os jobs usam `flock` para evitar overlap e executam a partir do checkout
+do repo em `/app`.
 
 Todos os jobs rodam sem `git pull`, `git checkout` ou mutação de branch em
 runtime.
@@ -135,9 +151,10 @@ runtime.
 
 1. Confirmar que `server/.env` do deploy contém credenciais válidas do backend.
 2. Criar o serviço `manaloom-ops` no projeto `evolution`.
-3. Apontar para `server/Dockerfile.manaloom-ops`.
+3. Apontar para `server/Dockerfile.manaloom-ops` com source path `/`.
 4. Montar volume persistente em `/data/manaloom-ops`.
-5. Configurar limites explícitos de CPU/RAM.
+5. Remover domínio/porta pública do serviço.
+6. Definir `deploy.command=/bin/bash /app/server/bin/manaloom_ops_entrypoint.sh`.
 
 ### Fase 2 — smoke sem AWS desligada
 
@@ -175,6 +192,8 @@ Se a dupla execução estiver estável:
    - `manaloom-auto-sync-learned-decks`
    - `manaloom-master-optimizer-preflight`
 2. manter no EasyPanel apenas o `manaloom-ops`.
+3. em caso de rollout do código, rodar `deployService` seguido de
+   `restartService`/`startService` se a task não reaparecer automaticamente.
 
 ### Fase 5 — pós-corte
 
@@ -203,3 +222,12 @@ O cutover deste slice é considerado pronto quando:
 3. não há `git checkout/pull` no runtime;
 4. os artifacts e logs ficam persistidos fora do container efêmero;
 5. o Hermes AWS pode ser desligado para esses três jobs sem perda de função.
+
+## Estado validado em 2026-06-17
+
+- commit do serviço no deploy: `d3e9de20`
+- deploy action do EasyPanel: concluída com sucesso
+- task do Swarm: `actual=1`, `desired=1`
+- container observado como `running`
+- comando efetivo do container:
+  - `/bin/bash /app/server/bin/manaloom_ops_entrypoint.sh`
