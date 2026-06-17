@@ -1163,7 +1163,11 @@ movimento errado neste momento.
    `/ai/commander-learning`, para learned deck nao contaminar scorecards errados.
 7. Reordenar/parametrizar o builder de deck para depender mais de
    stats/corpus/usage antes do fallback literal Lorehold. O slice 2026-06-17 ja
-   ampliou `usage_hot_cards` para 50 e reduziu `fallback_only` para 2 cartas.
+   ampliou `usage_hot_cards` para 50, zerou `fallback_only`, mas o auditor
+   canônico de source-mix mostrou que ainda restam `42` cartas tocadas por
+   `deterministic_fallback`, divididas em buckets mais honestos:
+   `learned+fallback=2`, `fallback sem profile/stats=9` e
+   `fallback+profile/stats sem suporte empírico=18`.
 8. Adicionar explainability backend-owned por carta gerada.
 9. So depois considerar nova rodada forte de learned deck promotion.
 
