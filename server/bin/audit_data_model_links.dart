@@ -604,13 +604,19 @@ List<Map<String, String>> _recommendations(
     final direct =
         fanout['direct_deck_cards_to_card_battle_rules_fanout_potential'];
     if (direct is Map && _toInt(direct['extra_rows']) > 0) {
+      final snapshot = fanout['deck_cards_to_card_intelligence_snapshot'];
+      final snapshotIsClean =
+          snapshot is Map && _toInt(snapshot['extra_rows']) == 0;
       recs.add({
         'priority': 'P0',
-        'title': 'Keep battle-rule joins behind card_intelligence_snapshot',
+        'title': snapshotIsClean
+            ? 'Maintain card_intelligence_snapshot anti-fanout guardrail'
+            : 'Route battle-rule joins behind card_intelligence_snapshot',
         'reason':
             'Direct joins from deck_cards to card_battle_rules multiply deck rows.',
-        'action':
-            'Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.',
+        'action': snapshotIsClean
+            ? 'Keep product consumers on card_intelligence_snapshot or equivalent per-card aggregation; do not replace this with direct deck_cards -> card_battle_rules joins.'
+            : 'Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.',
       });
     }
   }
@@ -797,7 +803,8 @@ Directory _findRepoRoot(Directory start) {
 
 Future<void> _writeFile(Directory repoRoot, String path, String content) async {
   final rootPath = repoRoot.absolute.path;
-  final file = File(path.startsWith('/') ? path : '$rootPath/$path').absolute;
+  final cwd = Directory.current.absolute.path;
+  final file = File(path.startsWith('/') ? path : '$cwd/$path').absolute;
   if (!file.path.startsWith('$rootPath/')) {
     throw ArgumentError('Output path must stay inside repo: $path');
   }
@@ -846,11 +853,22 @@ class _AuditOptions {
     var skipDb = false;
     var requireDb = false;
 
-    for (final arg in args) {
+    for (var i = 0; i < args.length; i += 1) {
+      final arg = args[i];
       if (arg.startsWith('--json-output=')) {
         jsonOutput = arg.substring('--json-output='.length);
+      } else if (arg == '--json-output') {
+        if (i + 1 >= args.length) {
+          throw ArgumentError('--json-output requires a path');
+        }
+        jsonOutput = args[++i];
       } else if (arg.startsWith('--markdown-output=')) {
         markdownOutput = arg.substring('--markdown-output='.length);
+      } else if (arg == '--markdown-output') {
+        if (i + 1 >= args.length) {
+          throw ArgumentError('--markdown-output requires a path');
+        }
+        markdownOutput = args[++i];
       } else if (arg == '--skip-db') {
         skipDb = true;
       } else if (arg == '--require-db') {
@@ -860,10 +878,12 @@ class _AuditOptions {
 Usage: dart run bin/audit_data_model_links.dart [options]
 
 Options:
-  --json-output=<path>       Write full machine-readable audit.
-  --markdown-output=<path>   Write human-readable report.
+  --json-output[=] <path>       Write full machine-readable audit.
+  --markdown-output[=] <path>   Write human-readable report.
   --skip-db                  Skip PostgreSQL validation.
   --require-db               Fail if DB env vars or connection are unavailable.
+
+Relative output paths resolve from the current working directory.
 ''');
         exit(0);
       }

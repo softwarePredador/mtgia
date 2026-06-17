@@ -94,8 +94,17 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     throw const OptimizeDeckContextException('DECK_FORMAT_MISSING');
   }
 
-  final semanticV2Select = await _semanticV2SelectSql(pool);
-  final functionalTagsSelect = await _functionalTagsSelectSql(pool);
+  final hasCardIntelligenceSnapshot =
+      await _hasTable(pool, 'card_intelligence_snapshot');
+  final cardSourceJoin = hasCardIntelligenceSnapshot
+      ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+      : 'JOIN cards c ON c.id = dc.card_id';
+  final semanticV2Select = hasCardIntelligenceSnapshot
+      ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+      : await _semanticV2SelectSql(pool);
+  final functionalTagsSelect = hasCardIntelligenceSnapshot
+      ? 'c.function_tag_details AS functional_tags'
+      : await _functionalTagsSelectSql(pool);
   final cardsResult = await (telemetry?.trackAsync(
         'deck_context.cards_query',
         () => pool.execute(
@@ -118,7 +127,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              $semanticV2Select,
              $functionalTagsSelect
       FROM deck_cards dc 
-      JOIN cards c ON c.id = dc.card_id 
+      $cardSourceJoin
       WHERE dc.deck_id = @id
     '''),
           parameters: {'id': deckId},
@@ -144,7 +153,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              $semanticV2Select,
              $functionalTagsSelect
       FROM deck_cards dc 
-      JOIN cards c ON c.id = dc.card_id 
+      $cardSourceJoin
       WHERE dc.deck_id = @id
     '''),
         parameters: {'id': deckId},

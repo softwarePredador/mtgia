@@ -108,6 +108,25 @@ void main() {
       expect(aiAnalysis, contains('JOIN cards c ON c.id = dc.card_id'));
     });
 
+    test('deck analysis uses card intelligence snapshot when available', () {
+      final analysis = File(
+        'routes/decks/[id]/analysis/index.dart',
+      ).readAsStringSync();
+
+      expect(analysis, contains('card_intelligence_snapshot'));
+      expect(analysis, contains('function_tag_details'));
+      expect(analysis, contains('semantic_tags_v2'));
+      expect(analysis, contains('JOIN cards c ON dc.card_id = c.id'));
+      expect(
+        analysis,
+        isNot(contains('LEFT JOIN card_function_tags')),
+      );
+      expect(
+        analysis,
+        isNot(contains('LEFT JOIN card_semantic_tags_v2')),
+      );
+    });
+
     test('weakness-analysis recommendations use DB lookup over fixed staples',
         () {
       final weakness = File(

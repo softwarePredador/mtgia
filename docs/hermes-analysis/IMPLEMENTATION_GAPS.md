@@ -922,9 +922,13 @@ Concluído no Slice 5 backend snapshot:
     A bridge é garantida junto de `card_localized_names`, sem substituir ainda
     todos os consumidores históricos.
 20. Migrar consumidores seguros para `card_intelligence_snapshot` com fallback:
-    `POST /decks/:id/ai-analysis`,
+    `GET /decks/:id/analysis`, `POST /decks/:id/ai-analysis`,
     `POST /decks/:id/recommendations` e
-    `POST /ai/weakness-analysis`.
+    `POST /ai/weakness-analysis`. Em 2026-06-17,
+    `/decks/:id/analysis` foi alinhada ao mesmo padrão: quando a view existe,
+    lê `function_tag_details` e `semantic_tags_v2` já agregados; quando não
+    existe, mantém fallback por subquery `jsonb_agg` por `card_id`, sem
+    multiplicar linhas de `deck_cards`.
 21. Validar SQL real das duas views em PostgreSQL com transação rollback:
     `card_identity_bridge=305.905` aliases/identidades e
     `card_intelligence_snapshot=34.329` cartas.
@@ -1024,11 +1028,23 @@ Concluido no Slice 10 commander learning safe summary/runtime adoption:
    deixaram de expor `metadata` bruto do Hermes. Metadata segue disponível
    internamente para `role_summary`/contagens, mas usuários normais recebem
    apenas campos agregados seguros.
+21.16. Revalidação local em 2026-06-17 contra
+   `origin/codex/hermes-analysis-docs@b53295fe` confirmou que os achados
+   estruturais Hermes sobre `deck_rebuild_created`, contrato
+   `/ai/commander-learning` e middleware de IA já estão resolvidos no `master`.
+   A mesma triagem marcou como stale os achados de knowledge synthesis sobre
+   Underworld Breach, tapped lands no goldfish, `functional_tags` persistidas no
+   classificador principal, sinal EDHREC e value engines: todos possuem código
+   ou teste vivo no backend atual. Não reabrir esses itens sem nova evidência
+   de regressão em `master`.
 
-22. Fazer loaders profundos do `optimize` lerem `card_intelligence_snapshot`
-    quando isso reduzir duplicação ou inconsistência. O sync Hermes
-    `sync_pg_target_deck_to_hermes.py` já prefere `card_intelligence_snapshot`
-    quando a view existe e mantém fallback CTE agregado para bancos antigos.
+22. `loadOptimizeDeckContext` passou a preferir `card_intelligence_snapshot`
+    quando a view existe, preservando fallback por subquery agregada para bancos
+    antigos. Isso remove duplicação de leitura de `card_function_tags` e
+    `card_semantic_tags_v2` no contexto que alimenta optimize/quality gate. O
+    sync Hermes `sync_pg_target_deck_to_hermes.py` já prefere
+    `card_intelligence_snapshot` quando a view existe e mantém fallback CTE
+    agregado para bancos antigos.
 23. Adotar `commander_learning_snapshot` em futuros loaders profundos de
     aprendizado/diagnóstico em vez de remontar `commander_learned_decks`,
     `commander_card_usage` e `commander_card_synergy` manualmente. Qualquer

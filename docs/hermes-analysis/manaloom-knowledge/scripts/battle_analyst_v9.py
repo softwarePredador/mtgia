@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Lorehold Battle Analyst v8 — Interactive Commander Simulator
+Lorehold Battle Analyst v9 — Interactive Commander Simulator
 Fase A: Priority, Stack, Instant/Sorcery Timing
 + Fase B: Miracle (Lorehold core mechanic)
 + Fase C: SBAs, Boros Charm modal, Double Strike fix, Indestructible per-creature
@@ -10046,7 +10046,7 @@ def main(argv=None):
         set_engine_metrics(EngineMetrics())
 
     print("=" * 60)
-    print("BATTLE ANALYST v8 — Interactive Commander (Priority + Stack + Miracle)")
+    print("BATTLE ANALYST v9 — Interactive Commander (Priority + Stack + Miracle)")
     print("=" * 60)
 
     commander, deck, construction_report = load_deck_with_construction_report()
@@ -10061,7 +10061,7 @@ def main(argv=None):
     print(f"Deck: 1+99 | L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}")
     if not construction_report["is_valid"]:
         print("Deck construction warnings: " + ", ".join(construction_report["issues"]))
-    print(f"v8: Priority, Stack, Instant/Sorcery Timing, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste")
+    print("v9: Priority, Stack, Instant/Sorcery Timing, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste")
 
     # Check for learned decks first
     learned = load_learned_opponents()
@@ -10122,12 +10122,12 @@ def main(argv=None):
 
     total_g = GAMES * len(opponent_sources)
     avg_wr = total_wins / total_g * 100
-    print(f"\n  OVERALL v8: WR={avg_wr:.1f}% ({total_wins}W/{total_losses}L/{total_stalls}S)")
+    print(f"\n  OVERALL v9: WR={avg_wr:.1f}% ({total_wins}W/{total_losses}L/{total_stalls}S)")
 
     os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with open(LOG_PATH, "a") as f:
-        f.write(f"\n## [{ts}] Battle Analyst v8 — Interactive Commander\n")
+        f.write(f"\n## [{ts}] Battle Analyst v9 — Interactive Commander\n")
         f.write(f"Games: {GAMES} 4-player | Deck: L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}\n")
         f.write(f"Opponents: {len(opponent_sources)} ({opponent_kind})\n\n")
         f.write(f"| Opponent | WR | Wins | Losses | Stalls | Avg T | Reasons |\n")
