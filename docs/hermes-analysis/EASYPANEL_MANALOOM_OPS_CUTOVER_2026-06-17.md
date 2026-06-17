@@ -11,6 +11,7 @@ Escopo atual do cutover:
 - `auto_sync_learned_decks`
 - `auto_promote_learned_decks`
 - `master_optimizer_preflight`
+- `manaloom_knowledge_import`
 - `hermes_mana_base_validator`
 - `hermes_cron_governor_report`
 
@@ -73,6 +74,7 @@ Isso não deve virar serviço de produção.
 - `server/bin/auto_sync_learned_decks.sh`
 - `server/bin/auto_promote_learned_decks.sh`
 - `server/bin/master_optimizer_preflight.sh`
+- `server/bin/manaloom_knowledge_import.sh`
 - `server/bin/hermes_mana_base_validator.sh`
 - `server/bin/hermes_cron_governor_report.sh`
 
@@ -101,6 +103,8 @@ Usar o mesmo `server/.env` do ManaLoom como base e acrescentar no serviço:
 - `PULL_LEARNING_EVENTS_CRON=0 * * * *`
 - `AUTO_SYNC_LEARNED_DECKS_CRON=0 */2 * * *`
 - `MASTER_OPTIMIZER_PREFLIGHT_CRON=15 * * * *`
+- `MANALOOM_KNOWLEDGE_IMPORT_CRON=20 */12 * * *`
+- `MANALOOM_IMPORT_APPLY=1`
 - `MANALOOM_RUN_PREFLIGHT_ON_BOOT=0`
 
 Opcional:
@@ -176,6 +180,7 @@ O daemon faz polling de minuto e avalia expressões cron simples em runtime:
 - `auto_sync_learned_decks`: `0 */2 * * *`
 - `auto_promote_learned_decks`: `30 */6 * * *`
 - `master_optimizer_preflight`: `15 * * * *`
+- `manaloom_knowledge_import`: `20 */12 * * *`
 - `hermes_mana_base_validator`: `45 */6 * * *`
 - `hermes_cron_governor_report`: `0 */12 * * *`
 

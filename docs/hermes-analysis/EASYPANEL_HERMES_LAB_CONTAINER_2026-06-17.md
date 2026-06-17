@@ -152,7 +152,6 @@ Pausada por bootstrap para evitar gasto improdutivo:
 
 - `manaloom-hermes-normal-audit`
 - `manaloom-hermes-weekly-parallel-audit`
-- `manaloom-knowledge-import`
 - `manaloom-tag-accuracy-reporter`
 - `manaloom-code-structure-auditor`
 - `manaloom-logic-coherence-auditor`
@@ -161,6 +160,15 @@ Pausada por bootstrap para evitar gasto improdutivo:
 
 Removida por bootstrap por ser legado ou duplicação já aposentada:
 
+- `manaloom-master-watchdog`
+- `manaloom-pull-learning-events`
+- `lorehold-knowncards-validator`
+- `manaloom-master-optimizer-preflight`
+- `manaloom-knowledge-import`
+- `manaloom-auto-sync-learned-decks`
+- `manaloom-auto-promote-learned`
+- `manaloom-mana-base-validator`
+- `manaloom-cron-governor-report`
 - `manaloom-manager-watchdog`
 - `manaloom-flutter-ui-auditor`
 - `manaloom-master-optimizer-loop`

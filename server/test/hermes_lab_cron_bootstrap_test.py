@@ -149,6 +149,12 @@ class HermesLabCronBootstrapTest(unittest.TestCase):
                             "state": "active",
                         },
                         {
+                            "id": "legacy-2",
+                            "name": "lorehold-knowncards-validator",
+                            "enabled": True,
+                            "state": "active",
+                        },
+                        {
                             "id": "pause-1",
                             "name": "manaloom-logic-coherence-auditor",
                             "enabled": True,
@@ -196,6 +202,7 @@ class HermesLabCronBootstrapTest(unittest.TestCase):
 
             commands = [json.loads(line)["argv"] for line in fake_log.read_text().splitlines()]
             self.assertIn(["cron", "remove", "legacy-1"], commands)
+            self.assertIn(["cron", "remove", "legacy-2"], commands)
             self.assertIn(["cron", "pause", "pause-1"], commands)
             self.assertIn(["cron", "remove", "rules-old"], commands)
             create_names = []

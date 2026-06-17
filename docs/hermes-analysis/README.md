@@ -138,6 +138,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Contrato operacional do worker deterministico `manaloom-ops`.
   - Use para conferir cadencias reais, volume persistente e ordem de cutover.
 
+- `EASYPANEL_AWS_RETIREMENT_CRON_MATRIX_2026-06-17.md`
+  - Matriz final cron por cron para desligar a AWS sem manter duplicidade.
+  - Use para decidir o que fica em `manaloom-ops`, o que continua em
+    `hermes-lab` e o que deve ser definitivamente removido.
+
 - `BATTLE_AUDIT_COVERAGE_STATUS_2026-06-16.md`
   - Status pos-correcao da auditoria de battle: 16 seeds, 17069 eventos,
     2301 decision traces, 0 high/critical, 0 strategy blockers e apenas

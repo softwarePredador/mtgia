@@ -213,6 +213,8 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "AUTO_SYNC_LEARNED_DECKS_CRON": "0 */2 * * *",
             "AUTO_PROMOTE_LEARNED_DECKS_CRON": "30 */6 * * *",
             "MASTER_OPTIMIZER_PREFLIGHT_CRON": "15 * * * *",
+            "MANALOOM_KNOWLEDGE_IMPORT_CRON": "20 */12 * * *",
+            "MANALOOM_IMPORT_APPLY": "1",
             "HERMES_MANA_BASE_VALIDATOR_CRON": "45 */6 * * *",
             "HERMES_CRON_GOVERNOR_REPORT_CRON": "0 */12 * * *",
         }

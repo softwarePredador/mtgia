@@ -70,6 +70,9 @@ def _base_env() -> dict[str, str]:
             "HERMES_CRON_GOVERNOR_REPORT": str(
                 ARTIFACT_DIR / "hermes_cron_governor/latest_cron_governor_report.md"
             ),
+            "MANALOOM_KNOWLEDGE_IMPORT_ARTIFACT_DIR": str(
+                ARTIFACT_DIR / "knowledge_import"
+            ),
             "MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR": str(
                 ARTIFACT_DIR / "master_optimizer_preflight"
             ),
@@ -122,6 +125,13 @@ JOBS = [
         lockfile=LOCK_DIR / "master_optimizer_preflight.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/master_optimizer_preflight.sh',
         script_name="master_optimizer_preflight.sh",
+    ),
+    Job(
+        name="manaloom_knowledge_import",
+        schedule=os.environ.get("MANALOOM_KNOWLEDGE_IMPORT_CRON", "20 */12 * * *"),
+        lockfile=LOCK_DIR / "manaloom_knowledge_import.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/manaloom_knowledge_import.sh',
+        script_name="manaloom_knowledge_import.sh",
     ),
     Job(
         name="hermes_mana_base_validator",
