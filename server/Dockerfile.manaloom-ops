@@ -1,6 +1,6 @@
 FROM dart:stable
 
-WORKDIR /app
+WORKDIR /app/server
 
 ENV PATH="$PATH:/root/.pub-cache/bin"
 
@@ -14,10 +14,10 @@ RUN apt-get update \
     util-linux \
   && rm -rf /var/lib/apt/lists/*
 
-COPY pubspec.yaml ./
+COPY server/pubspec.yaml ./pubspec.yaml
 RUN dart pub get
 
-COPY . .
+COPY . /app
 
 RUN chmod +x \
   /app/server/bin/pull_learning_events.sh \
