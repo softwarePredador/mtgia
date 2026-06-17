@@ -45,6 +45,10 @@ FORBIDDEN_LEGACY_ENGINES = {
 
 FORBIDDEN_LEGACY_PATCHER_DIR = REPO_ROOT / "server" / "bin" / "legacy" / "hermes_battle_patchers"
 
+FORBIDDEN_SERVER_PATCHERS = {
+    REPO_ROOT / "server" / "bin" / "patch_slot_optimizer.py",
+}
+
 FORBIDDEN_ONE_SHOT_RULE_PATCHERS = {
     SCRIPT_DIR / "_mulligan_exec15.py",
     SCRIPT_DIR / "_prepend_mulligan.py",
@@ -150,6 +154,11 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
 
     def test_legacy_battle_engines_and_patchers_are_not_restored(self) -> None:
         restored = [repo_rel(path) for path in sorted(FORBIDDEN_LEGACY_ENGINES) if path.exists()]
+        restored += [
+            repo_rel(path)
+            for path in sorted(FORBIDDEN_SERVER_PATCHERS)
+            if path.exists()
+        ]
         restored += [
             repo_rel(path)
             for path in sorted(FORBIDDEN_ONE_SHOT_RULE_PATCHERS)

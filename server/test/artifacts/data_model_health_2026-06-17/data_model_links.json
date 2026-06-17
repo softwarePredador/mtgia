@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-06-17T02:11:45.207758Z",
+  "generated_at": "2026-06-17T02:45:23.193032Z",
   "repo_root": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia",
   "git": {
-    "head": "6cc6d19f82f0d591dd26beab1cc56cfc64738332",
+    "head": "b6e3cd2da4ed4ea29ab14828faa28092cdfd43dc",
     "branch": "master",
-    "status_short": "M docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md\n M docs/hermes-analysis/IMPLEMENTATION_GAPS.md\n M docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py\n M server/bin/audit_data_model_links.dart\n M server/lib/ai/optimize_request_support.dart\n M server/routes/decks/[id]/analysis/index.dart\n M server/test/ai_optimize_authorization_source_test.dart\n M server/test/experimental_deck_ai_authorization_source_test.dart\n?? server/test/artifacts/data_model_health_2026-06-17/"
+    "status_short": "M docs/hermes-analysis/IMPLEMENTATION_GAPS.md\n M docs/hermes-analysis/manaloom-knowledge/scripts/test_known_cards_consumer_guardrail.py\n D server/bin/patch_slot_optimizer.py"
   },
   "static": {
     "table_count": 81,
@@ -289,8 +289,7 @@
           "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
           "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
           "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
-          "server/bin/patch_slot_optimizer.py"
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
         ],
         "write_files": [
           "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
@@ -298,7 +297,7 @@
           "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
           "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py"
         ],
-        "all_reference_count": 10,
+        "all_reference_count": 9,
         "has_runtime_read": false,
         "has_runtime_write": false,
         "hermes_files": [

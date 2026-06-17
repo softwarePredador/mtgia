@@ -1172,6 +1172,14 @@ com sinal EDHREC e planejou `54417` role scores sem mutacao. Evidencia:
 | P2 | Lorehold no-mox é política manual, não heurística universal | Learned deck 82 remove `Chrome Mox`, `Mox Diamond`, `Mox Opal` por decisão do produto | Não generalizar bloqueio de Mox para todos os comandantes/brackets sem regra explícita |
 | P2 | Decisões de produto base aprovadas; exceções ainda precisam validação | `BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` registra os defaults aprovados em 2026-06-11 | Seguir Slice 1; qualquer mudança fora dos defaults exige nova validação |
 
+Atualizacao 2026-06-17: o patcher textual `server/bin/patch_slot_optimizer.py`
+foi removido do tree operacional. Ele editava `slot_optimizer.py` por caminho
+absoluto em `/opt/data/...`, recriava backup local e aplicava `replace` textual
+fora do fluxo de testes. A funcao equivalente hoje pertence ao codigo versionado
+de `slot_optimizer.py` + `known_cards_fallback_snapshot.py` + `battle_card_rules`.
+`test_known_cards_consumer_guardrail.py` passou a falhar se esse patcher voltar,
+mantendo a regra de nao corrigir runtime por script solto.
+
 Atualização 2026-06-11: Slice 1 foi implementado localmente em
 `sync_pg_target_deck_to_hermes.py`. O sync agora exige `card_id`, agrega
 `functional_tags_json`, `semantic_tags_v2_json` e `battle_rules_json`, grava
