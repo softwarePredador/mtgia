@@ -5584,13 +5584,18 @@
     "battle_rule_version": 1
   },
   "Dismember": {
+    "battle_model_scope": "stat_modifier_removal_until_eot_v1",
     "cmc": 3.0,
-    "count": 1,
-    "effect": "draw_cards",
+    "effect": "remove_creature",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_confidence": 0.55,
+    "mana_cost": "{1}{B/P}{B/P}",
+    "power_boost": -5,
+    "target": "creature",
+    "toughness_boost": -5,
+    "uses_stat_modifier_removal": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_confidence": 0.98,
     "battle_rule_version": 1
   },
   "Dispatch": {

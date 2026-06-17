@@ -103,6 +103,7 @@ Verificadas após cada spell resolver:
 | Boros Charm modal | Escolhe indestructible ou double strike por contexto |
 | Double Strike | 2x dano total (corrigido de implementações anteriores) |
 | Indestructible per-creature | Board wipe respeita indestructible individual |
+| Toughness <= 0 SBA | Criatura morre mesmo se for indestrutivel; indestrutivel so impede destruicao/dano letal |
 | Lifelink | Ganho de vida ao causar dano |
 | Haste | Lorehold não tem summoning sickness |
 | Counterspells | Oponentes podem counterar spells com threat_score alto |
@@ -244,6 +245,13 @@ Uso correto:
   os jogadores vivos no modelo `multiplayer_discard_draw_v1` e registra refill
   risk/payoff. Ainda falta corpus maior, hand-quality e payoff-denial mais
   completo antes de usar como heuristica final de aprendizado.
+- Em 2026-06-17, `Dismember` foi promovido para
+  `curated/verified` como `stat_modifier_removal_until_eot_v1`
+  (`-5/-5` ate o fim do turno, custo `{1}{B/P}{B/P}`), e o SBA foi corrigido
+  para matar criaturas com resistencia `<= 0` mesmo se tiverem
+  indestrutivel. A rodada local de 2 seeds `20260617_005901` fechou com
+  `action_findings=0` e `strategy_findings=0`; o low anterior
+  `review_rule_used` de `Dismember` desapareceu.
 - Forums/artigos de estrategia podem calibrar heuristicas; comportamento duro
   continua exigindo regra oficial, replay e teste focado.
 

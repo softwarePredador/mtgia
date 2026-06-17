@@ -315,7 +315,7 @@ def check_sbas(
                 continue
             toughness = card.get("toughness", 1)
             damage = card.get("damage_marked", 0)
-            if (toughness <= 0 or damage >= toughness) and not card.get("indestructible"):
+            if toughness <= 0 or (damage >= toughness and not card.get("indestructible")):
                 move_creature_from_battlefield(player_obj, card, "sba_lethal", None, all_players)
                 return True
 

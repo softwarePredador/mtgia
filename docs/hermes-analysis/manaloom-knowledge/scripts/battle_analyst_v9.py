@@ -8057,6 +8057,38 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     return
                 if effect_data.get("target_controller_gains_life"):
                     gain_life(opp, int(effect_data.get("target_controller_gains_life") or 0))
+                if effect_data.get("uses_stat_modifier_removal"):
+                    try:
+                        power_delta = int(effect_data.get("power_boost") or 0)
+                    except Exception:
+                        power_delta = 0
+                    try:
+                        toughness_delta = int(effect_data.get("toughness_boost") or 0)
+                    except Exception:
+                        toughness_delta = 0
+                    remember_until_eot(t, "power")
+                    remember_until_eot(t, "toughness")
+                    t["power"] = int(t.get("power") or 0) + power_delta
+                    t["toughness"] = int(t.get("toughness") or 0) + toughness_delta
+                    emit_replay_event(
+                        "removal_resolved",
+                        player=player.name,
+                        card=card.get("name", "?"),
+                        target_player=opp.name,
+                        target=t.get("name", "?"),
+                        target_effect=get_card_effect(t).get("effect", t.get("effect")),
+                        target_power=t.get("power"),
+                        target_toughness=t.get("toughness"),
+                        target_is_creature=is_battlefield_creature(t),
+                        target_type_line=t.get("type_line", ""),
+                        available_targets=len(targets),
+                        result="stat_modifier_until_eot_applied",
+                        power_delta=power_delta,
+                        toughness_delta=toughness_delta,
+                        turn=turn,
+                        **decision,
+                    )
+                    break
                 emit_replay_event(
                     "removal_resolved",
                     player=player.name,

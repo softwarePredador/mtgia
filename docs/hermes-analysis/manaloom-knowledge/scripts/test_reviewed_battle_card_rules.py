@@ -38,6 +38,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
 
         self.assertIn("Angel's Grace", by_name)
         self.assertIn("Chromatic Star", by_name)
+        self.assertIn("Dismember", by_name)
         self.assertIn("Natural Order", by_name)
         self.assertEqual(by_name["Angel's Grace"]["source"], "curated")
         self.assertEqual(by_name["Angel's Grace"]["review_status"], "verified")
@@ -47,6 +48,12 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Chromatic Star"]["effect_json"]["effect"],
             "cantrip_mana_filter_artifact",
         )
+        self.assertEqual(by_name["Dismember"]["source"], "curated")
+        self.assertEqual(by_name["Dismember"]["review_status"], "verified")
+        self.assertEqual(by_name["Dismember"]["effect_json"]["effect"], "remove_creature")
+        self.assertEqual(by_name["Dismember"]["effect_json"]["target"], "creature")
+        self.assertEqual(by_name["Dismember"]["effect_json"]["toughness_boost"], -5)
+        self.assertTrue(by_name["Dismember"]["effect_json"]["uses_stat_modifier_removal"])
         self.assertEqual(by_name["Natural Order"]["source"], "curated")
         self.assertEqual(by_name["Natural Order"]["review_status"], "verified")
         self.assertEqual(by_name["Natural Order"]["effect_json"]["effect"], "tutor")
@@ -73,6 +80,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Chromatic Star"]["effect_json"]["effect"],
             "cantrip_mana_filter_artifact",
         )
+        self.assertEqual(by_name["Dismember"]["source"], "curated")
+        self.assertEqual(by_name["Dismember"]["effect_json"]["effect"], "remove_creature")
+        self.assertTrue(by_name["Dismember"]["effect_json"]["uses_stat_modifier_removal"])
         self.assertEqual(by_name["Natural Order"]["source"], "curated")
         self.assertEqual(by_name["Natural Order"]["effect_json"]["effect"], "tutor")
         self.assertEqual(
@@ -112,6 +122,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                 natural_order = battle.get_card_effect(
                     {"name": "Natural Order", "type_line": "Sorcery"}
                 )
+                dismember = battle.get_card_effect(
+                    {"name": "Dismember", "type_line": "Instant", "mana_cost": "{1}{B/P}{B/P}"}
+                )
             finally:
                 battle.DB = old_db
                 battle.battle_rule_registry._RULE_CACHE.clear()
@@ -128,6 +141,11 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(natural_order["effect"], "tutor")
         self.assertEqual(natural_order["target"], "green_creature_to_battlefield")
         self.assertTrue(natural_order["requires_sacrifice_green_creature"])
+        self.assertEqual(dismember["_rule_source"], "curated")
+        self.assertEqual(dismember["_rule_review_status"], "verified")
+        self.assertEqual(dismember["effect"], "remove_creature")
+        self.assertEqual(dismember["toughness_boost"], -5)
+        self.assertTrue(dismember["uses_stat_modifier_removal"])
 
 
 if __name__ == "__main__":

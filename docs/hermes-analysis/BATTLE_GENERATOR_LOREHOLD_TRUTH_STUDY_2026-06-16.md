@@ -113,6 +113,9 @@ Tambem ha validacao operacional recente em
 - mais de 2300 decision traces;
 - 0 blockers estrategicos na amostra reproduzida;
 - apenas findings low de `review_rule_used`.
+- Em 2026-06-17, uma rodada curta de controle com 2 seeds apos promover
+  `Dismember` e corrigir SBA de resistencia `<= 0` fechou com
+  `action_findings=0`, `strategy_findings=0` e `mulligan=coherent_in_sample`.
 
 Conclusao:
 
@@ -218,6 +221,15 @@ Casos de amostra validados no runtime atual:
   `battle_model_scope=green_creature_pod_tutor_v1`; o runtime local tambem
   passou a pagar o custo adicional no cast e a bloquear o cast quando nao
   houver criatura verde sacrificavel.
+- `Dismember` resolve agora como `curated/verified` com
+  `effect=remove_creature`,
+  `uses_stat_modifier_removal=true`,
+  `power_boost=-5`,
+  `toughness_boost=-5`,
+  `mana_cost={1}{B/P}{B/P}` e
+  `battle_model_scope=stat_modifier_removal_until_eot_v1`; o runtime local
+  aplica o modificador em vez de destruir diretamente, e o SBA remove criatura
+  com resistencia `<= 0` mesmo se for indestrutivel.
 
 Implicacao correta:
 
@@ -879,7 +891,8 @@ movimento errado neste momento.
 2. Fechar cartas recorrentes de oponente com `review_rule_used`.
    - Prioridade atual observada:
      `Ashnod's Altar`, `Incubation Druid` e qualquer outra que voltar a aparecer
-     no audit low recorrente.
+     no audit low recorrente. `Dismember` foi fechado em 2026-06-17 e nao deve
+     voltar como `needs_review` quando o cache/snapshot estiver sincronizado.
    - Ganho: reduzir ruido de battle coverage.
 
 3. Evoluir `decision_trace_v1` para decisao comparativa.

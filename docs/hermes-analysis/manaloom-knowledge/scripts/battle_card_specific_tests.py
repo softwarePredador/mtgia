@@ -1752,6 +1752,55 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        target = {
+            "name": "Indestructible Threat",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 5,
+            "toughness": 5,
+            "indestructible": True,
+        }
+        opponent.battlefield = [target]
+        dismember = {
+            "name": "Dismember",
+            "cmc": 3,
+            "type_line": "Instant",
+            "mana_cost": "{1}{B/P}{B/P}",
+            "effect": "remove_creature",
+            "target": "creature",
+            "instant": True,
+            "power_boost": -5,
+            "toughness_boost": -5,
+            "uses_stat_modifier_removal": True,
+            "_rule_source": "curated",
+            "_rule_review_status": "verified",
+        }
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            dismember,
+            turn=3,
+            rng=random.Random(108),
+        )
+        battle.check_sbas_until_stable([active, opponent])
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert target not in opponent.battlefield
+        assert target in opponent.graveyard
+        assert any(
+            event == "removal_resolved"
+            and data.get("card") == "Dismember"
+            and data.get("result") == "stat_modifier_until_eot_applied"
+            and data.get("toughness_delta") == -5
+            for event, data in events
+        )
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -1799,4 +1848,5 @@ def register_tests(battle, player):
         test_angels_grace_blocks_opponent_approach_win_this_turn,
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
+        test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
     ]

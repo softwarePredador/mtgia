@@ -41,6 +41,29 @@
     "review_status": "active",
     "notes": "Reviewed generic battle model. Official card is a mana-filtering artifact that cantrips when put into a graveyard from the battlefield. Runtime now models it as a sacrifice-to-filter-and-draw utility artifact, but still does not implement full mana-ability timing or every combo edge case."
   },
+  "Dismember": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "remove_creature",
+      "target": "creature",
+      "instant": true,
+      "mana_cost": "{1}{B/P}{B/P}",
+      "power_boost": -5,
+      "toughness_boost": -5,
+      "uses_stat_modifier_removal": true,
+      "battle_model_scope": "stat_modifier_removal_until_eot_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_creature",
+      "target": "creature",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall API: cost is {1}{B/P}{B/P}; target creature gets -5/-5 until end of turn. Runtime models this as a stat modifier, not destroy/exile."
+  },
   "Natural Order": {
     "effect_json": {
       "cmc": 4.0,
