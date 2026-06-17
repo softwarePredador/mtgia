@@ -4,9 +4,172 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-17 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-17 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib` - revalidacao 2026-06-17 23:00 UTC
+
+Escopo desta rodada: somente coerencia de contratos, ownership, middleware e
+consumo entre `app/lib`, `server/routes` e `server/lib`. Nao foi executada
+auditoria ampla de classes sem uso, funcoes sem chamador, imports/ciclos,
+tabelas PostgreSQL sem uso ou duplicacao geral.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `831c6ac8`.
+- `git diff --name-status 5ce943fa..HEAD -- app/lib server/lib server/routes server/bin server/database_setup.sql server/test app/test app/integration_test server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/CONTEXTO_PRODUTO_ATUAL.md server/manual-de-instrucao.md docs/hermes-analysis/manaloom-knowledge/scripts`:
+  sem saida. Desde a ultima rodada de coerencia (`5ce943fa`), nao houve delta de
+  produto, testes, API contract, contexto, manual ou scripts Hermes no recorte
+  usado para classificar este foco.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar reabrir claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante para
+esta rodada e tratar Hermes como laboratorio/cache/auditor e validar achados
+contra codigo/backend atual.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib` nem entende contrato app-facing, ownership ou middleware.
+- A execucao voltou a tentar reinserir o inventario gerado por causa do marcador
+  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  foi descartada antes desta atualizacao, mantendo apenas os numeros acima e a
+  triagem focada abaixo.
+
+### Metodo manual focado
+
+- Buscas executadas:
+  - `rg -n "deck_rebuild_created|_allowedEvents|activation-events" app/lib app/test server/routes server/test --glob '*.dart'`.
+  - `rg -n "/ai/commander-learning|commander_learned_decks|fetchCommanderLearning|CommanderLearning|commanderLearning|learned decks|learned_deck" app/lib server/routes server/lib server/test app/test server/doc/API_CONTRACTS_AND_DATA_MAP.md --glob '*.dart' --glob '*.md'`.
+  - `rg -n "OpenAI|openai|Scryfall|MTGTop8|EDHREC|package:http|http|client" server/routes/ai/commander-learning/index.dart`.
+  - `rg -n "/ai/commander-learning|commander_learned_decks" server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+  - `dart analyze routes/ai/commander-learning/index.dart routes/users/me/activation-events/index.dart routes/ai/_middleware.dart`.
+- O analyze focado retornou `No issues found!`.
+- A busca por chamada externa no handler de `commander-learning` encontrou
+  apenas o import local de `http_responses.dart`.
+- A busca literal no API contract por `/ai/commander-learning` ou
+  `commander_learned_decks` nao retornou saida.
+
+### Achados revalidados
+
+#### P1/P2 - `deck_rebuild_created` continua emitido/testado no app, mas rejeitado pela rota de activation events
+
+- **Emissao app:** `app/lib/features/decks/providers/deck_provider.dart:603`-`:614`
+  chama `_trackActivationEvent('deck_rebuild_created', ...)` quando
+  `rebuildDeck` cria `draftDeckId`.
+- **Teste app:** `app/test/features/decks/providers/deck_provider_test.dart:888`-`:891`
+  espera que o provider registre `deck_rebuild_created`.
+- **Allow-list backend:** `server/routes/users/me/activation-events/index.dart:10`-`:18`
+  lista eventos aceitos e nao inclui `deck_rebuild_created`.
+- **Rejeicao backend:** `server/routes/users/me/activation-events/index.dart:42`-`:48`
+  retorna `event_name invalido` quando o evento nao esta na allow-list.
+- **Por que e incoerente:** o app trata rebuild guiado como evento de ativacao,
+  mas a rota app-facing que recebe esses eventos descarta esse nome. Como o
+  servico de telemetria do app e nao-bloqueante, a falha pode sumir sem sinal
+  visivel para o usuario.
+- **O que valida:** adicionar `deck_rebuild_created` a `_allowedEvents` com teste
+  backend de rota, ou remover a emissao/teste app caso rebuild nao faca parte do
+  funil de ativacao.
+- **O que falsifica:** contrato ou teste backend existente que prove status 201
+  para `deck_rebuild_created`, ou ausencia de emissao app.
+
+#### P1/P2 - `GET /ai/commander-learning` segue app-facing, mas ausente do API contract map
+
+- **Consumidores app:** `app/lib/features/decks/screens/deck_generate_screen.dart:127`-`:143`
+  carrega disponibilidade inicial de learned decks; `:256`-`:264` busca um deck
+  aprendido especifico. O provider chama
+  `GET /ai/commander-learning?commander=...` em
+  `app/lib/features/decks/providers/deck_provider.dart:778`-`:801` e
+  `GET /ai/commander-learning` em `:804`-`:824`.
+- **Testes app:** `app/test/features/decks/providers/deck_provider_test.dart:352`-`:378`
+  espera `GET /ai/commander-learning`, e
+  `app/test/features/decks/screens/deck_flow_entry_screens_test.dart:18`-`:45`
+  cobre as duas variantes.
+- **Rota backend:** `server/routes/ai/commander-learning/index.dart:20`-`:27`
+  retorna `available`, `source`, `count` e `commanders[]` quando nao ha query;
+  `:47`-`:53` retorna `promoted_deck` e `recommended_deck` quando ha
+  `commander`.
+- **Fonte de dados:** `server/routes/ai/commander-learning/index.dart:67`-`:92`
+  e `:106`-`:132` leem `commander_learned_decks`; o nome da tabela esta em
+  `server/lib/ai/commander_learned_deck_support.dart:7`.
+- **Doc ausente:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md:308`-`:315`
+  lista as fontes de dados e nao inclui `commander_learned_decks`; busca literal
+  por `/ai/commander-learning` ou `commander_learned_decks` no arquivo nao
+  retornou saida.
+- **Por que e incoerente:** a API e consumida por tela/provider/testes do app e
+  usa tabela backend real, mas o contrato app-facing oficial nao documenta
+  endpoint, variantes de payload, consumidores, fonte de dados nem evidencia.
+- **O que valida:** atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` com
+  `GET /ai/commander-learning`, variantes sem/com `commander`, campos
+  `commanders[]`, `promoted_deck`, `recommended_deck`, fonte
+  `commander_learned_decks` e testes/evidencias.
+- **O que falsifica:** remocao do consumo app ou documentacao app-facing
+  existente que liste o endpoint e a tabela.
+
+#### P1/P2 - Consulta local de learned decks herda limite/plano de IA custosa
+
+- **Middleware aplicado:** `server/routes/ai/_middleware.dart:16`-`:20` aplica
+  `authMiddleware()`, `aiPlanLimitMiddleware()` e `aiRateLimit()` para rotas sob
+  `/ai`, incluindo `commander-learning`.
+- **Bloqueio de plano:** `server/lib/plan_middleware.dart:35`-`:53` retorna
+  `402` quando `aiRequestsRemaining <= 0`.
+- **Rate limit de IA:** `server/lib/rate_limit_middleware.dart:167`-`:170`
+  define bucket de 10/min em producao, e `:381`-`:397` retorna `429` para o
+  bucket `ai`.
+- **Handler auditado:** `server/routes/ai/commander-learning/index.dart:1`-`:8`
+  importa apenas helpers locais e `http_responses.dart`; busca focada por
+  OpenAI/Scryfall/MTGTop8/EDHREC/http/client no handler encontrou apenas o
+  import de `http_responses.dart`.
+- **Fonte de dados local:** o handler consulta `commander_learned_decks` em
+  `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:106`-`:132`,
+  sem chamada LLM/externa no proprio handler.
+- **Por que e incoerente:** a tela de geracao pode esconder disponibilidade de
+  learned decks por `402/429` de IA custosa mesmo quando a operacao atual e
+  leitura local de PostgreSQL.
+- **O que valida:** mover/isentar a rota com teste documentando que a consulta
+  local nao consome/bloqueia cota de IA custosa, ou aceitar explicitamente no
+  API contract que learned-deck availability e uma capacidade de IA sujeita a
+  `402/429`.
+- **O que falsifica:** chamada LLM/externa real no handler ou decisao de produto
+  documentada/testada de que qualquer endpoint sob `/ai`, inclusive leitura PG
+  local, deve consumir plano/rate limit de IA.
+
+### Resultado desta rodada
+
+Nao surgiu novo achado confiavel de coerencia no recorte auditado. Como nao
+houve delta de produto/teste/API/manual desde `5ce943fa`, os achados antigos de
+ownership em `POST /ai/optimize`, `POST /ai/archetypes` e polling async seguem
+stale/resolvidos e nao foram reabertos. Permanecem os mesmos tres gaps
+estreitos: `deck_rebuild_created` rejeitado pela allow-list backend,
+`GET /ai/commander-learning` app-facing ausente do API contract map, e consulta
+local de learned decks herdando middleware de IA custosa.
 
 ## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-17 19:00 UTC
 

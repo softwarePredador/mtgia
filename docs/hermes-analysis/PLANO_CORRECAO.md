@@ -4,12 +4,20 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-17 19:00 UTC
+> Data: 2026-06-17 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-17 19:00 UTC no checkout `e47adcd5`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco (`5ce943fa..HEAD`), manteve os clusters de produto ja abertos e adicionou um achado P2 ao recorte de duplicacao: `server/lib/sync_cards_utils.dart` contem helpers extraidos/testados, mas `server/bin/sync_cards.dart` ainda usa copias privadas/inline para janela incremental, parsing de set e legalidades. O achado P2 script-level dos exporters Hermes de learned deck segue aberto: `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py` continuam bifurcados em completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 2026-06-17 15:00 UTC no checkout `c33e15ba` nao encontrou delta de produto desde a rodada anterior deste foco nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-17 11:00 UTC no checkout `a96bffd6`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-17 07:00 UTC no checkout `caeade55` nao encontrou delta de produto desde `ae65f536` e manteve abertos os mesmos candidatos principais, estreitando apenas o achado menor de `normalize_commander` para a copia Hermes docs.
+
+A revalidacao de coerencia app/server de 2026-06-17 23:00 UTC no checkout
+`831c6ac8` nao encontrou delta de produto/testes/API/manual desde `5ce943fa` e
+nao abriu novo achado. Permanecem os mesmos tres gaps estreitos:
+`deck_rebuild_created` emitido/testado no app mas rejeitado por
+`_allowedEvents`, `GET /ai/commander-learning` consumido pelo app e ligado a
+`commander_learned_decks` mas ausente do API contract map, e consulta local de
+learned decks herdando middleware de IA custosa.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
@@ -20,9 +28,10 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    `.dart_frog/server.dart` em runtime, e `dart analyze bin/local_test_server.dart`
    retornou `No issues found`.
 5. **P1/P2 — Coerencia app-facing em `app/lib` ↔ `server/routes` ↔
-   `server/lib`**: **REVALIDADO no checkout local `5ce943fa` em 2026-06-16
-   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`9adb0989..HEAD`),
-   o delta de produto/testes/API contract no recorte app/backend continua nulo.
+   `server/lib`**: **REVALIDADO no checkout local `831c6ac8` em 2026-06-17
+   23:00 UTC**. Desde a rodada anterior deste mesmo foco (`5ce943fa..HEAD`),
+   o delta de produto/testes/API contract/manual no recorte app/backend continua
+   nulo.
    Os riscos
    anteriores de ownership em `POST /ai/optimize`, `POST /ai/archetypes` e
    polling de jobs async seguem stale: optimize exige usuario, passa `userId`
