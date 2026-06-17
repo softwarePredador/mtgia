@@ -1,12 +1,12 @@
 # Data Model Final Validation — 2026-06-15
 
-Generated at: `2026-06-15T23:15:57.841159Z`
+Generated at: `2026-06-17T03:30:09.616585Z`
 
 ## Executive summary
 
 - Static inventory found `81` tables and `4` views across product backend and Hermes scripts.
 - App scan found `66` API endpoint string references in Flutter code.
-- Hermes sync scan found `20` sync/import/export/materialize scripts.
+- Hermes sync scan found `23` sync/import/export/materialize scripts.
 - PostgreSQL validation was `executed`.
 
 ## PostgreSQL runtime validation
@@ -51,24 +51,16 @@ Generated at: `2026-06-15T23:15:57.841159Z`
   "cards_with_multiple_function_tags": 22675
 }
 ```
-- Clarification added 2026-06-17: `cards_with_multiple_battle_rules` is a
-  fanout warning by `card_id`, mostly caused by aliases/faces/printing rows
-  pointing at the same card id. The current PostgreSQL table still uses
-  `normalized_name` as its primary key and does not yet persist
-  `logical_rule_key` as a first-class column. Therefore, product consumers must
-  keep aggregating by `card_id`, and the next structural battle-rule slice must
-  add persisted `logical_rule_key` before allowing multiple executable rules
-  for the same normalized card name.
 - Critical row counts:
 ```json
 {
-  "users": 1075,
+  "users": 1092,
   "cards": 34329,
   "sets": 951,
   "card_legalities": 324538,
   "card_localized_names": 251107,
   "card_function_tags": 112563,
-  "card_role_scores": 46335,
+  "card_role_scores": 46598,
   "card_semantic_tags_v2": 24181,
   "card_battle_rules": 3158,
   "decks": 1337,
@@ -77,9 +69,9 @@ Generated at: `2026-06-15T23:15:57.841159Z`
   "battle_simulations": 1,
   "deck_weakness_reports": 15,
   "commander_learned_decks": 61,
-  "deck_learning_events": 107,
+  "deck_learning_events": 109,
   "commander_card_usage": 912,
-  "commander_card_synergy": 7179,
+  "commander_card_synergy": 7796,
   "commander_reference_profiles": 50,
   "commander_reference_card_stats": 1606,
   "commander_reference_decks": 121,
@@ -131,20 +123,9 @@ Generated at: `2026-06-15T23:15:57.841159Z`
 
 ## Prioritized next actions
 
-- **P0 — Keep battle-rule joins behind card_intelligence_snapshot**
+- **P0 — Maintain card_intelligence_snapshot anti-fanout guardrail**
   - Reason: Direct joins from deck_cards to card_battle_rules multiply deck rows.
-  - Action: Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.
-  - Update 2026-06-15: `optimize_candidate_quality_summary` now also
-    pre-aggregates function tags, role scores and semantic v2 rows by `card_id`
-    before joining `cards`, preserving multi-function signals without internal
-    cross-product.
-  - Update 2026-06-17: `GET /decks/:id/analysis` now also prefers
-    `card_intelligence_snapshot` and only uses per-card `jsonb_agg` subquery
-    fallback when the view is unavailable.
-  - Update 2026-06-17: `loadOptimizeDeckContext` now also prefers
-    `card_intelligence_snapshot`, so optimize/quality-gate context uses the
-    same one-row-per-card aggregate source before falling back to per-card
-    subqueries on older schemas.
+  - Action: Keep product consumers on card_intelligence_snapshot or equivalent per-card aggregation; do not replace this with direct deck_cards -> card_battle_rules joins.
 - **P1 — Adopt commander_learning_snapshot in future learning loaders**
   - Reason: The backend-owned commander learning aggregate exists; new consumers should not reassemble Hermes/usage/synergy lineage ad hoc.
   - Action: Route future learned-deck diagnostics and optimizer learning reads through commander_learning_snapshot while keeping raw Hermes metadata hidden from normal users.

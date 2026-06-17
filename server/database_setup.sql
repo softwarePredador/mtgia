@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
     card_name TEXT NOT NULL,
     effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
     deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-    source TEXT NOT NULL DEFAULT 'manual',
+    source TEXT NOT NULL DEFAULT 'curated',
     confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
       CHECK (confidence >= 0 AND confidence <= 1),
     review_status TEXT NOT NULL DEFAULT 'verified',

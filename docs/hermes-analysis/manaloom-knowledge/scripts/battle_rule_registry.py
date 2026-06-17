@@ -105,7 +105,7 @@ def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
             card_name TEXT NOT NULL,
             effect_json TEXT NOT NULL DEFAULT '{}',
             deck_role_json TEXT NOT NULL DEFAULT '{}',
-            source TEXT NOT NULL DEFAULT 'manual',
+            source TEXT NOT NULL DEFAULT 'curated',
             confidence REAL NOT NULL DEFAULT 1.0,
             review_status TEXT NOT NULL DEFAULT 'verified',
             rule_version INTEGER NOT NULL DEFAULT 1,

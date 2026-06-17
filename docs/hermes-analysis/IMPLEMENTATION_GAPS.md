@@ -647,8 +647,10 @@ autoriza derivação automática de tags funcionais.
 
 - PostgreSQL `deck_cards` é a fonte canônica de cardinalidade do deck:
   `server/database_setup.sql` define `UNIQUE(deck_id, card_id)` e `quantity`.
-- PostgreSQL `card_battle_rules` permite múltiplas regras por carta:
-  `card_id` é indexado, mas não único; a chave primária é `normalized_name`.
+- PostgreSQL `card_battle_rules` hoje pode gerar múltiplas linhas por
+  `card_id`, porque `card_id` é indexado, mas não único. Isso captura
+  aliases/faces/printings, não suporte completo a múltiplas regras executáveis
+  para o mesmo nome normalizado. A chave primária ainda é `normalized_name`.
 - `card_function_tags` é multi-tag por desenho:
   a chave efetiva usada pela camada de IA é `(card_id, tag, source)`.
 - O sync Hermes corrigido tem guard de soma de quantidade e agregação semântica
@@ -698,6 +700,12 @@ devem ser reduzidas para uma linha por carta.
   mas não impede duas regras equivalentes no mesmo `battle_rules_json`.
   Definir `logical_rule_key` por carta/face/efeito/papel antes de agregar e
   manter somente o melhor exemplar por chave lógica.
+- **Estado real do schema em 2026-06-17**: `logical_rule_key` existe em
+  scripts, snapshots e auditorias, mas ainda nao e coluna persistida em
+  PostgreSQL/SQLite. A tabela PostgreSQL `card_battle_rules` ainda usa
+  `normalized_name` como chave primaria. O fanout atual por `card_id` vem de
+  aliases/faces apontando para a mesma carta, nao de suporte completo a
+  multiplas regras distintas para o mesmo nome normalizado.
 - **Promoção confiável para `card_function_tags`**: tags derivadas de
   `card_battle_rules` só podem virar fonte canônica quando passarem por gate.
   No schema atual, `curated` é `source`, não `review_status`. Portanto, o gate
@@ -1363,7 +1371,8 @@ Tasks priorizadas derivadas do estudo:
 | P1 | Formalizar por commit/deploy o rollout do snapshot canonico de `known_cards` no Hermes AWS | Em 2026-06-16 o `master` local validou `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, precedencia `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`, snapshot materializado localmente e auditoria `PASS` com `known_cards_count=3159`. Em 2026-06-17 a precedencia versionada mudou para `battle_card_rules -> known_cards_canonical_snapshot -> heuristicas/unknown`, sem fallback gerado executavel. A rodada operacional no Hermes AWS anterior ja comprovou materializacao do snapshot, mas precisa absorver essa nova remocao do fallback gerado no proximo deploy/cron | O risco de logica/runtime foi reduzido; o risco restante agora e operacional: garantir que rebuild/container Hermes rode o SHA com fallback gerado removido e mantenha snapshot canonico materializado |
 | P1 | Promover reviewed rules de cartas recorrentes que ainda caiam em `unknown`/heuristica apesar de terem semantica oficial clara | O conflito estrutural de fontes foi fechado, e o runtime da batalha nao usa mais `known_cards_generated.json`. `Natural Order` ja foi promovido para `curated/verified` com custo verde sacrificavel e tutor verde ao campo. Em 2026-06-17, `Dismember` tambem foi promovido para `curated/verified` como modificador `-5/-5` ate EOT, e o SBA foi corrigido para matar criatura com resistencia `<= 0` mesmo se for indestrutivel; a rodada `20260617_005901` ficou com `action_findings=0` e `strategy_findings=0`. O mesmo criterio deve ser aplicado aos proximos outliers recorrentes dos replays/auditorias | Menos distorcoes de battle e de scorecard causadas por cartas reais que ainda nao possuem regra revisada; ausencia agora vira `unknown` auditavel em vez de efeito gerado incorreto |
 | P1 | Adicionar explainability backend-owned por carta gerada | O produto ainda nao responde bem "por que essa carta entrou?" | Transparencia de criacao, QA melhor e comparacao de fontes por carta |
-| P1 | Higienizar proveniencia das regras promovidas hoje marcadas como `source='manual'` em PG/SQLite | Runtime manual ativo ja esta zerado, mas a proveniencia historica ainda confunde auditoria | Menos ruido conceitual sem mudar comportamento de runtime |
+| P1 | Higienizar proveniencia das regras promovidas hoje marcadas como `source='manual'` em PG/SQLite | Runtime manual ativo ja esta zerado. Em 2026-06-17 o schema/default de `card_battle_rules` passou a nascer como `source='curated'`, o sync PG/Hermes tambem usa `curated` como fallback, e `sync_battle_card_rules.py` deixou de semear `HANDCRAFTED_KNOWN_CARDS` nao-waiver. A migration `027` normaliza linhas historicas `source='manual'` com notas `HANDCRAFTED_KNOWN_CARDS` para `source='curated'`. `manual` continua reservado para `MANUAL_RULE_RUNTIME_WAIVERS` explicitos | Reduz ruido conceitual sem mudar comportamento de runtime; proximo passo operacional e refrescar o cache SQLite Hermes a partir do PG normalizado |
+| P1 | Persistir `logical_rule_key` em `card_battle_rules` antes de admitir multiplas regras por mesmo nome | A auditoria de 2026-06-17 confirmou que o PG real tem `normalized_name` como chave primaria e zero coluna `logical_rule_key`; os `10` casos de fanout por `card_id` sao aliases/faces/printings, nao uma modelagem completa de varias regras executaveis para a mesma carta. Scripts Hermes calculam `logical_rule_key` em snapshots, mas PG/SQLite ainda nao conseguem armazenar duas regras distintas para o mesmo `normalized_name` sem overwrite | Criar migration/backfill controlado, alterar upserts PG/SQLite para chave composta `(normalized_name, logical_rule_key)`, preservar compatibilidade de lookup primario e adicionar testes que provem duas regras distintas para a mesma carta sem multiplicar `deck_cards` |
 | P2 | Manter scripts one-shot fora do tree operacional | Em 2026-06-17 foram removidos `_gc_check.py` (raiz `manaloom-knowledge/` e `scripts/`), `_scout_report.py`, `_update_logs.py` e `validate_patches.py`. Eles continham caminhos/ids/hashes hardcoded ou validavam patches antigos fora da suite atual. O guardrail `test_known_cards_consumer_guardrail.py` agora falha se eles voltarem | Reduz ruido, evita execucao acidental de diagnosticos antigos e obriga novas correcoes a entrar por script operacional testado ou por teste versionado |
 
 Regras mantidas por este estudo:

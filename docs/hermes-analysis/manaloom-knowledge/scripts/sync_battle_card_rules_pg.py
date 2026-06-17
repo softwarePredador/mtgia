@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
   card_name TEXT NOT NULL,
   effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
   deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-  source TEXT NOT NULL DEFAULT 'manual',
+  source TEXT NOT NULL DEFAULT 'curated',
   confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
     CHECK (confidence >= 0 AND confidence <= 1),
   review_status TEXT NOT NULL DEFAULT 'verified',
@@ -290,7 +290,7 @@ def load_card_id_lookup(cur: Any, card_names: list[str]) -> dict[str, str]:
 def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
     card_name = str(row["card_name"])
     normalized_name = normalize_card_name(card_name)
-    source = str(row.get("source") or "manual")
+    source = str(row.get("source") or "curated")
     current_source = current_pg_source(cur, normalized_name)
     if current_source:
         incoming_priority = SOURCE_PRIORITY.get(source, 0)
@@ -388,7 +388,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
     for row in rows:
         card_name = str(row["card_name"])
         normalized_name = normalize_card_name(card_name)
-        source = str(row.get("source") or "manual")
+        source = str(row.get("source") or "curated")
         current_source = current_sources.get(normalized_name)
         if current_source:
             incoming_priority = SOURCE_PRIORITY.get(source, 0)

@@ -117,5 +117,40 @@ void main() {
       expect(up, isNot(contains('left join card_semantic_tags_v2')));
       expect(up, isNot(contains('left join card_role_scores')));
     });
+
+    test('migration 026 keeps curated battle rules as the default source', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '026',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('default_card_battle_rules_source_curated'),
+      );
+      expect(up, contains("alter column source set default 'curated'"));
+      expect(down, contains("alter column source set default 'manual'"));
+    });
+
+    test('migration 027 normalizes legacy handcrafted battle rule provenance',
+        () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '027',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('normalize_legacy_manual_battle_rule_sources'),
+      );
+      expect(up, contains("source = 'curated'"));
+      expect(up, contains("source = 'manual'"));
+      expect(up, contains('handcrafted_known_cards'));
+      expect(up, contains('legacy handcrafted_known_cards provenance'));
+      expect(down, contains("source = 'manual'"));
+      expect(down, contains("source = 'curated'"));
+    });
   });
 }

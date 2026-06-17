@@ -147,21 +147,6 @@ def build_rows(
                 "notes": "Seeded from MANUAL_RULE_RUNTIME_WAIVERS.",
             }
         )
-    for name in sorted(battle.HANDCRAFTED_KNOWN_CARDS):
-        if name in getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set()):
-            continue
-        effect = dict(battle.KNOWN_CARDS[name])
-        rows.append(
-            {
-                "card_name": name,
-                "effect_json": effect,
-                "source": "manual",
-                "confidence": 1.0,
-                "review_status": "verified",
-                "notes": "Seeded from HANDCRAFTED_KNOWN_CARDS.",
-            }
-        )
-
     rows.extend(load_reviewed_rule_rows(reviewed_rules_path))
 
     if include_generated:

@@ -382,8 +382,14 @@ Resultado validado contra PostgreSQL real após a migration
   `448` linhas extras. Portanto, consumidores de deckbuilding, optimize,
   weakness-analysis, recommendations e sync Hermes devem consumir snapshots
   agregados por `card_id`, nao joins brutos em tabelas multi-linha.
-- `card_battle_rules` preserva multiplas regras por carta; isso e correto para
-  battle/rules, mas precisa de agregacao antes de alimentar deckbuilding.
+- `card_battle_rules` pode produzir fanout por `card_id` porque aliases/faces
+  ou printings podem apontar para a mesma carta. O schema PostgreSQL atual
+  ainda usa `normalized_name` como chave primaria; ele nao suporta, sozinho,
+  multiplas regras executaveis distintas para o mesmo nome normalizado. A
+  chave logica `logical_rule_key` hoje e calculada nos scripts/snapshots do
+  Hermes. Para suportar multiplas regras por nome de forma canônica, o proximo
+  slice estrutural deve persistir `logical_rule_key` em PostgreSQL/SQLite e
+  ajustar o upsert para `(normalized_name, logical_rule_key)`.
 - `card_function_tags` preserva multiplas funcoes por carta; validadores devem
   contar papeis por membership, sem achatar a carta para uma unica funcao.
 - `commander_learning_snapshot` foi adicionada como view interna backend-owned
@@ -461,7 +467,7 @@ das tabelas atuais. Outras tabelas app-facing aparecem em migrações, helpers
 | `commander_card_synergy` | commander normalized, `card_id`, `role`, `score`, `evidence_count`, `source` | Sinergia carta-comandante. |
 | `optimize_rejection_penalties` | card/commander/archetype/function, `penalty`, `reject_count`, `source` | Penaliza cartas rejeitadas em optimize. |
 | `card_semantic_tags_v2` | `card_id`, `schema_version`, velocidade, eficiencia, advantage/interacao, flags `combo_piece/wincon/engine/payoff/enabler`, `protection_type`, `tags`, `source` | Camada semantica v2; atualmente sinal/diagnostico e suporte de gate parcial. |
-| `card_battle_rules` | `normalized_name`, `card_id`, `card_name`, `effect_json`, `deck_role_json`, `source`, `confidence`, `review_status`, `rule_version`, hashes/notas | Regras executaveis/revisaveis para battle engine e Hermes. |
+| `card_battle_rules` | `normalized_name`, `card_id`, `card_name`, `effect_json`, `deck_role_json`, `source`, `confidence`, `review_status`, `rule_version`, hashes/notas | Regras executaveis/revisaveis para battle engine e Hermes. Hoje `normalized_name` e chave primaria; `logical_rule_key` ainda e calculado fora da tabela e deve virar coluna persistida antes de permitir multiplas regras por mesmo nome normalizado. |
 
 ### Diferenca essencial: function tags vs battle rules
 
@@ -473,9 +479,11 @@ consegue aplicar ou reconhecer?" Exemplo: gerar mana, destruir permanente,
 copiar spell, criar token, replacement/prevention.
 
 Uma carta pode ter multiplas funcoes. O erro operacional recente mostrou que
-`card_battle_rules` pode ter multiplas linhas para o mesmo `card_id` por faces,
-aliases ou multiplos efeitos. Portanto, qualquer join com deck deve agregar por
-`card_id`; nunca multiplicar `deck_cards`.
+`card_battle_rules` pode ter multiplas linhas para o mesmo `card_id` por faces
+ou aliases. Isso nao deve ser confundido com suporte completo a multiplas regras
+executaveis por mesmo `normalized_name`, que ainda depende de persistir
+`logical_rule_key`. Portanto, qualquer join com deck deve agregar por `card_id`;
+nunca multiplicar `deck_cards`, nem escolher `LIMIT 1` como solucao final.
 
 ## 7. Deckbuilding e IA
 

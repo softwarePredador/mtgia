@@ -499,7 +499,7 @@ final migrations = <Migration>[
         card_name TEXT NOT NULL,
         effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
         deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-        source TEXT NOT NULL DEFAULT 'manual',
+        source TEXT NOT NULL DEFAULT 'curated',
         confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
           CHECK (confidence >= 0 AND confidence <= 1),
         review_status TEXT NOT NULL DEFAULT 'verified',
@@ -721,6 +721,56 @@ final migrations = <Migration>[
     ''',
     down: '''
       DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+    ''',
+  ),
+  Migration(
+    version: '026',
+    name: 'default_card_battle_rules_source_curated',
+    up: '''
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN source SET DEFAULT 'curated';
+    ''',
+    down: '''
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN source SET DEFAULT 'manual';
+    ''',
+  ),
+  Migration(
+    version: '027',
+    name: 'normalize_legacy_manual_battle_rule_sources',
+    up: '''
+      UPDATE card_battle_rules
+      SET
+        source = 'curated',
+        notes = trim(
+          both ' ' from
+          regexp_replace(
+            COALESCE(notes, ''),
+            'Seeded from HANDCRAFTED_KNOWN_CARDS\\.',
+            'Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.',
+            'g'
+          )
+        ),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE source = 'manual'
+        AND notes ILIKE '%HANDCRAFTED_KNOWN_CARDS%';
+    ''',
+    down: '''
+      UPDATE card_battle_rules
+      SET
+        source = 'manual',
+        notes = trim(
+          both ' ' from
+          regexp_replace(
+            COALESCE(notes, ''),
+            'Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17\\.',
+            'Seeded from HANDCRAFTED_KNOWN_CARDS.',
+            'g'
+          )
+        ),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE source = 'curated'
+        AND notes ILIKE '%legacy HANDCRAFTED_KNOWN_CARDS provenance%';
     ''',
   ),
 ];
