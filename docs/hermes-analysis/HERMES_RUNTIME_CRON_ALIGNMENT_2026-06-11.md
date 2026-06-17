@@ -137,3 +137,21 @@ conflito/worktree sujo/push falho.
 Esses scripts não devem mascarar falha de checkout/pull com `|| true`. Se o
 checkout de `master` falhar, o job deve falhar alto para evitar execução de
 código stale da branch de memória.
+
+Atualização 2026-06-17: `manaloom-hermes-report-only.sh` foi corrigido no
+container Hermes para calcular reachability contra `origin/master`, não contra o
+`HEAD` local. Motivo: o workspace runtime pode ficar sujo/atrasado por
+artefatos (`knowledge.db`, reports e hotfixes operacionais), enquanto
+`origin/master` já contém o SHA pushado. O report-only agora informa
+`origin_master_contains_target` no prompt e não deve marcar um commit como
+`dangling/orphan` quando ele está contido em `origin/master`.
+
+Validação pós-correção:
+
+```bash
+bash -n /opt/data/scripts/manaloom-hermes-report-only.sh
+/opt/data/scripts/manaloom-hermes-report-only.sh <sha_pushado>
+```
+
+Resultado observado no SHA `c342a620`: `PASS`, commit alcançável por
+`origin/master`, sem risco de produto.
