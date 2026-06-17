@@ -12,12 +12,21 @@ Seguro para rodar em cron: idempotente (checa deck_promotions antes de inserir).
 """
 
 import argparse, os, re, sqlite3, sys, json
+from pathlib import Path
 from datetime import datetime, timezone
 
-SQLITE_DB = os.environ.get(
-    "HERMES_KNOWLEDGE_DB",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+
+def _resolve_repo_root() -> Path:
+    if os.environ.get("MANALOOM_REPO"):
+        return Path(os.environ["MANALOOM_REPO"]).resolve()
+    return Path(__file__).resolve().parents[2]
+
+
+REPO_ROOT = _resolve_repo_root()
+DEFAULT_SQLITE_DB = (
+    REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
 )
+SQLITE_DB = os.environ.get("HERMES_KNOWLEDGE_DB", str(DEFAULT_SQLITE_DB))
 
 REQUIRE_EXACT_100 = os.environ.get("HERMES_AUTO_PROMOTE_ALLOW_INCOMPLETE") != "1"
 MIN_CARD_COUNT = 100 if REQUIRE_EXACT_100 else 90

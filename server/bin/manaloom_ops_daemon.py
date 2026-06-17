@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import json
 import subprocess
 import sys
 import time
@@ -20,6 +21,13 @@ LOCK_DIR = Path(os.environ.get("MANALOOM_OPS_LOCK_DIR", str(DATA_ROOT / "locks")
 ARTIFACT_DIR = Path(
     os.environ.get("MANALOOM_OPS_ARTIFACT_DIR", str(DATA_ROOT / "artifacts"))
 ).resolve()
+CRON_DIR = Path(os.environ.get("MANALOOM_OPS_CRON_DIR", str(DATA_ROOT / "cron"))).resolve()
+CRON_OUTPUT_DIR = Path(
+    os.environ.get("MANALOOM_OPS_CRON_OUTPUT_DIR", str(CRON_DIR / "output"))
+).resolve()
+JOBS_JSON = Path(
+    os.environ.get("MANALOOM_OPS_JOBS_JSON", str(CRON_DIR / "jobs.json"))
+).resolve()
 KNOWLEDGE_DB = Path(
     os.environ.get("HERMES_KNOWLEDGE_DB", str(DATA_ROOT / "knowledge.db"))
 ).resolve()
@@ -35,6 +43,7 @@ class Job:
     schedule: str
     lockfile: Path
     command: str
+    script_name: str
 
 
 def _base_env() -> dict[str, str]:
@@ -50,6 +59,16 @@ def _base_env() -> dict[str, str]:
             "MANALOOM_DART_BIN": MANALOOM_DART_BIN,
             "HERMES_KNOWLEDGE_DB": str(KNOWLEDGE_DB),
             "HERMES_ARTIFACT_DIR": str(ARTIFACT_DIR / "hermes_auto_sync"),
+            "HERMES_PROFILE_ARTIFACTS_DIR": str(REPO_ROOT / "server/test/artifacts"),
+            "HERMES_MANA_BASE_REPORT": str(
+                ARTIFACT_DIR / "hermes_mana_base_validator/latest_mana_base_validation_report.md"
+            ),
+            "HERMES_CRON_JOBS_JSON": str(JOBS_JSON),
+            "HERMES_CRON_OUTPUT_DIR": str(CRON_OUTPUT_DIR),
+            "HERMES_SCRIPTS_DIR": str(REPO_ROOT / "server/bin"),
+            "HERMES_CRON_GOVERNOR_REPORT": str(
+                ARTIFACT_DIR / "hermes_cron_governor/latest_cron_governor_report.md"
+            ),
             "MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR": str(
                 ARTIFACT_DIR / "master_optimizer_preflight"
             ),
@@ -64,18 +83,42 @@ JOBS = [
         schedule=os.environ.get("PULL_LEARNING_EVENTS_CRON", "*/30 * * * *"),
         lockfile=LOCK_DIR / "pull_learning_events.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/pull_learning_events.sh',
+        script_name="pull_learning_events.sh",
     ),
     Job(
         name="auto_sync_learned_decks",
         schedule=os.environ.get("AUTO_SYNC_LEARNED_DECKS_CRON", "0 */2 * * *"),
         lockfile=LOCK_DIR / "auto_sync_learned_decks.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/auto_sync_learned_decks.sh',
+        script_name="auto_sync_learned_decks.sh",
+    ),
+    Job(
+        name="auto_promote_learned_decks",
+        schedule=os.environ.get("AUTO_PROMOTE_LEARNED_DECKS_CRON", "30 */6 * * *"),
+        lockfile=LOCK_DIR / "auto_promote_learned_decks.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/auto_promote_learned_decks.sh',
+        script_name="auto_promote_learned_decks.sh",
     ),
     Job(
         name="master_optimizer_preflight",
         schedule=os.environ.get("MASTER_OPTIMIZER_PREFLIGHT_CRON", "15 * * * *"),
         lockfile=LOCK_DIR / "master_optimizer_preflight.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/master_optimizer_preflight.sh',
+        script_name="master_optimizer_preflight.sh",
+    ),
+    Job(
+        name="hermes_mana_base_validator",
+        schedule=os.environ.get("HERMES_MANA_BASE_VALIDATOR_CRON", "45 */6 * * *"),
+        lockfile=LOCK_DIR / "hermes_mana_base_validator.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/hermes_mana_base_validator.sh',
+        script_name="hermes_mana_base_validator.sh",
+    ),
+    Job(
+        name="hermes_cron_governor_report",
+        schedule=os.environ.get("HERMES_CRON_GOVERNOR_REPORT_CRON", "0 */12 * * *"),
+        lockfile=LOCK_DIR / "hermes_cron_governor_report.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/hermes_cron_governor_report.sh',
+        script_name="hermes_cron_governor_report.sh",
     ),
 ]
 
@@ -115,51 +158,124 @@ def _matches_schedule(schedule: str, now: datetime) -> bool:
     )
 
 
-def _run_job(job: Job, env: dict[str, str]) -> None:
+def _write_jobs_manifest(
+    jobs: list[Job],
+    state: dict[str, dict[str, object]],
+) -> None:
+    JOBS_JSON.parent.mkdir(parents=True, exist_ok=True)
+    payload = []
+    for job in jobs:
+        job_state = state.get(job.name, {})
+        payload.append(
+            {
+                "id": job.name,
+                "name": job.name,
+                "enabled": True,
+                "script": job.script_name,
+                "schedule": job.schedule,
+                "schedule_display": job.schedule,
+                "last_status": job_state.get("last_status"),
+                "last_started_at": job_state.get("last_started_at"),
+                "last_finished_at": job_state.get("last_finished_at"),
+                "last_exit_code": job_state.get("last_exit_code"),
+                "latest_output": job_state.get("latest_output"),
+            }
+        )
+    JOBS_JSON.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def _job_log_path(job: Job) -> Path:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    job_dir = CRON_OUTPUT_DIR / job.name
+    job_dir.mkdir(parents=True, exist_ok=True)
+    return job_dir / f"{timestamp}.log"
+
+
+def _tail_excerpt(path: Path, max_lines: int = 6) -> str:
+    if not path.exists():
+        return ""
+    lines = path.read_text(errors="replace").splitlines()
+    if not lines:
+        return ""
+    return " | ".join(line.strip() for line in lines[-max_lines:] if line.strip())[:600]
+
+
+def _run_job(job: Job, env: dict[str, str], state: dict[str, dict[str, object]]) -> None:
+    started_at = datetime.now().isoformat(timespec="seconds")
+    log_path = _job_log_path(job)
+    state[job.name] = {
+        **state.get(job.name, {}),
+        "last_started_at": started_at,
+        "latest_output": str(log_path),
+    }
+    _write_jobs_manifest(JOBS, state)
     print(
         f"[manaloom-ops] run name={job.name} schedule={job.schedule} "
-        f"at={datetime.now().isoformat(timespec='seconds')}",
+        f"at={started_at} log={log_path}",
         flush=True,
     )
-    result = subprocess.run(
-        [
-            "flock",
-            "-n",
-            str(job.lockfile),
-            "bash",
-            "-lc",
-            job.command,
-        ],
-        cwd=REPO_ROOT,
-        env=env,
-        check=False,
-    )
+    with log_path.open("w", encoding="utf-8") as handle:
+        result = subprocess.run(
+            [
+                "flock",
+                "-n",
+                str(job.lockfile),
+                "bash",
+                "-lc",
+                job.command,
+            ],
+            cwd=REPO_ROOT,
+            env=env,
+            check=False,
+            stdout=handle,
+            stderr=subprocess.STDOUT,
+        )
+    finished_at = datetime.now().isoformat(timespec="seconds")
+    state[job.name] = {
+        "last_status": "ok" if result.returncode == 0 else "error",
+        "last_started_at": started_at,
+        "last_finished_at": finished_at,
+        "last_exit_code": result.returncode,
+        "latest_output": str(log_path),
+    }
+    _write_jobs_manifest(JOBS, state)
+    excerpt = _tail_excerpt(log_path)
     print(
         f"[manaloom-ops] done name={job.name} exit_code={result.returncode}",
         flush=True,
     )
+    if excerpt:
+        print(f"[manaloom-ops] excerpt name={job.name} tail={excerpt}", flush=True)
 
 
 def main() -> int:
     LOCK_DIR.mkdir(parents=True, exist_ok=True)
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    CRON_DIR.mkdir(parents=True, exist_ok=True)
+    CRON_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     KNOWLEDGE_DB.parent.mkdir(parents=True, exist_ok=True)
 
     env = _base_env()
+    state: dict[str, dict[str, object]] = {}
+    _write_jobs_manifest(JOBS, state)
 
     print("[manaloom-ops] scheduler started", flush=True)
     print(f"[manaloom-ops] repo_root={REPO_ROOT}", flush=True)
     print(f"[manaloom-ops] data_root={DATA_ROOT}", flush=True)
     print(f"[manaloom-ops] env_file={ENV_FILE}", flush=True)
     print(f"[manaloom-ops] knowledge_db={KNOWLEDGE_DB}", flush=True)
+    print(f"[manaloom-ops] jobs_json={JOBS_JSON}", flush=True)
+    print(f"[manaloom-ops] cron_output_dir={CRON_OUTPUT_DIR}", flush=True)
     for job in JOBS:
         print(
-            f"[manaloom-ops] job name={job.name} schedule={job.schedule}",
+            f"[manaloom-ops] job name={job.name} schedule={job.schedule} script={job.script_name}",
             flush=True,
         )
 
     if RUN_PREFLIGHT_ON_BOOT:
-        _run_job(JOBS[2], env)
+        preflight = next((job for job in JOBS if job.name == "master_optimizer_preflight"), None)
+        if preflight is not None:
+            _run_job(preflight, env, state)
 
     last_minute: str | None = None
     while True:
@@ -169,7 +285,7 @@ def main() -> int:
             for job in JOBS:
                 try:
                     if _matches_schedule(job.schedule, now):
-                        _run_job(job, env)
+                        _run_job(job, env, state)
                 except Exception as exc:  # keep scheduler alive even on bad schedule
                     print(
                         f"[manaloom-ops] error name={job.name} schedule={job.schedule} "

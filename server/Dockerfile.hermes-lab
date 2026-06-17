@@ -1,0 +1,40 @@
+FROM nousresearch/hermes-agent:latest
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV FLUTTER_VERSION=3.44.0
+ENV PATH="/opt/tools/flutter/bin:/opt/tools/flutter/bin/cache/dart-sdk/bin:/root/.pub-cache/bin:${PATH}"
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    clang \
+    cmake \
+    curl \
+    git \
+    jq \
+    libgtk-3-dev \
+    ninja-build \
+    nodejs \
+    npm \
+    pkg-config \
+    python3 \
+    python3-pip \
+    unzip \
+    xz-utils \
+    zip \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/tools \
+  && curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
+    | tar -xJ -C /opt/tools \
+  && dart pub global activate dart_frog_cli 1.2.14
+
+COPY server/bin/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_entrypoint.sh
+RUN chmod +x /opt/bootstrap/hermes_lab_entrypoint.sh
+
+VOLUME ["/opt/data"]
+
+CMD ["/bin/bash", "/opt/bootstrap/hermes_lab_entrypoint.sh"]

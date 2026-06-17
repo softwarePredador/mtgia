@@ -15,10 +15,21 @@ from pathlib import Path
 from typing import Any
 
 
-WORKSPACE = Path(os.environ.get("MANALOOM_WORKSPACE", "/opt/data/workspace/mtgia"))
-DEFAULT_DB = WORKSPACE / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
-DEFAULT_ARTIFACTS = WORKSPACE / "server/test/artifacts"
-DEFAULT_REPORT = Path("/opt/data/artifacts/hermes_mana_base_validator/latest_mana_base_validation_report.md")
+def _resolve_repo_root() -> Path:
+    if os.environ.get("MANALOOM_REPO"):
+        return Path(os.environ["MANALOOM_REPO"]).resolve()
+    return Path(__file__).resolve().parents[2]
+
+
+REPO_ROOT = _resolve_repo_root()
+DATA_ROOT = Path(os.environ.get("MANALOOM_OPS_DATA_DIR", "/data/manaloom-ops")).resolve()
+DEFAULT_DB = (
+    REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+)
+DEFAULT_ARTIFACTS = REPO_ROOT / "server/test/artifacts"
+DEFAULT_REPORT = (
+    DATA_ROOT / "artifacts/hermes_mana_base_validator/latest_mana_base_validation_report.md"
+)
 
 ROLE_TO_TAG = {
     "lands": "lands",

@@ -19,6 +19,9 @@ RUN dart pub get
 COPY . /app
 
 RUN chmod +x \
+  /app/server/bin/auto_promote_learned_decks.sh \
+  /app/server/bin/hermes_cron_governor_report.sh \
+  /app/server/bin/hermes_mana_base_validator.sh \
   /app/server/bin/pull_learning_events.sh \
   /app/server/bin/auto_sync_learned_decks.sh \
   /app/server/bin/master_optimizer_preflight.sh \

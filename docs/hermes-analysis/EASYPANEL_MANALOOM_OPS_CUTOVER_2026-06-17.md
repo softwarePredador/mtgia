@@ -5,11 +5,14 @@
 Absorver os jobs Hermes que agregam valor direto ao produto sem migrar o
 Hermes inteiro para produção.
 
-Escopo deste cutover:
+Escopo atual do cutover:
 
 - `pull_learning_events`
 - `auto_sync_learned_decks`
+- `auto_promote_learned_decks`
 - `master_optimizer_preflight`
+- `hermes_mana_base_validator`
+- `hermes_cron_governor_report`
 
 Fora do escopo:
 
@@ -55,14 +58,17 @@ O Hermes completo mistura:
 
 Isso não deve virar serviço de produção.
 
-## Artefatos versionados deste slice
+## Artefatos versionados dos slices operacionais
 
 - `server/Dockerfile.manaloom-ops`
 - `server/bin/manaloom_ops_entrypoint.sh`
 - `server/bin/manaloom_ops_daemon.py`
 - `server/bin/pull_learning_events.sh`
 - `server/bin/auto_sync_learned_decks.sh`
+- `server/bin/auto_promote_learned_decks.sh`
 - `server/bin/master_optimizer_preflight.sh`
+- `server/bin/hermes_mana_base_validator.sh`
+- `server/bin/hermes_cron_governor_report.sh`
 
 ## Runtime esperado
 
@@ -95,6 +101,31 @@ Opcional:
 
 - `MANALOOM_OPS_LOCK_DIR=/data/manaloom-ops/locks`
 - `MANALOOM_OPS_ARTIFACT_DIR=/data/manaloom-ops/artifacts`
+- `AUTO_PROMOTE_LEARNED_DECKS_CRON=30 */6 * * *`
+- `HERMES_MANA_BASE_VALIDATOR_CRON=45 */6 * * *`
+- `HERMES_CRON_GOVERNOR_REPORT_CRON=0 */12 * * *`
+
+## Tokens e provider
+
+`manaloom-ops` nao precisa de token de IA para os jobs migrados neste cutover.
+
+Os seis jobs acima sao deterministicos e usam:
+
+- PostgreSQL do backend;
+- `knowledge.db` no volume do worker;
+- scripts versionados no repositório;
+- artefatos locais do projeto.
+
+Eles nao dependem de:
+
+- OpenAI;
+- DeepSeek;
+- Claude;
+- Gemini;
+- dashboard/chat Hermes.
+
+Se o serviço receber um token de IA por conveniência operacional, ele deve ser
+tratado como opcional e nao como pre-requisito do worker.
 
 ## Runtime final aplicado
 
@@ -137,13 +168,27 @@ O daemon faz polling de minuto e avalia expressões cron simples em runtime:
 
 - `pull_learning_events`: `*/30 * * * *`
 - `auto_sync_learned_decks`: `0 */2 * * *`
+- `auto_promote_learned_decks`: `30 */6 * * *`
 - `master_optimizer_preflight`: `15 * * * *`
+- `hermes_mana_base_validator`: `45 */6 * * *`
+- `hermes_cron_governor_report`: `0 */12 * * *`
 
 Todos os jobs usam `flock` para evitar overlap e executam a partir do checkout
 do repo em `/app`.
 
 Todos os jobs rodam sem `git pull`, `git checkout` ou mutação de branch em
 runtime.
+
+## Estado operacional materializado pelo daemon
+
+O `manaloom_ops_daemon.py` agora escreve estado local do scheduler no próprio
+volume:
+
+- `/data/manaloom-ops/cron/jobs.json`
+- `/data/manaloom-ops/cron/output/<job>/*.log`
+
+Isso permite que `hermes_cron_governor_report.py` rode no próprio worker sem
+depender de `/opt/data/cron/jobs.json` do Hermes AWS.
 
 ## Ordem de cutover
 
@@ -199,10 +244,11 @@ Se a dupla execução estiver estável:
 
 1. validar artifacts por 48h;
 2. validar que nenhum job depende mais de `/opt/data`;
-3. só então planejar a migração do próximo bloco:
-   - `auto-promote-learned`
-   - `mana-base-validator`
-   - `cron-governor-report`
+3. só então manter fora do worker principal o que ainda for laboratório:
+   - chat Hermes;
+   - docs branch;
+   - jobs provider-heavy;
+   - research loops.
 
 ## Guardrails
 

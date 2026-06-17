@@ -17,9 +17,15 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_JOBS_JSON = "/opt/data/cron/jobs.json"
-DEFAULT_OUTPUT_DIR = "/opt/data/cron/output"
-DEFAULT_SCRIPTS_DIR = "/opt/data/scripts"
+DATA_ROOT = Path(os.environ.get("MANALOOM_OPS_DATA_DIR", "/data/manaloom-ops")).resolve()
+REPO_ROOT = Path(os.environ.get("MANALOOM_REPO", Path(__file__).resolve().parents[2])).resolve()
+
+DEFAULT_JOBS_JSON = str(DATA_ROOT / "cron/jobs.json")
+DEFAULT_OUTPUT_DIR = str(DATA_ROOT / "cron/output")
+DEFAULT_SCRIPTS_DIR = str(REPO_ROOT / "server/bin")
+DEFAULT_REPORT = str(
+    DATA_ROOT / "artifacts/hermes_cron_governor/latest_cron_governor_report.md"
+)
 
 ERROR_MARKERS = (
     "HTTP 429",
@@ -55,7 +61,7 @@ def _latest_output(output_dir: Path, job_id: str) -> Path | None:
     if not job_dir.is_dir():
         return None
     files = sorted(
-        (p for p in job_dir.glob("*.md") if p.is_file()),
+        (p for p in job_dir.iterdir() if p.is_file() and p.suffix in {".md", ".log"}),
         key=lambda p: p.stat().st_mtime,
         reverse=True,
     )
@@ -221,15 +227,24 @@ def build_report(jobs: list[dict[str, Any]], output_dir: Path, scripts_dir: Path
     return "\n".join(lines) + "\n"
 
 
+def write_report(path: Path, report: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(report)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--jobs-json", default=os.environ.get("HERMES_CRON_JOBS_JSON", DEFAULT_JOBS_JSON))
     parser.add_argument("--output-dir", default=os.environ.get("HERMES_CRON_OUTPUT_DIR", DEFAULT_OUTPUT_DIR))
     parser.add_argument("--scripts-dir", default=os.environ.get("HERMES_SCRIPTS_DIR", DEFAULT_SCRIPTS_DIR))
+    parser.add_argument("--output", default=os.environ.get("HERMES_CRON_GOVERNOR_REPORT", DEFAULT_REPORT))
+    parser.add_argument("--stdout-only", action="store_true")
     args = parser.parse_args(argv)
 
     jobs = _load_jobs(Path(args.jobs_json))
     report = build_report(jobs, Path(args.output_dir), Path(args.scripts_dir))
+    if not args.stdout_only:
+        write_report(Path(args.output), report)
     print(report, end="")
     return 0
 
