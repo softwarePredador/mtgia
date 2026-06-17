@@ -230,6 +230,25 @@ Casos de amostra validados no runtime atual:
   `battle_model_scope=stat_modifier_removal_until_eot_v1`; o runtime local
   aplica o modificador em vez de destruir diretamente, e o SBA remove criatura
   com resistencia `<= 0` mesmo se for indestrutivel.
+- `Incubation Druid` resolve agora como `curated/active` com
+  `effect=creature`,
+  `is_mana_source=true`,
+  `mana_produced=1`,
+  `produces=WUBRG` e
+  `battle_model_scope=mana_dork_without_adapt_v1`; o runtime local tambem foi
+  corrigido para que `effect=creature` entre no battlefield por
+  `apply_effect_immediate()`, respeite summoning sickness e so entre na conta
+  de mana source no turno seguinte.
+- `Ashnod's Altar` resolve agora como `curated/active` com
+  `effect=passive`,
+  `activated_mana_ability=true`,
+  `activation_cost=sacrifice_creature`,
+  `mana_produced=2`,
+  `produces=C` e
+  `battle_model_scope=activated_creature_sacrifice_mana_source_unexecuted_v1`;
+  isso remove o falso modelo de `ramp_ritual` no cast e preserva a verdade
+  operacional: a carta ja tem metadata revisada e rastreavel, mas a habilidade
+  ativada ainda precisa de executor proprio para virar comportamento completo.
 
 Implicacao correta:
 
@@ -238,8 +257,8 @@ Implicacao correta:
 - o proximo trabalho certo e promover cartas ainda `generated/needs_review`,
   `heuristic` ou `active` simplificado para regras trusted/traceable quando forem
   relevantes ao corpus;
-- findings como `Chromatic Star` agora sao gaps de fidelidade/completude de
-  modelagem, nao regressao de precedence.
+- findings como `Chromatic Star`, `Incubation Druid` e `Ashnod's Altar` agora
+  sao gaps de fidelidade/completude de modelagem, nao regressao de precedence.
 
 Risco operacional adicional encontrado:
 
@@ -899,9 +918,11 @@ movimento errado neste momento.
 
 2. Fechar cartas recorrentes de oponente com `review_rule_used`.
    - Prioridade atual observada:
-     `Ashnod's Altar`, `Incubation Druid` e qualquer outra que voltar a aparecer
-     no audit low recorrente. `Dismember` foi fechado em 2026-06-17 e nao deve
-     voltar como `needs_review` quando o cache/snapshot estiver sincronizado.
+     `Ashnod's Altar` e qualquer outra que voltar a aparecer no audit low
+     recorrente. `Incubation Druid` deixou a categoria `needs_review` em
+     2026-06-17 ao ganhar um baseline `curated/active` de mana dork; `Dismember`
+     foi fechado no mesmo ciclo e nao deve voltar como `needs_review` quando o
+     cache/snapshot estiver sincronizado.
    - Ganho: reduzir ruido de battle coverage.
 
 3. Evoluir `decision_trace_v1` para decisao comparativa.

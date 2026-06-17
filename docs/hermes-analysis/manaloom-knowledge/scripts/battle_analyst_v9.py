@@ -8141,6 +8141,19 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "land": pass
+    elif effect == "creature":
+        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "creature"
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "creature_to_battlefield",
+            player=player.name,
+            card=card.get("name", "?"),
+            is_mana_source=bool(permanent.get("is_mana_source")),
+            mana_produced=permanent.get("mana_produced"),
+            summoning_sick=permanent.get("summoning_sick"),
+            turn=turn,
+        )
     elif effect == "passive":
         if is_instant(card) or is_sorcery(card):
             finish_resolved_spell(player, card, turn=turn)

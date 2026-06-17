@@ -735,6 +735,16 @@ Risco operacional remanescente:
   `curated/active` com
   `effect=cantrip_mana_filter_artifact` e
   `battle_model_scope=sacrifice_mana_filter_cantrip_v2`.
+- continuidade validada em 2026-06-17:
+  - `Incubation Druid` entrou como `curated/active` em
+    `reviewed_battle_card_rules.json` com baseline de mana dork
+    (`effect=creature`, `is_mana_source=true`, `mana_produced=1`), e o runtime
+    passou a suportar esse caminho diretamente em `apply_effect_immediate()`;
+  - `Ashnod's Altar` entrou como `curated/active` com metadata revisada de
+    habilidade ativada (`activated_mana_ability`, `activation_cost`,
+    `mana_produced`), mas continua sem executor completo para a habilidade de
+    sacrificar criatura por mana. A regra correta no momento e manter metadata
+    rastreavel sem transformar isso em mana gratis no resolve do spell.
 - leitura correta desses dois casos:
   - o runtime esta coerente e consome a camada revisada sem conflito;
   - `Angel's Grace` saiu de drift de fallback e ganhou semantica executavel
@@ -742,6 +752,11 @@ Risco operacional remanescente:
   - `Chromatic Star` deixou de ser `unknown` e saiu do surrogate puro de
     `draw_cards`; hoje ela entra como artefato utilitario sacrificavel que pode
     corrigir cor no precombat e virar draw no postcombat;
+  - `Incubation Druid` deixou de depender de `needs_review` generico e passou a
+    ter comportamento parcial coerente com summoning sickness e mana baseline;
+  - `Ashnod's Altar` deixou de colapsar em `ramp_ritual`, mas o custo
+    `sacrifice_creature` ainda exige executor proprio antes de virar semantica
+    completa;
   - mesmo assim, ela ainda nao deve ser tratada como regra totalmente
     verificada enquanto a mana ability completa e todos os edge cases de combo
     nao estiverem modelados com fidelidade maior.

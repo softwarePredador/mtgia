@@ -231,7 +231,11 @@ def test_promoted_hotfixes_resolve_from_sqlite_without_manual_override():
     case = pg_rule_fallback_tests.RuntimePgRuleFallbackForPromotedHotfixesTests(
         "test_canonicalized_overrides_resolve_from_sqlite_without_manual_override"
     )
-    case.test_canonicalized_overrides_resolve_from_sqlite_without_manual_override()
+    case.setUp()
+    try:
+        case.test_canonicalized_overrides_resolve_from_sqlite_without_manual_override()
+    finally:
+        case.tearDown()
 
 
 if __name__ == "__main__":

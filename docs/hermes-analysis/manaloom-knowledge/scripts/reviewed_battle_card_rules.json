@@ -1,4 +1,24 @@
 {
+  "Ashnod's Altar": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "passive",
+      "activated_mana_ability": true,
+      "activation_cost": "sacrifice_creature",
+      "mana_produced": 2,
+      "produces": "C",
+      "battle_model_scope": "activated_creature_sacrifice_mana_source_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "activated_mana_ability",
+      "subtype": "sacrifice_outlet"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: Sacrifice a creature: Add {C}{C}. Runtime intentionally models this as a passive artifact with reviewed activated-mana metadata, not as free ramp on spell resolution. Full activation needs a dedicated sacrifice-creature mana executor."
+  },
   "Angel's Grace": {
     "effect_json": {
       "cmc": 1.0,
@@ -63,6 +83,27 @@
     "confidence": 0.98,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against Scryfall API: cost is {1}{B/P}{B/P}; target creature gets -5/-5 until end of turn. Runtime models this as a stat modifier, not destroy/exile."
+  },
+  "Incubation Druid": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_mana_source": true,
+      "mana_produced": 1,
+      "produces": "WUBRG",
+      "power": 0,
+      "toughness": 2,
+      "battle_model_scope": "mana_dork_without_adapt_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "creature",
+      "subtype": "mana_dork"
+    },
+    "source": "curated",
+    "confidence": 0.84,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: {T}: Add one mana of any type that a land you control could produce; with a +1/+1 counter it adds three instead; {3}{G}{G}: Adapt 3. Runtime models only the baseline mana-dork mode with summoning sickness. Adapt and triple-mana replacement remain tracked gaps."
   },
   "Natural Order": {
     "effect_json": {

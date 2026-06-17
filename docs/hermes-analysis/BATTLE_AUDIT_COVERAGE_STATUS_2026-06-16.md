@@ -232,6 +232,32 @@ cartas de oponentes:
 Acao: revisar `card_battle_rules`/oracle dessas cartas, promover apenas se a
 regra for trusted/traceable e mantiver teste focado.
 
+Atualizacao de continuidade - 2026-06-17:
+
+- `Incubation Druid` deixou de ser `generated/needs_review` e passou para
+  `curated/active` na camada versionada de reviewed rules.
+- O modelo novo e deliberadamente parcial:
+  - entra como `effect=creature`;
+  - `is_mana_source=true`;
+  - respeita summoning sickness;
+  - produz `1` mana no baseline;
+  - nao executa ainda `Adapt 3` nem o modo de `3` manas com `+1/+1 counter`.
+- O runtime precisou de um ajuste real para sustentar isso: `effect=creature`
+  agora resolve permanentemente para o battlefield em
+  `apply_effect_immediate()`, em vez de depender apenas de caminhos indiretos.
+- `Ashnod's Altar` tambem deixou de ser tratado como pseudo-ramp de spell e foi
+  promovida para `curated/active` como artefato passivo com metadata de
+  habilidade ativada:
+  - `activated_mana_ability=true`;
+  - `activation_cost=sacrifice_creature`;
+  - `mana_produced=2`;
+  - `battle_model_scope=activated_creature_sacrifice_mana_source_unexecuted_v1`.
+- O comportamento correto aqui e intencionalmente conservador: o runtime **nao**
+  gera mana gratis no resolve do spell. O passo pendente e um executor generico
+  para artefatos/permantentes com habilidade ativada que sacrificam criatura
+  para mana. Ate esse executor existir, Ashnod deve permanecer `active`,
+  auditavel e sem hard behavior completo.
+
 ### P1 - utility lands ainda parciais
 
 O pacote Lorehold nao tem mais nonlands `high risk`, mas alguns terrenos

@@ -217,6 +217,28 @@
     `canonical_snapshot_rows=3159`, `runtime_effect_different=217`,
     `source_review_counts` contendo `curated/active=1` e o runtime resolvendo
     esses dois casos pela camada revisada, nao pelo fallback legado.
+- Atualizacao adicional de continuidade — 2026-06-17:
+  - `Incubation Druid` foi promovida para `curated/active` com
+    `effect=creature`, `is_mana_source=true`, `mana_produced=1`,
+    `produces=WUBRG` e `battle_model_scope=mana_dork_without_adapt_v1`;
+  - `battle_analyst_v9.py` ganhou o branch faltante para `effect=creature` em
+    `apply_effect_immediate()`, colocando a criatura no battlefield com
+    summoning sickness e permitindo que a infraestrutura generica de mana dork
+    passe a valer tambem para regras promovidas por dado;
+  - `Ashnod's Altar` foi promovida para `curated/active` como artefato passivo
+    com metadata revisada de habilidade ativada
+    (`activated_mana_ability=true`,
+    `activation_cost=sacrifice_creature`,
+    `mana_produced=2`,
+    `produces=C`,
+    `battle_model_scope=activated_creature_sacrifice_mana_source_unexecuted_v1`);
+  - a carta deixou de usar o surrogate incorreto `ramp_ritual` no cast. O
+    comportamento duro continua pendente ate existir executor generico para
+    permanentes/artefatos que sacrificam criatura para gerar mana;
+  - `test_reviewed_battle_card_rules.py` passou a cobrir esses dois casos e a
+    provar que `Ashnod's Altar` nao gera mana gratis no resolve do spell,
+    enquanto `Incubation Druid` so entra como mana source depois que perde
+    summoning sickness.
 - P1 aberto a partir desta revalidacao:
   - promover cartas ainda relevantes ao corpus Lorehold/oponentes de
     `generated/needs_review`, `heuristic` ou `active` para regras canônicas
@@ -1387,7 +1409,7 @@ Tasks priorizadas derivadas do estudo:
 | Prioridade | Task | Motivo real | Resultado esperado |
 |---|---|---|---|
 | P1 | Refinar `Urza's Saga` depois do slice minimo ja implementado | Em 2026-06-16 o battle passou a inicializar capitulo/lore, avancar no upkeep, criar Construct no capitulo II e tutorar artefato cmc<=1 seguro no capitulo III antes do SBA. O gap remanescente e de refinamento: sizing dinamico do Construct e generalizacao prudente do fluxo de Saga | Menos ambiguidade medium-risk no Lorehold sem abrir uma engine de Saga agressiva demais |
-| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review` |
+| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; o proximo outlier principal virou `Ashnod's Altar`, que ja tem metadata revisada mas ainda nao possui executor generico de habilidade ativada com custo `sacrifice_creature` | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review` |
 | P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
 | P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | WR bruto continua fraco como sinal de verdade | Aprendizado menos enganado por variance e jogos longos |
 | P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |
