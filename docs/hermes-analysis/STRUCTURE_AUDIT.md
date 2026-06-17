@@ -22121,8 +22121,8 @@ rotas chamadas por `app/lib` e em endpoints experimentais documentados como
   `id + user_id` antes de carregar cartas e criar draft para o usuario.
 
 ## Rodada focada: Local ManaLoom Card Semantics Audit
-> Data: 2026-06-16 05:30 UTC
-> Checkout local: `e458c074`
+> Data: 2026-06-17 05:30 UTC
+> Checkout local: `6d25e447`
 > Rotacao local Codex: `local-manaloom-card-semantics-audit`
 
 Escopo desta rodada: hardcoded Magic card names em codigo de produto/runtime,
@@ -22138,6 +22138,9 @@ optimize, e sinais de utilidade inferidos por nome em vez de
   `git pull --ff-only origin codex/hermes-analysis-docs` executados; branch ja
   estava atualizada.
 - `git status --short` iniciou limpo.
+- `git diff --name-status e458c074..HEAD -- server/lib server/routes app/lib`
+  nao encontrou delta de codigo de produto desde a rodada anterior de semantica;
+  o delta no intervalo foi documental.
 
 ### Estado saneado confirmado
 
@@ -22275,6 +22278,35 @@ optimize, e sinais de utilidade inferidos por nome em vez de
   query de `findSynergyReplacements` para carregar role scores/tags antes do
   score inicial.
 
+#### P1/P2 — Rebuild guiado e validacao de mana base ainda usam nomes fora do adapter
+
+- **Classificacao:** Risk para rebuild; excecao intencional estreita para basic
+  lands, mas com implementacao duplicada a corrigir.
+- **Evidencia rebuild:** `server/lib/ai/rebuild_guided_service.dart:1226`-`:1231`
+  classifica ramp por `signet`/`sol ring`/`talisman`; `:1331`-`:1338` penaliza
+  `Temple of the False God` e `Terrain Generator`; `:1400`-`:1411` prioriza
+  utility lands especificas como `Scavenger Grounds`, `Myriad Landscape`,
+  `Reliquary Tower`, `War Room` e `Ancient Tomb`.
+- **Evidencia basic lands:** a rota `server/routes/decks/[id]/analysis/index.dart:175`-`:195`
+  ainda declara lista local de basics e usa `name.contains(...)` para limite de
+  copias, apesar de `server/lib/basic_land_utils.dart:27`-`:47` ja centralizar
+  normalizacao por nome e `type_line`. No app,
+  `app/lib/features/decks/providers/deck_provider_support_mutation.dart:365`-`:371`
+  usa primeiro `is_basic_land`/`type_line` e mantem nomes como fallback de
+  compatibilidade.
+- **Por que importa:** rebuild decide utilidade/prioridade por nomes sem
+  `semantic_tags_v2`/role scores, e a analise de deck ainda tem uma excecao de
+  regra de copias que pode divergir do helper compartilhado.
+- **O que valida:** rebuild receber roles/tags/policy versionada para utility
+  land e ramp, e a rota de analise trocar a lista inline por
+  `basic_land_utils.isBasicLandCard`.
+- **O que falsifica:** contrato e testes declarando que as listas de rebuild sao
+  policy versionada com fonte/escopo claros, e teste provando que a lista local
+  de basics e intencionalmente diferente do helper compartilhado.
+- **Correcao estreita:** centralizar as excecoes de rebuild em policy com
+  `source`, `reason`, `scope` e teste; substituir o check de basics da rota pelo
+  helper existente.
+
 #### P2 — Candidate quality gera parte da base semantica a partir de nomes
 
 - **Classificacao:** Risk.
@@ -22353,6 +22385,11 @@ optimize, e sinais de utilidade inferidos por nome em vez de
   `server/test/optimize_runtime_support_test.dart:361`-`:467` e
   `server/test/edh_bracket_policy_test.dart`. Isso e regra externa de power-level,
   nao classificador generico de utilidade.
+- **Intentional exception — basic lands/deckbuilding rule:** listas de basics sao
+  aceitaveis quando representam regra de copia/mana base e passam pelo helper
+  compartilhado `server/lib/basic_land_utils.dart:27`-`:47`; ocorrencias locais
+  fora dele, como a rota de analise citada acima, ficam como risco de drift
+  operacional, nao como inferencia de utilidade.
 - **Allowed — seed/corpus Commander Reference:** perfis/fallbacks como
   `loreholdDeterministicReferenceFallbackCards` em
   `server/lib/ai/commander_reference_generate_fallback_support.dart:182`-`:245`
@@ -22365,8 +22402,9 @@ optimize, e sinais de utilidade inferidos por nome em vez de
 - Nao ha evidencia atual para reabrir a claim antiga de que o caminho principal
   do optimize ignora `functional_tags`: ela esta stale nesta branch.
 - O risco real restante esta concentrado em fallbacks por nome, prompts runtime,
-  endpoints advisory, payload/ranking legado de optimize, foundation de candidate
-  quality e analises/corpus auxiliares.
+  endpoints advisory, payload/ranking legado de optimize, rebuild guiado,
+  foundation de candidate quality, basic-land checks locais e analises/corpus
+  auxiliares.
 - Nenhum achado foi baseado apenas em testes, docs, fixtures ou corpus/artifacts
   sem uso runtime.
 

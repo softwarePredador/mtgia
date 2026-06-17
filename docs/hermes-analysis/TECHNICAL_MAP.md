@@ -196,7 +196,8 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-16 05:30 UTC no checkout local `e458c074`. Deck analysis,
+  2026-06-17 05:30 UTC no checkout local `6d25e447` (sem delta de produto desde
+  `e458c074`). Deck analysis,
   `loadOptimizeDeckContext`, addition data do quality gate, validator e quality
   gate ja carregam ou preservam `functional_tags`, `semantic_tags_v2` e
   multi-role quando essas fontes chegam ao fluxo. A ordem principal e
@@ -208,21 +209,26 @@ mtgia/
   `/ai/weakness-analysis` usa o adapter em modo heuristico porque a query nao
   carrega `card_function_tags`/`semantic_tags_v2`, e
   `/decks/:id/recommendations` segue fora da camada semantica compartilhada.
-- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-16
-  05:30 UTC no checkout local `e458c074`. A claim antiga de ausencia de policy
+  Rebuild guiado ainda pontua ramp/utility lands por nomes especificos, e a rota
+  `decks/:id/analysis` mantem lista local de basic lands apesar do helper
+  compartilhado.
+- **P1 — Listas de nomes em runtime de cartas**: revalidado em 2026-06-17
+  05:30 UTC no checkout local `6d25e447`. A claim antiga de ausencia de policy
   versionada esta stale: `commander_fallback_policy.dart` existe, expoe versao e
   centraliza parte relevante dos fallbacks. Continuam como risco as decisoes por
   nome em fallbacks de `functional_card_tags.dart`,
   `optimization_functional_roles.dart`, `candidate_quality_data_support.dart` e
   seu job foundation, `optimize_runtime_support.dart`, `prompt.md`,
   `prompt_complete.md`, `deck_advanced_analysis.dart`,
-  `meta_deck_commander_shell_support.dart`, `/decks/:id/recommendations` e
-  `/ai/weakness-analysis`. Permanecem permitidos exemplos de UI/import,
+  `meta_deck_commander_shell_support.dart`, rebuild guiado,
+  `/decks/:id/recommendations` e `/ai/weakness-analysis`. Permanecem permitidos
+  exemplos de UI/import,
   docs/corpus/artifacts/test fixtures, aliases localizados, sugestoes de busca
   do life counter, mock dev de optimize sem API key, seeds/profiles de Commander
   Reference, `commander_fallback_policy.dart` como policy versionada/testada e a
   excecao intencional de `edh_bracket_policy.dart` para regras externas de
-  bracket/Game Changer.
+  bracket/Game Changer. Basic lands sao excecao de regra de deckbuilding quando
+  passam por `basic_land_utils.dart`; listas inline fora dele seguem gap estreito.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
   2026-06-17 03:00 UTC no checkout local `b53295fe`. O auditor textual executou
@@ -251,8 +257,9 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-16 05:30 UTC no checkout local `e458c074`:
-deck analysis, `loadOptimizeDeckContext`, addition data do quality gate,
+Estado atual revalidado em 2026-06-17 05:30 UTC no checkout local `6d25e447`
+(sem delta de produto desde `e458c074`): deck analysis,
+`loadOptimizeDeckContext`, addition data do quality gate,
 validator e quality gate carregam ou preservam `card_function_tags` e
 `semantic_tags_v2`. O adapter compartilhado
 `resolveCardFunctionalRoles` aplica precedencia
@@ -278,8 +285,13 @@ terrenos e usa raridade como proxy de impacto. A camada de meta Commander
 tambem deriva `strategy_archetype` por listas de nomes em
 `meta_deck_commander_shell_support.dart`; tratar como policy/corpus versionado
 ou substituir por tags/scores semanticos antes de usar esse dado como sinal de
-produto. `edh_bracket_policy.dart` segue excecao intencional por regra externa e
-Game Changer, nao um modelo geral de utilidade de carta.
+produto. `rebuild_guided_service.dart` tambem classifica ramp por
+`signet`/`sol ring`/`talisman` e prioriza/penaliza utility lands por nome; mover
+isso para roles/tags ou policy versionada. Basic lands sao excecao legitima de
+regra de deckbuilding, mas `server/routes/decks/[id]/analysis/index.dart` ainda
+tem lista inline e deve usar `basic_land_utils.dart`. `edh_bracket_policy.dart`
+segue excecao intencional por regra externa e Game Changer, nao um modelo geral
+de utilidade de carta.
 - **P2 — Fallback de semantic v2 baixa confianca**: revalidado e coberto em
   `origin/master@c3531df7`. Tags semantic v2 abaixo de 0.65 sao ignoradas e a
   classificacao cai para heuristica por `oracle_text`/`type_line`.

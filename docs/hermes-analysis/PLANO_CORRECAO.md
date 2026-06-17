@@ -4,16 +4,16 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-17 03:00 UTC
+> Data: 2026-06-17 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-16 19:00 UTC no checkout `41e681a0`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco, mas abriu um novo achado P2 de script-level: o exporter Hermes de learned decks esta bifurcado entre `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`, com drift de completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 15:00 UTC segue sem novo achado P1/P2 app-facing, e a frente aberta de aciclicidade da rodada de 11:00 UTC permanece registrada. A revalidacao de classes de 2026-06-17 03:00 UTC no checkout `b53295fe` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: `server/lib/ai/optimize_runtime_support.dart` (4197 linhas) e `server/routes/ai/optimize/index.dart` (3497 linhas) seguem como gargalos de manutenção.
-3. **P1/P2 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-16 19:00 UTC no checkout `41e681a0`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta; a mutacao mecanica do bloco gerado foi descartada. Desde a rodada anterior de duplicacao (`1c0f9b86..HEAD`), nao houve delta de codigo de produto no recorte auditado; permanecem os clusters ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. Novo achado P2 fora do runtime de produto: `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py` compartilham o mesmo objetivo/fluxo de exportacao Hermes, mas agora divergem em completude, contagem, schema fallback e metadata multi-role. A claim antiga de terrenos basicos/snow basics segue stale porque `basic_land_utils.dart` centraliza regular/snow basics. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
+3. **P1/P2 — Duplicação de helpers e lógica espalhada**: revalidada novamente na rotacao local Codex de 2026-06-16 19:00 UTC no checkout `41e681a0`. O auditor textual executou com sucesso (`205` arquivos backend, `115` problemas textuais, `0` imports quebrados), mas a lista bruta continua ruidosa por regex e nao foi usada como evidencia direta; a mutacao mecanica do bloco gerado foi descartada. Desde a rodada anterior de duplicacao (`1c0f9b86..HEAD`), nao houve delta de codigo de produto no recorte auditado; permanecem os clusters ja abertos: `DeckArchetypeAnalyzer`/`DeckArchetypeAnalyzerCore`, `assessDeckOptimizationState`/`assessDeckOptimizationStateCore`, `resolveOptimizeArchetype`, roles funcionais altos, trust social, logs sociais/follow, condicao de carta e CMC/tipo. Novo achado P2 fora do runtime de produto: `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py` compartilham o mesmo objetivo/fluxo de exportacao Hermes, mas agora divergem em completude, contagem, schema fallback e metadata multi-role. A claim antiga de quatro variantes backend de terrenos basicos/snow basics esta majoritariamente stale porque `basic_land_utils.dart` centraliza regular/snow basics, mas a rota `server/routes/decks/[id]/analysis/index.dart` ainda tem lista inline local e deve ser tratada como gap estreito separado. `buildOptimizeCacheKey`/`buildOptimizeDeckSignature` e wrappers finos em `server/routes/ai/optimize/index.dart` continuam delegando para support e nao sao o corpo duplicado de maior risco.
 4. **P1 — Entry point local quebrado**: **RESOLVIDO/STALE no checkout local
    `372cdfca` em 2026-06-11 11:00 UTC**. `server/bin/local_test_server.dart`
    nao importa mais `../.dart_frog/server.dart` estaticamente; valida
@@ -35,17 +35,20 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    ser leitura local de `commander_learned_decks`, sem chamada LLM/externa no
    handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-16 05:30 UTC no checkout `e458c074`. O caminho principal
+   2026-06-17 05:30 UTC no checkout `6d25e447`; sem delta de produto desde
+   `e458c074`. O caminho principal
    analysis/optimize/validator/quality gate carrega ou preserva
    `functional_tags` e `semantic_tags_v2`, entao a claim antiga de ausencia no
    optimize segue stale. Permanecem riscos por nome nos fallbacks de
    `functional_card_tags.dart`, `optimization_functional_roles.dart`, foundation
    de candidate quality, ranking deterministico de replacements, prompts runtime
    (`prompt.md`/`prompt_complete.md`), endpoints advisory
-   (`/ai/weakness-analysis`, `/decks/:id/recommendations`), advanced analysis e
-   meta shell. `edh_bracket_policy.dart` continua excecao intencional por regra
-   externa/Game Changer; `commander_fallback_policy.dart` e policy versionada e
-   testada, mas nao deve virar modelo geral de utilidade.
+   (`/ai/weakness-analysis`, `/decks/:id/recommendations`), rebuild guiado,
+   advanced analysis e meta shell. `edh_bracket_policy.dart` continua excecao
+   intencional por regra externa/Game Changer; `commander_fallback_policy.dart`
+   e policy versionada e testada, mas nao deve virar modelo geral de utilidade.
+   Basic lands sao excecao intencional de regra de deckbuilding quando passam por
+   `basic_land_utils.dart`; listas locais fora dele seguem gap estreito.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
    revalidado na rotacao local Codex de 2026-06-16 15:00 UTC no checkout
    `0feacae2`. Desde `d6e568ac`, nao houve delta de codigo de produto em
@@ -79,15 +82,15 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    chamada para `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta
    rotacao.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
-   `e458c074`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
+   `6d25e447`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
    e addition data de quality gate usam a ordem
    `functional_tags -> semantic_tags_v2 -> heuristica`. O risco atual esta nos
    paths legacy que colapsam multi-role (`inferFunctionalRole`/
    `_legacyOptimizeRoleForResolvedRoles`), em `removals_detailed` sem threadar as
    tags ja presentes em `allCardData`, em `findSynergyReplacements` que monta o
    pool inicial sem tags/role scores, em prompts runtime com exemplos nomeados, e
-   em endpoints advisory que ainda nao carregam fontes persistidas antes de
-   montar buckets/recomendacoes.
+   em endpoints advisory/rebuild guiado que ainda nao carregam fontes persistidas
+   antes de montar buckets/recomendacoes ou priorizar utilidade por nome.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -234,13 +237,16 @@ Histórico do problema:
     `resolveCardFunctionalRoles` em
     `server/lib/ai/optimization_functional_roles.dart:37`-`:91` centraliza
     precedencia de fonte, mas nao elimina os fallbacks duplicados.
-  - A claim antiga de `_isBasicLandName` duplicado esta stale:
+  - A claim antiga de `_isBasicLandName` duplicado em quatro variantes backend
+    esta majoritariamente stale:
     `server/lib/basic_land_utils.dart:1`-`:47` centraliza nomes regulares,
     snow basics, normalizacao e type line; consumidores atuais importam esse
     helper em `server/lib/ai/optimize_runtime_support.dart:2`,
     `server/lib/generated_deck_validation_service.dart:3`,
     `server/lib/meta/meta_deck_reference_support.dart:5` e
-    `server/routes/ai/commander-reference/index.dart:17`.
+    `server/routes/ai/commander-reference/index.dart:17`. Gap restante:
+    `server/routes/decks/[id]/analysis/index.dart:175`-`:195` ainda tem lista
+    inline e `name.contains(...)`, devendo migrar para o helper.
   - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
     `_buildTrustInsight` duplicam o mesmo trust em listagem/detalhe de trades
     (`server/routes/trades/index.dart:557`-`:635`,
@@ -297,8 +303,9 @@ Histórico do problema:
   3. criar adapter unico de roles funcionais que aceite nome, `oracle_text`,
      `type_line`, `functional_tags` e `semantic_tags_v2`, retornando conjunto
      de roles + `primary_role`;
-  4. manter `basic_land_utils.dart` como fonte canonica e remover wrappers
-     locais que nao agregam contrato;
+  4. manter `basic_land_utils.dart` como fonte canonica, migrar a rota de
+     analise que ainda usa lista inline e remover wrappers locais que nao
+     agregam contrato;
   5. agrupar duplicacoes de menor risco por dominio (trust social, request/log,
      condicao de carta, CMC/tipo), mantendo wrappers locais so quando o contrato
      divergente for intencional e testado.
@@ -323,13 +330,15 @@ Histórico do problema:
     operacional.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
-- **Status 2026-06-16 05:30 UTC: REVALIDADO/ABERTO no checkout `e458c074`.**
+- **Status 2026-06-17 05:30 UTC: REVALIDADO/ABERTO no checkout `6d25e447`.**
+  Sem delta de produto desde `e458c074` no recorte `server/lib`,
+  `server/routes` e `app/lib`.
   A branch atual ja tem excecoes aceitaveis e testadas:
   `edh_bracket_policy.dart` como regra externa/Game Changer e
   `commander_fallback_policy.dart` como policy versionada para fallbacks
   Commander. O risco aberto sao nomes ainda espalhados em classificadores
   heuristics, foundation de candidate quality, prompts runtime, replacement
-  ranking, endpoints advisory, advanced analysis e meta shell.
+  ranking, endpoints advisory, rebuild guiado, advanced analysis e meta shell.
 - **Evidencia**:
   - `server/lib/ai/functional_card_tags.dart:219`-`:226`, `:713`-`:730`,
     `:767`-`:793`, `:836`-`:848`, `:863`-`:884` e `:900`-`:924` usa nomes como
@@ -363,6 +372,14 @@ Histórico do problema:
     `resolveCardFunctionalRoles` sem essas fontes em `:115`-`:122` e retorna
     listas fixas de recomendacao em `:193`-`:199`, `:212`-`:217`,
     `:230`-`:235`, `:248`-`:253`, `:282`-`:287` e `:299`-`:304`.
+  - `server/lib/ai/rebuild_guided_service.dart:1226`-`:1231` classifica ramp por
+    `signet`/`sol ring`/`talisman`; `:1331`-`:1338` e `:1400`-`:1411`
+    penalizam/priorizam utility lands por nome.
+  - `server/routes/decks/[id]/analysis/index.dart:175`-`:195` ainda usa lista
+    local de basic lands e `name.contains(...)`, embora
+    `server/lib/basic_land_utils.dart:27`-`:47` centralize a regra por nome e
+    `type_line`. Basic lands continuam excecao legitima de regra de deckbuilding,
+    mas esta rota deve reutilizar o helper.
   - `server/lib/ai/deck_advanced_analysis.dart:43`-`:57` chama
     `resolveCardFunctionalRoles` sem fontes persistidas; `:104`-`:132` e
     `:507`-`:524` usam nomes em analises de wincon/drain/protecao/recursao.
@@ -395,7 +412,9 @@ Histórico do problema:
   5. migrar `/decks/:id/recommendations` e `/ai/weakness-analysis` para
      `card_function_tags`, `semantic_tags_v2`, role scores, legalidade,
      identidade de cor, bracket e budget antes de qualquer sugestao por nome;
-  6. manter `edh_bracket_policy.dart` como excecao documentada com sync/fonte e
+  6. mover as excecoes de rebuild para roles/tags ou policy versionada e trocar
+     a lista local de basic lands da rota de analise pelo helper compartilhado;
+  7. manter `edh_bracket_policy.dart` como excecao documentada com sync/fonte e
      teste dedicado, sem reutilizar essa lista como utilidade geral.
 - **Validacao**:
   - `rg -n "Sol Ring|Command Tower|Thassa's Oracle|Isochron Scepter|Dramatic Reversal|Blood Artist" server/lib server/routes app/lib`
@@ -405,11 +424,13 @@ Histórico do problema:
     mesmo role quando nao ha dado persistido;
   - scorecard prova que bonus por nome nao supera legalidade, identidade de cor,
     bracket, role_score, synergy e quality gate.
+  - a rota de analise de deck usa `basic_land_utils.isBasicLandCard` ou teste
+    documenta por que sua lista local de basics diverge do helper.
 
 ### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-16 05:30 UTC: PARCIALMENTE SANEADO no checkout
-  `e458c074`.** A acao antiga de "carregar `card_function_tags` no contexto
+- **Status 2026-06-17 05:30 UTC: PARCIALMENTE SANEADO no checkout
+  `6d25e447`.** Sem delta de produto desde `e458c074`. A acao antiga de "carregar `card_function_tags` no contexto
   principal de optimize" nao se aplica mais nesta branch.
 - **Evidencia atualizada**:
   - `GET /decks/:id/analysis` seleciona e retorna `card_function_tags` e
@@ -441,9 +462,10 @@ Histórico do problema:
   monta `removals_detailed.functionalRole` sem passar as tags persistidas ja
   disponiveis; `findSynergyReplacements` monta o pool inicial sem carregar fontes
   persistidas, embora aggressive mode possa reranquear com quality signals; os
-  prompts runtime ainda contem exemplos nomeados; e `/decks/:id/recommendations`
+  prompts runtime ainda contem exemplos nomeados; `/decks/:id/recommendations`
   + `/ai/weakness-analysis` ainda precisam usar o mesmo adapter antes de promocao
-  app-facing.
+  app-facing; e rebuild guiado ainda decide ramp/utility lands por nomes fora do
+  adapter/policy versionada.
 - **Acao recomendada**:
   1. manter um adapter unico para `functional_tags`, `semantic_tags_v2`,
      `oracle_text`, `type_line`, `mana_cost` e `cmc`;
@@ -454,8 +476,8 @@ Histórico do problema:
   4. alinhar candidate quality foundation e `candidate_quality_sources` com as
      fontes realmente consultadas ou documentar quais fontes sao apenas
      diagnostico;
-  5. antes de promover endpoints advisory/prompts runtime, exigir que reutilizem o mesmo adapter
-     ou declarem contrato interno separado.
+  5. antes de promover endpoints advisory/prompts runtime/rebuild side paths,
+     exigir que reutilizem o mesmo adapter ou declarem contrato interno separado.
 - **Validacao**:
   - carta com `functional_tags=[draw]` e sem `semantic_tags_v2` e tratada como
     draw em analysis, validator e quality gate;
@@ -465,6 +487,8 @@ Histórico do problema:
     `draw + engine` em ranking, contagem, risco e payload app-facing;
   - testes de candidate quality mostram fontes reais em `candidate_quality_sources`
     e que policy por nome nao supera oracle/tipo/tags;
+  - rebuild e endpoints advisory provam que roles secundarios chegam ao ranking,
+    deltas e payload, ou ficam documentados como fallback interno separado.
 
 ### P2 — Threadar estado atual do deck nos fillers de optimize/complete
 
