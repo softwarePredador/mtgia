@@ -33,6 +33,21 @@ void main() {
       expect(isReferenceProfileConfidenceUsable('unknown'), isFalse);
     });
 
+    test('derives profile confidence conservatively from commander deck count',
+        () {
+      expect(
+          commanderReferenceConfidenceFromDeckCount(0), equals('not_proven'));
+      expect(commanderReferenceConfidenceFromDeckCount(12), equals('low'));
+      expect(
+          commanderReferenceConfidenceFromDeckCount(75), equals('medium_low'));
+      expect(commanderReferenceConfidenceFromDeckCount(250), equals('medium'));
+      expect(
+        commanderReferenceConfidenceFromDeckCount(1500),
+        equals('medium_high'),
+      );
+      expect(commanderReferenceConfidenceFromDeckCount(5000), equals('high'));
+    });
+
     test('prefers a usable persisted profile when it exists', () {
       final persisted = buildCommanderReferenceProfilePayload(
         commanderName: 'Test Commander',
@@ -57,6 +72,27 @@ void main() {
       expect(resolved, isNotNull);
       expect(resolved!['version'], equals('persisted_v1'));
       expect(resolved['source'], equals('persisted_profile'));
+      expect(resolved.containsKey('runtime_profile_origin'), isFalse);
+    });
+
+    test('accepts a medium-confidence persisted profile even if it is sparse',
+        () {
+      final resolved = resolveRuntimeCommanderReferenceProfile(
+        commanderName: 'Exact Commander',
+        persistedProfile: {
+          'commander': 'Exact Commander',
+          'source': 'edhrec',
+          'confidence': 'medium',
+          'source_count': 1,
+          'themes': const ['tokens'],
+          'average_type_distribution': const {'creatures': 24},
+        },
+      );
+
+      expect(resolved, isNotNull);
+      expect(resolved!['source'], equals('edhrec'));
+      expect(resolved['confidence'], equals('medium'));
+      expect(resolved['source_count'], equals(1));
       expect(resolved.containsKey('runtime_profile_origin'), isFalse);
     });
 

@@ -1015,8 +1015,22 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
   }
 
   final profile = {
-    'source': 'edhrec',
-    'commander': commander,
+    ...buildCommanderReferenceProfilePayload(
+      commanderName: commander,
+      version: '',
+      source: 'edhrec',
+      confidence: commanderReferenceConfidenceFromDeckCount(data.deckCount),
+      sourceCount: data.deckCount > 0 ? 1 : 0,
+      colorIdentity: const [],
+      themes: const [],
+      roleTargets: const {},
+      expectedPackages: const {},
+      avoidPatterns: const [],
+      sourceLimitNotes: const [
+        'Single-source EDHREC aggregate commander page. Use with card_stats/corpus enrichment; do not treat as copied decklist evidence.',
+      ],
+      updatedAt: DateTime.now().toUtc(),
+    ),
     'deck_count': data.deckCount,
     'themes': data.themes,
     'average_type_distribution': data.averageTypeDistribution,
@@ -1045,7 +1059,6 @@ Future<Map<String, dynamic>?> _buildAndPersistEdhrecProfile({
     },
     'average_deck_seed': averageDeckSeed,
     'top_cards': topCards.take(120).toList(),
-    'updated_at': DateTime.now().toUtc().toIso8601String(),
   };
 
   await pool.execute(

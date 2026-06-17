@@ -51,6 +51,16 @@ bool isReferenceProfileConfidenceUsable(Object? confidence) {
       commanderReferenceConfidenceRank('medium');
 }
 
+String commanderReferenceConfidenceFromDeckCount(int deckCount) {
+  final count = deckCount < 0 ? 0 : deckCount;
+  if (count >= 5000) return 'high';
+  if (count >= 1000) return 'medium_high';
+  if (count >= 250) return 'medium';
+  if (count >= 50) return 'medium_low';
+  if (count >= 10) return 'low';
+  return 'not_proven';
+}
+
 int commanderReferenceConfidenceRank(Object? confidence) {
   final normalized = normalizeCommanderReferenceConfidence(confidence);
   return _confidenceRank[normalized] ?? _confidenceRank['not_proven']!;
