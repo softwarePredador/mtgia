@@ -7,8 +7,8 @@ ENV PATH="$PATH:/root/.pub-cache/bin"
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     bash \
-    busybox-static \
     ca-certificates \
+    cron \
     git \
     python3 \
     util-linux \
