@@ -40,6 +40,10 @@ O bootstrap precisa garantir:
    - `hermes gateway run`
    - sem reencadear `main-wrapper`/`entrypoint` depois que o container já
      entrou pelo `/init` da imagem base.
+7. materializar a configuração persistida do Hermes dentro do volume:
+   - `~/.hermes/.env` com secrets necessários já presentes no serviço;
+   - `config.yaml`/config interna com `model` alinhado ao `HERMES_MODEL`
+     quando esse env estiver definido.
 
 ## O que o container precisa para funcionar
 
@@ -53,6 +57,7 @@ Obrigatorio:
 - `API_SERVER_ENABLED=true`;
 - `API_SERVER_HOST=0.0.0.0`;
 - `API_SERVER_KEY` com valor aleatório persistido no serviço;
+- `HERMES_MODEL` coerente com o provider realmente configurado;
 - repo público ou credencial Git se for preciso push.
 
 Opcional:
@@ -77,6 +82,9 @@ Observação de runtime:
 - o bootstrap local preserva `HERMES_HOME=/opt/data` e evita reencadear o
   `main-wrapper` depois do `/init`, porque essa cadeia já teve regressões de
   env/workdir no upstream Docker do Hermes.
+- o bootstrap também precisa persistir `.env` dentro do volume; depender só de
+  env injetado pelo orchestrator deixa `hermes status` e a CLI interativa fora
+  de sincronia com o provider real do serviço.
 
 ## Tokens de IA
 

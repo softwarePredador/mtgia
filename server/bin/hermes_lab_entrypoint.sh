@@ -30,10 +30,53 @@ export MANALOOM_WORKSPACE=$REPO_DIR
 export HERMES_REPO_DIR=$REPO_DIR
 EOF
 
+touch "$HERMES_HOME/.env"
+
+upsert_env_file() {
+  local key="$1"
+  local value="${2:-}"
+  if [[ -z "$value" ]]; then
+    return 0
+  fi
+  python3 - "$HERMES_HOME/.env" "$key" "$value" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+key = sys.argv[2]
+value = sys.argv[3]
+lines = path.read_text().splitlines() if path.exists() else []
+prefix = f"{key}="
+updated = False
+out = []
+for line in lines:
+    if line.startswith(prefix):
+        out.append(f"{key}={value}")
+        updated = True
+    else:
+        out.append(line)
+if not updated:
+    out.append(f"{key}={value}")
+path.write_text("\n".join(out).rstrip() + "\n")
+PY
+}
+
+upsert_env_file "OPENAI_API_KEY" "${OPENAI_API_KEY:-}"
+upsert_env_file "OPENROUTER_API_KEY" "${OPENROUTER_API_KEY:-}"
+upsert_env_file "ANTHROPIC_API_KEY" "${ANTHROPIC_API_KEY:-}"
+upsert_env_file "GEMINI_API_KEY" "${GEMINI_API_KEY:-}"
+upsert_env_file "DEEPSEEK_API_KEY" "${DEEPSEEK_API_KEY:-}"
+upsert_env_file "API_SERVER_KEY" "${API_SERVER_KEY:-}"
+
 export HOME="$HERMES_HOME"
 export PATH="$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
 
 cd "$HERMES_HOME"
+
+if [[ -n "${HERMES_MODEL:-}" ]]; then
+  hermes config set model "$HERMES_MODEL" >/dev/null 2>&1 || true
+fi
+
 # This wrapper already runs under the image's /init entrypoint. Calling back
 # into the Docker wrapper chain again makes startup harder to reason about and
 # can reintroduce upstream main-wrapper environment quirks. Launch the gateway
