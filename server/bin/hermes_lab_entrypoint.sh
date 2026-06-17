@@ -34,4 +34,6 @@ export HOME="$HERMES_HOME"
 export PATH="$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
 
 cd "$HERMES_HOME"
-exec /init /opt/hermes/docker/main-wrapper.sh gateway
+# Use the official Docker entrypoint path for Hermes so the supervised
+# dashboard/API sidecars follow the vendor-supported lifecycle.
+exec /opt/hermes/docker/entrypoint.sh gateway run

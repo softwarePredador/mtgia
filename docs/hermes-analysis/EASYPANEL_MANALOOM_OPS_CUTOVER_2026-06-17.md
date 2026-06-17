@@ -22,6 +22,12 @@ Fora do escopo:
 - research crons;
 - qualquer job que altere documentação de análise em produção.
 
+Nota operacional:
+
+- o `hermes-lab` pode coexistir no mesmo projeto EasyPanel, mas não precisa de
+  domínio público para o cutover do worker determinístico;
+- o worker operacional deve permanecer separado do container Hermes completo.
+
 ## Serviço alvo
 
 Projeto EasyPanel:

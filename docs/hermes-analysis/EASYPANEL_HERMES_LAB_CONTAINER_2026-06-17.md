@@ -36,6 +36,9 @@ O bootstrap precisa garantir:
    - jq
    - node/npm
 5. `PATH` consistente escrito em `/opt/data/.profile`.
+6. handoff final para o entrypoint oficial da imagem Hermes:
+   - `gateway run`
+   - sem reinventar o lifecycle interno do vendor image.
 
 ## O que o container precisa para funcionar
 
@@ -44,17 +47,29 @@ Obrigatorio:
 - volume persistente `/opt/data`;
 - `HERMES_HOME=/opt/data`;
 - `HERMES_DASHBOARD=1`;
-- `HERMES_DASHBOARD_HOST=0.0.0.0`;
+- `HERMES_DASHBOARD_HOST=127.0.0.1` por padrão seguro;
 - `HERMES_DASHBOARD_PORT=9119`;
 - `API_SERVER_ENABLED=true`;
 - `API_SERVER_HOST=0.0.0.0`;
+- `API_SERVER_KEY` com valor aleatório persistido no serviço;
 - repo público ou credencial Git se for preciso push.
 
 Opcional:
 
 - `HERMES_GITHUB_TOKEN` para push na branch `codex/hermes-analysis-docs`;
 - tokens de provider para jobs/chat LLM;
-- domínio público dedicado do dashboard.
+- domínio público dedicado do dashboard somente com auth/OAuth explícito.
+
+Nao expor publicamente:
+
+- dashboard em `0.0.0.0` sem auth provider;
+- dashboard com `HERMES_DASHBOARD_INSECURE=1` na internet pública.
+
+Se precisar acesso web imediato antes de configurar auth:
+
+- manter o dashboard em loopback;
+- usar `docker exec`/túnel SSH/console controlado;
+- ou expor apenas o API server com `API_SERVER_KEY`.
 
 ## Tokens de IA
 
@@ -100,4 +115,6 @@ validação, mas nao executa tarefas dependentes de provider.
 3. Validar `flutter --version`, `dart --version`, `python3 --version` e repo
    disponível dentro do container.
 4. Validar `hermes status`.
-5. Só depois desligar a AWS.
+5. Só expor domínio público quando houver auth do dashboard ou política clara
+   de reverse proxy privado.
+6. Só depois desligar a AWS.
