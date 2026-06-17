@@ -30,7 +30,8 @@ RUN apt-get update \
 RUN mkdir -p /opt/tools \
   && curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
     | tar -xJ -C /opt/tools \
-  && dart pub global activate dart_frog_cli 1.2.14
+  && git config --global --add safe.directory /opt/tools/flutter \
+  && /opt/tools/flutter/bin/cache/dart-sdk/bin/dart pub global activate dart_frog_cli 1.2.14
 
 COPY server/bin/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_entrypoint.sh
 RUN chmod +x /opt/bootstrap/hermes_lab_entrypoint.sh
