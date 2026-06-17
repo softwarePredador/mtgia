@@ -98,7 +98,7 @@ Usar o mesmo `server/.env` do ManaLoom como base e acrescentar no serviço:
 - `HERMES_KNOWLEDGE_DB=/data/manaloom-ops/knowledge.db`
 - `MTGIA_ENV_FILE=/app/server/.env`
 - `MANALOOM_DART_BIN=dart`
-- `PULL_LEARNING_EVENTS_CRON=*/30 * * * *`
+- `PULL_LEARNING_EVENTS_CRON=0 * * * *`
 - `AUTO_SYNC_LEARNED_DECKS_CRON=0 */2 * * *`
 - `MASTER_OPTIMIZER_PREFLIGHT_CRON=15 * * * *`
 - `MANALOOM_RUN_PREFLIGHT_ON_BOOT=0`
@@ -172,7 +172,7 @@ em outro serviço, em vez de reapertar limites cedo demais.
 
 O daemon faz polling de minuto e avalia expressões cron simples em runtime:
 
-- `pull_learning_events`: `*/30 * * * *`
+- `pull_learning_events`: `0 * * * *`
 - `auto_sync_learned_decks`: `0 */2 * * *`
 - `auto_promote_learned_decks`: `30 */6 * * *`
 - `master_optimizer_preflight`: `15 * * * *`

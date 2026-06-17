@@ -122,6 +122,22 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para decidir proximos applies controlados: candidate quality, auto
     promote learned decks e metricas de decision impact.
 
+- `CRON_EFFICIENCY_REVALIDATION_2026-06-17.md`
+  - Revalida uma a uma as crons Hermes/ManaLoom sob criterio de valor real,
+    ruido e gasto de token.
+  - Separa o que deve ficar no `manaloom-ops`, o que ainda faz sentido com
+    provider e o que deve permanecer manual/pausado.
+  - Use antes de reativar crons antigas ou trocar provider por custo.
+
+- `EASYPANEL_HERMES_LAB_CONTAINER_2026-06-17.md`
+  - Contrato operacional do container `hermes-lab` no EasyPanel.
+  - Agora tambem documenta a frota de crons bootstrapada no startup e os jobs
+    pausados/removidos por reconciliacao.
+
+- `EASYPANEL_MANALOOM_OPS_CUTOVER_2026-06-17.md`
+  - Contrato operacional do worker deterministico `manaloom-ops`.
+  - Use para conferir cadencias reais, volume persistente e ordem de cutover.
+
 - `BATTLE_AUDIT_COVERAGE_STATUS_2026-06-16.md`
   - Status pos-correcao da auditoria de battle: 16 seeds, 17069 eventos,
     2301 decision traces, 0 high/critical, 0 strategy blockers e apenas

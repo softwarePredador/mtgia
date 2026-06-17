@@ -34,7 +34,8 @@ RUN mkdir -p /opt/tools \
   && /opt/tools/flutter/bin/cache/dart-sdk/bin/dart pub global activate dart_frog_cli 1.2.14
 
 COPY server/bin/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_entrypoint.sh
-RUN chmod +x /opt/bootstrap/hermes_lab_entrypoint.sh
+COPY server/bin/hermes_lab_cron_bootstrap.py /opt/bootstrap/hermes_lab_cron_bootstrap.py
+RUN chmod +x /opt/bootstrap/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_cron_bootstrap.py
 
 VOLUME ["/opt/data"]
 

@@ -62,10 +62,6 @@ PY
 }
 
 upsert_env_file "OPENAI_API_KEY" "${OPENAI_API_KEY:-}"
-upsert_env_file "OPENROUTER_API_KEY" "${OPENROUTER_API_KEY:-}"
-upsert_env_file "ANTHROPIC_API_KEY" "${ANTHROPIC_API_KEY:-}"
-upsert_env_file "GEMINI_API_KEY" "${GEMINI_API_KEY:-}"
-upsert_env_file "DEEPSEEK_API_KEY" "${DEEPSEEK_API_KEY:-}"
 upsert_env_file "API_SERVER_KEY" "${API_SERVER_KEY:-}"
 
 export HOME="$HERMES_HOME"
@@ -75,6 +71,15 @@ cd "$HERMES_HOME"
 
 if [[ -n "${HERMES_MODEL:-}" ]]; then
   hermes config set model "$HERMES_MODEL" >/dev/null 2>&1 || true
+fi
+
+if [[ "${HERMES_CRON_BOOTSTRAP:-1}" == "1" ]]; then
+  if ! python3 /opt/bootstrap/hermes_lab_cron_bootstrap.py; then
+    if [[ "${HERMES_CRON_BOOTSTRAP_REQUIRED:-1}" == "1" ]]; then
+      echo "hermes_lab_cron_bootstrap failed and HERMES_CRON_BOOTSTRAP_REQUIRED=1" >&2
+      exit 1
+    fi
+  fi
 fi
 
 # This wrapper already runs under the image's /init entrypoint. Calling back

@@ -80,7 +80,7 @@ def _base_env() -> dict[str, str]:
 JOBS = [
     Job(
         name="pull_learning_events",
-        schedule=os.environ.get("PULL_LEARNING_EVENTS_CRON", "*/30 * * * *"),
+        schedule=os.environ.get("PULL_LEARNING_EVENTS_CRON", "0 * * * *"),
         lockfile=LOCK_DIR / "pull_learning_events.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/pull_learning_events.sh',
         script_name="pull_learning_events.sh",

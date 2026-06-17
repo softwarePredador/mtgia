@@ -21,6 +21,7 @@ Camada adicional do projeto:
 
 - `server/Dockerfile.hermes-lab`
 - `server/bin/hermes_lab_entrypoint.sh`
+- `server/bin/hermes_lab_cron_bootstrap.py`
 
 O bootstrap precisa garantir:
 
@@ -44,6 +45,11 @@ O bootstrap precisa garantir:
    - `~/.hermes/.env` com secrets necessários já presentes no serviço;
    - `config.yaml`/config interna com `model` alinhado ao `HERMES_MODEL`
      quando esse env estiver definido.
+8. reconciliar a frota de crons do laboratório a cada startup:
+   - instalar `manaloom-docs-branch-sync` como cron script-only;
+   - instalar gates de delta para os jobs provider-heavy restantes;
+   - remover legados `lorehold-*` e watchdogs já substituídos;
+   - pausar auditorias amplas que devem ficar só on-demand.
 
 ## O que o container precisa para funcionar
 
@@ -113,6 +119,34 @@ Exige token de IA apenas para:
 
 Sem token de IA o container continua útil como ambiente de laboratório e
 validação, mas nao executa tarefas dependentes de provider.
+
+## Frota de crons do `hermes-lab`
+
+Ativa e bootstrapada pelo runtime:
+
+- `manaloom-docs-branch-sync` — `*/20 * * * *` — script-only.
+- `manaloom-commander-knowledge-deep` — `0 */8 * * *` — gated por delta.
+- `manaloom-gamechanger-research` — `0 */12 * * *` — gated por delta.
+- `manaloom-knowledge-synthesis` — `30 */12 * * *` — gated por delta.
+- `mtg-rules-auditor` — `45 */12 * * *` — gated por delta.
+
+Pausada por bootstrap para evitar gasto improdutivo:
+
+- `manaloom-hermes-normal-audit`
+- `manaloom-hermes-weekly-parallel-audit`
+- `manaloom-knowledge-import`
+- `manaloom-tag-accuracy-reporter`
+- `manaloom-code-structure-auditor`
+- `manaloom-logic-coherence-auditor`
+- `manaloom-master-optimizer-slot-scan`
+- `manaloom-master-optimizer-end-to-end`
+
+Removida por bootstrap por ser legado ou duplicação já aposentada:
+
+- `manaloom-manager-watchdog`
+- `manaloom-flutter-ui-auditor`
+- `manaloom-master-optimizer-loop`
+- família `lorehold-*` antiga
 
 ## Guardrails
 
