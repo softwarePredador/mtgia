@@ -8,7 +8,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
-    cron \
     git \
     python3 \
     util-linux \
@@ -23,7 +22,8 @@ RUN chmod +x \
   /app/server/bin/pull_learning_events.sh \
   /app/server/bin/auto_sync_learned_decks.sh \
   /app/server/bin/master_optimizer_preflight.sh \
-  /app/server/bin/manaloom_ops_entrypoint.sh
+  /app/server/bin/manaloom_ops_entrypoint.sh \
+  /app/server/bin/manaloom_ops_daemon.py
 
 ENV MANALOOM_OPS_DATA_DIR=/data/manaloom-ops
 VOLUME ["/data/manaloom-ops"]
