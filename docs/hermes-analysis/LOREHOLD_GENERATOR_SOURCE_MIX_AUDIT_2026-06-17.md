@@ -101,6 +101,38 @@ Ação correta:
   óbvias do pacote Lorehold;
 - priorizar backfill de profile/stats antes de mexer no fallback em si.
 
+Matriz exata observada nesta rodada:
+
+- `Arcane Signet`:
+  `active_learned_deck + deterministic_fallback + reference_corpus_packages + usage_hot_cards`
+- `Boros Charm`:
+  `active_learned_deck + deterministic_fallback + usage_hot_cards`
+- `Boros Signet`:
+  `active_learned_deck + deterministic_fallback + usage_hot_cards`
+- `Esper Sentinel`:
+  `active_learned_deck + deterministic_fallback + reference_corpus_packages`
+- `Faithless Looting`:
+  `active_learned_deck + deterministic_fallback + reference_corpus_packages`
+- `Fellwar Stone`:
+  `active_learned_deck + deterministic_fallback`
+- `Generous Gift`:
+  `active_learned_deck + deterministic_fallback + usage_hot_cards`
+- `Lightning Greaves`:
+  `active_learned_deck + deterministic_fallback`
+- `Sol Ring`:
+  `active_learned_deck + deterministic_fallback + reference_corpus_packages`
+
+Leitura prática:
+
+- `Arcane Signet` já está bem corroborada por learned/corpus/usage; o buraco é
+  claramente `profile/stats`.
+- `Boros Charm`, `Boros Signet` e `Generous Gift` já têm learned+usage, mas
+  ainda sem corpus/profile/stats.
+- `Esper Sentinel`, `Faithless Looting` e `Sol Ring` já têm learned+corpus, mas
+  ainda sem usage/profile/stats.
+- `Fellwar Stone` e `Lightning Greaves` são o sub-bucket mais fraco: ainda só
+  `learned + fallback`.
+
 ### P2 — fallback + profile/stats, mas sem learned/corpus/usage
 
 Cartas:
