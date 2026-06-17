@@ -34,6 +34,8 @@ export HOME="$HERMES_HOME"
 export PATH="$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
 
 cd "$HERMES_HOME"
-# Use the official Docker entrypoint path for Hermes so the supervised
-# dashboard/API sidecars follow the vendor-supported lifecycle.
-exec /opt/hermes/docker/entrypoint.sh gateway run
+# This wrapper already runs under the image's /init entrypoint. Calling back
+# into the Docker wrapper chain again makes startup harder to reason about and
+# can reintroduce upstream main-wrapper environment quirks. Launch the gateway
+# directly so HERMES_HOME, PATH and workspace bootstrap stay intact.
+exec hermes gateway run

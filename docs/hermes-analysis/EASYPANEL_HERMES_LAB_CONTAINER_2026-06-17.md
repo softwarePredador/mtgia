@@ -36,9 +36,10 @@ O bootstrap precisa garantir:
    - jq
    - node/npm
 5. `PATH` consistente escrito em `/opt/data/.profile`.
-6. handoff final para o entrypoint oficial da imagem Hermes:
-   - `gateway run`
-   - sem reinventar o lifecycle interno do vendor image.
+6. handoff final para o binário oficial do Hermes:
+   - `hermes gateway run`
+   - sem reencadear `main-wrapper`/`entrypoint` depois que o container já
+     entrou pelo `/init` da imagem base.
 
 ## O que o container precisa para funcionar
 
@@ -70,6 +71,12 @@ Se precisar acesso web imediato antes de configurar auth:
 - manter o dashboard em loopback;
 - usar `docker exec`/túnel SSH/console controlado;
 - ou expor apenas o API server com `API_SERVER_KEY`.
+
+Observação de runtime:
+
+- o bootstrap local preserva `HERMES_HOME=/opt/data` e evita reencadear o
+  `main-wrapper` depois do `/init`, porque essa cadeia já teve regressões de
+  env/workdir no upstream Docker do Hermes.
 
 ## Tokens de IA
 
