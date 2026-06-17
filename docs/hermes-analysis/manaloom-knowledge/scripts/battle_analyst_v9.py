@@ -1784,6 +1784,9 @@ def replay_rule_fields(effect_data):
     selection_mode = runtime_selection.get("selection_mode")
     if selection_mode:
         fields["rule_runtime_selection_mode"] = selection_mode
+    merged_annotation_count = runtime_selection.get("merged_annotation_count")
+    if merged_annotation_count:
+        fields["rule_merged_annotation_count"] = merged_annotation_count
     composite_component_count = len(effect_data.get("_composite_rule_components") or [])
     if composite_component_count:
         fields["composite_rule_component_count"] = composite_component_count
@@ -1816,6 +1819,25 @@ COMPOSITE_BLOCKING_EFFECT_KEYS = {
     "trigger",
     "activated",
     "static",
+}
+
+SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
+    "requires_discard_card",
+    "requires_discard_land",
+    "requires_sacrifice_creature",
+    "requires_sacrifice_green_creature",
+    "requires_sacrifice_land",
+}
+
+SAFE_RUNTIME_SECONDARY_DESCRIPTOR_KEYS = {
+    "effect",
+    "cmc",
+    "battle_model_scope",
+    "sorcery",
+    "instant",
+    "target",
+    "timing",
+    "subtype",
 }
 
 
@@ -1881,6 +1903,39 @@ def _annotate_runtime_rule_selection(effect, rules, *, selection_mode):
     return annotated
 
 
+def _build_runtime_rule_selection_with_merged_annotations(
+    effect,
+    rules,
+    *,
+    selection_mode,
+    merged_rules,
+    blocked_rules,
+):
+    annotated = dict(effect)
+    annotated["_rule_runtime_selection"] = {
+        "selection_mode": selection_mode,
+        "selected_logical_rule_key": annotated.get("_rule_logical_key"),
+        "selected_effect": annotated.get("effect"),
+        "rule_count": len(rules),
+        "merged_annotation_count": len(merged_rules),
+    }
+    annotated["_rule_alternatives"] = [
+        _battle_rule_summary(rule)
+        for rule in rules
+        if rule
+    ]
+    if merged_rules:
+        annotated["_rule_merged_alternatives"] = [
+            _battle_rule_summary(rule)
+            for rule in merged_rules
+            if rule
+        ]
+    if blocked_rules:
+        annotated["_rule_blocked_alternatives"] = blocked_rules
+        annotated["_rule_runtime_selection"]["blocked_alternative_count"] = len(blocked_rules)
+    return annotated
+
+
 def _annotated_battle_rule_effect(rule):
     return with_rule_metadata(
         rule.get("effect_json") or {},
@@ -1891,6 +1946,44 @@ def _annotated_battle_rule_effect(rule):
         logical_rule_key=rule.get("logical_rule_key"),
         oracle_hash=rule.get("oracle_hash"),
     )
+
+
+def _extract_runtime_safe_secondary_annotations(primary_effect, rule):
+    """Allow secondary rules to contribute only non-executable cost metadata."""
+    effect = rule.get("effect_json") or {}
+    review_status = str(rule.get("review_status") or "").lower()
+    if review_status not in {"verified", "active"}:
+        return None
+    if effect.get("activated_mana_ability") or effect.get("ability_kind") in {"triggered", "activated", "static"}:
+        return None
+    if effect.get("trigger"):
+        return None
+    if effect.get("compose_on_resolution") is True and effect.get("effect") in COMPOSABLE_RESOLUTION_EFFECTS:
+        return None
+    effect_name = effect.get("effect")
+    primary_effect_name = primary_effect.get("effect")
+    if effect_name not in (None, "", "passive", primary_effect_name):
+        return None
+    if (
+        effect.get("target")
+        and primary_effect.get("target")
+        and effect.get("target") != primary_effect.get("target")
+    ):
+        return None
+    annotations = {}
+    for key in SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS:
+        value = effect.get(key)
+        if value not in (None, False, "", [], {}):
+            annotations[key] = value
+    if not annotations:
+        return None
+    allowed_keys = SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS | SAFE_RUNTIME_SECONDARY_DESCRIPTOR_KEYS
+    for key, value in effect.items():
+        if key in allowed_keys:
+            continue
+        if value not in (None, False, "", [], {}):
+            return None
+    return annotations
 
 
 def _is_composable_resolution_rule(rule):
@@ -1954,6 +2047,37 @@ def _build_composite_battle_rule_effect(card, rules):
     )
 
 
+def _build_primary_effect_with_safe_secondary_annotations(card, rules):
+    if len(rules) < 2 or not rules[0] or not rules[0].get("effect_json"):
+        return None
+    primary = normalize_effect_by_oracle(
+        card,
+        _annotated_battle_rule_effect(rules[0]),
+    )
+    merged_rules = []
+    blocked_rules = []
+    for rule in rules[1:]:
+        if not rule:
+            continue
+        annotations = _extract_runtime_safe_secondary_annotations(primary, rule)
+        if annotations:
+            primary.update(annotations)
+            merged_rules.append(rule)
+            continue
+        summary = _battle_rule_summary(rule)
+        summary["runtime_reason"] = _runtime_rule_skip_reason(rule)
+        blocked_rules.append(summary)
+    if not merged_rules:
+        return None
+    return _build_runtime_rule_selection_with_merged_annotations(
+        primary,
+        rules,
+        selection_mode="single_selected_with_safe_annotations",
+        merged_rules=merged_rules,
+        blocked_rules=blocked_rules,
+    )
+
+
 def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[str] | None = None) -> None:
     try:
         decoded = load_snapshot_file(path)
@@ -2001,6 +2125,9 @@ def get_card_effect(card):
             composite_effect = _build_composite_battle_rule_effect(card, rules)
             if composite_effect is not None:
                 return composite_effect
+            enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
+            if enriched_effect is not None:
+                return enriched_effect
             rule = rules[0]
             effect = _annotate_runtime_rule_selection(
                 _annotated_battle_rule_effect(rule),

@@ -696,15 +696,23 @@ Leitura correta:
   `activated_ability_requires_executor`, `trigger_requires_event_hook`,
   `static_effect_requires_state_layer`, `blocked_by_<cost_or_clause>` e
   `multi_rule_requires_explicit_selector`;
+- desde o slice incremental mais recente de 2026-06-17, uma regra secundária
+  `verified/active` que só adiciona metadata segura de custo adicional
+  (`requires_discard_*`, `requires_sacrifice_*`) ao mesmo efeito principal pode
+  ser fundida ao runtime sem criar segunda resolução. O replay passa a expor
+  `rule_runtime_selection_mode=single_selected_with_safe_annotations` e
+  `rule_merged_annotation_count`; isso cobre o caso de multi-rule “efeito
+  principal + custo/guardrail” sem reabrir execução cega por nome;
 - `Worldfire` deixou de ser modelado como `board_wipe` genérico. O runtime
   agora o trata como `worldfire_reset`: exila permanentes, exila mãos e
   cemitérios, ajusta vidas para `1` e respeita replacement de comandante para
   `command_zone`. O cast automático continua bloqueado por padrão até existir
   uma heurística confiável de linha vencedora pós-reset;
 - regras sem opt-in, `needs_review`, triggers, habilidades ativadas, efeitos
-  estáticos, custos adicionais/sacrifícios e outros componentes sem executor
-  explícito continuam preservados em `_rule_alternatives`, mas não executam
-  comportamento duro automaticamente;
+  estáticos e componentes sem executor explícito continuam preservados em
+  `_rule_alternatives`, mas não executam comportamento duro automaticamente.
+  Custos adicionais/sacrifícios agora só podem atravessar esse limite quando
+  entram como metadata segura fundida a uma regra primária já executável;
 - `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade

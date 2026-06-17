@@ -234,6 +234,88 @@ class BattleRuleAlternativesTests(unittest.TestCase):
             "activated_ability_requires_executor",
         )
 
+    def test_runtime_merges_safe_additional_cost_annotation_from_secondary_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                battle.battle_rule_registry.ensure_battle_card_rules(conn)
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Cost Merge Test Spell",
+                    {
+                        "effect": "draw_cards",
+                        "count": 2,
+                        "target": "self",
+                    },
+                    source="curated",
+                    confidence=0.97,
+                    review_status="verified",
+                )
+                battle.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Cost Merge Test Spell",
+                    {
+                        "effect": "draw_cards",
+                        "target": "self",
+                        "requires_discard_land": True,
+                        "battle_model_scope": "additional_cost_annotation_v1",
+                    },
+                    source="curated",
+                    confidence=0.95,
+                    review_status="verified",
+                )
+                conn.commit()
+            old_db = battle.DB
+            try:
+                battle.DB = str(sqlite_db)
+                resolved = battle.get_card_effect(
+                    {
+                        "name": "Cost Merge Test Spell",
+                        "type_line": "Sorcery",
+                        "oracle_text": "",
+                    }
+                )
+            finally:
+                battle.DB = old_db
+
+        runtime_selection = resolved.get("_rule_runtime_selection") or {}
+        merged = resolved.get("_rule_merged_alternatives") or []
+        blocked = resolved.get("_rule_blocked_alternatives") or []
+        self.assertEqual(resolved.get("effect"), "draw_cards")
+        self.assertTrue(resolved.get("requires_discard_land"))
+        self.assertEqual(
+            runtime_selection.get("selection_mode"),
+            "single_selected_with_safe_annotations",
+        )
+        self.assertEqual(runtime_selection.get("merged_annotation_count"), 1)
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(len(blocked), 0)
+        self.assertEqual(
+            battle.replay_rule_fields(resolved).get("rule_merged_annotation_count"),
+            1,
+        )
+        player = battle.Player(
+            "Tester",
+            None,
+            [],
+        )
+        spell_card = {"name": "Cost Merge Test Spell", "type_line": "Sorcery"}
+        discard_land = {
+            "name": "Plains",
+            "type_line": "Basic Land — Plains",
+            "oracle_text": "{T}: Add {W}.",
+        }
+        player.hand = [spell_card, discard_land]
+        self.assertTrue(
+            battle.pay_additional_card_costs(
+                player,
+                spell_card,
+                resolved,
+                turn=1,
+            )
+        )
+        self.assertEqual([card.get("name") for card in player.graveyard], ["Plains"])
+
 
 if __name__ == "__main__":
     unittest.main()
