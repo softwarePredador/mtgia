@@ -21,11 +21,10 @@ def load_battle_module(path: Path, module_name: str):
 
 
 class RuntimeCanonicalSnapshotFallbackTests(unittest.TestCase):
-    def test_canonical_snapshot_beats_legacy_generated_when_registry_unavailable(self) -> None:
+    def test_canonical_snapshot_is_only_runtime_json_fallback_when_registry_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             canonical_path = tmp_path / "known_cards_canonical_snapshot.json"
-            generated_path = tmp_path / "known_cards_generated.json"
             db_path = tmp_path / "missing_knowledge.db"
 
             canonical_path.write_text(
@@ -43,27 +42,15 @@ class RuntimeCanonicalSnapshotFallbackTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            generated_path.write_text(
-                json.dumps(
-                    {
-                        "Alpha Card": {"effect": "remove_creature"},
-                        "Beta Card": {"effect": "tutor"},
-                    }
-                ),
-                encoding="utf-8",
-            )
-
             old_env = {
                 key: os.environ.get(key)
                 for key in (
                     "MANALOOM_CANONICAL_KNOWN_CARDS_JSON",
-                    "MANALOOM_KNOWN_CARDS_JSON",
                     "MANALOOM_KNOWLEDGE_DB",
                 )
             }
             try:
                 os.environ["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] = str(canonical_path)
-                os.environ["MANALOOM_KNOWN_CARDS_JSON"] = str(generated_path)
                 os.environ["MANALOOM_KNOWLEDGE_DB"] = str(db_path)
                 battle = load_battle_module(
                     MODULE_PATH,
@@ -83,8 +70,8 @@ class RuntimeCanonicalSnapshotFallbackTests(unittest.TestCase):
             self.assertEqual(alpha["_rule_source"], "known_cards_canonical_snapshot")
             self.assertEqual(alpha["_rule_review_status"], "verified")
             self.assertEqual(alpha["_rule_logical_key"], "battle_rule_v1:alpha")
-            self.assertEqual(beta["effect"], "tutor")
-            self.assertEqual(beta["_rule_source"], "known_cards_generated")
+            self.assertEqual(beta["effect"], "unknown")
+            self.assertEqual(beta["_rule_source"], "unknown")
 
 
 if __name__ == "__main__":

@@ -30,10 +30,10 @@ def register_tests(battle, player, card):
     def test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard():
         active = player("Active")
         token = battle.create_creature_token(active, name="Soldier Token", power=1, toughness=1)
-        previous = battle.KNOWN_CARDS.get("Wrath")
+        previous = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Wrath")
         was_handcrafted = "Wrath" in battle.HANDCRAFTED_KNOWN_CARDS
         try:
-            battle.KNOWN_CARDS["Wrath"] = {"effect": "board_wipe"}
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Wrath"] = {"effect": "board_wipe"}
             battle.HANDCRAFTED_KNOWN_CARDS.add("Wrath")
             battle.apply_effect_immediate(
                 active,
@@ -44,9 +44,9 @@ def register_tests(battle, player, card):
             )
         finally:
             if previous is None:
-                battle.KNOWN_CARDS.pop("Wrath", None)
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Wrath", None)
             else:
-                battle.KNOWN_CARDS["Wrath"] = previous
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Wrath"] = previous
             if not was_handcrafted:
                 battle.HANDCRAFTED_KNOWN_CARDS.discard("Wrath")
 

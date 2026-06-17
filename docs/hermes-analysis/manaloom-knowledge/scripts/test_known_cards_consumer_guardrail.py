@@ -4,10 +4,10 @@
 The canonical runtime order is:
 1. battle_card_rules / SQLite / PostgreSQL-backed registry
 2. known_cards_canonical_snapshot.json
-3. known_cards_generated.json only as last legacy fallback
+3. explicit functional/effect/type heuristics
 
-This test prevents new active consumers from quietly treating the legacy JSON
-as primary truth again.
+This test prevents active battle runtime from quietly treating the legacy JSON
+as executable truth again.
 """
 
 from __future__ import annotations
@@ -86,16 +86,18 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
                 msg=f"{repo_rel(path)} must use load_layered_known_cards()",
             )
 
-    def test_battle_runtime_keeps_registry_then_snapshot_then_legacy_order(self) -> None:
+    def test_battle_runtime_keeps_registry_then_snapshot_and_no_legacy_generated(self) -> None:
         path = SCRIPT_DIR / "battle_analyst_v9.py"
         source = path.read_text(encoding="utf-8")
         registry_idx = source.index("battle_rule_registry.lookup_battle_card_rule")
         handcrafted_idx = source.index("if name in HANDCRAFTED_KNOWN_CARDS")
         canonical_idx = source.index("if name in CANONICAL_FALLBACK_KNOWN_CARDS")
-        legacy_idx = source.index('source="known_cards_generated"')
+        functional_idx = source.index("for tag in card_functional_tags(card):")
         self.assertLess(registry_idx, handcrafted_idx)
         self.assertLess(handcrafted_idx, canonical_idx)
-        self.assertLess(canonical_idx, legacy_idx)
+        self.assertLess(canonical_idx, functional_idx)
+        self.assertNotIn('source="known_cards_generated"', source)
+        self.assertNotIn("MANALOOM_KNOWN_CARDS_JSON", source)
 
     def test_battle_runtime_does_not_embed_manual_known_cards_snapshot(self) -> None:
         path = SCRIPT_DIR / "battle_analyst_v9.py"

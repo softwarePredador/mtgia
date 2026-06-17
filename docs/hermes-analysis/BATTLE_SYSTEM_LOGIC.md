@@ -265,8 +265,11 @@ Ordem correta de resolucao:
 1. waiver manual explicito e temporario (`MANUAL_RULE_RUNTIME_WAIVERS`);
 2. `battle_card_rules` via registry/cache SQLite/PG;
 3. `known_cards_canonical_snapshot.json` como fallback canonico degradado;
-4. `known_cards_generated.json` apenas como ultimo fallback historico;
-5. `functional_tags_json` / heuristicas / `unknown`.
+4. `functional_tags_json` / heuristicas / `unknown`.
+
+`known_cards_generated.json` nao e mais fallback executavel do
+`battle_analyst_v9.py`. Ele fica no repositorio apenas como input historico de
+sync/auditoria ate a limpeza completa dos consumidores secundarios.
 
 Guardrails operacionais atuais:
 
@@ -647,13 +650,12 @@ CUT: Arcane Signet                  WDWR=0.0%
 O runtime atual nao usa mais `known_cards_generated.json` como fonte principal de
 efeito de batalha.
 
-Precedencia real do battle runtime e dos consumidores Hermes alinhados:
+Precedencia real do battle runtime:
 
 1. waiver manual explicito de emergencia;
 2. `card_battle_rules` / cache SQLite `battle_card_rules`;
 3. `known_cards_canonical_snapshot.json` exportado do cache canonico;
-4. `known_cards_generated.json` apenas como ultimo fallback historico;
-5. tags/heuristicas quando nao ha regra estruturada melhor.
+4. tags/heuristicas quando nao ha regra estruturada melhor.
 
 Leitura correta:
 
@@ -661,7 +663,8 @@ Leitura correta:
 - `known_cards_canonical_snapshot.json` existe para manter um modo degradado mais
   proximo da fonte canonica quando SQLite/PG nao estiverem disponiveis;
 - `known_cards_generated.json` continua no repositorio apenas como compatibilidade
-  historica e seed de fallback, nao como verdade principal;
+  historica, seed de sync/auditoria e comparacao de drift, nao como fallback
+  executavel do battle runtime;
 - `KNOWN_CARDS` em `battle_analyst_v9.py` começa vazio; o antigo dicionario
   literal manual foi removido do codigo ativo;
 - `HANDCRAFTED_KNOWN_CARDS` e `MANUAL_RULE_RUNTIME_WAIVERS` devem permanecer
@@ -689,8 +692,9 @@ Filtros aplicados pelo slot optimizer e consumidores equivalentes:
 Risco operacional remanescente:
 
 - o conflito principal ja nao e de precedencia no runtime;
-- o risco real virou drift do fallback legado: o JSON historico ainda cobre menos
-  cartas e pode divergir semanticamente do snapshot canonico em modo degradado;
+- o risco real virou drift de consumidores secundarios: o JSON historico ainda
+  cobre menos cartas e pode divergir semanticamente do snapshot canonico se algum
+  script auxiliar voltar a le-lo como fonte operacional;
 - por isso, qualquer auditoria ou scorecard deve preferir `battle_card_rules` ou
   o snapshot canonico antes de confiar no JSON legado.
 - a promocao de casos relevantes agora deve acontecer por uma camada versionada

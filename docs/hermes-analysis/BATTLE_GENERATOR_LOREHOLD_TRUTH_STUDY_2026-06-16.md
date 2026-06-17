@@ -82,8 +82,8 @@ O engine ativo e `battle_analyst_v9.py`. O estado atual do runtime mostra:
   1. waiver manual explicito;
   2. `card_battle_rules` via registry/cache;
   3. `known_cards_canonical_snapshot.json`;
-  4. `known_cards_generated.json` apenas como ultimo fallback historico;
-  5. tags/heuristicas.
+  4. tags/heuristicas;
+  5. `unknown` auditavel quando nao houver regra melhor.
 
 As suites focadas recentes cobrem:
 
@@ -187,7 +187,7 @@ Veredito tecnico:
 1. nao existe conflito estrutural ativo no runtime atual;
 2. o inventario manual legado continua desativado por padrao;
 3. o snapshot canonico continua sendo o fallback degradado preferencial;
-4. o JSON legado continua apenas como ultimo fallback historico;
+4. o JSON legado nao participa mais do runtime da batalha;
 5. o risco residual agora e cobertura incompleta de cartas, nao colisao de
    precedencia.
 
@@ -694,7 +694,7 @@ Consequencia pratica:
 Revalidacao focada desta rodada:
 
 - `battle_analyst_v9.py` continua resolvendo a regra pela ordem correta:
-  `battle_card_rules`/SQLite primeiro, fallback legado depois;
+  `battle_card_rules`/SQLite primeiro, snapshot canonico depois;
 - `test_runtime_pg_rule_fallback_for_promoted_hotfixes.py` passou e confirmou
   que os hotfixes promovidos resolvem do registry canonico, nao de inventario
   manual/runtime waiver;
@@ -711,9 +711,9 @@ Achado tecnico importante:
   `known_cards_generated.json` cru;
 - ela foi alinhada para o mesmo padrao de `slot_optimizer.py`: JSON legado como
   base, `battle_card_rules` por cima como fonte canonica.
-- o `battle_analyst_v9.py` agora tenta primeiro
-  `known_cards_canonical_snapshot.json` e so depois cai no
-  `known_cards_generated.json`;
+- o `battle_analyst_v9.py` agora tenta `known_cards_canonical_snapshot.json`
+  como unico fallback JSON executavel; ausencias caem para
+  tags/heuristicas/`unknown`, nao para `known_cards_generated.json`;
 - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` passou a exportar esse
   snapshot canonico junto com o refresh do cache SQLite, mantendo o modo
   degradado mais proximo da fonte de verdade.
@@ -726,6 +726,9 @@ Estado correto apos a validacao:
 - sem conflito ativo de precedencia no battle runtime;
 - sem conflito ativo na rota secundaria mais obvia do optimizer Hermes;
 - snapshot canonico agora esta implementado como fallback suportado;
+- `known_cards_generated.json` deixou de ser fallback executavel do
+  `battle_analyst_v9.py` porque o audit mostrou `generated_only_names=0` e
+  `runtime_effect_different=219`;
 - o snapshot canonico tambem foi materializado localmente em
   `known_cards_canonical_snapshot.json` e a auditoria
   `audit_known_cards_runtime_environment.py` fechou com `status=PASS`
@@ -733,15 +736,17 @@ Estado correto apos a validacao:
   `manual_waiver_count=0`);
 - o pendente restante virou rollout operacional:
   garantir que os jobs Hermes efetivamente refresquem esse snapshot no ambiente
-  AWS e apos isso reduzir ainda mais a dependencia do `known_cards_generated`
-  como ultimo recurso historico.
+  AWS e absorvam a remocao do fallback gerado no runtime.
 
 Drift operacional observado no Hermes AWS:
 
 - o `master` local resolveu com:
   - `HANDCRAFTED_KNOWN_CARDS=[]`;
   - `MANUAL_RULE_RUNTIME_WAIVERS=[]`;
-  - ordem `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`.
+  - ordem historica validada naquele momento:
+    `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`.
+- Em 2026-06-17, a ordem versionada foi apertada para:
+  `battle_card_rules -> known_cards_canonical_snapshot -> tags/heuristicas -> unknown`.
 - apos export local do snapshot canonico:
   - `known_cards_canonical_snapshot.json` presente;
   - `canonical_fallback_count=3159`;
@@ -1046,7 +1051,8 @@ movimento errado neste momento.
 16. Concluído em 2026-06-16: o snapshot legado embutido em
     `battle_analyst_v9.py` foi removido do código ativo. O runtime mantém
     apenas `KNOWN_CARDS = {}` para carregamento posterior de registry/snapshot
-    canonico/fallback gerado e para waivers explícitos de teste/incidente. O
+    canonico e para waivers explícitos de teste/incidente. Em 2026-06-17, o
+    fallback gerado tambem deixou de ser executavel no runtime da batalha. O
     guardrail `test_known_cards_consumer_guardrail.py` falha se o dicionário
     manual ou engines antigos forem restaurados.
 17. Formalizar em backend mais sinais de `why this card` para app/admin/debug.

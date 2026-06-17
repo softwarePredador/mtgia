@@ -225,7 +225,7 @@ def register_tests(battle, player, card, module_path):
         if battle.battle_rule_registry is None:
             raise AssertionError("battle_rule_registry failed to import")
         old_db = battle.DB
-        old_known = battle.KNOWN_CARDS.get("Waived Manual Card")
+        old_manual_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Waived Manual Card")
         had_handcrafted = "Waived Manual Card" in battle.HANDCRAFTED_KNOWN_CARDS
         had_waiver = "Waived Manual Card" in battle.MANUAL_RULE_RUNTIME_WAIVERS
         with tempfile.TemporaryDirectory() as tmp:
@@ -244,7 +244,7 @@ def register_tests(battle, player, card, module_path):
             conn.close()
 
             try:
-                battle.KNOWN_CARDS["Waived Manual Card"] = {
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Waived Manual Card"] = {
                     "effect": "draw_cards",
                     "count": 2,
                 }
@@ -265,10 +265,10 @@ def register_tests(battle, player, card, module_path):
             finally:
                 battle.DB = old_db
                 battle.battle_rule_registry._RULE_CACHE.clear()
-                if old_known is None:
-                    battle.KNOWN_CARDS.pop("Waived Manual Card", None)
+                if old_manual_rule is None:
+                    battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Waived Manual Card", None)
                 else:
-                    battle.KNOWN_CARDS["Waived Manual Card"] = old_known
+                    battle.HANDCRAFTED_KNOWN_CARD_RULES["Waived Manual Card"] = old_manual_rule
                 if not had_handcrafted:
                     battle.HANDCRAFTED_KNOWN_CARDS.discard("Waived Manual Card")
                 if not had_waiver:

@@ -221,6 +221,23 @@
   - promover cartas ainda relevantes ao corpus Lorehold/oponentes de
     `generated/needs_review`, `heuristic` ou `active` para regras canônicas
     `trusted/traceable`, em vez de tratar isso como bug de precedence.
+- Atualizacao de continuidade — 2026-06-17:
+  - a auditoria revalidada fechou `generated_only_names=0`, ou seja,
+    `known_cards_generated.json` nao entrega mais nenhuma carta exclusiva ao
+    runtime quando o snapshot canonico esta presente;
+  - o mesmo audit ainda mostrou `runtime_effect_different=219`, entao manter o
+    JSON gerado como fallback executavel era pior do que cair para `unknown`
+    auditavel;
+  - `battle_analyst_v9.py` deixou de carregar `known_cards_generated.json` em
+    runtime. A ordem operacional agora e `battle_card_rules`/SQLite/PG ->
+    `known_cards_canonical_snapshot.json` -> tags/heuristicas -> `unknown`;
+  - `test_runtime_canonical_snapshot_fallback.py` e
+    `test_known_cards_consumer_guardrail.py` agora falham se o fallback gerado
+    voltar a ser fonte executavel da batalha.
+  - pendencia restante: reduzir/remover consumidores secundarios que ainda usam
+    `load_layered_known_cards(... generated_path=...)` em optimizer/auditoria,
+    mas so depois de teste especifico desses fluxos. Eles nao devem influenciar
+    o replay/battle runtime.
 - P2 operacional:
   - `battle_analyst_v9.py --help` nao pode disparar simulacao; a CLI precisa
     responder com parse deterministico para nao contaminar jobs de auditoria.
@@ -1279,6 +1296,26 @@ Conclusao operacional consolidada:
     runtime local corrigido para pagar `requires_sacrifice_green_creature` no
     cast e bloquear o spell quando nao existir criatura verde sacrificavel.
 
+Triagem da branch `codex/hermes-analysis-docs` revalidada em 2026-06-17:
+
+- `origin/codex/hermes-analysis-docs` foi lida antes de fechar este slice.
+- Achados Hermes que ja estavam cobertos no `master` atual e nao exigiram novo
+  codigo:
+  - `Underworld Breach` ja esta em `_knownInfiniteComboPieces` e tem teste em
+    `server/test/edh_bracket_policy_test.dart`;
+  - `Narset, Parter of Veils` e `Grand Arbiter Augustin IV` ja entram como
+    stax/gamechanger por nome e por texto;
+  - `Consecrated Sphinx`, `Field of the Dead`, `Smothering Tithe` e
+    `The One Ring` ja entram como value engines;
+  - `GoldfishSimulator` ja nao conta land tapped como mana no mesmo turno;
+  - `classifyOptimizationFunctionalRole` e wrappers correlatos ja priorizam
+    `functional_tags` persistidos, depois `semantic_tags_v2`, depois heuristica.
+- Achado Hermes ainda valido, mas fora deste slice para evitar mistura de
+  escopos: limpar consumidores secundarios que ainda aceitam
+  `known_cards_generated.json` como input de auditoria/sync. O battle runtime
+  ja foi fechado; os secundarios precisam de testes proprios antes de qualquer
+  remocao para nao quebrar scorecards historicos.
+
 Tasks priorizadas derivadas do estudo:
 
 | Prioridade | Task | Motivo real | Resultado esperado |
@@ -1296,9 +1333,9 @@ Tasks priorizadas derivadas do estudo:
 | P1 | Reduzir dependencia do fallback literal Lorehold no builder deterministico | Em 2026-06-16 o builder passou a consumir `usage_hot_cards` antes do fallback literal, reduzindo `fallback_only` de `25` para `16`; em 2026-06-17 o limite de candidatos aprendidos do generator subiu para `50`, e o auditor real reduziu `source_usage_counts.deterministic_fallback` de `59` para `45` e `built_in_fallback_only_count` de `16` para `2` | Ação correta agora: atacar apenas o residual `Mind Stone`/`Fellwar Stone` e decidir a fronteira entre `/ai/generate` e deck aprendido promovido; não remover o fallback inteiro enquanto o profile persistido ainda cair em `built_in_fallback` |
 | P1 | Manter explainability backend-owned do deck determinístico | Em 2026-06-16 o builder passou a emitir `reference_deterministic_deck` com `source_mix_counts`, `source_usage_counts`, `built_in_fallback_used_count` e `built_in_fallback_only_count`; se isso regredir, voltamos a perder a distinção entre profile/stats/corpus e preset | Preserva QA real do generator e impede que Lorehold pareça “aprendido” quando ainda estiver fortemente ancorado em fallback |
 | P1 | Curar o bucket residual `fallback_only` do Lorehold por papel, não por nome solto | Depois da ampliação para 50 hot cards, o residual medido ficou restrito a `Mind Stone` e `Fellwar Stone`, ambos ramp/fixing genéricos que ainda só aparecem via fallback literal no deck determinístico local | Próximo slice seguro: promover esses slots para `usage_hot_cards`, `reference_corpus_packages` ou `reference_card_stats` somente se houver cobertura real; se não houver, manter como fallback explícito e documentado |
-| P1 | Fechar rollout/versionamento do snapshot canonico de `known_cards` | O suporte local ja foi implementado: `battle_analyst_v9.py` consulta `known_cards_canonical_snapshot.json` antes do JSON legado, `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` exporta o snapshot e a auditoria local fechou em `PASS` com `canonical_fallback_count=3159`. O ponto aberto agora e decidir se o snapshot fica versionado, sempre regenerado por sync, ou ambos | Menor degradacao semantica quando SQLite/PG nao estiverem disponiveis; reproducao local e remota mais previsivel; menos ambiguidade operacional |
-| P1 | Formalizar por commit/deploy o rollout do snapshot canonico de `known_cards` no Hermes AWS | Em 2026-06-16 o `master` local validou `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, precedencia `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`, snapshot materializado localmente e auditoria `PASS` com `known_cards_count=3159`. A rodada operacional no Hermes AWS evoluiu em tres passos comprovados: (1) o script ativo `/opt/data/scripts/known_cards_validator_cron.sh` ja faz `git checkout master`; (2) apos hotfix no cron + `sync_battle_card_rules_pg.py`, o ambiente remoto passou a materializar `known_cards_canonical_snapshot.json` com `canonical_snapshot_rows_exported=3159`; (3) apos roll-out tambem de `battle_analyst_v9.py` + `known_cards_fallback_snapshot.py`, o auditor remoto fechou `branch=master`, `head=9c1ca349`, `known_cards_count=3159`, `canonical_fallback_count=3159`, `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, `status=PASS` | O risco de logica/runtime foi reduzido; o risco restante agora e operacional: esse alinhamento remoto ainda esta como hotfix manual e precisa virar estado versionado/deployavel para nao regredir em rebuild, troca de container ou reposicionamento do workspace Hermes |
-| P1 | Promover reviewed rules de cartas recorrentes que ainda caiam em `generated/needs_review` apesar de terem semantica oficial clara | O conflito estrutural de fontes foi fechado, mas a fidelidade de battle ainda piora quando cartas oficiais ficam presas no fallback legado. `Natural Order` ja foi promovido para `curated/verified` com custo verde sacrificavel e tutor verde ao campo. Em 2026-06-17, `Dismember` tambem foi promovido para `curated/verified` como modificador `-5/-5` ate EOT, e o SBA foi corrigido para matar criatura com resistencia `<= 0` mesmo se for indestrutivel; a rodada `20260617_005901` ficou com `action_findings=0` e `strategy_findings=0`. O mesmo criterio deve ser aplicado aos proximos outliers recorrentes dos replays/auditorias | Menos distorcoes de battle e de scorecard causadas por `known_cards_generated.json` em cartas com texto oficial simples e auditavel |
+| P1 | Fechar rollout/versionamento do snapshot canonico de `known_cards` | O suporte local ja foi implementado: `battle_analyst_v9.py` consulta `known_cards_canonical_snapshot.json` como unico fallback JSON executavel, `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` exporta o snapshot e a auditoria local fechou em `PASS` com `canonical_fallback_count=3159`. Em 2026-06-17, como `known_cards_generated.json` nao tinha nomes exclusivos e ainda tinha `219` efeitos divergentes, ele foi removido do runtime da batalha | Menor degradacao semantica quando SQLite/PG nao estiverem disponiveis; replay local/remoto cai para snapshot canonico ou `unknown` auditavel, nao para regra gerada antiga |
+| P1 | Formalizar por commit/deploy o rollout do snapshot canonico de `known_cards` no Hermes AWS | Em 2026-06-16 o `master` local validou `HANDCRAFTED_KNOWN_CARDS=[]`, `MANUAL_RULE_RUNTIME_WAIVERS=[]`, precedencia `battle_card_rules -> known_cards_canonical_snapshot -> known_cards_generated`, snapshot materializado localmente e auditoria `PASS` com `known_cards_count=3159`. Em 2026-06-17 a precedencia versionada mudou para `battle_card_rules -> known_cards_canonical_snapshot -> heuristicas/unknown`, sem fallback gerado executavel. A rodada operacional no Hermes AWS anterior ja comprovou materializacao do snapshot, mas precisa absorver essa nova remocao do fallback gerado no proximo deploy/cron | O risco de logica/runtime foi reduzido; o risco restante agora e operacional: garantir que rebuild/container Hermes rode o SHA com fallback gerado removido e mantenha snapshot canonico materializado |
+| P1 | Promover reviewed rules de cartas recorrentes que ainda caiam em `unknown`/heuristica apesar de terem semantica oficial clara | O conflito estrutural de fontes foi fechado, e o runtime da batalha nao usa mais `known_cards_generated.json`. `Natural Order` ja foi promovido para `curated/verified` com custo verde sacrificavel e tutor verde ao campo. Em 2026-06-17, `Dismember` tambem foi promovido para `curated/verified` como modificador `-5/-5` ate EOT, e o SBA foi corrigido para matar criatura com resistencia `<= 0` mesmo se for indestrutivel; a rodada `20260617_005901` ficou com `action_findings=0` e `strategy_findings=0`. O mesmo criterio deve ser aplicado aos proximos outliers recorrentes dos replays/auditorias | Menos distorcoes de battle e de scorecard causadas por cartas reais que ainda nao possuem regra revisada; ausencia agora vira `unknown` auditavel em vez de efeito gerado incorreto |
 | P1 | Adicionar explainability backend-owned por carta gerada | O produto ainda nao responde bem "por que essa carta entrou?" | Transparencia de criacao, QA melhor e comparacao de fontes por carta |
 | P1 | Higienizar proveniencia das regras promovidas hoje marcadas como `source='manual'` em PG/SQLite | Runtime manual ativo ja esta zerado, mas a proveniencia historica ainda confunde auditoria | Menos ruido conceitual sem mudar comportamento de runtime |
 

@@ -1575,8 +1575,9 @@ def load_deck_with_construction_report(deck_id=6):
 KNOWN_CARDS = {}
 # Manual runtime rules are intentionally empty in normal operation. Tests or
 # incident waivers may inject explicit entries, but production semantics must
-# come from battle_card_rules, the canonical snapshot, or the generated legacy
-# fallback in that order.
+# come from battle_card_rules or the canonical snapshot. Generated legacy known
+# cards are intentionally not a battle runtime fallback anymore: the current
+# canonical snapshot fully covers that file and avoids stale generated effects.
 HANDCRAFTED_KNOWN_CARD_RULES = {}
 HANDCRAFTED_KNOWN_CARDS = set()
 
@@ -1783,22 +1784,15 @@ def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[
 
 # ── KNOWN_CARDS fallback loaders ──
 # The canonical snapshot mirrors reviewed SQLite battle_card_rules for degraded
-# runtime operation. The older generated JSON remains as the last fallback only.
+# runtime operation. If a card is absent from the registry and the snapshot, it
+# must fall through to explicit functional/effect/type heuristics instead of the
+# older generated JSON.
 _canonical_snapshot_path = resolve_canonical_snapshot_path()
 if _canonical_snapshot_path.exists():
     _load_known_cards_into_runtime(
         _canonical_snapshot_path,
         bucket=CANONICAL_FALLBACK_KNOWN_CARDS,
     )
-
-_gen_json_path = Path(
-    os.environ.get(
-        "MANALOOM_KNOWN_CARDS_JSON",
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "known_cards_generated.json"),
-    )
-)
-if _gen_json_path.exists():
-    _load_known_cards_into_runtime(_gen_json_path)
 
 def get_card_effect(card):
     name = card.get("name", "")
@@ -1826,7 +1820,7 @@ def get_card_effect(card):
             )
             return normalize_effect_by_oracle(card, effect)
     if name in HANDCRAFTED_KNOWN_CARDS:
-        handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name, KNOWN_CARDS.get(name))
+        handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(name)
         if handcrafted_effect is None:
             handcrafted_effect = {}
         return normalize_effect_by_oracle(
@@ -1850,16 +1844,6 @@ def get_card_effect(card):
                 rule_version=metadata.get("battle_rule_version"),
                 logical_rule_key=metadata.get("battle_rule_logical_key"),
                 oracle_hash=metadata.get("battle_rule_oracle_hash"),
-            ),
-        )
-    if name in KNOWN_CARDS:
-        return normalize_effect_by_oracle(
-            card,
-            with_rule_metadata(
-                KNOWN_CARDS[name],
-                source="known_cards_generated",
-                review_status="needs_review",
-                confidence=0.55,
             ),
         )
     for tag in card_functional_tags(card):

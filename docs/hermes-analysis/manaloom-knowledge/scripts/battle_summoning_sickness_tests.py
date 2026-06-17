@@ -171,17 +171,17 @@ def register_tests(battle, player, card):
         defender = player("Defender")
         token_spell = {"name": "Token Maker", "cmc": 4, "type_line": "Sorcery"}
 
-        previous_normal = battle.KNOWN_CARDS.get("Token Maker")
-        previous_hasty = battle.KNOWN_CARDS.get("Hasty Token Maker")
+        previous_normal = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Token Maker")
+        previous_hasty = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Hasty Token Maker")
         normal_was_handcrafted = "Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
         hasty_was_handcrafted = "Hasty Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
         try:
-            battle.KNOWN_CARDS["Token Maker"] = {
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Token Maker"] = {
                 "effect": "token_maker",
                 "token_count": 1,
                 "token_power": 2,
             }
-            battle.KNOWN_CARDS["Hasty Token Maker"] = {
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Hasty Token Maker"] = {
                 "effect": "token_maker",
                 "token_count": 1,
                 "token_power": 2,
@@ -219,13 +219,13 @@ def register_tests(battle, player, card):
             assert hasty.battlefield[0]["tapped"] is True
         finally:
             if previous_normal is None:
-                battle.KNOWN_CARDS.pop("Token Maker", None)
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Token Maker", None)
             else:
-                battle.KNOWN_CARDS["Token Maker"] = previous_normal
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Token Maker"] = previous_normal
             if previous_hasty is None:
-                battle.KNOWN_CARDS.pop("Hasty Token Maker", None)
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Hasty Token Maker", None)
             else:
-                battle.KNOWN_CARDS["Hasty Token Maker"] = previous_hasty
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Hasty Token Maker"] = previous_hasty
             if not normal_was_handcrafted:
                 battle.HANDCRAFTED_KNOWN_CARDS.discard("Token Maker")
             if not hasty_was_handcrafted:

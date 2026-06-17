@@ -22,10 +22,10 @@ def register_tests(battle, player, replay_auditor):
             {"name": "Mountain", "type_line": "Basic Land — Mountain", "effect": "land"},
             {"name": "Arcane Signet", "type_line": "Artifact", "effect": "ramp_permanent"},
         ]
-        previous = battle.KNOWN_CARDS.get("Land Count Token Maker")
+        previous = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Land Count Token Maker")
         was_handcrafted = "Land Count Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
         try:
-            battle.KNOWN_CARDS["Land Count Token Maker"] = {
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Land Count Token Maker"] = {
                 "effect": "token_maker",
                 "token_count": "lands",
                 "token_power": 1,
@@ -46,9 +46,9 @@ def register_tests(battle, player, replay_auditor):
             assert len(tokens) == 2
         finally:
             if previous is None:
-                battle.KNOWN_CARDS.pop("Land Count Token Maker", None)
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Land Count Token Maker", None)
             else:
-                battle.KNOWN_CARDS["Land Count Token Maker"] = previous
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Land Count Token Maker"] = previous
             if not was_handcrafted:
                 battle.HANDCRAFTED_KNOWN_CARDS.discard("Land Count Token Maker")
 
