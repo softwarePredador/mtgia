@@ -703,6 +703,12 @@ Leitura correta:
   `rule_runtime_selection_mode=single_selected_with_safe_annotations` e
   `rule_merged_annotation_count`; isso cobre o caso de multi-rule “efeito
   principal + custo/guardrail” sem reabrir execução cega por nome;
+- a auditoria `BATTLE_MULTI_RULE_RUNTIME_READINESS_2026-06-17.md` revalidou o
+  estado do corpus canônico: apesar da infraestrutura multi-rule já existir,
+  o PostgreSQL real tinha `3158` nomes ativos e `0` nomes com mais de uma regra
+  ativa ou histórica no momento do estudo. Logo, a lacuna atual não é “o
+  runtime já falha em várias cartas multi-rule vivas”, e sim “a fonte de
+  verdade ainda não materializou multi-row real por escopo de execução”;
 - no fechamento desse slice em 2026-06-17, PG `card_battle_rules`, SQLite
   Hermes `battle_card_rules`, snapshot canônico e runtime passaram a carregar
   `execution_status` com os estados

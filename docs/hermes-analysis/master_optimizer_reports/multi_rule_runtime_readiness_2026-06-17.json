@@ -1,0 +1,14 @@
+{
+  "blocked_reason_counts": {},
+  "details": [],
+  "example_cards_by_status": {},
+  "gap_category_counts": {},
+  "generated_at": "2026-06-17T08:57:06.672473+00:00",
+  "multi_rule_card_count": 0,
+  "multi_rule_rule_count": 0,
+  "overall_status_counts": {},
+  "selection_mode_counts": {},
+  "source_kind": "sqlite",
+  "source_ref": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "total_active_rule_names": 3159
+}
