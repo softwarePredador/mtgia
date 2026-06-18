@@ -238,6 +238,10 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "HERMES_HOME": "/opt/data",
             "HERMES_MODEL": runtime_env.get("HERMES_MODEL", existing_env.get("HERMES_MODEL", "gpt-4o-mini")),
             "HERMES_PROVIDER": runtime_env.get("HERMES_PROVIDER", existing_env.get("HERMES_PROVIDER", "openai-api")),
+            "HERMES_REASONING_EFFORT": runtime_env.get(
+                "HERMES_REASONING_EFFORT",
+                existing_env.get("HERMES_REASONING_EFFORT", "none"),
+            ),
             "HERMES_STATE_ROOT": "/opt/data",
             "HERMES_CRON_SCRIPTS_DIR": "/opt/data/scripts",
             "HERMES_CRON_JOBS_JSON": "/opt/data/cron/jobs.json",

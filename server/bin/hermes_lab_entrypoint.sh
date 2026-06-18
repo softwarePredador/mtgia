@@ -13,6 +13,7 @@ PUB_CACHE_BIN="/root/.pub-cache/bin"
 HERMES_BIN="/opt/hermes/bin"
 HERMES_VENV_BIN="/opt/hermes/.venv/bin"
 HERMES_PROVIDER="${HERMES_PROVIDER:-openai-api}"
+HERMES_REASONING_EFFORT="${HERMES_REASONING_EFFORT:-none}"
 HERMES_STATE_ROOT="${HERMES_STATE_ROOT:-$HERMES_HOME}"
 HERMES_CRON_SCRIPTS_DIR="${HERMES_CRON_SCRIPTS_DIR:-$HERMES_STATE_ROOT/scripts}"
 HERMES_CRON_JOBS_JSON="${HERMES_CRON_JOBS_JSON:-$HERMES_STATE_ROOT/cron/jobs.json}"
@@ -84,6 +85,7 @@ export HERMES_STATE_ROOT=$HERMES_STATE_ROOT
 export HERMES_CRON_SCRIPTS_DIR=$HERMES_CRON_SCRIPTS_DIR
 export HERMES_CRON_JOBS_JSON=$HERMES_CRON_JOBS_JSON
 export HERMES_PROVIDER=$HERMES_PROVIDER
+export HERMES_REASONING_EFFORT=$HERMES_REASONING_EFFORT
 EOF
 
 touch "$HERMES_HOME/.env"
@@ -127,6 +129,7 @@ export HERMES_STATE_ROOT
 export HERMES_CRON_SCRIPTS_DIR
 export HERMES_CRON_JOBS_JSON
 export HERMES_PROVIDER
+export HERMES_REASONING_EFFORT
 unset HERMES_INFERENCE_PROVIDER
 
 cd "$HERMES_HOME"
@@ -138,6 +141,7 @@ if [[ -n "${OPENAI_API_KEY:-}" ]]; then
   hermes config set model.provider "$HERMES_PROVIDER" >/dev/null 2>&1 || true
   hermes config set model.base_url "${OPENAI_BASE_URL:-https://api.openai.com/v1}" >/dev/null 2>&1 || true
 fi
+hermes config set agent.reasoning_effort "$HERMES_REASONING_EFFORT" >/dev/null 2>&1 || true
 
 if [[ "${HERMES_CRON_BOOTSTRAP:-1}" == "1" ]]; then
   write_runtime_status "bootstrap" "starting" "running hermes cron bootstrap"
