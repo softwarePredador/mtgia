@@ -124,11 +124,20 @@
   - no endurecimento seguinte do mesmo dia, o gate deixou de repassar
     diretorios observados como contexto bruto; agora o agente recebe apenas
     `scope_summary`, `watch_root_count` e `latest_files`.
-- Proximo passo correto:
-  - redeploy do `hermes-lab` no EasyPanel para rebootstrapar os prompts
-    endurecidos;
-  - depois, revalidar uma rodada manual curta dos quatro jobs e conferir se os
-    warnings de `read_file` em diretorio desapareceram dos logs.
+- Fechamento adicional desta trilha:
+  - o auditor `server/bin/audit_easypanel_cron_runtime.py` passou a coletar
+    probe de shell por container e evidencia real de output por job;
+  - `manaloom-ops` ficou provado por arquivos reais em
+    `/data/manaloom-ops/cron/output/<job>/...`;
+  - `hermes-lab` ficou provado por arquivos reais em
+    `/opt/data/cron/output/<job_id>/...`;
+  - a prova operacional agora nao depende apenas de `last_status=ok` em
+    `jobs.json`.
+- Pendente residual correto:
+  - continuar observando as proximas rodadas provider-backed para confirmar se
+    os warnings de `read_file` em diretorio desaparecem dos logs novos depois
+    do bootstrap endurecido;
+  - isso ja nao bloqueia a validacao operacional basica do EasyPanel.
 
 ### Atualizacao de ciclo — 2026-06-18 / EasyPanel mana validator truth fix
 

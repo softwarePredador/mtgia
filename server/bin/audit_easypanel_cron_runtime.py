@@ -37,6 +37,10 @@ DEFAULT_SERVICES = {
     "manaloom-ops": "evolution_manaloom-ops",
     "hermes-lab": "evolution_hermes-lab",
 }
+SERVICE_OUTPUT_ROOTS = {
+    "manaloom-ops": "/data/manaloom-ops/cron/output",
+    "hermes-lab": "/opt/data/cron/output",
+}
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reconcile_easypanel_services as reconcile  # noqa: E402
@@ -226,6 +230,197 @@ def _sanitize_output(text: str) -> str:
     return text.strip()
 
 
+def _parse_probe_lines(text: str) -> dict[str, str]:
+    parsed: dict[str, str] = {}
+    for line in _sanitize_output(text).splitlines():
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if not key:
+            continue
+        parsed[key] = value.strip()
+    return parsed
+
+
+def _job_output_probe_targets(service_name: str, job: dict[str, Any]) -> list[dict[str, str]]:
+    targets: list[dict[str, str]] = []
+    latest_output = str(job.get("latest_output") or "").strip()
+    if latest_output:
+        targets.append({"mode": "file", "path": latest_output, "source": "latest_output"})
+
+    output_root = SERVICE_OUTPUT_ROOTS.get(service_name)
+    if output_root:
+        if service_name == "manaloom-ops":
+            job_name = str(job.get("name") or "").strip()
+            if job_name:
+                targets.append(
+                    {
+                        "mode": "dir",
+                        "path": f"{output_root}/{job_name}",
+                        "source": "derived_job_name_dir",
+                    }
+                )
+        else:
+            job_id = str(job.get("id") or "").strip()
+            if job_id:
+                targets.append(
+                    {
+                        "mode": "dir",
+                        "path": f"{output_root}/{job_id}",
+                        "source": "derived_job_id_dir",
+                    }
+                )
+
+    deduped: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for target in targets:
+        key = (target["mode"], target["path"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(target)
+    return deduped
+
+
+def _shell_probe_file(
+    ws_base: str,
+    token: str,
+    container_id: str,
+    path: str,
+    *,
+    insecure: bool,
+    tail_lines: int = 20,
+) -> tuple[bool, str]:
+    quoted_path = shlex.quote(path)
+    command = (
+        "sh -lc '"
+        f"if [ -f {quoted_path} ]; then "
+        "echo __FOUND__; "
+        f"tail -n {tail_lines} {quoted_path}; "
+        "else echo __MISSING__; fi'"
+    )
+    output = _container_shell(
+        ws_base,
+        token,
+        container_id,
+        command,
+        insecure=insecure,
+    )
+    clean = _sanitize_output(output)
+    if clean.startswith("__FOUND__"):
+        return True, clean.replace("__FOUND__", "", 1).strip()
+    return False, clean
+
+
+def _shell_latest_file_in_dir(
+    ws_base: str,
+    token: str,
+    container_id: str,
+    path: str,
+    *,
+    insecure: bool,
+) -> str | None:
+    quoted_path = shlex.quote(path)
+    command = (
+        "sh -lc '"
+        f"if [ -d {quoted_path} ]; then "
+        f"find {quoted_path} -maxdepth 1 -type f | sort | tail -n 1; "
+        "else echo __MISSING__; fi'"
+    )
+    output = _container_shell(
+        ws_base,
+        token,
+        container_id,
+        command,
+        insecure=insecure,
+    )
+    clean = _sanitize_output(output)
+    if not clean or clean == "__MISSING__":
+        return None
+    return clean.splitlines()[-1].strip() or None
+
+
+def _runtime_probe(
+    ws_base: str,
+    token: str,
+    container_id: str,
+    *,
+    insecure: bool,
+) -> dict[str, str]:
+    output = _container_shell(
+        ws_base,
+        token,
+        container_id,
+        (
+            "sh -lc '"
+            "printf \"user=%s\\n\" \"$(id -un)\"; "
+            "printf \"uid=%s\\n\" \"$(id -u)\"; "
+            "printf \"hostname=%s\\n\" \"$(hostname)\"; "
+            "printf \"pwd=%s\\n\" \"$PWD\"; "
+            "printf \"repo_exists=%s\\n\" \"$(test -d /opt/data/workspace/mtgia && echo yes || echo no)\"'"
+        ),
+        insecure=insecure,
+    )
+    return _parse_probe_lines(output)
+
+
+def _collect_job_output_evidence(
+    ws_base: str,
+    token: str,
+    service_name: str,
+    container_id: str,
+    jobs: dict[str, Any],
+    *,
+    insecure: bool,
+) -> None:
+    for job in jobs.get("jobs", []):
+        evidence: dict[str, Any] | None = None
+        for target in _job_output_probe_targets(service_name, job):
+            if target["mode"] == "file":
+                found, preview = _shell_probe_file(
+                    ws_base,
+                    token,
+                    container_id,
+                    target["path"],
+                    insecure=insecure,
+                )
+                if not found:
+                    continue
+                evidence = {
+                    "path": target["path"],
+                    "source": target["source"],
+                    "preview": preview,
+                }
+                break
+            latest_path = _shell_latest_file_in_dir(
+                ws_base,
+                token,
+                container_id,
+                target["path"],
+                insecure=insecure,
+            )
+            if not latest_path:
+                continue
+            found, preview = _shell_probe_file(
+                ws_base,
+                token,
+                container_id,
+                latest_path,
+                insecure=insecure,
+            )
+            if not found:
+                continue
+            evidence = {
+                "path": latest_path,
+                "source": target["source"],
+                "preview": preview,
+            }
+            break
+        if evidence is not None:
+            job["output_evidence"] = evidence
+
+
 def _shell_read_json(
     ws_base: str,
     token: str,
@@ -364,6 +559,26 @@ def _extract_runtime_findings(
             }
         )
 
+    for service_name, jobs in (
+        ("manaloom-ops", ops_jobs),
+        ("hermes-lab", lab_jobs),
+    ):
+        for job in jobs.get("jobs", []):
+            if str(job.get("last_status") or "").lower() != "ok":
+                continue
+            if job.get("output_evidence"):
+                continue
+            findings.append(
+                {
+                    "priority": "P2",
+                    "code": f"{service_name.replace('-', '_')}_job_without_output_evidence",
+                    "message": (
+                        f"{service_name} job `{job.get('name')}` reports last_status=ok "
+                        "but no output evidence file was resolved"
+                    ),
+                }
+            )
+
     return findings
 
 
@@ -375,6 +590,7 @@ def _write_markdown(
     public_health: dict[str, Any] | None,
     service_envs: dict[str, dict[str, Any]],
     containers: dict[str, ContainerInfo],
+    runtime_probes: dict[str, dict[str, str]],
     ops_jobs: dict[str, Any],
     lab_jobs: dict[str, Any],
     ops_logs: list[str],
@@ -419,6 +635,17 @@ def _write_markdown(
                 f"- paused_jobs: `{jobs.get('paused_jobs')}`",
             ]
         )
+        probe = runtime_probes.get(service_name, {})
+        if probe:
+            lines.extend(
+                [
+                    f"- runtime_probe.user: `{probe.get('user')}`",
+                    f"- runtime_probe.uid: `{probe.get('uid')}`",
+                    f"- runtime_probe.hostname: `{probe.get('hostname')}`",
+                    f"- runtime_probe.pwd: `{probe.get('pwd')}`",
+                    f"- runtime_probe.repo_exists: `{probe.get('repo_exists')}`",
+                ]
+            )
         lines.append("")
         lines.append("### Jobs")
         lines.append("")
@@ -426,6 +653,13 @@ def _write_markdown(
             lines.append(
                 f"- `{job.get('name')}` | state=`{job.get('state')}` | schedule=`{job.get('schedule')}` | last_status=`{job.get('last_status')}` | last_run_at=`{job.get('last_run_at')}` | no_agent=`{job.get('no_agent')}` | script=`{job.get('script')}`"
             )
+            evidence = job.get("output_evidence")
+            if evidence:
+                preview = str(evidence.get("preview") or "").splitlines()
+                preview_line = preview[-1] if preview else ""
+                lines.append(
+                    f"  evidence=`{evidence.get('path')}` source=`{evidence.get('source')}` preview_tail=`{preview_line}`"
+                )
 
     if startup_status:
         lines.extend(
@@ -526,6 +760,7 @@ def main() -> int:
     services_payload = client.list_projects_and_services()
     service_envs: dict[str, dict[str, Any]] = {}
     containers: dict[str, ContainerInfo] = {}
+    runtime_probes: dict[str, dict[str, str]] = {}
     for short_name, api_service in DEFAULT_SERVICES.items():
         state = reconcile._collect_service_state(
             services_payload,
@@ -548,6 +783,12 @@ def main() -> int:
             {"service": api_service},
         )
         containers[short_name] = _parse_container(containers_payload, short_name)
+        runtime_probes[short_name] = _runtime_probe(
+            ws_base,
+            token,
+            containers[short_name].container_id,
+            insecure=args.insecure_health,
+        )
 
     ops_logs = _collect_service_logs(
         ws_base,
@@ -593,6 +834,22 @@ def main() -> int:
 
     ops_jobs = _jobs_summary(ops_jobs_json)
     lab_jobs = _jobs_summary(lab_jobs_json)
+    _collect_job_output_evidence(
+        ws_base,
+        token,
+        "manaloom-ops",
+        containers["manaloom-ops"].container_id,
+        ops_jobs,
+        insecure=args.insecure_health,
+    )
+    _collect_job_output_evidence(
+        ws_base,
+        token,
+        "hermes-lab",
+        containers["hermes-lab"].container_id,
+        lab_jobs,
+        insecure=args.insecure_health,
+    )
     findings = _extract_runtime_findings(
         service_envs=service_envs,
         ops_jobs=ops_jobs,
@@ -607,6 +864,7 @@ def main() -> int:
         "local_head": local_head,
         "public_health": public_health,
         "service_envs": service_envs,
+        "runtime_probes": runtime_probes,
         "containers": {
             key: container.__dict__ for key, container in containers.items()
         },
@@ -652,6 +910,7 @@ def main() -> int:
         public_health=public_health,
         service_envs=service_envs,
         containers=containers,
+        runtime_probes=runtime_probes,
         ops_jobs=ops_jobs,
         lab_jobs=lab_jobs,
         ops_logs=ops_logs,
