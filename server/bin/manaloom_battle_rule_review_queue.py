@@ -13,6 +13,8 @@ import os
 import re
 import sqlite3
 import sys
+import urllib.error
+import urllib.request
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -122,6 +124,7 @@ class RuleDraft:
     source_run_ids: set[str] = field(default_factory=set)
     max_score: int = 0
     payload: dict[str, Any] = field(default_factory=dict)
+    llm_review: dict[str, Any] | None = None
 
     @property
     def draft_rule_key(self) -> str:
@@ -172,8 +175,8 @@ class RuleDraft:
             "emits a traceable needs_review decision without executing verified-only behavior."
         )
 
-    def to_json(self) -> dict[str, Any]:
-        return {
+    def to_json(self, *, include_llm: bool = True) -> dict[str, Any]:
+        payload = {
             "card_name": self.card_name,
             "oracle_id": self.oracle_id,
             "set_code": self.set_code,
@@ -196,6 +199,9 @@ class RuleDraft:
                 "no_hard_battle_behavior",
             ],
         }
+        if include_llm and self.llm_review is not None:
+            payload["llm_review"] = self.llm_review
+        return payload
 
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
@@ -309,13 +315,217 @@ def aggregate(rows: list[QueueRow]) -> list[RuleDraft]:
     return sorted(drafts.values(), key=lambda item: (-item.max_score, item.card_name))
 
 
-def summarize(run_id: str, generated_at: str, queue_rows: list[QueueRow], drafts: list[RuleDraft]) -> dict[str, Any]:
+def env_truthy(name: str, default: str = "0") -> bool:
+    return os.environ.get(name, default).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def extract_response_text(response: dict[str, Any]) -> str:
+    output_text = response.get("output_text")
+    if isinstance(output_text, str) and output_text.strip():
+        return output_text.strip()
+
+    parts: list[str] = []
+    for item in response.get("output", []) if isinstance(response.get("output"), list) else []:
+        if not isinstance(item, dict):
+            continue
+        content = item.get("content")
+        if not isinstance(content, list):
+            continue
+        for content_item in content:
+            if not isinstance(content_item, dict):
+                continue
+            text = content_item.get("text")
+            if isinstance(text, str) and text.strip():
+                parts.append(text.strip())
+    return "\n".join(parts).strip()
+
+
+def bounded_text(value: Any, *, limit: int = 2000) -> str:
+    text = str(value or "").strip()
+    if len(text) <= limit:
+        return text
+    return text[: limit - 3].rstrip() + "..."
+
+
+def normalize_llm_review(raw_text: str, *, model: str) -> dict[str, Any]:
+    try:
+        parsed = json.loads(raw_text)
+    except Exception:
+        parsed = {
+            "summary": "OpenAI response was not valid JSON.",
+            "raw_text_excerpt": bounded_text(raw_text, limit=1200),
+        }
+    if not isinstance(parsed, dict):
+        parsed = {
+            "summary": "OpenAI response JSON was not an object.",
+            "raw_text_excerpt": bounded_text(raw_text, limit=1200),
+        }
+    parsed.setdefault("summary", "")
+    parsed.setdefault("recommended_status", "needs_review")
+    parsed["recommended_status"] = "needs_review"
+    parsed["status"] = "completed"
+    parsed["model"] = model
+    parsed["safety"] = [
+        "llm_review_only",
+        "no_postgres_write",
+        "no_verified_promotion",
+        "manual_gate_required",
+    ]
+    return parsed
+
+
+def call_openai_review(
+    draft: RuleDraft,
+    *,
+    api_key: str,
+    model: str,
+    timeout: int,
+) -> dict[str, Any]:
+    draft_payload = draft.to_json(include_llm=False)
+    instructions = (
+        "You are reviewing ManaLoom battle-rule draft candidates for Magic: The Gathering. "
+        "Return a single JSON object only. Do not promote anything to verified. "
+        "Use the provided oracle text and metadata only; do not invent official rulings. "
+        "If official source review is needed, say so. Keep recommendations report-only."
+    )
+    user_payload = {
+        "task": "review_needs_rule_review_draft",
+        "required_json_keys": [
+            "summary",
+            "risk_assessment",
+            "official_sources_needed",
+            "suggested_test_cases",
+            "implementation_notes",
+            "recommended_status",
+        ],
+        "draft": draft_payload,
+        "hard_constraints": [
+            "recommended_status must remain needs_review",
+            "do not suggest automatic verification",
+            "do not suggest PostgreSQL writes",
+            "do not suggest hard battle execution before focused tests",
+        ],
+    }
+    request_payload = {
+        "model": model,
+        "input": [
+            {"role": "developer", "content": instructions},
+            {"role": "user", "content": json.dumps(user_payload, sort_keys=True)},
+        ],
+        "temperature": 0,
+        "max_output_tokens": 900,
+        "text": {"format": {"type": "json_object"}},
+    }
+    request = urllib.request.Request(
+        "https://api.openai.com/v1/responses",
+        data=json.dumps(request_payload).encode("utf-8"),
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            response_payload = json.loads(response.read().decode("utf-8", "replace"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", "replace")
+        raise RuntimeError(f"OpenAI HTTP {exc.code}: {bounded_text(body, limit=800)}") from exc
+    raw_text = extract_response_text(response_payload)
+    return normalize_llm_review(raw_text, model=model)
+
+
+def apply_llm_reviews(drafts: list[RuleDraft], args: argparse.Namespace) -> dict[str, Any]:
+    limit = max(0, int(args.llm_limit or 0))
+    target_drafts = drafts[:limit]
+    summary = {
+        "enabled": bool(args.llm_review),
+        "model": args.llm_model if args.llm_review else None,
+        "limit": limit,
+        "attempted": 0,
+        "completed": 0,
+        "skipped": 0,
+        "errors": 0,
+        "status": "disabled",
+    }
+    if not args.llm_review:
+        return summary
+    summary["status"] = "enabled"
+    if not target_drafts:
+        summary["status"] = "skipped_no_drafts"
+        return summary
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        summary["status"] = "skipped_missing_openai_api_key"
+        summary["skipped"] = len(target_drafts)
+        for draft in target_drafts:
+            draft.llm_review = {
+                "status": "skipped_missing_openai_api_key",
+                "model": args.llm_model,
+                "safety": [
+                    "llm_review_only",
+                    "no_postgres_write",
+                    "no_verified_promotion",
+                    "manual_gate_required",
+                ],
+            }
+        return summary
+
+    for draft in target_drafts:
+        summary["attempted"] += 1
+        try:
+            draft.llm_review = call_openai_review(
+                draft,
+                api_key=api_key,
+                model=args.llm_model,
+                timeout=args.llm_timeout,
+            )
+            summary["completed"] += 1
+        except Exception as exc:
+            draft.llm_review = {
+                "status": "error",
+                "model": args.llm_model,
+                "error_type": type(exc).__name__,
+                "error": bounded_text(str(exc), limit=800),
+                "safety": [
+                    "llm_review_only",
+                    "no_postgres_write",
+                    "no_verified_promotion",
+                    "manual_gate_required",
+                ],
+            }
+            summary["errors"] += 1
+    if summary["errors"]:
+        summary["status"] = "completed_with_errors"
+    else:
+        summary["status"] = "completed"
+    return summary
+
+
+def summarize(
+    run_id: str,
+    generated_at: str,
+    queue_rows: list[QueueRow],
+    drafts: list[RuleDraft],
+    *,
+    llm_review: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     confidence_counts: dict[str, int] = {}
     effect_counts: dict[str, int] = {}
     for draft in drafts:
         confidence_counts[draft.confidence] = confidence_counts.get(draft.confidence, 0) + 1
         for family in draft.effect_families:
             effect_counts[family] = effect_counts.get(family, 0) + 1
+    notes = [
+        "report_only_no_pg_writes",
+        "drafts_remain_needs_review",
+        "no_verified_promotion",
+        "no_hard_battle_behavior",
+    ]
+    if llm_review and llm_review.get("enabled"):
+        notes.append("llm_review_optional_report_only")
+    else:
+        notes.append("no_llm_used")
     return {
         "run_id": run_id,
         "generated_at": generated_at,
@@ -325,13 +535,17 @@ def summarize(run_id: str, generated_at: str, queue_rows: list[QueueRow], drafts
         "draft_count": len(drafts),
         "confidence_counts": confidence_counts,
         "effect_family_counts": effect_counts,
-        "notes": [
-            "report_only_no_pg_writes",
-            "drafts_remain_needs_review",
-            "no_verified_promotion",
-            "no_hard_battle_behavior",
-            "no_llm_used",
-        ],
+        "llm_review": llm_review or {
+            "enabled": False,
+            "model": None,
+            "limit": 0,
+            "attempted": 0,
+            "completed": 0,
+            "skipped": 0,
+            "errors": 0,
+            "status": "disabled",
+        },
+        "notes": notes,
     }
 
 
@@ -352,6 +566,20 @@ def render_markdown(summary: dict[str, Any], drafts: list[RuleDraft]) -> str:
     lines.extend(["", "## Effect Families", ""])
     for family, count in sorted(summary["effect_family_counts"].items()):
         lines.append(f"- `{family}`: {count}")
+    llm_review = summary.get("llm_review") or {}
+    lines.extend(
+        [
+            "",
+            "## Optional LLM Review",
+            "",
+            f"- Enabled: `{str(bool(llm_review.get('enabled'))).lower()}`",
+            f"- Status: `{llm_review.get('status', 'disabled')}`",
+            f"- Model: `{llm_review.get('model') or 'n/a'}`",
+            f"- Completed: `{llm_review.get('completed', 0)}`",
+            f"- Errors: `{llm_review.get('errors', 0)}`",
+            "",
+        ]
+    )
     lines.extend(["", "## Drafts", ""])
     if not drafts:
         lines.append("No battle rule review queue rows found.")
@@ -453,6 +681,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--knowledge-db", default=os.environ.get("MANALOOM_KNOWLEDGE_DB") or os.environ.get("HERMES_KNOWLEDGE_DB"))
     parser.add_argument("--output-dir", default=os.environ.get("MANALOOM_BATTLE_RULE_REVIEW_QUEUE_DIR"))
     parser.add_argument("--limit", type=int, default=int(os.environ.get("MANALOOM_BATTLE_RULE_REVIEW_QUEUE_LIMIT", "250")))
+    parser.set_defaults(llm_review=env_truthy("MANALOOM_BATTLE_RULE_LLM_REVIEW", "0"))
+    parser.add_argument("--llm-review", action="store_true", dest="llm_review")
+    parser.add_argument("--no-llm-review", action="store_false", dest="llm_review")
+    parser.add_argument(
+        "--llm-model",
+        default=os.environ.get("MANALOOM_BATTLE_RULE_LLM_MODEL", "gpt-4o-mini"),
+    )
+    parser.add_argument(
+        "--llm-limit",
+        type=int,
+        default=int(os.environ.get("MANALOOM_BATTLE_RULE_LLM_LIMIT", "3")),
+    )
+    parser.add_argument(
+        "--llm-timeout",
+        type=int,
+        default=int(os.environ.get("MANALOOM_BATTLE_RULE_LLM_TIMEOUT", "30")),
+    )
     return parser.parse_args(argv)
 
 
@@ -468,7 +713,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     generated_at = utc_now().isoformat(timespec="seconds")
     run_id = "battle_rule_review_queue_" + utc_now().strftime("%Y%m%d_%H%M%S")
     if not db_path.exists():
-        summary = summarize(run_id, generated_at, [], [])
+        llm_summary = apply_llm_reviews([], args)
+        summary = summarize(run_id, generated_at, [], [], llm_review=llm_summary)
         summary["blocked_reason"] = "knowledge_db_missing"
         write_artifacts(output_dir, run_id, summary, [])
         print("MANALOOM_BATTLE_RULE_REVIEW_QUEUE " + json.dumps(summary, sort_keys=True))
@@ -479,7 +725,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ensure_schema(conn)
         rows = load_queue_rows(conn, args.limit)
         drafts = aggregate(rows)
-        summary = summarize(run_id, generated_at, rows, drafts)
+        llm_summary = apply_llm_reviews(drafts, args)
+        summary = summarize(run_id, generated_at, rows, drafts, llm_review=llm_summary)
         persist(conn, summary, drafts)
     finally:
         conn.close()

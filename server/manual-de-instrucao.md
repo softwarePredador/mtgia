@@ -51,6 +51,19 @@ Contrato operacional:
 - `card_battle_rules` deve ser lida agregada por `card_id`, preferencialmente
   via `card_intelligence_snapshot`, para evitar fanout.
 
+Atualizacao OpenAI/LLM:
+
+- `manaloom_battle_rule_review_queue` agora aceita enriquecimento opcional por
+  OpenAI apenas para drafts `needs_rule_review`.
+- O modo fica desligado por padrao em `manaloom-ops`:
+  `MANALOOM_BATTLE_RULE_LLM_REVIEW=0`.
+- Modelo default configuravel: `MANALOOM_BATTLE_RULE_LLM_MODEL=gpt-4o-mini`.
+- Limite default configuravel: `MANALOOM_BATTLE_RULE_LLM_LIMIT=3`.
+- `needs_data` continua deterministico e nao deve chamar LLM.
+- A revisao LLM nunca promove `verified`, nunca escreve em PostgreSQL e nunca
+  libera comportamento duro no battle; ela apenas anexa resumo, riscos, fontes
+  oficiais necessarias e sugestoes de teste ao artefato/fila.
+
 Saidas:
 
 - `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_summary.json`

@@ -60,6 +60,11 @@
     `new_card_battle_rule_review_queue`, agrega por carta e gera drafts
     `proposed_status=needs_review`, com famílias de efeito, risco e cenário de
     teste sugerido;
+  - a revisão OpenAI/LLM foi adicionada **apenas** como enriquecimento opcional
+    e report-only de `needs_rule_review`, desligada por padrão via
+    `MANALOOM_BATTLE_RULE_LLM_REVIEW=0`;
+  - `needs_data` continua sem LLM: deve ser tratado por sync determinístico de
+    catálogo, oracle, identidade e legalidade;
   - nenhum draft é promovido para `verified`;
   - nenhum comportamento duro é executado no battle;
   - nenhum write em PostgreSQL acontece nesses consumers.

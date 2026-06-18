@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sqlite3
 import sys
 import tempfile
@@ -193,6 +194,62 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             self.assertIn("no_verified_promotion", drafts[0]["safety"])
             self.assertIn("mass_removal_or_modal_wipe", drafts[0]["effect_families"])
             self.assertIn("targeted_interaction", drafts[0]["effect_families"])
+
+            original_call = battle_queue.call_openai_review
+            original_key = os.environ.get("OPENAI_API_KEY")
+
+            def fake_openai_review(*_args, **kwargs):
+                return {
+                    "status": "completed",
+                    "model": kwargs["model"],
+                    "summary": "Mocked report-only review.",
+                    "recommended_status": "needs_review",
+                    "risk_assessment": ["requires official source review"],
+                    "official_sources_needed": ["Scryfall oracle", "Wizards rules"],
+                    "suggested_test_cases": ["focused replay keeps draft in needs_review"],
+                    "implementation_notes": ["do not execute hard behavior"],
+                    "safety": [
+                        "llm_review_only",
+                        "no_postgres_write",
+                        "no_verified_promotion",
+                        "manual_gate_required",
+                    ],
+                }
+
+            battle_queue.call_openai_review = fake_openai_review
+            os.environ["OPENAI_API_KEY"] = "test-openai-key"
+            try:
+                llm_dir = tmp / "battle_llm"
+                llm_summary = battle_queue.run(
+                    battle_queue.parse_args(
+                        [
+                            "--knowledge-db",
+                            str(knowledge_db),
+                            "--output-dir",
+                            str(llm_dir),
+                            "--llm-review",
+                            "--llm-limit",
+                            "1",
+                        ]
+                    )
+                )
+            finally:
+                battle_queue.call_openai_review = original_call
+                if original_key is None:
+                    os.environ.pop("OPENAI_API_KEY", None)
+                else:
+                    os.environ["OPENAI_API_KEY"] = original_key
+
+            self.assertEqual(llm_summary["llm_review"]["completed"], 1)
+            llm_drafts = json.loads(
+                (llm_dir / "battle_rule_review_queue/latest_drafts.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(llm_drafts[0]["proposed_status"], "needs_review")
+            self.assertEqual(llm_drafts[0]["llm_review"]["status"], "completed")
+            self.assertEqual(llm_drafts[0]["llm_review"]["recommended_status"], "needs_review")
+            self.assertIn("no_verified_promotion", llm_drafts[0]["llm_review"]["safety"])
 
             conn = sqlite3.connect(knowledge_db)
             try:

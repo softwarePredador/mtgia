@@ -46,6 +46,12 @@ Achados confirmados:
   dependem de provider.
 - `hermes-lab` continua sendo o serviço report-only/provider-backed; ele é o
   único que precisa de `OPENAI_API_KEY` neste desenho atual.
+- `manaloom_battle_rule_review_queue` ganhou suporte opcional a revisão OpenAI
+  para `needs_rule_review`, mas o reconciliador mantém
+  `MANALOOM_BATTLE_RULE_LLM_REVIEW=0` por padrão. Assim, não há gasto de token
+  no ciclo normal do `manaloom-ops`.
+- `needs_data` permanece fora de LLM: o caminho correto é sync determinístico
+  de catálogo/legalidade/oracle/identidade.
 
 Jobs server-owned confirmados como script-only/determinísticos:
 

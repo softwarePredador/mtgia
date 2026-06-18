@@ -151,6 +151,22 @@ gera ações recomendadas, por exemplo:
 - riscos;
 - cenário de teste sugerido.
 
+Opcionalmente, `manaloom_battle_rule_review_queue` pode anexar uma revisão
+OpenAI/LLM ao draft quando `MANALOOM_BATTLE_RULE_LLM_REVIEW=1` ou
+`--llm-review` for usado. Esse modo:
+
+- usa `OPENAI_API_KEY` somente se a variável existir no ambiente do processo;
+- fica desligado por padrão em `manaloom-ops`;
+- nunca altera `proposed_status=needs_review`;
+- nunca escreve em PostgreSQL;
+- nunca promove regra para `verified`;
+- nunca libera comportamento duro no battle;
+- serve apenas para resumir riscos, fontes oficiais necessárias e cenários de
+  teste sugeridos.
+
+`needs_data` não usa LLM. Falta de oracle, legalidade, identidade ou catálogo
+deve ser resolvida por sync determinístico com PostgreSQL/Scryfall/MTGJSON.
+
 Esses drafts **não** são escritos em `card_battle_rules`, não viram
 `verified`, e não executam comportamento duro no battle. A promoção ainda exige
 fonte oficial/ruling, teste focado, replay/auditoria e ausência de finding
