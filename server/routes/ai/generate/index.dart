@@ -230,6 +230,8 @@ Future<Response> onRequest(RequestContext context) async {
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
         usageHotCards: usageHotCards,
+        isMock: false,
+        generationMode: 'reference_deterministic',
       );
       timings['reference_deterministic_ms'] =
           fastPathStopwatch.elapsedMilliseconds;
@@ -1270,6 +1272,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   List<Map<String, dynamic>> usageHotCards = const [],
   String? warningCode,
   String? warningMessage,
+  bool isMock = true,
+  String generationMode = 'mock_fallback',
 }) async {
   final usageHotCardNames = usageHotCardCanonicalNames(usageHotCards);
   final referenceDeterministicDeck = referenceProfile == null
@@ -1356,7 +1360,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       'format': format,
       'generated_deck': validation.generatedDeck,
       'meta_context_used': false,
-      'is_mock': true,
+      'is_mock': isMock,
+      'generation_mode': generationMode,
       'stats': {
         'total_suggested': validation.totalSuggestedEntries,
         'total_suggested_cards': validation.totalSuggestedCards,
@@ -1394,7 +1399,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       'format': format,
       'generated_deck': mockDeck,
       'meta_context_used': false,
-      'is_mock': true,
+      'is_mock': isMock,
+      'generation_mode': generationMode,
       'stats': {
         'total_suggested': (mockDeck['cards'] as List?)?.length ?? 0,
         'valid_cards': (mockDeck['cards'] as List?)?.length ?? 0,

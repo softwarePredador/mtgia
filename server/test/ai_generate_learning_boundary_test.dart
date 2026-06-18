@@ -4,7 +4,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('AI generate learning boundary guards', () {
-    test('/ai/generate stays reference-driven and does not read learned decks directly', () {
+    test(
+        '/ai/generate stays reference-driven and does not read learned decks directly',
+        () {
       final generateRoute =
           File('routes/ai/generate/index.dart').readAsStringSync();
 
@@ -23,6 +25,11 @@ void main() {
       expect(generateRoute, contains('loadUsageHotCards('));
       expect(generateRoute, contains('buildDeterministicReferenceDeck('));
       expect(generateRoute, contains('GeneratedDeckValidationService('));
+      expect(
+        generateRoute,
+        contains("generationMode: 'reference_deterministic'"),
+      );
+      expect(generateRoute, contains('isMock: false'));
 
       expect(generateRoute, isNot(contains('commander_learned_decks')));
       expect(generateRoute, isNot(contains('commander_learning_snapshot')));
@@ -36,7 +43,9 @@ void main() {
       );
     });
 
-    test('/ai/commander-learning remains the explicit learned-deck product route', () {
+    test(
+        '/ai/commander-learning remains the explicit learned-deck product route',
+        () {
       final learningRoute = File(
         'routes/ai/commander-learning/index.dart',
       ).readAsStringSync();

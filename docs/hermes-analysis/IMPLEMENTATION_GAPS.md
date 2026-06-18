@@ -12,6 +12,41 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / runtime truth de generate + cron topology
+
+- Revalidado o estado real do runtime `master` no EasyPanel:
+  - `hermes-lab` continua como runtime provider-backed, com
+    `HERMES_PROVIDER=openai-api`, `HERMES_MODEL=gpt-4o-mini` e
+    `OPENAI_API_KEY` presente;
+  - `manaloom-ops` continua corretamente deterministico e nao depende de
+    `OPENAI_API_KEY` para suas rotinas operacionais
+    (`pull_learning_events`, `auto_sync_learned_decks`,
+    `auto_promote_learned_decks`, `master_optimizer_preflight`,
+    `manaloom_knowledge_import`, `hermes_mana_base_validator`,
+    `hermes_cron_governor_report`);
+  - a ausencia de `OPENAI_API_KEY` em `manaloom-ops` nao e drift, e sim
+    separacao arquitetural intencional entre cron provider-backed e cron
+    deterministica.
+- Revalidado tambem o `/ai/generate` publico em `a90b3e899728...`:
+  - o endpoint esta saudavel, com `reference_profile_used=true` e
+    `reference_card_stats_used=true` para Lorehold;
+  - o deck retornado nao e "mock sem OpenAI" por falta de env, e sim o fast
+    path deterministico guiado por profile/reference;
+  - o bug real era semantico: o payload ainda marcava `is_mock=true`, o que
+    fazia a UI tratar o deck canônico/deterministico como "modo mock".
+- Ajuste aplicado:
+  - o fast path reference-guided agora retorna `is_mock=false` e
+    `generation_mode='reference_deterministic'`;
+  - fallbacks reais continuam `is_mock=true` e preservam warnings especificos
+    (`openai_api_key_missing`, timeout, fallback por validacao etc.).
+- Proxima leitura correta desse estado:
+  - battle: auditavel e com trace real; gaps residuais sao majoritariamente
+    `needs_review`, nao quebra de replay;
+  - generate: backend-owned e atualmente apto a devolver deck deterministico
+    valido para Lorehold, mesmo quando nao usa o ramo generativo da OpenAI;
+  - Lorehold: o risco principal voltou a ser composicao/qualidade do deck
+    (`lands=33`, `draw=15`, `wincon=2` no validator), nao wiring.
+
 ### Atualizacao de ciclo — 2026-06-18 / EasyPanel mana validator truth fix
 
 - Fechado um gap operacional/funcional do `manaloom-ops`: o

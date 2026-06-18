@@ -74,6 +74,7 @@ Uso:
     'generate': {
       'status_code': generate['status_code'],
       'is_mock': generate['body']['is_mock'],
+      'generation_mode': generate['body']['generation_mode'],
       'warning_code': generateMap(generate['body']['warnings'])['code'],
       'cache_hit': generateMap(generate['body']['cache'])['hit'],
       'reference_profile_used': diagnostics?['reference_profile_used'],
@@ -81,17 +82,18 @@ Uso:
       'runtime_profile_origin': diagnostics?['runtime_profile_origin'],
       'archetype_reference_used': diagnostics?['archetype_reference_used'],
       'archetype_candidate_count': diagnostics?['archetype_candidate_count'],
-      'archetype_source_commanders': diagnostics?['archetype_source_commanders'],
+      'archetype_source_commanders':
+          diagnostics?['archetype_source_commanders'],
       'generated_commander':
           generateMap(generate['body']['generated_deck'])['commander'] is Map
               ? (generateMap(
                   generateMap(generate['body']['generated_deck'])['commander'],
                 ))['name']
               : null,
-      'generated_cards_preview': (generateMap(generate['body']['generated_deck'])['cards']
-              as List?)
-          ?.take(5)
-          .toList(),
+      'generated_cards_preview':
+          (generateMap(generate['body']['generated_deck'])['cards'] as List?)
+              ?.take(5)
+              .toList(),
     },
     'commander_learning': {
       'status_code': learning['status_code'],
@@ -110,8 +112,7 @@ Uso:
       'model_source': generateMap(referenceBody['model'])['source'],
       'meta_decks_found': referenceBody['meta_decks_found'],
       'commander_profile_present': referenceBody['commander_profile'] != null,
-      'commander_learning_present':
-          referenceBody['commander_learning'] != null,
+      'commander_learning_present': referenceBody['commander_learning'] != null,
       'reference_cards_count':
           (referenceBody['reference_cards'] as List?)?.length ?? 0,
     },
@@ -125,9 +126,10 @@ Uso:
   stdout.writeln(jsonEncode({
     'status': summary['status'],
     'artifact': reportFile.path,
-    'generate_reference_profile_used':
-        summary['generate']['reference_profile_used'],
-    'learning_profile_present': summary['commander_learning']['profile_present'],
+    'generate_reference_profile_used': summary['generate']
+        ['reference_profile_used'],
+    'learning_profile_present': summary['commander_learning']
+        ['profile_present'],
     'reference_model_source': summary['commander_reference']['model_source'],
   }));
 }
