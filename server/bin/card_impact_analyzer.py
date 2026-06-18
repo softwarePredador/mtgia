@@ -10,16 +10,16 @@ import argparse, importlib.util, json, os, sqlite3, sys, random
 from collections import defaultdict
 from pathlib import Path
 
-SCRIPT_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
+from repo_runtime_paths import (
+    resolve_battle_script_path,
+    resolve_battle_scripts_dir,
+    resolve_forensic_replays_dir,
 )
-sys.path.insert(0, SCRIPT_DIR)
 
-BATTLE_PATH = os.environ.get(
-    "MANALOOM_BATTLE_SCRIPT",
-    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
-)
+BATTLE_SCRIPTS_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_SCRIPTS_DIR))
+
+BATTLE_PATH = resolve_battle_script_path()
 
 spec = importlib.util.spec_from_file_location("card_impact_battle", BATTLE_PATH)
 ba = importlib.util.module_from_spec(spec)
@@ -174,7 +174,7 @@ def run_impact_analysis(db_path: str, deck_id: int, games_per_opp: int, seed: in
 
     # ── Card impact from forensic replays ──
     print(f"\n--- Card Impact from Forensic Replays ---")
-    replays_dir = "/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/forensic_replays"
+    replays_dir = str(resolve_forensic_replays_dir())
 
     if os.path.isdir(replays_dir):
         replay_card_stats = _compute_from_replays(replays_dir, deck_name=commander)
@@ -297,7 +297,7 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold", min_see
 def main():
     parser = argparse.ArgumentParser(description="Card Impact Analyzer from forensic replays")
     parser.add_argument("--replay-dir",
-        default="/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/forensic_replays")
+        default=str(resolve_forensic_replays_dir()))
     parser.add_argument("--deck-name", default="Lorehold")
     parser.add_argument("--min-games", type=int, default=3)
     parser.add_argument("--json-output")

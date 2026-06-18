@@ -395,13 +395,16 @@ vs Kinnan WR=0% [W:elimination=1, L:screw=4, L:out-valued=2]
 ### 4.2 Geração de Replays (generate_card_replays.py)
 
 ```bash
-python3 generate_card_replays.py --games 5 --opponents 6 --deck-id 6
+python3 server/bin/generate_card_replays.py --games 5 --opponents 6 --deck-id 6
 ```
 
 - Usa `REPLAY_EVENT_HANDLER` para capturar eventos sem modificar a engine
 - Usa `load_deck()` nativo do v8 para carregar cartas com metadata completa
 - Gera arquivos JSONL em `master_optimizer_replays/`
 - Cada arquivo contém eventos turn-by-turn + game_ended com won/loss
+- Desde 2026-06-18, o runner resolve o repo atual dinamicamente no Mac local e
+  no EasyPanel; nao depende mais de `/opt/data/workspace/mtgia` para localizar
+  `battle_analyst_v9.py`.
 
 ### 4.3 Análise de Impacto (card_impact_analyzer.py)
 

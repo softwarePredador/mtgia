@@ -9,21 +9,16 @@ import argparse, importlib.util, os, sqlite3, sys, json
 from collections import defaultdict
 from pathlib import Path
 
-SCRIPT_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
-)
-sys.path.insert(0, SCRIPT_DIR)
+from repo_runtime_paths import resolve_battle_script_path, resolve_battle_scripts_dir
+
+BATTLE_SCRIPTS_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_SCRIPTS_DIR))
 
 # Monkey-patch: wrap simulate_game_v8 to also collect card data
-BATTLE_PATH = os.environ.get(
-    "MANALOOM_BATTLE_SCRIPT",
-    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
-)
+BATTLE_PATH = resolve_battle_script_path()
 spec = importlib.util.spec_from_file_location("card_impact_scorer_battle", BATTLE_PATH)
 ba = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ba)
-from master_optimizer_common import is_land
 
 _original_simulate = ba.simulate_game_v8
 
@@ -53,7 +48,7 @@ def _patched_simulate(commander, deck, opponents, rng, game_id=0):
         # After turn: track battlefield + graveyard
         for c in player.battlefield + player.graveyard:
             name = c.get("name", c.get("card_name", ""))
-            if name and not is_land(c):
+            if name and not ba.is_land(c):
                 player._cards_cast.add(name)
 
     ba.play_turn_sequence_v8 = _patched_play_turn
@@ -158,7 +153,7 @@ def run_impact_analysis(db_path: str, deck_id: int, games: int, seed: int):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--db", default=str(ba.DEFAULT_DB))
+    parser.add_argument("--db", default=str(getattr(ba, "DB", "")))
     parser.add_argument("--deck-id", type=int, default=6)
     parser.add_argument("--games", type=int, default=2)
     parser.add_argument("--seed", type=int, default=42)

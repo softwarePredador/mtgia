@@ -11,6 +11,9 @@ export MANALOOM_BATTLE_SCRIPT="/opt/data/workspace/mtgia/docs/hermes-analysis/ma
 ```
 
 Local fallbacks in optimizer, replay, sync and audit scripts now point to v9.
+When `MANALOOM_BATTLE_SCRIPT` / `BATTLE_SCRIPTS_DIR` are absent, the local
+helpers under `server/bin/` resolve the current repo root dynamically instead of
+assuming `/opt/data/workspace/mtgia`.
 
 ## Legacy Engines
 

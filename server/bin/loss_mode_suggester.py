@@ -15,11 +15,10 @@ Importante:
 import argparse, json, os, sqlite3, sys
 from collections import defaultdict
 
-SCRIPT_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
-)
-sys.path.insert(0, SCRIPT_DIR)
+from repo_runtime_paths import resolve_battle_scripts_dir, resolve_master_optimizer_replays_dir
+
+BATTLE_SCRIPTS_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_SCRIPTS_DIR))
 
 def classify_replays_by_turn(replay_dir: str) -> dict[str, int]:
     """Classifica perdas por heuristica de turno (fallback sem loss tags no engine)."""
@@ -151,8 +150,10 @@ def main():
     parser = argparse.ArgumentParser(description="Loss-Mode Swap Suggester")
     parser.add_argument("--loss-tags-json", help="JSON with loss tag counts")
     parser.add_argument("--impact-json", help="JSON with WDWR/PWR data")
-    parser.add_argument("--replay-dir",
-        default="/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_replays")
+    parser.add_argument(
+        "--replay-dir",
+        default=str(resolve_master_optimizer_replays_dir()),
+    )
     parser.add_argument("--min-sample-size", type=int, default=10)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
