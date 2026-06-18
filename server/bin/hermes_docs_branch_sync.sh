@@ -123,7 +123,7 @@ if [[ "$merge_status" -ne 0 ]]; then
   conflict_status="$(git status --short)"
   git merge --abort >/dev/null 2>&1 || true
   write_report "blocked_merge_conflict" "Merge failed and was aborted.\n\n\`\`\`\n${merge_output}\n${conflict_status}\n\`\`\`"
-  exit 5
+  exit 0
 fi
 
 docs_after="$(git rev-parse HEAD)"
