@@ -74,6 +74,21 @@ else
   fi
 fi
 
+if id hermes >/dev/null 2>&1; then
+  # Hermes cron jobs run as the hermes user. The repo can be created or
+  # touched by root during container bootstrap/redeploy, so normalize only the
+  # runtime paths that cron jobs must write to.
+  chown -R hermes:hermes \
+    "$REPO_DIR" \
+    "$HERMES_CRON_SCRIPTS_DIR" \
+    "$(dirname "$HERMES_CRON_JOBS_JSON")" \
+    "$LOG_DIR" \
+    "$RUNTIME_ARTIFACT_DIR" \
+    "$BOOTSTRAP_REPORT_DIR" \
+    "$HERMES_HOME/.config" \
+    "$HERMES_HOME/.env" 2>/dev/null || true
+fi
+
 write_runtime_status "workspace" "ready" "repository prepared"
 
 cat > "$HERMES_HOME/.profile" <<EOF

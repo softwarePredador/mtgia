@@ -272,6 +272,16 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
         openai_key = runtime_env.get("OPENAI_API_KEY") or existing_env.get("OPENAI_API_KEY")
         if openai_key:
             desired["OPENAI_API_KEY"] = openai_key
+        github_token = (
+            runtime_env.get("HERMES_GITHUB_TOKEN")
+            or runtime_env.get("GITHUB_TOKEN")
+            or runtime_env.get("GH_TOKEN")
+            or existing_env.get("HERMES_GITHUB_TOKEN")
+            or existing_env.get("GITHUB_TOKEN")
+            or existing_env.get("GH_TOKEN")
+        )
+        if github_token:
+            desired["HERMES_GITHUB_TOKEN"] = github_token
         return desired
     raise EasyPanelError(f"unsupported service: {service_name}")
 

@@ -70,10 +70,14 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
 def test_desired_env_for_hermes_lab_generates_missing_api_key() -> None:
     desired = MODULE._desired_env(
         "hermes-lab",
-        {"OPENAI_API_KEY": "sk-proj-example"},
+        {
+            "OPENAI_API_KEY": "test-openai-key",
+            "HERMES_GITHUB_TOKEN": "ghp-example",
+        },
         MODULE._parse_dotenv(""),
     )
-    assert desired["OPENAI_API_KEY"] == "sk-proj-example"
+    assert desired["OPENAI_API_KEY"] == "test-openai-key"
+    assert desired["HERMES_GITHUB_TOKEN"] == "ghp-example"
     assert desired["HERMES_DASHBOARD_HOST"] == "127.0.0.1"
     assert desired["HERMES_KNOWLEDGE_DB"].endswith("/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db")
     assert desired["MANALOOM_KNOWLEDGE_DB"] == desired["HERMES_KNOWLEDGE_DB"]

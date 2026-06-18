@@ -60,3 +60,38 @@ def test_parse_probe_lines_ignores_noise() -> None:
         "hostname": "node-1",
         "pwd": "/opt/data",
     }
+
+
+def test_extract_runtime_findings_flags_active_job_error() -> None:
+    findings = MODULE._extract_runtime_findings(
+        service_envs={
+            "manaloom-ops": {"openai_api_key_present": False},
+            "hermes-lab": {"openai_api_key_present": True},
+        },
+        ops_jobs={
+            "jobs_total": 1,
+            "jobs": [
+                {
+                    "name": "pull_learning_events",
+                    "state": "active",
+                    "enabled": True,
+                    "last_status": "ok",
+                    "output_evidence": {"path": "/tmp/out.log"},
+                }
+            ],
+        },
+        lab_jobs={
+            "jobs_total": 1,
+            "jobs": [
+                {
+                    "name": "manaloom-docs-branch-sync",
+                    "state": "scheduled",
+                    "enabled": True,
+                    "last_status": "error",
+                }
+            ],
+        },
+        ops_logs=["scheduler started"],
+        lab_logs=["bootstrap complete"],
+    )
+    assert any(finding["code"] == "hermes_lab_job_error" for finding in findings)

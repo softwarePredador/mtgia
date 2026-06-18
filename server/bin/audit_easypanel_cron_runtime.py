@@ -564,7 +564,22 @@ def _extract_runtime_findings(
         ("hermes-lab", lab_jobs),
     ):
         for job in jobs.get("jobs", []):
-            if str(job.get("last_status") or "").lower() != "ok":
+            state = str(job.get("state") or "").lower()
+            enabled = bool(job.get("enabled", True))
+            last_status = str(job.get("last_status") or "").lower()
+            if enabled and state != "paused" and last_status in {"error", "failed"}:
+                findings.append(
+                    {
+                        "priority": "P1",
+                        "code": f"{service_name.replace('-', '_')}_job_error",
+                        "message": (
+                            f"{service_name} job `{job.get('name')}` reports "
+                            f"last_status={job.get('last_status')}"
+                        ),
+                    }
+                )
+                continue
+            if last_status != "ok":
                 continue
             if job.get("output_evidence"):
                 continue

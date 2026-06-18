@@ -387,5 +387,53 @@ Leitura correta:
 - o proximo bloqueio operacional prioritario deixou de ser codigo e passou a
   ser:
   1. recuperar o painel EasyPanel;
-  2. liberar espaco no host do PostgreSQL;
-  3. reexecutar os auditores live.
+ 2. liberar espaco no host do PostgreSQL;
+ 3. reexecutar os auditores live.
+
+## Follow-up live — 2026-06-18 17:50 UTC
+
+Validacao manual das crons do EasyPanel encontrou tres pontos reais que nao
+podem ser tratados como "tudo validado" sem correcao:
+
+- `manaloom-ops` estava com 11 jobs ativos e todos com evidência de execução
+  recente em `/data/manaloom-ops/cron/output`;
+- `hermes-lab` estava com 5 jobs ativos, mas `manaloom-docs-branch-sync`
+  falhava quando executado pelo scheduler como usuario `hermes`;
+- a causa raiz era ownership do checkout persistido em
+  `/opt/data/workspace/mtgia` como `root:root`, enquanto as crons Hermes
+  executam como usuario `hermes`;
+- o auditor `audit_easypanel_cron_runtime.py` tambem estava fraco: reportava
+  `findings=[]` mesmo quando job ativo tinha `last_status=error`.
+
+Correcoes aplicadas:
+
+- `server/bin/hermes_lab_entrypoint.sh` normaliza ownership dos paths
+  persistidos usados pelo Hermes (`workspace`, `scripts`, `cron`, `logs`,
+  `artifacts` e config) antes do bootstrap/gateway;
+- `server/bin/audit_easypanel_cron_runtime.py` agora marca job ativo em
+  `error`/`failed` como finding P1;
+- `server/bin/hermes_docs_branch_sync.sh` agora detecta quando a branch local
+  de docs ja contem `origin/master`, mas a branch remota ainda esta atrasada;
+  nesse caso tenta push ou bloqueia com `blocked_push_failed`;
+- `server/bin/hermes_docs_branch_sync.sh` tambem passou a aceitar
+  `HERMES_GITHUB_TOKEN`/`GITHUB_TOKEN`/`GH_TOKEN` para push HTTPS sem expor o
+  token em relatorio;
+- `server/bin/reconcile_easypanel_services.py` preserva
+  `HERMES_GITHUB_TOKEN` quando ele existir no ambiente local ou no EasyPanel.
+
+Estado operacional apos hotfix runtime:
+
+- `git fetch` como usuario `hermes` passou no container;
+- `manaloom-docs-branch-sync` voltou a executar com status `ok`;
+- o EasyPanel `hermes-lab` ainda nao tinha token GitHub configurado
+  (`HERMES_GITHUB_TOKEN` ausente), portanto a capacidade de publicar a branch
+  remota depende de configurar esse segredo no serviço.
+
+Validacoes focadas:
+
+- `python3 server/test/hermes_docs_branch_sync_test.py`
+- `python3 server/test/reconcile_easypanel_services_test.py`
+- harness direto para `server/test/audit_easypanel_cron_runtime_test.py`
+- harness direto para `server/test/hermes_lab_entrypoint_test.py`
+- `bash -n server/bin/hermes_docs_branch_sync.sh server/bin/hermes_lab_entrypoint.sh`
+- `python3 -m py_compile server/bin/audit_easypanel_cron_runtime.py server/bin/reconcile_easypanel_services.py`
