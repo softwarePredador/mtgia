@@ -12,6 +12,7 @@ import json
 import os
 import re
 import sqlite3
+import ssl
 import sys
 import urllib.error
 import urllib.request
@@ -374,6 +375,15 @@ def normalize_llm_review(raw_text: str, *, model: str) -> dict[str, Any]:
     return parsed
 
 
+def openai_ssl_context() -> ssl.SSLContext:
+    try:
+        import certifi  # type: ignore
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
+
+
 def call_openai_review(
     draft: RuleDraft,
     *,
@@ -426,7 +436,11 @@ def call_openai_review(
         },
     )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with urllib.request.urlopen(
+            request,
+            timeout=timeout,
+            context=openai_ssl_context(),
+        ) as response:
             response_payload = json.loads(response.read().decode("utf-8", "replace"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", "replace")
