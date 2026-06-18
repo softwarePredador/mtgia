@@ -134,6 +134,108 @@ def register_tests(battle, player):
 
         assert defender.life == 37
 
+    def test_must_attack_zero_power_creature_attacks_if_able():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        attacker = player("Attacker")
+        defender = player("Defender")
+        must_attack = {
+            "name": "Compelled Recruit",
+            "effect": "creature",
+            "power": 0,
+            "toughness": 2,
+            "must_attack_each_combat_if_able": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        attacker.battlefield = [must_attack]
+
+        battle.combat_phase_v8(
+            attacker,
+            [defender],
+            [attacker, defender],
+            turn=2,
+            rng=random.Random(17),
+            stack=battle.Stack(),
+        )
+
+        declare_attackers = next(
+            data for event, data in events if data.get("step") == "declare_attackers"
+        )
+        assert declare_attackers["attackers"] == 1
+        assert must_attack["tapped"] is True
+        assert defender.life == 40
+
+    def test_cant_attack_alone_creature_does_not_attack_by_itself():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        attacker = player("Attacker")
+        defender = player("Defender")
+        lone_attacker = {
+            "name": "Bonded Raider",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "cant_attack_alone": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        attacker.battlefield = [lone_attacker]
+
+        battle.combat_phase_v8(
+            attacker,
+            [defender],
+            [attacker, defender],
+            turn=2,
+            rng=random.Random(18),
+            stack=battle.Stack(),
+        )
+
+        assert lone_attacker["tapped"] is False
+        assert defender.life == 40
+        assert not any(data.get("step") == "declare_attackers" for _, data in events)
+
+    def test_cant_attack_alone_creature_attacks_with_another_attacker():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        attacker = player("Attacker")
+        defender = player("Defender")
+        bonded = {
+            "name": "Bonded Raider",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "cant_attack_alone": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        partner = {
+            "name": "Partner Raider",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        attacker.battlefield = [bonded, partner]
+
+        battle.combat_phase_v8(
+            attacker,
+            [defender],
+            [attacker, defender],
+            turn=2,
+            rng=random.Random(19),
+            stack=battle.Stack(),
+        )
+
+        declare_attackers = next(
+            data for event, data in events if data.get("step") == "declare_attackers"
+        )
+        assert declare_attackers["attackers"] == 2
+        assert bonded["tapped"] is True
+        assert partner["tapped"] is True
+        assert defender.life == 34
+
     def test_multiple_blockers_can_gang_block():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -192,6 +294,48 @@ def register_tests(battle, player):
         assert defender.life == 0
         assert defender.battlefield == []
         assert attacker.battlefield[0]["name"] == "Trampler"
+
+    def test_damage_assignment_order_prioritizes_low_lethal_blocker():
+        attacker = player("Attacker")
+        defender = player("Defender")
+        trampler = {
+            "name": "Ordering Trampler",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 5,
+            "trample": True,
+            "summoning_sick": False,
+            "tapped": True,
+        }
+        large_blocker = {
+            "name": "Large Wall",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 8,
+        }
+        small_blocker = {
+            "name": "Small Blocker",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        attacker.battlefield = [trampler]
+        defender.battlefield = [large_blocker, small_blocker]
+
+        battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [trampler],
+            [(trampler, [large_blocker, small_blocker])],
+            turn=2,
+        )
+
+        assert [creature["name"] for creature in defender.battlefield] == [
+            "Large Wall"
+        ]
+        assert attacker.battlefield[0]["name"] == "Ordering Trampler"
+        assert defender.life == 40
 
     def test_deathtouch_assigns_one_lethal_damage_per_blocker():
         attacker = player("Attacker")
@@ -321,8 +465,12 @@ def register_tests(battle, player):
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,
         test_first_strike_does_not_deal_regular_damage_twice,
+        test_must_attack_zero_power_creature_attacks_if_able,
+        test_cant_attack_alone_creature_does_not_attack_by_itself,
+        test_cant_attack_alone_creature_attacks_with_another_attacker,
         test_multiple_blockers_can_gang_block,
         test_trample_assigns_excess_damage_to_defender,
+        test_damage_assignment_order_prioritizes_low_lethal_blocker,
         test_deathtouch_assigns_one_lethal_damage_per_blocker,
         test_first_strike_blocker_kills_before_regular_damage,
         test_indestructible_blocker_survives_lethal_combat_damage,

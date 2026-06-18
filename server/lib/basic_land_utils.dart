@@ -1,4 +1,4 @@
-const _regularBasicLandNames = <String>{
+const regularBasicLandNames = <String>{
   'plains',
   'island',
   'swamp',
@@ -7,13 +7,18 @@ const _regularBasicLandNames = <String>{
   'wastes',
 };
 
-const _snowBasicLandNames = <String>{
+const snowBasicLandNames = <String>{
   'snow covered plains',
   'snow covered island',
   'snow covered swamp',
   'snow covered mountain',
   'snow covered forest',
   'snow covered wastes',
+};
+
+const basicLandNames = <String>{
+  ...regularBasicLandNames,
+  ...snowBasicLandNames,
 };
 
 String normalizeBasicLandName(String name) {
@@ -26,8 +31,7 @@ String normalizeBasicLandName(String name) {
 
 bool isBasicLandName(String name) {
   final normalized = normalizeBasicLandName(name);
-  return _regularBasicLandNames.contains(normalized) ||
-      _snowBasicLandNames.contains(normalized);
+  return basicLandNames.contains(normalized);
 }
 
 bool isBasicLandTypeLine(String typeLine) {

@@ -11,6 +11,7 @@ const _defaultArtifactDir =
 const _heuristicSource = 'deterministic_heuristic_v1';
 const _metaSynergySource = 'meta_decks_cooccurrence_v1';
 const _rejectionPenaltySource = 'quality_gate_history_v1';
+const _defaultMaxStalePruneOnApply = 100;
 const _staleGeneratedRowsCsvHeaders = <String>[
   'table',
   'card_id',
@@ -53,6 +54,13 @@ Future<void> main(List<String> args) async {
   }
   final pruneTarget = _readArg(args, '--target=');
   final maxPrune = int.tryParse(_readArg(args, '--max-prune=') ?? '') ?? 1;
+  final maxStalePruneOnApply =
+      int.tryParse(_readArg(args, '--max-stale-prune-on-apply=') ?? '') ??
+          _defaultMaxStalePruneOnApply;
+  final allowLargeStalePrune = args.contains('--allow-large-stale-prune');
+  if (maxStalePruneOnApply < 0) {
+    throw ArgumentError('--max-stale-prune-on-apply deve ser >= 0.');
+  }
   if (pruneStaleOnly) {
     if (pruneTarget != 'card_role_scores') {
       throw ArgumentError(
@@ -123,6 +131,8 @@ Future<void> main(List<String> args) async {
         cmc: card.cmc,
         metaUsageCount: card.metaUsageCount,
         metaDeckCount: card.metaDeckCount,
+        edhrecInclusionRate: card.edhrecInclusionRate,
+        edhrecSampleDecks: card.edhrecSampleDecks,
       );
       for (final score in scores) {
         roleRows.add({
@@ -176,6 +186,13 @@ Future<void> main(List<String> args) async {
     final staleRowsBeforeApply = staleGeneratedRowsBeforeApply.map(
       (table, rows) => MapEntry(table, rows.length),
     );
+    if (apply) {
+      _guardApplyStalePrune(
+        staleRowsByTable: staleRowsBeforeApply,
+        maxRowsPerTable: maxStalePruneOnApply,
+        allowLargeStalePrune: allowLargeStalePrune,
+      );
+    }
     final flattenedStaleRows =
         _flattenStaleGeneratedRows(staleGeneratedRowsBeforeApply);
     await _writeJson(
@@ -237,6 +254,10 @@ Future<void> main(List<String> args) async {
       'artifact_dir': artifactDir.path,
       'prune_target': pruneTarget,
       'max_prune': maxPrune,
+      'apply_stale_prune_guard': {
+        'max_stale_prune_on_apply': maxStalePruneOnApply,
+        'allow_large_stale_prune': allowLargeStalePrune,
+      },
       'pre_counts': preCounts,
       'post_counts': postCounts,
       'cards_scanned': cards.length,
@@ -246,6 +267,10 @@ Future<void> main(List<String> args) async {
       'role_score_rows_planned': roleRows.length,
       'commander_synergy_rows_planned': synergyRows.length,
       'rejection_penalty_rows_planned': penaltyRows.length,
+      'cards_with_edhrec_signal': cards
+          .where((card) =>
+              card.edhrecInclusionRate > 0 || card.edhrecSampleDecks > 0)
+          .length,
       'function_tag_coverage_pct': cards.isEmpty
           ? 0
           : (tagRows.map((r) => r['card_id']).toSet().length /
@@ -333,6 +358,9 @@ Opcoes:
   --prune-stale-only           Remove somente stale generated rows do target explicitado
   --target=<table>             Target do prune-only; atualmente card_role_scores
   --max-prune=<N>              Limite de rows deletaveis no prune-only (default: 1)
+  --max-stale-prune-on-apply=<N>
+                               Limite por tabela para prune automatico no --apply (default: $_defaultMaxStalePruneOnApply)
+  --allow-large-stale-prune    Permite --apply mesmo quando stale prune passa do limite
   --artifact-dir=<path>        Diretorio de artefatos
   --min-synergy-evidence=<N>   Minimo de ocorrencias por commander/card (default: 2)
   --max-synergy-rows=<N>       Limite de rows de synergy a materializar (default: 5000)
@@ -354,6 +382,8 @@ class CandidateQualityCard {
     required this.priceUsdFoil,
     required this.metaUsageCount,
     required this.metaDeckCount,
+    required this.edhrecInclusionRate,
+    required this.edhrecSampleDecks,
   });
 
   final String id;
@@ -368,6 +398,8 @@ class CandidateQualityCard {
   final Object? priceUsdFoil;
   final int metaUsageCount;
   final int metaDeckCount;
+  final double edhrecInclusionRate;
+  final int edhrecSampleDecks;
 
   Set<String> get resolvedIdentity => resolveCandidateQualityIdentity(
         colorIdentity: colorIdentity,
@@ -381,6 +413,7 @@ Future<Map<String, int>> _loadPreCounts(Pool pool) async {
   final tables = [
     'cards',
     'card_meta_insights',
+    'edhrec_card_snapshots',
     'meta_decks',
     'optimization_analysis_logs',
     'card_function_tags',
@@ -402,8 +435,51 @@ Future<Map<String, int>> _loadPreCounts(Pool pool) async {
 
 Future<List<CandidateQualityCard>> _loadCandidateCards(Pool pool) async {
   final hasMetaInsights = await _hasTable(pool, 'card_meta_insights');
-  final sql = hasMetaInsights
+  final hasEdhrecSnapshots = await _hasTable(pool, 'edhrec_card_snapshots');
+  final edhrecCte = hasEdhrecSnapshots
       ? '''
+WITH edhrec_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(COALESCE(inclusion, 0))::double precision AS edhrec_inclusion_rate,
+    MAX(COALESCE(num_decks, 0))::int AS edhrec_sample_decks
+  FROM edhrec_card_snapshots
+  WHERE card_name IS NOT NULL
+    AND TRIM(card_name) <> ''
+  GROUP BY LOWER(card_name)
+)
+'''
+      : '';
+  final metaJoin = hasMetaInsights
+      ? 'LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)'
+      : '';
+  final edhrecJoin = hasEdhrecSnapshots
+      ? 'LEFT JOIN edhrec_insights ei ON ei.normalized_card_name = LOWER(c.name)'
+      : '';
+  final metaUsageSelect =
+      hasMetaInsights ? 'COALESCE(cmi.usage_count, 0)::int' : '0::int';
+  final metaDeckSelect =
+      hasMetaInsights ? 'COALESCE(cmi.meta_deck_count, 0)::int' : '0::int';
+  final edhrecRateSelect = hasEdhrecSnapshots
+      ? 'COALESCE(ei.edhrec_inclusion_rate, 0)::double precision'
+      : '0::double precision';
+  final edhrecSampleSelect = hasEdhrecSnapshots
+      ? 'COALESCE(ei.edhrec_sample_decks, 0)::int'
+      : '0::int';
+  final edhrecOrder = hasEdhrecSnapshots
+      ? '''
+  COALESCE(ei.edhrec_inclusion_rate, 0) DESC,
+  COALESCE(ei.edhrec_sample_decks, 0) DESC,
+'''
+      : '';
+  final metaOrder = hasMetaInsights
+      ? '''
+  COALESCE(cmi.meta_deck_count, 0) DESC,
+  COALESCE(cmi.usage_count, 0) DESC,
+'''
+      : '';
+  final sql = '''
+$edhrecCte
 SELECT DISTINCT ON (LOWER(c.name))
   c.id::text,
   c.name,
@@ -415,42 +491,22 @@ SELECT DISTINCT ON (LOWER(c.name))
   c.cmc,
   c.price_usd,
   c.price_usd_foil,
-  COALESCE(cmi.usage_count, 0)::int AS usage_count,
-  COALESCE(cmi.meta_deck_count, 0)::int AS meta_deck_count
+  $metaUsageSelect AS usage_count,
+  $metaDeckSelect AS meta_deck_count,
+  $edhrecRateSelect AS edhrec_inclusion_rate,
+  $edhrecSampleSelect AS edhrec_sample_decks
 FROM cards c
-LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+$metaJoin
+$edhrecJoin
 WHERE c.name IS NOT NULL
   AND c.name NOT LIKE 'A-%'
   AND c.name NOT LIKE '\\_%' ESCAPE '\\'
   AND c.name NOT LIKE '%World Champion%'
   AND c.name NOT LIKE '%Heroes of the Realm%'
 ORDER BY LOWER(c.name),
-  COALESCE(cmi.meta_deck_count, 0) DESC,
-  COALESCE(cmi.usage_count, 0) DESC,
+$edhrecOrder$metaOrder
   c.set_code ASC NULLS LAST,
   c.id ASC
-'''
-      : '''
-SELECT DISTINCT ON (LOWER(c.name))
-  c.id::text,
-  c.name,
-  COALESCE(c.type_line, '') AS type_line,
-  COALESCE(c.oracle_text, '') AS oracle_text,
-  COALESCE(c.mana_cost, '') AS mana_cost,
-  COALESCE(c.colors, ARRAY[]::text[]) AS colors,
-  COALESCE(c.color_identity, ARRAY[]::text[]) AS color_identity,
-  c.cmc,
-  c.price_usd,
-  c.price_usd_foil,
-  0::int AS usage_count,
-  0::int AS meta_deck_count
-FROM cards c
-WHERE c.name IS NOT NULL
-  AND c.name NOT LIKE 'A-%'
-  AND c.name NOT LIKE '\\_%' ESCAPE '\\'
-  AND c.name NOT LIKE '%World Champion%'
-  AND c.name NOT LIKE '%Heroes of the Realm%'
-ORDER BY LOWER(c.name), c.set_code ASC NULLS LAST, c.id ASC
 ''';
 
   final rows = await pool.execute(sql);
@@ -470,6 +526,8 @@ ORDER BY LOWER(c.name), c.set_code ASC NULLS LAST, c.id ASC
       priceUsdFoil: row[9],
       metaUsageCount: (row[10] as int?) ?? 0,
       metaDeckCount: (row[11] as int?) ?? 0,
+      edhrecInclusionRate: (row[12] as num?)?.toDouble() ?? 0,
+      edhrecSampleDecks: (row[13] as int?) ?? 0,
     );
   }).toList(growable: false);
 }
@@ -772,6 +830,7 @@ Future<void> _ensureCandidateQualitySchema(Pool pool) async {
     await pool.execute(statement);
   }
   await pool.execute(optimizeCandidateQualitySummaryViewStatement);
+  await pool.execute(cardIntelligenceSnapshotViewStatement);
 }
 
 Future<int> _upsertFunctionTags(
@@ -1049,6 +1108,27 @@ List<Map<String, dynamic>> _flattenStaleGeneratedRows(
     }
   }
   return rows;
+}
+
+void _guardApplyStalePrune({
+  required Map<String, int> staleRowsByTable,
+  required int maxRowsPerTable,
+  required bool allowLargeStalePrune,
+}) {
+  if (allowLargeStalePrune) return;
+  final oversized = staleRowsByTable.entries
+      .where((entry) => entry.value > maxRowsPerTable)
+      .toList(growable: false);
+  if (oversized.isEmpty) return;
+
+  final details =
+      oversized.map((entry) => '${entry.key}=${entry.value}').join(', ');
+  throw StateError(
+    'Apply abortado: stale prune acima do limite por tabela '
+    '($details; limite=$maxRowsPerTable). Revise '
+    'stale_generated_rows_preview.* e rerode com '
+    '--allow-large-stale-prune apenas em janela controlada.',
+  );
 }
 
 Future<List<Map<String, dynamic>>> _loadStaleFunctionTags(

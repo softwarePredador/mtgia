@@ -2,6 +2,7 @@
 
 > Data: 2026-06-10
 > Atualização de fonte local: 2026-06-11
+> Revisão estratégica complementar: `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
 > Escopo: battle engine/Hermes e validação Commander prática.
 > Fonte de verdade: documentação oficial Wizards vigente em 2026-06-10.
 > Objetivo: manter `IMPLEMENTATION_GAPS.md`, `PENDING_TASKS.md` e a matriz
@@ -15,9 +16,10 @@
 | `https://magic.wizards.com/en/rules` | Fonte canônica para Comprehensive Rules e downloads oficiais. | Referência oficial revalidada em 2026-06-10. |
 | `https://media.wizards.com/2026/downloads/MagicCompRules%2020260417.txt` | Base para CR 100-903, incluindo Omen/Station/Preparation. | Referência versionada atual nesta rodada; efetiva em 2026-04-17. |
 | `https://magic.wizards.com/en/formats/commander` | Commander 99+1, color identity, command zone, commander tax, 21 commander damage e multiplayer free-for-all com ataque a múltiplos jogadores. | Referência oficial de produto revalidada em 2026-06-10. |
-| `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Confirma que hybrid mana continua contando como todas as cores da carta no Commander; não houve mudança para modelo "or". | Regra documentada como invariável. |
-| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Station, Warp, Spacecraft, Lander/Void e elegibilidade de Legendary Vehicle/Spacecraft com P/T como commander. | Implementado como suporte mínimo. |
-| `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Mecânica operacional de Spacecraft/Station e Warp em linguagem de produto. | Usada para validar o comportamento mínimo do simulador. |
+| `https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026` | Confirma que hybrid mana continua contando como todas as cores da carta no Commander; não houve mudança para modelo "or". | Regra documentada como invariável. A data oficial publicada é 2026-02-09. |
+| `https://magic.wizards.com/en/news/announcements/edge-of-eternities-update-bulletin` | Update oficial de regras: Lander `111.10u`, Station Cards `721`, Station `702.184`, Warp `702.185` e Legendary Vehicle/Spacecraft com P/T como commander em `903.3`/`903.12c`. | Fonte primária para números de regra novos, commander legality moderno e conformance guardiã. |
+| `https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics` | Mecânica operacional de Spacecraft/Station, Warp, Lander e Void. | Usada para validar comportamento mínimo do simulador, mas não como fonte primária de número de regra. |
+| `https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes` | Detalhes oficiais de Station, striations, charge counters, Warp e regra de Commander para Vehicle/Spacecraft. | Referência suplementar para regressões card-specific futuras. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-mechanics` | Prepare, Repartee, Opus, Infusion, Increment, Paradigm, Flashback e Converge. | Implementado como suporte mínimo/telemetria. |
 | `https://magic.wizards.com/en/news/feature/secrets-of-strixhaven-release-notes` | Release notes com detalhes de Prepare, Increment e Paradigm. | Usada para classificar o que é engine mínimo vs card-specific. |
 
@@ -34,7 +36,7 @@
 
 | Área | Status ManaLoom | Implementação | Próxima ação |
 |---|---|---|---|
-| Legendary Vehicle/Spacecraft commander | `Implemented` | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness. | Manter teste de regra 903.3/903.12c e rota incremental. |
+| Legendary Vehicle/Spacecraft commander | `Implemented` | `commander_eligibility.dart`, `DeckRulesService`, `POST /decks/:id/cards` e `battle_analyst_v9.is_commander_eligible_card`. Exige `legendary`, `vehicle`/`spacecraft` e power/toughness; `is_commander=true` é rejeitado fora de Commander/Brawl pelo serviço compartilhado. | Manter teste de regra 903.3/903.12c, rota incremental e bloqueio central de slot de comandante. |
 | Brawl legendary planeswalker commander | `Implemented` | `commander_eligibility.dart` aceita planeswalker lendário somente quando `format == brawl`; Commander padrão permanece estrito. | Manter `commander_eligibility_test.dart` e validação completa via `DeckRulesService`. |
 | Hybrid color identity | `Implemented` | Mantida como identidade combinada, sem flexibilização. Coberta por `color_identity_test.dart` e conformance Hermes. | Não implementar modelo "or" enquanto a Wizards não alterar a regra. |
 | Warp | `Partial` | Cast por custo alternativo, exílio no end step e recast normal do exile. | Só adicionar efeitos card-specific quando aparecerem no corpus. |
@@ -85,6 +87,33 @@ planeswalker lendário como comandante de Brawl. O helper compartilhado agora
 recebe `format`, mantendo Commander estrito por padrão e liberando planeswalker
 apenas em `brawl`.
 
+Correção complementar: o `DeckRulesService` passou a rejeitar qualquer payload
+com `is_commander=true` quando `format` não é Commander/Brawl. Isso cobre
+criação, update, import e endpoints incrementais que delegam ao serviço, em vez
+de depender de guardas manuais por rota.
+
 ## Próxima auditoria obrigatória
 
 Antes de qualquer nova implementação de regras, reabrir `https://magic.wizards.com/en/rules` e confirmar se a data efetiva da Comprehensive Rules mudou após `2026-04-17`.
+
+## Revisão estratégica 2026-06-11
+
+Resultado da rechecagem: não foi identificado novo requisito que justifique
+expandir ManaLoom para judge engine completo. O backlog correto para os próximos
+20 dias continua sendo card-specific incremental: Warp, Station/Spacecraft,
+Prepare, Omen e Paradigm só ganham comportamento adicional quando houver carta
+real no corpus, replay e teste focado.
+
+O teste guardião `server/test/magic_rules_source_test.dart` foi ampliado para
+cobrir âncoras de CR 802, 903.3, 903.4e, 720, 721, 722, 702.184 e 702.185.
+
+## Rechecagem oficial 2026-06-11
+
+A revisão estratégica posterior confirmou que a matriz deve usar o
+`Edge of Eternities Update Bulletin` como fonte primária dos números de regra
+novos e da elegibilidade de Legendary Vehicle/Spacecraft com P/T como
+commander, mantendo a mechanics article e as release notes como explicação
+operacional/card-specific. A regra de hybrid mana em Commander continua
+estrita conforme o update oficial de Commander Brackets de 2026-02-09; nenhuma
+alteração para modelo "or" deve ser implementada sem nova publicação oficial da
+Wizards.

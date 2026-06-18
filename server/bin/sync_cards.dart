@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 
 import '../lib/database.dart';
+import '../lib/card_identity_support.dart';
 import '../lib/mtg_data_integrity_support.dart';
+import '../lib/sync_cards_utils.dart';
 
 /// Sincroniza cartas e legalidades do MTGJSON para o Postgres.
 ///
@@ -61,7 +63,7 @@ Opcoes:
 
   final force = args.contains('--force') || args.contains('-f');
   final full = args.contains('--full');
-  final sinceDays = _parseSinceDays(args) ?? 45;
+  final sinceDays = parseSinceDays(args) ?? 45;
 
   final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
   final environment = (env['ENVIRONMENT'] ??
@@ -128,7 +130,7 @@ Opcoes:
     } else {
       // INCREMENTAL SYNC
       final setCodes =
-          _getNewSetCodesSinceFromData(setListData, effectiveLastSyncAt);
+          getNewSetCodesSinceFromData(setListData, effectiveLastSyncAt);
       if (setCodes.isEmpty) {
         print(
             '✅ Nenhum set novo desde ${effectiveLastSyncAt.toIso8601String()}.');
@@ -346,16 +348,6 @@ Future<void> _logSync(
   } catch (_) {}
 }
 
-int? _parseSinceDays(List<String> args) {
-  for (final arg in args) {
-    if (arg.startsWith('--since-days=')) {
-      final parsed = int.tryParse(arg.split('=').last.trim());
-      if (parsed != null && parsed > 0) return parsed;
-    }
-  }
-  return null;
-}
-
 // ═══════════════════════════════════════════════════════════════════════
 // DOWNLOAD / FETCH
 // ═══════════════════════════════════════════════════════════════════════
@@ -380,25 +372,6 @@ Future<List<dynamic>> _fetchSetListData() async {
   final decoded =
       jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
   return decoded['data'] as List<dynamic>;
-}
-
-/// Filtra sets novos a partir dos dados ja em memoria (sem novo download).
-List<String> _getNewSetCodesSinceFromData(
-    List<dynamic> setListData, DateTime since) {
-  final cutoff = since.subtract(const Duration(days: 2));
-  final codes = <String>{};
-  for (final item in setListData) {
-    if (item is! Map) continue;
-    final code = normalizeMtgSetCode(item['code']?.toString());
-    final releaseDateStr = item['releaseDate']?.toString();
-    if (code == null || releaseDateStr == null) continue;
-    final releaseDate = DateTime.tryParse(releaseDateStr);
-    if (releaseDate != null && releaseDate.isAfter(cutoff)) {
-      codes.add(code);
-    }
-  }
-  final sorted = codes.toList()..sort();
-  return sorted;
 }
 
 Future<Map<String, dynamic>> _fetchSetJson(String setCode) async {
@@ -571,10 +544,11 @@ Future<int> _upsertCardsFromSet(
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
   print('🃏 Upsert de ${cards.length} cards (set=$canonicalSetCode)...');
 
+  final includeIdentityColumns = await hasCardIdentityColumns(pool);
   var processed = 0;
   final rows = <List<Object?>>[];
   for (final card in cards) {
-    final row = _extractCardRowFromSet(card, canonicalSetCode);
+    final row = extractSetCardSyncRow(card, canonicalSetCode);
     if (row != null) rows.add(row);
   }
   final dedupedRows = _dedupeRowsByKey(rows, (row) => row[0]?.toString() ?? '');
@@ -582,7 +556,12 @@ Future<int> _upsertCardsFromSet(
   for (var i = 0; i < dedupedRows.length; i += _batchSize) {
     final end = (i + _batchSize).clamp(0, dedupedRows.length);
     final batch = dedupedRows.sublist(i, end);
-    await _upsertCardRowsBatch(pool, batch, includeCollectorFoil: true);
+    await _upsertCardRowsBatch(
+      pool,
+      batch,
+      includeCollectorFoil: true,
+      includeIdentityColumns: includeIdentityColumns,
+    );
     processed += batch.length;
   }
   return processed;
@@ -592,11 +571,13 @@ Future<void> _upsertCardRowsBatch(
   Pool pool,
   List<List<Object?>> rows, {
   required bool includeCollectorFoil,
+  required bool includeIdentityColumns,
 }) async {
   if (rows.isEmpty) return;
 
   final columns = [
     'scryfall_id',
+    if (includeIdentityColumns) 'oracle_id',
     'name',
     'mana_cost',
     'type_line',
@@ -611,16 +592,38 @@ Future<void> _upsertCardRowsBatch(
     'rarity',
     if (includeCollectorFoil) 'collector_number',
     if (includeCollectorFoil) 'foil',
+    if (includeIdentityColumns) 'layout',
+    if (includeIdentityColumns) 'card_faces_json',
   ];
   final params = <String, Object?>{};
   final values = <String>[];
 
   for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
     final row = rows[rowIndex];
+    final rowValues = [
+      row[0],
+      if (includeIdentityColumns) row[1],
+      row[2],
+      row[3],
+      row[4],
+      row[5],
+      row[6],
+      row[7],
+      row[8],
+      row[9],
+      row[10],
+      row[11],
+      row[12],
+      row[13],
+      if (includeCollectorFoil) row[14],
+      if (includeCollectorFoil) row[15],
+      if (includeIdentityColumns) row[16],
+      if (includeIdentityColumns) row[17],
+    ];
     final placeholders = <String>[];
-    for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+    for (var columnIndex = 0; columnIndex < rowValues.length; columnIndex++) {
       final key = 'v_${rowIndex}_$columnIndex';
-      params[key] = row[columnIndex];
+      params[key] = rowValues[columnIndex];
       placeholders.add('@$key');
     }
     values.add('(${placeholders.join(', ')})');
@@ -630,6 +633,13 @@ Future<void> _upsertCardRowsBatch(
       ? '''
       collector_number = COALESCE(EXCLUDED.collector_number, cards.collector_number),
       foil = COALESCE(EXCLUDED.foil, cards.foil),
+'''
+      : '';
+  final identityUpdates = includeIdentityColumns
+      ? '''
+      oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
+      layout = COALESCE(EXCLUDED.layout, cards.layout),
+      card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
 '''
       : '';
 
@@ -649,6 +659,7 @@ Future<void> _upsertCardRowsBatch(
       image_url = EXCLUDED.image_url,
       set_code = EXCLUDED.set_code,
       rarity = EXCLUDED.rarity,
+      $identityUpdates
       $collectorUpdates
       created_at = cards.created_at
   ''';
@@ -656,69 +667,6 @@ Future<void> _upsertCardRowsBatch(
   await pool.runTx((session) async {
     await session.execute(Sql.named(sql), parameters: params);
   });
-}
-
-/// Extrai dados de uma carta de um Set.json incremental.
-List<Object?>? _extractCardRowFromSet(
-  Map<String, dynamic> card,
-  String canonicalSetCode,
-) {
-  final ids = card['identifiers'] as Map<String, dynamic>?;
-  final oracleId = ids?['scryfallOracleId']?.toString();
-  if (oracleId == null || oracleId.isEmpty) return null;
-
-  final name = card['name']?.toString();
-  if (name == null || name.isEmpty) return null;
-
-  final colors = (card['colors'] as List?)?.map((e) => e.toString()).toList() ??
-      const <String>[];
-  final colorIdentity =
-      (card['colorIdentity'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
-  final keywords =
-      (card['keywords'] as List?)?.map((e) => e.toString()).toList() ??
-          const <String>[];
-
-  final scryfallId = ids?['scryfallId']?.toString();
-  String imageUrl;
-  if (scryfallId != null && scryfallId.isNotEmpty) {
-    imageUrl =
-        'https://api.scryfall.com/cards/$scryfallId?format=image&version=normal';
-  } else {
-    final encodedName = Uri.encodeQueryComponent(name);
-    final setParam =
-        canonicalSetCode.isNotEmpty ? '&set=$canonicalSetCode' : '';
-    imageUrl =
-        'https://api.scryfall.com/cards/named?exact=$encodedName$setParam&format=image';
-  }
-
-  final collectorNumber = card['number']?.toString();
-  final hasFoil = card['hasFoil'] as bool?;
-  final hasNonFoil = card['hasNonFoil'] as bool?;
-  bool? foil;
-  if (hasFoil == true && hasNonFoil != true) {
-    foil = true;
-  } else if (hasNonFoil == true && hasFoil != true) {
-    foil = false;
-  }
-
-  return [
-    oracleId,
-    name,
-    card['manaCost']?.toString(),
-    card['type']?.toString(),
-    card['text']?.toString(),
-    colors,
-    colorIdentity,
-    card['power']?.toString(),
-    card['toughness']?.toString(),
-    keywords,
-    imageUrl,
-    canonicalSetCode,
-    card['rarity']?.toString(),
-    collectorNumber,
-    foil,
-  ];
 }
 
 List<List<Object?>> _dedupeRowsByKey(
@@ -788,9 +736,23 @@ Future<int> _upsertLegalitiesFromSet(
 Future<Map<String, String>> _loadCardIdMapForOracleIds(
     Pool pool, Set<String> oracleIds) async {
   if (oracleIds.isEmpty) return {};
+  final hasIdentityColumns = await hasCardIdentityColumns(pool);
+  final sql = hasIdentityColumns
+      ? '''
+      SELECT COALESCE(oracle_id, scryfall_id)::text AS oracle_lookup_id,
+             id::text
+      FROM cards
+      WHERE oracle_id = ANY(@ids)
+         OR scryfall_id = ANY(@ids)
+    '''
+      : '''
+      SELECT scryfall_id::text AS oracle_lookup_id,
+             id::text
+      FROM cards
+      WHERE scryfall_id = ANY(@ids)
+    ''';
   final result = await pool.execute(
-    Sql.named(
-        'SELECT scryfall_id::text, id::text FROM cards WHERE scryfall_id = ANY(@ids)'),
+    Sql.named(sql),
     parameters: {'ids': oracleIds.toList()},
   );
   final map = <String, String>{};

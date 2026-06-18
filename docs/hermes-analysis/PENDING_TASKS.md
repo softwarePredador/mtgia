@@ -11,6 +11,99 @@
 > Todos estão cobertos em `test_battle_analyst_v10_3.py`.
 > Tudo documentado com lógica exata, pseudocódigo e referências às Comprehensive Rules.
 >
+> **Atualização 2026-06-11 — mana-cost conformance.**
+> Fechado o gap de mana híbrida avançada e de spend restrictions por categoria
+> no battle analyst: `{2/W}`/monocolored hybrid e `{W/U/P}`/hybrid Phyrexian
+> agora têm parsing, pagamento e teste executável; mana restrita agora só paga
+> categorias compatíveis de spell e pode combinar com Treasure/mana comum quando
+> legal. `{2/P}` foi removido do backlog prático porque não aparece como símbolo
+> oficial na CR 107.4 vigente; permanecem pendentes apenas restrições
+> arbitrárias/card-specific e APNAP/pass sequence completa.
+>
+> **Atualização 2026-06-11 — combat requirements básicos.**
+> Fechado o gap ausente de requirements/restrictions simples na declaração de
+> atacantes: `must_attack*` permite atacar mesmo com poder 0 se a criatura
+> estiver apta, e `cant_attack_alone` impede ataque solitário sem tapar o
+> permanente. O modelo continua automático/heurístico; requisitos por defensor,
+> custos para atacar, restrições condicionais complexas e escolha interativa
+> permanecem em `IMPLEMENTATION_GAPS.md`.
+>
+> **Atualização 2026-06-11 — APNAP pass sequence básico.**
+> `priority_round` agora emite `priority_pass` em ordem APNAP para janelas de
+> pilha vazia e antes de resolver o topo da pilha sem resposta. Isso torna a
+> sequência formal auditável por replay/teste, preservando o modelo atual de IA.
+> Ainda não há escolha humana/interativa nem varredura completa de todas as
+> ações card-specific de cada jogador.
+>
+> **Atualização 2026-06-11 — extra combat básico.**
+> `extra_combat` agora agenda combates adicionais, opcionalmente destapa
+> criaturas do controlador e é consumido em `play_turn_v8` antes da postcombat
+> main com cap anti-loop. Fases extras arbitrárias e textos card-specific
+> permanecem fora do modelo genérico.
+>
+> **Atualização 2026-06-11 — revisão estratégica oficial.**
+> A pesquisa oficial foi rechecada contra Wizards Rules, Commander, Commander
+> Brackets 2026-02-09, Edge of Eternities e Secrets of Strixhaven. O plano de
+> 20 dias permanece prático: manter suporte mínimo testado e implementar
+> card-specific apenas com corpus/replay/evidência. Nova matriz:
+> `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
+> A rechecagem complementar usa `Edge of Eternities Update Bulletin` como fonte
+> primária para os números novos `111.10u`, `721`, `702.184` e `702.185`.
+> Mechanics/release notes continuam como suporte operacional/card-specific.
+> Correção complementar: `DeckRulesService` agora bloqueia `is_commander=true`
+> em formatos não Commander/Brawl, cobrindo rotas que delegam validação ao
+> serviço compartilhado.
+>
+> **Atualização 2026-06-11 — CMC app-facing hardening.**
+> O backend passou a carregar `cards.cmc` no resolver de import/deck generation,
+> propagar `cmc` internamente no `GeneratedDeckValidationService`, alertar CMC
+> não-terreno suspeito/divergente e consultar `cmc` em `DeckRulesService`.
+> Correção complementar: `DeckRulesService` agora aceita `cards.cmc` retornado
+> pelo driver PostgreSQL como `num` ou `String`, evitando `500` em fluxos
+> DB-backed de criação/validação/optimize quando a coluna numérica vem
+> serializada como texto.
+>
+> **Atualização 2026-06-11 — Commander pair validation extraído.**
+> A validação app-facing de dois comandantes deixou de ficar como helpers
+> privados em `DeckRulesService`: `commander_pairing.dart` centraliza Partner,
+> Partner with, Choose a Background + Background, Friends Forever, Doctor's
+> companion e normalização de nome físico. `DeckRulesService` reutiliza esse
+> suporte e `commander_pairing_test.dart` cobre pares válidos e falso positivo
+> de substring em `Partner with`. O battle engine segue rastreado como parcial
+> para UX/interação completa de dois commanders na command zone.
+>
+> **Atualização 2026-06-11 — optimize complete mana support extraído.**
+> Helpers puros de balanceamento de mana do modo `complete` saíram de
+> `optimize_complete_support.dart` para `optimize_complete_mana_support.dart`.
+> `calculateCompleteMaxBasicAdditions`, `buildCompleteColorDemandMap` e
+> `buildWeightedBasicLandPlan` agora têm módulo fino/export compatível e teste
+> direto de fallback por identidade de cor. `optimize_complete_support.dart`
+> caiu para 1450 linhas; o novo suporte tem 118 linhas.
+>
+> **Atualização 2026-06-11 — CMC Hermes operational sync.**
+> O código operacional Hermes também foi fechado: `sync_pg_card_metadata_to_hermes.py`
+> sincroniza `card_oracle_cache`, faz backfill idempotente de
+> `deck_cards.cmc/type_line/oracle_text`, reporta explicitamente SQLite vazio
+> ou sem `deck_cards`, e `import_lorehold_decks.py` prefere esse cache antes da
+> tabela histórica. As crons `known_cards_generator_cron.sh` e
+> `known_cards_validator_cron.sh` rodam o sync antes de gerar/validar cartas.
+> Resta executar no AWS com `knowledge.db` populado e exigir
+> `deck_cards_table_present=true` + `suspicious_nonland_zero_cmc_after=0` para
+> o corpus alvo.
+>
+> **Atualização 2026-06-11 — archetype resolution unificado.**
+> O drift entre `optimize_runtime_support.dart` e `deck_state_analysis.dart`
+> foi fechado com `optimize_archetype_support.dart`. Optimize, rebuild e deck
+> analysis agora compartilham a mesma política para request genérico versus
+> arquétipo detectado, coberta por `optimize_archetype_support_test.dart`.
+>
+> **Atualização 2026-06-11 — strategic role tags unificados.**
+> `functional_card_tags.dart` deixou de manter cópias privadas dos matchers
+> estratégicos `wincon`, `combo_piece`, `engine`, `payoff` e `enabler`.
+> `inferFunctionalCardTags` agora reutiliza `resolveCardFunctionalRoles`, o
+> mesmo adapter usado por optimize/validator/quality gate; cobertura em
+> `functional_card_tags_test.dart`.
+>
 > **Atualização 2026-06-10 — etapa deck-improvement.**
 > O diagnóstico/gate semântico do optimize deixou de depender apenas de
 > `semantic_tags_v2` para `role_delta`: agora usa a mesma precedência do produto
@@ -41,8 +134,8 @@
 > cobrindo cache oracle, rules table verificada, lands não conjuradas como
 > instant/sorcery, artefatos curados e sync de regras normalizado por oracle.
 > Turn flow/draw também foi movido para `battle_turn_flow_tests.py`, cobrindo
-> draw step único, Approach win/turn stop, failed draw, extra turns e
-> Unexpected Windfall discard/draw/treasure.
+> draw step único, Approach win/turn stop, failed draw, extra turns, extra
+> combats básicos e Unexpected Windfall discard/draw/treasure.
 > SBA/zone metadata também foi movido para `battle_sba_zone_tests.py`, cobrindo
 > eliminação nova, cleanup, counters, anexos ilegais, Saga final, LKI/zone id
 > e exile visibility.
@@ -78,6 +171,33 @@
 > buckets de rejeição e loader SQL foram movidos para
 > `optimize_candidate_quality_support.dart`, mantendo export público pelo
 > runtime.
+> Terceiro split do runtime de optimize concluído: inferência funcional,
+> matching de necessidades e score de substitutas foram movidos para
+> `optimize_functional_role_support.dart`. O ciclo circular
+> `optimize_runtime_support.dart` ↔ `optimize_filler_loader_support.dart` foi
+> removido e os exports compatíveis foram preservados pelo runtime.
+> Oitavo split do runtime de optimize concluído: dedupe, filtro de identidade
+> Commander, score de fillers e helpers de land fixing foram movidos para
+> `optimize_filler_candidate_support.dart`, reduzindo
+> `optimize_filler_loader_support.dart` para 1222 linhas e mantendo o loader
+> focado em SQL/structural recovery.
+> Quarto split do runtime de optimize concluído: seleção determinística de
+> cartas a cortar foi movida para `optimize_removal_candidate_support.dart`,
+> preservando export público pelo runtime e wrappers da rota. O módulo cobre
+> proteção contra cortes indevidos de lands, corte de lands em excesso
+> off-plan, core cards e escopo agressivo.
+> Quinto split do runtime de optimize concluído: pares de swap determinísticos,
+> `findSynergyReplacements` e diagnostics agressivos de candidates foram
+> movidos para `optimize_swap_candidate_support.dart`, preservando export
+> público pelo runtime.
+> Sexto split do runtime de optimize concluído: normalização de payload,
+> intensidade, parser de sugestões, resposta determinística, retry
+> deterministic-first e recommendation detail foram movidos para
+> `optimize_payload_support.dart`, preservando export público pelo runtime.
+> Sétimo split do runtime de optimize concluído: escrita e aggregate de
+> `ai_optimize_fallback_telemetry` foram movidos para
+> `optimize_fallback_telemetry_support.dart`, com helper puro para teste sem
+> banco e export público preservado pelo runtime.
 > Terceiro split/align de optimize concluído: response/cache/diagnostics da rota
 > foram movidos para `optimize_route_response_support.dart`. A elegibilidade
 > Commander 2026 foi centralizada em `commander_eligibility.dart` e agora cobre
@@ -138,6 +258,23 @@
 > Décimo nono split de optimize concluído: coleta de adições ausentes no EDHREC
 > foi movida para `optimize_route_post_validation_support.dart`, mantendo o
 > serviço EDHREC na rota e cobrindo a regra por callback.
+> Vigésimo split de optimize concluído: decisão final pós-validator foi movida
+> para `optimize_route_final_gate_support.dart`, cobrindo bloqueio final por
+> quality gate, validação serializada e Semantic Layer v2 sem alterar o contrato
+> HTTP da rota.
+> Vigésimo primeiro split de optimize concluído: classificação de
+> `outcome_code` foi movida para `optimize_route_outcome_support.dart`, com
+> wrapper compatível na rota e teste unitário direto para outcomes de sucesso,
+> no-op seguro, near-peak, needs-repair, execution_failed e blocked.
+> Vigésimo segundo split/reuse de optimize concluído: o modo `complete`
+> síncrono da rota passou a reutilizar
+> `optimize_complete.buildCompleteFinalResponse(...)`, removendo duplicação
+> com o executor async e preservando os campos de rota (`intensity`,
+> `optimize_intensity`, `timings`, `stage_telemetry`).
+> Hardening adicional: `rebuild_guided` deixou de gerar terreno básico com
+> `card_id` vazio, resolve identidade por `mana_cost/oracle_text`, carrega
+> básicos por subtipo (`Island // Island` incluso) e passa nos cenários live
+> Talrand preview/draft-clone.
 
 ---
 
@@ -172,7 +309,11 @@
 | ✅ | Suite de conformidade | `test_battle_analyst_v10_3.py:CONFORMANCE_SCENARIOS` |
 | ✅ | Regras modernas 2026 | Omen/Station/Spacecraft/Warp/Prepare/Paradigm/Flashback/multi-defender |
 | ✅ | Optimize role diagnostics alinhado ao produto | `functional_tags` → `semantic_tags_v2` → heurística |
-| ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + rota incremental |
+| ✅ | Commander eligibility 2026 compartilhada | `commander_eligibility.dart` + `DeckRulesService` + rota incremental |
+| ✅ | Commander pair validation compartilhada | `commander_pairing.dart` + `DeckRulesService` |
+| ✅ | Mana support do optimize complete compartilhado | `optimize_complete_mana_support.dart` + export compatível |
+| ✅ | Archetype resolution compartilhado | `optimize_archetype_support.dart` |
+| ✅ | Strategic role tags compartilhados | `resolveCardFunctionalRoles` em `functional_card_tags.dart` |
 | ✅ | Primeira extração da suite Hermes | `battle_rules_2026_tests.py` |
 | ✅ | Segunda extração da suite Hermes | `battle_combat_tests.py` |
 | ✅ | Terceira extração da suite Hermes | `battle_replacement_tests.py` |
@@ -201,10 +342,32 @@
 |---|---|---|---|---|
 | 1 | Tipos complexos avançados | 5-7 dias | Alto | Harness por cenário |
 | 2 | Seleção de alvos card-specific avançada | 3-5 dias | Alto | Targeting formal extraído + multi-target básico |
-| 3 | Plugar relatório agregado em cron/dashboard | 1-2 dias | Médio | `engine_metrics_report.py` |
-| 4 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
-| 5 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
-| 6 | Próximo split da rota optimize: decisão de rejeição/retry final após `OptimizationValidator` | 1-2 dias | Médio | `optimize_route_validator_support.dart` verde |
+| 3 | Efeitos card-specific de mecânicas 2026 | 5-10 dias | Médio | Corpus concreto usando Omen/Prepare/Station/Warp |
+| 4 | Modularização de arquivos grandes | 3-6 dias | Alto | Contratos/testes verdes antes do split |
+| 5 | Próximo split de optimize runtime/route: selecionar bloco remanescente de preferências de IA ou loaders de referência do comandante e extrair apenas com support test isolado | 1-2 dias | Médio | Suporte de mana do complete já extraído; novo split só com teste dedicado verde antes do movimento |
+
+### Ordem revalidada 2026-06-11
+
+| Ordem | Entrega | Critério para executar | Validação mínima |
+|---|---|---|---|
+| 1 | Guardar fonte oficial e matriz honesta | Sempre que Wizards publicar novo CR/update | `magic_rules_source_test.dart` + `test_battle_analyst_v10_3.py` |
+| 2 | Commander legality/color identity | Qualquer drift em deck creation/import/validate | `commander_eligibility_test.dart`, `color_identity_test.dart`, `deck_validation_test.dart` |
+| 3 | Warp/Flashback/exile card-specific | Carta real no corpus ou falha de replay | Novo teste em `battle_rules_2026_tests.py` ou módulo card-specific |
+| 4 | Station/Spacecraft card-specific | Spacecraft real em deck aprendido/simulado | Replay + conformance + regra no registry |
+| 5 | Prepare/Omen/Paradigm card-specific | Carta real usada pelo usuário/Hermes | Teste com resolução esperada e sem falso positivo semântico |
+| 6 | Multiplayer combat avançado | Falha de replay envolvendo múltiplos defensores | Teste com defensor escolhido, blockers APNAP e dano por commander |
+
+### Gate de decisão para os próximos 20 dias
+
+Não abrir implementação genérica nova para Warp, Station, Prepare, Omen,
+Paradigm ou ability words sem pelo menos um dos sinais abaixo:
+
+| Sinal | Ação permitida |
+|---|---|
+| Carta real aparece em deck aprendido/simulado e gera replay incorreto | Implementar handler card-specific + teste focado |
+| Usuário importa/salva deck com carta moderna e validação falha por regra já oficial | Corrigir validação/legality primeiro |
+| Hermes report-only aponta divergência com arquivo/linha e teste reproduzível | Corrigir código e atualizar matriz |
+| Apenas novidade teórica sem corpus nem falha | Manter como tracked gap, sem código |
 
 ---
 
@@ -244,7 +407,7 @@
 - `run_priority_loop` aplica janelas vazias de main phase de forma limitada e resolve a stack/triggers entre ações.
 - O turno usa `run_priority_loop` nas duas main phases.
 
-**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores; isso será aprofundado junto do casting pipeline 601.2 avançado e combate formal.
+**Limite restante**: ainda não é o loop completo APNAP com escolha humana/interativa para todos os jogadores nem varredura de todas as ações card-specific possíveis; isso será aprofundado junto do casting pipeline 601.2 avançado e combate formal.
 
 **Regra**: CR 117.3, CR 117.4
 
@@ -272,7 +435,7 @@
 
 **Limite restante**:
 - Targeting formal ainda fica no bloco próprio de targeting.
-- Hybrid/Phyrexian básico cobre `{W/U}` e `{W/P}`; `{2/W}`, `{2/P}` e spend restrictions seguem pendentes no bloco de mana.
+- Hybrid/Phyrexian básico cobre `{W/U}`, `{2/W}`, `{W/P}` e `{W/U/P}`; spend restrictions por categoria de spell cobrem os casos genéricos e restrições arbitrárias/card-specific seguem pendentes.
 
 **Regra**: CR 601.2a-601.2h
 
@@ -295,7 +458,7 @@
 - Evento formal `combat_step` para `end_of_combat`.
 - Eventos legados `combat` e `combat_result` preservados para consumidores atuais.
 
-**Limite restante**: atacantes/bloqueadores ainda são escolhidos por heurística automática; requirements/restrictions avançadas e escolha interativa ficam pendentes para a suite de conformidade e casting pipeline.
+**Limite restante**: atacantes/bloqueadores ainda são escolhidos por heurística automática; requirements/restrictions por defensor, custos para atacar, restrições condicionais complexas e escolha interativa ficam pendentes para a suite de conformidade e casting pipeline.
 
 ---
 
@@ -397,7 +560,7 @@
 
 ### 9. Telemetria de Saúde do Motor
 
-**Status 2026-06-10**: ✅ Básico implementado.
+**Status 2026-06-11**: ✅ Operacional implementado.
 
 **Arquivos**:
 - `battle_analyst_v9.py`: `EngineMetrics`, `set_engine_metrics`, `clear_engine_metrics`, hooks em replay events, `Stack`, `check_sbas_until_stable` e `priority_round`.
@@ -413,9 +576,11 @@
 - Snapshot JSON sanitizado via `MANALOOM_ENGINE_METRICS_OUT`.
 - Runners Hermes podem gravar snapshots por rodada via `MANALOOM_ENGINE_METRICS_DIR`.
 - Relatório agregado `battle_engine_metrics_report_v1` soma contadores/eventos, max stack depth e amostras curtas de warning sem decklists/replays brutos.
+- `master_optimizer_auto_cycle_cron.sh` define `MANALOOM_ENGINE_METRICS_DIR` por rodada e gera `latest_engine_metrics_report.json` ao final.
+- `master_optimizer_loop.py --preflight` valida a presença do agregador.
 
 **Limite restante**:
-- Falta apenas plugar o agregador em cron/dashboard operacional se esse painel for necessário.
+- Dashboard visual dedicado ainda é opcional; o artefato JSON operacional já fica disponível para Hermes/Codex.
 
 ---
 
@@ -441,12 +606,12 @@
 - `end_of_combat_trigger_511_3`: triggers do fim do combate entram na stack em ordem APNAP e resolvem LIFO.
 - `apnap_trigger_order_603_3b`: triggers entram na stack em ordem APNAP e resolvem LIFO.
 - `prevention_before_damage_615`: prevention reduz dano antes de mutar vida.
-- `hybrid_phyrexian_payment_601_2h`: mana híbrida colorida e Phyrexian colorida usam alternativas legais de pagamento.
+- `hybrid_phyrexian_payment_601_2h`: mana híbrida colorida, monocolored hybrid, Phyrexian colorida, hybrid Phyrexian e mana restrita por categoria usam alternativas legais de pagamento.
 - `targeting_formal_minimal`: hexproof, protection, ward, replay metadata e partial resolution multi-target ficam isolados em `battle_targeting_tests.py`.
 
 **Limite restante**:
 - Esta é uma suite mínima de regressão, não uma implementação completa das Comprehensive Rules.
-- Cenários ainda sem suporte formal, como active-player concede, `{2/W}`/`{2/P}` e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
+- Cenários ainda sem suporte formal, como active-player concede, restrições arbitrárias/card-specific de mana e full APNAP pass sequence, continuam rastreados em `IMPLEMENTATION_GAPS.md`.
 
 ---
 
@@ -461,10 +626,17 @@
 | `battle_zone_transition_support.py` | Helpers parametrizados de zone transitions, LKI, exile e spell resolution | 118 |
 | `battle_replacement_support.py` | Replacement/prevention, vida, dano, ganho de vida e escudos de prevenção | 231 |
 | `battle_sba_support.py` | SBAs, anexos ilegais, Saga final, token lifecycle e loop de estabilização | 381 |
+| `commander_pairing.dart` | Validação pura de pares Partner/Background/Friends Forever/Doctor's companion e normalização de nome físico | 105 |
 | `optimize_cache_support.dart` | Assinatura de deck, cache key e persistência de cache do optimize | 119 |
 | `optimize_cache_support_test.dart` | Cobertura direta de cache key, hash estável e wrapper do runtime | 77 |
 | `optimize_candidate_quality_support.dart` | Sinais/ranking de qualidade agressiva, buckets e loader SQL de candidates | 327 |
 | `optimize_candidate_quality_support_test.dart` | Cobertura direta de ranking, buckets e export compatível pelo runtime | 97 |
+| `optimize_swap_candidate_support.dart` | `findSynergyReplacements`, pares de swap determinísticos e diagnostics agressivos de candidates | 491 |
+| `optimize_swap_candidate_support_test.dart` | Cobertura direta do caminho sem banco e export compatível pelo runtime | 66 |
+| `optimize_payload_support.dart` | Normalização de payload, intensidade, parser de sugestões, response shaping, retry e recommendation detail | 489 |
+| `optimize_payload_support_test.dart` | Cobertura direta de payload/intensidade/response shaping e export compatível pelo runtime | 90 |
+| `optimize_fallback_telemetry_support.dart` | Escrita e aggregate de telemetry do fallback vazio do optimize | 148 |
+| `optimize_fallback_telemetry_support_test.dart` | Cobertura direta de aggregate vazio, rates por row e export compatível pelo runtime | 56 |
 | `optimize_route_warnings_support.dart` | Warnings finais de optimize para cartas inválidas, cor, bracket, tema e fallback vazio | 61 |
 | `optimize_route_warnings_support_test.dart` | Cobertura direta do contrato de warnings finais da rota optimize | 89 |
 | `optimize_route_diagnostics_support.dart` | Diagnostics finais de optimize para fallback vazio e merge incremental sem sobrescrever chaves existentes | 37 |
@@ -475,6 +647,7 @@
 | `optimize_route_addition_data_support.dart` | Query/normalização de dados completos das adições para complete/post-analysis/quality gate | 146 |
 | `optimize_route_virtual_analysis_support.dart` | Montagem do deck virtual pós-swap, análise antes/depois e warnings/improvements | 63 |
 | `optimize_route_validator_support.dart` | Execução injetável do `OptimizationValidator`, atualização de `postAnalysis.validation` e warnings finais | 74 |
+| `optimize_route_final_gate_support.dart` | Decisão final de rejeição por quality gate, validação serializada e Semantic Layer v2 | 156 |
 | `optimize_route_quality_rejection_support_test.dart` | Cobertura direta dos contratos `OPTIMIZE_NO_SAFE_SWAPS` e `OPTIMIZE_QUALITY_REJECTED` | 65 |
 | `optimize_route_post_validation_support.dart` | Warnings/improvements pós-processamento de identidade de cor, coleta EDHREC, tema e análise antes/depois | 146 |
 | `optimize_route_post_validation_support_test.dart` | Cobertura direta dos builders de validação pós-processamento e coleta EDHREC | 119 |

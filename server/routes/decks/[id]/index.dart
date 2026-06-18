@@ -138,6 +138,12 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
 
       // 3. Se uma nova lista de cartas for enviada, substitui a antiga
       if (cards != null) {
+        validateNoUnsupportedDeckSections(
+          cards: cards
+              .whereType<Map>()
+              .map((card) => card.cast<String, dynamic>()),
+        );
+
         final normalized = <Map<String, dynamic>>[];
         for (final rawCard in cards.whereType<Map>()) {
           final card = rawCard.cast<String, dynamic>();

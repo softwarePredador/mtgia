@@ -284,6 +284,16 @@ Future<Response> _createDeck(RequestContext context) async {
     return badRequest('Fields name and format are required.');
   }
 
+  final rawCardObjects = cards
+      .whereType<Map>()
+      .map((card) => card.cast<String, dynamic>())
+      .toList();
+  try {
+    validateNoUnsupportedDeckSections(cards: rawCardObjects);
+  } on DeckRulesException catch (e) {
+    return badRequest(e.message);
+  }
+
   final conn = context.read<Pool>();
   final hasMeta = await hasDeckMetaColumns(conn);
 

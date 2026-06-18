@@ -1,9 +1,13 @@
-﻿import 'package:postgres/postgres.dart';
+import 'package:postgres/postgres.dart';
 import '../color_identity.dart';
 import '../edh_bracket_policy.dart';
 import '../logger.dart';
 import 'commander_fallback_policy.dart';
-import 'optimize_runtime_support.dart';
+import 'optimize_filler_candidate_support.dart';
+import 'optimize_functional_role_support.dart';
+
+export 'optimize_filler_candidate_support.dart';
+
 Future<Map<String, String>> loadBasicLandIds(
   Pool pool,
   List<String> names,
@@ -160,94 +164,6 @@ int recommendedLandCountForOptimizeArchetype(String targetArchetype) {
   if (archetype.contains('combo')) return 33;
   if (archetype.contains('control')) return 37;
   return 35;
-}
-
-Set<String> resolvedCardIdentity(Map<String, dynamic> card) {
-  return resolvedCardIdentityFromParts(
-    colorIdentity:
-        (card['color_identity'] as List?)?.cast<String>() ?? const <String>[],
-    colors: (card['colors'] as List?)?.cast<String>() ?? const <String>[],
-    oracleText: card['oracle_text']?.toString(),
-    manaCost: card['mana_cost']?.toString(),
-  );
-}
-
-Set<String> resolvedCardIdentityFromParts({
-  List<String> colorIdentity = const <String>[],
-  List<String> colors = const <String>[],
-  String? oracleText,
-  String? manaCost,
-}) {
-  return resolveCardColorIdentity(
-    colorIdentity: colorIdentity,
-    colors: colors,
-    oracleText: oracleText,
-    manaCost: manaCost,
-  );
-}
-
-bool landProducesCommanderColors({
-  required Map<String, dynamic> card,
-  required Set<String> commanderColorIdentity,
-}) {
-  if (commanderColorIdentity.isEmpty) return false;
-
-  final oracleText = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-  final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
-  final colorIdentity =
-      (card['color_identity'] as List?)?.cast<String>() ?? const <String>[];
-  final detectedColors = <String>{
-    ...colors.map((c) => c.toUpperCase()),
-    ...colorIdentity.map((c) => c.toUpperCase()),
-  };
-
-  for (final color in commanderColorIdentity) {
-    if (detectedColors.contains(color.toUpperCase())) return true;
-    if (oracleText.contains('{${color.toLowerCase()}}')) return true;
-  }
-
-  if (oracleText.contains('mana of any color') ||
-      oracleText.contains('mana of any type')) {
-    return true;
-  }
-
-  return false;
-}
-
-bool landFixesCommanderColors({
-  required Map<String, dynamic> card,
-  required Set<String> commanderColorIdentity,
-}) {
-  if (commanderColorIdentity.isEmpty) return false;
-  if (landProducesCommanderColors(
-    card: card,
-    commanderColorIdentity: commanderColorIdentity,
-  )) {
-    return true;
-  }
-
-  final oracleText = ((card['oracle_text'] as String?) ?? '').toLowerCase();
-  if (oracleText.contains('search your library for a basic land') ||
-      oracleText.contains('search your library for a land')) {
-    return true;
-  }
-
-  const landTypesByColor = <String, String>{
-    'W': 'plains',
-    'U': 'island',
-    'B': 'swamp',
-    'R': 'mountain',
-    'G': 'forest',
-  };
-
-  for (final entry in landTypesByColor.entries) {
-    if (commanderColorIdentity.contains(entry.key) &&
-        oracleText.contains(entry.value)) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 bool isOptimizeStructuralRecoveryScenario({

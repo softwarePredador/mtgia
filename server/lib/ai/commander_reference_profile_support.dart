@@ -51,6 +51,16 @@ bool isReferenceProfileConfidenceUsable(Object? confidence) {
       commanderReferenceConfidenceRank('medium');
 }
 
+String commanderReferenceConfidenceFromDeckCount(int deckCount) {
+  final count = deckCount < 0 ? 0 : deckCount;
+  if (count >= 5000) return 'high';
+  if (count >= 1000) return 'medium_high';
+  if (count >= 250) return 'medium';
+  if (count >= 50) return 'medium_low';
+  if (count >= 10) return 'low';
+  return 'not_proven';
+}
+
 int commanderReferenceConfidenceRank(Object? confidence) {
   final normalized = normalizeCommanderReferenceConfidence(confidence);
   return _confidenceRank[normalized] ?? _confidenceRank['not_proven']!;
@@ -265,6 +275,7 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
   },
   Map<String, dynamic>? referenceDeckCorpusDiagnostics,
   Map<String, dynamic>? referenceDeckEvaluation,
+  Map<String, dynamic>? referenceDeterministicDeckDiagnostics,
 }) {
   if (profile == null) {
     return {
@@ -274,6 +285,8 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
         ...referenceDeckCorpusDiagnostics,
       if (referenceDeckEvaluation != null)
         'reference_deck_evaluation': referenceDeckEvaluation,
+      if (referenceDeterministicDeckDiagnostics != null)
+        'reference_deterministic_deck': referenceDeterministicDeckDiagnostics,
     };
   }
 
@@ -287,11 +300,17 @@ Map<String, dynamic> buildCommanderReferenceDiagnostics(
     ),
     'themes': _themeNames(profile).take(8).toList(growable: false),
     'source_count': _sourceCount(profile),
+    if (profile['runtime_profile_origin'] != null)
+      'runtime_profile_origin': profile['runtime_profile_origin'],
+    if (profile['runtime_profile_reason'] != null)
+      'runtime_profile_reason': profile['runtime_profile_reason'],
     ...cardStatsDiagnostics,
     if (referenceDeckCorpusDiagnostics != null)
       ...referenceDeckCorpusDiagnostics,
     if (referenceDeckEvaluation != null)
       'reference_deck_evaluation': referenceDeckEvaluation,
+    if (referenceDeterministicDeckDiagnostics != null)
+      'reference_deterministic_deck': referenceDeterministicDeckDiagnostics,
   };
 }
 
@@ -337,11 +356,11 @@ Future<Map<String, dynamic>?> loadUsableCommanderReferenceProfile({
     parameters: {'commander': commander},
   );
 
-  if (result.isEmpty) return null;
-  final profile = _decodeProfile(result.first[0]);
-  if (profile == null) return null;
-  if (!isReferenceProfileConfidenceUsable(profile['confidence'])) return null;
-  return profile;
+  final profile = result.isEmpty ? null : _decodeProfile(result.first[0]);
+  return resolveRuntimeCommanderReferenceProfile(
+    commanderName: commander,
+    persistedProfile: profile,
+  );
 }
 
 Future<Map<String, bool>> auditCommanderReferenceTables(Pool pool) async {
@@ -423,6 +442,24 @@ Future<void> upsertCommanderReferenceProfile(
   );
 }
 
+Map<String, dynamic>? resolveRuntimeCommanderReferenceProfile({
+  required String commanderName,
+  Map<String, dynamic>? persistedProfile,
+  DateTime? fallbackUpdatedAt,
+}) {
+  if (persistedProfile != null &&
+      isReferenceProfileConfidenceUsable(persistedProfile['confidence'])) {
+    return Map<String, dynamic>.from(persistedProfile);
+  }
+
+  final builtIn = _resolveBuiltInCommanderReferenceProfile(
+    commanderName,
+    updatedAt: fallbackUpdatedAt,
+  );
+  if (builtIn == null) return null;
+  return builtIn;
+}
+
 Map<String, dynamic>? _decodeProfile(dynamic value) {
   if (value is Map<String, dynamic>) return Map<String, dynamic>.from(value);
   if (value is Map) return value.cast<String, dynamic>();
@@ -430,6 +467,20 @@ Map<String, dynamic>? _decodeProfile(dynamic value) {
     final decoded = jsonDecode(value);
     if (decoded is Map<String, dynamic>) return decoded;
     if (decoded is Map) return decoded.cast<String, dynamic>();
+  }
+  return null;
+}
+
+Map<String, dynamic>? _resolveBuiltInCommanderReferenceProfile(
+  String commanderName, {
+  DateTime? updatedAt,
+}) {
+  if (isLoreholdCommanderReferenceCandidate(commanderName)) {
+    return {
+      ...buildLoreholdReferenceProfilePayload(updatedAt: updatedAt),
+      'runtime_profile_origin': 'built_in_fallback',
+      'runtime_profile_reason': 'persisted_profile_missing_or_not_usable',
+    };
   }
   return null;
 }

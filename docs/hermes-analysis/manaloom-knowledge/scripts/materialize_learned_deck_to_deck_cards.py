@@ -17,6 +17,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from learned_deck_completeness import learned_deck_completeness
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
@@ -37,6 +39,32 @@ def read_json_list(raw: str | None) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
+def stable_json(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def functional_tags_json_for_tag(tag: str) -> str:
+    normalized = str(tag or "").strip().lower()
+    if not normalized or normalized == "unknown":
+        return "[]"
+    return stable_json([normalized])
+
+
+def deck_card_columns(conn: sqlite3.Connection) -> set[str]:
+    return {str(row[1]) for row in conn.execute("PRAGMA table_info(deck_cards)").fetchall()}
+
+
+def ensure_column(
+    conn: sqlite3.Connection,
+    columns: set[str],
+    name: str,
+    definition: str,
+) -> None:
+    if name not in columns:
+        conn.execute(f"ALTER TABLE deck_cards ADD COLUMN {name} {definition}")
+        columns.add(name)
+
+
 def ensure_deck_cards(conn: sqlite3.Connection) -> None:
     conn.execute(
         """
@@ -46,6 +74,7 @@ def ensure_deck_cards(conn: sqlite3.Connection) -> None:
             card_name TEXT,
             quantity INTEGER DEFAULT 1,
             functional_tag TEXT,
+            functional_tags_json TEXT DEFAULT '[]',
             tag_confidence REAL DEFAULT 0.0,
             is_commander INTEGER DEFAULT 0,
             is_partner INTEGER DEFAULT 0,
@@ -56,6 +85,8 @@ def ensure_deck_cards(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    columns = deck_card_columns(conn)
+    ensure_column(conn, columns, "functional_tags_json", "TEXT DEFAULT '[]'")
 
 
 def oracle_cache(conn: sqlite3.Connection, card_names: list[str]) -> dict[str, sqlite3.Row]:
@@ -102,7 +133,7 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
 
     deck = conn.execute(
         """
-        SELECT id, commander, deck_name, card_list
+        SELECT id, commander, deck_name, card_list, card_count
         FROM learned_decks
         WHERE id=?
         """,
@@ -114,6 +145,19 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
     cards = read_json_list(deck["card_list"])
     card_names = [str(card.get("name") or "").strip() for card in cards if isinstance(card, dict)]
     commander = str(deck["commander"] or "").strip()
+    declared = int(deck["card_count"] or 0) if "card_count" in deck.keys() else None
+    completeness = learned_deck_completeness(
+        deck["card_list"],
+        commander=commander,
+        declared_quantity=declared,
+    )
+    if args.min_cards and not completeness.eligible_for_training(min_total=args.min_cards):
+        raise SystemExit(
+            "learned deck is partial: "
+            f"total_with_commander={completeness.total_with_commander}, "
+            f"main={completeness.main_quantity}, min_cards={args.min_cards}. "
+            "Refusing to materialize phantom decks."
+        )
     names_for_oracle = [commander, *card_names]
     cache = oracle_cache(conn, names_for_oracle)
     target_deck_id = int(args.target_deck_id or args.learned_deck_id)
@@ -141,10 +185,18 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
     rows = list(collapsed.values())
 
     current_total = sum(int(row["quantity"] or 1) for row in rows)
+    filled_basic = 0
     if args.min_cards and current_total < args.min_cards:
+        if not args.allow_fill_basic:
+            raise SystemExit(
+                "materialized rows are below min_cards after normalization: "
+                f"quantity={current_total}, min_cards={args.min_cards}. "
+                "Pass --allow-fill-basic only for explicit fixture generation."
+            )
         fill_name = str(args.fill_basic or "Mountain").strip()
         fill_key = normalize_name(fill_name)
         fill_quantity = args.min_cards - current_total
+        filled_basic = fill_quantity
         if fill_key in collapsed:
             collapsed[fill_key]["quantity"] += fill_quantity
         else:
@@ -168,15 +220,17 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
             conn.execute(
                 """
                 INSERT OR REPLACE INTO deck_cards (
-                    deck_id, card_name, quantity, functional_tag, tag_confidence,
-                    is_commander, is_partner, cmc, type_line, oracle_text
-                ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                    deck_id, card_name, quantity, functional_tag,
+                    functional_tags_json, tag_confidence, is_commander,
+                    is_partner, cmc, type_line, oracle_text
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
                 """,
                 (
                     target_deck_id,
                     row["name"],
                     row["quantity"],
                     tag,
+                    functional_tags_json_for_tag(tag),
                     confidence,
                     row["is_commander"],
                     cmc,
@@ -196,6 +250,9 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
         "rows": len(rows),
         "quantity": sum(int(row["quantity"] or 1) for row in rows),
         "oracle_rows": len(cache),
+        "filled_basic": filled_basic,
+        "source_total_with_commander": completeness.total_with_commander,
+        "source_main_quantity": completeness.main_quantity,
     }
     conn.close()
     return summary
@@ -208,6 +265,11 @@ def main() -> int:
     parser.add_argument("--target-deck-id", type=int)
     parser.add_argument("--min-cards", type=int, default=100)
     parser.add_argument("--fill-basic", default="Mountain")
+    parser.add_argument(
+        "--allow-fill-basic",
+        action="store_true",
+        help="Explicitly allow fixture-only basic-land filling when rows are short.",
+    )
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
     print(json.dumps(materialize(args), indent=2))

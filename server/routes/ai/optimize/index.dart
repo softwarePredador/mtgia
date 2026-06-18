@@ -11,6 +11,7 @@ import '../../../lib/ai/optimize_stage_telemetry.dart';
 import '../../../lib/ai/otimizacao.dart';
 import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/ai/optimization_quality_gate.dart';
+import '../../../lib/ai/optimize_complete_support.dart' as optimize_complete;
 import '../../../lib/ai/optimize_runtime_support.dart';
 import '../../../lib/ai/optimize_runtime_support.dart' as optimize_support;
 import '../../../lib/ai/optimize_route_async_support.dart'
@@ -33,10 +34,15 @@ import '../../../lib/ai/optimize_route_diagnostics_support.dart'
     as optimize_route_diagnostics;
 import '../../../lib/ai/optimize_route_empty_fallback_support.dart'
     as optimize_route_empty_fallback;
+import '../../../lib/ai/optimize_feedback_support.dart' as optimize_feedback;
+import '../../../lib/ai/optimize_route_final_gate_support.dart'
+    as optimize_route_final_gate;
 import '../../../lib/ai/optimize_route_quality_rejection_support.dart'
     as optimize_route_quality_rejection;
 import '../../../lib/ai/optimize_route_post_validation_support.dart'
     as optimize_route_post_validation;
+import '../../../lib/ai/optimize_route_outcome_support.dart'
+    as optimize_route_outcome;
 import '../../../lib/ai/optimize_route_request_support.dart'
     as optimize_route_request;
 import '../../../lib/ai/optimize_route_retry_support.dart'
@@ -370,60 +376,13 @@ String deriveOptimizeOutcomeCode({
   required Map<String, dynamic> body,
   required DeckOptimizationState deckState,
   ValidationReport? validationReport,
-}) {
-  if (statusCode >= 200 && statusCode < 300) {
-    final mode = body['mode']?.toString() ?? 'optimize';
-    if (mode == 'rebuild_guided') return 'rebuild_guided';
-    return mode == 'complete' ? 'deck_completed' : 'optimized';
-  }
-
-  final qualityError = body['quality_error'] is Map
-      ? (body['quality_error'] as Map).cast<String, dynamic>()
-      : null;
-  final qualityCode = qualityError?['code']?.toString() ?? '';
-  final validation = qualityError?['validation'] is Map
-      ? (qualityError?['validation'] as Map).cast<String, dynamic>()
-      : const <String, dynamic>{};
-  final healthScore = validationReport?.healthScore ??
-      (validation['deck_health_score'] as num?)?.toInt();
-  final improvementScore = validationReport?.improvementScore ??
-      (validation['improvement_score'] as num?)?.toInt();
-
-  switch (qualityCode) {
-    case 'OPTIMIZE_NEEDS_REPAIR':
-      return 'needs_repair';
-    case 'OPTIMIZE_NO_SAFE_SWAPS':
-    case 'OPTIMIZE_NO_ACTIONABLE_SWAPS':
-      return deckState.status == 'needs_repair'
-          ? 'needs_repair'
-          : 'no_safe_upgrade_found';
-    case 'OPTIMIZE_QUALITY_REJECTED':
-    case 'OPTIMIZE_SEMANTIC_V2_REJECTED':
-      if (deckState.status == 'needs_repair' ||
-          (healthScore != null && healthScore < 45)) {
-        return 'needs_repair';
-      }
-      if (healthScore != null &&
-          healthScore >= 80 &&
-          improvementScore != null &&
-          improvementScore < 35) {
-        return 'near_peak';
-      }
-      return 'no_safe_upgrade_found';
-    case 'OPTIMIZE_EXECUTION_FAILED':
-    case 'OPTIMIZE_VALIDATION_FAILED':
-    case 'OPTIMIZE_POST_ANALYSIS_FAILED':
-      if (deckState.status == 'needs_repair') {
-        return 'needs_repair';
-      }
-      if (deckState.status == 'healthy') {
-        return 'no_safe_upgrade_found';
-      }
-      return 'execution_failed';
-    default:
-      return statusCode >= 500 ? 'execution_failed' : 'blocked';
-  }
-}
+}) =>
+    optimize_route_outcome.deriveOptimizeOutcomeCode(
+      statusCode: statusCode,
+      body: body,
+      deckState: deckState,
+      validationReport: validationReport,
+    );
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -745,6 +704,21 @@ Future<Response> onRequest(RequestContext context) async {
       );
       responseBody['timings'] ??= telemetry.snapshot();
       responseBody['stage_telemetry'] ??= responseBody['timings'];
+      final resolvedRemovals = removalsOverride ??
+          ((responseBody['removals'] as List?)?.map((e) => '$e').toList() ??
+              const <String>[]);
+      final resolvedAdditions = additionsOverride ??
+          ((responseBody['additions'] as List?)?.map((e) => '$e').toList() ??
+              const <String>[]);
+      final resolvedQualityError = responseBody['quality_error'] is Map
+          ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
+          : null;
+      final resolvedValidationWarnings = validationWarningsOverride.isNotEmpty
+          ? validationWarningsOverride
+          : ((responseBody['validation_warnings'] as List?)
+                  ?.map((e) => '$e')
+                  .toList() ??
+              const <String>[]);
 
       // Integridade dos swaps: liga o conjunto remove/add ao estado do deck
       // (deck_signature) via SHA-256, para o caminho de aplicação verificar
@@ -770,23 +744,12 @@ Future<Response> onRequest(RequestContext context) async {
         detectedTheme: themeProfile.theme,
         deckAnalysis: deckAnalysis,
         postAnalysis: postAnalysisOverride,
-        removals: removalsOverride ??
-            ((responseBody['removals'] as List?)?.map((e) => '$e').toList() ??
-                const <String>[]),
-        additions: additionsOverride ??
-            ((responseBody['additions'] as List?)?.map((e) => '$e').toList() ??
-                const <String>[]),
+        removals: resolvedRemovals,
+        additions: resolvedAdditions,
         statusCode: statusCode,
-        qualityError: responseBody['quality_error'] is Map
-            ? (responseBody['quality_error'] as Map).cast<String, dynamic>()
-            : null,
+        qualityError: resolvedQualityError,
         validationReport: validationReport,
-        validationWarnings: validationWarningsOverride.isNotEmpty
-            ? validationWarningsOverride
-            : ((responseBody['validation_warnings'] as List?)
-                    ?.map((e) => '$e')
-                    .toList() ??
-                const <String>[]),
+        validationWarnings: resolvedValidationWarnings,
         blockedByColorIdentity: blockedByColorIdentityOverride,
         blockedByBracket: blockedByBracketOverride,
         commanderPriorityNames: optimizeCommanderPriorityNames,
@@ -794,6 +757,24 @@ Future<Response> onRequest(RequestContext context) async {
         deterministicSwapCandidates: deterministicSwapCandidates,
         cacheKey: cacheKey,
         executionTimeMs: requestStopwatch.elapsedMilliseconds,
+      );
+      await optimize_feedback.recordOptimizeMlFeedback(
+        connection: pool,
+        feedback: optimize_feedback.buildOptimizeMlFeedback(
+          deckId: deckId,
+          userId: userId,
+          archetype: targetArchetype,
+          commanderName: commanderNameForLogs,
+          operationMode: responseBody['mode']?.toString() ?? effectiveMode,
+          outcomeCode: responseBody['outcome_code']?.toString() ?? 'unknown',
+          statusCode: statusCode,
+          removals: resolvedRemovals,
+          additions: resolvedAdditions,
+          qualityError: resolvedQualityError,
+          validationWarnings: resolvedValidationWarnings,
+          blockedByColorIdentity: blockedByColorIdentityOverride,
+          blockedByBracket: blockedByBracketOverride,
+        ),
       );
 
       telemetry.logSummary();
@@ -1183,178 +1164,22 @@ Future<Response> onRequest(RequestContext context) async {
           );
         }
 
-        final rawAdditionsDetailed =
-            (jsonResponse['additions_detailed'] as List)
-                .whereType<Map>()
-                .map((m) {
-                  final mm = m.cast<String, dynamic>();
-                  return {
-                    'card_id': mm['card_id']?.toString(),
-                    'quantity': mm['quantity'] as int? ?? 1,
-                  };
-                })
-                .where((m) => (m['card_id'] as String?)?.isNotEmpty ?? false)
-                .toList();
-
-        final ids =
-            rawAdditionsDetailed.map((e) => e['card_id'] as String).toList();
-        final cardInfoById = <String, Map<String, String>>{};
-        var additionsDetailed = <Map<String, dynamic>>[];
-        Map<String, dynamic>? postAnalysisComplete;
-
-        if (ids.isNotEmpty) {
-          final r = await pool.execute(
-            Sql.named(
-                'SELECT id::text, name, type_line FROM cards WHERE id = ANY(@ids)'),
-            parameters: {'ids': ids},
-          );
-          for (final row in r) {
-            cardInfoById[row[0] as String] = {
-              'name': row[1] as String,
-              'type_line': (row[2] as String?) ?? '',
-            };
-          }
-
-          // Colapsa por NOME (nÃ£o por printing/card_id), aplicando limite de cÃ³pias por formato.
-          final aggregatedByName = <String, Map<String, dynamic>>{};
-          for (final entry in rawAdditionsDetailed) {
-            final cardId = entry['card_id'] as String;
-            final cardInfo = cardInfoById[cardId];
-            if (cardInfo == null) continue;
-
-            final name = cardInfo['name'] ?? '';
-            final typeLine = cardInfo['type_line'] ?? '';
-            if (name.trim().isEmpty) continue;
-
-            final maxCopies = maxCopiesForFormat(
-              deckFormat: deckFormat,
-              typeLine: typeLine,
-              name: name,
-            );
-
-            final existing = aggregatedByName[name.toLowerCase()];
-            final currentQty = (existing?['quantity'] as int?) ?? 0;
-            final incomingQty = (entry['quantity'] as int?) ?? 1;
-            final allowedToAdd = (maxCopies - currentQty).clamp(0, incomingQty);
-            if (allowedToAdd <= 0) continue;
-
-            if (existing == null) {
-              aggregatedByName[name.toLowerCase()] = {
-                'card_id': cardId,
-                'quantity': allowedToAdd,
-                'name': name,
-                'type_line': typeLine,
-              };
-            } else {
-              aggregatedByName[name.toLowerCase()] = {
-                ...existing,
-                'quantity': currentQty + allowedToAdd,
-              };
-            }
-          }
-
-          additionsDetailed = aggregatedByName.values
-              .map((e) => {
-                    'card_id': e['card_id'],
-                    'quantity': e['quantity'],
-                    'name': e['name'],
-                    'is_basic_land':
-                        isBasicLandName(((e['name'] as String?) ?? '').trim()),
-                  })
-              .toList();
-
-          // === Gerar post_analysis para modo complete ===
-          try {
-            final additionsData = await optimize_route_addition_data
-                .fetchOptimizeAdditionDataByIds(
-              pool,
-              ids: ids,
-            );
-
-            final additionsForAnalysis = additionsDetailed.map((add) {
-              final data = additionsData.firstWhere(
-                (d) =>
-                    (d['name'] as String).toLowerCase() ==
-                    ((add['name'] as String?) ?? '').toLowerCase(),
-                orElse: () => {
-                  'name': add['name'] ?? '',
-                  'type_line': '',
-                  'mana_cost': '',
-                  'colors': <String>[],
-                  'cmc': 0.0,
-                  'oracle_text': '',
-                },
-              );
-              return {
-                ...data,
-                'quantity': (add['quantity'] as int?) ?? 1,
-              };
-            }).toList();
-            final virtualDeck = buildVirtualDeckForAnalysis(
-              originalDeck: allCardData,
-              additions: additionsForAnalysis,
-            );
-
-            // 3. Rodar anÃ¡lise no deck virtual
-            final postAnalyzer =
-                DeckArchetypeAnalyzer(virtualDeck, deckColors.toList());
-            postAnalysisComplete = postAnalyzer.generateAnalysis();
-          } catch (e) {
-            Log.w('Falha ao gerar post_analysis para modo complete: $e');
-          }
-        }
-
-        final responseBody = {
-          'mode': 'complete',
-          'intensity': intensity.selected,
-          'optimize_intensity': intensity.toJson(
-            returnedSwaps: additionsDetailed.length,
-          ),
-          'constraints': {
-            'keep_theme': keepTheme,
-          },
-          'theme': themeProfile.toJson(),
-          'bracket': bracket,
-          'target_additions': jsonResponse['target_additions'],
-          'iterations': jsonResponse['iterations'],
-          'additions':
-              additionsDetailed.map((e) => e['name'] ?? e['card_id']).toList(),
-          'additions_detailed': additionsDetailed
-              .map((e) => {
-                    'card_id': e['card_id'],
-                    'quantity': e['quantity'],
-                    'name': e['name'],
-                    'is_basic_land': e['is_basic_land'] ??
-                        isBasicLandName(((e['name'] as String?) ?? '').trim()),
-                  })
-              .toList(),
-          'removals': const <String>[],
-          'removals_detailed': const <Map<String, dynamic>>[],
-          'reasoning': jsonResponse['reasoning'] ?? '',
-          'deck_analysis': deckAnalysis,
-          'post_analysis': postAnalysisComplete,
-          'validation_warnings': const <String>[],
-        };
-
-        final warnings = (jsonResponse['warnings'] is Map)
-            ? (jsonResponse['warnings'] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{};
-        if (warnings.isNotEmpty) {
-          responseBody['warnings'] = warnings;
-        }
-
-        // Incluir quality_warning para adiÃ§Ãµes parciais (PARTIAL)
-        final qw = jsonResponse['quality_warning'];
-        if (qw is Map) {
-          responseBody['quality_warning'] = qw;
-        }
-
-        // Incluir consistency_slo para diagnÃ³stico
-        final slo = jsonResponse['consistency_slo'];
-        if (slo is Map) {
-          responseBody['consistency_slo'] = slo;
-        }
-
+        final responseBody = await optimize_complete.buildCompleteFinalResponse(
+          pool: pool,
+          deckFormat: deckFormat,
+          originalDeck: allCardData,
+          deckColors: deckColors,
+          keepTheme: keepTheme,
+          theme: themeProfile.toJson(),
+          bracket: bracket,
+          deckAnalysis: deckAnalysis,
+          jsonResponse: jsonResponse,
+        );
+        responseBody['intensity'] = intensity.selected;
+        responseBody['optimize_intensity'] = intensity.toJson(
+          returnedSwaps:
+              (responseBody['additions_detailed'] as List?)?.length ?? 0,
+        );
         responseBody['timings'] = telemetry.snapshot();
         responseBody['stage_telemetry'] = responseBody['timings'];
 
@@ -2061,161 +1886,135 @@ Future<Response> onRequest(RequestContext context) async {
         validationWarnings.insertAll(0, qualityGateWarnings);
       }
 
-      if (!isComplete && optimizationValidationReport != null) {
-        final hardQualityRejected =
-            optimizationValidationReport.verdict != 'aprovado' ||
-                optimizationValidationReport.score < 70;
+      final preCurve =
+          double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ?? 0.0;
+      final postCurve = double.tryParse(
+            '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
+          ) ??
+          0.0;
+      final preManaAssessment =
+          deckAnalysis['mana_base_assessment']?.toString() ?? '';
+      final postManaAssessment =
+          (postAnalysis?['mana_base_assessment']?.toString()) ?? '';
 
-        final effectiveRejectionReasons = hardQualityRejected
-            ? buildOptimizationRejectionReasons(
-                validationReport: optimizationValidationReport,
-                archetype: effectiveOptimizeArchetype,
-                preCurve:
-                    double.tryParse('${deckAnalysis['average_cmc'] ?? '0'}') ??
-                        0.0,
-                postCurve: double.tryParse(
-                      '${(postAnalysis ?? const <String, dynamic>{})['average_cmc'] ?? '0'}',
-                    ) ??
-                    0.0,
-                preManaAssessment:
-                    deckAnalysis['mana_base_assessment']?.toString() ?? '',
-                postManaAssessment:
-                    (postAnalysis?['mana_base_assessment']?.toString()) ?? '',
-              )
-            : const <String>[];
+      final finalQualityGateDecision =
+          optimize_route_final_gate.evaluateOptimizeRouteQualityGate(
+        isComplete: isComplete,
+        validationReport: optimizationValidationReport,
+        archetype: effectiveOptimizeArchetype,
+        preCurve: preCurve,
+        postCurve: postCurve,
+        preManaAssessment: preManaAssessment,
+        postManaAssessment: postManaAssessment,
+      );
 
-        if (hardQualityRejected || effectiveRejectionReasons.isNotEmpty) {
-          final retryPlan =
-              optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
-            deterministicFirstEnabled: deterministicFirstEnabled,
-            fallbackAlreadyAttempted: optimizeFallbackAttempted,
-            strategySource: jsonResponse['strategy_source']?.toString(),
-            qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
-            isComplete: isComplete,
+      if (finalQualityGateDecision.rejected) {
+        final retryPlan = optimize_route_retry.buildOptimizeAiFallbackRetryPlan(
+          deterministicFirstEnabled: deterministicFirstEnabled,
+          fallbackAlreadyAttempted: optimizeFallbackAttempted,
+          strategySource: jsonResponse['strategy_source']?.toString(),
+          qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
+          isComplete: isComplete,
+        );
+        if (retryPlan.shouldRetry && retryPlan.trigger != null) {
+          optimizeFallbackAttempted = true;
+          final aiFallbackResponse = await runAiOptimizeAttempt(
+            trigger: retryPlan.trigger!,
           );
-          if (retryPlan.shouldRetry && retryPlan.trigger != null) {
-            optimizeFallbackAttempted = true;
-            final aiFallbackResponse = await runAiOptimizeAttempt(
-              trigger: retryPlan.trigger!,
-            );
-            if (aiFallbackResponse != null) {
-              Log.i(retryPlan.logMessage ?? 'Retry de optimize via IA.');
-              jsonResponse = aiFallbackResponse;
-              continue optimizeAttemptLoop;
-            }
+          if (aiFallbackResponse != null) {
+            Log.i(retryPlan.logMessage ?? 'Retry de optimize via IA.');
+            jsonResponse = aiFallbackResponse;
+            continue optimizeAttemptLoop;
           }
-
-          return respondWithOptimizeTelemetry(
-            statusCode: HttpStatus.unprocessableEntity,
-            body: optimize_route_quality_rejection.buildQualityRejectedBody(
-              reasons: effectiveRejectionReasons,
-              validation: optimizationValidationReport.toJson(),
-              removals: validRemovals,
-              additions: validAdditions,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              validationWarnings: validationWarnings,
-            ),
-            postAnalysisOverride: postAnalysis,
-            validationReport: optimizationValidationReport,
-            removalsOverride: validRemovals,
-            additionsOverride: validAdditions,
-            validationWarningsOverride: validationWarnings,
-            blockedByColorIdentityOverride: filteredByColorIdentity,
-            blockedByBracketOverride: blockedByBracket,
-          );
         }
+
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: optimize_route_quality_rejection.buildQualityRejectedBody(
+            reasons: finalQualityGateDecision.reasons,
+            validation: finalQualityGateDecision.validation,
+            removals: validRemovals,
+            additions: validAdditions,
+            deckAnalysis: deckAnalysis,
+            postAnalysis: postAnalysis,
+            validationWarnings: validationWarnings,
+          ),
+          postAnalysisOverride: postAnalysis,
+          validationReport: optimizationValidationReport,
+          removalsOverride: validRemovals,
+          additionsOverride: validAdditions,
+          validationWarningsOverride: validationWarnings,
+          blockedByColorIdentityOverride: filteredByColorIdentity,
+          blockedByBracketOverride: blockedByBracket,
+        );
       }
 
       final responseValidationJson =
           (postAnalysis?['validation'] as Map?)?.cast<String, dynamic>();
-      if (!isComplete && responseValidationJson != null) {
-        final responseValidationScore =
-            (responseValidationJson['validation_score'] as num?)?.toInt() ?? 0;
-        final responseValidationVerdict =
-            responseValidationJson['verdict']?.toString() ?? '';
-
-        if (responseValidationVerdict != 'aprovado' ||
-            responseValidationScore < 70) {
-          final serializedValidationReasons = optimizationValidationReport !=
-                  null
-              ? buildOptimizationRejectionReasons(
-                  validationReport: optimizationValidationReport,
-                  archetype: effectiveOptimizeArchetype,
-                  preCurve: double.tryParse(
-                        '${deckAnalysis['average_cmc'] ?? '0'}',
-                      ) ??
-                      0.0,
-                  postCurve: double.tryParse(
-                          '${postAnalysis?['average_cmc'] ?? '0'}') ??
-                      0.0,
-                  preManaAssessment:
-                      deckAnalysis['mana_base_assessment']?.toString() ?? '',
-                  postManaAssessment:
-                      postAnalysis?['mana_base_assessment']?.toString() ?? '',
-                )
-              : <String>[
-                  'A validaÃ§Ã£o final nÃ£o fechou como "aprovado" (score $responseValidationScore/100). Optimize sÃ³ retorna sucesso quando a melhoria Ã© aprovada sem ressalvas.',
-                ];
-
-          return respondWithOptimizeTelemetry(
-            statusCode: HttpStatus.unprocessableEntity,
-            body: optimize_route_quality_rejection.buildQualityRejectedBody(
-              reasons: serializedValidationReasons,
-              validation: responseValidationJson,
-              removals: validRemovals,
-              additions: validAdditions,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              validationWarnings: validationWarnings,
-            ),
-            postAnalysisOverride: postAnalysis,
-            validationReport: optimizationValidationReport,
-            removalsOverride: validRemovals,
-            additionsOverride: validAdditions,
-            validationWarningsOverride: validationWarnings,
-            blockedByColorIdentityOverride: filteredByColorIdentity,
-            blockedByBracketOverride: blockedByBracket,
-          );
-        }
+      final serializedValidationDecision =
+          optimize_route_final_gate.evaluateSerializedOptimizeValidation(
+        isComplete: isComplete,
+        serializedValidation: responseValidationJson,
+        validationReport: optimizationValidationReport,
+        archetype: effectiveOptimizeArchetype,
+        preCurve: preCurve,
+        postCurve: postCurve,
+        preManaAssessment: preManaAssessment,
+        postManaAssessment: postManaAssessment,
+      );
+      if (serializedValidationDecision.rejected) {
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: optimize_route_quality_rejection.buildQualityRejectedBody(
+            reasons: serializedValidationDecision.reasons,
+            validation: serializedValidationDecision.validation,
+            removals: validRemovals,
+            additions: validAdditions,
+            deckAnalysis: deckAnalysis,
+            postAnalysis: postAnalysis,
+            validationWarnings: validationWarnings,
+          ),
+          postAnalysisOverride: postAnalysis,
+          validationReport: optimizationValidationReport,
+          removalsOverride: validRemovals,
+          additionsOverride: validAdditions,
+          validationWarningsOverride: validationWarnings,
+          blockedByColorIdentityOverride: filteredByColorIdentity,
+          blockedByBracketOverride: blockedByBracket,
+        );
       }
 
-      if (!isComplete && optimizationValidationReport != null) {
-        final semanticV2 =
-            optimizationValidationReport.functional.semanticLayerV2;
-        if (semanticV2.isNotEmpty) {
-          final semanticV2Decision = evaluateOptimizationSemanticV2Enforcement(
-            semanticLayerV2: semanticV2,
-            mode: semanticV2OptimizeEnforcementMode,
-            expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
-          );
+      final semanticV2GateDecision =
+          optimize_route_final_gate.evaluateOptimizeRouteSemanticV2Gate(
+        isComplete: isComplete,
+        validationReport: optimizationValidationReport,
+        enforcementMode: semanticV2OptimizeEnforcementMode,
+        expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
+      );
+      if (semanticV2GateDecision.rejected) {
+        final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
+          semanticLayerV2: semanticV2GateDecision.semanticLayerV2,
+          enforcementMode: semanticV2OptimizeEnforcementMode,
+          expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
+          validation: optimizationValidationReport!.toJson(),
+          removals: validRemovals,
+          additions: validAdditions,
+          deckAnalysis: deckAnalysis,
+          postAnalysis: postAnalysis,
+          validationWarnings: validationWarnings,
+        );
 
-          if (semanticV2Decision.blockedBySemanticV2) {
-            final semanticRejectionBody = buildSemanticV2OptimizeRejectedBody(
-              semanticLayerV2: semanticV2,
-              enforcementMode: semanticV2OptimizeEnforcementMode,
-              expandedCriticalRoles: semanticV2ExpandedCriticalRoles,
-              validation: optimizationValidationReport.toJson(),
-              removals: validRemovals,
-              additions: validAdditions,
-              deckAnalysis: deckAnalysis,
-              postAnalysis: postAnalysis,
-              validationWarnings: validationWarnings,
-            );
-
-            return respondWithOptimizeTelemetry(
-              statusCode: HttpStatus.unprocessableEntity,
-              body: semanticRejectionBody,
-              postAnalysisOverride: postAnalysis,
-              validationReport: optimizationValidationReport,
-              removalsOverride: validRemovals,
-              additionsOverride: validAdditions,
-              validationWarningsOverride: validationWarnings,
-              blockedByColorIdentityOverride: filteredByColorIdentity,
-              blockedByBracketOverride: blockedByBracket,
-            );
-          }
-        }
+        return respondWithOptimizeTelemetry(
+          statusCode: HttpStatus.unprocessableEntity,
+          body: semanticRejectionBody,
+          postAnalysisOverride: postAnalysis,
+          validationReport: optimizationValidationReport,
+          removalsOverride: validRemovals,
+          additionsOverride: validAdditions,
+          validationWarningsOverride: validationWarnings,
+          blockedByColorIdentityOverride: filteredByColorIdentity,
+          blockedByBracketOverride: blockedByBracket,
+        );
       }
 
       // Preparar resposta com avisos sobre cartas invÃ¡lidas

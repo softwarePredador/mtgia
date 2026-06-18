@@ -19,6 +19,8 @@
   Warp, Station, Flashback, Omen, Prepare, Paradigm, Lander, ability-word
   telemetry e combate multi-defensor.
 - `DeckRulesService` aceita Legendary Vehicle/Spacecraft com power/toughness.
+- `DeckRulesService` bloqueia `is_commander=true` em formatos não
+  Commander/Brawl, cobrindo rotas que delegam ao serviço compartilhado.
 - A rota incremental `POST /decks/:id/cards` agora usa a mesma elegibilidade
   Commander 2026 compartilhada, evitando divergência entre validação completa
   e adição manual de comandante.
@@ -30,6 +32,7 @@
 - `dart test test/mtg_rules_validation_test.dart`.
 - `dart test test/color_identity_test.dart test/mtg_rules_validation_test.dart`.
 - `dart test test/commander_eligibility_test.dart test/mtg_rules_validation_test.dart -r expanded`.
+- `dart test test/commander_eligibility_test.dart test/magic_rules_source_test.dart test/color_identity_test.dart test/mtg_rules_validation_test.dart --reporter compact`.
 - Hermes report-only pós-push: `PASS`.
 
 ### Revisão complementar 2026-06-11 — snapshot oficial e Brawl
@@ -90,8 +93,193 @@ que o usuário vê na análise do deck.
 
 ## Etapa 3 — Auditoria de modularização
 
-**Status:** em andamento, com dezenove extrações de testes, seis splits
-do engine e dezenove splits da rota/runtime de optimize concluídos.
+**Status:** em andamento, com vinte e quatro extrações/testes de suporte, seis
+splits do engine e trinta splits da rota/runtime de optimize concluídos.
+
+### Revisão complementar 2026-06-11 — split de outcome code do optimize
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `deriveOptimizeOutcomeCode` era uma função pura dentro de
+  `server/routes/ai/optimize/index.dart`.
+- A classificação de UX/contrato (`optimized`, `deck_completed`,
+  `near_peak`, `needs_repair`, `no_safe_upgrade_found`, `execution_failed`,
+  `blocked`) é crítica o suficiente para teste isolado sem carregar a rota.
+
+**Entregue:**
+- Criado `server/lib/ai/optimize_route_outcome_support.dart`.
+- A rota mantém wrapper compatível `deriveOptimizeOutcomeCode(...)`, delegando
+  ao support novo para não quebrar imports legados em testes.
+- Criado `server/test/optimize_route_outcome_support_test.dart` com cobertura
+  direta de sucesso, no-op seguro, near-peak, repair, execution failed e HTTP
+  blocked.
+
+**Validação local:**
+- `dart analyze lib/ai/optimize_route_outcome_support.dart routes/ai/optimize/index.dart test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart`.
+- `dart test test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart --reporter compact`.
+
+### Revisão complementar 2026-06-11 — final response complete e CMC PostgreSQL
+
+**Status:** concluída localmente.
+
+**Problemas validados:**
+- O modo `complete` síncrono de `/ai/optimize` ainda duplicava a montagem de
+  resposta final que já existia em `optimize_complete_support.dart` e que
+  também é usada pelo executor async.
+- A execução DB-backed de `ai_optimize_flow_test.dart` expôs um erro real em
+  `DeckRulesService`: `cards.cmc` retornado pelo PostgreSQL podia chegar como
+  `String`, mas o serviço fazia cast direto para `num?`, gerando `500` em
+  criação/validação de deck com cartas.
+
+**Entregue:**
+- `server/routes/ai/optimize/index.dart` passou a reutilizar
+  `optimize_complete.buildCompleteFinalResponse(...)` no modo `complete`,
+  mantendo `intensity`, `optimize_intensity`, `timings` e
+  `stage_telemetry` como campos de rota.
+- `server/lib/deck_rules_service.dart` ganhou
+  `parseDeckRulesCmcValue(...)`, aceitando `num`, `String` numérica e valores
+  inválidos de forma tolerante.
+- Criado `server/test/deck_rules_service_test.dart` para cobrir o parser sem
+  banco.
+
+**Validação local:**
+- `dart analyze lib/deck_rules_service.dart test/deck_rules_service_test.dart routes/ai/optimize/index.dart`.
+- `dart test test/deck_rules_service_test.dart test/commander_eligibility_test.dart test/optimize_route_complete_top_up_support_test.dart test/optimize_complete_support_test.dart --reporter compact`.
+- `PORT=8082 dart run .dart_frog/server.dart` +
+  `dart test test/ai_optimize_flow_test.dart --reporter compact`: `+10 ~1`,
+  com skip esperado na stress matrix.
+
+### Revisão complementar 2026-06-11 — pairing de comandantes
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `IMPLEMENTATION_GAPS.md` ainda classificava Partner/Background/Friends
+  Forever como ausente, mas `DeckRulesService` já tinha lógica privada para
+  pares app-facing.
+- A regra ficava pouco testável fora do serviço com banco e usava comparação
+  por substring em `Partner with`, permitindo falso positivo potencial em nomes
+  parecidos.
+
+**Entregue:**
+- Criado `server/lib/commander_pairing.dart` com regra pura para Partner,
+  Partner with, Choose a Background + Background, Friends Forever, Doctor's
+  companion e normalização de nome físico.
+- `DeckRulesService` passou a reutilizar `areCommanderPairingCompatible(...)`
+  e removeu helpers privados duplicados.
+- Criado `server/test/commander_pairing_test.dart`, cobrindo pares válidos e
+  rejeição de falso positivo de substring em `Partner with`.
+- `IMPLEMENTATION_GAPS.md` agora marca o tema como parcial: servidor validado;
+  battle engine ainda sem UX/interação completa para dois commanders na command
+  zone.
+
+**Validação local:**
+- `dart analyze lib/commander_pairing.dart lib/deck_rules_service.dart test/commander_pairing_test.dart test/commander_eligibility_test.dart test/deck_rules_service_test.dart`.
+- `dart test test/commander_pairing_test.dart test/commander_eligibility_test.dart test/deck_rules_service_test.dart --reporter compact`.
+
+### Revisão complementar 2026-06-11 — split de mana do optimize complete
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/lib/ai/optimize_complete_support.dart` ainda concentrava helpers
+  puros de balanceamento de mana junto da orquestração DB-backed do modo
+  `complete`.
+- Esses helpers já tinham teste de suporte e podiam ser extraídos sem tocar no
+  contrato HTTP nem no executor async/sync.
+
+**Entregue:**
+- Criado `server/lib/ai/optimize_complete_mana_support.dart`.
+- Movidos `calculateCompleteMaxBasicAdditions`,
+  `buildCompleteColorDemandMap` e `buildWeightedBasicLandPlan` para o novo
+  módulo.
+- `optimize_complete_support.dart` mantém `export` compatível, então imports
+  legados continuam funcionando.
+- `optimize_complete_support.dart` caiu para 1450 linhas e o novo suporte ficou
+  em 118 linhas.
+- `optimize_complete_support_test.dart` ganhou cobertura direta para fallback
+  de demanda por identidade de cor quando a carta não tem símbolos explícitos
+  no `mana_cost`.
+
+**Validação local:**
+- `dart format lib/ai/optimize_complete_mana_support.dart lib/ai/optimize_complete_support.dart test/optimize_complete_support_test.dart`.
+- `dart analyze lib/ai/optimize_complete_mana_support.dart lib/ai/optimize_complete_support.dart test/optimize_complete_support_test.dart`.
+- `dart test test/optimize_complete_support_test.dart --reporter compact`.
+
+### Revisão complementar 2026-06-11 — split de candidate helpers do optimize filler
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/lib/ai/optimize_filler_loader_support.dart` ainda misturava loaders
+  SQL com helpers puros de dedupe, filtro de identidade Commander, score de
+  fillers e land fixing.
+- Isso mantinha a superfície de teste de política de candidatos acoplada ao
+  arquivo de loaders/structural recovery.
+
+**Entregue:**
+- Criado `server/lib/ai/optimize_filler_candidate_support.dart`.
+- `optimize_filler_loader_support.dart` passou a importar/exportar o suporte
+  novo para preservar compatibilidade com callers legados e o runtime.
+- Criado `server/test/optimize_filler_candidate_support_test.dart` cobrindo:
+  dedupe por nome, bloqueio por exclusão/off-identity, aceitação de colorless,
+  score de premium filler vs group draw trap, penalidade de utility cara e land
+  fixing sem inflar identidade de fetchland.
+
+**Validação local:**
+- `dart analyze lib/ai/optimize_filler_candidate_support.dart lib/ai/optimize_filler_loader_support.dart test/optimize_filler_candidate_support_test.dart`.
+- `dart test test/optimize_filler_candidate_support_test.dart test/optimize_runtime_support_test.dart test/optimize_complete_support_test.dart --reporter compact`.
+
+### Revisão complementar 2026-06-11 — feedback ML do optimize
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `MLKnowledgeService.recordFeedback` existia, mas o optimize não chamava o
+  writer em runtime.
+- `ml_prompt_feedback` era lida apenas como contador em `/ai/ml-status` e nem
+  estava declarada no schema principal/verificador.
+
+**Entregue:**
+- `server/lib/ai/optimize_feedback_support.dart` converte respostas de
+  `/ai/optimize` em feedback automático de ML: cartas aceitas, cartas
+  rejeitadas, score 1-5 e comentário sanitizado.
+- `server/routes/ai/optimize/index.dart` registra esse feedback dentro de
+  `respondWithOptimizeTelemetry`, depois do log de análise.
+- `server/database_setup.sql`, `server/bin/verify_schema.dart` e
+  `/ai/ml-status` agora tratam `ml_prompt_feedback` como parte real do schema ML.
+
+**Validação local:**
+- `dart analyze lib/ai/optimize_feedback_support.dart lib/ml_knowledge_service.dart routes/ai/optimize/index.dart routes/ai/ml-status/index.dart bin/verify_schema.dart test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart`.
+- `dart test test/optimize_feedback_support_test.dart test/optimize_learning_pipeline_test.dart --reporter compact`.
+
+### Revisão complementar 2026-06-11 — sync operacional de cartas usa utilitário compartilhado
+
+**Status:** concluída localmente.
+
+**Problema validado:**
+- `server/lib/sync_cards_utils.dart` era testado por
+  `server/test/sync_cards_test.dart`, mas `server/bin/sync_cards.dart` ainda
+  mantinha cópias privadas para parsing de `--since-days`, seleção incremental
+  de sets e extração de cards de Set.json.
+- Isso permitia drift entre o que os testes validavam e o que o sync
+  operacional usava para popular `cards`, `sets` e metadados usados por
+  import, análise e optimize.
+
+**Entregue:**
+- `server/bin/sync_cards.dart` agora importa `server/lib/sync_cards_utils.dart`.
+- O CLI usa `parseSinceDays`, `getNewSetCodesSinceFromData` e
+  `extractSetCardSyncRow`.
+- As cópias privadas `_parseSinceDays`, `_getNewSetCodesSinceFromData` e
+  `_extractCardRowFromSet` foram removidas do binário.
+- `extractSetCardSyncRow` preserva a linha operacional completa de 15 colunas,
+  incluindo `power`, `toughness` e `keywords`.
+- `extractSetCardRow` continua compatível como projeção legada de 12 colunas.
+
+**Validação local:**
+- `dart analyze lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart`.
+- `dart test test/sync_cards_test.dart --reporter compact`.
 
 **Arquivos que precisam split dedicado:**
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py` — 7017 linhas após seis splits do engine.
@@ -121,23 +309,53 @@ do engine e dezenove splits da rota/runtime de optimize concluídos.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py` — 201 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py` — 228 linhas extraídas.
 - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py` — 198 linhas extraídas.
-- `server/routes/ai/optimize/index.dart` — 2522 linhas após splits de
+- `server/routes/ai/optimize/index.dart` — 2476 linhas após splits de
   resposta/diagnóstico, envelope async, parsing inicial, payload final e
   warnings/diagnostics/fallback vazio/rejeições de qualidade/validação
   pós-processamento/retry orchestration/filtro inicial de sugestões/filtro de
   identidade de cor/filtro de bracket/top-up determinístico do modo complete e
   proteção de remoção de lands/reequilíbrio pós-filtros/coleta EDHREC/query de
   dados completos de adições/análise virtual pós-swap/execução do
-  `OptimizationValidator`. A rota ainda deve seguir reduzindo até ficar como
-  orquestrador fino.
-- `server/lib/ai/optimize_runtime_support.dart` — 2386 linhas após dois splits.
+  `OptimizationValidator`/outcome code. A rota ainda deve seguir reduzindo até
+  ficar como orquestrador fino.
+- `server/lib/ai/optimize_route_outcome_support.dart` — 62 linhas extraídas da
+  rota para classificação de `outcome_code`.
+- `server/test/optimize_route_outcome_support_test.dart` — 149 linhas cobrindo
+  outcomes diretos e preservando compatibilidade via wrapper da rota.
+- `server/lib/ai/optimize_runtime_support.dart` — 551 linhas após oito splits.
 - `server/lib/ai/optimize_cache_support.dart` — 119 linhas extraídas do runtime.
 - `server/test/optimize_cache_support_test.dart` — 77 linhas cobrindo cache key
   direta e delegação pelo runtime.
 - `server/lib/ai/optimize_candidate_quality_support.dart` — 327 linhas
   extraídas do runtime.
+- `server/lib/ai/optimize_functional_role_support.dart` — 323 linhas extraídas
+  do runtime para inferência funcional, matching de necessidades e score de
+  substitutas.
+- `server/test/optimize_functional_role_support_test.dart` — cobertura direta
+  do novo support e preservação de comportamento.
+- `server/lib/ai/optimize_removal_candidate_support.dart` — 274 linhas extraídas
+  do runtime para seleção determinística de cartas a cortar.
+- `server/test/optimize_removal_candidate_support_test.dart` — cobertura direta
+  de proteção contra corte indevido de lands, corte de lands em excesso e
+  escopo agressivo.
+- `server/lib/ai/optimize_swap_candidate_support.dart` — 491 linhas extraídas
+  do runtime para `findSynergyReplacements`, pares de swap determinísticos e
+  diagnostics agressivos de candidates.
+- `server/test/optimize_swap_candidate_support_test.dart` — 66 linhas cobrindo
+  caminho sem banco e export compatível pelo runtime.
 - `server/test/optimize_candidate_quality_support_test.dart` — 97 linhas
   cobrindo ranking, buckets e export compatível pelo runtime.
+- `server/lib/ai/optimize_filler_candidate_support.dart` — 203 linhas extraídas
+  do filler loader para dedupe, identidade Commander, score de fillers e land
+  fixing.
+- `server/test/optimize_filler_candidate_support_test.dart` — cobertura direta
+  dos helpers puros e preservação de export compatível pelo loader/runtime.
+- `server/lib/ai/optimize_archetype_support.dart` — helper único para resolver
+  o arquétipo efetivo entre request genérico/específico e detecção do deck.
+- `server/test/optimize_archetype_support_test.dart` — cobre requests
+  `midrange`, `value`, `goodstuff`, `general`, `tempo`, `unknown`, vazio e
+  prova que `optimize_runtime_support.dart` e `deck_state_analysis.dart`
+  delegam para a mesma política.
 - `server/lib/ai/optimize_route_response_support.dart` — 136 linhas extraídas
   da rota.
 - `server/test/optimize_route_response_support_test.dart` — 156 linhas cobrindo
@@ -590,6 +808,218 @@ fechado, com cenários próprios e sem dependência de produto mobile.
   - `dart test test/optimize_route_validator_support_test.dart test/optimize_route_virtual_analysis_support_test.dart test/optimization_pipeline_integration_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 28 testes, `All tests passed`.
   - `python3 -m py_compile battle_analyst_v9.py battle_*_support.py battle_*_tests.py test_battle_analyst_v10_3.py`: sem erro.
   - `python3 test_battle_analyst_v10_3.py`: `battle_passes=130`.
+- Split local da decisão final pós-validator:
+  - Criado `server/lib/ai/optimize_route_final_gate_support.dart`.
+  - Criado `server/test/optimize_route_final_gate_support_test.dart`.
+  - A rota `server/routes/ai/optimize/index.dart` removeu a decisão inline de
+    rejeição final por quality gate, validação serializada e Semantic Layer v2.
+    O retry deterministic-first continua orquestrado na rota para preservar o
+    fluxo `continue optimizeAttemptLoop`, mas a decisão pura agora é testável.
+  - Tamanho da rota após o corte: `2498` linhas.
+  - Validação local focada:
+    - `dart analyze lib/ai/optimize_route_final_gate_support.dart routes/ai/optimize/index.dart test/optimize_route_final_gate_support_test.dart`: sem issues.
+    - `dart test test/optimize_route_final_gate_support_test.dart test/optimize_route_validator_support_test.dart test/optimize_route_quality_rejection_support_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart --reporter compact`: 10 testes, `All tests passed`.
+- Hardening live do rebuild guiado:
+  - O teste live completo de `/ai/optimize` revelou regressão real em
+    `rebuild_guided`: terreno básico sintético com `card_id: ""` causava
+    `22P02 invalid input syntax for type uuid`.
+  - A rota `server/routes/ai/rebuild/index.dart` agora resolve identidade de cor
+    do comandante via `resolveCardColorIdentity`, usando fallback por
+    `mana_cost` e `oracle_text`.
+  - `server/lib/ai/rebuild_guided_service.dart` agora carrega terrenos básicos
+    por subtipo de `type_line` e nome canônico, cobrindo bases como
+    `Island // Island`; identidade vazia completa com `Wastes`; e qualquer
+    carta sem `card_id` vira `RebuildException` controlada antes de validar ou
+    persistir.
+  - Validação live local com `dart_frog dev -p 8082`:
+    - `dart test test/ai_optimize_flow_test.dart -p vm --plain-name 'AI optimize flow | /ai/optimize rebuild_guided preview_only rebuilds Talrand as full non-commander rebuild' --reporter compact`: passou.
+    - `dart test test/ai_optimize_flow_test.dart -p vm --plain-name 'AI optimize flow | /ai/optimize rebuild_guided draft_clone creates a strict-valid commander deck' --reporter compact`: passou.
+    - `dart test test/ai_optimize_flow_test.dart --reporter compact`: 10 testes passaram, 1 stress matrix skipped.
+- Fechamento local do gap de mana híbrida avançada:
+  - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py`
+    agora diferencia mana híbrida colorida, monocolored hybrid (`{2/W}`),
+    Phyrexian colorida (`{W/P}`) e hybrid Phyrexian (`{W/U/P}`).
+  - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`
+    passou a pagar monocolored hybrid como uma mana da cor ou dois manas de
+    qualquer tipo, e hybrid Phyrexian como uma mana de qualquer componente ou
+    2 de vida.
+  - `docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py`
+    cobre `{2/W}` por mana branca e por dois genéricos, rejeita pagamento curto
+    e cobre `{W/U/P}` por vida e por mana azul.
+  - `IMPLEMENTATION_GAPS.md` e `PENDING_TASKS.md` deixam de listar `{2/W}` como
+    pendente. `{2/P}` foi removido do backlog prático porque a CR 107.4 vigente
+    não lista esse símbolo.
+- Fechamento local do gap de spend restrictions genérico:
+  - `battle_mana_cost_support.py` agora adiciona `spend_tags` ao custo travado
+    com categorias coarse (`creature_spell`, `artifact_spell`,
+    `instant_or_sorcery_spell`, `noncreature_spell`).
+  - `battle_analyst_v9.py` ganhou `restricted_mana` separado do mana pool comum,
+    `add_restricted_mana(...)` e consumo atômico no `_payment_plan`.
+  - Mana restrita não entra em `available_mana()` e, portanto, não paga custos
+    não-card como ward/tax. Ela só é usada por `can_pay_card/spend_card_mana`
+    quando a categoria do spell permite.
+  - `battle_mana_tests.py` cobre mana restrita pagando creature spell, rejeitando
+    instant incompatível e combinando mana restrita com Treasure para custo
+    genérico legal.
+  - O gap remanescente foi reduzido para restrições arbitrárias/card-specific,
+    não para restrições genéricas por categoria de spell.
+- Fechamento local do gap de combat requirements básicos:
+  - `battle_analyst_v9.py` agora separa a seleção de atacantes em
+    `should_attack_with_creature(...)` e `apply_basic_attack_requirements(...)`
+    antes de tapar permanentes.
+  - `must_attack*`/`attacks_each_combat_if_able` permite que criatura de poder
+    0 ataque quando apta, cobrindo o caso básico de "attacks each combat if
+    able" sem tentar resolver todos os requisitos da CR 508.
+  - `cant_attack_alone`/`cannot_attack_alone` impede ataque solitário sem tapar
+    a criatura, mas permite o ataque quando outro atacante também foi escolhido.
+  - `battle_combat_tests.py` cobre os três cenários: must-attack de poder 0,
+    cannot-attack-alone sozinho e cannot-attack-alone acompanhado.
+  - O gap remanescente foi reduzido para custos para atacar, requisitos por
+    defensor, restrições condicionais complexas e escolha interativa.
+- Fechamento local do gap APNAP pass sequence básico:
+  - `battle_analyst_v9.py` ganhou `priority_order_from(...)` e
+    `emit_priority_pass_sequence(...)`, mantendo a ordem active-player,
+    non-active players por rotação da mesa.
+  - `priority_round(...)` agora emite eventos `priority_pass` em janelas de
+    pilha vazia e antes de resolver o topo da pilha quando ninguém responde.
+  - `battle_stack_casting_tests.py` cobre ordem APNAP em pilha vazia e no caso
+    de spell não respondido antes da resolução.
+  - O gap remanescente foi reduzido para escolha humana/interativa e varredura
+    completa de ações card-specific por jogador, não para a existência de
+    sequência APNAP auditável.
+- Fechamento local do gap de extra combat básico:
+  - `Player` agora possui contador `extra_combats`, separado de `extra_turns`.
+  - `get_card_effect(...)` aceita `effect=extra_combat` em cartas/modelos ad
+    hoc, preservando `combats`/`extra_combats` e `untap_creatures`.
+  - `apply_effect_immediate(...)` agenda combates adicionais, opcionalmente
+    destapa criaturas do controlador e emite `extra_combat_scheduled`.
+  - `play_turn_v8(...)` consome combates adicionais antes da postcombat main,
+    com cap anti-loop e eventos `extra_combat_taken` /
+    `extra_combat_cap_reached`.
+  - `battle_turn_flow_tests.py` cobre agendamento/untap e execução de combate
+    extra antes da segunda main phase.
+  - O gap remanescente foi reduzido para fases extras arbitrárias e textos
+    card-specific de cartas concretas.
+- Fechamento parcial do gap de integridade CMC no backend:
+  - `resolveImportCardNames(...)` agora carrega `cards.cmc` nos caminhos de
+    match exato, nome localizado e split/MDFC, preservando o campo autoritativo
+    para validação e auditoria.
+  - `GeneratedDeckValidationService` propaga `cmc` internamente e adiciona
+    warning quando uma carta não-terreno chega com `cmc` ausente/zerado
+    suspeito contra `mana_cost`, sem alterar o payload público do app.
+  - `CardValidationService.validateDeckCards(...)` compara `cmc` informado
+    pelo chamador contra `cards.cmc` e emite warnings de divergência ou dado
+    autoritativo suspeito.
+  - `DeckRulesService._loadCardsData(...)` passou a consultar `cmc`, fechando
+    o drift documentado em que a validação de deck não lia o campo.
+  - O gap remanescente é operacional: backfill/correção da base SQLite Hermes
+    e scripts Python de import/sync precisam continuar usando `cards.cmc` como
+    fonte autoritativa.
+- Fechamento do código operacional de sync CMC Hermes:
+  - `sync_pg_card_metadata_to_hermes.py` agora copia `cmc`, `type_line` e
+    `oracle_text` do `card_oracle_cache` autoritativo para `deck_cards` quando
+    a tabela existe, com relatório explícito de linhas totais, matches,
+    updates de CMC e non-lands ainda suspeitos.
+  - O modo `--dry-run` calcula o que seria atualizado sem mutar SQLite.
+  - `import_lorehold_decks.py` passa a preferir `card_oracle_cache` antes da
+    tabela histórica `card_oracle_data`.
+  - `known_cards_generator_cron.sh` e `known_cards_validator_cron.sh` executam
+    o sync de metadata antes de gerar/validar `known_cards_generated.json`.
+  - Teste isolado `test_sync_pg_card_metadata_to_hermes.py` cobre backfill real
+    e dry-run in-memory.
+  - O risco restante é executar essa rotina no Hermes/AWS com `knowledge.db`
+    populado; se o DB estiver vazio, o relatório agora deixa isso explícito
+    (`deck_cards_table_present=false`) em vez de parecer sucesso silencioso.
+- Fechamento parcial dos guards contra learned decks fantasmas:
+  - `learned_deck_completeness.py` centraliza parsing de `learned_decks.card_list`
+    em JSON/texto e calcula `parsed_quantity`, `total_with_commander`,
+    `main_quantity` e elegibilidade minima.
+  - `generate_known_cards.py` ignora learned decks Lorehold com menos de 90
+    cartas para não aprender tags a partir de seeds parciais.
+  - `materialize_learned_deck_to_deck_cards.py` não preenche mais decks
+    parciais com terrenos basicos por padrão; preenchimento artificial exige
+    `--allow-fill-basic` e deve ficar restrito a fixtures.
+  - `export_hermes_learned_deck.py` bloqueia export parcial e normaliza listas
+    main-99 adicionando o comandante quando ele está apenas na coluna
+    `commander`.
+  - `import_lorehold_decks.py`, `sync_pg_meta_decks_to_hermes.py` e
+    `sync_pg_target_deck_to_hermes.py` receberam guardrails contra import/sync
+    de decks `<90` cartas ou sem comandante.
+  - `IMPLEMENTATION_TASKS.md` foi alinhado ao código vivo: Game Changers
+    oficiais permanecem multi-tag por decisão atual de produto/testes, não
+    `gameChanger` exclusivo.
+- Fechamento operacional da telemetria agregada do battle engine:
+  - `master_optimizer_auto_cycle_cron.sh` agora define
+    `MANALOOM_ENGINE_METRICS_DIR` por rodada, permitindo que todas as chamadas
+    de `run_battle(...)` gravem snapshots sanitizados.
+  - Ao final do auto-cycle, o cron executa `engine_metrics_report.py` e salva
+    relatório timestampado em `$ARTIFACT_DIR`, além de
+    `latest_engine_metrics_report.json` para consumo rápido por Hermes/Codex.
+  - `master_optimizer_loop.py --preflight` passou a exigir
+    `engine_metrics_report.py` como dependência operacional.
+  - `test_engine_metrics_operational_wiring.py` cobre o wiring do cron e do
+    preflight sem executar o ciclo pesado.
+- Fechamento do drift de arquétipo efetivo na melhoria de deck:
+  - `resolveOptimizeArchetype` deixou de ter duas políticas divergentes entre
+    `optimize_runtime_support.dart` e `deck_state_analysis.dart`.
+  - A política única usa detecção do deck quando o request é genérico
+    (`midrange`, `value`, `goodstuff`, `general`, `tempo`) e preserva pedidos
+    explícitos (`aggro`, `control`, `combo`, `stax` etc.) quando a detecção é
+    genérica, vazia ou `unknown`.
+  - Isso alinha optimize/rebuild/deck-state analysis e reduz risco de o mesmo
+    deck receber target profile diferente em fluxos distintos.
+- Fechamento do drift de roles estratégicos na melhoria de deck:
+  - `functional_card_tags.dart` removeu matchers privados para `wincon`,
+    `combo_piece`, `engine`, `payoff` e `enabler`.
+  - `inferFunctionalCardTags` agora consulta `resolveCardFunctionalRoles`, o
+    mesmo adapter usado por optimize, validator e quality gate.
+  - `functional_card_tags_test.dart` cobre alinhamento direto entre tagger e
+    `optimizationFunctionalRolesForCard`, incluindo `Impact Tremors`,
+    `Isochron Scepter`, `The One Ring`, `Aetherflux Reservoir` e
+    `Demonic Tutor`.
+- Fechamento do drift de terrenos básicos/snow basics:
+  - `server/lib/basic_land_utils.dart` é a fonte canônica para nomes regulares,
+    snow basics, normalização e checagem por `type_line`.
+  - `optimize_runtime_support.dart` preserva apenas wrapper público fino e
+    `commander_reference_deck_corpus_support.dart` preserva `basicLandNames`
+    como alias do utilitário canônico.
+  - Testes de regras e optimize passaram a importar o helper compartilhado,
+    incluindo cobertura explícita para `Snow-Covered Wastes`.
+- Terceiro split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_functional_role_support.dart` centraliza
+    inferência funcional, matching de necessidades e score de substitutas.
+  - `server/lib/ai/optimize_filler_loader_support.dart` passou a concentrar
+    dedupe de candidatos, filtro de identidade Commander e score de fillers,
+    eliminando o ciclo circular com `optimize_runtime_support.dart`.
+  - `optimize_runtime_support.dart` mantém exports compatíveis para testes,
+    rota e callers legados, mas caiu para 1941 linhas.
+- Quarto split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_removal_candidate_support.dart` centraliza a
+    seleção determinística de cartas a cortar.
+  - O runtime mantém export compatível; wrappers da rota e testes legados
+    continuam chamando a mesma API.
+  - `optimize_runtime_support.dart` caiu para 1666 linhas.
+- Quinto split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_swap_candidate_support.dart` centraliza
+    `findSynergyReplacements`, construção de pares determinísticos e diagnostics
+    agressivos de candidates.
+  - O runtime mantém export compatível; rota, complete support e testes legados
+    continuam acessando a API pelo caminho antigo.
+  - `optimize_runtime_support.dart` caiu para 1179 linhas.
+- Sexto split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_payload_support.dart` centraliza normalização de
+    payload, intensidade, parser de sugestões, resposta determinística,
+    utility signal agressivo, retry deterministic-first e recommendation detail.
+  - O runtime mantém export compatível; rota, complete support e testes legados
+    continuam acessando a API pelo caminho antigo.
+  - `optimize_runtime_support.dart` caiu para 692 linhas.
+- Sétimo split seguro do runtime de optimize:
+  - `server/lib/ai/optimize_fallback_telemetry_support.dart` centraliza escrita
+    e agregação de `ai_optimize_fallback_telemetry`.
+  - O runtime mantém export compatível; a rota continua chamando as mesmas
+    funções pelo caminho antigo.
+  - O aggregate ganhou helper puro testável sem banco.
+  - `optimize_runtime_support.dart` caiu para 551 linhas.
 
 ## Etapa 4 — Próximas pendências reais
 
@@ -610,13 +1040,21 @@ fechado, com cenários próprios e sem dependência de produto mobile.
    de bracket/top-up determinístico de básicos no modo complete/proteção de
    remoção de terrenos/reequilíbrio pós-filtros/coleta EDHREC pós-processamento
    query de dados completos das adições/quality gate, análise virtual pós-swap
-   e execução do `OptimizationValidator` já foram feitos; o próximo corte
-   seguro é extrair a decisão de rejeição/retry final.
-3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os dois
-   primeiros cortes moveram assinatura/cache para `optimize_cache_support.dart`
-   e quality ranking/loader para `optimize_candidate_quality_support.dart`,
-   mantendo wrappers/exports compatíveis.
-4. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
+   execução do `OptimizationValidator` e decisão final pós-validator já foram
+   feitos; o próximo corte seguro é avaliar se ainda há blocos grandes de
+   orquestração que possam virar support sem esconder o fluxo principal.
+3. Continuar o split de `server/lib/ai/optimize_runtime_support.dart`: os sete
+   cortes atuais moveram assinatura/cache, quality ranking/loader,
+   inferência/scoring funcional, seleção de remoções, swap building e payload/
+   response shaping e telemetry de fallback para supports próprios, mantendo
+   wrappers/exports compatíveis. Próximo corte seguro: preferências de IA ou
+   loaders de referência do comandante com teste isolado antes de mover.
+4. Executar no Hermes/AWS a sequência operacional de seed/sync (`meta_decks` ou
+   target deck real → `sync_pg_card_metadata_to_hermes.py`) e verificar o
+   relatório `deck_cards_backfill` até `suspicious_nonland_zero_cmc_after=0`
+   para os decks alvo.
+5. Implementar efeitos card-specific de Omen/Prepare/Paradigm/Station somente
    quando houver corpus concreto usando essas cartas.
-5. Revalidar drift restante entre analysis/generate/optimize depois do split
-   estrutural.
+6. Revalidar drift restante entre analysis/generate/optimize depois do split
+   estrutural, agora focando em heurísticas secundárias, endpoints legacy e
+   dados incompletos, não mais nos roles estratégicos já centralizados.

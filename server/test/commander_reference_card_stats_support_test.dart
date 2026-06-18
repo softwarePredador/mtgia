@@ -1,6 +1,7 @@
 import 'package:server/ai/commander_reference_card_stats_support.dart';
 import 'package:server/ai/commander_reference_deck_corpus_support.dart';
 import 'package:server/ai/commander_reference_generate_fallback_support.dart';
+import 'package:server/ai/commander_learned_deck_support.dart';
 import 'package:server/ai/commander_reference_profile_support.dart';
 import 'package:test/test.dart';
 
@@ -202,7 +203,7 @@ void main() {
       final profile = buildLoreholdReferenceProfilePayload(
         updatedAt: DateTime.utc(2026, 5, 11, 12),
       );
-      final deck = buildDeterministicReferenceDeck(
+      final result = buildDeterministicReferenceDeckResult(
         profile: profile,
         referenceCardStats: [
           _stat(
@@ -253,6 +254,7 @@ void main() {
           themeCounts: {'topdeck_big_spells': 3},
         ),
       );
+      final deck = result.deck;
 
       expect((deck['commander'] as Map)['name'],
           equals('Lorehold, the Historian'));
@@ -277,6 +279,356 @@ void main() {
       expect(
           cards.where((card) => card['name'] == 'Mountain').single['quantity'],
           greaterThan(0));
+      expect(result.mainDeckQuantity, equals(99));
+      expect(result.builtInFallbackEnabled, isTrue);
+      expect(result.builtInFallbackUsedCount, greaterThan(0));
+      expect(
+        result.sourceUsageCounts['reference_card_stats'],
+        greaterThanOrEqualTo(2),
+      );
+      expect(
+        result.sourceUsageCounts['reference_corpus_packages'],
+        greaterThanOrEqualTo(1),
+      );
+      expect(
+        result.sourceUsageCounts['deterministic_fallback'],
+        greaterThan(0),
+      );
+      expect(
+        result.toDiagnosticsJson()['built_in_fallback_only_count'],
+        isA<int>(),
+      );
+    });
+
+    test('captures deterministic source provenance for overlap cards', () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Arcane Signet',
+            cardId: 'signet-id',
+            packageKey: 'ramp_package',
+            role: 'ramp',
+            score: 80,
+            confidence: 'high',
+          ),
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(result.basicLandQuantity, equals(0));
+      expect(result.builtInFallbackEnabled, isTrue);
+      expect(result.builtInFallbackUsedCount, equals(6));
+      expect(
+        result.sourceMixCounts['deterministic_fallback + reference_card_stats'],
+        equals(1),
+      );
+      final arcaneSignet = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Arcane Signet',
+      );
+      expect(
+        arcaneSignet.sources,
+        equals(['deterministic_fallback', 'reference_card_stats']),
+      );
+    });
+
+    test('captures fallback-only provenance when only built-in cards are used',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_fallback_only_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(result.basicLandQuantity, equals(0));
+      expect(result.builtInFallbackEnabled, isTrue);
+      expect(result.builtInFallbackUsedCount, equals(6));
+      expect(result.builtInFallbackOnlyCount, equals(6));
+      expect(result.sourceMixCounts['deterministic_fallback'], equals(6));
+    });
+
+    test('uses aggregated usage hot cards before built-in fallback', () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_usage_hot_cards_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        usageHotCardNames: const [
+          'Jeska\'s Will',
+          'Unexpected Windfall',
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName),
+        containsAll(['Jeska\'s Will', 'Unexpected Windfall']),
+      );
+      expect(result.sourceUsageCounts['usage_hot_cards'], equals(2));
+      final jeskasWill = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Jeska\'s Will',
+      );
+      expect(jeskasWill.sources, equals(['usage_hot_cards']));
+      expect(result.builtInFallbackOnlyCount, equals(4));
+    });
+
+    test(
+        'usage hot cards can satisfy deterministic slots without fallback-only cards',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_usage_hot_cards_full_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        usageHotCardNames: const [
+          'Laelia, the Blade Reforged',
+          'Smuggler\'s Share',
+          'Quintorius Kand',
+          'Sun Titan',
+          'Dockside Extortionist',
+          'Warleader\'s Call',
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(result.sourceUsageCounts['usage_hot_cards'], equals(6));
+      expect(result.sourceUsageCounts['deterministic_fallback'], isNull);
+      expect(result.builtInFallbackOnlyCount, equals(0));
+      expect(
+        result.cardProvenance.map((entry) => entry.sources),
+        everyElement(equals(['usage_hot_cards'])),
+      );
+    });
+
+    test(
+        'promoted learned deck cards are consumed before usage hot cards and fallback',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_active_learned_deck_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 6,
+        promotedLearnedCardNames: const [
+          'Fellwar Stone',
+          'Smuggler\'s Share',
+        ],
+        usageHotCardNames: const [
+          'Smuggler\'s Share',
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(6));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName),
+        containsAll(['Fellwar Stone', 'Smuggler\'s Share']),
+      );
+      expect(result.sourceUsageCounts['active_learned_deck'], equals(2));
+      final fellwarStone = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Fellwar Stone',
+      );
+      expect(
+        fellwarStone.sources,
+        equals(['active_learned_deck', 'deterministic_fallback']),
+      );
+      final smugglersShare = result.cardProvenance.singleWhere(
+        (entry) => entry.cardName == 'Smuggler\'s Share',
+      );
+      expect(
+        smugglersShare.sources,
+        equals(['active_learned_deck', 'usage_hot_cards']),
+      );
+      expect(result.builtInFallbackOnlyCount, equals(4));
+    });
+
+    test(
+        'promoted learned deck cards become the primary deterministic skeleton before reference stats',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_active_learned_priority_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {
+          'support_package': ['Expected Package Card'],
+        },
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 2,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Scroll Rack',
+            cardId: 'scroll-rack-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 94,
+            confidence: 'high',
+          ),
+        ],
+        referenceDeckCorpusGuidance: const CommanderReferenceDeckCorpusGuidance(
+          commanderName: loreholdReferenceCommanderName,
+          source: 'unit_test',
+          deckCount: 1,
+          acceptedDeckCount: 1,
+          averageRoleCounts: {'lands': 37},
+          topCards: [
+            {
+              'card_name': 'Corpus Priority Card',
+              'deck_count': 1,
+              'total_quantity': 1,
+              'role': 'support',
+            },
+          ],
+          themeCounts: {'topdeck_big_spells': 1},
+        ),
+        promotedLearnedCardNames: const ['Learned Priority Card'],
+        usageHotCardNames: const ['Usage Priority Card'],
+      );
+
+      expect(result.mainDeckQuantity, equals(2));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName).toList(),
+        equals(['Learned Priority Card', 'Scroll Rack']),
+      );
+      expect(result.sourceUsageCounts['active_learned_deck'], equals(1));
+      expect(result.sourceUsageCounts['reference_card_stats'], equals(1));
+      expect(result.sourceUsageCounts['reference_corpus_packages'], isNull);
+      expect(result.sourceUsageCounts['profile_expected_packages'], isNull);
+      expect(result.sourceUsageCounts['usage_hot_cards'], isNull);
+    });
+
+    test(
+        'active learned deck preserves basic land quantities before auxiliary sources',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_active_learned_quantities_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      const activeLearnedDeck = CommanderLearnedDeckInput(
+        commanderName: loreholdReferenceCommanderName,
+        deckName: 'Lorehold Learned',
+        sourceSystem: 'hermes',
+        sourceRef: 'learned_deck:test',
+        cardList: '''
+1 Lorehold, the Historian
+2 Plains
+1 Mountain
+1 Arcane Signet
+1 Scroll Rack
+''',
+        cardCount: 6,
+        isActive: true,
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 5,
+        activeLearnedDeck: activeLearnedDeck,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Brainstone',
+            cardId: 'brainstone-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 70,
+            confidence: 'medium',
+          ),
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(5));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName).toList(),
+        equals(['Plains', 'Mountain', 'Arcane Signet', 'Scroll Rack']),
+      );
+      final cards = (result.deck['cards'] as List).cast<Map>();
+      expect(
+        cards,
+        containsAll([
+          {'name': 'Plains', 'quantity': 2},
+          {'name': 'Mountain', 'quantity': 1},
+          {'name': 'Arcane Signet', 'quantity': 1},
+          {'name': 'Scroll Rack', 'quantity': 1},
+        ]),
+      );
+      expect(cards.map((card) => card['name']), isNot(contains('Brainstone')));
+      expect(result.sourceUsageCounts['active_learned_deck'], equals(4));
     });
 
     test('filters off-color generated cards before reference validation repair',

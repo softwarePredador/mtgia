@@ -8,6 +8,7 @@ import os
 import re
 import json
 import hashlib
+from pathlib import Path
 
 # Agregar scripts/ al path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +20,31 @@ import psycopg2.extras
 from db_helper import connect, sanitized_database_target
 
 DRY_RUN = os.environ.get("MANALOOM_IMPORT_APPLY") != "1"
+
+
+def _resolve_repo_root() -> Path:
+    for key in ("MANALOOM_REPO", "MANALOOM_WORKSPACE", "HERMES_REPO_DIR"):
+        value = os.environ.get(key)
+        if value:
+            candidate = Path(value).resolve()
+            if candidate.exists():
+                return candidate
+    return Path(__file__).resolve().parents[4]
+
+
+REPO_ROOT = _resolve_repo_root()
+KNOWLEDGE_ROOT = Path(
+    os.environ.get(
+        "MANALOOM_KNOWLEDGE_ROOT",
+        str(REPO_ROOT / "docs" / "hermes-analysis" / "manaloom-knowledge"),
+    )
+).resolve()
+THEMES_PATH = Path(
+    os.environ.get("MANALOOM_THEMES_MD", str(KNOWLEDGE_ROOT / "THEMES.md"))
+).resolve()
+DECKS_DIR = Path(
+    os.environ.get("MANALOOM_KNOWLEDGE_DECKS_DIR", str(KNOWLEDGE_ROOT / "decks"))
+).resolve()
 
 def get_conn():
     return connect()
@@ -250,6 +276,8 @@ def _insert_card(conn, card, commander, tag, func, importance, reason, source):
 def main():
     print("=== Importando conhecimento Hermes → PostgreSQL ===\n")
     print(f"Target PostgreSQL: {sanitized_database_target()}")
+    print(f"Repo root: {REPO_ROOT}")
+    print(f"Knowledge root: {KNOWLEDGE_ROOT}")
     if DRY_RUN:
         print("Mode: DRY RUN - write statements are skipped")
     conn = get_conn()
@@ -264,24 +292,22 @@ def main():
         print(f"  {table}: {before[table]}")
 
     # 1. Importar THEMES.md
-    themes_path = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/THEMES.md'
-    if os.path.exists(themes_path):
+    if THEMES_PATH.exists():
         print(f"\nParseando THEMES.md...")
-        rules = parse_themes_md(themes_path)
+        rules = parse_themes_md(str(THEMES_PATH))
         print(f"  {len(rules)} regras extraídas")
         if rules:
             n = import_themes(conn, rules)
             print(f"  {n} regras importadas/atualizadas\n")
     else:
-        print(f"  Nao encontrado: {themes_path}\n")
+        print(f"  Nao encontrado: {THEMES_PATH}\n")
 
     # 2. Importar perfis de commander
     print("Parseando perfis de comandante...")
     profiles = []
-    decks_dir = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/decks'
-    if os.path.exists(decks_dir):
-        for commander_dir in os.listdir(decks_dir):
-            cmd_path = os.path.join(decks_dir, commander_dir)
+    if DECKS_DIR.exists():
+        for commander_dir in os.listdir(DECKS_DIR):
+            cmd_path = os.path.join(DECKS_DIR, commander_dir)
             if not os.path.isdir(cmd_path):
                 continue
             for fname in os.listdir(cmd_path):
@@ -309,7 +335,7 @@ def main():
 
     # 3. Importar card_deck_profiles
     print("Importando card_deck_profiles...")
-    n = import_card_profiles(conn, decks_dir)
+    n = import_card_profiles(conn, str(DECKS_DIR))
     print(f"  {n} perfis de carta importados\n")
 
     # ── Count after ──

@@ -12,21 +12,21 @@ import argparse, importlib.util, json, os, random, sqlite3, sys
 from collections import defaultdict
 from pathlib import Path
 
-SCRIPT_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
+from repo_runtime_paths import (
+    resolve_battle_script_path,
+    resolve_battle_scripts_dir,
+    resolve_master_optimizer_replays_dir,
 )
-sys.path.insert(0, SCRIPT_DIR)
 
-BATTLE_PATH = os.environ.get(
-    "MANALOOM_BATTLE_SCRIPT",
-    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
-)
+BATTLE_SCRIPTS_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_SCRIPTS_DIR))
+
+BATTLE_PATH = resolve_battle_script_path()
 spec = importlib.util.spec_from_file_location("generate_replays_battle", BATTLE_PATH)
 ba = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ba)
 
-OUTPUT_DIR = "/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_replays"
+OUTPUT_DIR = resolve_master_optimizer_replays_dir()
 
 
 def generate_card_impact_replays(
@@ -103,7 +103,7 @@ def generate_card_impact_replays(
             # Save JSONL
             safe_name = opp_name.replace(" ", "_").replace(",", "").replace("'", "")
             game_id = f"impact_{safe_name}_{g}_seed{seed}"
-            filepath = os.path.join(OUTPUT_DIR, f"{game_id}.jsonl")
+            filepath = os.path.join(str(OUTPUT_DIR), f"{game_id}.jsonl")
 
             with open(filepath, "w") as f:
                 for evt in events:
@@ -116,7 +116,7 @@ def generate_card_impact_replays(
     avg_wr = total_wins / total_games * 100 if total_games > 0 else 0
     print(f"\nTotal: {total_games} games, {total_wins} wins ({avg_wr:.1f}%)")
     print(f"Replays saved to: {OUTPUT_DIR}")
-    print(f"\nNow run: python3 card_impact_analyzer.py --replay-dir {OUTPUT_DIR}")
+    print(f"\nNow run: python3 server/bin/card_impact_analyzer.py --replay-dir {OUTPUT_DIR}")
 
 
 def main():

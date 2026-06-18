@@ -87,6 +87,35 @@ void main() {
       );
     });
 
+    test('computes canonical learned deck role summary from multi-tags', () {
+      final summary = computeCommanderLearnedDeckRoleSummary(
+        cards: const [
+          CommanderLearnedDeckCardLine(
+            name: 'Lorehold, the Historian',
+            quantity: 1,
+          ),
+          CommanderLearnedDeckCardLine(name: 'Plains', quantity: 2),
+          CommanderLearnedDeckCardLine(name: 'Sol Ring', quantity: 1),
+          CommanderLearnedDeckCardLine(name: 'Boros Charm', quantity: 1),
+          CommanderLearnedDeckCardLine(name: 'Big Score', quantity: 1),
+        ],
+        commanderNameNormalized: 'lorehold, the historian',
+        tagsByName: const {
+          'plains': {'land', 'ramp'},
+          'sol ring': {'ramp'},
+          'boros charm': {'protection', 'removal'},
+          'big score': {'draw', 'ramp'},
+        },
+        landNames: const {'plains'},
+      );
+
+      expect(summary['total_lands'], equals(2));
+      expect(summary['ramp_count'], equals(2));
+      expect(summary['draw_count'], equals(1));
+      expect(summary['removal_count'], equals(1));
+      expect(summary['protection_count'], equals(1));
+    });
+
     test('route prefers promoted learned deck before deterministic fallback',
         () {
       final route =
@@ -106,16 +135,55 @@ void main() {
           File('routes/ai/commander-learning/index.dart').readAsStringSync();
 
       expect(route, contains('commander_learned_decks'));
+      expect(route, contains("'source': 'pg_commander_learned_deck_summary'"));
       expect(route, contains("'source': 'pg_commander_learned_decks'"));
-      expect(
-          route,
-          contains(
-              "'commanders': activeDecks.map(_promotedDeckSummary).toList()"));
+      expect(route, contains("'commanders': activeDecks"));
+      expect(route, contains('WITH active AS'));
+      expect(route, isNot(contains('FROM commander_learning_snapshot')));
       expect(route, contains("'recommended_deck': recommendedDeck"));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
       expect(route, contains("'source_confidence': _sourceConfidence"));
       expect(route, contains("'win_conditions': _winConditions"));
       expect(route, contains("'role_summary': _roleSummary"));
+      expect(route, isNot(contains("'metadata': learnedDeck.metadata")));
+      expect(route, isNot(contains("'metadata': deck.metadata")));
+    });
+
+    test('commander reference does not expose raw learned deck metadata', () {
+      final route =
+          File('routes/ai/commander-reference/index.dart').readAsStringSync();
+
+      expect(route, contains("'source': 'promoted_learned_deck_pg'"));
+      expect(route, isNot(contains("'metadata': learnedDeck['metadata']")));
+    });
+
+    test('commander learning route stays auth-only in AI middleware', () {
+      final middleware = File('routes/ai/_middleware.dart').readAsStringSync();
+
+      expect(middleware, contains("'/ai/commander-learning'"));
+      expect(middleware, contains('authOnlyHandler'));
+      expect(middleware, contains('costlyAiHandler'));
+      expect(
+        middleware.indexOf("'/ai/commander-learning'"),
+        lessThan(middleware.indexOf('return costlyAiHandler(context)')),
+      );
+    });
+
+    test(
+        'canonical learned deck metadata uses card identity bridge for split and alias resolution',
+        () {
+      final source = File(
+        'lib/ai/commander_learned_deck_support.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('LEFT JOIN card_identity_bridge cib'));
+      expect(source, contains("cib.normalized_lookup_name = w.lowered_name"));
+      expect(
+        source,
+        contains(
+          "cib.normalized_canonical_name LIKE w.lowered_name || ' // %'",
+        ),
+      );
     });
   });
 }

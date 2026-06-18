@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 """Loss-Mode-Driven Swap Suggester.
 
-Cruza dados de 3 fontes para sugerir swaps direcionados:
-1. Loss tags do baseline (screw, flood, out-valued, etc.)
-2. Card impact WDWR (cartas que correlacionam com vitoria/derrota)
-3. Card pool disponivel (known_cards_generated.json)
+Gera sugestoes heuristicas a partir de duas fontes locais:
+1. loss tags extraidas do baseline/replays;
+2. card impact WDWR derivado dos mesmos replays.
+
+Importante:
+- este script nao consome o fallback legado de known-cards;
+- ele nao consulta `battle_card_rules`;
+- ele sugere categorias/cuts com base no que ja apareceu nos replays, e nao um
+  pool externo canonico de candidatos.
 """
 
 import argparse, json, os, sqlite3, sys
 from collections import defaultdict
 
-SCRIPT_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
-)
-sys.path.insert(0, SCRIPT_DIR)
+from repo_runtime_paths import resolve_battle_scripts_dir, resolve_master_optimizer_replays_dir
+
+BATTLE_SCRIPTS_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_SCRIPTS_DIR))
 
 def classify_replays_by_turn(replay_dir: str) -> dict[str, int]:
     """Classifica perdas por heuristica de turno (fallback sem loss tags no engine)."""
@@ -57,6 +61,7 @@ def suggest_swaps_by_loss_mode(
     loss_tags: dict[str, int],
     card_impact: dict[str, dict],
     known_cards_path: str | None = None,
+    min_sample_size: int = 10,
 ) -> list[dict]:
     """Gera sugestoes de swap baseadas no modo de derrota dominante e WDWR."""
 
@@ -100,6 +105,8 @@ def suggest_swaps_by_loss_mode(
     # Encontra cartas com alto WDWR na categoria alvo
     category_cards = []
     for card, stats in card_impact.items():
+        if int(stats.get("sample_size") or stats.get("seen") or 0) < min_sample_size:
+            continue
         cat = stats.get("category", "")
         # Match by card role or effect
         if any(t in cat.lower() for t in card_types):
@@ -126,7 +133,7 @@ def suggest_swaps_by_loss_mode(
     # Segunda sugestao: carta com WDWR mais baixo que deveria ser cortada
     worst_cards = sorted(card_impact.items(), key=lambda x: x[1].get("wdwr", 0))
     for card, stats in worst_cards[:3]:
-        if stats.get("seen", 0) >= 3 and stats.get("wdwr", 0) < 30:
+        if int(stats.get("sample_size") or stats.get("seen") or 0) >= min_sample_size and stats.get("wdwr", 0) < 30:
             suggestions.append({
                 "loss_mode": "cut_candidate",
                 "card": card,
@@ -143,8 +150,11 @@ def main():
     parser = argparse.ArgumentParser(description="Loss-Mode Swap Suggester")
     parser.add_argument("--loss-tags-json", help="JSON with loss tag counts")
     parser.add_argument("--impact-json", help="JSON with WDWR/PWR data")
-    parser.add_argument("--replay-dir",
-        default="/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_replays")
+    parser.add_argument(
+        "--replay-dir",
+        default=str(resolve_master_optimizer_replays_dir()),
+    )
+    parser.add_argument("--min-sample-size", type=int, default=10)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
 
@@ -170,7 +180,11 @@ def main():
         loss_tags = classify_replays_by_turn(args.replay_dir)
 
     # 3. Gera sugestoes
-    suggestions = suggest_swaps_by_loss_mode(loss_tags if loss_tags else {}, card_impact)
+    suggestions = suggest_swaps_by_loss_mode(
+        loss_tags if loss_tags else {},
+        card_impact,
+        min_sample_size=args.min_sample_size,
+    )
 
     if args.report:
         print(f"\n# Loss-Mode-Driven Swap Suggestions\n")
@@ -185,7 +199,11 @@ def main():
                 print(f"- {s['rationale']}")
                 print(f"\n### Loss Breakdown")
                 for tag, freq in s['loss_breakdown'].items():
-                    bar = "█" * int(freq.split("/")[1].replace("(", "").replace(")", "").replace("%", "").strip()) // 5
+                    pct_text = freq.split("(")[-1].split("%")[0]
+                    try:
+                        bar = "█" * max(1, int(float(pct_text) // 5))
+                    except ValueError:
+                        bar = ""
                     print(f"- {tag}: {freq} {bar}")
                 print(f"\n### Top {s['recommended_category']} Candidates (by WDWR)")
                 for c in s['top_candidates']:
@@ -260,6 +278,8 @@ def compute_impact_from_replays(replay_dir: str) -> dict:
             pass
 
     stats = defaultdict(lambda: {"seen": 0, "won_when_seen": 0})
+    total_games = len(games)
+    total_wins = sum(1 for game in games.values() if game["won"])
     for gid, g in games.items():
         won = g["won"]
         for c in g["cards_seen"]:
@@ -271,10 +291,20 @@ def compute_impact_from_replays(replay_dir: str) -> dict:
     for c, s in stats.items():
         if s["seen"] < 3:
             continue
+        not_seen = max(0, total_games - s["seen"])
+        won_when_not_seen = max(0, total_wins - s["won_when_seen"])
+        wdwr = round(s["won_when_seen"] / s["seen"] * 100, 1)
+        wns_wr = round(won_when_not_seen / not_seen * 100, 1) if not_seen > 0 else None
         result[c] = {
-            "wdwr": round(s["won_when_seen"] / s["seen"] * 100, 1),
+            "wdwr": wdwr,
             "seen": s["seen"],
+            "sample_size": s["seen"],
+            "sample_quality": "low_sample" if s["seen"] < 10 else "usable",
             "won_when_seen": s["won_when_seen"],
+            "not_seen": not_seen,
+            "won_when_not_seen": won_when_not_seen,
+            "wns_wr": wns_wr,
+            "delta_vs_not_seen": round(wdwr - wns_wr, 1) if isinstance(wns_wr, (int, float)) else None,
         }
     return result
 

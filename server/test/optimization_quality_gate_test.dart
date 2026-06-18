@@ -706,6 +706,87 @@ void main() {
       expect(result.additions, isEmpty);
       expect(result.droppedReasons.single, contains('protection'));
     });
+
+    test('protects combo critical roles instead of using generic fallback', () {
+      final originalDeck = [
+        _card(
+          name: 'Imperial Seal of the Combo',
+          typeLine: 'Sorcery',
+          manaCost: '{B}',
+          cmc: 1,
+          oracleText: 'Search your library for a card, then shuffle.',
+          functionalTags: const [
+            {'tag': 'tutor', 'confidence': 0.95, 'source': 'persisted'},
+          ],
+        ),
+      ];
+
+      final additions = [
+        _card(
+          name: 'Spot Removal Bear',
+          typeLine: 'Instant',
+          manaCost: '{1}{W}',
+          cmc: 2,
+          oracleText: 'Exile target creature.',
+          functionalTags: const [
+            {'tag': 'removal', 'confidence': 0.95, 'source': 'persisted'},
+          ],
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Imperial Seal of the Combo'],
+        additions: const ['Spot Removal Bear'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'combo',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons, hasLength(1));
+      expect(result.droppedReasons.single.toLowerCase(), contains('tutor'));
+    });
+
+    test('allows combo support swaps inside the combo support band', () {
+      final originalDeck = [
+        _card(
+          name: 'Careful Study of the Combo',
+          typeLine: 'Sorcery',
+          manaCost: '{U}',
+          cmc: 1,
+          oracleText: 'Draw two cards, then discard two cards.',
+          functionalTags: const [
+            {'tag': 'draw', 'confidence': 0.95, 'source': 'persisted'},
+          ],
+        ),
+      ];
+
+      final additions = [
+        _card(
+          name: 'Rite of the Combo Turn',
+          typeLine: 'Sorcery',
+          manaCost: '{R}',
+          cmc: 1,
+          oracleText: 'Add {R}{R}{R}.',
+          functionalTags: const [
+            {'tag': 'ramp', 'confidence': 0.95, 'source': 'persisted'},
+          ],
+        ),
+      ];
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Careful Study of the Combo'],
+        additions: const ['Rite of the Combo Turn'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'combo',
+      );
+
+      expect(result.removals, equals(const ['Careful Study of the Combo']));
+      expect(result.additions, equals(const ['Rite of the Combo Turn']));
+      expect(result.droppedReasons, isEmpty);
+    });
   });
 }
 

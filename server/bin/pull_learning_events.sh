@@ -1,2 +1,7 @@
 #!/bin/sh
-exec /opt/data/.pull-venv/bin/python3 /opt/data/scripts/pull_learning_events.py
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+exec "$PYTHON_BIN" "$SCRIPT_DIR/pull_learning_events.py" "$@"

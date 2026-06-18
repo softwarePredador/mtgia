@@ -1,3 +1,7 @@
 #!/bin/sh
-# Auto-sync wrapper: sempre aplica no PG (cron mode)
-exec python3 /opt/data/scripts/auto_sync_learned_decks.py --apply
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+exec "$PYTHON_BIN" "$SCRIPT_DIR/auto_sync_learned_decks.py" --apply "$@"

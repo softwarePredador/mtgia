@@ -1,3 +1,8 @@
+bool isCommanderStyleFormat(String format) {
+  final normalizedFormat = format.toLowerCase();
+  return normalizedFormat == 'commander' || normalizedFormat == 'brawl';
+}
+
 bool isCommanderEligibleCard({
   required String typeLine,
   String? oracleText,

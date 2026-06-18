@@ -36,6 +36,9 @@ void main() async {
       'cards': [
         'id',
         'scryfall_id',
+        'oracle_id',
+        'layout',
+        'card_faces_json',
         'name',
         'mana_cost',
         'type_line',
@@ -149,6 +152,19 @@ void main() async {
         'recommendations',
         'auto_detected',
         'addressed',
+        'created_at'
+      ],
+      'ml_prompt_feedback': [
+        'id',
+        'deck_id',
+        'user_id',
+        'archetype',
+        'commander_name',
+        'cards_accepted',
+        'cards_rejected',
+        'effectiveness_score',
+        'user_comment',
+        'prompt_version',
         'created_at'
       ],
       'ai_optimize_fallback_telemetry': [

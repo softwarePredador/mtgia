@@ -1,0 +1,54 @@
+FROM nousresearch/hermes-agent:latest
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DART_VERSION=3.12.0
+ENV PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:/opt/tools/dart-sdk/bin:/root/.pub-cache/bin:${PATH}"
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    clang \
+    cmake \
+    curl \
+    git \
+    jq \
+    libgtk-3-dev \
+    ninja-build \
+    nodejs \
+    npm \
+    pkg-config \
+    python3 \
+    python3-pip \
+    unzip \
+    xz-utils \
+    zip \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/tools \
+  && curl -fsSL "https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip" \
+    -o /tmp/dartsdk.zip \
+  && unzip -q /tmp/dartsdk.zip -d /opt/tools \
+  && rm -f /tmp/dartsdk.zip \
+  && /opt/tools/dart-sdk/bin/dart pub global activate dart_frog_cli 1.2.14
+
+COPY server/bin/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_entrypoint.sh
+COPY server/bin/hermes_lab_cron_bootstrap.py /opt/bootstrap/hermes_lab_cron_bootstrap.py
+COPY server/bin/hermes_docs_branch_sync.sh /opt/bootstrap/hermes_docs_branch_sync.sh
+COPY server/bin/hermes_lab_healthcheck.sh /opt/bootstrap/hermes_lab_healthcheck.sh
+COPY server/bin/hermes_lab_runtime_probe.py /opt/bootstrap/hermes_lab_runtime_probe.py
+RUN chmod +x \
+  /opt/bootstrap/hermes_lab_entrypoint.sh \
+  /opt/bootstrap/hermes_lab_cron_bootstrap.py \
+  /opt/bootstrap/hermes_docs_branch_sync.sh \
+  /opt/bootstrap/hermes_lab_healthcheck.sh \
+  /opt/bootstrap/hermes_lab_runtime_probe.py
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD ["/opt/bootstrap/hermes_lab_healthcheck.sh"]
+
+VOLUME ["/opt/data"]
+
+CMD ["/bin/bash", "/opt/bootstrap/hermes_lab_entrypoint.sh"]

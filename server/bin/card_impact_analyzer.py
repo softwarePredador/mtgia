@@ -10,16 +10,16 @@ import argparse, importlib.util, json, os, sqlite3, sys, random
 from collections import defaultdict
 from pathlib import Path
 
-SCRIPT_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
+from repo_runtime_paths import (
+    resolve_battle_script_path,
+    resolve_battle_scripts_dir,
+    resolve_forensic_replays_dir,
 )
-sys.path.insert(0, SCRIPT_DIR)
 
-BATTLE_PATH = os.environ.get(
-    "MANALOOM_BATTLE_SCRIPT",
-    os.path.join(SCRIPT_DIR, "battle_analyst_v9.py"),
-)
+BATTLE_SCRIPTS_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_SCRIPTS_DIR))
+
+BATTLE_PATH = resolve_battle_script_path()
 
 spec = importlib.util.spec_from_file_location("card_impact_battle", BATTLE_PATH)
 ba = importlib.util.module_from_spec(spec)
@@ -174,7 +174,7 @@ def run_impact_analysis(db_path: str, deck_id: int, games_per_opp: int, seed: in
 
     # ── Card impact from forensic replays ──
     print(f"\n--- Card Impact from Forensic Replays ---")
-    replays_dir = "/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/forensic_replays"
+    replays_dir = str(resolve_forensic_replays_dir())
 
     if os.path.isdir(replays_dir):
         replay_card_stats = _compute_from_replays(replays_dir, deck_name=commander)
@@ -197,7 +197,7 @@ def run_impact_analysis(db_path: str, deck_id: int, games_per_opp: int, seed: in
     return total_games, total_wins
 
 
-def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold"):
+def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold", min_seen: int = 3):
     """Parse forensic replay JSONL files for card impact data."""
     jsonl_files = sorted(
         [f for f in os.listdir(replays_dir) if f.endswith(".jsonl")],
@@ -254,6 +254,8 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold"):
 
     # Compute stats
     stats = defaultdict(lambda: {"seen": 0, "cast": 0, "won_when_seen": 0, "won_when_cast": 0})
+    total_games = len(games)
+    total_wins = sum(1 for data in games.values() if data["won"])
 
     for game_id, data in games.items():
         won = data["won"]
@@ -269,10 +271,24 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold"):
     # Filter and compute rates
     result = {}
     for card, s in stats.items():
-        if s["seen"] < 3:
+        if s["seen"] < min_seen:
             continue
+        not_seen = max(0, total_games - s["seen"])
+        won_when_not_seen = max(0, total_wins - s["won_when_seen"])
         s["wdwr"] = round(s["won_when_seen"] / s["seen"] * 100, 1) if s["seen"] > 0 else 0
         s["wpwr"] = round(s["won_when_cast"] / s["cast"] * 100, 1) if s["cast"] > 0 else 0
+        s["wns_wr"] = round(won_when_not_seen / not_seen * 100, 1) if not_seen > 0 else None
+        s["delta_vs_not_seen"] = (
+            round(s["wdwr"] - s["wns_wr"], 1)
+            if isinstance(s["wns_wr"], (int, float))
+            else None
+        )
+        s["not_seen"] = not_seen
+        s["won_when_not_seen"] = won_when_not_seen
+        s["sample_size"] = s["seen"]
+        s["sample_quality"] = "low_sample" if s["seen"] < max(10, min_seen) else "usable"
+        s["total_games"] = total_games
+        s["baseline_wr"] = round(total_wins / total_games * 100, 1) if total_games else 0
         result[card] = s
 
     return result
@@ -281,9 +297,10 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold"):
 def main():
     parser = argparse.ArgumentParser(description="Card Impact Analyzer from forensic replays")
     parser.add_argument("--replay-dir",
-        default="/opt/data/workspace/mtgia/docs/hermes-analysis/master_optimizer_reports/forensic_replays")
+        default=str(resolve_forensic_replays_dir()))
     parser.add_argument("--deck-name", default="Lorehold")
     parser.add_argument("--min-games", type=int, default=3)
+    parser.add_argument("--json-output")
 
     args = parser.parse_args()
 
@@ -294,7 +311,7 @@ def main():
     print(f"=== Card Impact Analysis from Forensic Replays ===")
     print()
 
-    stats = _compute_from_replays(args.replay_dir, args.deck_name)
+    stats = _compute_from_replays(args.replay_dir, args.deck_name, min_seen=args.min_games)
 
     if not stats:
         print("No card data found. Run forensic audit first to generate replays.")
@@ -314,14 +331,22 @@ def main():
         delta = s["wdwr"] - baseline
         print(f"  {card[:35]:35s} WDWR={s['wdwr']:5.1f}% "
               f"seen={s['seen']:3d} cast={s['cast']:3d} "
-              f"delta={delta:+.1f}pp")
+              f"delta={delta:+.1f}pp "
+              f"vs_not_seen={s.get('delta_vs_not_seen')}")
 
     print(f"\nBottom 15 — Lowest WDWR:")
     for card, s in sorted_cards[-15:]:
         delta = s["wdwr"] - baseline
         print(f"  {card[:35]:35s} WDWR={s['wdwr']:5.1f}% "
               f"seen={s['seen']:3d} cast={s['cast']:3d} "
-              f"delta={delta:+.1f}pp")
+              f"delta={delta:+.1f}pp "
+              f"vs_not_seen={s.get('delta_vs_not_seen')}")
+
+    if args.json_output:
+        output = Path(args.json_output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(stats, indent=2, sort_keys=True), encoding="utf-8")
+        print(f"\nJSON written: {output}")
 
     return 0
 

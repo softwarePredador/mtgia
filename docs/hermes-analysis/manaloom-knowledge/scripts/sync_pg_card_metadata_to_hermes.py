@@ -28,6 +28,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from known_cards_fallback_snapshot import load_layered_known_cards
+
 try:
     from db_helper import connect, sanitized_database_target
 except Exception as exc:  # pragma: no cover - exercised in lean containers.
@@ -125,6 +127,26 @@ def ensure_cache_table(cur: sqlite3.Cursor) -> None:
     )
 
 
+def column_names(cur: sqlite3.Cursor, table: str) -> set[str]:
+    try:
+        return {str(row[1]) for row in cur.execute(f"PRAGMA table_info({table})")}
+    except sqlite3.Error:
+        return set()
+
+
+def ensure_deck_cards_metadata_columns(cur: sqlite3.Cursor) -> None:
+    if not table_exists(cur, "deck_cards"):
+        return
+    columns = column_names(cur, "deck_cards")
+    for name, ddl in (
+        ("cmc", "REAL"),
+        ("type_line", "TEXT"),
+        ("oracle_text", "TEXT"),
+    ):
+        if name not in columns:
+            cur.execute(f"ALTER TABLE deck_cards ADD COLUMN {name} {ddl}")
+
+
 def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
     names: set[str] = set()
 
@@ -182,14 +204,8 @@ def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
             if removed:
                 names.add(str(removed))
 
-    known_cards_path = Path(__file__).resolve().parent / "known_cards_generated.json"
-    if known_cards_path.exists():
-        try:
-            decoded = json.loads(known_cards_path.read_text(encoding="utf-8"))
-        except Exception:
-            decoded = {}
-        if isinstance(decoded, dict):
-            names.update(str(name) for name in decoded.keys() if name)
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
+    names.update(str(name) for name in known_cards.keys() if name)
 
     return {name.strip() for name in names if name and name.strip()}
 
@@ -200,6 +216,118 @@ def table_exists(cur: sqlite3.Cursor, table: str) -> bool:
         (table,),
     ).fetchone()
     return row is not None
+
+
+def backfill_deck_cards_from_cache(
+    cur: sqlite3.Cursor,
+    *,
+    dry_run: bool,
+) -> dict[str, Any]:
+    """Copy authoritative PG metadata from card_oracle_cache into deck_cards.
+
+    `deck_cards` is the table used by Hermes optimizers/battle simulations.
+    It can be older than `card_oracle_cache`, so this step makes CMC/type/oracle
+    consistency explicit and measurable.
+    """
+
+    if not table_exists(cur, "deck_cards"):
+        return {
+            "deck_cards_table_present": False,
+            "rows_total": 0,
+            "matched_cache_rows": 0,
+            "cmc_rows_to_update": 0,
+            "cmc_rows_updated": 0,
+            "suspicious_nonland_zero_cmc_after": 0,
+        }
+
+    ensure_deck_cards_metadata_columns(cur)
+    total = cur.execute(
+        "SELECT COUNT(*) FROM deck_cards WHERE COALESCE(card_name,'')!=''"
+    ).fetchone()[0]
+    matched = cur.execute(
+        """
+        SELECT COUNT(*)
+        FROM deck_cards dc
+        JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(trim(dc.card_name))
+        WHERE COALESCE(dc.card_name,'')!=''
+        """
+    ).fetchone()[0]
+    cmc_to_update = cur.execute(
+        """
+        SELECT COUNT(*)
+        FROM deck_cards dc
+        JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(trim(dc.card_name))
+        WHERE coc.cmc IS NOT NULL
+          AND (
+            dc.cmc IS NULL
+            OR abs(CAST(dc.cmc AS REAL) - CAST(coc.cmc AS REAL)) > 0.001
+          )
+        """
+    ).fetchone()[0]
+
+    if not dry_run:
+        cur.execute(
+            """
+            UPDATE deck_cards
+            SET
+              cmc = COALESCE(
+                (
+                  SELECT coc.cmc
+                  FROM card_oracle_cache coc
+                  WHERE coc.normalized_name = lower(trim(deck_cards.card_name))
+                    AND coc.cmc IS NOT NULL
+                  LIMIT 1
+                ),
+                cmc
+              ),
+              type_line = COALESCE(
+                (
+                  SELECT NULLIF(coc.type_line, '')
+                  FROM card_oracle_cache coc
+                  WHERE coc.normalized_name = lower(trim(deck_cards.card_name))
+                  LIMIT 1
+                ),
+                type_line
+              ),
+              oracle_text = COALESCE(
+                (
+                  SELECT NULLIF(coc.oracle_text, '')
+                  FROM card_oracle_cache coc
+                  WHERE coc.normalized_name = lower(trim(deck_cards.card_name))
+                  LIMIT 1
+                ),
+                oracle_text
+              )
+            WHERE EXISTS (
+              SELECT 1
+              FROM card_oracle_cache coc
+              WHERE coc.normalized_name = lower(trim(deck_cards.card_name))
+            )
+            """
+        )
+
+    suspicious_after = cur.execute(
+        """
+        SELECT COUNT(*)
+        FROM deck_cards dc
+        LEFT JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(trim(dc.card_name))
+        WHERE COALESCE(lower(COALESCE(coc.type_line, dc.type_line, '')), '') NOT LIKE '%land%'
+          AND COALESCE(CAST(COALESCE(coc.cmc, dc.cmc, 0) AS REAL), 0) = 0
+          AND COALESCE(coc.mana_cost, '') NOT IN ('', '{0}')
+        """
+    ).fetchone()[0]
+
+    return {
+        "deck_cards_table_present": True,
+        "rows_total": int(total or 0),
+        "matched_cache_rows": int(matched or 0),
+        "cmc_rows_to_update": int(cmc_to_update or 0),
+        "cmc_rows_updated": 0 if dry_run else int(cmc_to_update or 0),
+        "suspicious_nonland_zero_cmc_after": int(suspicious_after or 0),
+    }
 
 
 def load_pg_columns() -> set[str]:
@@ -400,6 +528,7 @@ def build_report(
     rows: list[tuple[Any, ...]],
     pg_columns: set[str],
     dry_run: bool,
+    deck_cards_backfill: dict[str, Any],
 ) -> dict[str, Any]:
     resolved_aliases = {row[0] for row in rows}
     unresolved = sorted(
@@ -439,14 +568,14 @@ def build_report(
             "toughness": sum(1 for card in pg_cards if card.get("toughness")),
             "keywords": sum(1 for card in pg_cards if extract_keywords(card)),
         },
+        "deck_cards_backfill": deck_cards_backfill,
     }
 
 
 def main() -> None:
     args = parse_args()
     sqlite_db = Path(args.sqlite_db)
-    if not sqlite_db.exists():
-        raise SystemExit(f"SQLite DB not found: {sqlite_db}")
+    sqlite_db.parent.mkdir(parents=True, exist_ok=True)
 
     sqlite_conn = sqlite3.connect(sqlite_db)
     sqlite_cur = sqlite_conn.cursor()
@@ -462,8 +591,16 @@ def main() -> None:
 
     if not args.dry_run:
         write_cache(sqlite_cur, rows)
+        deck_cards_backfill = backfill_deck_cards_from_cache(
+            sqlite_cur,
+            dry_run=False,
+        )
         sqlite_conn.commit()
     else:
+        deck_cards_backfill = backfill_deck_cards_from_cache(
+            sqlite_cur,
+            dry_run=True,
+        )
         sqlite_conn.rollback()
 
     report = build_report(
@@ -472,6 +609,7 @@ def main() -> None:
         rows=rows,
         pg_columns=pg_columns,
         dry_run=args.dry_run,
+        deck_cards_backfill=deck_cards_backfill,
     )
 
     if args.report:
@@ -484,6 +622,15 @@ def main() -> None:
     print(f"requested unique names: {report['requested_unique_names']}")
     print(f"postgres cards matched: {report['postgres_cards_matched']}")
     print(f"sqlite cache alias rows: {report['sqlite_cache_alias_rows']}")
+    print(
+        "deck_cards backfill: "
+        f"present={deck_cards_backfill['deck_cards_table_present']} "
+        f"matched={deck_cards_backfill['matched_cache_rows']}/"
+        f"{deck_cards_backfill['rows_total']} "
+        f"cmc_updates={deck_cards_backfill['cmc_rows_updated']} "
+        "suspicious_nonland_zero_cmc_after="
+        f"{deck_cards_backfill['suspicious_nonland_zero_cmc_after']}"
+    )
     print(f"unresolved: {report['unresolved_count']}")
     print(f"dry_run: {report['dry_run']}")
 

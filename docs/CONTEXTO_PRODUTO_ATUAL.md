@@ -234,9 +234,9 @@ Progresso atual documentado da Sprint 1:
 - `life_counter_screen_test.dart` passou a cobrir também esse gesto no bloco da vida, garantindo que os atalhos do jogador apareçam e que `Morto` zere a vida imediatamente
 - o `D20` individual do `PlayerPanel` agora deixa um rastro visual útil de mesa: cada jogador mantém no próprio card um badge com o último resultado (`D20 N`), em vez de depender apenas do texto do evento global
 - `life_counter_screen_test.dart` também passou a validar esse badge no card do jogador após o uso do atalho local
-- a comparação inicial com o app benchmark analisado em `dddddd/` foi consolidada em `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md`, mas essa leitura foi superada na mesma data
+- a comparação inicial com o app benchmark local foi consolidada em `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md`, mas essa leitura foi superada na mesma data
 - a direcao ativa do `life counter` agora esta formalizada em `docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md`: o objetivo deixou de ser "superar sem copiar" e passou a ser `clonar o benchmark o mais fielmente possivel e so depois customizar`
-- a pasta `dddddd/` passou a ser tratada como benchmark ampliado, com `10` capturas usadas como fonte de verdade para layout, hierarquia, hub central, rail inferior, overlays e estados especiais
+- o dump bruto antigo do benchmark (`dddddd/`) deixou de ser fonte operacional versionada em 2026-06-17; a direção ativa deve usar a documentação da sprint, os goldens/provas atuais e as validações runtime do `life counter`
 - a mesma sprint do clone passou a incorporar tambem motion/feedback de evento; foi decidido explicitamente nao abrir uma sprint separada de animacao para o `life counter`
 - veredito operacional atual da frente: a nossa logica de jogo ja e suficiente para sustentar o clone; o gargalo agora e de shell visual/interacional da mesa, nao de regra de negocio
 - a `Wave 1` do clone do `life counter` ja foi iniciada: a mesa perdeu o gradiente/backdrop autoral, adotou base `black-first`, quadrantes mais `full-bleed`, paleta do benchmark e um primeiro corte de hub central mais proximo da referencia

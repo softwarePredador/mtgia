@@ -1,0 +1,1154 @@
+{
+  "Ashnod's Altar": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "passive",
+      "activated_mana_ability": true,
+      "activation_cost": "sacrifice_creature",
+      "mana_produced": 2,
+      "produces": "C",
+      "battle_model_scope": "activated_creature_sacrifice_mana_source_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "activated_mana_ability",
+      "subtype": "sacrifice_outlet"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: Sacrifice a creature: Add {C}{C}. Runtime intentionally models this as a passive artifact with reviewed activated-mana metadata, not as free ramp on spell resolution. Full activation needs a dedicated sacrifice-creature mana executor."
+  },
+  "Basking Broodscale": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 2,
+      "battle_model_scope": "creature_counter_token_engine_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "counter_token_engine"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Basking Broodscale is a 2/2 creature with Adapt 1 and a trigger that creates an Eldrazi Spawn token whenever one or more +1/+1 counters are put on it. Runtime must model it as a creature permanent first and never create tokens immediately on spell resolution. Adapt and the counter-to-token trigger remain tracked gaps."
+  },
+  "Akroma's Will": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "pump_all",
+      "instant": true,
+      "keywords": [
+        "flying",
+        "double_strike",
+        "lifelink",
+        "indestructible"
+      ],
+      "battle_model_scope": "combat_keyword_grant_until_eot_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "pump_all",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: one mode grants flying, vigilance, and double strike; the other grants lifelink, indestructible, and protection from all colors; if you control a commander, you choose both. Runtime models the core combat keyword package relevant to current battle tests without inventing a power boost."
+  },
+  "Angel's Grace": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "cannot_lose_turn",
+      "instant": true,
+      "life_floor_on_damage": 1
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "cannot_lose_turn",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 1.0,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-16 against official Gatherer/Scryfall: player cannot lose this turn and damage cannot reduce life below 1."
+  },
+  "Approach of the Second Sun": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "approach",
+      "battle_model_scope": "approach_second_cast_win_v1"
+    },
+    "deck_role_json": {
+      "category": "wincon",
+      "effect": "approach",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.99,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: on first resolution it gains 7 life and is put seventh from the top if cast from hand; on the second resolving cast by the same player, that player wins the game. Runtime models the explicit second-cast win state instead of collapsing the card into a generic finisher bucket."
+  },
+  "Ancient Den": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "W",
+      "mana_produced": 1,
+      "battle_model_scope": "artifact_land_colored_source_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "artifact_land"
+    },
+    "source": "curated",
+    "confidence": 0.99,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Ancient Den is an artifact land that taps for white. Runtime keeps it as a land mana source, not as a spell heuristic."
+  },
+  "Ancient Tomb": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "C",
+      "mana_produced": 1,
+      "ancient_tomb_bonus_mana": 1,
+      "ancient_tomb_bonus_life_cost": 2,
+      "utility_land_profile": "ancient_tomb_contextual_fast_mana_v1",
+      "battle_model_scope": "ancient_tomb_bonus_mana_on_tap_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "fast_mana_land"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Ancient Tomb taps for {C} and deals 2 damage to you while effectively producing an extra colorless mana over a normal land under the current pooled-mana abstraction. Runtime uses the explicit life-cost and bonus-mana fields instead of collapsing it into a generic land."
+  },
+  "Chromatic Star": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "cantrip_mana_filter_artifact",
+      "activation_cost_generic": 1,
+      "activation_add_colors": [
+        "white",
+        "blue",
+        "black",
+        "red",
+        "green"
+      ],
+      "draw_on_self_sacrifice": 1,
+      "battle_model_scope": "sacrifice_mana_filter_cantrip_v2"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "cantrip_mana_filter_artifact",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.81,
+    "review_status": "active",
+    "notes": "Reviewed generic battle model. Official card is a mana-filtering artifact that cantrips when put into a graveyard from the battlefield. Runtime now models it as a sacrifice-to-filter-and-draw utility artifact, but still does not implement full mana-ability timing or every combo edge case."
+  },
+  "Dismember": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "remove_creature",
+      "target": "creature",
+      "instant": true,
+      "mana_cost": "{1}{B/P}{B/P}",
+      "power_boost": -5,
+      "toughness_boost": -5,
+      "uses_stat_modifier_removal": true,
+      "battle_model_scope": "stat_modifier_removal_until_eot_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_creature",
+      "target": "creature",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall API: cost is {1}{B/P}{B/P}; target creature gets -5/-5 until end of turn. Runtime models this as a stat modifier, not destroy/exile."
+  },
+  "Crop Rotation": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "land_ramp",
+      "instant": true,
+      "land_count": 1,
+      "land_enters_tapped": false,
+      "requires_sacrifice_land": true,
+      "battle_model_scope": "sacrifice_land_for_high_value_land_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "land_ramp",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost sacrifice a land, then search for any land card and put it onto the battlefield. Runtime uses the explicit sacrifice-land gate and contextual land-target scoring instead of treating this as permanent ramp."
+  },
+  "Entomb": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "tutor",
+      "instant": true,
+      "target": "graveyard",
+      "count": 1,
+      "battle_model_scope": "graveyard_tutor_single_card_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "tutor",
+      "target": "graveyard",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for a card and put that card into your graveyard. Runtime must not degrade this into draw."
+  },
+  "Fellwar Stone": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "conditionally_produces_opponent_land_colors": true,
+      "battle_model_scope": "conditional_opponent_color_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "conditional_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Fellwar Stone taps for one mana of any color that a land an opponent controls could produce. Runtime intentionally models the safe baseline as a live one-mana rock with conditional color flexibility, while exact opponent color derivation remains a tracked refinement."
+  },
+  "Rampant Growth": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "land_ramp",
+      "land_count": 1,
+      "basic_only": true,
+      "land_enters_tapped": true,
+      "battle_model_scope": "basic_land_ramp_tapped_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "land_ramp",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for a basic land card, put that card onto the battlefield tapped, then shuffle. Runtime must resolve this as one-shot land ramp and send the spell to graveyard."
+  },
+  "Reanimate": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "recursion",
+      "count": 1,
+      "target": "creature",
+      "destination": "battlefield",
+      "battle_model_scope": "single_creature_graveyard_to_battlefield_v1"
+    },
+    "deck_role_json": {
+      "category": "recursion",
+      "effect": "recursion",
+      "target": "creature"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: put target creature card from a graveyard onto the battlefield under your control, then lose life equal to its mana value. Runtime promotes the core recursion-to-battlefield behavior first; precise life-loss parity remains tracked separately."
+  },
+  "Formidable Speaker": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 4,
+      "battle_model_scope": "etb_discard_then_creature_tutor_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against current card text: this is a creature permanent with an enters/discard/search line, not an immediate free tutor on resolution. Runtime keeps it as a creature until the ETB discard-tutor branch is modeled explicitly."
+  },
+  "Gemstone Caverns": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "WUBRGC",
+      "mana_produced": 1,
+      "battle_model_scope": "pregame_fixing_land_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "conditional_fixing_land"
+    },
+    "source": "curated",
+    "confidence": 0.84,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Gemstone Caverns has a pregame luck-counter branch that changes its output. Runtime keeps the current broad fixing abstraction for battle consistency until dedicated pregame modeling exists."
+  },
+  "Great Furnace": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "R",
+      "mana_produced": 1,
+      "battle_model_scope": "artifact_land_colored_source_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "artifact_land"
+    },
+    "source": "curated",
+    "confidence": 0.99,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Great Furnace is an artifact land that taps for red. Runtime keeps it as a land mana source, not as a spell heuristic."
+  },
+  "Hall of Heliod's Generosity": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "C",
+      "mana_produced": 1,
+      "utility_land_profile": "hall_of_heliods_generosity_v1",
+      "battle_model_scope": "colorless_utility_recursion_land_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "utility_land"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is primarily a colorless utility land with enchantment-recursion activation. Runtime keeps the recursion profile as reviewed metadata while preserving the baseline colorless land behavior."
+  },
+  "Incubation Druid": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_mana_source": true,
+      "mana_produced": 1,
+      "produces": "WUBRG",
+      "power": 0,
+      "toughness": 2,
+      "battle_model_scope": "mana_dork_without_adapt_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "creature",
+      "subtype": "mana_dork"
+    },
+    "source": "curated",
+    "confidence": 0.84,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: {T}: Add one mana of any type that a land you control could produce; with a +1/+1 counter it adds three instead; {3}{G}{G}: Adapt 3. Runtime models only the baseline mana-dork mode with summoning sickness. Adapt and triple-mana replacement remain tracked gaps."
+  },
+  "Library of Leng": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "passive",
+      "no_max_hand_size": true,
+      "discard_effect_to_top_replacement": true,
+      "battle_model_scope": "discard_replacement_to_top_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "discard_effect_to_top_replacement"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer-Scryfall text: you have no maximum hand size, and if an effect causes you to discard a card you may discard it to the top of your library instead of to your graveyard. This is especially relevant for Lorehold miracle turns and rummage lines; it is not a mana rock."
+  },
+  "Lorehold, the Historian": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "passive",
+      "is_commander": true,
+      "haste": true,
+      "grants_miracle_cost": 2,
+      "opponent_upkeep_rummage": true,
+      "battle_model_scope": "lorehold_opponent_upkeep_miracle_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "miracle_engine"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer and commander coverage: instants and sorceries in hand gain miracle {2}; at the beginning of each opponent's upkeep you may discard a card, and if you do draw a card. Runtime currently models the opponent-upkeep rummage and miracle window, not every policy edge."
+  },
+  "Lumra, Bellow of the Woods": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "land_recursion_creature",
+      "power_equals_lands": true,
+      "toughness_equals_lands": true,
+      "mill_count": 4,
+      "vigilance": true,
+      "reach": true,
+      "battle_model_scope": "mill_four_then_return_all_graveyard_lands_tapped_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "land_recursion_creature",
+      "subtype": "land_recursion_payoff"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Lumra is a creature whose power and toughness each equal the number of lands you control and whose ETB mills four, then returns all land cards from your graveyard to the battlefield tapped. Runtime uses the dedicated land-recursion-creature executor instead of degrading this into generic recursion."
+  },
+  "Mox Amber": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "requires_legendary_creature_or_planeswalker_for_mana": true,
+      "battle_model_scope": "legend_gated_fast_mana_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "legend_gated_fast_mana"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mox Amber taps for one mana of any color among legendary creatures and planeswalkers you control. Runtime must not count it as live opening-hand ramp or active mana without a valid legendary permanent on the battlefield."
+  },
+  "Mind Stone": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "C",
+      "activated_self_sacrifice_draw": true,
+      "activation_cost_generic": 1,
+      "activation_requires_tap": true,
+      "battle_model_scope": "mana_rock_self_sacrifice_draw_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "utility_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mind Stone is a colorless mana rock that can later be tapped, sacrificed, and turned into a card. Runtime must not collapse it into immediate draw on spell resolution; it enters as a mana permanent and can be cashed in later when hand quality is low."
+  },
+  "Mana Vault": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 3,
+      "produces": "C",
+      "does_not_untap_normally": true,
+      "upkeep_optional_untap_cost_generic": 4,
+      "tapped_upkeep_damage": 1,
+      "battle_model_scope": "fast_mana_artifact_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "fast_mana"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Mana Vault taps for three colorless mana, does not untap normally, can be untapped in upkeep for {4}, and pings while tapped. Runtime already models the fast-mana baseline; the untap/upkeep pain policy remains partial and therefore stays active instead of verified."
+  },
+  "Natural Order": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "tutor",
+      "target": "green_creature_to_battlefield",
+      "requires_sacrifice_green_creature": true,
+      "sorcery": true,
+      "battle_model_scope": "green_creature_pod_tutor_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "tutor",
+      "target": "green_creature_to_battlefield",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield."
+  },
+  "Path to Exile": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "remove_creature",
+      "instant": true,
+      "target": "creature",
+      "exile_target": true,
+      "target_controller_basic_land_tapped": true,
+      "battle_model_scope": "one_for_one_exile_removal_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_creature",
+      "target": "creature",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Path to Exile exiles target creature and may ramp that creature's controller with a tapped basic land. Runtime keeps the strict instant exile-removal semantic and records the compensation rider for future parity work; the opponent land-search compensation is still modeled conservatively."
+  },
+  "Splendid Reclamation": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "land_recursion",
+      "battle_model_scope": "graveyard_lands_to_battlefield_tapped_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "land_recursion"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: return all land cards from your graveyard to the battlefield tapped. Runtime must model this as land recursion, not generic recursion of arbitrary permanents."
+  },
+  "Zuran Orb": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "life_artifact",
+      "sacrifice_land_gain_life": 2,
+      "battle_model_scope": "sacrifice_land_gain_life_artifact_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "life_artifact",
+      "subtype": "sacrifice_outlet"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Sacrifice a land: You gain 2 life. Runtime must not collapse it into a mana rock; it is a battlefield life artifact with a land-sacrifice activation."
+  },
+  "Scroll Rack": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "topdeck_manipulation",
+      "activation_cost_generic": 1,
+      "hand_to_top_exchange": true,
+      "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "topdeck_manipulation"
+    },
+    "source": "curated",
+    "confidence": 0.8,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17: {1}, {T}, Exile any number of cards from your hand face down, put that many cards from the top of your library into your hand, then put the exiled cards on top in any order. Runtime now supports a low-risk Lorehold-only upkeep slice that exchanges a single high-priority instant/sorcery from hand onto the top for the next first-draw miracle window; full arbitrary exchange sequencing remains pending."
+  },
+  "Skullclamp": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "passive",
+      "equipment_power_boost": 1,
+      "equipment_toughness_boost": -1,
+      "draw_on_equipped_death": 2,
+      "battle_model_scope": "equipment_stat_mod_draw_on_death_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "passive",
+      "subtype": "equipment"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Skullclamp is an Equipment that gives equipped creature +1/-1 and draws two cards when that creature dies. Runtime keeps it as a conservative passive battlefield object until equip/death-card-draw sequencing is modeled explicitly; it must not draw on spell resolution."
+  },
+  "Sensei's Divining Top": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "topdeck_manipulation",
+      "activation_cost_generic": 1,
+      "peek_top_count": 3,
+      "reorder_top": true,
+      "activated_draw_put_self_on_top": true,
+      "battle_model_scope": "senseis_top_reorder_draw_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "topdeck_manipulation"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17: {1}: Look at the top three cards of your library, then put them back in any order. {T}: Draw a card, then put Sensei's Divining Top on top of its owner's library. Runtime now supports the low-risk reorder use for first-draw planning and the immediate draw-put-self miracle line when the current top card is already the best castable first draw; broader generic policy remains pending."
+  },
+  "Soul-Guide Lantern": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "hate_artifact",
+      "etb_exile_single_graveyard_card": true,
+      "activated_self_sacrifice_draw": true,
+      "battle_model_scope": "graveyard_hate_cantrip_artifact_v1"
+    },
+    "deck_role_json": {
+      "category": "interaction",
+      "effect": "hate_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a graveyard-hate artifact with a later self-sacrifice draw mode. Runtime must not degrade it into a generic draw spell because the draw is conditional and delayed."
+  },
+  "Staff of Compleation": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "utility_artifact_profile": "staff_of_compleation_v1",
+      "battle_model_scope": "multi_mode_life_payment_utility_artifact_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "utility_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Staff of Compleation is a utility artifact whose baseline safe role is mana acceleration plus optional paid abilities. Runtime must not collapse activated destroy/draw text into free immediate spell effects."
+  },
+  "Talisman of Conviction": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "CRW",
+      "life_for_colored_mana": 1,
+      "battle_model_scope": "pain_talisman_color_pair_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "pain_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Talisman of Conviction can tap for colorless freely or for red/white while dealing 1 damage to its controller. Runtime safely models the card as a one-mana rock with tracked pain-color metadata; exact per-tap color-choice and pain sequencing remain partial."
+  },
+  "Unexpected Windfall": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "treasure_maker",
+      "instant": true,
+      "requires_discard_card": true,
+      "draw_count": 2,
+      "treasure_count": 2,
+      "battle_model_scope": "discard_draw_create_treasures_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "treasure_maker",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost discard a card, then draw two cards and create two Treasure tokens. Runtime already supports the discard/draw/treasure executor; this reviewed rule prevents the card from degrading into a generic ramp bucket."
+  },
+  "Vexing Bauble": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "hate_artifact",
+      "counters_free_spells": true,
+      "activated_draw_on_self_sacrifice": true,
+      "activation_cost_generic": 1,
+      "battle_model_scope": "free_spell_hate_artifact_v1"
+    },
+    "deck_role_json": {
+      "category": "interaction",
+      "effect": "hate_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this artifact counters spells cast with no mana spent and can sacrifice itself later to draw a card. Runtime should treat it as a battlefield hate piece, not as an immediate draw spell."
+  },
+  "Miscast": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "counter",
+      "instant": true,
+      "target": "instant_or_sorcery",
+      "battle_model_scope": "soft_noncreature_counter_v1"
+    },
+    "deck_role_json": {
+      "category": "interaction",
+      "effect": "counter",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a cheap spell interaction piece aimed at instants or sorceries. Runtime keeps the conservative counter semantic instead of inventing full tax-resolution nuance."
+  },
+  "Mystical Tutor": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "tutor",
+      "instant": true,
+      "target": "instant_or_sorcery",
+      "battle_model_scope": "instant_or_sorcery_tutor_topdeck_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "tutor",
+      "target": "instant_or_sorcery",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for an instant or sorcery card and reveal it, then shuffle and put that card on top. Runtime first promotes the strict target filter and decision trace; exact top-of-library destination parity remains tracked separately."
+  },
+  "Lightning Greaves": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "equipment_haste_shroud",
+      "battle_model_scope": "equipment_auto_attach_haste_shroud_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "equipment_haste_shroud"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this equipment grants haste and shroud. Runtime models the immediate attach-to-best-creature heuristic and must not turn it into indestructible."
+  },
+  "Inventors' Fair": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "C",
+      "mana_produced": 1,
+      "utility_land_profile": "inventors_fair_v1",
+      "battle_model_scope": "artifact_threshold_utility_land_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "utility_land"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a colorless utility land with artifact-threshold life gain and an artifact tutor activation. Runtime preserves the reviewed utility profile while treating it as a normal land for mana."
+  },
+  "Chrome Mox": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "requires_imprint_nonartifact_nonland": true,
+      "battle_model_scope": "imprint_fast_mana_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "fast_mana"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only after imprinting a nonartifact, nonland colored card from hand. Runtime should use the dedicated imprint selector and never treat it as free unconditional mana."
+  },
+  "Mox Diamond": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "requires_discard_land": true,
+      "battle_model_scope": "discard_land_fast_mana_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "fast_mana"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only if you discard a land as an additional cost, then taps for one mana of any color. Runtime should use the explicit discard-land gate and stay conservative about spending your last land without payoff."
+  },
+  "Nature's Claim": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "remove_permanent",
+      "instant": true,
+      "target": "artifact_or_enchantment",
+      "target_controller_gains_life": 4,
+      "battle_model_scope": "artifact_or_enchantment_removal_lifegain_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_permanent",
+      "target": "artifact_or_enchantment",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: destroy target artifact or enchantment; its controller gains 4 life. Runtime must keep the target restriction explicit instead of widening the card to generic nonland permanent removal."
+  },
+  "Everflowing Chalice": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "ramp_permanent",
+      "multikicker_generic_cost": 2,
+      "min_kicker_count_for_mana": 1,
+      "battle_model_scope": "multikicker_charge_mana_artifact_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "multikicker_mana_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Everflowing Chalice enters with a charge counter for each multikicker payment and taps for colorless equal to its counters. Runtime should pay multikicker before treating it as a mana source."
+  },
+  "Birgi, God of Storytelling": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 3,
+      "toughness": 3,
+      "trigger": "spell_cast",
+      "spell_cast_add_mana": 1,
+      "spell_cast_mana_color": "R",
+      "battle_model_scope": "spell_cast_red_mana_trigger_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature"
+    },
+    "source": "curated",
+    "confidence": 0.92,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: whenever you cast a spell, add {R} until end of turn. Runtime keeps the creature body and the spell-cast mana trigger without modeling every backside/modal nuance."
+  },
+  "Electroduplicate": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "copy_creature_token",
+      "token_haste": true,
+      "sacrifice_token_at_end_step": true,
+      "battle_model_scope": "temporary_hasty_copy_token_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "copy_creature_token"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against mechanics coverage: runtime should create a hasty token copy that sacrifices at the next end step, not collapse this into a generic token-maker bucket."
+  },
+  "Runaway Steam-Kin": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 1,
+      "toughness": 1,
+      "battle_model_scope": "creature_counter_engine_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a creature with +1/+1 counter and mana-conversion text, not an immediate ritual. Runtime keeps it as a creature permanent until a dedicated counter-to-mana executor exists."
+  },
+  "Sunbaked Canyon": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "WR",
+      "mana_produced": 1,
+      "utility_land_profile": "sunbaked_canyon_v1",
+      "battle_model_scope": "pain_cycle_sac_draw_land_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "utility_land"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Sunbaked Canyon taps for red or white at the cost of life and can be sacrificed to draw. Runtime preserves the land identity plus reviewed utility profile."
+  },
+  "Urza's Saga": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "C",
+      "mana_produced": 1,
+      "utility_land_profile": "urzas_saga_v1",
+      "battle_model_scope": "saga_land_token_then_tutor_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "saga_land"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Urza's Saga is an enchantment land Saga with mana, Construct-token, and tutor chapters. Runtime keeps the baseline colorless land plus reviewed saga profile; full chapter sequencing remains partially modeled."
+  },
+  "Valakut Awakening": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "hand_filter",
+      "max_bottom": 99,
+      "draw_extra": 1,
+      "instant": true,
+      "battle_model_scope": "bottom_then_draw_plus_one_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "hand_filter",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: put any number of cards from your hand on the bottom, then draw that many plus one. Runtime should use the bottom-then-draw filter helper instead of leaving it unknown."
+  },
+  "Valakut Awakening // Valakut Stoneforge": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "hand_filter",
+      "max_bottom": 99,
+      "draw_extra": 1,
+      "instant": true,
+      "mdfc_land_face": {
+        "effect": "land",
+        "produces": "R",
+        "mana_produced": 1,
+        "enters_tapped": true
+      },
+      "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "hand_filter",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: front face is the hand-filter instant, back face is Valakut Stoneforge tapped red land. Runtime keeps both faces together so split-name lookups do not degrade into generic draw heuristics."
+  },
+  "Wall of Omens": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "etb_draw_count": 1,
+      "battle_model_scope": "etb_cantrip_creature_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "creature",
+      "subtype": "etb_cantrip_creature"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wall of Omens is a creature that draws a card when it enters the battlefield. Runtime must place it on the battlefield and apply the ETB draw, never degrade it into a generic draw spell."
+  },
+  "Wayfarer's Bauble": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "ramp_permanent",
+      "activated_self_sacrifice_land_tutor": true,
+      "activation_cost_generic": 2,
+      "activation_requires_tap": true,
+      "basic_only": true,
+      "lands_to_battlefield": 1,
+      "land_count": 1,
+      "land_enters_tapped": true,
+      "battle_model_scope": "self_sacrifice_basic_land_tutor_artifact_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "utility_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.92,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wayfarer's Bauble is not immediate land ramp on cast; it is a battlefield artifact that later pays {2}, taps, and sacrifices itself to fetch a basic land tapped. Runtime now preserves the permanent-first sequencing and a safe activation slice."
+  },
+  "War Room": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "C",
+      "mana_produced": 1,
+      "utility_land_profile": "war_room_v1",
+      "battle_model_scope": "colorless_life_paid_draw_land_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "utility_land"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a colorless utility land that pays life to draw. Runtime preserves the draw-land utility profile while keeping the baseline mana source explicit."
+  },
+  "Sami's Curiosity": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "lander_token_maker",
+      "life_gain": 2,
+      "token_count": 1,
+      "battle_model_scope": "gain_life_make_lander_token_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "lander_token_maker"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against current mechanics coverage: runtime should treat this as a gain-life plus Lander-token spell, not as a tutor bucket."
+  },
+  "Scavenging Ooze": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 2,
+      "activated_graveyard_exile": true,
+      "activated_gain_life": 1,
+      "activated_add_counter_to_self": 1,
+      "battle_model_scope": "graveyard_hate_creature_activation_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "interaction",
+      "effect": "creature",
+      "subtype": "graveyard_hate_creature"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Scavenging Ooze is a creature permanent with a repeatable graveyard-exile activation that can grow itself and gain life. Runtime must not resolve it as immediate removal on spell cast; it should enter the battlefield as a creature first. The activated exile/counter/life mode remains tracked until a dedicated graveyard-hate creature executor exists."
+  },
+  "Seething Song": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "ramp_ritual",
+      "instant": true,
+      "mana_produced": 5,
+      "produces": "R",
+      "battle_model_scope": "single_shot_red_ritual_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_ritual",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Seething Song adds five red mana immediately and then goes to the graveyard. Runtime should keep it as a one-shot ritual, not a permanent mana source or generic draw placeholder."
+  },
+  "Silence": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "silence_spell",
+      "instant": true,
+      "battle_model_scope": "silence_until_eot_v1"
+    },
+    "deck_role_json": {
+      "category": "interaction",
+      "effect": "silence_spell",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: opponents cannot cast spells this turn. Runtime should set the until-end-of-turn silence state, not materialize a battlefield permanent."
+  },
+  "Worldfire": {
+    "effect_json": {
+      "cmc": 9.0,
+      "effect": "worldfire_reset",
+      "sorcery": true,
+      "exile_all_permanents": true,
+      "exile_all_hands": true,
+      "exile_all_graveyards": true,
+      "set_life_total": 1,
+      "battle_model_scope": "worldfire_total_reset_v1"
+    },
+    "deck_role_json": {
+      "category": "wincon",
+      "effect": "worldfire_reset",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.99,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: exile all permanents, exile all cards from all hands and graveyards, and set each player's life total to 1. Runtime must treat this as a dedicated reset-finisher, not as a generic board wipe."
+  }
+}

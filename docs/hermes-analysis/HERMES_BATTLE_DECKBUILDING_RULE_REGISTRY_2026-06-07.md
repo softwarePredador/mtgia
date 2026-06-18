@@ -31,15 +31,22 @@ Hermes should separate raw facts from interpreted behavior:
 
 ## Tables: `card_battle_rules` and `battle_card_rules`
 
-`card_battle_rules` is the PostgreSQL source of truth. It stores the reviewed
-card semantics that can eventually be shared by Hermes, backend services and
+`card_battle_rules` is the PostgreSQL target source of truth. It stores the
+reviewed card semantics that should be shared by Hermes, backend services and
 admin/review tooling.
 
 `battle_card_rules` is the SQLite runtime cache. Hermes battle jobs read it for
 speed, determinism and isolation from production latency. Crons must refresh it
 from Postgres before running battles or optimizer scans.
 
-One row per card name.
+Important drift note:
+
+- PostgreSQL can hold multiple logical rules per card while the migration from
+  code overrides to canonical rows is still in progress.
+- SQLite `battle_card_rules` is the normalized runtime cache that Hermes reads
+  during battles.
+- Any remaining handwritten override in `battle_analyst_v9.py` must be treated
+  as temporary technical debt unless it is an engine primitive.
 
 | Column | Meaning |
 | --- | --- |
@@ -57,15 +64,22 @@ One row per card name.
 
 ## Resolution priority
 
-Battle effect lookup now follows this order:
+Battle effect lookup in the current runtime follows this order:
 
-1. `battle_card_rules` row, if present.
-2. Handwritten `KNOWN_CARDS`.
+1. Handwritten `KNOWN_CARDS`.
+2. `battle_card_rules` / registry row, if present.
 3. `known_cards_generated.json`.
 4. Functional tag (`TAG_EFFECTS`).
 5. Imported effect map.
 6. Type fallbacks such as `land` or `creature`.
 7. `unknown`.
+
+Target architecture:
+
+1. `battle_card_rules` / PostgreSQL-reviewed semantics.
+2. Handwritten overrides only for engine primitives and documented temporary
+   hotfixes.
+3. Generated and heuristic fallbacks.
 
 Oracle normalization still runs after lookup to prevent dangerous mistakes like:
 
@@ -189,6 +203,22 @@ Result:
 - seeds `100-104`: zero findings;
 - seeds `200-204`: zero findings;
 - `python docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`: all checks passed.
+
+Operational note added in the 2026-06-16 canonicalization slice:
+
+- `battle_analyst_v9.py` now resolves `MANALOOM_KNOWLEDGE_DB` /
+  `MANALOOM_KNOWLEDGE_DIR` first, then `/opt/data/workspace/...` when present,
+  and finally falls back to the local repo `scripts/knowledge.db`.
+- This removed a false negative where local Mac runs would miss the SQLite rule
+  cache and incorrectly conclude that PG-promoted rules still depended on
+  handcrafted overrides.
+- The runtime lookup order is now waiver manual-first -> SQLite/PG
+  `card_battle_rules` -> handcrafted fallback -> generated fallback. The waiver
+  set is explicit and empty by default.
+- After the final active-runtime cleanup on 2026-06-16, the handcrafted
+  inventory used by the running engine dropped to `0`. Canonized card-specific
+  rules now resolve only through PostgreSQL/SQLite unless an explicit temporary
+  waiver is injected into `HANDCRAFTED_KNOWN_CARDS`.
 
 Do not interpret this as a full MTG rules-engine proof. It proves that the
 current Lorehold forensic replay batches no longer depend on unknown,

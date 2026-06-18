@@ -6,23 +6,72 @@ as fontes canônicas abaixo.
 
 ## Fontes canônicas atuais
 
-1. `server/manual-de-instrucao.md`
+1. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
+   - relatório mestre de lógica atual do produto, app, backend, banco, IA,
+     Hermes, crons, battle engine e validações.
+2. `docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md`
+   - validação final source-backed de tabelas, views internas, fanout,
+     relações app/backend, PostgreSQL real, Hermes/AWS, EasyPanel e fontes
+     externas de Magic.
+3. `docs/hermes-analysis/BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md`
+   - detalhamento específico de battle simulator, geração IA, estratégia de
+     melhoria/otimização de deck, Hermes e Lorehold.
+4. `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md`
+   - plano faseado para implementar agregação multi-função, snapshot Hermes,
+     consumers set-based e validações.
+5. `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md`
+   - evidência do Slice 1 local: sync Hermes por `card_id`, arrays semânticos,
+     hashes, bridge do optimizer e validação anti-fanout/Lorehold.
+6. `docs/hermes-analysis/BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md`
+   - perguntas/dúvidas de produto, logística e política que precisam de validação
+     antes das próximas mudanças estruturais.
+7. `docs/hermes-analysis/BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md`
+   - handoff objetivo de perguntas, furos, decisões logísticas e ideias que o
+     owner deve validar antes das próximas fases de battle/IA/Hermes.
+8. `docs/hermes-analysis/HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md`
+   - classificação dos consumidores Hermes de `functional_tag`, indicando quais
+     já usam `functional_tags_json`, quais são indiretos e quais são manuais ou
+     históricos.
+9. `docs/hermes-analysis/DECK_GENERATION_FOCUS_READINESS_2026-06-16.md`
+   - decisão operacional atual: battle/Hermes não bloqueia foco em geração e
+     optimize; primeiro slice seguro adiciona sinal EDHREC bounded ao pipeline
+     interno de candidate quality.
+10. `docs/hermes-analysis/BATTLE_GENERATOR_LOREHOLD_TRUTH_STUDY_2026-06-16.md`
+   - estudo consolidado do estado real do battle simulator, da geracao de
+     decks e do caso Lorehold; separa o que ja e dado util, o que ainda e
+     heuristica operacional e a ordem correta dos proximos slices.
+11. `docs/hermes-analysis/EASYPANEL_MANALOOM_OPS_CUTOVER_2026-06-17.md`
+   - desenho operacional do cutover AWS Hermes -> EasyPanel para os jobs
+     críticos do produto, com serviço `manaloom-ops`, volume, envs, limites e
+     sequência de migração controlada.
+12. `docs/hermes-analysis/EASYPANEL_CRON_MIGRATION_SLICE1_2026-06-17.md`
+   - slice 1 de portabilidade dos entrypoints críticos (`pull-learning-events`,
+     `auto-sync-learned-decks`, `master-optimizer-preflight`) para runtime
+     server-owned.
+13. `docs/hermes-analysis/NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`
+   - contrato da rotina geral `manaloom_new_card_candidate_review` e de seus
+     consumers `manaloom_card_data_gap_review` /
+     `manaloom_battle_rule_review_queue`: detecção de cartas novas/alteradas,
+     classificação de lacunas de dados, drafts `needs_review` de battle rules,
+     report-only, sem LLM, sem auto-apply e com SQLite apenas como cache
+     operacional.
+14. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
-2. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+15. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
-3. `app/doc/APP_AUDIT_2026-04-29.md`
+16. `app/doc/APP_AUDIT_2026-04-29.md`
    - status consolidado do app mobile, riscos e validacoes recentes.
-4. `app/doc/UI_TEST_SURFACE_MAP.md`
+17. `app/doc/UI_TEST_SURFACE_MAP.md`
    - keys e superficies que testes runtime devem usar.
-5. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+18. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
    - checklist para rodada interna non-scanner.
-6. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+19. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-7. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+20. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
    - veredito global atual de produto, gates restantes e ordem de execucao.
-8. `app/doc/runtime_flow_handoffs/README.md`
+21. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-9. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+22. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 
@@ -37,6 +86,12 @@ as fontes canônicas abaixo.
 - Gate visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_QA_RUBRIC_2026-06-04.md` e
   baseline gerada em `docs/qa/manaloom_premium_visual_audit_latest.md`
 - Prova runtime visual premium: `docs/qa/MANALOOM_PREMIUM_VISUAL_RUNTIME_PROOF_2026-06-04.md`
+- Battle/generator truth (2026-06-17):
+  `docs/hermes-analysis/BATTLE_GENERATOR_TRUTH_STUDY_2026-06-17.md`,
+  `docs/hermes-analysis/BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md`,
+  `docs/hermes-analysis/BATTLE_GENERATOR_IMPLEMENTATION_SLICE_SPEC_2026-06-17.md`
+- Lorehold miracle/topdeck audit (2026-06-17):
+  `docs/hermes-analysis/LOREHOLD_MIRACLE_TOPDECK_READINESS_AUDIT_2026-06-17.md`
 - Icone do app: `docs/qa/manaloom_app_icon_contact_sheet_2026-05-21.png`
 - Splash art: `docs/qa/manaloom_splash_art_preview_2026-05-21.png`
 - Auditoria de docs/artefatos: `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`

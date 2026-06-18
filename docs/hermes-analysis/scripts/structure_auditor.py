@@ -23,6 +23,7 @@ SERVER_ROUTES = BASE / "server" / "routes"
 APP_LIB = BASE / "app" / "lib"
 OUTPUT = BASE / "docs" / "hermes-analysis" / "STRUCTURE_AUDIT.md"
 GENERATED_SECTION_MARKER = "## Historico gerado pelo auditor estrutural anterior"
+PRESERVED_MANUAL_HISTORY_MARKER = "## Historico manual preservado"
 MANUAL_SUFFIX_MARKER = "## Rodada focada:"
 
 # ── Common function names that are expected to appear in multiple files ──
@@ -89,7 +90,11 @@ def merge_generated_report_with_manual_history(generated_report):
         return generated_report
     existing = read_file(OUTPUT)
     if GENERATED_SECTION_MARKER not in existing:
-        return generated_report
+        return (
+            f"{generated_report.strip()}\n\n"
+            f"{PRESERVED_MANUAL_HISTORY_MARKER}\n\n"
+            f"{existing.strip()}\n"
+        )
     prefix = existing.split(GENERATED_SECTION_MARKER, 1)[0].rstrip()
     suffix = ""
     if MANUAL_SUFFIX_MARKER in existing:

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:postgres/postgres.dart';
 
 import 'deck_state_analysis.dart';
+import '../color_identity.dart';
 import '../deck_rules_service.dart';
 import '../deck_schema_support.dart';
 import '../edh_bracket_policy.dart';
@@ -99,8 +100,8 @@ class RebuildResult {
   final List<String> warnings;
   final Map<String, dynamic> sourceSummary;
 
-  int get totalCards =>
-      rebuiltCards.fold<int>(0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
+  int get totalCards => rebuiltCards.fold<int>(
+      0, (sum, card) => sum + ((card['quantity'] as int?) ?? 0));
 
   int get replacedSlots {
     final kept = keptCards.fold<int>(
@@ -156,7 +157,8 @@ class RebuildGuidedService {
       );
     }
 
-    final commanderData = await _edhrecService.fetchCommanderData(commanderName);
+    final commanderData =
+        await _edhrecService.fetchCommanderData(commanderName);
     final averageDeckData =
         await _edhrecService.fetchAverageDeckData(commanderName);
     final cachedProfile =
@@ -189,10 +191,14 @@ class RebuildGuidedService {
       commanderData: commanderData,
       cachedProfile: cachedProfile,
     );
-    final mustKeepLower =
-        mustKeep.map((name) => name.trim().toLowerCase()).where((e) => e.isNotEmpty).toSet();
-    final mustAvoidLower =
-        mustAvoid.map((name) => name.trim().toLowerCase()).where((e) => e.isNotEmpty).toSet();
+    final mustKeepLower = mustKeep
+        .map((name) => name.trim().toLowerCase())
+        .where((e) => e.isNotEmpty)
+        .toSet();
+    final mustAvoidLower = mustAvoid
+        .map((name) => name.trim().toLowerCase())
+        .where((e) => e.isNotEmpty)
+        .toSet();
 
     final currentCardScores = _scoreCurrentDeckCards(
       originalDeck: originalDeck,
@@ -237,6 +243,7 @@ class RebuildGuidedService {
       mustAvoid: mustAvoidLower,
       basicLandCatalog: basicLandCatalog,
     );
+    _assertResolvedCardIds(rebuiltCards);
 
     await _pool.runTx(
       (session) => DeckRulesService(session).validateAndThrow(
@@ -254,7 +261,8 @@ class RebuildGuidedService {
 
     final rebuiltDeckColors = <String>{};
     for (final card in rebuiltCards) {
-      rebuiltDeckColors.addAll((card['colors'] as List?)?.cast<String>() ?? const []);
+      rebuiltDeckColors
+          .addAll((card['colors'] as List?)?.cast<String>() ?? const []);
     }
     final deckAnalysisAfter = DeckArchetypeAnalyzer(
       rebuiltCards,
@@ -383,7 +391,8 @@ class RebuildGuidedService {
     required Map<String, dynamic>? cachedProfile,
   }) {
     final recommendedStructure = cachedProfile?['recommended_structure'] is Map
-        ? (cachedProfile!['recommended_structure'] as Map).cast<String, dynamic>()
+        ? (cachedProfile!['recommended_structure'] as Map)
+            .cast<String, dynamic>()
         : const <String, dynamic>{};
     final categoryTargetsRaw = recommendedStructure['category_targets'] is Map
         ? (recommendedStructure['category_targets'] as Map)
@@ -584,8 +593,10 @@ class RebuildGuidedService {
     if (commanderData != null) {
       for (var i = 0; i < commanderData.topCards.length; i++) {
         final card = commanderData.topCards[i];
-        final weight =
-            170 - i + (card.synergy * 40).round() + (card.inclusion * 20).round();
+        final weight = 170 -
+            i +
+            (card.synergy * 40).round() +
+            (card.inclusion * 20).round();
         addWeight(card.name, weight);
       }
     }
@@ -734,10 +745,9 @@ class RebuildGuidedService {
 
     var selectedScope = normalizedRequested;
     if (selectedScope.isEmpty || selectedScope == 'auto') {
-      selectedScope =
-          keepRate < 0.25 || deckStateBefore.severityScore >= 70
-              ? 'full_non_commander_rebuild'
-              : 'repair_partial';
+      selectedScope = keepRate < 0.25 || deckStateBefore.severityScore >= 70
+          ? 'full_non_commander_rebuild'
+          : 'repair_partial';
     }
     if (selectedScope != 'repair_partial' &&
         selectedScope != 'full_non_commander_rebuild') {
@@ -760,7 +770,8 @@ class RebuildGuidedService {
     }
 
     return RebuildScopeDecision(
-      requestedScope: normalizedRequested.isEmpty ? 'auto' : normalizedRequested,
+      requestedScope:
+          normalizedRequested.isEmpty ? 'auto' : normalizedRequested,
       selectedScope: selectedScope,
       keepRate: keepRate,
       keptCards: keptCards,
@@ -769,7 +780,8 @@ class RebuildGuidedService {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _loadCardsByNames(List<String> names) async {
+  Future<List<Map<String, dynamic>>> _loadCardsByNames(
+      List<String> names) async {
     if (names.isEmpty) return const [];
     final normalized = names.map((name) => name.toLowerCase()).toSet().toList();
 
@@ -924,7 +936,8 @@ class RebuildGuidedService {
 
     final currentCardsForBracket =
         selected.values.map((card) => Map<String, dynamic>.from(card)).toList();
-    final candidateCardsOrdered = weightedCandidates.map((item) => item.card).toList();
+    final candidateCardsOrdered =
+        weightedCandidates.map((item) => item.card).toList();
     final bracketAllowedNames = <String>{};
     if (bracket != null) {
       final decision = applyBracketPolicyToAdditions(
@@ -991,7 +1004,8 @@ class RebuildGuidedService {
     }
 
     for (final candidate in nonLandCandidates) {
-      if (_totalNonCommanderNonLand(selected.values.toList()) >= nonLandTarget) {
+      if (_totalNonCommanderNonLand(selected.values.toList()) >=
+          nonLandTarget) {
         break;
       }
       final lower = ((candidate.card['name'] as String?) ?? '').toLowerCase();
@@ -1096,7 +1110,8 @@ class RebuildGuidedService {
       final commanderB = b['is_commander'] == true ? 0 : 1;
       final byCommander = commanderA.compareTo(commanderB);
       if (byCommander != 0) return byCommander;
-      return ((a['name'] as String?) ?? '').compareTo((b['name'] as String?) ?? '');
+      return ((a['name'] as String?) ?? '')
+          .compareTo((b['name'] as String?) ?? '');
     });
     return assembled;
   }
@@ -1109,7 +1124,8 @@ class RebuildGuidedService {
   }) {
     if (commanderColorIdentity.length != 1) return cards;
 
-    final mutable = cards.map((card) => Map<String, dynamic>.from(card)).toList();
+    final mutable =
+        cards.map((card) => Map<String, dynamic>.from(card)).toList();
     final utilityIndexes = <int>[];
     for (var i = 0; i < mutable.length; i++) {
       final card = mutable[i];
@@ -1412,7 +1428,8 @@ class RebuildGuidedService {
     return 3;
   }
 
-  bool _basicMatchesCommander(String lower, Set<String> commanderColorIdentity) {
+  bool _basicMatchesCommander(
+      String lower, Set<String> commanderColorIdentity) {
     if (commanderColorIdentity.isEmpty) return false;
     if (commanderColorIdentity.length == 1) {
       final color = commanderColorIdentity.first;
@@ -1481,8 +1498,7 @@ class RebuildGuidedService {
     final currentLandCount = selected.values.fold<int>(
       0,
       (sum, card) =>
-          sum +
-          (_isLandCard(card) ? ((card['quantity'] as int?) ?? 1) : 0),
+          sum + (_isLandCard(card) ? ((card['quantity'] as int?) ?? 1) : 0),
     );
     if (currentLandCount >= targetLandCount) return;
     final missing = targetLandCount - currentLandCount;
@@ -1521,7 +1537,7 @@ class RebuildGuidedService {
   }) {
     if (missing <= 0) return const [];
     final colors = commanderColorIdentity.isEmpty
-        ? const ['W', 'U', 'B', 'R', 'G']
+        ? const ['C']
         : commanderColorIdentity.toList();
     final basics = <Map<String, dynamic>>[];
     for (var i = 0; i < missing; i++) {
@@ -1588,18 +1604,9 @@ class RebuildGuidedService {
         'is_commander': false,
       };
     }
-    return {
-      'card_id': '',
-      'name': name,
-      'type_line': 'Basic Land',
-      'mana_cost': '',
-      'colors': const <String>[],
-      'color_identity': const <String>[],
-      'cmc': 0.0,
-      'oracle_text': oracle,
-      'quantity': 1,
-      'is_commander': false,
-    };
+    throw RebuildException(
+      'Basic land "$name" was not found in the card database; rebuild cannot produce a strict-valid deck.',
+    );
   }
 
   bool _isBasicLandCardByName(String lower) {
@@ -1632,7 +1639,8 @@ class RebuildGuidedService {
     required String resolvedArchetype,
     required String resolvedTheme,
   }) {
-    final mutable = cards.map((card) => Map<String, dynamic>.from(card)).toList();
+    final mutable =
+        cards.map((card) => Map<String, dynamic>.from(card)).toList();
     mutable.sort((a, b) {
       final commanderA = a['is_commander'] == true ? 0 : 1;
       final commanderB = b['is_commander'] == true ? 0 : 1;
@@ -1652,7 +1660,8 @@ class RebuildGuidedService {
       final removableB = roleB == 'land' ? 0 : 1;
       final byRole = removableA.compareTo(removableB);
       if (byRole != 0) return byRole;
-      return ((a['name'] as String?) ?? '').compareTo((b['name'] as String?) ?? '');
+      return ((a['name'] as String?) ?? '')
+          .compareTo((b['name'] as String?) ?? '');
     });
 
     while (_totalCards(mutable) > targetTotal) {
@@ -1705,22 +1714,83 @@ class RebuildGuidedService {
   }
 
   Set<String> _extractIdentity(Map<String, dynamic> card) {
-    final colorIdentity =
-        (card['color_identity'] as List?)?.cast<String>() ?? const <String>[];
-    final colors = (card['colors'] as List?)?.cast<String>() ?? const <String>[];
-    final source = colorIdentity.isNotEmpty ? colorIdentity : colors;
-    return source.map((c) => c.toUpperCase()).toSet();
+    return resolveCardColorIdentity(
+      colorIdentity:
+          (card['color_identity'] as List?)?.cast<String>() ?? const [],
+      colors: (card['colors'] as List?)?.cast<String>() ?? const [],
+      manaCost: card['mana_cost']?.toString(),
+      oracleText: card['oracle_text']?.toString(),
+    );
+  }
+
+  void _assertResolvedCardIds(List<Map<String, dynamic>> cards) {
+    for (final card in cards) {
+      final cardId = card['card_id']?.toString().trim() ?? '';
+      if (cardId.isNotEmpty) continue;
+      final name = card['name']?.toString().trim();
+      throw RebuildException(
+        'Rebuild generated unresolved card entry${name == null || name.isEmpty ? '' : ' "$name"'}. Run card sync before applying rebuild.',
+      );
+    }
   }
 
   Future<Map<String, Map<String, dynamic>>> _loadBasicLandCatalog() async {
-    final basics = await _loadCardsByNames(
-      const ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest', 'Wastes'],
+    final result = await _pool.execute(
+      Sql.named(r'''
+        SELECT DISTINCT ON (basic_key)
+               id::text,
+               name,
+               type_line,
+               COALESCE(mana_cost, '') AS mana_cost,
+               COALESCE(colors, ARRAY[]::text[]) AS colors,
+               COALESCE(color_identity, ARRAY[]::text[]) AS color_identity,
+               COALESCE(oracle_text, '') AS oracle_text,
+               basic_key
+        FROM (
+          SELECT
+            c.*,
+            CASE
+              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%plains%' THEN 'plains'
+              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%island%' THEN 'island'
+              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%swamp%' THEN 'swamp'
+              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%mountain%' THEN 'mountain'
+              WHEN LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%forest%' THEN 'forest'
+              WHEN LOWER(c.name) = 'wastes'
+                   AND LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%' THEN 'wastes'
+              ELSE NULL
+            END AS basic_key,
+            CASE
+              WHEN LOWER(c.name) IN ('plains', 'island', 'swamp', 'mountain', 'forest', 'wastes') THEN 0
+              ELSE 1
+            END AS basic_priority
+          FROM cards c
+          WHERE LOWER(COALESCE(c.type_line, '')) LIKE '%basic land%'
+        ) basics
+        WHERE basic_key IS NOT NULL
+        ORDER BY basic_key, basic_priority, id
+      '''),
     );
     final byName = <String, Map<String, dynamic>>{};
-    for (final basic in basics) {
-      final name = (basic['name'] as String?)?.toLowerCase() ?? '';
-      if (name.isEmpty) continue;
-      byName[name] = basic;
+    for (final row in result) {
+      final key = row[7] as String? ?? '';
+      if (key.isEmpty) continue;
+      byName[key] = {
+        'card_id': row[0] as String,
+        'name': row[1] as String? ?? '',
+        'type_line': row[2] as String? ?? '',
+        'mana_cost': row[3] as String? ?? '',
+        'colors': (row[4] as List?)?.cast<String>() ?? const <String>[],
+        'color_identity': (row[5] as List?)?.cast<String>() ?? const <String>[],
+        'cmc': 0.0,
+        'oracle_text': row[6] as String? ?? '',
+        'quantity': 1,
+        'is_commander': false,
+      };
     }
     return byName;
   }

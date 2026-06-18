@@ -1283,6 +1283,7 @@ Future<void> _ensureCandidateQualitySchema(Pool pool) async {
     await pool.execute(statement);
   }
   await pool.execute(optimizeCandidateQualitySummaryViewStatement);
+  await pool.execute(cardIntelligenceSnapshotViewStatement);
 }
 
 Future<int> _upsertCommanderSignalRows(

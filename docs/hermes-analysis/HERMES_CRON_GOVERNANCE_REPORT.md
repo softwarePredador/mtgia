@@ -168,7 +168,13 @@ Key discrepancies: reports 23 crons (actual 24), missing 7 new crons, lists 8 re
 | Master optimizer report bloat | 110 files |
 | Git divergence | Resolved (3bc7966d) |
 
-4 orphan dirs root-owned: 192a066876de, 1c81c3e46d5c, 55f9197139f1, 835fd204aea6.
+**Dirty worktree details:**
+- `M docs/hermes-analysis/FLUTTER_UI_AUDIT.md` — uncommitted UI audit update from flutter-ui-auditor cron
+- `M docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db` — SQLite modifications
+- `M docs/hermes-analysis/manaloom-knowledge/scripts/__pycache__/db_helper.cpython-313.pyc` — bytecode changes
+- `_gc_check.py` — removido em 2026-06-17 tanto de `manaloom-knowledge/` quanto de `manaloom-knowledge/scripts/`; era diagnostico manual/historico de `game_changers`, nao cron ativo.
+
+These are cron artifacts from other crons operating on the shared branch, not product drift.
 
 ---
 

@@ -5,17 +5,77 @@ Phase 1 (QUICK): 10 games/archetype → all candidates → ~3h
 Phase 2 (FULL):  25 games/archetype → promising candidates (WR >= baseline - 2pp)
 Auto-applies winning swaps. Cron-safe: skip already-tested, lock file prevents concurrency.
 """
-import sqlite3, subprocess, os, json, re, time, sys
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import time
 from datetime import datetime, timezone
+from pathlib import Path
+
+import battle_rule_registry
+from known_cards_fallback_snapshot import load_layered_known_cards
 
 DB = os.environ.get('MANALOOM_KNOWLEDGE_DB', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
 BATTLE = os.environ.get('MANALOOM_BATTLE_SCRIPT', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py')
-KC_JSON = os.environ.get('MANALOOM_KNOWN_CARDS_JSON', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generated.json')
 LOCK_FILE = '/tmp/optimizer.lock'
 
 GAMES_QUICK = 10
 GAMES_FULL = 25
 BASELINE_WR = 81.8
+
+REAL_CATEGORY_PRIORITY = [
+    "wincon",
+    "protection",
+    "removal",
+    "wipe",
+    "ramp",
+    "draw",
+    "tutor",
+    "engine",
+    "land",
+]
+
+
+def choose_primary_category(categories: list[str]) -> str | None:
+    present = set(categories)
+    for category in REAL_CATEGORY_PRIORITY:
+        if category in present:
+            return category
+    return categories[0] if categories else None
+
+
+def load_known_cards(db_path: str) -> dict[str, dict[str, object]]:
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
+
+    rule_lists = battle_rule_registry.load_active_battle_card_rule_lists(db_path)
+    for rules in rule_lists.values():
+        if not rules:
+            continue
+        rule = rules[0]
+        name = str(rule.get("card_name") or "")
+        effect = dict(rule.get("effect_json") or {})
+        if not name or not effect:
+            continue
+        categories = [
+            str(role.get("category"))
+            for role in (dict(item.get("deck_role_json") or {}) for item in rules)
+            if role.get("category")
+        ]
+        merged = dict(known_cards.get(name, {}))
+        merged.update(effect)
+        primary_category = choose_primary_category(categories)
+        if primary_category:
+            merged["deck_category"] = primary_category
+        merged["battle_rules"] = [dict(item.get("effect_json") or {}) for item in rules]
+        merged["battle_rule_categories"] = sorted(set(categories))
+        merged["battle_rule_source"] = rule.get("source")
+        merged["battle_rule_review_status"] = rule.get("review_status")
+        merged["battle_rule_execution_status"] = rule.get("execution_status")
+        known_cards[name] = merged
+    return known_cards
 
 # ── Concurrency lock ──
 if os.path.exists(LOCK_FILE):
@@ -49,9 +109,8 @@ try:
     current = conn.execute("SELECT card_name, quantity, cmc, functional_tag, type_line, is_commander FROM deck_cards WHERE deck_id=6").fetchall()
     current_names = set(c[0] for c in current)
     
-    # Load KNOWN_CARDS
-    with open(KC_JSON) as f:
-        kc = json.load(f)
+    # Load known cards from canonical snapshot with SQLite battle rules overlay.
+    kc = load_known_cards(DB)
     
     # Load candidates
     all_lorehold = set()

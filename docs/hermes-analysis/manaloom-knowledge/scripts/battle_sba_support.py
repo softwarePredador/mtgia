@@ -261,11 +261,15 @@ def check_sbas(
     """State-based actions after each spell resolution."""
     for player_obj in all_players:
         if getattr(player_obj, "failed_draw_from_empty_library", False) and not player_obj.eliminated:
+            if getattr(player_obj, "cannot_lose_this_turn", False):
+                continue
             player_obj.life = 0
             player_obj.eliminated = True
             emit_replay_event("player_eliminated", player=player_obj.name, reason="draw_from_empty_library")
             return True
         if player_obj.life <= 0 and not player_obj.eliminated:
+            if getattr(player_obj, "cannot_lose_this_turn", False):
+                continue
             player_obj.eliminated = True
             emit_replay_event("player_eliminated", player=player_obj.name, reason="life_zero")
             return True
@@ -274,6 +278,8 @@ def check_sbas(
         for name, dmg, source_key in commander_damage_lethal_entries(player_obj):
             for opponent in all_players:
                 if opponent.name == name and not opponent.eliminated:
+                    if getattr(opponent, "cannot_lose_this_turn", False):
+                        continue
                     opponent.life = 0
                     opponent.eliminated = True
                     emit_replay_event(
@@ -287,6 +293,8 @@ def check_sbas(
 
     for player_obj in all_players:
         if getattr(player_obj, "poison", 0) >= 10 and not player_obj.eliminated:
+            if getattr(player_obj, "cannot_lose_this_turn", False):
+                continue
             player_obj.life = 0
             player_obj.eliminated = True
             emit_replay_event("player_eliminated", player=player_obj.name, reason="poison")
@@ -307,7 +315,7 @@ def check_sbas(
                 continue
             toughness = card.get("toughness", 1)
             damage = card.get("damage_marked", 0)
-            if (toughness <= 0 or damage >= toughness) and not card.get("indestructible"):
+            if toughness <= 0 or (damage >= toughness and not card.get("indestructible")):
                 move_creature_from_battlefield(player_obj, card, "sba_lethal", None, all_players)
                 return True
 

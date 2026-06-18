@@ -14,6 +14,7 @@ const _allowedEvents = <String>{
   'base_choice_import',
   'deck_created',
   'deck_optimized',
+  'deck_rebuild_created',
   'onboarding_completed',
 };
 
@@ -80,7 +81,8 @@ Future<Response> _postEvent(RequestContext context) async {
       body: {'ok': true},
     );
   } catch (e) {
-    return internalServerError('Falha ao registrar evento de ativação', details: e);
+    return internalServerError('Falha ao registrar evento de ativação',
+        details: e);
   }
 }
 
@@ -88,7 +90,8 @@ Future<Response> _getSummary(RequestContext context) async {
   final userId = getUserId(context);
   final pool = context.read<Pool>();
 
-  final days = int.tryParse(context.request.uri.queryParameters['days'] ?? '30') ?? 30;
+  final days =
+      int.tryParse(context.request.uri.queryParameters['days'] ?? '30') ?? 30;
   final safeDays = days.clamp(1, 90);
 
   try {
@@ -114,6 +117,7 @@ Future<Response> _getSummary(RequestContext context) async {
       'events': events,
     });
   } catch (e) {
-    return internalServerError('Falha ao buscar resumo de ativação', details: e);
+    return internalServerError('Falha ao buscar resumo de ativação',
+        details: e);
   }
 }

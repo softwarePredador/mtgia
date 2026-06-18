@@ -3,6 +3,274 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-18 — Sync focado de legalidades para fechar `needs_legality_sync`
+
+Motivo:
+
+- A rotina `manaloom_new_card_candidate_review` passou a detectar cartas
+  recentes em `msh,msc,mar`.
+- O bloqueio real nao era falta de oracle text ou identidade, e sim ausência
+  de linhas `card_legalities` para 150 cartas já existentes no PostgreSQL.
+- `needs_data` não deve usar LLM; deve ser resolvido por sync determinístico.
+
+Patch aplicado:
+
+- Criado `server/bin/sync_card_legalities_from_scryfall.py`.
+- Criado wrapper `server/bin/sync_card_legalities_from_scryfall.sh`.
+- Registrado no `server/bin/manaloom_ops_daemon.py` antes da candidate review:
+  - `name=manaloom_sync_card_legalities_from_scryfall`;
+  - `schedule=30 */6 * * *`;
+  - override por `MANALOOM_SYNC_CARD_LEGALITIES_CRON`.
+- O reconciliador EasyPanel define:
+  - `MANALOOM_SYNC_CARD_LEGALITIES_APPLY=1`;
+  - `MANALOOM_SYNC_LEGALITIES_SETS=msh,msc,mar`.
+- Criado teste `server/test/sync_card_legalities_from_scryfall_test.py`.
+
+Contrato:
+
+- dry-run por padrão;
+- `--apply` explícito para persistir;
+- cron em `manaloom-ops` aplica somente porque a env
+  `MANALOOM_SYNC_CARD_LEGALITIES_APPLY=1` é definida pelo reconciliador;
+- usa Scryfall Collection API por `oracle_id`;
+- escreve somente `card_legalities`;
+- não altera `cards`, decks, tags, regras battle, APIs públicas ou app;
+- PostgreSQL/backend continua como fonte de verdade.
+
+Comandos:
+
+```bash
+python3 server/bin/sync_card_legalities_from_scryfall.py \
+  --sets msh,msc,mar
+
+python3 server/bin/sync_card_legalities_from_scryfall.py \
+  --sets msh,msc,mar \
+  --apply
+```
+
+Resultado real aplicado no PostgreSQL:
+
+```json
+{
+  "candidate_cards": 150,
+  "oracle_ids_requested": 150,
+  "oracle_ids_found": 150,
+  "oracle_ids_not_found": 0,
+  "legality_rows_ready": 3300,
+  "legality_rows_upserted": 3300,
+  "commander_statuses": {
+    "legal": 1,
+    "not_legal": 149
+  }
+}
+```
+
+Cobertura pós-sync:
+
+- `mar`: 17/17 cartas com legalidade Commander, 17 jogáveis.
+- `msc`: 22/22 cartas com legalidade Commander, 22 `not_legal`.
+- `msh`: 127/127 cartas com legalidade Commander, 127 `not_legal`.
+
+Validação funcional:
+
+- Rerun limpo `candidate -> data_gap -> battle_queue` após o sync:
+  - `needs_data=0`;
+  - `gap_rows=0`;
+  - `needs_rule_review=66`;
+  - `draft_count=6`.
+- Interpretação: o gap de dados foi fechado; a fila restante é revisão de regra
+  battle, não problema de catálogo.
+
+## 2026-06-18 — New-card candidate review geral em manaloom-ops
+
+Motivo:
+
+- A descoberta de cartas novas/alteradas nao pode depender de uma rodada manual
+  do Codex nem ficar exclusiva ao Lorehold.
+- O produto precisa detectar candidatos por comandante acompanhado, mas sem
+  aplicar swaps automaticamente e sem gastar token de IA em triagem barata.
+
+Patch aplicado:
+
+- Criado `server/bin/manaloom_new_card_candidate_review.py`.
+- Criado wrapper `server/bin/manaloom_new_card_candidate_review.sh`.
+- Criado `server/bin/manaloom_card_data_gap_review.py` e wrapper.
+- Criado `server/bin/manaloom_battle_rule_review_queue.py` e wrapper.
+- Registrado no `server/bin/manaloom_ops_daemon.py` como:
+  - `name=manaloom_new_card_candidate_review`;
+  - `schedule=35 */6 * * *`;
+  - override por `MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON`.
+- Registrados os consumers:
+  - `name=manaloom_card_data_gap_review`;
+  - `schedule=50 */6 * * *`;
+  - override por `MANALOOM_CARD_DATA_GAP_REVIEW_CRON`;
+  - `name=manaloom_battle_rule_review_queue`;
+  - `schedule=55 */6 * * *`;
+  - override por `MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON`.
+- Criado teste `server/test/manaloom_new_card_candidate_review_test.py`.
+- Criado teste `server/test/manaloom_review_queue_consumers_test.py`.
+- Criada documentacao operacional em
+  `docs/hermes-analysis/NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`.
+
+Contrato operacional:
+
+- `manaloom-ops` faz a triagem deterministica e barata.
+- Nao usa LLM.
+- Nao escreve em PostgreSQL.
+- Nao altera decks.
+- `needs_data` vira acao recomendada em `card_data_gap_review`.
+- `needs_rule_review` vira draft `proposed_status=needs_review` em
+  `battle_rule_review_queue`.
+- Nenhum draft vira `verified` sem fonte oficial, teste focado e replay/auditoria
+  sem finding critico.
+- SQLite `knowledge.db` guarda apenas historico operacional/fila/checkpoint.
+- Lorehold entra como controle padrao, mas nao e escopo exclusivo.
+- Funcoes multiplas por carta sao preservadas como arrays.
+- `card_battle_rules` deve ser lida agregada por `card_id`, preferencialmente
+  via `card_intelligence_snapshot`, para evitar fanout.
+
+Atualizacao OpenAI/LLM:
+
+- `manaloom_battle_rule_review_queue` agora aceita enriquecimento opcional por
+  OpenAI apenas para drafts `needs_rule_review`.
+- O modo fica desligado por padrao em `manaloom-ops`:
+  `MANALOOM_BATTLE_RULE_LLM_REVIEW=0`.
+- Modelo default configuravel: `MANALOOM_BATTLE_RULE_LLM_MODEL=gpt-4o-mini`.
+- Limite default configuravel: `MANALOOM_BATTLE_RULE_LLM_LIMIT=3`.
+- `needs_data` continua deterministico e nao deve chamar LLM.
+- A revisao LLM nunca promove `verified`, nunca escreve em PostgreSQL e nunca
+  libera comportamento duro no battle; ela apenas anexa resumo, riscos, fontes
+  oficiais necessarias e sugestoes de teste ao artefato/fila.
+
+Saidas:
+
+- `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_summary.json`
+- `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_reviews.json`
+- `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_report.md`
+- tabelas SQLite:
+  - `new_card_candidate_review_runs`;
+  - `new_card_candidate_reviews`;
+  - `new_card_battle_rule_review_queue`;
+  - `new_card_candidate_review_checkpoints`.
+
+Validação local:
+
+```bash
+python3 -m py_compile \
+  server/bin/manaloom_new_card_candidate_review.py \
+  server/bin/manaloom_ops_daemon.py \
+  server/test/manaloom_new_card_candidate_review_test.py
+
+bash -n server/bin/manaloom_new_card_candidate_review.sh
+
+python3 server/test/manaloom_new_card_candidate_review_test.py
+```
+
+Dry-run read-only contra PostgreSQL configurado:
+
+```bash
+tmpdir="$(mktemp -d)"
+MANALOOM_OPS_ARTIFACT_DIR="$tmpdir/artifacts" \
+MANALOOM_KNOWLEDGE_DB="$tmpdir/knowledge.db" \
+python3 server/bin/manaloom_new_card_candidate_review.py \
+  --sets msh,msc,mar \
+  --commander-limit 8 \
+  --card-limit 120
+```
+
+Resultado observado na primeira rodada local:
+
+- 120 cartas analisadas;
+- 8 comandantes analisados;
+- decisoes principais: `ignore=657`, `needs_data=303`;
+- `hermes_lab_should_wake=false`.
+
+Leitura: o catalogo recente esta visivel, mas a camada de dados ainda precisa
+completar legalidade/oracle/tags antes de promover candidatos reais.
+
+## 2026-06-17 — Cutover Hermes AWS -> EasyPanel (slice server-owned)
+
+Motivo:
+
+- O que sera desligado e a AWS que hoje hospeda o Hermes. O produto nao precisa
+  do Hermes inteiro em producao; precisa apenas dos jobs operacionais que
+  realmente alimentam `learned decks`, sync e preflight.
+- O EasyPanel atual tem folga de host, mas ja roda muitos servicos e quase
+  todos estao sem limites explicitos de CPU/RAM. Migrar o Hermes inteiro seria
+  mistura indevida de laboratorio com runtime do produto.
+
+Patch aplicado:
+
+- `server/bin/pull_learning_events.py` e
+  `server/bin/auto_sync_learned_decks.py` deixaram de depender de paths
+  hardcoded de `/opt/data/...` e agora derivam defaults do repo/ambiente.
+- `server/bin/auto_sync_learned_decks.py` parou de fazer `git pull` em runtime
+  por default; isso so volta se `MTGIA_SYNC_GIT_PULL=1`.
+- wrappers portaveis:
+  - `server/bin/pull_learning_events.sh`
+  - `server/bin/auto_sync_learned_decks.sh`
+  - `server/bin/master_optimizer_preflight.sh`
+- novo runtime server-owned:
+  - `server/Dockerfile.manaloom-ops`
+  - `server/bin/manaloom_ops_entrypoint.sh`
+- documentacao de deploy/cutover:
+  - `docs/hermes-analysis/EASYPANEL_CRON_MIGRATION_SLICE1_2026-06-17.md`
+  - `docs/hermes-analysis/EASYPANEL_MANALOOM_OPS_CUTOVER_2026-06-17.md`
+
+Desenho aprovado:
+
+- manter `cartinhas` como backend publico;
+- criar servico separado `manaloom-ops` no projeto `evolution`;
+- migrar agora apenas:
+  - `pull_learning_events`
+  - `auto_sync_learned_decks`
+  - `master_optimizer_preflight`
+- manter jobs exploratorios/provider-heavy fora do runtime principal.
+
+Validacao:
+
+- `bash -n server/bin/master_optimizer_preflight.sh server/bin/manaloom_ops_entrypoint.sh`
+- `sh -n server/bin/pull_learning_events.sh server/bin/auto_sync_learned_decks.sh`
+- `python3 -m py_compile server/bin/pull_learning_events.py server/bin/auto_sync_learned_decks.py`
+
+Hardening posterior do runtime:
+
+- `server/Dockerfile.manaloom-ops` passou a instalar `python3-psycopg2`;
+- `manaloom_ops_daemon.py` passou a rodar `master_optimizer_preflight` no boot
+  quando o `knowledge.db` ainda nao contem `decks`/`deck_cards`;
+- `manaloom_ops_daemon.py` agora exporta tambem `MANALOOM_KNOWLEDGE_DB`,
+  evitando drift entre scripts antigos que ainda resolvem o SQLite canonico por
+  `MANALOOM_KNOWLEDGE_DB` em vez de `HERMES_KNOWLEDGE_DB`;
+- `manaloom_ops_daemon.py` agora tambem faz catch-up de
+  `pull_learning_events` no boot quando o PostgreSQL ainda mostra backlog em
+  `deck_learning_events.synced_to_hermes = false`, reduzindo risco de fila
+  parada apos restart/deploy;
+- `hermes_mana_base_validator.py` nao encerra mais com erro estrutural quando o
+  SQLite ainda nao recebeu deck alvo; gera relatorio com `runtime_note`.
+- `server/bin/reconcile_easypanel_services.py` virou o caminho canônico para
+  reconciliar env mínima de `manaloom-ops`/`hermes-lab` e disparar deploy
+  controlado no EasyPanel.
+- `server/bin/audit_easypanel_runtime_alignment.py` passou a auditar, em modo
+  read-only, SHA publico, env efetiva dos servicos, backlog real em
+  `deck_learning_events` e frescor de `commander_learned_decks` /
+  `analysis_sources`.
+
+Achado operacional confirmado no follow-up de 2026-06-17:
+
+- o deploy estava coerente, mas o PostgreSQL expunha backlog real de
+  `deck_learning_events` pendentes, entao a prova de execucao dos jobs nao pode
+  depender apenas do SHA/health do servico;
+- `manaloom-ops` e `hermes-lab` tambem precisavam declarar explicitamente o
+  caminho do `knowledge.db` em env para evitar fallback implicito e drift
+  silencioso entre scripts legados/report-only.
+
+Risco remanescente:
+
+- antes do cutover real, o servico `manaloom-ops` deve receber limites
+  explicitos de CPU/RAM e volume proprio para `knowledge.db`/artifacts;
+- o token de operador do EasyPanel tem privilegio alto e deve ser tratado como
+  segredo operacional, idealmente com rotacao apos a fase de migracao.
+
 ## 2026-06-04 — Gate premium de validacao visual
 
 Motivo:
@@ -6178,6 +6446,22 @@ TEST_API_BASE_URL=http://127.0.0.1:8082 dart test -P live
 - `server/test/sync_cards_test.dart`
   - adiciona regressao para `soc/SOC`;
   - garante URL fallback e `set_code` uppercase no full e incremental.
+
+### Atualização 2026-06-11 — utilitário compartilhado ligado ao CLI
+- `server/bin/sync_cards.dart` agora importa `server/lib/sync_cards_utils.dart`
+  diretamente.
+- O CLI operacional usa `parseSinceDays`, `getNewSetCodesSinceFromData` e
+  `extractSetCardSyncRow`; as cópias privadas equivalentes foram removidas.
+- `extractSetCardSyncRow` é o contrato operacional completo de Set.json, com
+  `power`, `toughness` e `keywords`; `extractSetCardRow` permanece como
+  projeção legada de 12 colunas para compatibilidade de testes/consumidores.
+
+Validação focada:
+```bash
+cd server
+dart analyze lib/sync_cards_utils.dart bin/sync_cards.dart test/sync_cards_test.dart
+dart test test/sync_cards_test.dart --reporter compact
+```
 
 ### Rotina oficial
 ```bash
@@ -18037,12 +18321,14 @@ que o endpoint entrega quando a Semantic Layer v2 bloqueia uma perda crítica.
 - Quality gate bloqueia swaps que removem win conditions do deck
 - `weakness-analysis` reporta `wincon_count` via F1 adapter
 
-### Tabelas Write-only — documentadas como audit logs
+### Tabelas de histórico/cache operacional
 
-Três tabelas operam como audit logs (escritas, nunca lidas pelo runtime). Política:
-- `deck_matchups` — resultados de `POST /ai/simulate-matchup`. Uso futuro: cache de matchup.
-- `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`. Uso futuro: histórico.
-- `ml_prompt_feedback` — helper em `ml_knowledge_service.dart`, sem chamador runtime.
+Algumas tabelas operam como histórico/cache operacional das próprias rotas. Política:
+- `deck_matchups` — resultados de `POST /ai/simulate-matchup`, lidos pela rota como histórico/cache de matchup quando disponível.
+- `deck_weakness_reports` — resultados de `POST /ai/weakness-analysis`, lidos pela rota para sumarizar histórico recente de fraquezas.
+- `ml_prompt_feedback` — alimentada por `/ai/optimize` via
+  `optimize_feedback.recordOptimizeMlFeedback(...)`; segue como histórico
+  operacional para futura métrica/seleção de prompts.
 
 Retenção recomendada: DELETE > 90 dias para evitar acúmulo sem consumidor.
 
@@ -18088,3 +18374,320 @@ redesenhar a mesa:
 
 Relatório:
 `server/doc/LIFE_COUNTER_ACCESSIBILITY_LAYOUT_PASS_2026-06-04.md`.
+
+## 2026-06-11 — Revisão estratégica oficial do Battle Engine
+
+Rechecagem de regras concluída contra fontes oficiais Wizards vigentes:
+
+- `https://magic.wizards.com/en/rules` aponta para Comprehensive Rules
+  efetivas em 2026-04-17;
+- Commander oficial permanece 99+1, identidade de cor, command zone,
+  commander tax, 21 commander damage e free-for-all com ataque a múltiplos
+  jogadores;
+- Commander Brackets 2026-02-09 confirmou que hybrid mana não mudou e continua
+  contando como todas as cores híbridas; a data correta da publicação oficial é
+  2026-02-09, não 2026-02-10;
+- Edge of Eternities Update Bulletin é a fonte primária para Lander `111.10u`,
+  Station Cards `721`, Station `702.184`, Warp `702.185` e Legendary
+  Vehicle/Spacecraft com P/T como commander em `903.3`/`903.12c`;
+- Secrets of Strixhaven Mechanics cobre Prepare, Repartee, Opus, Infusion,
+  Flashback, Increment, Paradigm e Converge.
+
+Decisão de produto/engenharia: manter ManaLoom como simulador Commander prático,
+não judge engine completo. O suporte mínimo para Vehicle/Spacecraft commander,
+hybrid estrito, Warp, Station, Prepare/Omen/Paradigm, Flashback,
+multi-defender combat e ability-word telemetry já está rastreado em
+`docs/hermes-analysis/BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`.
+Novas regras modernas só devem virar implementação card-specific com carta real
+no corpus, replay incorreto e teste focado.
+Nenhuma implementação genérica adicional foi autorizada por esta rechecagem:
+Warp/Station/Prepare/Omen/Paradigm já têm suporte mínimo guardião, enquanto
+ability words permanecem telemetry/semântica.
+
+Correção complementar desta rodada: `DeckRulesService` passou a bloquear
+centralmente qualquer payload com `is_commander=true` quando o formato não é
+Commander/Brawl. Isso cobre criação, update, import e endpoints incrementais
+que delegam validação ao serviço, mantendo a regra de slot de comandante
+uniforme em vez de depender de guardas manuais por rota.
+
+Rechecagem complementar: a matriz `BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`
+já cobre o plano estratégico de regras modernas. O suporte mínimo para
+Vehicle/Spacecraft commander, hybrid estrito, Warp, Station, Prepare/Omen/
+Paradigm, Flashback, combate multi-defensor e ability-word telemetry está
+implementado/testado como simulador Commander prático. Novas regras genéricas
+só devem ser promovidas quando houver carta real no corpus, replay incorreto e
+teste focado; caso contrário permanecem tracked gap.
+
+Hardening encontrado por teste DB-backed: `DeckRulesService` agora aceita
+`cards.cmc` retornado pelo PostgreSQL como `num` ou `String`. Antes, o cast
+direto para `num?` podia gerar `500` em fluxos de criação/validação/optimize
+quando a coluna numérica vinha serializada como texto. Cobertura:
+`server/test/deck_rules_service_test.dart` e `ai_optimize_flow_test.dart` com
+servidor local em `127.0.0.1:8082`.
+
+Hardening adicional app-facing: a validação de pares de comandante foi extraída
+para `server/lib/commander_pairing.dart`. `DeckRulesService` agora reutiliza
+esse suporte para Partner, Partner with, Choose a Background + Background,
+Friends Forever, Doctor's companion e normalização de nome físico. Cobertura:
+`server/test/commander_pairing_test.dart`. A matriz Hermes deve manter o battle
+engine como parcial apenas para interação/simulação completa de dois commanders
+na command zone, não para validação de deck no servidor.
+
+## 2026-06-11 — Optimize runtime modularization pass
+
+- Extraído `server/lib/ai/optimize_functional_role_support.dart` para
+  centralizar inferência funcional, matching de necessidades e score de
+  substitutas do optimize.
+- Extraído `server/lib/ai/optimize_removal_candidate_support.dart` para
+  centralizar seleção determinística de cartas a cortar sem depender da rota ou
+  do runtime monolítico.
+- Extraído `server/lib/ai/optimize_swap_candidate_support.dart` para centralizar
+  `findSynergyReplacements`, construção determinística de pares de swap e
+  diagnostics agressivos de candidates.
+- Extraído `server/lib/ai/optimize_payload_support.dart` para centralizar
+  normalização de payload, intensidade, parser de sugestões, response shaping,
+  retry deterministic-first e recommendation detail.
+- Extraído `server/lib/ai/optimize_fallback_telemetry_support.dart` para
+  centralizar escrita e aggregate de `ai_optimize_fallback_telemetry`, com
+  helper puro de aggregate testável sem banco.
+- Extraído `server/lib/ai/optimize_route_outcome_support.dart` para centralizar
+  a classificação de `outcome_code` do optimize, mantendo wrapper compatível na
+  rota.
+- Extraído `server/lib/ai/optimize_filler_candidate_support.dart` para
+  centralizar dedupe, filtro de identidade Commander, score de fillers e land
+  fixing sem acoplar esses helpers aos loaders SQL.
+- Extraído `server/lib/ai/optimize_complete_mana_support.dart` para
+  centralizar limite de básicos, demanda de cores e plano ponderado de terrenos
+  básicos do modo `complete`, mantendo export compatível por
+  `optimize_complete_support.dart`.
+- `server/lib/ai/optimize_filler_loader_support.dart` preserva exports
+  compatíveis e agora foca em fillers, lands e structural recovery.
+- `server/lib/ai/optimize_complete_support.dart` preserva exports compatíveis
+  e caiu para 1450 linhas; o suporte de mana novo tem 118 linhas.
+- `optimize_runtime_support.dart` preserva exports compatíveis e caiu para 551
+  linhas; próximo corte seguro é preferências de IA ou loaders de referência do
+  comandante com teste isolado.
+- Validações focadas:
+  - `dart analyze lib/ai/optimize_complete_mana_support.dart lib/ai/optimize_complete_support.dart test/optimize_complete_support_test.dart`: PASS.
+  - `dart test test/optimize_complete_support_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_route_outcome_support.dart routes/ai/optimize/index.dart test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart`: PASS.
+  - `dart test test/optimize_route_outcome_support_test.dart test/optimization_pipeline_integration_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_filler_candidate_support.dart lib/ai/optimize_filler_loader_support.dart test/optimize_filler_candidate_support_test.dart`: PASS.
+  - `dart test test/optimize_filler_candidate_support_test.dart test/optimize_runtime_support_test.dart test/optimize_complete_support_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_filler_loader_support.dart lib/ai/optimize_functional_role_support.dart routes/ai/optimize/index.dart test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart`: PASS.
+  - `dart test test/optimize_functional_role_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_removal_candidate_support.dart lib/ai/optimize_filler_loader_support.dart routes/ai/optimize/index.dart test/optimize_removal_candidate_support_test.dart test/optimize_learning_pipeline_test.dart`: PASS.
+  - `dart test test/optimize_removal_candidate_support_test.dart test/optimize_learning_pipeline_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_swap_candidate_support.dart lib/ai/optimize_runtime_support.dart lib/ai/optimize_complete_support.dart routes/ai/optimize/index.dart test/optimize_swap_candidate_support_test.dart`: PASS.
+  - `dart test test/optimize_swap_candidate_support_test.dart test/optimize_removal_candidate_support_test.dart test/optimize_runtime_support_test.dart test/optimize_learning_pipeline_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_payload_support.dart lib/ai/optimize_runtime_support.dart routes/ai/optimize/index.dart test/optimize_payload_support_test.dart`: PASS.
+  - `dart test test/optimize_payload_support_test.dart test/optimize_runtime_support_test.dart test/optimize_learning_pipeline_test.dart test/optimization_final_validation_test.dart --reporter compact`: PASS.
+  - `dart analyze lib/ai/optimize_fallback_telemetry_support.dart lib/ai/optimize_runtime_support.dart routes/ai/optimize/index.dart test/optimize_fallback_telemetry_support_test.dart`: PASS.
+  - `dart test test/optimize_fallback_telemetry_support_test.dart test/optimize_payload_support_test.dart test/optimize_runtime_support_test.dart --reporter compact`: PASS.
+  - `dart analyze bin lib routes test`: PASS.
+  - `dart test --concurrency=2 --reporter compact`: PASS, 630 testes.
+
+## 2026-06-12 — Identidade canônica aditiva para cartas
+
+- Primeiro slice de identidade semântica de carta implementado de forma
+  aditiva e sem enforcement duro.
+- `cards.scryfall_id` passa a ser tratado nos fluxos alterados como ID de
+  printing do Scryfall.
+- Novas colunas planejadas/aplicadas por migration:
+  `cards.oracle_id`, `cards.layout` e `cards.card_faces_json`.
+- Rotas `/cards/resolve`, `/cards/printings`, `/cards/:id/rulings` e o sync de
+  cartas foram ajustados para preservar printing id, oracle id, layout e faces
+  quando disponíveis.
+- `sync_cards_utils.dart` mantém wrapper legado para testes/consumidores antigos
+  e expõe linha operacional nova com printing id + oracle id.
+- Limites explícitos deste slice:
+  - não aplica backfill completo por si só;
+  - não escolhe printing canônica para learned-opponent decks ambíguos;
+  - não relaxa singleton, identidade de cor, Commander legality ou regras de
+    parceiro.
+- Próximo passo seguro: aplicar migration/backfill controlado, medir cobertura
+  de `oracle_id` e só depois ligar consumidores críticos a identidade canônica.
+
+## 2026-06-12 — Singleton Commander por identidade canônica
+
+- `DeckRulesService` passou a carregar `cards.oracle_id` quando as colunas de
+  identidade canônica existem no banco.
+- A chave de cópia física agora prefere `oracle_id` e cai para nome físico
+  normalizado quando a coluna/dado ainda não existe.
+- Impacto real: save/import/validate final passam a bloquear duas printings da
+  mesma carta em Commander e também bloqueiam o comandante em outra printing
+  dentro das 99 cartas.
+- `/import`, `/import/validate` e mutações de deck continuam usando o backend
+  como fonte de verdade via `DeckRulesService`; a prévia não grava nada e
+  expõe conflitos canônicos como warnings, enquanto os caminhos de escrita
+  continuam bloqueando a mutação inválida.
+- Validação focada:
+  - `dart analyze lib/deck_rules_service.dart lib/card_identity_support.dart test/deck_rules_service_identity_test.dart`: PASS.
+  - `dart test test/deck_rules_service_identity_test.dart --reporter compact`: PASS.
+  - `dart test test/deck_rules_service_identity_test.dart test/card_identity_support_test.dart test/import_list_service_test.dart test/import_parser_test.dart test/generated_deck_validation_service_test.dart --reporter compact`: PASS.
+
+## 2026-06-12 — Backfill controlado de identidade canônica de cartas
+
+- Migração `021 add_card_canonical_identity_columns` aplicada no PostgreSQL real.
+- `server/bin/verify_schema.dart` agora espera `cards.oracle_id`,
+  `cards.layout` e `cards.card_faces_json`; o verificador deixou de aceitar o
+  schema antigo como válido.
+- Criado `server/bin/backfill_card_identity_columns.dart`:
+  - dry-run por padrão;
+  - `--apply` explícito para persistir;
+  - usa fast-path seguro para linhas legadas de `AtomicCards` cujo `image_url`
+    é `/cards/named`, tratando `cards.scryfall_id` como `oracle_id`;
+  - usa Scryfall Collection API apenas para o restante;
+  - respeita batch máximo `75` e pausa configurável.
+- Resultado aplicado:
+  - total `34329` cartas;
+  - `oracle_id` preenchido em `34325`;
+  - `layout` preenchido em `500`;
+  - `card_faces_json` preenchido em `12`;
+  - `4` cartas ainda sem `oracle_id` (`A-Alrund's Epiphany`,
+    `A-Omnath, Locus of Creation`, `A-Unholy Heat`,
+    `Birds of Paradise // Birds of Paradise`).
+- Hermes/AWS report-only pós-backfill:
+  - `oracle_id_column_present=true`;
+  - `semantic_identity_coverage=1.0`;
+  - `oracle_resolved_instances=50`;
+  - `ambiguous_instances=0`;
+  - `unresolved_instances=0`;
+  - `1200` learned-opponent card instances auditadas.
+- Limite explícito:
+  - isso resolve identidade semântica por `oracle_id`;
+  - ainda não autoriza persistir `card_id` em learned-opponent decks sem
+    política backend-owned de printing canônica;
+  - não usar `LIMIT 1` para resolver múltiplas printings.
+
+## 2026-06-12 — Auditor v4 de printing canônica report-only
+
+- `audit_learned_opponent_card_identity.py` passou para
+  `learned_opponent_identity_audit_v4_report_only`.
+- O auditor continua separando:
+  - `resolved_instances`: match concreto com uma única linha `cards.id`;
+  - `oracle_resolved_instances`: múltiplas printings compartilhando a mesma
+    identidade `oracle_id`;
+  - `ambiguous_instances`: múltiplas identidades reais conflitantes;
+  - `unresolved_instances`: nomes sem resolução.
+- Novo campo report-only:
+  - `canonical_printing_candidate_instances`;
+  - `canonical_printing_candidate_unique_names`;
+  - `canonical_printing_reason_instances`;
+  - `canonical_printing_policy`.
+- Política:
+  - só emite candidato de `card_id` quando uma printing tem pontuação de
+    evidência estritamente maior que todas as outras;
+  - sinais aceitos: `scryfall_id` de printing diferente de `oracle_id`, imagem
+    direta `cards.scryfall.io`, `layout`, `collector_number`, `set_code`,
+    `rarity`;
+  - empates permanecem semantic-only;
+  - não há apply e não há persistência em `knowledge.db`/PostgreSQL.
+- Validação Hermes/AWS no commit `babf800c`:
+  - 50 learned-opponent decks;
+  - 5.000 instâncias de cartas;
+  - `semantic_identity_coverage=1.0`;
+  - `resolved_instances=4793`;
+  - `oracle_resolved_instances=207`;
+  - `unresolved_instances=0`;
+  - `ambiguous_instances=0`;
+  - `canonical_printing_candidate_instances=0`;
+  - recomendação mantida:
+    `do_not_apply_without_canonical_oracle_or_printing_policy`.
+
+## 2026-06-12 — Derivação de tags funcionais: overrides card-specific
+
+- `derive_functional_tags_from_battle_rules.py` continua report-only e
+  `apply=false`.
+- Foram adicionados overrides de revisão manual para impedir que regras úteis
+  ao simulador virem tags canônicas sem análise card-by-card:
+  - `Dramatic Reversal` + `ramp_ritual` ->
+    `combo_ramp_scope_review`;
+  - `Manamorphose` + `treasure_maker` ->
+    `mana_filter_not_treasure_review`;
+  - `Victory Chimes` + `draw_engine` ->
+    `mana_engine_not_draw_review`.
+- Validação Hermes/AWS no commit `86ef9062`:
+  - `rules_seen=3156`;
+  - `new_candidates_count=89`;
+  - `already_present_count=261`;
+  - `rejected_by_gate_count=2806`;
+  - `low_risk_review_count=27`;
+  - `manual_review_count=62`;
+  - `apply=false`.
+- Allowlist dry-run versionada no commit `51328ea7`:
+  - arquivo:
+    `docs/hermes-analysis/BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json`;
+  - `approved` entries: 27;
+  - `apply_approved=false`;
+  - validação Hermes/AWS:
+    - `allowlist_loaded_count=72` chaves expandidas;
+    - `allowlisted_candidates_count=27`;
+    - `allowlist_blocked_manual_review_count=0`;
+    - `allowlist_unmatched_count=0`;
+    - `apply=false`.
+- Stale cleanup + PostgreSQL transaction dry-run adicionados em 2026-06-12 e
+  reexecutados localmente e no Hermes AWS:
+  - `existing_derived_tags_count=0`;
+  - `stale_cleanup_candidates_count=0`;
+  - `would_upsert_allowlisted_count=27`;
+  - `would_delete_stale_count=0`;
+  - `rolled_back=true`;
+  - `apply=false`.
+- Caminho operator-controlled `--apply-reviewed-allowlist` existe, mas a
+  allowlist atual bloqueia apply porque `apply_approved=false`; tentativa local
+  retornou `pg_apply.blocked=true`, `pg_apply.applied=false` e
+  `allowlist_apply_approved_required`.
+- Nenhum write real em `card_function_tags` está aprovado sem nova allowlist
+  revisada com `apply_approved=true` e validação de falso positivo zero.
+
+## 2026-06-17 — Slice local Lorehold miracle/topdeck no battle
+
+- `battle_analyst_v9.py` recebeu o primeiro slice seguro para aproximar o
+  battle do plano real do `Lorehold, the Historian`.
+- Entraram no runtime local:
+  - upkeep rummage do Lorehold em turno de oponente com `decision_trace_v1`;
+  - reset de `cards_drawn_this_turn` por turno global;
+  - `Library of Leng` como `no_max_hand_size` +
+    `discard_effect_to_top_replacement`;
+  - `Library of Leng` tambem passou a cobrir os caminhos ja modelados de
+    discard por efeito em `wheel_resolved`;
+  - `Sensei's Divining Top` com reorder de topo para melhorar first
+    draw/miracle e linha segura de `draw -> put self on top` quando o topo
+    atual ja e o melhor miracle castavel;
+  - `Scroll Rack` com slice seguro de upkeep: troca de uma instant/sorcery
+    forte da mao para o topo para preparar a proxima draw step de miracle;
+  - helper reaproveitável de `miracle_cast` fora do draw step próprio.
+- Ajuste estrutural complementar:
+  - `known_cards_canonical_snapshot.json` deixou de ser exportado por ordem
+    incidental de linha; agora usa prioridade canonica de regra para nao
+    degradar cartas multi-fonte como `Approach of the Second Sun` e
+    `Library of Leng` no fallback JSON.
+  - `sync_battle_card_rules.py` passou a limpar linhas `manual` obsoletas e
+    regras `curated` superseded do mesmo card antes de reexportar o snapshot
+    local, evitando drift silencioso no cache SQLite/Hermes.
+  - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` passou a filtrar
+    linhas `curated` historicas que nao pertencem mais ao reviewed layer atual
+    antes de refreshar o SQLite Hermes, reaplicando tambem a limpeza de
+    `manual` obsoleto e `curated` superseded no espelho PG -> cache.
+- Guardrail mantido:
+  - o runtime ainda aceita fallback por nome para `Lorehold, the Historian`
+    quando o permanente antigo não vier enriquecido, mas a fonte principal passa
+    a ser a regra revisada canônica.
+- Fechamento adicional validado no mesmo ciclo:
+  - `Ashnod's Altar` saiu de metadata-only e ganhou um slice seguro de
+    ativacao contextual para `sacrifice_creature -> mana unlock`, limitado ao
+    `precombat_main`, sem sacrificar comandante e sem abrir combo engine
+    generica.
+- Validação local:
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+    -> `Ran 15 tests ... OK`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_manual_preserve.py`
+    -> `Ran 5 tests ... OK`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py`
+    -> `Ran 4 tests ... OK`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+    -> `PASS`
+- Evidência controlada gerada em:
+  - `server/test/artifacts/lorehold_battle_validation_2026-06-17/`
+    com cenários de upkeep/topdeck e upkeep+miracle cast.

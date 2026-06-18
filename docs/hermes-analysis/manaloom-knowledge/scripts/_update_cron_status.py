@@ -1,61 +1,65 @@
 #!/usr/bin/env python3
 """Generate and replace the Mana Base Validation section in CRON_STATUS.md"""
+import os
 import sqlite3, json, datetime
 from pathlib import Path
+from semantic_role_metrics import load_deck_metric_rows
 
-DB = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db'
-CRON_PATH = '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/CRON_STATUS.md'
-
-# Read current CRON_STATUS.md
-with open(CRON_PATH, 'r', encoding='utf-8') as f:
-    content = f.read()
+DB = os.environ.get(
+    'MANALOOM_KNOWLEDGE_DB',
+    '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db',
+)
+CRON_PATH = os.environ.get(
+    'MANALOOM_CRON_STATUS_PATH',
+    '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/CRON_STATUS.md',
+)
 
 # Find section boundaries
 start_marker = '## Mana Base Validation Report'
 end_marker = '## Precisão das Functional Tags'
 
+cron_file = Path(CRON_PATH)
+if cron_file.exists():
+    content = cron_file.read_text(encoding='utf-8')
+else:
+    content = (
+        '# ManaLoom Cron Status\n\n'
+        f'{start_marker}\n\n'
+        '_Nenhuma validacao registrada ainda._\n\n'
+        f'{end_marker}\n\n'
+        '_Nenhum relatorio registrado ainda._\n'
+    )
+
 start_pos = content.find(start_marker)
 end_pos = content.find(end_marker)
 
 if start_pos == -1 or end_pos == -1:
-    print("ERROR: Could not find section boundaries")
-    exit(1)
+    content = (
+        content.rstrip()
+        + '\n\n'
+        f'{start_marker}\n\n'
+        '_Nenhuma validacao registrada ainda._\n\n'
+        f'{end_marker}\n\n'
+        '_Nenhum relatorio registrado ainda._\n'
+    )
+    start_pos = content.find(start_marker)
+    end_pos = content.find(end_marker)
 
 # Read validation results from DB
 conn = sqlite3.connect(DB)
 conn.row_factory = sqlite3.Row
 cur = conn.cursor()
 
-cur.execute("SELECT id, name FROM commanders ORDER BY id")
-commanders = {r['id']: r['name'] for r in cur.fetchall()}
+has_commanders = cur.execute(
+    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='commanders'"
+).fetchone()
+if has_commanders:
+    cur.execute("SELECT id, name FROM commanders ORDER BY id")
+    commanders = {r['id']: r['name'] for r in cur.fetchall()}
+else:
+    commanders = {}
 
-cur.execute("""
-SELECT d.id, d.deck_name, d.commander_id, d.archetype,
-  COALESCE(SUM(dc.quantity), 0) as total_cards,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='land' THEN dc.quantity ELSE 0 END), 0) as lands_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='ramp' THEN dc.quantity ELSE 0 END), 0) as ramp_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='draw' THEN dc.quantity ELSE 0 END), 0) as draw_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='removal' THEN dc.quantity ELSE 0 END), 0) as removal_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='tutor' THEN dc.quantity ELSE 0 END), 0) as tutor_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='board_wipe' THEN dc.quantity ELSE 0 END), 0) as board_wipe_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='protection' THEN dc.quantity ELSE 0 END), 0) as protection_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='recursion' THEN dc.quantity ELSE 0 END), 0) as recursion_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='wincon' THEN dc.quantity ELSE 0 END), 0) as wincon_tag,
-  COALESCE(SUM(CASE WHEN dc.functional_tag='unknown' THEN dc.quantity ELSE 0 END), 0) as unknown_tag,
-  d.total_lands as col_lands,
-  d.ramp_count as col_ramp,
-  d.draw_count as col_draw,
-  d.removal_count as col_removal,
-  d.protection_count as col_protection,
-  d.wincon_count as col_wincon,
-  ROUND(AVG(dc.cmc), 2) as avg_cmc
-FROM decks d
-LEFT JOIN deck_cards dc ON dc.deck_id = d.id
-GROUP BY d.id
-ORDER BY d.id
-""")
-
-decks = [dict(r) for r in cur.fetchall()]
+decks = load_deck_metric_rows(conn)
 conn.close()
 
 now = datetime.datetime.now(datetime.timezone.utc)
@@ -68,8 +72,8 @@ lines.append('')
 lines.append(f'> Ultima atualizacao: **{timestamp}**')
 lines.append('')
 lines.append(f'**Decks analisados:** {len(decks)}')
-lines.append('**Criterios:** Lands/Ramp/Draw/Remocao vs ranges do perfil EDHREC (metricas baseadas em tags `functional_tag` de `deck_cards`, nao colunas `decks`)')
-lines.append('**⚠️ Metodologia alterada nesta execucao:** validacao agora usa SOMENTE tags de `deck_cards`, nao colunas da tabela `decks` (que estao stale). Ver Nota #9.')
+lines.append('**Criterios:** Lands/Ramp/Draw/Remocao vs ranges do perfil EDHREC (metricas baseadas em membership de `functional_tags_json` com fallback para `functional_tag`, nao colunas `decks`)')
+lines.append('**⚠️ Metodologia:** cardinalidade vem de `SUM(deck_cards.quantity)`; funcoes sao overlay multi-tag e podem somar mais que o total do deck. Ver Nota #9.')
 lines.append('')
 lines.append('### Resumo Geral')
 lines.append('')
@@ -243,11 +247,11 @@ notes_text.append(f'{note_num}. **Yuriko (#2):** `interaction=6 vs [10-16]` → 
 note_num += 1
 
 # Methodology change note
-notes_text.append(f'{note_num}. **⚠️ Mudanca metodologica nesta execucao:** Validacao anterior usava colunas da tabela `decks` (e.g., `removal_count`, `protection_count`, `wincon_count`) que estao STALE — nao refletem as tags atuais em `deck_cards`. Esta execucao usa SOMENTE tags `functional_tag` de `deck_cards`, que e a fonte de verdade. Isso explica as diferencas: Yuriko interaction 9→6, Winota protection 10→3, Aesi protection 7→3, Atraxa finishers 1→0. Nenhum dado de deck foi alterado — apenas a fonte de consulta mudou.')
+notes_text.append(f'{note_num}. **⚠️ Mudanca metodologica nesta execucao:** Validacao anterior usava colunas da tabela `decks` (e.g., `removal_count`, `protection_count`, `wincon_count`) que estao STALE. Esta execucao usa `functional_tags_json` com fallback para `functional_tag` em `deck_cards`. A cardinalidade continua vindo somente de `SUM(deck_cards.quantity)`; somas de papeis podem exceder o total porque uma carta pode ter varias funcoes. Nenhum dado de deck foi alterado — apenas a fonte de consulta mudou.')
 note_num += 1
 
 # Lorehold improvement note
-notes_text.append(f'{note_num}. **✅ Melhoria no Deck #6 (Lorehold):** 23 cartas "unknown" → 3 cartas "unknown". O classificador foi executado parcialmente, reclassificando 20/23 cartas com tags apropriadas. Restam 3 cartas com `functional_tag=\'unknown\'` e CMC invalido (Inventors\' Fair, Prismatic Vista, Reforge the Soul).')
+notes_text.append(f'{note_num}. **✅ Melhoria no Deck #6 (Lorehold):** validacao agora considera multi-tags do snapshot Hermes quando presentes. Cartas restantes sem papel funcional rastreavel devem ser tratadas no classificador/sync, nao por ajuste manual de coluna stale.')
 note_num += 1
 
 for nt in notes_text:
@@ -264,8 +268,8 @@ new_section = '\n'.join(lines)
 new_content = content[:start_pos] + new_section + content[end_pos:]
 
 # Write back
-with open(CRON_PATH, 'w', encoding='utf-8') as f:
-    f.write(new_content)
+cron_file.parent.mkdir(parents=True, exist_ok=True)
+cron_file.write_text(new_content, encoding='utf-8')
 
 print(f"CRON_STATUS.md updated successfully at {timestamp}")
 print(f"Section length: {len(new_section)} chars")

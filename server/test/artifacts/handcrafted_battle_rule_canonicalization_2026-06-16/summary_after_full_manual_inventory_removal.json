@@ -1,0 +1,16 @@
+{
+  "battle_script": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "counts": {
+    "classification": {},
+    "pg_state": {},
+    "recommended_action": {},
+    "sqlite_state": {}
+  },
+  "entries": [],
+  "generated_at": "2026-06-16T14:16:42.110832+00:00",
+  "handcrafted_count": 0,
+  "pg_error": null,
+  "pg_target": "configured",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "sqlite_rule_count": 3158
+}

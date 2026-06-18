@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io' show Platform, Directory, File;
 
 import 'package:http/http.dart' as http;
+import 'package:server/basic_land_utils.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -409,16 +410,6 @@ void main() {
             'Deck size=$size bracket=$bracket retornou quantidade absurda para "$key".',
       );
     }
-  }
-
-  bool isBasicLandName(String name) {
-    final normalized = name.trim().toLowerCase();
-    return normalized == 'plains' ||
-        normalized == 'island' ||
-        normalized == 'swamp' ||
-        normalized == 'mountain' ||
-        normalized == 'forest' ||
-        normalized == 'wastes';
   }
 
   setUpAll(() async {

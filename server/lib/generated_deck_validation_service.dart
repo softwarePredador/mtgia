@@ -1,5 +1,6 @@
 import 'package:postgres/postgres.dart';
 
+import 'ai/cmc_safety.dart';
 import 'basic_land_utils.dart' as basic_lands;
 import 'card_validation_service.dart';
 import 'color_identity.dart';
@@ -112,6 +113,20 @@ class GeneratedDeckValidationService {
 
     final sanitizedCards = <Map<String, dynamic>>[];
     final warnings = <String>[];
+    final unsupportedSections = unsupportedDeckSectionLabels(cards);
+    if (unsupportedSections.isNotEmpty) {
+      return GeneratedDeckValidationResult(
+        generatedDeck: const {'cards': <Map<String, dynamic>>[]},
+        errors: [unsupportedDeckSectionsMessage(unsupportedSections)],
+        invalidCards: const [],
+        suggestions: const {},
+        warnings: const [],
+        totalSuggestedEntries: cards.length,
+        totalSuggestedCards: _sumRawCardQuantities(cards),
+        totalResolvedEntries: 0,
+        totalResolvedCards: 0,
+      );
+    }
 
     for (final rawCard in cards) {
       final rawName = rawCard['name']?.toString() ?? '';
@@ -178,6 +193,7 @@ class GeneratedDeckValidationService {
         'colors': resolved['colors'],
         'oracle_text': resolved['oracle_text'],
         'mana_cost': resolved['mana_cost'],
+        'cmc': resolved['cmc'],
         'quantity': card['quantity'],
         'is_commander': false,
       });
@@ -198,6 +214,7 @@ class GeneratedDeckValidationService {
           'colors': commanderCard['colors'],
           'oracle_text': commanderCard['oracle_text'],
           'mana_cost': commanderCard['mana_cost'],
+          'cmc': commanderCard['cmc'],
           'quantity': 1,
           'is_commander': true,
         };
@@ -223,6 +240,8 @@ class GeneratedDeckValidationService {
         warnings: warnings,
       );
     }
+
+    _appendCmcIntegrityWarnings(consolidatedCards, warnings);
 
     final errors = <String>[];
     if (requiresCommander && resolvedCommander == null) {
@@ -340,6 +359,15 @@ class GeneratedDeckValidationService {
         (sum, card) => sum + (card['quantity'] as int),
       ),
     );
+  }
+
+  int _sumRawCardQuantities(List<Map<String, dynamic>> cards) {
+    return cards.fold<int>(0, (sum, card) {
+      final raw = card['quantity'];
+      final quantity =
+          raw is int ? raw : int.tryParse(raw?.toString() ?? '') ?? 1;
+      return quantity > 0 ? sum + quantity : sum;
+    });
   }
 
   Future<List<Map<String, dynamic>>?> _tryAutoRepairCommanderOrBrawl({
@@ -487,6 +515,10 @@ class GeneratedDeckValidationService {
           'name': resolved['name'],
           'type_line': resolved['type_line'],
           'color_identity': resolved['color_identity'],
+          'colors': resolved['colors'],
+          'oracle_text': resolved['oracle_text'],
+          'mana_cost': resolved['mana_cost'],
+          'cmc': resolved['cmc'],
           'quantity': qty,
           'is_commander': false,
         });
@@ -662,6 +694,7 @@ class GeneratedDeckValidationService {
         'colors': resolved['colors'],
         'oracle_text': resolved['oracle_text'],
         'mana_cost': resolved['mana_cost'],
+        'cmc': resolved['cmc'],
         'quantity': entry.value,
         'is_commander': false,
       });
@@ -766,6 +799,31 @@ class GeneratedDeckValidationService {
     }
 
     return byId.values.toList();
+  }
+
+  static void _appendCmcIntegrityWarnings(
+    List<Map<String, dynamic>> cards,
+    List<String> warnings,
+  ) {
+    final suspiciousNames = <String>[];
+    for (final card in cards) {
+      if (!hasSuspiciousNonLandCmc(card)) continue;
+      final name = (card['name'] ?? '').toString().trim();
+      suspiciousNames.add(name.isEmpty ? 'card_id=${card['card_id']}' : name);
+    }
+
+    if (suspiciousNames.isEmpty) return;
+
+    const maxNames = 8;
+    final shown = suspiciousNames.take(maxNames).join(', ');
+    final hidden = suspiciousNames.length > maxNames
+        ? suspiciousNames.length - maxNames
+        : 0;
+    warnings.add(
+      hidden > 0
+          ? 'Integridade CMC: ${suspiciousNames.length} carta(s) não-terreno têm CMC ausente/zerado suspeito contra mana_cost; exemplos: $shown; +$hidden.'
+          : 'Integridade CMC: ${suspiciousNames.length} carta(s) não-terreno têm CMC ausente/zerado suspeito contra mana_cost: $shown.',
+    );
   }
 
   static String _lookupKey(

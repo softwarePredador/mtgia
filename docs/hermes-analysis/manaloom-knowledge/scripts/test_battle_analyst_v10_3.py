@@ -188,6 +188,24 @@ misc_regression_spec = importlib.util.spec_from_file_location(
 battle_misc_regression_tests = importlib.util.module_from_spec(misc_regression_spec)
 misc_regression_spec.loader.exec_module(battle_misc_regression_tests)
 
+DECISION_TRACE_TESTS_PATH = MODULE_PATH.with_name("battle_decision_trace_tests.py")
+decision_trace_spec = importlib.util.spec_from_file_location(
+    "battle_decision_trace_tests_under_test",
+    DECISION_TRACE_TESTS_PATH,
+)
+battle_decision_trace_tests = importlib.util.module_from_spec(decision_trace_spec)
+decision_trace_spec.loader.exec_module(battle_decision_trace_tests)
+
+PG_RULE_FALLBACK_TESTS_PATH = MODULE_PATH.with_name(
+    "test_runtime_pg_rule_fallback_for_promoted_hotfixes.py"
+)
+pg_rule_fallback_spec = importlib.util.spec_from_file_location(
+    "pg_rule_fallback_tests_under_test",
+    PG_RULE_FALLBACK_TESTS_PATH,
+)
+pg_rule_fallback_tests = importlib.util.module_from_spec(pg_rule_fallback_spec)
+pg_rule_fallback_spec.loader.exec_module(pg_rule_fallback_tests)
+
 
 def card(name, cmc=99, effect="unknown", power=0):
     return {
@@ -207,6 +225,17 @@ def player(name, deck=None):
 CONFORMANCE_SCENARIOS = battle_conformance_tests.build_conformance_scenarios(
     battle_rules_2026_tests.CONFORMANCE_SCENARIOS_2026,
 )
+
+
+def test_promoted_hotfixes_resolve_from_sqlite_without_manual_override():
+    case = pg_rule_fallback_tests.RuntimePgRuleFallbackForPromotedHotfixesTests(
+        "test_canonicalized_overrides_resolve_from_sqlite_without_manual_override"
+    )
+    case.setUp()
+    try:
+        case.test_canonicalized_overrides_resolve_from_sqlite_without_manual_override()
+    finally:
+        case.tearDown()
 
 
 if __name__ == "__main__":
@@ -230,6 +259,8 @@ if __name__ == "__main__":
         *battle_summoning_sickness_tests.register_tests(battle, player, card),
         *battle_zone_transition_tests.register_tests(battle, player, card),
         *battle_misc_regression_tests.register_tests(battle, player, replay_auditor),
+        *battle_decision_trace_tests.register_tests(battle, replay_auditor),
+        test_promoted_hotfixes_resolve_from_sqlite_without_manual_override,
     ]
     for test in tests:
         if hasattr(battle, "clear_pending_triggers"):

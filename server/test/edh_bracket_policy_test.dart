@@ -40,7 +40,9 @@ void main() {
       );
 
       expect(field.categories, contains(BracketCategory.gameChanger));
+      expect(field.categories, contains(BracketCategory.valueEngine));
       expect(breach.categories, contains(BracketCategory.gameChanger));
+      expect(breach.categories, contains(BracketCategory.infiniteCombo));
     });
 
     test('detects curated free interaction even when oracle text is missing',
@@ -74,14 +76,60 @@ void main() {
     });
 
     test('detects curated value engines without oracle text', () {
-      final tags = tagCardForBracket(
-        name: 'Tergrid, God of Fright',
-        typeLine: 'Legendary Creature - God',
-        oracleText: '',
-      );
+      for (final name in const [
+        'Tergrid, God of Fright',
+        'Consecrated Sphinx',
+        'Field of the Dead',
+        'Smothering Tithe',
+        'The One Ring',
+      ]) {
+        final tags = tagCardForBracket(
+          name: name,
+          typeLine: 'Legendary Permanent',
+          oracleText: '',
+        );
 
-      expect(tags.categories, contains(BracketCategory.valueEngine));
-      expect(tags.categories, contains(BracketCategory.gameChanger));
+        expect(
+          tags.categories,
+          contains(BracketCategory.valueEngine),
+          reason: name,
+        );
+        expect(
+          tags.categories,
+          contains(BracketCategory.gameChanger),
+          reason: name,
+        );
+      }
+    });
+
+    test('detects curated and text-based gamechanger stax pieces', () {
+      for (final card in const [
+        {
+          'name': 'Narset, Parter of Veils',
+          'oracle': 'Each opponent can\'t draw more than one card each turn.',
+        },
+        {
+          'name': 'Grand Arbiter Augustin IV',
+          'oracle': 'Spells your opponents cast cost {1} more to cast.',
+        },
+      ]) {
+        final tags = tagCardForBracket(
+          name: card['name']!,
+          typeLine: 'Legendary Creature',
+          oracleText: card['oracle']!,
+        );
+
+        expect(
+          tags.categories,
+          contains(BracketCategory.stax),
+          reason: card['name'],
+        );
+        expect(
+          tags.categories,
+          contains(BracketCategory.gameChanger),
+          reason: card['name'],
+        );
+      }
     });
   });
 }

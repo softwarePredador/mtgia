@@ -22,6 +22,9 @@ def _dotenv_candidates() -> list[Path]:
         env_path = base / ".env"
         if env_path not in candidates:
             candidates.append(env_path)
+        server_env_path = base / "server" / ".env"
+        if server_env_path not in candidates:
+            candidates.append(server_env_path)
     return candidates
 
 

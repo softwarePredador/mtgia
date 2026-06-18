@@ -19,8 +19,9 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
   no iPhone Simulator.
 - **OPEN:** geometria 2p/3p/4p contra benchmark, centragem otica, hub central,
   DICE overlay, PLAYERS overlay, commander damage, motion final e side-by-side.
-- **Regra:** nao marcar Life Counter como DONE sem side-by-side final com
-  `dddddd/` e sem documento de freeze.
+- **Regra:** nao marcar Life Counter como DONE sem side-by-side final contra
+  benchmark arquivado/goldens atuais e sem documento de freeze. O dump bruto
+  antigo `dddddd/` nao e mais fonte operacional versionada.
 
 ### LC.1 — Geometria fina 2p/3p/4p nao travada
 - **Arquivo:** `app/lib/features/home/life_counter_screen.dart` / `lotus_visual_skin.dart`
@@ -90,9 +91,9 @@ Baseadas em `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md` e validacao no codi
 ### LC.8 — Side-by-side final com benchmark + freeze
 - **Arquivo:** `app/doc/runtime_flow_handoffs/` / novo documento
 - **Status:** OPEN / RELEASE_GATE
-- **Evidencia:** Task doc seccao Fase E: "side-by-side final com benchmark". A pasta `dddddd/` contem 10 capturas do benchmark. Nao ha documento de comparacao visual publicado desde 2026-03-26.
+- **Evidencia:** Task doc seccao Fase E: "side-by-side final com benchmark". O dump bruto antigo com capturas do benchmark foi removido do versionamento; nao ha documento de comparacao visual publicado desde 2026-03-26 usando goldens atuais ou artefato arquivado.
 - **Por que importa:** Sem comparacao direta, nao e possivel provar que o clone esta no nivel aceitavel.
-- **Ajuste recomendado:** Gerar screenshots do estado atual, comparar com as 10 capturas do benchmark em `dddddd/`. Documentar discrepancias. Congelar aceite.
+- **Ajuste recomendado:** Gerar screenshots do estado atual, comparar com benchmark arquivado/goldens atuais. Documentar discrepancias. Congelar aceite.
 - **Criterio de pronto:** Documento de side-by-side publicado. Todos os 8 gaps acima fechados ou aceitos como "risco aceito". Life counter marcado como DONE.
 - **Teste:** Screenshots + documento comparativo.
 

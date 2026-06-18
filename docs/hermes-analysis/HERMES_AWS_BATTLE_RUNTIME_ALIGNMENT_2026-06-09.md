@@ -9,10 +9,12 @@ and operational cron wrappers.
 
 - Active battle engine: `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`.
 - Legacy engines (`battle_analyst.py`, `battle_analyst_v6.py`, `battle_analyst_v7.py`,
-  `battle_analyst_v8.py`) are historical comparison targets only.
+  `battle_analyst_v8.py`) were removed from the operational tree. Old reports may
+  reference them only as historical evidence.
 - Operational scripts must either default to v9 or honor `MANALOOM_BATTLE_SCRIPT`.
-- One-shot patch/build scripts that target v8 are archived under
-  `server/bin/legacy/hermes_battle_patchers/` and must not be used by crons.
+- One-shot patch/build scripts that targeted v8 were removed. Future battle
+  changes must edit `battle_analyst_v9.py` or support modules directly and add
+  focused regression tests.
 
 ## AWS Findings
 
@@ -63,7 +65,7 @@ python3 -m py_compile \
 
 ## Operating Notes
 
-- Do not run old patchers from `server/bin/legacy/hermes_battle_patchers/`.
+- Do not restore old patchers from historical branches or external workspaces.
 - Do not treat remaining `battle_analyst_v8.py` mentions in old reports as
   operational instructions.
 - If a cron needs a custom engine, set `MANALOOM_BATTLE_SCRIPT` explicitly.

@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart';
 import 'dart:developer' as developer;
 
+import 'ai/cmc_safety.dart';
 import 'basic_land_utils.dart' as basic_lands;
 
 /// Serviço de validação de cartas para prevenir alucinações da IA
@@ -171,6 +172,24 @@ class CardValidationService {
         continue;
       }
 
+      final canonicalCmc = cardInfo['cmc'];
+      if (card.containsKey('cmc') &&
+          _cmcValuesDiffer(card['cmc'], canonicalCmc)) {
+        warnings.add(
+          '${cardInfo['name']}: CMC informado (${card['cmc']}) difere do cards.cmc autoritativo ($canonicalCmc).',
+        );
+      }
+      if (hasSuspiciousNonLandCmc({
+        'name': cardInfo['name'],
+        'type_line': cardInfo['type_line'],
+        'mana_cost': cardInfo['mana_cost'],
+        'cmc': canonicalCmc,
+      })) {
+        warnings.add(
+          '${cardInfo['name']}: cards.cmc ausente/zerado suspeito contra mana_cost; revisar sync de cartas.',
+        );
+      }
+
       // Verifica legalidade
       if (!await isCardLegalInFormat(cardId, format)) {
         errors.add('${cardInfo['name']} não é legal no formato $format');
@@ -210,7 +229,7 @@ class CardValidationService {
     try {
       final result = await _pool.execute(
         Sql.named(
-            'SELECT id, name, type_line FROM cards WHERE id = @id LIMIT 1'),
+            'SELECT id, name, type_line, mana_cost, cmc FROM cards WHERE id = @id LIMIT 1'),
         parameters: {'id': cardId},
       );
 
@@ -219,6 +238,8 @@ class CardValidationService {
           'id': result.first[0] as String,
           'name': result.first[1] as String,
           'type_line': result.first[2] as String,
+          'mana_cost': result.first[3] as String?,
+          'cmc': result.first[4],
         };
       }
     } catch (e) {
@@ -246,5 +267,21 @@ class CardValidationService {
     cleaned = cleaned.replaceAll(RegExp(r'\s*\([A-Za-z0-9]+\)\s*$'), '');
 
     return cleaned;
+  }
+
+  static bool _cmcValuesDiffer(Object? informed, Object? canonical) {
+    if (informed == null && canonical == null) return false;
+    final informedParsed = _parseCmcNumber(informed);
+    final canonicalParsed = _parseCmcNumber(canonical);
+    if (informedParsed == null || canonicalParsed == null) {
+      return informed?.toString().trim() != canonical?.toString().trim();
+    }
+    return (informedParsed - canonicalParsed).abs() > 0.001;
+  }
+
+  static double? _parseCmcNumber(Object? raw) {
+    if (raw == null) return null;
+    if (raw is num) return raw.toDouble();
+    return double.tryParse(raw.toString().trim());
   }
 }

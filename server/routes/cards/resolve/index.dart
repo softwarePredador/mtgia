@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import '../../../lib/card_identity_support.dart';
 import '../../../lib/card_resolution_support.dart';
 import '../../../lib/scryfall_image_url.dart';
 
@@ -52,6 +53,7 @@ Future<Response> onRequest(RequestContext context) async {
     );
   }
   final includeTokens = _parseBool(body['include_tokens']);
+  final hasIdentityColumns = await hasCardIdentityColumns(pool);
 
   try {
     // ─── 1) Busca local (nome exato, case-insensitive) ───
@@ -60,6 +62,7 @@ Future<Response> onRequest(RequestContext context) async {
       name,
       exact: true,
       includeTokens: includeTokens,
+      hasIdentityColumns: hasIdentityColumns,
     );
     if (localExact.isNotEmpty) {
       return Response.json(body: {
@@ -86,6 +89,7 @@ Future<Response> onRequest(RequestContext context) async {
         pool,
         scryfallToken,
         includeTokens: true,
+        hasIdentityColumns: hasIdentityColumns,
       );
       await _insertLegalities(pool, insertedCards, scryfallToken);
 
@@ -94,6 +98,7 @@ Future<Response> onRequest(RequestContext context) async {
         scryfallToken['name'] as String,
         exact: true,
         includeTokens: true,
+        hasIdentityColumns: hasIdentityColumns,
       );
 
       return Response.json(body: {
@@ -111,6 +116,7 @@ Future<Response> onRequest(RequestContext context) async {
         pool,
         localDecision.matchedName!,
         exact: true,
+        hasIdentityColumns: hasIdentityColumns,
       );
       return Response.json(body: {
         'source': 'local',
@@ -153,6 +159,7 @@ Future<Response> onRequest(RequestContext context) async {
       pool,
       scryfallCard,
       includeTokens: false,
+      hasIdentityColumns: hasIdentityColumns,
     );
 
     // ─── 5) Insere legalities ───
@@ -165,6 +172,7 @@ Future<Response> onRequest(RequestContext context) async {
       scryfallCard['name'] as String,
       exact: true,
       includeTokens: false,
+      hasIdentityColumns: hasIdentityColumns,
     );
 
     return Response.json(body: {
@@ -191,8 +199,10 @@ Future<List<Map<String, dynamic>>> _searchLocal(
   String name, {
   required bool exact,
   bool includeTokens = false,
+  required bool hasIdentityColumns,
 }) async {
   final hasSets = await _hasTable(pool, 'sets');
+  final identityColumns = cardIdentitySelectSql('c', hasIdentityColumns);
 
   final condition =
       exact ? 'LOWER(c.name) = LOWER(@name)' : 'c.name ILIKE @name';
@@ -204,6 +214,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       ? '''
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
+      $identityColumns
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
       s.name AS set_name, s.release_date AS set_release_date,
       c.rarity, c.price, c.price_updated_at, c.collector_number, c.foil
@@ -216,6 +227,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       : '''
     SELECT
       c.id::text, c.scryfall_id::text, c.name, c.mana_cost, c.type_line,
+      $identityColumns
       c.oracle_text, c.colors, c.color_identity, c.image_url, c.set_code,
       c.rarity, c.price, c.price_updated_at, c.collector_number, c.foil
     FROM cards c
@@ -234,6 +246,9 @@ Future<List<Map<String, dynamic>>> _searchLocal(
     return {
       'id': m['id'],
       'scryfall_id': m['scryfall_id'],
+      'oracle_id': m['oracle_id'],
+      'layout': m['layout'],
+      'card_faces': m['card_faces_json'],
       'name': m['name'],
       'mana_cost': m['mana_cost'],
       'type_line': m['type_line'],
@@ -412,7 +427,7 @@ Future<Map<String, dynamic>?> _fetchFromScryfallSearch(String name) async {
 /// printings da mesma carta (via prints_search_uri) para importar todas.
 Future<List<Map<String, dynamic>>> _insertScryfallCard(
     Pool pool, Map<String, dynamic> scryfallCard,
-    {required bool includeTokens}) async {
+    {required bool includeTokens, required bool hasIdentityColumns}) async {
   final oracleId = scryfallCard['oracle_id'] as String?;
   if (oracleId == null || oracleId.isEmpty) return [];
 
@@ -425,8 +440,10 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
   final inserted = <Map<String, dynamic>>[];
 
   for (final card in allPrintings) {
+    final identity = scryfallIdentityPayload(card);
+
     // Usar o ID único da printing (não oracle_id, que é igual para todas as edições)
-    final scryfallUniqueId = card['id'] as String?;
+    final scryfallUniqueId = identity['scryfall_id'];
     if (scryfallUniqueId == null || scryfallUniqueId.isEmpty) continue;
 
     final cardName = card['name']?.toString() ?? '';
@@ -490,22 +507,37 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
     final foil = card['foil'] is bool ? card['foil'] as bool : null;
 
     try {
+      final identityInsertColumns =
+          hasIdentityColumns ? ', oracle_id, layout, card_faces_json' : '';
+      final identityInsertValues = hasIdentityColumns
+          ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
+          : '';
+      final identityUpdates = hasIdentityColumns
+          ? '''
+            oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
+            layout = COALESCE(EXCLUDED.layout, cards.layout),
+            card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
+'''
+          : '';
       await pool.execute(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
                              colors, color_identity, image_url, set_code, rarity, cmc,
-                             collector_number, foil)
+                             collector_number, foil$identityInsertColumns)
           VALUES (
-            @oracle_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
+            @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal, @collector_number, @foil
+            @cmc::decimal, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
-            foil = COALESCE(cards.foil, EXCLUDED.foil)
+            foil = COALESCE(cards.foil, EXCLUDED.foil),
+            $identityUpdates
+            created_at = cards.created_at
         '''),
         parameters: {
-          'oracle_id': scryfallUniqueId,
+          'scryfall_id': scryfallUniqueId,
+          'oracle_id': identity['oracle_id'],
           'name': cardName,
           'mana_cost': manaCost,
           'type_line': typeLine,
@@ -518,6 +550,8 @@ Future<List<Map<String, dynamic>>> _insertScryfallCard(
           'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
           'collector_number': collectorNumber,
           'foil': foil,
+          'layout': identity['layout'],
+          'card_faces_json': identity['card_faces_json'],
         },
       );
       inserted.add(card);

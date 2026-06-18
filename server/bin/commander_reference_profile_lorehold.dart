@@ -8,6 +8,33 @@ import 'package:server/database.dart';
 const _defaultArtifactDir =
     'test/artifacts/commander_reference_profile_lorehold_2026-05-11';
 
+Map<String, dynamic> buildGenerateContractSummary() {
+  return {
+    'request_field': 'commander_name',
+    'regression_fixture_commander': loreholdReferenceCommanderName,
+    'exact_profile_activation': 'persisted_profile_confidence_gte_medium',
+    'runtime_built_in_fallback_scope': loreholdReferenceCommanderName,
+    'archetype_reuse_when_no_exact_profile': true,
+    'diagnostics': [
+      'reference_profile_used',
+      'reference_profile_source',
+      'reference_profile_version',
+      'profile_confidence',
+      'themes',
+      'source_count',
+      'runtime_profile_origin',
+      'runtime_profile_reason',
+      'reference_card_stats_used',
+      'on_theme_candidate_count',
+      'unresolved_reference_cards',
+      'package_keys',
+      'reference_deck_evaluation',
+    ],
+    'learned_decks_direct_input_to_ai_generate': false,
+    'learned_decks_product_route': '/ai/commander-learning',
+  };
+}
+
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
@@ -89,23 +116,7 @@ Future<void> main(List<String> args) async {
         'cache_version':
             commanderReferenceCardStatsCacheVersion(loadedStats.stats),
       },
-      'generate_contract': {
-        'request_field': 'commander_name',
-        'enabled_only_for': loreholdReferenceCommanderName,
-        'minimum_confidence': 'medium',
-        'diagnostics': [
-          'reference_profile_used',
-          'reference_card_stats_used',
-          'profile_confidence',
-          'themes',
-          'source_count',
-          'on_theme_candidate_count',
-          'unresolved_reference_cards',
-          'package_keys',
-          'reference_deck_evaluation',
-        ],
-        'fallback_for_other_commanders': 'legacy_generate_path',
-      },
+      'generate_contract': buildGenerateContractSummary(),
       'comparison': _buildLoreholdComparison(profile),
       'safety': {
         'no_scraping': true,

@@ -1,4 +1,5 @@
 import 'package:server/ai/commander_fallback_policy.dart';
+import 'package:server/ai/commander_learning_snapshot_support.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:test/test.dart';
 
@@ -120,6 +121,38 @@ void main() {
       expect(ramp.score, greaterThanOrEqualTo(70));
     });
 
+    test(
+        'role scores use bounded EDHREC inclusion evidence as a ranking signal',
+        () {
+      final baseline = buildCandidateRoleScores(
+        name: 'Arcane Signet',
+        typeLine: 'Artifact',
+        oracleText:
+            '{T}: Add one mana of any color in your commander\'s color identity.',
+        manaCost: '{2}',
+        priceUsd: 1.5,
+        priceUsdFoil: null,
+        cmc: 2,
+      ).firstWhere((score) => score.role == 'ramp');
+
+      final withEdhrec = buildCandidateRoleScores(
+        name: 'Arcane Signet',
+        typeLine: 'Artifact',
+        oracleText:
+            '{T}: Add one mana of any color in your commander\'s color identity.',
+        manaCost: '{2}',
+        priceUsd: 1.5,
+        priceUsdFoil: null,
+        cmc: 2,
+        edhrecInclusionRate: 0.42,
+        edhrecSampleDecks: 4200,
+      ).firstWhere((score) => score.role == 'ramp');
+
+      expect(withEdhrec.score, greaterThan(baseline.score));
+      expect(withEdhrec.evidence, contains('edhrec_inclusion_rate=0.420'));
+      expect(withEdhrec.evidence, contains('edhrec_sample_decks=4200'));
+    });
+
     test('uses versioned high-power and premium name policy', () {
       expect(candidateQualityHighPowerNames, contains('thassa\'s oracle'));
       expect(candidateQualityPremiumNames, contains('sol ring'));
@@ -141,6 +174,7 @@ void main() {
         ...candidateQualitySchemaStatements,
         ...candidateQualityIndexStatements,
         optimizeCandidateQualitySummaryViewStatement,
+        cardIntelligenceSnapshotViewStatement,
       ].join('\n').toLowerCase();
 
       expect(schema, contains('create table if not exists card_function_tags'));
@@ -158,6 +192,108 @@ void main() {
       expect(schema, isNot(contains('delete from cards')));
       expect(schema, isNot(contains('alter table cards')));
       expect(schema, isNot(contains('alter table card_legalities')));
+    });
+
+    test('card intelligence snapshot aggregates sources before card joins', () {
+      final view = cardIntelligenceSnapshotViewStatement.toLowerCase();
+
+      expect(
+          view, contains('create or replace view card_intelligence_snapshot'));
+      expect(view, contains('c.id as id'));
+      expect(view, contains('c.id as card_id'));
+      expect(view, contains('c.name as name'));
+      expect(view, contains('c.name as card_name'));
+      expect(view, contains('c.image_url'));
+      expect(view, contains('with function_tags as'));
+      expect(view, contains('role_scores as'));
+      expect(view, contains('commander_synergy as'));
+      expect(view, contains('semantic_v2 as'));
+      expect(view, contains('battle_rules as'));
+      expect(view, contains('legalities as'));
+      expect(view, contains('rulings as'));
+      expect(view, contains('group by card_id'));
+      expect(view, contains('from cards c'));
+      expect(view, contains('left join function_tags ft on ft.card_id = c.id'));
+      expect(view, contains('left join role_scores rs on rs.card_id = c.id'));
+      expect(view, contains('left join battle_rules br on br.card_id = c.id'));
+      expect(view, contains('battle_rule_count'));
+      expect(view, contains('verified_battle_rules'));
+      expect(view, contains("'execution_status', execution_status"));
+      expect(view, contains('source_coverage'));
+
+      for (final source in [
+        'from card_function_tags',
+        'from card_role_scores',
+        'from commander_card_synergy',
+        'from card_semantic_tags_v2',
+        'from card_battle_rules',
+        'from card_legalities',
+        'from card_rulings',
+      ]) {
+        expect(
+          view,
+          contains(source),
+          reason: '$source must remain inside an aggregating CTE.',
+        );
+      }
+
+      expect(view, isNot(contains('left join card_battle_rules')));
+      expect(view, isNot(contains('left join card_function_tags')));
+      expect(view, isNot(contains('left join card_semantic_tags_v2')));
+      expect(view, isNot(contains('left join card_role_scores')));
+      expect(view, isNot(contains('left join commander_card_synergy')));
+    });
+
+    test('candidate quality summary aggregates multi-row sources first', () {
+      final view = optimizeCandidateQualitySummaryViewStatement.toLowerCase();
+
+      expect(
+        view,
+        contains('create or replace view optimize_candidate_quality_summary'),
+      );
+      expect(view, contains('with meta_insights as'));
+      expect(view, contains('function_tags as'));
+      expect(view, contains('role_scores as'));
+      expect(view, contains('semantic_v2 as'));
+      expect(view, contains('group by card_id'));
+      expect(view, contains('from cards c'));
+      expect(view, contains('left join function_tags ft on ft.card_id = c.id'));
+      expect(view, contains('left join role_scores rs on rs.card_id = c.id'));
+      expect(view, contains('left join semantic_v2 sv2 on sv2.card_id = c.id'));
+      expect(view, isNot(contains('left join card_function_tags')));
+      expect(view, isNot(contains('left join card_semantic_tags_v2')));
+      expect(view, isNot(contains('left join card_role_scores')));
+    });
+
+    test('commander learning snapshot aggregates safe learning signals', () {
+      final view = commanderLearningSnapshotViewStatement.toLowerCase();
+
+      expect(
+          view, contains('create or replace view commander_learning_snapshot'));
+      expect(view, contains('active_learned_decks as'));
+      expect(view, contains('usage_summary as'));
+      expect(view, contains('synergy_summary as'));
+      expect(view, contains('from commander_learned_decks'));
+      expect(view, contains('from commander_card_usage'));
+      expect(view, contains('from commander_card_synergy'));
+      expect(view, contains('card_identity_bridge'));
+      expect(view, contains('jsonb_agg'));
+      expect(view, contains('metadata_hidden'));
+      expect(view, contains('source_coverage'));
+      expect(view, contains('partition by ccu.commander_name_normalized'));
+      expect(view, contains('partition by ccs.commander_name_normalized'));
+
+      expect(
+        view,
+        isNot(contains("'metadata'")),
+        reason: 'Raw Hermes metadata must not be surfaced in the snapshot.',
+      );
+      expect(
+        view,
+        isNot(contains('cld.metadata')),
+        reason: 'Raw Hermes metadata must stay hidden from normal consumers.',
+      );
+      expect(view, isNot(contains('left join card_battle_rules')));
     });
   });
 }

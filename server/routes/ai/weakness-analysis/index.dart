@@ -28,6 +28,17 @@ Future<Response> onRequest(RequestContext context) async {
 
     final pool = context.read<Pool>();
     final countersService = ArchetypeCountersService(pool);
+    final hasCardIntelligenceSnapshot =
+        await _hasTable(pool, 'card_intelligence_snapshot');
+    final cardSourceJoin = hasCardIntelligenceSnapshot
+        ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+        : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect = hasCardIntelligenceSnapshot
+        ? 'c.function_tag_details AS functional_tags'
+        : await _functionalTagsSelectSql(pool);
+    final semanticV2Select = hasCardIntelligenceSnapshot
+        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+        : await _semanticV2SelectSql(pool);
 
     // 1. Buscar informações do deck
     final deckResult = await pool.execute(
@@ -62,9 +73,11 @@ Future<Response> onRequest(RequestContext context) async {
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
                ) as cmc,
-               c.scryfall_id::text as oracle_id
+               COALESCE(c.oracle_id::text, c.scryfall_id::text) as oracle_id,
+               $functionalTagsSelect,
+               $semanticV2Select
         FROM deck_cards dc 
-        JOIN cards c ON c.id = dc.card_id 
+        $cardSourceJoin
         WHERE dc.deck_id = @id
       '''),
       parameters: {'id': deckId},
@@ -73,6 +86,7 @@ Future<Response> onRequest(RequestContext context) async {
     final cards = <Map<String, dynamic>>[];
     final deckColors = <String>{};
     final deckOracleIds = <String>{};
+    final deckCardNames = <String>{};
 
     int totalCards = 0;
     int landCount = 0;
@@ -95,9 +109,12 @@ Future<Response> onRequest(RequestContext context) async {
       final quantity = row[5] as int;
       final cmc = (row[6] as num?)?.toDouble() ?? 0;
       final oracleId = (row[7] as String?) ?? '';
+      final functionalTags = row[8];
+      final semanticTagsV2 = row[9];
 
       deckColors.addAll(colors);
       if (oracleId.isNotEmpty) deckOracleIds.add(oracleId);
+      deckCardNames.add(name.toLowerCase());
       totalCards += quantity;
 
       cards.add({
@@ -108,12 +125,16 @@ Future<Response> onRequest(RequestContext context) async {
         'colors': colors,
         'quantity': quantity,
         'cmc': cmc,
+        'functional_tags': functionalTags,
+        'semantic_tags_v2': semanticTagsV2,
       });
 
       final typeLineLower = typeLine.toLowerCase();
 
       // Usar adapter F1 (resolveCardFunctionalRoles) em vez de heuristicas oracle_text
       final cardRoles = resolveCardFunctionalRoles(
+        functionalTags: functionalTags,
+        semanticTagsV2: semanticTagsV2,
         oracleText: oracleText,
         typeLine: typeLine,
         name: name,
@@ -133,12 +154,16 @@ Future<Response> onRequest(RequestContext context) async {
       }
 
       // Contagem via adapter F1
-      if (cardRoles.contains('ramp') || cardRoles.contains('ritual')) rampCount += quantity;
-      if (cardRoles.contains('draw') || cardRoles.contains('loot')) drawCount += quantity;
+      if (cardRoles.contains('ramp') || cardRoles.contains('ritual'))
+        rampCount += quantity;
+      if (cardRoles.contains('draw') || cardRoles.contains('loot'))
+        drawCount += quantity;
       if (cardRoles.contains('removal')) removalCount += quantity;
-      if (cardRoles.contains('wipe') || cardRoles.contains('board_wipe')) boardWipeCount += quantity;
+      if (cardRoles.contains('wipe') || cardRoles.contains('board_wipe'))
+        boardWipeCount += quantity;
       if (cardRoles.contains('protection')) protectionCount += quantity;
-      if (cardRoles.contains('recursion') || cardRoles.contains('graveyard')) graveyardInteractionCount += quantity;
+      if (cardRoles.contains('recursion') || cardRoles.contains('graveyard'))
+        graveyardInteractionCount += quantity;
     }
 
     // 3. Detectar arquétipo do deck
@@ -190,13 +215,23 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': rampCount < 5 ? 'critical' : 'high',
         'description':
             'Deck tem apenas $rampCount fontes de ramp. Recomendado: 10-12.',
-        'recommendations': [
-          'Sol Ring',
-          'Arcane Signet',
-          'Signets/Talismans das suas cores',
-          'Cultivate',
-          'Kodama\'s Reach'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['ramp', 'ritual'],
+          oraclePatterns: const [
+            'add {%',
+            '%search your library%land%',
+            '%put%land%onto the battlefield%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 5,
+          fallback: const [
+            'Buscar ramp legal nas cores do deck',
+            'Priorizar rocks, dorks ou ramp de terrenos conforme a identidade',
+          ],
+        ),
         'current_value': rampCount,
         'recommended_value': 10,
       });
@@ -209,12 +244,19 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': drawCount < 4 ? 'critical' : 'high',
         'description':
             'Deck tem apenas $drawCount fontes de draw. Recomendado: 10+.',
-        'recommendations': [
-          'Rhystic Study',
-          'Mystic Remora',
-          'Beast Whisperer',
-          'Phyrexian Arena'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['draw', 'loot'],
+          oraclePatterns: const ['%draw%card%', '%draw%cards%'],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 4,
+          fallback: const [
+            'Buscar draw legal nas cores do deck',
+            'Priorizar peças de compra recorrente ou cantrips eficientes',
+          ],
+        ),
         'current_value': drawCount,
         'recommended_value': 10,
       });
@@ -227,12 +269,23 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': removalCount < 3 ? 'critical' : 'medium',
         'description':
             'Deck tem apenas $removalCount remoções pontuais. Recomendado: 8-10.',
-        'recommendations': [
-          'Swords to Plowshares',
-          'Path to Exile',
-          'Beast Within',
-          'Generous Gift'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['removal'],
+          oraclePatterns: const [
+            '%destroy target%',
+            '%exile target%',
+            '%damage%target%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 4,
+          fallback: const [
+            'Buscar remoção pontual legal nas cores do deck',
+            'Priorizar respostas baratas para criaturas e permanentes-chave',
+          ],
+        ),
         'current_value': removalCount,
         'recommended_value': 8,
       });
@@ -245,12 +298,23 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': 'medium',
         'description':
             'Deck tem apenas $boardWipeCount board wipes. Recomendado: 3-4.',
-        'recommendations': [
-          'Wrath of God',
-          'Damnation',
-          'Cyclonic Rift',
-          'Toxic Deluge'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['wipe', 'board_wipe'],
+          oraclePatterns: const [
+            '%destroy all%',
+            '%exile all%',
+            '%each creature%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 4,
+          fallback: const [
+            'Buscar sweeper legal nas cores do deck',
+            'Priorizar wipes assimétricos ou de baixo custo quando possível',
+          ],
+        ),
         'current_value': boardWipeCount,
         'recommended_value': 3,
       });
@@ -279,12 +343,24 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': 'high',
         'description':
             'Deck depende muito do cemitério ($graveyardInteractionCount cartas) mas tem pouca proteção.',
-        'recommendations': [
-          'Teferi\'s Protection',
-          'Heroic Intervention',
-          'Ground Seal',
-          'Orbs of Warding'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['protection', 'graveyard_hate'],
+          oraclePatterns: const [
+            '%graveyard%',
+            '%hexproof%',
+            '%indestructible%',
+            '%protection from%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 4,
+          fallback: const [
+            'Buscar proteção ou hate de cemitério legal nas cores do deck',
+            'Adicionar redundância para proteger plano baseado em cemitério',
+          ],
+        ),
         'current_value': graveyardInteractionCount,
         'recommended_value': 0,
       });
@@ -296,12 +372,24 @@ Future<Response> onRequest(RequestContext context) async {
         'type': 'low_protection',
         'severity': 'medium',
         'description': 'Deck tem apenas $protectionCount fontes de proteção.',
-        'recommendations': [
-          'Lightning Greaves',
-          'Swiftfoot Boots',
-          'Heroic Intervention',
-          'Teferi\'s Protection'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['protection'],
+          oraclePatterns: const [
+            '%hexproof%',
+            '%indestructible%',
+            '%protection from%',
+            '%ward%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 4,
+          fallback: const [
+            'Buscar proteção legal nas cores do deck',
+            'Priorizar proteção barata para comandante e engines',
+          ],
+        ),
         'current_value': protectionCount,
         'recommended_value': 5,
       });
@@ -328,13 +416,26 @@ Future<Response> onRequest(RequestContext context) async {
             artifactEnchantmentRemovalCount == 0 ? 'critical' : 'medium',
         'description':
             'Deck tem apenas $artifactEnchantmentRemovalCount remoções de artefatos/encantamentos. Recomendado: 4-6.',
-        'recommendations': [
-          'Nature\'s Claim',
-          'Beast Within',
-          'Generous Gift',
-          'Vandalblast',
-          'Austere Command'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['removal'],
+          oraclePatterns: const [
+            '%destroy target artifact%',
+            '%destroy target enchantment%',
+            '%exile target artifact%',
+            '%exile target enchantment%',
+            '%destroy target nonland permanent%',
+            '%exile target nonland permanent%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 5,
+          fallback: const [
+            'Buscar remoção de artefato/encantamento legal nas cores do deck',
+            'Priorizar respostas flexíveis para permanentes não-terreno',
+          ],
+        ),
         'current_value': artifactEnchantmentRemovalCount,
         'recommended_value': 5,
       });
@@ -349,6 +450,8 @@ Future<Response> onRequest(RequestContext context) async {
       final manaCost = (card['mana_cost'] as String?) ?? '';
       final cmc = card['cmc'];
       final roles = resolveCardFunctionalRoles(
+        functionalTags: card['functional_tags'],
+        semanticTagsV2: card['semantic_tags_v2'],
         oracleText: oracle,
         typeLine: typeLine,
         name: name,
@@ -460,11 +563,26 @@ Future<Response> onRequest(RequestContext context) async {
         'severity': instantSpeedCount < 4 ? 'high' : 'medium',
         'description':
             'Deck tem apenas $instantSpeedCount cartas instant-speed. Em multiplayer, interação nos turnos dos oponentes é crucial.',
-        'recommendations': [
-          'Priorizar instants sobre sorceries',
-          'Adicionar counterspells',
-          'Incluir removal instant-speed como Swords to Plowshares'
-        ],
+        'recommendations': await _findWeaknessRecommendations(
+          pool: pool,
+          roles: const ['removal', 'protection'],
+          oraclePatterns: const [
+            '%counter target%',
+            '%destroy target%',
+            '%exile target%',
+            '%instant%',
+            '%flash%',
+          ],
+          deckColors: deckColors,
+          excludeNames: deckCardNames,
+          format: deckFormat,
+          limit: 5,
+          instantSpeedOnly: true,
+          fallback: const [
+            'Priorizar instants sobre sorceries',
+            'Buscar interação instant-speed legal nas cores do deck',
+          ],
+        ),
         'current_value': instantSpeedCount,
         'recommended_value': 10,
       });
@@ -599,21 +717,194 @@ Future<Map<String, dynamic>> _loadWeaknessHistory(
     return {
       'stored_reports': bySeverity.values.fold<int>(0, (a, b) => a + b),
       'by_severity': bySeverity,
-      'recent': recentRows
-          .map((row) {
-            final m = row.toColumnMap();
-            return {
-              'type': m['weakness_type'],
-              'severity': m['severity'],
-              'description': m['description'],
-              'addressed': m['addressed'],
-              'created_at': m['created_at']?.toString(),
-            };
-          })
-          .toList(),
+      'recent': recentRows.map((row) {
+        final m = row.toColumnMap();
+        return {
+          'type': m['weakness_type'],
+          'severity': m['severity'],
+          'description': m['description'],
+          'addressed': m['addressed'],
+          'created_at': m['created_at']?.toString(),
+        };
+      }).toList(),
     };
   } catch (e) {
     print('[weakness-analysis] weakness history unavailable: $e');
     return const {'stored_reports': 0, 'by_severity': {}, 'recent': []};
   }
+}
+
+Future<List<String>> _findWeaknessRecommendations({
+  required Pool pool,
+  required List<String> roles,
+  required Set<String> deckColors,
+  required Set<String> excludeNames,
+  required String format,
+  required int limit,
+  List<String> oraclePatterns = const [],
+  List<String> fallback = const [],
+  bool instantSpeedOnly = false,
+}) async {
+  final normalizedRoles = roles
+      .map((role) => role.trim().toLowerCase())
+      .where((role) => role.isNotEmpty)
+      .toList(growable: false);
+  final predicates = <String>[];
+
+  try {
+    if (normalizedRoles.isNotEmpty &&
+        await _hasTable(pool, 'card_function_tags')) {
+      predicates.add('''
+        EXISTS (
+          SELECT 1
+          FROM card_function_tags cft
+          WHERE cft.card_id = c.id
+            AND LOWER(cft.tag) = ANY(@role_tags)
+        )
+      ''');
+    }
+
+    if (normalizedRoles.isNotEmpty &&
+        await _hasTable(pool, 'card_semantic_tags_v2')) {
+      predicates.add('''
+        EXISTS (
+          SELECT 1
+          FROM card_semantic_tags_v2 cstv2
+          WHERE cstv2.card_id = c.id
+            AND cstv2.role_confidence >= 0.65
+            AND cstv2.tags ?| @role_tags
+        )
+      ''');
+    }
+
+    for (final pattern in oraclePatterns) {
+      final normalized = pattern.trim().toLowerCase();
+      if (normalized.isEmpty) continue;
+      predicates.add(
+        "LOWER(COALESCE(c.oracle_text, '')) LIKE ${_sqlStringLiteral(normalized)}",
+      );
+    }
+
+    if (predicates.isEmpty) return fallback.take(limit).toList();
+
+    final instantFilter = instantSpeedOnly
+        ? '''
+          AND (
+            c.type_line ILIKE '%instant%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE '%flash%'
+            OR LOWER(COALESCE(c.oracle_text, '')) LIKE '%as though it had flash%'
+          )
+        '''
+        : '';
+
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT c.name, MIN(COALESCE(c.cmc, 99)) AS cmc_sort
+        FROM cards c
+        LEFT JOIN card_legalities cl
+          ON cl.card_id = c.id
+         AND cl.format = @format
+        WHERE (${predicates.join(' OR ')})
+          AND (
+            @deck_colors IS NULL
+            OR COALESCE(c.color_identity, ARRAY[]::text[]) = ARRAY[]::text[]
+            OR COALESCE(c.color_identity, ARRAY[]::text[]) <@ @deck_colors
+          )
+          AND (cl.id IS NULL OR cl.status = 'legal')
+          AND c.type_line NOT ILIKE '%basic%land%'
+          $instantFilter
+        GROUP BY c.name
+        ORDER BY cmc_sort ASC, c.name ASC
+        LIMIT @limit_plus
+      '''),
+      parameters: {
+        'format': format.toLowerCase(),
+        'deck_colors': deckColors.isEmpty
+            ? null
+            : TypedValue(Type.textArray, deckColors.toList()..sort()),
+        'role_tags': TypedValue(Type.textArray, normalizedRoles),
+        'limit_plus': limit + 20,
+      },
+    );
+
+    final recommendations = <String>[];
+    for (final row in result) {
+      final name = row[0] as String;
+      if (excludeNames.contains(name.toLowerCase())) continue;
+      recommendations.add(name);
+      if (recommendations.length >= limit) break;
+    }
+
+    if (recommendations.isNotEmpty) return recommendations;
+  } catch (e) {
+    print('[weakness-analysis] recommendation lookup unavailable: $e');
+  }
+
+  return fallback.take(limit).toList();
+}
+
+String _sqlStringLiteral(String value) {
+  return "'${value.replaceAll("'", "''")}'";
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = @tableName
+      )
+    '''),
+    parameters: {'tableName': tableName},
+  );
+  return result.isNotEmpty && result.first[0] == true;
+}
+
+Future<String> _functionalTagsSelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_function_tags');
+  if (!exists) return "'[]'::jsonb AS functional_tags";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tag', cft.tag,
+                       'confidence', cft.confidence,
+                       'evidence', cft.evidence,
+                       'source', cft.source
+                     )
+                     ORDER BY cft.confidence DESC, cft.tag
+                   )
+                   FROM card_function_tags cft
+                   WHERE cft.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS functional_tags''';
+}
+
+Future<String> _semanticV2SelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_semantic_tags_v2');
+  if (!exists) return "'[]'::jsonb AS semantic_tags_v2";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tags', cstv2.tags,
+                       'role_confidence', cstv2.role_confidence,
+                       'engine', cstv2.engine,
+                       'payoff', cstv2.payoff,
+                       'enabler', cstv2.enabler,
+                       'wincon', cstv2.wincon,
+                       'combo_piece', cstv2.combo_piece
+                     )
+                     ORDER BY cstv2.role_confidence DESC, cstv2.source
+                   )
+                   FROM card_semantic_tags_v2 cstv2
+                   WHERE cstv2.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS semantic_tags_v2''';
 }

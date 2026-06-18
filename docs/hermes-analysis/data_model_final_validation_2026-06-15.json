@@ -1,0 +1,3005 @@
+{
+  "generated_at": "2026-06-15T23:15:57.841159Z",
+  "repo_root": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia",
+  "git": {
+    "head": "a1d7dea99baa9b7658510e31b2f7674bf0434622",
+    "branch": "master",
+    "status_short": "M docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md\n M docs/hermes-analysis/IMPLEMENTATION_GAPS.md\n M docs/hermes-analysis/IMPLEMENTATION_TASKS.md\n M docs/hermes-analysis/INFORMATION_BANK_DIAGNOSTIC_2026-06-15.md\n M docs/hermes-analysis/TECHNICAL_MAP.md\n M server/bin/audit_data_model_links.dart\n M server/bin/migrate.dart\n M server/doc/API_CONTRACTS_AND_DATA_MAP.md\n M server/test/candidate_quality_data_support_test.dart\n M server/test/data_model_migration_test.dart\n?? server/lib/ai/commander_learning_snapshot_support.dart"
+  },
+  "static": {
+    "table_count": 81,
+    "view_count": 4,
+    "tables": {
+      "activation_funnel_events": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/routes/users/me/activation-events/index.dart"
+        ],
+        "write_files": [
+          "server/routes/users/me/activation-events/index.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "ai_generate_jobs": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/lib/ai_generate_job.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai_generate_job.dart"
+        ],
+        "write_files": [
+          "server/lib/ai_generate_job.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "ai_logs": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai_log_service.dart",
+          "server/lib/plan_service.dart",
+          "server/routes/health/dashboard/index.dart"
+        ],
+        "write_files": [
+          "server/lib/ai_log_service.dart"
+        ],
+        "all_reference_count": 6,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "ai_optimize_cache": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/optimize_cache_support.dart",
+          "server/test/test_single_deck.py"
+        ],
+        "write_files": [
+          "server/lib/ai/optimize_cache_support.dart",
+          "server/test/test_single_deck.py"
+        ],
+        "all_reference_count": 6,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "ai_optimize_fallback_telemetry": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/cleanup_optimize_telemetry.dart",
+          "server/lib/ai/optimize_fallback_telemetry_support.dart",
+          "server/routes/ai/optimize/telemetry/index.dart",
+          "server/routes/health/dashboard/index.dart"
+        ],
+        "write_files": [
+          "server/bin/cleanup_optimize_telemetry.dart",
+          "server/lib/ai/optimize_fallback_telemetry_support.dart"
+        ],
+        "all_reference_count": 7,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "ai_optimize_jobs": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/optimize_job.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/optimize_job.dart"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "ai_user_preferences": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/optimize_runtime_support.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/optimize_runtime_support.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "archetype_counters": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/hate_cards_service.dart",
+          "server/lib/archetype_counters_service.dart"
+        ],
+        "write_files": [
+          "server/database_setup.sql",
+          "server/lib/archetype_counters_service.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "battle_card_rules": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py"
+        ],
+        "all_reference_count": 8,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
+        ]
+      },
+      "battle_simulations": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/ml_extract_features.dart"
+        ],
+        "write_files": [
+          "server/bin/migrate.dart",
+          "server/routes/ai/simulate/index.dart"
+        ],
+        "all_reference_count": 9,
+        "has_runtime_read": false,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "card_analyses": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "all_reference_count": 3,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ]
+      },
+      "card_battle_rules": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product_and_hermes_bridge",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "server/bin/audit_data_model_links.dart",
+          "server/bin/auto_promote_battle_rules.py",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "server/bin/auto_promote_battle_rules.py"
+        ],
+        "all_reference_count": 10,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py"
+        ]
+      },
+      "card_combos": {
+        "sources": [
+          "server/bin/migrate.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/commander_spellbook_service.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_combos.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "card_deck_analysis": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
+          "server/bin/export_hermes_learned_deck.py",
+          "server/bin/patch_slot_optimizer.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py"
+        ],
+        "all_reference_count": 11,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "card_function_tags": {
+        "sources": [
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/test/candidate_quality_data_support_test.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "server/bin/audit_data_model_links.dart",
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/bin/sync_combos.dart",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/optimize_candidate_quality_support.dart",
+          "server/lib/ai/optimize_request_support.dart",
+          "server/lib/ai/optimize_route_internal.dart",
+          "server/routes/ai/weakness-analysis/index.dart",
+          "server/routes/decks/[id]/ai-analysis/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart",
+          "server/routes/decks/[id]/recommendations/index.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py",
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/semantic_layer_v2_backfill.dart",
+          "server/bin/sync_combos.dart"
+        ],
+        "all_reference_count": 22,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py"
+        ]
+      },
+      "card_legalities": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product_and_hermes_bridge",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/bin/sync_staples.dart",
+          "server/database_indexes.sql",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/commander_reference_helpers.dart",
+          "server/lib/ai/optimize_filler_loader_support.dart",
+          "server/lib/ai/optimize_runtime_support.dart",
+          "server/lib/ai/optimize_swap_candidate_support.dart",
+          "server/lib/card_validation_service.dart",
+          "server/lib/deck_rules_service.dart",
+          "server/lib/import_card_lookup_service.dart",
+          "server/lib/meta/external_commander_meta_candidate_support.dart",
+          "server/routes/ai/generate/index.dart",
+          "server/routes/ai/weakness-analysis/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart",
+          "server/routes/decks/[id]/cards/index.dart",
+          "server/routes/decks/[id]/recommendations/index.dart",
+          "server/routes/decks/index.dart",
+          "server/routes/import/validate/index.dart",
+          "server/test/candidate_quality_data_support_test.dart",
+          "server/test/check_db_schema2.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "server/bin/seed_legalities.dart",
+          "server/bin/seed_legalities_optimized.dart",
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_cards_full_fast.py",
+          "server/routes/cards/resolve/index.dart"
+        ],
+        "all_reference_count": 35,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py"
+        ]
+      },
+      "card_localized_names": {
+        "sources": [
+          "server/lib/import_card_lookup_service.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/import_card_lookup_service.dart",
+          "server/test/import_list_service_test.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_localized_card_names.dart"
+        ],
+        "all_reference_count": 7,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "card_meta_insights": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/optimize_filler_loader_support.dart",
+          "server/lib/ai/optimize_runtime_support.dart",
+          "server/lib/ai/optimize_state_support.dart",
+          "server/lib/ai/optimize_swap_candidate_support.dart",
+          "server/lib/ml_knowledge_service.dart",
+          "server/routes/ai/commander-reference/index.dart",
+          "server/routes/ai/ml-status/index.dart",
+          "server/test/check_db_schema.py"
+        ],
+        "write_files": [
+          "server/bin/extract_meta_insights.dart"
+        ],
+        "all_reference_count": 13,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "card_oracle_cache": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py"
+        ],
+        "all_reference_count": 12,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py"
+        ]
+      },
+      "card_role_scores": {
+        "sources": [
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/optimize_candidate_quality_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart"
+        ],
+        "all_reference_count": 8,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "card_rulings": {
+        "sources": [
+          "server/bin/migrate.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/routes/cards/[id]/rulings/index.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_rulings.dart"
+        ],
+        "all_reference_count": 7,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "card_semantic_tags_v2": {
+        "sources": [
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/optimize_request_support.dart",
+          "server/lib/ai/optimize_route_internal.dart",
+          "server/routes/ai/weakness-analysis/index.dart",
+          "server/routes/decks/[id]/ai-analysis/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart",
+          "server/routes/decks/[id]/recommendations/index.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "server/bin/semantic_layer_v2_backfill.dart"
+        ],
+        "all_reference_count": 12,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py"
+        ]
+      },
+      "card_tags": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ]
+      },
+      "cards": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "server/bin/backfill_card_combat_metadata.py",
+          "server/bin/backfill_card_identity_columns.dart",
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/bin/meta_commander_color_identity_report.dart",
+          "server/bin/meta_profile_report.dart",
+          "server/bin/ml_extract_features.dart",
+          "server/bin/mtg_data_integrity.dart",
+          "server/bin/run_commander_only_optimization_validation.dart",
+          "server/bin/run_three_commander_optimization_validation.dart",
+          "server/bin/run_three_commander_resolution_validation.dart",
+          "server/bin/seed_legalities.dart",
+          "server/bin/seed_legalities_optimized.dart",
+          "server/bin/semantic_layer_v2_backfill.dart",
+          "server/bin/snapshot_edhrec.dart",
+          "server/bin/snapshot_price_history.dart",
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_cards_full_fast.py",
+          "server/bin/sync_combos.dart",
+          "server/bin/sync_localized_card_names.dart",
+          "server/bin/sync_prices.dart",
+          "server/bin/sync_prices_mtgjson_fast.dart",
+          "server/bin/sync_staples.dart",
+          "server/database_indexes.sql",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/commander_reference_helpers.dart",
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/lib/ai/hate_cards_service.dart",
+          "server/lib/ai/optimize_complete_support.dart",
+          "server/lib/ai/optimize_filler_loader_support.dart",
+          "server/lib/ai/optimize_request_support.dart",
+          "server/lib/ai/optimize_route_addition_data_support.dart",
+          "server/lib/ai/optimize_runtime_support.dart",
+          "server/lib/ai/optimize_swap_candidate_support.dart",
+          "server/lib/ai/rebuild_guided_service.dart",
+          "server/lib/card_validation_service.dart",
+          "server/lib/deck_rules_service.dart",
+          "server/lib/import_card_lookup_service.dart",
+          "server/lib/market_movers.dart",
+          "server/routes/ai/archetypes/index.dart",
+          "server/routes/ai/explain/index.dart",
+          "server/routes/ai/generate/index.dart",
+          "server/routes/ai/optimize/index.dart",
+          "server/routes/ai/rebuild/index.dart",
+          "server/routes/ai/simulate-matchup/index.dart",
+          "server/routes/ai/simulate/index.dart",
+          "server/routes/ai/weakness-analysis/index.dart",
+          "server/routes/binder/[id]/index.dart",
+          "server/routes/binder/index.dart",
+          "server/routes/cards/[id]/rulings/index.dart",
+          "server/routes/cards/index.dart",
+          "server/routes/cards/printings/index.dart",
+          "server/routes/cards/resolve/batch/index.dart",
+          "server/routes/cards/resolve/index.dart",
+          "server/routes/community/binders/[userId].dart",
+          "server/routes/community/decks/[id].dart",
+          "server/routes/community/decks/index.dart",
+          "server/routes/community/marketplace/index.dart",
+          "server/routes/community/users/[id].dart",
+          "server/routes/decks/[id]/ai-analysis/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart",
+          "server/routes/decks/[id]/cards/index.dart",
+          "server/routes/decks/[id]/cards/replace/index.dart",
+          "server/routes/decks/[id]/cards/set/index.dart",
+          "server/routes/decks/[id]/export/index.dart",
+          "server/routes/decks/[id]/index.dart",
+          "server/routes/decks/[id]/pricing/index.dart",
+          "server/routes/decks/[id]/recommendations/index.dart",
+          "server/routes/decks/[id]/simulate/index.dart",
+          "server/routes/decks/index.dart",
+          "server/routes/health/ready/index.dart",
+          "server/routes/import/validate/index.dart",
+          "server/routes/market/card/[cardId].dart",
+          "server/routes/sets/index.dart",
+          "server/routes/trades/[id]/index.dart",
+          "server/test/candidate_quality_data_support_test.dart",
+          "server/test/check_db_schema.py",
+          "server/test/check_db_schema2.py",
+          "server/test/check_db_schema3.py",
+          "server/test/experimental_deck_ai_authorization_source_test.dart",
+          "server/test/import_list_service_test.dart"
+        ],
+        "write_files": [
+          "server/bin/backfill_card_combat_metadata.py",
+          "server/bin/backfill_card_identity_columns.dart",
+          "server/bin/mtg_data_integrity.dart",
+          "server/bin/seed_database.dart",
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_cards_full_fast.py",
+          "server/bin/sync_prices.dart",
+          "server/bin/sync_prices_mtgjson_fast.dart",
+          "server/routes/ai/explain/index.dart",
+          "server/routes/cards/printings/index.dart",
+          "server/routes/cards/resolve/index.dart",
+          "server/routes/decks/[id]/pricing/index.dart",
+          "server/test/candidate_quality_data_support_test.dart",
+          "server/test/decks_crud_test.dart",
+          "server/test/import_list_service_test.dart"
+        ],
+        "all_reference_count": 310,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_prepend_mulligan.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_cron_status.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v6.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v7.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_strategy_auditor.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_land_support.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_misc_regression_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/cross_ref.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/debug_card_list.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/deep_analysis.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/extract_edhrec_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/extract_teysa.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_edgar_seed.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/list_dina_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_auto_cycle_cron.sh",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_baseline.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_preflight_cron.sh",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mulligan_sim_ciclo3.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mulligan_sim_ciclo4.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/reimport_lorehold_scryfall.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/research_vampires_theme_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_classifier.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_search.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_search2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_knowledge_db_multi_tags.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_scryfall_classifier_multi_tags.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/thassa_analysis.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_index.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_index2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_rhystic_study.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_underworld_breach.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_kinnan_tags.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_mana.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_patches.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "combo_cards": {
+        "sources": [
+          "server/bin/migrate.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/sync_combos.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_combos.dart"
+        ],
+        "all_reference_count": 3,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "commander_card_synergy": {
+        "sources": [
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/lib/ai/commander_learning_snapshot_support.dart",
+          "server/lib/ai/optimize_candidate_quality_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart"
+        ],
+        "all_reference_count": 8,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "commander_card_usage": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql",
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/commander_learning_snapshot_support.dart",
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/deck_learning_event_support.dart"
+        ],
+        "all_reference_count": 7,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "commander_learned_decks": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql",
+          "server/lib/ai/commander_learned_deck_support.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/commander_learning_snapshot_support.dart",
+          "server/routes/ai/commander-learning/index.dart",
+          "server/routes/ai/commander-reference/index.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/commander_learned_deck_support.dart"
+        ],
+        "all_reference_count": 11,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "commander_reference_card_stats": {
+        "sources": [
+          "server/lib/ai/commander_reference_card_stats_support.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/commander_reference_card_stats_support.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/commander_reference_card_stats_support.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "commander_reference_deck_analysis": {
+        "sources": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "all_reference_count": 2,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "commander_reference_deck_cards": {
+        "sources": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "all_reference_count": 2,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "commander_reference_decks": {
+        "sources": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [],
+        "write_files": [
+          "server/lib/ai/commander_reference_deck_corpus_support.dart"
+        ],
+        "all_reference_count": 2,
+        "has_runtime_read": false,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "commander_reference_profiles": {
+        "sources": [
+          "server/lib/ai/commander_reference_profile_support.dart",
+          "server/routes/ai/commander-reference/index.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/lib/ai/commander_reference_card_stats_support.dart",
+          "server/lib/ai/commander_reference_profile_support.dart",
+          "server/lib/ai/optimize_runtime_support.dart",
+          "server/lib/ai/rebuild_guided_service.dart",
+          "server/routes/ai/commander-reference/index.dart"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py",
+          "server/lib/ai/commander_reference_profile_support.dart",
+          "server/routes/ai/commander-reference/index.dart"
+        ],
+        "all_reference_count": 9,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py"
+        ]
+      },
+      "commanders": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "server/bin/pull_learning_events.py",
+          "server/test/hermes_mana_base_validator_test.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_mana_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_cron_status.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/reimport_lorehold_scryfall.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py",
+          "server/bin/auto_promote_learned_decks.py",
+          "server/bin/hermes_mana_base_validator.py",
+          "server/bin/pull_learning_events.py",
+          "server/bin/register_commanders.py",
+          "server/test/pull_learning_events_schema_test.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "server/bin/pull_learning_events.py",
+          "server/bin/register_commanders.py",
+          "server/test/hermes_mana_base_validator_test.py"
+        ],
+        "all_reference_count": 90,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_mana_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_cron_status.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v7.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_conformance_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fetch_edhrec_live.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/list_dina_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/reimport_lorehold_scryfall.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/research_vampires_theme_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/thassa_analysis.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ]
+      },
+      "deck_cards": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_functional_tags_json.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_master_optimizer_hashes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
+          "server/database_setup.sql",
+          "server/test/hermes_mana_base_validator_test.py"
+        ],
+        "classification": "postgres_product_and_hermes_bridge",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_mulligan_exec15.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v6.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v7.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/cross_ref.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/deep_analysis.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mulligan_sim_ciclo3.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mulligan_sim_ciclo4.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_knowledge_db_multi_tags.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_mana.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_matches.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
+          "server/bin/audit_data_model_links.dart",
+          "server/bin/card_impact_analysis.py",
+          "server/bin/card_impact_analyzer.py",
+          "server/bin/card_impact_scorer.py",
+          "server/bin/export_hermes_learned_deck.py",
+          "server/bin/hermes_mana_base_validator.py",
+          "server/bin/ml_extract_features.dart",
+          "server/bin/run_commander_only_optimization_validation.dart",
+          "server/bin/run_three_commander_optimization_validation.dart",
+          "server/bin/run_three_commander_resolution_validation.dart",
+          "server/bin/snapshot_edhrec.dart",
+          "server/bin/sync_prices.dart",
+          "server/database_indexes.sql",
+          "server/lib/ai/optimize_request_support.dart",
+          "server/routes/ai/archetypes/index.dart",
+          "server/routes/ai/rebuild/index.dart",
+          "server/routes/ai/simulate-matchup/index.dart",
+          "server/routes/ai/simulate/index.dart",
+          "server/routes/ai/weakness-analysis/index.dart",
+          "server/routes/binder/[id]/index.dart",
+          "server/routes/binder/index.dart",
+          "server/routes/community/decks/[id].dart",
+          "server/routes/community/decks/index.dart",
+          "server/routes/community/users/[id].dart",
+          "server/routes/decks/[id]/ai-analysis/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart",
+          "server/routes/decks/[id]/cards/bulk/index.dart",
+          "server/routes/decks/[id]/cards/index.dart",
+          "server/routes/decks/[id]/cards/replace/index.dart",
+          "server/routes/decks/[id]/cards/set/index.dart",
+          "server/routes/decks/[id]/export/index.dart",
+          "server/routes/decks/[id]/index.dart",
+          "server/routes/decks/[id]/pricing/index.dart",
+          "server/routes/decks/[id]/recommendations/index.dart",
+          "server/routes/decks/[id]/simulate/index.dart",
+          "server/routes/decks/[id]/validate/index.dart",
+          "server/routes/decks/index.dart",
+          "server/routes/import/to-deck/index.dart",
+          "server/test/check_db_schema.py",
+          "server/test/check_db_schema2.py",
+          "server/test/check_db_schema3.py",
+          "server/test/deck_validation_test.dart"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_functional_tags_json.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_master_optimizer_hashes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py",
+          "server/lib/ai/rebuild_guided_service.dart",
+          "server/routes/community/decks/[id].dart",
+          "server/routes/decks/[id]/cards/bulk/index.dart",
+          "server/routes/decks/[id]/cards/index.dart",
+          "server/routes/decks/[id]/cards/replace/index.dart",
+          "server/routes/decks/[id]/cards/set/index.dart",
+          "server/routes/decks/[id]/index.dart",
+          "server/routes/decks/index.dart",
+          "server/routes/import/index.dart",
+          "server/routes/import/to-deck/index.dart",
+          "server/test/deck_validation_test.dart",
+          "server/test/hermes_mana_base_validator_test.py"
+        ],
+        "all_reference_count": 99,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_mulligan_exec15.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_cron_status.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v6.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v7.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/cross_ref.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/deep_analysis.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mulligan_sim_ciclo3.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mulligan_sim_ciclo4.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_functional_tags_json.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_knowledge_db_multi_tags.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_master_optimizer_hashes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_slot_optimizer_real_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_mana.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_matches.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "deck_learning_events": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql",
+          "server/lib/ai/deck_learning_event_support.dart",
+          "server/test/data_model_migration_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/pull_learning_events.py"
+        ],
+        "write_files": [
+          "server/bin/pull_learning_events.py",
+          "server/lib/ai/deck_learning_event_support.dart"
+        ],
+        "all_reference_count": 6,
+        "has_runtime_read": false,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "deck_matchups": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/routes/ai/simulate-matchup/index.dart"
+        ],
+        "write_files": [
+          "server/routes/ai/simulate-matchup/index.dart"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "deck_promotions": {
+        "sources": [
+          "server/test/auto_sync_learned_decks_test.py"
+        ],
+        "classification": "unknown",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "server/bin/auto_promote_learned_decks.py",
+          "server/bin/auto_sync_learned_decks.py",
+          "server/bin/export_hermes_learned_deck.py"
+        ],
+        "write_files": [
+          "server/bin/auto_promote_learned_decks.py",
+          "server/test/auto_sync_learned_decks_test.py"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py"
+        ]
+      },
+      "deck_themes": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py"
+        ],
+        "all_reference_count": 3,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py"
+        ]
+      },
+      "deck_weakness_reports": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/routes/ai/weakness-analysis/index.dart"
+        ],
+        "write_files": [
+          "server/routes/ai/weakness-analysis/index.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "decks": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "server/database_setup.sql",
+          "server/test/hermes_mana_base_validator_test.py"
+        ],
+        "classification": "postgres_product_and_hermes_bridge",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_mana.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py",
+          "server/bin/auto_promote_learned_decks.py",
+          "server/bin/export_hermes_learned_deck.py",
+          "server/bin/hermes_mana_base_validator.py",
+          "server/bin/ml_extract_features.dart",
+          "server/bin/register_commanders.py",
+          "server/bin/run_commander_only_optimization_validation.dart",
+          "server/bin/run_three_commander_optimization_validation.dart",
+          "server/bin/run_three_commander_resolution_validation.dart",
+          "server/database_indexes.sql",
+          "server/lib/ai/optimize_request_support.dart",
+          "server/routes/ai/archetypes/index.dart",
+          "server/routes/ai/rebuild/index.dart",
+          "server/routes/ai/simulate-matchup/index.dart",
+          "server/routes/ai/simulate/index.dart",
+          "server/routes/ai/weakness-analysis/index.dart",
+          "server/routes/binder/[id]/index.dart",
+          "server/routes/binder/index.dart",
+          "server/routes/community/decks/[id].dart",
+          "server/routes/community/decks/index.dart",
+          "server/routes/community/users/[id].dart",
+          "server/routes/community/users/index.dart",
+          "server/routes/decks/[id]/ai-analysis/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart",
+          "server/routes/decks/[id]/cards/bulk/index.dart",
+          "server/routes/decks/[id]/cards/index.dart",
+          "server/routes/decks/[id]/cards/replace/index.dart",
+          "server/routes/decks/[id]/cards/set/index.dart",
+          "server/routes/decks/[id]/export/index.dart",
+          "server/routes/decks/[id]/index.dart",
+          "server/routes/decks/[id]/pricing/index.dart",
+          "server/routes/decks/[id]/recommendations/index.dart",
+          "server/routes/decks/[id]/simulate/index.dart",
+          "server/routes/decks/[id]/validate/index.dart",
+          "server/routes/decks/index.dart",
+          "server/routes/import/to-deck/index.dart",
+          "server/test/ai_optimize_authorization_source_test.dart",
+          "server/test/experimental_deck_ai_authorization_source_test.dart"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "server/bin/register_commanders.py",
+          "server/lib/ai/rebuild_guided_service.dart",
+          "server/routes/community/decks/[id].dart",
+          "server/routes/decks/[id]/ai-analysis/index.dart",
+          "server/routes/decks/[id]/index.dart",
+          "server/routes/decks/[id]/pricing/index.dart",
+          "server/routes/decks/index.dart",
+          "server/routes/import/index.dart",
+          "server/test/hermes_mana_base_validator_test.py"
+        ],
+        "all_reference_count": 179,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_mana_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_prepend_mulligan.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_run_validation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_cron_status.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/apply_evolution.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v6.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v7.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/ciclo4_swaps.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/debug_card_list.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/extract_edhrec_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/extract_teysa.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/fix_deck_counts.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_cron_section.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_edgar_seed.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_card_profiles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/insert_log.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/list_dina_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_auto_cycle_cron.sh",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/research_vampires_theme_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_classifier.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_semantic_role_metrics.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/thassa_analysis.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_index.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_index2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_rhystic_study.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_smothering_tithe.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_underworld_breach.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_mana.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "discrepancies": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "all_reference_count": 6,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_edgar_seed.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/insert_log.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_classifier.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/validate_mana.py"
+        ]
+      },
+      "edhrec_card_snapshots": {
+        "sources": [
+          "server/bin/migrate.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/snapshot_edhrec.dart",
+          "server/lib/ai/edhrec_trend_service.dart"
+        ],
+        "write_files": [
+          "server/lib/ai/edhrec_trend_service.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "external_commander_meta_candidates": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/bin/promote_external_commander_meta_candidates.dart",
+          "server/lib/meta/meta_deck_reference_support.dart"
+        ],
+        "write_files": [
+          "server/lib/meta/external_commander_meta_import_support.dart",
+          "server/lib/meta/external_commander_meta_promotion_support.dart"
+        ],
+        "all_reference_count": 9,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "format_staples": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product_and_hermes_bridge",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "server/lib/ai/format_staples_service.dart",
+          "server/test/check_db_schema.py",
+          "server/test/check_db_schema2.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "server/bin/sync_staples.dart"
+        ],
+        "all_reference_count": 10,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py"
+        ]
+      },
+      "game_changers": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/copy_back_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_rhystic_study.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_smothering_tithe.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_underworld_breach.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_thassa_update.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_update.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_rhystic_study.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_smothering_tithe.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_underworld_breach.py"
+        ],
+        "all_reference_count": 19,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_gc_check.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/copy_back_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_cyclonic_rift_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_rhystic_study.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_smothering_tithe.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_thassa_oracle_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_underworld_breach.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_thassa_update.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_update.py"
+        ]
+      },
+      "insights": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "all_reference_count": 10,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/gen_edgar_seed.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/insert_log.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/reimport_lorehold_scryfall.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/scryfall_classifier.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ]
+      },
+      "learned_decks": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py",
+          "server/test/auto_sync_learned_decks_test.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
+          "server/bin/auto_promote_learned_decks.py",
+          "server/bin/auto_sync_learned_decks.py",
+          "server/bin/export_hermes_learned_deck.py",
+          "server/bin/register_commanders.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py",
+          "server/test/auto_sync_learned_decks_test.py"
+        ],
+        "all_reference_count": 22,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_audit_learned_opponent_card_identity.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_wincon_pipeline_multi_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "lorehold_import_runs": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py"
+        ],
+        "all_reference_count": 1,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py"
+        ]
+      },
+      "meta_decks": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/bin/extract_meta_insights.dart",
+          "server/bin/fetch_meta.dart",
+          "server/bin/meta_commander_color_identity_report.dart",
+          "server/bin/meta_profile_report.dart",
+          "server/bin/meta_reference_probe.dart",
+          "server/bin/meta_report.dart",
+          "server/bin/repair_mtgtop8_meta_history.dart",
+          "server/lib/meta/external_commander_meta_promotion_support.dart",
+          "server/lib/meta/meta_deck_reference_support.dart",
+          "server/routes/ai/commander-reference/index.dart",
+          "server/routes/ai/ml-status/index.dart",
+          "server/routes/ai/simulate-matchup/index.dart",
+          "server/routes/decks/[id]/analysis/index.dart"
+        ],
+        "write_files": [
+          "server/bin/fetch_meta.dart",
+          "server/bin/repair_mtgtop8_meta_history.dart",
+          "server/lib/meta/external_commander_meta_promotion_support.dart",
+          "server/routes/ai/commander-reference/index.dart"
+        ],
+        "all_reference_count": 24,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py"
+        ]
+      },
+      "ml_prompt_feedback": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/routes/ai/ml-status/index.dart"
+        ],
+        "write_files": [
+          "server/lib/ml_knowledge_service.dart"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "optimize_rejection_penalties": {
+        "sources": [
+          "server/lib/ai/candidate_quality_data_support.dart",
+          "server/test/candidate_quality_data_support_test.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/candidate_quality_data_foundation.dart",
+          "server/bin/candidate_quality_meta_signals.dart",
+          "server/lib/ai/optimize_candidate_quality_support.dart"
+        ],
+        "write_files": [
+          "server/bin/candidate_quality_data_foundation.dart"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "optimizer_applied_swaps": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ]
+      },
+      "optimizer_baseline_runs": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_baseline.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_master_optimizer_hashes.py"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_baseline.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_master_optimizer_hashes.py"
+        ]
+      },
+      "optimizer_handoffs": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py"
+        ],
+        "all_reference_count": 2,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py"
+        ]
+      },
+      "optimizer_product_handoffs": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ],
+        "all_reference_count": 3,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ]
+      },
+      "optimizer_quality_reviews": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "all_reference_count": 2,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py"
+        ]
+      },
+      "optimizer_rollback_events": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ],
+        "all_reference_count": 1,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py"
+        ]
+      },
+      "patterns": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ],
+        "write_files": [],
+        "all_reference_count": 15,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ]
+      },
+      "psychology_profiles": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [],
+        "all_reference_count": 1,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ]
+      },
+      "rate_limit_events": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/lib/distributed_rate_limiter.dart"
+        ],
+        "write_files": [
+          "server/lib/distributed_rate_limiter.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "rules": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/routes/rules/index.dart",
+          "server/test/color_identity_test.dart"
+        ],
+        "write_files": [
+          "server/bin/seed_rules.dart",
+          "server/bin/sync_rules.dart"
+        ],
+        "all_reference_count": 44,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_auto_cycle_cron.sh",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_decision_research_review.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py"
+        ]
+      },
+      "run_log": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_log.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_logs.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/insert_log.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_log.py"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_update_logs.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/insert_log.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_log.py"
+        ]
+      },
+      "schema_migrations": {
+        "sources": [
+          "server/bin/migrate.dart"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/migrate.dart"
+        ],
+        "write_files": [
+          "server/bin/migrate.dart"
+        ],
+        "all_reference_count": 1,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "sets": {
+        "sources": [
+          "server/bin/sync_cards.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/mtg_data_integrity.dart",
+          "server/routes/binder/[id]/index.dart",
+          "server/routes/cards/index.dart",
+          "server/routes/cards/printings/index.dart",
+          "server/routes/cards/resolve/index.dart",
+          "server/routes/decks/[id]/index.dart",
+          "server/routes/sets/index.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_cards.dart",
+          "server/routes/cards/printings/index.dart",
+          "server/routes/cards/resolve/index.dart"
+        ],
+        "all_reference_count": 21,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "slot_benchmarks": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_quality_gate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_master_optimizer_hashes.py"
+        ]
+      },
+      "sources": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "all_reference_count": 40,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v6.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v8.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_land_support.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/learned_deck_completeness.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/mana_base_validate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/research_vampires_theme_20260527.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_cyclonic_rift.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ad_nauseam_real_sources.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_ancient_tomb.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_index.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/update_index2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "swap_benchmarks": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_confirmation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_confirmation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py"
+        ],
+        "all_reference_count": 9,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_apply.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_common.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_confirmation.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_post_apply_gate.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_product_handoff.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_rollback.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py"
+        ]
+      },
+      "sync_log": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/sync_status.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_staples.dart"
+        ],
+        "all_reference_count": 5,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "sync_state": {
+        "sources": [
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_rules.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_rules.dart",
+          "server/bin/sync_status.dart",
+          "server/routes/rules/index.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_cards.dart",
+          "server/bin/sync_rules.dart"
+        ],
+        "all_reference_count": 6,
+        "has_runtime_read": true,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "synergies": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [],
+        "all_reference_count": 4,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ]
+      },
+      "tag_accuracy": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "all_reference_count": 1,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ]
+      },
+      "theme_detection_rules": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py"
+        ],
+        "all_reference_count": 3,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_dragons.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/seed_goblins_theme.py"
+        ]
+      },
+      "tmp_mtgjson_prices": {
+        "sources": [
+          "server/bin/sync_prices_mtgjson_fast.dart"
+        ],
+        "classification": "temporary",
+        "read_files": [
+          "server/bin/sync_prices_mtgjson_fast.dart"
+        ],
+        "write_files": [
+          "server/bin/sync_prices_mtgjson_fast.dart"
+        ],
+        "all_reference_count": 1,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "user_collection": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ],
+        "write_files": [],
+        "all_reference_count": 5,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/_scout_report.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/evolve_lorehold_20260527_cycle2.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/parse_collection.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      },
+      "user_follows": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/routes/community/decks/[id].dart",
+          "server/routes/community/users/[id].dart",
+          "server/routes/community/users/index.dart",
+          "server/routes/users/[id]/follow/index.dart",
+          "server/routes/users/[id]/followers/index.dart",
+          "server/routes/users/[id]/following/index.dart"
+        ],
+        "write_files": [
+          "server/routes/users/[id]/follow/index.dart"
+        ],
+        "all_reference_count": 7,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "user_learning_events": {
+        "sources": [
+          "server/bin/pull_learning_events.py",
+          "server/test/pull_learning_events_schema_test.py"
+        ],
+        "classification": "unknown",
+        "read_files": [
+          "server/bin/pull_learning_events.py",
+          "server/test/pull_learning_events_schema_test.py"
+        ],
+        "write_files": [
+          "server/bin/pull_learning_events.py",
+          "server/test/pull_learning_events_schema_test.py"
+        ],
+        "all_reference_count": 2,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": []
+      },
+      "user_plans": {
+        "sources": [
+          "server/bin/migrate.dart",
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/migrate.dart",
+          "server/lib/plan_service.dart"
+        ],
+        "write_files": [
+          "server/bin/migrate.dart",
+          "server/lib/plan_service.dart"
+        ],
+        "all_reference_count": 4,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "users": {
+        "sources": [
+          "server/database_setup.sql"
+        ],
+        "classification": "postgres_product",
+        "read_files": [
+          "server/bin/migrate.dart",
+          "server/lib/auth_service.dart",
+          "server/lib/notification_service.dart",
+          "server/lib/push_notification_service.dart",
+          "server/routes/ai/optimize/telemetry/index.dart",
+          "server/routes/community/binders/[userId].dart",
+          "server/routes/community/decks/[id].dart",
+          "server/routes/community/decks/index.dart",
+          "server/routes/community/marketplace/index.dart",
+          "server/routes/community/users/[id].dart",
+          "server/routes/community/users/index.dart",
+          "server/routes/conversations/[id]/messages.dart",
+          "server/routes/conversations/index.dart",
+          "server/routes/trades/[id]/index.dart",
+          "server/routes/trades/[id]/messages.dart",
+          "server/routes/trades/index.dart",
+          "server/routes/users/[id]/follow/index.dart",
+          "server/routes/users/[id]/followers/index.dart",
+          "server/routes/users/[id]/following/index.dart",
+          "server/routes/users/me/index.dart"
+        ],
+        "write_files": [
+          "server/lib/auth_service.dart",
+          "server/routes/users/me/fcm-token/index.dart",
+          "server/routes/users/me/index.dart"
+        ],
+        "all_reference_count": 39,
+        "has_runtime_read": true,
+        "has_runtime_write": true,
+        "hermes_files": []
+      },
+      "vocabulary": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ],
+        "write_files": [],
+        "all_reference_count": 2,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge_db.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/verify_teysa.py"
+        ]
+      },
+      "wincon_catalog": {
+        "sources": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ],
+        "classification": "hermes_sqlite_or_lab",
+        "read_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
+          "server/bin/export_hermes_learned_deck.py"
+        ],
+        "write_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ],
+        "all_reference_count": 3,
+        "has_runtime_read": false,
+        "has_runtime_write": false,
+        "hermes_files": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py"
+        ]
+      }
+    },
+    "views": {
+      "card_identity_bridge": [
+        "server/lib/import_card_lookup_service.dart",
+        "server/test/data_model_migration_test.dart",
+        "server/test/import_list_service_test.dart"
+      ],
+      "card_intelligence_snapshot": [
+        "server/lib/ai/candidate_quality_data_support.dart",
+        "server/test/candidate_quality_data_support_test.dart",
+        "server/test/data_model_migration_test.dart"
+      ],
+      "commander_learning_snapshot": [
+        "server/lib/ai/commander_learning_snapshot_support.dart",
+        "server/test/candidate_quality_data_support_test.dart",
+        "server/test/data_model_migration_test.dart"
+      ],
+      "optimize_candidate_quality_summary": [
+        "server/lib/ai/candidate_quality_data_support.dart",
+        "server/test/data_model_migration_test.dart"
+      ]
+    },
+    "app_endpoints": {
+      "endpoint_count": 66,
+      "endpoints": {
+        "/ai/archetypes": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/ai/commander-learning": [
+          "app/lib/features/decks/providers/deck_provider.dart"
+        ],
+        "/ai/explain": [
+          "app/lib/features/cards/providers/card_provider.dart"
+        ],
+        "/ai/generate": [
+          "app/lib/features/decks/providers/deck_provider_support_generation.dart"
+        ],
+        "/ai/optimize": [
+          "app/lib/features/decks/providers/deck_provider_support_ai.dart"
+        ],
+        "/ai/optimize/jobs/$jobId": [
+          "app/lib/features/decks/providers/deck_provider_support_ai.dart"
+        ],
+        "/ai/rebuild": [
+          "app/lib/features/decks/providers/deck_provider_support_ai.dart"
+        ],
+        "/auth/login": [
+          "app/lib/features/auth/providers/auth_provider.dart"
+        ],
+        "/auth/me": [
+          "app/lib/features/auth/providers/auth_provider.dart"
+        ],
+        "/auth/register": [
+          "app/lib/features/auth/providers/auth_provider.dart"
+        ],
+        "/binder": [
+          "app/lib/features/binder/providers/binder_provider.dart"
+        ],
+        "/binder/$itemId": [
+          "app/lib/features/binder/providers/binder_provider.dart"
+        ],
+        "/binder/stats": [
+          "app/lib/features/binder/providers/binder_provider.dart"
+        ],
+        "/cards/printings?name=$encoded&limit=$limit": [
+          "app/lib/features/scanner/services/scanner_card_search_service.dart"
+        ],
+        "/cards/printings?name=$encoded&limit=50": [
+          "app/lib/features/cards/providers/card_provider.dart"
+        ],
+        "/cards/printings?name=$encoded&limit=50&sync=true": [
+          "app/lib/features/cards/providers/card_provider.dart"
+        ],
+        "/cards/resolve": [
+          "app/lib/features/scanner/services/scanner_card_search_service.dart"
+        ],
+        "/cards/resolve/batch": [
+          "app/lib/features/decks/providers/deck_provider_support_generation.dart"
+        ],
+        "/cards?name=$encoded&limit=$limit&page=$page": [
+          "app/lib/features/cards/providers/card_provider.dart",
+          "app/lib/features/scanner/services/scanner_card_search_service.dart"
+        ],
+        "/cards?name=$encoded&limit=1": [
+          "app/lib/features/decks/providers/deck_provider_support_generation.dart"
+        ],
+        "/cards?set=${Uri.encodeQueryComponent(setCode)}&limit=$limit&page=$page&dedupe=true": [
+          "app/lib/features/collection/screens/set_cards_screen.dart"
+        ],
+        "/community/binders/$userId?page=$page&limit=$limit&list_type=$listType": [
+          "app/lib/features/binder/providers/binder_provider.dart"
+        ],
+        "/community/binders/$userId?page=$requestPage&limit=20": [
+          "app/lib/features/binder/providers/binder_provider.dart"
+        ],
+        "/community/decks/$deckId": [
+          "app/lib/features/community/providers/community_provider.dart",
+          "app/lib/features/decks/providers/deck_provider_support_import.dart"
+        ],
+        "/community/decks/following?page=$_feedPage&limit=20": [
+          "app/lib/features/social/providers/social_provider.dart"
+        ],
+        "/community/decks?$queryString": [
+          "app/lib/features/community/providers/community_provider.dart"
+        ],
+        "/community/users/$userId": [
+          "app/lib/features/social/providers/social_provider.dart"
+        ],
+        "/community/users?q=$encoded&limit=30": [
+          "app/lib/features/social/providers/social_provider.dart"
+        ],
+        "/conversations": [
+          "app/lib/features/messages/providers/message_provider.dart"
+        ],
+        "/conversations/$conversationId/messages": [
+          "app/lib/features/messages/providers/message_provider.dart"
+        ],
+        "/conversations/$conversationId/read": [
+          "app/lib/features/messages/providers/message_provider.dart"
+        ],
+        "/conversations/unread-count": [
+          "app/lib/features/messages/providers/message_provider.dart"
+        ],
+        "/conversations?page=$page&limit=$limit": [
+          "app/lib/features/messages/providers/message_provider.dart"
+        ],
+        "/decks": [
+          "app/lib/features/decks/providers/deck_provider_support_fetch.dart",
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId": [
+          "app/lib/features/decks/providers/deck_provider_support_fetch.dart",
+          "app/lib/features/decks/providers/deck_provider_support_import.dart",
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId/ai-analysis": [
+          "app/lib/features/decks/providers/deck_provider_support_fetch.dart"
+        ],
+        "/decks/$deckId/analysis": [
+          "app/lib/features/decks/providers/deck_provider_support_fetch.dart"
+        ],
+        "/decks/$deckId/cards": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId/cards/bulk": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId/cards/replace": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId/cards/set": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId/export": [
+          "app/lib/features/decks/providers/deck_provider_support_import.dart"
+        ],
+        "/decks/$deckId/pricing": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/decks/$deckId/validate": [
+          "app/lib/features/decks/providers/deck_provider_support_mutation.dart"
+        ],
+        "/import": [
+          "app/lib/features/decks/providers/deck_provider_support_import.dart"
+        ],
+        "/import/to-deck": [
+          "app/lib/features/decks/providers/deck_provider_support_import.dart"
+        ],
+        "/import/validate": [
+          "app/lib/features/decks/providers/deck_provider_support_import.dart"
+        ],
+        "/market/movers?limit=$limit&min_price=$minPrice": [
+          "app/lib/features/market/providers/market_provider.dart"
+        ],
+        "/notifications/$notificationId/read": [
+          "app/lib/features/notifications/providers/notification_provider.dart"
+        ],
+        "/notifications/count": [
+          "app/lib/features/notifications/providers/notification_provider.dart"
+        ],
+        "/notifications/read-all": [
+          "app/lib/features/notifications/providers/notification_provider.dart"
+        ],
+        "/notifications?$query": [
+          "app/lib/features/notifications/providers/notification_provider.dart"
+        ],
+        "/sets?limit=$limit&page=$page$queryParam": [
+          "app/lib/features/collection/screens/sets_catalog_screen.dart"
+        ],
+        "/trades": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/trades/$tradeId": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/trades/$tradeId/messages": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/trades/$tradeId/messages?page=$page&limit=$limit": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/trades/$tradeId/respond": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/trades/$tradeId/status": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/trades?$query": [
+          "app/lib/features/trades/providers/trade_provider.dart"
+        ],
+        "/users/$targetId/follow": [
+          "app/lib/features/social/providers/social_provider.dart"
+        ],
+        "/users/$userId/followers?page=$_followersPage&limit=30": [
+          "app/lib/features/social/providers/social_provider.dart"
+        ],
+        "/users/$userId/following?page=$_followingPage&limit=30": [
+          "app/lib/features/social/providers/social_provider.dart"
+        ],
+        "/users/me": [
+          "app/lib/features/auth/providers/auth_provider.dart"
+        ],
+        "/users/me/activation-events": [
+          "app/lib/core/services/activation_funnel_service.dart"
+        ],
+        "/users/me/fcm-token": [
+          "app/lib/core/services/push_notification_service.dart"
+        ]
+      }
+    },
+    "sync_scripts": {
+      "script_count": 20,
+      "scripts": [
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
+          "direction": "other_sync",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": false,
+          "mentions_sqlite": false,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+          "direction": "postgres_to_hermes_or_local",
+          "mentions_postgres": true,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+          "direction": "mixed_postgres_sqlite",
+          "mentions_postgres": true,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+          "direction": "postgres_to_hermes_or_local",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py",
+          "direction": "hermes_to_postgres_candidate",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/test_materialize_learned_deck_to_deck_cards.py",
+          "direction": "hermes_to_postgres_candidate",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py",
+          "direction": "other_sync",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+          "direction": "postgres_to_hermes_or_local",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_game_changers_to_dart.py",
+          "direction": "other_sync",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+          "direction": "postgres_to_hermes_or_local",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_metadata.py",
+          "direction": "hermes_to_postgres_candidate",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": false,
+          "mentions_sqlite": false,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/materialize_learned_deck_to_deck_cards.py",
+          "direction": "hermes_to_postgres_candidate",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/import_card_profiles.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": false,
+          "mentions_sqlite": false,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/reimport_lorehold_scryfall.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+          "direction": "other_sync",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": true
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": true,
+          "mentions_sqlite": false,
+          "has_apply_flag": false
+        },
+        {
+          "file": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_import_tests.py",
+          "direction": "external_or_file_to_hermes",
+          "mentions_postgres": false,
+          "mentions_sqlite": true,
+          "has_apply_flag": false
+        }
+      ]
+    },
+    "stale_docs": []
+  },
+  "database": {
+    "skipped": false,
+    "connection": {
+      "host": "143.x.x.247",
+      "port": 5433,
+      "database": "halder",
+      "username_present": true
+    },
+    "relation_count": 72,
+    "relations": {
+      "activation_funnel_events": "BASE TABLE",
+      "ai_generate_jobs": "BASE TABLE",
+      "ai_logs": "BASE TABLE",
+      "ai_optimize_cache": "BASE TABLE",
+      "ai_optimize_fallback_telemetry": "BASE TABLE",
+      "ai_optimize_jobs": "BASE TABLE",
+      "ai_user_preferences": "BASE TABLE",
+      "analysis_sources": "BASE TABLE",
+      "archetype_counters": "BASE TABLE",
+      "archetype_patterns": "BASE TABLE",
+      "battle_simulations": "BASE TABLE",
+      "card_battle_rules": "BASE TABLE",
+      "card_combos": "BASE TABLE",
+      "card_deck_profiles": "BASE TABLE",
+      "card_extended": "BASE TABLE",
+      "card_function_tags": "BASE TABLE",
+      "card_identity_bridge": "VIEW",
+      "card_intelligence_snapshot": "VIEW",
+      "card_legalities": "BASE TABLE",
+      "card_localized_names": "BASE TABLE",
+      "card_meta_insights": "BASE TABLE",
+      "card_role_scores": "BASE TABLE",
+      "card_rulings": "BASE TABLE",
+      "card_rulings_legacy": "BASE TABLE",
+      "card_semantic_tags_v2": "BASE TABLE",
+      "cards": "BASE TABLE",
+      "combo_cards": "BASE TABLE",
+      "commander_card_synergy": "BASE TABLE",
+      "commander_card_usage": "BASE TABLE",
+      "commander_learned_decks": "BASE TABLE",
+      "commander_learning_snapshot": "VIEW",
+      "commander_reference_card_stats": "BASE TABLE",
+      "commander_reference_deck_analysis": "BASE TABLE",
+      "commander_reference_deck_cards": "BASE TABLE",
+      "commander_reference_decks": "BASE TABLE",
+      "commander_reference_profiles": "BASE TABLE",
+      "conversations": "BASE TABLE",
+      "deck_cards": "BASE TABLE",
+      "deck_learning_events": "BASE TABLE",
+      "deck_matchups": "BASE TABLE",
+      "deck_weakness_reports": "BASE TABLE",
+      "decks": "BASE TABLE",
+      "direct_messages": "BASE TABLE",
+      "edhrec_card_snapshots": "BASE TABLE",
+      "external_commander_meta_candidates": "BASE TABLE",
+      "format_staples": "BASE TABLE",
+      "meta_decks": "BASE TABLE",
+      "ml_learning_state": "BASE TABLE",
+      "ml_prompt_feedback": "BASE TABLE",
+      "notifications": "BASE TABLE",
+      "optimization_analysis_logs": "BASE TABLE",
+      "optimize_candidate_quality_summary": "VIEW",
+      "optimize_rejection_penalties": "BASE TABLE",
+      "posts": "BASE TABLE",
+      "price_history": "BASE TABLE",
+      "rate_limit_events": "BASE TABLE",
+      "rules": "BASE TABLE",
+      "schema_migrations": "BASE TABLE",
+      "search_subjects": "BASE TABLE",
+      "sets": "BASE TABLE",
+      "sync_log": "BASE TABLE",
+      "sync_state": "BASE TABLE",
+      "synergy_packages": "BASE TABLE",
+      "theme_contextual_rules": "BASE TABLE",
+      "trade_items": "BASE TABLE",
+      "trade_messages": "BASE TABLE",
+      "trade_offers": "BASE TABLE",
+      "trade_status_history": "BASE TABLE",
+      "user_binder_items": "BASE TABLE",
+      "user_follows": "BASE TABLE",
+      "user_plans": "BASE TABLE",
+      "users": "BASE TABLE"
+    },
+    "critical_row_counts": {
+      "users": 1075,
+      "cards": 34329,
+      "sets": 951,
+      "card_legalities": 324538,
+      "card_localized_names": 251107,
+      "card_function_tags": 112563,
+      "card_role_scores": 46335,
+      "card_semantic_tags_v2": 24181,
+      "card_battle_rules": 3158,
+      "decks": 1337,
+      "deck_cards": 50841,
+      "deck_matchups": 4,
+      "battle_simulations": 1,
+      "deck_weakness_reports": 15,
+      "commander_learned_decks": 61,
+      "deck_learning_events": 107,
+      "commander_card_usage": 912,
+      "commander_card_synergy": 7179,
+      "commander_reference_profiles": 50,
+      "commander_reference_card_stats": 1606,
+      "commander_reference_decks": 121,
+      "commander_reference_deck_cards": 10114,
+      "commander_reference_deck_analysis": 27,
+      "meta_decks": 653,
+      "external_commander_meta_candidates": 10,
+      "format_staples": 748,
+      "ai_optimize_cache": 7,
+      "ai_optimize_jobs": 0,
+      "ai_generate_jobs": 4,
+      "ml_prompt_feedback": 3,
+      "ai_logs": 1102
+    },
+    "critical_view_presence": {
+      "card_identity_bridge": true,
+      "card_intelligence_snapshot": true,
+      "commander_learning_snapshot": true,
+      "optimize_candidate_quality_summary": true
+    },
+    "rollback_view_validation": {
+      "card_identity_bridge": {
+        "compiled_in_rollback": true,
+        "row_count_in_rollback": 305905
+      },
+      "card_intelligence_snapshot": {
+        "compiled_in_rollback": true,
+        "row_count_in_rollback": 34329
+      },
+      "commander_learning_snapshot": {
+        "compiled_in_rollback": true,
+        "row_count_in_rollback": 106
+      },
+      "optimize_candidate_quality_summary": {
+        "compiled_in_rollback": true,
+        "row_count_in_rollback": 34329
+      }
+    },
+    "fanout_checks": {
+      "deck_cards_to_card_intelligence_snapshot": {
+        "rows": 50841,
+        "distinct_deck_card_rows": 50841,
+        "extra_rows": 0
+      },
+      "direct_deck_cards_to_card_battle_rules_fanout_potential": {
+        "rows": 36440,
+        "distinct_deck_card_rows": 35992,
+        "extra_rows": 448
+      },
+      "cards_with_multiple_battle_rules": 10,
+      "cards_with_multiple_function_tags": 22675
+    }
+  },
+  "external_sources": [
+    {
+      "source": "Scryfall Card API",
+      "url": "https://scryfall.com/docs/api/cards",
+      "relevance": "Canonical card object fields for oracle_id, legalities, prices, images, all_parts, keywords, produced_mana, rulings_uri, and prints_search_uri.",
+      "gap": "ManaLoom has core card identity and prices, but should keep all_parts/keywords/produced_mana/rulings_uri available for battle and decision trace enrichment."
+    },
+    {
+      "source": "MTGJSON Card Atomic/Deck/Leadership Skills",
+      "url": "https://mtgjson.com/data-models/card/card-atomic/",
+      "relevance": "Atomic cards separate oracle-like data from printing data; leadershipSkills marks formats where a card can be commander.",
+      "gap": "Commander/Brawl eligibility should prefer explicit leadershipSkills/official rule gates over text-only inference when available."
+    },
+    {
+      "source": "Wizards Commander Format",
+      "url": "https://magic.wizards.com/en/formats/commander",
+      "relevance": "Official commander color identity, 100-card deck shape, command zone, commander tax, and commander damage framing.",
+      "gap": "Keep strict color identity and commander tax/damage as backend-owned validation; do not outsource this to Hermes SQLite."
+    },
+    {
+      "source": "Edge of Eternities Mechanics",
+      "url": "https://magic.wizards.com/en/news/feature/edge-of-eternities-mechanics",
+      "relevance": "Legendary Vehicles and Spacecraft with printed power/toughness can be commanders; Spacecraft/Station/Warp must be modeled deliberately.",
+      "gap": "Battle/Commander legality should retain backlog coverage for Vehicle/Spacecraft commander, Station, Warp, Void, and Lander signals."
+    },
+    {
+      "source": "17Lands Metrics",
+      "url": "https://www.17lands.com/metrics_definitions",
+      "relevance": "Metrics like OH WR, GIH WR, GP WR, IWD, ALSA, and ATA show how to avoid overtrusting raw win rate.",
+      "gap": "Use methodology for Hermes scorecards only; do not import 17Lands card performance into Commander recommendations."
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Keep battle-rule joins behind card_intelligence_snapshot",
+      "reason": "Direct joins from deck_cards to card_battle_rules multiply deck rows.",
+      "action": "Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots."
+    },
+    {
+      "priority": "P1",
+      "title": "Adopt commander_learning_snapshot in future learning loaders",
+      "reason": "The backend-owned commander learning aggregate exists; new consumers should not reassemble Hermes/usage/synergy lineage ad hoc.",
+      "action": "Route future learned-deck diagnostics and optimizer learning reads through commander_learning_snapshot while keeping raw Hermes metadata hidden from normal users."
+    },
+    {
+      "priority": "P2",
+      "title": "Add decision-impact metrics inspired by 17Lands methodology",
+      "reason": "Raw Lorehold WR is not enough to trust deck or battle improvements.",
+      "action": "Track with/without-seen/cast deltas, sample size, baseline hash, and opponent archetype; do not import 17Lands Commander recommendations."
+    }
+  ]
+}

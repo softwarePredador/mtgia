@@ -23,6 +23,8 @@ def render_report(deck_summary: dict[str, object], result, baseline_id: int) -> 
         f"- baseline_id: {baseline_id}",
         f"- deck_id: {deck_summary['deck_id']}",
         f"- deck_hash: `{deck_summary['hash']}`",
+        f"- semantics_hash: `{deck_summary['semantics_hash']}`",
+        f"- ruleset_hash: `{deck_summary['ruleset_hash']}`",
         f"- cards: {deck_summary['cards']}",
         f"- lands: {deck_summary['lands']}",
         f"- avg_cmc: {deck_summary['avg_cmc']}",
@@ -65,13 +67,16 @@ def main() -> int:
         cur = conn.execute(
             """
             INSERT INTO optimizer_baseline_runs
-                (deck_id, deck_hash, games_per_opponent, opponents, total_games,
-                 wr, wins, losses, stalls, status, result_json, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', ?, ?)
+                (deck_id, deck_hash, semantics_hash, ruleset_hash,
+                 games_per_opponent, opponents, total_games, wr, wins, losses,
+                 stalls, status, result_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', ?, ?)
             """,
             (
                 args.deck_id,
                 deck_summary["hash"],
+                deck_summary["semantics_hash"],
+                deck_summary["ruleset_hash"],
                 result.games_per_opponent,
                 result.opponents,
                 result.total_games,

@@ -3,16 +3,18 @@
 
 The battle engine can still use heuristic fallbacks, but this table is the
 intended source of truth for card semantics that must be trusted by the
-optimizer. One row represents what Hermes currently believes a card does in
-battle and how deckbuilding should categorize it.
+optimizer. Rows are keyed by `(normalized_name, logical_rule_key)` so a card can
+carry multiple executable semantics without multiplying deck rows.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
 import sqlite3
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -29,11 +31,28 @@ SOURCE_PRIORITY = {
     "heuristic": 20,
 }
 
+REVIEW_STATUS_PRIORITY = {
+    "verified": 0,
+    "active": 1,
+    "needs_review": 2,
+    "deprecated": 8,
+    "rejected": 9,
+}
+
+EXECUTION_STATUS_PRIORITY = {
+    "executable": 0,
+    "auto": 1,
+    "annotation_only": 2,
+    "review_only": 3,
+    "disabled": 4,
+}
+
 EFFECT_TO_DECK_CATEGORY = {
     "ramp_permanent": "ramp",
     "ramp_ritual": "ramp",
     "ramp_engine": "ramp",
     "land_ramp": "ramp",
+    "lander_token_maker": "ramp",
     "treasure_maker": "ramp",
     "silence_opponents": "protection",
     "silence_spell": "protection",
@@ -41,10 +60,12 @@ EFFECT_TO_DECK_CATEGORY = {
     "phase_out": "protection",
     "phase_creatures": "protection",
     "protect_creature": "protection",
+    "cannot_lose_turn": "protection",
     "redirect_removal": "protection",
     "counter": "protection",
     "hate_artifact": "protection",
     "draw_cards": "draw",
+    "cantrip_mana_filter_artifact": "draw",
     "draw_engine": "draw",
     "topdeck_manipulation": "draw",
     "loot": "draw",
@@ -56,6 +77,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "steal_all_creatures": "wincon",
     "pump_all": "wincon",
     "extra_turn": "wincon",
+    "worldfire_reset": "wincon",
     "board_wipe": "wipe",
     "damage_wipe": "wipe",
     "remove_creature": "removal",
@@ -74,6 +96,7 @@ EFFECT_TO_DECK_CATEGORY = {
 }
 
 _RULE_CACHE: dict[str, tuple[int | None, dict[str, dict[str, Any]]]] = {}
+_RULE_LIST_CACHE: dict[str, tuple[int | None, dict[str, list[dict[str, Any]]]]] = {}
 
 
 def utc_now() -> str:
@@ -92,24 +115,139 @@ def table_exists(conn: sqlite3.Connection, table: str) -> bool:
     return bool(row)
 
 
-def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
+def _create_battle_card_rules_table(
+    conn: sqlite3.Connection,
+    table_name: str = "battle_card_rules",
+) -> None:
     conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS battle_card_rules (
-            normalized_name TEXT PRIMARY KEY,
+        f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            normalized_name TEXT NOT NULL,
+            logical_rule_key TEXT NOT NULL,
             card_name TEXT NOT NULL,
-            effect_json TEXT NOT NULL DEFAULT '{}',
-            deck_role_json TEXT NOT NULL DEFAULT '{}',
-            source TEXT NOT NULL DEFAULT 'manual',
+            effect_json TEXT NOT NULL DEFAULT '{{}}',
+            deck_role_json TEXT NOT NULL DEFAULT '{{}}',
+            source TEXT NOT NULL DEFAULT 'curated',
             confidence REAL NOT NULL DEFAULT 1.0,
             review_status TEXT NOT NULL DEFAULT 'verified',
+            execution_status TEXT NOT NULL DEFAULT 'auto',
             rule_version INTEGER NOT NULL DEFAULT 1,
             oracle_hash TEXT,
             notes TEXT,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
-            last_seen_at TEXT
+            last_seen_at TEXT,
+            PRIMARY KEY (normalized_name, logical_rule_key)
         )
+        """
+    )
+
+
+def _battle_rule_table_columns(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
+    rows = conn.execute("PRAGMA table_info(battle_card_rules)").fetchall()
+    return {
+        str(row[1]): {
+            "cid": row[0],
+            "type": row[2],
+            "notnull": row[3],
+            "default": row[4],
+            "pk": row[5],
+        }
+        for row in rows
+    }
+
+
+def _migrate_battle_card_rules_schema(conn: sqlite3.Connection) -> None:
+    if not table_exists(conn, "battle_card_rules"):
+        _create_battle_card_rules_table(conn)
+        return
+
+    columns = _battle_rule_table_columns(conn)
+    if "execution_status" not in columns:
+        conn.execute(
+            """
+            ALTER TABLE battle_card_rules
+            ADD COLUMN execution_status TEXT NOT NULL DEFAULT 'auto'
+            """
+        )
+        conn.execute(
+            """
+            UPDATE battle_card_rules
+            SET execution_status = CASE
+                WHEN review_status IN ('rejected', 'deprecated') THEN 'disabled'
+                WHEN review_status = 'needs_review' THEN 'review_only'
+                ELSE 'auto'
+            END
+            WHERE execution_status IS NULL OR execution_status = ''
+            """
+        )
+        columns = _battle_rule_table_columns(conn)
+    pk_columns = [
+        name
+        for name, meta in sorted(columns.items(), key=lambda item: int(item[1]["pk"] or 0))
+        if int(meta["pk"] or 0) > 0
+    ]
+    if "logical_rule_key" in columns and pk_columns == [
+        "normalized_name",
+        "logical_rule_key",
+    ]:
+        return
+
+    conn.execute("DROP TABLE IF EXISTS battle_card_rules_v2_migration")
+    _create_battle_card_rules_table(conn, "battle_card_rules_v2_migration")
+    existing_rows = conn.execute(
+        """
+        SELECT normalized_name, card_name, effect_json, deck_role_json, source,
+               confidence, review_status, execution_status, rule_version, oracle_hash, notes,
+               created_at, updated_at, last_seen_at
+        FROM battle_card_rules
+        """
+    ).fetchall()
+    for row in existing_rows:
+        effect_json = _safe_json_loads(row[2])
+        deck_role_json = _safe_json_loads(row[3])
+        logical_key = logical_rule_key(
+            {
+                "effect_json": effect_json,
+                "deck_role_json": deck_role_json,
+            }
+        )
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO battle_card_rules_v2_migration (
+                normalized_name, logical_rule_key, card_name, effect_json,
+                deck_role_json, source, confidence, review_status, execution_status, rule_version,
+                oracle_hash, notes, created_at, updated_at, last_seen_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                row[0],
+                logical_key,
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+                row[6],
+                row[7],
+                row[8],
+                row[9],
+                row[10],
+                row[11],
+                row[12],
+                row[13],
+            ),
+        )
+    conn.execute("DROP TABLE battle_card_rules")
+    conn.execute("ALTER TABLE battle_card_rules_v2_migration RENAME TO battle_card_rules")
+
+
+def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
+    _migrate_battle_card_rules_schema(conn)
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_battle_card_rules_normalized_name
+        ON battle_card_rules(normalized_name)
         """
     )
     conn.execute(
@@ -124,10 +262,16 @@ def ensure_battle_card_rules(conn: sqlite3.Connection) -> None:
 def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     effect = str(effect_json.get("effect") or "unknown")
     category = EFFECT_TO_DECK_CATEGORY.get(effect, "unknown")
+    subtype = None
+    if effect == "creature" and effect_json.get("is_mana_source"):
+        category = "ramp"
+        subtype = "mana_dork"
     role = {
         "category": category,
         "effect": effect,
     }
+    if subtype:
+        role["subtype"] = subtype
     if effect_json.get("instant"):
         role["timing"] = "instant"
     if effect_json.get("target"):
@@ -145,11 +289,167 @@ def _safe_json_loads(value: str | None) -> dict[str, Any]:
     return decoded if isinstance(decoded, dict) else {}
 
 
+def stable_json(value: Any) -> str:
+    return json.dumps(
+        value,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+
+
+def _first_present(*values: Any) -> Any:
+    for value in values:
+        if value not in (None, "", [], {}):
+            return value
+    return None
+
+
+def logical_rule_key(rule: dict[str, Any]) -> str:
+    """Return a stable key for equivalent battle-rule semantics.
+
+    Provenance/review metadata is intentionally excluded. Cards can still keep
+    multiple rules: only duplicate rows with the same face/variant/effect/deck
+    role collapse to the same key for replay/audit evidence.
+    """
+    effect = rule.get("effect_json") or rule.get("effect") or {}
+    deck_role = rule.get("deck_role_json") or rule.get("deck_role") or {}
+    if isinstance(effect, str):
+        effect = _safe_json_loads(effect)
+    if isinstance(deck_role, str):
+        deck_role = _safe_json_loads(deck_role)
+    if not isinstance(effect, dict):
+        effect = {}
+    if not isinstance(deck_role, dict):
+        deck_role = {}
+    payload = {
+        "effect": effect,
+        "deck_role": deck_role,
+        "face_name": _first_present(
+            rule.get("face_name"),
+            effect.get("face_name"),
+            deck_role.get("face_name"),
+        ),
+        "face_index": _first_present(
+            rule.get("face_index"),
+            effect.get("face_index"),
+            deck_role.get("face_index"),
+        ),
+        "variant_kind": _first_present(
+            rule.get("variant_kind"),
+            effect.get("variant_kind"),
+            deck_role.get("variant_kind"),
+        ),
+        "ability_kind": _first_present(
+            rule.get("ability_kind"),
+            effect.get("ability_kind"),
+            deck_role.get("ability_kind"),
+        ),
+        "timing_window": _first_present(
+            rule.get("timing_window"),
+            effect.get("timing_window"),
+            deck_role.get("timing_window"),
+        ),
+        "source_zone": _first_present(
+            rule.get("source_zone"),
+            effect.get("source_zone"),
+            deck_role.get("source_zone"),
+        ),
+    }
+    digest = hashlib.sha256(stable_json(payload).encode("utf-8")).hexdigest()
+    return f"battle_rule_v1:{digest[:32]}"
+
+
+def _rule_rank(rule: dict[str, Any]) -> tuple[int, int, int, float, int, str]:
+    return (
+        REVIEW_STATUS_PRIORITY.get(str(rule.get("review_status") or "").lower(), 7),
+        EXECUTION_STATUS_PRIORITY.get(str(rule.get("execution_status") or "").lower(), 9),
+        -SOURCE_PRIORITY.get(str(rule.get("source") or "").lower(), 0),
+        -float(rule.get("confidence") or 0.0),
+        -int(rule.get("rule_version") or 1),
+        str(rule.get("logical_rule_key") or ""),
+    )
+
+
 def _db_mtime(db_path: Path) -> int | None:
     try:
         return int(db_path.stat().st_mtime_ns)
     except OSError:
         return None
+
+
+def _invalidate_rule_caches_for_connection(conn: sqlite3.Connection) -> None:
+    # Upserts are rare and rule correctness is more important than keeping a
+    # small in-process cache warm. SQLite temp paths can differ by spelling
+    # between `PRAGMA database_list` and caller-provided paths, so clear both
+    # caches globally instead of risking stale multi-rule reads.
+    _RULE_CACHE.clear()
+    _RULE_LIST_CACHE.clear()
+
+
+def load_active_battle_card_rule_lists(
+    db_path: str | Path = DEFAULT_DB,
+) -> dict[str, list[dict[str, Any]]]:
+    path = Path(db_path)
+    mtime = _db_mtime(path)
+    cache_key = str(path)
+    cached = _RULE_LIST_CACHE.get(cache_key)
+    if cached and cached[0] == mtime:
+        return {
+            key: [dict(rule) for rule in value]
+            for key, value in cached[1].items()
+        }
+    if not path.exists():
+        _RULE_LIST_CACHE[cache_key] = (mtime, {})
+        return {}
+
+    try:
+        with closing(sqlite3.connect(path)) as conn:
+            conn.row_factory = sqlite3.Row
+            if not table_exists(conn, "battle_card_rules"):
+                _RULE_LIST_CACHE[cache_key] = (mtime, {})
+                return {}
+            rows = conn.execute(
+                """
+                SELECT normalized_name, logical_rule_key, card_name, effect_json, deck_role_json,
+                       source, confidence, review_status, execution_status, rule_version, oracle_hash, notes
+                FROM battle_card_rules
+                WHERE review_status IN ('verified', 'needs_review', 'active')
+                  AND execution_status != 'disabled'
+                """
+            ).fetchall()
+    except sqlite3.Error:
+        _RULE_LIST_CACHE[cache_key] = (mtime, {})
+        return {}
+
+    rules: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        effect_json = _safe_json_loads(row["effect_json"])
+        deck_role_json = _safe_json_loads(row["deck_role_json"])
+        rule = {
+            "normalized_name": row["normalized_name"],
+            "logical_rule_key": row["logical_rule_key"],
+            "card_name": row["card_name"],
+            "effect_json": effect_json,
+            "deck_role_json": deck_role_json,
+            "source": row["source"],
+            "confidence": row["confidence"],
+            "review_status": row["review_status"],
+            "execution_status": row["execution_status"],
+            "rule_version": row["rule_version"],
+            "oracle_hash": row["oracle_hash"],
+            "notes": row["notes"],
+        }
+        rules.setdefault(row["normalized_name"], []).append(rule)
+
+    for normalized_name, values in rules.items():
+        values.sort(key=_rule_rank)
+
+    _RULE_LIST_CACHE[cache_key] = (mtime, rules)
+    return {
+        key: [dict(rule) for rule in value]
+        for key, value in rules.items()
+    }
 
 
 def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str, dict[str, Any]]:
@@ -159,43 +459,13 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
     cached = _RULE_CACHE.get(cache_key)
     if cached and cached[0] == mtime:
         return {key: dict(value) for key, value in cached[1].items()}
-    if not path.exists():
-        _RULE_CACHE[cache_key] = (mtime, {})
-        return {}
 
-    try:
-        conn = sqlite3.connect(path)
-        conn.row_factory = sqlite3.Row
-        if not table_exists(conn, "battle_card_rules"):
-            conn.close()
-            _RULE_CACHE[cache_key] = (mtime, {})
-            return {}
-        rows = conn.execute(
-            """
-            SELECT normalized_name, card_name, effect_json, deck_role_json,
-                   source, confidence, review_status, rule_version, notes
-            FROM battle_card_rules
-            WHERE review_status IN ('verified', 'needs_review', 'active')
-            """
-        ).fetchall()
-        conn.close()
-    except sqlite3.Error:
-        _RULE_CACHE[cache_key] = (mtime, {})
-        return {}
-
-    rules: dict[str, dict[str, Any]] = {}
-    for row in rows:
-        rules[row["normalized_name"]] = {
-            "normalized_name": row["normalized_name"],
-            "card_name": row["card_name"],
-            "effect_json": _safe_json_loads(row["effect_json"]),
-            "deck_role_json": _safe_json_loads(row["deck_role_json"]),
-            "source": row["source"],
-            "confidence": row["confidence"],
-            "review_status": row["review_status"],
-            "rule_version": row["rule_version"],
-            "notes": row["notes"],
-        }
+    rule_lists = load_active_battle_card_rule_lists(path)
+    rules = {
+        normalized_name: values[0]
+        for normalized_name, values in rule_lists.items()
+        if values
+    }
     _RULE_CACHE[cache_key] = (mtime, rules)
     return {key: dict(value) for key, value in rules.items()}
 
@@ -217,6 +487,24 @@ def lookup_battle_card_rule(
     return dict(rule) if rule else None
 
 
+def lookup_battle_card_rule_list(
+    db_path: str | Path,
+    card_name: str,
+) -> list[dict[str, Any]]:
+    rules = load_active_battle_card_rule_lists(db_path)
+    normalized = normalize_card_name(card_name)
+    values = rules.get(normalized)
+    if values:
+        return [dict(rule) for rule in values]
+    face_prefix = f"{normalized} //"
+    matches: list[dict[str, Any]] = []
+    for key, value in rules.items():
+        if key.startswith(face_prefix):
+            matches.extend(dict(rule) for rule in value)
+    matches.sort(key=_rule_rank)
+    return matches
+
+
 def upsert_battle_card_rule(
     conn: sqlite3.Connection,
     card_name: str,
@@ -225,6 +513,7 @@ def upsert_battle_card_rule(
     source: str,
     confidence: float,
     review_status: str,
+    execution_status: str = "auto",
     deck_role_json: dict[str, Any] | None = None,
     notes: str = "",
     oracle_hash: str | None = None,
@@ -232,11 +521,19 @@ def upsert_battle_card_rule(
     ensure_battle_card_rules(conn)
     normalized = normalize_card_name(card_name)
     now = utc_now()
+    role = deck_role_json or deck_role_from_effect(effect_json)
+    rule_key = logical_rule_key(
+        {
+            "effect_json": effect_json,
+            "deck_role_json": role,
+        }
+    )
     current = conn.execute(
         """
-        SELECT source FROM battle_card_rules WHERE normalized_name=?
+        SELECT source FROM battle_card_rules
+        WHERE normalized_name=? AND logical_rule_key=?
         """,
-        (normalized,),
+        (normalized, rule_key),
     ).fetchone()
     if current:
         incoming_priority = SOURCE_PRIORITY.get(source, 0)
@@ -246,27 +543,29 @@ def upsert_battle_card_rule(
                 """
                 UPDATE battle_card_rules
                 SET last_seen_at=?
-                WHERE normalized_name=?
+                WHERE normalized_name=? AND logical_rule_key=?
                 """,
-                (now, normalized),
+                (now, normalized, rule_key),
             )
+            _invalidate_rule_caches_for_connection(conn)
             return False
 
-    role = deck_role_json or deck_role_from_effect(effect_json)
     conn.execute(
         """
         INSERT INTO battle_card_rules (
-            normalized_name, card_name, effect_json, deck_role_json, source,
-            confidence, review_status, rule_version, oracle_hash, notes,
+            normalized_name, logical_rule_key, card_name, effect_json,
+            deck_role_json, source, confidence, review_status, execution_status, rule_version,
+            oracle_hash, notes,
             created_at, updated_at, last_seen_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
-        ON CONFLICT(normalized_name) DO UPDATE SET
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+        ON CONFLICT(normalized_name, logical_rule_key) DO UPDATE SET
             card_name=excluded.card_name,
             effect_json=excluded.effect_json,
             deck_role_json=excluded.deck_role_json,
             source=excluded.source,
             confidence=excluded.confidence,
             review_status=excluded.review_status,
+            execution_status=excluded.execution_status,
             oracle_hash=excluded.oracle_hash,
             notes=excluded.notes,
             updated_at=excluded.updated_at,
@@ -274,12 +573,14 @@ def upsert_battle_card_rule(
         """,
         (
             normalized,
+            rule_key,
             card_name,
             json.dumps(effect_json, ensure_ascii=True, sort_keys=True),
             json.dumps(role, ensure_ascii=True, sort_keys=True),
             source,
             confidence,
             review_status,
+            execution_status,
             oracle_hash,
             notes,
             now,
@@ -287,4 +588,5 @@ def upsert_battle_card_rule(
             now,
         ),
     )
+    _invalidate_rule_caches_for_connection(conn)
     return True

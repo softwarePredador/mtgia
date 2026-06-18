@@ -102,6 +102,100 @@ def register_tests(battle, player):
         assert low_life_payer.can_pay_card(phyrexian_spell) is False
         assert low_life_payer.life == 1
 
+    def test_monocolored_hybrid_and_hybrid_phyrexian_mana_use_legal_payment_options():
+        white_payer = player("White")
+        white_payer.mana_pool.add("white", 1)
+        monocolored_hybrid_spell = {
+            "name": "Monocolored Hybrid",
+            "cmc": 2,
+            "mana_cost": "{2/W}",
+        }
+
+        assert white_payer.can_pay_card(monocolored_hybrid_spell) is True
+        assert white_payer.spend_card_mana(monocolored_hybrid_spell) is True
+        assert white_payer.mana_pool.white == 0
+
+        generic_payer = player("Generic")
+        generic_payer.mana_pool.add_generic(2)
+
+        assert generic_payer.can_pay_card(monocolored_hybrid_spell) is True
+        assert generic_payer.spend_card_mana(monocolored_hybrid_spell) is True
+        assert generic_payer.available_mana() == 0
+
+        short_payer = player("Short")
+        short_payer.mana_pool.add_generic(1)
+
+        assert short_payer.can_pay_card(monocolored_hybrid_spell) is False
+
+        blue_life_payer = player("Blue Life")
+        blue_life_payer.life = 10
+        hybrid_phyrexian_spell = {
+            "name": "Hybrid Phyrexian",
+            "cmc": 1,
+            "mana_cost": "{W/U/P}",
+        }
+
+        assert blue_life_payer.can_pay_card(hybrid_phyrexian_spell) is True
+        assert blue_life_payer.spend_card_mana(hybrid_phyrexian_spell) is True
+        assert blue_life_payer.life == 8
+
+        blue_mana_payer = player("Blue Mana")
+        blue_mana_payer.life = 10
+        blue_mana_payer.mana_pool.add("blue", 1)
+
+        assert blue_mana_payer.spend_card_mana(hybrid_phyrexian_spell) is True
+        assert blue_mana_payer.life == 10
+        assert blue_mana_payer.mana_pool.blue == 0
+
+    def test_restricted_mana_only_pays_matching_spell_categories():
+        creature_payer = player("Creature Payer")
+        creature_payer.add_restricted_mana(
+            2,
+            "creature_spell_only",
+            color="wildcard",
+        )
+        creature_spell = {
+            "name": "Restricted Creature",
+            "cmc": 2,
+            "mana_cost": "{1}{G}",
+            "type_line": "Creature — Elf",
+        }
+        instant_spell = {
+            "name": "Restricted Instant",
+            "cmc": 2,
+            "mana_cost": "{1}{G}",
+            "type_line": "Instant",
+        }
+
+        assert creature_payer.available_mana() == 0
+        assert creature_payer.can_pay_card(creature_spell) is True
+        assert creature_payer.can_pay_card(instant_spell) is False
+        assert creature_payer.spend_card_mana(creature_spell) is True
+        assert creature_payer.restricted_mana == {}
+
+    def test_restricted_mana_combines_with_treasure_for_matching_generic_costs():
+        active = player("Active")
+        active.add_restricted_mana(1, "creature_spell_only", color="generic")
+        active.treasures = 1
+        creature_spell = {
+            "name": "Two Generic Creature",
+            "cmc": 2,
+            "mana_cost": "{2}",
+            "type_line": "Creature",
+        }
+        noncreature_spell = {
+            "name": "Two Generic Instant",
+            "cmc": 2,
+            "mana_cost": "{2}",
+            "type_line": "Instant",
+        }
+
+        assert active.can_pay_card(noncreature_spell) is False
+        assert active.can_pay_card(creature_spell) is True
+        assert active.spend_card_mana(creature_spell) is True
+        assert active.treasures == 0
+        assert active.restricted_mana == {}
+
     return [
         test_mana_sources_do_not_refill_after_spending,
         test_treasures_are_spent_without_refilling_sources,
@@ -109,4 +203,7 @@ def register_tests(battle, player):
         test_treasure_and_flexible_sources_pay_colored_costs,
         test_basic_lands_refresh_as_colored_sources,
         test_hybrid_and_phyrexian_mana_use_legal_payment_options,
+        test_monocolored_hybrid_and_hybrid_phyrexian_mana_use_legal_payment_options,
+        test_restricted_mana_only_pays_matching_spell_categories,
+        test_restricted_mana_combines_with_treasure_for_matching_generic_costs,
     ]

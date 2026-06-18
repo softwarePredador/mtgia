@@ -17,6 +17,8 @@ from master_optimizer_common import (
     get_deck_summary,
     latest_baseline,
     quality_gate_candidate,
+    ruleset_hash,
+    semantics_hash,
     utc_now,
     write_report,
 )
@@ -85,6 +87,8 @@ def main() -> int:
 
         before_rows = [row_to_dict(row) for row in deck_rows(conn, args.deck_id)]
         before_hash = deck_hash(conn, args.deck_id)
+        before_semantics_hash = semantics_hash(conn, args.deck_id)
+        before_ruleset_hash = ruleset_hash(conn, args.deck_id)
         removed_rows = [
             row
             for row in before_rows
@@ -96,27 +100,50 @@ def main() -> int:
             raise SystemExit(f"Added card already present in deck: {added}")
 
         meta = card_metadata(conn, added)
+        deck_columns = {row[1] for row in conn.execute("PRAGMA table_info(deck_cards)")}
+        added_tag = candidate["add_tag"] or candidate["add_effect"] or "candidate"
         conn.execute(
             "DELETE FROM deck_cards WHERE deck_id=? AND lower(card_name)=lower(?)",
             (args.deck_id, removed),
         )
+        insert_columns = [
+            "deck_id",
+            "card_name",
+            "quantity",
+            "functional_tag",
+            "tag_confidence",
+            "is_commander",
+            "is_partner",
+            "cmc",
+            "type_line",
+            "oracle_text",
+        ]
+        insert_values = [
+            args.deck_id,
+            added,
+            1,
+            added_tag,
+            None,
+            0,
+            0,
+            meta["cmc"] if meta else candidate["add_cmc"],
+            meta["type_line"] if meta else None,
+            meta["oracle_text"] if meta else None,
+        ]
+        if "functional_tags_json" in deck_columns:
+            insert_columns.append("functional_tags_json")
+            insert_values.append(json.dumps([added_tag], ensure_ascii=True))
+        placeholders = ", ".join("?" for _ in insert_columns)
         conn.execute(
-            """
-            INSERT INTO deck_cards
-                (deck_id, card_name, quantity, functional_tag, tag_confidence,
-                 is_commander, is_partner, cmc, type_line, oracle_text)
-            VALUES (?, ?, 1, ?, NULL, 0, 0, ?, ?, ?)
+            f"""
+            INSERT INTO deck_cards ({", ".join(insert_columns)})
+            VALUES ({placeholders})
             """,
-            (
-                args.deck_id,
-                added,
-                candidate["add_tag"] or candidate["add_effect"] or "candidate",
-                meta["cmc"] if meta else candidate["add_cmc"],
-                meta["type_line"] if meta else None,
-                meta["oracle_text"] if meta else None,
-            ),
+            insert_values,
         )
         after_hash = deck_hash(conn, args.deck_id)
+        after_semantics_hash = semantics_hash(conn, args.deck_id)
+        after_ruleset_hash = ruleset_hash(conn, args.deck_id)
         after_summary = get_deck_summary(conn, args.deck_id)
 
         REPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -128,6 +155,10 @@ def main() -> int:
             "card_removed": removed,
             "before_hash": before_hash,
             "after_hash": after_hash,
+            "before_semantics_hash": before_semantics_hash,
+            "after_semantics_hash": after_semantics_hash,
+            "before_ruleset_hash": before_ruleset_hash,
+            "after_ruleset_hash": after_ruleset_hash,
             "before_rows": before_rows,
             "created_at": utc_now(),
         }
@@ -144,8 +175,10 @@ def main() -> int:
             """
             INSERT INTO optimizer_applied_swaps
                 (deck_id, swap_benchmark_id, card_added, card_removed,
-                 before_hash, after_hash, rollback_path, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 before_hash, after_hash, before_semantics_hash,
+                 after_semantics_hash, before_ruleset_hash, after_ruleset_hash,
+                 rollback_path, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 args.deck_id,
@@ -154,6 +187,10 @@ def main() -> int:
                 removed,
                 before_hash,
                 after_hash,
+                before_semantics_hash,
+                after_semantics_hash,
+                before_ruleset_hash,
+                after_ruleset_hash,
                 str(rollback_path),
                 utc_now(),
             ),
@@ -171,6 +208,10 @@ def main() -> int:
             f"- confirmation_delta: {float(candidate['delta_pp']):+.1f}pp",
             f"- before_hash: `{before_hash}`",
             f"- after_hash: `{after_hash}`",
+            f"- before_semantics_hash: `{before_semantics_hash}`",
+            f"- after_semantics_hash: `{after_semantics_hash}`",
+            f"- before_ruleset_hash: `{before_ruleset_hash}`",
+            f"- after_ruleset_hash: `{after_ruleset_hash}`",
             f"- rollback_path: `{rollback_path}`",
             f"- deck_cards_after: {after_summary['cards']}",
             f"- lands_after: {after_summary['lands']}",

@@ -1,0 +1,195 @@
+{
+  "apply_approved": false,
+  "approved": [
+    {
+      "card_name": "Aetherflux Reservoir",
+      "logical_rule_key": "battle_rule_v1:2d9a2f1f7842e5c722724602452fcfdb",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "wincon"
+    },
+    {
+      "card_name": "Amphibian Downpour",
+      "logical_rule_key": "battle_rule_v1:5c692dfddd76362160ffb7d287af62b8",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Arcane Bombardment",
+      "logical_rule_key": "battle_rule_v1:4de8d3e4fbfdeac3093aca7ddc61a2b0",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Brain Freeze",
+      "logical_rule_key": "battle_rule_v1:2d9a2f1f7842e5c722724602452fcfdb",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "wincon"
+    },
+    {
+      "card_name": "Burnt Offering",
+      "logical_rule_key": "battle_rule_v1:68cf6e0c41bc9101589d8b0eac35a588",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "ramp"
+    },
+    {
+      "card_name": "Chaos Warp",
+      "logical_rule_key": "battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Double Vision",
+      "logical_rule_key": "battle_rule_v1:1a98476a2542043b9e67f4601501a216",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Dualcaster Mage",
+      "logical_rule_key": "battle_rule_v1:5d3ebd644649b6bcf02333c463132d11",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Echoes of Eternity",
+      "logical_rule_key": "battle_rule_v1:468e6a550866c287025d0ac1b1ba6658",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Flare of Duplication",
+      "logical_rule_key": "battle_rule_v1:ed13c274dec8f6ba95496fed1196f343",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Force of Vigor",
+      "logical_rule_key": "battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Isochron Scepter",
+      "logical_rule_key": "battle_rule_v1:1a98476a2542043b9e67f4601501a216",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Jin-Gitaxias, Progress Tyrant",
+      "logical_rule_key": "battle_rule_v1:f4728e6d868b9abba11c31b6867d4574",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Living Death",
+      "logical_rule_key": "battle_rule_v1:3d1d7c9ec8ddbb2ca0307f4f7a323f11",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "board_wipe"
+    },
+    {
+      "card_name": "Peer into the Abyss",
+      "logical_rule_key": "battle_rule_v1:2b0f89d9cf72f86f0cb0c1b6a8820cf3",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "draw"
+    },
+    {
+      "card_name": "Pest Infestation",
+      "logical_rule_key": "battle_rule_v1:49b642b05385ea2bc5e7025255aa112a",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Reforge the Soul",
+      "logical_rule_key": "battle_rule_v1:132fb1a9b40732a75b8c14105ba41b19",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "draw"
+    },
+    {
+      "card_name": "Reiterate",
+      "logical_rule_key": "battle_rule_v1:ed13c274dec8f6ba95496fed1196f343",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Reverberate",
+      "logical_rule_key": "battle_rule_v1:ed13c274dec8f6ba95496fed1196f343",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "engine"
+    },
+    {
+      "card_name": "Run Away Together",
+      "logical_rule_key": "battle_rule_v1:5c692dfddd76362160ffb7d287af62b8",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Step Through",
+      "logical_rule_key": "battle_rule_v1:8afc9f7b14b491ecf19087aa05bda874",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Timetwister",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "draw"
+    },
+    {
+      "card_name": "Ugin, Eye of the Storms",
+      "logical_rule_key": "battle_rule_v1:aa0232c55d7fd2a1f899be6002405931",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "removal"
+    },
+    {
+      "card_name": "Ugin, the Spirit Dragon",
+      "logical_rule_key": "battle_rule_v1:b3c65fe201e8f4da8061217e3f55e192",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "board_wipe"
+    },
+    {
+      "card_name": "Wheel of Fortune",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "draw"
+    },
+    {
+      "card_name": "Wheel of Misfortune",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "draw"
+    },
+    {
+      "card_name": "Windfall",
+      "logical_rule_key": "battle_rule_v1:c66a152a0ec70eb9e2a03412262eb225",
+      "notes": "No PostgreSQL apply approved. Allowlist is for dry-run contract validation only.",
+      "review_status": "dry_run_low_risk_review_only",
+      "tag": "draw"
+    }
+  ],
+  "schema_version": "card_battle_rules_v1_low_risk_allowlist_2026_06_12"
+}

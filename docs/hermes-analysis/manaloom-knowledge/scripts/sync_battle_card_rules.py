@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Sync canonical battle/deckbuilding rules into Hermes SQLite.
 
-This does not infer new rules from scratch. It takes the current manual rules
-and generated rules, stores them in `battle_card_rules`, and makes their source
-and review state explicit for battle/optimizer consumers.
+This does not infer new rules from scratch. It takes the currently available
+generated rules plus any explicitly injected runtime waivers, stores them in
+`battle_card_rules`, and makes their source and review state explicit for
+battle/optimizer consumers.
 
 For production/Hermes crons, prefer `sync_battle_card_rules_pg.py`: Postgres
 stores the reviewable source of truth and this SQLite table acts as the fast
@@ -17,12 +18,23 @@ import importlib.util
 import json
 import os
 import sqlite3
+from collections import defaultdict
+from contextlib import closing
 from pathlib import Path
 
+import battle_rule_registry
 from battle_rule_registry import (
     DEFAULT_DB,
     ensure_battle_card_rules,
     upsert_battle_card_rule,
+)
+from known_cards_fallback_snapshot import (
+    build_snapshot_payload,
+    write_snapshot_payload,
+)
+from reviewed_battle_card_rules import (
+    DEFAULT_REVIEWED_RULES_PATH,
+    load_reviewed_rule_rows,
 )
 
 
@@ -45,7 +57,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
     parser.add_argument("--skip-generated", action="store_true")
+    parser.add_argument(
+        "--reviewed-rules-json",
+        default=str(DEFAULT_REVIEWED_RULES_PATH),
+    )
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument(
+        "--export-canonical-fallback-json",
+        default=str(SCRIPT_DIR / "known_cards_canonical_snapshot.json"),
+    )
     parser.add_argument("--report")
     return parser.parse_args()
 
@@ -75,18 +95,20 @@ def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> l
         return rows
 
     try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        oracle_cache = battle.load_card_oracle_cache(
-            conn,
-            [str(row.get("card_name") or "") for row in rows],
-        )
-        conn.close()
+        with closing(sqlite3.connect(db_path)) as conn:
+            conn.row_factory = sqlite3.Row
+            oracle_cache = battle.load_card_oracle_cache(
+                conn,
+                [str(row.get("card_name") or "") for row in rows],
+            )
     except Exception:
         return rows
 
     normalized_rows: list[dict] = []
     for row in rows:
+        if row.get("source") == "manual":
+            normalized_rows.append(dict(row))
+            continue
         card_name = str(row.get("card_name") or "")
         card = battle.merge_oracle_metadata({"name": card_name}, oracle_cache)
         effect_before = dict(row.get("effect_json") or {})
@@ -107,10 +129,16 @@ def build_rows(
     include_generated: bool,
     *,
     sqlite_db: str | Path | None = None,
+    reviewed_rules_path: str | Path = DEFAULT_REVIEWED_RULES_PATH,
 ) -> list[dict]:
     rows: list[dict] = []
-    for name in sorted(battle.HANDCRAFTED_KNOWN_CARDS):
-        effect = dict(battle.KNOWN_CARDS[name])
+    # After the 2026-06-16 canonicalization cleanup, active handwritten rules
+    # should normally be empty. This loop remains only for explicit temporary
+    # runtime waivers injected by tests or incident response.
+    for name in sorted(getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set())):
+        effect = dict(getattr(battle, "HANDCRAFTED_KNOWN_CARD_RULES", {}).get(name) or {})
+        if not effect:
+            continue
         rows.append(
             {
                 "card_name": name,
@@ -118,9 +146,10 @@ def build_rows(
                 "source": "manual",
                 "confidence": 1.0,
                 "review_status": "verified",
-                "notes": "Seeded from HANDCRAFTED_KNOWN_CARDS.",
+                "notes": "Seeded from MANUAL_RULE_RUNTIME_WAIVERS.",
             }
         )
+    rows.extend(load_reviewed_rule_rows(reviewed_rules_path))
 
     if include_generated:
         for name, effect in sorted(load_generated_rules().items()):
@@ -141,39 +170,150 @@ def build_rows(
     return _oracle_normalized_rows(sqlite_db, rows)
 
 
+def cleanup_obsolete_manual_rows(conn: sqlite3.Connection) -> int:
+    """Purge stale persisted manual overrides before reseeding current waivers.
+
+    `source='manual'` is reserved for explicit `MANUAL_RULE_RUNTIME_WAIVERS`
+    injected into the active runtime. Historical handcrafted/manual rows should
+    not continue shadowing curated/generated rules in the long-lived SQLite
+    cache once the runtime inventory has been canonicalized.
+    """
+    ensure_battle_card_rules(conn)
+    deleted = conn.execute(
+        """
+        DELETE FROM battle_card_rules
+        WHERE source = 'manual'
+        """
+    ).rowcount
+    battle_rule_registry._invalidate_rule_caches_for_connection(conn)
+    return int(deleted or 0)
+
+
+def cleanup_stale_reviewed_rows(
+    conn: sqlite3.Connection,
+    reviewed_rows: list[dict],
+) -> int:
+    """Drop stale curated reviewed rows superseded by the current reviewed file.
+
+    When a reviewed rule changes its logical shape, the old `(normalized_name,
+    logical_rule_key)` row can survive beside the new one because both are
+    `curated/active`. That leaves the canonical snapshot free to pick the wrong
+    sibling by lexical tie-break. Reviewed rows should therefore be treated as a
+    replace-set per card name.
+    """
+    ensure_battle_card_rules(conn)
+    allowed_by_name: dict[str, set[str]] = defaultdict(set)
+    for row in reviewed_rows:
+        if str(row.get("source") or "") != "curated":
+            continue
+        card_name = str(row.get("card_name") or "").strip()
+        effect_json = dict(row.get("effect_json") or {})
+        if not card_name or not effect_json:
+            continue
+        normalized = battle_rule_registry.normalize_card_name(card_name)
+        allowed_by_name[normalized].add(
+            battle_rule_registry.logical_rule_key(
+                {
+                    "effect_json": effect_json,
+                    "deck_role_json": row.get("deck_role_json"),
+                }
+            )
+        )
+
+    deleted = 0
+    for normalized_name, allowed_keys in allowed_by_name.items():
+        placeholders = ",".join("?" for _ in allowed_keys)
+        query = f"""
+            DELETE FROM battle_card_rules
+            WHERE normalized_name = ?
+              AND source = 'curated'
+              AND logical_rule_key NOT IN ({placeholders})
+        """
+        deleted += conn.execute(query, (normalized_name, *sorted(allowed_keys))).rowcount or 0
+
+    battle_rule_registry._invalidate_rule_caches_for_connection(conn)
+    return int(deleted or 0)
+
+
 def main() -> int:
     args = parse_args()
-    rows = build_rows(include_generated=not args.skip_generated, sqlite_db=args.sqlite_db)
+    rows = build_rows(
+        include_generated=not args.skip_generated,
+        sqlite_db=args.sqlite_db,
+        reviewed_rules_path=args.reviewed_rules_json,
+    )
     report = {
         "sqlite_db": args.sqlite_db,
         "apply": bool(args.apply),
+        "export_canonical_fallback_json": args.export_canonical_fallback_json,
+        "reviewed_rules_json": args.reviewed_rules_json,
         "input_rows": len(rows),
         "manual_rows": sum(1 for row in rows if row["source"] == "manual"),
+        "curated_rows": sum(1 for row in rows if row["source"] == "curated"),
         "generated_rows": sum(1 for row in rows if row["source"] == "generated"),
         "oracle_normalized_rows": sum(1 for row in rows if row.get("_oracle_normalized")),
         "inserted_or_updated": 0,
         "skipped_lower_priority": 0,
+        "deleted_stale_manual_rows": 0,
+        "deleted_stale_reviewed_rows": 0,
+        "canonical_snapshot_rows_exported": 0,
     }
 
     if args.apply:
-        conn = sqlite3.connect(args.sqlite_db)
-        ensure_battle_card_rules(conn)
-        for row in rows:
-            changed = upsert_battle_card_rule(
-                conn,
-                row["card_name"],
-                row["effect_json"],
-                source=row["source"],
-                confidence=row["confidence"],
-                review_status=row["review_status"],
-                notes=row["notes"],
-            )
-            if changed:
-                report["inserted_or_updated"] += 1
-            else:
-                report["skipped_lower_priority"] += 1
-        conn.commit()
-        conn.close()
+        with closing(sqlite3.connect(args.sqlite_db)) as conn:
+            ensure_battle_card_rules(conn)
+            report["deleted_stale_manual_rows"] = cleanup_obsolete_manual_rows(conn)
+            report["deleted_stale_reviewed_rows"] = cleanup_stale_reviewed_rows(conn, rows)
+            for row in rows:
+                changed = upsert_battle_card_rule(
+                    conn,
+                    row["card_name"],
+                    row["effect_json"],
+                    source=row["source"],
+                    confidence=row["confidence"],
+                    review_status=row["review_status"],
+                    notes=row["notes"],
+                )
+                if changed:
+                    report["inserted_or_updated"] += 1
+                else:
+                    report["skipped_lower_priority"] += 1
+            conn.commit()
+
+        with sqlite3.connect(args.sqlite_db) as conn:
+            conn.row_factory = sqlite3.Row
+            active_rows = []
+            for row in conn.execute(
+                """
+                SELECT
+                    card_name,
+                    effect_json,
+                    source,
+                    confidence,
+                    review_status,
+                    rule_version,
+                    oracle_hash,
+                    updated_at,
+                    last_seen_at
+                FROM battle_card_rules
+                """
+            ):
+                active_rows.append(
+                    {
+                        "card_name": row["card_name"],
+                        "effect_json": json.loads(row["effect_json"]),
+                        "source": row["source"],
+                        "confidence": row["confidence"],
+                        "review_status": row["review_status"],
+                        "rule_version": row["rule_version"],
+                        "oracle_hash": row["oracle_hash"],
+                        "updated_at": row["updated_at"],
+                        "last_seen_at": row["last_seen_at"],
+                    }
+                )
+        payload = build_snapshot_payload(active_rows)
+        write_snapshot_payload(args.export_canonical_fallback_json, payload)
+        report["canonical_snapshot_rows_exported"] = len(payload)
 
     output = json.dumps(report, ensure_ascii=True, indent=2, sort_keys=True)
     print(output)

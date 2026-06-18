@@ -19,11 +19,11 @@ from pathlib import Path
 from typing import Any
 
 import battle_rule_registry
+from known_cards_fallback_snapshot import load_layered_known_cards
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_REPORT_DIR = SCRIPT_DIR.parents[1] / "master_optimizer_reports"
-GENERATED_PATH = SCRIPT_DIR / "known_cards_generated.json"
 BATTLE_PATH = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v9.py"))
 
 
@@ -68,19 +68,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def generated_cards() -> dict[str, Any]:
-    if not GENERATED_PATH.exists():
-        return {}
-    try:
-        decoded = json.loads(GENERATED_PATH.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    return decoded if isinstance(decoded, dict) else {}
+def fallback_known_cards() -> set[str]:
+    _fallback_cards, canonical_names, _generated_only_names = load_layered_known_cards()
+    return canonical_names
 
 
 def effect_source(
     card: dict[str, Any],
-    generated: dict[str, Any],
+    canonical_names: set[str],
     rules: dict[str, dict[str, Any]],
 ) -> str:
     name = card.get("name", "")
@@ -91,8 +86,8 @@ def effect_source(
         return f"battle_rule_{rule.get('source', 'unknown')}"
     if name in battle.HANDCRAFTED_KNOWN_CARDS:
         return "handcrafted"
-    if name in generated:
-        return "generated"
+    if name in canonical_names:
+        return "known_cards_canonical_snapshot"
     if card.get("tag") in battle.TAG_EFFECTS:
         return "tag"
     effect = card.get("effect", "")
@@ -169,7 +164,7 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(args.opponent_limit)
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(args.seed)
 
-    generated = generated_cards()
+    canonical_names = fallback_known_cards()
     rules = battle_rule_registry.load_active_battle_card_rules(args.sqlite_db)
     commander, lorehold_deck = battle.load_deck(args.deck_id)
     lorehold_cards = ([commander] if commander else []) + lorehold_deck
@@ -191,7 +186,11 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
     for deck_name, card in rows:
         name = card.get("name", "?")
         effect = battle.get_card_effect(card).get("effect", "unknown")
-        source = effect_source(card, generated, rules)
+        source = effect_source(
+            card,
+            canonical_names,
+            rules,
+        )
         flags = risk_flags(card, effect, source)
         source_totals[source] += 1
         effect_totals[effect] += 1

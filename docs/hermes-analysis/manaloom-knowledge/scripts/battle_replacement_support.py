@@ -117,9 +117,29 @@ class ReplacementRegistry:
             candidates.append(
                 ("protection_from_everything", 20, lambda current: current.mark_prevented("protection_from_everything"))
             )
+        damage_floor = getattr(player, "damage_life_floor", None)
+        if damage_floor is not None:
+            candidates.append(("damage_life_floor", 25, ReplacementRegistry._apply_damage_life_floor))
         if any((shield.get("amount", 0) or 0) > 0 for shield in getattr(player, "damage_prevention_shields", [])):
             candidates.append(("damage_prevention_shields", 30, ReplacementRegistry._consume_damage_prevention_shields))
         return candidates
+
+    @staticmethod
+    def _apply_damage_life_floor(event):
+        player = event.affected_player
+        floor = getattr(player, "damage_life_floor", None)
+        if floor is None:
+            return
+        current_life = int(getattr(player, "life", 0) or 0)
+        allowed_damage = max(0, current_life - int(floor))
+        if event.amount <= allowed_damage:
+            return
+        prevented = max(0, event.amount - allowed_damage)
+        event.amount = allowed_damage
+        event.delta = -allowed_damage
+        event.replacements.append(f"damage_life_floor:{floor}:{prevented}")
+        if allowed_damage <= 0:
+            event.prevented = True
 
     @staticmethod
     def _consume_damage_prevention_shields(event):

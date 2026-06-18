@@ -171,17 +171,17 @@ def register_tests(battle, player, card):
         defender = player("Defender")
         token_spell = {"name": "Token Maker", "cmc": 4, "type_line": "Sorcery"}
 
-        previous_normal = battle.KNOWN_CARDS.get("Token Maker")
-        previous_hasty = battle.KNOWN_CARDS.get("Hasty Token Maker")
+        previous_normal = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Token Maker")
+        previous_hasty = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Hasty Token Maker")
         normal_was_handcrafted = "Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
         hasty_was_handcrafted = "Hasty Token Maker" in battle.HANDCRAFTED_KNOWN_CARDS
         try:
-            battle.KNOWN_CARDS["Token Maker"] = {
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Token Maker"] = {
                 "effect": "token_maker",
                 "token_count": 1,
                 "token_power": 2,
             }
-            battle.KNOWN_CARDS["Hasty Token Maker"] = {
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Hasty Token Maker"] = {
                 "effect": "token_maker",
                 "token_count": 1,
                 "token_power": 2,
@@ -219,13 +219,13 @@ def register_tests(battle, player, card):
             assert hasty.battlefield[0]["tapped"] is True
         finally:
             if previous_normal is None:
-                battle.KNOWN_CARDS.pop("Token Maker", None)
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Token Maker", None)
             else:
-                battle.KNOWN_CARDS["Token Maker"] = previous_normal
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Token Maker"] = previous_normal
             if previous_hasty is None:
-                battle.KNOWN_CARDS.pop("Hasty Token Maker", None)
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Hasty Token Maker", None)
             else:
-                battle.KNOWN_CARDS["Hasty Token Maker"] = previous_hasty
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Hasty Token Maker"] = previous_hasty
             if not normal_was_handcrafted:
                 battle.HANDCRAFTED_KNOWN_CARDS.discard("Token Maker")
             if not hasty_was_handcrafted:
@@ -347,6 +347,75 @@ def register_tests(battle, player, card):
         assert reclaimer["tapped"] is True
         assert any(event == "activated_ability" for event, _ in events)
 
+    def test_elvish_reclaimer_does_not_sacrifice_unique_color_for_tapped_basic():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.library = [{"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}]
+        reclaimer = {
+            "name": "Elvish Reclaimer",
+            "effect": "creature",
+            "type_line": "Creature — Elf Warrior",
+            "power": 1,
+            "toughness": 2,
+            "land_tutor_activated": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        active.battlefield = [
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+            reclaimer,
+        ]
+        active.refresh_mana_sources(turn=2)
+
+        battle.activate_land_tutor_creatures(active, turn=2)
+
+        assert [card["name"] for card in active.library] == ["Forest"]
+        assert reclaimer["tapped"] is False
+        skipped = [data for event, data in events if event == "activated_ability_skipped"]
+        assert skipped
+        assert skipped[-1]["reason"] == "strategic_guardrail"
+        assert skipped[-1]["strategic_guardrail_reason"] == "unique_color_loss_without_clear_replacement"
+
+    def test_elvish_reclaimer_prefers_redundant_tapped_land_for_high_value_target():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.library = [{"name": "Ancient Tomb", "effect": "land", "type_line": "Land"}]
+        reclaimer = {
+            "name": "Elvish Reclaimer",
+            "effect": "creature",
+            "type_line": "Creature — Elf Warrior",
+            "power": 1,
+            "toughness": 2,
+            "land_tutor_activated": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        active.battlefield = [
+            {"name": "Plains A", "effect": "land", "type_line": "Basic Land — Plains", "tapped": True},
+            {"name": "Plains B", "effect": "land", "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+            reclaimer,
+        ]
+        active.refresh_mana_sources(turn=2)
+
+        battle.activate_land_tutor_creatures(active, turn=2)
+
+        assert active.library == []
+        assert "Plains A" in [card["name"] for card in active.graveyard]
+        assert "Ancient Tomb" in [card["name"] for card in active.battlefield]
+        activated = [data for event, data in events if event == "activated_ability"]
+        assert activated
+        assert activated[-1]["sacrificed"] == "Plains A"
+        assert activated[-1]["found"] == "Ancient Tomb"
+        assert activated[-1]["strategic_benefit_reason"] == "no_scarce_land_risk"
+        assert any(
+            option["name"] == "Ancient Tomb" and option["high_value_target"]
+            for option in activated[-1]["land_ramp_target_options"]
+        )
+
     return [
         test_summoning_sick_creature_cannot_attack_until_next_turn,
         test_creature_loses_summoning_sickness_at_start_of_controller_turn_and_taps_to_attack,
@@ -359,4 +428,6 @@ def register_tests(battle, player, card):
         test_creature_mana_source_has_summoning_sickness_then_refreshes_mana,
         test_elvish_reclaimer_cannot_activate_while_summoning_sick,
         test_elvish_reclaimer_activates_after_sickness_clears,
+        test_elvish_reclaimer_does_not_sacrifice_unique_color_for_tapped_basic,
+        test_elvish_reclaimer_prefers_redundant_tapped_land_for_high_value_target,
     ]

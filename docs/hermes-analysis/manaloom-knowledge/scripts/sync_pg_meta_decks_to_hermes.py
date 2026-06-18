@@ -48,7 +48,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--sqlite-db", default=str(DEFAULT_SQLITE_DB))
     parser.add_argument("--limit", type=int, default=120)
-    parser.add_argument("--min-cards", type=int, default=80)
+    parser.add_argument("--min-cards", type=int, default=90)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--include-lorehold", action="store_true")
     return parser.parse_args()

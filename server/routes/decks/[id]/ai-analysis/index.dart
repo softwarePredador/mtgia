@@ -71,9 +71,36 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       );
     }
 
+    final hasCardIntelligenceSnapshot =
+        await _hasTable(pool, 'card_intelligence_snapshot');
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
-    final semanticV2Select = hasSemanticV2
-        ? '''
+    final cardSourceJoin = hasCardIntelligenceSnapshot
+        ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+        : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect = hasCardIntelligenceSnapshot
+        ? 'c.function_tag_details'
+        : '''
+          COALESCE(
+            (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'tag', cft.tag,
+                  'confidence', cft.confidence,
+                  'evidence', cft.evidence,
+                  'source', cft.source
+                )
+                ORDER BY cft.confidence DESC, cft.tag
+              )
+              FROM card_function_tags cft
+              WHERE cft.card_id = c.id
+            ),
+            '[]'::jsonb
+          )
+        ''';
+    final semanticV2Select = hasCardIntelligenceSnapshot
+        ? 'c.semantic_tags_v2'
+        : hasSemanticV2
+            ? '''
           COALESCE(
             (
               SELECT jsonb_agg(
@@ -103,7 +130,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             '[]'::jsonb
           )
         '''
-        : ''''[]'::jsonb''';
+            : ''''[]'::jsonb''';
 
     final cardsResult = await pool.execute(
       Sql.named('''
@@ -116,22 +143,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           c.mana_cost,
           c.colors,
           c.color_identity,
-          COALESCE(
-            (
-              SELECT jsonb_agg(
-                jsonb_build_object(
-                  'tag', cft.tag,
-                  'confidence', cft.confidence,
-                  'evidence', cft.evidence,
-                  'source', cft.source
-                )
-                ORDER BY cft.confidence DESC, cft.tag
-              )
-              FROM card_function_tags cft
-              WHERE cft.card_id = c.id
-            ),
-            '[]'::jsonb
-          ) AS functional_tags,
+          $functionalTagsSelect AS functional_tags,
           $semanticV2Select AS semantic_tags_v2,
           COALESCE(
             (SELECT SUM(
@@ -145,7 +157,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
             0
           ) as cmc
         FROM deck_cards dc
-        JOIN cards c ON c.id = dc.card_id
+        $cardSourceJoin
         WHERE dc.deck_id = @deckId
       '''),
       parameters: {'deckId': deckId},

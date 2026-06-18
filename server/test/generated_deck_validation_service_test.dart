@@ -151,6 +151,25 @@ void main() {
       );
     });
 
+    test('rejects unsupported sideboard payload before resolving cards',
+        () async {
+      final repository = _FakeGeneratedDeckRepository(cardsByName: const {});
+      final service = GeneratedDeckValidationService(repository);
+
+      final result = await service.validate(
+        format: 'commander',
+        commanderName: 'Talrand, Sky Summoner',
+        cards: [
+          {'name': 'Blue Elemental Blast', 'quantity': 1, 'zone': 'sideboard'},
+        ],
+      );
+
+      expect(result.isValid, isFalse);
+      expect(result.errors.single, contains('não suporta sideboard'));
+      expect(repository.lastResolvedItems, isEmpty);
+      expect(result.totalSuggestedCards, equals(1));
+    });
+
     test('ignores commander duplicated inside cards list', () async {
       final service = GeneratedDeckValidationService(
         _FakeGeneratedDeckRepository(
@@ -202,6 +221,38 @@ void main() {
       expect(result.isValid, isTrue);
       expect(repository.lastResolvedItems, hasLength(1));
       expect(repository.lastResolvedItems.single['name'], equals('Mountain'));
+    });
+
+    test('warns when resolved non-land CMC is suspiciously zero', () async {
+      final service = GeneratedDeckValidationService(
+        _FakeGeneratedDeckRepository(
+          cardsByName: {
+            'mana vault': {
+              'id': 'mana-vault-id',
+              'name': 'Mana Vault',
+              'type_line': 'Artifact',
+              'mana_cost': '{1}',
+              'cmc': 0,
+            },
+            'mountain': _basicLand('mountain-id', 'Mountain', 'R'),
+          },
+        ),
+      );
+
+      final result = await service.validate(
+        format: 'standard',
+        cards: [
+          {'name': 'Mana Vault', 'quantity': 1},
+          {'name': 'Mountain', 'quantity': 59},
+        ],
+      );
+
+      expect(result.isValid, isTrue);
+      expect(
+        result.warnings.join('\n'),
+        contains('Integridade CMC: 1 carta(s)'),
+      );
+      expect(result.warnings.join('\n'), contains('Mana Vault'));
     });
 
     test(

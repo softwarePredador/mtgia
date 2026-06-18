@@ -53,6 +53,23 @@ def register_tests(battle, player, card):
         assert creature["minus_one_counters"] == 0
         assert any(event == "counters_cancelled" for event, _ in events)
 
+    def test_zero_or_negative_toughness_dies_even_if_indestructible():
+        active = player("Active")
+        creature = {
+            "name": "Indestructible 0 Toughness",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 1,
+            "toughness": 0,
+            "indestructible": True,
+        }
+        active.battlefield = [creature]
+
+        battle.check_sbas_until_stable([active])
+
+        assert creature not in active.battlefield
+        assert creature in active.graveyard
+
     def test_illegal_aura_goes_to_graveyard_and_equipment_detaches():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -164,6 +181,7 @@ def register_tests(battle, player, card):
         test_sba_only_reports_new_elimination,
         test_cleanup_runs_with_previously_eliminated_player,
         test_plus_minus_counters_cancel_as_sba,
+        test_zero_or_negative_toughness_dies_even_if_indestructible,
         test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
         test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
         test_zone_change_records_lki_and_advances_zone_identity,

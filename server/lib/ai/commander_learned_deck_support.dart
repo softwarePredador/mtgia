@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 
+import 'commander_reference_helpers.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderLearnedDecksTable = 'commander_learned_decks';
@@ -115,7 +116,222 @@ class CommanderLearnedDeckValidationResult {
         'main_quantity': mainQuantity,
         'blockers': blockers,
         'warnings': warnings,
-      };
+  };
+}
+
+const Map<String, String> _learnedDeckSummaryTagToRole = {
+  'board_wipe': 'board_wipe',
+  'counterspell': 'removal',
+  'mana_fixing': 'ramp',
+  'ritual': 'ramp',
+  'loot': 'draw',
+  'exile_value': 'draw',
+  'blink': 'protection',
+  'graveyard_synergy': 'engine',
+  'aristocrat_payoff': 'engine',
+  'spellslinger': 'engine',
+  'artifact_synergy': 'engine',
+  'enchantment_synergy': 'engine',
+  'sacrifice_outlet': 'engine',
+  'payoff': 'engine',
+  'enabler': 'engine',
+  'combo_piece': 'wincon',
+  'big_spell': 'wincon',
+  'drain': 'wincon',
+  'ramp': 'ramp',
+  'draw': 'draw',
+  'tutor': 'tutor',
+  'removal': 'removal',
+  'protection': 'protection',
+  'recursion': 'recursion',
+  'wincon': 'wincon',
+  'engine': 'engine',
+};
+
+Map<String, int> computeCommanderLearnedDeckRoleSummary({
+  required Iterable<CommanderLearnedDeckCardLine> cards,
+  required String commanderNameNormalized,
+  required Map<String, Set<String>> tagsByName,
+  required Set<String> landNames,
+}) {
+  final summary = <String, int>{
+    'total_lands': 0,
+    'ramp_count': 0,
+    'draw_count': 0,
+    'removal_count': 0,
+    'tutor_count': 0,
+    'board_wipe_count': 0,
+    'protection_count': 0,
+    'recursion_count': 0,
+    'wincon_count': 0,
+    'engine_count': 0,
+  };
+
+  for (final card in cards) {
+    final normalizedName = normalizeCommanderReferenceName(card.name);
+    if (normalizedName.isEmpty || normalizedName == commanderNameNormalized) {
+      continue;
+    }
+    final quantity = card.quantity;
+    if (quantity <= 0) continue;
+
+    final tags = tagsByName[normalizedName] ?? const <String>{};
+    if (landNames.contains(normalizedName) || tags.contains('land')) {
+      summary['total_lands'] = summary['total_lands']! + quantity;
+      continue;
+    }
+
+    final roles = tags
+        .map((tag) => _learnedDeckSummaryTagToRole[tag])
+        .whereType<String>()
+        .toSet();
+    for (final role in roles) {
+      switch (role) {
+        case 'ramp':
+          summary['ramp_count'] = summary['ramp_count']! + quantity;
+          break;
+        case 'draw':
+          summary['draw_count'] = summary['draw_count']! + quantity;
+          break;
+        case 'removal':
+          summary['removal_count'] = summary['removal_count']! + quantity;
+          break;
+        case 'tutor':
+          summary['tutor_count'] = summary['tutor_count']! + quantity;
+          break;
+        case 'board_wipe':
+          summary['board_wipe_count'] = summary['board_wipe_count']! + quantity;
+          break;
+        case 'protection':
+          summary['protection_count'] =
+              summary['protection_count']! + quantity;
+          break;
+        case 'recursion':
+          summary['recursion_count'] = summary['recursion_count']! + quantity;
+          break;
+        case 'wincon':
+          summary['wincon_count'] = summary['wincon_count']! + quantity;
+          break;
+        case 'engine':
+          summary['engine_count'] = summary['engine_count']! + quantity;
+          break;
+      }
+    }
+  }
+
+  return summary;
+}
+
+Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
+  Pool pool,
+  CommanderLearnedDeckInput input,
+) async {
+  final cards = input.cards;
+  if (cards.isEmpty) return input.metadata;
+
+  final distinctNames = <String>{};
+  for (final card in cards) {
+    final normalizedName = normalizeCommanderReferenceName(card.name);
+    if (normalizedName.isEmpty) continue;
+    distinctNames.add(normalizedName);
+  }
+  if (distinctNames.isEmpty) return input.metadata;
+
+  final placeholders = <String>[];
+  final parameters = <String, dynamic>{};
+  var index = 0;
+  for (final name in distinctNames) {
+    final key = 'name$index';
+    placeholders.add('(@$key)');
+    parameters[key] = name;
+    index += 1;
+  }
+
+  try {
+    final rows = await pool.execute(
+      Sql.named('''
+        WITH wanted(lowered_name) AS (
+          VALUES ${placeholders.join(', ')}
+        ),
+        resolved_cards AS (
+          SELECT
+            w.lowered_name,
+            cib.card_id,
+            cib.type_line,
+            ROW_NUMBER() OVER (
+              PARTITION BY w.lowered_name
+              ORDER BY
+                CASE
+                  WHEN cib.normalized_lookup_name = w.lowered_name THEN 0
+                  WHEN cib.normalized_canonical_name = w.lowered_name THEN 1
+                  WHEN cib.normalized_canonical_name LIKE w.lowered_name || ' // %' THEN 2
+                  ELSE 3
+                END,
+                COALESCE(cib.match_priority, 999),
+                cib.card_id
+            ) AS rn
+          FROM wanted w
+          LEFT JOIN card_identity_bridge cib
+            ON cib.normalized_lookup_name = w.lowered_name
+            OR cib.normalized_canonical_name = w.lowered_name
+            OR cib.normalized_canonical_name LIKE w.lowered_name || ' // %'
+        ),
+        card_info AS (
+          SELECT
+            rc.lowered_name,
+            COALESCE(rc.type_line ILIKE '%Land%', FALSE) AS is_land,
+            COALESCE(
+              ARRAY_REMOVE(ARRAY_AGG(DISTINCT LOWER(cft.tag)), NULL),
+              ARRAY[]::TEXT[]
+            ) AS tags
+          FROM resolved_cards rc
+          LEFT JOIN card_function_tags cft
+            ON cft.card_id = rc.card_id
+          WHERE rc.rn = 1
+          GROUP BY rc.lowered_name, rc.type_line
+        )
+        SELECT lowered_name, is_land, tags
+        FROM card_info
+      '''),
+      parameters: parameters,
+    );
+
+    final tagsByName = <String, Set<String>>{};
+    final landNames = <String>{};
+    for (final row in rows) {
+      final loweredName = row[0]?.toString() ?? '';
+      if (loweredName.isEmpty) continue;
+      final isLand = row[1] == true;
+      if (isLand) landNames.add(loweredName);
+      final rawTags = row[2];
+      final tags = <String>{};
+      if (rawTags is Iterable) {
+        for (final value in rawTags) {
+          final text = value?.toString().trim().toLowerCase();
+          if (text != null && text.isNotEmpty) {
+            tags.add(text);
+          }
+        }
+      }
+      if (tags.isNotEmpty) {
+        tagsByName[loweredName] = tags;
+      }
+    }
+
+    final summary = computeCommanderLearnedDeckRoleSummary(
+      cards: cards,
+      commanderNameNormalized: input.commanderNameNormalized,
+      tagsByName: tagsByName,
+      landNames: landNames,
+    );
+
+    return {
+      ...input.metadata,
+      ...summary,
+    };
+  } catch (_) {
+    return input.metadata;
+  }
 }
 
 CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
@@ -256,6 +472,86 @@ List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCards(
 ) =>
     parseCommanderLearnedDeckCardList(cardList);
 
+Future<CommanderLearnedDeckInput?> loadActiveCommanderLearnedDeck({
+  required Pool pool,
+  required String commanderName,
+}) async {
+  final commander = commanderName.trim();
+  if (commander.isEmpty) return null;
+  try {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          commander_name,
+          deck_name,
+          source_system,
+          source_ref,
+          source_url,
+          archetype,
+          card_list,
+          card_count,
+          score,
+          wincon_primary,
+          wincon_backup,
+          legal_status,
+          notes,
+          metadata,
+          is_active,
+          promoted_at,
+          updated_at
+        FROM commander_learned_decks
+        WHERE commander_name_normalized = @commander
+          AND is_active = TRUE
+        ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
+        LIMIT 1
+      '''),
+      parameters: {
+        'commander': normalizeCommanderReferenceName(commander),
+      },
+    );
+    if (result.isEmpty) return null;
+    final row = result.first;
+    return CommanderLearnedDeckInput(
+      commanderName: row[0]?.toString() ?? commander,
+      deckName: row[1]?.toString() ?? commander,
+      sourceSystem: row[2]?.toString() ?? 'hermes',
+      sourceRef: row[3]?.toString() ?? 'learned_deck:unknown',
+      sourceUrl: row[4]?.toString(),
+      archetype: row[5]?.toString(),
+      cardList: row[6]?.toString() ?? '',
+      cardCount: _intValue(row[7]),
+      score: _nullableDouble(row[8]),
+      winconPrimary: row[9]?.toString(),
+      winconBackup: row[10]?.toString(),
+      legalStatus: row[11]?.toString(),
+      notes: row[12]?.toString(),
+      metadata: _jsonObject(row[13]),
+      isActive: row[14] == true,
+      promotedAt: _dateTimeValue(row[15]),
+      updatedAt: _dateTimeValue(row[16]),
+    );
+  } catch (error) {
+    if (isUndefinedLearnedDeckTableError(error)) return null;
+    rethrow;
+  }
+}
+
+List<String> activeCommanderLearnedDeckCardNames(
+  CommanderLearnedDeckInput? deck,
+) {
+  if (deck == null) return const [];
+  final normalizedCommander = deck.commanderNameNormalized;
+  final seen = <String>{};
+  final names = <String>[];
+  for (final card in deck.cards) {
+    final normalized = normalizeCommanderReferenceName(card.name);
+    if (normalized.isEmpty || normalized == normalizedCommander) continue;
+    if (!seen.add(normalized)) continue;
+    names.add(card.name);
+  }
+  return names;
+}
+
 CommanderLearnedDeckCardLine? _parseCommanderLearnedDeckCardLine(String line) {
   final withoutBullet = line.replaceFirst(RegExp(r'^[-*]\s+'), '').trim();
   final match = RegExp(r'^(\d+)\s+(.+)$').firstMatch(withoutBullet);
@@ -322,6 +618,8 @@ Future<void> upsertCommanderLearnedDeck(
   CommanderLearnedDeckInput input, {
   bool deactivateOtherActive = true,
 }) async {
+  final metadata = await canonicalizeCommanderLearnedDeckMetadata(pool, input);
+
   if (input.isActive && deactivateOtherActive) {
     await pool.execute(
       Sql.named('''
@@ -413,7 +711,7 @@ Future<void> upsertCommanderLearnedDeck(
       'wincon_backup': input.winconBackup,
       'legal_status': input.legalStatus,
       'notes': input.notes,
-      'metadata': jsonEncode(input.metadata),
+      'metadata': jsonEncode(metadata),
       'is_active': input.isActive,
       'promoted_at': input.promotedAt,
     },

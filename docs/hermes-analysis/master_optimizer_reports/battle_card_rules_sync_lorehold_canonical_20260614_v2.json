@@ -1,0 +1,10 @@
+{
+  "apply": true,
+  "generated_rows": 1602,
+  "input_rows": 2071,
+  "inserted_or_updated": 1896,
+  "manual_rows": 469,
+  "oracle_normalized_rows": 199,
+  "skipped_lower_priority": 175,
+  "sqlite_db": "docs\\hermes-analysis\\manaloom-knowledge\\scripts\\knowledge.db"
+}

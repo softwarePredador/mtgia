@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS deck_cards (
     card_name TEXT NOT NULL,
     quantity INTEGER DEFAULT 1,
     functional_tag TEXT,
+    functional_tags_json TEXT DEFAULT '[]',
     tag_confidence REAL,
     is_commander INTEGER DEFAULT 0,
     is_partner INTEGER DEFAULT 0,
@@ -246,6 +247,38 @@ CREATE TABLE IF NOT EXISTS run_log (
 """
 
 
+def functional_tags_json_for_card(card):
+    raw = card.get("functional_tags_json")
+    if isinstance(raw, str) and raw.strip():
+        return raw
+    if isinstance(raw, list):
+        return json.dumps(
+            sorted({str(tag).strip().lower() for tag in raw if str(tag).strip()}),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+
+    tags = []
+    for entry in card.get("tags") or []:
+        if isinstance(entry, dict):
+            tag = str(entry.get("tag") or "").strip().lower()
+        else:
+            tag = str(entry or "").strip().lower()
+        if tag:
+            tags.append(tag)
+
+    functional_tag = str(card.get("functional_tag") or "").strip().lower()
+    if not tags and functional_tag and functional_tag != "unknown":
+        tags.append(functional_tag)
+    return json.dumps(
+        sorted(set(tags)),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
 def get_conn():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -254,9 +287,20 @@ def get_conn():
     return conn
 
 
+def ensure_schema_migrations(conn):
+    deck_card_columns = {
+        str(row[1]) for row in conn.execute("PRAGMA table_info(deck_cards)").fetchall()
+    }
+    if "functional_tags_json" not in deck_card_columns:
+        conn.execute(
+            "ALTER TABLE deck_cards ADD COLUMN functional_tags_json TEXT DEFAULT '[]'"
+        )
+
+
 def cmd_create():
     conn = get_conn()
     conn.executescript(SCHEMA)
+    ensure_schema_migrations(conn)
     conn.commit()
     conn.close()
     tables = ["commanders", "sources", "decks", "deck_cards", "card_tags", "card_analyses",
@@ -336,6 +380,7 @@ def cmd_query_decks(commander=None):
 def cmd_insert_deck():
     data = json.load(sys.stdin)
     conn = get_conn()
+    ensure_schema_migrations(conn)
     now = datetime.now(timezone.utc).isoformat()
 
     commander_name = data.get("commander", "Unknown")
@@ -389,12 +434,14 @@ def cmd_insert_deck():
     for card in data.get("cards", []):
         conn.execute("""
             INSERT INTO deck_cards (deck_id, card_name, quantity, functional_tag,
-                                   tag_confidence, is_commander, is_partner, cmc,
-                                   type_line, oracle_text)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                   functional_tags_json, tag_confidence,
+                                   is_commander, is_partner, cmc, type_line,
+                                   oracle_text)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             deck_id, card["name"], card.get("quantity", 1), card.get("functional_tag"),
-            card.get("tag_confidence"), card.get("is_commander", 0),
+            functional_tags_json_for_card(card), card.get("tag_confidence"),
+            card.get("is_commander", 0),
             card.get("is_partner", 0), card.get("cmc"), card.get("type_line"),
             card.get("oracle_text")
         ))

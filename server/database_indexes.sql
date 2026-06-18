@@ -127,6 +127,13 @@ CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_b
 CREATE INDEX IF NOT EXISTS idx_battle_simulations_winner 
   ON battle_simulations(winner_deck_id);
 
+-- Performance para agregações por tipo de simulação e auditoria temporal
+CREATE INDEX IF NOT EXISTS idx_battle_sim_type
+  ON battle_simulations(simulation_type);
+
+CREATE INDEX IF NOT EXISTS idx_battle_sim_created
+  ON battle_simulations(created_at DESC);
+
 -- ========================================
 -- 8. Índices para Market Movers
 -- ========================================

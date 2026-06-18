@@ -1,3 +1,4 @@
+import 'package:server/basic_land_utils.dart';
 import 'package:test/test.dart';
 
 /// Testes de regras MTG: snow basics, tamanho mínimo de deck,
@@ -27,30 +28,6 @@ int calculateCmc(String? manaCost) {
   return cmc;
 }
 
-// ─── Basic Land Detection ──────────────────────────────────────────────────
-
-/// Replicação de _isBasicLandTypeLine (deck_rules_service.dart e optimize/index.dart)
-bool isBasicLandTypeLine(String typeLineLower) {
-  return typeLineLower.contains('basic land') ||
-      typeLineLower.contains('basic snow land');
-}
-
-/// Replicação de _isBasicLandName (optimize/index.dart)
-bool isBasicLandName(String name) {
-  final normalized = name.trim().toLowerCase();
-  return normalized == 'plains' ||
-      normalized == 'island' ||
-      normalized == 'swamp' ||
-      normalized == 'mountain' ||
-      normalized == 'forest' ||
-      normalized == 'wastes' ||
-      normalized == 'snow-covered plains' ||
-      normalized == 'snow-covered island' ||
-      normalized == 'snow-covered swamp' ||
-      normalized == 'snow-covered mountain' ||
-      normalized == 'snow-covered forest';
-}
-
 /// Replicação de _maxCopiesForFormat (optimize/index.dart)
 int maxCopiesForFormat({
   required String deckFormat,
@@ -58,11 +35,7 @@ int maxCopiesForFormat({
   required String name,
 }) {
   final normalizedFormat = deckFormat.toLowerCase();
-  final normalizedType = typeLine.toLowerCase();
-  final normalizedName = name.trim().toLowerCase();
-
-  final isBasicLand =
-      isBasicLandTypeLine(normalizedType) || normalizedName == 'wastes';
+  final isBasicLand = isBasicLandCard(name: name, typeLine: typeLine);
   if (isBasicLand) return 999;
 
   if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') return 1;

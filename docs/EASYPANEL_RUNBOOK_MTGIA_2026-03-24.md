@@ -36,6 +36,38 @@ No EasyPanel:
 
 - o domínio deve apontar para HTTP `:8080`
 - `PORT` pode ser injetado pelo painel; o container já faz fallback para `8080`
+- serviço público atual:
+  - projeto: `evolution`
+  - app: `cartinhas`
+  - source: `git`
+  - repo: `https://github.com/softwarePredador/mtgia.git`
+  - branch/ref: `master`
+  - build path: `/server`
+  - build: `Dockerfile`
+
+### Nota operacional 2026-06-15
+
+O serviço `evolution/cartinhas` já esteve configurado como source `github`
+archive. Nesse modo, o EasyPanel falhava antes do build com:
+
+```text
+curl: (23) Failure writing output to destination
+gzip: stdin: unexpected end of file
+tar: Unexpected EOF in archive
+```
+
+A correção operacional aplicada foi trocar a source do app para `git`, mantendo o
+mesmo repositório, branch `master` e path `/server`. Depois disso o build voltou a
+passar (`dart_frog build`) e o deploy público confirmou o SHA esperado em
+`GET /health`.
+
+Se o erro de archive voltar em outro serviço, validar nesta ordem:
+
+1. Confirmar espaço e saúde do host via painel.
+2. Rodar `settings.systemPrune` pelo EasyPanel apenas se houver acúmulo de
+   imagens antigas.
+3. Preferir source `git` para este app, evitando o fluxo de GitHub archive.
+4. Validar `GET /health` e `GET /ready` no domínio publicado.
 
 ## Variáveis mínimas no EasyPanel
 
@@ -92,9 +124,14 @@ Essas variáveis não são lidas diretamente pelo app em runtime no EasyPanel, m
    - `./scripts/quality_gate_resolution_corpus.sh`
 3. Validar observabilidade:
    - `./scripts/validate_sentry_backend_ingestion.sh`
-4. Subir/redeployar o serviço backend no EasyPanel.
+4. Subir/redeployar o serviço backend no EasyPanel:
+   - projeto `evolution`
+   - app `cartinhas`
+   - ação `services.app.deployService`
 5. Validar no domínio publicado:
    - `bash scripts/validate_request_id_ready.sh`
+   - `curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health`
+   - `curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/ready`
 6. Confirmar logs e ausência de segredos em payloads de erro.
 
 Precondição para o script:

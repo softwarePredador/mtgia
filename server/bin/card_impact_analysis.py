@@ -14,26 +14,15 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent if "__file__" in dir() else Path(os.getcwd())
 
-# Add battle scripts to path
-BATTLE_DIR = os.environ.get(
-    "BATTLE_SCRIPTS_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts",
-)
-sys.path.insert(0, BATTLE_DIR)
+from repo_runtime_paths import resolve_battle_script_path, resolve_battle_scripts_dir
 
-BATTLE_PATH = os.environ.get(
-    "MANALOOM_BATTLE_SCRIPT",
-    os.path.join(BATTLE_DIR, "battle_analyst_v9.py"),
-)
+BATTLE_DIR = resolve_battle_scripts_dir()
+sys.path.insert(0, str(BATTLE_DIR))
+
+BATTLE_PATH = resolve_battle_script_path()
 spec = importlib.util.spec_from_file_location("card_impact_analysis_battle", BATTLE_PATH)
 ba = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ba)
-from master_optimizer_common import (
-    connect as optimizer_connect,
-    deck_rows as optimizer_deck_rows,
-    normalize_name,
-    is_land,
-)
 
 
 def load_lorehold_deck(db_path: str, deck_id: int = 6):
@@ -132,7 +121,7 @@ def run_impact_analysis(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--db", default=str(ba.DEFAULT_DB))
+    parser.add_argument("--db", default=str(getattr(ba, "DB", "")))
     parser.add_argument("--deck-id", type=int, default=6)
     parser.add_argument("--games", type=int, default=3, help="Games per opponent")
     parser.add_argument("--seed", type=int, default=42)

@@ -495,6 +495,13 @@ Set<String> _criticalRolesForArchetype(String archetype) {
     'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe', 'wincon'},
     'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection', 'wincon'},
     'midrange' => {'removal', 'ramp', 'draw', 'wipe', 'wincon'},
+    'combo' => {
+        'tutor',
+        'engine',
+        'wincon',
+        'protection',
+        'combo_piece',
+      },
     _ => {'removal', 'ramp', 'wipe', 'wincon'},
   };
 }
@@ -522,6 +529,30 @@ bool _looksLikeOffThemeRoleSwap({
       {'removal', 'ramp', 'draw', 'wipe'}.contains(removedRole) &&
       !{'removal', 'ramp', 'draw', 'wipe', 'creature', 'protection'}
           .contains(addedRole)) {
+    return true;
+  }
+
+  if (normalized == 'combo' &&
+      {
+        'tutor',
+        'engine',
+        'wincon',
+        'protection',
+        'draw',
+        'ramp',
+        'combo_piece',
+      }.contains(removedRole) &&
+      !{
+        'tutor',
+        'engine',
+        'wincon',
+        'protection',
+        'draw',
+        'ramp',
+        'combo_piece',
+        'payoff',
+        'enabler',
+      }.contains(addedRole)) {
     return true;
   }
 

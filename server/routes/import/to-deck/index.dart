@@ -44,6 +44,14 @@ Future<Response> _importToDeck(RequestContext context) async {
   final format = deckCheck.first[1] as String;
   final normalizedFormat = format.trim().toLowerCase();
 
+  final unsupportedRawSections = unsupportedRawDeckSectionLabels(rawList);
+  if (unsupportedRawSections.isNotEmpty) {
+    return badRequest(
+      unsupportedDeckSectionsMessage(unsupportedRawSections),
+      details: {'unsupported_section_lines': unsupportedRawSections},
+    );
+  }
+
   late final List<String> lines;
   try {
     lines = normalizeImportLines(rawList);
@@ -60,6 +68,14 @@ Future<Response> _importToDeck(RequestContext context) async {
   final parseResult = parseImportLines(lines);
   final parsedItems = parseResult.parsedItems;
   notFoundCards.addAll(parseResult.invalidLines);
+  if (parseResult.unsupportedSectionLines.isNotEmpty) {
+    return badRequest(
+      unsupportedDeckSectionsMessage(parseResult.unsupportedSectionLines),
+      details: {
+        'unsupported_section_lines': parseResult.unsupportedSectionLines,
+      },
+    );
+  }
 
   // 2) Resolve nomes em lote (exato + clean + split fallback)
   final foundCardsMap = await resolveImportCardNames(pool, parsedItems);

@@ -53,6 +53,56 @@ def normalize(name: str) -> str:
     return name.strip().lower().replace("\u2018", "'").replace("\u2019", "'")
 
 
+def decide_card_promotion(rule_rows: list[dict], info: dict, min_age_hours: int) -> dict:
+    active_rows = [
+        row
+        for row in rule_rows
+        if str(row.get("execution_status") or "auto") != "disabled"
+    ]
+    if not active_rows:
+        return {"decision": "missing"}
+    if len(active_rows) > 1:
+        return {
+            "decision": "skip_multi_rule",
+            "reason": "multiple_active_rules_for_name",
+            "logical_rule_keys": [
+                str(row.get("logical_rule_key") or "") for row in active_rows
+            ],
+        }
+
+    row = active_rows[0]
+    status = str(row.get("review_status") or "")
+    source = str(row.get("source") or "")
+    age_hours = float(row.get("age_hours") or 0)
+    severities = info["severities"]
+    only_medium_or_lower = "high" not in severities and "critical" not in severities
+
+    if (
+        status == "needs_review"
+        and info["has_needs_review"]
+        and only_medium_or_lower
+        and age_hours >= min_age_hours
+    ):
+        return {
+            "decision": "promote_needs_review",
+            "row": row,
+            "age_hours": age_hours,
+        }
+
+    if (
+        source == "heuristic"
+        and only_medium_or_lower
+        and age_hours >= min_age_hours * 2
+    ):
+        return {
+            "decision": "promote_heuristic",
+            "row": row,
+            "age_hours": age_hours,
+        }
+
+    return {"decision": "no_promotion", "row": row, "age_hours": age_hours}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--forensic-json", help="Path to forensic audit JSON report")
@@ -107,35 +157,56 @@ def main():
     now = datetime.now(timezone.utc)
 
     promotions = []
+    skipped_multi_rule = []
     seen_updates = 0
 
     for card_name, info in affected_cards.items():
         cur.execute(
-            "SELECT review_status, source, last_seen_at, confidence, "
-            "  EXTRACT(EPOCH FROM (NOW() - COALESCE(last_seen_at, created_at)))/3600 AS age_hours "
-            "FROM card_battle_rules WHERE LOWER(normalized_name) = %s",
+            "SELECT logical_rule_key, review_status, source, execution_status, "
+            "last_seen_at, confidence, "
+            "EXTRACT(EPOCH FROM (NOW() - COALESCE(last_seen_at, created_at)))/3600 AS age_hours "
+            "FROM card_battle_rules WHERE LOWER(normalized_name) = %s "
+            "ORDER BY logical_rule_key",
             (card_name,),
         )
-        row = cur.fetchone()
-        if not row:
+        fetched = cur.fetchall()
+        if not fetched:
             continue
 
-        status, source, last_seen, confidence, age_hours = row
-        age_hours = float(age_hours or 0)
-        severities = info["severities"]
-        count = info["count"]
-        only_medium_or_lower = "high" not in severities and "critical" not in severities
+        rows = [
+            {
+                "logical_rule_key": row[0],
+                "review_status": row[1],
+                "source": row[2],
+                "execution_status": row[3],
+                "last_seen_at": row[4],
+                "confidence": row[5],
+                "age_hours": row[6],
+            }
+            for row in fetched
+        ]
 
         # Sempre atualiza last_seen_at para rastrear aparicoes
         cur.execute(
-            "UPDATE card_battle_rules SET last_seen_at = NOW() WHERE LOWER(normalized_name) = %s",
+            "UPDATE card_battle_rules SET last_seen_at = NOW() "
+            "WHERE LOWER(normalized_name) = %s "
+            "AND COALESCE(execution_status, 'auto') != 'disabled'",
             (card_name,),
         )
         seen_updates += 1
 
-        # Promove needs_review → verified: regra tem idade minima e sem high findings
-        if (status == "needs_review" and info["has_needs_review"]
-                and only_medium_or_lower and age_hours >= args.min_age_hours):
+        decision = decide_card_promotion(rows, info, args.min_age_hours)
+        kind = decision["decision"]
+
+        if kind == "skip_multi_rule":
+            skipped_multi_rule.append(
+                f"{card_name} ({', '.join(decision['logical_rule_keys'])})"
+            )
+            continue
+
+        if kind == "promote_needs_review":
+            row = decision["row"]
+            age_hours = float(decision["age_hours"])
             if not args.dry_run:
                 cur.execute(
                     "UPDATE card_battle_rules SET review_status = 'verified', "
@@ -143,16 +214,17 @@ def main():
                     "confidence = LEAST(confidence * 1.2, 1.0), "
                     "reviewed_by = 'auto_promote_battle_rules', "
                     "reviewed_at = NOW() "
-                    "WHERE LOWER(normalized_name) = %s",
-                    (card_name,),
+                    "WHERE LOWER(normalized_name) = %s AND logical_rule_key = %s",
+                    (card_name, row["logical_rule_key"]),
                 )
             promotions.append(
                 f"needs_review→verified: {card_name} (age={age_hours:.1f}h, only medium)"
             )
 
         # Promove heuristic → curated: muito tempo sem high findings
-        elif (source == "heuristic" and only_medium_or_lower
-                and age_hours >= args.min_age_hours * 2):
+        elif kind == "promote_heuristic":
+            row = decision["row"]
+            age_hours = float(decision["age_hours"])
             if not args.dry_run:
                 cur.execute(
                     "UPDATE card_battle_rules SET source = 'curated', "
@@ -160,8 +232,8 @@ def main():
                     "confidence = 0.85, "
                     "reviewed_by = 'auto_promote_battle_rules', "
                     "reviewed_at = NOW() "
-                    "WHERE LOWER(normalized_name) = %s",
-                    (card_name,),
+                    "WHERE LOWER(normalized_name) = %s AND logical_rule_key = %s",
+                    (card_name, row["logical_rule_key"]),
                 )
             promotions.append(
                 f"heuristic→curated: {card_name} (age={age_hours:.1f}h, only medium)"
@@ -179,6 +251,10 @@ def main():
         print(f"Promocoes: {len(promotions)}")
     else:
         print("Nenhuma promocao elegivel (idade minima nao atingida ou high findings bloqueando).")
+    if skipped_multi_rule:
+        print("Promocoes puladas por multi-rule sem chave row-level no forensic:")
+        for item in skipped_multi_rule:
+            print(f"  {item}")
 
     return 0
 

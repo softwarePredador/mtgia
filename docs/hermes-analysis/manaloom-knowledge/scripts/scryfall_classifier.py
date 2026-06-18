@@ -570,6 +570,88 @@ def _select_primary_role(tags: set[str], type_line: str = "") -> Optional[str]:
     return "utility"
 
 
+def _ordered_tag_names(tags: list[dict]) -> list[str]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for tag in tags:
+        name = str(tag.get("tag", "")).strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        ordered.append(name)
+    return ordered
+
+
+def _normalize_color_identity(value: Any) -> str:
+    """Normalize a Scryfall color_identity payload without inventing colors."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        raw_values = list(value)
+    elif isinstance(value, list):
+        raw_values = value
+    else:
+        return ""
+
+    seen: set[str] = set()
+    colors: list[str] = []
+    for raw in raw_values:
+        color = str(raw).strip().upper()
+        if color not in {"W", "U", "B", "R", "G"} or color in seen:
+            continue
+        seen.add(color)
+        colors.append(color)
+    return "".join(colors)
+
+
+def _infer_deck_color_identity(
+    commander_name: str,
+    commander_card: dict | None,
+    enriched_cards: list[dict],
+) -> str:
+    """Prefer commander color identity; fall back to observed card identities.
+
+    The previous helper hardcoded Lorehold as RW. That remains only as a
+    compatibility fallback when legacy Lorehold payloads lack Scryfall identity.
+    """
+    if commander_card:
+        commander_identity = _normalize_color_identity(
+            commander_card.get("color_identity"),
+        )
+        if commander_identity:
+            return commander_identity
+
+    merged = _normalize_color_identity([
+        color
+        for card in enriched_cards
+        for color in _normalize_color_identity(card.get("color_identity"))
+    ])
+    if merged:
+        return merged
+
+    if commander_name.strip().lower() == "lorehold, the historian":
+        return "RW"
+    return ""
+
+
+def _merge_user_override_tag(tags: list[dict], override: str) -> list[dict]:
+    if not override:
+        return tags
+    merged = list(tags)
+    for tag in merged:
+        if tag.get("tag") == override:
+            tag["confidence"] = max(float(tag.get("confidence", 0.0)), 1.0)
+            tag["evidence"] = "user_tag_comment"
+            break
+    else:
+        merged.append({
+            "tag": override,
+            "confidence": 1.0,
+            "evidence": "user_tag_comment",
+        })
+    return sorted(merged, key=lambda t: (-float(t.get("confidence", 0.0)), t.get("tag", "")))
+
+
 def infer_functional_card_tags(
     name: str,
     type_line: str = "",
@@ -771,12 +853,19 @@ def classify_deck(cards_list: list[dict]) -> list[dict]:
         # Check if Scryfall returned error
         if card_data.get("object") == "error":
             functional_tag = "unknown"
+            tags = []
             cmc = 0
             type_line = ""
         else:
-            functional_tag = classify_card(card_data)
             cmc = card_data.get("cmc", 0)
             type_line = card_data.get("type_line", "")
+            tags = infer_functional_card_tags(
+                name=card_data.get("name", name),
+                type_line=type_line,
+                oracle_text=card_data.get("oracle_text", ""),
+                cmc=cmc,
+            )
+            functional_tag = classify_card(card_data)
 
         # Honor user-provided tags when they are clear functional roles
         tag_lower = tag.lower()
@@ -796,6 +885,7 @@ def classify_deck(cards_list: list[dict]) -> list[dict]:
         override = user_tag_map.get(tag_lower)
         if override:
             functional_tag = override
+            tags = _merge_user_override_tag(tags, override)
 
         enriched.append({
             "name": name,
@@ -803,8 +893,13 @@ def classify_deck(cards_list: list[dict]) -> list[dict]:
             "set_code": c["set_code"],
             "tag_comment": tag,
             "functional_tag": functional_tag,
+            "functional_tags_json": _ordered_tag_names(tags),
+            "tags": tags,
             "cmc": cmc,
             "type_line": type_line,
+            "color_identity": _normalize_color_identity(
+                card_data.get("color_identity"),
+            ),
         })
     return enriched
 
@@ -867,21 +962,28 @@ def build_deck_json(
             "name": c["name"],
             "quantity": c["qty"],
             "functional_tag": c["functional_tag"],
+            "functional_tags_json": c.get("functional_tags_json", []),
             "is_commander": 1 if c == commander_card else 0,
             "cmc": c["cmc"],
+            "type_line": c.get("type_line", ""),
+            "color_identity": _normalize_color_identity(c.get("color_identity")),
         }
         # Include multi-tags if available
         if c.get("tags"):
             card_entry["tags"] = c["tags"]
-            # Also update functional_tag to highest-confidence tag
-            if c["tags"]:
-                card_entry["functional_tag"] = c["tags"][0]["tag"]
+            primary = _select_primary_role({t["tag"] for t in c["tags"]}, c.get("type_line", ""))
+            if primary:
+                card_entry["functional_tag"] = primary
         cards_out.append(card_entry)
 
     return {
         "commander": commander_name,
         "archetype": archetype,
-        "color_identity": "RW",  # TODO: infer from Scryfall data
+        "color_identity": _infer_deck_color_identity(
+            commander_name,
+            commander_card,
+            enriched_cards,
+        ),
         "bracket": bracket,
         "source_name": source_name,
         "source_url": "",
@@ -896,7 +998,7 @@ def build_deck_json(
         "draw_count": tag_counts.get("draw", 0),
         "removal_count": tag_counts.get("removal", 0),
         "tutor_count": tag_counts.get("tutor", 0),
-        "board_wipe_count": tag_counts.get("wipe", 0),
+        "board_wipe_count": tag_counts.get("wipe", 0) + tag_counts.get("board_wipe", 0),
         "protection_count": tag_counts.get("protection", 0),
         "wincon_count": tag_counts.get("wincon", 0),
         "engine_count": tag_counts.get("engine", 0),

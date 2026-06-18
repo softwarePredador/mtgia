@@ -54,6 +54,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       }
 
       final format = (deckResult.first[1] as String).toLowerCase();
+      validateNoUnsupportedDeckSections(cards: [body]);
       final maxTotal = (format == 'commander')
           ? 100
           : (format == 'brawl')

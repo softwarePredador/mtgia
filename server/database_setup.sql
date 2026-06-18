@@ -37,7 +37,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE D
 -- 2. Tabela de Cartas (Otimizada para busca e dados do MTGJSON)
 	CREATE TABLE IF NOT EXISTS cards (
 	    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	    scryfall_id UUID UNIQUE NOT NULL, -- ID oficial da carta (Oracle ID)
+	    scryfall_id UUID UNIQUE NOT NULL, -- ID unico da printing no Scryfall
+	    oracle_id UUID, -- ID Oracle/Scryfall compartilhado entre printings
 	    name TEXT NOT NULL,
 	    mana_cost TEXT,
 	    type_line TEXT,
@@ -50,6 +51,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE D
 	    image_url TEXT, -- URL da imagem na Scryfall
 	    set_code TEXT,
 	    rarity TEXT,
+	    layout TEXT,
+	    card_faces_json JSONB,
 	    ai_description TEXT, -- Cache de explicações da IA
 	    price DECIMAL(10,2), -- Preço da carta (integração Scryfall)
 	    price_updated_at TIMESTAMP WITH TIME ZONE,
@@ -67,12 +70,17 @@ ALTER TABLE cards ADD COLUMN IF NOT EXISTS foil BOOLEAN;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT;
 ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_faces_json JSONB;
 
 -- Índice para busca rápida por nome
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);
 CREATE INDEX IF NOT EXISTS idx_cards_name_lower ON cards (LOWER(name));
 CREATE INDEX IF NOT EXISTS idx_cards_front_name_lower
 ON cards (LOWER(split_part(name, ' // ', 1)));
+CREATE INDEX IF NOT EXISTS idx_cards_oracle_id ON cards (oracle_id);
+CREATE INDEX IF NOT EXISTS idx_cards_layout ON cards (layout);
 -- Índice GIN para buscas por identidade (Commander/Brawl)
 CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity);
 CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords);
@@ -107,15 +115,17 @@ CREATE TABLE IF NOT EXISTS card_legalities (
 -- Fatos oficiais ficam em cards/card_rulings; esta tabela guarda a interpretacao
 -- revisavel que o battle/optimizer consegue executar.
 CREATE TABLE IF NOT EXISTS card_battle_rules (
-    normalized_name TEXT PRIMARY KEY,
+    normalized_name TEXT NOT NULL,
+    logical_rule_key TEXT NOT NULL,
     card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
     card_name TEXT NOT NULL,
     effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
     deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-    source TEXT NOT NULL DEFAULT 'manual',
+    source TEXT NOT NULL DEFAULT 'curated',
     confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
       CHECK (confidence >= 0 AND confidence <= 1),
     review_status TEXT NOT NULL DEFAULT 'verified',
+    execution_status TEXT NOT NULL DEFAULT 'auto',
     rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
     oracle_hash TEXT,
     notes TEXT,
@@ -135,8 +145,21 @@ CREATE TABLE IF NOT EXISTS card_battle_rules (
         'rejected',
         'deprecated'
       )
-    )
+    ),
+    CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+      execution_status IN (
+        'auto',
+        'executable',
+        'annotation_only',
+        'review_only',
+        'disabled'
+      )
+    ),
+    PRIMARY KEY (normalized_name, logical_rule_key)
 );
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
+ON card_battle_rules (normalized_name);
 
 CREATE INDEX IF NOT EXISTS idx_card_battle_rules_card_id
 ON card_battle_rules (card_id);
@@ -235,9 +258,11 @@ CREATE TABLE IF NOT EXISTS battle_simulations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
     deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    simulation_type TEXT NOT NULL DEFAULT 'legacy',
     winner_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
     turns_played INTEGER,
     game_log JSONB, -- Log completo passo-a-passo da partida (crucial para RL)
+    metrics JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -519,6 +544,31 @@ CREATE INDEX IF NOT EXISTS idx_ai_logs_deck ON ai_logs (deck_id);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_endpoint ON ai_logs (endpoint);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_created ON ai_logs (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_logs_success ON ai_logs (success);
+
+-- 14.0.1 Feedback do pipeline ML/prompt de optimize
+-- Recebe feedback automático de qualidade das respostas de /ai/optimize.
+CREATE TABLE IF NOT EXISTS ml_prompt_feedback (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    archetype TEXT NOT NULL,
+    commander_name TEXT,
+    cards_accepted TEXT[] NOT NULL DEFAULT '{}',
+    cards_rejected TEXT[] NOT NULL DEFAULT '{}',
+    effectiveness_score INTEGER,
+    user_comment TEXT,
+    prompt_version TEXT NOT NULL DEFAULT 'v1.1-hybrid',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_ml_prompt_feedback_effectiveness_score
+        CHECK (effectiveness_score IS NULL OR (effectiveness_score >= 1 AND effectiveness_score <= 10))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_deck_created
+    ON ml_prompt_feedback (deck_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_user_created
+    ON ml_prompt_feedback (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_archetype_created
+    ON ml_prompt_feedback (LOWER(archetype), created_at DESC);
 
 -- 14.1 Telemetria de fallback do /ai/optimize (persistente)
 -- Registra eficácia do fallback de sugestões vazias para análise histórica.

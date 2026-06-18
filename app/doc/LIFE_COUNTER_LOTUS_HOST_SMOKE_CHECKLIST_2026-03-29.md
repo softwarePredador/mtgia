@@ -68,10 +68,9 @@ $adb = "$env:LOCALAPPDATA\\Android\\Sdk\\platform-tools\\adb.exe"
 
 ## What to compare against
 
-Reference parity captures currently live in:
-
-- `dddddd/comparison/original/`
-- `dddddd/comparison/embedded/`
+Reference parity must use the current runtime proof/golden artifacts or an
+external archived benchmark bundle. The old raw `dddddd/` dump was removed from
+version control and must not be treated as an active source path.
 
 Stable surfaces that should remain effectively equivalent:
 

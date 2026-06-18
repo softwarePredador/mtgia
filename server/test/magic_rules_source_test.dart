@@ -29,10 +29,24 @@ void main() {
         '722. Preparation Cards',
         '702.184. Station',
         '702.185. Warp',
+        '802. Attack Multiple Players Option',
         '903.3. Each deck has a legendary card designated as its commander.',
         '903.12c Each deck has a legendary card designated as its commander.',
       ]) {
         expect(rulesText, contains(ruleHeading), reason: ruleHeading);
+      }
+    });
+
+    test('keeps 2026 Commander and modern-mechanic rule anchors intact', () {
+      for (final ruleText in const [
+        'That card must be either (a) a creature card, (b) a Vehicle card, or (c) a Spacecraft card with one or more power/toughness boxes.',
+        'If a card has any alternative characteristics, such as those of adventurer cards',
+        'As long as this permanent has N or more charge counters on it, it has [abilities].',
+        'You may cast this card from your hand by paying [cost] rather than its mana cost',
+        'As a permanent with a prepare spell gains the prepared designation or phases in prepared',
+        'As the attacking player declares each attacking creature, they choose a defending player',
+      ]) {
+        expect(rulesText, contains(ruleText), reason: ruleText);
       }
     });
 

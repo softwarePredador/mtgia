@@ -15,6 +15,7 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 
+from known_cards_fallback_snapshot import load_layered_known_cards
 from master_optimizer_common import (
     DEFAULT_DB,
     PROTECTED_CARDS,
@@ -26,6 +27,7 @@ from master_optimizer_common import (
     deck_commander_identity,
     deck_rows,
     ensure_optimizer_tables,
+    functional_tags_for_row,
     json_list,
     latest_baseline,
     normalize_name,
@@ -36,7 +38,6 @@ from master_optimizer_common import (
 )
 import battle_rule_registry
 
-KC_JSON = SCRIPT_DIR / "known_cards_generated.json"
 LOCK_FILE = Path(
     os.environ.get("MANALOOM_SLOT_SCAN_LOCK", str(Path(tempfile.gettempdir()) / "optimizer_v3.lock"))
 )
@@ -95,10 +96,23 @@ REAL_ROLE_TO_CATEGORY = {
     "land": "land",
 }
 
+REAL_CATEGORY_PRIORITY = [
+    "wincon",
+    "wipe",
+    "removal",
+    "tutor",
+    "protection",
+    "ramp",
+    "draw",
+    "engine",
+    "land",
+]
+
 
 CATEGORY_TERMS = {
     "draw": ("draw", "card", "wheel", "discard", "exile the top", "impulse"),
     "engine": ("copy", "cast", "instant", "sorcery", "graveyard", "trigger"),
+    "land": ("add", "mana", "any color", "sacrifice", "search", "draw"),
     "protection": ("prevent", "indestructible", "hexproof", "protection", "phase", "counter"),
     "ramp": ("treasure", "mana", "cost", "ritual", "artifact", "add "),
     "removal": ("destroy", "exile", "damage", "target", "permanent"),
@@ -116,41 +130,174 @@ MAX_CMC_BY_CATEGORY = {
     "tutor": 5.0,
     "wincon": 8.0,
     "wipe": 9.0,
+    "land": 99.0,
 }
 
 BASICS = {"Plains", "Mountain", "Island", "Swamp", "Forest", "Wastes"}
 EXTRA_PROTECTED = {
+    "Aetherflux Reservoir",
     "Deflecting Swat",
+    "Drannith Magistrate",
+    "Dualcaster Mage",
+    "Heat Shimmer",
+    "Enlightened Tutor",
     "Esper Sentinel",
+    "Flawless Maneuver",
+    "Gamble",
+    "Giver of Runes",
+    "Imperial Recruiter",
+    "Land Tax",
+    "Lightning Greaves",
+    "Mizzix's Mastery",
+    "Molten Duplication",
+    "Mother of Runes",
+    "Orim's Chant",
+    "Past in Flames",
+    "Recruiter of the Guard",
+    "Reiterate",
     "Smothering Tithe",
     "Dockside Extortionist",
     "Chrome Mox",
     "Mox Diamond",
+    "Ranger-Captain of Eos",
+    "Rise of the Eldrazi",
     "Sol Ring",
+    "The One Ring",
+    "Twinflame",
+    "Wheel of Fortune",
+    "Wheel of Misfortune",
+    "Worldfire",
+}
+
+LAND_CUT_PRIORITY = {
+    # Prefer replacing basics or lower-ceiling utility lands before touching
+    # premium fixing, fetches, artifact lands, Ancient Tomb, or Urza's Saga.
+    "Mountain // Mountain": 0,
+    "Plains // Plains": 1,
+    "Mountain": 2,
+    "Plains": 3,
+    "Hall of Heliod's Generosity": 10,
+    "Inventors' Fair": 11,
+    "War Room": 12,
+    "Sunbillow Verge": 20,
+    "Sundown Pass": 21,
+    "Inspiring Vantage": 22,
+}
+
+PREMIUM_LANDS = {
+    "Ancient Den",
+    "Ancient Tomb",
+    "Arid Mesa",
+    "Battlefield Forge",
+    "Bloodstained Mire",
+    "City of Brass",
+    "Command Tower",
+    "Elegant Parlor",
+    "Flooded Strand",
+    "Gemstone Caverns",
+    "Great Furnace",
+    "Mana Confluence",
+    "Marsh Flats",
+    "Plateau",
+    "Prismatic Vista",
+    "Rugged Prairie",
+    "Sacred Foundry",
+    "Scalding Tarn",
+    "Spectator Seating",
+    "Sunbaked Canyon",
+    "Urza's Saga",
+    "Windswept Heath",
+    "Wooded Foothills",
+}
+
+LAND_CANDIDATE_PRIORITY = {
+    "Cavern of Souls": 30.0,
+    "Eiganjo, Seat of the Empire": 26.0,
+    "Sokenzan, Crucible of Defiance": 24.0,
+    "Exotic Orchard": 23.0,
+    "Forbidden Orchard": 21.0,
+    "Command Beacon": 18.0,
+    "Fabled Passage": 16.0,
+    "Spire of Industry": 14.0,
+    "Plaza of Heroes": 10.0,
+    "Ash Barrens": 8.0,
+}
+
+LOW_CEILING_LAND_TERMS = (
+    "enters the battlefield tapped",
+    "enters tapped",
+    "depletion counter",
+    "charge counter",
+)
+
+LOW_VALUE_BOROS_LANDS = {
+    # Legal in Commander due no color identity, but they cannot fetch the
+    # Mountain/Plains dual package and should not outrank real RW fixing.
+    "Misty Rainforest",
+    "Polluted Delta",
+    "Verdant Catacombs",
 }
 
 
 _REAL_ROLES_CACHE = {}
 
+
+def parse_analysis_roles(raw) -> list[str]:
+    if not raw:
+        return []
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, list):
+            return [str(role).strip().lower() for role in parsed if str(role).strip()]
+    except Exception:
+        pass
+    return [str(role).strip().lower() for role in str(raw).split(",") if role.strip()]
+
+
+def name_variants(name: str) -> set[str]:
+    variants = {normalize_name(name)}
+    if "//" in str(name):
+        for part in str(name).split("//"):
+            normalized = normalize_name(part)
+            if normalized:
+                variants.add(normalized)
+    return variants
+
+
+def choose_primary_category(categories: list[str]) -> str | None:
+    present = set(categories)
+    for category in REAL_CATEGORY_PRIORITY:
+        if category in present:
+            return category
+    return categories[0] if categories else None
+
+
 def load_known_cards() -> dict[str, dict[str, object]]:
-    if KC_JSON.exists():
-        with KC_JSON.open("r", encoding="utf-8") as fh:
-            known_cards = json.load(fh)
-    else:
-        known_cards = {}
-    rules = battle_rule_registry.load_active_battle_card_rules(DEFAULT_DB)
-    for rule in rules.values():
+    known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
+    rule_lists = battle_rule_registry.load_active_battle_card_rule_lists(DEFAULT_DB)
+    for rules in rule_lists.values():
+        if not rules:
+            continue
+        rule = rules[0]
         name = str(rule.get("card_name") or "")
         effect = dict(rule.get("effect_json") or {})
         if not name or not effect:
             continue
-        role = dict(rule.get("deck_role_json") or {})
+        categories = [
+            str(role.get("category"))
+            for role in (dict(item.get("deck_role_json") or {}) for item in rules)
+            if role.get("category")
+        ]
         merged = dict(known_cards.get(name, {}))
         merged.update(effect)
-        if role.get("category"):
-            merged["deck_category"] = role["category"]
+        primary_category = choose_primary_category(categories)
+        if primary_category:
+            merged["deck_category"] = primary_category
+        merged["battle_rules"] = [dict(item.get("effect_json") or {}) for item in rules]
+        merged["battle_rule_categories"] = sorted(set(categories))
         merged["battle_rule_source"] = rule.get("source")
         merged["battle_rule_review_status"] = rule.get("review_status")
+        merged["battle_rule_execution_status"] = rule.get("execution_status")
         known_cards[name] = merged
     return known_cards
 
@@ -160,36 +307,69 @@ def load_real_roles(conn, deck_id: int) -> dict[str, str]:
     roles = {}
     # 1. Try card_deck_analysis (detailed role analysis, most reliable)
     try:
+        columns = {
+            row[1]
+            for row in conn.execute("PRAGMA table_info(card_deck_analysis)").fetchall()
+        }
+        if "role_in_deck" not in columns:
+            columns = set()
+        pg_roles_expr = "pg_roles" if "pg_roles" in columns else "NULL AS pg_roles"
+        role_filter = (
+            "((role_in_deck IS NOT NULL AND role_in_deck != '') OR pg_roles IS NOT NULL)"
+            if "pg_roles" in columns
+            else "(role_in_deck IS NOT NULL AND role_in_deck != '')"
+        )
         rows = conn.execute(
-            "SELECT LOWER(card_name) as name, LOWER(role_in_deck) as role FROM card_deck_analysis WHERE deck_id = ? AND role_in_deck IS NOT NULL AND role_in_deck != ''",
+            f"""
+            SELECT LOWER(card_name) as name, LOWER(role_in_deck) as role, {pg_roles_expr}
+            FROM card_deck_analysis
+            WHERE deck_id = ?
+              AND {role_filter}
+            """,
             (deck_id,),
         ).fetchall()
+        categories_by_name = defaultdict(list)
         for row in rows:
             name = str(row["name"] or "").strip()
+            if not name:
+                continue
+            raw_roles = parse_analysis_roles(row["pg_roles"])
             role = str(row["role"] or "").strip().lower()
-            if name and role:
+            if role:
+                raw_roles.append(role)
+            for raw_role in raw_roles:
+                role = raw_role.strip().lower()
                 mapped = REAL_ROLE_TO_CATEGORY.get(role)
-                if mapped:
-                    roles[name] = mapped
+                if mapped and mapped not in categories_by_name[name]:
+                    categories_by_name[name].append(mapped)
+        for name, categories in categories_by_name.items():
+            primary = choose_primary_category(categories)
+            if primary:
+                roles[name] = primary
     except Exception:
         pass
 
-    # 2. Fallback: deck_cards.functional_tag (lighter annotation)
-    if not roles:
-        try:
-            rows = conn.execute(
-                "SELECT LOWER(card_name) as name, LOWER(functional_tag) as tag FROM deck_cards WHERE deck_id = ? AND functional_tag IS NOT NULL AND functional_tag != ''",
-                (deck_id,),
-            ).fetchall()
-            for row in rows:
-                name = str(row["name"] or "").strip()
-                tag = str(row["tag"] or "").strip().lower()
-                if name and tag:
-                    mapped = REAL_ROLE_TO_CATEGORY.get(tag)
-                    if mapped:
-                        roles[name] = mapped
-        except Exception:
-            pass
+    # 2. Fallback: deck_cards functional tags. Prefer the multi-tag snapshot
+    # when present, and never overwrite the detailed card_deck_analysis role.
+    try:
+        rows = conn.execute(
+            "SELECT * FROM deck_cards WHERE deck_id = ?",
+            (deck_id,),
+        ).fetchall()
+        for row in rows:
+            name = normalize_name(row["card_name"])
+            if not name or name in roles:
+                continue
+            categories: list[str] = []
+            for tag in functional_tags_for_row(row):
+                mapped = REAL_ROLE_TO_CATEGORY.get(tag)
+                if mapped and mapped not in categories:
+                    categories.append(mapped)
+            primary = choose_primary_category(categories)
+            if primary:
+                roles[name] = primary
+    except Exception:
+        pass
 
     return roles
 
@@ -201,14 +381,13 @@ def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]])
     entry = known_cards.get(name, {})
     # Prioridade 1: role real do card_deck_analysis (evita swap wincon <-> removal)
     real_role = _REAL_ROLES_CACHE.get(normalize_name(name), "")
-    if real_role and real_role in REAL_ROLE_TO_CATEGORY:
-        return REAL_ROLE_TO_CATEGORY[real_role]
+    if real_role:
+        return real_role
     if entry.get("deck_category"):
         return str(entry["deck_category"])
     effect = str(entry.get("effect") or "")
     if effect in EFFECT_TO_CATEGORY:
         return EFFECT_TO_CATEGORY[effect]
-    tag = str(row["functional_tag"] or "")
     tag_map = {
         "ramp": "ramp",
         "draw": "draw",
@@ -222,8 +401,9 @@ def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]])
         "engine": "engine",
         "land": "land",
     }
-    if tag in tag_map:
-        return tag_map[tag]
+    for tag in functional_tags_for_row(row):
+        if tag in tag_map:
+            return tag_map[tag]
     return "unknown"
 
 
@@ -233,6 +413,25 @@ def candidate_score(name: str, entry: dict[str, object], meta, category: str) ->
     cmc = float(meta["cmc"] if meta["cmc"] is not None else entry.get("cmc", 3) or 3)
     score = max(0.0, 8.0 - cmc)
     score += float(entry.get("count", 0) or 0) * 0.1
+
+    if category == "land":
+        score = 5.0
+        score += LAND_CANDIDATE_PRIORITY.get(name, 0.0)
+        if name in LOW_VALUE_BOROS_LANDS:
+            score -= 20.0
+        if "Land" in type_line:
+            score += 2.0
+        if any(term in oracle for term in LOW_CEILING_LAND_TERMS):
+            score -= 3.0
+        if "any color" in oracle or "one mana of any color" in oracle:
+            score += 2.0
+        if "search your library" in oracle:
+            score += 1.5
+        if "draw a card" in oracle:
+            score += 1.0
+        if "Artifact Land" in type_line:
+            score += 1.0
+        return score
 
     if "Instant" in type_line or "Sorcery" in type_line:
         score += 2.0
@@ -273,7 +472,18 @@ def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> 
     protected = set(PROTECTED_CARDS) | EXTRA_PROTECTED
     targets: dict[str, str] = {}
     for category, cards in deck_categories.items():
-        if category in {"land", "unknown"} or not cards:
+        if category == "unknown" or not cards:
+            continue
+        if category == "land":
+            cuttable = [
+                (name, cmc)
+                for name, cmc in cards
+                if name not in protected and name not in PREMIUM_LANDS
+            ]
+            if not cuttable:
+                cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
+            cuttable.sort(key=lambda item: (LAND_CUT_PRIORITY.get(item[0], 100), item[0]))
+            targets[category] = cuttable[0][0]
             continue
         cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
         if not cuttable:
@@ -285,12 +495,16 @@ def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> 
 
 def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, only_category: str):
     allowed = deck_commander_identity(conn, deck_id)
-    deck_names = {normalize_name(row["card_name"]) for row in deck_rows(conn, deck_id)}
+    deck_names = {
+        variant
+        for row in deck_rows(conn, deck_id)
+        for variant in name_variants(str(row["card_name"]))
+    }
     by_category: dict[str, list[tuple[float, str, float, str, dict[str, object]]]] = defaultdict(list)
     stats = {"deck": 0, "basic": 0, "unknown_category": 0, "missing_meta": 0, "off_color": 0, "illegal": 0, "high_cmc": 0}
 
     for name, entry in known_cards.items():
-        if normalize_name(name) in deck_names:
+        if name_variants(name) & deck_names:
             stats["deck"] += 1
             continue
         if name in BASICS:
@@ -298,7 +512,7 @@ def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, onl
             continue
         effect = str(entry.get("effect") or "unknown")
         category = str(entry.get("deck_category") or EFFECT_TO_CATEGORY.get(effect, "unknown"))
-        if category == "unknown" or category == "land":
+        if category == "unknown":
             stats["unknown_category"] += 1
             continue
         if only_category and category != only_category:
@@ -360,6 +574,8 @@ def main() -> int:
             assert_current_deck_matches_baseline(conn, args.deck_id, baseline)
             baseline_id = int(baseline["id"])
             baseline_hash = str(baseline["deck_hash"])
+            baseline_semantics_hash = str(baseline["semantics_hash"] or "")
+            baseline_ruleset_hash = str(baseline["ruleset_hash"] or "")
             baseline_wr = float(baseline["wr"])
 
             if args.reset_current_baseline:
@@ -392,14 +608,14 @@ def main() -> int:
             print(f"baseline_id={baseline_id}")
             print(f"baseline_wr={baseline_wr:.1f}%")
             print(f"baseline_hash={baseline_hash}")
+            print(f"baseline_semantics_hash={baseline_semantics_hash or 'legacy-missing'}")
+            print(f"baseline_ruleset_hash={baseline_ruleset_hash or 'legacy-missing'}")
             print(f"games_per_opponent={args.games}")
             print(f"max_per_category={args.max_per_category}")
             print(f"selected_candidates={total}")
             print(f"filter_stats={json.dumps(stats, sort_keys=True)}")
             print("\nCurrent deck composition:")
             for category, cards in sorted(deck_categories.items()):
-                if category == "land":
-                    continue
                 avg = sum(cmc for _, cmc in cards) / max(1, len(cards))
                 print(f"  {category:<12s} x{len(cards):<2d} avg_cmc={avg:.1f}")
             print("\nSwap targets:")
@@ -443,15 +659,19 @@ def main() -> int:
                     conn.execute(
                         """
                         INSERT INTO slot_benchmarks
-                            (deck_id, baseline_id, baseline_hash, category,
+                            (deck_id, baseline_id, baseline_hash,
+                             baseline_semantics_hash, baseline_ruleset_hash,
+                             category,
                              card_added, card_removed, add_cmc, add_effect, add_tag,
                              wr, wins, losses, draws, games, delta_pp, phase, tested_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             args.deck_id,
                             baseline_id,
                             baseline_hash,
+                            baseline_semantics_hash,
+                            baseline_ruleset_hash,
                             category,
                             name,
                             target,

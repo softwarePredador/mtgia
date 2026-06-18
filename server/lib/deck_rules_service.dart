@@ -1,18 +1,14 @@
 import 'package:postgres/postgres.dart';
 
 import 'basic_land_utils.dart' as basic_lands;
+import 'card_identity_support.dart';
 import 'commander_eligibility.dart';
+import 'commander_pairing.dart' as commander_pairing;
 import 'color_identity.dart';
+import 'deck_section_support.dart';
 
-/// Normaliza nomes para regra de cópia física.
-///
-/// Cartas split/MDFC podem chegar como nome completo ("Face A // Face B") ou
-/// só pela face frontal ("Face A"). Para limite de cópias, ambas representam a
-/// mesma carta física e precisam compartilhar a mesma chave.
 String normalizePhysicalCardCopyName(String name) {
-  final collapsed = name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
-  final splitParts = collapsed.split(RegExp(r'\s*//\s*'));
-  return splitParts.first.trim();
+  return commander_pairing.normalizePhysicalCardCopyName(name);
 }
 
 class DeckRulesService {
@@ -27,6 +23,11 @@ class DeckRulesService {
     bool strict = false,
   }) async {
     final normalizedFormat = format.toLowerCase();
+    validateNoUnsupportedDeckSections(cards: cards);
+    validateCommanderSlotAllowedForFormat(
+      format: normalizedFormat,
+      cards: cards,
+    );
 
     final cardIds = cards.map((c) => c['card_id']).whereType<String>().toList();
     if (cardIds.isEmpty) return;
@@ -54,7 +55,7 @@ class DeckRulesService {
       final isBasicLand = _isBasicLandTypeLine(typeLine);
       if (isBasicLand) continue;
 
-      final key = normalizePhysicalCardCopyName(info.name);
+      final key = info.physicalCopyKey;
       final existing = copiesByName[key];
       if (existing == null) {
         copiesByName[key] = _CopyCounter(info.name.trim(), quantity);
@@ -64,10 +65,7 @@ class DeckRulesService {
       }
     }
 
-    final limit =
-        (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
-            ? 1
-            : 4;
+    final limit = isCommanderStyleFormat(normalizedFormat) ? 1 : 4;
     print(
         '[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
     for (final entry in copiesByName.entries) {
@@ -108,10 +106,7 @@ class DeckRulesService {
       final typeLine = info.typeLine.toLowerCase();
       final isBasicLand = _isBasicLandTypeLine(typeLine);
 
-      final limit =
-          (normalizedFormat == 'commander' || normalizedFormat == 'brawl')
-              ? 1
-              : 4;
+      final limit = isCommanderStyleFormat(normalizedFormat) ? 1 : 4;
 
       // Commanders são validados separadamente pela regra quantity == 1
       // Aqui só validamos cartas normais
@@ -148,7 +143,7 @@ class DeckRulesService {
     }
 
     // Regras específicas de Commander/Brawl (MVP para o fluxo que você descreveu)
-    if (normalizedFormat == 'commander' || normalizedFormat == 'brawl') {
+    if (isCommanderStyleFormat(normalizedFormat)) {
       await _validateCommanderStyle(
         format: normalizedFormat,
         cards: cards,
@@ -241,7 +236,7 @@ class DeckRulesService {
 
     // Calcular identidade de cor combinada de todos os comandantes
     final commanderIdentitySet = <String>{};
-    final commanderNameSet = <String>{};
+    final commanderIdentityKeys = <String>{};
     for (final cmd in commanders) {
       final cmdId = cmd['card_id'] as String?;
       if (cmdId == null) continue;
@@ -255,7 +250,7 @@ class DeckRulesService {
         );
       }
 
-      commanderNameSet.add(normalizePhysicalCardCopyName(info.name));
+      commanderIdentityKeys.add(info.physicalCopyKey);
       commanderIdentitySet.addAll(_resolvedIdentity(info));
     }
 
@@ -267,7 +262,7 @@ class DeckRulesService {
       final isCommander = item['is_commander'] as bool? ?? false;
 
       if (!isCommander &&
-          commanderNameSet.contains(normalizePhysicalCardCopyName(info.name))) {
+          commanderIdentityKeys.contains(info.physicalCopyKey)) {
         throw DeckRulesException(
           'Regra violada: "${info.name}" já está selecionada como comandante e não pode entrar no deck principal.',
           cardName: info.name,
@@ -315,96 +310,16 @@ class DeckRulesService {
 
   /// Verifica se a carta é um Background (encantamento lendário com subtipo Background)
   bool _isBackground(_CardData card) {
-    final typeLine = card.typeLine.toLowerCase();
-    return typeLine.contains('legendary') &&
-        typeLine.contains('enchantment') &&
-        typeLine.contains('background');
-  }
-
-  /// Verifica se a carta tem "Partner" (qualquer um) no texto
-  bool _hasPartner(_CardData card) {
-    final oracle = (card.oracleText ?? '').toLowerCase();
-    // Procura por "partner" mas não como parte de outra palavra
-    // Regex para encontrar "partner" isolado (fim de linha ou espaço)
-    return RegExp(r'\bpartner\b').hasMatch(oracle);
-  }
-
-  /// Verifica se a carta tem "Partner with [Nome Específico]"
-  String? _getPartnerWithName(_CardData card) {
-    final oracle = (card.oracleText ?? '').toLowerCase();
-    final match = RegExp(r'partner with ([^(]+)').firstMatch(oracle);
-    if (match != null) {
-      return match.group(1)?.trim();
-    }
-    return null;
-  }
-
-  /// Verifica se a carta tem "Choose a Background"
-  bool _hasChooseBackground(_CardData card) {
-    final oracle = (card.oracleText ?? '').toLowerCase();
-    return oracle.contains('choose a background');
+    return commander_pairing
+        .isBackgroundCommanderPairCard(card.toCommanderPairingCard());
   }
 
   /// Valida se dois comandantes podem ser usados juntos
   bool _validatePartnerPairing(_CardData cmd1, _CardData cmd2) {
-    // Caso 1: Ambos têm "Partner" genérico
-    final hasPartner1 = _hasPartner(cmd1);
-    final hasPartner2 = _hasPartner(cmd2);
-    final partnerWith1 = _getPartnerWithName(cmd1);
-    final partnerWith2 = _getPartnerWithName(cmd2);
-
-    // Se ambos têm Partner genérico (sem "with"), podem ser pareados
-    if (hasPartner1 &&
-        hasPartner2 &&
-        partnerWith1 == null &&
-        partnerWith2 == null) {
-      return true;
-    }
-
-    // Caso 2: Partner with [nome específico]
-    if (partnerWith1 != null) {
-      // cmd1 tem "Partner with X", verificar se cmd2 é X
-      if (cmd2.name.toLowerCase().contains(partnerWith1)) {
-        return true;
-      }
-    }
-    if (partnerWith2 != null) {
-      // cmd2 tem "Partner with X", verificar se cmd1 é X
-      if (cmd1.name.toLowerCase().contains(partnerWith2)) {
-        return true;
-      }
-    }
-
-    // Caso 3: Choose a Background + Background
-    final hasChooseBg1 = _hasChooseBackground(cmd1);
-    final hasChooseBg2 = _hasChooseBackground(cmd2);
-    final isBg1 = _isBackground(cmd1);
-    final isBg2 = _isBackground(cmd2);
-
-    if ((hasChooseBg1 && isBg2) || (hasChooseBg2 && isBg1)) {
-      return true;
-    }
-
-    // Caso 4: Friends forever (Doctor Who)
-    final oracle1 = (cmd1.oracleText ?? '').toLowerCase();
-    final oracle2 = (cmd2.oracleText ?? '').toLowerCase();
-    if (oracle1.contains('friends forever') &&
-        oracle2.contains('friends forever')) {
-      return true;
-    }
-
-    // Caso 5: Doctor's companion
-    final hasDoctor1 = oracle1.contains("doctor's companion");
-    final hasDoctor2 = oracle2.contains("doctor's companion");
-    final isTimeLord1 = cmd1.typeLine.toLowerCase().contains('time lord') &&
-        cmd1.typeLine.toLowerCase().contains('doctor');
-    final isTimeLord2 = cmd2.typeLine.toLowerCase().contains('time lord') &&
-        cmd2.typeLine.toLowerCase().contains('doctor');
-
-    if ((hasDoctor1 && isTimeLord2) || (hasDoctor2 && isTimeLord1)) {
-      return true;
-    }
-    return false;
+    return commander_pairing.areCommanderPairingCompatible(
+      cmd1.toCommanderPairingCard(),
+      cmd2.toCommanderPairingCard(),
+    );
   }
 
   /// Retorna `true` para terrenos básicos (incluindo Snow-Covered variants).
@@ -418,9 +333,13 @@ class DeckRulesService {
   }
 
   Future<Map<String, _CardData>> _loadCardsData(List<String> cardIds) async {
+    final hasIdentityColumns = await hasCardIdentityColumns(_session);
+    final identitySelect = hasIdentityColumns
+        ? 'oracle_id::text AS oracle_id'
+        : 'NULL::text AS oracle_id';
     final result = await _session.execute(
       Sql.named('''
-        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, power, toughness
+        SELECT id::text, name, type_line, oracle_text, colors, color_identity, mana_cost, cmc, power, toughness, $identitySelect
         FROM cards
         WHERE id = ANY(@ids)
       '''),
@@ -439,17 +358,21 @@ class DeckRulesService {
           (row[5] as List?)?.map((e) => e.toString()).toList() ??
               const <String>[];
       final manaCost = row[6] as String?;
-      final power = row[7] as String?;
-      final toughness = row[8] as String?;
+      final cmc = parseDeckRulesCmcValue(row[7]);
+      final power = row[8] as String?;
+      final toughness = row[9] as String?;
+      final oracleId = nonEmptyCardIdentityString(row[10]);
 
       map[id] = _CardData(
         id: id,
+        oracleId: oracleId,
         name: name,
         typeLine: typeLine,
         oracleText: oracleText,
         colors: colors,
         colorIdentity: colorIdentity,
         manaCost: manaCost,
+        cmc: cmc,
         power: power,
         toughness: toughness,
       );
@@ -485,12 +408,118 @@ class DeckRulesService {
   }
 }
 
+void validateCommanderSlotAllowedForFormat({
+  required String format,
+  required List<Map<String, dynamic>> cards,
+}) {
+  if (isCommanderStyleFormat(format)) return;
+  final hasCommanderSlot =
+      cards.any((card) => card['is_commander'] as bool? ?? false);
+  if (!hasCommanderSlot) return;
+  throw DeckRulesException(
+    'Regra violada: is_commander só é permitido em Commander/Brawl.',
+  );
+}
+
+List<String> unsupportedDeckSectionLabels(
+  Iterable<Map<String, dynamic>> cards,
+) {
+  final labels = <String>[];
+  for (final card in cards) {
+    final label = unsupportedDeckSectionLabel(card);
+    if (label == null) continue;
+    labels.add(label);
+  }
+  return labels;
+}
+
+List<String> unsupportedRawDeckSectionLabels(Object? rawList) {
+  if (rawList is! List) return const [];
+  final labels = <String>[];
+  for (final item in rawList) {
+    if (item is! Map) continue;
+    final card = <String, dynamic>{
+      for (final entry in item.entries) entry.key.toString(): entry.value,
+    };
+    final label = unsupportedDeckSectionLabel(card);
+    if (label != null) labels.add(label);
+  }
+  return labels;
+}
+
+String? unsupportedDeckSectionLabel(Map<String, dynamic> card) {
+  const booleanFields = {
+    'sideboard': 'sideboard',
+    'is_sideboard': 'sideboard',
+    'wishboard': 'wishboard',
+    'is_wishboard': 'wishboard',
+    'maybeboard': 'maybeboard',
+    'is_maybeboard': 'maybeboard',
+    'outside_game': 'outside-game',
+    'is_outside_game': 'outside-game',
+  };
+
+  for (final entry in booleanFields.entries) {
+    final raw = card[entry.key];
+    if (raw == true || raw?.toString().trim().toLowerCase() == 'true') {
+      return entry.value;
+    }
+  }
+
+  const sectionFields = {
+    'zone',
+    'board',
+    'board_type',
+    'section',
+    'deck_section',
+    'list_section',
+    'list_type',
+  };
+
+  for (final key in sectionFields) {
+    final raw = card[key];
+    if (raw == null) continue;
+    if (isUnsupportedDeckSectionValue(raw)) {
+      return raw.toString().trim();
+    }
+  }
+
+  return null;
+}
+
+void validateNoUnsupportedDeckSections({
+  required Iterable<Map<String, dynamic>> cards,
+}) {
+  final labels = unsupportedDeckSectionLabels(cards);
+  if (labels.isEmpty) return;
+  throw DeckRulesException(unsupportedDeckSectionsMessage(labels));
+}
+
+String unsupportedDeckSectionsMessage(Iterable<String> labels) {
+  final uniqueLabels = labels
+      .map((label) => label.trim())
+      .where((label) => label.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+  final suffix = uniqueLabels.isEmpty ? '' : ' (${uniqueLabels.join(', ')}).';
+  return 'Regra violada: ManaLoom ainda não suporta sideboard, wishboard, maybeboard ou cartas "outside the game" em decks salvos$suffix '
+      'Importe apenas o deck principal e marque comandante pelo campo/tag de comandante.';
+}
+
 class DeckRulesException implements Exception {
   DeckRulesException(this.message, {this.cardName});
   final String message;
   final String? cardName;
   @override
   String toString() => message;
+}
+
+double? parseDeckRulesCmcValue(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
 }
 
 class _CopyCounter {
@@ -506,23 +535,41 @@ class _CopyCounter {
 class _CardData {
   const _CardData({
     required this.id,
+    required this.oracleId,
     required this.name,
     required this.typeLine,
     required this.oracleText,
     required this.colors,
     required this.colorIdentity,
     required this.manaCost,
+    required this.cmc,
     required this.power,
     required this.toughness,
   });
 
   final String id;
+  final String? oracleId;
   final String name;
   final String typeLine;
   final String? oracleText;
   final List<String> colors;
   final List<String> colorIdentity;
   final String? manaCost;
+  final double? cmc;
   final String? power;
   final String? toughness;
+
+  String get physicalCopyKey {
+    final canonicalId = nonEmptyCardIdentityString(oracleId);
+    if (canonicalId != null) return 'oracle:$canonicalId';
+    return 'name:${normalizePhysicalCardCopyName(name)}';
+  }
+
+  commander_pairing.CommanderPairingCard toCommanderPairingCard() {
+    return commander_pairing.CommanderPairingCard(
+      name: name,
+      typeLine: typeLine,
+      oracleText: oracleText,
+    );
+  }
 }

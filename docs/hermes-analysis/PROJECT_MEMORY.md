@@ -14,8 +14,9 @@
 - Produto: Plataforma Commander-first para Magic: The Gathering
 - Stack: Flutter (`app/`) + Dart Frog (`server/`) + PostgreSQL
 - Backend publicado: `https://evolution-cartinhas.8ktevp.easypanel.host`
-- Master HEAD: 6c2dd6b1 (2026-06-09, Add auto-promotion of battle rules + integrate into optimizer loop)
-- Backend tests: 604 (2026-06-09 13:00Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
+- Master HEAD observado no apply Hermes: 55af86c4 (2026-06-11, Deduplicate Hermes battle rules by logical key)
+- Relatorio mestre atual: `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md`
+- Backend tests: 599 (2026-06-04 14:10Z), `dart analyze lib/` — No issues found, `flutter analyze --no-pub --no-fatal-infos` — No issues found
 
 ## Branch de analise
 
@@ -23,22 +24,30 @@ A memoria versionada do agente vive em `codex/hermes-analysis-docs`.
 Nunca commitar diretamente na `master`. Fluxo:
 
 1. `git fetch --all --prune`
-2. `git checkout codex/hermes-analysis-docs`
-3. `git pull --ff-only origin codex/hermes-analysis-docs`
-4. Editar `docs/hermes-analysis/*`
-5. Stage apenas arquivos intencionais em `docs/hermes-analysis/**` (evitar artefatos de crons como `knowledge.db`, decks gerados e `__pycache__`) e commitar com `Update Hermes project analysis docs`
-6. `git push origin codex/hermes-analysis-docs`
+2. Rodar `/opt/data/scripts/manaloom-docs-branch-sync.sh` ou
+   `server/bin/hermes_docs_branch_sync.sh` no workspace Hermes.
+3. Prosseguir somente se a sync retornar `up_to_date` ou `merged`.
+4. Se a sync bloquear por conflito, worktree sujo ou push falho, retornar
+   `BLOCKED` e nao publicar achado novo.
+5. Editar `docs/hermes-analysis/*`
+6. Stage apenas arquivos intencionais em `docs/hermes-analysis/**` (evitar artefatos de crons como `knowledge.db`, decks gerados e `__pycache__`) e commitar com `Update Hermes project analysis docs`
+7. `git push origin codex/hermes-analysis-docs`
+
+Motivo: a branch docs e memoria/staging, mas as auditorias de codigo precisam
+ver a `master` viva. A sync mergeia `origin/master` em
+`codex/hermes-analysis-docs` antes de qualquer auditoria estrutural.
 
 ## Fontes canonicas (ordem de precedencia)
 
-1. `docs/CONTEXTO_PRODUTO_ATUAL.md` — fonte de verdade operacional
-2. `server/manual-de-instrucao.md` — diario tecnico com ultimas decisoes
-3. `docs/README.md` — indice documental
-4. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` — contratos app/backend
-5. `app/doc/APP_AUDIT_2026-04-29.md` — status consolidado do app
-6. `app/doc/UI_TEST_SURFACE_MAP.md` — keys de teste para runtime
-7. `docs/hermes-analysis/*` — analise do agente (este diretorio)
-8. `git log --oneline --decorate -40` — estado atual dos commits
+1. `docs/CONTEXTO_PRODUTO_ATUAL.md` - fonte de verdade operacional
+2. `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md` - mapa mestre de logica, dados, IA, Hermes e validacao
+3. `server/manual-de-instrucao.md` - diario tecnico com ultimas decisoes
+4. `docs/README.md` - indice documental
+5. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` - contratos app/backend
+6. `app/doc/APP_AUDIT_2026-04-29.md` - status consolidado do app
+7. `app/doc/UI_TEST_SURFACE_MAP.md` - keys de teste para runtime
+8. `docs/hermes-analysis/*` - analise do agente (este diretorio)
+9. `git log --oneline --decorate -40` - estado atual dos commits
 
 ## Regra de escopo
 
@@ -49,11 +58,14 @@ Nunca commitar diretamente na `master`. Fluxo:
 
 ## Estado do agente neste servidor
 
-Hermes consegue ler, auditar e analisar o repositorio. O container Hermes usado para
-esta memoria possui **Dart 3.12.0** e **Flutter 3.44.0** instalados em `/opt/data/tools/flutter/bin/`.
+Hermes consegue ler, auditar e analisar o repositorio. No recorte atual de
+EasyPanel, o `hermes-lab` foi reduzido para **Dart 3.12.0 standalone** em
+`/opt/tools/dart-sdk/bin/`; `flutter` deixou de ser dependência do container e
+fica restrito ao ambiente local do Codex para validação mobile/UI.
 
-- `dart test`: 604 passed (backend, 2026-06-09)
-- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-06-09)
+- `dart test`: 599 passed (backend, 2026-05-27)
+- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-05-27,
+  evidência histórica do ambiente anterior)
 
 ## Politica de resposta
 
@@ -71,6 +83,57 @@ Ao responder sobre o ManaLoom:
 - `server/routes/ai/**` (IA: generate, optimize, rebuild)
 - `server/lib/ai/**` (logica de IA, ~30 arquivos)
 - `server/doc/API_CONTRACTS_AND_DATA_MAP.md` (contratos)
+- `docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md` (mapa mestre de arquitetura/logica)
+- `docs/hermes-analysis/BATTLE_AI_DECK_LOGIC_DEEP_DIVE_2026-06-11.md` (mapa detalhado de battle, IA, Hermes e Lorehold)
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_IMPLEMENTATION_PLAN_2026-06-11.md` (plano de implementação para agregação multi-função e sync Hermes)
+- `docs/hermes-analysis/BATTLE_AI_GAP_CYCLE_2026-06-12.md` (ciclo seguro que remove fallback fixo de `/decks/:id/recommendations` e registra triagem Hermes)
+- `docs/hermes-analysis/BATTLE_SEMANTIC_SYNC_SLICE1_REPORT_2026-06-11.md` (evidência do Slice 1 de sync semântico local e bridge do optimizer para arrays)
+- `docs/hermes-analysis/BATTLE_AI_PROJECT_DECISIONS_TO_VALIDATE_2026-06-11.md` (dúvidas/decisões para validação do owner)
+- `docs/hermes-analysis/BATTLE_AI_OWNER_VALIDATION_QUESTIONS_2026-06-11.md` (handoff objetivo de perguntas/furos/logística antes das próximas fases)
+- `docs/hermes-analysis/HERMES_FUNCTIONAL_TAG_CONSUMER_CLASSIFICATION_2026-06-11.md` (classificação dos consumidores Hermes de `functional_tag` e status de migração para arrays)
+- `docs/hermes-analysis/DECK_GENERATION_FOCUS_READINESS_2026-06-16.md` (triagem atual: battle nao bloqueia foco em geracao/optimize; candidate quality usa sinal EDHREC bounded em dry-run validado)
+- Hermes AWS aplicou o snapshot semântico de Lorehold em 2026-06-11 com backup
+  do `knowledge.db`; invariantes pós-scan: 100 cartas, 1 comandante, hash
+  estrutural restaurado e nenhuma Chrome Mox/Mox Diamond/Mox Opal no deck.
+- Hermes AWS aplicou o Slice 2 `ruleset_hash` em 2026-06-11 com backup
+  `knowledge.db.pre-ruleset-76d828d2.20260611T194820Z`; invariantes pós-smoke:
+  100 cartas, 1 comandante, um `deck_hash`, um `semantics_hash`, um
+  `ruleset_hash`, baseline `id=2` com 60 jogos e 7 benchmarks
+  `ruleset_hash_smoke` contendo hashes semântico e de regras.
+- Hermes AWS aplicou o Slice 3 `logical_rule_key` em 2026-06-11 com backup
+  `knowledge.db.pre-logical-rule-55af86c4.20260611T201027Z`; invariantes
+  pós-smoke: 100 cartas, 1 comandante, 98 regras com `logical_rule_key`, 0
+  regras sem chave lógica, 2 regras equivalentes deduplicadas, baseline `id=3`
+  com 36 jogos e 8 benchmarks `logical_rule_smoke` contendo hashes semântico e
+  de regras.
+- `derive_functional_tags_from_battle_rules.py` existe apenas como report-only:
+  smoke PG atualizado em `86ef9062` viu 3156 regras, propôs 89 novos candidatos
+  `card_battle_rules_v1`, encontrou 261 tags já presentes e rejeitou 2806 por
+  gate. A revisão `BATTLE_RULE_DERIVED_TAG_REVIEW_2026-06-11.md` classifica
+  27 candidatos como low-risk review e 62 como manual-review após mover
+  Dramatic Reversal, Manamorphose e Victory Chimes para revisão manual por
+  escopo card-specific. A allowlist
+  `BATTLE_RULE_DERIVED_TAG_LOW_RISK_ALLOWLIST_2026-06-12.json` versiona os 27
+  low-risk apenas para dry-run; Hermes AWS confirmou 27 allowlisted, 0 manual
+  liberado, 0 unmatched e `apply=false`. O runner agora detecta stale cleanup
+  e roda PostgreSQL transaction dry-run com rollback obrigatório; as rodadas
+  local e Hermes AWS exercitaram 27 upserts allowlisted, 0 stale deletes,
+  rollback true e `apply=false`. O caminho operator-controlled
+  `--apply-reviewed-allowlist` existe, mas a allowlist atual bloqueia apply por
+  `apply_approved=false`; a tentativa local retornou `pg_apply.blocked=true`.
+  Nenhum apply em `card_function_tags` está liberado sem nova allowlist
+  revisada com `apply_approved=true`.
+- Decision Trace v1 entrou em 2026-06-15 como slice Hermes-only:
+  `battle_analyst_v9.py` emite decisoes por side-channel opcional,
+  `battle_replay_v10_3.py` grava `*.decision_trace.jsonl`, e
+  `replay_decision_auditor.py` audita decisoes sem alterar simulacao, API,
+  Flutter ou PostgreSQL. Fonte operacional:
+  `docs/hermes-analysis/DECISION_TRACE_V1_SLICE_2026-06-15.md`.
+- Identidade canônica de carta entrou em transição em 2026-06-12: backend/sync
+  agora têm contrato aditivo para `cards.oracle_id`, `cards.layout` e
+  `cards.card_faces_json`, tratando `scryfall_id` como printing id. Ainda falta
+  migration/backfill e medição de cobertura antes de ligar singleton/import/
+  learned-opponent sync a essa identidade.
 - `scripts/quality_gate.sh` (validacao automatizada)
 - `CHECKLIST_GO_LIVE_FINAL.md` (gates de release)
 

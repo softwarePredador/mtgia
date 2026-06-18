@@ -31,9 +31,38 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     }
 
     final format = deckResult.first[0] as String;
+    final hasCardIntelligenceSnapshot =
+        await _hasTable(pool, 'card_intelligence_snapshot');
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
-    final semanticV2Select = hasSemanticV2
-        ? '''
+    final cardSourceJoin = hasCardIntelligenceSnapshot
+        ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.id'
+        : 'JOIN cards c ON dc.card_id = c.id';
+    final priceSelect =
+        hasCardIntelligenceSnapshot ? 'c.price_usd AS price' : 'c.price';
+    final functionalTagsSelect = hasCardIntelligenceSnapshot
+        ? 'c.function_tag_details AS functional_tags'
+        : '''
+          COALESCE(
+            (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'tag', cft.tag,
+                  'confidence', cft.confidence,
+                  'evidence', cft.evidence,
+                  'source', cft.source
+                )
+                ORDER BY cft.confidence DESC, cft.tag
+              )
+              FROM card_function_tags cft
+              WHERE cft.card_id = c.id
+            ),
+            '[]'::jsonb
+          ) AS functional_tags
+        ''';
+    final semanticV2Select = hasCardIntelligenceSnapshot
+        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+        : hasSemanticV2
+            ? '''
           COALESCE(
             (
               SELECT jsonb_agg(
@@ -61,9 +90,9 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
               WHERE cstv2.card_id = c.id
             ),
             '[]'::jsonb
-          )
+          ) AS semantic_tags_v2
         '''
-        : ''''[]'::jsonb''';
+            : ''''[]'::jsonb AS semantic_tags_v2''';
 
     // 2. Buscar cartas do deck
     final cardsResult = await pool.execute(
@@ -74,28 +103,13 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           c.mana_cost,
           c.type_line,
           c.oracle_text,
-          c.price,
+          $priceSelect,
           dc.quantity,
           c.cmc,
-          COALESCE(
-            (
-              SELECT jsonb_agg(
-                jsonb_build_object(
-                  'tag', cft.tag,
-                  'confidence', cft.confidence,
-                  'evidence', cft.evidence,
-                  'source', cft.source
-                )
-                ORDER BY cft.confidence DESC, cft.tag
-              )
-              FROM card_function_tags cft
-              WHERE cft.card_id = c.id
-            ),
-            '[]'::jsonb
-          ) AS functional_tags,
-          $semanticV2Select AS semantic_tags_v2
+          $functionalTagsSelect,
+          $semanticV2Select
         FROM deck_cards dc
-        JOIN cards c ON dc.card_id = c.id
+        $cardSourceJoin
         WHERE dc.deck_id = @deckId
       '''),
       parameters: {'deckId': deckId},

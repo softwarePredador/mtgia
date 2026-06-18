@@ -91,5 +91,11 @@ Resumo sanitizado com usuario QA descartavel autenticado:
 
 ## Notas Operacionais
 - A rota nao depende do Hermes em runtime; Hermes e fonte de materializacao, PG e a fonte runtime.
-- Proximo deploy conhecido historicamente: `git pull`, `dart_frog build` dentro do container de backend e `docker commit` da imagem atualizada.
-- Antes de deploy destrutivo/restart, confirmar container, imagem e health atual.
+- Deploy publico atual: EasyPanel projeto `evolution`, app `cartinhas`, source
+  `git`, repo `softwarePredador/mtgia`, branch `master`, path `/server`, build
+  `Dockerfile`.
+- O fluxo historico de `git pull`, `dart_frog build` dentro do container de
+  backend e `docker commit` nao deve ser usado como caminho primario enquanto o
+  EasyPanel source `git` estiver funcional.
+- Antes de deploy destrutivo/restart, confirmar action status no EasyPanel,
+  `/health.git_sha` e `/ready` no dominio publicado.

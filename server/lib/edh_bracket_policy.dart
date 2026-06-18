@@ -348,6 +348,7 @@ const _knownInfiniteComboPieces = <String>{
   'thassa\'s oracle',
   'demonic consultation',
   'tainted pact',
+  'underworld breach',
 };
 
 // BEGIN GENERATED GAME CHANGERS
@@ -495,6 +496,8 @@ bool _looksLikeGameChangerStax(String normalizedName, String oracleLower) {
   if (normalizedName == 'drannith magistrate' ||
       normalizedName == 'opposition agent' ||
       normalizedName == 'grand abolisher' ||
+      normalizedName == 'grand arbiter augustin iv' ||
+      normalizedName == 'narset, parter of veils' ||
       normalizedName == 'winter orb' ||
       normalizedName == 'static orb' ||
       normalizedName == 'torpor orb' ||
@@ -507,6 +510,9 @@ bool _looksLikeGameChangerStax(String normalizedName, String oracleLower) {
   if (oracleLower.contains('cast') &&
           oracleLower.contains('more than one spell') ||
       oracleLower.contains('can\'t cast more than one spell')) return true;
+  // Draw and tax restrictions.
+  if (oracleLower.contains('can\'t draw more than one card')) return true;
+  if (oracleLower.contains('spells your opponents cast cost')) return true;
   // ETB hate
   if (oracleLower.contains('creatures entering') &&
       oracleLower.contains('don\'t cause')) return true;
@@ -544,4 +550,8 @@ const _knownValueEngineNames = <String>{
   'bolas\'s citadel',
   'sensei\'s divining top',
   'aetherflux reservoir',
+  'consecrated sphinx',
+  'field of the dead',
+  'smothering tithe',
+  'the one ring',
 };

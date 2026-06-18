@@ -113,7 +113,8 @@ def register_tests(battle, player):
     def test_multi_target_removal_partially_resolves_legal_targets():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
-        previous_known = battle.KNOWN_CARDS.get("Forked Removal")
+        previous_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Forked Removal")
+        had_waiver = "Forked Removal" in battle.MANUAL_RULE_RUNTIME_WAIVERS
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
         try:
             caster = player("Caster")
@@ -134,7 +135,7 @@ def register_tests(battle, player):
                 "shroud": True,
             }
             opponent.battlefield = [legal_target, illegal_target]
-            battle.KNOWN_CARDS["Forked Removal"] = {
+            battle.HANDCRAFTED_KNOWN_CARD_RULES["Forked Removal"] = {
                 "effect": "remove_creature",
                 "target": "creature",
                 "declared_targets": [
@@ -142,6 +143,7 @@ def register_tests(battle, player):
                     {"target": illegal_target, "controller": opponent},
                 ],
             }
+            battle.MANUAL_RULE_RUNTIME_WAIVERS.add("Forked Removal")
             spell = {
                 "name": "Forked Removal",
                 "type_line": "Instant",
@@ -157,10 +159,12 @@ def register_tests(battle, player):
             assert multi_event["resolved"] == ["Legal Target"]
             assert multi_event["illegal"] == ["Illegal Target"]
         finally:
-            if previous_known is None:
-                battle.KNOWN_CARDS.pop("Forked Removal", None)
+            if previous_rule is None:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Forked Removal", None)
             else:
-                battle.KNOWN_CARDS["Forked Removal"] = previous_known
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Forked Removal"] = previous_rule
+            if not had_waiver:
+                battle.MANUAL_RULE_RUNTIME_WAIVERS.discard("Forked Removal")
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
     def test_ward_counters_targeted_removal_when_unpaid():

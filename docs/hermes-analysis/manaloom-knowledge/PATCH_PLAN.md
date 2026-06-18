@@ -1,5 +1,11 @@
 # Patch Plan — P0 Code Fixes para ManaLoom
 
+> **Historico / nao operacional em 2026-06-17:** este documento permanece como
+> memoria do patch aplicado em maio. O executor `validate_patches.py` foi
+> removido do tree operacional; validacoes atuais devem usar testes versionados
+> em `server/test/*` e os guardrails Hermes em
+> `docs/hermes-analysis/manaloom-knowledge/scripts/test_known_cards_consumer_guardrail.py`.
+
 > Patches validados e simulados para os 3 bugs criticos no codigo
 > que causam classificacao errada de cartas.
 >
@@ -207,20 +213,18 @@ if (hasPitch || hasFreeCast) {
 
 ## Simulacao de Validacao
 
-Para confirmar que os patches funcionam, o script de validacao
-`validate_kinnan_tags.py` foi ATUALIZADO com as novas heuristicas.
-
-Para rodar a simulacao:
+Historicamente, `validate_patches.py` comparava tags ANTES/DEPOIS do patch. Em
+2026-06-17 esse executor foi removido porque validava uma proposta antiga fora
+da suite atual. Para confirmar regressao hoje, rode os testes versionados do
+backend e do guardrail Hermes em vez do script historico:
 
 ```bash
-cd docs/hermes-analysis/manaloom-knowledge/scripts
-python3 validate_patches.py
-```
+cd server
+dart test test/optimization_quality_gate_test.dart test/optimization_validator_test.dart test/optimize_runtime_support_test.dart -r expanded
 
-Isso mostra:
-- Tags ANTES (codigo atual) vs DEPOIS (codigo com patch)
-- Diferenca de classificacao para cada carta afetada
-- Contagem de acertos antes/depois
+cd ../docs/hermes-analysis/manaloom-knowledge/scripts
+python3 test_known_cards_consumer_guardrail.py -v
+```
 
 ---
 

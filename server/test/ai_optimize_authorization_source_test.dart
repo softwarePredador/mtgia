@@ -11,6 +11,9 @@ void main() {
       expect(source, contains('required String userId'));
       expect(source, contains('AND user_id = CAST(@user_id AS uuid)'));
       expect(source, contains('verifyOptimizeDeckAccess'));
+      expect(source, contains('card_intelligence_snapshot'));
+      expect(source, contains('function_tag_details'));
+      expect(source, contains('semantic_tags_v2'));
       expect(source,
           isNot(contains('SELECT name, format FROM decks WHERE id = @id')));
     });
@@ -18,7 +21,7 @@ void main() {
     test('route verifies deck access before creating async optimize job', () {
       final source = File('routes/ai/optimize/index.dart').readAsStringSync();
       final accessCheck = source.indexOf('verifyOptimizeDeckAccess');
-      final jobCreate = source.indexOf('OptimizeJobStore.create');
+      final jobCreate = source.indexOf('createOptimizeAsyncJob');
 
       expect(
           source, contains("return unauthorized('Authentication required')"));

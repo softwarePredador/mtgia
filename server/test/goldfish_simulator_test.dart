@@ -193,6 +193,32 @@ void main() {
       expect(result1.consistencyScore, equals(result2.consistencyScore));
       expect(result1.screwRate, equals(result2.screwRate));
     });
+
+    test('does not count tapped lands as same-turn mana sources', () {
+      final cards = [
+        {
+          'name': 'Temple of Epiphany',
+          'type_line': 'Land',
+          'oracle_text':
+              'Temple of Epiphany enters the battlefield tapped. {T}: Add {U} or {R}.',
+          'quantity': 6,
+        },
+        {
+          'name': 'Brainstorm',
+          'type_line': 'Instant',
+          'mana_cost': '{U}',
+          'cmc': 1,
+          'oracle_text': 'Draw three cards, then put two cards back.',
+          'quantity': 1,
+        },
+      ];
+
+      final simulator = GoldfishSimulator(cards, simulations: 1);
+      final result = simulator.simulate();
+
+      expect(result.turn1PlayRate, equals(0));
+      expect(result.turn2PlayRate, equals(1));
+    });
   });
 
   group('MatchupAnalyzer', () {

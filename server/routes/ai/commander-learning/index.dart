@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
@@ -18,12 +20,12 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     final pool = context.read<Pool>();
     if (commander.isEmpty) {
-      final activeDecks = await _loadActiveLearnedDecks(pool);
+      final activeDecks = await _loadActiveLearnedDeckSummaries(pool);
       return Response.json(body: {
         'available': activeDecks.isNotEmpty,
-        'source': 'pg_commander_learned_decks',
+        'source': 'pg_commander_learned_deck_summary',
         'count': activeDecks.length,
-        'commanders': activeDecks.map(_promotedDeckSummary).toList(),
+        'commanders': activeDecks,
       });
     }
 
@@ -103,36 +105,97 @@ Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck({
   }
 }
 
-Future<List<CommanderLearnedDeckInput>> _loadActiveLearnedDecks(
+Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries(
   Pool pool,
 ) async {
   try {
     final result = await pool.execute('''
+      WITH active AS (
+        SELECT
+          commander_name_normalized,
+          commander_name,
+          deck_name,
+          source_system,
+          source_ref,
+          source_url,
+          archetype,
+          card_count,
+          score,
+          legal_status,
+          promoted_at,
+          updated_at
+        FROM commander_learned_decks
+        WHERE is_active = TRUE
+      ),
+      aggregate AS (
+        SELECT
+          commander_name_normalized,
+          COUNT(*)::int AS active_learned_deck_count,
+          ARRAY_REMOVE(ARRAY_AGG(DISTINCT archetype ORDER BY archetype), NULL)
+            AS learned_archetypes
+        FROM active
+        GROUP BY commander_name_normalized
+      ),
+      primary_deck AS (
+        SELECT DISTINCT ON (commander_name_normalized)
+          commander_name_normalized,
+          commander_name,
+          deck_name,
+          source_system,
+          source_ref,
+          source_url,
+          archetype,
+          card_count,
+          score,
+          legal_status,
+          promoted_at,
+          updated_at
+        FROM active
+        ORDER BY commander_name_normalized,
+          score DESC NULLS LAST,
+          promoted_at DESC NULLS LAST,
+          updated_at DESC
+      )
       SELECT
-        commander_name,
-        deck_name,
-        source_system,
-        source_ref,
-        source_url,
-        archetype,
-        card_list,
-        card_count,
-        score,
-        wincon_primary,
-        wincon_backup,
-        legal_status,
-        notes,
-        metadata,
-        is_active,
-        promoted_at,
-        updated_at
-      FROM commander_learned_decks
-      WHERE is_active = TRUE
-      ORDER BY commander_name ASC, promoted_at DESC NULLS LAST, updated_at DESC
+        primary_deck.commander_name,
+        primary_deck.deck_name,
+        primary_deck.source_system,
+        primary_deck.source_ref,
+        primary_deck.source_url,
+        primary_deck.archetype,
+        primary_deck.card_count,
+        primary_deck.score,
+        primary_deck.legal_status,
+        primary_deck.promoted_at,
+        primary_deck.updated_at,
+        aggregate.active_learned_deck_count,
+        aggregate.learned_archetypes
+      FROM primary_deck
+      JOIN aggregate
+        ON aggregate.commander_name_normalized =
+          primary_deck.commander_name_normalized
+      ORDER BY primary_deck.commander_name ASC
     ''');
-    return result
-        .map((row) => _learnedDeckFromRow(row))
-        .toList(growable: false);
+
+    return result.map((row) {
+      final archetypes = _stringList(row[12]);
+      return <String, dynamic>{
+        'commander': row[0]?.toString(),
+        'deck_name': row[1]?.toString(),
+        'source_system': row[2]?.toString(),
+        'source_ref': row[3]?.toString(),
+        'source_url': row[4]?.toString(),
+        'archetype': row[5]?.toString() ??
+            (archetypes.isEmpty ? null : archetypes.first),
+        'card_count': intValue(row[6]),
+        'score': nullableDouble(row[7]),
+        'legal_status': row[8]?.toString(),
+        'promoted_at': row[9]?.toString(),
+        'last_synced_at': row[10]?.toString(),
+        'active_learned_deck_count': intValue(row[11]),
+        'learned_archetypes': archetypes,
+      };
+    }).toList(growable: false);
   } catch (error) {
     if (isUndefinedLearnedDeckTableError(error)) return const [];
     rethrow;
@@ -242,7 +305,6 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
     'cards': mainDecklist,
     'legality': legality,
     'validation': validationSummary,
-    'metadata': learnedDeck.metadata,
   };
 }
 
@@ -260,7 +322,6 @@ Map<String, dynamic> _promotedDeckSummary(CommanderLearnedDeckInput deck) => {
       'last_synced_at': deck.updatedAt?.toIso8601String(),
       'win_conditions': _winConditions(deck),
       'role_summary': _roleSummary(deck),
-      'metadata': deck.metadata,
     };
 
 List<Map<String, dynamic>> _winConditions(CommanderLearnedDeckInput deck) {
@@ -320,4 +381,34 @@ String _sourceConfidence({
   }
   if (isValid && noBanned) return 'medium';
   return 'low';
+}
+
+List<String> _stringList(Object? value) {
+  if (value is List) {
+    return value
+        .map((entry) => entry?.toString().trim() ?? '')
+        .where((entry) => entry.isNotEmpty)
+        .toList(growable: false);
+  }
+  final text = value?.toString().trim();
+  if (text != null && text.isNotEmpty && text != 'null') {
+    try {
+      final decoded = jsonDecode(text);
+      if (decoded is List) {
+        return decoded
+            .map((entry) => entry?.toString().trim() ?? '')
+            .where((entry) => entry.isNotEmpty)
+            .toList(growable: false);
+      }
+    } catch (_) {}
+    final normalized = text.startsWith('{') && text.endsWith('}')
+        ? text.substring(1, text.length - 1)
+        : text;
+    return normalized
+        .split(RegExp(r'\s*,\s*'))
+        .map((entry) => entry.trim())
+        .where((entry) => entry.isNotEmpty)
+        .toList(growable: false);
+  }
+  return const <String>[];
 }

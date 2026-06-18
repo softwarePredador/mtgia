@@ -3,6 +3,9 @@
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
+import 'package:server/ai/candidate_quality_data_support.dart';
+import 'package:server/ai/commander_learning_snapshot_support.dart';
+import 'package:server/import_card_lookup_service.dart';
 
 /// Sistema de Migrações Versionado para MTG IA
 ///
@@ -494,12 +497,14 @@ final migrations = <Migration>[
         normalized_name TEXT PRIMARY KEY,
         card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
         card_name TEXT NOT NULL,
+        logical_rule_key TEXT,
         effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
         deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-        source TEXT NOT NULL DEFAULT 'manual',
+        source TEXT NOT NULL DEFAULT 'curated',
         confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
           CHECK (confidence >= 0 AND confidence <= 1),
         review_status TEXT NOT NULL DEFAULT 'verified',
+        execution_status TEXT NOT NULL DEFAULT 'auto',
         rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
         oracle_hash TEXT,
         notes TEXT,
@@ -518,6 +523,15 @@ final migrations = <Migration>[
             'needs_review',
             'rejected',
             'deprecated'
+          )
+        ),
+        CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+          execution_status IN (
+            'auto',
+            'executable',
+            'annotation_only',
+            'review_only',
+            'disabled'
           )
         )
       );
@@ -559,6 +573,322 @@ final migrations = <Migration>[
     down: '''
       DROP INDEX IF EXISTS idx_cards_front_name_lower;
       DROP INDEX IF EXISTS idx_cards_name_lower;
+    ''',
+  ),
+  Migration(
+    version: '021',
+    name: 'add_card_canonical_identity_columns',
+    up: '''
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID;
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT;
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_faces_json JSONB;
+
+      CREATE INDEX IF NOT EXISTS idx_cards_oracle_id
+      ON cards (oracle_id);
+
+      CREATE INDEX IF NOT EXISTS idx_cards_layout
+      ON cards (layout);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_cards_layout;
+      DROP INDEX IF EXISTS idx_cards_oracle_id;
+      ALTER TABLE cards DROP COLUMN IF EXISTS card_faces_json;
+      ALTER TABLE cards DROP COLUMN IF EXISTS layout;
+      ALTER TABLE cards DROP COLUMN IF EXISTS oracle_id;
+    ''',
+  ),
+  Migration(
+    version: '022',
+    name: 'create_card_identity_and_intelligence_views',
+    up: '''
+      CREATE TABLE IF NOT EXISTS card_meta_insights (
+        card_name TEXT PRIMARY KEY,
+        usage_count INTEGER NOT NULL DEFAULT 0,
+        meta_deck_count INTEGER NOT NULL DEFAULT 0,
+        common_archetypes TEXT[] NOT NULL DEFAULT '{}',
+        common_formats TEXT[] NOT NULL DEFAULT '{}',
+        top_pairs JSONB NOT NULL DEFAULT '[]'::jsonb,
+        learned_role TEXT,
+        versatility_score NUMERIC(6,3) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        last_updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_card_meta_insights_usage
+      ON card_meta_insights (usage_count DESC);
+
+      CREATE INDEX IF NOT EXISTS idx_card_meta_insights_archetypes
+      ON card_meta_insights USING gin (common_archetypes);
+
+      $createCardLocalizedNamesTableSql;
+
+      ${createCardLocalizedNamesIndexesSql.join(';\n')};
+
+      ${candidateQualitySchemaStatements.join(';\n')};
+
+      ${candidateQualityIndexStatements.join(';\n')};
+
+      $optimizeCandidateQualitySummaryViewStatement;
+
+      $cardIntelligenceSnapshotViewStatement;
+
+      $createCardIdentityBridgeViewSql;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS card_identity_bridge;
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+      DROP INDEX IF EXISTS idx_card_meta_insights_archetypes;
+      DROP INDEX IF EXISTS idx_card_meta_insights_usage;
+    ''',
+  ),
+  Migration(
+    version: '023',
+    name: 'create_commander_learning_snapshot',
+    up: '''
+      CREATE TABLE IF NOT EXISTS commander_learned_decks (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        commander_name TEXT NOT NULL,
+        commander_name_normalized TEXT NOT NULL,
+        deck_name TEXT NOT NULL,
+        source_system TEXT NOT NULL,
+        source_ref TEXT NOT NULL,
+        source_url TEXT,
+        archetype TEXT,
+        card_list TEXT NOT NULL,
+        card_count INTEGER NOT NULL,
+        score NUMERIC,
+        wincon_primary TEXT,
+        wincon_backup TEXT,
+        legal_status TEXT,
+        notes TEXT,
+        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+        is_active BOOLEAN NOT NULL DEFAULT FALSE,
+        promoted_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE (source_system, source_ref)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
+      ON commander_learned_decks (
+        commander_name_normalized,
+        is_active,
+        promoted_at DESC,
+        updated_at DESC
+      );
+
+      CREATE TABLE IF NOT EXISTS deck_learning_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deck_id UUID NOT NULL,
+        commander_name TEXT,
+        format TEXT NOT NULL,
+        card_count INTEGER NOT NULL DEFAULT 0,
+        source TEXT NOT NULL DEFAULT 'user_created',
+        event_data JSONB DEFAULT '{}'::jsonb,
+        synced_to_hermes BOOLEAN NOT NULL DEFAULT FALSE,
+        synced_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
+      ON deck_learning_events (synced_to_hermes, created_at);
+
+      CREATE TABLE IF NOT EXISTS commander_card_usage (
+        commander_name_normalized TEXT NOT NULL,
+        card_name_normalized TEXT NOT NULL,
+        usage_count INTEGER NOT NULL DEFAULT 1,
+        last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (commander_name_normalized, card_name_normalized)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
+      ON commander_card_usage (commander_name_normalized, usage_count DESC);
+
+      $commanderLearningSnapshotViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS commander_learning_snapshot;
+      DROP TABLE IF EXISTS commander_card_usage CASCADE;
+      DROP TABLE IF EXISTS deck_learning_events CASCADE;
+      DROP TABLE IF EXISTS commander_learned_decks CASCADE;
+    ''',
+  ),
+  Migration(
+    version: '024',
+    name: 'refresh_commander_learning_snapshot_bridge_resolution',
+    up: '''
+      $commanderLearningSnapshotViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS commander_learning_snapshot;
+    ''',
+  ),
+  Migration(
+    version: '025',
+    name: 'refresh_optimize_candidate_quality_summary_anti_fanout',
+    up: '''
+      $optimizeCandidateQualitySummaryViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+    ''',
+  ),
+  Migration(
+    version: '026',
+    name: 'default_card_battle_rules_source_curated',
+    up: '''
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN source SET DEFAULT 'curated';
+    ''',
+    down: '''
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN source SET DEFAULT 'manual';
+    ''',
+  ),
+  Migration(
+    version: '027',
+    name: 'normalize_legacy_manual_battle_rule_sources',
+    up: '''
+      UPDATE card_battle_rules
+      SET
+        source = 'curated',
+        notes = trim(
+          both ' ' from
+          regexp_replace(
+            COALESCE(notes, ''),
+            'Seeded from HANDCRAFTED_KNOWN_CARDS\\.',
+            'Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.',
+            'g'
+          )
+        ),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE source = 'manual'
+        AND notes ILIKE '%HANDCRAFTED_KNOWN_CARDS%';
+    ''',
+    down: '''
+      UPDATE card_battle_rules
+      SET
+        source = 'manual',
+        notes = trim(
+          both ' ' from
+          regexp_replace(
+            COALESCE(notes, ''),
+            'Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17\\.',
+            'Seeded from HANDCRAFTED_KNOWN_CARDS.',
+            'g'
+          )
+        ),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE source = 'curated'
+        AND notes ILIKE '%legacy HANDCRAFTED_KNOWN_CARDS provenance%';
+    ''',
+  ),
+  Migration(
+    version: '028',
+    name: 'persist_card_battle_rules_logical_rule_key',
+    up: '''
+      ALTER TABLE card_battle_rules
+      ADD COLUMN IF NOT EXISTS logical_rule_key TEXT;
+
+      UPDATE card_battle_rules
+      SET logical_rule_key = 'battle_rule_v1:' || substring(md5(
+        jsonb_build_object(
+          'effect', COALESCE(effect_json, '{}'::jsonb),
+          'deck_role', COALESCE(deck_role_json, '{}'::jsonb),
+          'face_name', COALESCE(effect_json->>'face_name', deck_role_json->>'face_name'),
+          'face_index', COALESCE(effect_json->>'face_index', deck_role_json->>'face_index'),
+          'variant_kind', COALESCE(effect_json->>'variant_kind', deck_role_json->>'variant_kind'),
+          'ability_kind', COALESCE(effect_json->>'ability_kind', deck_role_json->>'ability_kind'),
+          'timing_window', COALESCE(effect_json->>'timing_window', deck_role_json->>'timing_window'),
+          'source_zone', COALESCE(effect_json->>'source_zone', deck_role_json->>'source_zone')
+        )::text
+      ) from 1 for 32)
+      WHERE logical_rule_key IS NULL OR logical_rule_key = '';
+
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN logical_rule_key SET NOT NULL;
+
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS card_battle_rules_pkey;
+
+      ALTER TABLE card_battle_rules
+      ADD CONSTRAINT card_battle_rules_pkey
+      PRIMARY KEY (normalized_name, logical_rule_key);
+
+      CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
+      ON card_battle_rules (normalized_name);
+
+      $cardIntelligenceSnapshotViewStatement;
+      $optimizeCandidateQualitySummaryViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+
+      DELETE FROM card_battle_rules a
+      USING card_battle_rules b
+      WHERE a.ctid < b.ctid
+        AND a.normalized_name = b.normalized_name;
+
+      DROP INDEX IF EXISTS idx_card_battle_rules_normalized_name;
+
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS card_battle_rules_pkey;
+
+      ALTER TABLE card_battle_rules
+      ADD CONSTRAINT card_battle_rules_pkey
+      PRIMARY KEY (normalized_name);
+
+      ALTER TABLE card_battle_rules
+      DROP COLUMN IF EXISTS logical_rule_key;
+    ''',
+  ),
+  Migration(
+    version: '029',
+    name: 'add_card_battle_rules_execution_status',
+    up: '''
+      ALTER TABLE card_battle_rules
+      ADD COLUMN IF NOT EXISTS execution_status TEXT;
+
+      UPDATE card_battle_rules
+      SET execution_status = CASE
+        WHEN review_status IN ('rejected', 'deprecated') THEN 'disabled'
+        WHEN review_status = 'needs_review' THEN 'review_only'
+        ELSE 'auto'
+      END
+      WHERE execution_status IS NULL OR execution_status = '';
+
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN execution_status SET DEFAULT 'auto';
+
+      ALTER TABLE card_battle_rules
+      ALTER COLUMN execution_status SET NOT NULL;
+
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS chk_card_battle_rules_execution_status;
+
+      ALTER TABLE card_battle_rules
+      ADD CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+        execution_status IN (
+          'auto',
+          'executable',
+          'annotation_only',
+          'review_only',
+          'disabled'
+        )
+      );
+
+      $cardIntelligenceSnapshotViewStatement;
+      $optimizeCandidateQualitySummaryViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS optimize_candidate_quality_summary;
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+      ALTER TABLE card_battle_rules
+      DROP CONSTRAINT IF EXISTS chk_card_battle_rules_execution_status;
+      ALTER TABLE card_battle_rules
+      DROP COLUMN IF EXISTS execution_status;
     ''',
   ),
 ];

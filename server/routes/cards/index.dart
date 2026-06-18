@@ -1,5 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../lib/card_identity_support.dart';
 import '../../lib/card_query_contract.dart';
 import '../../lib/endpoint_cache.dart';
 import '../../lib/scryfall_image_url.dart';
@@ -13,6 +14,7 @@ Future<Response> onRequest(RequestContext context) async {
   // Acessa a conexão do banco de dados fornecida pelo middleware
   final conn = context.read<Pool>();
   final hasSets = await _hasTable(conn, 'sets');
+  final hasIdentityColumns = await hasCardIdentityColumns(conn);
 
   final params = context.request.uri.queryParameters;
   final nameFilter = params['name'];
@@ -42,6 +44,7 @@ Future<Response> onRequest(RequestContext context) async {
       safeLimit,
       offset,
       includeSetInfo: hasSets,
+      includeIdentityColumns: hasIdentityColumns,
       deduplicate: deduplicate,
       includeTokens: includeTokens,
     );
@@ -58,6 +61,10 @@ Future<Response> onRequest(RequestContext context) async {
       return {
         'id': map['id'],
         'scryfall_id': map['scryfall_id'],
+        if (map.containsKey('oracle_id')) 'oracle_id': map['oracle_id'],
+        if (map.containsKey('layout')) 'layout': map['layout'],
+        if (map.containsKey('card_faces_json'))
+          'card_faces': map['card_faces_json'],
         'name': map['name'],
         'mana_cost': map['mana_cost'],
         'type_line': map['type_line'],
@@ -106,6 +113,7 @@ class _QueryBuilder {
 _QueryBuilder _buildQuery(
     String? nameFilter, String? setFilter, int limit, int offset,
     {required bool includeSetInfo,
+    required bool includeIdentityColumns,
     bool deduplicate = false,
     bool includeTokens = false}) {
   final params = <String, dynamic>{};
@@ -143,6 +151,7 @@ _QueryBuilder _buildQuery(
       conditions.isNotEmpty ? 'WHERE ${conditions.join(' AND ')}' : '';
 
   String sql;
+  final identityColumns = cardIdentitySelectSql('c', includeIdentityColumns);
 
   if (deduplicate) {
     // Deduplicar por (name, LOWER(set_code)) para evitar variantes e inconsistências de case
@@ -152,6 +161,7 @@ _QueryBuilder _buildQuery(
           SELECT * FROM (
             SELECT DISTINCT ON (c.name, LOWER(c.set_code))
               c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
+              $identityColumns
               c.oracle_text, c.colors, c.color_identity, c.image_url,
               LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
               c.collector_number, c.foil,
@@ -178,6 +188,7 @@ _QueryBuilder _buildQuery(
           SELECT * FROM (
             SELECT DISTINCT ON (c.name, LOWER(c.set_code))
               c.id, c.scryfall_id, c.name, c.mana_cost, c.type_line,
+              $identityColumns
               c.oracle_text, c.colors, c.color_identity, c.image_url,
               LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
               c.collector_number, c.foil

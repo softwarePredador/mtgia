@@ -1,0 +1,36 @@
+FROM dart:stable
+
+WORKDIR /app/server
+
+ENV PATH="$PATH:/root/.pub-cache/bin"
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    git \
+    python3 \
+    python3-psycopg2 \
+    util-linux \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY server/pubspec.yaml ./pubspec.yaml
+RUN dart pub get
+
+COPY . /app
+
+RUN chmod +x \
+  /app/server/bin/auto_promote_learned_decks.sh \
+  /app/server/bin/hermes_cron_governor_report.sh \
+  /app/server/bin/hermes_mana_base_validator.sh \
+  /app/server/bin/pull_learning_events.sh \
+  /app/server/bin/auto_sync_learned_decks.sh \
+  /app/server/bin/master_optimizer_preflight.sh \
+  /app/server/bin/manaloom_knowledge_import.sh \
+  /app/server/bin/manaloom_ops_entrypoint.sh \
+  /app/server/bin/manaloom_ops_daemon.py
+
+ENV MANALOOM_OPS_DATA_DIR=/data/manaloom-ops
+VOLUME ["/data/manaloom-ops"]
+
+CMD ["/bin/bash", "/app/server/bin/manaloom_ops_entrypoint.sh"]
