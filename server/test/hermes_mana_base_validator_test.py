@@ -44,6 +44,8 @@ def _make_db() -> sqlite3.Connection:
             deck_id INTEGER,
             quantity INTEGER,
             functional_tag TEXT,
+            functional_tags_json TEXT,
+            type_line TEXT,
             cmc REAL
         )
         """
@@ -70,10 +72,16 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
                 )
             )
             conn = _make_db()
+            self.addCleanup(conn.close)
             conn.execute("INSERT INTO commanders VALUES (1, 'Talrand, Sky Summoner')")
             conn.execute("INSERT INTO decks VALUES (1, 'Talrand Test', 1, 'spellslinger')")
-            rows = [(1, 36, "land", 0), (1, 9, "ramp", 2), (1, 10, "draw", 2), (1, 45, "engine", 3)]
-            conn.executemany("INSERT INTO deck_cards VALUES (?, ?, ?, ?)", rows)
+            rows = [
+                (1, 36, "land", "[\"land\"]", "Land", 0),
+                (1, 9, "ramp", "[\"ramp\"]", "Artifact", 2),
+                (1, 10, "draw", "[\"draw\"]", "Instant", 2),
+                (1, 45, "engine", "[\"engine\"]", "Sorcery", 3),
+            ]
+            conn.executemany("INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?)", rows)
 
             results = module.validate(conn, artifacts)
             report = module.build_report(results)
@@ -86,11 +94,12 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:
             conn = _make_db()
+            self.addCleanup(conn.close)
             conn.execute("INSERT INTO commanders VALUES (1, 'Unknown Commander')")
             conn.execute("INSERT INTO decks VALUES (1, 'Seed', 1, 'unknown')")
-            conn.execute("INSERT INTO deck_cards VALUES (1, 13, 'land', 0)")
+            conn.execute("INSERT INTO deck_cards VALUES (1, 13, 'land', '[\"land\"]', 'Land', 0)")
             conn.execute("INSERT INTO decks VALUES (2, 'Full No Profile', 1, 'unknown')")
-            conn.execute("INSERT INTO deck_cards VALUES (2, 100, 'land', 0)")
+            conn.execute("INSERT INTO deck_cards VALUES (2, 100, 'land', '[\"land\"]', 'Land', 0)")
 
             results = module.validate(conn, Path(tmp))
 
@@ -107,6 +116,7 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
                 json.dumps({"role_targets": {"lands": {"min": 30, "max": 34}}})
             )
             conn = sqlite3.connect(":memory:")
+            self.addCleanup(conn.close)
             conn.execute(
                 """
                 CREATE TABLE decks (
@@ -124,6 +134,8 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
                     card_name TEXT,
                     quantity INTEGER,
                     functional_tag TEXT,
+                    functional_tags_json TEXT,
+                    type_line TEXT,
                     is_commander INTEGER,
                     cmc REAL
                 )
@@ -131,11 +143,16 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
             )
             conn.execute("INSERT INTO decks VALUES (1, 'Runtime Lorehold', 'unknown')")
             conn.executemany(
-                "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+                """
+                INSERT INTO deck_cards (
+                    id, deck_id, card_name, quantity, functional_tag,
+                    functional_tags_json, type_line, is_commander, cmc
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
                 [
-                    (1, 1, "Lorehold, the Historian", 1, "draw", 1, 5),
-                    (2, 1, "Plains", 31, "land", 0, 0),
-                    (3, 1, "Spell", 68, "engine", 0, 2),
+                    (1, 1, "Lorehold, the Historian", 1, "draw", "[\"draw\"]", "Legendary Creature", 1, 5),
+                    (2, 1, "Plains", 31, "land", "[\"land\"]", "Basic Land — Plains", 0, 0),
+                    (3, 1, "Spell", 68, "engine", "[\"engine\"]", "Sorcery", 0, 2),
                 ],
             )
 
@@ -147,6 +164,7 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
     def test_overfull_deck_is_flagged_even_without_profile(self) -> None:
         module = _load_module()
         conn = sqlite3.connect(":memory:")
+        self.addCleanup(conn.close)
         conn.execute("CREATE TABLE decks (id INTEGER PRIMARY KEY, deck_name TEXT, archetype TEXT)")
         conn.execute(
             """
@@ -156,6 +174,8 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
                 card_name TEXT,
                 quantity INTEGER,
                 functional_tag TEXT,
+                functional_tags_json TEXT,
+                type_line TEXT,
                 is_commander INTEGER,
                 cmc REAL
             )
@@ -163,10 +183,15 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
         )
         conn.execute("INSERT INTO decks VALUES (1, 'Overfull', 'unknown')")
         conn.executemany(
-            "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+            """
+            INSERT INTO deck_cards (
+                id, deck_id, card_name, quantity, functional_tag,
+                functional_tags_json, type_line, is_commander, cmc
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
             [
-                (1, 1, "Unknown Commander", 1, "engine", 1, 4),
-                (2, 1, "Plains", 104, "land", 0, 0),
+                (1, 1, "Unknown Commander", 1, "engine", "[\"engine\"]", "Creature", 1, 4),
+                (2, 1, "Plains", 104, "land", "[\"land\"]", "Basic Land — Plains", 0, 0),
             ],
         )
 
@@ -195,6 +220,66 @@ class HermesManaBaseValidatorTest(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             self.assertIn("runtime_note", rendered)
             self.assertIn("missing required decks/deck_cards tables", rendered)
+
+    def test_multitag_land_detection_and_profile_fallback_paths(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            module.REPO_ROOT = tmp_root
+            fallback_profile_dir = (
+                tmp_root / "docs" / "qa" / "commander_reference_profiles_runtime"
+            )
+            fallback_profile_dir.mkdir(parents=True)
+            (fallback_profile_dir / "lorehold_the_historian.json").write_text(
+                json.dumps(
+                    {
+                        "role_targets": {
+                            "lands": {"min": 33, "max": 35},
+                            "mana_rocks_treasure_ramp": {"min": 8, "max": 12},
+                            "draw_rummage_opponent_turn_draw": {"min": 8, "max": 12},
+                            "spot_interaction": {"min": 4, "max": 8},
+                        }
+                    }
+                )
+            )
+            conn = sqlite3.connect(":memory:")
+            self.addCleanup(conn.close)
+            conn.execute("CREATE TABLE decks (id INTEGER PRIMARY KEY, deck_name TEXT, archetype TEXT)")
+            conn.execute(
+                """
+                CREATE TABLE deck_cards (
+                    id INTEGER PRIMARY KEY,
+                    deck_id INTEGER,
+                    card_name TEXT,
+                    quantity INTEGER,
+                    functional_tag TEXT,
+                    functional_tags_json TEXT,
+                    type_line TEXT,
+                    is_commander INTEGER,
+                    cmc REAL
+                )
+                """
+            )
+            conn.execute("INSERT INTO decks VALUES (1, 'Runtime Lorehold Learned', 'miracle')")
+            conn.executemany(
+                "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [
+                    (1, 1, "Lorehold, the Historian", 1, "engine", "[\"engine\"]", "Legendary Creature — Elder Dragon", 1, 5),
+                    (2, 1, "Ancient Tomb", 33, "ramp", "[\"ramp\",\"land\"]", "Land", 0, 0),
+                    (3, 1, "Arcane Signet", 8, "ramp", "[\"ramp\"]", "Artifact", 0, 2),
+                    (4, 1, "Faithless Looting", 9, "draw", "[\"draw\"]", "Sorcery", 0, 1),
+                    (5, 1, "Swords to Plowshares", 5, "removal", "[\"removal\"]", "Instant", 0, 1),
+                    (6, 1, "Engine Card", 44, "engine", "[\"engine\"]", "Enchantment", 0, 3),
+                ],
+            )
+
+            results = module.validate(conn, tmp_root / "no-artifacts-here")
+
+            self.assertTrue(results[0].profile_loaded)
+            self.assertEqual(results[0].lands, 33)
+            self.assertEqual(results[0].ramp, 8)
+            self.assertEqual(results[0].draw, 9)
+            self.assertEqual(results[0].status, "OK")
 
 
 if __name__ == "__main__":

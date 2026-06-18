@@ -91,6 +91,14 @@ ROLE_TO_TAG = {
     "cheap_creature_density": "engine",
     "bounce_loop_pieces": "engine",
     "infinite_mana_pieces": "engine",
+    "mana_rocks_treasure_ramp": "ramp",
+    "draw_rummage_opponent_turn_draw": "draw",
+    "spot_interaction": "removal",
+    "board_wipes_resets": "board_wipe",
+    "spell_payoffs_copy_engines": "engine",
+    "graveyard_recursion": "recursion",
+    "topdeck_miracle_setup": "engine",
+    "miracle_haymakers": "wincon",
 }
 
 DISPLAY_NAMES = {
@@ -157,14 +165,17 @@ def _range_status(value: int, minimum: int | None, maximum: int | None) -> tuple
 
 
 def find_profile(artifacts_dir: Path, commander: str) -> Path | None:
-    pattern = str(
-        artifacts_dir
-        / "commander_reference_profile_*"
-        / "profiles"
-        / f"{slug(commander)}.json"
-    )
-    matches = sorted(glob.glob(pattern))
-    return Path(matches[0]) if matches else None
+    commander_slug = f"{slug(commander)}.json"
+    patterns = [
+        artifacts_dir / "commander_reference_profile_*" / "profiles" / commander_slug,
+        artifacts_dir / "**" / commander_slug,
+        REPO_ROOT / "docs" / "qa" / "commander_reference_profiles_*" / commander_slug,
+    ]
+    for pattern in patterns:
+        matches = sorted(glob.glob(str(pattern), recursive=True))
+        if matches:
+            return Path(matches[0])
+    return None
 
 
 def load_profile(artifacts_dir: Path, commander: str) -> dict[str, Any] | None:
@@ -186,6 +197,75 @@ def _table_exists(conn: sqlite3.Connection, table: str) -> bool:
 
 def _table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
     return {str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+
+
+def _normalized_role_tag(role: str) -> str | None:
+    canonical = ROLE_TO_TAG.get(role)
+    if canonical:
+        return canonical
+
+    normalized = role.lower()
+    if "board" in normalized and "wipe" in normalized:
+        return "board_wipe"
+    if "wipe" in normalized or "reset" in normalized:
+        return "board_wipe"
+    if "protect" in normalized:
+        return "protection"
+    if "recur" in normalized:
+        return "recursion"
+    if any(token in normalized for token in ("wincon", "finisher", "haymaker")):
+        return "wincon"
+    if any(token in normalized for token in ("interaction", "removal", "counter", "spot")):
+        return "removal"
+    if any(token in normalized for token in ("draw", "rummage", "loot", "card_advantage")):
+        return "draw"
+    if any(token in normalized for token in ("ramp", "mana_rocks", "treasure", "mana")):
+        return "ramp"
+    if any(token in normalized for token in ("engine", "setup", "payoff", "topdeck", "spell")):
+        return "engine"
+    if normalized == "lands":
+        return "lands"
+    return None
+
+
+def _parse_tags(value: Any) -> set[str]:
+    if not value:
+        return set()
+    if isinstance(value, list):
+        return {str(item).strip().lower() for item in value if str(item).strip()}
+    if not isinstance(value, str):
+        return set()
+    raw = value.strip()
+    if not raw:
+        return set()
+    try:
+        decoded = json.loads(raw)
+    except json.JSONDecodeError:
+        return {raw.lower()}
+    if isinstance(decoded, list):
+        return {
+            str(item).strip().lower()
+            for item in decoded
+            if isinstance(item, (str, int, float)) and str(item).strip()
+        }
+    if isinstance(decoded, str) and decoded.strip():
+        return {decoded.strip().lower()}
+    return set()
+
+
+def _is_land_card(primary_tag: str | None, tags: set[str], type_line: str | None) -> bool:
+    if primary_tag == "land" or "land" in tags:
+        return True
+    return "land" in (type_line or "").lower()
+
+
+def _count_card_for_tag(canonical_tag: str, *, primary_tag: str | None, tags: set[str], type_line: str | None) -> bool:
+    is_land = _is_land_card(primary_tag, tags, type_line)
+    if canonical_tag == "lands":
+        return is_land
+    if is_land:
+        return False
+    return primary_tag == canonical_tag or canonical_tag in tags
 
 
 def validate(conn: sqlite3.Connection, artifacts_dir: Path) -> list[DeckValidation]:
@@ -214,18 +294,6 @@ def validate(conn: sqlite3.Connection, artifacts_dir: Path) -> list[DeckValidati
         f"""
         SELECT d.id, d.deck_name, d.archetype,
                {commander_select},
-               COALESCE(SUM(dc.quantity), 0) AS total_cards,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='land' THEN dc.quantity ELSE 0 END), 0) AS lands,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='ramp' THEN dc.quantity ELSE 0 END), 0) AS ramp,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='draw' THEN dc.quantity ELSE 0 END), 0) AS draw,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='removal' THEN dc.quantity ELSE 0 END), 0) AS removal,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='tutor' THEN dc.quantity ELSE 0 END), 0) AS tutor,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='board_wipe' THEN dc.quantity ELSE 0 END), 0) AS board_wipe,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='protection' THEN dc.quantity ELSE 0 END), 0) AS protection,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='recursion' THEN dc.quantity ELSE 0 END), 0) AS recursion,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='wincon' THEN dc.quantity ELSE 0 END), 0) AS wincon,
-               COALESCE(SUM(CASE WHEN dc.functional_tag='engine' THEN dc.quantity ELSE 0 END), 0) AS engine,
-               COALESCE(SUM(CASE WHEN dc.functional_tag IS NULL OR dc.functional_tag='unknown' THEN dc.quantity ELSE 0 END), 0) AS unknown,
                ROUND(AVG(dc.cmc), 2) AS avg_cmc
         FROM decks d
         {commander_join}
@@ -238,20 +306,34 @@ def validate(conn: sqlite3.Connection, artifacts_dir: Path) -> list[DeckValidati
     results: list[DeckValidation] = []
     for row in rows:
         commander = str(row["commander"])
-        total_cards = int(row["total_cards"] or 0)
-        tag_counts = {
-            "lands": int(row["lands"] or 0),
-            "ramp": int(row["ramp"] or 0),
-            "draw": int(row["draw"] or 0),
-            "removal": int(row["removal"] or 0),
-            "tutor": int(row["tutor"] or 0),
-            "board_wipe": int(row["board_wipe"] or 0),
-            "protection": int(row["protection"] or 0),
-            "recursion": int(row["recursion"] or 0),
-            "wincon": int(row["wincon"] or 0),
-            "engine": int(row["engine"] or 0),
-        }
-        unknown = int(row["unknown"] or 0)
+        deck_cards = conn.execute(
+            """
+            SELECT quantity, functional_tag, functional_tags_json, type_line
+            FROM deck_cards
+            WHERE deck_id = ?
+            """,
+            (int(row["id"]),),
+        ).fetchall()
+
+        tag_counts = {key: 0 for key in DISPLAY_NAMES.keys()}
+        total_cards = 0
+        unknown = 0
+        for card in deck_cards:
+            quantity = int(card["quantity"] or 0)
+            total_cards += quantity
+            primary_tag = str(card["functional_tag"]).lower() if card["functional_tag"] else None
+            tags = _parse_tags(card["functional_tags_json"])
+            type_line = str(card["type_line"]) if card["type_line"] else None
+            for canonical_tag in tag_counts:
+                if _count_card_for_tag(
+                    canonical_tag,
+                    primary_tag=primary_tag,
+                    tags=tags,
+                    type_line=type_line,
+                ):
+                    tag_counts[canonical_tag] += quantity
+            if primary_tag is None or primary_tag == "unknown":
+                unknown += quantity
         notes: list[str] = []
         checks: list[RoleCheck] = []
         profile = load_profile(artifacts_dir, commander)
@@ -268,7 +350,7 @@ def validate(conn: sqlite3.Connection, artifacts_dir: Path) -> list[DeckValidati
         else:
             role_targets = profile.get("role_targets", {})
             for role, target in role_targets.items():
-                tag = ROLE_TO_TAG.get(role)
+                tag = _normalized_role_tag(role)
                 if not tag:
                     continue
                 value = tag_counts.get(tag, 0)

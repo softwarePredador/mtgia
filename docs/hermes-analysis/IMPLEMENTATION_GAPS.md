@@ -12,6 +12,38 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / EasyPanel mana validator truth fix
+
+- Fechado um gap operacional/funcional do `manaloom-ops`: o
+  `hermes_mana_base_validator` estava marcando o Lorehold runtime como
+  `NO_PROFILE` e `lands=0` mesmo com deck canônico de `100` cartas e `33`
+  lands no SQLite operacional.
+- Causa raiz confirmada em runtime:
+  - o validador procurava profiles apenas no padrão legado
+    `server/test/artifacts/commander_reference_profile_*/profiles/*.json`,
+    enquanto o container já tinha profile válido também em
+    `docs/qa/commander_reference_profiles_*/*.json`;
+  - a contagem usava apenas `deck_cards.functional_tag`, mas no SQLite
+    operacional as lands do Lorehold carregam `functional_tag='ramp'` com
+    `functional_tags_json` incluindo `"land"`, o que zerava `lands` e
+    inflava `ramp`.
+- Ajustes aplicados:
+  - fallback de descoberta de profile para `docs/qa/commander_reference_profiles_*`;
+  - normalização de `role_targets` modernos
+    (`mana_rocks_treasure_ramp`, `draw_rummage_opponent_turn_draw`,
+    `spot_interaction`, `board_wipes_resets`, etc.);
+  - contagem semântica por carta usando `functional_tags_json` + `type_line`
+    para detectar land, e exclusão de lands do bucket bruto de `ramp`.
+- Validação:
+  - `python3 server/test/hermes_mana_base_validator_test.py`
+  - caso novo cobre exatamente o cenário real: lands multi-tag com
+    `functional_tag='ramp'`, profile vindo do fallback `docs/qa`, e role
+    targets modernos.
+- Próximo gap real:
+  - reexecutar a cron no EasyPanel e confirmar o novo relatório do Lorehold;
+  - depois disso, discutir se outros scorecards Hermes devem abandonar de vez
+    o campo único `functional_tag` em favor de multi-tag + tipagem estrutural.
+
 ### Atualizacao de ciclo — 2026-06-18 / Wheel + Lorehold miracle guard
 
 - Fechado um gap estratégico objetivo do battle: `miracle_cast` do Lorehold
