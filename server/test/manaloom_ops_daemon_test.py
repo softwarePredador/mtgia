@@ -139,6 +139,59 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             "2026-06-18T07:36:27",
         )
 
+    def test_load_existing_state_prefers_newer_log_over_stale_manifest_error(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            jobs_json = Path(tmp) / "jobs.json"
+            stale_log = (
+                "/data/manaloom-ops/cron/output/manaloom_knowledge_import/"
+                "20260618_122001.log"
+            )
+            jobs_json.write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": "manaloom_knowledge_import",
+                            "name": "manaloom_knowledge_import",
+                            "last_status": "error",
+                            "last_started_at": "2026-06-18T12:20:01",
+                            "last_finished_at": "2026-06-18T12:20:01",
+                            "last_exit_code": 1,
+                            "latest_output": stale_log,
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            cron_output_dir = Path(tmp) / "cron" / "output" / "manaloom_knowledge_import"
+            cron_output_dir.mkdir(parents=True, exist_ok=True)
+            fresh_log = cron_output_dir / "20260618_171404.log"
+            fresh_log.write_text(
+                "=== Importando conhecimento Hermes → PostgreSQL ===\n"
+                "manaloom_knowledge_import=ok\n",
+                encoding="utf-8",
+            )
+            original_jobs_json = module.JOBS_JSON
+            original_output_dir = module.CRON_OUTPUT_DIR
+            try:
+                module.JOBS_JSON = jobs_json
+                module.CRON_OUTPUT_DIR = Path(tmp) / "cron" / "output"
+                state = module._load_existing_state(module.JOBS)
+            finally:
+                module.JOBS_JSON = original_jobs_json
+                module.CRON_OUTPUT_DIR = original_output_dir
+
+        self.assertEqual(state["manaloom_knowledge_import"]["last_status"], "ok")
+        self.assertEqual(state["manaloom_knowledge_import"]["last_exit_code"], 0)
+        self.assertEqual(
+            state["manaloom_knowledge_import"]["last_started_at"],
+            "2026-06-18T17:14:04",
+        )
+        self.assertEqual(
+            state["manaloom_knowledge_import"]["latest_output"],
+            str(fresh_log),
+        )
+
     def test_sync_legalities_job_runs_before_candidate_review(self) -> None:
         module = _load_module()
         names = [job.name for job in module.JOBS]

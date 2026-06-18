@@ -382,9 +382,15 @@ def _load_existing_state(jobs: list[Job]) -> dict[str, dict[str, object]]:
         if not recovered:
             continue
         current = state.get(job.name, {})
-        if any(current.get(field) is not None for field in fields):
+        if not any(current.get(field) is not None for field in fields):
+            state[job.name] = recovered
             continue
-        state[job.name] = recovered
+        current_started = str(current.get("last_started_at") or "")
+        recovered_started = str(recovered.get("last_started_at") or "")
+        if recovered_started and (
+            not current_started or recovered_started > current_started
+        ):
+            state[job.name] = {**current, **recovered}
     return state
 
 
