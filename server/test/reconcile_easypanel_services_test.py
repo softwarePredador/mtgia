@@ -50,6 +50,7 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
         MODULE._parse_dotenv(""),
     )
     assert desired["PULL_LEARNING_EVENTS_CRON"] == "0 * * * *"
+    assert desired["MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON"] == "35 */6 * * *"
     assert desired["MTGIA_ENV_FILE"] == "/app/server/.env"
     assert desired["HERMES_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
     assert desired["MANALOOM_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
