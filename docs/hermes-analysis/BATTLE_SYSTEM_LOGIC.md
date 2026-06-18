@@ -238,6 +238,15 @@ Uso correto:
   mas ainda ser marcada como fraca se gastar Lotus Petal sem payoff, descartar
   land unica no Mox Diamond, sacrificar land sem alvo relevante ou manter mao
   sem plano inicial.
+- No fechamento do slice de resource trace em 2026-06-18, linhas de
+  `ramp_ritual`, `requires_discard_land` e `requires_sacrifice_land`
+  passaram a registrar contexto de payoff/beneﬁcio: `unlock_card`,
+  `unlock_role`, `unlock_effect`, `unlock_reason`, `resource_gate`,
+  `resource_land`, `imprint_card` e `strategic_benefit_reason`.
+- O auditor estrategico agora usa isso para flagar
+  `resource_risk_without_payoff_reason` quando uma jogada com
+  `spending_last_land` ou `spending_unique_color_land` nao documenta por que
+  o recurso escasso foi gasto.
 - A politica atual de opening hand precisa continuar alinhada a fontes externas
   estaveis: a regra dura e London Mulligan, e a heuristica minima de Commander
   precisa avaliar `curve + color + plan + sequencing + interaction`, nao apenas

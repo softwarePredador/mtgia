@@ -154,11 +154,15 @@ def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
     if decision_type == "cast_spell":
         chosen_effect = str(chosen.get("effect") or resource_delta.get("effect") or "")
         if chosen_effect == "ramp_ritual" or "one_shot_mana" in risk_flags:
-            if not has_score(decision, "unlocks_same_turn_action"):
+            if (
+                not has_score(decision, "unlocks_same_turn_action")
+                or not resource_delta.get("unlock_card")
+                or not (resource_delta.get("unlock_reason") or decision.get("expected_payoff_reason"))
+            ):
                 findings.append(finding(
                     "high",
                     "ramp_ritual_without_unlock_signal",
-                    "One-shot mana was chosen without recording the immediate payoff it unlocks.",
+                    "One-shot mana was chosen without recording the immediate payoff card/reason it unlocks.",
                     "Spend Lotus Petal/ritual mana only when it unlocks a same-turn relevant action, protection or win attempt.",
                     decision_id=decision_id,
                 ))
@@ -170,6 +174,22 @@ def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
                 "Record land discard as a resource risk for Mox Diamond-style plays.",
                 decision_id=decision_id,
             ))
+        if (
+            resource_delta.get("requires_discard_land")
+            or resource_delta.get("requires_sacrifice_land")
+        ) and ({"spending_last_land", "spending_unique_color_land"} & risk_flags):
+            if not (
+                resource_delta.get("strategic_benefit_reason")
+                or resource_delta.get("unlock_card")
+                or decision.get("expected_payoff_reason")
+            ):
+                findings.append(finding(
+                    "medium",
+                    "resource_risk_without_payoff_reason",
+                    "Scarce-land ramp spend was recorded without explicit payoff or benefit reason.",
+                    "Record the unlocked spell/commander or the strategic land benefit before treating this decision as learning-quality.",
+                    decision_id=decision_id,
+                ))
 
     if decision_type == "pass_no_action":
         if not decision.get("reason") and not score and not risk_flags:

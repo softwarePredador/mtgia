@@ -165,6 +165,57 @@ def register_tests(battle, player, card):
             for permanent in active.battlefield
         )
 
+    def test_one_shot_ritual_trace_records_unlock_payoff():
+        decisions = []
+        previous_handler = battle.DECISION_TRACE_HANDLER
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = player("Active")
+            opponent = player("Opponent")
+            petal = {
+                "name": "Lotus Petal",
+                "cmc": 0,
+                "type_line": "Artifact",
+                "effect": "ramp_ritual",
+                "mana_produced": 1,
+            }
+            two_drop = {
+                "name": "Two Drop Creature",
+                "cmc": 2,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            active.hand = [petal, two_drop]
+            active.mana_pool.add_generic(1)
+
+            acted = battle.cast_spells_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=1,
+                phase="precombat_main",
+                stack=battle.Stack(),
+                rng=random.Random(9201),
+            )
+        finally:
+            battle.DECISION_TRACE_HANDLER = previous_handler
+
+        assert acted is True
+        trace = next(
+            trace
+            for trace in decisions
+            if trace["decision_type"] == "cast_spell"
+            and trace["chosen_option"].get("card") == "Lotus Petal"
+        )
+        assert trace["expected_payoff_reason"] == "same_turn_castable_spell"
+        assert trace["score_components"]["unlock_card"] == "Two Drop Creature"
+        assert trace["resource_delta"]["unlock_card"] == "Two Drop Creature"
+        assert trace["resource_delta"]["unlock_reason"] == "same_turn_castable_spell"
+
     def test_extra_turns_are_taken_before_next_player():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -507,6 +558,7 @@ def register_tests(battle, player, card):
         test_failed_draw_from_empty_library_loses_even_with_cards_in_hand,
         test_one_shot_ritual_is_not_spent_without_same_turn_payoff,
         test_one_shot_ritual_can_be_spent_when_it_unlocks_spell,
+        test_one_shot_ritual_trace_records_unlock_payoff,
         test_extra_turns_are_taken_before_next_player,
         test_extra_combat_effect_schedules_and_untaps_creatures,
         test_extra_combat_is_taken_before_postcombat_main,

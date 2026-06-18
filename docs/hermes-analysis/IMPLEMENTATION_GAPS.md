@@ -544,6 +544,12 @@
 - Mox Diamond/land discard e Crop Rotation/Harrow/land sacrifice agora
   registram opções de land, motivo de escolha e riscos como
   `spending_last_land` e `spending_unique_color_land`.
+- No follow-up final desse slice, o trace passou a carregar payoff/beneﬁcio
+  explícito para esses gastos de recurso: `unlock_card`, `unlock_role`,
+  `unlock_reason`, `resource_gate`, `resource_land`,
+  `strategic_benefit_reason`. O auditor também passou a bloquear
+  `resource_risk_without_payoff_reason` quando a linha aceita land escassa sem
+  motivo documentado.
 - Criado `battle_decision_strategy_auditor.py` para flagar decisões legais mas
   ruins/mal explicadas: keep sem plano inicial, one-shot mana sem payoff,
   custo de land sem contexto e pass/no-action sem motivo.
@@ -588,6 +594,7 @@
 - Continua pendente: avaliação de board wipe/wheel em corpus maior, pass
   reasons mais ricos, threat assessment por player/permanent, explicacao
   comparativa mais completa do bottom do London Mulligan e ampliação de corpus
+  para synergies de storm/free-spell e proteção reativa de one-shot mana.
   para confirmar Mox/land-sacrifice.
 - Rodada pós-correção de board wipe/wheel (`20260615_172608`) analisou `19226`
   eventos e `2564` decisões: `strategy_findings=0`,

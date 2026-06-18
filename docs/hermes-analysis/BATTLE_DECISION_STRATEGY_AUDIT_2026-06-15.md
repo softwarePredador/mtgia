@@ -142,6 +142,19 @@ Atualização do slice comparativo ainda em 2026-06-18:
   continuou com `turn_findings=0`, `decision_findings=0` e
   `strategy_findings=0`, provando que a checagem de castabilidade por cor no
   mulligan não introduziu regressão no fluxo completo.
+- no fechamento do slice de resource trace do mesmo dia, `Lotus Petal`,
+  `Mox Diamond` e ramp com discard/sacrifice de land passaram a registrar
+  payoff ou benefício explícito no `decision_trace_v1`:
+  `unlock_card`, `unlock_role`, `unlock_effect`, `unlock_reason`,
+  `resource_gate`, `resource_land`, `imprint_card` e
+  `strategic_benefit_reason`.
+- o auditor estratégico também foi endurecido para distinguir:
+  - ritual/one-shot mana sem payoff imediato documentado;
+  - gasto de land escassa sem payoff ou sem benefício líquido documentado.
+- revalidação local:
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_decision_strategy_auditor.py`
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passaram após a instrumentação nova.
 
 ### Seleção contextual de land
 
@@ -158,6 +171,21 @@ contexto quando consomem land:
 
 O comportamento continua permitido quando a jogada é legal, mas o replay passa a
 ser auditável como decisão estratégica.
+
+### Trace de payoff de recurso
+
+Desde o follow-up final de 2026-06-18, o trace de recursos passou a separar
+duas classes de linha:
+
+- `one_shot_ritual_unlock`: mana one-shot só entra com payoff explícito no
+  turno, como `same_turn_castable_spell` ou `same_turn_commander_cast`;
+- `land_discard_ramp` / `land_sacrifice_ramp`: gasto de land escassa precisa
+  carregar payoff desbloqueado ou benefício estrutural claro, como
+  `high_value_land_target`, `untapped_net_mana_upgrade`,
+  `flexible_color_fixing` ou `no_scarce_land_risk`.
+
+Isso não transforma a heurística em EV perfeito. O ganho deste slice é deixar
+claro no replay por que o recurso foi gasto e o que a jogada destravou.
 
 ### Auditor estratégico
 
@@ -179,6 +207,7 @@ Findings iniciais:
 - `mulligan_without_hand_summary`
 - `ramp_ritual_without_unlock_signal`
 - `land_discard_missing_risk_flag`
+- `resource_risk_without_payoff_reason`
 - `pass_without_context`
 - `resource_cost_without_selection_context`
 - `spending_last_land`
@@ -189,9 +218,9 @@ Findings iniciais:
 | Decisão | Regra oficial | Estratégia esperada | Status Hermes | Próximo ajuste |
 |---|---|---|---|---|
 | Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial forte: avalia lands, plano inicial, ramp barato, card flow, reactive-only, cluster caro sem setup e castabilidade por cor do plano inicial; emite trace rico | Melhorar tuning por comandante/arquetipo e ranking comparativo mais semântico do bottom/keep |
-| Lotus Petal/ritual | Sacrificar para gerar mana conforme oracle | Usar só para destravar ação relevante, proteção, win attempt ou correção crítica | Parcial: `ramp_ritual` só entra no ramp loop se destrava ação no turno; auditor exige sinal | Ampliar para storm/free-spell synergies e proteção reativa |
-| Mox Diamond | Deve descartar land da mão antes de entrar | Só jogar com land descartável e plano de mana real | Guardrail mínimo: exige `requires_discard_land`, preserva cor única e bloqueia última/única land sem payoff nominal | Ampliar corpus e casos por bracket, sem ban global de Mox |
-| Sacrificar land | Crop Rotation/Harrow etc. exigem land conforme texto | Avaliar land sacrificada, risco de counter, alvo buscado e mana screw | Guardrail mínimo: escolhe alvo de land-ramp por score e bloqueia fetch/tapped sem benefício claro quando gasta última/única fonte | Ampliar scoring de utility lands e risco de counter |
+| Lotus Petal/ritual | Sacrificar para gerar mana conforme oracle | Usar só para destravar ação relevante, proteção, win attempt ou correção crítica | Parcial forte: `ramp_ritual` só entra no ramp loop se destrava ação no turno; trace agora exige `unlock_card` + `unlock_reason` | Ampliar para storm/free-spell synergies e proteção reativa |
+| Mox Diamond | Deve descartar land da mão antes de entrar | Só jogar com land descartável e plano de mana real | Parcial forte: exige `requires_discard_land`, preserva cor única, bloqueia última/única land sem payoff e agora registra `resource_land` + payoff explícito | Ampliar corpus e casos por bracket, sem ban global de Mox |
+| Sacrificar land | Crop Rotation/Harrow etc. exigem land conforme texto | Avaliar land sacrificada, risco de counter, alvo buscado e mana screw | Parcial forte: escolhe alvo de land-ramp por score, bloqueia fetch/tapped sem benefício claro quando gasta última/única fonte e registra `strategic_benefit_reason` | Ampliar scoring de utility lands e risco de counter |
 | Cast de spell | Legalidade/timing/mana | Escolher por curva, função, janela, risco de overextension e plano | Parcial: score heurístico por papel | Registrar opção rejeitada com motivo por spell jogável |
 | Removal/counter/protection | Respeitar alvo/timing/stack | Responder a win attempt, engine, commander crítico, wipe ou lethal | Parcial: threat score e response trace | Tuning por ameaça real e política multiplayer |
 | Tutor | Legalidade da busca | Escolher alvo por estado: land/ramp, interação, wincon ou engine | Coerente na amostra: target trace e selected_reason emitidos | Ampliar scoring por arquétipo e alvo de utility land |

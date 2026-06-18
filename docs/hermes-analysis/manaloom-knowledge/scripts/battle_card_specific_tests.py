@@ -535,7 +535,10 @@ def register_tests(battle, player):
 
     def test_mox_diamond_discards_land_when_it_unlocks_commander():
         events = []
+        decisions = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        previous_trace_handler = battle.DECISION_TRACE_HANDLER
+        battle.DECISION_TRACE_HANDLER = decisions.append
         active = player("Active")
         opponent = player("Opponent")
         mox = {"name": "Mox Diamond", "cmc": 0, "type_line": "Artifact"}
@@ -551,16 +554,19 @@ def register_tests(battle, player):
             }
         ]
 
-        acted = battle.cast_spells_v8(
-            active,
-            [opponent],
-            [active, opponent],
-            turn=1,
-            phase="precombat_main",
-            stack=battle.Stack(),
-            rng=random.Random(39),
-        )
-        battle.REPLAY_EVENT_HANDLER = None
+        try:
+            acted = battle.cast_spells_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=1,
+                phase="precombat_main",
+                stack=battle.Stack(),
+                rng=random.Random(39),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+            battle.DECISION_TRACE_HANDLER = previous_trace_handler
 
         assert acted is True
         assert mox not in active.hand
@@ -578,6 +584,17 @@ def register_tests(battle, player):
             and data.get("discarded") == "Savannah"
             for event, data in events
         )
+        trace = next(
+            trace
+            for trace in decisions
+            if trace["decision_type"] == "cast_spell"
+            and trace["chosen_option"].get("card") == "Mox Diamond"
+        )
+        assert trace["expected_payoff_reason"] == "same_turn_commander_cast"
+        assert "spending_last_land" in trace["risk_flags"]
+        assert trace["resource_delta"]["resource_land"] == "Savannah"
+        assert trace["resource_delta"]["unlock_card"] == "Cheap Commander"
+        assert trace["resource_delta"]["unlock_role"] == "commander"
 
     def test_mox_diamond_does_not_spend_last_land_without_payoff():
         events = []

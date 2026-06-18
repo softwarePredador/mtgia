@@ -58,6 +58,42 @@ def test_strategy_auditor_flags_one_shot_mana_without_unlock_signal():
     assert "ramp_ritual_without_unlock_signal" in codes
 
 
+def test_strategy_auditor_accepts_one_shot_mana_with_unlock_context():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "d-petal-ok",
+                "decision_type": "cast_spell",
+                "chosen_option": {"card": "Lotus Petal", "effect": "ramp_ritual"},
+                "score_components": {
+                    "role": "ramp",
+                    "unlocks_same_turn_action": 1,
+                    "unlock_card": "Talisman of Conviction",
+                    "unlock_role": "high_impact_spell",
+                    "unlock_reason": "same_turn_castable_spell",
+                    "resource_gate": "one_shot_ritual_unlock",
+                },
+                "strategic_principle": "spend_ramp_resource_only_when_it_unlocks_or_accelerates_plan",
+                "heuristic_version": "test",
+                "resource_delta": {
+                    "effect": "ramp_ritual",
+                    "one_shot_mana": 1,
+                    "unlock_card": "Talisman of Conviction",
+                    "unlock_role": "high_impact_spell",
+                    "unlock_reason": "same_turn_castable_spell",
+                    "resource_gate": "one_shot_ritual_unlock",
+                },
+                "risk_flags": ["one_shot_mana"],
+                "alternatives_considered": [{"card": "Lotus Petal"}],
+                "expected_payoff_reason": "same_turn_castable_spell",
+            }
+        ],
+    )
+
+    assert result["summary"]["findings"] == 0
+
+
 def test_strategy_auditor_flags_land_cost_without_selection_context():
     result = auditor.audit_strategy(
         events=[
@@ -87,6 +123,41 @@ def test_strategy_auditor_flags_land_cost_without_selection_context():
     assert "resource_cost_without_selection_context" in codes
     assert "spending_unique_color_land" in codes
     assert "spending_last_land" in codes
+
+
+def test_strategy_auditor_flags_risky_land_ramp_without_payoff_reason():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "d-mox-risk",
+                "decision_type": "cast_spell",
+                "chosen_option": {"card": "Mox Diamond", "effect": "ramp_permanent"},
+                "score_components": {
+                    "role": "ramp",
+                    "requires_discard_land": True,
+                    "resource_gate": "land_discard_ramp",
+                },
+                "strategic_principle": "spend_ramp_resource_only_when_it_unlocks_or_accelerates_plan",
+                "heuristic_version": "test",
+                "resource_delta": {
+                    "effect": "ramp_permanent",
+                    "requires_discard_land": True,
+                    "resource_gate": "land_discard_ramp",
+                    "resource_land": "Plateau",
+                },
+                "risk_flags": [
+                    "requires_land_discard",
+                    "spending_last_land",
+                    "spending_unique_color_land",
+                ],
+                "alternatives_considered": [{"card": "Mox Diamond"}],
+            }
+        ],
+    )
+
+    codes = {finding["code"] for finding in result["findings"]}
+    assert "resource_risk_without_payoff_reason" in codes
 
 
 def test_strategy_auditor_ignores_failed_land_cost_when_no_land_exists():
@@ -355,12 +426,15 @@ if __name__ == "__main__":
     tests = [
         test_strategy_auditor_flags_bad_mulligan_keep,
         test_strategy_auditor_flags_one_shot_mana_without_unlock_signal,
+        test_strategy_auditor_accepts_one_shot_mana_with_unlock_context,
         test_strategy_auditor_flags_land_cost_without_selection_context,
+        test_strategy_auditor_flags_risky_land_ramp_without_payoff_reason,
         test_strategy_auditor_ignores_failed_land_cost_when_no_land_exists,
         test_strategy_auditor_accepts_last_land_spend_with_commander_payoff,
         test_strategy_auditor_accepts_documented_land_sacrifice_benefit,
         test_strategy_auditor_still_blocks_last_land_spend_without_payoff,
         test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel,
+        test_strategy_auditor_accepts_contextual_pass_no_action,
         test_strategy_auditor_accepts_multiplayer_wheel_with_payoff,
         test_strategy_auditor_flags_worldfire_without_known_follow_up,
         test_strategy_auditor_renders_markdown,

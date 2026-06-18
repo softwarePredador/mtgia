@@ -9207,7 +9207,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     def ritual_unlocks_same_turn_action(ritual_card, ritual_effect):
         """One-shot mana is only useful when it unlocks a new same-turn action."""
         if ritual_effect.get("effect") != "ramp_ritual":
-            return True
+            return {"unlocks_same_turn_action": False, "resource_gate": "not_one_shot_ritual"}
 
         def playable_candidates():
             candidates = []
@@ -9219,7 +9219,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     for permanent in player.battlefield
                 )
                 if not already_there:
-                    candidates.append((cmd, player.commander_tax))
+                    candidates.append((cmd, player.commander_tax, "commander"))
             for candidate in player.hand:
                 if candidate is ritual_card or is_effective_land(candidate):
                     continue
@@ -9228,12 +9228,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     continue
                 if not can_cast_in_phase(candidate, candidate_effect, phase):
                     continue
-                candidates.append((candidate, 0))
+                candidates.append((candidate, 0, candidate_effect.get("effect") or "spell"))
             return candidates
 
         before = {
-            id(candidate)
-            for candidate, additional_generic in playable_candidates()
+            (id(candidate), role)
+            for candidate, additional_generic, role in playable_candidates()
             if player.can_pay_card(candidate, additional_generic)
         }
         pool_snapshot = player.mana_pool.snapshot()
@@ -9243,12 +9243,24 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         try:
             # Keep this check aligned with the current ritual resolution path.
             player.mana_pool.add_generic(ritual_mana_produced(player, ritual_effect))
-            for candidate, additional_generic in playable_candidates():
-                if id(candidate) in before:
+            for candidate, additional_generic, role in playable_candidates():
+                if (id(candidate), role) in before:
                     continue
                 if player.can_pay_card(candidate, additional_generic):
-                    return True
-            return False
+                    effect_data = get_card_effect(candidate)
+                    return {
+                        "unlocks_same_turn_action": True,
+                        "resource_gate": "one_shot_ritual_unlock",
+                        "unlock_card": candidate.get("name", "?"),
+                        "unlock_role": role,
+                        "unlock_effect": effect_data.get("effect", "unknown"),
+                        "unlock_reason": (
+                            "same_turn_commander_cast"
+                            if role == "commander"
+                            else "same_turn_castable_spell"
+                        ),
+                    }
+            return None
         finally:
             for color, amount in pool_snapshot.items():
                 setattr(player.mana_pool, color, amount)
@@ -9281,6 +9293,30 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             candidates.append((candidate, 0, "high_impact_spell"))
         return candidates
 
+    def _payoff_context(candidate, additional_generic, role):
+        effect_data = get_card_effect(candidate)
+        locked_cost = card_mana_cost(candidate, additional_generic)
+        nominal_cost = int(locked_cost.get("generic") or 0)
+        nominal_cost += sum(int(amount or 0) for amount in (locked_cost.get("colored") or {}).values())
+        nominal_cost += len(locked_cost.get("hybrid") or [])
+        nominal_cost += len(locked_cost.get("phyrexian") or [])
+        nominal_cost += len(locked_cost.get("phyrexian_hybrid") or [])
+        nominal_cost += sum(
+            int(option.get("generic") or 1)
+            for option in (locked_cost.get("monocolored_hybrid") or [])
+        )
+        return {
+            "unlock_card": candidate.get("name", "?"),
+            "unlock_role": role,
+            "unlock_effect": effect_data.get("effect", "unknown"),
+            "unlock_reason": (
+                "same_turn_commander_cast"
+                if role == "commander"
+                else "same_turn_high_impact_spell"
+            ),
+            "unlock_nominal_cost": nominal_cost,
+        }
+
     def restore_mana_snapshot(pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot):
         for color, amount in pool_snapshot.items():
             setattr(player.mana_pool, color, amount)
@@ -9296,7 +9332,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             enrich_card({**ramp_card, **ramp_effect}),
         )
         if produced_mana <= 0:
-            return False
+            return None
         available_after_ramp = player.available_mana() + produced_mana
 
         def payoff_is_affordable_by_count(candidate, additional_generic):
@@ -9341,8 +9377,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     payoff_is_affordable_by_count(candidate, additional_generic)
                     and player.can_pay_card(candidate, additional_generic)
                 ):
-                    return True
-            return False
+                    return {
+                        "unlocks_same_turn_action": True,
+                        "resource_gate": "permanent_ramp_unlock",
+                        **_payoff_context(candidate, additional_generic, role),
+                    }
+            return None
         finally:
             restore_mana_snapshot(pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot)
 
@@ -9374,17 +9414,24 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             **metadata,
         }
 
-    def ramp_resource_unlocks_same_turn_action(ramp_card, ramp_effect):
+    def ramp_resource_strategy_context(ramp_card, ramp_effect):
         if ramp_cast_plan(ramp_card, ramp_effect) is None:
-            return False
+            return None
         if ramp_effect.get("requires_imprint_nonartifact_nonland"):
             imprint, _options, _risk_flags, _reason = choose_chrome_mox_imprint_card(
                 player,
                 ramp_card,
             )
             if not imprint:
-                return False
-            return ramp_permanent_unlocks_meaningful_action(ramp_card, ramp_effect)
+                return None
+            context = ramp_permanent_unlocks_meaningful_action(ramp_card, ramp_effect)
+            if not context:
+                return None
+            return {
+                **context,
+                "resource_gate": "imprint_ramp_unlock",
+                "imprint_card": imprint.get("name", "?"),
+            }
         if ramp_effect.get("effect") == "ramp_ritual":
             return ritual_unlocks_same_turn_action(ramp_card, ramp_effect)
         if ramp_effect.get("requires_sacrifice_land"):
@@ -9398,17 +9445,30 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 zone="battlefield",
             )
             if not sacrifice_land:
-                return False
+                return None
             count = int(ramp_effect.get("land_count") or ramp_effect.get("lands_to_battlefield") or 1)
             _targets, target_options = choose_land_ramp_targets(player, ramp_effect, count)
-            allowed, _reason = land_sacrifice_has_strategic_benefit(
+            allowed, benefit_reason = land_sacrifice_has_strategic_benefit(
                 strategic_risk_flags,
                 target_options,
                 count,
             )
-            return allowed
+            if not allowed:
+                return None
+            return {
+                "unlocks_same_turn_action": False,
+                "resource_gate": "land_sacrifice_ramp",
+                "strategic_risk_flags": strategic_risk_flags,
+                "strategic_benefit_reason": benefit_reason,
+                "resource_land": sacrifice_land.get("name", "?"),
+                "target_land": (target_options[0]["name"] if target_options else None),
+            }
         if not ramp_effect.get("requires_discard_land"):
-            return True
+            return {
+                "unlocks_same_turn_action": False,
+                "resource_gate": "ramp_without_scarce_land_cost",
+                "strategic_benefit_reason": "no_scarce_land_risk",
+            }
         hand_lands = [
             candidate
             for candidate in player.hand
@@ -9419,17 +9479,31 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             zone="hand",
         )
         if not discard:
-            return False
+            return None
         if not (
             "spending_last_land" in strategic_risk_flags
             or "spending_unique_color_land" in strategic_risk_flags
         ):
-            return True
-        return ramp_permanent_unlocks_meaningful_action(
+            return {
+                "unlocks_same_turn_action": False,
+                "resource_gate": "land_discard_ramp",
+                "strategic_risk_flags": strategic_risk_flags,
+                "strategic_benefit_reason": "no_scarce_land_risk",
+                "resource_land": discard.get("name", "?"),
+            }
+        context = ramp_permanent_unlocks_meaningful_action(
             ramp_card,
             ramp_effect,
             allowed_roles={"commander"},
         )
+        if not context:
+            return None
+        return {
+            **context,
+            "resource_gate": "land_discard_ramp",
+            "strategic_risk_flags": strategic_risk_flags,
+            "resource_land": discard.get("name", "?"),
+        }
 
     # Track counters available (count counterspells in hand)
     player.counters_available = sum(
@@ -9581,27 +9655,69 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
 
     # 2. Ramp (main phase only)
     if is_main_phase:
-        ramp_cards = [
-            c for c in player.hand
-            if ramp_cast_plan(c, get_card_effect(c)) is not None
-            and get_card_effect(c).get("effect") in (
+        ramp_contexts = {}
+        for candidate in list(player.hand):
+            effect = get_card_effect(candidate)
+            if ramp_cast_plan(candidate, effect) is None:
+                continue
+            if effect.get("effect") not in (
                 "land_ramp",
                 "land_recursion",
                 "ramp_permanent",
                 "ramp_engine",
                 "ramp_ritual",
-            )
-            and ramp_resource_unlocks_same_turn_action(c, get_card_effect(c))
-        ]
+            ):
+                continue
+            strategy_context = ramp_resource_strategy_context(candidate, effect)
+            if strategy_context is None:
+                continue
+            ramp_contexts[id(candidate)] = strategy_context
+        ramp_cards = [c for c in player.hand if id(c) in ramp_contexts]
         for c in ramp_cards[:2]:
             eff = get_card_effect(c)
+            strategy_context = ramp_contexts.get(id(c))
             if (
                 c in player.hand
                 and ramp_cast_plan(c, eff) is not None
-                and ramp_resource_unlocks_same_turn_action(c, eff)
+                and strategy_context is not None
             ):
-                same_turn_unlock = ramp_resource_unlocks_same_turn_action(c, eff)
                 cast_plan = ramp_cast_plan(c, eff) or {}
+                ramp_risk_flags = [
+                    flag
+                    for flag in (
+                        "one_shot_mana"
+                        if eff.get("effect") == "ramp_ritual"
+                        else None,
+                        "requires_land_discard"
+                        if eff.get("requires_discard_land")
+                        else None,
+                        "requires_land_sacrifice"
+                        if eff.get("requires_sacrifice_land")
+                        else None,
+                        "requires_imprint"
+                        if eff.get("requires_imprint_nonartifact_nonland")
+                        else None,
+                        "multikicker_paid"
+                        if cast_plan.get("kicker_count")
+                        else None,
+                    )
+                    if flag
+                ]
+                ramp_risk_flags.extend(
+                    flag for flag in (strategy_context.get("strategic_risk_flags") or [])
+                    if flag and flag not in ramp_risk_flags
+                )
+                def ramp_trace_score(option_card, option_context):
+                    base_score = max(1, int(option_card.get("cmc", 0) or 0) + 10)
+                    if option_context.get("unlocks_same_turn_action"):
+                        return base_score + 4
+                    if option_context.get("strategic_benefit_reason") in (
+                        "high_value_land_target",
+                        "untapped_net_mana_upgrade",
+                        "flexible_color_fixing",
+                    ):
+                        return base_score + 2
+                    return base_score
                 cast_ctx = begin_cast_context(
                     player,
                     c,
@@ -9623,18 +9739,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         decision_card_option(
                             option_card,
                             get_card_effect(option_card),
-                            score=max(
-                                1,
-                                int(option_card.get("cmc", 0) or 0) + 10,
-                                (
-                                    int(option_card.get("cmc", 0) or 0) + 14
-                                    if ramp_resource_unlocks_same_turn_action(
-                                        option_card,
-                                        get_card_effect(option_card),
-                                    )
-                                    else int(option_card.get("cmc", 0) or 0) + 10
-                                ),
-                            ),
+                            score=ramp_trace_score(option_card, ramp_contexts[id(option_card)]),
                             action="cast_ramp",
                         )
                         for option_card in ramp_cards[:8]
@@ -9642,25 +9747,14 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     chosen_option=decision_card_option(
                         c,
                         eff,
-                        score=max(1, int(c.get("cmc", 0) or 0) + 14),
+                        score=ramp_trace_score(c, strategy_context),
                         action="cast_ramp",
                     ),
                     rejected_options=[
                         decision_card_option(
                             option_card,
                             get_card_effect(option_card),
-                            score=max(
-                                1,
-                                int(option_card.get("cmc", 0) or 0) + 10,
-                                (
-                                    int(option_card.get("cmc", 0) or 0) + 14
-                                    if ramp_resource_unlocks_same_turn_action(
-                                        option_card,
-                                        get_card_effect(option_card),
-                                    )
-                                    else int(option_card.get("cmc", 0) or 0) + 10
-                                ),
-                            ),
+                            score=ramp_trace_score(option_card, ramp_contexts[id(option_card)]),
                             action="defer_ramp",
                         )
                         for option_card in ramp_cards
@@ -9670,7 +9764,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         "role": "ramp",
                         "mana_before": mana,
                         "ramp_options": len(ramp_cards),
-                        "unlocks_same_turn_action": 1 if same_turn_unlock else 0,
+                        "unlocks_same_turn_action": 1 if strategy_context.get("unlocks_same_turn_action") else 0,
+                        "unlock_card": strategy_context.get("unlock_card"),
+                        "unlock_role": strategy_context.get("unlock_role"),
+                        "unlock_reason": strategy_context.get("unlock_reason"),
+                        "strategic_benefit_reason": strategy_context.get("strategic_benefit_reason"),
+                        "resource_gate": strategy_context.get("resource_gate"),
                         "requires_discard_land": bool(eff.get("requires_discard_land")),
                         "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
                         "requires_imprint_nonartifact_nonland": bool(
@@ -9681,10 +9780,14 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     rule_source=fields.get("rule_source", "battle_heuristic"),
                     rule_status=fields.get("rule_review_status", "heuristic"),
                     confidence="medium",
-                    expected_benefit_score=max(1, int(c.get("cmc", 0) or 0) + 14),
+                    expected_benefit_score=ramp_trace_score(c, strategy_context),
                     actual_outcome="cast_and_resolve_ramp",
                     reason="early_mana_development",
-                    expected_payoff_reason="develop mana only when it unlocks same-turn or near-turn plan",
+                    expected_payoff_reason=(
+                        strategy_context.get("unlock_reason")
+                        or strategy_context.get("strategic_benefit_reason")
+                        or "develop_mana_only_when_it_unlocks_or_preserves_plan"
+                    ),
                     strategic_principle=(
                         "spend_ramp_resource_only_when_it_unlocks_or_accelerates_plan"
                     ),
@@ -9695,6 +9798,15 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         "one_shot_mana": ritual_mana_produced(player, eff)
                         if eff.get("effect") == "ramp_ritual"
                         else 0,
+                        "resource_gate": strategy_context.get("resource_gate"),
+                        "unlock_card": strategy_context.get("unlock_card"),
+                        "unlock_role": strategy_context.get("unlock_role"),
+                        "unlock_effect": strategy_context.get("unlock_effect"),
+                        "unlock_reason": strategy_context.get("unlock_reason"),
+                        "unlock_nominal_cost": strategy_context.get("unlock_nominal_cost"),
+                        "strategic_benefit_reason": strategy_context.get("strategic_benefit_reason"),
+                        "resource_land": strategy_context.get("resource_land"),
+                        "imprint_card": strategy_context.get("imprint_card"),
                         "requires_discard_land": bool(eff.get("requires_discard_land")),
                         "requires_sacrifice_land": bool(eff.get("requires_sacrifice_land")),
                         "requires_imprint_nonartifact_nonland": bool(
@@ -9702,27 +9814,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         ),
                         "multikicker_count": int(cast_plan.get("kicker_count") or 0),
                     },
-                    risk_flags=[
-                        flag
-                        for flag in (
-                            "one_shot_mana"
-                            if eff.get("effect") == "ramp_ritual"
-                            else None,
-                            "requires_land_discard"
-                            if eff.get("requires_discard_land")
-                            else None,
-                            "requires_land_sacrifice"
-                            if eff.get("requires_sacrifice_land")
-                            else None,
-                            "requires_imprint"
-                            if eff.get("requires_imprint_nonartifact_nonland")
-                            else None,
-                            "multikicker_paid"
-                            if cast_plan.get("kicker_count")
-                            else None,
-                        )
-                        if flag
-                    ],
+                    risk_flags=ramp_risk_flags,
                     rejected_reason="deferred_lower_priority_ramp",
                 )
                 player.hand.remove(c)
