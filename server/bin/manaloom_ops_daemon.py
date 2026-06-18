@@ -51,6 +51,16 @@ class Job:
 
 def _base_env() -> dict[str, str]:
     env = dict(os.environ)
+    if ENV_FILE.is_file():
+        for raw_line in ENV_FILE.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in raw_line:
+                continue
+            key, value = raw_line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip("\"'")
+            if key and key not in env:
+                env[key] = value
     env.update(
         {
             "MTGIA_HOME": str(REPO_ROOT),

@@ -21,6 +21,20 @@ def _load_module():
 
 
 class ManaLoomOpsDaemonTest(unittest.TestCase):
+    def test_base_env_loads_database_values_from_env_file(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            env_file = Path(tmp) / ".env"
+            env_file.write_text("DB_HOST=db.example\nDB_NAME=mana\n", encoding="utf-8")
+            original_env_file = module.ENV_FILE
+            try:
+                module.ENV_FILE = env_file
+                env = module._base_env()
+            finally:
+                module.ENV_FILE = original_env_file
+        self.assertEqual(env["DB_HOST"], "db.example")
+        self.assertEqual(env["DB_NAME"], "mana")
+
     def test_collect_boot_jobs_runs_pull_for_pending_events(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:
