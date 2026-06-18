@@ -22,6 +22,8 @@ ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-1}"
 GIT_USER_NAME="${HERMES_GIT_USER_NAME:-Hermes Agent}"
 GIT_USER_EMAIL="${HERMES_GIT_USER_EMAIL:-hermes-agent@local.invalid}"
 GIT_PUSH_TOKEN="${HERMES_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN:-}}}"
+GIT_TERMINAL_PROMPT=0
+export GIT_TERMINAL_PROMPT
 
 mkdir -p "$STATE_DIR" "$REPORT_DIR"
 
@@ -126,8 +128,16 @@ fi
 if [[ -z "$(git config --get user.email || true)" ]]; then
   git config --global user.email "$GIT_USER_EMAIL"
 fi
+remote_url="$(git remote get-url "$REMOTE" 2>/dev/null || true)"
+remote_push_url="$(git remote get-url --push "$REMOTE" 2>/dev/null || true)"
+if [[ -z "$remote_push_url" ]]; then
+  remote_push_url="$remote_url"
+fi
+push_blocked_missing_token=0
+if [[ "$PUSH" == "1" && -z "$GIT_PUSH_TOKEN" && "$remote_push_url" == *github.com* ]]; then
+  push_blocked_missing_token=1
+fi
 if [[ -n "$GIT_PUSH_TOKEN" ]]; then
-  remote_url="$(git remote get-url "$REMOTE" 2>/dev/null || true)"
   repo_path=""
   case "$remote_url" in
     git@github.com:*)
@@ -197,6 +207,10 @@ fi
 
 if [[ "$DRY_RUN" == "1" ]]; then
   finish "would_merge" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}.\n\n${quarantine_details}"
+fi
+
+if [[ "$push_blocked_missing_token" == "1" ]]; then
+  finish "would_merge_push_token_missing" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}, but ${REMOTE} push URL requires GitHub credentials and no HERMES_GITHUB_TOKEN/GITHUB_TOKEN/GH_TOKEN is configured. Remote docs sync remains manual until a token is configured.\n\n${quarantine_details}"
 fi
 
 set +e

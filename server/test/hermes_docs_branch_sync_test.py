@@ -241,6 +241,26 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
             self.assertIn("status: would_merge", report_text)
             self.assertIn("Quarantined 2 untracked file(s)", report_text)
 
+    def test_reports_missing_github_push_token_without_hanging(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, work = self._seed_remote(root, advance_master=True)
+            env = self._script_env(root, work)
+            env["HERMES_DOCS_SYNC_PUSH"] = "1"
+            env.pop("HERMES_GITHUB_TOKEN", None)
+            env.pop("GITHUB_TOKEN", None)
+            env.pop("GH_TOKEN", None)
+            _git(work, "remote", "set-url", "--push", "origin", "https://github.com/softwarePredador/mtgia.git")
+
+            result = _run(["bash", str(SCRIPT)], cwd=work, env=env)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertEqual(_git_output(work, "branch", "--show-current"), "master")
+
+            report = max((root / "reports").glob("docs_branch_sync_*.md"))
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("status: would_merge_push_token_missing", report_text)
+            self.assertIn("HERMES_GITHUB_TOKEN", report_text)
+
     def test_blocks_tracked_modifications(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

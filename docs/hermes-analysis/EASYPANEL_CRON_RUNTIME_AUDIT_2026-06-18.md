@@ -267,6 +267,11 @@ Correcao aplicada:
 - `server/bin/hermes_lab_cron_bootstrap.py` prefere a copia empacotada em
   `/opt/bootstrap/hermes_docs_branch_sync.sh` para scripts operacionais,
   evitando que o repo persistido stale copie uma versao antiga do script;
+- `server/bin/hermes_docs_branch_sync.sh` exporta `GIT_TERMINAL_PROMPT=0` e,
+  quando o push URL exige GitHub mas nenhum `HERMES_GITHUB_TOKEN`/
+  `GITHUB_TOKEN`/`GH_TOKEN` existe no container, reporta
+  `would_merge_push_token_missing` sem tentar um push interativo que travaria
+  a cron ate timeout;
 - a rotina continua bloqueando tracked dirty worktree antes de qualquer
   checkout;
 - untracked files continuam sendo movidos para quarentena antes do sync;
@@ -276,6 +281,13 @@ Correcao aplicada:
 Essa correcao preserva a arquitetura correta: a branch docs remota e o master
 remoto sao as fontes de verdade; o checkout persistente do Hermes e apenas
 estado operacional recuperavel.
+
+Limitacao operacional restante:
+
+- push automatico para `origin/codex/hermes-analysis-docs` exige configurar
+  `HERMES_GITHUB_TOKEN` no `hermes-lab`;
+- enquanto esse token nao existir, o job valida que a branch docs conseguiria
+  receber o merge de `origin/master`, mas a publicacao remota deve ser manual.
 
 Correção aplicada em `server/bin/hermes_lab_cron_bootstrap.py`:
 
