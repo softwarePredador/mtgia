@@ -218,6 +218,54 @@ volume:
 - `/data/manaloom-ops/cron/jobs.json`
 - `/data/manaloom-ops/cron/output/<job>/*.log`
 
+## Revalidacao de runtime em 2026-06-18
+
+Prova viva executada no EasyPanel ja sem depender da topologia antiga da AWS:
+
+- `public_health_sha` ficou alinhado ao `local_head`
+  `5899ebb1cdd1a03ecb824835693f173e4c6b7969`;
+- `manaloom-ops` e `hermes-lab` passaram a rodar exatamente no mesmo SHA;
+- `manaloom-ops` validou `HERMES_KNOWLEDGE_DB=/data/manaloom-ops/knowledge.db`
+  e `MANALOOM_KNOWLEDGE_DB=/data/manaloom-ops/knowledge.db`;
+- `hermes-lab` validou `OPENAI_API_KEY` presente e execução real de cron
+  provider-backed após o bootstrap no EasyPanel;
+- `master_optimizer_preflight.sh` deixou de falhar por wiring antigo.
+
+### Ajustes operacionais confirmados
+
+1. O preflight do `manaloom-ops` estava correto no path da SQLite, mas a ordem
+   interna ainda era errada.
+2. O snapshot canônico do Lorehold dependia de `card_oracle_cache` e
+   `battle_card_rules`, porém essas sincronizações rodavam depois.
+3. A ordem canônica passou a ser:
+   - `sync_pg_meta_decks_to_hermes.py`
+   - `sync_pg_target_deck_to_hermes.py`
+   - `sync_pg_card_metadata_to_hermes.py`
+   - `sync_battle_card_rules_pg.py --apply-pg`
+   - `sync_battle_card_rules_pg.py --apply-sqlite-from-pg --include-needs-review`
+   - `lorehold_canonical_deck_snapshot.py --apply-local-sqlite`
+   - `master_optimizer_loop.py --preflight --report`
+
+### Resultado provado
+
+Execução manual no container `manaloom-ops`:
+
+- `master_optimizer_preflight=ok`
+- `status=approved`
+- relatório gerado em
+  `/app/docs/hermes-analysis/master_optimizer_reports/master_optimizer_preflight_20260618_024107.md`
+- artefatos de sync gerados em
+  `/app/server/test/artifacts/master_optimizer_preflight/`
+
+Conclusão operacional:
+
+- o worker determinístico no EasyPanel está apto para substituir o runtime
+  operacional antigo da AWS;
+- o `hermes-lab` continua como laboratório/report-only com cache separado;
+- o único drift restante intencional é o SQLite separado entre `manaloom-ops`
+  e `hermes-lab`, aceitável enquanto o laboratório não for promovido a fonte
+  operacional.
+
 Isso permite que `hermes_cron_governor_report.py` rode no próprio worker sem
 depender de `/opt/data/cron/jobs.json` do Hermes AWS.
 
