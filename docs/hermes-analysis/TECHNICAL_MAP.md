@@ -309,14 +309,15 @@ de utilidade de carta.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado
-  novamente em 2026-06-17 07:00 UTC no checkout local `caeade55`. Desde a
-  rodada focada anterior (`ae65f536..HEAD`), nao houve delta de produto em
+  novamente em 2026-06-18 07:00 UTC no checkout local `2a9f76ee`. Desde a
+  rodada focada anterior (`caeade55..HEAD`), nao houve delta de produto em
   `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
-  database setup, API contract, contexto de produto ou manual. O auditor
-  textual executou com sucesso (`205` arquivos backend, `115` problemas
-  textuais, `0` imports quebrados), mas continua sem grafo de chamadas; a
-  evidencia veio de buscas exatas por simbolo. Permanecem abertos os achados de
-  maior impacto: `server/lib/sync_cards_utils.dart` test-only neste branch
+  database setup, API contract, contexto de produto ou manual; o delta foi
+  apenas em documentos Hermes. O auditor textual executou com sucesso (`205`
+  arquivos backend, `115` problemas textuais, `0` imports quebrados), mas
+  continua sem grafo de chamadas; a evidencia veio de buscas exatas por simbolo.
+  Permanecem abertos os achados de maior impacto:
+  `server/lib/sync_cards_utils.dart` test-only neste branch
   enquanto `server/bin/sync_cards.dart` mantem helpers privados/inline;
   `swap_integrity` e emitido, mas `verifySwapIntegrity` nao e chamado no apply
   app/backend; e a extracao de `optimize_response_support.dart` continua

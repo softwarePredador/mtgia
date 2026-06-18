@@ -4,9 +4,274 @@
 > Nao leia por padrao em tarefas Hermes runtime. Use apenas para auditoria
 > estrutural ampla e revalide achados contra codigo vivo.
 
-> Atualizacao local Codex: 2026-06-18 03:00 UTC
-> Rotacao: `classes-not-used`
+> Atualizacao local Codex: 2026-06-18 07:00 UTC
+> Rotacao: `functions-not-called`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Funcoes nao chamadas - revalidacao 2026-06-18 07:00 UTC
+
+Escopo desta rodada: somente funcoes, metodos ou helpers declarados sem
+chamador runtime confirmado. Nao foi executada auditoria ampla de classes sem
+uso, imports/ciclos, tabelas PostgreSQL sem uso, duplicacao geral ou coerencia
+entre modulos fora do necessario para validar/falsificar candidatos de funcao.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `2a9f76ee`.
+- `git diff --name-status caeade55..HEAD -- app/lib server/lib server/routes server/bin server/test app/test app/integration_test server/database_setup.sql server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/CONTEXTO_PRODUTO_ATUAL.md server/manual-de-instrucao.md`:
+  sem saida. Desde a rodada focada anterior de funcoes, nao houve delta de
+  produto, testes, database setup, API contract, contexto de produto ou manual
+  no recorte app/backend.
+- `git diff --name-status caeade55..HEAD`: apenas documentos Hermes
+  (`TECHNICAL_MAP.md`, `STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`) mudaram no
+  branch desde a rodada anterior de funcoes.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar claims
+stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante aqui e
+tratar Hermes como laboratorio/cache/auditor e validar achados contra codigo
+vivo.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 205.
+- Classes encontradas: 196.
+- Tabelas PostgreSQL referenciadas: 92.
+- Problemas identificados pelo relatorio gerado: 115.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`.
+- O script e textual/regex; ele nao compila o projeto nem constroi grafo de
+  chamadas.
+- A lista bruta de funcoes publicas e duplicacoes do auditor nao foi promovida
+  como evidencia direta de ausencia de uso; todos os achados abaixo foram
+  revalidados por busca exata de simbolo.
+- A execucao do auditor voltou a reinserir inventario gerado por causa de uma
+  nota historica que citava o marcador do bloco gerado. A mutacao mecanica foi
+  removida nesta atualizacao, mantendo apenas os numeros do auditor e a triagem
+  focada.
+
+### Metodo manual focado
+
+- Comparacao de delta desde `caeade55`: nenhum arquivo de produto/teste/contrato
+  no recorte app/backend mudou; portanto os candidatos historicos foram
+  revalidados por busca exata, sem promover achados novos por inferencia.
+- `rg -n "sync_cards_utils|\bextractCardRow\b|\bextractSetCardRow\b|\bparseSinceDays\b|\bextractOracleIds\b|\bextractLegalities\b|getNewSetCodesSinceFromData" server/bin server/lib server/routes server/test --glob '*.dart'`.
+- `rg -n "\bverifySwapIntegrity\b|\bswap_integrity\b|\bdeck_signature\b|\bbuildSwapIntegrityForResponse\b" server app --glob '*.dart'`.
+- `rg -n "\bbuildOptimizeResponse\b|\brespondWithOptimizeTelemetry\b|\bbuildSemanticV2OptimizeRejectedBody\b|\battachOptimizeBracketPolicyDiagnostics\b" server/lib/ai/optimize_response_support.dart server/routes/ai/optimize server/test --glob '*.dart'`.
+- `rg` focado para wrappers/conveniencias app/backend (`getRequestTrace`,
+  `loadTokenFromDisk`, `applyFilters`, `clearFilters`, `clearAllCache`,
+  `recordFeedback`, `clearExpired`, metodos EDHREC/counters/log/push e
+  `normalize_commander`).
+- Leitura direta com `nl -ba` dos arquivos citados abaixo.
+
+### Achados revalidados
+
+#### P1 - `sync_cards_utils.dart` segue test-only neste checkout
+
+- **Helpers exportados:** `server/lib/sync_cards_utils.dart:16`, `:82`,
+  `:102`, `:121`, `:178` e `:189` definem `extractCardRow`,
+  `getNewSetCodesSinceFromData`, `parseSinceDays`, `extractSetCardRow`,
+  `extractOracleIds` e `extractLegalities`.
+- **Unico import encontrado:** `server/test/sync_cards_test.dart:3` importa
+  `../lib/sync_cards_utils.dart`; `rg` por `sync_cards_utils` nao encontrou
+  import em `server/bin`, `server/lib` runtime ou `server/routes`.
+- **CLI real ainda usa copias locais:** `server/bin/sync_cards.dart:64` chama
+  `_parseSinceDays`, definido em `:349`-`:357`; `:131` chama
+  `_getNewSetCodesSinceFromData`, definido em `:386`-`:402`; `:577` chama
+  `_extractCardRowFromSet`, definido em `:662`-`:722`; legalidades continuam
+  montadas inline em `:766`-`:770`.
+- **Por que parece sem chamador runtime:** a suite valida helpers exportados que
+  dizem ter sido extraidos do sync, mas o binario operacional continua usando
+  copias privadas e loops inline.
+- **O que valida:** importar `sync_cards_utils.dart` no CLI real e substituir as
+  copias privadas, ou remover o helper/teste compartilhado se ele for somente
+  harness legado.
+- **O que falsifica:** um import runtime atual de `sync_cards_utils.dart` em
+  `server/bin`, `server/lib` ou `server/routes`, ou uma decisao documentada de
+  manter o arquivo apenas como fixture/test helper.
+
+#### P1 - `verifySwapIntegrity` ainda nao protege o caminho de aplicacao
+
+- **Assinatura emitida:** `server/routes/ai/optimize/index.dart:749`-`:758`
+  anexa `swap_integrity` usando `buildSwapIntegrityForResponse`.
+- **Verificador sem chamada:** `server/lib/ai/optimize_swap_integrity.dart:112`
+  -`:134` define `verifySwapIntegrity`, mas `rg` por `verifySwapIntegrity` em
+  `server` e `app` encontrou apenas a propria definicao.
+- **Controle positivo:** `computeSwapIntegrity` e
+  `buildSwapIntegrityForResponse` sao vivos no caminho de resposta:
+  `optimize_swap_integrity.dart:84`-`:106`, `:139`-`:163` e rota em
+  `server/routes/ai/optimize/index.dart:753`.
+- **Por que parece sem chamador runtime:** o backend gera hash de integridade,
+  mas nenhum apply app/backend o recalcula para rejeitar `hash` adulterado ou
+  `deck_signature` antigo.
+- **O que valida:** chamar `verifySwapIntegrity` no caminho que aplica swaps e
+  adicionar teste que falhe com hash/deck antigo.
+- **O que falsifica:** decisao documentada de `swap_integrity` ser apenas
+  diagnostico informativo, ou chamador real fora das buscas acima.
+
+#### P1/P2 - Extracao de `optimize_response_support.dart` permanece parcial
+
+- **Helpers extraidos sem chamador runtime:** `server/lib/ai/optimize_response_support.dart:92`
+  define `buildOptimizeResponse`; `:125` define o top-level
+  `respondWithOptimizeTelemetry`.
+- **Rota usa funcao local homonima:** `server/routes/ai/optimize/index.dart:689`
+  -`:800` define `respondWithOptimizeTelemetry` local, e as chamadas em
+  `:804`, `:815`, `:1065`, `:1135`, `:1756`, `:1929`, `:2004`, `:2032`,
+  `:2108`, `:2161`, `:2206` e `:2498` resolvem para essa funcao local.
+- **Controles positivos no mesmo arquivo extraido:** `buildSemanticV2OptimizeRejectedBody`
+  e chamado pela rota em `server/routes/ai/optimize/index.dart:2194`, e
+  `attachOptimizeBracketPolicyDiagnostics` em `:2440`; ambos tambem tem teste de
+  contrato em `server/test/ai_optimize_semantic_enforcement_route_contract_test.dart:11`
+  e `:72`.
+- **Por que parece sem chamador runtime:** a extracao ja reduziu alguns helpers,
+  mas o builder geral de response e o responder top-level nao participam do
+  fluxo real de optimize.
+- **O que valida:** remover esses exports ou migrar a rota para o helper unico
+  com teste de telemetry/outcome/swap-integrity.
+- **O que falsifica:** busca por `buildOptimizeResponse` e pelo top-level
+  `optimize_response_support.respondWithOptimizeTelemetry` encontrar chamadas
+  runtime reais.
+
+#### P2 - Wrappers e conveniencias app/backend sem chamada runtime confirmada
+
+- **Request trace:** `server/lib/request_trace.dart:48` define
+  `getRequestTrace`; `rg` por `getRequestTrace|tryGetRequestId` em
+  `server/lib`, `server/routes` e `server/test` encontrou apenas essa definicao.
+- **Token app:** `app/lib/core/api/api_client.dart:140`-`:143` define
+  `ApiClient.loadTokenFromDisk()`, mas `rg` por `loadTokenFromDisk` em
+  `app/lib`, `app/test` e `app/integration_test` encontrou somente a definicao.
+  O boot real de auth carrega `auth_token` em
+  `app/lib/features/auth/providers/auth_provider.dart:38`.
+- **Performance manual/debug:** `app/lib/core/services/performance_service.dart:115`,
+  `:135`, `:205`, `:215`, `:225` e `:253` expoem `startTrace`, `stopTrace`,
+  `addMetric`, `addAttribute`, `getLocalStats` e `printLocalStats` sem chamada
+  app confirmada. Controles vivos: `PerformanceService.instance.init` em
+  `app/lib/main.dart:122`, `PerformanceNavigatorObserver` em
+  `app/lib/main.dart:209`, e `traceAsync` no smoke
+  `app/integration_test/release_observability_smoke_test.dart:51`.
+- **Providers app:** `BinderProvider.applyFilters` em
+  `app/lib/features/binder/providers/binder_provider.dart:639` e chamado apenas
+  por teste (`binder_provider_test.dart:160`, `:182`); `CommunityProvider.clearFilters`
+  em `app/lib/features/community/providers/community_provider.dart:179` nao tem
+  chamada app confirmada; `DeckProvider.clearAllCache` em
+  `app/lib/features/decks/providers/deck_provider.dart:1067` nao tem chamada
+  confirmada, enquanto `invalidateDeckCache` segue vivo em `:448`, `:1170` e
+  `:1205`.
+- **Commander Reference / optimize samples:** `server/lib/ai/commander_reference_card_stats_support.dart:252`
+  define `buildLoreholdReferenceCardStatsFromProfile`, chamado apenas por teste
+  e por delegacao para o builder generico; o builder generico e vivo em `:363`.
+  `server/lib/ai/optimize_runtime_support.dart:1671` define
+  `summarizeAggressiveOptimizeUtilitySamples`, com chamada encontrada apenas em
+  `server/test/optimize_runtime_support_test.dart:215`.
+- **Por que parece sem chamador runtime:** sao APIs publicas que parecem
+  contrato de consumo, mas as telas/boot atuais usam caminhos diretos,
+  alternativos ou privados.
+- **O que valida:** ligar cada wrapper ao fluxo esperado ou reduzir visibilidade/
+  remover metodo e teste correspondente.
+- **O que falsifica:** chamada em `app/lib`, `server/lib`, `server/routes` ou
+  bootstrap real fora das buscas acima.
+
+#### P2/P3 - Servicos backend vivos mantem metodos publicos sem consumidor
+
+- **`MLKnowledgeService.recordFeedback`:** `server/lib/ml_knowledge_service.dart:251`
+  -`:288` insere em `ml_prompt_feedback`, mas `recordFeedback(` aparece apenas
+  na definicao. O servico segue vivo por `getContextForDeck` e
+  `generatePromptContext` em `server/lib/ai/otimizacao.dart:167`-`:173` e
+  `:361`-`:367`.
+- **`EndpointCache.clearExpired`:** `server/lib/endpoint_cache.dart:32` define o
+  metodo sem chamada; `EndpointCache.instance.get/set` seguem vivos em
+  `/cards`, `/sets`, `/ai/archetypes` e generate performance support.
+- **`EdhrecService`:** `getHighSynergyCards` e vivo em
+  `server/lib/ai/otimizacao.dart:112`, `:120`, `:313` e `:321`; ja
+  `getTopByCategory`, `calculateFitScore`, `cleanupCache` e `isHighSynergy`
+  aparecem somente nas definicoes de
+  `server/lib/ai/edhrec_service.dart:350`, `:372`, `:380` e `:416`.
+- **`ArchetypeCountersService`:** a classe e viva em
+  `/ai/weakness-analysis` e `/ai/simulate-matchup`; `detectDeckArchetype` e
+  `getHateCards` sao chamados em `server/routes/ai/weakness-analysis/index.dart:146`
+  /`:474` e `server/routes/ai/simulate-matchup/index.dart:255`/`:265`/`:270`.
+  Ja `getCounterStrategy`, `getAvailableArchetypes` e `upsertCounter` aparecem
+  somente nas definicoes de `server/lib/archetype_counters_service.dart:67`,
+  `:104` e `:204`.
+- **`AiLogService`:** `log` e vivo em `server/lib/ai/otimizacao.dart:807`,
+  `:824`, `:839`, `:955`, `:973` e `:987`; `getRecentLogs`, `getStats` e
+  `getStatsByEndpoint` aparecem somente em
+  `server/lib/ai_log_service.dart:120`, `:163` e `:204`.
+- **`PushNotificationService.sendToMultipleTokens`:**
+  `server/lib/push_notification_service.dart:295` nao tem chamador confirmado,
+  enquanto envio individual por usuario segue vivo via
+  `server/lib/notification_service.dart:43` e
+  `push_notification_service.dart:179`.
+- **Por que parece sem chamador runtime:** os servicos existem e partes sao
+  usadas, mas metodos publicos restantes parecem APIs planejadas/debug sem rota,
+  job ou consumidor atual.
+- **O que valida:** criar rota/job consumidor com teste, ou reduzir/remover
+  metodos publicos nao usados.
+- **O que falsifica:** chamador runtime real nos recortes buscados.
+
+#### P3 - Helper `normalize_commander` so segue sem chamada na copia Hermes docs
+
+- **Funcao sem chamada:** `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:58`
+  define `normalize_commander`, mas `rg -n "normalize_commander\("` nesse script
+  encontrou apenas a propria definicao.
+- **Controle positivo fora do achado:** a copia operacional
+  `server/bin/export_hermes_learned_deck.py:43` define `normalize_commander` e a
+  chama em `:48` e `:52`; portanto o achado nao deve ser generalizado para o
+  exporter de `server/bin`.
+- **Controles positivos na copia Hermes docs:** `table_exists`, `column_exists`,
+  `parse_role_list`, `analysis_roles_for_card`, `parse_card_list`,
+  `compute_score` e `build_metadata` sao chamados pelo caminho de export.
+- **Por que parece sem chamador:** o filtro por comandante usa
+  `commander_filter.lower()` diretamente em `:210`-`:211`, sem passar pelo
+  normalizador.
+- **O que valida:** usar `normalize_commander` no filtro/comparacao de commander
+  ou remover o helper da copia Hermes docs.
+- **O que falsifica:** chamada externa/import desse helper por outro script ou
+  execucao dinamica documentada.
+
+### Suspeitas revalidadas e nao reabertas
+
+- `server/bin/export_hermes_learned_deck.py` nao repete o achado de
+  `normalize_commander`: a funcao e chamada em `:48` e `:52`.
+- `isLikelyLandCard` nao esta morto: e chamado por `safeCmcForOptimization` em
+  `server/lib/ai/cmc_safety.dart:48`, e esse helper e usado por
+  `optimization_quality_gate.dart:607`, `optimization_validator.dart:737` e
+  `goldfish_simulator.dart:265`/`:577`.
+- Nao houve novo achado P1/P2 em codigo de produto desde a rodada focada
+  anterior, porque o delta app/backend/test/contrato no recorte auditado foi
+  nulo.
+
+### Resultado desta revalidacao
+
+No checkout `2a9f76ee`, os achados principais da rodada anterior seguem abertos
+com evidencia atual: `sync_cards_utils.dart` test-only neste branch,
+`verifySwapIntegrity` sem uso no caminho de apply, extracao parcial de
+`optimize_response_support.dart`, wrappers app/backend sem chamada e metodos
+publicos residuais em servicos vivos. Nao surgiu novo achado P1/P2 em codigo de
+produto. O achado menor de `normalize_commander` continua estreito para a copia
+Hermes docs; a copia `server/bin` chama o helper e nao deve ser citada como
+funcao morta.
+
 
 ## Rodada focada: Classes sem uso - revalidacao 2026-06-18 03:00 UTC
 
@@ -62,10 +327,10 @@ Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
 varre classes Flutter de `app/lib`. Portanto, a evidencia de classes app sem
 uso veio de `rg`, leitura direta e comparacao com rotas/widgets vivos. A lista
 bruta de classes backend segue inventario textual, nao prova de ausencia de
-uso. A execucao voltou a tentar reinserir o inventario gerado por causa do
-marcador `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
-mecanica foi descartada antes desta atualizacao, mantendo apenas os numeros do
-auditor e a triagem focada abaixo.
+uso. A execucao voltou a tentar reinserir o inventario gerado por causa de uma
+nota historica que citava o marcador do bloco gerado; essa mutacao mecanica foi
+descartada antes desta atualizacao, mantendo apenas os numeros do auditor e a
+triagem focada abaixo.
 
 ### Metodo manual focado
 
@@ -230,7 +495,7 @@ Limitacoes relevantes para este foco:
 - O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
   `app/lib` nem entende contrato app-facing, ownership ou middleware.
 - A execucao voltou a tentar reinserir o inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros acima e a
   triagem focada abaixo.
 
@@ -398,7 +663,7 @@ Limitacoes relevantes para este foco:
   apenas como fila de triagem, nao como evidencia direta.
 - A execucao voltou a tentar reinserir inventario gerado dentro da primeira
   secao manual por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi removida nesta atualizacao, mantendo os numeros acima e a triagem focada
   abaixo.
 
@@ -594,7 +859,7 @@ Limitacoes relevantes para este foco:
   runtime, DDL, indices, constraints e comentarios.
 - A execucao voltou a tentar reinserir inventario gerado dentro da primeira
   secao manual por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao. Os numeros acima foram preservados,
   mas nenhum achado de tabela foi aceito sem `rg` literal e leitura de fonte.
 
@@ -780,7 +1045,7 @@ Limitacoes relevantes para este foco:
   ciclos.
 - A execucao voltou a tentar reinserir inventario gerado dentro da primeira
   secao manual por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -941,7 +1206,7 @@ Limitacoes relevantes para este foco:
   chamadas.
 - A execucao voltou a tentar reinserir inventario gerado dentro da primeira
   secao manual por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -1201,7 +1466,7 @@ varre classes Flutter de `app/lib`. Portanto, a evidencia de classes app sem
 uso veio de `rg`, leitura direta e comparacao com rotas/widgets vivos. A lista
 bruta de classes backend segue inventario textual, nao prova de ausencia de
 uso. A execucao do script voltou a tentar reinserir inventario gerado por causa
-do marcador `## Historico gerado pelo auditor estrutural anterior`; essa
+do marcador `marcador do bloco gerado`; essa
 mutacao mecanica foi descartada antes desta atualizacao, mantendo apenas os
 numeros do auditor e a triagem focada abaixo.
 
@@ -1367,7 +1632,7 @@ Limitacoes relevantes para este foco:
 - O auditor textual nao cobre consumidores Flutter em `app/lib`, nao compila a
   app e nao entende contratos app-facing, ownership ou middleware.
 - A execucao do script tentou reinserir inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -1544,7 +1809,7 @@ Limitacoes relevantes para este foco:
 - A lista de duplicacao e textual/regex; ela ainda mistura SQL keywords,
   wrappers, nomes comuns e funcoes que apenas delegam para suporte canonico.
 - A execucao do script tentou reinserir inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -1739,7 +2004,7 @@ Limitacoes relevantes para este foco:
   SQL keywords, inserts, leituras app-facing, jobs operacionais, scripts
   Hermes SQLite ou tabelas raw mantidas como lineage.
 - A execucao do script tentou reinserir inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+  `marcador do bloco gerado`; essa mutacao
   mecanica foi descartada antes desta atualizacao, mantendo apenas os numeros
   do auditor e a triagem focada abaixo.
 
@@ -1922,7 +2187,7 @@ Limitacoes relevantes para este foco:
   grafo completo de dependencia.
 - A execucao tentou reinserir o inventario gerado dentro da primeira secao
   manual por causa do marcador historico
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+  `marcador do bloco gerado`; essa mutacao
   mecanica foi descartada antes desta atualizacao. Foram mantidos apenas os
   numeros do auditor e a triagem focada abaixo.
 
@@ -2076,7 +2341,7 @@ Limitacoes relevantes para este foco:
   chamadas.
 - A execucao tentou reinserir o inventario gerado dentro da primeira secao
   manual por causa do marcador historico
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+  `marcador do bloco gerado`; essa mutacao
   mecanica foi descartada antes desta atualizacao, mantendo apenas os numeros
   do auditor e a triagem focada abaixo.
 
@@ -2321,7 +2586,7 @@ varre classes Flutter de `app/lib`. Portanto, a evidencia de classes app sem
 uso veio de `rg`, leitura direta e comparacao com rotas/widgets vivos. A lista
 bruta de classes backend segue inventario textual, nao prova de ausencia de
 uso. A execucao do script tentou reinserir inventario gerado por causa do
-marcador `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+marcador `marcador do bloco gerado`; essa mutacao
 mecanica foi descartada antes desta atualizacao, mantendo apenas os numeros do
 auditor e a triagem focada abaixo.
 
@@ -2486,7 +2751,7 @@ Limitacoes relevantes para este foco:
 - O auditor textual nao cobre os consumidores Flutter em `app/lib`, nao compila
   a app e nao prova coerencia app-facing.
 - A execucao do script tentou reinserir inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -2655,7 +2920,7 @@ Limitacoes relevantes para este foco:
 - A lista de duplicacao e textual/regex; ela ainda mistura SQL keywords,
   wrappers, nomes comuns e funcoes que apenas delegam para suporte canonico.
 - A execucao do script tentou reinserir inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -2905,7 +3170,7 @@ Limitacoes relevantes para este foco:
   SQL keywords, inserts, leituras app-facing, jobs operacionais ou tabelas raw
   mantidas como lineage.
 - A execucao do script tentou reinserir inventario gerado por causa do marcador
-  `## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+  `marcador do bloco gerado`; essa mutacao mecanica
   foi descartada antes desta atualizacao, mantendo apenas os numeros do auditor
   e a triagem focada abaixo.
 
@@ -3081,7 +3346,7 @@ Limitacoes relevantes para este foco:
 - Ele valida imports relativos locais nesse recorte, mas nao monta grafo SCC e
   nao cobre `app/lib` nem `server/bin`.
 - A execucao do script voltou a tentar duplicar historico manual por causa do
-  marcador `## Historico gerado pelo auditor estrutural anterior`; essa mutacao
+  marcador `marcador do bloco gerado`; essa mutacao
   mecanica foi descartada antes desta atualizacao, mantendo apenas o resultado
   do auditor e a triagem focada abaixo.
 
@@ -4482,7 +4747,7 @@ Resultado reportado pelo script:
 Limitacao para esta rotacao: o auditor textual detecta duplicacao por nomes de
 funcoes/regex e mistura helpers reais com tokens SQL, palavras de prompts e
 wrappers finos. A execucao voltou a inserir inventario gerado por causa do
-marcador historico `## Historico gerado pelo auditor estrutural anterior`; essa
+marcador historico `marcador do bloco gerado`; essa
 mutacao mecanica foi removida antes desta atualizacao manual. Os achados abaixo
 usam apenas `rg`, `nl -ba` e leitura direta como evidencia.
 
@@ -4739,7 +5004,7 @@ Limitacao para esta rotacao: o auditor textual lista nomes de tabelas por regex,
 mas nao separa DDL, `INSERT`, `DELETE FROM`, `FROM jsonb_to_recordset(...)`,
 contagens operacionais e consumidores reais. A execucao voltou a inserir um
 inventario gerado por causa do texto historico
-`## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+`marcador do bloco gerado`; essa mutacao mecanica
 foi removida antes desta atualizacao manual.
 
 ### Metodo manual focado
@@ -4917,7 +5182,7 @@ Resultado reportado pelo script:
 Limitacoes para esta rotacao: o auditor textual cobre `server/lib` e
 `server/routes`, nao inclui `app/lib` nem `server/bin`, e nao constroi grafo de
 imports/SCC. A execucao voltou a tentar inserir um inventario gerado por causa
-do marcador historico `## Historico gerado pelo auditor estrutural anterior`;
+do marcador historico `marcador do bloco gerado`;
 essa mutacao mecanica foi removida antes desta atualizacao manual.
 
 ### Metodo manual focado
@@ -5704,7 +5969,7 @@ Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
 `server/routes`, mas nao entende consumidores Flutter em `app/lib`, nao valida
 contrato app-facing e nao classifica se um middleware de IA faz sentido para uma
 rota especifica. A execucao voltou a inserir inventario gerado por causa do
-marcador historico `## Historico gerado pelo auditor estrutural anterior`; essa
+marcador historico `marcador do bloco gerado`; essa
 mutacao mecanica foi removida antes desta atualizacao manual. Os achados abaixo
 usam apenas `rg`, `nl -ba`, leitura direta e um analyze pontual como evidencia.
 
@@ -5872,7 +6137,7 @@ Resultado reportado pelo script:
 Limitacao para esta rotacao: o auditor textual detecta duplicacao por nomes de
 funcoes/regex e mistura helpers reais com tokens SQL, palavras de prompts e
 wrappers finos. A execucao voltou a inserir inventario gerado por causa do
-marcador historico `## Historico gerado pelo auditor estrutural anterior`; essa
+marcador historico `marcador do bloco gerado`; essa
 mutacao mecanica foi removida antes desta atualizacao manual. Os achados abaixo
 usam apenas `rg`, `nl -ba` e leitura direta como evidencia.
 
@@ -6130,7 +6395,7 @@ Limitacao para esta rotacao: o auditor textual lista nomes de tabelas por regex,
 mas nao separa DDL, `INSERT`, `DELETE FROM`, `FROM jsonb_to_recordset(...)`,
 contagens operacionais e consumidores reais. A execucao voltou a inserir um
 inventario gerado por causa do texto historico
-`## Historico gerado pelo auditor estrutural anterior`; essa mutacao mecanica
+`marcador do bloco gerado`; essa mutacao mecanica
 foi removida antes desta atualizacao manual.
 
 ### Metodo manual focado
@@ -6298,7 +6563,7 @@ Resultado reportado pelo script:
 Limitacoes para esta rotacao: o auditor textual cobre somente `server/lib` e
 `server/routes`; ele nao inclui `app/lib` nem `server/bin`, e nao constroi grafo
 de imports/SCC. A execucao voltou a inserir um inventario gerado por causa do
-texto historico `## Historico gerado pelo auditor estrutural anterior` citado em
+texto historico `marcador do bloco gerado` citado em
 uma nota manual; essa mutacao mecanica foi descartada antes desta atualizacao.
 
 ### Metodo manual focado
@@ -6999,7 +7264,7 @@ Resultado reportado pelo script:
 Limitacao para esta rotacao: o auditor textual detecta duplicacao por regex de
 nomes de funcoes publicas e continua ruidoso para SQL, literais e wrappers. A
 execucao tambem voltou a inserir o inventario gerado por causa do texto
-historico `## Historico gerado pelo auditor estrutural anterior`; esse bloco
+historico `marcador do bloco gerado`; esse bloco
 gerado foi removido antes desta atualizacao manual. Os achados abaixo usam
 somente `rg`, `nl -ba` e leitura direta dos corpos atuais.
 
@@ -7244,7 +7509,7 @@ Limitacao para esta rotacao: o auditor textual lista nomes de tabelas por
 regex, mas nao separa DDL, migrations, `DELETE FROM`, `INSERT ... SELECT`,
 contagens operacionais e consumidores reais. A execucao voltou a inserir o
 inventario gerado por causa do texto historico
-`## Historico gerado pelo auditor estrutural anterior` citado em nota manual;
+`marcador do bloco gerado` citado em nota manual;
 essa mutacao mecanica foi removida antes desta atualizacao.
 
 ### Metodo manual focado
@@ -7396,7 +7661,7 @@ Resultado reportado pelo script:
 Limitacoes para esta rotacao: o auditor textual cobre somente `server/lib` e
 `server/routes`; ele nao inclui `app/lib` nem `server/bin`, e nao constroi grafo
 de imports/SCC. A execucao voltou a inserir um inventario gerado por causa do
-texto historico `## Historico gerado pelo auditor estrutural anterior` citado em
+texto historico `marcador do bloco gerado` citado em
 uma nota manual; essa mutacao mecanica foi removida antes desta atualizacao.
 
 ### Metodo manual focado
@@ -8475,7 +8740,7 @@ Resultado reportado pelo script:
 Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
 `server/routes`, mas nao entende consumidores Flutter em `app/lib` nem contrato
 app-facing. A execucao tambem voltou a inserir inventario gerado dentro de uma
-nota manual que cita `## Historico gerado pelo auditor estrutural anterior`;
+nota manual que cita `marcador do bloco gerado`;
 essa mutacao automatica foi removida antes desta atualizacao. Os achados abaixo
 usam `rg`, leitura direta de handlers/providers e line references atuais.
 
@@ -8650,7 +8915,7 @@ Resultado reportado pelo script:
 Limitacao para esta rotacao: o auditor detecta duplicacao por regex de nomes de
 funcoes publicas e continua ruidoso para SQL/literais e wrappers. Nesta branch,
 a execucao tambem inseriu o inventario gerado dentro da secao manual porque o
-texto `## Historico gerado pelo auditor estrutural anterior` aparece dentro de
+texto `marcador do bloco gerado` aparece dentro de
 uma nota historica, nao como marker real de secao gerada. Essa mutacao automatica
 foi removida antes desta atualizacao manual; os achados abaixo usam somente
 `rg`, leitura direta de codigo e comparacao de corpos atuais.
@@ -8884,7 +9149,7 @@ regex, mas nao separa DDL, setup/migration, `DELETE FROM`, `INSERT ... SELECT`,
 contagens operacionais e consumidores reais. Nesta branch, a execucao tambem
 inseriu o inventario gerado dentro da secao manual porque
 `STRUCTURE_AUDIT.md` continua sem o marker
-`## Historico gerado pelo auditor estrutural anterior`; essa mutacao automatica
+`marcador do bloco gerado`; essa mutacao automatica
 foi restaurada antes desta atualizacao manual.
 
 ### Metodo manual focado
@@ -9032,7 +9297,7 @@ Resultado reportado pelo script:
 Limitacoes para esta rotacao: o auditor textual cobre somente `server/lib` e
 `server/routes`; ele nao inclui `app/lib` nem `server/bin`, e nao constroi grafo
 de imports/SCC. Nesta branch, `STRUCTURE_AUDIT.md` continua sem o marker
-`## Historico gerado pelo auditor estrutural anterior`; por isso a execucao do
+`marcador do bloco gerado`; por isso a execucao do
 auditor inseriu um inventario gerado ruidoso no topo do arquivo. A mutacao
 gerada foi restaurada antes desta atualizacao manual para preservar o historico.
 
@@ -9183,7 +9448,7 @@ Limitacoes para esta rotacao:
 - O auditor continua textual/regex e nao constroi grafo de chamadas; a propria
   docstring do script exige validacao manual de achados "nao usado".
 - Nesta branch, o `STRUCTURE_AUDIT.md` atual nao contem o marker
-  `## Historico gerado pelo auditor estrutural anterior`; por isso a execucao do
+  `marcador do bloco gerado`; por isso a execucao do
   auditor substituiu temporariamente o historico manual por um relatorio de 639
   linhas. A alteracao gerada foi restaurada antes desta atualizacao manual para
   preservar o contexto historico.

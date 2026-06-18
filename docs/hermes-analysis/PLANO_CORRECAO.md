@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-17 23:00 UTC
+> Data: 2026-06-18 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-17 19:00 UTC no checkout `e47adcd5`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco (`5ce943fa..HEAD`), manteve os clusters de produto ja abertos e adicionou um achado P2 ao recorte de duplicacao: `server/lib/sync_cards_utils.dart` contem helpers extraidos/testados, mas `server/bin/sync_cards.dart` ainda usa copias privadas/inline para janela incremental, parsing de set e legalidades. O achado P2 script-level dos exporters Hermes de learned deck segue aberto: `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py` continuam bifurcados em completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 2026-06-17 15:00 UTC no checkout `c33e15ba` nao encontrou delta de produto desde a rodada anterior deste foco nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-17 11:00 UTC no checkout `a96bffd6`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-18 03:00 UTC no checkout `94f73400` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-17 07:00 UTC no checkout `caeade55` nao encontrou delta de produto desde `ae65f536` e manteve abertos os mesmos candidatos principais, estreitando apenas o achado menor de `normalize_commander` para a copia Hermes docs.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-17 19:00 UTC no checkout `e47adcd5`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco (`5ce943fa..HEAD`), manteve os clusters de produto ja abertos e adicionou um achado P2 ao recorte de duplicacao: `server/lib/sync_cards_utils.dart` contem helpers extraidos/testados, mas `server/bin/sync_cards.dart` ainda usa copias privadas/inline para janela incremental, parsing de set e legalidades. O achado P2 script-level dos exporters Hermes de learned deck segue aberto: `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py` continuam bifurcados em completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 2026-06-17 15:00 UTC no checkout `c33e15ba` nao encontrou delta de produto desde a rodada anterior deste foco nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-17 11:00 UTC no checkout `a96bffd6`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-18 03:00 UTC no checkout `94f73400` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-18 07:00 UTC no checkout `2a9f76ee` nao encontrou delta de produto desde `caeade55` e manteve abertos os mesmos candidatos principais; o achado menor de `normalize_commander` continua estreito para a copia Hermes docs.
 
 A revalidacao de coerencia app/server de 2026-06-17 23:00 UTC no checkout
 `831c6ac8` nao encontrou delta de produto/testes/API/manual desde `5ce943fa` e
@@ -117,13 +117,14 @@ learned decks herdando middleware de IA custosa.
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado novamente em
-    2026-06-17 07:00 UTC como **ABERTO neste checkout `caeade55`**. Desde a
-    rodada focada anterior (`ae65f536..HEAD`), nao houve delta de produto em
+    2026-06-18 07:00 UTC como **ABERTO neste checkout `2a9f76ee`**. Desde a
+    rodada focada anterior (`caeade55..HEAD`), nao houve delta de produto em
     `app/lib`, `server/lib`, `server/routes`, `server/bin`, testes app/server,
-    database setup, API contract, contexto de produto ou manual. O auditor
-    textual executou com sucesso (`205` arquivos backend, `115` problemas
-    textuais, `0` imports quebrados), mas nao prova ausencia de chamadas; a
-    evidencia veio de buscas exatas por simbolo. Permanecem abertos
+    database setup, API contract, contexto de produto ou manual; o delta foi
+    apenas em documentos Hermes. O auditor textual executou com sucesso (`205`
+    arquivos backend, `115` problemas textuais, `0` imports quebrados), mas nao
+    prova ausencia de chamadas; a evidencia veio de buscas exatas por simbolo.
+    Permanecem abertos
     `sync_cards_utils.dart` test-only neste branch enquanto
     `server/bin/sync_cards.dart` mantem helpers privados/inline;
     `verifySwapIntegrity` sem chamador apesar de `swap_integrity` ser anexado;
@@ -743,10 +744,11 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1 — Religar ou remover helpers publicos sem chamador runtime
 
-**Status 2026-06-17 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
-`caeade55`**. Desde a rodada anterior de funcoes (`ae65f536..HEAD`), nao houve
+**Status 2026-06-18 07:00 UTC:** **REVALIDADO/ABERTO no checkout local
+`2a9f76ee`**. Desde a rodada anterior de funcoes (`caeade55..HEAD`), nao houve
 delta de produto em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-testes app/server, database setup, API contract, contexto de produto ou manual.
+testes app/server, database setup, API contract, contexto de produto ou manual;
+o delta foi apenas em documentos Hermes.
 A rodada atual manteve os achados de maior impacto (`sync_cards_utils.dart`
 test-only neste branch, `verifySwapIntegrity` sem chamador apesar de
 `swap_integrity` e builders de response do optimize fora do fluxo real),
