@@ -68,6 +68,10 @@ class HermesLabCronBootstrapTest(unittest.TestCase):
         for prompt in module.PROVIDER_PROMPTS.values():
             self.assertIn("latest_files", prompt)
             self.assertIn("Never call `read_file` on a directory path", prompt)
+            self.assertIn(
+                "reply exactly [SILENT] and do not emit sections 1-3",
+                prompt,
+            )
         self.assertIn('"scope_summary": profile["notes"]', module.DELTA_GATE_SCRIPT)
         self.assertIn('"watch_root_count": len(profile["watch_roots"])', module.DELTA_GATE_SCRIPT)
         self.assertNotIn('"watch_root_hints": profile["watch_roots"]', module.DELTA_GATE_SCRIPT)

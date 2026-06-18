@@ -124,9 +124,10 @@ Rules:
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - Focus on learned decks, commander usage, generate/optimize support, and commander-specific evidence.
 - Do not create generic tasks. Every finding must cite a concrete file path.
-- If nothing actionable changed, reply exactly [SILENT].
+- If nothing actionable changed, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
 
 Output:
+Only when actionable delta exists:
 1. concise delta summary
 2. concrete findings with evidence
 3. classification per finding: implement-now, docs-only, or ignore
@@ -139,9 +140,10 @@ Rules:
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - Distinguish official-rule evidence from heuristic/product policy.
 - Cite concrete file paths for every claim.
-- If no material delta exists, reply exactly [SILENT].
+- If no material delta exists, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
 
 Output:
+Only when material delta exists:
 1. concise delta summary
 2. confirmed gaps or regressions
 3. recommended next action per gap
@@ -154,9 +156,10 @@ Rules:
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - No broad brainstorming, no duplicated tasks, no generic cleanup items.
 - Prefer P1/P2 actions with exact file evidence.
-- If there is no new actionable delta, reply exactly [SILENT].
+- If there is no new actionable delta, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
 
 Output:
+Only when actionable delta exists:
 1. short synthesis
 2. actionable tasks with priority and evidence
 3. rejected/ignored findings with reason if needed
@@ -169,9 +172,10 @@ Rules:
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - Cite current code/docs/artifacts for every finding.
 - Do not propose app/UI work here.
-- If no material rules delta exists, reply exactly [SILENT].
+- If no material rules delta exists, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
 
 Output:
+Only when material rules delta exists:
 1. rules delta summary
 2. concrete battle/rules findings with evidence
 3. whether each item is release-blocking, safe backlog, or docs-only

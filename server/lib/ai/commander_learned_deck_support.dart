@@ -253,20 +253,42 @@ Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
         WITH wanted(lowered_name) AS (
           VALUES ${placeholders.join(', ')}
         ),
-        card_info AS (
+        resolved_cards AS (
           SELECT
             w.lowered_name,
-            COALESCE(BOOL_OR(c.type_line ILIKE '%Land%'), FALSE) AS is_land,
+            cib.card_id,
+            cib.type_line,
+            ROW_NUMBER() OVER (
+              PARTITION BY w.lowered_name
+              ORDER BY
+                CASE
+                  WHEN cib.normalized_lookup_name = w.lowered_name THEN 0
+                  WHEN cib.normalized_canonical_name = w.lowered_name THEN 1
+                  WHEN cib.normalized_canonical_name LIKE w.lowered_name || ' // %' THEN 2
+                  ELSE 3
+                END,
+                COALESCE(cib.match_priority, 999),
+                cib.card_id
+            ) AS rn
+          FROM wanted w
+          LEFT JOIN card_identity_bridge cib
+            ON cib.normalized_lookup_name = w.lowered_name
+            OR cib.normalized_canonical_name = w.lowered_name
+            OR cib.normalized_canonical_name LIKE w.lowered_name || ' // %'
+        ),
+        card_info AS (
+          SELECT
+            rc.lowered_name,
+            COALESCE(rc.type_line ILIKE '%Land%', FALSE) AS is_land,
             COALESCE(
               ARRAY_REMOVE(ARRAY_AGG(DISTINCT LOWER(cft.tag)), NULL),
               ARRAY[]::TEXT[]
             ) AS tags
-          FROM wanted w
-          LEFT JOIN cards c
-            ON LOWER(c.name) = w.lowered_name
+          FROM resolved_cards rc
           LEFT JOIN card_function_tags cft
-            ON cft.card_id = c.id
-          GROUP BY w.lowered_name
+            ON cft.card_id = rc.card_id
+          WHERE rc.rn = 1
+          GROUP BY rc.lowered_name, rc.type_line
         )
         SELECT lowered_name, is_land, tags
         FROM card_info

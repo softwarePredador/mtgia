@@ -119,6 +119,29 @@
   - o row ativo `learned_deck:82` foi reaplicado no PG e agora persiste
     `metadata.total_lands=30`.
 
+### Atualizacao de ciclo — 2026-06-18 / canonical learned deck name bridge
+
+- O resumo canônico de `commander_learned_decks` ainda tinha um buraco de
+  resolução de nome no backend:
+  - a canonicalização de metadata usava apenas `LOWER(cards.name)` exato;
+  - isso perdia nomes de frente MDFC/split (`Needleverge Pathway`,
+    `Valakut Awakening`, `Birgi, God of Storytelling`) e até básicos
+    persistidos como `Plains // Plains` / `Mountain // Mountain`.
+- Ajuste aplicado em `commander_learned_deck_support.dart`:
+  - a resolução agora usa `card_identity_bridge` como camada canônica;
+  - a busca prioriza `normalized_lookup_name`, depois
+    `normalized_canonical_name`, e por fim o padrão
+    `'<nome> // %'` para frente de split/MDFC.
+- Impacto esperado:
+  - o backend deixa de subcontar `total_lands` e outros agregados por falha de
+    resolução nominal;
+  - o risco residual do Lorehold volta a ser cobertura de
+    `card_function_tags`/`card_battle_rules`, não mais identificação da carta.
+- Pendência real remanescente desta trilha:
+  - revisar as cartas ainda sem tags úteis no row ativo do Lorehold
+    (`Orim's Chant`, `Ruby Medallion`, `Scroll Rack`, `Victory Chimes` e afins),
+    porque isso já não é problema de alias/canonicalização.
+
 ### Atualizacao de ciclo — 2026-06-18 / canonicalização de metadata no PG
 
 - O learned-deck import path backend-owned agora recalcula os agregados

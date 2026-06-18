@@ -168,5 +168,22 @@ void main() {
         lessThan(middleware.indexOf('return costlyAiHandler(context)')),
       );
     });
+
+    test(
+        'canonical learned deck metadata uses card identity bridge for split and alias resolution',
+        () {
+      final source = File(
+        'lib/ai/commander_learned_deck_support.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('LEFT JOIN card_identity_bridge cib'));
+      expect(source, contains("cib.normalized_lookup_name = w.lowered_name"));
+      expect(
+        source,
+        contains(
+          "cib.normalized_canonical_name LIKE w.lowered_name || ' // %'",
+        ),
+      );
+    });
   });
 }

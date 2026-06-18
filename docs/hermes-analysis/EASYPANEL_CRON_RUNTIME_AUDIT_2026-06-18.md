@@ -206,6 +206,46 @@ prompts provider-backed:
 - o que faltava provar neste slice era acesso real ao output por job, e isso
   ficou fechado.
 
+## Follow-up live — 2026-06-18 10:23 UTC
+
+Rodada manual adicional validada em:
+
+- `server/test/artifacts/easypanel_manual_provider_cron_run_2026-06-18_env_fix/summary.json`
+
+O objetivo desta rodada foi provar o fluxo provider-backed sem esperar a
+próxima janela do cron:
+
+1. `hermes-lab` não pode ser testado com `hermes cron run/tick` em shell cru de
+   inspeção sem forçar o mesmo ambiente do gateway (`HOME=/opt/data`,
+   `HERMES_HOME=/opt/data`, `HERMES_STATE_ROOT=/opt/data`,
+   `HERMES_CRON_JOBS_JSON=/opt/data/cron/jobs.json`).
+2. Com esse ambiente aplicado, `hermes cron run 6f791f1baad5` seguido de
+   `hermes cron tick` executou de fato o job
+   `manaloom-commander-knowledge-deep`.
+3. Evidência objetiva:
+   - `last_run_at=2026-06-18T10:23:01.675572+00:00`;
+   - `last_status=ok`;
+   - output real em `/opt/data/cron/output/6f791f1baad5/2026-06-18_10-23-01.md`.
+
+Essa prova fechou o ponto pendente "provider configurado, mas não executado
+manualmente" no EasyPanel.
+
+## Correcao de contrato aplicada
+
+A mesma rodada manual encontrou um defeito menor, mas real, no contrato de
+saída provider-backed:
+
+- o job retornou relatório textual e também anexou `[SILENT]` no fim;
+- isso não quebrou a execução, mas viola o contrato correto de delivery do
+  Hermes (`ou [SILENT] puro, ou relatório normal`).
+
+Correção aplicada em `server/bin/hermes_lab_cron_bootstrap.py`:
+
+- todos os prompts provider-backed agora instruem explicitamente:
+  - se não houver delta acionável, responder exatamente `[SILENT]`;
+  - não emitir seções, bullets, headings ou texto extra nesse caso;
+  - só produzir a estrutura `1/2/3` quando realmente houver delta material.
+
 ## Proxima regra operacional
 
 - `manaloom-ops` continua dono de:
