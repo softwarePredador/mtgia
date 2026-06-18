@@ -30,9 +30,8 @@ O bootstrap precisa garantir:
 1. volume persistente em `/opt/data`;
 2. clone do repo em `/opt/data/workspace/mtgia` quando ainda nao existir;
 3. `fetch --all --prune` seguro quando o repo ja existir;
-4. toolchain local para o laboratorio:
-   - Flutter
-   - Dart
+4. toolchain local minima para o laboratorio:
+   - Dart SDK standalone
    - dart_frog_cli
    - git
    - python3
@@ -121,10 +120,15 @@ Funciona sem token de IA para:
 - leitura do repo;
 - `dart analyze`;
 - `dart test`;
-- `flutter analyze`;
 - scripts Python determinísticos;
 - auditorias read-only;
 - atualização de docs locais/manual.
+
+Observacao:
+
+- `flutter` nao fica mais empacotado no `hermes-lab`;
+- validacao visual/mobile continua responsabilidade do ambiente local Codex
+  (iPhone Simulator / Android device), nao do laboratorio Linux.
 
 ### 2. Provider-enabled
 
@@ -187,8 +191,8 @@ Removida por bootstrap por ser legado ou duplicação já aposentada:
 
 1. Subir o serviço `hermes-lab` no projeto `evolution`.
 2. Validar que o volume persiste entre restarts.
-3. Validar `flutter --version`, `dart --version`, `python3 --version` e repo
-   disponível dentro do container.
+3. Validar `dart --version`, `python3 --version` e repo disponível dentro do
+   container.
 4. Validar `hermes status`.
 5. Só expor domínio público quando houver auth do dashboard ou política clara
    de reverse proxy privado.

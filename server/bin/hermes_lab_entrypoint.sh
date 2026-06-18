@@ -7,8 +7,7 @@ REPO_DIR="${HERMES_REPO_DIR:-$WORKSPACE_ROOT/mtgia}"
 REPO_URL="${HERMES_REPO_URL:-https://github.com/softwarePredador/mtgia.git}"
 REPO_REF="${HERMES_REPO_REF:-master}"
 REPO_AUTO_SYNC="${HERMES_REPO_AUTO_SYNC:-0}"
-FLUTTER_BIN="/opt/tools/flutter/bin"
-DART_BIN="/opt/tools/flutter/bin/cache/dart-sdk/bin"
+DART_BIN="/opt/tools/dart-sdk/bin"
 PUB_CACHE_BIN="/root/.pub-cache/bin"
 HERMES_BIN="/opt/hermes/bin"
 HERMES_VENV_BIN="/opt/hermes/.venv/bin"
@@ -77,7 +76,7 @@ fi
 write_runtime_status "workspace" "ready" "repository prepared"
 
 cat > "$HERMES_HOME/.profile" <<EOF
-export PATH=$HERMES_BIN:$HERMES_VENV_BIN:$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:\$PATH
+export PATH=$HERMES_BIN:$HERMES_VENV_BIN:$DART_BIN:$PUB_CACHE_BIN:\$PATH
 export HERMES_HOME=$HERMES_HOME
 export MANALOOM_WORKSPACE=$REPO_DIR
 export HERMES_REPO_DIR=$REPO_DIR
@@ -123,7 +122,7 @@ upsert_env_file "OPENAI_API_KEY" "${OPENAI_API_KEY:-}"
 upsert_env_file "API_SERVER_KEY" "${API_SERVER_KEY:-}"
 
 export HOME="$HERMES_HOME"
-export PATH="$HERMES_BIN:$HERMES_VENV_BIN:$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
+export PATH="$HERMES_BIN:$HERMES_VENV_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
 export MANALOOM_REPO="$REPO_DIR"
 export HERMES_STATE_ROOT
 export HERMES_CRON_SCRIPTS_DIR

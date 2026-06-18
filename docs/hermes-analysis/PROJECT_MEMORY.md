@@ -58,11 +58,14 @@ ver a `master` viva. A sync mergeia `origin/master` em
 
 ## Estado do agente neste servidor
 
-Hermes consegue ler, auditar e analisar o repositorio. O container Hermes usado para
-esta memoria possui **Dart 3.12.0** e **Flutter 3.44.0** instalados em `/opt/data/tools/flutter/bin/`.
+Hermes consegue ler, auditar e analisar o repositorio. No recorte atual de
+EasyPanel, o `hermes-lab` foi reduzido para **Dart 3.12.0 standalone** em
+`/opt/tools/dart-sdk/bin/`; `flutter` deixou de ser dependência do container e
+fica restrito ao ambiente local do Codex para validação mobile/UI.
 
 - `dart test`: 599 passed (backend, 2026-05-27)
-- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-05-27)
+- `flutter analyze --no-pub --no-fatal-infos`: No issues found (2026-05-27,
+  evidência histórica do ambiente anterior)
 
 ## Politica de resposta
 

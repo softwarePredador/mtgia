@@ -85,6 +85,27 @@ Isso fecha a prova operacional forte de que:
 3. os jobs deterministcos tambem escrevem output real no volume esperado;
 4. a OpenAI key esta sendo consumida apenas onde deveria.
 
+## Ajuste de runtime aplicado no `hermes-lab`
+
+Na tentativa de redeploy da revisao `ab490778`, o build do `hermes-lab`
+falhou por `No space left on device` ao extrair o Flutter completo dentro da
+imagem.
+
+Correcao aplicada:
+
+- `server/Dockerfile.hermes-lab` passou a instalar apenas Dart SDK standalone
+  + `dart_frog_cli`;
+- `server/bin/hermes_lab_entrypoint.sh` passou a exportar apenas o path do Dart
+  SDK;
+- o corte e coerente com a frota atual, porque nenhuma das 5 crons ativas do
+  laboratorio depende de `flutter`.
+
+Consequencia operacional:
+
+- `hermes-lab` continua apto para chat/auditoria/docs/provider-backed;
+- validacao mobile/UI continua fora do laboratorio Linux e segue no ambiente
+  local do Codex.
+
 ## Probe de runtime
 
 O auditor agora prova shell real dentro dos containers:
