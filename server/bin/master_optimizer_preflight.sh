@@ -40,17 +40,17 @@ target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M
   --target-deck-id "$DECK_ID" \
   --apply | tee "$target_deck_log"
 
+sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
+"$PYTHON_BIN" "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
+  --sqlite-db "$SQLITE_DB" \
+  --report "$sync_report"
+
 if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
   canonical_log="$ARTIFACT_DIR/lorehold_canonical_preflight_$(date -u +%Y%m%d_%H%M%S).log"
   "$PYTHON_BIN" "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
     --db "$SQLITE_DB" \
     --apply-local-sqlite | tee "$canonical_log"
 fi
-
-sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
-"$PYTHON_BIN" "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
-  --sqlite-db "$SQLITE_DB" \
-  --report "$sync_report"
 
 battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_$(date -u +%Y%m%d_%H%M%S).json"
 "$PYTHON_BIN" "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
