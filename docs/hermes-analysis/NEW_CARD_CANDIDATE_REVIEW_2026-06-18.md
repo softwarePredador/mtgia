@@ -26,6 +26,8 @@ Contrato:
 - `server/bin/manaloom_card_data_gap_review.sh`
 - `server/bin/manaloom_battle_rule_review_queue.py`
 - `server/bin/manaloom_battle_rule_review_queue.sh`
+- `server/bin/manaloom_battle_rule_focused_evidence.py`
+- `server/bin/manaloom_battle_rule_focused_evidence.sh`
 - `server/bin/manaloom_battle_rule_promotion_gate.py`
 - `server/bin/manaloom_battle_rule_promotion_gate.sh`
 - `server/bin/sync_card_legalities_from_scryfall.py`
@@ -59,6 +61,10 @@ name=manaloom_battle_rule_review_queue
 schedule=55 */6 * * *
 env override=MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON
 
+name=manaloom_battle_rule_focused_evidence
+schedule=56 */6 * * *
+env override=MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE_CRON
+
 name=manaloom_battle_rule_promotion_gate
 schedule=58 */6 * * *
 env override=MANALOOM_BATTLE_RULE_PROMOTION_GATE_CRON
@@ -69,6 +75,7 @@ Wrapper:
 ```bash
 ./server/bin/manaloom_new_card_candidate_review.sh
 ./server/bin/sync_card_legalities_from_scryfall.sh
+./server/bin/manaloom_battle_rule_focused_evidence.sh
 ```
 
 Artefatos padrão no EasyPanel/manaloom-ops:
@@ -158,6 +165,8 @@ No SQLite:
 - `new_card_data_gap_review_items`
 - `new_card_battle_rule_review_runs`
 - `new_card_battle_rule_review_drafts`
+- `new_card_battle_rule_focused_evidence_runs`
+- `new_card_battle_rule_focused_evidence_items`
 - `new_card_battle_rule_promotion_gate_runs`
 - `new_card_battle_rule_promotion_gate_items`
 
@@ -173,6 +182,8 @@ manaloom_new_card_candidate_review
       -> manaloom_card_data_gap_review
   -> decision=needs_rule_review
       -> manaloom_battle_rule_review_queue
+          -> manaloom_battle_rule_focused_evidence
+              -> manaloom_battle_rule_promotion_gate
 ```
 
 `manaloom_card_data_gap_review` agrega ocorrências `needs_data` por carta e
@@ -213,6 +224,34 @@ Esses drafts **não** são escritos em `card_battle_rules`, não viram
 `verified`, e não executam comportamento duro no battle. A promoção ainda exige
 fonte oficial/ruling, teste focado, replay/auditoria e ausência de finding
 crítico.
+
+`manaloom_battle_rule_focused_evidence` consome os drafts e gera evidência
+somente para templates pequenos, rastreáveis e suportados por teste focado.
+No primeiro slice, o único template automático suportado é:
+
+```text
+oracle_text_excerpt == "Counter target spell."
+effect_families inclui counterspell_stack_interaction
+proposed_status == needs_review
+```
+
+Para esse template, o job executa um cenário in-process no
+`battle_analyst_v9.py`: um jogador anuncia `Approach of the Second Sun`, o
+oponente responde com a carta draftada como counterspell, o stack resolve, e o
+auditor de replay/decision trace precisa fechar sem findings críticos/high.
+
+Saídas:
+
+- `latest_evidence.json`;
+- `focused_artifacts/<draft_rule_key>/focused_test.json`;
+- `focused_artifacts/<draft_rule_key>/replay_audit.json`;
+- `focused_artifacts/<draft_rule_key>/replay_events.jsonl`;
+- `focused_artifacts/<draft_rule_key>/decision_trace.jsonl`.
+
+Complexidades como sacrifício de criatura para dano, extra combat/flashback ou
+trigger de ataque/tutor continuam bloqueadas até existir template focado
+proprio. Esse bloqueio é proposital: o job prova uma regra pequena por vez e
+nao promove comportamento duro automaticamente.
 
 `manaloom_battle_rule_promotion_gate` consome os drafts e decide apenas se cada
 um continua bloqueado ou se está elegível para **promoção manual**. Por padrão,
@@ -494,6 +533,64 @@ Leitura correta: `needs_data` foi fechado para esta massa. O trabalho restante
 é revisar `needs_rule_review`; isso deve continuar como draft/auditoria até
 haver fonte oficial, teste focado e replay sem finding crítico.
 
+## Rodada De Evidência Focada — 2026-06-18
+
+Rodada local report-only contra os sets `msh,msc,mar`, limitada a 8
+comandantes e 250 cartas, validou o novo trecho
+`candidate -> data_gap -> battle_queue -> focused_evidence -> promotion_gate`.
+
+Resumo:
+
+```json
+{
+  "candidate_review": {
+    "cards_scanned": 166,
+    "commanders_scanned": 8,
+    "review_count": 1328,
+    "decisions": {
+      "backlog": 9,
+      "ignore": 1308,
+      "needs_rule_review": 11
+    }
+  },
+  "card_data_gap_review": {
+    "gap_rows": 0,
+    "unique_cards": 0
+  },
+  "battle_rule_review_queue": {
+    "queue_rows": 11,
+    "draft_count": 4
+  },
+  "focused_evidence": {
+    "evaluated_count": 4,
+    "evidence_count": 1
+  },
+  "promotion_gate": {
+    "eligible_count": 1,
+    "blocked_count": 3
+  }
+}
+```
+
+Resultado por draft:
+
+- `Counterspell`: elegível para `eligible_for_manual_verified_promotion` com
+  evidência focada de stack/counterspell e replay/decision audit sem finding
+  crítico/high. Continua sem write automático em PostgreSQL.
+- `Goblin Bombardment`: bloqueado; precisa template focado para habilidade
+  ativada com sacrifício de criatura e dano alvo.
+- `Iron Man, Titan of Innovation`: bloqueado; envolve trigger de ataque,
+  artifact count, treasure e tutor, exigindo executor contextual próprio.
+- `Seize the Day`: bloqueado; envolve extra combat e flashback/recast do
+  cemitério, exigindo cenário focado dedicado.
+
+O wrapper `manaloom_battle_rule_promotion_gate.sh` passou a consumir
+automaticamente
+`$MANALOOM_OPS_ARTIFACT_DIR/battle_rule_focused_evidence/latest_evidence.json`
+quando o arquivo existir e `MANALOOM_BATTLE_RULE_PROMOTION_EVIDENCE_FILE` não
+estiver definido. Isso mantém o gate report-only, mas evita rodadas falsas sem
+evidência quando o job anterior já produziu prova focada.
+
 ## Próximos Passos
 
 1. Rodar a rotina no `manaloom-ops` após deploy e verificar
@@ -505,7 +602,9 @@ haver fonte oficial, teste focado e replay sem finding crítico.
    saída para priorizar sync de legalidades/dados.
 4. Rodar `manaloom_battle_rule_review_queue` após cada candidate review e usar
    os drafts para criar testes/regra, sem promoção automática.
-5. Se surgirem candidatos `test`, rodar scorecard/battle específico antes de
+5. Rodar `manaloom_battle_rule_focused_evidence` antes do gate; apenas drafts
+   com template focado suportado devem gerar evidência automática.
+6. Se surgirem candidatos `test`, rodar scorecard/battle específico antes de
    qualquer recomendação para geração ou optimize.
-6. Promover regra para `card_battle_rules` apenas depois de fonte confiável,
+7. Promover regra para `card_battle_rules` apenas depois de fonte confiável,
    teste focado e replay/auditoria sem finding crítico.

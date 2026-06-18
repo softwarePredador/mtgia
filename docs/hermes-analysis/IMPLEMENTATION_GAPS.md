@@ -12,6 +12,60 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / focused battle-rule evidence gate
+
+- Foi fechado o primeiro slice seguro para transformar fila `needs_rule_review`
+  em evidência testável antes do gate:
+  - `server/bin/manaloom_battle_rule_focused_evidence.py`;
+  - `server/bin/manaloom_battle_rule_focused_evidence.sh`;
+  - cron `manaloom_battle_rule_focused_evidence` no `manaloom-ops`, entre
+    `manaloom_battle_rule_review_queue` e
+    `manaloom_battle_rule_promotion_gate`.
+- Escopo implementado:
+  - report-only;
+  - sem write em PostgreSQL;
+  - sem promoção automática para `verified`;
+  - sem comportamento duro no battle;
+  - template suportado apenas para `Counter target spell.` com família
+    `counterspell_stack_interaction`.
+- Evidência gerada:
+  - cenário focado no `battle_analyst_v9.py`;
+  - replay events JSONL;
+  - decision trace JSONL;
+  - auditoria de replay/decisão sem critical/high;
+  - arquivo `latest_evidence.json` consumido pelo promotion gate.
+- Resultado da rodada local `msh,msc,mar`, 8 comandantes e 166 cartas:
+  - candidate review: `1328` reviews, `needs_rule_review=11`,
+    `needs_data=0`;
+  - battle rule queue: `11` ocorrências agregadas em `4` drafts;
+  - focused evidence: `4` drafts avaliados, `1` evidência gerada;
+  - promotion gate com evidência padrão: `eligible=1`, `blocked=3`.
+- Draft elegível:
+  - `Counterspell` ficou `eligible_for_manual_verified_promotion`;
+  - isso **não** grava em `card_battle_rules` e **não** ativa regra dura.
+- Drafts ainda bloqueados:
+  - `Goblin Bombardment`: precisa template focado de habilidade ativada,
+    sacrifício de criatura e dano alvo;
+  - `Iron Man, Titan of Innovation`: precisa executor contextual para trigger
+    de ataque, contagem de artefatos, treasure e tutor;
+  - `Seize the Day`: precisa template focado para extra combat +
+    flashback/recast.
+- Battle/replay:
+  - `lorehold_upkeep_rummage` passou a registrar opções rejeitadas e scores
+    comparativos;
+  - replay Lorehold seed 42 fechou com `1098` eventos estruturados,
+    `152` decision traces, `turn_findings=0` e `decision_findings=0`.
+- Geração/Lorehold:
+  - `commander_generate_provenance_audit` para `Lorehold, the Historian`
+    fechou `PASS_WITH_RISKS`;
+  - profile usável, `stats_count=34`, `corpus_accepted_deck_count=3`,
+    `usage_hot_cards_count=50`, learned deck ativo e fallback determinístico
+    com `99` cartas distintas;
+  - risco residual: ainda há dependência auxiliar alta do fallback
+    determinístico (`deterministic_fallback` com `62` entradas), então o
+    próximo slice de qualidade deve reduzir esse fallback com sinais
+    canônicos/tags verificadas antes de chamar o deck de ideal.
+
 ### Atualizacao de ciclo — 2026-06-18 / new-card candidate review geral
 
 - Foi criado o job deterministico `manaloom_new_card_candidate_review` em
