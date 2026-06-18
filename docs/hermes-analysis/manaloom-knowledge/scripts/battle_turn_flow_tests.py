@@ -289,9 +289,10 @@ def register_tests(battle, player, card):
         evaluation = battle.mulligan_evaluation(hand)
 
         assert evaluation["keep"] is False
-        assert evaluation["reason"] == "no_early_game_plan"
+        assert evaluation["reason"] == "expensive_cluster_without_setup"
+        assert "expensive_dead_hand" in evaluation["risk_flags"]
 
-    def test_mulligan_keeps_three_lands_with_early_play():
+    def test_mulligan_rejects_three_lands_with_single_early_body_and_expensive_cluster():
         hand = [
             {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
             {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
@@ -304,8 +305,9 @@ def register_tests(battle, player, card):
 
         evaluation = battle.mulligan_evaluation(hand)
 
-        assert evaluation["keep"] is True
-        assert evaluation["reason"].startswith("early_play:Two Drop")
+        assert evaluation["keep"] is False
+        assert evaluation["reason"] == "expensive_cluster_without_setup"
+        assert "expensive_dead_hand" in evaluation["risk_flags"]
 
     def test_mulligan_keeps_two_lands_with_cheap_ramp():
         hand = [
@@ -323,6 +325,39 @@ def register_tests(battle, player, card):
         assert evaluation["keep"] is True
         assert evaluation["reason"].startswith("early_ramp:Arcane Signet")
 
+    def test_mulligan_keeps_three_lands_with_card_flow_even_with_expensive_cluster():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Faithless Looting", "cmc": 1, "type_line": "Sorcery", "effect": "rummage"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+            {"name": "Nine Mana Spell", "cmc": 9, "type_line": "Creature", "effect": "creature"},
+            {"name": "Seven Mana Spell", "cmc": 7, "type_line": "Sorcery", "effect": "draw"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is True
+        assert evaluation["reason"].startswith("early_card_flow:Faithless Looting")
+
+    def test_mulligan_rejects_five_lands_with_only_reactive_spell():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain"},
+            {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+            {"name": "Battlefield Forge", "cmc": 0, "type_line": "Land"},
+            {"name": "Needleverge Pathway", "cmc": 0, "type_line": "Land"},
+            {"name": "Adamant Will", "cmc": 2, "type_line": "Instant", "effect": "indestructible"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is False
+        assert evaluation["reason"] == "land_heavy_reactive_only"
+        assert "land_heavy_low_action" in evaluation["risk_flags"]
+
     def test_mulligan_rejects_dead_mox_amber_hand_without_live_legend():
         hand = [
             {"name": "Mana Confluence", "cmc": 0, "type_line": "Land"},
@@ -337,7 +372,7 @@ def register_tests(battle, player, card):
         evaluation = battle.mulligan_evaluation(hand)
 
         assert evaluation["keep"] is False
-        assert evaluation["reason"] == "no_early_game_plan"
+        assert evaluation["reason"] == "no_play_before_turn_3"
         assert "no_early_game_plan" in evaluation["risk_flags"]
 
     def test_mulligan_bottoms_expensive_cards_before_lands_and_early_play():
@@ -401,8 +436,10 @@ def register_tests(battle, player, card):
         test_extra_combat_is_taken_before_postcombat_main,
         test_treasure_maker_can_discard_draw_and_create_treasures,
         test_mulligan_rejects_three_lands_with_only_expensive_spells,
-        test_mulligan_keeps_three_lands_with_early_play,
+        test_mulligan_rejects_three_lands_with_single_early_body_and_expensive_cluster,
         test_mulligan_keeps_two_lands_with_cheap_ramp,
+        test_mulligan_keeps_three_lands_with_card_flow_even_with_expensive_cluster,
+        test_mulligan_rejects_five_lands_with_only_reactive_spell,
         test_mulligan_rejects_dead_mox_amber_hand_without_live_legend,
         test_mulligan_bottoms_expensive_cards_before_lands_and_early_play,
         test_mulligan_bottoms_expensive_card_even_in_land_heavy_hand,

@@ -145,6 +145,30 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "token_maker",
     "wincon",
 }
+OPENING_HAND_REACTIVE_EFFECTS = {
+    "counter",
+    "indestructible",
+    "protection",
+    "remove_creature",
+    "remove_permanent",
+    "silence_opponents",
+    "silence_spell",
+}
+OPENING_HAND_CARD_FLOW_EFFECTS = {
+    "draw_cards",
+    "draw_engine",
+    "impulse_draw",
+    "loot_draw",
+    "rummage",
+    "topdeck_setup",
+    "tutor",
+}
+OPENING_HAND_RAMP_EFFECTS = {
+    "land_ramp",
+    "mana_dork",
+    "ramp_engine",
+    "ramp_permanent",
+}
 ENGINE_METRICS = None
 
 
@@ -3074,6 +3098,16 @@ def _opening_hand_effect(card):
         return {}
 
 
+def _opening_hand_effect_name(card, effect_data=None):
+    if not isinstance(card, dict):
+        return "unknown"
+    effect_data = effect_data or _opening_hand_effect(card)
+    resolved = effect_data.get("effect")
+    if resolved and resolved != "unknown":
+        return resolved
+    return card.get("effect") or card.get("tag") or "unknown"
+
+
 def _opening_hand_colors(hand):
     colors = []
     for card in hand:
@@ -3092,12 +3126,7 @@ def _opening_hand_summary(hand):
             "cmc": _opening_hand_card_cmc(card) if isinstance(card, dict) else 0,
             "type_line": card.get("type_line", "") if isinstance(card, dict) else "",
             "is_land": bool(is_effective_land(card)),
-            "effect": (
-                _opening_hand_effect(card).get("effect")
-                or card.get("effect")
-                or card.get("tag")
-                or "unknown"
-            ) if isinstance(card, dict) else "unknown",
+            "effect": _opening_hand_effect_name(card) if isinstance(card, dict) else "unknown",
         }
         for card in hand
     ]
@@ -3129,6 +3158,27 @@ def _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_w
     return False
 
 
+def _opening_hand_role(card, effect_data):
+    effect = _opening_hand_effect_name(card, effect_data)
+    type_line = str(card.get("type_line") or "").lower()
+
+    if effect in OPENING_HAND_RAMP_EFFECTS:
+        return "ramp"
+    if effect in OPENING_HAND_CARD_FLOW_EFFECTS:
+        return "card_flow"
+    if effect in OPENING_HAND_REACTIVE_EFFECTS:
+        return "interaction"
+    if effect == "ramp_ritual":
+        return "one_shot_ramp"
+    if effect in HIGH_IMPACT_PAYOFF_EFFECTS:
+        return "payoff"
+    if "creature" in type_line:
+        return "board"
+    if any(token in type_line for token in ("artifact", "enchantment", "planeswalker", "battle")):
+        return "engine"
+    return "other"
+
+
 def _opening_hand_has_early_plan(hand, lands):
     nonlands = [c for c in hand if not is_effective_land(c)]
     if not nonlands:
@@ -3136,48 +3186,108 @@ def _opening_hand_has_early_plan(hand, lands):
 
     early_turn_window = 2 if lands == 2 else (4 if lands >= 5 else 3)
     evaluated = []
+    live_ramp = []
+    card_flow = []
+    proactive_board = []
+    early_engines = []
+    reactive_only = []
     for card in nonlands:
         effect_data = _opening_hand_effect(card)
-        effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
+        effect = _opening_hand_effect_name(card, effect_data)
         cmc = _opening_hand_card_cmc(card)
+        role = _opening_hand_role(card, effect_data)
+        additional_costs_live = _opening_hand_can_satisfy_basic_additional_costs(
+            card, effect_data, lands
+        )
         evaluated.append({
             "card": card.get("name", "?"),
             "cmc": cmc,
             "effect": effect,
+            "role": role,
+            "additional_costs_live": additional_costs_live,
         })
-        if effect in ("counter", "unknown"):
+        if cmc > early_turn_window:
             continue
-        if effect == "ramp_ritual":
+        if not additional_costs_live:
             continue
-        if effect in ("ramp_permanent", "land_ramp", "mana_dork"):
-            continue
-        if not _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
-            continue
-        if cmc <= early_turn_window:
-            return True, f"early_play:{card.get('name', '?')}:{cmc:g}", {
-                "early_play": card.get("name", "?"),
-                "early_play_cmc": cmc,
-                "early_turn_window": early_turn_window,
-                "evaluated_nonlands": evaluated,
-            }
-
-    for card in nonlands:
-        effect_data = _opening_hand_effect(card)
-        effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
-        cmc = _opening_hand_card_cmc(card)
-        if effect in ("ramp_permanent", "land_ramp", "mana_dork") and cmc <= 2:
+        if role == "ramp":
             if _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_window):
-                return True, f"early_ramp:{card.get('name', '?')}:{cmc:g}", {
-                    "early_ramp": card.get("name", "?"),
-                    "early_ramp_cmc": cmc,
-                    "early_turn_window": early_turn_window,
-                    "evaluated_nonlands": evaluated,
-                }
+                live_ramp.append((card, cmc))
+            continue
+        if role == "card_flow":
+            card_flow.append((card, cmc))
+            continue
+        if role == "engine":
+            early_engines.append((card, cmc))
+            continue
+        if role == "interaction":
+            reactive_only.append((card, cmc))
+            continue
+        if role in ("board", "other") and effect not in ("unknown", "ramp_ritual"):
+            proactive_board.append((card, cmc))
 
-    return False, "no_play_before_turn_3", {
+    high_cost_count = sum(
+        1
+        for card in nonlands
+        if isinstance(card, dict) and _opening_hand_card_cmc(card) >= 7
+    )
+    plan_details = {
         "early_turn_window": early_turn_window,
         "evaluated_nonlands": evaluated,
+        "live_ramp_count": len(live_ramp),
+        "card_flow_count": len(card_flow),
+        "engine_count": len(early_engines),
+        "proactive_board_count": len(proactive_board),
+        "reactive_only_count": len(reactive_only),
+        "high_cost_cluster_count": high_cost_count,
     }
+
+    if live_ramp:
+        chosen, cmc = sorted(live_ramp, key=lambda item: (item[1], item[0].get("name", "")))[0]
+        return True, f"early_ramp:{chosen.get('name', '?')}:{cmc:g}", {
+            **plan_details,
+            "early_ramp": chosen.get("name", "?"),
+            "early_ramp_cmc": cmc,
+            "plan_role": "ramp",
+        }
+
+    if card_flow:
+        chosen, cmc = sorted(card_flow, key=lambda item: (item[1], item[0].get("name", "")))[0]
+        return True, f"early_card_flow:{chosen.get('name', '?')}:{cmc:g}", {
+            **plan_details,
+            "early_play": chosen.get("name", "?"),
+            "early_play_cmc": cmc,
+            "plan_role": "card_flow",
+        }
+
+    if early_engines:
+        chosen, cmc = sorted(early_engines, key=lambda item: (item[1], item[0].get("name", "")))[0]
+        return True, f"early_engine:{chosen.get('name', '?')}:{cmc:g}", {
+            **plan_details,
+            "early_play": chosen.get("name", "?"),
+            "early_play_cmc": cmc,
+            "plan_role": "engine",
+        }
+
+    if lands >= 5 and reactive_only and not proactive_board:
+        return False, "land_heavy_reactive_only", plan_details
+
+    if high_cost_count >= 3 and len(proactive_board) < 2:
+        return False, "expensive_cluster_without_setup", plan_details
+
+    if proactive_board:
+        chosen, cmc = sorted(proactive_board, key=lambda item: (item[1], item[0].get("name", "")))[0]
+        return True, f"early_play:{chosen.get('name', '?')}:{cmc:g}", {
+            **plan_details,
+            "early_play": chosen.get("name", "?"),
+            "early_play_cmc": cmc,
+            "plan_role": "board",
+        }
+
+    if reactive_only:
+        return False, "reactive_only_opener", plan_details
+
+    return False, "no_play_before_turn_3", plan_details
 
 
 def _mulligan_bottom_priority(card, hand, land_count):
@@ -3189,7 +3299,7 @@ def _mulligan_bottom_priority(card, hand, land_count):
         return 35 + max(0, land_count - 4) * 20
 
     effect_data = _opening_hand_effect(card)
-    effect = effect_data.get("effect") or card.get("effect") or card.get("tag")
+    effect = _opening_hand_effect_name(card, effect_data)
     cmc = _opening_hand_card_cmc(card)
     priority = cmc * 8
 
@@ -3275,13 +3385,19 @@ def mulligan_evaluation(hand):
     has_plan, reason, plan_details = _opening_hand_has_early_plan(hand, lands)
     if not has_plan:
         base["risk_flags"].append("no_early_game_plan")
+    if reason == "reactive_only_opener":
+        base["risk_flags"].append("reactive_only_opener")
+    if reason == "land_heavy_reactive_only":
+        base["risk_flags"].append("land_heavy_low_action")
+    if reason == "expensive_cluster_without_setup":
+        base["risk_flags"].append("expensive_dead_hand")
     if len(high_cost_cards) >= 3 and not has_plan:
         base["risk_flags"].append("expensive_dead_hand")
     return {
         **base,
         **plan_details,
         "keep": has_plan,
-        "reason": reason if has_plan else "no_early_game_plan",
+        "reason": reason if reason else "no_early_game_plan",
     }
 
 
@@ -3340,7 +3456,12 @@ def _emit_mulligan_decision_trace(
             "early_play": evaluation.get("early_play"),
             "early_ramp": evaluation.get("early_ramp"),
             "early_turn_window": evaluation.get("early_turn_window"),
+            "plan_role": evaluation.get("plan_role"),
+            "card_flow_count": evaluation.get("card_flow_count"),
+            "proactive_board_count": evaluation.get("proactive_board_count"),
+            "reactive_only_count": evaluation.get("reactive_only_count"),
             "high_cost_cards": evaluation.get("high_cost_cards"),
+            "high_cost_cluster_count": evaluation.get("high_cost_cluster_count"),
             "keep": evaluation.get("keep"),
         },
         rule_source="battle_opening_hand_policy",

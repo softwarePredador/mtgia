@@ -232,6 +232,19 @@ Uso correto:
   preserva lands necessarias quando a mao tem ate 3 lands, preserva ramp/early
   interaction live e so bottoma land em excesso quando nao existe spell morta
   melhor. Isso ainda e heuristica, mas torna a decisao reproduzivel e testavel.
+- Em 2026-06-18 a heuristica de keep ficou mais estrita: a abertura agora
+  classifica explicitamente `ramp`, `card_flow`, `engine`, `board` e
+  `reactive_only`. Spell reativa isolada deixou de justificar keep em maos
+  land-heavy, e um unico corpo barato nao mascara mais uma mao `3 lands +`
+  cluster de bombas `7+` sem setup.
+- As rejeicoes novas ficaram explicitas no runtime e no trace:
+  `reactive_only_opener`, `land_heavy_reactive_only` e
+  `expensive_cluster_without_setup`. Isso fecha o caso "legal mas morta" sem
+  depender apenas da contagem de terrenos.
+- O `decision_trace_v1` de mulligan agora tambem carrega `plan_role`,
+  `card_flow_count`, `proactive_board_count`, `reactive_only_count` e
+  `high_cost_cluster_count`, deixando rastreavel por que a mao foi mantida ou
+  devolvida.
 - Fast mana condicional conta como recurso inicial apenas quando a condicao de
   producao esta ativa no estado da partida ou na linha inicial prevista. Exemplo
   concreto ja fechado localmente: `Mox Amber` nao pode justificar keep nem

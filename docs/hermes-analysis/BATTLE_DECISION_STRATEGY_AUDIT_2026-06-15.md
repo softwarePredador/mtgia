@@ -102,9 +102,14 @@ O mulligan agora emite `decision_type=mulligan_decision` com:
 - cartas colocadas no fundo;
 - flags como `mana_screw`, `mana_flood`, `no_early_game_plan`,
   `expensive_dead_hand` e `forced_keep_after_mulligan_cap`.
+- desde 2026-06-18, contadores adicionais de plano:
+  `plan_role`, `card_flow_count`, `proactive_board_count`,
+  `reactive_only_count` e `high_cost_cluster_count`.
 
-Limitação conhecida: a escolha das cartas colocadas no fundo ainda é simples e
-não otimizada por plano. Isso fica como gap, não como comportamento confiável.
+Limitação conhecida: a escolha das cartas colocadas no fundo continua
+heurística e o keep ainda não é calibrado por comandante/arquetipo. O gap já
+não é mais "detectar mão claramente morta"; agora é ranking comparativo de
+alternativas e tuning fino por profile.
 
 ### Seleção contextual de land
 
@@ -151,7 +156,7 @@ Findings iniciais:
 
 | Decisão | Regra oficial | Estratégia esperada | Status Hermes | Próximo ajuste |
 |---|---|---|---|---|
-| Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial: avalia lands, plano inicial, ramp barato e high-cost; emite trace | Melhorar escolha de bottom cards e plano por comandante/arquetipo |
+| Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial forte: avalia lands, plano inicial, ramp barato, card flow, reactive-only e cluster caro sem setup; emite trace rico | Melhorar ranking comparativo das opções e tuning por comandante/arquetipo |
 | Lotus Petal/ritual | Sacrificar para gerar mana conforme oracle | Usar só para destravar ação relevante, proteção, win attempt ou correção crítica | Parcial: `ramp_ritual` só entra no ramp loop se destrava ação no turno; auditor exige sinal | Ampliar para storm/free-spell synergies e proteção reativa |
 | Mox Diamond | Deve descartar land da mão antes de entrar | Só jogar com land descartável e plano de mana real | Guardrail mínimo: exige `requires_discard_land`, preserva cor única e bloqueia última/única land sem payoff nominal | Ampliar corpus e casos por bracket, sem ban global de Mox |
 | Sacrificar land | Crop Rotation/Harrow etc. exigem land conforme texto | Avaliar land sacrificada, risco de counter, alvo buscado e mana screw | Guardrail mínimo: escolhe alvo de land-ramp por score e bloqueia fetch/tapped sem benefício claro quando gasta última/única fonte | Ampliar scoring de utility lands e risco de counter |
