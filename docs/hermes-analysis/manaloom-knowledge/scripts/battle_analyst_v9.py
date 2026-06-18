@@ -3611,6 +3611,123 @@ def emit_priority_pass_sequence(active_player, all_players, turn, phase=None, re
     return order
 
 
+def _is_reactive_interaction_card(card, effect_data):
+    effect = str(effect_data.get("effect") or card.get("effect") or "").lower()
+    if effect in (
+        "counter",
+        "phase_out",
+        "indestructible",
+        "cannot_lose_turn",
+        "modal_boros_charm",
+        "remove_creature",
+        "remove_permanent",
+        "remove_artifact_or_enchantment",
+        "bounce",
+    ):
+        return True
+    return is_instant(card) or card_has_functional_tag(card, "counter", "protection", "removal")
+
+
+def describe_pass_no_action(player, phase):
+    nonland_cards = [
+        card
+        for card in player.hand
+        if isinstance(card, dict) and not is_effective_land(card)
+    ]
+    available_options = [{"action": "pass"}]
+    alternatives = []
+    castable_now = []
+    reactive_options = []
+    affordable_cards = []
+    main_phase_relevant = phase in MAIN_PHASES
+    minimum_cmc = None
+
+    for card in nonland_cards:
+        effect_data = get_card_effect(card)
+        cmc = int(float(card.get("cmc") or 0))
+        payable = bool(player.can_pay_card(card))
+        phase_legal = bool(can_cast_in_phase(card, effect_data, phase))
+        if minimum_cmc is None or cmc < minimum_cmc:
+            minimum_cmc = cmc
+        option = decision_card_option(
+            card,
+            effect_data,
+            action="consider",
+            payable=payable,
+            phase_legal=phase_legal,
+            reactive=_is_reactive_interaction_card(card, effect_data),
+        )
+        alternatives.append(option)
+        if payable:
+            affordable_cards.append(option)
+        if payable and phase_legal:
+            castable_now.append(option)
+        if payable and _is_reactive_interaction_card(card, effect_data):
+            reactive_options.append(option)
+
+    score_components = {
+        "stack_empty": 1,
+        "main_phase_action_taken": 0,
+        "phase_is_main": 1 if main_phase_relevant else 0,
+        "hand_nonland_count": len(nonland_cards),
+        "affordable_card_count": len(affordable_cards),
+        "castable_now_count": len(castable_now),
+        "reactive_option_count": len(reactive_options),
+        "available_mana": player.available_mana(),
+        "minimum_hand_cmc": minimum_cmc or 0,
+    }
+    risk_flags = []
+
+    if main_phase_relevant:
+        if castable_now:
+            available_options.extend(castable_now[:8])
+            if castable_now and len(castable_now) == len(reactive_options):
+                reason = "hold_instant_speed_interaction"
+                risk_flags.append("holding_instant_speed_interaction")
+            else:
+                reason = "defer_low_value_main_phase_action"
+                risk_flags.append("low_value_main_phase_lines_only")
+        elif reactive_options:
+            available_options.extend(reactive_options[:8])
+            reason = "hold_instant_speed_interaction"
+            risk_flags.append("holding_instant_speed_interaction")
+        elif affordable_cards:
+            reason = "phase_or_heuristic_restriction_blocks_line"
+            risk_flags.append("phase_restricted_action")
+        elif nonland_cards:
+            reason = "no_affordable_nonland_action"
+            risk_flags.append("mana_constrained_hand")
+        else:
+            reason = "no_nonland_resources_available"
+            risk_flags.append("empty_nonland_hand")
+    else:
+        if reactive_options:
+            available_options.extend(reactive_options[:8])
+            reason = "reactive_window_held"
+            risk_flags.append("holding_instant_speed_interaction")
+        elif nonland_cards:
+            reason = "no_reactive_action_in_window"
+            risk_flags.append("phase_restricted_action")
+        else:
+            reason = "no_nonland_resources_available"
+            risk_flags.append("empty_nonland_hand")
+
+    chosen_option = {"action": "pass", "reason": reason}
+    rejected_options = [
+        {**option, "action": "defer"}
+        for option in available_options[1:9]
+    ]
+    return {
+        "available_options": available_options,
+        "chosen_option": chosen_option,
+        "rejected_options": rejected_options,
+        "alternatives_considered": alternatives[:12],
+        "score_components": score_components,
+        "risk_flags": sorted(set(risk_flags)),
+        "reason": reason,
+    }
+
+
 def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     """v9: Priority round with optional empty-stack window during main phases."""
     record_engine_metric("priority_rounds")
@@ -3640,21 +3757,26 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             phase=phase,
             reason="empty_stack",
         )
+        pass_context = describe_pass_no_action(active_player, phase)
         emit_decision_trace(
             decision_type="pass_no_action",
             player=active_player,
             turn=turn,
             phase=phase,
-            available_options=[{"action": "pass"}],
-            chosen_option={"action": "pass"},
-            rejected_options=[],
-            score_components={"stack_empty": 1, "main_phase_action_taken": 0},
+            available_options=pass_context["available_options"],
+            chosen_option=pass_context["chosen_option"],
+            rejected_options=pass_context["rejected_options"],
+            score_components=pass_context["score_components"],
             rule_source="battle_heuristic",
             rule_status="heuristic",
             confidence="medium",
             expected_benefit_score=0,
             actual_outcome="priority_pass",
-            reason="empty_stack_no_action",
+            reason=pass_context["reason"],
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            risk_flags=pass_context["risk_flags"],
+            alternatives_considered=pass_context["alternatives_considered"],
+            rejected_reason="preserve_resources_or_no_profitable_line",
         )
         return False
 

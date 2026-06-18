@@ -187,6 +187,13 @@ Cobertura inicial:
 - upkeep do Lorehold com `lorehold_upkeep_rummage`, replacement de
   `Library of Leng` e reorder parcial de `Sensei's Divining Top`.
 
+No slice de 2026-06-18, `pass/no-action` deixou de ser apenas
+`empty_stack_no_action`: o trace agora diferencia janelas como
+`hold_instant_speed_interaction`, `no_affordable_nonland_action`,
+`phase_or_heuristic_restriction_blocks_line`, `reactive_window_held` e
+`no_nonland_resources_available`, além de registrar alternativas consideradas
+e flags de risco coerentes com o estado da mão.
+
 Auditoria:
 
 ```bash

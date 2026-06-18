@@ -130,6 +130,93 @@ def register_tests(battle, player):
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
+    def test_main_phase_pass_trace_explains_held_interaction():
+        decisions = []
+        previous_handler = battle.DECISION_TRACE_HANDLER
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = player("Active")
+            active.hand = [
+                {
+                    "name": "Counterspell",
+                    "cmc": 2,
+                    "mana_cost": "{U}{U}",
+                    "type_line": "Instant",
+                    "effect": "counter",
+                }
+            ]
+            active.battlefield = [
+                {"name": "Island", "type_line": "Land", "effect": "land"},
+                {"name": "Island", "type_line": "Land", "effect": "land"},
+            ]
+            active.refresh_mana_sources(turn=2)
+            stack = battle.Stack()
+
+            assert battle.priority_round(
+                active,
+                [active],
+                stack,
+                2,
+                random.Random(210),
+                phase="precombat_main",
+            ) is False
+        finally:
+            battle.DECISION_TRACE_HANDLER = previous_handler
+
+        pass_traces = [trace for trace in decisions if trace["decision_type"] == "pass_no_action"]
+        assert len(pass_traces) == 1
+        trace = pass_traces[0]
+        assert trace["reason"] == "hold_instant_speed_interaction"
+        assert "holding_instant_speed_interaction" in trace["risk_flags"]
+        assert trace["score_components"]["castable_now_count"] == 0
+        assert trace["score_components"]["reactive_option_count"] == 1
+        assert trace["available_options"][1]["card"] == "Counterspell"
+
+    def test_main_phase_pass_trace_explains_mana_constrained_hand():
+        decisions = []
+        previous_handler = battle.DECISION_TRACE_HANDLER
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = player("Active")
+            active.hand = [
+                {
+                    "name": "Austere Command",
+                    "cmc": 6,
+                    "mana_cost": "{4}{W}{W}",
+                    "type_line": "Sorcery",
+                    "effect": "board_wipe",
+                }
+            ]
+            active.battlefield = [
+                {"name": "Plains", "type_line": "Land", "effect": "land"},
+                {"name": "Mountain", "type_line": "Land", "effect": "land"},
+            ]
+            active.refresh_mana_sources(turn=3)
+            stack = battle.Stack()
+
+            assert battle.priority_round(
+                active,
+                [active],
+                stack,
+                3,
+                random.Random(211),
+                phase="precombat_main",
+            ) is False
+        finally:
+            battle.DECISION_TRACE_HANDLER = previous_handler
+
+        pass_traces = [trace for trace in decisions if trace["decision_type"] == "pass_no_action"]
+        assert len(pass_traces) == 1
+        trace = pass_traces[0]
+        assert trace["reason"] == "no_affordable_nonland_action"
+        assert "mana_constrained_hand" in trace["risk_flags"]
+        assert trace["score_components"]["affordable_card_count"] == 0
+        assert trace["alternatives_considered"][0]["card"] == "Austere Command"
+
     def test_stack_resolution_emits_apnap_pass_sequence_before_resolve():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -334,6 +421,8 @@ def register_tests(battle, player):
         test_empty_stack_priority_casts_main_phase_creature,
         test_main_phase_priority_loop_casts_bounded_empty_stack_actions,
         test_empty_stack_priority_emits_apnap_pass_sequence,
+        test_main_phase_pass_trace_explains_held_interaction,
+        test_main_phase_pass_trace_explains_mana_constrained_hand,
         test_stack_resolution_emits_apnap_pass_sequence_before_resolve,
         test_casting_context_locks_cost_before_payment,
         test_casting_context_locks_x_alternative_and_additional_costs,

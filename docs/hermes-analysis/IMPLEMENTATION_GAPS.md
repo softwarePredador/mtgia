@@ -179,12 +179,18 @@
 
 - Hoje o battle já prova legalidade e coerência das decisões modeladas, mas
   ainda não prova por que a ação escolhida foi melhor que as rejeitadas.
+- Slice 2026-06-18 fechou uma parte do gap: `pass_no_action` deixou de sair
+  como motivo genérico e agora classifica ao menos `hold_instant_speed_interaction`,
+  `no_affordable_nonland_action`, `phase_or_heuristic_restriction_blocks_line`,
+  `reactive_window_held` e `no_nonland_resources_available`, com
+  `alternatives_considered`, `risk_flags` e contadores de opção no trace.
 - Implementar:
   - ranking explícito de `available_options`;
   - `chosen_option_score`;
   - `rejected_option_score`;
   - `expected_payoff_reason`;
-  - motivo de `pass/no-action` quando havia linha jogável.
+  - motivo comparativo de `pass/no-action` quando houver múltiplas linhas
+    principais jogáveis e o runtime optar por segurar recursos.
 - Validação:
   - corpus pequeno com zero findings `critical/high` no auditor forense;
   - auditor estratégico apontando decisões sem justificativa comparativa.

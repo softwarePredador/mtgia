@@ -252,6 +252,44 @@ def test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel():
     assert result["summary"]["verdict"] == "needs_review"
 
 
+def test_strategy_auditor_accepts_contextual_pass_no_action():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "d-pass-context",
+                "decision_type": "pass_no_action",
+                "chosen_option": {
+                    "action": "pass",
+                    "reason": "hold_instant_speed_interaction",
+                },
+                "score_components": {
+                    "stack_empty": 1,
+                    "main_phase_action_taken": 0,
+                    "castable_now_count": 1,
+                    "reactive_option_count": 1,
+                },
+                "strategic_principle": "pass_when_no_profitable_or_legal_action_is_available",
+                "heuristic_version": "test",
+                "resource_delta": {},
+                "risk_flags": ["holding_instant_speed_interaction"],
+                "alternatives_considered": [
+                    {
+                        "card": "Counterspell",
+                        "action": "consider",
+                        "payable": True,
+                        "phase_legal": True,
+                        "reactive": True,
+                    }
+                ],
+                "reason": "hold_instant_speed_interaction",
+            }
+        ],
+    )
+
+    assert result["summary"]["findings"] == 0
+
+
 def test_strategy_auditor_accepts_multiplayer_wheel_with_payoff():
     result = auditor.audit_strategy(
         events=[],

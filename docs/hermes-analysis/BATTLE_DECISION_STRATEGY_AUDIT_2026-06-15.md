@@ -517,7 +517,11 @@ Leitura correta pós-correção:
 - Land-tutor activated abilities agora usam o mesmo guardrail de sacrifice-land
   e target scoring; manter monitoramento em corpus maior para confirmar que
   utility lands/fronteiras de risco seguem coerentes.
-- Adicionar reason estruturado para pass/no-action em todos os passes de prioridade.
+- Slice 2026-06-18: `pass/no-action` já ganhou reason estruturado no runtime
+  (`hold_instant_speed_interaction`, `no_affordable_nonland_action`,
+  `phase_or_heuristic_restriction_blocks_line`, `reactive_window_held`,
+  `no_nonland_resources_available`). O gap que resta é comparativo: explicar
+  melhor por que uma linha principal jogável foi rejeitada contra outra.
 - Ampliar `decision_type=board_wipe`/`wheel` para corpus maior e melhorar
   hand-quality/payoff-denial: o gate mínimo de timing e o modelo multiplayer v1
   já estão implementados, mas ainda não cobrem toda estratégia de Wheel em
