@@ -38,6 +38,8 @@ app/doc/menu_icon_iteration_*/
 app/test/features/home/failures/
 
 # Local server test artifacts
+server/test/artifacts/*
+!server/test/artifacts/ai_optimize/
 server/test/artifacts/*.pid
 server/test/artifacts/*.port
 
@@ -47,5 +49,6 @@ server/test/artifacts/ai_optimize/source_deck_optimize_*.json
 
 # Accidental local SQLite created outside the canonical Hermes scripts path
 docs/hermes-analysis/manaloom-knowledge/knowledge.db
+docs/hermes-analysis/master_optimizer_replays/
 *.pyc
 __pycache__/
