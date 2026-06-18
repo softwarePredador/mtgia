@@ -1176,6 +1176,48 @@ Pendência real remanescente:
    compartilhar o mesmo SQLite operacional com `manaloom-ops`;
 3. nao tratar `knowledge.db` do `hermes-lab` como fonte de verdade nem como
    prova de que o pipeline product-path foi consumido.
+
+### P1 — `hermes-lab` ainda precisa de revalidacao live pos-hardening
+
+Status em 2026-06-18:
+
+- o slice de robustez do runtime foi implementado, mas ainda nao foi provado em
+  deploy novo porque o painel EasyPanel ficou indisponivel (`:3000` recusando
+  conexoes) durante a rodada final;
+- o backend publico do produto continuou saudavel, entao o bloqueio e do plano
+  de controle/runtime do lab, nao do app/backend principal;
+- a validacao DB-backed paralela tambem travou por infraestrutura:
+  PostgreSQL `143.198.230.247:5433` respondeu
+  `FATAL: could not write init file: No space left on device`.
+
+Slice aplicado:
+
+- novo `server/bin/hermes_lab_runtime_probe.py`;
+- `server/bin/hermes_lab_entrypoint.sh` agora gera `runtime_probe.json` e
+  `startup_status.json` por fase;
+- `server/bin/hermes_lab_healthcheck.sh` agora exige:
+  - report de bootstrap quando obrigatorio;
+  - `jobs.json` nao vazio;
+  - gateway local respondendo em `127.0.0.1:8642/health`;
+  - payload do runtime probe quando presente;
+- cobertura nova:
+  - `server/test/hermes_lab_runtime_probe_test.py`
+  - `server/test/hermes_lab_healthcheck_test.py`
+
+O que este gap representa agora:
+
+- nao falta desenho de runtime;
+- falta apenas a prova live pos-redeploy assim que o painel EasyPanel voltar e
+  o host do PostgreSQL sair do estado sem espaco.
+
+Fechamento objetivo desta pendencia:
+
+1. redeploy do `hermes-lab` com o novo probe/healthcheck;
+2. confirmar `runtime_probe.json` e gateway health no container live;
+3. reexecutar:
+   - `server/bin/audit_easypanel_runtime_alignment.py`
+   - `server/bin/audit_easypanel_cron_runtime.py`
+4. rerodar um audit DB-backed do Lorehold sem o bloqueio de disco do PG.
 7. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas; o bloco formal mínimo já está isolado em `battle_targeting_tests.py`
 8. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 9. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário

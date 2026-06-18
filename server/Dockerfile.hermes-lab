@@ -38,11 +38,13 @@ COPY server/bin/hermes_lab_entrypoint.sh /opt/bootstrap/hermes_lab_entrypoint.sh
 COPY server/bin/hermes_lab_cron_bootstrap.py /opt/bootstrap/hermes_lab_cron_bootstrap.py
 COPY server/bin/hermes_docs_branch_sync.sh /opt/bootstrap/hermes_docs_branch_sync.sh
 COPY server/bin/hermes_lab_healthcheck.sh /opt/bootstrap/hermes_lab_healthcheck.sh
+COPY server/bin/hermes_lab_runtime_probe.py /opt/bootstrap/hermes_lab_runtime_probe.py
 RUN chmod +x \
   /opt/bootstrap/hermes_lab_entrypoint.sh \
   /opt/bootstrap/hermes_lab_cron_bootstrap.py \
   /opt/bootstrap/hermes_docs_branch_sync.sh \
-  /opt/bootstrap/hermes_lab_healthcheck.sh
+  /opt/bootstrap/hermes_lab_healthcheck.sh \
+  /opt/bootstrap/hermes_lab_runtime_probe.py
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD ["/opt/bootstrap/hermes_lab_healthcheck.sh"]

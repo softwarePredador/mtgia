@@ -22,6 +22,7 @@ BOOTSTRAP_REPORT_DIR="${HERMES_CRON_BOOTSTRAP_ARTIFACT_DIR:-$HERMES_HOME/artifac
 BOOTSTRAP_REPORT_PATH="$BOOTSTRAP_REPORT_DIR/latest_bootstrap_report.json"
 BOOTSTRAP_LOG_PATH="$LOG_DIR/hermes_lab_bootstrap.log"
 STARTUP_STATUS_PATH="${HERMES_LAB_STARTUP_STATUS_FILE:-$RUNTIME_ARTIFACT_DIR/startup_status.json}"
+RUNTIME_PROBE_PATH="${HERMES_LAB_RUNTIME_PROBE_FILE:-$RUNTIME_ARTIFACT_DIR/runtime_probe.json}"
 
 mkdir -p \
   "$HERMES_HOME" \
@@ -161,6 +162,11 @@ if [[ "${HERMES_CRON_BOOTSTRAP:-1}" == "1" ]]; then
     fi
     write_runtime_status "bootstrap" "succeeded" "$success_message"
   fi
+fi
+
+write_runtime_status "probe" "starting" "capturing hermes lab runtime probe"
+if ! python3 /opt/bootstrap/hermes_lab_runtime_probe.py; then
+  write_runtime_status "probe" "failed" "runtime probe failed; see runtime_probe.json if present"
 fi
 
 write_runtime_status "gateway" "starting" "launching hermes gateway run"

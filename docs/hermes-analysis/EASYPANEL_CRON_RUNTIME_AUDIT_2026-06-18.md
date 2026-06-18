@@ -311,3 +311,81 @@ Estado correto apos o ajuste:
 - `master` volta a ser a arvore viva auditada pelo Hermes;
 - `codex/hermes-analysis-docs` continua como memoria derivada e branch de
   documentacao, nao como worktree persistente do produto.
+
+## Follow-up live — 2026-06-18 11:27 UTC
+
+Revalidacao externa desta trilha mostrou um estado misto, mas coerente:
+
+- o backend publico continuou saudavel em
+  `https://evolution-cartinhas.8ktevp.easypanel.host/health`,
+  respondendo com `git_sha=b6500c7a3c0f1901502ea07bbbb268d92f085b67`;
+- o painel EasyPanel em `http://143.198.230.247:3000` passou a recusar
+  conexoes;
+- o endpoint publico do Hermes (`https://hermes.b1uvfi.easypanel.host`) ficou
+  em `502`, consistente com upstream sem runtime valido.
+
+Isso mudou a leitura operacional da rodada:
+
+1. o deploy publico do produto nao caiu junto com o painel;
+2. a prova final do `hermes-lab` por T-RPC/controle do EasyPanel ficou
+   temporariamente bloqueada pelo painel indisponivel;
+3. os auditores read-only de runtime continuam uteis para separar "produto de
+   pe" de "lab fora do ar".
+
+## Hardening aplicado no `hermes-lab`
+
+Mesmo sem conseguir completar um novo redeploy por causa do painel fora do ar,
+o slice de robustez do runtime foi fechado em codigo:
+
+- novo probe de startup:
+  - `server/bin/hermes_lab_runtime_probe.py`
+- `server/bin/hermes_lab_entrypoint.sh` agora:
+  - roda bootstrap;
+  - materializa `runtime_probe.json`;
+  - registra `startup_status.json` por fase;
+  - so depois sobe `hermes gateway run`;
+- `server/bin/hermes_lab_healthcheck.sh` agora valida:
+  - `startup_status.json`;
+  - existencia do bootstrap report quando requerido;
+  - `jobs.json` nao vazio apos bootstrap obrigatorio;
+  - health real do gateway local em `127.0.0.1:8642/health`;
+  - payload do `runtime_probe.json` quando presente.
+
+Cobertura adicionada:
+
+- `server/test/hermes_lab_runtime_probe_test.py`
+- `server/test/hermes_lab_healthcheck_test.py`
+
+Objetivo pratico do hardening:
+
+- quando o painel EasyPanel voltar, o proximo deploy do `hermes-lab` passa a
+  falhar de forma explicita se:
+  - o gateway nao sobe;
+  - o bootstrap nao materializa jobs;
+  - provider/model resolvidos nao baterem com o esperado;
+  - o workspace do repo nao existir.
+
+## Bloqueio externo confirmado
+
+As validacoes DB-backed desta mesma rodada ficaram bloqueadas por infraestrutura
+externa, nao por regressao do slice:
+
+- PostgreSQL `143.198.230.247:5433` retornou
+  `FATAL: could not write init file: No space left on device`;
+- com isso falharam:
+  - boot do server local em `:8082`;
+  - auditorias publicas que dependem de `/auth/register`;
+  - audits de provenance e parity do Lorehold;
+  - testes Python que encostam no PostgreSQL real.
+
+Leitura correta:
+
+- `battle` local continua validado por replay offline;
+- `generate` e `learned deck` continuam dependentes do PostgreSQL real para
+  prova completa;
+- `hermes-lab` precisa de redeploy assim que o painel voltar;
+- o proximo bloqueio operacional prioritario deixou de ser codigo e passou a
+  ser:
+  1. recuperar o painel EasyPanel;
+  2. liberar espaco no host do PostgreSQL;
+  3. reexecutar os auditores live.
