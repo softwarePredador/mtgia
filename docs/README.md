@@ -48,23 +48,27 @@ as fontes canônicas abaixo.
    - slice 1 de portabilidade dos entrypoints críticos (`pull-learning-events`,
      `auto-sync-learned-decks`, `master-optimizer-preflight`) para runtime
      server-owned.
-13. `server/manual-de-instrucao.md`
+13. `docs/hermes-analysis/NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`
+   - contrato da rotina geral `manaloom_new_card_candidate_review`: detecção de
+     cartas novas/alteradas por comandante, report-only, sem LLM, sem auto-apply
+     e com SQLite apenas como cache operacional.
+14. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
-14. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+15. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
-15. `app/doc/APP_AUDIT_2026-04-29.md`
+16. `app/doc/APP_AUDIT_2026-04-29.md`
    - status consolidado do app mobile, riscos e validacoes recentes.
-16. `app/doc/UI_TEST_SURFACE_MAP.md`
+17. `app/doc/UI_TEST_SURFACE_MAP.md`
    - keys e superficies que testes runtime devem usar.
-17. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+18. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
    - checklist para rodada interna non-scanner.
-18. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+19. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-19. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+20. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
    - veredito global atual de produto, gates restantes e ordem de execucao.
-20. `app/doc/runtime_flow_handoffs/README.md`
+21. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-21. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+22. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 

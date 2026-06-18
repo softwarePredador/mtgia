@@ -3,6 +3,85 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-18 — New-card candidate review geral em manaloom-ops
+
+Motivo:
+
+- A descoberta de cartas novas/alteradas nao pode depender de uma rodada manual
+  do Codex nem ficar exclusiva ao Lorehold.
+- O produto precisa detectar candidatos por comandante acompanhado, mas sem
+  aplicar swaps automaticamente e sem gastar token de IA em triagem barata.
+
+Patch aplicado:
+
+- Criado `server/bin/manaloom_new_card_candidate_review.py`.
+- Criado wrapper `server/bin/manaloom_new_card_candidate_review.sh`.
+- Registrado no `server/bin/manaloom_ops_daemon.py` como:
+  - `name=manaloom_new_card_candidate_review`;
+  - `schedule=35 */6 * * *`;
+  - override por `MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON`.
+- Criado teste `server/test/manaloom_new_card_candidate_review_test.py`.
+- Criada documentacao operacional em
+  `docs/hermes-analysis/NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`.
+
+Contrato operacional:
+
+- `manaloom-ops` faz a triagem deterministica e barata.
+- Nao usa LLM.
+- Nao escreve em PostgreSQL.
+- Nao altera decks.
+- SQLite `knowledge.db` guarda apenas historico operacional/fila/checkpoint.
+- Lorehold entra como controle padrao, mas nao e escopo exclusivo.
+- Funcoes multiplas por carta sao preservadas como arrays.
+- `card_battle_rules` deve ser lida agregada por `card_id`, preferencialmente
+  via `card_intelligence_snapshot`, para evitar fanout.
+
+Saidas:
+
+- `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_summary.json`
+- `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_reviews.json`
+- `/data/manaloom-ops/artifacts/new_card_candidate_review/latest_report.md`
+- tabelas SQLite:
+  - `new_card_candidate_review_runs`;
+  - `new_card_candidate_reviews`;
+  - `new_card_battle_rule_review_queue`;
+  - `new_card_candidate_review_checkpoints`.
+
+Validação local:
+
+```bash
+python3 -m py_compile \
+  server/bin/manaloom_new_card_candidate_review.py \
+  server/bin/manaloom_ops_daemon.py \
+  server/test/manaloom_new_card_candidate_review_test.py
+
+bash -n server/bin/manaloom_new_card_candidate_review.sh
+
+python3 server/test/manaloom_new_card_candidate_review_test.py
+```
+
+Dry-run read-only contra PostgreSQL configurado:
+
+```bash
+tmpdir="$(mktemp -d)"
+MANALOOM_OPS_ARTIFACT_DIR="$tmpdir/artifacts" \
+MANALOOM_KNOWLEDGE_DB="$tmpdir/knowledge.db" \
+python3 server/bin/manaloom_new_card_candidate_review.py \
+  --sets msh,msc,mar \
+  --commander-limit 8 \
+  --card-limit 120
+```
+
+Resultado observado na primeira rodada local:
+
+- 120 cartas analisadas;
+- 8 comandantes analisados;
+- decisoes principais: `ignore=657`, `needs_data=303`;
+- `hermes_lab_should_wake=false`.
+
+Leitura: o catalogo recente esta visivel, mas a camada de dados ainda precisa
+completar legalidade/oracle/tags antes de promover candidatos reais.
+
 ## 2026-06-17 — Cutover Hermes AWS -> EasyPanel (slice server-owned)
 
 Motivo:

@@ -12,6 +12,48 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / new-card candidate review geral
+
+- Foi criado o job deterministico `manaloom_new_card_candidate_review` em
+  `manaloom-ops` para detectar cartas novas/alteradas e avaliar utilidade por
+  comandante acompanhado.
+- Escopo fechado:
+  - sem LLM;
+  - sem auto-apply;
+  - sem alteracao em decks;
+  - sem write em PostgreSQL;
+  - SQLite `manaloom-ops` apenas como cache/evidencia operacional.
+- Fontes usadas:
+  - preferencialmente `card_intelligence_snapshot`, que agrega
+    `card_function_tags`, `card_semantic_tags_v2` e `card_battle_rules` por
+    `card_id`;
+  - fallback para `cards` + `card_legalities` + heuristica local quando a view
+    nao existir.
+- Decisoes emitidas por carta/comandante:
+  - `test`;
+  - `backlog`;
+  - `needs_rule_review`;
+  - `needs_data`;
+  - `already_present`;
+  - `ignore`.
+- Guardrails:
+  - carta fora da identidade Commander vira `ignore`;
+  - carta ja presente vira `already_present`;
+  - carta sem oracle/legalidade vira `needs_data`;
+  - carta com papel forte e regra battle ausente/nao confiavel vira
+    `needs_rule_review`;
+  - funcoes multiplas sao preservadas como arrays.
+- Lorehold ficou como caso de controle padrao, mas o pipeline descobre
+  comandantes via `commander_learned_decks`, `commander_card_usage` e
+  `--force-commander`.
+- O primeiro dry-run real read-only contra PostgreSQL nos sets `msh,msc,mar`
+  analisou 120 cartas e 8 comandantes, retornando principalmente
+  `needs_data`/`ignore`. A leitura correta e: o catalogo recente esta visivel,
+  mas ainda precisa de legalidade/oracle/tags suficientes antes de virar
+  recomendacao testavel.
+- Documento operacional:
+  `NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`.
+
 ### Atualizacao de ciclo — 2026-06-18 / local replay cache truth
 
 - Um falso suspeito de precedência no battle runtime foi reavaliado com prova

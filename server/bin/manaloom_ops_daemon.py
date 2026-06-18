@@ -90,6 +90,9 @@ def _base_env() -> dict[str, str]:
             "MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR": str(
                 ARTIFACT_DIR / "master_optimizer_preflight"
             ),
+            "MANALOOM_NEW_CARD_CANDIDATE_REVIEW_DIR": str(
+                ARTIFACT_DIR / "new_card_candidate_review"
+            ),
         }
     )
     return env
@@ -199,6 +202,16 @@ JOBS = [
         lockfile=LOCK_DIR / "auto_sync_learned_decks.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/auto_sync_learned_decks.sh',
         script_name="auto_sync_learned_decks.sh",
+    ),
+    Job(
+        name="manaloom_new_card_candidate_review",
+        schedule=os.environ.get(
+            "MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON",
+            "35 */6 * * *",
+        ),
+        lockfile=LOCK_DIR / "manaloom_new_card_candidate_review.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/manaloom_new_card_candidate_review.sh',
+        script_name="manaloom_new_card_candidate_review.sh",
     ),
     Job(
         name="auto_promote_learned_decks",
@@ -379,6 +392,7 @@ def _infer_status_from_output(path: Path) -> str | None:
         "nenhum evento novo.",
         "nenhum deck promovido elegivel encontrado.",
         "totals promoted=",
+        "manaloom_new_card_candidate_review",
         "# mana base validation report",
         "## enabled jobs",
     )
