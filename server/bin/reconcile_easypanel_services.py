@@ -22,7 +22,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ENV_CANDIDATES = [REPO_ROOT / ".env", REPO_ROOT / "server" / ".env"]
 DEFAULT_PROJECT = "evolution"
 DEFAULT_SERVICES = ("manaloom-ops", "hermes-lab")
-SECRET_KEYS = {"OPENAI_API_KEY", "API_SERVER_KEY", "EASYPANEL_API_TOKEN"}
+SECRET_KEYS = {
+    "OPENAI_API_KEY",
+    "API_SERVER_KEY",
+    "EASYPANEL_API_TOKEN",
+    "HERMES_GITHUB_TOKEN",
+    "GITHUB_TOKEN",
+    "GH_TOKEN",
+}
 
 
 @dataclass(frozen=True)

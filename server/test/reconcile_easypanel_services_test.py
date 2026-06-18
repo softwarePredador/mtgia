@@ -35,6 +35,7 @@ def test_merge_env_updates_only_target_keys() -> None:
 def test_redact_value_hides_secret_payloads() -> None:
     assert MODULE._redact_value("API_SERVER_KEY", "abc123") == "present"
     assert MODULE._redact_value("OPENAI_API_KEY", "") == "empty"
+    assert MODULE._redact_value("HERMES_GITHUB_TOKEN", "ghp-example") == "present"
 
 
 def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
