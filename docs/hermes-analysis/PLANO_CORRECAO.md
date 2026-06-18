@@ -4,20 +4,22 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-18 19:00 UTC
+> Data: 2026-06-18 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-18 19:00 UTC no checkout `920486c4`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. O delta desde a rodada de duplicacao anterior (`e47adcd5..HEAD`) removeu ou estreitou claims antigas: `sync_cards_utils.dart` agora e chamado pelo CLI real para parsing de janela/set/card row, o exporter Hermes de learned deck virou wrapper para a implementacao canonica em docs, `resolveOptimizeArchetype` tem fonte unica em `optimize_archetype_support.dart`, e `functional_card_tags.dart` usa `resolveCardFunctionalRoles` para roles estrategicos. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition e CMC/tipo. Novo risco estreito script-level: `server/bin/repo_runtime_paths.py` existe, mas parte dos crons Hermes ainda duplica resolucao de repo root/knowledge DB. A revalidacao de tabelas PostgreSQL de 2026-06-18 15:00 UTC no checkout `024903d6` confirmou que nao houve delta de produto desde a rodada anterior deste foco (`c33e15ba..HEAD`) nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-18 03:00 UTC no checkout `94f73400` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-18 07:00 UTC no checkout `2a9f76ee` nao encontrou delta de produto desde `caeade55` e manteve abertos os mesmos candidatos principais; o achado menor de `normalize_commander` continua estreito para a copia Hermes docs.
 
-A revalidacao de coerencia app/server de 2026-06-17 23:00 UTC no checkout
-`831c6ac8` nao encontrou delta de produto/testes/API/manual desde `5ce943fa` e
-nao abriu novo achado. Permanecem os mesmos tres gaps estreitos:
-`deck_rebuild_created` emitido/testado no app mas rejeitado por
-`_allowedEvents`, `GET /ai/commander-learning` consumido pelo app e ligado a
-`commander_learned_decks` mas ausente do API contract map, e consulta local de
-learned decks herdando middleware de IA custosa.
+A revalidacao de coerencia app/server de 2026-06-18 23:00 UTC no checkout
+`523589bc` fechou os tres gaps estreitos da rodada anterior:
+`deck_rebuild_created` agora esta aceito/documentado na rota de activation
+events, `GET /ai/commander-learning` esta documentado no API contract map com
+`commander_learned_decks`, e a rota de learned deck availability ficou
+autenticada sem herdar plano/rate-limit de IA custosa. Nao surgiu novo achado
+confiavel de coerencia no recorte `server/lib` <-> `server/routes` <->
+`app/lib`; o residual foi apenas operacional: `flutter test --no-pub` nao
+executou no app sem `app/.dart_tool/package_config.json`.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: revalidado em
@@ -662,17 +664,12 @@ apenas para os demais helpers abaixo.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-16 23:00 UTC:** REVALIDADO/ABERTO no checkout local
-  `5ce943fa`. Desde a rodada anterior deste mesmo foco (`9adb0989..HEAD`),
-  nao houve delta em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
-  `server/database_setup.sql`, testes app/server ou
-  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. Os achados anteriores de
-  ownership em `/ai/optimize`, `/ai/archetypes` e jobs async de
-  optimize/generate continuam resolvidos/stale. A lacuna ativa permanece
-  estreita: activation telemetry rejeita um evento emitido pelo app,
-  `/ai/commander-learning` e app-facing mas nao esta no API contract/data map, e
-  a disponibilidade automatica de learned decks usa o mesmo middleware de IA
-  custosa das rotas com LLM.
+- **Status 2026-06-18 23:00 UTC:** RESOLVIDO para os tres gaps estreitos
+  revalidados no checkout local `523589bc`. Os achados anteriores de ownership
+  em `/ai/optimize`, `/ai/archetypes` e jobs async de optimize/generate
+  continuam resolvidos/stale. A lacuna de activation telemetry foi fechada, o
+  contrato app-facing de `/ai/commander-learning` foi documentado, e a rota de
+  learned deck availability agora e auth-only no middleware de IA.
 - **Evidencia atualizada**:
   - O app envia `POST /ai/optimize` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`. A rota
@@ -694,11 +691,12 @@ apenas para os demais helpers abaixo.
     para generate em `server/lib/ai_generate_job.dart:18`-`:23` e
     `server/routes/ai/generate/jobs/[id].dart:16`-`:27`.
   - `app/lib/features/decks/providers/deck_provider.dart:603`-`:614` emite
-    `deck_rebuild_created` quando rebuild cria draft; a rota
-    `server/routes/users/me/activation-events/index.dart:10`-`:18` nao inclui
-    esse evento em `_allowedEvents` e rejeita fora da lista em `:46`-`:48`.
-    `app/test/features/decks/providers/deck_provider_test.dart:874`-`:891`
-    espera explicitamente esse evento no provider.
+    `deck_rebuild_created` quando rebuild cria draft. A rota
+    `server/routes/users/me/activation-events/index.dart:10`-`:18` agora inclui
+    esse evento em `_allowedEvents`, e
+    `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` documenta o evento aceito.
+    `server/test/activation_events_contract_test.dart:7`-`:20` guarda a
+    coerencia entre eventos emitidos pelo provider e eventos aceitos pela rota.
   - `app/lib/features/decks/screens/deck_generate_screen.dart:127`-`:130` carrega
     learned decks no primeiro frame; `:132`-`:143` indexa a disponibilidade por
     comandante; o provider chama
@@ -711,47 +709,47 @@ apenas para os demais helpers abaixo.
     retorna `promoted_deck`/`recommended_deck` em
     `server/routes/ai/commander-learning/index.dart:43`-`:53`.
   - A rota de learned decks le `commander_learned_decks` em
-    `server/routes/ai/commander-learning/index.dart:67`-`:92` e `:106`-`:132`;
+    `server/routes/ai/commander-learning/index.dart:69`-`:94` e `:112`-`:178`;
     o schema/modelo fica em
     `server/lib/ai/commander_learned_deck_support.dart:7` e `:283`-`:315`.
-    `rg "/ai/commander-learning" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
-    nao encontrou contrato, e `server/doc/API_CONTRACTS_AND_DATA_MAP.md:310`-`:315`
-    nao lista `commander_learned_decks` nos data sources.
-  - `server/routes/ai/_middleware.dart:16`-`:20` aplica
-    `aiPlanLimitMiddleware()` e `aiRateLimit()` a `/ai/commander-learning`.
-    `server/lib/plan_middleware.dart:35`-`:53` bloqueia quando a cota de IA
-    acaba, e `server/lib/rate_limit_middleware.dart:167`-`:170`/`:381`-`:397`
-    aplica bucket AI de 10/min em producao. O handler de commander-learning e
-    leitura local de PG; busca focada por `OpenAI|openai|http` encontrou apenas
-    o import de `http_responses.dart`.
-  - `cd server && dart analyze routes/ai/commander-learning/index.dart routes/users/me/activation-events/index.dart routes/ai/_middleware.dart`
-    retornou `No issues found!`.
+    `server/doc/API_CONTRACTS_AND_DATA_MAP.md:290` documenta o endpoint, as
+    variantes sem/com `commander`, consumidores, payloads, data source e
+    ausencia de chamada OpenAI/externa; `:313` lista `commander_learned_decks`
+    nos data sources AI/meta.
+  - `server/routes/ai/_middleware.dart:16`-`:31` separa `authOnlyHandler` de
+    `costlyAiHandler` e envia o path exato `/ai/commander-learning` para o
+    handler auth-only em `:27`-`:29`.
+  - `server/test/api_contracts_data_map_guard_test.dart:39`-`:54` exige a linha
+    de contrato de `/ai/commander-learning`; `server/test/commander_learned_deck_support_test.dart:160`-`:169`
+    guarda o bypass auth-only; `server/test/ai_generate_learning_boundary_test.dart:46`-`:60`
+    preserva `/ai/commander-learning` como rota explicita de learned decks.
+  - `cd server && dart analyze routes/ai/commander-learning/index.dart routes/users/me/activation-events/index.dart routes/ai/_middleware.dart test/activation_events_contract_test.dart test/ai_generate_learning_boundary_test.dart test/api_contracts_data_map_guard_test.dart`
+    retornou `No issues found!`. As suites
+    `activation_events_contract_test.dart`, `ai_generate_learning_boundary_test.dart`,
+    `api_contracts_data_map_guard_test.dart` e
+    `commander_learned_deck_support_test.dart` passaram.
+  - Limite local: `cd app && flutter test --no-pub ...` nao executou testes
+    porque `app/.dart_tool/package_config.json` esta ausente; `app/pubspec.yaml`
+    declara `flutter_test`, mas sem package config o runner nao resolveu a
+    dependencia.
 - **Impacto**: o risco de acesso cross-owner nos fluxos principais de optimize
-  foi removido nesta branch. Os riscos remanescentes sao de confiabilidade e
-  contrato: telemetria de rebuild some silenciosamente, um endpoint consumido
-  pelo app nao esta documentado como app-facing, e a UI de learned deck pode
-  desaparecer por plano/rate limit de IA mesmo quando a consulta e local.
+  continua removido. Os tres riscos remanescentes de confiabilidade/contrato
+  desta secao foram fechados no checkout atual; o risco residual e manter os
+  source guards quando o fluxo de learned decks evoluir.
 - **Acao recomendada**:
-  1. adicionar `deck_rebuild_created` a `_allowedEvents` com teste de rota, ou
-     remover a emissao no app se rebuild nao pertence ao funil;
-  2. atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` com
-     `GET /ai/commander-learning`, payloads sem/com `commander`, consumidores,
-     data source `commander_learned_decks`, testes e notas de compatibilidade;
-  3. decidir se learned-deck availability deve sair do middleware de IA custosa,
-     ganhar excecao documentada/testada ou ser explicitamente tratado como
-     capacidade de IA sujeita a `402/429`;
+  1. manter `activation_events_contract_test.dart` quando novos eventos forem
+     emitidos pelo app;
+  2. manter `api_contracts_data_map_guard_test.dart` quando endpoints
+     app-facing forem adicionados ao fluxo de IA/decks;
+  3. preservar a decisao auth-only de `/ai/commander-learning` enquanto a rota
+     seguir sendo leitura local de PostgreSQL sem chamada LLM/externa;
   4. manter testes owner vs non-owner para qualquer rota nova que aceite
      `deck_id`, usando optimize/archetypes como padrao positivo atual.
 - **Validacao**:
-  - teste backend aceita ou elimina `deck_rebuild_created`, e a doc deixa de
-    chamar consumidores app reais de `not proven`;
-  - `API_CONTRACTS_AND_DATA_MAP.md` passa a listar `/ai/commander-learning` e
-    `commander_learned_decks`;
-  - teste/contrato cobre `GET /ai/commander-learning` sem query e com
-    `commander`;
-  - se o endpoint continuar sob `/ai`, teste cobre comportamento esperado para
-    `402/429`; se for isento/movido, teste garante que a tela pode carregar
-    disponibilidade sem consumir/bloquear cota de IA custosa;
+  - `cd server && dart test test/activation_events_contract_test.dart test/ai_generate_learning_boundary_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`;
+  - `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`;
+  - apos restaurar `app/.dart_tool/package_config.json`, rodar
+    `cd app && flutter test --no-pub test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/providers/deck_provider_test.dart`.
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
 - **Status 2026-06-07 15:00 UTC: REVALIDADO no checkout `52f6084e`.** A rodada local focada em
