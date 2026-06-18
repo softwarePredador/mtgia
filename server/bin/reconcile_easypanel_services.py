@@ -237,6 +237,10 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
         desired = {
             "HERMES_HOME": "/opt/data",
             "HERMES_MODEL": runtime_env.get("HERMES_MODEL", existing_env.get("HERMES_MODEL", "gpt-4o-mini")),
+            "HERMES_PROVIDER": runtime_env.get("HERMES_PROVIDER", existing_env.get("HERMES_PROVIDER", "openai-api")),
+            "HERMES_STATE_ROOT": "/opt/data",
+            "HERMES_CRON_SCRIPTS_DIR": "/opt/data/scripts",
+            "HERMES_CRON_JOBS_JSON": "/opt/data/cron/jobs.json",
             "HERMES_DASHBOARD": "1",
             "HERMES_DASHBOARD_HOST": "127.0.0.1",
             "HERMES_DASHBOARD_PORT": "9119",
@@ -247,6 +251,7 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "API_SERVER_KEY": api_server_key,
             "HERMES_CRON_BOOTSTRAP": "1",
             "HERMES_CRON_BOOTSTRAP_REQUIRED": "1",
+            "HERMES_DOCS_SYNC_ALLOW_ROOT": "1",
             "HERMES_REPO_REF": "master",
             "HERMES_REPO_AUTO_SYNC": "0",
         }

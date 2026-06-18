@@ -30,7 +30,7 @@ def _resolve_repo_root() -> Path:
 
 REPO_ROOT = _resolve_repo_root()
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", "/opt/data")).resolve()
-HERMES_STATE_ROOT = Path(os.environ.get("HERMES_STATE_ROOT", str(HERMES_HOME / ".hermes"))).resolve()
+HERMES_STATE_ROOT = Path(os.environ.get("HERMES_STATE_ROOT", str(HERMES_HOME))).resolve()
 HERMES_SCRIPTS_DIR = Path(
     os.environ.get("HERMES_CRON_SCRIPTS_DIR", str(HERMES_STATE_ROOT / "scripts"))
 ).resolve()
@@ -43,7 +43,7 @@ ARTIFACT_DIR = Path(
         str(HERMES_HOME / "artifacts" / "hermes_cron_bootstrap"),
     )
 ).resolve()
-HERMES_CLI = os.environ.get("HERMES_CLI", "hermes")
+HERMES_CLI = os.environ.get("HERMES_CLI", "/opt/hermes/bin/hermes")
 WORKDIR = Path(os.environ.get("MANALOOM_WORKSPACE", str(REPO_ROOT))).resolve()
 DELIVER = os.environ.get("HERMES_CRON_DELIVER", "local")
 DRY_RUN = os.environ.get("HERMES_CRON_BOOTSTRAP_DRY_RUN", "0") == "1"
@@ -263,8 +263,8 @@ if profile is None:
     sys.exit(0)
 
 repo = Path(os.environ.get("MANALOOM_WORKSPACE") or os.environ.get("HERMES_REPO_DIR") or "/opt/data/workspace/mtgia").resolve()
-state_root = Path(os.environ.get("HERMES_STATE_ROOT", "/opt/data/.hermes")).resolve() / "data" / "manaloom" / "cron-gates"
-jobs_json = Path(os.environ.get("HERMES_CRON_JOBS_JSON", str(Path(os.environ.get("HERMES_STATE_ROOT", "/opt/data/.hermes")).resolve() / "cron" / "jobs.json"))).resolve()
+state_root = Path(os.environ.get("HERMES_STATE_ROOT", "/opt/data")).resolve() / "data" / "manaloom" / "cron-gates"
+jobs_json = Path(os.environ.get("HERMES_CRON_JOBS_JSON", str(Path(os.environ.get("HERMES_STATE_ROOT", "/opt/data")).resolve() / "cron" / "jobs.json"))).resolve()
 state_root.mkdir(parents=True, exist_ok=True)
 state_file = state_root / f"{{SCRIPT_PATH.stem}}.json"
 

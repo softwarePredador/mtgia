@@ -4,7 +4,7 @@ USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV FLUTTER_VERSION=3.44.0
-ENV PATH="/opt/tools/flutter/bin:/opt/tools/flutter/bin/cache/dart-sdk/bin:/root/.pub-cache/bin:${PATH}"
+ENV PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:/opt/tools/flutter/bin:/opt/tools/flutter/bin/cache/dart-sdk/bin:/root/.pub-cache/bin:${PATH}"
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \

@@ -10,6 +10,12 @@ REPO_AUTO_SYNC="${HERMES_REPO_AUTO_SYNC:-0}"
 FLUTTER_BIN="/opt/tools/flutter/bin"
 DART_BIN="/opt/tools/flutter/bin/cache/dart-sdk/bin"
 PUB_CACHE_BIN="/root/.pub-cache/bin"
+HERMES_BIN="/opt/hermes/bin"
+HERMES_VENV_BIN="/opt/hermes/.venv/bin"
+HERMES_PROVIDER="${HERMES_PROVIDER:-openai-api}"
+HERMES_STATE_ROOT="${HERMES_STATE_ROOT:-$HERMES_HOME}"
+HERMES_CRON_SCRIPTS_DIR="${HERMES_CRON_SCRIPTS_DIR:-$HERMES_STATE_ROOT/scripts}"
+HERMES_CRON_JOBS_JSON="${HERMES_CRON_JOBS_JSON:-$HERMES_STATE_ROOT/cron/jobs.json}"
 LOG_DIR="${HERMES_LAB_LOG_DIR:-$HERMES_HOME/logs}"
 RUNTIME_ARTIFACT_DIR="${HERMES_LAB_RUNTIME_ARTIFACT_DIR:-$HERMES_HOME/artifacts/hermes_lab_runtime}"
 BOOTSTRAP_REPORT_DIR="${HERMES_CRON_BOOTSTRAP_ARTIFACT_DIR:-$HERMES_HOME/artifacts/hermes_cron_bootstrap}"
@@ -17,7 +23,14 @@ BOOTSTRAP_REPORT_PATH="$BOOTSTRAP_REPORT_DIR/latest_bootstrap_report.json"
 BOOTSTRAP_LOG_PATH="$LOG_DIR/hermes_lab_bootstrap.log"
 STARTUP_STATUS_PATH="${HERMES_LAB_STARTUP_STATUS_FILE:-$RUNTIME_ARTIFACT_DIR/startup_status.json}"
 
-mkdir -p "$HERMES_HOME" "$WORKSPACE_ROOT" "$HERMES_HOME/.config" "$LOG_DIR" "$RUNTIME_ARTIFACT_DIR"
+mkdir -p \
+  "$HERMES_HOME" \
+  "$WORKSPACE_ROOT" \
+  "$HERMES_HOME/.config" \
+  "$LOG_DIR" \
+  "$RUNTIME_ARTIFACT_DIR" \
+  "$HERMES_CRON_SCRIPTS_DIR" \
+  "$(dirname "$HERMES_CRON_JOBS_JSON")"
 
 write_runtime_status() {
   local phase="$1"
@@ -63,10 +76,14 @@ fi
 write_runtime_status "workspace" "ready" "repository prepared"
 
 cat > "$HERMES_HOME/.profile" <<EOF
-export PATH=$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:\$PATH
+export PATH=$HERMES_BIN:$HERMES_VENV_BIN:$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:\$PATH
 export HERMES_HOME=$HERMES_HOME
 export MANALOOM_WORKSPACE=$REPO_DIR
 export HERMES_REPO_DIR=$REPO_DIR
+export HERMES_STATE_ROOT=$HERMES_STATE_ROOT
+export HERMES_CRON_SCRIPTS_DIR=$HERMES_CRON_SCRIPTS_DIR
+export HERMES_CRON_JOBS_JSON=$HERMES_CRON_JOBS_JSON
+export HERMES_PROVIDER=$HERMES_PROVIDER
 EOF
 
 touch "$HERMES_HOME/.env"
@@ -104,13 +121,22 @@ upsert_env_file "OPENAI_API_KEY" "${OPENAI_API_KEY:-}"
 upsert_env_file "API_SERVER_KEY" "${API_SERVER_KEY:-}"
 
 export HOME="$HERMES_HOME"
-export PATH="$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
+export PATH="$HERMES_BIN:$HERMES_VENV_BIN:$FLUTTER_BIN:$DART_BIN:$PUB_CACHE_BIN:$PATH"
 export MANALOOM_REPO="$REPO_DIR"
+export HERMES_STATE_ROOT
+export HERMES_CRON_SCRIPTS_DIR
+export HERMES_CRON_JOBS_JSON
+export HERMES_PROVIDER
+unset HERMES_INFERENCE_PROVIDER
 
 cd "$HERMES_HOME"
 
 if [[ -n "${HERMES_MODEL:-}" ]]; then
-  hermes config set model "$HERMES_MODEL" >/dev/null 2>&1 || true
+  hermes config set model.default "$HERMES_MODEL" >/dev/null 2>&1 || true
+fi
+if [[ -n "${OPENAI_API_KEY:-}" ]]; then
+  hermes config set model.provider "$HERMES_PROVIDER" >/dev/null 2>&1 || true
+  hermes config set model.base_url "${OPENAI_BASE_URL:-https://api.openai.com/v1}" >/dev/null 2>&1 || true
 fi
 
 if [[ "${HERMES_CRON_BOOTSTRAP:-1}" == "1" ]]; then

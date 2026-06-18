@@ -13,11 +13,11 @@ REPO="${MANALOOM_WORKSPACE:-/opt/data/workspace/mtgia}"
 REMOTE="${HERMES_GIT_REMOTE:-origin}"
 MASTER_BRANCH="${HERMES_MASTER_BRANCH:-master}"
 DOCS_BRANCH="${HERMES_DOCS_BRANCH:-codex/hermes-analysis-docs}"
-STATE_DIR="${HERMES_STATE_DIR:-/opt/data/.hermes/data/manaloom}"
+STATE_DIR="${HERMES_STATE_DIR:-/opt/data/data/manaloom}"
 REPORT_DIR="${HERMES_DOCS_SYNC_REPORT_DIR:-/opt/data/artifacts/hermes_docs_branch_sync}"
 PUSH="${HERMES_DOCS_SYNC_PUSH:-1}"
 DRY_RUN="${HERMES_DOCS_SYNC_DRY_RUN:-0}"
-ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-0}"
+ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-1}"
 
 mkdir -p "$STATE_DIR" "$REPORT_DIR"
 
@@ -48,7 +48,7 @@ write_report() {
 }
 
 if [[ "${EUID:-$(id -u)}" == "0" && "$ALLOW_ROOT" != "1" ]]; then
-  write_report "blocked_root_user" "Run this cron as the hermes user, not root. Set HERMES_DOCS_SYNC_ALLOW_ROOT=1 only for emergency recovery."
+  write_report "blocked_root_user" "Run this cron as the hermes user, not root. Set HERMES_DOCS_SYNC_ALLOW_ROOT=1 only when the runtime is a root-owned container."
   exit 64
 fi
 
