@@ -82,6 +82,7 @@ def test_desired_env_for_hermes_lab_generates_missing_api_key() -> None:
     assert desired["HERMES_KNOWLEDGE_DB"].endswith("/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db")
     assert desired["MANALOOM_KNOWLEDGE_DB"] == desired["HERMES_KNOWLEDGE_DB"]
     assert desired["API_SERVER_ENABLED"] == "true"
+    assert desired["HERMES_REPO_AUTO_SYNC"] == "1"
     assert len(desired["API_SERVER_KEY"]) >= 20
 
 

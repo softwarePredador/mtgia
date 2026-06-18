@@ -444,8 +444,8 @@ def _script_path(name: str) -> Path:
 
 def _resolve_docs_branch_sync_source() -> Path:
     candidates = [
-        REPO_ROOT / "server" / "bin" / "hermes_docs_branch_sync.sh",
         Path("/opt/bootstrap/hermes_docs_branch_sync.sh"),
+        REPO_ROOT / "server" / "bin" / "hermes_docs_branch_sync.sh",
     ]
     for candidate in candidates:
         if candidate.exists():

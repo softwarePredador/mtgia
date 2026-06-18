@@ -260,6 +260,13 @@ Correcao aplicada:
 - `server/bin/hermes_docs_branch_sync.sh` agora reseta a branch docs local para
   `origin/codex/hermes-analysis-docs` antes de criar o merge fresco de
   `origin/master`;
+- `server/bin/hermes_lab_entrypoint.sh` agora deixa `HERMES_REPO_AUTO_SYNC=1`
+  por padrao e registra `safe.directory` antes de operar o checkout persistido;
+- `server/bin/reconcile_easypanel_services.py` passa a declarar
+  `HERMES_REPO_AUTO_SYNC=1` no ambiente desejado do `hermes-lab`;
+- `server/bin/hermes_lab_cron_bootstrap.py` prefere a copia empacotada em
+  `/opt/bootstrap/hermes_docs_branch_sync.sh` para scripts operacionais,
+  evitando que o repo persistido stale copie uma versao antiga do script;
 - a rotina continua bloqueando tracked dirty worktree antes de qualquer
   checkout;
 - untracked files continuam sendo movidos para quarentena antes do sync;

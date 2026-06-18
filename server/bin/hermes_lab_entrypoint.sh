@@ -6,7 +6,7 @@ WORKSPACE_ROOT="${HERMES_WORKSPACE_ROOT:-$HERMES_HOME/workspace}"
 REPO_DIR="${HERMES_REPO_DIR:-$WORKSPACE_ROOT/mtgia}"
 REPO_URL="${HERMES_REPO_URL:-https://github.com/softwarePredador/mtgia.git}"
 REPO_REF="${HERMES_REPO_REF:-master}"
-REPO_AUTO_SYNC="${HERMES_REPO_AUTO_SYNC:-0}"
+REPO_AUTO_SYNC="${HERMES_REPO_AUTO_SYNC:-1}"
 DART_BIN="/opt/tools/dart-sdk/bin"
 PUB_CACHE_BIN="/root/.pub-cache/bin"
 HERMES_BIN="/opt/hermes/bin"
@@ -67,6 +67,7 @@ write_runtime_status "entrypoint" "starting" "initializing hermes-lab runtime"
 if [[ ! -d "$REPO_DIR/.git" ]]; then
   git clone --branch "$REPO_REF" --single-branch "$REPO_URL" "$REPO_DIR"
 else
+  git config --global --add safe.directory "$REPO_DIR" >/dev/null 2>&1 || true
   git -C "$REPO_DIR" fetch --all --prune || true
   if [[ "$REPO_AUTO_SYNC" == "1" ]]; then
     git -C "$REPO_DIR" checkout "$REPO_REF"

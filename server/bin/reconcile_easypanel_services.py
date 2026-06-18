@@ -267,7 +267,7 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "HERMES_CRON_BOOTSTRAP_REQUIRED": "1",
             "HERMES_DOCS_SYNC_ALLOW_ROOT": "1",
             "HERMES_REPO_REF": "master",
-            "HERMES_REPO_AUTO_SYNC": "0",
+            "HERMES_REPO_AUTO_SYNC": "1",
         }
         openai_key = runtime_env.get("OPENAI_API_KEY") or existing_env.get("OPENAI_API_KEY")
         if openai_key:
