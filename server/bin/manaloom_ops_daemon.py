@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import json
+import re
 import sqlite3
 import subprocess
 import sys
@@ -98,13 +99,16 @@ def _knowledge_db_has_validator_tables(path: Path) -> bool:
     if not path.exists():
         return False
     try:
-        with sqlite3.connect(path) as conn:
+        conn = sqlite3.connect(path)
+        try:
             tables = {
                 row[0]
                 for row in conn.execute(
                     "SELECT name FROM sqlite_master WHERE type='table'"
                 ).fetchall()
             }
+        finally:
+            conn.close()
         return {"decks", "deck_cards"}.issubset(tables)
     except sqlite3.Error:
         return False
@@ -295,6 +299,118 @@ def _write_jobs_manifest(
     JOBS_JSON.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
+def _load_existing_state(jobs: list[Job]) -> dict[str, dict[str, object]]:
+    if not JOBS_JSON.exists():
+        return {}
+    try:
+        payload = json.loads(JOBS_JSON.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if isinstance(payload, dict):
+        payload = payload.get("jobs", payload)
+    if not isinstance(payload, list):
+        return {}
+
+    allowed_names = {job.name for job in jobs}
+    fields = (
+        "last_status",
+        "last_started_at",
+        "last_finished_at",
+        "last_exit_code",
+        "latest_output",
+    )
+    state: dict[str, dict[str, object]] = {}
+    for row in payload:
+        if not isinstance(row, dict):
+            continue
+        job_name = str(row.get("name") or row.get("id") or "").strip()
+        if not job_name or job_name not in allowed_names:
+            continue
+        state[job_name] = {
+            field: row[field]
+            for field in fields
+            if field in row and row[field] is not None
+        }
+    for job in jobs:
+        recovered = _recover_state_from_output_dir(job)
+        if not recovered:
+            continue
+        current = state.get(job.name, {})
+        if any(current.get(field) is not None for field in fields):
+            continue
+        state[job.name] = recovered
+    return state
+
+
+_LOG_TIMESTAMP_RE = re.compile(r"(?P<stamp>\d{8}_\d{6})\.log$")
+
+
+def _parse_log_timestamp(path: Path) -> str | None:
+    match = _LOG_TIMESTAMP_RE.search(path.name)
+    if not match:
+        return None
+    stamp = match.group("stamp")
+    try:
+        return datetime.strptime(stamp, "%Y%m%d_%H%M%S").isoformat(timespec="seconds")
+    except ValueError:
+        return None
+
+
+def _infer_status_from_output(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8", errors="replace")
+    lowered = text.lower()
+    error_markers = (
+        "traceback",
+        "runtimeerror",
+        "keyboardinterrupt",
+        "fatal:",
+        "exception",
+        "error:",
+    )
+    if any(marker in lowered for marker in error_markers):
+        return "error"
+    success_markers = (
+        "=ok",
+        "houve mudanças nos dados.",
+        "script gate returned `wakeagent=false`",
+        "script gate returned `wakeagent=true`",
+        "nenhum evento novo.",
+        "nenhum deck promovido elegivel encontrado.",
+        "totals promoted=",
+        "# mana base validation report",
+        "## enabled jobs",
+    )
+    if any(marker in lowered for marker in success_markers):
+        return "ok"
+    if text.strip():
+        return "ok"
+    return None
+
+
+def _recover_state_from_output_dir(job: Job) -> dict[str, object]:
+    job_dir = CRON_OUTPUT_DIR / job.name
+    if not job_dir.exists():
+        return {}
+    candidates = sorted(job_dir.glob("*.log"), key=lambda path: path.name, reverse=True)
+    if not candidates:
+        return {}
+    latest = candidates[0]
+    started_at = _parse_log_timestamp(latest)
+    status = _infer_status_from_output(latest)
+    recovered: dict[str, object] = {
+        "latest_output": str(latest),
+    }
+    if started_at is not None:
+        recovered["last_started_at"] = started_at
+        recovered["last_finished_at"] = started_at
+    if status is not None:
+        recovered["last_status"] = status
+        recovered["last_exit_code"] = 0 if status == "ok" else 1
+    return recovered
+
+
 def _job_log_path(job: Job) -> Path:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     job_dir = CRON_OUTPUT_DIR / job.name
@@ -367,7 +483,7 @@ def main() -> int:
     KNOWLEDGE_DB.parent.mkdir(parents=True, exist_ok=True)
 
     env = _base_env()
-    state: dict[str, dict[str, object]] = {}
+    state = _load_existing_state(JOBS)
     _write_jobs_manifest(JOBS, state)
 
     print("[manaloom-ops] scheduler started", flush=True)

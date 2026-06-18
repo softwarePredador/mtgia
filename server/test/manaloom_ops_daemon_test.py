@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sqlite3
 import sys
 import tempfile
@@ -61,11 +62,82 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "knowledge.db"
-            with sqlite3.connect(db_path) as conn:
+            conn = sqlite3.connect(db_path)
+            try:
                 conn.execute("CREATE TABLE decks (id INTEGER PRIMARY KEY)")
                 self.assertFalse(module._knowledge_db_has_validator_tables(db_path))
                 conn.execute("CREATE TABLE deck_cards (id INTEGER PRIMARY KEY)")
+            finally:
+                conn.close()
             self.assertTrue(module._knowledge_db_has_validator_tables(db_path))
+
+    def test_load_existing_state_reuses_last_job_status_from_jobs_json(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            jobs_json = Path(tmp) / "jobs.json"
+            jobs_json.write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": "manaloom_knowledge_import",
+                            "name": "manaloom_knowledge_import",
+                            "last_status": "ok",
+                            "last_started_at": "2026-06-18T07:36:27",
+                            "last_finished_at": "2026-06-18T07:36:28",
+                            "last_exit_code": 0,
+                            "latest_output": "/data/manaloom-ops/cron/output/manaloom_knowledge_import/20260618_073627.log",
+                        },
+                        {
+                            "id": "unknown_job",
+                            "name": "unknown_job",
+                            "last_status": "error",
+                        },
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            original_jobs_json = module.JOBS_JSON
+            try:
+                module.JOBS_JSON = jobs_json
+                state = module._load_existing_state(module.JOBS)
+            finally:
+                module.JOBS_JSON = original_jobs_json
+        self.assertEqual(state["manaloom_knowledge_import"]["last_status"], "ok")
+        self.assertEqual(state["manaloom_knowledge_import"]["last_exit_code"], 0)
+        self.assertNotIn("unknown_job", state)
+
+    def test_load_existing_state_recovers_from_latest_log_when_manifest_is_empty(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            jobs_json = Path(tmp) / "jobs.json"
+            jobs_json.write_text("[]\n", encoding="utf-8")
+            cron_output_dir = Path(tmp) / "cron" / "output" / "manaloom_knowledge_import"
+            cron_output_dir.mkdir(parents=True, exist_ok=True)
+            log_path = cron_output_dir / "20260618_073627.log"
+            log_path.write_text(
+                "=== Importando conhecimento Hermes → PostgreSQL ===\n"
+                "✔ Houve mudanças nos dados.\n"
+                "manaloom_knowledge_import=ok\n",
+                encoding="utf-8",
+            )
+            original_jobs_json = module.JOBS_JSON
+            original_output_dir = module.CRON_OUTPUT_DIR
+            try:
+                module.JOBS_JSON = jobs_json
+                module.CRON_OUTPUT_DIR = Path(tmp) / "cron" / "output"
+                state = module._load_existing_state(module.JOBS)
+            finally:
+                module.JOBS_JSON = original_jobs_json
+                module.CRON_OUTPUT_DIR = original_output_dir
+        self.assertEqual(state["manaloom_knowledge_import"]["last_status"], "ok")
+        self.assertEqual(
+            state["manaloom_knowledge_import"]["latest_output"],
+            str(log_path),
+        )
+        self.assertEqual(
+            state["manaloom_knowledge_import"]["last_started_at"],
+            "2026-06-18T07:36:27",
+        )
 
 
 if __name__ == "__main__":

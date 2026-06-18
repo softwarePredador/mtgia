@@ -117,6 +117,50 @@ de diretorio como:
 Isso nao quebrou a execucao final dos jobs, mas ainda gera ruido em rodadas
 mais antigas e pode alongar execucoes provider-backed desnecessariamente.
 
+## Follow-up live — 2026-06-18 08:51 UTC
+
+Nova rodada validada em:
+
+- `server/test/artifacts/easypanel_cron_runtime_2026-06-18_post_manual_knowledge_import/summary.json`
+- `server/test/artifacts/easypanel_cron_runtime_2026-06-18_post_manual_knowledge_import/report.md`
+
+Essa rodada fechou dois pontos que ainda pareciam ambíguos no snapshot das
+06:23 UTC:
+
+1. `manaloom_knowledge_import` no `manaloom-ops`
+   - o erro antigo de `DATABASE_URL is not set` ficou para trás;
+   - a evidência atual do cron aponta output real com import concluído e
+     `manaloom_knowledge_import=ok`;
+   - uma execução manual dentro do container confirmou import efetivo em
+     PostgreSQL, com `card_deck_profiles` alterando e log final em
+     `/app/server/test/artifacts/knowledge_import/knowledge_import_20260618_084640.log`.
+
+2. Jobs provider-backed do `hermes-lab`
+   - `manaloom-commander-knowledge-deep` já executou no container após a janela
+     de agenda (`last_run_at=2026-06-18T08:50:58.445151+00:00`, `last_status=ok`);
+   - `manaloom-gamechanger-research` e `manaloom-knowledge-synthesis` também
+     rodaram e provaram o fluxo de gate, retornando `wakeAgent=false` quando não
+     havia delta real;
+   - isso confirma que a topologia final `gate script -> decisão wake/skip ->
+     output em /opt/data/cron/output/<job_id>/...` está funcional no EasyPanel.
+
+## Correção de observabilidade aplicada
+
+O `manaloom-ops` ainda podia reaparecer com `last_status=None` após restart de
+container mesmo quando um job já tinha output `ok`, porque o daemon zerava o
+estado em memória e sobrescrevia `jobs.json` no boot.
+
+Correção aplicada em `server/bin/manaloom_ops_daemon.py`:
+
+- o daemon agora carrega o `jobs.json` existente antes de reescrever o
+  manifesto;
+- isso preserva `last_status`, `last_started_at`, `last_finished_at`,
+  `last_exit_code` e `latest_output` de jobs já executados;
+- quando o manifesto já tiver sido zerado por uma versão antiga do daemon, ele
+  também reconstrói o estado básico a partir do log mais recente em
+  `/data/manaloom-ops/cron/output/<job>/`;
+- isso evita falsos negativos operacionais em auditorias logo após redeploy.
+
 ## Correcao aplicada
 
 `server/bin/hermes_lab_cron_bootstrap.py` foi endurecido para que todos os
