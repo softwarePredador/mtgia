@@ -21,6 +21,7 @@ DRY_RUN="${HERMES_DOCS_SYNC_DRY_RUN:-0}"
 ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-1}"
 GIT_USER_NAME="${HERMES_GIT_USER_NAME:-Hermes Agent}"
 GIT_USER_EMAIL="${HERMES_GIT_USER_EMAIL:-hermes-agent@local.invalid}"
+GIT_PUSH_TOKEN="${HERMES_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN:-}}}"
 
 mkdir -p "$STATE_DIR" "$REPORT_DIR"
 
@@ -125,6 +126,25 @@ fi
 if [[ -z "$(git config --get user.email || true)" ]]; then
   git config --global user.email "$GIT_USER_EMAIL"
 fi
+if [[ -n "$GIT_PUSH_TOKEN" ]]; then
+  remote_url="$(git remote get-url "$REMOTE" 2>/dev/null || true)"
+  repo_path=""
+  case "$remote_url" in
+    git@github.com:*)
+      repo_path="${remote_url#git@github.com:}"
+      ;;
+    https://github.com/*)
+      repo_path="${remote_url#https://github.com/}"
+      ;;
+    https://*@github.com/*)
+      repo_path="${remote_url#*@github.com/}"
+      ;;
+  esac
+  if [[ -n "$repo_path" ]]; then
+    repo_path="${repo_path%.git}.git"
+    git remote set-url --push "$REMOTE" "https://x-access-token:${GIT_PUSH_TOKEN}@github.com/${repo_path}"
+  fi
+fi
 
 tracked_dirty="$(git status --porcelain --untracked-files=no)"
 if [[ -n "$tracked_dirty" ]]; then
@@ -160,8 +180,16 @@ git merge --ff-only --quiet "${REMOTE}/${DOCS_BRANCH}"
 
 docs_before="$(git rev-parse HEAD)"
 master_sha="$(git rev-parse "${REMOTE}/${MASTER_BRANCH}")"
+remote_docs_before="$(git rev-parse "${REMOTE}/${DOCS_BRANCH}")"
 
 if git merge-base --is-ancestor "$master_sha" HEAD; then
+  docs_current="$(git rev-parse HEAD)"
+  if [[ "$PUSH" == "1" && "$docs_current" != "$remote_docs_before" ]]; then
+    if ! git push --quiet "$REMOTE" "HEAD:${DOCS_BRANCH}"; then
+      finish "blocked_push_failed" "Docs branch already contains ${REMOTE}/${MASTER_BRANCH}@${master_sha} locally, but push to ${REMOTE}/${DOCS_BRANCH} failed. Manual credential triage is required before audits continue." 6
+    fi
+    finish "pushed_up_to_date" "Pushed local docs branch ${docs_current} to ${REMOTE}/${DOCS_BRANCH}; it already contained ${REMOTE}/${MASTER_BRANCH}@${master_sha}.\n\n${quarantine_details}"
+  fi
   finish "up_to_date" "Docs branch already contains ${REMOTE}/${MASTER_BRANCH}@${master_sha}.\n\n${quarantine_details}"
 fi
 
