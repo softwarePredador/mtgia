@@ -265,7 +265,9 @@ def _count_card_for_tag(canonical_tag: str, *, primary_tag: str | None, tags: se
         return is_land
     if is_land:
         return False
-    return primary_tag == canonical_tag or canonical_tag in tags
+    if not primary_tag:
+        return False
+    return _normalized_role_tag(primary_tag) == canonical_tag
 
 
 def validate(conn: sqlite3.Connection, artifacts_dir: Path) -> list[DeckValidation]:

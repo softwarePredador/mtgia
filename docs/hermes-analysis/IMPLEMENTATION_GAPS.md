@@ -33,7 +33,8 @@
     (`mana_rocks_treasure_ramp`, `draw_rummage_opponent_turn_draw`,
     `spot_interaction`, `board_wipes_resets`, etc.);
   - contagem semântica por carta usando `functional_tags_json` + `type_line`
-    para detectar land, e exclusão de lands do bucket bruto de `ramp`.
+    apenas para detectar land, enquanto os buckets de função seguem o papel
+    primário normalizado da carta e excluem lands do bucket bruto de `ramp`.
 - Validação:
   - `python3 server/test/hermes_mana_base_validator_test.py`
   - caso novo cobre exatamente o cenário real: lands multi-tag com
