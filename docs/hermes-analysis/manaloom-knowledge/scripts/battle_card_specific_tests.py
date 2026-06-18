@@ -1964,6 +1964,106 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_goblin_bombardment_sacrifices_expendable_token_for_damage():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        active = player("Active")
+        opponent = player("Opponent")
+        opponent.life = 3
+        token = battle.create_creature_token(
+            active,
+            name="Goblin Token",
+            power=1,
+            toughness=1,
+        )
+        outlet = {
+            "name": "Goblin Bombardment",
+            "cmc": 2,
+            "type_line": "Enchantment",
+            "effect": "sacrifice_damage_outlet",
+            "activated_sacrifice_creature_damage": True,
+            "damage": 1,
+            "_rule_source": "focused_test",
+            "_rule_review_status": "needs_review",
+        }
+        active.battlefield.append(outlet)
+
+        activations = battle.activate_sacrifice_damage_outlets(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            rng=random.Random(109),
+            phase="precombat_main",
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+        battle.DECISION_TRACE_HANDLER = None
+
+        assert activations == 1
+        assert opponent.life == 2
+        assert token not in active.battlefield
+        assert token not in active.graveyard
+        assert outlet in active.battlefield
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Goblin Bombardment"
+            and data.get("activation_kind") == "sacrifice_creature_damage"
+            and data.get("sacrificed") == "Goblin Token"
+            and data.get("target") == "Opponent"
+            and data.get("damage_dealt") == 1
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "activated_sacrifice_damage"
+            and decision.get("chosen_option", {}).get("card") == "Goblin Token"
+            for decision in decisions
+        )
+
+    def test_goblin_bombardment_skips_without_expendable_creature():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        commander = {
+            "name": "Lorehold, the Historian",
+            "cmc": 5,
+            "type_line": "Legendary Creature — Elder Dragon",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+            "is_commander": True,
+        }
+        outlet = {
+            "name": "Goblin Bombardment",
+            "cmc": 2,
+            "type_line": "Enchantment",
+            "effect": "sacrifice_damage_outlet",
+            "activated_sacrifice_creature_damage": True,
+            "damage": 1,
+        }
+        active.battlefield = [outlet, commander]
+
+        activations = battle.activate_sacrifice_damage_outlets(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            rng=random.Random(110),
+            phase="precombat_main",
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 0
+        assert commander in active.battlefield
+        assert any(
+            event == "activated_ability_skipped"
+            and data.get("card") == "Goblin Bombardment"
+            and data.get("strategic_guardrail_reason") == "no_expendable_creature_to_sacrifice"
+            for event, data in events
+        )
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -2016,4 +2116,6 @@ def register_tests(battle, player):
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
+        test_goblin_bombardment_sacrifices_expendable_token_for_damage,
+        test_goblin_bombardment_skips_without_expendable_creature,
     ]

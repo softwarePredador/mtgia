@@ -876,17 +876,52 @@ oracle_text_excerpt == "Counter target spell."
 effect_families inclui counterspell_stack_interaction
 ```
 
+Templates adicionais suportados no mesmo pipeline:
+
+```text
+Sacrifice outlet de dano simples
+- oracle_text contem "Sacrifice a creature:"
+- oracle_text contem dano a alvo/any target
+- executor estreito: activate_sacrifice_damage_outlets()
+- so sacrifica criatura expendable; nao sacrifica commander, mana creature ou
+  criatura de alto valor por um dano sem justificativa
+
+Extra combat + flashback simples
+- oracle_text contem additional combat phase
+- oracle_text contem flashback
+- prova resolucao da mao, cast via graveyard, replacement para exile e replay
+  audit sem critical/high
+```
+
 Resultado de controle:
 
 - `Counterspell` ficou elegível para
   `eligible_for_manual_verified_promotion` depois de cenário focado
   stack/counterspell e replay/decision audit sem finding crítico/high;
-- `Goblin Bombardment`, `Iron Man, Titan of Innovation` e `Seize the Day`
-  permaneceram bloqueados porque exigem executores contextuais próprios.
+- `Goblin Bombardment` ficou elegível para promoção manual depois de cenário
+  focado de sacrifice outlet com token expendable, dano aplicado e decision
+  trace;
+- `Seize the Day` ficou elegível para promoção manual depois de cenário focado
+  de extra combat + flashback/recast;
+- `Iron Man, Titan of Innovation` permaneceu bloqueado porque exige executor
+  contextual próprio para trigger de ataque, geração de Treasure, contagem de
+  artefatos, sacrifício opcional e artifact tutor.
 
 Logo, o gate já prova que regras simples podem avançar para revisão manual,
 mas ainda preserva a barreira correta para cartas multi-etapa ou com custo/
 trigger/flashback complexo.
+
+Na rodada real read-only local contra `msh,msc,mar`, os bloqueadores restantes
+foram:
+
+- `Concerted Effort`: precisa modelo focado de compartilhamento contínuo de
+  habilidades/keywords.
+- `Final Showdown`: precisa template focado para spell modal com wipe/protection
+  e timing estratégico.
+- `Iron Man, Titan of Innovation`: precisa trigger de ataque + treasure +
+  artifact tutor.
+- `Warleader's Call`: precisa template de engine estática/trigger de dano em
+  entrada de criaturas.
 
 Campos tipicos encontrados no snapshot/fallback legado:
 

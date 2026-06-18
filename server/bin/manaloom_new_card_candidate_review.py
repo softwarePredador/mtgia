@@ -287,6 +287,9 @@ def battle_rule_status(card: CardRecord, roles: list[str]) -> str:
         return "verified"
     if card.battle_rule_count > 0:
         return "needs_review"
+    text = card.oracle_text.lower()
+    if "additional combat phase" in text or "flashback" in text:
+        return "missing"
     if any(role in roles for role in ("removal", "board_wipe", "tutor", "engine", "wincon", "combo")):
         return "missing"
     return "not_required"
@@ -371,9 +374,11 @@ def evaluate_card_for_commander(card: CardRecord, commander: CommanderTarget) ->
         score, score_reasons = score_candidate(card, commander, roles)
         reasons.extend(score_reasons)
         rule_status = battle_rule_status(card, roles)
-        if rule_status in {"missing", "needs_review"} and score >= 45:
+        if rule_status in {"missing", "needs_review"}:
             decision = "needs_rule_review"
             reasons.append(f"battle_rule_status:{rule_status}")
+            if score < 45:
+                reasons.append("rule_gap_queued_below_candidate_threshold")
         elif score >= 70:
             decision = "test"
             reasons.append("score_above_test_threshold")

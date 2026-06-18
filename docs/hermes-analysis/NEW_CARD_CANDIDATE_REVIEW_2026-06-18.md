@@ -227,18 +227,38 @@ crítico.
 
 `manaloom_battle_rule_focused_evidence` consome os drafts e gera evidência
 somente para templates pequenos, rastreáveis e suportados por teste focado.
-No primeiro slice, o único template automático suportado é:
+O job suporta os seguintes templates automáticos:
 
 ```text
-oracle_text_excerpt == "Counter target spell."
-effect_families inclui counterspell_stack_interaction
-proposed_status == needs_review
+1. Counterspell simples
+   oracle_text_excerpt == "Counter target spell."
+   effect_families inclui counterspell_stack_interaction
+   proposed_status == needs_review
+
+2. Sacrifice outlet de dano simples
+   oracle_text_excerpt contem "Sacrifice a creature:"
+   oracle_text_excerpt contem dano a alvo/any target
+   proposed_status == needs_review
+
+3. Extra combat + flashback simples
+   oracle_text_excerpt contem additional combat phase
+   oracle_text_excerpt contem flashback
+   proposed_status == needs_review
 ```
 
-Para esse template, o job executa um cenário in-process no
+Para counterspell, o job executa um cenário in-process no
 `battle_analyst_v9.py`: um jogador anuncia `Approach of the Second Sun`, o
 oponente responde com a carta draftada como counterspell, o stack resolve, e o
 auditor de replay/decision trace precisa fechar sem findings críticos/high.
+
+Para sacrifice outlet, o job prova uma ativação estreita: criatura-token
+expendable é sacrificada, o dano é aplicado ao alvo, o token não permanece em
+graveyard e o decision trace registra a escolha e alternativas rejeitadas.
+
+Para extra combat + flashback, o job prova resolução da mão, agendamento de
+combate extra, untap da criatura relevante, cast via flashback do graveyard e
+exílio após resolução. Isso cobre `Seize the Day` como evidência focada, sem
+promover a regra automaticamente.
 
 Saídas:
 
@@ -248,9 +268,9 @@ Saídas:
 - `focused_artifacts/<draft_rule_key>/replay_events.jsonl`;
 - `focused_artifacts/<draft_rule_key>/decision_trace.jsonl`.
 
-Complexidades como sacrifício de criatura para dano, extra combat/flashback ou
-trigger de ataque/tutor continuam bloqueadas até existir template focado
-proprio. Esse bloqueio é proposital: o job prova uma regra pequena por vez e
+Complexidades como trigger de ataque, geração de Treasure, contagem de
+artefatos e tutor contextual continuam bloqueadas até existir template focado
+próprio. Esse bloqueio é proposital: o job prova uma regra pequena por vez e
 nao promove comportamento duro automaticamente.
 
 `manaloom_battle_rule_promotion_gate` consome os drafts e decide apenas se cada
@@ -563,11 +583,11 @@ Resumo:
   },
   "focused_evidence": {
     "evaluated_count": 4,
-    "evidence_count": 1
+    "evidence_count": 3
   },
   "promotion_gate": {
-    "eligible_count": 1,
-    "blocked_count": 3
+    "eligible_count": 3,
+    "blocked_count": 1
   }
 }
 ```
@@ -577,12 +597,55 @@ Resultado por draft:
 - `Counterspell`: elegível para `eligible_for_manual_verified_promotion` com
   evidência focada de stack/counterspell e replay/decision audit sem finding
   crítico/high. Continua sem write automático em PostgreSQL.
-- `Goblin Bombardment`: bloqueado; precisa template focado para habilidade
-  ativada com sacrifício de criatura e dano alvo.
+- `Goblin Bombardment`: elegível para
+  `eligible_for_manual_verified_promotion` com evidência focada de habilidade
+  ativada, sacrifício de criatura-token expendable e dano alvo.
 - `Iron Man, Titan of Innovation`: bloqueado; envolve trigger de ataque,
   artifact count, treasure e tutor, exigindo executor contextual próprio.
-- `Seize the Day`: bloqueado; envolve extra combat e flashback/recast do
-  cemitério, exigindo cenário focado dedicado.
+- `Seize the Day`: elegível para `eligible_for_manual_verified_promotion` com
+  evidência focada de extra combat + flashback/recast do cemitério.
+
+Rodada real read-only local contra PostgreSQL para `msh,msc,mar`, 8
+comandantes e 166 cartas, após os templates adicionais:
+
+```json
+{
+  "candidate_review": {
+    "cards_scanned": 166,
+    "commanders_scanned": 8,
+    "decisions": {
+      "backlog": 2,
+      "ignore": 1304,
+      "needs_rule_review": 22
+    }
+  },
+  "battle_rule_review_queue": {
+    "queue_rows": 22,
+    "draft_count": 7
+  },
+  "focused_evidence": {
+    "evaluated_count": 7,
+    "evidence_count": 3
+  },
+  "promotion_gate": {
+    "eligible_count": 3,
+    "blocked_count": 4
+  }
+}
+```
+
+Elegíveis nessa rodada real:
+
+- `Counterspell`;
+- `Goblin Bombardment`;
+- `Seize the Day`.
+
+Ainda bloqueados por falta de template focado/replay evidence:
+
+- `Concerted Effort`;
+- `Final Showdown`;
+- `Iron Man, Titan of Innovation`;
+- `Warleader's Call`.
 
 O wrapper `manaloom_battle_rule_promotion_gate.sh` passou a consumir
 automaticamente
