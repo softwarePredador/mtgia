@@ -106,6 +106,30 @@ msh,msc,mar
 Isso cobre o controle operacional de cartas Marvel, mas o job aceita qualquer
 lista de sets via `--sets` ou `MANALOOM_NEW_CARD_REVIEW_SETS`.
 
+## Escopos De Varredura
+
+O runner agora aceita escopo explícito:
+
+```bash
+./server/bin/manaloom_new_card_candidate_review.sh --scope sets
+./server/bin/manaloom_new_card_candidate_review.sh --scope lookback
+./server/bin/manaloom_new_card_candidate_review.sh --scope full --card-limit 0
+```
+
+Contrato por escopo:
+
+- `sets`: avalia apenas os sets configurados em
+  `MANALOOM_NEW_CARD_REVIEW_SETS`; é o modo barato para cartas recém-chegadas.
+- `lookback`: ignora `--sets` e avalia cartas recentes pela janela
+  `--lookback-days`; é útil quando o catálogo foi sincronizado sem lista de set
+  explícita.
+- `full`: ignora `--sets`/lookback e avalia o corpus disponível, respeitando
+  `--card-limit`; use `--card-limit 0` somente em janela controlada.
+
+Esse modo `full` é o caminho para revalidar cartas antigas com a mesma régua das
+cartas novas, sem criar exceções em código e sem promover regras
+automaticamente.
+
 ## Saída
 
 Por rodada:
@@ -113,6 +137,8 @@ Por rodada:
 - `latest_summary.json`
 - `latest_reviews.json`
 - `latest_report.md`
+- `latest_commanders/<commander>.json`
+- `latest_commanders/<commander>.md`
 - diretório por `run_id`
 
 No SQLite:
@@ -121,6 +147,7 @@ No SQLite:
 - `new_card_candidate_reviews`
 - `new_card_battle_rule_review_queue`
 - `new_card_candidate_review_checkpoints`
+- `new_card_candidate_commander_snapshots`
 - `new_card_data_gap_review_runs`
 - `new_card_data_gap_review_items`
 - `new_card_battle_rule_review_runs`
@@ -178,6 +205,35 @@ Esses drafts **não** são escritos em `card_battle_rules`, não viram
 `verified`, e não executam comportamento duro no battle. A promoção ainda exige
 fonte oficial/ruling, teste focado, replay/auditoria e ausência de finding
 crítico.
+
+## Relatório Por Comandante
+
+Cada rodada grava um snapshot por comandante com:
+
+- decisões agregadas;
+- cobertura de dados e rule status;
+- top candidatos `test`/`backlog`/`needs_rule_review`;
+- riscos e razões por carta;
+- contrato de segurança `no_pg_writes`, `no_auto_apply`,
+  `verified_promotion_required`.
+
+Lorehold continua sendo controle padrão, mas o mesmo formato vale para qualquer
+comandante descoberto via `commander_learned_decks`, `commander_card_usage` ou
+`--force-commander`. O relatório correto para iniciar melhoria de deck é o
+snapshot por comandante, não a fila bruta SQLite.
+
+## Próximo Gate Para Melhorias De Deck
+
+Antes de usar candidatos no optimize/generate:
+
+1. Rodar `--scope full` em janela controlada para reclassificar cartas antigas.
+2. Rodar `manaloom_card_data_gap_review` e zerar `needs_data` material.
+3. Rodar `manaloom_battle_rule_review_queue` para candidatos
+   `needs_rule_review`.
+4. Promover para `card_battle_rules`/`card_function_tags` somente após fonte
+   oficial, teste focado e replay/auditoria.
+5. Usar o relatório por comandante para escolher candidatos de scorecard; não
+   aplicar swap automático.
 
 ## Decisões
 

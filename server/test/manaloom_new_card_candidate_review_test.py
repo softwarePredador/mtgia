@@ -152,6 +152,13 @@ class ManaloomNewCardCandidateReviewTest(unittest.TestCase):
 
             self.assertEqual(summary["cards_scanned"], 4)
             self.assertEqual(summary["commanders_scanned"], 2)
+            self.assertEqual(summary["scope"], "sets")
+            self.assertIn("card_coverage", summary)
+            self.assertIn("review_coverage", summary)
+            self.assertGreaterEqual(
+                summary["card_coverage"]["counts"].get("function_tags", 0),
+                1,
+            )
             self.assertGreaterEqual(summary["decisions"].get("ignore", 0), 1)
             self.assertGreaterEqual(summary["decisions"].get("already_present", 0), 1)
             self.assertGreaterEqual(summary["decisions"].get("needs_data", 0), 1)
@@ -159,6 +166,11 @@ class ManaloomNewCardCandidateReviewTest(unittest.TestCase):
 
             lorehold = summary["by_commander"]["Lorehold, the Historian"]
             self.assertEqual(lorehold["color_identity"], ["R", "W"])
+            self.assertIn("coverage", lorehold)
+            self.assertGreaterEqual(
+                lorehold["coverage"]["decisions"].get("needs_rule_review", 0),
+                1,
+            )
             green = [
                 row
                 for row in lorehold["top_candidates"]
@@ -191,6 +203,13 @@ class ManaloomNewCardCandidateReviewTest(unittest.TestCase):
             self.assertIn("engine", reset_rows[0]["roles"])
             self.assertIn("payoff", reset_rows[0]["roles"])
 
+            lorehold_report = (
+                output_dir
+                / "new_card_candidate_review/latest_commanders/lorehold_the_historian.md"
+            )
+            self.assertTrue(lorehold_report.is_file())
+            self.assertIn("Candidate Review", lorehold_report.read_text(encoding="utf-8"))
+
             conn = sqlite3.connect(knowledge_db)
             try:
                 persisted = conn.execute(
@@ -206,8 +225,39 @@ class ManaloomNewCardCandidateReviewTest(unittest.TestCase):
                     "SELECT COUNT(*) FROM new_card_battle_rule_review_queue"
                 ).fetchone()[0]
                 self.assertGreaterEqual(queued, 1)
+                snapshots = conn.execute(
+                    "SELECT COUNT(*) FROM new_card_candidate_commander_snapshots"
+                ).fetchone()[0]
+                self.assertEqual(snapshots, 2)
             finally:
                 conn.close()
+
+    def test_full_scope_fixture_keeps_report_only_contract_and_clears_sets_filter(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            tmp = Path(raw_tmp)
+            fixture_path = _write_fixture(tmp)
+
+            summary = module.run(
+                module.parse_args(
+                    [
+                        "--fixture",
+                        str(fixture_path),
+                        "--scope",
+                        "full",
+                        "--output-dir",
+                        str(tmp / "artifacts"),
+                        "--knowledge-db",
+                        str(tmp / "knowledge.db"),
+                        "--no-lorehold-control",
+                    ]
+                )
+            )
+
+            self.assertEqual(summary["scope"], "full")
+            self.assertEqual(summary["sets"], [])
+            self.assertIn("report_only_no_pg_writes", summary["notes"])
+            self.assertIn("sqlite_operational_cache_only", summary["notes"])
 
 
 if __name__ == "__main__":
