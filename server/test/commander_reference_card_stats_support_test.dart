@@ -444,7 +444,8 @@ void main() {
       );
     });
 
-    test('promoted learned deck cards are consumed before usage hot cards and fallback',
+    test(
+        'promoted learned deck cards are consumed before usage hot cards and fallback',
         () {
       final profile = buildCommanderReferenceProfilePayload(
         commanderName: loreholdReferenceCommanderName,
@@ -494,6 +495,71 @@ void main() {
         equals(['active_learned_deck', 'usage_hot_cards']),
       );
       expect(result.builtInFallbackOnlyCount, equals(4));
+    });
+
+    test(
+        'promoted learned deck cards outrank corpus and expected packages after reference stats',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_active_learned_priority_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {
+          'support_package': ['Expected Package Card'],
+        },
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 2,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Scroll Rack',
+            cardId: 'scroll-rack-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 94,
+            confidence: 'high',
+          ),
+        ],
+        referenceDeckCorpusGuidance: const CommanderReferenceDeckCorpusGuidance(
+          commanderName: loreholdReferenceCommanderName,
+          source: 'unit_test',
+          deckCount: 1,
+          acceptedDeckCount: 1,
+          averageRoleCounts: {'lands': 37},
+          topCards: [
+            {
+              'card_name': 'Corpus Priority Card',
+              'deck_count': 1,
+              'total_quantity': 1,
+              'role': 'support',
+            },
+          ],
+          themeCounts: {'topdeck_big_spells': 1},
+        ),
+        promotedLearnedCardNames: const ['Learned Priority Card'],
+        usageHotCardNames: const ['Usage Priority Card'],
+      );
+
+      expect(result.mainDeckQuantity, equals(2));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName).toList(),
+        equals(['Scroll Rack', 'Learned Priority Card']),
+      );
+      expect(result.sourceUsageCounts['reference_card_stats'], equals(1));
+      expect(result.sourceUsageCounts['active_learned_deck'], equals(1));
+      expect(result.sourceUsageCounts['reference_corpus_packages'], isNull);
+      expect(result.sourceUsageCounts['profile_expected_packages'], isNull);
+      expect(result.sourceUsageCounts['usage_hot_cards'], isNull);
     });
 
     test('filters off-color generated cards before reference validation repair',

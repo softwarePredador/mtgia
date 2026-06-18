@@ -205,6 +205,10 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     addCard(stat.cardName, 'reference_card_stats');
   }
 
+  for (final rawName in promotedLearnedCardNames) {
+    addCard(rawName, 'active_learned_deck');
+  }
+
   final corpusPackages = referenceDeckCorpusGuidance?.packages;
   for (final package in [
     if (corpusPackages != null) corpusPackages.corePackage,
@@ -238,10 +242,6 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
         addCard(rawCard.toString(), 'profile_expected_packages');
       }
     }
-  }
-
-  for (final rawName in promotedLearnedCardNames) {
-    addCard(rawName, 'active_learned_deck');
   }
 
   for (final rawName in usageHotCardNames) {

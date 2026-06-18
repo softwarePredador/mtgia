@@ -12,6 +12,26 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / learned deck priority slice
+
+- O slice seguro de precedência do builder determinístico foi aplicado em
+  `commander_reference_generate_fallback_support.dart`:
+  `reference_card_stats -> active_learned_deck -> reference_corpus_packages -> profile_expected_packages -> usage_hot_cards -> deterministic_fallback`.
+- A regra não muda contratos públicos e mantém os guardrails vigentes:
+  - PostgreSQL/backend continuam donos da decisão;
+  - learned decks continuam single-commander;
+  - metadata Hermes segue escondida do usuário comum;
+  - fallback determinístico continua por último.
+- Revalidação read-only com
+  `commander_generate_provenance_2026-06-18_learned_priority` mostrou melhora
+  concreta no Lorehold:
+  - `learned_deck_parallel_not_ranked_in_generate.count`: `32 -> 24`;
+  - `source_usage_counts.active_learned_deck`: `68 -> 76`;
+  - `built_in_fallback_used_count`: `42 -> 41`;
+  - `built_in_fallback_only_count`: permaneceu `0`.
+- O gap deixou de ser "learned deck não tem prioridade nenhuma" e passou a
+  ser "ainda existem 24 cartas do learned deck fora do ranking final".
+
 ### Atualizacao de ciclo — 2026-06-18 / runtime truth de generate + cron topology
 
 - Revalidado o estado real do runtime `master` no EasyPanel:
@@ -187,13 +207,19 @@
 
 #### P1 — Decidir política explícita de precedência do builder determinístico
 
-- O caminho determinístico hoje inclui fontes nesta ordem:
-  `reference_card_stats -> reference_corpus_packages -> profile_expected_packages -> active_learned_deck -> usage_hot_cards -> deterministic_fallback`.
-- Isso é verdade operacional, mas ainda não é política de produto documentada.
-- Falta decidir e congelar:
-  - se `active_learned_deck` deve continuar apenas preenchendo slots;
-  - se pode reordenar picks frente a `profile_expected_packages`;
-  - quando learned deck pode ganhar prioridade controlada.
+- Em 2026-06-18 o primeiro slice de política foi congelado em código:
+  `reference_card_stats -> active_learned_deck -> reference_corpus_packages -> profile_expected_packages -> usage_hot_cards -> deterministic_fallback`.
+- A prioridade do learned deck agora é controlada e explícita: ele entra logo
+  após a camada mais explicável por carta (`reference_card_stats`) e antes de
+  corpus/usage/fallback.
+- Isso não significa "seguir learned deck cegamente"; significa apenas que um
+  learned deck ativo/aceito deixou de ser canal passivo quando disputa slots
+  com fontes menos fortes.
+- Pendente residual:
+  - decidir se `active_learned_deck` deve ultrapassar também
+    `reference_card_stats` em algum modo futuro;
+  - reduzir o bloco remanescente de cartas do learned deck ainda fora do
+    ranking final (`24` no auditor de 2026-06-18).
 - Regra vigente mantida:
   - learned decks continuam single-commander até existir corpus confiável de
     Partner/Background.
