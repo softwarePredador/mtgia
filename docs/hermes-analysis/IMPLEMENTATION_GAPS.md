@@ -12,6 +12,41 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / local replay cache truth
+
+- Um falso suspeito de precedência no battle runtime foi reavaliado com prova
+  direta:
+  - o replay local antigo ainda carregava várias decisões com
+    `rule_source=known_cards_canonical_snapshot` e `rule_status=needs_review`;
+  - a inspeção do PostgreSQL mostrou que as mesmas cartas já tinham linhas
+    `curated/verified` ou `curated/active`;
+  - o problema real era operacional: o `knowledge.db` local estava stale antes
+    do replay.
+- Verificação objetiva:
+  - `battle_rule_registry.lookup_battle_card_rule_list()` já ordenava as regras
+    corretamente;
+  - `battle_analyst_v9.py#get_card_effect()` já selecionava primária
+    `verified/active` quando a lista atualizada estava presente;
+  - após `sync_battle_card_rules_pg.py --apply-sqlite-from-pg`, a primeira
+    reexecução do replay local fechou com:
+    - `decision_findings=0` no `replay_decision_auditor.py`;
+    - `findings=0` e `verdict=usable_for_strategy_learning` no
+      `battle_decision_strategy_auditor.py`.
+  - um segundo smoke curto com o runner consolidado confirmou que o ruído
+    remanescente caiu para `low` apenas, vindo de cartas de oponentes ainda
+    atendidas por `known_cards_canonical_snapshot/needs_review`
+    (`Basking Broodscale`, `Scavenging Ooze`) e não mais de precedência
+    quebrada entre `generated` e `curated`.
+- Ajuste de processo aplicado:
+  - criado `server/bin/run_local_battle_replay_audit.sh` para obrigar o fluxo
+    local correto `PG -> SQLite -> replay -> auditor forense -> auditor
+    estratégico`.
+- Reclassificação:
+  - o gap "runtime escolhe regra generated em vez de curated" deixou de ser
+    evidência ativa;
+  - o gap real virou disciplina operacional: não auditar replay local contra
+    cache desatualizado.
+
 ### Atualizacao de ciclo — 2026-06-18 / learned deck priority slice
 
 - O slice seguro de precedência do builder determinístico foi aplicado em

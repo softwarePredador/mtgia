@@ -780,6 +780,20 @@ Leitura correta:
 - `HANDCRAFTED_KNOWN_CARDS` e `MANUAL_RULE_RUNTIME_WAIVERS` devem permanecer
   vazios no runtime normal e so podem ser preenchidos em incidentes controlados
   ou testes focados.
+- fechamento operacional de 2026-06-18: um replay local chegou a parecer
+  degradado porque foi gerado antes do refresh `PG -> SQLite`, ainda usando
+  snapshot/metadata stale para cartas que o PostgreSQL já possuía como
+  `curated/verified`. A reexecução imediata após
+  `sync_battle_card_rules_pg.py --apply-sqlite-from-pg` fechou um sample com
+  `decision_findings=0`, e o runner local consolidado manteve o auditor
+  estratégico em `usable_for_strategy_learning`; em outra seed curta ainda
+  sobraram apenas findings `low` de oponentes que seguem em
+  `known_cards_canonical_snapshot/needs_review`. A leitura correta é:
+  - o problema não era mais precedência do runtime;
+  - o problema era validar replay local com cache Hermes defasado;
+  - a rotina local correta agora é usar
+    `server/bin/run_local_battle_replay_audit.sh` ou, no mínimo, sincronizar o
+    SQLite antes do replay.
 
 Campos tipicos encontrados no snapshot/fallback legado:
 
