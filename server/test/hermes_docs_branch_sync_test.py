@@ -138,6 +138,71 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
             )
             self.assertEqual(ancestor.returncode, 0, msg=ancestor.stderr)
 
+    def test_quarantines_untracked_files_before_branch_sync(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, work = self._seed_remote(root, advance_master=True)
+            env = self._script_env(root, work)
+            env["HERMES_DOCS_SYNC_DRY_RUN"] = "1"
+            env["HERMES_DOCS_SYNC_PUSH"] = "0"
+
+            generated_report = (
+                work
+                / "docs"
+                / "hermes-analysis"
+                / "master_optimizer_reports"
+                / "generated.md"
+            )
+            generated_report.parent.mkdir(parents=True, exist_ok=True)
+            generated_report.write_text("generated artifact\n", encoding="utf-8")
+            loose_script = work / "server" / "bin" / "patch_slot_optimizer.py"
+            loose_script.parent.mkdir(parents=True, exist_ok=True)
+            loose_script.write_text("print('old scratch')\n", encoding="utf-8")
+
+            result = _run(["bash", str(SCRIPT)], cwd=work, env=env)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertEqual(_git_output(work, "branch", "--show-current"), "master")
+            self.assertFalse(generated_report.exists())
+            self.assertFalse(loose_script.exists())
+
+            quarantine_dirs = list((root / "reports").glob("untracked_quarantine_*"))
+            self.assertEqual(len(quarantine_dirs), 1)
+            quarantine_dir = quarantine_dirs[0]
+            self.assertTrue(
+                (
+                    quarantine_dir
+                    / "docs"
+                    / "hermes-analysis"
+                    / "master_optimizer_reports"
+                    / "generated.md"
+                ).exists()
+            )
+            self.assertTrue(
+                (quarantine_dir / "server" / "bin" / "patch_slot_optimizer.py").exists()
+            )
+
+            report = max((root / "reports").glob("docs_branch_sync_*.md"))
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("status: would_merge", report_text)
+            self.assertIn("Quarantined 2 untracked file(s)", report_text)
+
+    def test_blocks_tracked_modifications(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, work = self._seed_remote(root, advance_master=True)
+            env = self._script_env(root, work)
+            env["HERMES_DOCS_SYNC_PUSH"] = "0"
+            (work / "README.md").write_text("local uncommitted edit\n", encoding="utf-8")
+
+            result = _run(["bash", str(SCRIPT)], cwd=work, env=env)
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(_git_output(work, "branch", "--show-current"), "master")
+
+            report = max((root / "reports").glob("docs_branch_sync_*.md"))
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("status: blocked_dirty_worktree", report_text)
+            self.assertIn("tracked uncommitted changes", report_text)
+
 
 if __name__ == "__main__":
     unittest.main()

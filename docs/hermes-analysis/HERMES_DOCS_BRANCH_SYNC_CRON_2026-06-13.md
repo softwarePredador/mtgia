@@ -34,16 +34,20 @@ Comando runtime recomendado:
 
 1. Entra no workspace Hermes (`/opt/data/workspace/mtgia` por padrão).
 2. Recusa rodar como `root`, salvo override explícito.
-3. Recusa prosseguir se o worktree estiver sujo.
-4. Faz `git fetch --prune` com refspec explícito para atualizar
+3. Recusa prosseguir se houver alterações tracked não commitadas.
+4. Move arquivos untracked para quarentena em
+   `/opt/data/artifacts/hermes_docs_branch_sync/untracked_quarantine_*`.
+   Isso preserva artefatos locais gerados por replay/auditoria sem deixar que
+   bloqueiem checkout/merge.
+5. Faz `git fetch --prune` com refspec explícito para atualizar
    `origin/master` e `origin/codex/hermes-analysis-docs`.
-5. Faz checkout de `codex/hermes-analysis-docs`.
-6. Atualiza a branch docs com `git pull --ff-only origin codex/hermes-analysis-docs`.
-7. Verifica se `origin/master` já está contido na branch docs.
-8. Se não estiver, faz merge controlado de `origin/master` na branch docs.
-9. Aborta e falha alto se houver conflito.
-10. Faz push para `origin/codex/hermes-analysis-docs`.
-11. Grava relatório em `/opt/data/artifacts/hermes_docs_branch_sync/`.
+6. Faz checkout de `codex/hermes-analysis-docs`.
+7. Atualiza a branch docs com `git pull --ff-only origin codex/hermes-analysis-docs`.
+8. Verifica se `origin/master` já está contido na branch docs.
+9. Se não estiver, faz merge controlado de `origin/master` na branch docs.
+10. Aborta e falha alto se houver conflito.
+11. Faz push para `origin/codex/hermes-analysis-docs`.
+12. Grava relatório em `/opt/data/artifacts/hermes_docs_branch_sync/`.
 
 Ele nunca altera `master`.
 
@@ -153,3 +157,5 @@ O último comando deve retornar código `0` depois da sync.
 - Não mascarar conflito com `|| true`.
 - Rodar como usuário `hermes` para não quebrar permissões de SQLite/artifacts.
 - Não executar auditoria de código se a branch docs não contém `origin/master`.
+- Não apagar artefatos untracked do workspace Hermes sem rastreabilidade; usar a
+  quarentena automática do docs-sync.

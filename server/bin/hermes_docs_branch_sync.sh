@@ -28,6 +28,7 @@ timestamp="$(date -u +"%Y%m%d_%H%M%S")"
 report="$REPORT_DIR/docs_branch_sync_${timestamp}.md"
 lock_dir="$STATE_DIR/docs_branch_sync.lock"
 docs_checked_out=0
+quarantine_details=""
 
 write_report() {
   local status="$1"
@@ -49,6 +50,24 @@ write_report() {
     echo "${details}"
   } > "$report"
   echo "HERMES_DOCS_SYNC_REPORT: $report"
+}
+
+quarantine_untracked_files() {
+  local untracked_count
+  untracked_count="$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')"
+  if [[ "$untracked_count" == "0" ]]; then
+    return 0
+  fi
+
+  local quarantine_dir="$REPORT_DIR/untracked_quarantine_${timestamp}"
+  mkdir -p "$quarantine_dir"
+  while IFS= read -r -d '' path; do
+    mkdir -p "$quarantine_dir/$(dirname "$path")"
+    mv -- "$path" "$quarantine_dir/$path"
+  done < <(git ls-files --others --exclude-standard -z)
+
+  quarantine_details="Quarantined ${untracked_count} untracked file(s) before branch sync: ${quarantine_dir}"
+  echo "$quarantine_details"
 }
 
 restore_workspace() {
@@ -107,11 +126,14 @@ if [[ -z "$(git config --get user.email || true)" ]]; then
   git config --global user.email "$GIT_USER_EMAIL"
 fi
 
-if [[ -n "$(git status --porcelain)" ]]; then
-  write_report "blocked_dirty_worktree" "The Hermes workspace has uncommitted changes. Refusing to checkout or merge before an audit."
-  git status --short
+tracked_dirty="$(git status --porcelain --untracked-files=no)"
+if [[ -n "$tracked_dirty" ]]; then
+  write_report "blocked_dirty_worktree" "The Hermes workspace has tracked uncommitted changes. Refusing to checkout or merge before an audit.\n\n\`\`\`\n${tracked_dirty}\n\`\`\`"
+  git status --short --untracked-files=no
   exit 2
 fi
+
+quarantine_untracked_files
 
 git fetch --quiet --prune "$REMOTE" \
   "+refs/heads/${MASTER_BRANCH}:refs/remotes/${REMOTE}/${MASTER_BRANCH}" \
@@ -140,11 +162,11 @@ docs_before="$(git rev-parse HEAD)"
 master_sha="$(git rev-parse "${REMOTE}/${MASTER_BRANCH}")"
 
 if git merge-base --is-ancestor "$master_sha" HEAD; then
-  finish "up_to_date" "Docs branch already contains ${REMOTE}/${MASTER_BRANCH}@${master_sha}."
+  finish "up_to_date" "Docs branch already contains ${REMOTE}/${MASTER_BRANCH}@${master_sha}.\n\n${quarantine_details}"
 fi
 
 if [[ "$DRY_RUN" == "1" ]]; then
-  finish "would_merge" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}."
+  finish "would_merge" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}.\n\n${quarantine_details}"
 fi
 
 set +e
@@ -166,4 +188,4 @@ if [[ "$PUSH" == "1" ]]; then
   fi
 fi
 
-finish "merged" "Merged ${REMOTE}/${MASTER_BRANCH}@${master_sha} into ${DOCS_BRANCH}.\n\n- before: ${docs_before}\n- after: ${docs_after}"
+finish "merged" "Merged ${REMOTE}/${MASTER_BRANCH}@${master_sha} into ${DOCS_BRANCH}.\n\n- before: ${docs_before}\n- after: ${docs_after}\n\n${quarantine_details}"
