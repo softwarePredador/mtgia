@@ -23546,6 +23546,76 @@ optimize, e sinais de utilidade inferidos por nome em vez de
 - Nenhum achado foi baseado apenas em testes, docs, fixtures ou corpus/artifacts
   sem uso runtime.
 
+### Revalidacao local — 2026-06-18 05:30 UTC
+
+> Checkout local: `abfe1497`
+> Run timestamp UTC: `2026-06-18T05:30:05Z`
+
+- Working directory confirmado como repo root:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`, `git checkout codex/hermes-analysis-docs`,
+  `git pull --ff-only origin codex/hermes-analysis-docs` e
+  `git status --short` executados; branch estava atualizada e o status inicial
+  estava limpo.
+- `git diff --name-status 6d25e447..HEAD -- server/lib server/routes app/lib`
+  e `git diff --name-status e458c074..HEAD -- server/lib server/routes app/lib`
+  nao retornaram arquivos. Portanto, nao houve delta de codigo de produto no
+  recorte auditado desde a rodada local anterior de semantica; os commits novos
+  ate `abfe1497` sao documentais.
+
+#### Estado confirmado nesta revalidacao
+
+- A classificacao de ocorrencias permitidas/intencionais da rodada anterior
+  permanece valida: exemplos de import/UI, fixtures/testes, docs/artifacts,
+  mock dev de optimize, corpus/seeds Commander Reference, policy versionada de
+  Commander fallback, policy externa de EDH bracket/Game Changer e basic lands
+  quando passam pelo helper compartilhado continuam separados de bugs de
+  semantica runtime.
+- O caminho principal ainda carrega os dados esperados:
+  `loadOptimizeDeckContext` seleciona `semantic_tags_v2` e `functional_tags` em
+  `server/lib/ai/optimize_request_support.dart:97`-`:119` e anexa ambos ao
+  `allCardData` em `:201`-`:214`.
+- `summarizeFunctionalTagsForDeck` continua preferindo `functional_tags`
+  persistidos antes de `semantic_tags_v2` e heuristica em
+  `server/lib/ai/functional_card_tags.dart:430`-`:478`.
+- O adapter compartilhado continua declarando e implementando a ordem
+  `functional_tags -> semantic_tags_v2 -> heuristica` em
+  `server/lib/ai/optimization_functional_roles.dart:37`-`:91`, e os wrappers
+  principais usam esse adapter em
+  `server/lib/ai/optimization_functional_roles.dart:301`-`:338`.
+
+#### P1/P2 — Quality gate ainda pode mascarar multi-tags persistidas quando semantic v2 existe
+
+- **Classificacao:** Risk estreito de drift no gate; nao reabre a claim antiga
+  de que optimize ignora `functional_tags` no caminho principal.
+- **Evidencia:** `_functionalRolesForGate` calcula `primaryRole` via
+  `classifyOptimizationFunctionalRole`, que usa o adapter compartilhado e pode
+  vir de `functional_tags`, mas logo depois busca
+  `optimizationFunctionalRolesForCard(card, semanticOnly: true)` em
+  `server/lib/ai/optimization_quality_gate.dart:159`-`:163`.
+- **Evidencia:** os `functional_tags` persistidos so sao lidos quando
+  `semanticRoles.isEmpty` em `server/lib/ai/optimization_quality_gate.dart:167`-`:191`.
+  Se `semantic_tags_v2` existir, o conjunto usado pelo gate pode vir somente de
+  semantic v2; em seguida o `primaryRole` so e reincluido se nao for
+  `draw`, `removal`, `ramp` ou `wipe` em `:194`-`:198`.
+- **Por que importa:** um card com `functional_tags=[draw, engine]` e
+  `semantic_tags_v2=[engine]` pode preservar o `engine`, mas perder o papel
+  critico `draw` no conjunto usado por `losingCriticalRole`, mesmo que deck
+  analysis conte `draw` pelo caminho persistido. O inverso tambem e possivel:
+  semantic v2 pode carregar um role parcial e impedir que multi-tags
+  persistidas entrem no gate.
+- **O que valida:** teste unitario em `optimization_quality_gate_test.dart` com
+  `functional_tags` multi-tag e `semantic_tags_v2` parcial provando que o gate
+  usa a uniao normalizada com prioridade persistida, nao semantic-only.
+- **O que falsifica:** contrato explicito dizendo que o gate deve usar
+  semantic v2 isolado quando presente, com teste mostrando por que isso e mais
+  seguro que preservar `card_function_tags`.
+- **Correcao estreita:** trocar `_functionalRolesForGate` para usar
+  `resolveCardFunctionalRoles`/`optimizationFunctionalRolesForCard` sem
+  `semanticOnly`, aplicar `_gateRoleForFunctionalTag` sobre todas as roles
+  resolvidas e preservar semantic-only apenas como diagnostico ou enforcement
+  separado.
+
 ## Rodada focada anterior: Duplicated or similar logic
 > Data: 2026-05-28 12:40 UTC
 > Rotacao local Codex: `duplicated-or-similar-logic`

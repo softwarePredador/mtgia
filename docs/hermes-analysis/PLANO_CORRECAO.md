@@ -44,8 +44,9 @@ learned decks herdando middleware de IA custosa.
    ser leitura local de `commander_learned_decks`, sem chamada LLM/externa no
    handler.
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-17 05:30 UTC no checkout `6d25e447`; sem delta de produto desde
-   `e458c074`. O caminho principal
+   2026-06-18 05:30 UTC no checkout `abfe1497`; sem delta de produto em
+   `server/lib`, `server/routes` ou `app/lib` desde `6d25e447`/`e458c074`.
+   O caminho principal
    analysis/optimize/validator/quality gate carrega ou preserva
    `functional_tags` e `semantic_tags_v2`, entao a claim antiga de ausencia no
    optimize segue stale. Permanecem riscos por nome nos fallbacks de
@@ -57,7 +58,10 @@ learned decks herdando middleware de IA custosa.
    intencional por regra externa/Game Changer; `commander_fallback_policy.dart`
    e policy versionada e testada, mas nao deve virar modelo geral de utilidade.
    Basic lands sao excecao intencional de regra de deckbuilding quando passam por
-   `basic_land_utils.dart`; listas locais fora dele seguem gap estreito.
+   `basic_land_utils.dart`; listas locais fora dele seguem gap estreito. A
+   revalidacao adicionou um gap estreito de drift: `_functionalRolesForGate`
+   pode usar `semantic_tags_v2` isolado e deixar de incorporar multi-tags
+   persistidas quando semantic v2 existe.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
    revalidado na rotacao local Codex de 2026-06-17 15:00 UTC no checkout
    `c33e15ba`. Desde a rodada anterior deste foco (`41e681a0..HEAD`), nao
@@ -89,15 +93,21 @@ learned decks herdando middleware de IA custosa.
    chamada para `enter()`/`exit()`. Nao surgiram novos achados confiaveis nesta
    rotacao.
 9. **P1/P2 — Drift entre deck analysis e optimize**: revalidado no checkout
-   `6d25e447`. Deck analysis, `loadOptimizeDeckContext`, validator, quality gate
-   e addition data de quality gate usam a ordem
-   `functional_tags -> semantic_tags_v2 -> heuristica`. O risco atual esta nos
+   `abfe1497`. Deck analysis, `loadOptimizeDeckContext`, validator e addition
+   data de quality gate carregam ou preservam as fontes esperadas, e o adapter
+   compartilhado usa a ordem `functional_tags -> semantic_tags_v2 -> heuristica`.
+   O risco atual esta nos
    paths legacy que colapsam multi-role (`inferFunctionalRole`/
    `_legacyOptimizeRoleForResolvedRoles`), em `removals_detailed` sem threadar as
    tags ja presentes em `allCardData`, em `findSynergyReplacements` que monta o
    pool inicial sem tags/role scores, em prompts runtime com exemplos nomeados, e
    em endpoints advisory/rebuild guiado que ainda nao carregam fontes persistidas
-   antes de montar buckets/recomendacoes ou priorizar utilidade por nome.
+   antes de montar buckets/recomendacoes ou priorizar utilidade por nome. Novo
+   detalhe desta revalidacao: no quality gate, `_functionalRolesForGate` chama
+   `optimizationFunctionalRolesForCard(card, semanticOnly: true)` e so le
+   `functional_tags` persistidos quando semantic v2 esta vazio; isso pode fazer
+   deck analysis contar uma multi-tag persistida que o gate nao usa no conjunto
+   de roles criticos.
 10. **P2 — Bracket state em fillers de optimize/complete**: **RESOLVIDO em
     `origin/master@1aa4da71`**. Os loaders de fillers agora recebem estado
     atual/virtual do deck e nao usam fallback `bracket: null` quando o bracket
@@ -352,15 +362,17 @@ Histórico do problema:
     operacional.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
-- **Status 2026-06-17 05:30 UTC: REVALIDADO/ABERTO no checkout `6d25e447`.**
-  Sem delta de produto desde `e458c074` no recorte `server/lib`,
-  `server/routes` e `app/lib`.
+- **Status 2026-06-18 05:30 UTC: REVALIDADO/ABERTO no checkout `abfe1497`.**
+  Sem delta de produto desde `6d25e447`/`e458c074` no recorte `server/lib`,
+  `server/routes` e `app/lib`; os commits novos da branch sao documentais.
   A branch atual ja tem excecoes aceitaveis e testadas:
   `edh_bracket_policy.dart` como regra externa/Game Changer e
   `commander_fallback_policy.dart` como policy versionada para fallbacks
   Commander. O risco aberto sao nomes ainda espalhados em classificadores
   heuristics, foundation de candidate quality, prompts runtime, replacement
-  ranking, endpoints advisory, rebuild guiado, advanced analysis e meta shell.
+  ranking, endpoints advisory, rebuild guiado, advanced analysis e meta shell,
+  alem de um gap estreito no quality gate quando semantic v2 existe mas
+  `functional_tags` persistidos tem multi-tags adicionais.
 - **Evidencia**:
   - `server/lib/ai/functional_card_tags.dart:219`-`:226`, `:713`-`:730`,
     `:767`-`:793`, `:836`-`:848`, `:863`-`:884` e `:900`-`:924` usa nomes como
@@ -402,6 +414,13 @@ Histórico do problema:
     `server/lib/basic_land_utils.dart:27`-`:47` centralize a regra por nome e
     `type_line`. Basic lands continuam excecao legitima de regra de deckbuilding,
     mas esta rota deve reutilizar o helper.
+  - `server/lib/ai/optimization_quality_gate.dart:159`-`:199` calcula o
+    `primaryRole` pelo adapter compartilhado, mas monta o conjunto do gate com
+    `optimizationFunctionalRolesForCard(card, semanticOnly: true)` e so le
+    `functional_tags` persistidos quando semantic v2 esta vazio. Isso pode
+    descartar multi-tags persistidas, especialmente roles criticos como `draw`,
+    `removal`, `ramp` ou `wipe`, apesar de deck analysis contar essas tags pelo
+    caminho persistido.
   - `server/lib/ai/deck_advanced_analysis.dart:43`-`:57` chama
     `resolveCardFunctionalRoles` sem fontes persistidas; `:104`-`:132` e
     `:507`-`:524` usam nomes em analises de wincon/drain/protecao/recursao.
@@ -436,7 +455,11 @@ Histórico do problema:
      identidade de cor, bracket e budget antes de qualquer sugestao por nome;
   6. mover as excecoes de rebuild para roles/tags ou policy versionada e trocar
      a lista local de basic lands da rota de analise pelo helper compartilhado;
-  7. manter `edh_bracket_policy.dart` como excecao documentada com sync/fonte e
+  7. trocar `_functionalRolesForGate` para usar `resolveCardFunctionalRoles` ou
+     `optimizationFunctionalRolesForCard` sem `semanticOnly`, unindo as roles
+     persistidas/semantic v2 de forma normalizada antes do calculo de perda
+     critica;
+  8. manter `edh_bracket_policy.dart` como excecao documentada com sync/fonte e
      teste dedicado, sem reutilizar essa lista como utilidade geral.
 - **Validacao**:
   - `rg -n "Sol Ring|Command Tower|Thassa's Oracle|Isochron Scepter|Dramatic Reversal|Blood Artist" server/lib server/routes app/lib`
@@ -444,6 +467,9 @@ Histórico do problema:
     versionada ou excecao bracket;
   - testes provam que cartas com texto equivalente e nome diferente recebem o
     mesmo role quando nao ha dado persistido;
+  - teste em `optimization_quality_gate_test.dart` prova que
+    `functional_tags=[draw, engine]` com `semantic_tags_v2` parcial preserva as
+    duas roles no conjunto usado pelo gate;
   - scorecard prova que bonus por nome nao supera legalidade, identidade de cor,
     bracket, role_score, synergy e quality gate.
   - a rota de analise de deck usa `basic_land_utils.isBasicLandCard` ou teste
@@ -451,8 +477,8 @@ Histórico do problema:
 
 ### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-17 05:30 UTC: PARCIALMENTE SANEADO no checkout
-  `6d25e447`.** Sem delta de produto desde `e458c074`. A acao antiga de "carregar `card_function_tags` no contexto
+- **Status 2026-06-18 05:30 UTC: PARCIALMENTE SANEADO no checkout
+  `abfe1497`.** Sem delta de produto desde `6d25e447`/`e458c074`. A acao antiga de "carregar `card_function_tags` no contexto
   principal de optimize" nao se aplica mais nesta branch.
 - **Evidencia atualizada**:
   - `GET /decks/:id/analysis` seleciona e retorna `card_function_tags` e
@@ -472,13 +498,17 @@ Histórico do problema:
   - `OptimizationValidator` usa role primario e conjuntos multi-role em
     `server/lib/ai/optimization_validator.dart:267`-`:270` e calcula deltas em
     `:318`-`:358`.
-  - `optimization_quality_gate.dart:58`-`:65` e `:159`-`:200` prefere fontes
-    persistidas antes do fallback heuristico.
+  - `optimization_quality_gate.dart:58`-`:65` usa role primario + multi-role no
+    filtro, mas `_functionalRolesForGate` em
+    `server/lib/ai/optimization_quality_gate.dart:159`-`:199` ainda consulta
+    semantic v2 isolado antes de ler multi-tags persistidas, deixando um gap
+    estreito de precedencia no gate.
   - `fetchOptimizeAdditionDataForQualityGate` busca `semantic_tags_v2` e
     `functional_tags` para additions em
     `server/lib/ai/optimize_route_addition_data_support.dart:84`-`:130`.
 - **Impacto remanescente**: a branch atual esta alinhada no caminho principal
-  analysis/optimize/validator, mas `inferFunctionalRole` em
+  de carregamento/adapter e no validator, mas o quality gate ainda tem a
+  excecao `semanticOnly` descrita acima; `inferFunctionalRole` em
   `server/lib/ai/optimize_runtime_support.dart:752`-`:859` ainda colapsa
   conjuntos em roles legacy para ranking/removal/details; `server/routes/ai/optimize/index.dart:2364`-`:2383`
   monta `removals_detailed.functionalRole` sem passar as tags persistidas ja

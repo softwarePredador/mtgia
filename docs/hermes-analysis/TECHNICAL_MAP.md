@@ -255,10 +255,11 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-17 05:30 UTC no checkout local `6d25e447`
-(sem delta de produto desde `e458c074`): deck analysis,
+Estado atual revalidado em 2026-06-18 05:30 UTC no checkout local `abfe1497`
+(sem delta de produto desde `6d25e447`/`e458c074` no recorte `server/lib`,
+`server/routes` e `app/lib`): deck analysis,
 `loadOptimizeDeckContext`, addition data do quality gate,
-validator e quality gate carregam ou preservam `card_function_tags` e
+validator e os dados de entrada do quality gate carregam ou preservam `card_function_tags` e
 `semantic_tags_v2`. O adapter compartilhado
 `resolveCardFunctionalRoles` aplica precedencia
 `functional_tags -> semantic_tags_v2 -> heuristica`, e os paths principais ja
@@ -279,7 +280,10 @@ nao carrega `card_function_tags`, `semantic_tags_v2` nem `card_role_scores` e
 ainda devolve sugestoes por nomes fixos; `deck_advanced_analysis.dart`, chamado
 por weakness-analysis, tambem opera sem fontes persistidas; `/decks/:id/recommendations`
 usa buckets por texto, recomenda `Command Tower` diretamente quando faltam
-terrenos e usa raridade como proxy de impacto. A camada de meta Commander
+terrenos e usa raridade como proxy de impacto. Gap estreito novo da revalidacao:
+`_functionalRolesForGate` no quality gate usa `semantic_tags_v2` isolado quando
+ele existe e so le `functional_tags` persistidos quando semantic v2 esta vazio,
+o que pode mascarar multi-tags persistidas em roles criticos. A camada de meta Commander
 tambem deriva `strategy_archetype` por listas de nomes em
 `meta_deck_commander_shell_support.dart`; tratar como policy/corpus versionado
 ou substituir por tags/scores semanticos antes de usar esse dado como sinal de
