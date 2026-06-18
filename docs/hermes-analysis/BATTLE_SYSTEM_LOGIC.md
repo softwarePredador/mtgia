@@ -209,6 +209,13 @@ linhas jogaveis tambem passou a pontuar as alternativas, e os casts genericos
 de ramp/criatura/spell normal deixaram de sair sem score comparativo quando a
 heuristica ja tinha ranking local.
 
+No slice de fechamento de 2026-06-18, o upkeep rummage do Lorehold tambem
+passou a emitir `rejected_options` e scores comparativos. A prova viva local
+com seed fixa gerou `1098` eventos estruturados e `152` decision traces; o
+`replay_decision_auditor.py --require-decision-trace --skip-baseline --report`
+fechou com `turn_findings=0`, `decision_findings=0`, `critical=0`, `high=0`,
+`medium=0` e `low=0`.
+
 Auditoria:
 
 ```bash
@@ -838,6 +845,48 @@ Leitura correta:
   - a rotina local correta agora é usar
     `server/bin/run_local_battle_replay_audit.sh` ou, no mínimo, sincronizar o
     SQLite antes do replay.
+
+### 9.4 Focused Evidence Gate Para `needs_review`
+
+Desde o slice de 2026-06-18, a esteira operacional de novas cartas possui uma
+etapa intermediária entre draft de regra e promotion gate:
+
+```text
+manaloom_battle_rule_review_queue
+  -> manaloom_battle_rule_focused_evidence
+      -> manaloom_battle_rule_promotion_gate
+```
+
+Contrato:
+
+- `manaloom_battle_rule_review_queue` continua criando apenas drafts
+  `proposed_status=needs_review`;
+- `manaloom_battle_rule_focused_evidence` executa cenários focados somente para
+  templates suportados e grava replay/decision trace/evidence em artefatos;
+- `manaloom_battle_rule_promotion_gate` consome `latest_evidence.json` quando
+  existir e decide se a regra está bloqueada ou elegível para promoção manual;
+- nenhum desses jobs escreve em PostgreSQL;
+- nenhum desses jobs ativa comportamento duro no runtime;
+- `needs_review` continua auditável, mas não executável.
+
+Template suportado no primeiro slice:
+
+```text
+oracle_text_excerpt == "Counter target spell."
+effect_families inclui counterspell_stack_interaction
+```
+
+Resultado de controle:
+
+- `Counterspell` ficou elegível para
+  `eligible_for_manual_verified_promotion` depois de cenário focado
+  stack/counterspell e replay/decision audit sem finding crítico/high;
+- `Goblin Bombardment`, `Iron Man, Titan of Innovation` e `Seize the Day`
+  permaneceram bloqueados porque exigem executores contextuais próprios.
+
+Logo, o gate já prova que regras simples podem avançar para revisão manual,
+mas ainda preserva a barreira correta para cartas multi-etapa ou com custo/
+trigger/flashback complexo.
 
 Campos tipicos encontrados no snapshot/fallback legado:
 

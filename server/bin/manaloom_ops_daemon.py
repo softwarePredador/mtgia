@@ -84,6 +84,12 @@ def _base_env() -> dict[str, str]:
             "MANALOOM_BATTLE_RULE_REVIEW_QUEUE_DIR": str(
                 ARTIFACT_DIR / "battle_rule_review_queue"
             ),
+            "MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE_DIR": str(
+                ARTIFACT_DIR / "battle_rule_focused_evidence"
+            ),
+            "MANALOOM_BATTLE_RULE_PROMOTION_EVIDENCE_FILE": str(
+                ARTIFACT_DIR / "battle_rule_focused_evidence/latest_evidence.json"
+            ),
             "HERMES_CRON_JOBS_JSON": str(JOBS_JSON),
             "HERMES_CRON_OUTPUT_DIR": str(CRON_OUTPUT_DIR),
             "HERMES_SCRIPTS_DIR": str(REPO_ROOT / "server/bin"),
@@ -245,6 +251,13 @@ JOBS = [
         lockfile=LOCK_DIR / "manaloom_battle_rule_review_queue.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/manaloom_battle_rule_review_queue.sh',
         script_name="manaloom_battle_rule_review_queue.sh",
+    ),
+    Job(
+        name="manaloom_battle_rule_focused_evidence",
+        schedule=os.environ.get("MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE_CRON", "56 */6 * * *"),
+        lockfile=LOCK_DIR / "manaloom_battle_rule_focused_evidence.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/manaloom_battle_rule_focused_evidence.sh',
+        script_name="manaloom_battle_rule_focused_evidence.sh",
     ),
     Job(
         name="manaloom_battle_rule_promotion_gate",
@@ -442,6 +455,7 @@ def _infer_status_from_output(path: Path) -> str | None:
         "manaloom_new_card_candidate_review",
         "manaloom_card_data_gap_review",
         "manaloom_battle_rule_review_queue",
+        "manaloom_battle_rule_focused_evidence",
         "manaloom_battle_rule_promotion_gate",
         "# mana base validation report",
         "## enabled jobs",

@@ -75,6 +75,68 @@ def _write_fixture(tmp: Path) -> Path:
     return path
 
 
+def _write_counterspell_gate_fixture(tmp: Path) -> Path:
+    fixture = {
+        "commanders": [
+            {
+                "name": "Urza, Lord High Artificer",
+                "source": "fixture_control",
+                "color_identity": ["U"],
+                "existing_cards": [],
+                "role_counts": {
+                    "protection": 0,
+                    "removal": 0,
+                },
+            },
+            {
+                "name": "Lorehold, the Historian",
+                "source": "fixture_control",
+                "color_identity": ["R", "W"],
+                "existing_cards": [],
+                "role_counts": {
+                    "protection": 0,
+                    "removal": 0,
+                },
+            },
+        ],
+        "cards": [
+            {
+                "card_id": "card-counterspell",
+                "oracle_id": "oracle-counterspell",
+                "name": "Counterspell",
+                "mana_cost": "{U}{U}",
+                "type_line": "Instant",
+                "oracle_text": "Counter target spell.",
+                "color_identity": ["U"],
+                "cmc": 2,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["protection", "removal"],
+            },
+            {
+                "card_id": "card-goblin-bombardment",
+                "oracle_id": "oracle-goblin-bombardment",
+                "name": "Goblin Bombardment",
+                "mana_cost": "{1}{R}",
+                "type_line": "Enchantment",
+                "oracle_text": "Sacrifice a creature: This enchantment deals 1 damage to any target.",
+                "color_identity": ["R"],
+                "cmc": 2,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["removal", "sacrifice_outlet"],
+                "semantic_tags_v2": [
+                    {"protection_type": "sacrifice_outlet"},
+                    {"recursion_type": "graveyard_synergy"},
+                ],
+            },
+        ],
+    }
+    path = tmp / "counterspell_gate_fixture.json"
+    path.write_text(json.dumps(fixture), encoding="utf-8")
+    return path
+
+
 class ManaloomReviewQueueConsumersTest(unittest.TestCase):
     def test_consumers_do_not_fail_before_candidate_review_runs(self) -> None:
         data_gap = _load_module(
@@ -350,6 +412,105 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 self.assertEqual(gate_runs, 2)
             finally:
                 conn.close()
+
+    def test_focused_evidence_only_unblocks_supported_counterspell_template(self) -> None:
+        candidate = _load_module(
+            "manaloom_new_card_candidate_review_for_focused_evidence",
+            "bin/manaloom_new_card_candidate_review.py",
+        )
+        battle_queue = _load_module(
+            "manaloom_battle_rule_review_queue_for_focused_evidence",
+            "bin/manaloom_battle_rule_review_queue.py",
+        )
+        focused_evidence = _load_module(
+            "manaloom_battle_rule_focused_evidence",
+            "bin/manaloom_battle_rule_focused_evidence.py",
+        )
+        promotion_gate = _load_module(
+            "manaloom_battle_rule_promotion_gate_for_focused_evidence",
+            "bin/manaloom_battle_rule_promotion_gate.py",
+        )
+
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            tmp = Path(raw_tmp)
+            fixture = _write_counterspell_gate_fixture(tmp)
+            knowledge_db = tmp / "knowledge.db"
+
+            candidate.run(
+                candidate.parse_args(
+                    [
+                        "--fixture",
+                        str(fixture),
+                        "--output-dir",
+                        str(tmp / "candidate"),
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--no-lorehold-control",
+                    ]
+                )
+            )
+            battle_summary = battle_queue.run(
+                battle_queue.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "battle"),
+                    ]
+                )
+            )
+            self.assertEqual(battle_summary["draft_count"], 2)
+
+            evidence_summary = focused_evidence.run(
+                focused_evidence.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "focused"),
+                    ]
+                )
+            )
+            self.assertEqual(evidence_summary["evaluated_count"], 2)
+            self.assertEqual(evidence_summary["evidence_count"], 1)
+
+            evidence_file = (
+                tmp
+                / "focused"
+                / "battle_rule_focused_evidence"
+                / "latest_evidence.json"
+            )
+            self.assertTrue(evidence_file.exists())
+            gate_summary = promotion_gate.run(
+                promotion_gate.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "gate"),
+                        "--evidence-file",
+                        str(evidence_file),
+                    ]
+                )
+            )
+            self.assertEqual(gate_summary["evaluated_count"], 2)
+            self.assertEqual(gate_summary["eligible_count"], 1)
+            self.assertEqual(gate_summary["blocked_count"], 1)
+
+            items = json.loads(
+                (
+                    tmp
+                    / "gate"
+                    / "battle_rule_promotion_gate"
+                    / "latest_items.json"
+                ).read_text(encoding="utf-8")
+            )
+            decisions = {item["card_name"]: item["decision"] for item in items}
+            self.assertEqual(
+                decisions["Counterspell"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertEqual(decisions["Goblin Bombardment"], "blocked")
 
 
 if __name__ == "__main__":

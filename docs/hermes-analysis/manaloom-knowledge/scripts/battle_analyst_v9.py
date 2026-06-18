@@ -7342,18 +7342,39 @@ def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, r
                 continue
             seen_option_keys.add(option_key)
             available_options.append(option)
+        chosen_rummage_option = decision_card_option(
+            discarded,
+            score=lorehold_draw_priority(discarded, player),
+            action="discard_for_lorehold_rummage",
+            effect=get_card_effect(discarded).get("effect", discarded.get("effect", "unknown")),
+        )
+        chosen_rummage_key = (
+            chosen_rummage_option.get("card"),
+            chosen_rummage_option.get("action"),
+            chosen_rummage_option.get("effect"),
+            chosen_rummage_option.get("cmc"),
+            chosen_rummage_option.get("type_line"),
+        )
+        rejected_rummage_options = [
+            option
+            for option in available_options
+            if (
+                option.get("card"),
+                option.get("action"),
+                option.get("effect"),
+                option.get("cmc"),
+                option.get("type_line"),
+            )
+            != chosen_rummage_key
+        ]
         emit_decision_trace(
             decision_type="lorehold_upkeep_rummage",
             player=player,
             turn=turn,
             phase="opponent_upkeep",
             available_options=available_options,
-            chosen_option=decision_card_option(
-                discarded,
-                score=lorehold_draw_priority(discarded, player),
-                action="discard_for_lorehold_rummage",
-                effect=get_card_effect(discarded).get("effect", discarded.get("effect", "unknown")),
-            ),
+            chosen_option=chosen_rummage_option,
+            rejected_options=rejected_rummage_options,
             score_components={
                 "discard_destination": discard_destination,
                 "drawn_card": drawn_name,
