@@ -266,3 +266,48 @@ Qualquer cron nova deve entrar primeiro como:
 2. delta-gated;
 3. prova de output acessivel dentro do container, nao so `last_status=ok`;
 4. consumo restrito de provider.
+
+## Fechamento adicional — branch stale e escopo fora do produto
+
+Depois da primeira prova manual de provider, a rodada seguinte mostrou um drift
+mais sutil, mas mais perigoso:
+
+- os jobs provider-backed estavam rodando com `repo_head=88fa4a1e...`, isto e,
+  a HEAD da `codex/hermes-analysis-docs`;
+- ao mesmo tempo, o deploy vivo do produto ja estava em `b6500c7a...` na
+  `master`.
+
+Diagnostico:
+
+- `manaloom-docs-branch-sync.sh` estava correto em mergear `origin/master` na
+  branch de docs, mas errado em deixar o workspace principal parado nessa
+  branch ao final;
+- como os jobs provider-backed usam o workspace do container, isso fazia o
+  Hermes auditar codigo stale por design operacional, nao por bug do provider.
+
+Correcao aplicada nesta mesma trilha:
+
+- `server/bin/hermes_docs_branch_sync.sh` agora restaura o workspace para
+  `master`/`HERMES_REPO_REF` no final do fluxo;
+- o comportamento foi coberto por teste real de Git em
+  `server/test/hermes_docs_branch_sync_test.py`;
+- `server/bin/hermes_lab_cron_bootstrap.py` endureceu tambem o escopo dos
+  prompts provider-backed para ignorar `optional-mcps/` e manifests alheios ao
+  runtime ManaLoom, porque um smoke do `manaloom-knowledge-synthesis`
+  retornou tarefas falsas sobre `optional-mcps/*`.
+
+Prova objetiva do ruido fora de escopo:
+
+- `manaloom-knowledge-synthesis` executou com `status=ok`, mas o output da
+  rodada anterior sugeriu tasks para `optional-mcps/linear/manifest.yaml` e
+  `optional-mcps/n8n/manifest.yaml`, sem relacao com o runtime do produto;
+- isso confirmou que o problema nao era "falta de key OpenAI", e sim falta de
+  delimitacao do workspace auditavel.
+
+Estado correto apos o ajuste:
+
+- `hermes-lab` continua sendo o runtime provider-backed;
+- `manaloom-ops` continua sendo o runtime deterministico/operacional;
+- `master` volta a ser a arvore viva auditada pelo Hermes;
+- `codex/hermes-analysis-docs` continua como memoria derivada e branch de
+  documentacao, nao como worktree persistente do produto.

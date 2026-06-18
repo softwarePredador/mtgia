@@ -233,6 +233,45 @@
     do bootstrap endurecido;
   - isso ja nao bloqueia a validacao operacional basica do EasyPanel.
 
+### Atualizacao de ciclo — 2026-06-18 / docs branch sync workspace restore
+
+- A rodada de smoke dos jobs provider-backed encontrou um drift operacional
+  real do `hermes-lab`:
+  - os jobs estavam executando com `repo_head=88fa4a1e...`, que era a HEAD da
+    `codex/hermes-analysis-docs`;
+  - o runtime real do produto e o deploy publico ja estavam em
+    `b6500c7a...` na `master`.
+- Causa raiz confirmada:
+  - `server/bin/hermes_docs_branch_sync.sh` fazia checkout da branch de docs
+    para mergear `origin/master`, mas nao restaurava o workspace principal para
+    `master` ao final;
+  - isso deixava os auditores provider-backed lendo codigo stale da branch de
+    memoria, exatamente o tipo de conflito que a topologia Hermes/Codex deve
+    evitar.
+- Correcao aplicada:
+  - o script agora restaura explicitamente o workspace para
+    `HERMES_REPO_REF/master` ao final de `up_to_date`, `would_merge`, `merged`,
+    `push_failed` e `merge_conflict`;
+  - se a restauracao falhar, o relatorio passa a fechar em
+    `blocked_restore_failed`.
+- Guardrail adicional aplicado no bootstrap provider-backed:
+  - prompts agora ignoram `optional-mcps/`, scaffolding local e manifests
+    alheios ao runtime ManaLoom, a menos que `latest_files` prove dependencia
+    real do produto;
+  - isso foi necessario porque um smoke do
+    `manaloom-knowledge-synthesis` chegou a propor tarefas para
+    `optional-mcps/*`, que nao pertencem ao escopo operacional do ManaLoom.
+- Validacao:
+  - `server/test/hermes_docs_branch_sync_test.py` cobre restauracao para
+    `master` tanto no `dry-run` quanto no merge local sem push;
+  - `server/test/hermes_lab_cron_bootstrap_test.py` agora exige o guardrail de
+    exclusao de `optional-mcps/`.
+- Reclassificacao:
+  - o gap real deixou de ser "Hermes tem provider ativo mas ainda sem prova
+    funcional" e passou a ser apenas manutencao de escopo dos prompts;
+  - a integracao Hermes/Codex volta a operar com `master` como arvore canonica
+    e a branch docs apenas como memoria derivada.
+
 ### Atualizacao de ciclo — 2026-06-18 / EasyPanel mana validator truth fix
 
 - Fechado um gap operacional/funcional do `manaloom-ops`: o

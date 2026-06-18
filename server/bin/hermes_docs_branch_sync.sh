@@ -13,6 +13,7 @@ REPO="${MANALOOM_WORKSPACE:-/opt/data/workspace/mtgia}"
 REMOTE="${HERMES_GIT_REMOTE:-origin}"
 MASTER_BRANCH="${HERMES_MASTER_BRANCH:-master}"
 DOCS_BRANCH="${HERMES_DOCS_BRANCH:-codex/hermes-analysis-docs}"
+RESTORE_BRANCH="${HERMES_DOCS_SYNC_RESTORE_BRANCH:-${HERMES_REPO_REF:-$MASTER_BRANCH}}"
 STATE_DIR="${HERMES_STATE_DIR:-/opt/data/data/manaloom}"
 REPORT_DIR="${HERMES_DOCS_SYNC_REPORT_DIR:-/opt/data/artifacts/hermes_docs_branch_sync}"
 PUSH="${HERMES_DOCS_SYNC_PUSH:-1}"
@@ -26,6 +27,7 @@ mkdir -p "$STATE_DIR" "$REPORT_DIR"
 timestamp="$(date -u +"%Y%m%d_%H%M%S")"
 report="$REPORT_DIR/docs_branch_sync_${timestamp}.md"
 lock_dir="$STATE_DIR/docs_branch_sync.lock"
+docs_checked_out=0
 
 write_report() {
   local status="$1"
@@ -47,6 +49,38 @@ write_report() {
     echo "${details}"
   } > "$report"
   echo "HERMES_DOCS_SYNC_REPORT: $report"
+}
+
+restore_workspace() {
+  if [[ "$docs_checked_out" != "1" ]]; then
+    return 0
+  fi
+
+  if git show-ref --verify --quiet "refs/remotes/${REMOTE}/${RESTORE_BRANCH}"; then
+    if git show-ref --verify --quiet "refs/heads/${RESTORE_BRANCH}"; then
+      git checkout --quiet "$RESTORE_BRANCH"
+      git merge --ff-only --quiet "${REMOTE}/${RESTORE_BRANCH}"
+    else
+      git checkout --quiet -b "$RESTORE_BRANCH" "${REMOTE}/${RESTORE_BRANCH}"
+    fi
+    docs_checked_out=0
+    return 0
+  fi
+
+  echo "failed to restore workspace branch ${RESTORE_BRANCH}" >&2
+  return 7
+}
+
+finish() {
+  local status="$1"
+  local details="$2"
+  local exit_code="${3:-0}"
+  if ! restore_workspace; then
+    write_report "blocked_restore_failed" "${details}\n\nWorkspace restore to ${RESTORE_BRANCH} failed after docs sync."
+    exit 7
+  fi
+  write_report "$status" "$details"
+  exit "$exit_code"
 }
 
 if [[ "${EUID:-$(id -u)}" == "0" && "$ALLOW_ROOT" != "1" ]]; then
@@ -98,6 +132,7 @@ if git show-ref --verify --quiet "refs/heads/${DOCS_BRANCH}"; then
 else
   git checkout --quiet -b "$DOCS_BRANCH" "${REMOTE}/${DOCS_BRANCH}"
 fi
+docs_checked_out=1
 
 git merge --ff-only --quiet "${REMOTE}/${DOCS_BRANCH}"
 
@@ -105,13 +140,11 @@ docs_before="$(git rev-parse HEAD)"
 master_sha="$(git rev-parse "${REMOTE}/${MASTER_BRANCH}")"
 
 if git merge-base --is-ancestor "$master_sha" HEAD; then
-  write_report "up_to_date" "Docs branch already contains ${REMOTE}/${MASTER_BRANCH}@${master_sha}."
-  exit 0
+  finish "up_to_date" "Docs branch already contains ${REMOTE}/${MASTER_BRANCH}@${master_sha}."
 fi
 
 if [[ "$DRY_RUN" == "1" ]]; then
-  write_report "would_merge" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}."
-  exit 0
+  finish "would_merge" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}."
 fi
 
 set +e
@@ -122,17 +155,15 @@ set -e
 if [[ "$merge_status" -ne 0 ]]; then
   conflict_status="$(git status --short)"
   git merge --abort >/dev/null 2>&1 || true
-  write_report "blocked_merge_conflict" "Merge failed and was aborted.\n\n\`\`\`\n${merge_output}\n${conflict_status}\n\`\`\`"
-  exit 0
+  finish "blocked_merge_conflict" "Merge failed and was aborted.\n\n\`\`\`\n${merge_output}\n${conflict_status}\n\`\`\`"
 fi
 
 docs_after="$(git rev-parse HEAD)"
 
 if [[ "$PUSH" == "1" ]]; then
   if ! git push --quiet "$REMOTE" "HEAD:${DOCS_BRANCH}"; then
-    write_report "blocked_push_failed" "Merge commit ${docs_after} was created locally, but push to ${REMOTE}/${DOCS_BRANCH} failed. Manual triage is required before audits continue."
-    exit 6
+    finish "blocked_push_failed" "Merge commit ${docs_after} was created locally, but push to ${REMOTE}/${DOCS_BRANCH} failed. Manual triage is required before audits continue." 6
   fi
 fi
 
-write_report "merged" "Merged ${REMOTE}/${MASTER_BRANCH}@${master_sha} into ${DOCS_BRANCH}.\n\n- before: ${docs_before}\n- after: ${docs_after}"
+finish "merged" "Merged ${REMOTE}/${MASTER_BRANCH}@${master_sha} into ${DOCS_BRANCH}.\n\n- before: ${docs_before}\n- after: ${docs_after}"

@@ -68,6 +68,7 @@ class HermesLabCronBootstrapTest(unittest.TestCase):
         for prompt in module.PROVIDER_PROMPTS.values():
             self.assertIn("latest_files", prompt)
             self.assertIn("Never call `read_file` on a directory path", prompt)
+            self.assertIn("Ignore `optional-mcps/`", prompt)
             self.assertIn(
                 "reply exactly [SILENT] and do not emit sections 1-3",
                 prompt,

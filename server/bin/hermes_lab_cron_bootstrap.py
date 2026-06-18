@@ -122,6 +122,7 @@ Rules:
 - Work only from current repo files and recent local artifacts.
 - Treat `latest_files` from cron context as the first evidence set.
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
+- Ignore `optional-mcps/`, personal tooling, local agent scaffolding and unrelated manifests unless `latest_files` proves a live ManaLoom runtime dependency.
 - Focus on learned decks, commander usage, generate/optimize support, and commander-specific evidence.
 - Do not create generic tasks. Every finding must cite a concrete file path.
 - If nothing actionable changed, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
@@ -138,6 +139,7 @@ Rules:
 - Use current repo files and recent local artifacts only.
 - Treat `latest_files` from cron context as the first evidence set.
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
+- Ignore `optional-mcps/`, personal tooling, local agent scaffolding and unrelated manifests unless `latest_files` proves a live ManaLoom runtime dependency.
 - Distinguish official-rule evidence from heuristic/product policy.
 - Cite concrete file paths for every claim.
 - If no material delta exists, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
@@ -154,6 +156,7 @@ Rules:
 - Use only repo-local evidence and recent artifacts.
 - Treat `latest_files` from cron context as the first evidence set.
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
+- Ignore `optional-mcps/`, external plugin manifests, local agent scaffolding and unrelated infra unless `latest_files` shows they affect live ManaLoom runtime paths under `server/`, `app/`, `docs/hermes-analysis/` or `server/test/artifacts/`.
 - No broad brainstorming, no duplicated tasks, no generic cleanup items.
 - Prefer P1/P2 actions with exact file evidence.
 - If there is no new actionable delta, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
@@ -170,6 +173,7 @@ Rules:
 - Separate official rules gaps from strategic-heuristic gaps.
 - Treat `latest_files` from cron context as the first evidence set.
 - Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
+- Ignore `optional-mcps/`, personal tooling, local agent scaffolding and unrelated manifests unless `latest_files` proves a live ManaLoom runtime dependency.
 - Cite current code/docs/artifacts for every finding.
 - Do not propose app/UI work here.
 - If no material rules delta exists, reply exactly [SILENT] and do not emit sections 1-3, bullets, headings, explanations, or any extra text.
