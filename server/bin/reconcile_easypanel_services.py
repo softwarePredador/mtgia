@@ -22,7 +22,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ENV_CANDIDATES = [REPO_ROOT / ".env", REPO_ROOT / "server" / ".env"]
 DEFAULT_PROJECT = "evolution"
 DEFAULT_SERVICES = ("manaloom-ops", "hermes-lab")
-SECRET_KEYS = {"OPENAI_API_KEY", "API_SERVER_KEY", "EASYPANEL_API_TOKEN"}
+SECRET_KEYS = {
+    "OPENAI_API_KEY",
+    "API_SERVER_KEY",
+    "EASYPANEL_API_TOKEN",
+    "HERMES_GITHUB_TOKEN",
+    "GITHUB_TOKEN",
+    "GH_TOKEN",
+}
 
 
 @dataclass(frozen=True)
@@ -267,7 +274,7 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "HERMES_CRON_BOOTSTRAP_REQUIRED": "1",
             "HERMES_DOCS_SYNC_ALLOW_ROOT": "1",
             "HERMES_REPO_REF": "master",
-            "HERMES_REPO_AUTO_SYNC": "0",
+            "HERMES_REPO_AUTO_SYNC": "1",
         }
         openai_key = runtime_env.get("OPENAI_API_KEY") or existing_env.get("OPENAI_API_KEY")
         if openai_key:

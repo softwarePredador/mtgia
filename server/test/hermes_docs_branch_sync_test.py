@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 import subprocess
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -138,7 +139,7 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
             )
             self.assertEqual(ancestor.returncode, 0, msg=ancestor.stderr)
 
-    def test_pushes_local_docs_branch_when_already_contains_master_but_remote_lags(self) -> None:
+    def test_recovers_diverged_local_docs_branch_by_resetting_to_remote(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             _, work = self._seed_remote(root, advance_master=True)
@@ -148,7 +149,13 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
 
             first = _run(["bash", str(SCRIPT)], cwd=work, env=env)
             self.assertEqual(first.returncode, 0, msg=first.stderr)
+            _git(work, "checkout", "codex/hermes-analysis-docs")
+            local_only = work / "docs" / "hermes-analysis" / "LOCAL_ONLY.md"
+            local_only.write_text("must not be pushed\n", encoding="utf-8")
+            _git(work, "add", "docs/hermes-analysis/LOCAL_ONLY.md")
+            _git(work, "commit", "-m", "local only docs state")
             local_docs_sha = _git_output(work, "rev-parse", "codex/hermes-analysis-docs")
+            _git(work, "checkout", "master")
             remote_docs_sha = _git_output(work, "rev-parse", "origin/codex/hermes-analysis-docs")
             self.assertNotEqual(local_docs_sha, remote_docs_sha)
 
@@ -159,11 +166,33 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
 
             _git(work, "fetch", "origin", "codex/hermes-analysis-docs")
             pushed_docs_sha = _git_output(work, "rev-parse", "origin/codex/hermes-analysis-docs")
-            self.assertEqual(pushed_docs_sha, local_docs_sha)
+            self.assertNotEqual(pushed_docs_sha, local_docs_sha)
+            remote_show = _run(
+                [
+                    "git",
+                    "show",
+                    "origin/codex/hermes-analysis-docs:docs/hermes-analysis/LOCAL_ONLY.md",
+                ],
+                cwd=work,
+            )
+            self.assertNotEqual(remote_show.returncode, 0)
+            self.assertEqual(
+                _run(
+                    [
+                        "git",
+                        "merge-base",
+                        "--is-ancestor",
+                        "origin/master",
+                        "origin/codex/hermes-analysis-docs",
+                    ],
+                    cwd=work,
+                ).returncode,
+                0,
+            )
 
             report = max((root / "reports").glob("docs_branch_sync_*.md"))
             report_text = report.read_text(encoding="utf-8")
-            self.assertIn("status: pushed_up_to_date", report_text)
+            self.assertIn("status: merged", report_text)
 
     def test_quarantines_untracked_files_before_branch_sync(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -212,6 +241,48 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("status: would_merge", report_text)
             self.assertIn("Quarantined 2 untracked file(s)", report_text)
+
+    def test_reports_missing_github_push_token_without_hanging(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, work = self._seed_remote(root, advance_master=True)
+            env = self._script_env(root, work)
+            env["HERMES_DOCS_SYNC_PUSH"] = "1"
+            env.pop("HERMES_GITHUB_TOKEN", None)
+            env.pop("GITHUB_TOKEN", None)
+            env.pop("GH_TOKEN", None)
+            _git(work, "remote", "set-url", "--push", "origin", "https://github.com/softwarePredador/mtgia.git")
+
+            result = _run(["bash", str(SCRIPT)], cwd=work, env=env)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertEqual(_git_output(work, "branch", "--show-current"), "master")
+
+            report = max((root / "reports").glob("docs_branch_sync_*.md"))
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("status: would_merge_push_token_missing", report_text)
+            self.assertIn("HERMES_GITHUB_TOKEN", report_text)
+
+    def test_recovers_stale_lock_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, work = self._seed_remote(root, advance_master=True)
+            env = self._script_env(root, work)
+            env["HERMES_DOCS_SYNC_DRY_RUN"] = "1"
+            env["HERMES_DOCS_SYNC_PUSH"] = "0"
+            env["HERMES_DOCS_SYNC_STALE_LOCK_SECONDS"] = "1"
+            lock_dir = root / "state" / "docs_branch_sync.lock"
+            lock_dir.mkdir(parents=True)
+            old = time.time() - 60
+            os.utime(lock_dir, (old, old))
+
+            result = _run(["bash", str(SCRIPT)], cwd=work, env=env)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertEqual(_git_output(work, "branch", "--show-current"), "master")
+            self.assertFalse(lock_dir.exists())
+
+            report = max((root / "reports").glob("docs_branch_sync_*.md"))
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("status: would_merge", report_text)
 
     def test_blocks_tracked_modifications(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

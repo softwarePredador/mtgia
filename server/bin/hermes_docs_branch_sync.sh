@@ -19,9 +19,12 @@ REPORT_DIR="${HERMES_DOCS_SYNC_REPORT_DIR:-/opt/data/artifacts/hermes_docs_branc
 PUSH="${HERMES_DOCS_SYNC_PUSH:-1}"
 DRY_RUN="${HERMES_DOCS_SYNC_DRY_RUN:-0}"
 ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-1}"
+STALE_LOCK_SECONDS="${HERMES_DOCS_SYNC_STALE_LOCK_SECONDS:-900}"
 GIT_USER_NAME="${HERMES_GIT_USER_NAME:-Hermes Agent}"
 GIT_USER_EMAIL="${HERMES_GIT_USER_EMAIL:-hermes-agent@local.invalid}"
 GIT_PUSH_TOKEN="${HERMES_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN:-}}}"
+GIT_TERMINAL_PROMPT=0
+export GIT_TERMINAL_PROMPT
 
 mkdir -p "$STATE_DIR" "$REPORT_DIR"
 
@@ -109,11 +112,50 @@ if [[ "${EUID:-$(id -u)}" == "0" && "$ALLOW_ROOT" != "1" ]]; then
 fi
 
 if ! mkdir "$lock_dir" 2>/dev/null; then
+  stale_lock="$(
+    python3 - "$lock_dir" "$STALE_LOCK_SECONDS" <<'PY'
+from __future__ import annotations
+
+import os
+import sys
+import time
+from pathlib import Path
+
+path = Path(sys.argv[1])
+threshold = int(sys.argv[2])
+try:
+    age = time.time() - path.stat().st_mtime
+except FileNotFoundError:
+    print("missing")
+    raise SystemExit(0)
+print("stale" if age >= threshold else "fresh")
+PY
+  )"
+  if [[ "$stale_lock" == "stale" ]]; then
+    rm -rf "$lock_dir"
+    if mkdir "$lock_dir" 2>/dev/null; then
+      echo "removed stale docs branch sync lock: ${lock_dir}"
+    else
+      write_report "skipped_locked" "Another docs branch sync is already running after stale lock cleanup attempt: ${lock_dir}"
+      exit 0
+    fi
+  else
+    write_report "skipped_locked" "Another docs branch sync is already running: ${lock_dir}"
+    exit 0
+  fi
+fi
+
+if [[ ! -f "$lock_dir/pid" ]]; then
+  echo "$$" > "$lock_dir/pid" 2>/dev/null || true
+fi
+
+if [[ ! -d "$lock_dir" ]]; then
   write_report "skipped_locked" "Another docs branch sync is already running: ${lock_dir}"
   exit 0
 fi
 
 cleanup() {
+  rm -f "$lock_dir/pid" 2>/dev/null || true
   rmdir "$lock_dir" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -126,8 +168,16 @@ fi
 if [[ -z "$(git config --get user.email || true)" ]]; then
   git config --global user.email "$GIT_USER_EMAIL"
 fi
+remote_url="$(git remote get-url "$REMOTE" 2>/dev/null || true)"
+remote_push_url="$(git remote get-url --push "$REMOTE" 2>/dev/null || true)"
+if [[ -z "$remote_push_url" ]]; then
+  remote_push_url="$remote_url"
+fi
+push_blocked_missing_token=0
+if [[ "$PUSH" == "1" && -z "$GIT_PUSH_TOKEN" && "$remote_push_url" == *github.com* ]]; then
+  push_blocked_missing_token=1
+fi
 if [[ -n "$GIT_PUSH_TOKEN" ]]; then
-  remote_url="$(git remote get-url "$REMOTE" 2>/dev/null || true)"
   repo_path=""
   case "$remote_url" in
     git@github.com:*)
@@ -171,12 +221,14 @@ fi
 
 if git show-ref --verify --quiet "refs/heads/${DOCS_BRANCH}"; then
   git checkout --quiet "$DOCS_BRANCH"
+  # The Hermes checkout is operational state, not the source of truth for docs.
+  # If a prior run left a local merge commit that could not be pushed, recover
+  # from the remote branch before creating a fresh merge from current master.
+  git reset --hard --quiet "${REMOTE}/${DOCS_BRANCH}"
 else
   git checkout --quiet -b "$DOCS_BRANCH" "${REMOTE}/${DOCS_BRANCH}"
 fi
 docs_checked_out=1
-
-git merge --ff-only --quiet "${REMOTE}/${DOCS_BRANCH}"
 
 docs_before="$(git rev-parse HEAD)"
 master_sha="$(git rev-parse "${REMOTE}/${MASTER_BRANCH}")"
@@ -195,6 +247,10 @@ fi
 
 if [[ "$DRY_RUN" == "1" ]]; then
   finish "would_merge" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}.\n\n${quarantine_details}"
+fi
+
+if [[ "$push_blocked_missing_token" == "1" ]]; then
+  finish "would_merge_push_token_missing" "Docs branch ${docs_before} would merge ${REMOTE}/${MASTER_BRANCH}@${master_sha}, but ${REMOTE} push URL requires GitHub credentials and no HERMES_GITHUB_TOKEN/GITHUB_TOKEN/GH_TOKEN is configured. Remote docs sync remains manual until a token is configured.\n\n${quarantine_details}"
 fi
 
 set +e

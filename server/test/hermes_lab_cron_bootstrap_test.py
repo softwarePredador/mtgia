@@ -104,6 +104,12 @@ class HermesLabCronBootstrapTest(unittest.TestCase):
                 else:
                     os.environ["HERMES_REPO_DIR"] = previous_hermes_repo
 
+    def test_docs_sync_source_prefers_bootstrap_script_over_persistent_repo(self) -> None:
+        text = BOOTSTRAP.read_text(encoding="utf-8")
+        bootstrap_index = text.index('Path("/opt/bootstrap/hermes_docs_branch_sync.sh")')
+        repo_index = text.index('REPO_ROOT / "server" / "bin" / "hermes_docs_branch_sync.sh"')
+        assert bootstrap_index < repo_index
+
     def test_install_scripts_uses_bootstrap_fallback_when_repo_script_missing(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:

@@ -239,6 +239,59 @@ saída provider-backed:
 - isso não quebrou a execução, mas viola o contrato correto de delivery do
   Hermes (`ou [SILENT] puro, ou relatório normal`).
 
+## Follow-up live — 2026-06-18 18:09 UTC
+
+Depois do deploy de hardening `1cc517ba`, a auditoria live passou a flagar
+`last_status=error` em jobs ativos, em vez de aceitar apenas a existencia do
+job no `jobs.json`.
+
+Resultado:
+
+- `manaloom-ops`: 11/11 jobs forcados manualmente e com `last_status=ok`;
+- `hermes-lab`: 5 jobs ativos encontrados, mas `manaloom-docs-branch-sync`
+  falhou por divergencia Git local/remota na branch
+  `codex/hermes-analysis-docs`;
+- causa: o checkout persistente do container pode manter uma branch docs local
+  com merge commit antigo que nao foi pushado. Esse estado local nao deve ser
+  tratado como fonte de verdade.
+
+Correcao aplicada:
+
+- `server/bin/hermes_docs_branch_sync.sh` agora reseta a branch docs local para
+  `origin/codex/hermes-analysis-docs` antes de criar o merge fresco de
+  `origin/master`;
+- `server/bin/hermes_lab_entrypoint.sh` agora deixa `HERMES_REPO_AUTO_SYNC=1`
+  por padrao e registra `safe.directory` antes de operar o checkout persistido;
+- `server/bin/reconcile_easypanel_services.py` passa a declarar
+  `HERMES_REPO_AUTO_SYNC=1` no ambiente desejado do `hermes-lab`;
+- `server/bin/hermes_lab_cron_bootstrap.py` prefere a copia empacotada em
+  `/opt/bootstrap/hermes_docs_branch_sync.sh` para scripts operacionais,
+  evitando que o repo persistido stale copie uma versao antiga do script;
+- `server/bin/hermes_docs_branch_sync.sh` exporta `GIT_TERMINAL_PROMPT=0` e,
+  quando o push URL exige GitHub mas nenhum `HERMES_GITHUB_TOKEN`/
+  `GITHUB_TOKEN`/`GH_TOKEN` existe no container, reporta
+  `would_merge_push_token_missing` sem tentar um push interativo que travaria
+  a cron ate timeout;
+- a mesma rotina remove lock antigo controlado por
+  `HERMES_DOCS_SYNC_STALE_LOCK_SECONDS` antes de executar, evitando que um
+  timeout anterior transforme as proximas rodadas em falso `skipped_locked`;
+- a rotina continua bloqueando tracked dirty worktree antes de qualquer
+  checkout;
+- untracked files continuam sendo movidos para quarentena antes do sync;
+- `server/test/hermes_docs_branch_sync_test.py` cobre o caso de branch docs
+  local divergente com commit local-only que nao pode ser propagado.
+
+Essa correcao preserva a arquitetura correta: a branch docs remota e o master
+remoto sao as fontes de verdade; o checkout persistente do Hermes e apenas
+estado operacional recuperavel.
+
+Limitacao operacional restante:
+
+- push automatico para `origin/codex/hermes-analysis-docs` exige configurar
+  `HERMES_GITHUB_TOKEN` no `hermes-lab`;
+- enquanto esse token nao existir, o job valida que a branch docs conseguiria
+  receber o merge de `origin/master`, mas a publicacao remota deve ser manual.
+
 Correção aplicada em `server/bin/hermes_lab_cron_bootstrap.py`:
 
 - todos os prompts provider-backed agora instruem explicitamente:
