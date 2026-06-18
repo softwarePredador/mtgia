@@ -26,9 +26,11 @@ Contrato:
 - `server/bin/manaloom_card_data_gap_review.sh`
 - `server/bin/manaloom_battle_rule_review_queue.py`
 - `server/bin/manaloom_battle_rule_review_queue.sh`
+- `server/bin/sync_card_legalities_from_scryfall.py`
 - `server/bin/manaloom_ops_daemon.py`
 - `server/test/manaloom_new_card_candidate_review_test.py`
 - `server/test/manaloom_review_queue_consumers_test.py`
+- `server/test/sync_card_legalities_from_scryfall_test.py`
 
 ## Cron
 
@@ -43,6 +45,10 @@ env override=MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON
 Consumers registrados:
 
 ```text
+name=manaloom_sync_card_legalities_from_scryfall
+schedule=30 */6 * * *
+env override=MANALOOM_SYNC_CARD_LEGALITIES_CRON
+
 name=manaloom_card_data_gap_review
 schedule=50 */6 * * *
 env override=MANALOOM_CARD_DATA_GAP_REVIEW_CRON
@@ -56,6 +62,7 @@ Wrapper:
 
 ```bash
 ./server/bin/manaloom_new_card_candidate_review.sh
+./server/bin/sync_card_legalities_from_scryfall.sh
 ```
 
 Artefatos padrão no EasyPanel/manaloom-ops:
@@ -301,12 +308,95 @@ Leitura correta dessa rodada:
 - `Seize the Day` agora gera família `extra_combat_phase` e
   `graveyard_recast_replacement`, mas permanece `needs_review`.
 
+## Fechamento Do Gap De Legalidade
+
+Em 2026-06-18 foi criado e executado um sincronizador focado para resolver
+`needs_legality_sync` sem acoplar isso a LLM ou Hermes:
+
+```bash
+python3 server/bin/sync_card_legalities_from_scryfall.py \
+  --sets msh,msc,mar
+
+python3 server/bin/sync_card_legalities_from_scryfall.py \
+  --sets msh,msc,mar \
+  --apply
+```
+
+Contrato:
+
+- dry-run por padrão;
+- `--apply` explícito para persistir;
+- no EasyPanel `manaloom-ops`, o reconciliador define
+  `MANALOOM_SYNC_CARD_LEGALITIES_APPLY=1` para a cron controlada;
+- usa Scryfall Collection API por `oracle_id`;
+- escreve somente `card_legalities`;
+- não altera `cards`, decks, tags, battle rules ou qualquer contrato app-facing;
+- PostgreSQL/backend continua como fonte de verdade.
+
+Resultado aplicado no PostgreSQL:
+
+```json
+{
+  "candidate_cards": 150,
+  "oracle_ids_requested": 150,
+  "oracle_ids_found": 150,
+  "oracle_ids_not_found": 0,
+  "legality_rows_ready": 3300,
+  "legality_rows_upserted": 3300,
+  "commander_statuses": {
+    "legal": 1,
+    "not_legal": 149
+  }
+}
+```
+
+Cobertura pós-sync:
+
+```text
+mar: 17/17 com legalidade Commander, 17 jogáveis
+msc: 22/22 com legalidade Commander, 22 not_legal
+msh: 127/127 com legalidade Commander, 127 not_legal
+```
+
+Rerun limpo do pipeline após o sync:
+
+```json
+{
+  "candidate_review": {
+    "cards_scanned": 166,
+    "commanders_scanned": 30,
+    "decisions": {
+      "backlog": 48,
+      "ignore": 4866,
+      "needs_rule_review": 66
+    }
+  },
+  "card_data_gap_review": {
+    "gap_rows": 0,
+    "unique_cards": 0,
+    "decisions": {}
+  },
+  "battle_rule_review_queue": {
+    "queue_rows": 66,
+    "draft_count": 6,
+    "confidence_counts": {
+      "low": 6
+    }
+  }
+}
+```
+
+Leitura correta: `needs_data` foi fechado para esta massa. O trabalho restante
+é revisar `needs_rule_review`; isso deve continuar como draft/auditoria até
+haver fonte oficial, teste focado e replay sem finding crítico.
+
 ## Próximos Passos
 
 1. Rodar a rotina no `manaloom-ops` após deploy e verificar
    `latest_report.md`.
-2. Se o volume de `needs_data` em `msh/msc/mar` continuar alto, priorizar sync
-   de legalidades/oracle/tags desses sets.
+2. Se `needs_data` reaparecer em novos sets, rodar primeiro
+   `sync_card_legalities_from_scryfall.py` em dry-run e aplicar somente quando
+   o resumo fechar `not_found=0` ou a exceção estiver documentada.
 3. Rodar `manaloom_card_data_gap_review` após cada candidate review e usar a
    saída para priorizar sync de legalidades/dados.
 4. Rodar `manaloom_battle_rule_review_queue` após cada candidate review e usar

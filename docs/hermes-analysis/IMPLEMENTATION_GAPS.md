@@ -74,11 +74,31 @@
   - data gap review: `150` cartas únicas, todas classificadas como
     `needs_legality_sync` nesta massa;
   - battle rule queue: `49` ocorrências agregadas em `5` drafts de regra.
+- Fechamento de dados em 2026-06-18:
+  - criado `server/bin/sync_card_legalities_from_scryfall.py`, dry-run por
+    padrão e `--apply` explícito;
+  - registrado `manaloom_sync_card_legalities_from_scryfall` no
+    `manaloom-ops` às `30 */6 * * *`, antes da candidate review;
+  - no EasyPanel, o reconciliador define
+    `MANALOOM_SYNC_CARD_LEGALITIES_APPLY=1` e
+    `MANALOOM_SYNC_LEGALITIES_SETS=msh,msc,mar`;
+  - o script usa Scryfall Collection API por `oracle_id` para cartas já
+    existentes e escreve somente `card_legalities`;
+  - execução real em PostgreSQL para `msh,msc,mar` encontrou `150/150`
+    Oracle IDs, `0` not found e aplicou `3300` linhas de legalidade;
+  - cobertura Commander pós-sync:
+    - `mar`: `17/17` cartas com legalidade, `17` jogáveis;
+    - `msc`: `22/22` cartas com legalidade, `22` `not_legal`;
+    - `msh`: `127/127` cartas com legalidade, `127` `not_legal`;
+  - rerun limpo do pipeline (`candidate -> data_gap -> battle_queue`) retornou
+    `needs_data=0`, `backlog=48`, `ignore=4866` e
+    `needs_rule_review=66`.
 - Reclassificação de prioridade:
-  - antes de discutir swaps Marvel/Lorehold, resolver legalidade Commander dos
-    150 cards em `needs_legality_sync`;
-  - depois, revisar os 5 drafts de battle rule com teste focado;
-  - só então rodar scorecard/optimizer.
+  - o bloqueio `needs_legality_sync` desta massa foi resolvido;
+  - a pendência real agora é revisar os drafts/filas `needs_rule_review` com
+    fonte oficial, teste focado e replay/auditoria antes de qualquer promoção;
+  - só depois disso rodar scorecard/optimizer para cartas que continuarem
+    candidatas.
 
 ### Atualizacao de ciclo — 2026-06-18 / local replay cache truth
 

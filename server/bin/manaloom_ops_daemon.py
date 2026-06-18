@@ -99,6 +99,9 @@ def _base_env() -> dict[str, str]:
             "MANALOOM_NEW_CARD_CANDIDATE_REVIEW_DIR": str(
                 ARTIFACT_DIR / "new_card_candidate_review"
             ),
+            "MANALOOM_SYNC_CARD_LEGALITIES_OUTPUT_DIR": str(
+                ARTIFACT_DIR / "sync_card_legalities_from_scryfall"
+            ),
         }
     )
     return env
@@ -208,6 +211,16 @@ JOBS = [
         lockfile=LOCK_DIR / "auto_sync_learned_decks.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/auto_sync_learned_decks.sh',
         script_name="auto_sync_learned_decks.sh",
+    ),
+    Job(
+        name="manaloom_sync_card_legalities_from_scryfall",
+        schedule=os.environ.get(
+            "MANALOOM_SYNC_CARD_LEGALITIES_CRON",
+            "30 */6 * * *",
+        ),
+        lockfile=LOCK_DIR / "manaloom_sync_card_legalities_from_scryfall.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/sync_card_legalities_from_scryfall.sh',
+        script_name="sync_card_legalities_from_scryfall.sh",
     ),
     Job(
         name="manaloom_new_card_candidate_review",
@@ -412,6 +425,7 @@ def _infer_status_from_output(path: Path) -> str | None:
         "nenhum evento novo.",
         "nenhum deck promovido elegivel encontrado.",
         "totals promoted=",
+        "manaloom_sync_card_legalities",
         "manaloom_new_card_candidate_review",
         "manaloom_card_data_gap_review",
         "manaloom_battle_rule_review_queue",

@@ -139,6 +139,18 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             "2026-06-18T07:36:27",
         )
 
+    def test_sync_legalities_job_runs_before_candidate_review(self) -> None:
+        module = _load_module()
+        names = [job.name for job in module.JOBS]
+        self.assertIn("manaloom_sync_card_legalities_from_scryfall", names)
+        self.assertLess(
+            names.index("manaloom_sync_card_legalities_from_scryfall"),
+            names.index("manaloom_new_card_candidate_review"),
+        )
+        job = module.JOBS[names.index("manaloom_sync_card_legalities_from_scryfall")]
+        self.assertEqual(job.schedule, "30 */6 * * *")
+        self.assertIn("sync_card_legalities_from_scryfall.sh", job.command)
+
 
 if __name__ == "__main__":
     unittest.main()

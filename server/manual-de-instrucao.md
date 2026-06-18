@@ -3,6 +3,84 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-06-18 — Sync focado de legalidades para fechar `needs_legality_sync`
+
+Motivo:
+
+- A rotina `manaloom_new_card_candidate_review` passou a detectar cartas
+  recentes em `msh,msc,mar`.
+- O bloqueio real nao era falta de oracle text ou identidade, e sim ausência
+  de linhas `card_legalities` para 150 cartas já existentes no PostgreSQL.
+- `needs_data` não deve usar LLM; deve ser resolvido por sync determinístico.
+
+Patch aplicado:
+
+- Criado `server/bin/sync_card_legalities_from_scryfall.py`.
+- Criado wrapper `server/bin/sync_card_legalities_from_scryfall.sh`.
+- Registrado no `server/bin/manaloom_ops_daemon.py` antes da candidate review:
+  - `name=manaloom_sync_card_legalities_from_scryfall`;
+  - `schedule=30 */6 * * *`;
+  - override por `MANALOOM_SYNC_CARD_LEGALITIES_CRON`.
+- O reconciliador EasyPanel define:
+  - `MANALOOM_SYNC_CARD_LEGALITIES_APPLY=1`;
+  - `MANALOOM_SYNC_LEGALITIES_SETS=msh,msc,mar`.
+- Criado teste `server/test/sync_card_legalities_from_scryfall_test.py`.
+
+Contrato:
+
+- dry-run por padrão;
+- `--apply` explícito para persistir;
+- cron em `manaloom-ops` aplica somente porque a env
+  `MANALOOM_SYNC_CARD_LEGALITIES_APPLY=1` é definida pelo reconciliador;
+- usa Scryfall Collection API por `oracle_id`;
+- escreve somente `card_legalities`;
+- não altera `cards`, decks, tags, regras battle, APIs públicas ou app;
+- PostgreSQL/backend continua como fonte de verdade.
+
+Comandos:
+
+```bash
+python3 server/bin/sync_card_legalities_from_scryfall.py \
+  --sets msh,msc,mar
+
+python3 server/bin/sync_card_legalities_from_scryfall.py \
+  --sets msh,msc,mar \
+  --apply
+```
+
+Resultado real aplicado no PostgreSQL:
+
+```json
+{
+  "candidate_cards": 150,
+  "oracle_ids_requested": 150,
+  "oracle_ids_found": 150,
+  "oracle_ids_not_found": 0,
+  "legality_rows_ready": 3300,
+  "legality_rows_upserted": 3300,
+  "commander_statuses": {
+    "legal": 1,
+    "not_legal": 149
+  }
+}
+```
+
+Cobertura pós-sync:
+
+- `mar`: 17/17 cartas com legalidade Commander, 17 jogáveis.
+- `msc`: 22/22 cartas com legalidade Commander, 22 `not_legal`.
+- `msh`: 127/127 cartas com legalidade Commander, 127 `not_legal`.
+
+Validação funcional:
+
+- Rerun limpo `candidate -> data_gap -> battle_queue` após o sync:
+  - `needs_data=0`;
+  - `gap_rows=0`;
+  - `needs_rule_review=66`;
+  - `draft_count=6`.
+- Interpretação: o gap de dados foi fechado; a fila restante é revisão de regra
+  battle, não problema de catálogo.
+
 ## 2026-06-18 — New-card candidate review geral em manaloom-ops
 
 Motivo:
