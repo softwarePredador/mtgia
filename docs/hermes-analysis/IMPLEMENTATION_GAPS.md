@@ -99,6 +99,26 @@
     fonte oficial, teste focado e replay/auditoria antes de qualquer promoção;
   - só depois disso rodar scorecard/optimizer para cartas que continuarem
     candidatas.
+- Fechamento operacional complementar:
+  - `manaloom_new_card_candidate_review` passou a aceitar
+    `--scope sets|lookback|full`;
+  - `--scope full` permite revalidar cartas antigas com a mesma régua das
+    cartas novas, respeitando `--card-limit` e mantendo o contrato
+    report-only;
+  - cada rodada agora grava snapshots por comandante em
+    `latest_commanders/<commander>.json|md` e na tabela operacional
+    `new_card_candidate_commander_snapshots`;
+  - os snapshots preservam múltiplas funções, status de battle rule, riscos,
+    razões e top candidatos por comandante;
+  - Lorehold continua como controle padrão, mas não há lógica exclusiva para
+    Lorehold.
+- Gap remanescente:
+  - criar o gate de promoção `needs_review -> verified` fora do runner de
+    candidatos, com fonte oficial, teste focado e replay/auditoria;
+  - ligar os snapshots por comandante a scorecards do optimizer/battle antes de
+    sugerir troca concreta;
+  - manter `needs_data` determinístico e `needs_rule_review` como draft
+    auditável, sem comportamento duro.
 
 ### Atualizacao de ciclo — 2026-06-18 / local replay cache truth
 

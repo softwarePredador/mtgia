@@ -64,6 +64,7 @@ RELEVANT_ROLES = {
     "recursion",
 }
 CONTROL_COMMANDER = "Lorehold, the Historian"
+VALID_SCOPES = {"sets", "lookback", "full"}
 
 
 def utc_now() -> datetime:
@@ -143,6 +144,11 @@ def json_default(value: Any) -> Any:
     if isinstance(value, datetime):
         return value.isoformat()
     return str(value)
+
+
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", normalize_name(value))
+    return slug.strip("_") or "unknown"
 
 
 def load_env_file(path: Path) -> None:
@@ -532,13 +538,21 @@ class PgSource:
                 self._columns[table] = {str(row["column_name"]) for row in cur.fetchall()}
         return self._columns[table]
 
-    def fetch_cards(self, sets: list[str], lookback_days: int, card_limit: int) -> list[CardRecord]:
+    def fetch_cards(
+        self,
+        scope: str,
+        sets: list[str],
+        lookback_days: int,
+        card_limit: int,
+    ) -> list[CardRecord]:
         has_snapshot = self.table_exists("card_intelligence_snapshot")
         has_sets = self.table_exists("sets")
         set_filter = ""
         params: list[Any] = []
         normalized_sets = [item.lower() for item in sets if item]
-        if normalized_sets:
+        if scope == "full":
+            set_filter = ""
+        elif scope == "sets" and normalized_sets:
             placeholders = ", ".join(["%s"] * len(normalized_sets))
             set_filter = f"WHERE LOWER(c.set_code) IN ({placeholders})"
             params.extend(normalized_sets)
@@ -548,7 +562,10 @@ class PgSource:
         else:
             set_filter = "WHERE c.created_at >= (NOW() - (%s || ' days')::interval)"
             params.append(str(lookback_days))
-        params.append(card_limit)
+        limit_clause = ""
+        if card_limit > 0:
+            limit_clause = "LIMIT %s"
+            params.append(card_limit)
 
         if has_snapshot:
             release_select = "s.release_date::text AS release_date" if has_sets else "NULL AS release_date"
@@ -578,7 +595,7 @@ class PgSource:
                 {set_join}
                 {set_filter}
                 ORDER BY {order_expr} DESC NULLS LAST, c.name
-                LIMIT %s
+                {limit_clause}
             """
         else:
             has_legalities = self.table_exists("card_legalities")
@@ -623,7 +640,7 @@ class PgSource:
                 {legal_join}
                 {set_filter}
                 ORDER BY {order_expr} DESC NULLS LAST, c.name
-                LIMIT %s
+                {limit_clause}
             """
         with self.conn.cursor() as cur:
             cur.execute(query, params)
@@ -819,6 +836,21 @@ def ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS new_card_candidate_commander_snapshots (
+            run_id TEXT NOT NULL,
+            commander_name TEXT NOT NULL,
+            commander_source TEXT NOT NULL,
+            color_identity_json TEXT NOT NULL,
+            decisions_json TEXT NOT NULL,
+            coverage_json TEXT NOT NULL,
+            top_candidates_json TEXT NOT NULL,
+            generated_at TEXT NOT NULL,
+            PRIMARY KEY (run_id, commander_name)
+        )
+        """
+    )
     conn.commit()
 
 
@@ -904,6 +936,25 @@ def persist_sqlite(
                         run_id,
                     ),
                 )
+        for commander_name, row in summary.get("by_commander", {}).items():
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO new_card_candidate_commander_snapshots (
+                    run_id, commander_name, commander_source, color_identity_json,
+                    decisions_json, coverage_json, top_candidates_json, generated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    run_id,
+                    commander_name,
+                    row.get("source", ""),
+                    json.dumps(row.get("color_identity", []), sort_keys=True),
+                    json.dumps(row.get("decisions", {}), sort_keys=True),
+                    json.dumps(row.get("coverage", {}), sort_keys=True),
+                    json.dumps(row.get("top_candidates", []), sort_keys=True),
+                    generated_at,
+                ),
+            )
         conn.execute(
             """
             INSERT OR REPLACE INTO new_card_candidate_review_checkpoints (
@@ -915,6 +966,59 @@ def persist_sqlite(
         conn.commit()
     finally:
         conn.close()
+
+
+def calculate_coverage(cards: list[CardRecord]) -> dict[str, Any]:
+    total = len(cards)
+
+    def count(predicate) -> int:
+        return sum(1 for card in cards if predicate(card))
+
+    counts = {
+        "cards": total,
+        "oracle_id": count(lambda card: bool(card.oracle_id)),
+        "oracle_text": count(lambda card: bool(card.oracle_text)),
+        "commander_legality": count(lambda card: bool(commander_legal_status(card))),
+        "function_tags": count(lambda card: bool(card.function_tags)),
+        "semantic_tags_v2": count(lambda card: bool(card.semantic_tags_v2)),
+        "battle_rules": count(lambda card: card.battle_rule_count > 0),
+        "verified_battle_rules": count(lambda card: card.verified_battle_rule_count > 0),
+    }
+    percentages = {
+        key: (round((value / total) * 100, 2) if total else 0.0)
+        for key, value in counts.items()
+        if key != "cards"
+    }
+    return {
+        "counts": counts,
+        "percentages": percentages,
+    }
+
+
+def calculate_review_coverage(reviews: list[CandidateReview]) -> dict[str, Any]:
+    total = len(reviews)
+    decisions: dict[str, int] = {}
+    rule_statuses: dict[str, int] = {}
+    role_counts: dict[str, int] = {}
+    risk_flags: dict[str, int] = {}
+    for review in reviews:
+        decisions[review.decision] = decisions.get(review.decision, 0) + 1
+        rule_statuses[review.battle_rule_status] = (
+            rule_statuses.get(review.battle_rule_status, 0) + 1
+        )
+        for role in review.roles:
+            role_counts[role] = role_counts.get(role, 0) + 1
+        for flag in review.risk_flags:
+            risk_flags[flag] = risk_flags.get(flag, 0) + 1
+    actionable = sum(decisions.get(key, 0) for key in ("test", "backlog", "needs_rule_review"))
+    return {
+        "review_count": total,
+        "decisions": decisions,
+        "battle_rule_statuses": rule_statuses,
+        "roles": role_counts,
+        "risk_flags": risk_flags,
+        "actionable_candidate_count": actionable,
+    }
 
 
 def summarize_reviews(
@@ -943,12 +1047,15 @@ def summarize_reviews(
         if review.decision in {"test", "needs_rule_review", "backlog"}:
             row["top_candidates"].append(
                 {
+                    "oracle_id": review.oracle_id,
                     "card_name": review.card_name,
                     "set_code": review.set_code,
                     "decision": review.decision,
                     "score": review.score,
                     "roles": review.roles,
                     "reasons": review.reasons[:5],
+                    "battle_rule_status": review.battle_rule_status,
+                    "risk_flags": review.risk_flags,
                 }
             )
     for row in by_commander.values():
@@ -956,6 +1063,11 @@ def summarize_reviews(
             row["top_candidates"],
             key=lambda item: (-int(item["score"]), item["card_name"]),
         )[:10]
+    for commander, row in by_commander.items():
+        commander_reviews = [
+            review for review in reviews if review.commander_name == commander
+        ]
+        row["coverage"] = calculate_review_coverage(commander_reviews)
     if decisions.get("test", 0):
         hermes_wake_reasons.append("new_test_candidates")
     if decisions.get("needs_rule_review", 0) >= args.hermes_rule_review_threshold:
@@ -966,12 +1078,16 @@ def summarize_reviews(
         "run_id": run_id,
         "generated_at": generated_at,
         "mode": "fixture" if args.fixture else "postgres",
+        "scope": args.scope,
         "dry_run": True,
         "sets": args.sets,
         "lookback_days": args.lookback_days,
+        "card_limit": args.card_limit,
         "cards_scanned": len(cards),
         "commanders_scanned": len(commanders),
         "review_count": len(reviews),
+        "card_coverage": calculate_coverage(cards),
+        "review_coverage": calculate_review_coverage(reviews),
         "decisions": decisions,
         "by_commander": by_commander,
         "hermes_lab_should_wake": bool(hermes_wake_reasons),
@@ -992,9 +1108,15 @@ def render_markdown(summary: dict[str, Any], reviews: list[CandidateReview]) -> 
         f"- Run: `{summary['run_id']}`",
         f"- Generated at: `{summary['generated_at']}`",
         f"- Mode: `{summary['mode']}`",
+        f"- Scope: `{summary['scope']}`",
         f"- Cards scanned: `{summary['cards_scanned']}`",
         f"- Commanders scanned: `{summary['commanders_scanned']}`",
         f"- Hermes wake: `{summary['hermes_lab_should_wake']}` {summary['hermes_wake_reasons']}",
+        "",
+        "## Coverage",
+        "",
+        f"- Card coverage: `{json.dumps(summary['card_coverage'], sort_keys=True)}`",
+        f"- Review coverage: `{json.dumps(summary['review_coverage'], sort_keys=True)}`",
         "",
         "## Decision Counts",
         "",
@@ -1008,18 +1130,21 @@ def render_markdown(summary: dict[str, Any], reviews: list[CandidateReview]) -> 
         lines.append(f"- Source: `{row['source']}`")
         lines.append(f"- Identity: `{''.join(row['color_identity']) or 'colorless'}`")
         lines.append(f"- Decisions: `{json.dumps(row['decisions'], sort_keys=True)}`")
+        lines.append(f"- Coverage: `{json.dumps(row.get('coverage', {}), sort_keys=True)}`")
         if row["top_candidates"]:
             lines.append("")
-            lines.append("| Card | Set | Decision | Score | Roles | Reasons |")
-            lines.append("| --- | --- | --- | ---: | --- | --- |")
+            lines.append("| Card | Set | Decision | Score | Roles | Rule | Risks | Reasons |")
+            lines.append("| --- | --- | --- | ---: | --- | --- | --- | --- |")
             for item in row["top_candidates"]:
                 lines.append(
-                    "| {card} | {set_code} | `{decision}` | {score} | {roles} | {reasons} |".format(
+                    "| {card} | {set_code} | `{decision}` | {score} | {roles} | `{rule}` | {risks} | {reasons} |".format(
                         card=item["card_name"].replace("|", "\\|"),
                         set_code=item["set_code"],
                         decision=item["decision"],
                         score=item["score"],
                         roles=", ".join(item["roles"]),
+                        rule=item.get("battle_rule_status", ""),
+                        risks=", ".join(item.get("risk_flags", [])),
                         reasons=", ".join(item["reasons"]).replace("|", "\\|"),
                     )
                 )
@@ -1100,10 +1225,122 @@ def write_artifacts(
     (output_dir / "latest_reviews.json").write_text(reviews_path.read_text(encoding="utf-8"), encoding="utf-8")
     (output_dir / "latest_report.md").write_text(report_path.read_text(encoding="utf-8"), encoding="utf-8")
 
+    commander_dir = run_dir / "commanders"
+    commander_dir.mkdir(parents=True, exist_ok=True)
+    latest_commander_dir = output_dir / "latest_commanders"
+    latest_commander_dir.mkdir(parents=True, exist_ok=True)
+    for commander, row in summary.get("by_commander", {}).items():
+        slug = slugify(commander)
+        commander_reviews = [
+            {
+                "card_name": review.card_name,
+                "oracle_id": review.oracle_id,
+                "set_code": review.set_code,
+                "decision": review.decision,
+                "score": review.score,
+                "roles": review.roles,
+                "battle_rule_status": review.battle_rule_status,
+                "reasons": review.reasons,
+                "risk_flags": review.risk_flags,
+            }
+            for review in reviews
+            if review.commander_name == commander
+        ]
+        payload = {
+            "run_id": run_id,
+            "generated_at": summary["generated_at"],
+            "commander_name": commander,
+            "summary": row,
+            "reviews": sorted(
+                commander_reviews,
+                key=lambda item: (-int(item["score"]), item["decision"], item["card_name"]),
+            ),
+            "contract": {
+                "postgres_source_of_truth": True,
+                "sqlite_operational_cache_only": True,
+                "no_pg_writes": True,
+                "no_auto_apply": True,
+                "verified_promotion_required": True,
+            },
+        }
+        commander_json = commander_dir / f"{slug}.json"
+        commander_json.write_text(
+            json.dumps(payload, indent=2, sort_keys=True, default=json_default) + "\n",
+            encoding="utf-8",
+        )
+        commander_md = commander_dir / f"{slug}.md"
+        commander_md.write_text(
+            render_commander_markdown(payload),
+            encoding="utf-8",
+        )
+        (latest_commander_dir / f"{slug}.json").write_text(
+            commander_json.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        (latest_commander_dir / f"{slug}.md").write_text(
+            commander_md.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+
+def render_commander_markdown(payload: dict[str, Any]) -> str:
+    row = payload["summary"]
+    lines = [
+        f"# Candidate Review — {payload['commander_name']}",
+        "",
+        f"- Run: `{payload['run_id']}`",
+        f"- Generated at: `{payload['generated_at']}`",
+        f"- Source: `{row.get('source', '')}`",
+        f"- Identity: `{''.join(row.get('color_identity', [])) or 'colorless'}`",
+        f"- Decisions: `{json.dumps(row.get('decisions', {}), sort_keys=True)}`",
+        f"- Coverage: `{json.dumps(row.get('coverage', {}), sort_keys=True)}`",
+        "",
+        "## Top Candidates",
+        "",
+    ]
+    candidates = row.get("top_candidates", [])
+    if not candidates:
+        lines.append("No `test`, `backlog`, or `needs_rule_review` candidates in this run.")
+    else:
+        lines.append("| Card | Set | Decision | Score | Roles | Rule | Risks | Reasons |")
+        lines.append("| --- | --- | --- | ---: | --- | --- | --- | --- |")
+        for item in candidates:
+            lines.append(
+                "| {card} | {set_code} | `{decision}` | {score} | {roles} | `{rule}` | {risks} | {reasons} |".format(
+                    card=str(item["card_name"]).replace("|", "\\|"),
+                    set_code=item.get("set_code", ""),
+                    decision=item.get("decision", ""),
+                    score=item.get("score", 0),
+                    roles=", ".join(item.get("roles", [])),
+                    rule=item.get("battle_rule_status", ""),
+                    risks=", ".join(item.get("risk_flags", [])),
+                    reasons=", ".join(item.get("reasons", [])).replace("|", "\\|"),
+                )
+            )
+    lines.extend(
+        [
+            "",
+            "## Safety Contract",
+            "",
+            "- This report is advisory and report-only.",
+            "- Candidates are not swaps.",
+            "- `needs_rule_review` stays non-executable until official source, focused test, and replay audit pass.",
+            "- PostgreSQL/backend remains the product source of truth.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Report-only new card candidate review")
     parser.add_argument("--fixture", help="JSON fixture for deterministic tests")
+    parser.add_argument(
+        "--scope",
+        choices=sorted(VALID_SCOPES),
+        default=os.environ.get("MANALOOM_NEW_CARD_REVIEW_SCOPE", "sets"),
+        help="Card scan scope: sets, lookback, or full. Full still respects --card-limit unless it is 0.",
+    )
     parser.add_argument("--sets", default=os.environ.get("MANALOOM_NEW_CARD_REVIEW_SETS", "msh,msc,mar"))
     parser.add_argument("--lookback-days", type=int, default=int(os.environ.get("MANALOOM_NEW_CARD_REVIEW_LOOKBACK_DAYS", "45")))
     parser.add_argument("--commander-limit", type=int, default=int(os.environ.get("MANALOOM_NEW_CARD_REVIEW_COMMANDER_LIMIT", "24")))
@@ -1118,7 +1355,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
+    if args.scope not in VALID_SCOPES:
+        raise ValueError(f"invalid scope: {args.scope}")
     sets = [item.strip().lower() for item in args.sets.split(",") if item.strip()]
+    if args.scope != "sets":
+        sets = []
     args.sets = sets
     force_commanders = list(args.force_commander or [])
     if not args.no_lorehold_control and CONTROL_COMMANDER not in force_commanders:
@@ -1130,7 +1371,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         load_env_file(Path(args.env_file))
         source = PgSource()
         try:
-            cards = source.fetch_cards(sets, args.lookback_days, args.card_limit)
+            cards = source.fetch_cards(args.scope, sets, args.lookback_days, args.card_limit)
             commanders = source.discover_targets(args.commander_limit, force_commanders)
         finally:
             source.close()
