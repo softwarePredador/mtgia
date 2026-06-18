@@ -27,9 +27,280 @@
 > `server/bin/sync_cards.dart` importa `server/lib/sync_cards_utils.dart` e usa
 > `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`.
 
-> Atualizacao local Codex: 2026-06-07 19:00 UTC
+> Atualizacao local Codex: 2026-06-18 19:00 UTC
 > Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-18 19:00 UTC
+
+Escopo desta rodada: somente logica duplicada ou similar com risco de drift.
+Nao foi executada auditoria ampla de classes sem uso, funcoes sem chamador,
+imports/ciclos, tabelas PostgreSQL sem uso ou coerencia app/server fora do
+necessario para validar/falsificar duplicacao.
+
+### Setup executado
+
+- `pwd` e `git rev-parse --show-toplevel` confirmaram o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `920486c4`.
+- `git diff --name-status e47adcd5..HEAD -- app/lib server/lib server/routes server/bin server/test app/test app/integration_test server/database_setup.sql server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/CONTEXTO_PRODUTO_ATUAL.md server/manual-de-instrucao.md docs/hermes-analysis/manaloom-knowledge/scripts`:
+  grande delta de produto, testes, contratos e scripts Hermes desde a ultima
+  rodada focada de duplicacao (`e47adcd5`). A triagem abaixo ficou restrita aos
+  clusters historicos de duplicacao e aos novos helpers/superficies de scripts
+  tocados pelo delta.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar reabrir claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, `server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante para
+esta rodada e tratar Hermes como laboratorio/cache/auditor e validar achados
+contra codigo/backend atual.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib`, `server/bin`, scripts Hermes nem o app Flutter.
+- A lista de duplicacao e textual/regex; ela ainda mistura SQL keywords,
+  palavras de prompts, nomes convencionais e wrappers finos. Ela foi usada
+  apenas como fila de triagem, nao como evidencia direta.
+- A execucao voltou a inserir inventario gerado e duplicar historico manual sob
+  o marcador `## Historico gerado pelo auditor estrutural anterior`. Essa
+  mutacao mecanica foi revertida antes desta atualizacao, mantendo os numeros
+  acima e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- Revalidacao dos clusters historicos por `rg` e leitura direta (`nl -ba`) em:
+  sync de cartas, analise de estado/arquetipo do optimize, roles funcionais,
+  trust social, request/log social, condition, CMC/tipo e exporters Hermes.
+- Inspecao dos novos scripts operacionais de Hermes tocados pelo delta com foco
+  estreito em duplicacao de resolucao de path/runtime, porque o branch agora
+  possui `server/bin/repo_runtime_paths.py`.
+- Saidas brutas do auditor de funcoes publicas duplicadas nao foram promovidas
+  sem evidencia de mesma responsabilidade funcional.
+
+### Achados revalidados e ajustados
+
+#### Status ajustado - claims antigas que ficaram stale nesta rodada
+
+- **`sync_cards_utils.dart` deixou de ser test-only no caminho principal do
+  sync.** `server/bin/sync_cards.dart:12` importa
+  `../lib/sync_cards_utils.dart`; o CLI usa `parseSinceDays` em `:66`,
+  `getNewSetCodesSinceFromData` em `:132`-`:133` e
+  `extractSetCardSyncRow` em `:551`. O achado amplo de que o CLI mantinha
+  copias privadas para esses trechos nao deve mais ser reaberto.
+- **O exporter Hermes de learned deck foi consolidado.**
+  `server/bin/export_hermes_learned_deck.py:1`-`:6` declara wrapper de
+  compatibilidade; `_implementation_path` aponta para a implementacao canonica
+  em docs em `:16`-`:25`; `:51`-`:62` reexporta e delega para o modulo canonico.
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_export_hermes_learned_deck_wrapper_parity.py:46`-`:62`
+  protege que `export_learned_deck` e `build_metadata` venham do arquivo canonico.
+- **`resolveOptimizeArchetype` deixou de ter duas politicas.**
+  `server/lib/ai/optimize_archetype_support.dart:17`-`:34` e a fonte canonica;
+  `server/lib/ai/deck_state_analysis.dart:580`-`:587`,
+  `server/lib/ai/optimize_runtime_support.dart:113`-`:120` e
+  `server/routes/ai/optimize/index.dart:95`-`:102` sao wrappers/delegacoes.
+  `server/test/optimize_archetype_support_test.dart:69`-`:97` prova paridade
+  entre runtime e deck-state.
+- **Strategic roles em `functional_card_tags.dart` tambem foram estreitados.**
+  `server/lib/ai/functional_card_tags.dart:200`-`:206` consulta
+  `resolveCardFunctionalRoles`, e `:326`-`:345` deriva
+  `wincon`/`combo_piece`/`engine`/`payoff`/`enabler` desse resultado. Nao ha
+  mais evidencia da antiga familia privada `_looksLike*` nesse arquivo.
+
+#### P1/P2 - Analise de estado do deck ainda existe em duas familias paralelas
+
+- **Familia antiga usada por rebuild:** `server/lib/ai/deck_state_analysis.dart:3`
+  define `DeckArchetypeAnalyzer`; `:9`-`:24` calcula CMC medio; `:27`-`:68`
+  conta tipos; `:70`-`:95` inicia a deteccao de arquetipo. A avaliacao de
+  estado comeca em `assessDeckOptimizationState` em `:311`-`:365`.
+  `server/lib/ai/rebuild_guided_service.dart:140`-`:142`, `:173` e
+  `:267`-`:271` continuam chamando essa familia.
+- **Familia optimize/core:** `server/lib/ai/optimize_state_support.dart:6`
+  define `DeckArchetypeAnalyzerCore`; `:12`-`:28`, `:30`-`:70` e `:73`-`:85`
+  repetem o mesmo esqueleto de CMC/tipos/arquetipo. `assessDeckOptimizationStateCore`
+  comeca em `:337`-`:390` com o mesmo gate inicial de incompletude/formato.
+  A rota `server/routes/ai/optimize/index.dart:325`-`:360` preserva wrappers
+  finos para compatibilidade.
+- **Por que parece duplicado/similar:** rebuild e optimize respondem a mesma
+  pergunta estrutural sobre o deck, mas mantem DTOs/classes separadas e corpos
+  similares. Alteracoes em contagem de tipos, CMC ou regra de incompletude podem
+  ser aplicadas em uma familia e esquecidas na outra.
+- **O que valida:** mover rebuild para `optimize_state_support.dart` ou criar
+  um adapter unico com testes comparando os dois consumidores.
+- **O que falsifica:** teste/contrato mostrando que rebuild e optimize devem
+  divergir deliberadamente nos pontos acima.
+
+#### P1/P2 - Optimize ainda tem fallback de role/scoring separado do adapter canonico
+
+- **Fonte canonica atual:** `server/lib/ai/optimization_functional_roles.dart:35`
+  -`:91` define `resolveCardFunctionalRoles` com precedencia
+  `functional_tags -> semantic_tags_v2 -> heuristica`; a heuristica interna
+  adiciona roles em `:195`-`:207`, e os wrappers legados
+  `classifyOptimizationFunctionalRole`/`optimizationFunctionalRolesForCard`
+  delegam para ela em `:301`-`:338`.
+- **Fallback separado no optimize:** `server/lib/ai/optimize_functional_role_support.dart:3`
+  -`:24` usa o adapter quando ha tags persistidas/semantic v2, mas `:27`-`:68`
+  reimplementa classificacao textual para ramp/draw/removal/interaction/wincon/engine.
+  O mesmo arquivo tambem define matching/scoring proprio em
+  `inferOptimizeFunctionalNeed` `:167`-`:217`,
+  `matchesFunctionalNeed` `:219`-`:245` e
+  `scoreOptimizeReplacementCandidate` `:248`-`:295`.
+- **Chamadores runtime:** `server/lib/ai/optimize_filler_loader_support.dart:287`
+  usa `inferOptimizeFunctionalNeed`; `:391` e `:440` usam
+  `inferFunctionalRoleForCard`; `server/lib/ai/optimize_removal_candidate_support.dart:51`,
+  `:69` e `:176` usam `inferFunctionalRoleForCard`;
+  `server/lib/ai/optimize_swap_candidate_support.dart:79`, `:186`-`:201` e
+  `:221`-`:240` usam `inferOptimizeFunctionalNeed`,
+  `scoreOptimizeReplacementCandidate` e `matchesFunctionalNeed`.
+- **Por que parece duplicado/similar:** o antigo drift foi reduzido, mas o
+  fallback textual e o matching/scoring de candidatos continuam fora do adapter
+  canonico. Uma nova regra em `resolveCardFunctionalRoles` pode nao afetar
+  `inferOptimizeFunctionalNeed` ou `matchesFunctionalNeed`.
+- **O que valida:** fazer `inferOptimizeFunctionalNeed`/`matchesFunctionalNeed`
+  consumir `resolveCardFunctionalRoles` ou adicionar testes contratuais que
+  comparem as saidas para cartas de ramp/draw/removal/wipe/protection/tutor.
+- **O que falsifica:** documentacao e testes provando que o optimize precisa de
+  uma semantica de "need" diferente de role funcional, com mapeamento explicito.
+
+#### P2 - Trust social ainda duplica SQL e serializer entre trades e marketplace
+
+- **Trades listagem:** `server/routes/trades/index.dart:482`-`:487` injeta
+  `_trustStatsSql`, `_responseTimeSql` e `_shippingTimeSql` para sender e
+  receiver; os tres fragments e `_buildTrustInsight` ficam em `:557`-`:635`.
+- **Trade detalhe:** `server/routes/trades/[id]/index.dart:50`-`:55` injeta os
+  mesmos fragments; as definicoes equivalentes ficam em `:260`-`:338`.
+- **Marketplace:** `server/routes/community/marketplace/index.dart:131`-`:167`
+  repete os LATERALs inline para owner trust/response/shipping, e
+  `_buildTrustInsight` aparece em `:316`-`:348`.
+- **Por que parece duplicado/similar:** os tres endpoints calculam o mesmo
+  conceito de trust social e retornam shape equivalente com prefixos diferentes.
+  Qualquer ajuste em criterio de conta nova, perfil incompleto ou historico
+  insuficiente precisa ser replicado em tres lugares.
+- **O que valida:** extrair SQL fragments e serializer para `server/lib` com
+  testes de listagem, detalhe e marketplace.
+- **O que falsifica:** divergencia de contrato documentada entre trust de
+  trade e trust de marketplace.
+
+#### P2 - Request-id/log de payload invalido continua copiado em rotas sociais
+
+- **Helpers duplicados:** `server/routes/trades/index.dart:330`-`:353`,
+  `server/routes/trades/[id]/respond.dart:154`-`:178` e
+  `server/routes/conversations/[id]/messages.dart:247`-`:271` repetem
+  `_requestId` e `_logInvalidPayload` com a mesma leitura defensiva de
+  `RequestTrace`, header `x-request-id` e usuario autenticado.
+- **Fonte compartilhavel ja existe:** `server/lib/request_trace.dart:48`-`:49`
+  expoe `getRequestTrace(RequestContext)`, mas os helpers locais ainda leem
+  `context.read<RequestTrace>()` diretamente.
+- **Por que parece duplicado/similar:** formato de log, fallback de request id
+  e leitura defensiva de user id sao comportamento transversal de observabilidade.
+- **O que valida:** helper compartilhado para log social invalido, ou ajuste das
+  rotas para usar `getRequestTrace`/`tryGetRequestId` com teste de formato.
+- **O que falsifica:** requisito de mensagens de log diferentes por endpoint,
+  documentado e testado.
+
+#### P2/P3 - `condition` e calculos CMC/tipo seguem duplicados em rotas de deck
+
+- **CMC/tipo:** `server/routes/decks/[id]/index.dart:410`-`:435` e
+  `server/routes/community/decks/[id].dart:91`-`:117` repetem
+  `getMainType`/`calculateCmc`; `server/routes/decks/[id]/simulate/index.dart:199`
+  -`:214` mantem `_calculateCmc` separado.
+- **Condition:** decks normalizam invalido para `NM` em
+  `server/routes/decks/[id]/index.dart:524`-`:529`,
+  `server/routes/decks/[id]/cards/index.dart:407`-`:413` e
+  `server/routes/decks/[id]/cards/set/index.dart:248`-`:253`, enquanto
+  `server/routes/binder/index.dart:275`-`:280` rejeita invalido com `400`.
+- **Por que parece duplicado/similar:** CMC/tipo alimenta o mesmo agrupamento de
+  resposta de decks privado/publico/simulacao; `condition` usa a mesma
+  allow-list `NM/LP/MP/HP/DMG`, mas com comportamento diferente por rota.
+- **O que valida:** extrair helper de tipo/CMC e policy de condition com
+  comportamento intencional por dominio.
+- **O que falsifica:** contrato documentado dizendo que decks devem normalizar
+  condition invalida enquanto binder deve rejeitar.
+
+#### P2/P3 - Resolucao de paths/runtime Hermes tem helper novo, mas copias continuam
+
+- **Helper novo:** `server/bin/repo_runtime_paths.py:34`-`:47` resolve repo root
+  por `MANALOOM_REPO`, `MANALOOM_WORKSPACE`, `HERMES_REPO_DIR`,
+  `MTGIA_REPO_ROOT`, marcadores de repo e fallback por `__file__`; `:50`-`:75`
+  deriva scripts de battle e diretorios de replay.
+- **Copias atuais:** `server/bin/manaloom_ops_daemon.py:15`-`:18`,
+  `server/bin/hermes_mana_base_validator.py:18`-`:24`,
+  `server/bin/auto_promote_learned_decks.py:19`-`:29` e
+  `docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py:25`-`:35`
+  mantem resolucao propria de repo root e/ou knowledge DB. Algumas copias tem
+  testes locais, por exemplo `server/test/run_import_resolution_test.py:43`-`:47`
+  e `server/test/hermes_lab_cron_bootstrap_test.py:80`-`:92`.
+- **Por que parece duplicado/similar:** scripts operacionais agora possuem uma
+  fonte compartilhada para runtime paths, mas novos jobs ainda codificam
+  precedencias e defaults proprios. Drift em variaveis aceitas ou marcadores de
+  repo pode quebrar apenas parte dos crons.
+- **O que valida:** migrar scripts elegiveis para `repo_runtime_paths.py`, ou
+  criar testes de paridade para os scripts que precisam manter resolucao propria
+  por rodarem fora de `server/bin`.
+- **O que falsifica:** justificativa documentada de isolamento por ambiente e
+  teste cobrindo cada divergencia de variavel/default.
+
+#### P3 - `extractLegalities` segue como duplicacao pequena/test-only no sync
+
+- **Helper testavel:** `server/lib/sync_cards_utils.dart:226`-`:231` extrai
+  legalidades como pares e lower-case.
+- **Caminho operacional:** `server/bin/sync_cards.dart:691`-`:719` monta rows
+  de legalidade inline dentro de `_upsertLegalitiesFromSet`.
+- **Uso encontrado:** `rg "extractLegalities\\("` encontra somente a definicao
+  e `server/test/sync_cards_test.dart:542`-`:568`.
+- **Por que parece duplicado/similar:** o parser testado nao protege o fluxo
+  real de legalidades incremental, embora o restante do sync ja use o helper.
+- **O que valida:** usar `extractLegalities` dentro de `_upsertLegalitiesFromSet`
+  ou remover o helper/teste se a montagem inline for a API intencional.
+- **O que falsifica:** outro chamador runtime nao capturado pela busca.
+
+### Achados nao promovidos nesta rodada
+
+- A lista bruta de "funcoes publicas duplicadas" do auditor nao foi promovida
+  porque inclui tokens SQL (`ON`, `LOWER`, `LATERAL`), palavras de prompts,
+  classes wrappers e nomes convencionais.
+- `buildOptimizeCacheKey`, `buildOptimizeDeckSignature` e wrappers em
+  `server/routes/ai/optimize/index.dart` continuam delegacoes de compatibilidade,
+  nao corpos duplicados de maior risco.
+- A duplicacao antiga de basic/snow basic lands segue stale no recorte amplo:
+  `server/lib/basic_land_utils.dart` continua fonte canonica; qualquer lista
+  residual por nome deve ser tratada em semantica/policy de cartas, nao como a
+  antiga claim de quatro implementacoes divergentes.
+
+### Resultado desta revalidacao
+
+No checkout `920486c4`, o delta desde a ultima rodada de duplicacao removeu ou
+estreitou varios achados antigos: `sync_cards_utils.dart` agora participa do
+CLI real, o exporter Hermes de learned deck virou wrapper, `resolveOptimizeArchetype`
+tem fonte canonica e `functional_card_tags.dart` usa o adapter unico para roles
+estrategicos. Permanecem abertos os clusters de analise de estado
+rebuild/optimize, fallback/scoring funcional do optimize, trust social,
+request/log social, condition e CMC/tipo. A rodada adiciona um achado
+script-level novo: `repo_runtime_paths.py` existe, mas parte dos novos crons
+Hermes ainda duplica resolucao de repo root/knowledge DB.
 
 ## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-18 15:00 UTC
 

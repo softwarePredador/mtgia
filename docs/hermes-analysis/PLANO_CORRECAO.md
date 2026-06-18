@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-18 15:00 UTC
+> Data: 2026-06-18 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de 2026-06-17 19:00 UTC no checkout `e47adcd5`, o auditor base voltou a executar com sucesso (`205` arquivos backend, `92` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados). A revalidacao focada em duplicacao nao encontrou delta de produto desde a rodada anterior do mesmo foco (`5ce943fa..HEAD`), manteve os clusters de produto ja abertos e adicionou um achado P2 ao recorte de duplicacao: `server/lib/sync_cards_utils.dart` contem helpers extraidos/testados, mas `server/bin/sync_cards.dart` ainda usa copias privadas/inline para janela incremental, parsing de set e legalidades. O achado P2 script-level dos exporters Hermes de learned deck segue aberto: `server/bin/export_hermes_learned_deck.py` e `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py` continuam bifurcados em completude, contagem, fallback de schema e metadata multi-role. A revalidacao de tabelas PostgreSQL de 2026-06-18 15:00 UTC no checkout `024903d6` confirmou que nao houve delta de produto desde a rodada anterior deste foco (`c33e15ba..HEAD`) nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-18 03:00 UTC no checkout `94f73400` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-18 07:00 UTC no checkout `2a9f76ee` nao encontrou delta de produto desde `caeade55` e manteve abertos os mesmos candidatos principais; o achado menor de `normalize_commander` continua estreito para a copia Hermes docs.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-18 19:00 UTC no checkout `920486c4`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. O delta desde a rodada de duplicacao anterior (`e47adcd5..HEAD`) removeu ou estreitou claims antigas: `sync_cards_utils.dart` agora e chamado pelo CLI real para parsing de janela/set/card row, o exporter Hermes de learned deck virou wrapper para a implementacao canonica em docs, `resolveOptimizeArchetype` tem fonte unica em `optimize_archetype_support.dart`, e `functional_card_tags.dart` usa `resolveCardFunctionalRoles` para roles estrategicos. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition e CMC/tipo. Novo risco estreito script-level: `server/bin/repo_runtime_paths.py` existe, mas parte dos crons Hermes ainda duplica resolucao de repo root/knowledge DB. A revalidacao de tabelas PostgreSQL de 2026-06-18 15:00 UTC no checkout `024903d6` confirmou que nao houve delta de produto desde a rodada anterior deste foco (`c33e15ba..HEAD`) nem novo achado P1/P2 app-facing; seguem apenas os mesmos riscos P3 (`ml_prompt_feedback` count-only/sem chamador/sem DDL local confirmado e raws do Commander Reference Corpus sem leitor raw direto). A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-18 03:00 UTC no checkout `94f73400` nao encontrou delta de codigo de produto desde `2edcc757` nem novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-18 07:00 UTC no checkout `2a9f76ee` nao encontrou delta de produto desde `caeade55` e manteve abertos os mesmos candidatos principais; o achado menor de `normalize_commander` continua estreito para a copia Hermes docs.
 
 A revalidacao de coerencia app/server de 2026-06-17 23:00 UTC no checkout
 `831c6ac8` nao encontrou delta de produto/testes/API/manual desde `5ce943fa` e
@@ -25,13 +25,13 @@ learned decks herdando middleware de IA custosa.
    `server/routes/ai/optimize/index.dart` (~2498 linhas) reduziram, mas seguem
    como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente em
-   2026-06-11. `resolveOptimizeArchetype` foi removido do risco por delegar
-   para `optimize_archetype_support.dart`; os roles estratégicos
-   `wincon/combo_piece/engine/payoff/enabler` também passaram a reutilizar
-   `resolveCardFunctionalRoles` em `functional_card_tags.dart`. O drift de
-   terrenos básicos/snow basics foi fechado em 2026-06-11 com
-   `server/lib/basic_land_utils.dart`. Os maiores riscos restantes são trust
-   social, logs sociais/follow, condição de carta e CMC/tipo.
+   2026-06-18. `resolveOptimizeArchetype`, strategic roles em
+   `functional_card_tags.dart`, o sync principal de cartas e o exporter Hermes
+   de learned deck foram retirados das claims amplas por terem fonte canonica
+   ou wrapper atual. Os maiores riscos restantes sao analise de estado
+   rebuild/optimize, fallback/scoring funcional do optimize, trust social,
+   request/log social, condition, CMC/tipo e resolucao de runtime path em crons
+   Hermes.
 4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
    `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
    `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
@@ -178,12 +178,16 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-11: PARCIAL.** `resolveOptimizeArchetype` foi unificado, os
-  roles estratégicos `wincon`, `combo_piece`, `engine`, `payoff` e `enabler`
-  agora usam o adapter único `resolveCardFunctionalRoles` também na geração de
-  `functional_tags`, e basic/snow basic lands passaram a usar
-  `server/lib/basic_land_utils.dart` como fonte canônica. As duplicações
-  restantes abaixo continuam abertas conforme domínio.
+- **Status 2026-06-18 19:00 UTC: PARCIAL no checkout `920486c4`.**
+  `resolveOptimizeArchetype` foi unificado, os roles estratégicos
+  `wincon`, `combo_piece`, `engine`, `payoff` e `enabler` usam
+  `resolveCardFunctionalRoles` também na geração de `functional_tags`,
+  basic/snow basic lands seguem centralizados em `server/lib/basic_land_utils.dart`,
+  `sync_cards.dart` passou a consumir `sync_cards_utils.dart` no caminho
+  operacional principal, e `server/bin/export_hermes_learned_deck.py` virou
+  wrapper da implementacao canonica em
+  `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
+  As duplicações restantes abaixo continuam abertas conforme dominio.
 - **Evidência**:
   - Resolvido: `resolveOptimizeArchetype` agora delega para
     `server/lib/ai/optimize_archetype_support.dart`, com teste em
@@ -201,6 +205,25 @@ Histórico do problema:
     preserva somente wrapper público fino, `commander_reference_deck_corpus_support.dart`
     preserva `basicLandNames` como alias do utilitário e testes de regras/optimize
     importam o helper em vez de copiar `_isBasicLandName`.
+  - Resolvido: o achado amplo de `sync_cards_utils.dart` test-only ficou stale.
+    `server/bin/sync_cards.dart:12` importa `../lib/sync_cards_utils.dart` e
+    usa `parseSinceDays`, `getNewSetCodesSinceFromData` e
+    `extractSetCardSyncRow` no fluxo operacional. Residuo P3 estreito:
+    `extractLegalities` ainda aparece somente em `sync_cards_utils.dart` e
+    `sync_cards_test.dart`, enquanto `_upsertLegalitiesFromSet` monta rows
+    inline.
+  - Resolvido: o exporter de learned deck em `server/bin` deixou de duplicar a
+    implementacao. Ele carrega o arquivo canonico de docs e reexporta seus
+    simbolos; `test_export_hermes_learned_deck_wrapper_parity.py` protege essa
+    paridade.
+  - `DeckArchetypeAnalyzer`/`assessDeckOptimizationState` continuam em duas
+    familias: `server/lib/ai/deck_state_analysis.dart:3`-`:95` e `:311`-`:365`
+    para rebuild, e `server/lib/ai/optimize_state_support.dart:6`-`:85` e
+    `:337`-`:390` para optimize.
+  - `server/lib/ai/optimize_functional_role_support.dart:3`-`:68`,
+    `:167`-`:217`, `:219`-`:245` e `:248`-`:295` mantem fallback/matching/scoring
+    proprio para optimize mesmo depois de usar `resolveCardFunctionalRoles`
+    quando tags persistidas ou semantic v2 existem.
   - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
     `_buildTrustInsight` duplicam o mesmo trust em listagem/detalhe de trades
     (`server/routes/trades/index.dart:557`-`:635`,
@@ -227,36 +250,13 @@ Histórico do problema:
     (`server/routes/decks/[id]/index.dart:405`-`:435`,
     `server/routes/community/decks/[id].dart:91`-`:117`) e ha variante de CMC
     em `server/routes/decks/[id]/simulate/index.dart:199`-`:214`.
-  - **Novo P2 no recorte de duplicacao:** `server/lib/sync_cards_utils.dart:1`-`:4`
-    declara que helpers foram extraidos de `sync_cards.dart` para teste
-    independente e define `extractCardRow`, `getNewSetCodesSinceFromData`,
-    `parseSinceDays`, `extractSetCardRow`, `extractOracleIds` e
-    `extractLegalities` em `:16`, `:82`, `:102`, `:121`, `:178` e `:189`.
-    `rg "sync_cards_utils"` encontrou apenas
-    `server/test/sync_cards_test.dart:3`, enquanto o CLI real ainda chama
-    copias privadas/inline em `server/bin/sync_cards.dart:64`,
-    `:130`-`:131`, `:349`-`:357`, `:385`-`:402`, `:661`-`:722` e monta
-    legalidades inline em `:766`-`:770`.
-  - **Novo P2 script-level:** `server/bin/export_hermes_learned_deck.py` e
-    `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`
-    tem o mesmo prologo/uso e fluxo geral de exportacao
-    (`server/bin/export_hermes_learned_deck.py:1`-`:11`;
-    `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:1`-`:13`), repetem
-    `parse_card_list`, `normalize_commander`, `compute_score`, `build_metadata`
-    e `export_learned_deck`, mas agora divergem: o `server/bin` usa
-    `validate_commander_100` + `HERMES_EXPORT_ALLOW_INCOMPLETE` e grava
-    `card_count` como `len(parsed_cards)`
-    (`server/bin/export_hermes_learned_deck.py:46`-`:64`, `:193`-`:202`,
-    `:235`-`:236`), enquanto o script Hermes usa
-    `learned_deck_completeness`, bloqueia incompletos, injeta o comandante
-    ausente e grava `total_with_commander`
-    (`docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:13`,
-    `:233`-`:251`, `:299`). Tambem ha drift de metadata:
-    `server/bin/export_hermes_learned_deck.py:84`-`:151` usa
-    `role_in_deck` + `elif`, enquanto o script Hermes usa `pg_roles` quando
-    existe e multiplos `if`
-    (`docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py:80`-`:118`,
-    `:158`-`:175`).
+  - `server/bin/repo_runtime_paths.py:34`-`:75` oferece helper compartilhado
+    para repo root, scripts de battle e diretorios de replay, mas
+    `server/bin/manaloom_ops_daemon.py:15`-`:18`,
+    `server/bin/hermes_mana_base_validator.py:18`-`:24`,
+    `server/bin/auto_promote_learned_decks.py:19`-`:29` e
+    `docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py:25`-`:35`
+    ainda mantem resolucao propria.
 - **Impacto**: mudanca semantica em um ponto nao propaga automaticamente para os demais; risco de respostas inconsistentes por endpoint/fluxo. O risco mais alto e de IA: optimize, complete, rebuild, validator e deck analysis podem discordar sobre estado do deck, arquetipo efetivo e papel funcional de cartas.
 - **Ação recomendada**:
   1. manter `optimize_archetype_support.dart` como fonte única de arquétipo
@@ -268,12 +268,10 @@ Histórico do problema:
   4. agrupar duplicacoes de menor risco por dominio (trust social, request/log,
      condicao de carta, CMC/tipo), mantendo wrappers locais so quando o contrato
      divergente for intencional e testado.
-  6. decidir se `sync_cards_utils.dart` e fonte compartilhada real ou harness
-     legado; se for fonte real, importar no CLI e substituir as copias privadas,
-     mantendo `sync_cards_test` como cobertura do caminho operacional.
-  7. decidir qual exporter Hermes de learned deck e canonico; fazer um wrapper
-     chamar a implementacao unica, ou documentar `server/bin` como legado com
-     teste/fixture que prove as divergencias esperadas.
+  5. mover `extractLegalities` para o fluxo real de `_upsertLegalitiesFromSet`
+     ou remover o helper/teste residual;
+  6. migrar crons elegiveis para `repo_runtime_paths.py` ou documentar/testar as
+     divergencias de ambiente de cada copia.
 - **Validação**:
   - ✅ `optimize_archetype_support_test.dart` prova o mesmo arquetipo efetivo
     para `midrange`, `tempo`, `goodstuff`, `general`, `unknown`, vazio e
@@ -288,12 +286,10 @@ Histórico do problema:
   - listagem/detalhe de trades e marketplace continuam retornando o mesmo shape
     de `trust`;
   - `dart analyze` e suites focadas seguem verdes apos cada extracao.
-  - `rg "sync_cards_utils" server` encontra o binario ativo, ou o helper deixa
-    de ser anunciado como codigo compartilhado operacional.
-  - ambos os exporters de learned deck geram o mesmo JSON para fixtures SQLite
-    com lista texto, lista JSON, comandante ausente/presente, `pg_roles` e
-    metricas ausentes, ou o exporter legado deixa de existir/ser anunciado como
-    operacional.
+  - `rg "extractLegalities\\(" server/bin server/lib server/test` mostra
+    chamador operacional ou helper/teste removidos.
+  - scripts que mantiverem `_resolve_repo_root` proprio tem teste cobrindo
+    variaveis aceitas e defaults.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
 - **Status 2026-06-18 05:30 UTC: REVALIDADO/ABERTO no checkout `abfe1497`.**

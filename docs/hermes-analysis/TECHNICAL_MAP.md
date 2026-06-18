@@ -187,16 +187,16 @@ mtgia/
   `semantic_tags_v2`; o risco restante fica em endpoints legacy/experimentais e
   activation telemetry, não no fluxo principal de optimize.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em
-  2026-06-11. `resolveOptimizeArchetype` foi removido da lista de riscos por
-  delegar para `optimize_archetype_support.dart`. Os roles estratégicos
-  `wincon/combo_piece/engine/payoff/enabler` também deixaram de ter cópias
-  privadas em `functional_card_tags.dart` e agora consultam
-  `resolveCardFunctionalRoles`. Basic/snow basic lands agora usam
-  `server/lib/basic_land_utils.dart` como fonte canônica; o wrapper público em
-  `optimize_runtime_support.dart` e o alias `basicLandNames` em
-  `commander_reference_deck_corpus_support.dart` existem apenas para preservar
-  APIs internas. Ainda persistem duplicações relevantes em utilitarios de
-  request/log e trust SQL/serializer em trades/marketplace.
+  2026-06-18 19:00 UTC. `resolveOptimizeArchetype` tem fonte canonica em
+  `optimize_archetype_support.dart`; os roles estrategicos em
+  `functional_card_tags.dart` usam `resolveCardFunctionalRoles`;
+  basic/snow basic lands seguem centralizados em `server/lib/basic_land_utils.dart`;
+  `sync_cards.dart` ja consome `sync_cards_utils.dart` no caminho principal; e
+  `server/bin/export_hermes_learned_deck.py` virou wrapper da implementacao
+  canonica em docs. Permanecem duplicacoes relevantes em analise de estado
+  rebuild/optimize, fallback/scoring funcional do optimize, request/log social,
+  trust SQL/serializer em trades/marketplace, condition, CMC/tipo e runtime
+  path resolution de alguns crons Hermes.
 - **P1 — Payoff functional tag fragil por precedencia**: resolvido em
   `origin/master@1463732a`. `_looksLikePayoff` agora usa branches explicitos e
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
