@@ -260,6 +260,13 @@ Uso correto:
   `card_flow_count`, `proactive_board_count`, `reactive_only_count` e
   `high_cost_cluster_count`, deixando rastreavel por que a mao foi mantida ou
   devolvida.
+- No follow-up de 2026-06-18, a heuristica tambem deixou de tratar como
+  "plano valido" cartas cedo que so seriam castaveis off-color: o runtime usa
+  `mana_cost` real + subconjuntos possiveis dos terrenos na mao para decidir se
+  um ramp/card-flow/engine/board inicial esta realmente live. Isso tambem
+  entrou no bottom do London Mulligan, que agora prioriza spell cedo morta por
+  cor antes de bottomar terreno excedente quando a mao ja tem bomba mais cara
+  para devolver.
 - Fast mana condicional conta como recurso inicial apenas quando a condicao de
   producao esta ativa no estado da partida ou na linha inicial prevista. Exemplo
   concreto ja fechado localmente: `Mox Amber` nao pode justificar keep nem

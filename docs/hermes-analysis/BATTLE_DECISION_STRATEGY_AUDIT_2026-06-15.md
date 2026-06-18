@@ -112,6 +112,11 @@ O mulligan agora emite `decision_type=mulligan_decision` com:
 - desde 2026-06-18, contadores adicionais de plano:
   `plan_role`, `card_flow_count`, `proactive_board_count`,
   `reactive_only_count` e `high_cost_cluster_count`.
+- no follow-up de 2026-06-18, o keep/bottom passou a verificar também se a
+  carta de plano inicial é realmente castável pelas cores dos terrenos da mão,
+  usando `mana_cost` real e fontes `wildcard`; o trace agora distingue mãos
+  com play cedo off-color via `off_color_early_count`,
+  `off_color_early_cards` e `off_color_early_hand`.
 
 Limitação conhecida: a escolha das cartas colocadas no fundo continua
 heurística e o keep ainda não é calibrado por comandante/arquetipo. O gap já
@@ -132,6 +137,11 @@ Atualização do slice comparativo ainda em 2026-06-18:
   camada reviewed como criaturas conservadoras; o replay local
   `20260618_071541` passou a fechar com `strategy_findings=0`,
   `decision_findings=0` e `needs_review_decisions=0`.
+- no follow-up de cor do opening hand, o replay local
+  `server/test/artifacts/local_battle_replay_audit_mulligan_2026-06-18_post_color_live/summary_20260618_091322.json`
+  continuou com `turn_findings=0`, `decision_findings=0` e
+  `strategy_findings=0`, provando que a checagem de castabilidade por cor no
+  mulligan não introduziu regressão no fluxo completo.
 
 ### Seleção contextual de land
 
@@ -178,7 +188,7 @@ Findings iniciais:
 
 | Decisão | Regra oficial | Estratégia esperada | Status Hermes | Próximo ajuste |
 |---|---|---|---|---|
-| Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial forte: avalia lands, plano inicial, ramp barato, card flow, reactive-only e cluster caro sem setup; emite trace rico | Melhorar tuning por comandante/arquetipo e ranking comparativo mais semântico do bottom/keep |
+| Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial forte: avalia lands, plano inicial, ramp barato, card flow, reactive-only, cluster caro sem setup e castabilidade por cor do plano inicial; emite trace rico | Melhorar tuning por comandante/arquetipo e ranking comparativo mais semântico do bottom/keep |
 | Lotus Petal/ritual | Sacrificar para gerar mana conforme oracle | Usar só para destravar ação relevante, proteção, win attempt ou correção crítica | Parcial: `ramp_ritual` só entra no ramp loop se destrava ação no turno; auditor exige sinal | Ampliar para storm/free-spell synergies e proteção reativa |
 | Mox Diamond | Deve descartar land da mão antes de entrar | Só jogar com land descartável e plano de mana real | Guardrail mínimo: exige `requires_discard_land`, preserva cor única e bloqueia última/única land sem payoff nominal | Ampliar corpus e casos por bracket, sem ban global de Mox |
 | Sacrificar land | Crop Rotation/Harrow etc. exigem land conforme texto | Avaliar land sacrificada, risco de counter, alvo buscado e mana screw | Guardrail mínimo: escolhe alvo de land-ramp por score e bloqueia fetch/tapped sem benefício claro quando gasta última/única fonte | Ampliar scoring de utility lands e risco de counter |

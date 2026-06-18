@@ -341,6 +341,58 @@ def register_tests(battle, player, card):
         assert evaluation["keep"] is True
         assert evaluation["reason"].startswith("early_card_flow:Faithless Looting")
 
+    def test_mulligan_rejects_off_color_early_hand_without_fixing():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Wastes", "cmc": 0, "type_line": "Basic Land — Wastes"},
+            {
+                "name": "Faithless Looting",
+                "cmc": 1,
+                "mana_cost": "{R}",
+                "type_line": "Sorcery",
+                "effect": "rummage",
+            },
+            {"name": "Four Mana Spell", "cmc": 4, "type_line": "Sorcery", "effect": "draw"},
+            {"name": "Five Mana Spell", "cmc": 5, "type_line": "Sorcery", "effect": "draw"},
+            {"name": "Six Mana Spell", "cmc": 6, "type_line": "Creature", "effect": "creature"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is False
+        assert evaluation["reason"] == "no_castable_early_play_by_color"
+        assert "off_color_early_hand" in evaluation["risk_flags"]
+        assert evaluation["off_color_early_cards"] == ["Faithless Looting"]
+
+    def test_mulligan_keeps_off_color_early_hand_when_wildcard_fixing_exists():
+        hand = [
+            {
+                "name": "Command Tower",
+                "cmc": 0,
+                "type_line": "Land",
+                "produces": "WUBRGC",
+            },
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {
+                "name": "Faithless Looting",
+                "cmc": 1,
+                "mana_cost": "{R}",
+                "type_line": "Sorcery",
+                "effect": "rummage",
+            },
+            {"name": "Four Mana Spell", "cmc": 4, "type_line": "Sorcery", "effect": "draw"},
+            {"name": "Five Mana Spell", "cmc": 5, "type_line": "Sorcery", "effect": "draw"},
+            {"name": "Six Mana Spell", "cmc": 6, "type_line": "Creature", "effect": "creature"},
+            {"name": "Seven Mana Spell", "cmc": 7, "type_line": "Sorcery", "effect": "draw"},
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is True
+        assert evaluation["reason"].startswith("early_card_flow:Faithless Looting")
+        assert evaluation["off_color_early_count"] == 0
+
     def test_mulligan_rejects_five_lands_with_only_reactive_spell():
         hand = [
             {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
@@ -408,6 +460,30 @@ def register_tests(battle, player, card):
 
         assert bottomed[0]["name"] == "Eight Mana Spell"
 
+    def test_mulligan_bottoms_off_color_early_spell_after_dead_bomb():
+        hand = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
+            {"name": "Wastes", "cmc": 0, "type_line": "Basic Land — Wastes"},
+            {"name": "Clifftop Retreat", "cmc": 0, "type_line": "Land"},
+            {
+                "name": "Faithless Looting",
+                "cmc": 1,
+                "mana_cost": "{R}",
+                "type_line": "Sorcery",
+                "effect": "rummage",
+            },
+            {"name": "Helpful Two Drop", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+            {"name": "Eight Mana Spell", "cmc": 8, "type_line": "Sorcery", "effect": "wipe"},
+        ]
+
+        bottomed = battle.choose_mulligan_bottom_cards(hand, 2)
+
+        assert [card["name"] for card in bottomed] == [
+            "Eight Mana Spell",
+            "Faithless Looting",
+        ]
+
     def test_mulligan_bottoms_excess_land_when_no_dead_spell_exists():
         hand = [
             {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
@@ -439,9 +515,12 @@ def register_tests(battle, player, card):
         test_mulligan_rejects_three_lands_with_single_early_body_and_expensive_cluster,
         test_mulligan_keeps_two_lands_with_cheap_ramp,
         test_mulligan_keeps_three_lands_with_card_flow_even_with_expensive_cluster,
+        test_mulligan_rejects_off_color_early_hand_without_fixing,
+        test_mulligan_keeps_off_color_early_hand_when_wildcard_fixing_exists,
         test_mulligan_rejects_five_lands_with_only_reactive_spell,
         test_mulligan_rejects_dead_mox_amber_hand_without_live_legend,
         test_mulligan_bottoms_expensive_cards_before_lands_and_early_play,
         test_mulligan_bottoms_expensive_card_even_in_land_heavy_hand,
+        test_mulligan_bottoms_off_color_early_spell_after_dead_bomb,
         test_mulligan_bottoms_excess_land_when_no_dead_spell_exists,
     ]

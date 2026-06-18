@@ -22,6 +22,7 @@ import argparse
 import sqlite3, random, json, os, re, copy, sys
 from datetime import datetime, timezone
 from collections import defaultdict
+from itertools import combinations
 from pathlib import Path
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -3196,6 +3197,50 @@ def _opening_hand_summary(hand):
     ]
 
 
+def _opening_hand_land_options(hand):
+    return [
+        card
+        for card in hand
+        if isinstance(card, dict) and is_effective_land(card)
+    ]
+
+
+def _opening_hand_virtual_mana_pool(lands):
+    pool = ManaPool()
+    for land in lands:
+        colors = source_colors(land)
+        color = colors[0] if len(colors) == 1 else "wildcard"
+        pool.add(color, 1)
+    return pool
+
+
+def _opening_hand_subset_can_pay_cost(card, land_subset):
+    if not isinstance(card, dict):
+        return False
+    ghost = Player("__opening_hand__", None, [])
+    ghost.mana_pool = _opening_hand_virtual_mana_pool(land_subset)
+    ghost.treasures = 0
+    ghost.restricted_mana = {}
+    return ghost.can_pay(card_mana_cost(card))
+
+
+def _opening_hand_card_is_color_live(card, hand, max_lands_available):
+    if not isinstance(card, dict):
+        return False
+    lands = _opening_hand_land_options(hand)
+    if not lands:
+        return False
+    usable_lands = min(len(lands), max(1, int(max_lands_available or 0)))
+    if usable_lands <= 0:
+        return False
+    if usable_lands >= len(lands):
+        return _opening_hand_subset_can_pay_cost(card, lands)
+    for subset in combinations(lands, usable_lands):
+        if _opening_hand_subset_can_pay_cost(card, subset):
+            return True
+    return False
+
+
 def _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
     if effect_data.get("requires_discard_land") and lands < 2:
         return False
@@ -3207,6 +3252,8 @@ def _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
 def _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_window):
     if not _opening_hand_can_satisfy_basic_additional_costs(card, effect_data, lands):
         return False
+    if not _opening_hand_card_is_color_live(card, hand, early_turn_window):
+        return False
     if not effect_data.get("requires_legendary_creature_or_planeswalker_for_mana"):
         return True
     for candidate in hand:
@@ -3217,7 +3264,10 @@ def _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_w
             continue
         if "creature" not in type_line and "planeswalker" not in type_line:
             continue
-        if _opening_hand_card_cmc(candidate) <= max(2, early_turn_window):
+        if (
+            _opening_hand_card_cmc(candidate) <= max(2, early_turn_window)
+            and _opening_hand_card_is_color_live(candidate, hand, early_turn_window)
+        ):
             return True
     return False
 
@@ -3255,6 +3305,7 @@ def _opening_hand_has_early_plan(hand, lands):
     proactive_board = []
     early_engines = []
     reactive_only = []
+    off_color_early = []
     for card in nonlands:
         effect_data = _opening_hand_effect(card)
         effect = _opening_hand_effect_name(card, effect_data)
@@ -3263,16 +3314,21 @@ def _opening_hand_has_early_plan(hand, lands):
         additional_costs_live = _opening_hand_can_satisfy_basic_additional_costs(
             card, effect_data, lands
         )
+        color_live = _opening_hand_card_is_color_live(card, hand, early_turn_window)
         evaluated.append({
             "card": card.get("name", "?"),
             "cmc": cmc,
             "effect": effect,
             "role": role,
             "additional_costs_live": additional_costs_live,
+            "color_live": color_live,
         })
         if cmc > early_turn_window:
             continue
         if not additional_costs_live:
+            continue
+        if not color_live:
+            off_color_early.append((card, cmc, role))
             continue
         if role == "ramp":
             if _opening_hand_ramp_card_is_live(card, effect_data, hand, lands, early_turn_window):
@@ -3303,6 +3359,8 @@ def _opening_hand_has_early_plan(hand, lands):
         "engine_count": len(early_engines),
         "proactive_board_count": len(proactive_board),
         "reactive_only_count": len(reactive_only),
+        "off_color_early_count": len(off_color_early),
+        "off_color_early_cards": [card.get("name", "?") for card, _cmc, _role in off_color_early[:4]],
         "high_cost_cluster_count": high_cost_count,
     }
 
@@ -3332,6 +3390,9 @@ def _opening_hand_has_early_plan(hand, lands):
             "early_play_cmc": cmc,
             "plan_role": "engine",
         }
+
+    if off_color_early and not (proactive_board or reactive_only):
+        return False, "no_castable_early_play_by_color", plan_details
 
     if lands >= 5 and reactive_only and not proactive_board:
         return False, "land_heavy_reactive_only", plan_details
@@ -3375,6 +3436,8 @@ def _mulligan_bottom_priority(card, hand, land_count):
     early_window = 2 if land_count == 2 else (4 if land_count >= 5 else 3)
     if cmc <= early_window and effect not in ("counter", "unknown"):
         priority -= 70
+    if not _opening_hand_card_is_color_live(card, hand, early_window):
+        priority += 120
 
     if effect in ("ramp_permanent", "land_ramp", "mana_dork") and cmc <= 2:
         if _opening_hand_ramp_card_is_live(card, effect_data, hand, land_count, early_window):
@@ -3453,6 +3516,8 @@ def mulligan_evaluation(hand):
         base["risk_flags"].append("reactive_only_opener")
     if reason == "land_heavy_reactive_only":
         base["risk_flags"].append("land_heavy_low_action")
+    if reason == "no_castable_early_play_by_color":
+        base["risk_flags"].append("off_color_early_hand")
     if reason == "expensive_cluster_without_setup":
         base["risk_flags"].append("expensive_dead_hand")
     if len(high_cost_cards) >= 3 and not has_plan:
@@ -3524,6 +3589,8 @@ def _emit_mulligan_decision_trace(
             "card_flow_count": evaluation.get("card_flow_count"),
             "proactive_board_count": evaluation.get("proactive_board_count"),
             "reactive_only_count": evaluation.get("reactive_only_count"),
+            "off_color_early_count": evaluation.get("off_color_early_count"),
+            "off_color_early_cards": evaluation.get("off_color_early_cards"),
             "high_cost_cards": evaluation.get("high_cost_cards"),
             "high_cost_cluster_count": evaluation.get("high_cost_cluster_count"),
             "keep": evaluation.get("keep"),
