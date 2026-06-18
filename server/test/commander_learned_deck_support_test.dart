@@ -87,6 +87,35 @@ void main() {
       );
     });
 
+    test('computes canonical learned deck role summary from multi-tags', () {
+      final summary = computeCommanderLearnedDeckRoleSummary(
+        cards: const [
+          CommanderLearnedDeckCardLine(
+            name: 'Lorehold, the Historian',
+            quantity: 1,
+          ),
+          CommanderLearnedDeckCardLine(name: 'Plains', quantity: 2),
+          CommanderLearnedDeckCardLine(name: 'Sol Ring', quantity: 1),
+          CommanderLearnedDeckCardLine(name: 'Boros Charm', quantity: 1),
+          CommanderLearnedDeckCardLine(name: 'Big Score', quantity: 1),
+        ],
+        commanderNameNormalized: 'lorehold, the historian',
+        tagsByName: const {
+          'plains': {'land', 'ramp'},
+          'sol ring': {'ramp'},
+          'boros charm': {'protection', 'removal'},
+          'big score': {'draw', 'ramp'},
+        },
+        landNames: const {'plains'},
+      );
+
+      expect(summary['total_lands'], equals(2));
+      expect(summary['ramp_count'], equals(2));
+      expect(summary['draw_count'], equals(1));
+      expect(summary['removal_count'], equals(1));
+      expect(summary['protection_count'], equals(1));
+    });
+
     test('route prefers promoted learned deck before deterministic fallback',
         () {
       final route =

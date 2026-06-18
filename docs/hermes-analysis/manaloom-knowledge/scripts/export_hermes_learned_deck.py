@@ -250,45 +250,10 @@ def export_learned_deck(db_path, out_path, commander_filter=None, learned_id=Non
     if completeness.commander_quantity_in_list == 0:
         output_card_list = f"1 {commander}\n{str(card_list or '').strip()}"
 
-    # Prefer decks table counts if available.
-    deck_columns = {
-        row[1] for row in db.execute("PRAGMA table_info(decks)")
-    } if table_exists(db, "decks") else set()
-    metric_columns = {
-        "total_lands",
-        "ramp_count",
-        "draw_count",
-        "removal_count",
-        "tutor_count",
-        "board_wipe_count",
-        "protection_count",
-        "recursion_count",
-        "wincon_count",
-        "engine_count",
-    }
-    deck_row = None
-    if metric_columns.issubset(deck_columns):
-        deck_row = db.execute(
-            "SELECT total_lands, ramp_count, draw_count, removal_count, tutor_count, "
-            "board_wipe_count, protection_count, recursion_count, wincon_count, engine_count "
-            "FROM decks WHERE id = ?", (target_deck_id,)
-        ).fetchone()
-
-    if deck_row:
-        metadata = {
-            "total_lands": deck_row["total_lands"] or 0,
-            "ramp_count": deck_row["ramp_count"] or 0,
-            "draw_count": deck_row["draw_count"] or 0,
-            "removal_count": deck_row["removal_count"] or 0,
-            "tutor_count": deck_row["tutor_count"] or 0,
-            "board_wipe_count": deck_row["board_wipe_count"] or 0,
-            "protection_count": deck_row["protection_count"] or 0,
-            "recursion_count": deck_row["recursion_count"] or 0,
-            "wincon_count": deck_row["wincon_count"] or 0,
-            "engine_count": deck_row["engine_count"] or 0,
-        }
-    else:
-        metadata = build_metadata(db, target_deck_id, card_list, commander)
+    # `card_list` is the promoted learned-deck truth. The exported metadata must
+    # be rederived from that persisted list instead of trusting stale summary
+    # counters in `decks`, which can diverge from the promoted composition.
+    metadata = build_metadata(db, target_deck_id, output_card_list, commander)
 
     output = {
         "source_system": source,

@@ -107,11 +107,36 @@
     caminho determinístico atual;
   - o risco remanescente deixou de ser precedence interna do builder e passou
     a ser qualidade/drift do dado promovido em `commander_learned_decks`.
-- Drift residual confirmado:
-  - o row ativo do Lorehold ainda carrega `metadata.total_lands=33`, mas o
-    `card_list` persistido resolve para `30` lands reais;
-  - isso indica divergência entre agregados Hermes/metadata e a lista
-    realmente promovida, não degradação do builder.
+- O drift residual foi confirmado logo após o slice e fechado no follow-up da
+  mesma rodada:
+  - o row ativo do Lorehold carregava `metadata.total_lands=33`, mas o
+    `card_list` persistido resolvia para `30` lands reais;
+  - o exporter Hermes foi corrigido para sempre derivar `metadata` do
+    `card_list`, nunca da tabela `decks`;
+  - o upsert backend (`commander_learned_deck_support.dart`) passou a
+    canonicalizar os agregados no próprio PostgreSQL usando `cards` +
+    `card_function_tags` antes de gravar;
+  - o row ativo `learned_deck:82` foi reaplicado no PG e agora persiste
+    `metadata.total_lands=30`.
+
+### Atualizacao de ciclo — 2026-06-18 / canonicalização de metadata no PG
+
+- O learned-deck import path backend-owned agora recalcula os agregados
+  canônicos antes do upsert em `commander_learned_decks`:
+  - fonte estrutural: `cards.type_line` para detectar land;
+  - fonte funcional: `card_function_tags` para `ramp/draw/removal/tutor/
+    board_wipe/protection/recursion/wincon/engine`;
+  - contagem multi-role é aditiva e deixa de confiar no `metadata` enviado por
+    Hermes/exporters.
+- O exporter Hermes `export_hermes_learned_deck.py` também foi endurecido:
+  - removeu a preferência pelos contadores de `decks`;
+  - rederiva `metadata` a partir do `card_list` promovido.
+- Validação objetiva:
+  - teste Python novo cobre exatamente o caso `decks.total_lands` stale;
+  - `commander_learned_deck_support_test.dart` cobre o resumo multi-tag e o
+    guardrail de land não inflando `ramp`;
+  - reaplicação real do `learned_deck:82` no PG atualizou o row ativo do
+    Lorehold para `total_lands=30`.
 
 ### Atualizacao de ciclo — 2026-06-18 / runtime truth de generate + cron topology
 
@@ -373,21 +398,20 @@
   - depois revisar as cartas ainda dependentes de fallback apenas nos fluxos
     sem learned deck ativo ou nos relatórios de explainability.
 
-#### P1 — Curar drift entre `commander_learned_decks.card_list` e `metadata`
+#### P1 — Consolidar a política de `metadata` learned-deck como cache derivado
 
-- O row ativo do Lorehold está coerente como lista promoted/salva, mas não como
-  agregados:
-  - `card_list` resolve para `99` main / `30` lands reais;
-  - `metadata.total_lands` persiste `33`.
-- Isso é perigoso porque scorecards, validators e UX diagnóstica podem confiar
-  em `metadata` e chegar a conclusões diferentes do deck realmente promovido.
-- Próximo passo correto:
-  - rederivar os agregados canônicos (`total_lands`, counts por role, etc.) a
-    partir do `card_list` persistido no promote/sync;
-  - tratar `metadata` como cache derivado, nunca como fonte principal da
-    composição do learned deck;
-  - adicionar teste/guardrail para impedir novos rows ativos com
-    `metadata.total_lands` divergente do `card_list`.
+- O bug específico de drift `card_list` vs `metadata.total_lands` foi fechado
+  em 2026-06-18:
+  - exporter Hermes não usa mais a tabela `decks` como fonte de agregados;
+  - upsert backend rederiva os agregados no PG;
+  - `learned_deck:82` foi corrigido em produção local/PG.
+- O que continua pendente aqui é a regra de produto/documentação:
+  - `metadata` deve ser tratado sempre como cache derivado do `card_list`,
+    nunca como fonte principal da composição;
+  - counts por role são aditivos/multi-tag e podem exceder a cardinalidade
+    exclusiva do deck;
+  - qualquer consumidor novo precisa ler isso como resumo funcional, não como
+    partição exclusiva 1:1 do main deck.
 
 #### P1 — Fechar o gap entre o plano real do Lorehold e o battle runtime
 

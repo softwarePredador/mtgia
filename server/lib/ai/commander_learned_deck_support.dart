@@ -116,7 +116,200 @@ class CommanderLearnedDeckValidationResult {
         'main_quantity': mainQuantity,
         'blockers': blockers,
         'warnings': warnings,
-      };
+  };
+}
+
+const Map<String, String> _learnedDeckSummaryTagToRole = {
+  'board_wipe': 'board_wipe',
+  'counterspell': 'removal',
+  'mana_fixing': 'ramp',
+  'ritual': 'ramp',
+  'loot': 'draw',
+  'exile_value': 'draw',
+  'blink': 'protection',
+  'graveyard_synergy': 'engine',
+  'aristocrat_payoff': 'engine',
+  'spellslinger': 'engine',
+  'artifact_synergy': 'engine',
+  'enchantment_synergy': 'engine',
+  'sacrifice_outlet': 'engine',
+  'payoff': 'engine',
+  'enabler': 'engine',
+  'combo_piece': 'wincon',
+  'big_spell': 'wincon',
+  'drain': 'wincon',
+  'ramp': 'ramp',
+  'draw': 'draw',
+  'tutor': 'tutor',
+  'removal': 'removal',
+  'protection': 'protection',
+  'recursion': 'recursion',
+  'wincon': 'wincon',
+  'engine': 'engine',
+};
+
+Map<String, int> computeCommanderLearnedDeckRoleSummary({
+  required Iterable<CommanderLearnedDeckCardLine> cards,
+  required String commanderNameNormalized,
+  required Map<String, Set<String>> tagsByName,
+  required Set<String> landNames,
+}) {
+  final summary = <String, int>{
+    'total_lands': 0,
+    'ramp_count': 0,
+    'draw_count': 0,
+    'removal_count': 0,
+    'tutor_count': 0,
+    'board_wipe_count': 0,
+    'protection_count': 0,
+    'recursion_count': 0,
+    'wincon_count': 0,
+    'engine_count': 0,
+  };
+
+  for (final card in cards) {
+    final normalizedName = normalizeCommanderReferenceName(card.name);
+    if (normalizedName.isEmpty || normalizedName == commanderNameNormalized) {
+      continue;
+    }
+    final quantity = card.quantity;
+    if (quantity <= 0) continue;
+
+    final tags = tagsByName[normalizedName] ?? const <String>{};
+    if (landNames.contains(normalizedName) || tags.contains('land')) {
+      summary['total_lands'] = summary['total_lands']! + quantity;
+      continue;
+    }
+
+    final roles = tags
+        .map((tag) => _learnedDeckSummaryTagToRole[tag])
+        .whereType<String>()
+        .toSet();
+    for (final role in roles) {
+      switch (role) {
+        case 'ramp':
+          summary['ramp_count'] = summary['ramp_count']! + quantity;
+          break;
+        case 'draw':
+          summary['draw_count'] = summary['draw_count']! + quantity;
+          break;
+        case 'removal':
+          summary['removal_count'] = summary['removal_count']! + quantity;
+          break;
+        case 'tutor':
+          summary['tutor_count'] = summary['tutor_count']! + quantity;
+          break;
+        case 'board_wipe':
+          summary['board_wipe_count'] = summary['board_wipe_count']! + quantity;
+          break;
+        case 'protection':
+          summary['protection_count'] =
+              summary['protection_count']! + quantity;
+          break;
+        case 'recursion':
+          summary['recursion_count'] = summary['recursion_count']! + quantity;
+          break;
+        case 'wincon':
+          summary['wincon_count'] = summary['wincon_count']! + quantity;
+          break;
+        case 'engine':
+          summary['engine_count'] = summary['engine_count']! + quantity;
+          break;
+      }
+    }
+  }
+
+  return summary;
+}
+
+Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
+  Pool pool,
+  CommanderLearnedDeckInput input,
+) async {
+  final cards = input.cards;
+  if (cards.isEmpty) return input.metadata;
+
+  final distinctNames = <String>{};
+  for (final card in cards) {
+    final normalizedName = normalizeCommanderReferenceName(card.name);
+    if (normalizedName.isEmpty) continue;
+    distinctNames.add(normalizedName);
+  }
+  if (distinctNames.isEmpty) return input.metadata;
+
+  final placeholders = <String>[];
+  final parameters = <String, dynamic>{};
+  var index = 0;
+  for (final name in distinctNames) {
+    final key = 'name$index';
+    placeholders.add('(@$key)');
+    parameters[key] = name;
+    index += 1;
+  }
+
+  try {
+    final rows = await pool.execute(
+      Sql.named('''
+        WITH wanted(lowered_name) AS (
+          VALUES ${placeholders.join(', ')}
+        ),
+        card_info AS (
+          SELECT
+            w.lowered_name,
+            COALESCE(BOOL_OR(c.type_line ILIKE '%Land%'), FALSE) AS is_land,
+            COALESCE(
+              ARRAY_REMOVE(ARRAY_AGG(DISTINCT LOWER(cft.tag)), NULL),
+              ARRAY[]::TEXT[]
+            ) AS tags
+          FROM wanted w
+          LEFT JOIN cards c
+            ON LOWER(c.name) = w.lowered_name
+          LEFT JOIN card_function_tags cft
+            ON cft.card_id = c.id
+          GROUP BY w.lowered_name
+        )
+        SELECT lowered_name, is_land, tags
+        FROM card_info
+      '''),
+      parameters: parameters,
+    );
+
+    final tagsByName = <String, Set<String>>{};
+    final landNames = <String>{};
+    for (final row in rows) {
+      final loweredName = row[0]?.toString() ?? '';
+      if (loweredName.isEmpty) continue;
+      final isLand = row[1] == true;
+      if (isLand) landNames.add(loweredName);
+      final rawTags = row[2];
+      final tags = <String>{};
+      if (rawTags is Iterable) {
+        for (final value in rawTags) {
+          final text = value?.toString().trim().toLowerCase();
+          if (text != null && text.isNotEmpty) {
+            tags.add(text);
+          }
+        }
+      }
+      if (tags.isNotEmpty) {
+        tagsByName[loweredName] = tags;
+      }
+    }
+
+    final summary = computeCommanderLearnedDeckRoleSummary(
+      cards: cards,
+      commanderNameNormalized: input.commanderNameNormalized,
+      tagsByName: tagsByName,
+      landNames: landNames,
+    );
+
+    return {
+      ...input.metadata,
+      ...summary,
+    };
+  } catch (_) {
+    return input.metadata;
+  }
 }
 
 CommanderLearnedDeckInput parseCommanderLearnedDeckInput(
@@ -403,6 +596,8 @@ Future<void> upsertCommanderLearnedDeck(
   CommanderLearnedDeckInput input, {
   bool deactivateOtherActive = true,
 }) async {
+  final metadata = await canonicalizeCommanderLearnedDeckMetadata(pool, input);
+
   if (input.isActive && deactivateOtherActive) {
     await pool.execute(
       Sql.named('''
@@ -494,7 +689,7 @@ Future<void> upsertCommanderLearnedDeck(
       'wincon_backup': input.winconBackup,
       'legal_status': input.legalStatus,
       'notes': input.notes,
-      'metadata': jsonEncode(input.metadata),
+      'metadata': jsonEncode(metadata),
       'is_active': input.isActive,
       'promoted_at': input.promotedAt,
     },
