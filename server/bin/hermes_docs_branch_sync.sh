@@ -171,12 +171,14 @@ fi
 
 if git show-ref --verify --quiet "refs/heads/${DOCS_BRANCH}"; then
   git checkout --quiet "$DOCS_BRANCH"
+  # The Hermes checkout is operational state, not the source of truth for docs.
+  # If a prior run left a local merge commit that could not be pushed, recover
+  # from the remote branch before creating a fresh merge from current master.
+  git reset --hard --quiet "${REMOTE}/${DOCS_BRANCH}"
 else
   git checkout --quiet -b "$DOCS_BRANCH" "${REMOTE}/${DOCS_BRANCH}"
 fi
 docs_checked_out=1
-
-git merge --ff-only --quiet "${REMOTE}/${DOCS_BRANCH}"
 
 docs_before="$(git rev-parse HEAD)"
 master_sha="$(git rev-parse "${REMOTE}/${MASTER_BRANCH}")"

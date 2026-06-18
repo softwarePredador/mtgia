@@ -239,6 +239,37 @@ saída provider-backed:
 - isso não quebrou a execução, mas viola o contrato correto de delivery do
   Hermes (`ou [SILENT] puro, ou relatório normal`).
 
+## Follow-up live — 2026-06-18 18:09 UTC
+
+Depois do deploy de hardening `1cc517ba`, a auditoria live passou a flagar
+`last_status=error` em jobs ativos, em vez de aceitar apenas a existencia do
+job no `jobs.json`.
+
+Resultado:
+
+- `manaloom-ops`: 11/11 jobs forcados manualmente e com `last_status=ok`;
+- `hermes-lab`: 5 jobs ativos encontrados, mas `manaloom-docs-branch-sync`
+  falhou por divergencia Git local/remota na branch
+  `codex/hermes-analysis-docs`;
+- causa: o checkout persistente do container pode manter uma branch docs local
+  com merge commit antigo que nao foi pushado. Esse estado local nao deve ser
+  tratado como fonte de verdade.
+
+Correcao aplicada:
+
+- `server/bin/hermes_docs_branch_sync.sh` agora reseta a branch docs local para
+  `origin/codex/hermes-analysis-docs` antes de criar o merge fresco de
+  `origin/master`;
+- a rotina continua bloqueando tracked dirty worktree antes de qualquer
+  checkout;
+- untracked files continuam sendo movidos para quarentena antes do sync;
+- `server/test/hermes_docs_branch_sync_test.py` cobre o caso de branch docs
+  local divergente com commit local-only que nao pode ser propagado.
+
+Essa correcao preserva a arquitetura correta: a branch docs remota e o master
+remoto sao as fontes de verdade; o checkout persistente do Hermes e apenas
+estado operacional recuperavel.
+
 Correção aplicada em `server/bin/hermes_lab_cron_bootstrap.py`:
 
 - todos os prompts provider-backed agora instruem explicitamente:
