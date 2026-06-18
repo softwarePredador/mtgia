@@ -16,6 +16,24 @@ Escopo deste ciclo: Hermes-only, report-only para estratégia, sem auto-apply de
 swaps, sem ban global de Mox e sem transformar o simulador em judge engine
 completo.
 
+### Atualizacao 2026-06-18
+
+- O batch curto de 2026-06-18 mostrou um problema concreto: `Wheel of Fortune`
+  podia entrar por `miracle_cast` do Lorehold mesmo quando o próprio contexto
+  de `wheel` registrava `timing_justified=false`.
+- O runtime foi ajustado para:
+  - bloquear `miracle_cast` automático de `wheel`, `board_wipe` e
+    `worldfire_reset` quando os guardrails já dizem que a linha não é boa;
+  - inferir `draw_count` correto para wheels clássicas sem `count`
+    explícito, fechando a regressão de `Reforge the Soul` que resolvia como
+    draw `2`.
+- Revalidação:
+  - suite `test_battle_analyst_v10_3.py` passou;
+  - rodada curta
+    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260618_004552/summary.json`
+    terminou com `strategy_findings=0` e
+    `board_wipe_wheel=coherent_in_sample`.
+
 ## Fontes e política de evidência
 
 Fontes oficiais usadas como regra:

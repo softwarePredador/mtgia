@@ -25,6 +25,45 @@ Decisão principal:
 - Manter jobs pesados de optimizer como execução manual até virarem rotinas do
   servidor ManaLoom com isolamento, locks e métricas.
 
+## Atualização 2026-06-18 — EasyPanel runtime e uso real de OpenAI
+
+Evidência canônica desta rodada:
+
+```bash
+cd /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia
+python3 server/bin/audit_easypanel_runtime_alignment.py --stdout-only
+```
+
+Achados confirmados:
+
+- `manaloom-ops` está rodando no SHA
+  `e0a908f02e767711b206562811eca7605de36c87`.
+- `deck_learning_events.pending=0` e
+  `deck_learning_events.latest_synced=2026-06-18T00:32:10.843015+00:00`,
+  o que prova execução real do boot catch-up / `pull_learning_events`.
+- `manaloom-ops` aparece com `openai_api_key_present=False`, e isso é o estado
+  correto: os jobs canônicos ativos desse serviço são determinísticos e não
+  dependem de provider.
+- `hermes-lab` continua sendo o serviço report-only/provider-backed; ele é o
+  único que precisa de `OPENAI_API_KEY` neste desenho atual.
+
+Jobs server-owned confirmados como script-only/determinísticos:
+
+- `pull_learning_events`
+- `auto_sync_learned_decks`
+- `auto_promote_learned_decks`
+- `master_optimizer_preflight`
+- `manaloom_knowledge_import`
+- `hermes_mana_base_validator`
+- `hermes_cron_governor_report`
+
+Gap remanescente:
+
+- `hermes-lab` ainda está em SHA antigo
+  `80eb35700e6df11422594b4a919fe8b91110d544`.
+- Esse drift não bloqueia o pipeline canônico enquanto o lab continuar
+  estritamente `report-only` e sem ownership sobre decisões do backend.
+
 ## Atualização 2026-06-13 — sync obrigatório da branch docs
 
 Achado novo: as auditorias de documentação/estrutura rodam na branch

@@ -427,7 +427,24 @@ def register_tests(battle, player, card):
         active.hand = [{"name": "Wheel of Fortune", "cmc": 3, "type_line": "Sorcery"}]
         opponent.hand = []
 
-        assert battle.should_cast_wheel(active, [opponent], {"count": 7}) is False
+        assert battle.should_cast_wheel(
+            active,
+            [opponent],
+            {"name": "Wheel of Fortune", "count": 7},
+        ) is False
+
+    def test_reforge_defaults_wheel_draw_count_to_seven():
+        active = player("Active")
+        opponent = player("Opponent")
+        active.hand = [{"name": "Reforge the Soul", "cmc": 5, "type_line": "Sorcery"}]
+        opponent.hand = []
+
+        assert battle.wheel_like_draw_count(
+            {"name": "Reforge the Soul", "cmc": 5, "type_line": "Sorcery"},
+            battle.get_card_effect({"name": "Reforge the Soul", "cmc": 5, "type_line": "Sorcery"}),
+            player=active,
+            opponents=[opponent],
+        ) == 7
 
     def test_reanimation_recursion_returns_creature_to_battlefield():
         active = player("Active")
@@ -472,5 +489,6 @@ def register_tests(battle, player, card):
         test_wheel_uses_library_of_leng_replacement_for_effect_discard,
         test_effect_discard_replacement_prefers_keepable_spells_over_graveyard,
         test_wheel_cast_guard_blocks_opponent_refill_without_payoff,
+        test_reforge_defaults_wheel_draw_count_to_seven,
         test_reanimation_recursion_returns_creature_to_battlefield,
     ]

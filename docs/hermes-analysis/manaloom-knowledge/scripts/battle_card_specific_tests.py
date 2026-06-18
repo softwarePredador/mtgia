@@ -69,6 +69,7 @@ def register_tests(battle, player):
             "land",
         ]
         opponent = player("Opponent", [_card("Opp Filler")])
+        opponent.hand = [_card(f"Opp Keep {index}") for index in range(7)]
 
         battle.play_turn_v8(
             active,
@@ -117,6 +118,62 @@ def register_tests(battle, player):
 
         assert not any(event == "miracle_cast" for event, _ in events)
         assert any(c.get("name") == "Reforge the Soul" for c in active.hand)
+
+    def test_lorehold_miracle_skips_bad_wheel_refill():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player(
+            "Lorehold",
+            [
+                {
+                    "name": "Reforge the Soul",
+                    "cmc": 7,
+                    "type_line": "Sorcery",
+                },
+                *[_card(f"Filler {index}") for index in range(4)],
+            ],
+        )
+        active.is_human = True
+        active.battlefield = [
+            {"name": "Lorehold, the Historian", "effect": "creature", "power": 3},
+            "land",
+            "land",
+        ]
+        opponent = player("Opponent", [])
+
+        battle.play_turn_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=2,
+            rng=random.Random(191),
+            stack=battle.Stack(),
+        )
+
+        assert not any(event == "miracle_cast" for event, _ in events)
+        assert any(c.get("name") == "Reforge the Soul" for c in active.hand)
+
+    def test_reforge_resolution_draws_seven_when_count_missing():
+        active = player("Active")
+        opponent = player("Opponent")
+        active.hand = [
+            {"name": "Big Spell", "cmc": 8, "type_line": "Sorcery"},
+            {"name": "Cheap Spell", "cmc": 1, "type_line": "Instant"},
+        ]
+        opponent.hand = [{"name": f"Opp Card {index}", "cmc": 1, "type_line": "Instant"} for index in range(3)]
+        active.library = [_card(f"Draw {index}", cmc=1) for index in range(8)]
+        opponent.library = [_card(f"Opponent Draw {index}", cmc=1) for index in range(8)]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Reforge the Soul", "cmc": 5, "type_line": "Sorcery"},
+            turn=3,
+            rng=random.Random(8018),
+        )
+
+        assert len(active.hand) == 7
+        assert len(opponent.hand) == 7
 
     def test_boros_charm_protects_creatures_until_cleanup():
         active = player("Lorehold")
@@ -1805,6 +1862,8 @@ def register_tests(battle, player):
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
         test_lorehold_miracle_does_not_use_second_draw_of_turn,
+        test_lorehold_miracle_skips_bad_wheel_refill,
+        test_reforge_resolution_draws_seven_when_count_missing,
         test_boros_charm_protects_creatures_until_cleanup,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_mox_amber_only_counts_mana_with_live_legend,

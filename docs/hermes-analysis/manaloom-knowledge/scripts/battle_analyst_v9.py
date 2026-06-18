@@ -5007,10 +5007,16 @@ def should_cast_worldfire_reset(player, opponents):
 
 
 def should_cast_wheel(player, opponents, effect_data):
+    draw_count = wheel_like_draw_count(
+        effect_data if isinstance(effect_data, dict) and effect_data.get("name") else {},
+        effect_data,
+        player=player,
+        opponents=opponents,
+    )
     return wheel_decision_context(
         player,
         opponents,
-        int(effect_data.get("count") or 0),
+        draw_count,
     )["timing_justified"]
 
 
@@ -5063,11 +5069,25 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng):
 
 def is_wheel_like_card(card, effect_data):
     name = normalize_card_name(card.get("name", "")) if isinstance(card, dict) else ""
-    count = int(effect_data.get("count") or 0)
+    count = wheel_like_draw_count(card, effect_data)
     return count >= 7 or any(
         marker in name
         for marker in ("wheel", "windfall", "timetwister", "reforge")
     )
+
+
+def wheel_like_draw_count(card, effect_data, *, player=None, opponents=None):
+    count = int(effect_data.get("count") or 0)
+    if count > 0:
+        return count
+    name = normalize_card_name(card.get("name", "")) if isinstance(card, dict) else ""
+    if any(marker in name for marker in ("wheel", "reforge", "timetwister")):
+        return 7
+    if "windfall" in name and player is not None:
+        hand_sizes = [len(player.hand)]
+        hand_sizes.extend(len(opp.hand) for opp in (opponents or []) if opp.is_alive())
+        return max(hand_sizes) if hand_sizes else 0
+    return 0
 
 
 def move_zone_object_to_exile(owner, zone_name, card, *, reason=None, source=None, turn=None):
@@ -5198,7 +5218,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         if effect == "board_wipe" and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
-            if not should_cast_wheel(player, opponents, effect_data):
+            if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
                 continue
 
         cmc = int(float(card.get("cmc") or 0))
@@ -5302,7 +5322,7 @@ def sacrifice_mana_unlock_candidates(
         if effect == "board_wipe" and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
-            if not should_cast_wheel(player, opponents, effect_data):
+            if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
                 continue
 
         cmc = int(float(card.get("cmc") or 0))
@@ -6825,6 +6845,14 @@ def try_lorehold_miracle_cast(player, drawn_for_turn, turn, phase, all_players, 
     eff = get_card_effect(last_drawn)
     if last_drawn not in player.hand:
         return False
+    opponents = [candidate for candidate in all_players if candidate is not player]
+    if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+        return False
+    if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
+        return False
+    if eff.get("effect") == "draw_cards" and is_wheel_like_card(last_drawn, eff):
+        if not should_cast_wheel(player, opponents, {**eff, "name": last_drawn.get("name")}):
+            return False
     player.hand.remove(last_drawn)
     player.spend_mana(miracle_cost)
     emit_replay_event(
@@ -9368,7 +9396,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 elif (
                     eff.get("effect") == "draw_cards"
                     and is_wheel_like_card(c, eff)
-                    and not should_cast_wheel(player, opponents, eff)
+                    and not should_cast_wheel(player, opponents, {**eff, "name": c.get("name")})
                 ):
                     wincons = []
                 elif not additional_card_costs_are_payable(player, c, eff):
@@ -9475,7 +9503,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             if (
                 eff.get("effect") == "draw_cards"
                 and is_wheel_like_card(c, eff)
-                and not should_cast_wheel(player, opponents, eff)
+                and not should_cast_wheel(player, opponents, {**eff, "name": c.get("name")})
             ):
                 continue
             if eff.get("effect") == "creature":
@@ -9939,7 +9967,13 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             return
         n = effect_data.get("count", 2)
         if is_wheel_like_card(card, effect_data):
-            context = wheel_decision_context(player, opponents, int(n or 0))
+            wheel_draw_count = wheel_like_draw_count(
+                card,
+                effect_data,
+                player=player,
+                opponents=opponents,
+            )
+            context = wheel_decision_context(player, opponents, wheel_draw_count)
             risk_flags = []
             if (
                 context["opponent_refill_risk"] > 0
@@ -9980,7 +10014,19 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 rejected_reason="spell_already_resolving",
             )
         if is_wheel_like_card(card, effect_data):
-            resolve_wheel_like_draw(player, opponents, card, int(n or 0), turn, rng)
+            resolve_wheel_like_draw(
+                player,
+                opponents,
+                card,
+                wheel_like_draw_count(
+                    card,
+                    effect_data,
+                    player=player,
+                    opponents=opponents,
+                ),
+                turn,
+                rng,
+            )
         else:
             player.draw(n, rng)
         finish_resolved_spell(player, card, turn=turn)

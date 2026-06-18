@@ -12,6 +12,34 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-18 / Wheel + Lorehold miracle guard
+
+- Fechado um gap estratégico objetivo do battle: `miracle_cast` do Lorehold
+  podia resolver wheels mesmo quando o próprio contexto de `wheel` marcava
+  `timing_justified=false`.
+- Ajustes aplicados no runtime:
+  - `try_lorehold_miracle_cast()` passou a respeitar os mesmos guardrails de
+    `wheel`, `board_wipe` e `worldfire_reset` antes do cast automático;
+  - `wheel_like_draw_count()` passou a inferir `7` para wheels clássicas sem
+    `count` explícito (`Reforge the Soul`, `Wheel of Fortune`,
+    `Timetwister`) e a usar a maior mão visível para `Windfall`;
+  - `Reforge the Soul` deixou de resolver como draw `2` por fallback genérico
+    de `draw_cards`.
+- Validação:
+  - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+    passou com a suite completa;
+  - bateria curta local
+    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260618_004552/summary.json`
+    fechou com `strategy_findings=0`,
+    `board_wipe_wheel=coherent_in_sample`,
+    `seeds_with_high_or_critical_action_findings=[]`.
+- Reclassificação:
+  - `board_wipe/wheel` saiu do estado `blocked_or_needs_review` do batch curto
+    anterior;
+  - o próximo gap real volta a ser explicação comparativa de decisão
+    (`chosen_option_score` vs `rejected_option_score`) e não mais esse bug de
+    cast automático.
+
 ### Atualizacao de ciclo — 2026-06-17 / Battle + Generator Truth Consolidation
 
 - Documento canônico desta rodada:
