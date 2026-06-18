@@ -47,6 +47,38 @@
   - o gap real virou disciplina operacional: não auditar replay local contra
     cache desatualizado.
 
+### Atualizacao de ciclo — 2026-06-18 / reviewed creature hotfixes no replay vivo
+
+- O ruido residual do replay local tambem foi fechado para as duas cartas que
+  ainda apareciam em jogadas reais com `known_cards_canonical_snapshot` /
+  `needs_review`:
+  - `Basking Broodscale` foi promovida para `curated/active` como
+    `effect=creature`, `power=2`, `toughness=2`,
+    `battle_model_scope=creature_counter_token_engine_unexecuted_v1`;
+  - `Scavenging Ooze` foi promovida para `curated/active` como
+    `effect=creature`, `power=2`, `toughness=2`,
+    `battle_model_scope=graveyard_hate_creature_activation_unexecuted_v1`.
+- Guardrail aplicado:
+  - nenhuma das duas cartas pode mais resolver como efeito imediato errado
+    (`token_maker` / `remove_permanent`) no cast;
+  - o runtime agora as coloca primeiro no battlefield como permanentes de
+    criatura, deixando trigger/activated ability para gap rastreado separado.
+- Validação:
+  - `test_reviewed_battle_card_rules.py` passou;
+  - `test_battle_analyst_v10_3.py` passou com os novos casos
+    `test_basking_broodscale_enters_as_creature_not_immediate_token_maker` e
+    `test_scavenging_ooze_enters_as_creature_not_immediate_removal`;
+  - após `sync_battle_card_rules_pg.py --apply-pg` e
+    `--apply-sqlite-from-pg`, o replay local
+    `20260618_071541` fechou com:
+    - `decision_findings=0`;
+    - `strategy_findings=0`;
+    - `needs_review_decisions=0`.
+- Reclassificação:
+  - o gap real saiu de "carta ainda entra por regra gerada errada em jogada ao
+    vivo" para "falta executor dedicado para adapt/counter-trigger e
+    graveyard-exile activation", sem impacto no replay básico atual.
+
 ### Atualizacao de ciclo — 2026-06-18 / learned deck priority slice
 
 - O slice seguro de precedência do builder determinístico foi aplicado em
@@ -1859,7 +1891,7 @@ Tasks priorizadas derivadas do estudo:
 | Prioridade | Task | Motivo real | Resultado esperado |
 |---|---|---|---|
 | P1 | Refinar `Urza's Saga` depois do slice minimo ja implementado | Em 2026-06-16 o battle passou a inicializar capitulo/lore, avancar no upkeep, criar Construct no capitulo II e tutorar artefato cmc<=1 seguro no capitulo III antes do SBA. O gap remanescente e de refinamento: sizing dinamico do Construct e generalizacao prudente do fluxo de Saga | Menos ambiguidade medium-risk no Lorehold sem abrir uma engine de Saga agressiva demais |
-| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; `Ashnod's Altar` tambem avancou e ja tem executor contextual minimo para `sacrifice_creature -> mana unlock`. Em 2026-06-18 um slice seguro promoveu mais seis recorrentes para a camada reviewed sem inventar executor novo: `Ancient Tomb` (`curated/verified`), `Fellwar Stone` (`curated/active`), `Mana Vault` (`curated/active`), `Path to Exile` (`curated/active`), `Seething Song` (`curated/verified`) e `Talisman of Conviction` (`curated/active`) | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review`; proximo gap real deixa de ser "falta regra" e passa a ser medir quais outliers residuais ainda justificam promotion conservador |
+| P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; `Ashnod's Altar` tambem avancou e ja tem executor contextual minimo para `sacrifice_creature -> mana unlock`. Em 2026-06-18 um slice seguro promoveu mais seis recorrentes para a camada reviewed sem inventar executor novo: `Ancient Tomb` (`curated/verified`), `Fellwar Stone` (`curated/active`), `Mana Vault` (`curated/active`), `Path to Exile` (`curated/active`), `Seething Song` (`curated/verified`) e `Talisman of Conviction` (`curated/active`). No fechamento seguinte do mesmo dia, `Basking Broodscale` e `Scavenging Ooze` tambem sairam do replay vivo como `needs_review` ao serem promovidas para modelos conservadores de criatura | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review`; proximo gap real deixa de ser "falta regra" e passa a ser medir quais outliers residuais ainda justificam promotion conservador e quais habilidades ativadas/triggers merecem executor proprio |
 | P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
 | P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | WR bruto continua fraco como sinal de verdade | Aprendizado menos enganado por variance e jogos longos |
 | P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |

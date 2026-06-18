@@ -127,6 +127,11 @@ Atualização do slice comparativo ainda em 2026-06-18:
 - replay local `20260618_065705` ficou com `strategy_findings=0` e o auditor
   forense caiu para apenas `2` findings low de `needs_review` em cartas de
   oponente, sem ruído adicional de trace comparativo faltante.
+- no fechamento seguinte do mesmo slice, essas duas cartas residuais de
+  oponente (`Basking Broodscale`, `Scavenging Ooze`) foram promovidas para a
+  camada reviewed como criaturas conservadoras; o replay local
+  `20260618_071541` passou a fechar com `strategy_findings=0`,
+  `decision_findings=0` e `needs_review_decisions=0`.
 
 ### Seleção contextual de land
 

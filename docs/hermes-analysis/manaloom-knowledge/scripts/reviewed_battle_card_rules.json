@@ -19,6 +19,25 @@
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: Sacrifice a creature: Add {C}{C}. Runtime intentionally models this as a passive artifact with reviewed activated-mana metadata, not as free ramp on spell resolution. Full activation needs a dedicated sacrifice-creature mana executor."
   },
+  "Basking Broodscale": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 2,
+      "battle_model_scope": "creature_counter_token_engine_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "counter_token_engine"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Basking Broodscale is a 2/2 creature with Adapt 1 and a trigger that creates an Eldrazi Spawn token whenever one or more +1/+1 counters are put on it. Runtime must model it as a creature permanent first and never create tokens immediately on spell resolution. Adapt and the counter-to-token trigger remain tracked gaps."
+  },
   "Akroma's Will": {
     "effect_json": {
       "cmc": 4.0,
@@ -1052,6 +1071,28 @@
     "confidence": 0.9,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against current mechanics coverage: runtime should treat this as a gain-life plus Lander-token spell, not as a tutor bucket."
+  },
+  "Scavenging Ooze": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 2,
+      "activated_graveyard_exile": true,
+      "activated_gain_life": 1,
+      "activated_add_counter_to_self": 1,
+      "battle_model_scope": "graveyard_hate_creature_activation_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "interaction",
+      "effect": "creature",
+      "subtype": "graveyard_hate_creature"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Scavenging Ooze is a creature permanent with a repeatable graveyard-exile activation that can grow itself and gain life. Runtime must not resolve it as immediate removal on spell cast; it should enter the battlefield as a creature first. The activated exile/counter/life mode remains tracked until a dedicated graveyard-hate creature executor exists."
   },
   "Seething Song": {
     "effect_json": {

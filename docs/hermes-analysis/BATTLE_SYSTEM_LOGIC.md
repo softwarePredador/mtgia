@@ -3,7 +3,7 @@
 > Documento canônico da lógica de simulação de batalha, otimização e validação.
 > Tudo que é usado e pensado em cada etapa do pipeline de análise de deck.
 
-Última atualização: 2026-06-17
+Última atualização: 2026-06-18
 
 Revisão estratégica oficial: 2026-06-11
 (`BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`).
@@ -882,6 +882,14 @@ Risco operacional remanescente:
     ativacao contextual minima para `sacrifice_creature -> mana unlock`, mas o
     custo ainda nao esta coberto por executor generico completo nem por
     heuristica de combo;
+  - no fechamento incremental seguinte do mesmo dia, `Basking Broodscale` e
+    `Scavenging Ooze` deixaram de aparecer em cast ao vivo como
+    `known_cards_canonical_snapshot/needs_review`: ambas foram promovidas para
+    `curated/active` com semantica conservadora de criatura, impedindo
+    degradacao para `token_maker` e `remove_permanent` no resolve do spell;
+  - o gap remanescente dessas duas cartas mudou de natureza: agora e
+    explicitamente "trigger/activated ability ainda sem executor dedicado",
+    nao mais "efeito principal errado no replay";
   - no fechamento incremental de 2026-06-18, `Ancient Tomb`, `Fellwar Stone`,
     `Mana Vault`, `Path to Exile`, `Seething Song` e
     `Talisman of Conviction` deixaram de depender da camada

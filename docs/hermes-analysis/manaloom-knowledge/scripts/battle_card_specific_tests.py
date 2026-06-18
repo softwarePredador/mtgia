@@ -436,6 +436,12 @@ def register_tests(battle, player):
         steamkin = battle.get_card_effect(
             {"name": "Runaway Steam-Kin", "type_line": "Creature — Elemental"}
         )
+        broodscale = battle.get_card_effect(
+            {"name": "Basking Broodscale", "type_line": "Creature — Eldrazi Insect"}
+        )
+        ooze = battle.get_card_effect(
+            {"name": "Scavenging Ooze", "type_line": "Creature — Ooze"}
+        )
 
         assert miscast["effect"] == "counter"
         assert miscast["instant"] is True
@@ -443,6 +449,89 @@ def register_tests(battle, player):
         assert steamkin["effect"] == "creature"
         assert steamkin["effect"] != "ramp_ritual"
         assert steamkin["is_creature_permanent"] is True
+        assert broodscale["effect"] == "creature"
+        assert broodscale["effect"] != "token_maker"
+        assert broodscale["is_creature_permanent"] is True
+        assert ooze["effect"] == "creature"
+        assert ooze["effect"] != "remove_permanent"
+        assert ooze["is_creature_permanent"] is True
+
+    def test_basking_broodscale_enters_as_creature_not_immediate_token_maker():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Falco")
+        card = {
+            "name": "Basking Broodscale",
+            "cmc": 2,
+            "type_line": "Creature — Eldrazi Insect",
+        }
+
+        battle.apply_effect_immediate(active, [], card, 3, random.Random(109))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(
+            permanent.get("name") == "Basking Broodscale"
+            and permanent.get("effect") == "creature"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert not any(
+            permanent.get("token_created_by") == "Basking Broodscale"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert any(
+            event == "creature_to_battlefield"
+            and data.get("card") == "Basking Broodscale"
+            for event, data in events
+        )
+        assert not any(
+            event == "token_created" and data.get("card") == "Basking Broodscale"
+            for event, data in events
+        )
+
+    def test_scavenging_ooze_enters_as_creature_not_immediate_removal():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Falco")
+        opponent = player("Opponent")
+        target = {
+            "name": "Value Creature",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        opponent.battlefield = [target]
+        opponent.graveyard = [
+            {"name": "Dead Card", "effect": "creature", "type_line": "Creature"}
+        ]
+        card = {
+            "name": "Scavenging Ooze",
+            "cmc": 2,
+            "type_line": "Creature — Ooze",
+        }
+
+        battle.apply_effect_immediate(active, [opponent], card, 4, random.Random(110))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(
+            permanent.get("name") == "Scavenging Ooze"
+            and permanent.get("effect") == "creature"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert target in opponent.battlefield
+        assert opponent.graveyard[0]["name"] == "Dead Card"
+        assert any(
+            event == "creature_to_battlefield"
+            and data.get("card") == "Scavenging Ooze"
+            for event, data in events
+        )
+        assert not any(
+            event == "removal_resolved" and data.get("card") == "Scavenging Ooze"
+            for event, data in events
+        )
 
     def test_mox_diamond_discards_land_when_it_unlocks_commander():
         events = []
@@ -1873,6 +1962,8 @@ def register_tests(battle, player):
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
+        test_basking_broodscale_enters_as_creature_not_immediate_token_maker,
+        test_scavenging_ooze_enters_as_creature_not_immediate_removal,
         test_mox_diamond_discards_land_when_it_unlocks_commander,
         test_mox_diamond_does_not_spend_last_land_without_payoff,
         test_mox_diamond_does_not_claim_unaffordable_commander_payoff,
