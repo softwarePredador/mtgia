@@ -18,6 +18,8 @@ REPORT_DIR="${HERMES_DOCS_SYNC_REPORT_DIR:-/opt/data/artifacts/hermes_docs_branc
 PUSH="${HERMES_DOCS_SYNC_PUSH:-1}"
 DRY_RUN="${HERMES_DOCS_SYNC_DRY_RUN:-0}"
 ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-1}"
+GIT_USER_NAME="${HERMES_GIT_USER_NAME:-Hermes Agent}"
+GIT_USER_EMAIL="${HERMES_GIT_USER_EMAIL:-hermes-agent@local.invalid}"
 
 mkdir -p "$STATE_DIR" "$REPORT_DIR"
 
@@ -64,6 +66,12 @@ trap cleanup EXIT
 
 cd "$REPO"
 git config --global --add safe.directory "$REPO" >/dev/null 2>&1 || true
+if [[ -z "$(git config --get user.name || true)" ]]; then
+  git config --global user.name "$GIT_USER_NAME"
+fi
+if [[ -z "$(git config --get user.email || true)" ]]; then
+  git config --global user.email "$GIT_USER_EMAIL"
+fi
 
 if [[ -n "$(git status --porcelain)" ]]; then
   write_report "blocked_dirty_worktree" "The Hermes workspace has uncommitted changes. Refusing to checkout or merge before an audit."
