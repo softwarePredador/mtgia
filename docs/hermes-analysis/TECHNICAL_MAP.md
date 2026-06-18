@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-17)
+## Achados do audit de estrutura (atualizado 2026-06-18)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -229,7 +229,7 @@ mtgia/
   passam por `basic_land_utils.dart`; listas inline fora dele seguem gap estreito.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-17 03:00 UTC no checkout local `b53295fe`. O auditor textual executou
+  2026-06-18 03:00 UTC no checkout local `94f73400`. O auditor textual executou
   com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
   de `rg`, leitura direta e triagem do delta. Desde a rodada anterior de
