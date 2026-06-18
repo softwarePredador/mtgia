@@ -160,11 +160,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 - `BATTLE_GENERATOR_LOREHOLD_TRUTH_STUDY_2026-06-16.md`
   - Consolidacao canônica do estado real do battle simulator, do generator e do
-    caso Lorehold.
+  caso Lorehold.
   - Use quando a pergunta for "o que ja esta suficientemente certo?" versus
-    "o que ainda precisa virar dado util para criacao/optimize?".
+  "o que ainda precisa virar dado util para criacao/optimize?".
   - Mantem a separacao entre laboratorio auditavel, fallback curado e verdade
     de produto/backend.
+
+- `NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`
+  - Contrato da rotina geral de cartas novas em `manaloom-ops`.
+  - Use para entender o pipeline `candidate_review -> card_data_gap_review ->
+    battle_rule_review_queue`.
+  - Guardrail central: `needs_data` e `needs_rule_review` viram artefato/fila,
+    nao regra verificada, nao swap automatico e nao write em PostgreSQL.
 
 ## Fonte de verdade atual
 

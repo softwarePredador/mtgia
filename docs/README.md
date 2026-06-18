@@ -49,9 +49,12 @@ as fontes canônicas abaixo.
      `auto-sync-learned-decks`, `master-optimizer-preflight`) para runtime
      server-owned.
 13. `docs/hermes-analysis/NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`
-   - contrato da rotina geral `manaloom_new_card_candidate_review`: detecção de
-     cartas novas/alteradas por comandante, report-only, sem LLM, sem auto-apply
-     e com SQLite apenas como cache operacional.
+   - contrato da rotina geral `manaloom_new_card_candidate_review` e de seus
+     consumers `manaloom_card_data_gap_review` /
+     `manaloom_battle_rule_review_queue`: detecção de cartas novas/alteradas,
+     classificação de lacunas de dados, drafts `needs_review` de battle rules,
+     report-only, sem LLM, sem auto-apply e com SQLite apenas como cache
+     operacional.
 14. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
 15. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`

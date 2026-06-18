@@ -384,6 +384,7 @@ def evaluate_card_for_commander(card: CardRecord, commander: CommanderTarget) ->
         "type_line": card.type_line,
         "mana_cost": card.mana_cost,
         "color_identity": card.color_identity,
+        "oracle_text": card.oracle_text,
         "set_name": card.set_name,
         "release_date": card.release_date,
         "legalities": card.legalities,

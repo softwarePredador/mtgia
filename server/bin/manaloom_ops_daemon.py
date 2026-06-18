@@ -78,6 +78,12 @@ def _base_env() -> dict[str, str]:
             "HERMES_MANA_BASE_REPORT": str(
                 ARTIFACT_DIR / "hermes_mana_base_validator/latest_mana_base_validation_report.md"
             ),
+            "MANALOOM_CARD_DATA_GAP_REVIEW_DIR": str(
+                ARTIFACT_DIR / "card_data_gap_review"
+            ),
+            "MANALOOM_BATTLE_RULE_REVIEW_QUEUE_DIR": str(
+                ARTIFACT_DIR / "battle_rule_review_queue"
+            ),
             "HERMES_CRON_JOBS_JSON": str(JOBS_JSON),
             "HERMES_CRON_OUTPUT_DIR": str(CRON_OUTPUT_DIR),
             "HERMES_SCRIPTS_DIR": str(REPO_ROOT / "server/bin"),
@@ -212,6 +218,20 @@ JOBS = [
         lockfile=LOCK_DIR / "manaloom_new_card_candidate_review.lock",
         command='cd "$MTGIA_HOME" && ./server/bin/manaloom_new_card_candidate_review.sh',
         script_name="manaloom_new_card_candidate_review.sh",
+    ),
+    Job(
+        name="manaloom_card_data_gap_review",
+        schedule=os.environ.get("MANALOOM_CARD_DATA_GAP_REVIEW_CRON", "50 */6 * * *"),
+        lockfile=LOCK_DIR / "manaloom_card_data_gap_review.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/manaloom_card_data_gap_review.sh',
+        script_name="manaloom_card_data_gap_review.sh",
+    ),
+    Job(
+        name="manaloom_battle_rule_review_queue",
+        schedule=os.environ.get("MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON", "55 */6 * * *"),
+        lockfile=LOCK_DIR / "manaloom_battle_rule_review_queue.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/manaloom_battle_rule_review_queue.sh',
+        script_name="manaloom_battle_rule_review_queue.sh",
     ),
     Job(
         name="auto_promote_learned_decks",
@@ -393,6 +413,8 @@ def _infer_status_from_output(path: Path) -> str | None:
         "nenhum deck promovido elegivel encontrado.",
         "totals promoted=",
         "manaloom_new_card_candidate_review",
+        "manaloom_card_data_gap_review",
+        "manaloom_battle_rule_review_queue",
         "# mana base validation report",
         "## enabled jobs",
     )

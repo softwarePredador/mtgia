@@ -216,6 +216,8 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "PULL_LEARNING_EVENTS_CRON": "0 * * * *",
             "AUTO_SYNC_LEARNED_DECKS_CRON": "0 */2 * * *",
             "MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON": "35 */6 * * *",
+            "MANALOOM_CARD_DATA_GAP_REVIEW_CRON": "50 */6 * * *",
+            "MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON": "55 */6 * * *",
             "AUTO_PROMOTE_LEARNED_DECKS_CRON": "30 */6 * * *",
             "MASTER_OPTIMIZER_PREFLIGHT_CRON": "15 * * * *",
             "MANALOOM_KNOWLEDGE_IMPORT_CRON": "20 */12 * * *",

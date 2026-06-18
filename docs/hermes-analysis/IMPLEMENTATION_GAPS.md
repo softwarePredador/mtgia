@@ -53,6 +53,27 @@
   recomendacao testavel.
 - Documento operacional:
   `NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`.
+- Follow-up implementado no mesmo ciclo:
+  - `manaloom_card_data_gap_review` consome `needs_data`, agrega por carta e
+    gera ações report-only para sync de legalidade/oracle/identidade;
+  - `manaloom_battle_rule_review_queue` consome
+    `new_card_battle_rule_review_queue`, agrega por carta e gera drafts
+    `proposed_status=needs_review`, com famílias de efeito, risco e cenário de
+    teste sugerido;
+  - nenhum draft é promovido para `verified`;
+  - nenhum comportamento duro é executado no battle;
+  - nenhum write em PostgreSQL acontece nesses consumers.
+- Rodada de massa atualizada (`msh,msc,mar`, 30 comandantes, 166 cartas):
+  - candidate review: `4980` reviews, `needs_data=2006`,
+    `needs_rule_review=49`;
+  - data gap review: `150` cartas únicas, todas classificadas como
+    `needs_legality_sync` nesta massa;
+  - battle rule queue: `49` ocorrências agregadas em `5` drafts de regra.
+- Reclassificação de prioridade:
+  - antes de discutir swaps Marvel/Lorehold, resolver legalidade Commander dos
+    150 cards em `needs_legality_sync`;
+  - depois, revisar os 5 drafts de battle rule com teste focado;
+  - só então rodar scorecard/optimizer.
 
 ### Atualizacao de ciclo — 2026-06-18 / local replay cache truth
 

@@ -16,11 +16,21 @@ Patch aplicado:
 
 - Criado `server/bin/manaloom_new_card_candidate_review.py`.
 - Criado wrapper `server/bin/manaloom_new_card_candidate_review.sh`.
+- Criado `server/bin/manaloom_card_data_gap_review.py` e wrapper.
+- Criado `server/bin/manaloom_battle_rule_review_queue.py` e wrapper.
 - Registrado no `server/bin/manaloom_ops_daemon.py` como:
   - `name=manaloom_new_card_candidate_review`;
   - `schedule=35 */6 * * *`;
   - override por `MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON`.
+- Registrados os consumers:
+  - `name=manaloom_card_data_gap_review`;
+  - `schedule=50 */6 * * *`;
+  - override por `MANALOOM_CARD_DATA_GAP_REVIEW_CRON`;
+  - `name=manaloom_battle_rule_review_queue`;
+  - `schedule=55 */6 * * *`;
+  - override por `MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON`.
 - Criado teste `server/test/manaloom_new_card_candidate_review_test.py`.
+- Criado teste `server/test/manaloom_review_queue_consumers_test.py`.
 - Criada documentacao operacional em
   `docs/hermes-analysis/NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`.
 
@@ -30,6 +40,11 @@ Contrato operacional:
 - Nao usa LLM.
 - Nao escreve em PostgreSQL.
 - Nao altera decks.
+- `needs_data` vira acao recomendada em `card_data_gap_review`.
+- `needs_rule_review` vira draft `proposed_status=needs_review` em
+  `battle_rule_review_queue`.
+- Nenhum draft vira `verified` sem fonte oficial, teste focado e replay/auditoria
+  sem finding critico.
 - SQLite `knowledge.db` guarda apenas historico operacional/fila/checkpoint.
 - Lorehold entra como controle padrao, mas nao e escopo exclusivo.
 - Funcoes multiplas por carta sao preservadas como arrays.

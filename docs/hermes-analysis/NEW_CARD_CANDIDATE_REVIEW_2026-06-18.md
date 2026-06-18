@@ -22,8 +22,13 @@ Contrato:
 
 - `server/bin/manaloom_new_card_candidate_review.py`
 - `server/bin/manaloom_new_card_candidate_review.sh`
+- `server/bin/manaloom_card_data_gap_review.py`
+- `server/bin/manaloom_card_data_gap_review.sh`
+- `server/bin/manaloom_battle_rule_review_queue.py`
+- `server/bin/manaloom_battle_rule_review_queue.sh`
 - `server/bin/manaloom_ops_daemon.py`
 - `server/test/manaloom_new_card_candidate_review_test.py`
+- `server/test/manaloom_review_queue_consumers_test.py`
 
 ## Cron
 
@@ -33,6 +38,18 @@ Job registrado:
 name=manaloom_new_card_candidate_review
 schedule=35 */6 * * *
 env override=MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON
+```
+
+Consumers registrados:
+
+```text
+name=manaloom_card_data_gap_review
+schedule=50 */6 * * *
+env override=MANALOOM_CARD_DATA_GAP_REVIEW_CRON
+
+name=manaloom_battle_rule_review_queue
+schedule=55 */6 * * *
+env override=MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON
 ```
 
 Wrapper:
@@ -97,8 +114,47 @@ No SQLite:
 - `new_card_candidate_reviews`
 - `new_card_battle_rule_review_queue`
 - `new_card_candidate_review_checkpoints`
+- `new_card_data_gap_review_runs`
+- `new_card_data_gap_review_items`
+- `new_card_battle_rule_review_runs`
+- `new_card_battle_rule_review_drafts`
 
 Essas tabelas são cache/evidência operacional. Não são fonte final do produto.
+
+## Pipeline Automático Seguro
+
+Fluxo atual:
+
+```text
+manaloom_new_card_candidate_review
+  -> decision=needs_data
+      -> manaloom_card_data_gap_review
+  -> decision=needs_rule_review
+      -> manaloom_battle_rule_review_queue
+```
+
+`manaloom_card_data_gap_review` agrega ocorrências `needs_data` por carta e
+gera ações recomendadas, por exemplo:
+
+- `refresh_commander_legality`;
+- `refresh_card_legalities`;
+- `refresh_oracle_text`;
+- `resolve_oracle_id`;
+- `defer_battle_rule_until_data_complete`.
+
+`manaloom_battle_rule_review_queue` agrega a fila
+`new_card_battle_rule_review_queue` por carta e gera drafts:
+
+- `proposed_status=needs_review`;
+- `draft_rule_key`;
+- famílias de efeito inferidas por roles e `oracle_text`;
+- riscos;
+- cenário de teste sugerido.
+
+Esses drafts **não** são escritos em `card_battle_rules`, não viram
+`verified`, e não executam comportamento duro no battle. A promoção ainda exige
+fonte oficial/ruling, teste focado, replay/auditoria e ausência de finding
+crítico.
 
 ## Decisões
 
@@ -147,12 +203,19 @@ O script já expõe:
 ```bash
 python3 -m py_compile \
   server/bin/manaloom_new_card_candidate_review.py \
+  server/bin/manaloom_card_data_gap_review.py \
+  server/bin/manaloom_battle_rule_review_queue.py \
   server/bin/manaloom_ops_daemon.py \
-  server/test/manaloom_new_card_candidate_review_test.py
+  server/test/manaloom_new_card_candidate_review_test.py \
+  server/test/manaloom_review_queue_consumers_test.py
 
-bash -n server/bin/manaloom_new_card_candidate_review.sh
+bash -n \
+  server/bin/manaloom_new_card_candidate_review.sh \
+  server/bin/manaloom_card_data_gap_review.sh \
+  server/bin/manaloom_battle_rule_review_queue.sh
 
 python3 server/test/manaloom_new_card_candidate_review_test.py
+python3 server/test/manaloom_review_queue_consumers_test.py
 ```
 
 Dry-run real read-only contra PostgreSQL configurado:
@@ -184,13 +247,55 @@ Interpretação: o catálogo recente já é visível, mas parte relevante ainda
 precisa de dados completos de legalidade/oracle/tags antes de virar candidato
 real. Isso é uma pendência de dados, não motivo para aplicar swap automático.
 
+Rodada de massa atualizada com 30 comandantes e 166 cartas (`msh,msc,mar`):
+
+```json
+{
+  "candidate_review": {
+    "review_count": 4980,
+    "decisions": {
+      "backlog": 48,
+      "ignore": 2877,
+      "needs_data": 2006,
+      "needs_rule_review": 49
+    },
+    "hermes_wake_reasons": ["rule_review_threshold"]
+  },
+  "card_data_gap_review": {
+    "gap_rows": 2006,
+    "unique_cards": 150,
+    "decisions": {"needs_legality_sync": 150}
+  },
+  "battle_rule_review_queue": {
+    "queue_rows": 49,
+    "draft_count": 5,
+    "confidence_counts": {"low": 5}
+  }
+}
+```
+
+Leitura correta dessa rodada:
+
+- o principal bloqueio de dados em Marvel nao é oracle text ausente no payload
+  atual, e sim legalidade Commander não preenchida/confirmada para 150 cartas;
+- a fila de battle rule reduziu 49 ocorrências por comandante para 5 cartas
+  únicas em draft;
+- exemplos de drafts: `Iron Man, Titan of Innovation`, `Black Panther,
+  Wakandan King`, `Storm, Force of Nature`, `Counterspell`, `Seize the Day`;
+- `Seize the Day` agora gera família `extra_combat_phase` e
+  `graveyard_recast_replacement`, mas permanece `needs_review`.
+
 ## Próximos Passos
 
 1. Rodar a rotina no `manaloom-ops` após deploy e verificar
    `latest_report.md`.
 2. Se o volume de `needs_data` em `msh/msc/mar` continuar alto, priorizar sync
    de legalidades/oracle/tags desses sets.
-3. Se surgirem candidatos `test`, rodar scorecard/battle específico antes de
+3. Rodar `manaloom_card_data_gap_review` após cada candidate review e usar a
+   saída para priorizar sync de legalidades/dados.
+4. Rodar `manaloom_battle_rule_review_queue` após cada candidate review e usar
+   os drafts para criar testes/regra, sem promoção automática.
+5. Se surgirem candidatos `test`, rodar scorecard/battle específico antes de
    qualquer recomendação para geração ou optimize.
-4. Se surgirem muitos `needs_rule_review`, criar lote de revisão em
-   `card_battle_rules` no PostgreSQL e sincronizar para Hermes SQLite.
+6. Promover regra para `card_battle_rules` apenas depois de fonte confiável,
+   teste focado e replay/auditoria sem finding crítico.
