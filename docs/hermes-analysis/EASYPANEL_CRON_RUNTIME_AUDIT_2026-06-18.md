@@ -272,6 +272,9 @@ Correcao aplicada:
   `GITHUB_TOKEN`/`GH_TOKEN` existe no container, reporta
   `would_merge_push_token_missing` sem tentar um push interativo que travaria
   a cron ate timeout;
+- a mesma rotina remove lock antigo controlado por
+  `HERMES_DOCS_SYNC_STALE_LOCK_SECONDS` antes de executar, evitando que um
+  timeout anterior transforme as proximas rodadas em falso `skipped_locked`;
 - a rotina continua bloqueando tracked dirty worktree antes de qualquer
   checkout;
 - untracked files continuam sendo movidos para quarentena antes do sync;

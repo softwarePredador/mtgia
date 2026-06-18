@@ -19,6 +19,7 @@ REPORT_DIR="${HERMES_DOCS_SYNC_REPORT_DIR:-/opt/data/artifacts/hermes_docs_branc
 PUSH="${HERMES_DOCS_SYNC_PUSH:-1}"
 DRY_RUN="${HERMES_DOCS_SYNC_DRY_RUN:-0}"
 ALLOW_ROOT="${HERMES_DOCS_SYNC_ALLOW_ROOT:-1}"
+STALE_LOCK_SECONDS="${HERMES_DOCS_SYNC_STALE_LOCK_SECONDS:-900}"
 GIT_USER_NAME="${HERMES_GIT_USER_NAME:-Hermes Agent}"
 GIT_USER_EMAIL="${HERMES_GIT_USER_EMAIL:-hermes-agent@local.invalid}"
 GIT_PUSH_TOKEN="${HERMES_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN:-}}}"
@@ -111,11 +112,50 @@ if [[ "${EUID:-$(id -u)}" == "0" && "$ALLOW_ROOT" != "1" ]]; then
 fi
 
 if ! mkdir "$lock_dir" 2>/dev/null; then
+  stale_lock="$(
+    python3 - "$lock_dir" "$STALE_LOCK_SECONDS" <<'PY'
+from __future__ import annotations
+
+import os
+import sys
+import time
+from pathlib import Path
+
+path = Path(sys.argv[1])
+threshold = int(sys.argv[2])
+try:
+    age = time.time() - path.stat().st_mtime
+except FileNotFoundError:
+    print("missing")
+    raise SystemExit(0)
+print("stale" if age >= threshold else "fresh")
+PY
+  )"
+  if [[ "$stale_lock" == "stale" ]]; then
+    rm -rf "$lock_dir"
+    if mkdir "$lock_dir" 2>/dev/null; then
+      echo "removed stale docs branch sync lock: ${lock_dir}"
+    else
+      write_report "skipped_locked" "Another docs branch sync is already running after stale lock cleanup attempt: ${lock_dir}"
+      exit 0
+    fi
+  else
+    write_report "skipped_locked" "Another docs branch sync is already running: ${lock_dir}"
+    exit 0
+  fi
+fi
+
+if [[ ! -f "$lock_dir/pid" ]]; then
+  echo "$$" > "$lock_dir/pid" 2>/dev/null || true
+fi
+
+if [[ ! -d "$lock_dir" ]]; then
   write_report "skipped_locked" "Another docs branch sync is already running: ${lock_dir}"
   exit 0
 fi
 
 cleanup() {
+  rm -f "$lock_dir/pid" 2>/dev/null || true
   rmdir "$lock_dir" 2>/dev/null || true
 }
 trap cleanup EXIT

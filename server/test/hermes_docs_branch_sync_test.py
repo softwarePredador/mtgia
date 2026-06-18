@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 import subprocess
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -260,6 +261,28 @@ class HermesDocsBranchSyncTest(unittest.TestCase):
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("status: would_merge_push_token_missing", report_text)
             self.assertIn("HERMES_GITHUB_TOKEN", report_text)
+
+    def test_recovers_stale_lock_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, work = self._seed_remote(root, advance_master=True)
+            env = self._script_env(root, work)
+            env["HERMES_DOCS_SYNC_DRY_RUN"] = "1"
+            env["HERMES_DOCS_SYNC_PUSH"] = "0"
+            env["HERMES_DOCS_SYNC_STALE_LOCK_SECONDS"] = "1"
+            lock_dir = root / "state" / "docs_branch_sync.lock"
+            lock_dir.mkdir(parents=True)
+            old = time.time() - 60
+            os.utime(lock_dir, (old, old))
+
+            result = _run(["bash", str(SCRIPT)], cwd=work, env=env)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertEqual(_git_output(work, "branch", "--show-current"), "master")
+            self.assertFalse(lock_dir.exists())
+
+            report = max((root / "reports").glob("docs_branch_sync_*.md"))
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("status: would_merge", report_text)
 
     def test_blocks_tracked_modifications(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
