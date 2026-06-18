@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-18 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-18 15:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -337,8 +337,8 @@ de utilidade de carta.
   continua sem chamada, mas `server/bin/export_hermes_learned_deck.py` chama sua
   propria versao e nao deve ser citado como funcao morta.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  em 2026-06-17 15:00 UTC no checkout local `c33e15ba`. Desde a ultima rodada
-  focada (`41e681a0..HEAD`), nao houve delta de codigo de produto, setup DB,
+  em 2026-06-18 15:00 UTC no checkout local `024903d6`. Desde a ultima rodada
+  focada (`c33e15ba..HEAD`), nao houve delta de codigo de produto, setup DB,
   testes, API contract, contexto, manual ou scripts Hermes no recorte usado para
   classificar tabelas. Nao houve novo achado P1/P2 app-facing. As claims antigas
   contra `deck_matchups` e `deck_weakness_reports` continuam stale: ambas tem
