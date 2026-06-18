@@ -247,6 +247,13 @@ JOBS = [
         script_name="manaloom_battle_rule_review_queue.sh",
     ),
     Job(
+        name="manaloom_battle_rule_promotion_gate",
+        schedule=os.environ.get("MANALOOM_BATTLE_RULE_PROMOTION_GATE_CRON", "58 */6 * * *"),
+        lockfile=LOCK_DIR / "manaloom_battle_rule_promotion_gate.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/manaloom_battle_rule_promotion_gate.sh',
+        script_name="manaloom_battle_rule_promotion_gate.sh",
+    ),
+    Job(
         name="auto_promote_learned_decks",
         schedule=os.environ.get("AUTO_PROMOTE_LEARNED_DECKS_CRON", "30 */6 * * *"),
         lockfile=LOCK_DIR / "auto_promote_learned_decks.lock",
@@ -435,6 +442,7 @@ def _infer_status_from_output(path: Path) -> str | None:
         "manaloom_new_card_candidate_review",
         "manaloom_card_data_gap_review",
         "manaloom_battle_rule_review_queue",
+        "manaloom_battle_rule_promotion_gate",
         "# mana base validation report",
         "## enabled jobs",
     )

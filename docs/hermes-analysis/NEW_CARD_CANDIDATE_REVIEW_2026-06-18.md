@@ -26,6 +26,8 @@ Contrato:
 - `server/bin/manaloom_card_data_gap_review.sh`
 - `server/bin/manaloom_battle_rule_review_queue.py`
 - `server/bin/manaloom_battle_rule_review_queue.sh`
+- `server/bin/manaloom_battle_rule_promotion_gate.py`
+- `server/bin/manaloom_battle_rule_promotion_gate.sh`
 - `server/bin/sync_card_legalities_from_scryfall.py`
 - `server/bin/manaloom_ops_daemon.py`
 - `server/test/manaloom_new_card_candidate_review_test.py`
@@ -56,6 +58,10 @@ env override=MANALOOM_CARD_DATA_GAP_REVIEW_CRON
 name=manaloom_battle_rule_review_queue
 schedule=55 */6 * * *
 env override=MANALOOM_BATTLE_RULE_REVIEW_QUEUE_CRON
+
+name=manaloom_battle_rule_promotion_gate
+schedule=58 */6 * * *
+env override=MANALOOM_BATTLE_RULE_PROMOTION_GATE_CRON
 ```
 
 Wrapper:
@@ -152,6 +158,8 @@ No SQLite:
 - `new_card_data_gap_review_items`
 - `new_card_battle_rule_review_runs`
 - `new_card_battle_rule_review_drafts`
+- `new_card_battle_rule_promotion_gate_runs`
+- `new_card_battle_rule_promotion_gate_items`
 
 Essas tabelas são cache/evidência operacional. Não são fonte final do produto.
 
@@ -206,6 +214,44 @@ Esses drafts **não** são escritos em `card_battle_rules`, não viram
 fonte oficial/ruling, teste focado, replay/auditoria e ausência de finding
 crítico.
 
+`manaloom_battle_rule_promotion_gate` consome os drafts e decide apenas se cada
+um continua bloqueado ou se está elegível para **promoção manual**. Por padrão,
+sem arquivo de evidência explícito, o gate bloqueia por:
+
+- falta de revisão de fonte oficial;
+- falta de teste focado;
+- falta de replay/auditoria;
+- findings críticos/high;
+- oracle/rule payload insuficiente.
+
+Mesmo quando retorna `eligible_for_manual_verified_promotion`, o gate continua
+report-only:
+
+- não escreve em PostgreSQL;
+- não muda `card_battle_rules`;
+- não muda `proposed_status`;
+- não libera comportamento duro no battle;
+- exige revisão humana ou etapa posterior explicitamente aprovada.
+
+Formato esperado para evidência opcional:
+
+```json
+{
+  "by_draft_rule_key": {
+    "card_name__role__draft_v1": {
+      "official_source_reviewed": true,
+      "official_sources": ["Scryfall oracle text"],
+      "focused_test_passed": true,
+      "focused_test_refs": ["server/test/..."],
+      "replay_audit_passed": true,
+      "replay_audit_refs": ["server/test/artifacts/..."],
+      "critical_findings": 0,
+      "high_findings": 0
+    }
+  }
+}
+```
+
 ## Relatório Por Comandante
 
 Cada rodada grava um snapshot por comandante com:
@@ -230,9 +276,11 @@ Antes de usar candidatos no optimize/generate:
 2. Rodar `manaloom_card_data_gap_review` e zerar `needs_data` material.
 3. Rodar `manaloom_battle_rule_review_queue` para candidatos
    `needs_rule_review`.
-4. Promover para `card_battle_rules`/`card_function_tags` somente após fonte
+4. Rodar `manaloom_battle_rule_promotion_gate` para provar que cada draft ainda
+   está bloqueado ou elegível para promoção manual.
+5. Promover para `card_battle_rules`/`card_function_tags` somente após fonte
    oficial, teste focado e replay/auditoria.
-5. Usar o relatório por comandante para escolher candidatos de scorecard; não
+6. Usar o relatório por comandante para escolher candidatos de scorecard; não
    aplicar swap automático.
 
 ## Decisões
