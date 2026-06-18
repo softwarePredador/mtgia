@@ -49,6 +49,7 @@ python3 "$SCRIPT_DIR/sync_pg_target_deck_to_hermes.py" \
 if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
   canonical_log="$ARTIFACT_DIR/lorehold_canonical_preflight_$(date -u +%Y%m%d_%H%M%S).log"
   python3 "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+    --db "$SCRIPT_DIR/knowledge.db" \
     --apply-local-sqlite | tee "$canonical_log"
 fi
 
@@ -71,7 +72,10 @@ python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
   --report "$battle_rules_report"
 
 preflight_log="$ARTIFACT_DIR/master_optimizer_preflight_$(date -u +%Y%m%d_%H%M%S).log"
-python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report | tee "$preflight_log"
+python3 "$SCRIPT_DIR/master_optimizer_loop.py" \
+  --db "$SCRIPT_DIR/knowledge.db" \
+  --preflight \
+  --report | tee "$preflight_log"
 
 latest_report="$(ls -1t "$REPORT_DIR"/master_optimizer_preflight_*.md 2>/dev/null | head -1 || true)"
 if [[ -n "$latest_report" ]]; then

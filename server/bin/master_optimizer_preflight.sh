@@ -43,6 +43,7 @@ target_deck_log="$ARTIFACT_DIR/target_deck_sync_preflight_$(date -u +%Y%m%d_%H%M
 if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
   canonical_log="$ARTIFACT_DIR/lorehold_canonical_preflight_$(date -u +%Y%m%d_%H%M%S).log"
   "$PYTHON_BIN" "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+    --db "$SQLITE_DB" \
     --apply-local-sqlite | tee "$canonical_log"
 fi
 
@@ -65,7 +66,10 @@ battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_$(date -u +%Y%m%
   --report "$battle_rules_report"
 
 preflight_log="$ARTIFACT_DIR/master_optimizer_preflight_$(date -u +%Y%m%d_%H%M%S).log"
-"$PYTHON_BIN" "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report | tee "$preflight_log"
+"$PYTHON_BIN" "$SCRIPT_DIR/master_optimizer_loop.py" \
+  --db "$SQLITE_DB" \
+  --preflight \
+  --report | tee "$preflight_log"
 
 latest_report="$(ls -1t "$REPORT_DIR"/master_optimizer_preflight_*.md 2>/dev/null | head -1 || true)"
 if [[ -n "$latest_report" ]]; then
