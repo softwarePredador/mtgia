@@ -235,6 +235,17 @@
   - `expected_payoff_reason`;
   - motivo comparativo de `pass/no-action` quando houver múltiplas linhas
     principais jogáveis e o runtime optar por segurar recursos.
+- Atualização 2026-06-18:
+  - o trace já grava `chosen_option_score`, `available_option_scores`,
+    `rejected_option_scores`, `best_available_option_score`,
+    `best_rejected_option_score`, `score_gap_vs_best_rejected` e
+    `expected_payoff_reason`;
+  - `pass_no_action` passou a pontuar as alternativas do trace;
+  - casts genéricos de `ramp`, `creature` e `spell` normal passaram a propagar
+    score comparativo quando o ranking local já existe;
+  - replay local `20260618_065705` fechou com `strategy_findings=0`,
+    `critical/high/medium=0` e só `2` findings low remanescentes vindos de
+    `needs_review` em cartas de oponente, não de ausência de comparativo.
 - Validação:
   - corpus pequeno com zero findings `critical/high` no auditor forense;
   - auditor estratégico apontando decisões sem justificativa comparativa.

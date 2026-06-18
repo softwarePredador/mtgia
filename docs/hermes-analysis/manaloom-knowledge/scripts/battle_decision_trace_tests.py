@@ -15,6 +15,12 @@ def register_tests(battle, replay_auditor):
                 "type_line": "Instant",
                 "effect": "deal_damage",
             }
+            helix = {
+                "name": "Lightning Helix",
+                "cmc": 2,
+                "type_line": "Instant",
+                "effect": "deal_damage",
+            }
             battle.emit_decision_trace(
                 decision_type="cast_spell",
                 player=active,
@@ -22,15 +28,19 @@ def register_tests(battle, replay_auditor):
                 phase="precombat_main",
                 available_options=[
                     battle.decision_card_option(bolt, {"effect": "deal_damage"}, score=25),
+                    battle.decision_card_option(helix, {"effect": "deal_damage"}, score=19),
                 ],
                 chosen_option=battle.decision_card_option(bolt, {"effect": "deal_damage"}, score=25),
-                rejected_options=[],
+                rejected_options=[
+                    battle.decision_card_option(helix, {"effect": "deal_damage"}, score=19),
+                ],
                 score_components={"threat_score": 25, "cmc": 1},
                 rule_source="known_cards_manual",
                 rule_status="verified",
                 confidence="medium",
                 expected_benefit_score=25,
                 actual_outcome="cast_to_stack",
+                expected_payoff_reason="remove blocker and push damage",
             )
         finally:
             battle.DECISION_TRACE_HANDLER = None
@@ -42,6 +52,12 @@ def register_tests(battle, replay_auditor):
         assert trace["chosen_option"]["card"] == "Lightning Bolt"
         assert trace["available_options"][0]["card"] == "Lightning Bolt"
         assert trace["score_components"]["threat_score"] == 25
+        assert trace["chosen_option_score"] == 25.0
+        assert trace["best_rejected_option_score"] == 19.0
+        assert trace["score_gap_vs_best_rejected"] == 6.0
+        assert trace["expected_payoff_reason"] == "remove blocker and push damage"
+        assert trace["available_option_scores"][0]["score"] == 25.0
+        assert trace["rejected_option_scores"][0]["score"] == 19.0
         assert replay_auditor.audit_decision_traces(traces) == []
 
     def test_decision_trace_auditor_flags_missing_score_and_duplicate_id():
@@ -106,8 +122,38 @@ def register_tests(battle, replay_auditor):
 
         assert any("Chosen option is not present" in finding["finding"] for finding in findings)
 
+    def test_decision_trace_auditor_flags_missing_comparative_fields_for_multi_option_choice():
+        decisions = [
+            {
+                "decision_id": "trace-2",
+                "replay_id": "trace_test",
+                "turn": 4,
+                "phase": "precombat_main",
+                "player": "A",
+                "decision_type": "cast_spell",
+                "available_options": [
+                    {"card": "Arcane Signet", "action": "cast"},
+                    {"card": "Talisman of Conviction", "action": "cast"},
+                ],
+                "chosen_option": {"card": "Arcane Signet", "action": "cast"},
+                "rejected_options": [{"card": "Talisman of Conviction", "action": "cast"}],
+                "score_components": {"threat_score": 15},
+                "rule_source": "known_cards_manual",
+                "rule_status": "verified",
+                "confidence": "medium",
+                "expected_benefit_score": 15,
+            }
+        ]
+
+        findings = replay_auditor.audit_decision_traces(decisions)
+
+        assert any("missing chosen_option_score" in finding["finding"] for finding in findings)
+        assert any("missing available_option_scores" in finding["finding"] for finding in findings)
+        assert any("missing rejected_option_scores" in finding["finding"] for finding in findings)
+
     return [
         test_emit_decision_trace_includes_chosen_option_and_scores,
         test_decision_trace_auditor_flags_missing_score_and_duplicate_id,
         test_decision_trace_auditor_flags_chosen_outside_options,
+        test_decision_trace_auditor_flags_missing_comparative_fields_for_multi_option_choice,
     ]

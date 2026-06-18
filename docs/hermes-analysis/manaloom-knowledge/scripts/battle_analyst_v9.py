@@ -229,6 +229,48 @@ def _option_identity(option):
     return str(option.get("card") or option.get("action") or option)
 
 
+def _option_score(option, fallback=None):
+    if not isinstance(option, dict):
+        return fallback
+    value = option.get("score", fallback)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _comparative_option_scores(chosen, options, rejected_options, expected_benefit_score):
+    chosen_score = _option_score(chosen, fallback=expected_benefit_score)
+    available_scored = []
+    for option in options:
+        score = _option_score(option)
+        if score is None:
+            continue
+        available_scored.append(
+            {
+                "option": _option_identity(option),
+                "score": score,
+            }
+        )
+    rejected_scored = []
+    for option in rejected_options:
+        score = _option_score(option)
+        if score is None:
+            continue
+        rejected_scored.append(
+            {
+                "option": _option_identity(option),
+                "score": score,
+            }
+        )
+    best_available = max((item["score"] for item in available_scored), default=chosen_score)
+    best_rejected = max((item["score"] for item in rejected_scored), default=None)
+    score_gap = None
+    if chosen_score is not None and best_rejected is not None:
+        score_gap = chosen_score - best_rejected
+    return chosen_score, available_scored, rejected_scored, best_available, best_rejected, score_gap
+
+
 def _default_strategic_principle(decision_type, reason=None):
     if decision_type == "mulligan_decision":
         return "opening_hand_must_have_mana_and_early_plan"
@@ -266,6 +308,7 @@ def emit_decision_trace(
     risk_flags=None,
     alternatives_considered=None,
     rejected_reason=None,
+    expected_payoff_reason=None,
 ):
     """Emit optional decision trace data without changing battle behavior."""
     if DECISION_TRACE_HANDLER is None:
@@ -276,6 +319,20 @@ def emit_decision_trace(
         chosen_key = _option_identity(chosen)
         if chosen_key and all(_option_identity(option) != chosen_key for option in options):
             options.insert(0, chosen)
+        rejected = list(rejected_options or [])
+        (
+            chosen_option_score,
+            available_option_scores,
+            rejected_option_scores,
+            best_available_option_score,
+            best_rejected_option_score,
+            score_gap_vs_best_rejected,
+        ) = _comparative_option_scores(
+            chosen,
+            options,
+            rejected,
+            expected_benefit_score,
+        )
         payload = {
             "schema_version": DECISION_TRACE_SCHEMA_VERSION,
             "decision_id": _next_decision_id(replay_id),
@@ -286,12 +343,13 @@ def emit_decision_trace(
             "decision_type": decision_type,
             "available_options": options,
             "chosen_option": chosen,
-            "rejected_options": list(rejected_options or []),
+            "rejected_options": rejected,
             "score_components": dict(score_components or {"heuristic": 0}),
             "rule_source": rule_source or "unknown",
             "rule_status": rule_status or "unknown",
             "confidence": confidence,
             "expected_benefit_score": expected_benefit_score,
+            "expected_payoff_reason": expected_payoff_reason or reason,
             "actual_outcome": actual_outcome,
             "reason": reason,
             "strategic_principle": strategic_principle
@@ -303,6 +361,12 @@ def emit_decision_trace(
                 alternatives_considered if alternatives_considered is not None else options
             ),
             "rejected_reason": rejected_reason,
+            "chosen_option_score": chosen_option_score,
+            "available_option_scores": available_option_scores,
+            "rejected_option_scores": rejected_option_scores,
+            "best_available_option_score": best_available_option_score,
+            "best_rejected_option_score": best_rejected_option_score,
+            "score_gap_vs_best_rejected": score_gap_vs_best_rejected,
         }
         DECISION_TRACE_HANDLER(payload)
     except Exception:
@@ -3749,6 +3813,31 @@ def _is_reactive_interaction_card(card, effect_data):
     return is_instant(card) or card_has_functional_tag(card, "counter", "protection", "removal")
 
 
+def _pass_option_trace_score(card, effect_data, *, payable, phase_legal, reactive, main_phase_relevant):
+    cmc = int(float(card.get("cmc") or 0))
+    effect = str(effect_data.get("effect") or card.get("effect") or card.get("tag") or "").lower()
+    score = 0.0
+    if payable:
+        score += 3.0
+    else:
+        score -= max(1.0, float(cmc))
+    if phase_legal:
+        score += 3.0
+    if reactive:
+        score += 2.0
+    if effect in OPENING_HAND_RAMP_EFFECTS:
+        score += 2.5
+    elif effect in OPENING_HAND_CARD_FLOW_EFFECTS:
+        score += 2.0
+    elif effect in OPENING_HAND_REACTIVE_EFFECTS:
+        score += 1.5
+    elif effect in HIGH_IMPACT_PAYOFF_EFFECTS:
+        score += 1.0
+    if main_phase_relevant and not reactive and phase_legal:
+        score += 1.0
+    return round(score, 2)
+
+
 def describe_pass_no_action(player, phase):
     nonland_cards = [
         card
@@ -3770,10 +3859,19 @@ def describe_pass_no_action(player, phase):
         phase_legal = bool(can_cast_in_phase(card, effect_data, phase))
         if minimum_cmc is None or cmc < minimum_cmc:
             minimum_cmc = cmc
+        option_score = _pass_option_trace_score(
+            card,
+            effect_data,
+            payable=payable,
+            phase_legal=phase_legal,
+            reactive=_is_reactive_interaction_card(card, effect_data),
+            main_phase_relevant=main_phase_relevant,
+        )
         option = decision_card_option(
             card,
             effect_data,
             action="consider",
+            score=option_score,
             payable=payable,
             phase_legal=phase_legal,
             reactive=_is_reactive_interaction_card(card, effect_data),
@@ -3833,7 +3931,7 @@ def describe_pass_no_action(player, phase):
             reason = "no_nonland_resources_available"
             risk_flags.append("empty_nonland_hand")
 
-    chosen_option = {"action": "pass", "reason": reason}
+    chosen_option = {"action": "pass", "reason": reason, "score": 0}
     rejected_options = [
         {**option, "action": "defer"}
         for option in available_options[1:9]
@@ -9458,15 +9556,44 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         decision_card_option(
                             option_card,
                             get_card_effect(option_card),
+                            score=max(
+                                1,
+                                int(option_card.get("cmc", 0) or 0) + 10,
+                                (
+                                    int(option_card.get("cmc", 0) or 0) + 14
+                                    if ramp_resource_unlocks_same_turn_action(
+                                        option_card,
+                                        get_card_effect(option_card),
+                                    )
+                                    else int(option_card.get("cmc", 0) or 0) + 10
+                                ),
+                            ),
                             action="cast_ramp",
                         )
                         for option_card in ramp_cards[:8]
                     ],
-                    chosen_option=decision_card_option(c, eff, action="cast_ramp"),
+                    chosen_option=decision_card_option(
+                        c,
+                        eff,
+                        score=max(1, int(c.get("cmc", 0) or 0) + 14),
+                        action="cast_ramp",
+                    ),
                     rejected_options=[
                         decision_card_option(
                             option_card,
                             get_card_effect(option_card),
+                            score=max(
+                                1,
+                                int(option_card.get("cmc", 0) or 0) + 10,
+                                (
+                                    int(option_card.get("cmc", 0) or 0) + 14
+                                    if ramp_resource_unlocks_same_turn_action(
+                                        option_card,
+                                        get_card_effect(option_card),
+                                    )
+                                    else int(option_card.get("cmc", 0) or 0) + 10
+                                ),
+                            ),
                             action="defer_ramp",
                         )
                         for option_card in ramp_cards
@@ -9487,9 +9614,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     rule_source=fields.get("rule_source", "battle_heuristic"),
                     rule_status=fields.get("rule_review_status", "heuristic"),
                     confidence="medium",
-                    expected_benefit_score=max(1, int(c.get("cmc", 0) or 0) + 10),
+                    expected_benefit_score=max(1, int(c.get("cmc", 0) or 0) + 14),
                     actual_outcome="cast_and_resolve_ramp",
                     reason="early_mana_development",
+                    expected_payoff_reason="develop mana only when it unlocks same-turn or near-turn plan",
                     strategic_principle=(
                         "spend_ramp_resource_only_when_it_unlocks_or_accelerates_plan"
                     ),
@@ -9754,6 +9882,13 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="creature")
                 if not commit_cast_payment(cast_ctx):
                     continue
+                creature_score = threat_score(
+                    eff.get("effect", ""),
+                    c.get("name", ""),
+                    player,
+                    all_players,
+                    turn,
+                )
                 fields = replay_rule_fields(eff)
                 emit_decision_trace(
                     decision_type="cast_spell",
@@ -9775,11 +9910,23 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         )
                         for option_card in remaining[:8]
                     ],
-                    chosen_option=decision_card_option(c, eff, action="cast_creature"),
+                    chosen_option=decision_card_option(
+                        c,
+                        eff,
+                        score=creature_score,
+                        action="cast_creature",
+                    ),
                     rejected_options=[
                         decision_card_option(
                             option_card,
                             get_card_effect(option_card),
+                            score=threat_score(
+                                get_card_effect(option_card).get("effect", ""),
+                                option_card.get("name", ""),
+                                player,
+                                all_players,
+                                turn,
+                            ),
                             action="defer_cast",
                         )
                         for option_card in remaining
@@ -9793,9 +9940,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     rule_source=fields.get("rule_source", "battle_heuristic"),
                     rule_status=fields.get("rule_review_status", "heuristic"),
                     confidence="medium",
-                    expected_benefit_score=max(1, int(c.get("power", 0) or 0) + int(c.get("cmc", 0) or 0)),
+                    expected_benefit_score=creature_score,
                     actual_outcome="creature_to_battlefield",
                     reason="lowest_cmc_castable_creature",
+                    expected_payoff_reason="deploy board presence at the best available mana slot",
                 )
                 player.hand.remove(c)
                 c_copy = enrich_card({**c, **eff})
@@ -9911,6 +10059,13 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         decision_card_option(
                             option_card,
                             get_card_effect(option_card),
+                            score=threat_score(
+                                get_card_effect(option_card).get("effect", ""),
+                                option_card.get("name", ""),
+                                player,
+                                all_players,
+                                turn,
+                            ),
                             action="defer_cast",
                         )
                         for option_card in remaining
@@ -9927,6 +10082,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     expected_benefit_score=normal_score,
                     actual_outcome="cast_to_stack",
                     reason="lowest_cmc_castable_spell",
+                    expected_payoff_reason="advance stack development with the best affordable spell line",
                 )
                 player.hand.remove(c)
                 emit_replay_event(

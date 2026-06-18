@@ -169,6 +169,13 @@ Cada decisao registra:
 - `risk_flags`
 - `alternatives_considered`
 - `rejected_reason`
+- `chosen_option_score`
+- `available_option_scores`
+- `rejected_option_scores`
+- `best_available_option_score`
+- `best_rejected_option_score`
+- `score_gap_vs_best_rejected`
+- `expected_payoff_reason`
 
 Cobertura inicial:
 - mulligan pregame;
@@ -193,6 +200,14 @@ No slice de 2026-06-18, `pass/no-action` deixou de ser apenas
 `phase_or_heuristic_restriction_blocks_line`, `reactive_window_held` e
 `no_nonland_resources_available`, além de registrar alternativas consideradas
 e flags de risco coerentes com o estado da mão.
+
+No slice seguinte de 2026-06-18, o trace passou a materializar comparativo
+minimo auditavel: quando as opcoes ja possuem score no runtime, o replay grava
+`chosen_option_score`, lista de scores disponiveis/rejeitados, melhor score
+rejeitado, `score_gap_vs_best_rejected` e `expected_payoff_reason`. `pass` com
+linhas jogaveis tambem passou a pontuar as alternativas, e os casts genericos
+de ramp/criatura/spell normal deixaram de sair sem score comparativo quando a
+heuristica ja tinha ranking local.
 
 Auditoria:
 

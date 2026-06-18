@@ -85,6 +85,13 @@ Campos estratégicos adicionados ao trace:
 - `risk_flags`
 - `alternatives_considered`
 - `rejected_reason`
+- `chosen_option_score`
+- `available_option_scores`
+- `rejected_option_scores`
+- `best_available_option_score`
+- `best_rejected_option_score`
+- `score_gap_vs_best_rejected`
+- `expected_payoff_reason`
 
 Esses campos não mudam a simulação. Eles explicam a decisão para auditoria e
 aprendizado posterior.
@@ -110,6 +117,16 @@ Limitação conhecida: a escolha das cartas colocadas no fundo continua
 heurística e o keep ainda não é calibrado por comandante/arquetipo. O gap já
 não é mais "detectar mão claramente morta"; agora é ranking comparativo de
 alternativas e tuning fino por profile.
+
+Atualização do slice comparativo ainda em 2026-06-18:
+
+- `pass/no-action` ganhou pontuação mínima das alternativas para deixar
+  rastreável quando o runtime segurou recurso apesar de linhas jogáveis.
+- casts genéricos de `ramp`, `creature` e `spell` normal passaram a propagar
+  score da opção escolhida e das rejeitadas quando o ranking local já existia.
+- replay local `20260618_065705` ficou com `strategy_findings=0` e o auditor
+  forense caiu para apenas `2` findings low de `needs_review` em cartas de
+  oponente, sem ruído adicional de trace comparativo faltante.
 
 ### Seleção contextual de land
 
@@ -156,7 +173,7 @@ Findings iniciais:
 
 | Decisão | Regra oficial | Estratégia esperada | Status Hermes | Próximo ajuste |
 |---|---|---|---|---|
-| Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial forte: avalia lands, plano inicial, ramp barato, card flow, reactive-only e cluster caro sem setup; emite trace rico | Melhorar ranking comparativo das opções e tuning por comandante/arquetipo |
+| Mulligan | London Mulligan: compra 7 e coloca N no fundo após N mulligans | Avaliar terrenos, cores, curva T1-T3, ramp, draw/filter, interação e mão morta | Parcial forte: avalia lands, plano inicial, ramp barato, card flow, reactive-only e cluster caro sem setup; emite trace rico | Melhorar tuning por comandante/arquetipo e ranking comparativo mais semântico do bottom/keep |
 | Lotus Petal/ritual | Sacrificar para gerar mana conforme oracle | Usar só para destravar ação relevante, proteção, win attempt ou correção crítica | Parcial: `ramp_ritual` só entra no ramp loop se destrava ação no turno; auditor exige sinal | Ampliar para storm/free-spell synergies e proteção reativa |
 | Mox Diamond | Deve descartar land da mão antes de entrar | Só jogar com land descartável e plano de mana real | Guardrail mínimo: exige `requires_discard_land`, preserva cor única e bloqueia última/única land sem payoff nominal | Ampliar corpus e casos por bracket, sem ban global de Mox |
 | Sacrificar land | Crop Rotation/Harrow etc. exigem land conforme texto | Avaliar land sacrificada, risco de counter, alvo buscado e mana screw | Guardrail mínimo: escolhe alvo de land-ramp por score e bloqueia fetch/tapped sem benefício claro quando gasta última/única fonte | Ampliar scoring de utility lands e risco de counter |
@@ -165,7 +182,7 @@ Findings iniciais:
 | Tutor | Legalidade da busca | Escolher alvo por estado: land/ramp, interação, wincon ou engine | Coerente na amostra: target trace e selected_reason emitidos | Ampliar scoring por arquétipo e alvo de utility land |
 | Board wipe/wheel | Timing e efeito legal | Usar quando atrás, evita lethal, assimétrico ou tem payoff | Coerente na amostra pós-ajuste: gate de timing e wheel multiplayer v1 | Ampliar corpus e refinar payoff denial/hand quality |
 | Combate/bloqueio | Ataque/bloqueio/dano legal | Avaliar lethal, crackback, commander damage e múltiplos defensores | Parcial: alvo e combat trace | Registrar blockers lucrativos e risco de crackback |
-| Pass/no-action | Prioridade pode ser passada | Explicar sem opções, segurando instant, preservando recurso ou jogada ruim | Parcial: pass trace e auditor | Expandir pass reasons com opções rejeitadas |
+| Pass/no-action | Prioridade pode ser passada | Explicar sem opções, segurando instant, preservando recurso ou jogada ruim | Parcial forte: pass trace tem reasons estruturados, alternativas e score comparativo mínimo | Evoluir ranking por valor esperado real, não só score heurístico curto |
 
 ## Evidência de código
 

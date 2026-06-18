@@ -512,6 +512,23 @@ def audit_decision_traces(decisions: list[dict[str, Any]]) -> list[dict[str, Any
             float(decision.get("expected_benefit_score", 0))
         except (TypeError, ValueError):
             add_finding(findings, "medium", event, "Decision expected_benefit_score is not numeric.")
+        chosen_option_score = decision.get("chosen_option_score")
+        available_option_scores = decision.get("available_option_scores")
+        rejected_option_scores = decision.get("rejected_option_scores")
+        best_rejected_option_score = decision.get("best_rejected_option_score")
+        if isinstance(options, list) and len(options) > 1:
+            if chosen_option_score is None:
+                add_finding(findings, "medium", event, "Decision trace missing chosen_option_score for comparative choice.")
+            if available_option_scores is None:
+                add_finding(findings, "medium", event, "Decision trace missing available_option_scores for comparative choice.")
+            if rejected_option_scores is None:
+                add_finding(findings, "medium", event, "Decision trace missing rejected_option_scores for comparative choice.")
+            scored_option_count = len(available_option_scores or [])
+            chosen_option = decision.get("chosen_option") if isinstance(decision.get("chosen_option"), dict) else {}
+            if scored_option_count >= 2 and chosen_option.get("action") != "pass" and best_rejected_option_score is None:
+                add_finding(findings, "low", event, "Decision trace has multiple options but no best_rejected_option_score.")
+            if scored_option_count >= 2 and not decision.get("expected_payoff_reason"):
+                add_finding(findings, "low", event, "Decision trace is missing expected_payoff_reason.")
         if str(decision.get("rule_source") or "").lower() == "unknown":
             add_finding(findings, "low", event, "Decision used unknown rule source; keep as audit-only.")
         if str(decision.get("rule_status") or "").lower() == "needs_review":
