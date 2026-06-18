@@ -93,6 +93,27 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Ancient Den is an artifact land that taps for white. Runtime keeps it as a land mana source, not as a spell heuristic."
   },
+  "Ancient Tomb": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "C",
+      "mana_produced": 1,
+      "ancient_tomb_bonus_mana": 1,
+      "ancient_tomb_bonus_life_cost": 2,
+      "utility_land_profile": "ancient_tomb_contextual_fast_mana_v1",
+      "battle_model_scope": "ancient_tomb_bonus_mana_on_tap_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "fast_mana_land"
+    },
+    "source": "curated",
+    "confidence": 0.98,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Ancient Tomb taps for {C} and deals 2 damage to you while effectively producing an extra colorless mana over a normal land under the current pooled-mana abstraction. Runtime uses the explicit life-cost and bonus-mana fields instead of collapsing it into a generic land."
+  },
   "Chromatic Star": {
     "effect_json": {
       "cmc": 1.0,
@@ -180,6 +201,25 @@
     "confidence": 0.97,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for a card and put that card into your graveyard. Runtime must not degrade this into draw."
+  },
+  "Fellwar Stone": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "conditionally_produces_opponent_land_colors": true,
+      "battle_model_scope": "conditional_opponent_color_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "conditional_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Fellwar Stone taps for one mana of any color that a land an opponent controls could produce. Runtime intentionally models the safe baseline as a live one-mana rock with conditional color flexibility, while exact opponent color derivation remains a tracked refinement."
   },
   "Rampant Growth": {
     "effect_json": {
@@ -410,6 +450,27 @@
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mind Stone is a colorless mana rock that can later be tapped, sacrificed, and turned into a card. Runtime must not collapse it into immediate draw on spell resolution; it enters as a mana permanent and can be cashed in later when hand quality is low."
   },
+  "Mana Vault": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 3,
+      "produces": "C",
+      "does_not_untap_normally": true,
+      "upkeep_optional_untap_cost_generic": 4,
+      "tapped_upkeep_damage": 1,
+      "battle_model_scope": "fast_mana_artifact_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "fast_mana"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Mana Vault taps for three colorless mana, does not untap normally, can be untapped in upkeep for {4}, and pings while tapped. Runtime already models the fast-mana baseline; the untap/upkeep pain policy remains partial and therefore stays active instead of verified."
+  },
   "Natural Order": {
     "effect_json": {
       "cmc": 4.0,
@@ -429,6 +490,27 @@
     "confidence": 0.96,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield."
+  },
+  "Path to Exile": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "remove_creature",
+      "instant": true,
+      "target": "creature",
+      "exile_target": true,
+      "target_controller_basic_land_tapped": true,
+      "battle_model_scope": "one_for_one_exile_removal_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_creature",
+      "target": "creature",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Path to Exile exiles target creature and may ramp that creature's controller with a tapped basic land. Runtime keeps the strict instant exile-removal semantic and records the compensation rider for future parity work; the opponent land-search compensation is still modeled conservatively."
   },
   "Splendid Reclamation": {
     "effect_json": {
@@ -552,6 +634,25 @@
     "confidence": 0.9,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Staff of Compleation is a utility artifact whose baseline safe role is mana acceleration plus optional paid abilities. Runtime must not collapse activated destroy/draw text into free immediate spell effects."
+  },
+  "Talisman of Conviction": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "CRW",
+      "life_for_colored_mana": 1,
+      "battle_model_scope": "pain_talisman_color_pair_partial_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "pain_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Talisman of Conviction can tap for colorless freely or for red/white while dealing 1 damage to its controller. Runtime safely models the card as a one-mana rock with tracked pain-color metadata; exact per-tap color-choice and pain sequencing remain partial."
   },
   "Unexpected Windfall": {
     "effect_json": {
@@ -951,6 +1052,25 @@
     "confidence": 0.9,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against current mechanics coverage: runtime should treat this as a gain-life plus Lander-token spell, not as a tutor bucket."
+  },
+  "Seething Song": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "ramp_ritual",
+      "instant": true,
+      "mana_produced": 5,
+      "produces": "R",
+      "battle_model_scope": "single_shot_red_ritual_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_ritual",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Seething Song adds five red mana immediately and then goes to the graveyard. Runtime should keep it as a one-shot ritual, not a permanent mana source or generic draw placeholder."
   },
   "Silence": {
     "effect_json": {

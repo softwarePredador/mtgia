@@ -830,6 +830,12 @@ Risco operacional remanescente:
     ativacao contextual minima para `sacrifice_creature -> mana unlock`, mas o
     custo ainda nao esta coberto por executor generico completo nem por
     heuristica de combo;
+  - no fechamento incremental de 2026-06-18, `Ancient Tomb`, `Fellwar Stone`,
+    `Mana Vault`, `Path to Exile`, `Seething Song` e
+    `Talisman of Conviction` deixaram de depender da camada
+    `generated/needs_review` e passaram a sair do registry reviewed como
+    `curated/verified` ou `curated/active`, com semantica limitada ao que o
+    runtime ja executa hoje;
   - mesmo assim, ela ainda nao deve ser tratada como regra totalmente
     verificada enquanto a mana ability completa e todos os edge cases de combo
     nao estiverem modelados com fidelidade maior.
