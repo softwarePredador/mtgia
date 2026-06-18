@@ -74,7 +74,8 @@ rodadas provider-backed desnecessariamente.
 prompts provider-backed:
 
 - priorizem `latest_files` do contexto da cron;
-- tratem `watch_root_hints` apenas como escopo;
+- nao recebam mais os diretorios observados como contexto bruto;
+- recebam apenas `scope_summary`, `watch_root_count` e `latest_files`;
 - nunca tentem `read_file` em diretorio;
 - enumerem arquivos com `rg --files`, `find`, `ls` ou `git diff --name-only`
   antes de abrir evidencias concretas.

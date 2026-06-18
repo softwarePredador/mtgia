@@ -83,10 +83,12 @@
   - `hermes_lab_cron_bootstrap.py` passou a instruir explicitamente os prompts
     provider-backed a:
     - usar `latest_files` como primeira evidencia;
-    - tratar `watch_root_hints` apenas como escopo;
     - nunca chamar `read_file` em diretorio;
     - enumerar arquivos com `rg --files`, `find`, `ls` ou
       `git diff --name-only` antes de abrir evidencias.
+  - no endurecimento seguinte do mesmo dia, o gate deixou de repassar
+    diretorios observados como contexto bruto; agora o agente recebe apenas
+    `scope_summary`, `watch_root_count` e `latest_files`.
 - Proximo passo correto:
   - redeploy do `hermes-lab` no EasyPanel para rebootstrapar os prompts
     endurecidos;

@@ -345,8 +345,9 @@ if not wake:
 
 context = {{
     "repo_head": head,
-    "watch_root_hints": profile["watch_roots"],
-    "watch_root_instruction": "Treat watch_root_hints as scope hints only. Enumerate files before reading; never pass a directory path to read_file.",
+    "scope_summary": profile["notes"],
+    "watch_root_count": len(profile["watch_roots"]),
+    "watch_root_instruction": "Latest_files are the first evidence set. If more evidence is needed, enumerate concrete files first and never pass a directory path to read_file.",
     "file_count": len(entries),
     "latest_files": [path for path, _, _ in entries[-8:]],
     "reason": "retry_after_error" if retry_after_error and not changed else ("changed_inputs" if changed else "first_run"),
