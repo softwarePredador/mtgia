@@ -85,6 +85,10 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             "manaloom_battle_rule_review_queue_empty",
             "bin/manaloom_battle_rule_review_queue.py",
         )
+        promotion_gate = _load_module(
+            "manaloom_battle_rule_promotion_gate_empty",
+            "bin/manaloom_battle_rule_promotion_gate.py",
+        )
 
         with tempfile.TemporaryDirectory() as raw_tmp:
             tmp = Path(raw_tmp)
@@ -111,8 +115,20 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             )
             self.assertEqual(data_summary["unique_cards"], 0)
             self.assertEqual(battle_summary["draft_count"], 0)
+            gate_summary = promotion_gate.run(
+                promotion_gate.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "gate"),
+                    ]
+                )
+            )
+            self.assertEqual(gate_summary["evaluated_count"], 0)
             self.assertEqual(data_summary.get("blocked_reason"), "knowledge_db_missing")
             self.assertEqual(battle_summary.get("blocked_reason"), "knowledge_db_missing")
+            self.assertEqual(gate_summary.get("blocked_reason"), "knowledge_db_missing")
 
     def test_consumers_classify_data_gaps_and_generate_rule_drafts(self) -> None:
         candidate = _load_module(
@@ -127,6 +143,10 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             "manaloom_battle_rule_review_queue",
             "bin/manaloom_battle_rule_review_queue.py",
         )
+        promotion_gate = _load_module(
+            "manaloom_battle_rule_promotion_gate",
+            "bin/manaloom_battle_rule_promotion_gate.py",
+        )
 
         with tempfile.TemporaryDirectory() as raw_tmp:
             tmp = Path(raw_tmp)
@@ -135,6 +155,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             candidate_dir = tmp / "candidate"
             data_gap_dir = tmp / "data_gap"
             battle_dir = tmp / "battle"
+            gate_dir = tmp / "gate"
 
             candidate_summary = candidate.run(
                 candidate.parse_args(
@@ -194,6 +215,68 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             self.assertIn("no_verified_promotion", drafts[0]["safety"])
             self.assertIn("mass_removal_or_modal_wipe", drafts[0]["effect_families"])
             self.assertIn("targeted_interaction", drafts[0]["effect_families"])
+
+            blocked_gate_summary = promotion_gate.run(
+                promotion_gate.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(gate_dir),
+                    ]
+                )
+            )
+            self.assertEqual(blocked_gate_summary["evaluated_count"], 1)
+            self.assertEqual(blocked_gate_summary["blocked_count"], 1)
+            self.assertIn(
+                "missing_official_source_review",
+                blocked_gate_summary["blockers"],
+            )
+
+            evidence_path = tmp / "promotion_evidence.json"
+            evidence_path.write_text(
+                json.dumps(
+                    {
+                        "by_draft_rule_key": {
+                            drafts[0]["draft_rule_key"]: {
+                                "official_source_reviewed": True,
+                                "official_sources": ["Scryfall oracle text"],
+                                "focused_test_passed": True,
+                                "focused_test_refs": ["test/marvel_tactical_reset_test.py"],
+                                "replay_audit_passed": True,
+                                "replay_audit_refs": ["artifacts/replay_audit.json"],
+                                "critical_findings": 0,
+                                "high_findings": 0,
+                            }
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            eligible_dir = tmp / "gate_eligible"
+            eligible_gate_summary = promotion_gate.run(
+                promotion_gate.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(eligible_dir),
+                        "--evidence-file",
+                        str(evidence_path),
+                    ]
+                )
+            )
+            self.assertEqual(eligible_gate_summary["eligible_count"], 1)
+            gate_items = json.loads(
+                (eligible_dir / "battle_rule_promotion_gate/latest_items.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(
+                gate_items[0]["decision"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertFalse(gate_items[0]["promotion_contract"]["postgres_write_allowed"])
 
             original_call = battle_queue.call_openai_review
             original_key = os.environ.get("OPENAI_API_KEY")
@@ -259,8 +342,12 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 battle_runs = conn.execute(
                     "SELECT COUNT(*) FROM new_card_battle_rule_review_runs"
                 ).fetchone()[0]
+                gate_runs = conn.execute(
+                    "SELECT COUNT(*) FROM new_card_battle_rule_promotion_gate_runs"
+                ).fetchone()[0]
                 self.assertEqual(data_runs, 1)
                 self.assertEqual(battle_runs, 1)
+                self.assertEqual(gate_runs, 2)
             finally:
                 conn.close()
 

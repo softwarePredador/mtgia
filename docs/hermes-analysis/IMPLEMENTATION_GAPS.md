@@ -119,6 +119,23 @@
     sugerir troca concreta;
   - manter `needs_data` determinístico e `needs_rule_review` como draft
     auditável, sem comportamento duro.
+- Gate implementado:
+  - `manaloom_battle_rule_promotion_gate` roda depois da fila
+    `manaloom_battle_rule_review_queue`;
+  - o gate é report-only e bloqueia por padrão qualquer draft sem evidência de
+    fonte oficial, teste focado e replay/auditoria;
+  - evidência explícita pode marcar um draft como
+    `eligible_for_manual_verified_promotion`, mas isso **não** escreve em
+    PostgreSQL e **não** promove automaticamente;
+  - `eligible_for_manual_verified_promotion` é apenas autorização para etapa
+    manual/controlada posterior.
+- Gap remanescente atualizado:
+  - criar a etapa manual/controlada que transforma uma regra elegível em linha
+    `card_battle_rules` `verified/active`, com diff auditável e teste focado;
+  - conectar rules verified/active à derivação segura de `card_function_tags`
+    somente quando trusted e traceable;
+  - rodar scorecard Lorehold apenas com candidatos que passaram por esse gate
+    ou que não dependem de executor battle.
 
 ### Atualizacao de ciclo — 2026-06-18 / local replay cache truth
 

@@ -52,6 +52,16 @@ Achados confirmados:
   no ciclo normal do `manaloom-ops`.
 - `needs_data` permanece fora de LLM: o caminho correto é sync determinístico
   de catálogo/legalidade/oracle/identidade.
+- `manaloom_battle_rule_promotion_gate` foi adicionado como etapa
+  determinística após `manaloom_battle_rule_review_queue`. Ele não promove
+  regras; apenas bloqueia ou marca drafts como
+  `eligible_for_manual_verified_promotion` quando há evidência explícita de
+  fonte oficial, teste focado e replay/auditoria sem findings críticos/high.
+- O auditor `audit_easypanel_cron_runtime.py` deixou de depender somente da
+  janela de logs para provar bootstrap do `hermes-lab`; agora aceita
+  `/opt/data/artifacts/hermes_cron_bootstrap/latest_bootstrap_report.json` e
+  `startup_status.json` como evidência de bootstrap. Isso fecha o falso P2
+  `hermes_lab_bootstrap_not_visible` quando os artefatos existem.
 
 Jobs server-owned confirmados como script-only/determinísticos:
 
@@ -62,6 +72,7 @@ Jobs server-owned confirmados como script-only/determinísticos:
 - `manaloom_knowledge_import`
 - `hermes_mana_base_validator`
 - `hermes_cron_governor_report`
+- `manaloom_battle_rule_promotion_gate`
 
 Gap remanescente:
 

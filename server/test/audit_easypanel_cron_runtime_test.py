@@ -95,3 +95,44 @@ def test_extract_runtime_findings_flags_active_job_error() -> None:
         lab_logs=["bootstrap complete"],
     )
     assert any(finding["code"] == "hermes_lab_job_error" for finding in findings)
+
+
+def test_extract_runtime_findings_accepts_bootstrap_artifact_without_recent_log() -> None:
+    findings = MODULE._extract_runtime_findings(
+        service_envs={
+            "manaloom-ops": {"openai_api_key_present": False},
+            "hermes-lab": {"openai_api_key_present": True},
+        },
+        ops_jobs={
+            "jobs_total": 1,
+            "jobs": [
+                {
+                    "name": "pull_learning_events",
+                    "state": "active",
+                    "enabled": True,
+                    "last_status": "ok",
+                    "output_evidence": {"path": "/tmp/out.log"},
+                }
+            ],
+        },
+        lab_jobs={
+            "jobs_total": 1,
+            "jobs": [
+                {
+                    "name": "manaloom-docs-branch-sync",
+                    "state": "active",
+                    "enabled": True,
+                    "last_status": "ok",
+                    "output_evidence": {"path": "/tmp/out.log"},
+                }
+            ],
+        },
+        ops_logs=["scheduler started"],
+        lab_logs=["gateway run only, no sampled bootstrap line"],
+        bootstrap_report={"desired_jobs": ["manaloom-docs-branch-sync"]},
+    )
+
+    assert not any(
+        finding["code"] == "hermes_lab_bootstrap_not_visible"
+        for finding in findings
+    )

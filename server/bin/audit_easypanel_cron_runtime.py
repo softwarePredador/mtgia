@@ -502,6 +502,8 @@ def _extract_runtime_findings(
     lab_jobs: dict[str, Any],
     ops_logs: list[str],
     lab_logs: list[str],
+    startup_status: dict[str, Any] | None = None,
+    bootstrap_report: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
 
@@ -550,12 +552,20 @@ def _extract_runtime_findings(
             }
         )
 
-    if not any("bootstrap" in line.lower() for line in lab_logs):
+    bootstrap_proven = (
+        any("bootstrap" in line.lower() for line in lab_logs)
+        or bool(bootstrap_report and bootstrap_report.get("desired_jobs"))
+        or bool(startup_status and startup_status.get("bootstrap_report_path"))
+    )
+    if not bootstrap_proven:
         findings.append(
             {
                 "priority": "P2",
                 "code": "hermes_lab_bootstrap_not_visible",
-                "message": "service logs did not show hermes bootstrap activity in sampled window",
+                "message": (
+                    "service logs and runtime artifacts did not show hermes bootstrap "
+                    "activity in sampled window"
+                ),
             }
         )
 
@@ -871,6 +881,8 @@ def main() -> int:
         lab_jobs=lab_jobs,
         ops_logs=ops_logs,
         lab_logs=lab_logs,
+        startup_status=startup_status_json if isinstance(startup_status_json, dict) else None,
+        bootstrap_report=bootstrap_report_json if isinstance(bootstrap_report_json, dict) else None,
     )
 
     generated_at = _utc_now().isoformat(timespec="seconds")
