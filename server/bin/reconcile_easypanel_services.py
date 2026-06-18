@@ -202,8 +202,11 @@ def _collect_service_state(payload: dict[str, Any], project_name: str, service_n
 
 
 def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: OrderedDict[str, str]) -> dict[str, str]:
+    def _runtime_or_existing(key: str) -> str | None:
+        return runtime_env.get(key) or existing_env.get(key)
+
     if service_name == "manaloom-ops":
-        return {
+        desired = {
             "MANALOOM_OPS_DATA_DIR": "/data/manaloom-ops",
             "HERMES_KNOWLEDGE_DB": "/data/manaloom-ops/knowledge.db",
             "MANALOOM_KNOWLEDGE_DB": "/data/manaloom-ops/knowledge.db",
@@ -219,6 +222,11 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "HERMES_MANA_BASE_VALIDATOR_CRON": "45 */6 * * *",
             "HERMES_CRON_GOVERNOR_REPORT_CRON": "0 */12 * * *",
         }
+        for key in ("DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASS", "DATABASE_URL"):
+            value = _runtime_or_existing(key)
+            if value:
+                desired[key] = value
+        return desired
     if service_name == "hermes-lab":
         api_server_key = (
             runtime_env.get("API_SERVER_KEY")

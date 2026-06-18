@@ -38,11 +38,26 @@ def test_redact_value_hides_secret_payloads() -> None:
 
 
 def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
-    desired = MODULE._desired_env("manaloom-ops", {}, MODULE._parse_dotenv(""))
+    desired = MODULE._desired_env(
+        "manaloom-ops",
+        {
+            "DB_HOST": "db.example",
+            "DB_PORT": "5433",
+            "DB_NAME": "mana",
+            "DB_USER": "postgres",
+            "DB_PASS": "secret",
+        },
+        MODULE._parse_dotenv(""),
+    )
     assert desired["PULL_LEARNING_EVENTS_CRON"] == "0 * * * *"
     assert desired["MTGIA_ENV_FILE"] == "/app/server/.env"
     assert desired["HERMES_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
     assert desired["MANALOOM_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
+    assert desired["DB_HOST"] == "db.example"
+    assert desired["DB_PORT"] == "5433"
+    assert desired["DB_NAME"] == "mana"
+    assert desired["DB_USER"] == "postgres"
+    assert desired["DB_PASS"] == "secret"
     assert desired["MANALOOM_KNOWLEDGE_IMPORT_CRON"] == "20 */12 * * *"
     assert desired["MANALOOM_IMPORT_APPLY"] == "1"
     assert desired["HERMES_CRON_GOVERNOR_REPORT_CRON"] == "0 */12 * * *"
