@@ -107,6 +107,7 @@ Future<Response> onRequest(RequestContext context) async {
     var usageHotCardsPrompt = '';
     var usageHotCards = const <Map<String, dynamic>>[];
     var promotedLearnedCardNames = const <String>[];
+    CommanderLearnedDeckInput? activeLearnedDeck;
     if (requestedCommanderName != null && requestedCommanderName.isNotEmpty) {
       try {
         usageHotCards = await loadUsageHotCards(
@@ -117,7 +118,7 @@ Future<Response> onRequest(RequestContext context) async {
         usageHotCardsPrompt = buildUsageHotCardsPrompt(usageHotCards);
       } catch (_) {}
       try {
-        final activeLearnedDeck = await loadActiveCommanderLearnedDeck(
+        activeLearnedDeck = await loadActiveCommanderLearnedDeck(
           pool: pool,
           commanderName: requestedCommanderName,
         );
@@ -184,6 +185,7 @@ Future<Response> onRequest(RequestContext context) async {
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        activeLearnedDeck: activeLearnedDeck,
         promotedLearnedCardNames: promotedLearnedCardNames,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
@@ -226,6 +228,7 @@ Future<Response> onRequest(RequestContext context) async {
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        activeLearnedDeck: activeLearnedDeck,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -478,6 +481,7 @@ $metaContext
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        activeLearnedDeck: activeLearnedDeck,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -531,6 +535,7 @@ $metaContext
           referenceCardStats: referenceCardStats,
           unresolvedReferenceCards: unresolvedReferenceCards,
           referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
           archetypeReferenceStats: archetypeReferenceStats,
           archetypeSourceCommanderNames: archetypeSourceCommanderNames,
           archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -630,6 +635,7 @@ $metaContext
         referenceCardStats: referenceCardStats,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
         usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
+        activeLearnedDeck: activeLearnedDeck,
         promotedLearnedCardNames: promotedLearnedCardNames,
       );
       timings['reference_identity_filter_ms'] =
@@ -758,6 +764,7 @@ $metaContext
         referenceCardStats: referenceCardStats,
         unresolvedReferenceCards: unresolvedReferenceCards,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        activeLearnedDeck: activeLearnedDeck,
         archetypeReferenceStats: archetypeReferenceStats,
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
@@ -1163,6 +1170,7 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
   required Map<String, dynamic> referenceProfile,
   required List<CommanderReferenceCardStat> referenceCardStats,
   required CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
 }) async {
@@ -1208,6 +1216,7 @@ Future<List<Map<String, dynamic>>> _filterAndRefillReferenceGeneratedCards({
     profile: referenceProfile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    activeLearnedDeck: activeLearnedDeck,
     promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
     targetMainQuantity: targetMainQuantity,
@@ -1265,6 +1274,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   List<String> unresolvedReferenceCards = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  CommanderLearnedDeckInput? activeLearnedDeck,
   List<CommanderReferenceCardStat> archetypeReferenceStats = const [],
   List<String> archetypeSourceCommanderNames = const [],
   List<String> archetypeCommanderColorIdentity = const [],
@@ -1282,6 +1292,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           profile: referenceProfile,
           referenceCardStats: referenceCardStats,
           referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+          activeLearnedDeck: activeLearnedDeck,
           promotedLearnedCardNames: promotedLearnedCardNames,
           usageHotCardNames: usageHotCardNames,
         );
@@ -1292,6 +1303,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
     referenceProfile: referenceProfile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    activeLearnedDeck: activeLearnedDeck,
     promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
   );
@@ -1503,6 +1515,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
   Map<String, dynamic>? referenceProfile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
 }) async {
@@ -1514,6 +1527,7 @@ Future<Map<String, dynamic>> _mockGeneratedDeck(
         referenceProfile,
         referenceCardStats: referenceCardStats,
         referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+        activeLearnedDeck: activeLearnedDeck,
         promotedLearnedCardNames: promotedLearnedCardNames,
         usageHotCardNames: usageHotCardNames,
       );
@@ -1588,6 +1602,7 @@ Map<String, dynamic> _mockReferenceProfileDeck(
   Map<String, dynamic> profile, {
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
 }) {
@@ -1607,6 +1622,7 @@ Map<String, dynamic> _mockReferenceProfileDeck(
     profile: profile,
     referenceCardStats: referenceCardStats,
     referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+    activeLearnedDeck: activeLearnedDeck,
     promotedLearnedCardNames: promotedLearnedCardNames,
     usageHotCardNames: usageHotCardNames,
   );

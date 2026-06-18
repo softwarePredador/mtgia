@@ -1,6 +1,7 @@
 import 'package:server/ai/commander_reference_card_stats_support.dart';
 import 'package:server/ai/commander_reference_deck_corpus_support.dart';
 import 'package:server/ai/commander_reference_generate_fallback_support.dart';
+import 'package:server/ai/commander_learned_deck_support.dart';
 import 'package:server/ai/commander_reference_profile_support.dart';
 import 'package:test/test.dart';
 
@@ -498,7 +499,7 @@ void main() {
     });
 
     test(
-        'promoted learned deck cards outrank corpus and expected packages after reference stats',
+        'promoted learned deck cards become the primary deterministic skeleton before reference stats',
         () {
       final profile = buildCommanderReferenceProfilePayload(
         commanderName: loreholdReferenceCommanderName,
@@ -553,13 +554,81 @@ void main() {
       expect(result.mainDeckQuantity, equals(2));
       expect(
         result.cardProvenance.map((entry) => entry.cardName).toList(),
-        equals(['Scroll Rack', 'Learned Priority Card']),
+        equals(['Learned Priority Card', 'Scroll Rack']),
       );
-      expect(result.sourceUsageCounts['reference_card_stats'], equals(1));
       expect(result.sourceUsageCounts['active_learned_deck'], equals(1));
+      expect(result.sourceUsageCounts['reference_card_stats'], equals(1));
       expect(result.sourceUsageCounts['reference_corpus_packages'], isNull);
       expect(result.sourceUsageCounts['profile_expected_packages'], isNull);
       expect(result.sourceUsageCounts['usage_hot_cards'], isNull);
+    });
+
+    test(
+        'active learned deck preserves basic land quantities before auxiliary sources',
+        () {
+      final profile = buildCommanderReferenceProfilePayload(
+        commanderName: loreholdReferenceCommanderName,
+        version: 'lorehold_active_learned_quantities_test',
+        source: 'unit_test',
+        confidence: 'high',
+        sourceCount: 1,
+        colorIdentity: const ['R', 'W'],
+        themes: const [
+          {'name': 'topdeck_big_spells', 'confidence': 'high'}
+        ],
+        roleTargets: const {},
+        expectedPackages: const {},
+        avoidPatterns: const [],
+        updatedAt: DateTime.utc(2026, 5, 11, 12),
+      );
+      const activeLearnedDeck = CommanderLearnedDeckInput(
+        commanderName: loreholdReferenceCommanderName,
+        deckName: 'Lorehold Learned',
+        sourceSystem: 'hermes',
+        sourceRef: 'learned_deck:test',
+        cardList: '''
+1 Lorehold, the Historian
+2 Plains
+1 Mountain
+1 Arcane Signet
+1 Scroll Rack
+''',
+        cardCount: 6,
+        isActive: true,
+      );
+      final result = buildDeterministicReferenceDeckResult(
+        profile: profile,
+        targetMainQuantity: 5,
+        activeLearnedDeck: activeLearnedDeck,
+        referenceCardStats: [
+          _stat(
+            cardName: 'Brainstone',
+            cardId: 'brainstone-id',
+            packageKey: 'topdeck_and_miracle_setup',
+            role: 'topdeck_miracle_setup',
+            score: 70,
+            confidence: 'medium',
+          ),
+        ],
+      );
+
+      expect(result.mainDeckQuantity, equals(5));
+      expect(
+        result.cardProvenance.map((entry) => entry.cardName).toList(),
+        equals(['Plains', 'Mountain', 'Arcane Signet', 'Scroll Rack']),
+      );
+      final cards = (result.deck['cards'] as List).cast<Map>();
+      expect(
+        cards,
+        containsAll([
+          {'name': 'Plains', 'quantity': 2},
+          {'name': 'Mountain', 'quantity': 1},
+          {'name': 'Arcane Signet', 'quantity': 1},
+          {'name': 'Scroll Rack', 'quantity': 1},
+        ]),
+      );
+      expect(cards.map((card) => card['name']), isNot(contains('Brainstone')));
+      expect(result.sourceUsageCounts['active_learned_deck'], equals(4));
     });
 
     test('filters off-color generated cards before reference validation repair',

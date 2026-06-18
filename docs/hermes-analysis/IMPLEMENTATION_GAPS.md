@@ -79,25 +79,39 @@
     vivo" para "falta executor dedicado para adapt/counter-trigger e
     graveyard-exile activation", sem impacto no replay básico atual.
 
-### Atualizacao de ciclo — 2026-06-18 / learned deck priority slice
+### Atualizacao de ciclo — 2026-06-18 / learned deck primary skeleton slice
 
-- O slice seguro de precedência do builder determinístico foi aplicado em
-  `commander_reference_generate_fallback_support.dart`:
+- O slice seguro de precedência do builder determinístico foi fechado em
+  `commander_reference_generate_fallback_support.dart` com duas mudanças
+  estruturais:
+  - `active_learned_deck` passou a entrar como skeleton explícito do builder;
+  - o builder deixou de achatar o learned deck para nomes distintos e passou a
+    preservar quantidades, inclusive basic lands.
+- Ordem vigente do builder:
   `reference_card_stats -> active_learned_deck -> reference_corpus_packages -> profile_expected_packages -> usage_hot_cards -> deterministic_fallback`.
 - A regra não muda contratos públicos e mantém os guardrails vigentes:
   - PostgreSQL/backend continuam donos da decisão;
   - learned decks continuam single-commander;
   - metadata Hermes segue escondida do usuário comum;
   - fallback determinístico continua por último.
-- Revalidação read-only com
-  `commander_generate_provenance_2026-06-18_learned_priority` mostrou melhora
-  concreta no Lorehold:
-  - `learned_deck_parallel_not_ranked_in_generate.count`: `32 -> 24`;
-  - `source_usage_counts.active_learned_deck`: `68 -> 76`;
-  - `built_in_fallback_used_count`: `42 -> 41`;
-  - `built_in_fallback_only_count`: permaneceu `0`.
-- O gap deixou de ser "learned deck não tem prioridade nenhuma" e passou a
-  ser "ainda existem 24 cartas do learned deck fora do ranking final".
+- Revalidação read-only final com
+  `commander_generate_provenance_2026-06-18_learned_primary_slice_v3` e
+  checagem direta do builder contra o PostgreSQL mostraram:
+  - `gaps=[]` no auditor de provenance;
+  - `missing_count=0` e `extra_count=0` entre o `card_list` ativo de
+    `commander_learned_decks` e o deck determinístico final;
+  - `learned_main_qty=99` e `deterministic_main_qty=99`;
+  - paridade real de terrenos por `card_list` resolvido: `30 -> 30`.
+- Reclassificação correta:
+  - o gap "generate não respeita o learned deck ativo" foi fechado para o
+    caminho determinístico atual;
+  - o risco remanescente deixou de ser precedence interna do builder e passou
+    a ser qualidade/drift do dado promovido em `commander_learned_decks`.
+- Drift residual confirmado:
+  - o row ativo do Lorehold ainda carrega `metadata.total_lands=33`, mas o
+    `card_list` persistido resolve para `30` lands reais;
+  - isso indica divergência entre agregados Hermes/metadata e a lista
+    realmente promovida, não degradação do builder.
 
 ### Atualizacao de ciclo — 2026-06-18 / runtime truth de generate + cron topology
 
@@ -326,9 +340,10 @@
   - manter guardrail de "ativar so com unlock contextual rastreavel" ate haver
     corpus e testes para algo mais forte.
 
-#### P1 — Decidir política explícita de precedência do builder determinístico
+#### P1 — Congelar e documentar a política explícita do builder determinístico
 
-- Em 2026-06-18 o primeiro slice de política foi congelado em código:
+- Em 2026-06-18 a política do builder foi congelada em código e revalidada no
+  Lorehold real:
   `reference_card_stats -> active_learned_deck -> reference_corpus_packages -> profile_expected_packages -> usage_hot_cards -> deterministic_fallback`.
 - A prioridade do learned deck agora é controlada e explícita: ele entra logo
   após a camada mais explicável por carta (`reference_card_stats`) e antes de
@@ -336,28 +351,43 @@
 - Isso não significa "seguir learned deck cegamente"; significa apenas que um
   learned deck ativo/aceito deixou de ser canal passivo quando disputa slots
   com fontes menos fortes.
-- Pendente residual:
-  - decidir se `active_learned_deck` deve ultrapassar também
-    `reference_card_stats` em algum modo futuro;
-  - reduzir o bloco remanescente de cartas do learned deck ainda fora do
-    ranking final (`24` no auditor de 2026-06-18).
+- O que resta aqui já não é bug de implementação, e sim decisão de produto:
+  - manter `reference_card_stats` acima de `active_learned_deck`;
+  - ou promover um modo futuro em que o learned deck aprovado vira a camada
+    dominante quando existir confiança suficiente.
 - Regra vigente mantida:
   - learned decks continuam single-commander até existir corpus confiável de
     Partner/Background.
 
 #### P1 — Curar dependência residual do fallback no Lorehold
 
-- A auditoria de source mix desta rodada confirmou:
-  - `fallback_without_profile_or_stats_count = 9`;
-  - `learned_plus_fallback_only_count = 2`;
-  - `fallback_profile_stats_no_empirical_support_count = 18`.
-- Isso não significa que o deck está quebrado, mas mostra exatamente onde o
-  builder ainda depende de heurística/fallback ou de fontes sem suporte
-  empírico suficiente.
+- O path com learned deck ativo deixou de depender do fallback para remontar o
+  Lorehold principal: o builder agora reproduz exatamente o `card_list`
+  promovido.
+- O fallback residual continua relevante apenas para:
+  - comandantes sem learned deck ativo;
+  - casos futuros em que a política do builder seja alterada;
+  - cartas adicionais fora do `card_list` promovido em scorecards de apoio.
 - Próximo passo correto:
-  - curar primeiro as 9 cartas sem profile/stats;
-  - depois revisar as 2 cartas `learned_plus_fallback_only`;
-  - por fim auditar as 18 `fallback_profile_stats_no_empirical_support`.
+  - tratar o drift entre `commander_learned_decks.card_list` e `metadata`;
+  - depois revisar as cartas ainda dependentes de fallback apenas nos fluxos
+    sem learned deck ativo ou nos relatórios de explainability.
+
+#### P1 — Curar drift entre `commander_learned_decks.card_list` e `metadata`
+
+- O row ativo do Lorehold está coerente como lista promoted/salva, mas não como
+  agregados:
+  - `card_list` resolve para `99` main / `30` lands reais;
+  - `metadata.total_lands` persiste `33`.
+- Isso é perigoso porque scorecards, validators e UX diagnóstica podem confiar
+  em `metadata` e chegar a conclusões diferentes do deck realmente promovido.
+- Próximo passo correto:
+  - rederivar os agregados canônicos (`total_lands`, counts por role, etc.) a
+    partir do `card_list` persistido no promote/sync;
+  - tratar `metadata` como cache derivado, nunca como fonte principal da
+    composição do learned deck;
+  - adicionar teste/guardrail para impedir novos rows ativos com
+    `metadata.total_lands` divergente do `card_list`.
 
 #### P1 — Fechar o gap entre o plano real do Lorehold e o battle runtime
 

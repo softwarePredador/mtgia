@@ -1,5 +1,6 @@
 import 'commander_reference_card_stats_support.dart';
 import 'commander_reference_deck_corpus_support.dart';
+import 'commander_learned_deck_support.dart';
 import 'commander_reference_profile_support.dart';
 import '../color_identity.dart';
 
@@ -140,6 +141,7 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
   required Map<String, dynamic> profile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
@@ -148,6 +150,7 @@ Map<String, dynamic> buildDeterministicReferenceDeck({
       profile: profile,
       referenceCardStats: referenceCardStats,
       referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+      activeLearnedDeck: activeLearnedDeck,
       promotedLearnedCardNames: promotedLearnedCardNames,
       usageHotCardNames: usageHotCardNames,
       targetMainQuantity: targetMainQuantity,
@@ -157,6 +160,7 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   required Map<String, dynamic> profile,
   List<CommanderReferenceCardStat> referenceCardStats = const [],
   CommanderReferenceDeckCorpusGuidance? referenceDeckCorpusGuidance,
+  CommanderLearnedDeckInput? activeLearnedDeck,
   List<String> promotedLearnedCardNames = const [],
   List<String> usageHotCardNames = const [],
   int targetMainQuantity = 99,
@@ -165,16 +169,23 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
       (profile['commander'] ?? profile['commander_name'] ?? '')
           .toString()
           .trim();
-  final nonLands = <String>[];
+  final orderedCardNames = <String>[];
   final seen = <String>{};
+  final quantitiesByName = <String, int>{};
+  final displayNameByName = <String, String>{};
   final sourceLabelsByName = <String, Set<String>>{};
   final avoidedExampleNames = _profileAvoidExampleNames(profile);
   final builtInFallbackEnabled =
       isLoreholdCommanderReferenceCandidate(commanderName);
 
-  void addCard(String? rawName, String source) {
+  void addCard(
+    String? rawName,
+    String source, {
+    int quantity = 1,
+    bool allowBasicLand = false,
+  }) {
     final name = rawName?.trim();
-    if (name == null || name.isEmpty) return;
+    if (name == null || name.isEmpty || quantity <= 0) return;
     final normalizedName = normalizeCommanderReferenceCardName(name);
     if (normalizedName == normalizeCommanderReferenceCardName(commanderName)) {
       return;
@@ -182,14 +193,41 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     if (avoidedExampleNames.contains(normalizedName)) {
       return;
     }
-    if (basicLandNames.contains(normalizedName)) {
+    final isBasicLand = basicLandNames.contains(normalizedName);
+    if (isBasicLand && !allowBasicLand) {
       return;
     }
     sourceLabelsByName
         .putIfAbsent(normalizedName, () => <String>{})
         .add(source);
-    if (!seen.add(normalizedName)) return;
-    nonLands.add(name);
+    displayNameByName.putIfAbsent(normalizedName, () => name);
+    if (seen.add(normalizedName)) {
+      orderedCardNames.add(normalizedName);
+      quantitiesByName[normalizedName] = 0;
+    }
+    if (isBasicLand) {
+      quantitiesByName[normalizedName] =
+          (quantitiesByName[normalizedName] ?? 0) + quantity;
+      return;
+    }
+    if ((quantitiesByName[normalizedName] ?? 0) <= 0) {
+      quantitiesByName[normalizedName] = 1;
+    }
+  }
+
+  if (activeLearnedDeck != null) {
+    for (final card in activeLearnedDeck.cards) {
+      addCard(
+        card.name,
+        'active_learned_deck',
+        quantity: card.quantity,
+        allowBasicLand: true,
+      );
+    }
+  } else {
+    for (final rawName in promotedLearnedCardNames) {
+      addCard(rawName, 'active_learned_deck');
+    }
   }
 
   final stats = referenceCardStats.where((stat) => !stat.unresolved).toList()
@@ -203,10 +241,6 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     });
   for (final stat in stats) {
     addCard(stat.cardName, 'reference_card_stats');
-  }
-
-  for (final rawName in promotedLearnedCardNames) {
-    addCard(rawName, 'active_learned_deck');
   }
 
   final corpusPackages = referenceDeckCorpusGuidance?.packages;
@@ -254,10 +288,23 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     }
   }
 
-  final cappedNonLands = nonLands.take(targetMainQuantity).toList();
+  final cappedCards = <Map<String, dynamic>>[];
+  var cappedMainQuantity = 0;
+  for (final normalizedName in orderedCardNames) {
+    if (cappedMainQuantity >= targetMainQuantity) break;
+    final quantity = quantitiesByName[normalizedName] ?? 0;
+    if (quantity <= 0) continue;
+    final remaining = targetMainQuantity - cappedMainQuantity;
+    final appliedQuantity = quantity > remaining ? remaining : quantity;
+    cappedCards.add({
+      'name': displayNameByName[normalizedName] ?? normalizedName,
+      'quantity': appliedQuantity,
+    });
+    cappedMainQuantity += appliedQuantity;
+  }
   final colors = _profileColorIdentity(profile);
   final basics = _buildBasicLandFallbackCards(
-    total: targetMainQuantity - cappedNonLands.length,
+    total: targetMainQuantity - cappedMainQuantity,
     colors: colors.isEmpty ? const ['W'] : colors,
   );
   final provenance = <DeterministicReferenceDeckCardProvenance>[];
@@ -265,7 +312,8 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
   final sourceUsageCounts = <String, int>{};
   final builtInFallbackOnlyNames = <String>[];
 
-  for (final name in cappedNonLands) {
+  for (final card in cappedCards) {
+    final name = card['name']?.toString() ?? '';
     final normalizedName = normalizeCommanderReferenceCardName(name);
     final sources = (sourceLabelsByName[normalizedName] ?? const <String>{})
         .toList(growable: false)
@@ -295,7 +343,7 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
       'name': commanderName.isEmpty ? 'Isamaru, Hound of Konda' : commanderName
     },
     'cards': [
-      for (final name in cappedNonLands) {'name': name, 'quantity': 1},
+      ...cappedCards,
       ...basics,
     ],
   };
@@ -305,8 +353,8 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
     cardProvenance: provenance,
     sourceMixCounts: sourceMixCounts,
     sourceUsageCounts: sourceUsageCounts,
-    mainDeckQuantity: cappedNonLands.length + basicLandQuantity,
-    distinctCardCount: cappedNonLands.length + basics.length,
+    mainDeckQuantity: cappedMainQuantity + basicLandQuantity,
+    distinctCardCount: cappedCards.length + basics.length,
     basicLandQuantity: basicLandQuantity,
     builtInFallbackEnabled: builtInFallbackEnabled,
     builtInFallbackUsedCount: provenance

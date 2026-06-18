@@ -364,6 +364,7 @@ Future<CommanderReferenceReadinessScorecard>
         profile: profile,
         referenceCardStats: statsLoad.stats,
         referenceDeckCorpusGuidance: corpus,
+        activeLearnedDeck: activeLearnedDeck,
         promotedLearnedCardNames: promotedLearnedCardNames,
       );
       final cards = (deck['cards'] as List?)

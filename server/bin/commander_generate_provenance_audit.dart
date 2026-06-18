@@ -200,6 +200,7 @@ Future<void> main(List<String> args) async {
             profile: usableProfile,
             referenceCardStats: statsLoad.stats,
             referenceDeckCorpusGuidance: corpus,
+            activeLearnedDeck: activeLearnedDeck,
             promotedLearnedCardNames: learnedNames,
             usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
           );
@@ -660,10 +661,13 @@ List<Map<String, dynamic>> _buildGaps({
     });
   }
   if (activeLearnedDeck != null) {
+    final normalizedCommander = normalizeAuditName(activeLearnedDeck.commanderName);
     final learnedOnlyAbsent = normalizeNameSet(
       activeLearnedDeck.cards.map((card) => card.name),
     ).where(
-      (name) => deterministicOwnership.every(
+      (name) =>
+          name != normalizedCommander &&
+          deterministicOwnership.every(
         (entry) => normalizeAuditName(entry.cardName) != name,
       ),
     );
