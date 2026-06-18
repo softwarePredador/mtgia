@@ -63,6 +63,12 @@ def _run_bootstrap(env: dict[str, str]) -> subprocess.CompletedProcess[str]:
 
 
 class HermesLabCronBootstrapTest(unittest.TestCase):
+    def test_provider_prompts_harden_directory_reads(self) -> None:
+        module = _load_module()
+        for prompt in module.PROVIDER_PROMPTS.values():
+            self.assertIn("latest_files", prompt)
+            self.assertIn("Never call `read_file` on a directory path", prompt)
+
     def test_resolve_repo_root_prefers_workspace_and_repo_dir(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:

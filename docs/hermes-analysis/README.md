@@ -143,6 +143,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para decidir o que fica em `manaloom-ops`, o que continua em
     `hermes-lab` e o que deve ser definitivamente removido.
 
+- `EASYPANEL_CRON_RUNTIME_AUDIT_2026-06-18.md`
+  - Prova live da topologia final `manaloom-ops` vs `hermes-lab` ja no
+    EasyPanel.
+  - Confirma quais jobs usam provider/OpenAI, quais sao deterministicas e quais
+    jobs provider-backed ja executaram com `last_status=ok`.
+  - Use antes de declarar a AWS dispensavel ou de reabrir discussao sobre qual
+    cron deve carregar `OPENAI_API_KEY`.
+
 - `BATTLE_AUDIT_COVERAGE_STATUS_2026-06-16.md`
   - Status pos-correcao da auditoria de battle: 16 seeds, 17069 eventos,
     2301 decision traces, 0 high/critical, 0 strategy blockers e apenas

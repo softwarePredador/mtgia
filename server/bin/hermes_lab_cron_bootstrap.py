@@ -120,6 +120,8 @@ PROVIDER_PROMPTS = {
 
 Rules:
 - Work only from current repo files and recent local artifacts.
+- Treat `latest_files` from cron context as the first evidence set.
+- Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - Focus on learned decks, commander usage, generate/optimize support, and commander-specific evidence.
 - Do not create generic tasks. Every finding must cite a concrete file path.
 - If nothing actionable changed, reply exactly [SILENT].
@@ -133,6 +135,8 @@ Output:
 
 Rules:
 - Use current repo files and recent local artifacts only.
+- Treat `latest_files` from cron context as the first evidence set.
+- Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - Distinguish official-rule evidence from heuristic/product policy.
 - Cite concrete file paths for every claim.
 - If no material delta exists, reply exactly [SILENT].
@@ -146,6 +150,8 @@ Output:
 
 Rules:
 - Use only repo-local evidence and recent artifacts.
+- Treat `latest_files` from cron context as the first evidence set.
+- Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - No broad brainstorming, no duplicated tasks, no generic cleanup items.
 - Prefer P1/P2 actions with exact file evidence.
 - If there is no new actionable delta, reply exactly [SILENT].
@@ -159,6 +165,8 @@ Output:
 
 Rules:
 - Separate official rules gaps from strategic-heuristic gaps.
+- Treat `latest_files` from cron context as the first evidence set.
+- Never call `read_file` on a directory path; enumerate with `rg --files`, `find`, `ls` or `git diff --name-only`, then open only concrete files.
 - Cite current code/docs/artifacts for every finding.
 - Do not propose app/UI work here.
 - If no material rules delta exists, reply exactly [SILENT].
@@ -337,7 +345,8 @@ if not wake:
 
 context = {{
     "repo_head": head,
-    "watched_roots": profile["watch_roots"],
+    "watch_root_hints": profile["watch_roots"],
+    "watch_root_instruction": "Treat watch_root_hints as scope hints only. Enumerate files before reading; never pass a directory path to read_file.",
     "file_count": len(entries),
     "latest_files": [path for path, _, _ in entries[-8:]],
     "reason": "retry_after_error" if retry_after_error and not changed else ("changed_inputs" if changed else "first_run"),

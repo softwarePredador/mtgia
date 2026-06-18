@@ -66,6 +66,32 @@
     valido para Lorehold, mesmo quando nao usa o ramo generativo da OpenAI;
   - Lorehold: o risco principal voltou a ser composicao/qualidade do deck
     (`lands=33`, `draw=15`, `wincon=2` no validator), nao wiring.
+- Fechamento operacional adicional na mesma rodada:
+  - revalidacao direta do `jobs.json` no `hermes-lab` confirmou `last_status=ok`
+    para os quatro jobs provider-backed ativos:
+    `manaloom-commander-knowledge-deep`,
+    `manaloom-gamechanger-research`,
+    `manaloom-knowledge-synthesis` e `mtg-rules-auditor`;
+  - `manaloom-ops` e `hermes-lab` ficaram provados como topologia funcional,
+    nao apenas "configurada".
+- Gap residual reduzido:
+  - os jobs provider-backed ainda geravam warnings por tentar `read_file` em
+    diretorios (`docs/hermes-analysis/manaloom-knowledge/decks`,
+    `server/test/artifacts`) durante algumas rodadas;
+  - isso nao impediu `last_status=ok`, mas aumentava ruido e tempo de execucao.
+- Ajuste aplicado:
+  - `hermes_lab_cron_bootstrap.py` passou a instruir explicitamente os prompts
+    provider-backed a:
+    - usar `latest_files` como primeira evidencia;
+    - tratar `watch_root_hints` apenas como escopo;
+    - nunca chamar `read_file` em diretorio;
+    - enumerar arquivos com `rg --files`, `find`, `ls` ou
+      `git diff --name-only` antes de abrir evidencias.
+- Proximo passo correto:
+  - redeploy do `hermes-lab` no EasyPanel para rebootstrapar os prompts
+    endurecidos;
+  - depois, revalidar uma rodada manual curta dos quatro jobs e conferir se os
+    warnings de `read_file` em diretorio desapareceram dos logs.
 
 ### Atualizacao de ciclo — 2026-06-18 / EasyPanel mana validator truth fix
 
