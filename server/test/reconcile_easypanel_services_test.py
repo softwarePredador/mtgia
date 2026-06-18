@@ -41,6 +41,8 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
     desired = MODULE._desired_env("manaloom-ops", {}, MODULE._parse_dotenv(""))
     assert desired["PULL_LEARNING_EVENTS_CRON"] == "0 * * * *"
     assert desired["MTGIA_ENV_FILE"] == "/app/server/.env"
+    assert desired["HERMES_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
+    assert desired["MANALOOM_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
     assert desired["MANALOOM_KNOWLEDGE_IMPORT_CRON"] == "20 */12 * * *"
     assert desired["MANALOOM_IMPORT_APPLY"] == "1"
     assert desired["HERMES_CRON_GOVERNOR_REPORT_CRON"] == "0 */12 * * *"
@@ -54,6 +56,8 @@ def test_desired_env_for_hermes_lab_generates_missing_api_key() -> None:
     )
     assert desired["OPENAI_API_KEY"] == "sk-proj-example"
     assert desired["HERMES_DASHBOARD_HOST"] == "127.0.0.1"
+    assert desired["HERMES_KNOWLEDGE_DB"].endswith("/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db")
+    assert desired["MANALOOM_KNOWLEDGE_DB"] == desired["HERMES_KNOWLEDGE_DB"]
     assert desired["API_SERVER_ENABLED"] == "true"
     assert len(desired["API_SERVER_KEY"]) >= 20
 

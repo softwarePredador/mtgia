@@ -206,6 +206,7 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
         return {
             "MANALOOM_OPS_DATA_DIR": "/data/manaloom-ops",
             "HERMES_KNOWLEDGE_DB": "/data/manaloom-ops/knowledge.db",
+            "MANALOOM_KNOWLEDGE_DB": "/data/manaloom-ops/knowledge.db",
             "MTGIA_ENV_FILE": "/app/server/.env",
             "MANALOOM_DART_BIN": "dart",
             "MANALOOM_RUN_PREFLIGHT_ON_BOOT": "0",
@@ -231,6 +232,8 @@ def _desired_env(service_name: str, runtime_env: dict[str, str], existing_env: O
             "HERMES_DASHBOARD": "1",
             "HERMES_DASHBOARD_HOST": "127.0.0.1",
             "HERMES_DASHBOARD_PORT": "9119",
+            "HERMES_KNOWLEDGE_DB": "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+            "MANALOOM_KNOWLEDGE_DB": "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
             "API_SERVER_ENABLED": "true",
             "API_SERVER_HOST": "0.0.0.0",
             "API_SERVER_KEY": api_server_key,

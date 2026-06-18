@@ -777,6 +777,39 @@
 4. **Learned decks Commander completo** — evoluir contrato de learned decks de 1 commander + 99 main para também aceitar pares oficiais quando houver corpus validado
 5. **Integração avançada de tipos complexos** — efeitos específicos de Omen/Prepare/Paradigm/Station por carta concreta
 6. **Modularização segura** — continuar split do engine Hermes por domínio e depois route/runtime de optimize
+
+### P1 — observabilidade e alinhamento do runtime EasyPanel ainda exigem prova por side effect
+
+Status em 2026-06-17:
+
+- o deploy server-owned no EasyPanel ficou coerente em SHA/env, mas a auditoria
+  read-only do runtime mostrou backlog real em `deck_learning_events`
+  pendentes no PostgreSQL;
+- isso prova que `health`/SHA iguais nao bastam para concluir que
+  `pull_learning_events` e o loop de aprendizado estao fechando no runtime;
+- `manaloom-ops` e `hermes-lab` tambem precisavam declarar explicitamente
+  `HERMES_KNOWLEDGE_DB` / `MANALOOM_KNOWLEDGE_DB`, porque scripts antigos ainda
+  resolvem o cache por nomes diferentes e o fallback implicito mascara drift.
+
+Slice seguro aplicado:
+
+- `server/bin/manaloom_ops_daemon.py` agora exporta tambem
+  `MANALOOM_KNOWLEDGE_DB` para todos os jobs determinísticos;
+- `server/bin/manaloom_ops_daemon.py` passou a executar `pull_learning_events`
+  no boot quando detectar backlog real em `deck_learning_events`;
+- `server/bin/reconcile_easypanel_services.py` passou a reconciliar os dois
+  nomes de env tanto em `manaloom-ops` quanto em `hermes-lab`;
+- novo auditor read-only:
+  `server/bin/audit_easypanel_runtime_alignment.py`.
+
+Pendência real remanescente:
+
+1. provar execucao ativa do `manaloom-ops` por fechamento do backlog
+   `deck_learning_events.pending -> 0` ou via log/artefato acessivel;
+2. manter `hermes-lab` como report-only ate existir decisão explícita sobre
+   compartilhar o mesmo SQLite operacional com `manaloom-ops`;
+3. nao tratar `knowledge.db` do `hermes-lab` como fonte de verdade nem como
+   prova de que o pipeline product-path foi consumido.
 7. **Targeting avançado** — seleção complexa/card-specific além de remoções declaradas; o bloco formal mínimo já está isolado em `battle_targeting_tests.py`
 8. **Suite de conformidade expandida** — triggers aninhadas, escolha de ordenação e regressões v9
 9. **Operacionalização Hermes** — plugar relatório agregado de telemetria nas crons se necessário

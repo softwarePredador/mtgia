@@ -53,11 +53,31 @@ Hardening posterior do runtime:
 - `server/Dockerfile.manaloom-ops` passou a instalar `python3-psycopg2`;
 - `manaloom_ops_daemon.py` passou a rodar `master_optimizer_preflight` no boot
   quando o `knowledge.db` ainda nao contem `decks`/`deck_cards`;
+- `manaloom_ops_daemon.py` agora exporta tambem `MANALOOM_KNOWLEDGE_DB`,
+  evitando drift entre scripts antigos que ainda resolvem o SQLite canonico por
+  `MANALOOM_KNOWLEDGE_DB` em vez de `HERMES_KNOWLEDGE_DB`;
+- `manaloom_ops_daemon.py` agora tambem faz catch-up de
+  `pull_learning_events` no boot quando o PostgreSQL ainda mostra backlog em
+  `deck_learning_events.synced_to_hermes = false`, reduzindo risco de fila
+  parada apos restart/deploy;
 - `hermes_mana_base_validator.py` nao encerra mais com erro estrutural quando o
   SQLite ainda nao recebeu deck alvo; gera relatorio com `runtime_note`.
 - `server/bin/reconcile_easypanel_services.py` virou o caminho canônico para
   reconciliar env mínima de `manaloom-ops`/`hermes-lab` e disparar deploy
   controlado no EasyPanel.
+- `server/bin/audit_easypanel_runtime_alignment.py` passou a auditar, em modo
+  read-only, SHA publico, env efetiva dos servicos, backlog real em
+  `deck_learning_events` e frescor de `commander_learned_decks` /
+  `analysis_sources`.
+
+Achado operacional confirmado no follow-up de 2026-06-17:
+
+- o deploy estava coerente, mas o PostgreSQL expunha backlog real de
+  `deck_learning_events` pendentes, entao a prova de execucao dos jobs nao pode
+  depender apenas do SHA/health do servico;
+- `manaloom-ops` e `hermes-lab` tambem precisavam declarar explicitamente o
+  caminho do `knowledge.db` em env para evitar fallback implicito e drift
+  silencioso entre scripts legados/report-only.
 
 Risco remanescente:
 

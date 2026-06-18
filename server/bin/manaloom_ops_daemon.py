@@ -8,6 +8,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 
 def _resolve_repo_root() -> Path:
@@ -36,6 +37,7 @@ ENV_FILE = Path(os.environ.get("MTGIA_ENV_FILE", str(REPO_ROOT / "server/.env"))
 PYTHON_BIN = os.environ.get("PYTHON_BIN", "python3")
 MANALOOM_DART_BIN = os.environ.get("MANALOOM_DART_BIN", "dart")
 RUN_PREFLIGHT_ON_BOOT = os.environ.get("MANALOOM_RUN_PREFLIGHT_ON_BOOT", "0") == "1"
+BOOT_PULL_PENDING_EVENTS = os.environ.get("MANALOOM_BOOT_PULL_PENDING_EVENTS", "1") == "1"
 
 
 @dataclass(frozen=True)
@@ -59,6 +61,7 @@ def _base_env() -> dict[str, str]:
             "PYTHON_BIN": PYTHON_BIN,
             "MANALOOM_DART_BIN": MANALOOM_DART_BIN,
             "HERMES_KNOWLEDGE_DB": str(KNOWLEDGE_DB),
+            "MANALOOM_KNOWLEDGE_DB": str(KNOWLEDGE_DB),
             "HERMES_ARTIFACT_DIR": str(ARTIFACT_DIR / "hermes_auto_sync"),
             "HERMES_PROFILE_ARTIFACTS_DIR": str(REPO_ROOT / "server/test/artifacts"),
             "HERMES_MANA_BASE_REPORT": str(
@@ -95,6 +98,77 @@ def _knowledge_db_has_validator_tables(path: Path) -> bool:
         return {"decks", "deck_cards"}.issubset(tables)
     except sqlite3.Error:
         return False
+
+
+def _load_psycopg2():
+    import psycopg2  # type: ignore
+    import psycopg2.extras  # type: ignore
+
+    return psycopg2, psycopg2.extras
+
+
+def _pg_pending_learning_events_count(env: dict[str, str]) -> int | None:
+    try:
+        psycopg2, extras = _load_psycopg2()
+        database_url = env.get("DATABASE_URL")
+        connect_kwargs = {"connect_timeout": 10}
+        if database_url:
+            conn = psycopg2.connect(dsn=database_url, cursor_factory=extras.RealDictCursor, **connect_kwargs)
+        else:
+            conn = psycopg2.connect(
+                host=env.get("DB_HOST", ""),
+                port=env.get("DB_PORT", "5432"),
+                dbname=env.get("DB_NAME", ""),
+                user=env.get("DB_USER", ""),
+                password=env.get("DB_PASS", ""),
+                cursor_factory=extras.RealDictCursor,
+                **connect_kwargs,
+            )
+    except Exception as exc:
+        print(f"[manaloom-ops] pending learning-events probe failed at connect: {exc}", flush=True)
+        return None
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT COUNT(*) AS pending FROM deck_learning_events WHERE synced_to_hermes = FALSE"
+                )
+                row = cur.fetchone() or {}
+                return int(row.get("pending") or 0)
+    except Exception as exc:
+        print(f"[manaloom-ops] pending learning-events probe failed at query: {exc}", flush=True)
+        return None
+    finally:
+        conn.close()
+
+
+def _collect_boot_jobs(
+    env: dict[str, str],
+    *,
+    knowledge_db_path: Path,
+    knowledge_db_has_validator_tables: Callable[[Path], bool] = _knowledge_db_has_validator_tables,
+    pending_learning_events_count: Callable[[dict[str, str]], int | None] = _pg_pending_learning_events_count,
+) -> list[tuple[str, str]]:
+    planned: list[tuple[str, str]] = []
+    if BOOT_PULL_PENDING_EVENTS:
+        pending_events = pending_learning_events_count(env)
+        if pending_events and pending_events > 0:
+            planned.append(
+                (
+                    "pull_learning_events",
+                    f"pending_learning_events={pending_events}",
+                )
+            )
+
+    if RUN_PREFLIGHT_ON_BOOT or not knowledge_db_has_validator_tables(knowledge_db_path):
+        reason = (
+            "env_enabled"
+            if RUN_PREFLIGHT_ON_BOOT
+            else "knowledge_db_missing_validator_tables"
+        )
+        planned.append(("master_optimizer_preflight", reason))
+    return planned
 
 
 JOBS = [
@@ -299,19 +373,15 @@ def main() -> int:
             flush=True,
         )
 
-    if RUN_PREFLIGHT_ON_BOOT or not _knowledge_db_has_validator_tables(KNOWLEDGE_DB):
-        preflight = next((job for job in JOBS if job.name == "master_optimizer_preflight"), None)
-        if preflight is not None:
-            reason = (
-                "env_enabled"
-                if RUN_PREFLIGHT_ON_BOOT
-                else "knowledge_db_missing_validator_tables"
-            )
-            print(
-                f"[manaloom-ops] boot preflight trigger reason={reason}",
-                flush=True,
-            )
-            _run_job(preflight, env, state)
+    for job_name, reason in _collect_boot_jobs(env, knowledge_db_path=KNOWLEDGE_DB):
+        job = next((candidate for candidate in JOBS if candidate.name == job_name), None)
+        if job is None:
+            continue
+        print(
+            f"[manaloom-ops] boot trigger name={job_name} reason={reason}",
+            flush=True,
+        )
+        _run_job(job, env, state)
 
     last_minute: str | None = None
     while True:
