@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-18 15:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-19 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -218,17 +218,16 @@ mtgia/
 - **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-07 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases localizados, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, os profiles/seeds de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, mock runtime e prompt runtime por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/ai/optimize` quando `deckOptimizer == null`, `prompt.md` e `prompt_complete.md`). Em 2026-06-12, `/ai/weakness-analysis` deixou de retornar listas fixas de staples para fraquezas principais e `/decks/:id/recommendations` deixou de usar `Command Tower` literal e raridade como proxy; ambos passaram a buscar sugestões no banco por tags/semântica/legalidade, com fallback genérico sem nomes. `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-18 03:00 UTC no checkout local `94f73400`. O auditor textual executou
-  com sucesso (`205` arquivos backend, `196` classes, `0` imports quebrados),
+  2026-06-19 03:00 UTC no checkout local `ad2238a9`. O auditor textual executou
+  com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg`, leitura direta e triagem do delta. Desde a rodada anterior de
-  classes (`2edcc757..HEAD`), nao houve delta de codigo de produto, testes,
-  contrato API, contexto de produto ou manual no recorte app/backend.
-  `LifeCounterScreen` continua legado/test-only enquanto a rota ativa usa
-  `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip` continuam sem uso
-  runtime confirmado nas listagens; e `LotusPresentationMode` nao e
-  importado/chamado pelo Lotus. Nao surgiram novos achados confiaveis nesta
-  rotacao.
+  de `rg`, leitura direta e triagem do delta. Houve delta de produto desde a
+  rodada anterior de classes, principalmente backend/Hermes e
+  `deck_generate_screen.dart`, mas a triagem das 94 declaracoes de classe em
+  Dart alterado nao gerou novo achado confiavel. `LifeCounterScreen` continua
+  legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
+  `DeckCard` e `DeckProgressChip` continuam sem uso runtime confirmado nas
+  listagens; e `LotusPresentationMode` nao e importado/chamado pelo Lotus.
 
 ## Pipeline semantico de cartas
 

@@ -36,9 +36,186 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-18 23:00 UTC
-> Rotacao: `module-coherence-server-lib-routes-app-lib`
+> Atualizacao local Codex: 2026-06-19 03:00 UTC
+> Rotacao: `classes-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Classes not used - revalidacao 2026-06-19 03:00 UTC
+
+Escopo desta rodada: somente classes declaradas sem uso runtime confirmado.
+Nao foi executada auditoria ampla de funcoes sem chamador, imports/ciclos,
+tabelas PostgreSQL sem uso, duplicacao geral ou coerencia entre modulos fora do
+necessario para validar/falsificar candidatos de classe.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `ad2238a9`.
+- `git diff --name-status 94f73400..HEAD -- app/lib server/lib server/routes server/bin server/test app/test app/integration_test server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/CONTEXTO_PRODUTO_ATUAL.md server/manual-de-instrucao.md`:
+  houve delta grande desde a ultima rodada de classes, principalmente em
+  backend/Hermes, rotas de IA/decks, testes, contratos e scripts. No app runtime,
+  o delta relevante para classes ficou concentrado em
+  `app/lib/features/decks/screens/deck_generate_screen.dart`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para manter o foco e evitar claims
+stale: `TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, trechos relevantes de
+`server/manual-de-instrucao.md` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+A skill local `manaloom-data-semantic-layer` tambem foi carregada; a regra
+relevante aqui e tratar Hermes como laboratorio/cache/auditor e validar achados
+contra codigo vivo.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacao para esta rotacao: o auditor textual cobre `server/lib` e
+`server/routes`, inventaria classes, mas nao constroi grafo de chamadas e nao
+varre classes Flutter de `app/lib`. Portanto, a evidencia de classes app sem
+uso veio de `rg`, leitura direta e comparacao com rotas/widgets vivos. A lista
+bruta de classes backend segue inventario textual, nao prova de ausencia de
+uso. A execucao voltou a inserir inventario gerado amplo em `STRUCTURE_AUDIT.md`;
+essa mutacao mecanica foi descartada antes desta atualizacao, mantendo apenas
+os numeros do auditor e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- Reexecucao das buscas focadas da rodada anterior:
+  `LifeCounterScreen`, `DeckCard`, `DeckProgressChip`,
+  `LotusPresentationMode`, controles positivos `LotusLifeCounterScreen` e
+  `DeckProgressIndicator`, e chamadas `SystemChrome` no recorte do life counter.
+- Inventario de classes declaradas nos Dart alterados desde `94f73400`:
+  94 declaracoes em `app/lib`, `server/lib`, `server/routes` e `server/bin`.
+  A triagem nao promoveu classes backend como achado porque os candidatos
+  encontrados eram DTOs/helpers usados no proprio modulo, wrappers de rota ou
+  classes privadas de script; esse padrao nao prova ausencia de uso runtime em
+  Dart.
+- Triagem do unico app runtime alterado: `deck_generate_screen.dart` declara
+  `DeckGenerateScreen`, `_DeckGenerateScreenState`, `_LearnedDeckCallout`,
+  `_ExamplePromptList`, `_LearnedDeckPreviewSummary`, `_PreviewSectionHeader`,
+  `_GenerateProgressPanel`, `_GenerateProgressChip` e `_AiTrustPanel`. As
+  classes privadas continuam chamadas no proprio arquivo em `:550`, `:649`,
+  `:663`, `:672`, `:844`, `:848`, `:862` e `:1307`, portanto nao sao novos
+  candidatos.
+
+### Achados revalidados
+
+#### P1/P2 - `LifeCounterScreen` continua legado/test-only
+
+- **Classe:** `app/lib/features/home/life_counter_screen.dart:61` define
+  `LifeCounterScreen`; o construtor esta em `:66`.
+- **Rota viva:** `app/lib/main.dart:282`-`:284` registra
+  `lifeCounterRoutePath` com `const LotusLifeCounterScreen()`.
+- **Busca focada:** `rg -n '(^|[^A-Za-z0-9_])LifeCounterScreen\(' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou somente o construtor da propria classe e duas instanciacoes em
+  testes: `app/test/features/home/life_counter_screen_test.dart:36` e
+  `app/test/features/home/life_counter_clone_proof_test.dart:277`.
+- **Por que parece sem uso runtime:** nenhum arquivo em `app/lib` instancia
+  `LifeCounterScreen`; o caminho app-facing do contador usa Lotus.
+- **O que valida:** remover/deprecar formalmente `LifeCounterScreen`, ou marcar
+  a classe como fixture/harness legado e ajustar os testes para refletirem esse
+  contrato.
+- **O que falsifica:** alguma rota/widget em `app/lib` passar a instanciar
+  `LifeCounterScreen` fora dos testes.
+
+#### P1/P2 - `DeckCard` permanece testado, mas sem consumidor runtime
+
+- **Classe:** `app/lib/features/decks/widgets/deck_card.dart:17` define
+  `DeckCard`; o construtor esta em `:22`.
+- **Busca focada:** `rg -n '\bDeckCard\b|deck_card\.dart|_RecentDeckCard|_CommunityDeckCard|_FollowingDeckCard|_EmptyDeckCard' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou `DeckCard` em `app/lib` somente no proprio arquivo. Fora dele,
+  aparece apenas nos testes `app/test/features/decks/widgets/deck_card_test.dart`
+  e `app/test/features/decks/widgets/deck_card_overflow_test.dart`.
+- **Listagens reais:** Home usa `_RecentDeckCard` em
+  `app/lib/features/home/home_screen.dart:519` e define a classe em `:525`;
+  Community usa `_CommunityDeckCard` em
+  `app/lib/features/community/screens/community_screen.dart:341` e define em
+  `:774`, `_FollowingDeckCard` em `:542` e define em `:955`; a listagem de
+  decks vazia usa `_EmptyDeckCard` em
+  `app/lib/features/decks/screens/deck_list_screen.dart:1777` e define a classe
+  em `:1829`.
+- **Por que parece sem uso runtime:** nao ha import de `deck_card.dart` em
+  `app/lib` nem chamada `DeckCard(...)` em telas vivas; as listagens usam cards
+  locais/privados.
+- **O que valida:** remover `DeckCard` e seus testes, ou religar a listagem real
+  ao componente compartilhado.
+- **O que falsifica:** import de `deck_card.dart` ou chamada `DeckCard(...)` em
+  `app/lib` que a busca atual nao encontrou.
+
+#### P2 - `DeckProgressChip` continua sem chamada de construtor
+
+- **Classe:** `app/lib/features/decks/widgets/deck_progress_indicator.dart:295`
+  define `DeckProgressChip`; o construtor esta em `:301`.
+- **Busca focada:** `rg -n '\bDeckProgressChip\(|\bDeckProgressIndicator\(|deck_progress_indicator\.dart' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou `DeckProgressChip(` somente no construtor da propria classe.
+- **Controle positivo:** `DeckProgressIndicator` no mesmo arquivo continua vivo
+  em `app/lib/features/decks/screens/deck_details_screen.dart:403` e
+  `app/lib/features/decks/widgets/deck_details_overview_tab.dart:328`.
+- **Por que parece sem uso runtime:** o chip compacto existe como segunda
+  variante no arquivo, mas nenhuma superficie app/test o instancia.
+- **O que valida:** remover `DeckProgressChip`, ou substituir alguma superficie
+  compacta real por ele com teste.
+- **O que falsifica:** qualquer chamada `DeckProgressChip(...)` em `app/lib` ou
+  teste que prove o contrato runtime esperado.
+
+#### P2 - `LotusPresentationMode` nao e chamado pelo Lotus runtime
+
+- **Classe:** `app/lib/features/home/lotus/lotus_presentation_mode.dart:4`
+  define `LotusPresentationMode`; `enter()` e `exit()` estao em `:15` e `:26`.
+- **Busca focada:** `rg -n 'lotus_presentation_mode\.dart|LotusPresentationMode\.(enter|exit)|\bLotusPresentationMode\b' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou somente a propria classe/construtor privado.
+- **Busca por System UI:** `rg -n 'SystemChrome|setPreferredOrientations|setEnabledSystemUIMode|setSystemUIOverlayStyle|lotus_presentation_mode' app/lib/features/home app/test app/integration_test --glob '*.dart'`
+  encontrou chamadas `SystemChrome` apenas nesse arquivo.
+- **Por que parece sem uso runtime:** o helper encapsula orientacao e System UI,
+  mas `LotusLifeCounterScreen` nao importa o arquivo nem chama
+  `LotusPresentationMode.enter()`/`exit()`.
+- **O que valida:** remover a classe ou ligar `enter/exit` ao lifecycle real de
+  `LotusLifeCounterScreen`, com teste que prove restauracao de UI/orientacao.
+- **O que falsifica:** import/chamada de `LotusPresentationMode.enter/exit` em
+  `app/lib` ou teste runtime dedicado que passe a exercer o helper.
+
+### Suspeitas revalidadas e nao reabertas
+
+- `LotusLifeCounterScreen` nao esta unused: `app/lib/main.dart:282`-`:284`
+  usa essa tela na rota viva, e ha ampla cobertura em `app/test` e
+  `app/integration_test`.
+- `DeckProgressIndicator` nao esta unused: e chamado em
+  `deck_details_screen.dart:403` e `deck_details_overview_tab.dart:328`.
+- Classes privadas do `DeckGenerateScreen` alterado seguem chamadas no proprio
+  arquivo, incluindo `_LearnedDeckCallout`, `_ExamplePromptList`,
+  `_LearnedDeckPreviewSummary`, `_PreviewSectionHeader`,
+  `_GenerateProgressPanel`, `_GenerateProgressChip` e `_AiTrustPanel`.
+- A lista bruta de classes backend do auditor e o inventario de 94 declaracoes
+  em arquivos alterados continuam ruidosos para DTOs, resultados, adapters de
+  rota e classes usadas por inferencia/retorno no mesmo arquivo; nenhuma classe
+  backend foi promovida como novo achado nesta rodada.
+
+### Resultado desta revalidacao
+
+No checkout `ad2238a9`, houve delta de produto desde a ultima rodada focada em
+classes, mas nao surgiu novo achado confiavel de classe sem uso. Permanecem
+abertos os mesmos quatro candidatos app: `LifeCounterScreen`, `DeckCard`,
+`DeckProgressChip` e `LotusPresentationMode`. A recomendacao segue remover ou
+reconectar cada classe, e alinhar/remover testes que hoje cobrem componentes
+fora do runtime real.
 
 ## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib` - revalidacao 2026-06-18 23:00 UTC
 
