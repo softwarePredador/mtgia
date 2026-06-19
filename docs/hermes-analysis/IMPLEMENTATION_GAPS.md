@@ -2333,6 +2333,16 @@ Validacoes:
 - `dart test test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart -r expanded`
 - `dart analyze lib/ai/optimization_quality_gate.dart lib/ai/optimization_functional_roles.dart lib/edh_bracket_policy.dart test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart`
 - `dart test test/functional_card_tags_test.dart test/optimization_validator_test.dart test/optimize_route_bracket_policy_filter_support_test.dart -r expanded`
+- `dart test -r compact`
+- Deploy EasyPanel `manaloom-ops`/`hermes-lab` para
+  `177544ca289e2c96048d59591c3b98d52708a4e7`
+- `lorehold_public_generator_parity`: `PASS_WITH_RISKS`,
+  `reference_profile_used=true`, `reference_card_stats_used=true`,
+  `is_mock=false`
+- `commander_generate_provenance`: `PASS_WITH_RISKS`, `profile_usable=true`,
+  `stats_count=34`, `corpus_accepted_deck_count=3`,
+  `usage_hot_cards_count=50`, `active_learned_deck_exists=true`,
+  `deterministic_main_count=99`, `deterministic_distinct_card_count=99`
 - `git diff --check`
 
 Documento de ciclo:
@@ -2345,6 +2355,7 @@ Pendencia que permanece P1:
   `needs_rule_review`, principalmente `Goblin Bombardment`, `Seize the Day`,
   `Iron Man, Titan of Innovation` e proximas cartas novas que afetem Lorehold
   ou oponentes recorrentes.
-- Rodar scorecard Lorehold apos deploy deste slice para medir o impacto real no
-  pool de candidatos e confirmar que nao houve regressao em legalidade,
-  singleton, color identity ou fallback.
+- Rodar scorecard Lorehold de optimize/battle em lote maior para medir impacto
+  no pool de candidatos. A validacao de generate/provenance deste slice ja
+  confirmou profile ativo, learned deck ativo e main deck deterministico
+  `99/99` distinto.

@@ -58,6 +58,13 @@ Achados rejeitados neste slice:
 - `dart analyze lib/ai/optimization_quality_gate.dart lib/ai/optimization_functional_roles.dart lib/edh_bracket_policy.dart test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart`
 - `dart test test/functional_card_tags_test.dart test/optimization_validator_test.dart test/optimize_route_bracket_policy_filter_support_test.dart -r expanded`
 - `git diff --check`
+- Deploy EasyPanel de `manaloom-ops` e `hermes-lab` para
+  `177544ca289e2c96048d59591c3b98d52708a4e7`
+- `curl https://evolution-cartinhas.8ktevp.easypanel.host/health`
+- `python3 server/bin/audit_easypanel_runtime_alignment.py --stdout-only`
+- `python3 server/bin/audit_easypanel_cron_runtime.py`
+- `dart run bin/lorehold_public_generator_parity_audit.dart --base-url=https://evolution-cartinhas.8ktevp.easypanel.host --artifact-dir=test/artifacts/lorehold_public_generator_parity_2026-06-18_role_gate`
+- `API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host dart run bin/commander_generate_provenance_audit.dart --commander="Lorehold, the Historian" --artifact-dir=test/artifacts/goal_lorehold_generate_provenance_20260618_role_gate`
 
 ## Impacto esperado
 
@@ -70,6 +77,32 @@ Achados rejeitados neste slice:
   combo apenas por não terem "ritual" no nome.
 - Bracket policy e optimizer ficam mais coerentes para combo pieces comuns.
 
+## Validacao Lorehold pos-deploy
+
+Resultado publico:
+
+- `health.git_sha=177544ca289e2c96048d59591c3b98d52708a4e7`
+- `lorehold_public_generator_parity`: `PASS_WITH_RISKS`
+- `/ai/generate`: `is_mock=false`, `generation_mode=reference_deterministic`,
+  `reference_profile_used=true`, `reference_card_stats_used=true`
+- `commander-learning`: `recommended_deck_source=promoted_learned_deck_pg`
+- `commander_generate_provenance`: `PASS_WITH_RISKS`
+- `profile_usable=true`
+- `stats_count=34`
+- `corpus_accepted_deck_count=3`
+- `usage_hot_cards_count=50`
+- `active_learned_deck_exists=true`
+- `deterministic_main_count=99`
+- `deterministic_distinct_card_count=99`
+
+Riscos mantidos:
+
+- `commander-learning` continua canal paralelo e nao substitui a ownership do
+  backend.
+- O auditor runtime ainda reporta P2 `split_operational_cache_paths` entre
+  `manaloom-ops` e `hermes-lab`; aceitavel enquanto `hermes-lab` ficar
+  report-only.
+
 ## Pendencias restantes
 
 P1:
@@ -78,8 +111,9 @@ P1:
   `Goblin Bombardment`, `Seize the Day`, `Iron Man, Titan of Innovation` e
   qualquer carta nova que entrar em `needs_rule_review`.
 - Reduzir fallback do Lorehold com evidence por carta, nao por nome solto.
-- Rodar scorecard Lorehold apos o deploy deste slice para medir se as sugestoes
-  aprovadas mudaram e se nao houve regressao de singleton/color identity.
+- Rodar scorecard Lorehold de optimize/battle em lote maior para medir se as
+  sugestoes aprovadas mudaram; a validacao de generate/provenance deste slice
+  ja confirmou main deck 99/99 distinto e profile ativo.
 
 P2:
 
@@ -87,4 +121,3 @@ P2:
   aparecer em novas auditorias Hermes.
 - Expandir testes de role detection para mais exemplos reais de "opponent
   draws", "each player draws" e draw simetrico/wheel.
-
