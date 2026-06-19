@@ -298,22 +298,19 @@ policy/dados versionados, nao mantidos como texto solto.
   `compute_loss_tags_from_replays`. Funcoes historicas
   `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
   e `buildCandidateQualitySamplePoolSql` nao existem mais no checkout vivo.
-- **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: o achado
-  de 2026-06-07 foi superseded pela validação de 2026-06-15. `deck_matchups`
-  e `deck_weakness_reports` têm leitura runtime nas próprias rotas de
+- **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado em
+  2026-06-19 15:00 UTC no checkout `f80b2da2`. `deck_matchups` e
+  `deck_weakness_reports` têm leitura runtime nas próprias rotas de
   matchup/weakness-analysis; o risco atual é produto/retroalimentação baixa,
-  não ausência total de consumidor. `ml_prompt_feedback` agora tem writer
-  runtime em `/ai/optimize`, schema em `database_setup.sql`/`verify_schema.dart`
-  e contador operacional em `/ai/ml-status`; o risco restante é consumir esse
-  histórico para seleção de prompt, não coletá-lo. `commander_reference_decks` e
-  `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
-  direto confirmado, enquanto o produto le o agregado
-  `commander_reference_deck_analysis`; e `ml_prompt_feedback` tem insert helper
-  sem chamador, leitura apenas `COUNT(*)` em `/ai/ml-status` e nenhum DDL local
-  encontrado neste checkout. `server/doc/API_CONTRACTS_AND_DATA_MAP.md` e
-  `server/manual-de-instrucao.md` ainda contem texto stale sobre
-  `deck_matchups`/`deck_weakness_reports`, mas ficaram fora do escopo de escrita
-  desta rotina.
+  não ausência total de consumidor. `ml_prompt_feedback` tem writer runtime em
+  `/ai/optimize`, schema em `database_setup.sql`/`verify_schema.dart` e contador
+  operacional em `/ai/ml-status`; o risco restante é consumir esse histórico
+  para seleção/score de prompt, não coletá-lo. `commander_reference_decks` e
+  `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN` direto
+  confirmado, enquanto o produto le o agregado `commander_reference_deck_analysis`.
+  `deck_learning_events`, `commander_card_usage`, `commander_card_synergy` e
+  `commander_learning_snapshot` possuem leitores/escritores ou consumidores
+  operacionais confirmados e nao entraram como achados.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.
 
 ## Observabilidade
