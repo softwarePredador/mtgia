@@ -389,6 +389,20 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
   return currentCards.values.toList();
 }
 
+String buildDeckOptimizationSignature(DeckDetails deck) {
+  final entries = <String>[];
+  for (final commander in deck.commander) {
+    entries.add('${commander.id}:1');
+  }
+  for (final cards in deck.mainBoard.values) {
+    for (final card in cards) {
+      entries.add('${card.id}:${card.quantity <= 0 ? 1 : card.quantity}');
+    }
+  }
+  entries.sort();
+  return entries.join('|');
+}
+
 Map<String, int> buildRemovalCounts(List<String> cardIds) {
   final removalCounts = <String, int>{};
   for (final id in cardIds) {

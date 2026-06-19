@@ -47,6 +47,111 @@ void main() {
     expect(preview.intensity, OptimizeIntensity.focused);
   });
 
+  test('requestOptimizePreview validates swap integrity payload', () async {
+    final removalsDetailed = const [
+      {'card_id': 'remove-1', 'name': 'Mind Stone'},
+    ];
+    final additionsDetailed = const [
+      {'card_id': 'add-1', 'name': 'Arcane Signet'},
+    ];
+    final hash = computeOptimizeSwapIntegrityHash(
+      deckId: 'deck-1',
+      deckSignature: 'cmd-1:1|remove-1:1',
+      removalsDetailed: removalsDetailed,
+      additionsDetailed: additionsDetailed,
+    );
+
+    final outcome = await requestOptimizePreview(
+      deckId: 'deck-1',
+      archetype: 'control',
+      bracket: 2,
+      keepTheme: true,
+      intensity: OptimizeIntensity.focused,
+      executeRequest: (
+        _,
+        __, {
+        required bracket,
+        required keepTheme,
+        required intensity,
+        required onProgress,
+      }) async {
+        return {
+          'mode': 'optimize',
+          'removals': const ['Mind Stone'],
+          'additions': const ['Arcane Signet'],
+          'removals_detailed': removalsDetailed,
+          'additions_detailed': additionsDetailed,
+          'swap_integrity': {
+            'version': 'v1',
+            'algo': 'sha256',
+            'hash': hash,
+            'deck_signature': 'cmd-1:1|remove-1:1',
+            'removal_count': 1,
+            'addition_count': 1,
+          },
+        };
+      },
+      onProgressUpdate: (_) {},
+    );
+
+    expect(outcome.preview.swapIntegrity?.deckSignature, 'cmd-1:1|remove-1:1');
+    expect(outcome.applyPlan.expectedDeckSignature, 'cmd-1:1|remove-1:1');
+  });
+
+  test(
+    'requestOptimizePreview rejects invalid swap integrity payload',
+    () async {
+      final removalsDetailed = const [
+        {'card_id': 'remove-1', 'name': 'Mind Stone'},
+      ];
+      final additionsDetailed = const [
+        {'card_id': 'add-1', 'name': 'Arcane Signet'},
+      ];
+
+      expect(
+        () => requestOptimizePreview(
+          deckId: 'deck-1',
+          archetype: 'control',
+          bracket: 2,
+          keepTheme: true,
+          intensity: OptimizeIntensity.focused,
+          executeRequest: (
+            _,
+            __, {
+            required bracket,
+            required keepTheme,
+            required intensity,
+            required onProgress,
+          }) async {
+            return {
+              'mode': 'optimize',
+              'removals': const ['Mind Stone'],
+              'additions': const ['Arcane Signet'],
+              'removals_detailed': removalsDetailed,
+              'additions_detailed': additionsDetailed,
+              'swap_integrity': const {
+                'version': 'v1',
+                'algo': 'sha256',
+                'hash': 'bad-hash',
+                'deck_signature': 'cmd-1:1|remove-1:1',
+                'removal_count': 1,
+                'addition_count': 1,
+              },
+            };
+          },
+          onProgressUpdate: (_) {},
+        ),
+        throwsA(
+          isA<DeckAiFlowException>().having(
+            (error) => error.code,
+            'code',
+            'OPTIMIZE_SWAP_INTEGRITY_INVALID',
+          ),
+        ),
+      );
+    },
+  );
+
   test('AggressiveCandidateQualityDiagnostics parses optional payload', () {
     final diagnostics = AggressiveCandidateQualityDiagnostics.fromPayload({
       'optimize_diagnostics': {
@@ -347,13 +452,16 @@ void main() {
         additionsDetailed: [
           {'card_id': 'add-1'},
         ],
+        expectedDeckSignature: 'sig-1',
       ),
       addBulk: (_, __) async => calls.add('bulk'),
-      applyWithIds: (_, __, ___) async => calls.add('ids'),
+      applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+        calls.add('ids:$expectedDeckSignature');
+      },
       applyByNames: (_, __, ___) async => calls.add('names'),
     );
 
-    expect(calls, ['ids']);
+    expect(calls, ['ids:sig-1']);
   });
 
   test(
@@ -371,7 +479,8 @@ void main() {
           additions: ['Arcane Signet'],
         ),
         addBulk: (_, __) async => calls.add('bulk'),
-        applyWithIds: (_, __, ___) async => calls.add('ids'),
+        applyWithIds:
+            (_, __, ___, {expectedDeckSignature}) async => calls.add('ids'),
         applyByNames: (_, removals, additions) async {
           calls.add('names:${removals.join(",")}:${additions.join(",")}');
         },
@@ -576,7 +685,8 @@ void main() {
       onAiError: (_) async => calls.add('ai-error'),
       onGenericError: (_) => calls.add('generic-error'),
       addBulk: (_, __) async => calls.add('bulk'),
-      applyWithIds: (_, __, ___) async => calls.add('ids'),
+      applyWithIds:
+          (_, __, ___, {expectedDeckSignature}) async => calls.add('ids'),
       applyByNames: (_, removals, additions) async {
         calls.add('names:${removals.join(",")}:${additions.join(",")}');
       },

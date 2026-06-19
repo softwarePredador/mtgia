@@ -1646,12 +1646,17 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
           (deckId, cards) =>
               deckProvider.addCardsBulk(deckId: deckId, cards: cards),
       applyWithIds:
-          (deckId, removalsDetailed, additionsDetailed) =>
-              deckProvider.applyOptimizationWithIds(
-                deckId: deckId,
-                removalsDetailed: removalsDetailed,
-                additionsDetailed: additionsDetailed,
-              ),
+          (
+            deckId,
+            removalsDetailed,
+            additionsDetailed, {
+            expectedDeckSignature,
+          }) => deckProvider.applyOptimizationWithIds(
+            deckId: deckId,
+            removalsDetailed: removalsDetailed,
+            additionsDetailed: additionsDetailed,
+            expectedDeckSignature: expectedDeckSignature,
+          ),
       applyByNames:
           (deckId, removals, additions) => deckProvider.applyOptimization(
             deckId: deckId,

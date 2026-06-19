@@ -1000,6 +1000,47 @@ void main() {
     );
 
     test(
+      'applyOptimizationWithIds rejects stale deck signature before PUT',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1':
+                () => ApiResponse(200, _buildDeckDetailsJson({'remove-1': 1})),
+          },
+          putHandlers: {
+            '/decks/deck-1': (_) {
+              fail('PUT should not be called when deck signature is stale');
+            },
+          },
+        );
+
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDeckDetails('deck-1');
+
+        expect(
+          () => provider.applyOptimizationWithIds(
+            deckId: 'deck-1',
+            removalsDetailed: const [
+              {'card_id': 'remove-1', 'name': 'Mind Stone'},
+            ],
+            additionsDetailed: const [
+              {'card_id': 'add-1', 'name': 'Arcane Signet'},
+            ],
+            expectedDeckSignature: 'stale-signature',
+          ),
+          throwsA(
+            predicate(
+              (error) => error.toString().contains(
+                'O deck mudou desde que a otimização foi gerada',
+              ),
+            ),
+          ),
+        );
+        expect(apiClient.putCalls, isEmpty);
+      },
+    );
+
+    test(
       'applyOptimizationWithIds filters additions outside commander identity',
       () async {
         final currentCards = <String, int>{'remove-1': 1, 'land-1': 36};
