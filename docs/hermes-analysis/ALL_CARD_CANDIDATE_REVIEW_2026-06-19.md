@@ -303,13 +303,18 @@ P1:
 - criar templates focados para as famílias mais frequentes, começando por
   `recursion/zone`, `protection/prevention` restante,
   `triggered_or_static_engine`, `counter_manipulation` e
-  `mana/resource_acceleration`;
+  `mana/resource_acceleration` restante. Em 2026-06-19 foi fechado apenas o
+  subcaso estreito `Create a Treasure token.`;
 - considerar `protection` papel que exige fila `needs_rule_review` quando não
   há regra battle confiável; em 2026-06-19 foi fechado apenas o template seguro
   `Creatures you control gain indestructible until end of turn.` como resposta
   a `board_wipe`, com replay e decision trace. Casos de prevenção ampla,
   proteção individual e `Permanents you control gain indestructible` continuam
   pendentes por exigirem assertions específicas;
+- considerar texto com `Treasure token` como fila `needs_rule_review` quando não
+  há regra battle confiável; em 2026-06-19 foi fechado o template seguro
+  `Create a Treasure token.`, com regra temporária SQLite no focused evidence,
+  evento `treasure_created` e promotion gate report-only;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;

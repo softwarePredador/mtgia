@@ -2636,7 +2636,8 @@ Pendências P1 agora priorizadas:
     criaturas ganhando indestrutível até o fim do turno;
   - `triggered_or_static_engine`;
   - `counter_manipulation`;
-  - `mana_or_resource_acceleration`.
+  - `mana_or_resource_acceleration`, excluindo o subcaso já coberto de
+    `Create a Treasure token.`.
 - Expandir `targeted_interaction` e `mass_removal_or_modal_wipe` somente para
   variantes que não sejam os templates simples já cobertos. Exemplos: destroy
   target permanent com rider, exile target creature/permanent, modal wipe,

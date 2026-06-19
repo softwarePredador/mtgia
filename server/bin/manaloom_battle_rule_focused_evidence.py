@@ -18,6 +18,7 @@ import os
 import random
 import sqlite3
 import sys
+from contextlib import closing
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -337,6 +338,15 @@ def supports_creatures_indestructible_template(draft: DraftRecord) -> bool:
         and "creatures you control" in text
         and "gain indestructible until end of turn" in text
         and "target" not in text
+        and draft.proposed_status == "needs_review"
+    )
+
+
+def supports_simple_treasure_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "treasure_resource_generation" in draft.effect_families
+        and text == "create a treasure token."
         and draft.proposed_status == "needs_review"
     )
 
@@ -1338,6 +1348,158 @@ def build_creatures_indestructible_evidence(draft: DraftRecord, output_dir: Path
     )
 
 
+def build_simple_treasure_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    battle = load_module(
+        "battle_analyst_treasure_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        "replay_decision_auditor_treasure_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+    if battle.battle_rule_registry is None:
+        return EvidenceResult(
+            draft=draft,
+            status="unsupported",
+            reason="battle_rule_registry_unavailable",
+        )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    runtime_db = rule_dir / "runtime_rules.db"
+    old_db = battle.DB
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        with closing(sqlite3.connect(runtime_db)) as conn:
+            battle.battle_rule_registry.upsert_battle_card_rule(
+                conn,
+                draft.card_name,
+                {
+                    "effect": "treasure_maker",
+                    "treasure_count": 1,
+                    "instant": False,
+                },
+                source="focused_evidence",
+                confidence=1.0,
+                review_status="verified",
+                oracle_hash=f"focused:{draft.oracle_id or draft.card_name}",
+                notes="Temporary focused-evidence rule for simple Treasure token creation.",
+            )
+            conn.commit()
+        battle.DB = str(runtime_db)
+        battle.battle_rule_registry._RULE_CACHE.clear()
+
+        active = battle.Player("Active", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        spell = {
+            "name": draft.card_name,
+            "cmc": 1,
+            "mana_cost": "{R}",
+            "type_line": "Sorcery",
+            "oracle_text": "Create a Treasure token.",
+        }
+        battle.apply_effect_immediate(active, [opponent], spell, turn=3, rng=random.Random(22))
+    finally:
+        battle.DB = old_db
+        if battle.battle_rule_registry is not None:
+            battle.battle_rule_registry._RULE_CACHE.clear()
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    resolved_event = any(
+        row.get("event") == "spell_resolved"
+        and row.get("card") == draft.card_name
+        and row.get("effect") == "treasure_maker"
+        for row in event_rows
+    )
+    treasure_event = any(
+        row.get("event") == "treasure_created"
+        and row.get("card") == draft.card_name
+        and row.get("treasures_created") == 1
+        and row.get("treasures") == 1
+        for row in event_rows
+    )
+    spell_finished = any(card.get("name") == draft.card_name for card in active.graveyard)
+    focused_passed = bool(
+        resolved_event
+        and treasure_event
+        and active.treasures == 1
+        and spell_finished
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "spell_resolved_as_treasure_maker": resolved_event,
+            "treasure_created_event": treasure_event,
+            "treasure_count_after_resolution": active.treasures,
+            "spell_finished_in_graveyard": spell_finished,
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": "simple_treasure_resource_generation",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: Create a Treasure token.",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": "hard_behavior_simple_treasure_generation_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason="simple_treasure_generation_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
 def build_sacrifice_damage_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_sacrifice_damage_evidence",
@@ -1824,6 +1986,8 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
         return build_destroy_all_creatures_evidence(draft, output_dir)
     if supports_creatures_indestructible_template(draft):
         return build_creatures_indestructible_evidence(draft, output_dir)
+    if supports_simple_treasure_template(draft):
+        return build_simple_treasure_evidence(draft, output_dir)
     if supports_sacrifice_damage_template(draft):
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):

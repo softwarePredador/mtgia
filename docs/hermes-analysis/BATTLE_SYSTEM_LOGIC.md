@@ -1011,6 +1011,18 @@ Extra combat + flashback simples
 - prova resolucao da mao, cast via graveyard, replacement para exile e replay
   audit sem critical/high
 
+Treasure simples
+- oracle_text contem exatamente `Create a Treasure token.`;
+- effect_families inclui `treasure_resource_generation`;
+- `new_card_candidate_review` envia texto com `Treasure token` para
+  `needs_rule_review` quando não há regra battle confiável;
+- o focused evidence usa uma regra temporária em SQLite local de teste, executa
+  `apply_effect_immediate()` pelo caminho real de `card_battle_rules`, valida
+  `treasure_created`, spell finalizada no graveyard e replay audit sem
+  critical/high;
+- não cobre ainda Treasure com draw/rider, Treasure condicional, rituais, mana
+  rocks ou efeitos que escolhem cor/quantidade variável.
+
 Attack trigger + Treasure + artifact tutor
 - oracle_text contem trigger de ataque, Treasure, sacrificio de artefato e
   busca de artifact card para o campo;
@@ -1053,6 +1065,9 @@ Resultado de controle:
   proteção pura passou a entrar na fila `needs_rule_review` quando não há regra
   battle confiável, e o teste local de consumidores subiu de 9 para 10 drafts
   elegíveis sem auto-promotion.
+- Com o template `Create a Treasure token.`, texto com `Treasure token` passou a
+  entrar em `needs_rule_review` quando não há regra confiável, e o teste local
+  de consumidores subiu de 10 para 11 drafts elegíveis sem auto-promotion.
 
 Correção crítica associada ao wipe:
 

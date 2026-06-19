@@ -290,6 +290,8 @@ def battle_rule_status(card: CardRecord, roles: list[str]) -> str:
     text = card.oracle_text.lower()
     if "additional combat phase" in text or "flashback" in text:
         return "missing"
+    if "treasure token" in text:
+        return "missing"
     if any(role in roles for role in ("removal", "board_wipe", "protection", "tutor", "engine", "wincon", "combo")):
         return "missing"
     return "not_required"
