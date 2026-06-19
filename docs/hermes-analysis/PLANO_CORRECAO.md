@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-19 15:00 UTC
+> Data: 2026-06-19 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-18 19:00 UTC no checkout `920486c4`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. O delta desde a rodada de duplicacao anterior (`e47adcd5..HEAD`) removeu ou estreitou claims antigas: `sync_cards_utils.dart` agora e chamado pelo CLI real para parsing de janela/set/card row, o exporter Hermes de learned deck virou wrapper para a implementacao canonica em docs, `resolveOptimizeArchetype` tem fonte unica em `optimize_archetype_support.dart`, e `functional_card_tags.dart` usa `resolveCardFunctionalRoles` para roles estrategicos. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition e CMC/tipo. Novo risco estreito script-level: `server/bin/repo_runtime_paths.py` existe, mas parte dos crons Hermes ainda duplica resolucao de repo root/knowledge DB. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-19 03:00 UTC no checkout `ad2238a9` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta de produto desde `94f73400`, mas nao abriu novo candidato confiavel alem dos quatro ja abertos; a unica mudanca app runtime relevante (`deck_generate_screen.dart`) manteve suas classes privadas chamadas no proprio arquivo. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-19 07:00 UTC no checkout `895fb545` encontrou delta amplo desde `88fa4a1e`: fechou como stale o achado P1 amplo de `sync_cards_utils.dart` test-only e confirmou `MLKnowledgeService.recordFeedback`/`hasSuspiciousNonLandCmc` como vivos, mas manteve abertos `verifySwapIntegrity`, a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada e helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-19 03:00 UTC no checkout `ad2238a9` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta de produto desde `94f73400`, mas nao abriu novo candidato confiavel alem dos quatro ja abertos; a unica mudanca app runtime relevante (`deck_generate_screen.dart`) manteve suas classes privadas chamadas no proprio arquivo. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-19 07:00 UTC no checkout `895fb545` encontrou delta amplo desde `88fa4a1e`: fechou como stale o achado P1 amplo de `sync_cards_utils.dart` test-only e confirmou `MLKnowledgeService.recordFeedback`/`hasSuspiciousNonLandCmc` como vivos, mas manteve abertos `verifySwapIntegrity`, a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada e helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado.
 
 A revalidacao de coerencia app/server de 2026-06-18 23:00 UTC no checkout
 `523589bc` fechou os tres gaps estreitos da rodada anterior:
@@ -47,7 +47,7 @@ o SCC app entre `life_counter_tabletop_engine.dart` e
    `server/routes/ai/optimize/index.dart` (~2498 linhas) reduziram, mas seguem
    como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente em
-   2026-06-18. `resolveOptimizeArchetype`, strategic roles em
+   2026-06-19 19:00 UTC. `resolveOptimizeArchetype`, strategic roles em
    `functional_card_tags.dart`, o sync principal de cartas e o exporter Hermes
    de learned deck foram retirados das claims amplas por terem fonte canonica
    ou wrapper atual. Os maiores riscos restantes sao analise de estado
@@ -208,7 +208,7 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-18 19:00 UTC: PARCIAL no checkout `920486c4`.**
+- **Status 2026-06-19 19:00 UTC: PARCIAL no checkout `ced006f2`.**
   `resolveOptimizeArchetype` foi unificado, os roles estratégicos
   `wincon`, `combo_piece`, `engine`, `payoff` e `enabler` usam
   `resolveCardFunctionalRoles` também na geração de `functional_tags`,
@@ -217,7 +217,9 @@ Histórico do problema:
   operacional principal, e `server/bin/export_hermes_learned_deck.py` virou
   wrapper da implementacao canonica em
   `docs/hermes-analysis/manaloom-knowledge/scripts/export_hermes_learned_deck.py`.
-  As duplicações restantes abaixo continuam abertas conforme dominio.
+  As duplicações restantes abaixo continuam abertas conforme dominio; a
+  duplicacao de maior risco atual e a familia de analise de estado ainda
+  separada entre rebuild e optimize.
 - **Evidência**:
   - Resolvido: `resolveOptimizeArchetype` agora delega para
     `server/lib/ai/optimize_archetype_support.dart`, com teste em
@@ -247,11 +249,11 @@ Histórico do problema:
     simbolos; `test_export_hermes_learned_deck_wrapper_parity.py` protege essa
     paridade.
   - `DeckArchetypeAnalyzer`/`assessDeckOptimizationState` continuam em duas
-    familias: `server/lib/ai/deck_state_analysis.dart:3`-`:95` e `:311`-`:365`
-    para rebuild, e `server/lib/ai/optimize_state_support.dart:6`-`:85` e
-    `:337`-`:390` para optimize.
+    familias: `server/lib/ai/deck_state_analysis.dart:3`-`:100` e `:311`-`:500`
+    para rebuild, e `server/lib/ai/optimize_state_support.dart:6`-`:103` e
+    `:337`-`:520` para optimize.
   - `server/lib/ai/optimize_functional_role_support.dart:3`-`:68`,
-    `:167`-`:217`, `:219`-`:245` e `:248`-`:295` mantem fallback/matching/scoring
+    `:167`-`:217`, `:219`-`:245` e `:248`-`:303` mantem fallback/matching/scoring
     proprio para optimize mesmo depois de usar `resolveCardFunctionalRoles`
     quando tags persistidas ou semantic v2 existem.
   - `_trustStatsSql`, `_responseTimeSql`, `_shippingTimeSql` e
@@ -271,13 +273,13 @@ Histórico do problema:
     `server/lib/request_trace.dart:35`-`:49` ja expor wrappers de trace.
   - Condicoes `NM/LP/MP/HP/DMG` estao espalhadas entre mutacoes de deck,
     binder e marketplace; algumas rotas normalizam invalido para `NM`
-    (`server/routes/decks/[id]/cards/index.dart:407`-`:413`,
-    `server/routes/decks/[id]/cards/set/index.dart:247`-`:253` e
-    `server/routes/decks/[id]/index.dart:518`-`:524`), outras rejeitam
+    (`server/routes/decks/[id]/cards/index.dart:409`-`:413`,
+    `server/routes/decks/[id]/cards/set/index.dart:249`-`:253` e
+    `server/routes/decks/[id]/index.dart:525`-`:529`), outras rejeitam
     com `400` (`server/routes/binder/index.dart:275`-`:280`) e o marketplace
     ignora filtros invalidos (`server/routes/community/marketplace/index.dart:39`-`:43`).
   - `getMainType` e `calculateCmc` aparecem duplicados em deck privado/publico
-    (`server/routes/decks/[id]/index.dart:405`-`:435`,
+    (`server/routes/decks/[id]/index.dart:411`-`:441`,
     `server/routes/community/decks/[id].dart:91`-`:117`) e ha variante de CMC
     em `server/routes/decks/[id]/simulate/index.dart:199`-`:214`.
   - `server/bin/repo_runtime_paths.py:34`-`:75` oferece helper compartilhado
