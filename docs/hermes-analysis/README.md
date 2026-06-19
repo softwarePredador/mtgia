@@ -87,6 +87,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Nao fazer merge bruto desses relatórios na `master` sem revalidar contra o
     código vivo.
 
+- `HERMES_DOCS_TRIAGE_2026-06-19.md`
+  - Triagem curada da branch `origin/codex/hermes-analysis-docs@7db89b40`.
+  - Incorpora o achado P1 de `swap_integrity` no fluxo app de optimize/apply.
+  - Mantem como pendencia separada sync Hermes de tags/CMC/Game Changers,
+    limpeza de widgets/classes legados e refactor de optimize response.
+
 - `DECISION_TRACE_V1_SLICE_2026-06-15.md`
   - Slice Hermes-only que adiciona `decision_trace_v1` aos replays de battle.
   - Use para auditar por que o simulador escolheu cast/resposta/ataque/pass

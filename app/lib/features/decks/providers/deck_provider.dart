@@ -919,11 +919,21 @@ class DeckProvider extends ChangeNotifier {
     required String deckId,
     required List<Map<String, dynamic>> removalsDetailed,
     required List<Map<String, dynamic>> additionsDetailed,
+    String? expectedDeckSignature,
   }) async {
     try {
       AppLogger.debug('🚀 [DeckProvider] Otimização rápida com IDs diretos');
 
       final deck = await _ensureDeckLoadedForOptimization(deckId);
+      if (expectedDeckSignature != null &&
+          expectedDeckSignature.trim().isNotEmpty) {
+        final currentDeckSignature = buildDeckOptimizationSignature(deck);
+        if (currentDeckSignature != expectedDeckSignature) {
+          throw Exception(
+            'O deck mudou desde que a otimização foi gerada. Atualize a análise e tente novamente.',
+          );
+        }
+      }
 
       AppLogger.debug(
         '👑 [DeckProvider] Commanders no deck: ${deck.commander.length}',

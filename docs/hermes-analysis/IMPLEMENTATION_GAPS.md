@@ -12,6 +12,27 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-19 / Hermes docs branch triage
+
+- A branch `origin/codex/hermes-analysis-docs` foi lida em `7db89b40` sem merge
+  bruto para `master`.
+- Relatorio novo:
+  `docs/hermes-analysis/HERMES_DOCS_TRIAGE_2026-06-19.md`.
+- Achado P1 incorporado neste ciclo:
+  - `swap_integrity` agora protege o fluxo app de optimize antes do apply;
+  - o app recalcula o hash de `removals_detailed`/`additions_detailed`;
+  - o plano de apply carrega `expectedDeckSignature`;
+  - `DeckProvider.applyOptimizationWithIds` rejeita mutação se o deck carregado
+    mudou desde a geração da sugestão.
+- Limite restante:
+  - o gate definitivo deve ser backend-owned em um futuro endpoint de apply,
+    comparando contra PostgreSQL no instante da mutação.
+- Achados válidos deixados para slices próprios:
+  - limpeza de classes/widgets legados sem uso runtime confirmado;
+  - sync Hermes de `tag_accuracy`, CMC e Game Changers ausentes;
+  - refactor de `optimize_response_support.dart`;
+  - descarte de seeds incompletos como fonte de optimize/generate.
+
 ### Atualizacao de ciclo — 2026-06-18 / focused battle-rule evidence gate
 
 - Foi fechado o primeiro slice seguro para transformar fila `needs_rule_review`

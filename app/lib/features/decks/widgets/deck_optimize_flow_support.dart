@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+
 import '../providers/deck_provider_support.dart';
 import 'deck_optimize_ui_support.dart';
 
@@ -182,6 +184,7 @@ class OptimizeApplyPlan {
   final List<Map<String, dynamic>> additionsDetailed;
   final List<String> removals;
   final List<String> additions;
+  final String? expectedDeckSignature;
 
   const OptimizeApplyPlan({
     required this.mode,
@@ -190,6 +193,7 @@ class OptimizeApplyPlan {
     this.additionsDetailed = const <Map<String, dynamic>>[],
     this.removals = const <String>[],
     this.additions = const <String>[],
+    this.expectedDeckSignature,
   });
 }
 
@@ -199,8 +203,9 @@ typedef OptimizeApplyWithIdsExecutor =
     Future<void> Function(
       String deckId,
       List<Map<String, dynamic>> removalsDetailed,
-      List<Map<String, dynamic>> additionsDetailed,
-    );
+      List<Map<String, dynamic>> additionsDetailed, {
+      String? expectedDeckSignature,
+    });
 typedef OptimizeApplyByNamesExecutor =
     Future<void> Function(
       String deckId,
@@ -277,6 +282,7 @@ class OptimizePreviewData {
   final OptimizeIntensity intensity;
   final Map<String, dynamic> optimizeIntensity;
   final String? outcomeCode;
+  final OptimizeSwapIntegrityPayload? swapIntegrity;
 
   const OptimizePreviewData({
     required this.removals,
@@ -297,6 +303,7 @@ class OptimizePreviewData {
     required this.intensity,
     required this.optimizeIntensity,
     required this.outcomeCode,
+    required this.swapIntegrity,
   });
 
   bool get hasChanges => removals.isNotEmpty || additions.isNotEmpty;
@@ -331,6 +338,12 @@ class OptimizePreviewData {
             .map((m) => m.cast<String, dynamic>())
             .toList() ??
         const <Map<String, dynamic>>[];
+    final swapIntegrity =
+        result['swap_integrity'] is Map
+            ? OptimizeSwapIntegrityPayload.fromJson(
+              (result['swap_integrity'] as Map).cast<String, dynamic>(),
+            )
+            : null;
 
     return OptimizePreviewData(
       removals: removals,
@@ -377,6 +390,36 @@ class OptimizePreviewData {
       intensity: OptimizeIntensity.fromApiValue(selectedIntensity),
       optimizeIntensity: optimizeIntensity,
       outcomeCode: result['outcome_code']?.toString(),
+      swapIntegrity: swapIntegrity,
+    );
+  }
+}
+
+class OptimizeSwapIntegrityPayload {
+  final String version;
+  final String algo;
+  final String hash;
+  final String deckSignature;
+  final int? removalCount;
+  final int? additionCount;
+
+  const OptimizeSwapIntegrityPayload({
+    required this.version,
+    required this.algo,
+    required this.hash,
+    required this.deckSignature,
+    required this.removalCount,
+    required this.additionCount,
+  });
+
+  factory OptimizeSwapIntegrityPayload.fromJson(Map<String, dynamic> json) {
+    return OptimizeSwapIntegrityPayload(
+      version: json['version']?.toString() ?? '',
+      algo: json['algo']?.toString() ?? '',
+      hash: json['hash']?.toString() ?? '',
+      deckSignature: json['deck_signature']?.toString() ?? '',
+      removalCount: (json['removal_count'] as num?)?.toInt(),
+      additionCount: (json['addition_count'] as num?)?.toInt(),
     );
   }
 }
@@ -404,6 +447,73 @@ class OptimizeRequestOutcome {
     required this.preview,
     required this.applyPlan,
   });
+}
+
+List<String> _canonicalOptimizeSwapEntries(
+  List<Map<String, dynamic>> detailed,
+) {
+  final entries = <String>[];
+  for (final item in detailed) {
+    final id = (item['card_id'] ?? item['name'] ?? '').toString().trim();
+    if (id.isEmpty) continue;
+    final quantity = (item['quantity'] as num?)?.toInt() ?? 1;
+    entries.add('$id:$quantity');
+  }
+  entries.sort();
+  return entries;
+}
+
+String computeOptimizeSwapIntegrityHash({
+  required String deckId,
+  required String deckSignature,
+  required List<Map<String, dynamic>> removalsDetailed,
+  required List<Map<String, dynamic>> additionsDetailed,
+}) {
+  final canonical =
+      StringBuffer()
+        ..write('v1')
+        ..write('|deck=')
+        ..write(deckId)
+        ..write('|sig=')
+        ..write(deckSignature)
+        ..write('|R=')
+        ..write(_canonicalOptimizeSwapEntries(removalsDetailed).join(','))
+        ..write('|A=')
+        ..write(_canonicalOptimizeSwapEntries(additionsDetailed).join(','));
+  return sha256.convert(utf8.encode(canonical.toString())).toString();
+}
+
+String? validateOptimizeSwapIntegrity({
+  required String deckId,
+  required OptimizePreviewData preview,
+}) {
+  final integrity = preview.swapIntegrity;
+  if (integrity == null) return null;
+  if (integrity.version != 'v1') return 'unsupported_version';
+  if (integrity.algo != 'sha256') return 'unsupported_algorithm';
+  if (integrity.hash.isEmpty || integrity.deckSignature.isEmpty) {
+    return 'missing_integrity_fields';
+  }
+
+  final removals = _canonicalOptimizeSwapEntries(preview.removalsDetailed);
+  final additions = _canonicalOptimizeSwapEntries(preview.additionsDetailed);
+  if (integrity.removalCount != null &&
+      integrity.removalCount != removals.length) {
+    return 'removal_count_mismatch';
+  }
+  if (integrity.additionCount != null &&
+      integrity.additionCount != additions.length) {
+    return 'addition_count_mismatch';
+  }
+
+  final expectedHash = computeOptimizeSwapIntegrityHash(
+    deckId: deckId,
+    deckSignature: integrity.deckSignature,
+    removalsDetailed: preview.removalsDetailed,
+    additionsDetailed: preview.additionsDetailed,
+  );
+  if (expectedHash != integrity.hash) return 'hash_mismatch';
+  return null;
 }
 
 String buildOptimizeDebugJson({
@@ -532,6 +642,19 @@ Future<OptimizeRequestOutcome> requestOptimizePreview({
   );
 
   final preview = OptimizePreviewData.fromResult(result);
+  final integrityError = validateOptimizeSwapIntegrity(
+    deckId: deckId,
+    preview: preview,
+  );
+  if (integrityError != null) {
+    throw DeckAiFlowException(
+      message:
+          'A assinatura da otimização não confere. Atualize a análise e tente novamente.',
+      code: 'OPTIMIZE_SWAP_INTEGRITY_INVALID',
+      outcomeCode: 'swap_integrity_invalid',
+      payload: {'integrity_error': integrityError},
+    );
+  }
   final applyPlan = buildOptimizeApplyPlan(preview);
 
   return OptimizeRequestOutcome(
@@ -682,6 +805,7 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
       mode: OptimizeApplyMode.applyWithIds,
       removalsDetailed: selectedRemovalsDetailed,
       additionsDetailed: selectedAdditionsDetailed,
+      expectedDeckSignature: preview.swapIntegrity?.deckSignature,
     );
   }
 
@@ -706,7 +830,12 @@ Future<void> executeOptimizeApplyPlan({
       await addBulk(deckId, plan.bulkCards);
       return;
     case OptimizeApplyMode.applyWithIds:
-      await applyWithIds(deckId, plan.removalsDetailed, plan.additionsDetailed);
+      await applyWithIds(
+        deckId,
+        plan.removalsDetailed,
+        plan.additionsDetailed,
+        expectedDeckSignature: plan.expectedDeckSignature,
+      );
       return;
     case OptimizeApplyMode.applyByNames:
       await applyByNames(deckId, plan.removals, plan.additions);
