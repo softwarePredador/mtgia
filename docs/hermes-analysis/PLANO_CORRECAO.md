@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-19 07:00 UTC
+> Data: 2026-06-19 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -31,6 +31,16 @@ staples. Permanecem abertos fallbacks por nome, prompts runtime, payload/ranking
 inicial do optimize, rebuild guiado, candidate-quality foundation, check local de
 basic lands em analysis e corpus/analises auxiliares.
 
+A revalidacao de imports quebrados e dependencias circulares de 2026-06-19
+11:00 UTC no checkout `8ddc978a` confirmou `0` imports/exports/parts Dart
+locais quebrados em 1155 diretivas locais checadas (`app/lib`, `server/lib`,
+`server/routes`, `server/bin`) e `0` imports Python locais quebrados em
+`server/bin`. O ciclo backend antigo entre `optimize_runtime_support.dart` e
+`optimize_filler_loader_support.dart` ficou stale: o filler loader nao importa
+mais o runtime e passou a depender de modulos neutros. Permanece aberto somente
+o SCC app entre `life_counter_tabletop_engine.dart` e
+`life_counter_turn_tracker_engine.dart`.
+
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
 2. **P1 — Concentradores de complexidade muito grandes**: revalidado em
    2026-06-11; `server/lib/ai/optimize_runtime_support.dart` (~2386 linhas) e
@@ -44,11 +54,11 @@ basic lands em analysis e corpus/analises auxiliares.
    rebuild/optimize, fallback/scoring funcional do optimize, trust social,
    request/log social, condition, CMC/tipo e resolucao de runtime path em crons
    Hermes.
-4. **P1 — Entry point local quebrado**: **REVALIDADO/ABERTO no checkout local
-   `2061f291` em 2026-06-07 11:00 UTC**. `server/bin/local_test_server.dart:3` ainda importa
-   `../.dart_frog/server.dart` estaticamente, `server/.dart_frog/server.dart`
-   nao existe neste checkout, e `dart analyze bin/local_test_server.dart` falha
-   com `uri_does_not_exist`.
+4. **P1 — Entry point local quebrado**: **RESOLVIDO/STALE em 2026-06-19**.
+   `server/bin/local_test_server.dart` nao tem mais import estatico para
+   `.dart_frog/server.dart`; a varredura ampliada encontrou 0 imports locais
+   quebrados e o item nao deve ser reaberto sem nova falha de analyzer ou do
+   resolvedor local.
 5. **P1 — Ownership, jobs async e contratos app-facing em rotas deck/AI**:
    **PARCIAL em 2026-06-11**. O achado antigo de optimize sem owner-scope foi
    resolvido: `POST /ai/optimize` exige usuário autenticado,
@@ -117,24 +127,20 @@ basic lands em analysis e corpus/analises auxiliares.
     `compute_loss_tags_from_replays`). Funcoes historicas
     `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
     e `buildCandidateQualitySamplePoolSql` nao existem mais no checkout vivo.
-13. **P1/P2 — Imports quebrados e ciclo app/server**: **REVALIDADO/ABERTO no
-    checkout local `2061f291` em 2026-06-07 11:00 UTC.** O auditor base reportou
-    `Imports quebrados: 0` em `server/lib`/`server/routes`, e o import historico
-    de `server/routes/ai/commander-learning/index.dart:4` deixou de estar
-    quebrado porque `server/lib/ai/commander_learned_deck_support.dart` existe
-    neste checkout. A varredura local ampliada encontrou 3 imports locais
-    quebrados em 426 arquivos: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
-    resolvendo para `app/core/utils/mana_helper.dart`,
-    `app/lib/features/home/life_counter_screen.dart:7` resolvendo para
-    `app/core/theme/app_theme.dart`, e `server/bin/local_test_server.dart:3`
-    resolvendo para `server/.dart_frog/server.dart`. `dart analyze
-    bin/local_test_server.dart` confirma o erro backend; `flutter analyze
-    --no-pub` focado no app foi nao conclusivo por falta de
-    `app/.dart_tool/package_config.json`, mas incluiu os dois
-    `uri_does_not_exist` locais. A varredura SCC encontrou somente um ciclo
-    local: `CommunityDeckDetailScreen` e `UserProfileScreen` importam e
-    instanciam uma a outra por `Navigator.push`; nenhum ciclo local backend foi
-    encontrado.
+13. **P1/P2 — Imports quebrados e dependencias circulares**: revalidado em
+    2026-06-19 11:00 UTC no checkout `8ddc978a`. O auditor base reportou
+    `Imports quebrados: 0`; o scanner ampliado encontrou `0` diretivas Dart
+    locais quebradas em 429 arquivos e `0` imports Python locais quebrados em
+    33 scripts de `server/bin`. As claims antigas contra `deck_analysis_tab.dart`,
+    `life_counter_screen.dart`, `local_test_server.dart`,
+    `commander-learning/index.dart` e o ciclo Community/Social seguem stale. O
+    ciclo backend `optimize_runtime_support.dart` <->
+    `optimize_filler_loader_support.dart` tambem foi fechado: o filler loader
+    agora usa `optimize_filler_candidate_support.dart` e
+    `optimize_functional_role_support.dart` sem importar o runtime. O unico SCC
+    aberto nesta frente e o par
+    `life_counter_tabletop_engine.dart` <->
+    `life_counter_turn_tracker_engine.dart`, com analyzer focado verde.
 
 ## Achados priorizados
 
@@ -505,8 +511,8 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
-- **Status 2026-06-11 11:00 UTC: RESOLVIDO no checkout local `372cdfca`.**
-  A resolucao historica ja esta refletida nesta branch de memoria.
+- **Status 2026-06-19 11:00 UTC: RESOLVIDO/STALE no checkout local `8ddc978a`.**
+  A resolucao historica segue refletida nesta branch de memoria.
 - **Evidência**:
   - `server/bin/local_test_server.dart:5`-`:13` checa
     `.dart_frog/server.dart` em runtime e retorna erro operacional claro quando
@@ -530,7 +536,7 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-06-11 11:00 UTC: RESOLVIDO/STALE no checkout local `372cdfca`.**
+**Status 2026-06-19 11:00 UTC: RESOLVIDO/STALE no checkout local `8ddc978a`.**
 As resolucoes historicas para os imports app e o entrypoint local estao
 refletidas nesta branch de memoria; nao ha import local quebrado confirmado no
 recorte auditado.
@@ -542,9 +548,11 @@ recorte auditado.
     `package:manaloom/...`.
   - `server/bin/local_test_server.dart:5`-`:13` valida
     `.dart_frog/server.dart` em runtime, sem import estatico quebrado.
-  - A varredura focada de 409 arquivos em `app/lib`, `server/lib`,
+  - A varredura focada de 429 arquivos Dart em `app/lib`, `server/lib`,
     `server/routes` e `server/bin` encontrou 0 imports/exports/parts locais
-    quebrados.
+    quebrados em 1155 diretivas locais checadas.
+  - A checagem estreita de 33 scripts Python em `server/bin` encontrou 0
+    imports locais quebrados.
   - `cd server && dart analyze bin/local_test_server.dart` retornou
     `No issues found`.
   - O import historico de `server/routes/ai/commander-learning/index.dart:4`
@@ -553,8 +561,8 @@ recorte auditado.
     `dart analyze routes/ai/commander-learning/index.dart` retornou
     `No issues found`.
 - **Impacto atual**: nenhuma acao de correcao de import quebrado foi confirmada
-  nesta rodada. `app/.dart_tool/package_config.json` ainda esta ausente, entao
-  `flutter analyze --no-pub` nao foi usado como prova limpa app-side.
+  nesta rodada. O analyzer app focado nos dois arquivos do SCC atual retornou
+  `No issues found!`; o app inteiro ainda deve ser confirmado apos `flutter pub get`.
 - **Ação recomendada**:
   1. nao abrir task para `deck_analysis_tab.dart`, `life_counter_screen.dart` ou
      `local_test_server.dart` sem nova evidencia;
@@ -905,9 +913,11 @@ apenas para os demais helpers abaixo.
 ## Sequência sugerida
 
 1. **Primeiro**: manter o auditor estrutural corrigido e confrontar novas falhas com analyzer antes de abrir tasks.
-2. **Segundo**: quebrar os dois SCCs atuais com menor blast radius:
-   `life_counter_tabletop_engine.dart`/`life_counter_turn_tracker_engine.dart`
-   e `optimize_runtime_support.dart`/`optimize_filler_loader_support.dart`.
+2. **Segundo**: quebrar o SCC atual com menor blast radius:
+   `life_counter_tabletop_engine.dart`/`life_counter_turn_tracker_engine.dart`.
+   O SCC antigo de `optimize_runtime_support.dart`/
+   `optimize_filler_loader_support.dart` foi fechado pela dependencia em
+   modulos neutros.
 3. **Terceiro**: manter `/decks/:id/recommendations` e `/ai/weakness-analysis`
    como experimentais/not-proven ate consumirem a camada semantica compartilhada
    ou terem contrato interno explicito.
@@ -925,9 +935,10 @@ Resolvido em `origin/master@32418bc6`: teste de contrato de rota para
 
 - Os **178 imports quebrados** do relatório **não** foram validados como defeitos reais de código; a amostragem conferida aponta falso-positivo do auditor.
 - Os achados antigos contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
-  `local_test_server.dart`, `commander-learning/index.dart` e o ciclo
-  Community/Social nao estao abertos no checkout `ea37f3cf`; foram substituidos
-  pelos SCCs atuais listados acima.
+  `local_test_server.dart`, `commander-learning/index.dart`, o ciclo
+  Community/Social e o SCC backend de optimize nao estao abertos no checkout
+  `8ddc978a`; foram substituidos pelo SCC app atual entre os engines do life
+  counter.
 - A seção de "funções com nomes duplicados" mistura duplicação relevante com nomes esperados (`toString`, `print`, `add`), então precisa de triagem antes de virar tarefa de engenharia.
 - `battle_simulations` nao entrou como tabela nao usada nesta rodada: a rota
   `server/routes/ai/simulate/index.dart` escreve nela e

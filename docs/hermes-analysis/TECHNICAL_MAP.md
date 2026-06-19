@@ -147,28 +147,23 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-18)
+## Achados do audit de estrutura (atualizado 2026-06-19)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
-  **REVALIDADO/ABERTO em 2026-06-18 11:00 UTC no checkout `88fa4a1e`.** O
-  auditor base cobre apenas `server/lib` e `server/routes` e reportou
-  `Imports quebrados: 0`. O import historico de
-  `server/routes/ai/commander-learning/index.dart:4` para
-  `server/lib/ai/commander_learned_deck_support.dart` nao esta mais quebrado
-  neste checkout porque o arquivo alvo existe. A triagem focada em 426 arquivos
-  Dart de `app/lib`, `server/lib`, `server/routes` e `server/bin` encontrou
-  somente 3 imports locais quebrados: `app/lib/features/decks/widgets/deck_analysis_tab.dart:5`
-  resolvendo para `app/core/utils/mana_helper.dart`,
-  `app/lib/features/home/life_counter_screen.dart:7` resolvendo para
-  `app/core/theme/app_theme.dart`, e `server/bin/local_test_server.dart:3`
-  resolvendo para `server/.dart_frog/server.dart`. `dart analyze
-  bin/local_test_server.dart` confirma o erro backend. `flutter analyze
-  --no-pub` focado no app foi nao conclusivo porque
-  `app/.dart_tool/package_config.json` nao existe, mas a saida incluiu os dois
-  `uri_does_not_exist` locais do app. A mesma varredura achou 1 SCC de 2
-  arquivos entre `CommunityDeckDetailScreen` e `UserProfileScreen`, e nenhum
-  ciclo local backend.
+  **REVALIDADO em 2026-06-19 11:00 UTC no checkout `8ddc978a`.** O auditor base
+  cobre apenas `server/lib` e `server/routes` e reportou `Imports quebrados: 0`.
+  A triagem ampliada em 429 arquivos Dart de `app/lib`, `server/lib`,
+  `server/routes` e `server/bin` resolveu 1155 diretivas locais e encontrou 0
+  imports/exports/parts locais quebrados. A checagem estreita de 33 scripts
+  Python em `server/bin` tambem encontrou 0 imports locais quebrados. Claims
+  antigas contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
+  `local_test_server.dart`, `commander-learning/index.dart` e o ciclo
+  Community/Social estao stale. O ciclo backend antigo entre
+  `optimize_runtime_support.dart` e `optimize_filler_loader_support.dart` foi
+  fechado por modulos neutros; o unico SCC atual e
+  `life_counter_tabletop_engine.dart` <->
+  `life_counter_turn_tracker_engine.dart`, com analyzer focado verde.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**:
   revalidado em 2026-06-11 no `master@321b0f24`. Os tamanhos atuais cairam para
   `server/lib/ai/optimize_runtime_support.dart` (~2386 linhas) e
