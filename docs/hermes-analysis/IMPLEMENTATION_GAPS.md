@@ -2363,3 +2363,102 @@ Pendencia que permanece P1:
   no pool de candidatos. A validacao de generate/provenance deste slice ja
   confirmou profile ativo, learned deck ativo e main deck deterministico
   `99/99` distinto.
+
+---
+
+## Atualizacao 2026-06-19 - All-Card Candidate Review / Battle Rule Queue
+
+Documento de ciclo:
+
+- `docs/hermes-analysis/ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md`
+
+Slice fechado neste ciclo:
+
+- Corrigida a persistencia SQLite report-only de
+  `new_card_candidate_reviews`: a chave agora inclui `card_id`, evitando
+  colapsar cartas com mesmo `name`/`set_code` em rodadas globais.
+- Corrigida a fila `new_card_battle_rule_review_queue`: a chave agora inclui
+  `card_id`, e o consumidor faz join exato por `card_id` quando disponível.
+- Consumidores `manaloom_battle_rule_review_queue.py`,
+  `manaloom_battle_rule_focused_evidence.py` e
+  `manaloom_battle_rule_promotion_gate.py` passam a tratar `--limit 0` como
+  sem limite. Antes, `--limit 0` processava zero linhas e podia gerar falsa
+  sensação de fila vazia.
+- Adicionados testes para:
+  - preservar duas cartas com mesmo nome/set e `card_id` diferente;
+  - processar todos os drafts com `--limit 0` nos consumidores.
+
+Rodada global read-only contra PostgreSQL:
+
+```json
+{
+  "cards_scanned": 34079,
+  "commanders_scanned": 24,
+  "review_count": 817896,
+  "persisted_reviews": 817896,
+  "decisions": {
+    "already_present": 24,
+    "backlog": 44203,
+    "ignore": 551330,
+    "needs_data": 44096,
+    "needs_rule_review": 159873,
+    "test": 18370
+  },
+  "queue_rows": 159873,
+  "draft_count": 13883,
+  "focused_evidence_count": 18,
+  "eligible_for_manual_verified_promotion": 18,
+  "blocked": 13865
+}
+```
+
+Leitura correta:
+
+- O gargalo não é "só 8 cartas"; aqueles 8 eram apenas bloqueios do recorte
+  Marvel/12 comandantes.
+- No catálogo inteiro, há 13.883 drafts únicos para revisão de regra battle.
+- A evidência focada automática atual cobre 18 drafts. Os demais permanecem
+  bloqueados corretamente por falta de fonte oficial, teste focado e replay
+  audit.
+- `needs_data` ainda soma 3.232 cartas únicas, principalmente por legalidade
+  Commander ausente e 358 casos de oracle text ausente.
+
+Pendências P1 agora priorizadas:
+
+- Fechar `needs_data` material via sync determinístico
+  Scryfall/MTGJSON/PostgreSQL, sem LLM.
+- Criar templates focados para as famílias mais frequentes:
+  - `graveyard_or_zone_recursion`;
+  - `protection_or_prevention`;
+  - `targeted_interaction`;
+  - `triggered_or_static_engine`;
+  - `mass_removal_or_modal_wipe`;
+  - `counter_manipulation`;
+  - `mana_or_resource_acceleration`.
+- Calibrar inferência de roles para reduzir falsos scores 100 em cartas que
+  acumulam `protection/ramp/recursion/tutor` por texto genérico.
+- Rodar scorecard Lorehold apenas com candidatos `test`/regra `verified` ou
+  gate elegível; não usar fila bruta `needs_rule_review` como fonte de swap.
+
+Pendências P2:
+
+- Melhorar `draft_rule_key` para usar família/efeito principal em vez do
+  primeiro role ordenado. Hoje alguns sacrifice outlets aparecem como
+  `__protection__draft_v1`, o que é ruim para leitura, embora o gate continue
+  correto.
+- Compactar/paginar artefatos full-scope para rodadas frequentes, evitando
+  `latest_reviews.json` gigante.
+- Gerar ranking por comandante separando candidatos realmente prontos de
+  candidatos bloqueados por template.
+
+Validações:
+
+- `python3 -m py_compile server/bin/manaloom_new_card_candidate_review.py server/bin/manaloom_battle_rule_review_queue.py server/bin/manaloom_battle_rule_focused_evidence.py server/bin/manaloom_battle_rule_promotion_gate.py`
+- `python3 server/test/manaloom_new_card_candidate_review_test.py`
+- `python3 server/test/manaloom_review_queue_consumers_test.py`
+- Rodada full report-only:
+  - `manaloom_new_card_candidate_review.py --scope full --card-limit 0`
+  - `manaloom_card_data_gap_review.py`
+  - `manaloom_battle_rule_review_queue.py --limit 0`
+  - `manaloom_battle_rule_focused_evidence.py --limit 0`
+  - `manaloom_battle_rule_promotion_gate.py --limit 0`

@@ -111,6 +111,7 @@ def unique_sorted(values: Iterable[str]) -> list[str]:
 @dataclass
 class QueueRow:
     commander_name: str
+    card_id: str
     card_name: str
     oracle_id: str | None
     set_code: str
@@ -256,13 +257,30 @@ def table_exists(conn: sqlite3.Connection, name: str) -> bool:
     return row is not None
 
 
+def table_columns(conn: sqlite3.Connection, name: str) -> set[str]:
+    if not table_exists(conn, name):
+        return set()
+    return {str(row[1]) for row in conn.execute(f"PRAGMA table_info({name})").fetchall()}
+
+
 def load_queue_rows(conn: sqlite3.Connection, limit: int) -> list[QueueRow]:
     if not table_exists(conn, "new_card_battle_rule_review_queue"):
         return []
+    queue_columns = table_columns(conn, "new_card_battle_rule_review_queue")
+    review_columns = table_columns(conn, "new_card_candidate_reviews")
+    queue_card_id_expr = (
+        "q.card_id"
+        if "card_id" in queue_columns
+        else "COALESCE(q.oracle_id, q.card_name)"
+    )
+    card_id_join = "AND r.card_id = q.card_id" if "card_id" in queue_columns and "card_id" in review_columns else ""
+    limit_clause = "" if limit <= 0 else "LIMIT ?"
+    params: tuple[int, ...] = () if limit <= 0 else (limit,)
     rows = conn.execute(
-        """
+        f"""
         SELECT
             q.commander_name,
+            {queue_card_id_expr} AS card_id,
             q.card_name,
             q.oracle_id,
             COALESCE(q.set_code, '') AS set_code,
@@ -276,25 +294,27 @@ def load_queue_rows(conn: sqlite3.Connection, limit: int) -> list[QueueRow]:
         LEFT JOIN new_card_candidate_reviews r
             ON r.run_id = q.latest_run_id
            AND r.commander_name = q.commander_name
+           {card_id_join}
            AND r.card_name = q.card_name
            AND COALESCE(r.set_code, '') = COALESCE(q.set_code, '')
         ORDER BY COALESCE(r.score, 0) DESC, q.card_name, q.commander_name
-        LIMIT ?
+        {limit_clause}
         """,
-        (limit,),
+        params,
     ).fetchall()
     return [
         QueueRow(
             commander_name=str(row[0]),
-            card_name=str(row[1]),
-            oracle_id=str(row[2]) if row[2] else None,
-            set_code=str(row[3] or ""),
-            roles=[str(item) for item in parse_json(row[4], [])],
-            reason=str(row[5] or ""),
-            latest_run_id=str(row[6] or ""),
-            candidate_score=int(row[7] or 0),
-            candidate_reasons=[str(item) for item in parse_json(row[8], [])],
-            payload=parse_json(row[9], {}),
+            card_id=str(row[1] or ""),
+            card_name=str(row[2]),
+            oracle_id=str(row[3]) if row[3] else None,
+            set_code=str(row[4] or ""),
+            roles=[str(item) for item in parse_json(row[5], [])],
+            reason=str(row[6] or ""),
+            latest_run_id=str(row[7] or ""),
+            candidate_score=int(row[8] or 0),
+            candidate_reasons=[str(item) for item in parse_json(row[9], [])],
+            payload=parse_json(row[10], {}),
         )
         for row in rows
     ]

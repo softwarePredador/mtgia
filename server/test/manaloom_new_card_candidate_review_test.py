@@ -259,6 +259,101 @@ class ManaloomNewCardCandidateReviewTest(unittest.TestCase):
             self.assertIn("report_only_no_pg_writes", summary["notes"])
             self.assertIn("sqlite_operational_cache_only", summary["notes"])
 
+    def test_operational_cache_preserves_same_name_set_with_distinct_card_ids(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            tmp = Path(raw_tmp)
+            fixture = {
+                "commanders": [
+                    {
+                        "name": "Lorehold, the Historian",
+                        "source": "fixture_control",
+                        "color_identity": ["R", "W"],
+                        "existing_cards": [],
+                    }
+                ],
+                "cards": [
+                    {
+                        "card_id": "variant-a",
+                        "oracle_id": "oracle-variant-a",
+                        "name": "Variant Rule Card",
+                        "mana_cost": "{1}{R}",
+                        "type_line": "Instant",
+                        "oracle_text": "Variant Rule Card deals 2 damage to any target.",
+                        "color_identity": ["R"],
+                        "cmc": 2,
+                        "set_code": "var",
+                        "legalities": {"commander": "legal"},
+                        "function_tags": ["removal"],
+                    },
+                    {
+                        "card_id": "variant-b",
+                        "oracle_id": "oracle-variant-b",
+                        "name": "Variant Rule Card",
+                        "mana_cost": "{2}{W}",
+                        "type_line": "Instant",
+                        "oracle_text": "Exile target attacking creature.",
+                        "color_identity": ["W"],
+                        "cmc": 3,
+                        "set_code": "var",
+                        "legalities": {"commander": "legal"},
+                        "function_tags": ["removal"],
+                    },
+                ],
+            }
+            fixture_path = tmp / "fixture.json"
+            fixture_path.write_text(json.dumps(fixture), encoding="utf-8")
+            knowledge_db = tmp / "knowledge.db"
+
+            summary = module.run(
+                module.parse_args(
+                    [
+                        "--fixture",
+                        str(fixture_path),
+                        "--output-dir",
+                        str(tmp / "artifacts"),
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--no-lorehold-control",
+                    ]
+                )
+            )
+
+            self.assertEqual(summary["review_count"], 2)
+            conn = sqlite3.connect(knowledge_db)
+            try:
+                review_rows = conn.execute(
+                    """
+                    SELECT card_id, oracle_id
+                    FROM new_card_candidate_reviews
+                    ORDER BY card_id
+                    """
+                ).fetchall()
+                queue_rows = conn.execute(
+                    """
+                    SELECT card_id, oracle_id
+                    FROM new_card_battle_rule_review_queue
+                    ORDER BY card_id
+                    """
+                ).fetchall()
+            finally:
+                conn.close()
+
+            self.assertEqual(
+                review_rows,
+                [
+                    ("variant-a", "oracle-variant-a"),
+                    ("variant-b", "oracle-variant-b"),
+                ],
+            )
+            self.assertEqual(
+                queue_rows,
+                [
+                    ("variant-a", "oracle-variant-a"),
+                    ("variant-b", "oracle-variant-b"),
+                ],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
