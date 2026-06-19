@@ -6,6 +6,12 @@
 
 > Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-07 19:00 UTC.
 
+> Atualizacao Codex 2026-06-19: a triagem seletiva de
+> `origin/codex/hermes-analysis-docs@8ddc978a` fechou achados stale no
+> `master`: `swap_integrity` ja protege o fluxo app de optimize/apply,
+> `DeckProgressChip` foi removido por nao possuir consumidor runtime e
+> `LotusPresentationMode` passou a ser chamado por `LotusLifeCounterScreen`.
+
 ## Estrutura do repositorio
 
 ```
@@ -216,9 +222,10 @@ mtgia/
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
   2026-06-07 03:00 UTC no checkout local `ee74c6a9`. `LifeCounterScreen` segue
   legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
-  `DeckCard` e `DeckProgressChip` nao tem uso runtime confirmado nas listagens;
-  `LotusPresentationMode` nao e importado/chamado pelo Lotus; e
-  `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface` aparecem somente no
+  `DeckCard` nao tem uso runtime confirmado nas listagens. `DeckProgressChip`
+  foi removido em 2026-06-19 e `LotusPresentationMode` passou a ser chamado
+  pelo Lotus runtime; `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface`
+  aparecem somente no
   proprio `auth_visual_shell.dart`. Controles positivos descartaram
   `LotusLifeCounterScreen` e `DeckProgressIndicator`. Uma varredura textual
   ampla de classes publicas foi usada apenas como triagem, mas DTOs/helpers
@@ -273,7 +280,9 @@ mantidos como texto solto.
   2026-06-11. `server/lib/sync_cards_utils.dart` deixou de ser test-only:
   `server/bin/sync_cards.dart` agora importa o utilitário e usa
   `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`.
-  Ainda seguem sem chamador runtime confirmado
+  O achado de `verifySwapIntegrity` sem protecao app ficou resolvido em
+  2026-06-19: o app valida `swap_integrity` e `expectedDeckSignature` antes do
+  apply. Ainda seguem sem chamador runtime confirmado
   `getRequestTrace`/`tryGetRequestId`,
   `normalizedCommanderReferenceCandidate`,
   `buildLoreholdReferenceCardStatsFromProfile`,

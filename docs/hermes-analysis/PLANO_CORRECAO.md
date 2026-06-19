@@ -7,6 +7,13 @@
 > Data: 2026-06-07 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
+> Atualizacao Codex 2026-06-19: a triagem de
+> `origin/codex/hermes-analysis-docs@8ddc978a` foi incorporada de forma
+> seletiva. `swap_integrity` ficou resolvido no fluxo app, `DeckProgressChip`
+> foi removido e `LotusPresentationMode` foi ligado ao ciclo de vida do Lotus.
+> `DeckCard` e `LifeCounterScreen` seguem pendentes por exigirem decisao de
+> produto/teste antes de apagar fixtures legadas.
+
 ## Resumo executivo
 
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`; a rodada local de 2026-06-07 11:00 UTC no checkout `2061f291` reportou `Imports quebrados: 0` no recorte backend do auditor base (`server/lib` e `server/routes`). Ainda assim, a varredura ampliada app/server segue apontando frentes prioritárias de organização:
@@ -57,9 +64,9 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
    na rotacao local Codex de 2026-06-07 03:00 UTC no checkout `ee74c6a9`.
    `LifeCounterScreen` segue
    como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
-   `DeckCard` continua testado mas sem import/chamada na listagem real;
-   `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
-   nao tem import nem chamada para `enter()`/`exit()`; `AuthVisualShell`,
+   `DeckCard` continua testado mas sem import/chamada na listagem real.
+   `DeckProgressChip` foi removido em 2026-06-19, e `LotusPresentationMode`
+   passou a ser chamado por `LotusLifeCounterScreen`; `AuthVisualShell`,
    `AuthBrandHeader` e `AuthFormSurface` aparecem somente no proprio arquivo
    `auth_visual_shell.dart`. Controles positivos desta rodada descartaram
    `LotusLifeCounterScreen` e `DeckProgressIndicator`; a varredura textual
@@ -83,6 +90,8 @@ O auditor gerava muito ruído por inferir imports relativos a partir do root do 
     test-only: `server/bin/sync_cards.dart` importa o utilitário compartilhado
     para `parseSinceDays`, `getNewSetCodesSinceFromData` e
     `extractSetCardSyncRow`, removendo as cópias privadas do CLI operacional.
+    O achado de `verifySwapIntegrity` sem protecao app ficou resolvido em
+    2026-06-19: o app valida `swap_integrity` e assinatura local antes do apply.
     Ainda seguem sem chamador runtime confirmado
     wrappers/helpers em request trace, Commander Reference, MTGTop8, candidate
     quality e optimize utility samples. `MLKnowledgeService.recordFeedback`
@@ -777,13 +786,12 @@ apenas para os demais helpers abaixo.
     As listagens reais usam widgets privados/locais como `_RecentDeckCard`,
     `_CommunityDeckCard`, `_FollowingDeckCard`, `_DeckGalleryCard` e
     `_EmptyDeckCard`.
-  - `app/lib/features/decks/widgets/deck_progress_indicator.dart:286` define
-    `DeckProgressChip`, sem ocorrencias alem do construtor em `app/lib`,
-    `app/test` e `app/integration_test`. `DeckProgressIndicator` no mesmo
-    arquivo permanece usado e nao faz parte deste achado.
-  - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
-    `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
-    `app/lib`, `app/test` ou `app/integration_test`.
+  - **Resolvido em 2026-06-19:** `DeckProgressChip` foi removido de
+    `app/lib/features/decks/widgets/deck_progress_indicator.dart` porque nao
+    possuia consumidor runtime; `DeckProgressIndicator` permanece usado e nao
+    faz parte deste achado.
+  - **Resolvido em 2026-06-19:** `LotusPresentationMode` passou a ser importado
+    e chamado por `LotusLifeCounterScreen` em `initState`/`dispose`, exceto Web.
   - `app/lib/features/auth/widgets/auth_visual_shell.dart:5`, `:105` e `:196`
     definem `AuthVisualShell`, `AuthBrandHeader` e `AuthFormSurface`; busca por
     esses simbolos e por `auth_visual_shell.dart` em arquivos Dart encontrou
@@ -799,8 +807,8 @@ apenas para os demais helpers abaixo.
 - **Ação recomendada**:
   1. decidir se `LifeCounterScreen` e fixture/harness legado ou deve ser removido
      em favor do Lotus runtime;
-  2. remover ou reconectar `DeckCard`, `DeckProgressChip`, `LotusPresentationMode`
-     e o shell auth (`AuthVisualShell`/`AuthBrandHeader`/`AuthFormSurface`);
+  2. remover ou reconectar `DeckCard`, `LifeCounterScreen` e o shell auth
+     (`AuthVisualShell`/`AuthBrandHeader`/`AuthFormSurface`);
   3. atualizar/remover testes que hoje exercitam widgets fora do runtime real.
 - **Validação**:
   - `rg -n '\b(LifeCounterScreen|DeckCard|DeckProgressChip|LotusPresentationMode|AuthVisualShell|AuthBrandHeader|AuthFormSurface)\b|auth_visual_shell\.dart' app/lib app/test app/integration_test --glob '*.dart'`

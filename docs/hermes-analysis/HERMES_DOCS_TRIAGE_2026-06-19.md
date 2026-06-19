@@ -1,6 +1,6 @@
 # Hermes Docs Branch Triage — 2026-06-19
 
-> Branch avaliada: `origin/codex/hermes-analysis-docs` em `7db89b40`.
+> Branch avaliada: `origin/codex/hermes-analysis-docs` em `8ddc978a`.
 > Base local: `master`.
 > Objetivo: ler os relatórios novos gerados pelo Hermes, validar contra o
 > código atual e incorporar apenas achados tecnicamente corretos.
@@ -52,14 +52,39 @@ Limite consciente:
   backend-owned de apply ainda seria o caminho definitivo para comparar contra o
   PostgreSQL no instante exato da mutação.
 
+### P2 — `DeckProgressChip` não possuía consumidor runtime
+
+Validação:
+
+- `rg` encontrou `DeckProgressChip(` apenas no construtor da própria classe.
+- `DeckProgressIndicator` continua vivo e consumido em detalhes/visão geral de
+  deck.
+
+Correção aplicada:
+
+- `DeckProgressChip` foi removido de
+  `app/lib/features/decks/widgets/deck_progress_indicator.dart`.
+
+### P2 — `LotusPresentationMode` existia, mas não era chamado
+
+Validação:
+
+- `LotusPresentationMode.enter/exit` não tinha call-site em `app/lib`.
+- `LotusLifeCounterScreen` é o fluxo runtime vivo do contador.
+
+Correção aplicada:
+
+- `LotusLifeCounterScreen` chama `LotusPresentationMode.enter()` em `initState`
+  e `LotusPresentationMode.exit()` em `dispose`, exceto Web.
+
 ## Válido, Mas Não Incorporado Neste Slice
 
 ### Funções/classes sem uso runtime confirmado
 
-Achados como `DeckCard`, `DeckProgressChip`, `LotusPresentationMode` e
-`LifeCounterScreen` continuam plausíveis, mas exigem decisão de produto/teste
-visual antes de remoção. Não foram removidos nesta rodada para não quebrar
-fixtures, harnesses ou fluxos legados sem uma substituição clara.
+`DeckCard` e `LifeCounterScreen` continuam plausíveis, mas exigem decisão de
+produto/teste visual antes de remoção. Não foram removidos nesta rodada porque
+ainda existem suites de teste/fixtures legadas e o fluxo vivo precisa de decisão
+explícita antes de apagar cobertura histórica.
 
 ### `optimize_response_support.dart` parcialmente extraído
 
@@ -100,13 +125,15 @@ filtrar decks incompletos e reportar `INCOMPLETE`, não gerar recomendações.
   `/ai/optimize` e leitura operacional em `/ai/ml-status`.
 - Reabertura de Game Changer double-counting: rejeitada; a política atual é
   multi-tag intencional e já protegida por testes.
+- `verifySwapIntegrity` sem uso no app: stale após `master@47411a23`; o app
+  agora valida `swap_integrity` e assinatura local antes de aplicar optimize.
 
 ## Próximo Slice Recomendado
 
 1. Criar endpoint/backend apply para optimize, validando `swap_integrity` contra
    o deck atual no PostgreSQL antes de mutar `deck_cards`.
 2. Rodar slice separado de limpeza UI/fixtures para decidir remover ou religar
-   `DeckCard`, `DeckProgressChip`, `LotusPresentationMode` e `LifeCounterScreen`.
+   `DeckCard` e `LifeCounterScreen`.
 3. Corrigir o sync Hermes de `tag_accuracy`, CMC e Game Changers ausentes sem
    alterar contratos app-facing.
 4. Refatorar `optimize_response_support.dart` somente com teste de contrato do

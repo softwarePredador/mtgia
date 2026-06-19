@@ -27,6 +27,13 @@
 > `server/bin/sync_cards.dart` importa `server/lib/sync_cards_utils.dart` e usa
 > `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`.
 
+> Atualizacao Codex 2026-06-19: o achado P1 de `verifySwapIntegrity` sem
+> protecao no fluxo app ficou stale no `master@47411a23`. O app agora parseia
+> `swap_integrity`, recalcula o hash antes do preview/apply e bloqueia apply se
+> a assinatura local do deck mudou. Nesta mesma triagem, `DeckProgressChip` foi
+> removido por nao possuir consumidor runtime/teste e `LotusPresentationMode`
+> passou a ser chamado por `LotusLifeCounterScreen`.
+
 > Atualizacao local Codex: 2026-06-07 19:00 UTC
 > Rotacao: `duplicated-or-similar-logic`
 > Branch de memoria: `codex/hermes-analysis-docs`

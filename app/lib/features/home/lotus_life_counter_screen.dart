@@ -43,6 +43,7 @@ import 'lotus/lotus_host_controller.dart';
 import 'lotus/lotus_host_overlays.dart';
 import 'lotus/lotus_life_counter_game_timer_adapter.dart';
 import 'lotus/lotus_lifecycle_diagnostic_store.dart';
+import 'lotus/lotus_presentation_mode.dart';
 import 'lotus/lotus_runtime_flags.dart';
 import 'lotus/lotus_storage_snapshot.dart';
 import 'lotus/lotus_storage_snapshot_store.dart';
@@ -240,6 +241,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (!kIsWeb) {
+      unawaited(LotusPresentationMode.enter());
+    }
     _nativeLifecycleChannel.setMethodCallHandler(_handleNativeLifecycleSignal);
     _hostController = (widget.hostFactory ?? LotusHostController.new)(
       onAppReviewRequested: _handleAppReviewRequested,
@@ -287,6 +291,9 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       ),
     );
     _hostController.dispose();
+    if (!kIsWeb) {
+      unawaited(LotusPresentationMode.exit());
+    }
     super.dispose();
   }
 

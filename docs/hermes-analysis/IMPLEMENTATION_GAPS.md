@@ -14,8 +14,9 @@
 
 ### Atualizacao de ciclo — 2026-06-19 / Hermes docs branch triage
 
-- A branch `origin/codex/hermes-analysis-docs` foi lida em `7db89b40` sem merge
-  bruto para `master`.
+- A branch `origin/codex/hermes-analysis-docs` foi lida em `8ddc978a` sem merge
+  bruto para `master`. Esse estado ja inclui merge de `master@47411a23`, mas os
+  relatórios estruturais anteriores ainda reabriam achados stale.
 - Relatorio novo:
   `docs/hermes-analysis/HERMES_DOCS_TRIAGE_2026-06-19.md`.
 - Achado P1 incorporado neste ciclo:
@@ -24,11 +25,18 @@
   - o plano de apply carrega `expectedDeckSignature`;
   - `DeckProvider.applyOptimizationWithIds` rejeita mutação se o deck carregado
     mudou desde a geração da sugestão.
+- Achados app de classes sem uso tratados neste ciclo:
+  - `DeckProgressChip` foi removido porque nao possuia chamada em `app/lib` nem
+    cobertura propria;
+  - `LotusPresentationMode` passou a ser chamado por `LotusLifeCounterScreen`
+    no enter/exit do fluxo Lotus;
+  - `DeckCard` e `LifeCounterScreen` continuam pendentes porque ainda possuem
+    suites de teste/fixtures legadas e exigem decisao separada de produto.
 - Limite restante:
   - o gate definitivo deve ser backend-owned em um futuro endpoint de apply,
     comparando contra PostgreSQL no instante da mutação.
 - Achados válidos deixados para slices próprios:
-  - limpeza de classes/widgets legados sem uso runtime confirmado;
+  - decisao de produto sobre `DeckCard` e `LifeCounterScreen` legados;
   - sync Hermes de `tag_accuracy`, CMC e Game Changers ausentes;
   - refactor de `optimize_response_support.dart`;
   - descarte de seeds incompletos como fonte de optimize/generate.
