@@ -70,6 +70,54 @@ def get_lki(creature):
     }
 
 
+def move_permanent_from_battlefield(
+    owner,
+    permanent,
+    *,
+    reason=None,
+    source=None,
+    all_players=None,
+    replacement_registry,
+    replacement_event_cls,
+):
+    """Move a battlefield permanent to the correct zone for this simulator."""
+    if not isinstance(permanent, dict):
+        return "none"
+
+    permanent["_lki_snapshot"] = {
+        "name": permanent.get("name", permanent.get("card_name", "")),
+        "power": permanent.get("power", 0),
+        "toughness": permanent.get("toughness", 0),
+        "cmc": permanent.get("cmc", 0),
+        "type_line": permanent.get("type_line", ""),
+        "is_commander": permanent.get("is_commander", False),
+        "owner": permanent.get("owner", permanent.get("controller", "")),
+    }
+    permanent["_zone_id"] = permanent.get("_zone_id", 0) + 1
+    permanent["_last_zone"] = "battlefield"
+    if permanent in owner.battlefield:
+        owner.battlefield.remove(permanent)
+    if permanent.get("is_commander"):
+        event = replacement_registry.process_event(
+            replacement_event_cls(
+                "zone_change",
+                affected_player=owner,
+                card=permanent,
+                from_zone="battlefield",
+                to_zone="graveyard",
+                source=source,
+                reason=reason,
+            )
+        )
+        if event.to_zone == "command_zone":
+            owner.command_zone.append(permanent)
+            return "command_zone"
+    if permanent.get("tag") == "token" or "token" in str(permanent.get("type_line") or "").lower():
+        return "vanished_token"
+    owner.graveyard.append(permanent)
+    return "graveyard"
+
+
 def move_creature_from_battlefield(
     owner,
     creature,
@@ -80,39 +128,13 @@ def move_creature_from_battlefield(
     replacement_registry,
     replacement_event_cls,
 ):
-    """Move a dead/sacrificed creature to the correct zone for this simulator."""
-    if not isinstance(creature, dict):
-        return "none"
-
-    creature["_lki_snapshot"] = {
-        "name": creature.get("name", creature.get("card_name", "")),
-        "power": creature.get("power", 0),
-        "toughness": creature.get("toughness", 0),
-        "cmc": creature.get("cmc", 0),
-        "type_line": creature.get("type_line", ""),
-        "is_commander": creature.get("is_commander", False),
-        "owner": creature.get("owner", creature.get("controller", "")),
-    }
-    creature["_zone_id"] = creature.get("_zone_id", 0) + 1
-    creature["_last_zone"] = "battlefield"
-    if creature in owner.battlefield:
-        owner.battlefield.remove(creature)
-    if creature.get("is_commander"):
-        event = replacement_registry.process_event(
-            replacement_event_cls(
-                "zone_change",
-                affected_player=owner,
-                card=creature,
-                from_zone="battlefield",
-                to_zone="graveyard",
-                source=source,
-                reason=reason,
-            )
-        )
-        if event.to_zone == "command_zone":
-            owner.command_zone.append(creature)
-            return "command_zone"
-    if creature.get("tag") == "token" or "token" in str(creature.get("type_line") or "").lower():
-        return "vanished_token"
-    owner.graveyard.append(creature)
-    return "graveyard"
+    """Compatibility wrapper for older creature-specific call sites."""
+    return move_permanent_from_battlefield(
+        owner,
+        creature,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+        replacement_registry=replacement_registry,
+        replacement_event_cls=replacement_event_cls,
+    )

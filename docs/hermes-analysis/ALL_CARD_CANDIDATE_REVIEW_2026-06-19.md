@@ -210,6 +210,17 @@ Atualização do slice de 2026-06-19:
   - 1 `attack_trigger_artifact_tutor_supported`;
   - 1 `extra_combat_flashback_supported`.
 
+Atualização posterior do mesmo ciclo:
+
+- foi adicionado template focado para `Destroy target nonland permanent.`;
+- o executor ganhou caminho explícito `move_permanent_from_battlefield()` para
+  permanentes não criatura, mantendo o wrapper antigo para compatibilidade;
+- a seleção de alvo foi ajustada para não deixar `unknown` mascarar o efeito
+  real do permanente;
+- a prova controlada de consumidores passou de 6 para 7 drafts elegíveis. A
+  rodada full não foi repetida neste sub-slice para evitar novo artefato gigante
+  no disco local.
+
 Os 13.772 bloqueios são esperados e corretos: todos faltam fonte oficial
 revisada, teste focado e replay/auditoria. Isso impede que `needs_review` vire
 comportamento duro por acidente.
@@ -294,7 +305,7 @@ P1:
   `counter_manipulation` e `mana/resource_acceleration`;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
-  creature.` e `Destroy all creatures.`;
+  creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;
 - calibrar roles inferidos por texto para diminuir scores 100 genéricos em
   cartas utilitárias que hoje acumulam papéis demais;
 - rodar scorecard Lorehold usando apenas candidatos `test` ou

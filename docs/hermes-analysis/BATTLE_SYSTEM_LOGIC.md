@@ -889,6 +889,14 @@ Targeted creature removal simples
 - o teste focado prova alvo legal, criatura alvo removida, criatura decoy
   preservada, envio ao graveyard e replay/decision audit sem critical/high.
 
+Targeted nonland permanent removal simples
+- oracle_text_excerpt contem exatamente "Destroy target nonland permanent.";
+- effect_families inclui targeted_interaction;
+- executor estreito: apply_effect_immediate() com effect remove_permanent;
+- o teste focado prova alvo não criatura legal, artefato removido, criatura
+  decoy preservada, land preservada, envio ao graveyard e replay/decision
+  audit sem critical/high.
+
 Creature board wipe simples
 - oracle_text_excerpt contem exatamente "Destroy all creatures.";
 - effect_families inclui mass_removal_or_modal_wipe;
@@ -937,6 +945,10 @@ Resultado de controle:
 - Em 2026-06-19, os templates de `Destroy target creature.` e
   `Destroy all creatures.` elevaram a evidência focada global de 18 para 113
   drafts elegíveis para futura promoção manual.
+- Em seguida, o template `Destroy target nonland permanent.` foi validado em
+  fixture/harness controlado, elevando o teste local de consumidores de 6 para
+  7 drafts elegíveis. A rodada full não foi repetida neste slice para evitar
+  novo artefato gigante no disco local.
 
 Correção crítica associada ao wipe:
 
@@ -947,6 +959,16 @@ Correção crítica associada ao wipe:
   cópia da lista e só depois move as criaturas destruídas para o graveyard;
 - o teste focado de `Destroy all creatures.` exige explicitamente que `Mana
   Rock` permaneça no battlefield após o wipe.
+
+Correção associada a remoções de permanente:
+
+- o runtime agora expõe `move_permanent_from_battlefield()` como caminho
+  canônico para permanentes não criatura;
+- `move_creature_from_battlefield()` permanece como wrapper compatível para
+  chamadas antigas;
+- a seleção de alvo agora trata `unknown` como ausência de efeito e volta para
+  o `effect` real do permanente, impedindo que remoção genérica escolha criatura
+  pequena antes de um artefato/engine mais relevante apenas por fallback.
 
 Logo, o gate já prova que regras simples podem avançar para revisão manual,
 mas ainda preserva a barreira correta para cartas multi-etapa ou com custo/

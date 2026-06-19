@@ -152,6 +152,26 @@ def register_tests(battle, player, card):
         assert battle.get_lki(creature)["power"] == 4
         assert battle.move_creature_from_battlefield(active, "not a permanent") == "none"
 
+    def test_noncreature_permanent_zone_change_uses_generic_helper():
+        active = player("Active")
+        artifact = {
+            "name": "Tracked Artifact",
+            "effect": "ramp_permanent",
+            "type_line": "Artifact",
+            "cmc": 2,
+            "_zone_id": 3,
+        }
+        active.battlefield = [artifact]
+
+        destination = battle.move_permanent_from_battlefield(active, artifact, reason="destroyed")
+
+        assert destination == "graveyard"
+        assert artifact not in active.battlefield
+        assert artifact in active.graveyard
+        assert artifact["_zone_id"] == 4
+        assert artifact["_last_zone"] == "battlefield"
+        assert battle.get_lki(artifact)["type_line"] == "Artifact"
+
     def test_exile_records_face_up_and_face_down_visibility():
         active = player("Active")
         public_card = {"name": "Public Exile"}
@@ -185,5 +205,6 @@ def register_tests(battle, player, card):
         test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
         test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
         test_zone_change_records_lki_and_advances_zone_identity,
+        test_noncreature_permanent_zone_change_uses_generic_helper,
         test_exile_records_face_up_and_face_down_visibility,
     ]

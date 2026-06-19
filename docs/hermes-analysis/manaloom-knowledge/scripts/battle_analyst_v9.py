@@ -84,6 +84,7 @@ from battle_zone_transition_support import (
     finish_resolved_spell as _finish_resolved_spell,
     get_lki,
     move_creature_from_battlefield as _move_creature_from_battlefield,
+    move_permanent_from_battlefield as _move_permanent_from_battlefield,
     move_to_exile,
 )
 from battle_replacement_support import (
@@ -3800,7 +3801,7 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
         if check_ward(target, card, player, rng):
             ward_countered.append(decision["target_name"])
             continue
-        move_creature_from_battlefield(target_controller, target)
+        move_permanent_from_battlefield(target_controller, target)
         resolved.append(decision["target_name"])
 
     emit_replay_event(
@@ -4455,6 +4456,18 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
     )
 
 
+def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, all_players=None):
+    return _move_permanent_from_battlefield(
+        owner,
+        permanent,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+        replacement_registry=ReplacementRegistry,
+        replacement_event_cls=ReplacementEvent,
+    )
+
+
 def is_artifact_permanent(card):
     if not isinstance(card, dict):
         return False
@@ -4509,6 +4522,8 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
 def choose_best_creature_target(creatures):
     def target_priority(target):
         effect = get_card_effect(target).get("effect") or target.get("effect")
+        if effect == "unknown":
+            effect = target.get("effect")
         engine_priority = {
             "commander": 10,
             "combo": 9,
@@ -11233,7 +11248,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     turn=turn,
                     **decision,
                 )
-                move_creature_from_battlefield(opp, t)
+                move_permanent_from_battlefield(opp, t)
                 break
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "deal_damage":

@@ -2467,6 +2467,20 @@ Atualização do slice de 2026-06-19:
   - 1 counterspell simples;
   - 1 attack artifact tutor;
   - 1 extra combat + flashback.
+- Slice posterior no mesmo ciclo:
+  - `battle_zone_transition_support.py` ganhou
+    `move_permanent_from_battlefield()` como caminho explícito para permanentes
+    não criatura, mantendo `move_creature_from_battlefield()` como wrapper
+    compatível;
+  - `battle_analyst_v9.py` passou a usar o caminho genérico em remoções e
+    partial multi-target removal;
+  - a seleção de alvo deixou de tratar `unknown` como efeito prioritário e
+    volta para `target.effect`, corrigindo escolha ruim em remoções genéricas;
+  - `manaloom_battle_rule_focused_evidence.py` ganhou template estreito para
+    `Destroy target nonland permanent.`;
+  - o teste controlado de consumidores passou de 6 para 7 drafts elegíveis para
+    promoção manual futura. A rodada full não foi repetida nesse sub-slice para
+    evitar novo artefato gigante no disco local.
 
 Pendências P1 agora priorizadas:
 
@@ -2480,8 +2494,9 @@ Pendências P1 agora priorizadas:
   - `mana_or_resource_acceleration`.
 - Expandir `targeted_interaction` e `mass_removal_or_modal_wipe` somente para
   variantes que não sejam os templates simples já cobertos. Exemplos: destroy
-  target nonland permanent, exile target creature, modal wipe, asymmetric wipe,
-  damage-based removal e removal com restrições/conditional rider.
+  target permanent com rider, exile target creature/permanent, modal wipe,
+  asymmetric wipe, damage-based removal e removal com restrições/conditional
+  rider.
 - Calibrar inferência de roles para reduzir falsos scores 100 em cartas que
   acumulam `protection/ramp/recursion/tutor` por texto genérico.
 - Rodar scorecard Lorehold apenas com candidatos `test`/regra `verified` ou
