@@ -202,20 +202,32 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-11. Deck analysis e optimize agora carregam `functional_tags` +
-  `semantic_tags_v2`, e o validator/quality gate usam precedencia
-  `functional_tags` persistidos -> `semantic_tags_v2` -> heuristica. Em
-  2026-06-12, `/decks/:id/recommendations` e `/ai/weakness-analysis` também
-  passaram a carregar `card_function_tags`/`card_semantic_tags_v2` quando as
-  tabelas existem e usam `resolveCardFunctionalRoles` para os contadores internos
-  de ramp/draw/removal/wipes/protection, mantendo fallback textual. No mesmo
-  ciclo, o fallback de `/decks/:id/recommendations` deixou de recomendar
-  `Command Tower` como literal fixo, deixou de usar raridade como proxy de
-  impacto e passou a buscar sugestões por tags/semântica/legalidade/identidade
-  de cor via PostgreSQL. O risco restante ficou concentrado em heurísticas
-  secundárias não estratégicas que ainda precisam contrato interno explícito
-  antes de serem tratadas como produto principal.
-- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-07 classificou como permitidos exemplos de UI/import, comentarios de contrato, aliases localizados, docs/corpus/artifacts/test fixtures e sugestoes de busca do life counter; como excecao intencional, a policy externa de EDH/bracket; e como seed allowed-with-caution, os profiles/seeds de Commander Reference. Permanecem como risco as listas inline que decidem tags, score, fillers, rebuild, mock runtime e prompt runtime por nomes especificos (`functional_card_tags.dart`, `candidate_quality_data_support.dart`, `optimize_runtime_support.dart`, `rebuild_guided_service.dart`, `/ai/optimize` quando `deckOptimizer == null`, `prompt.md` e `prompt_complete.md`). Em 2026-06-12, `/ai/weakness-analysis` deixou de retornar listas fixas de staples para fraquezas principais e `/decks/:id/recommendations` deixou de usar `Command Tower` literal e raridade como proxy; ambos passaram a buscar sugestões no banco por tags/semântica/legalidade, com fallback genérico sem nomes. `edh_bracket_policy.dart` e excecao intencional para regras externas de bracket/Game Changer, mas deve manter fonte/versionamento/teste dedicado.
+  2026-06-19 no checkout `708541a5`. Deck analysis, optimize context,
+  additionsData, validator e quality gate carregam/preservam
+  `functional_tags` + `semantic_tags_v2` com precedencia
+  `functional_tags` persistidos -> `semantic_tags_v2` -> heuristica. A claim de
+  que o quality gate mascarava multi-tags persistidas quando semantic v2 existia
+  ficou stale: `_functionalRolesForGate` agora soma persisted + semantic roles.
+  `/decks/:id/recommendations` e `/ai/weakness-analysis` tambem carregam snapshot
+  ou fallbacks agregados e buscam sugestoes por tags/semantica/legalidade/
+  identidade de cor. O risco restante fica nos pontos que ainda usam role escalar
+  legado ou pool inicial sem tags: `removals_detailed`, need/replacement ranking
+  inicial, rebuild guiado, prompts runtime, candidate-quality foundation e
+  analises/corpus auxiliares.
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-19
+  manteve como permitidos exemplos de UI/import, comentarios de contrato, aliases
+  localizados, docs/corpus/artifacts/test fixtures, sugestoes de busca do life
+  counter e o mock dev de `/ai/optimize` marcado como `is_mock=true`. Como
+  excecoes intencionais ficam `commander_fallback_policy.dart` (policy
+  versionada de fallback/complete/filler) e `edh_bracket_policy.dart` (regra
+  externa de bracket/Game Changer). Permanecem como risco as listas/branches por
+  nome que decidem tags, roles, score, rebuild, payload/ranking ou prompt runtime
+  por cartas especificas em `functional_card_tags.dart`,
+  `optimization_functional_roles.dart`, `candidate_quality_data_support.dart`,
+  `optimize_functional_role_support.dart`, `optimize_swap_candidate_support.dart`,
+  `rebuild_guided_service.dart`, `prompt.md`, `prompt_complete.md` e analises/
+  corpus auxiliares. Qualquer excecao real deve migrar para policy/tabela
+  versionada com fonte, escopo e teste.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
   2026-06-19 03:00 UTC no checkout local `ad2238a9`. O auditor textual executou
@@ -243,21 +255,19 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-07 05:30 UTC no checkout `84a97d75`: deck
-analysis segue mais proximo do fluxo desejado porque usa `card_function_tags` e
-`semantic_tags_v2`; o contexto de optimize, `additionsData`, validator e role
-delta ainda nao threadam `card_function_tags` persistidos e reduzem v2 a um
-role unico. Candidate quality tem uso parcial de `card_function_tags`, mas
-tambem usa normalizacao propria, bonus por nome e listas de escopo high-power.
-Weakness analysis e recommendations continuam fora de um service compartilhado,
-mas carregam dados persistidos e usam `resolveCardFunctionalRoles` para
-contadores internos. Em 2026-06-12, ambos os fallbacks deixaram de depender de
-listas fixas de staples; recommendations também deixou de recomendar
-`Command Tower` diretamente e removeu raridade como proxy de impacto. O mock de
-`/ai/optimize` sem `deckOptimizer` ainda retorna staples por nome. Os prompts
-runtime carregados por `otimizacao.dart` tambem contem exemplos fixos de cartas;
-idealmente esses exemplos devem ser gerados por policy/dados versionados, nao
-mantidos como texto solto.
+Estado atual revalidado em 2026-06-19 05:30 UTC no checkout `708541a5`: deck
+analysis, optimize context, additionsData, validator, role delta e quality gate
+threadam `functional_tags` e `semantic_tags_v2` no caminho principal. Weakness
+analysis e recommendations continuam fora de um service unico, mas carregam
+snapshot/tags semanticas e usam `resolveCardFunctionalRoles` para contadores
+internos; seus fallbacks buscam candidatos por tags/semantica/legalidade/
+identidade em vez de listas fixas de staples. Candidate quality tem uso parcial
+de `card_function_tags`, mas parte da propria foundation ainda nasce de
+heuristicas por nome e de listas de escopo high-power/premium. O mock de
+`/ai/optimize` sem `deckOptimizer` ainda retorna staples por nome, mas marcado
+como `is_mock=true`. Os prompts runtime carregados por `otimizacao.dart` ainda
+contem exemplos fixos de cartas; idealmente esses exemplos devem ser gerados por
+policy/dados versionados, nao mantidos como texto solto.
 - **P2 — Fallback de semantic v2 baixa confianca**: revalidado e coberto em
   `origin/master@c3531df7`. Tags semantic v2 abaixo de 0.65 sao ignoradas e a
   classificacao cai para heuristica por `oracle_text`/`type_line`.
