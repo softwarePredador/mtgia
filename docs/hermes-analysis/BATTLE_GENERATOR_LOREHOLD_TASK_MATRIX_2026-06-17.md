@@ -22,6 +22,16 @@ Spec técnica derivada desta matriz:
 
 - [BATTLE_GENERATOR_IMPLEMENTATION_SLICE_SPEC_2026-06-17.md](/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/BATTLE_GENERATOR_IMPLEMENTATION_SLICE_SPEC_2026-06-17.md)
 
+Atualizacao 2026-06-19: a inspecao manual do artefato local
+`/Users/desenvolvimentomobile/.manaloom-agents/artifacts/manual-battle-simulation/20260619_135854/`
+mostrou que `replay.txt` ainda e um resumo humano incompleto. Os JSONL
+estruturados carregam land drops, tentativas ilegais, prioridade e trace, mas o
+texto omite land play, pagamento de custo, alvo/resultado de counter, fases e
+conteudo real do board. Isso deve virar task explicita porque o proximo Codex
+que trabalhar em battle precisa validar o replay textual contra
+`replay.events.jsonl`/`replay.decision_trace.jsonl`, nao assumir que o texto
+sozinho prova legalidade.
+
 ## Fontes base
 
 - [BATTLE_GENERATOR_TRUTH_STUDY_2026-06-17.md](/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/BATTLE_GENERATOR_TRUTH_STUDY_2026-06-17.md)
@@ -65,6 +75,7 @@ Referências externas rechecadas nesta rodada:
 | Pri | Frente | Task | Evidência atual | O que fazer | Critério de fechamento |
 | --- | --- | --- | --- | --- | --- |
 | P1 | Battle | `decision_trace_v1` comparativo | O trace atual já cobre pass/cast/rummage e, em 2026-06-19, passou a pontuar `keep` vs `mulligan` para mãos pesadas. Ainda falta ampliar a mesma exigência para todas as decisões complexas de tutor/response/combat. | Continuar adicionando score comparativo onde o runtime já possui ranking local, sem inventar EV perfeito. | Replay com `available_options`, score da escolhida, score das rejeitadas e motivo explícito das rejeições nas decisões de maior impacto. |
+| P1 | Battle | Replay textual auditável e coerente com JSONL | Replay manual `20260619_135854`, seed `786135854`, mostrou divergência de observabilidade no turno 1: `replay.txt` omite `Sunbillow Verge`, `Dryad Arbor`, `Scrubland`, `Breeding Pool`, pagamento de custos, fases detalhadas e board contents; também mostra `Mental Misstep` como `RESOLVE` sem alvo/resultado claro, enquanto `replay.events.jsonl` registra `end_step_instant` depois de `Sensei's Divining Top` já ter resolvido. | Fazer o render de `replay.txt` derivar os eventos estruturados essenciais: `PLAY LAND`, `TAP/PAY COST`, `CAST/RESOLVE` com phase, targets e counter result, tentativas ilegais relevantes, mudanças de vida por custo, e snapshot legível de permanentes no fim do turno. Adicionar auditor/teste que compare texto e JSONL para impedir que um evento critico exista só no side-channel estruturado. | O mesmo seed ou fixture equivalente deve gerar `replay.txt` contendo land drops/custos/alvos/fases suficientes para auditar o turno 1 sem abrir o JSONL; `Mental Misstep` precisa declarar alvo e resultado legal, ou ser marcado como finding bloqueante quando nao houver alvo valido. |
 | P1 | Battle | Scorecard Commander-safe | Em 2026-06-19 o `server/bin/card_impact_analyzer.py` ganhou scorecard replay-derived com `seen_wr`, `not_seen_wr`, `cast_wr`, `not_cast_wr`, `delta_vs_baseline`, `baseline_hash`, `sample_quality` e resumo `trusted/needs_more_samples/blocked` via `--json-summary-output`. Isso reduz o risco de confiar em WR bruto, mas ainda nao prova qualidade final sem corpus maior. | Rodar o scorecard em lote Lorehold/control decks, congelar `baseline_hash` por rodada e adicionar segmentacao por arquétipo/turno antes de usar como gate de swap. | Relatório por carta/swap com amostra utilizável, baseline reproduzível e conclusão explícita; sem auto-apply. |
 | P1 | Battle | Executor genérico de activated abilities recorrentes | Em 2026-06-19 `Ashnod's Altar` foi coberta por teste focado: o executor `activated_mana_ability + activation_cost=sacrifice_creature` sacrifica token apenas quando os 2 manas destravam payoff real no mesmo precombat main, emite replay event e decision trace. | Ampliar a mesma família para outros permanentes recorrentes somente quando houver metadata confiável e cenário focado. | Slice mínimo fechado para `sacrifice_creature -> add mana`; próximos fechamentos exigem novo teste por família de habilidade, sem combo engine genérica. |
 | P1 | Battle | Multi-row real em `card_battle_rules` | Infra pronta; PostgreSQL ainda com `multi_rule_card_count = 0`. | Persistir 3-5 cartas reais com escopos distintos: `spell_resolution`, `activated_ability`, `trigger_resolution`, `cost_annotation` ou `static_layer`. | Auditor multi-rule reencontra casos reais no PG e o runtime seleciona por escopo, não por nome cru. |
@@ -84,9 +95,10 @@ Referências externas rechecadas nesta rodada:
 ### Fase 1 — Battle confiável para aprendizagem
 
 1. `decision_trace_v1` comparativo
-2. executor genérico de activated abilities recorrentes
-3. scorecard Commander-safe
-4. primeiro lote multi-row real em `card_battle_rules`
+2. replay textual auditável e coerente com JSONL
+3. executor genérico de activated abilities recorrentes
+4. scorecard Commander-safe
+5. primeiro lote multi-row real em `card_battle_rules`
 
 Motivo:
 
