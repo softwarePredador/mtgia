@@ -2609,6 +2609,22 @@ Atualização do slice de 2026-06-19:
     - 1 counterspell simples;
     - 1 attack artifact tutor;
     - 1 extra combat + flashback.
+- Slice adicional de proteção/prevenção:
+  - `manaloom_new_card_candidate_review.py` passou a tratar `protection` como
+    papel que exige `needs_rule_review` quando não há regra battle confiável;
+    antes cartas de proteção pura podiam cair em `ignore` apesar de impactarem
+    resposta a wipes e combate;
+  - `manaloom_battle_rule_review_queue.py` passou a inferir
+    `protection_or_prevention` de oracle text com `gain indestructible until end
+    of turn`, `prevent all damage` ou `protection from`;
+  - `manaloom_battle_rule_focused_evidence.py` ganhou template estreito para
+    `Creatures you control gain indestructible until end of turn.`, provando
+    resposta no stack contra `board_wipe`, preservação das criaturas protegidas,
+    gasto da carta e `decision_trace` de proteção;
+  - o fixture controlado de consumidores passou de 9 para 10 drafts elegíveis.
+  - escopo propositalmente não cobre ainda `Permanents you control gain
+    indestructible`, prevenção ampla de dano ou proteção de alvo individual,
+    porque esses casos exigem templates e assertions próprios.
 
 Pendências P1 agora priorizadas:
 
@@ -2616,7 +2632,8 @@ Pendências P1 agora priorizadas:
   Scryfall/MTGJSON/PostgreSQL, sem LLM.
 - Criar templates focados para as famílias mais frequentes:
   - `graveyard_or_zone_recursion`;
-  - `protection_or_prevention`;
+  - `protection_or_prevention` restante, excluindo o subcaso já coberto de
+    criaturas ganhando indestrutível até o fim do turno;
   - `triggered_or_static_engine`;
   - `counter_manipulation`;
   - `mana_or_resource_acceleration`.

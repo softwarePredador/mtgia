@@ -236,6 +236,19 @@ def _write_counterspell_gate_fixture(tmp: Path) -> Path:
                 "legalities": {"commander": "legal"},
                 "function_tags": ["removal"],
             },
+            {
+                "card_id": "card-clean-formation",
+                "oracle_id": "oracle-clean-formation",
+                "name": "Clean Formation",
+                "mana_cost": "{W}",
+                "type_line": "Instant",
+                "oracle_text": "Creatures you control gain indestructible until end of turn.",
+                "color_identity": ["W"],
+                "cmc": 1,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["protection"],
+            },
         ],
     }
     path = tmp / "counterspell_gate_fixture.json"
@@ -567,7 +580,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(battle_summary["draft_count"], 9)
+            self.assertEqual(battle_summary["draft_count"], 10)
 
             evidence_summary = focused_evidence.run(
                 focused_evidence.parse_args(
@@ -581,8 +594,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(evidence_summary["evaluated_count"], 9)
-            self.assertEqual(evidence_summary["evidence_count"], 9)
+            self.assertEqual(evidence_summary["evaluated_count"], 10)
+            self.assertEqual(evidence_summary["evidence_count"], 10)
 
             evidence_file = (
                 tmp
@@ -603,8 +616,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(gate_summary["evaluated_count"], 9)
-            self.assertEqual(gate_summary["eligible_count"], 9)
+            self.assertEqual(gate_summary["evaluated_count"], 10)
+            self.assertEqual(gate_summary["eligible_count"], 10)
             self.assertEqual(gate_summary["blocked_count"], 0)
             self.assertEqual(gate_summary["evidence_file"], str(evidence_file))
 
@@ -651,6 +664,10 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             )
             self.assertEqual(
                 decisions["Clean Demystify"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertEqual(
+                decisions["Clean Formation"],
                 "eligible_for_manual_verified_promotion",
             )
 

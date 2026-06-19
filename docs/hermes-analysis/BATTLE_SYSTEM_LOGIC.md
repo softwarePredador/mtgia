@@ -983,6 +983,18 @@ Creature board wipe simples
   indestrutível preservada, permanentes não criatura preservados e replay/
   decision audit sem critical/high.
 
+Creatures gain indestructible até o fim do turno
+- oracle_text contem `Creatures you control` e
+  `gain indestructible until end of turn`;
+- effect_families inclui protection_or_prevention;
+- executor estreito: resposta no stack contra `board_wipe`, usando o caminho
+  real de prioridade/response do `battle_analyst_v9.py`;
+- o teste focado prova `decision_trace` de proteção, carta gasta, wipe
+  resolvido, criaturas protegidas preservadas, criatura oponente destruída e
+  replay/decision audit sem critical/high;
+- não cobre ainda `Permanents you control gain indestructible`, prevenção ampla
+  de dano ou proteção individual por alvo.
+
 Sacrifice outlet de dano simples
 - oracle_text contem "Sacrifice a creature:"
 - oracle_text contem dano a alvo/any target
@@ -1033,9 +1045,11 @@ Resultado de controle:
   de `Destroy target artifact/enchantment` para `nonland_permanent`.
 - Com os templates `Destroy target artifact.` e `Destroy target enchantment.`,
   o teste local de consumidores subiu de 7 para 9 drafts elegíveis e a rodada
-  full report-only passou para `118` evidências focadas / `118` elegíveis no
-  promotion gate, ainda com `13765` drafts bloqueados corretamente por falta de
-  template/fonte/replay.
+  full read-only subiu para 118 evidências focadas.
+- Com o template `Creatures you control gain indestructible until end of turn.`,
+  proteção pura passou a entrar na fila `needs_rule_review` quando não há regra
+  battle confiável, e o teste local de consumidores subiu de 9 para 10 drafts
+  elegíveis sem auto-promotion.
 
 Correção crítica associada ao wipe:
 

@@ -330,6 +330,17 @@ def supports_destroy_all_creatures_template(draft: DraftRecord) -> bool:
     )
 
 
+def supports_creatures_indestructible_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "protection_or_prevention" in draft.effect_families
+        and "creatures you control" in text
+        and "gain indestructible until end of turn" in text
+        and "target" not in text
+        and draft.proposed_status == "needs_review"
+    )
+
+
 def build_counterspell_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_focused_evidence",
@@ -1118,6 +1129,215 @@ def build_destroy_all_creatures_evidence(draft: DraftRecord, output_dir: Path) -
     )
 
 
+def build_creatures_indestructible_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    battle = load_module(
+        "battle_analyst_creatures_indestructible_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        "replay_decision_auditor_creatures_indestructible_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        active = battle.Player("Active", None, [])
+        defender = battle.Player("Defender", None, [], is_human=True)
+        defender.hand = [
+            {
+                "name": draft.card_name,
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "tag": "protection",
+                "effect": "indestructible",
+                "type_line": "Instant",
+                "color_identity": ["W"],
+                "_rule_source": "focused_battle_rule_evidence",
+                "_rule_review_status": "needs_review",
+            }
+        ]
+        defender.mana_pool.add("white", 1)
+        defender.battlefield = [
+            {
+                "name": "Defender Creature A",
+                "cmc": 2,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": defender.name,
+            },
+            {
+                "name": "Defender Creature B",
+                "cmc": 3,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": defender.name,
+            },
+        ]
+        active.battlefield = [
+            {
+                "name": "Active Threat",
+                "cmc": 4,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "controller": active.name,
+            }
+        ]
+        board_wipe = {
+            "name": "Test Board Wipe",
+            "cmc": 4,
+            "type_line": "Sorcery",
+            "effect": "board_wipe",
+        }
+        stack = battle.Stack()
+        stack.push(board_wipe, active, battle.get_card_effect(board_wipe))
+
+        first_priority = battle.priority_round(
+            active,
+            [active, defender],
+            stack,
+            4,
+            random.Random(18),
+            phase="precombat_main",
+        )
+        second_priority = battle.priority_round(
+            active,
+            [active, defender],
+            stack,
+            4,
+            random.Random(18),
+            phase="precombat_main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    protection_response = any(
+        row.get("decision_type") == "response"
+        and row.get("chosen_option", {}).get("card") == draft.card_name
+        and row.get("actual_outcome") == "protective_response_cast"
+        for row in decision_rows
+    )
+    protection_cast = any(
+        row.get("event") == "spell_cast"
+        and row.get("card") == draft.card_name
+        and row.get("role") == "response"
+        and row.get("response_to") == "Test Board Wipe"
+        for row in event_rows
+    )
+    wipe_event = next(
+        (
+            row
+            for row in event_rows
+            if row.get("event") == "board_wipe_resolved"
+            and row.get("card") == "Test Board Wipe"
+        ),
+        None,
+    )
+    defender_creatures = [
+        card.get("name")
+        for card in defender.battlefield
+        if isinstance(card, dict) and battle.is_battlefield_creature(card)
+    ]
+    protection_spent = bool(defender.graveyard) and defender.graveyard[0].get("name") == draft.card_name
+    focused_passed = bool(
+        first_priority
+        and not second_priority
+        and protection_response
+        and protection_cast
+        and protection_spent
+        and wipe_event
+        and wipe_event.get("destroyed") == 1
+        and wipe_event.get("protected") == 2
+        and sorted(defender_creatures) == ["Defender Creature A", "Defender Creature B"]
+        and not active.battlefield
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "first_priority_protected": bool(first_priority),
+            "second_priority_resolved_stack": not bool(second_priority),
+            "protection_response_decision": protection_response,
+            "protection_cast_event": protection_cast,
+            "protection_card_spent": protection_spent,
+            "destroyed": wipe_event.get("destroyed") if wipe_event else None,
+            "protected": wipe_event.get("protected") if wipe_event else None,
+            "defender_creatures_survived": sorted(defender_creatures),
+            "active_board_empty": not active.battlefield,
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": "creatures_gain_indestructible_against_board_wipe",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: Creatures you control gain indestructible until end of turn.",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": "hard_behavior_creatures_indestructible_until_eot_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason="creatures_indestructible_until_eot_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
 def build_sacrifice_damage_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_sacrifice_damage_evidence",
@@ -1602,6 +1822,8 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
         return build_destroy_target_enchantment_evidence(draft, output_dir)
     if supports_destroy_all_creatures_template(draft):
         return build_destroy_all_creatures_evidence(draft, output_dir)
+    if supports_creatures_indestructible_template(draft):
+        return build_creatures_indestructible_evidence(draft, output_dir)
     if supports_sacrifice_damage_template(draft):
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):

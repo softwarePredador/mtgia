@@ -71,6 +71,12 @@ def infer_effect_families_from_text(oracle_text: str) -> list[str]:
         families.add("mass_removal_or_modal_wipe")
     if "destroy target" in text or "exile target" in text or "damage to target" in text:
         families.add("targeted_interaction")
+    if (
+        "gain indestructible until end of turn" in text
+        or "prevent all damage" in text
+        or "protection from" in text
+    ):
+        families.add("protection_or_prevention")
     if "+1/+1 counter" in text:
         families.add("counter_manipulation")
     if "copy" in text and ("spell" in text or "target" in text):

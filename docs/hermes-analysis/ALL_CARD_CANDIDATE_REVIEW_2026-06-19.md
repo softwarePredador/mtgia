@@ -301,8 +301,15 @@ P1:
 - reduzir `needs_data` com sync determinístico de legalidade/oracle para 3.232
   cartas únicas;
 - criar templates focados para as famílias mais frequentes, começando por
-  `recursion/zone`, `protection/prevention`, `triggered_or_static_engine`,
-  `counter_manipulation` e `mana/resource_acceleration`;
+  `recursion/zone`, `protection/prevention` restante,
+  `triggered_or_static_engine`, `counter_manipulation` e
+  `mana/resource_acceleration`;
+- considerar `protection` papel que exige fila `needs_rule_review` quando não
+  há regra battle confiável; em 2026-06-19 foi fechado apenas o template seguro
+  `Creatures you control gain indestructible until end of turn.` como resposta
+  a `board_wipe`, com replay e decision trace. Casos de prevenção ampla,
+  proteção individual e `Permanents you control gain indestructible` continuam
+  pendentes por exigirem assertions específicas;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;
