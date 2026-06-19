@@ -2160,6 +2160,11 @@ Future<Response> onRequest(RequestContext context) async {
           .map((name) {
             final v = validByNameLower[name.toLowerCase()];
             if (v == null || v['id'] == null) return null;
+            final originalCard = originalCardByName[name.toLowerCase()];
+            final resolvedRoles = originalCard == null
+                ? const <String>[]
+                : (optimizationFunctionalRolesForCard(originalCard).toList()
+                  ..sort());
             return buildOptimizeRecommendationDetail(
               type: 'remove',
               name: '${v['name']}',
@@ -2172,14 +2177,10 @@ Future<Response> onRequest(RequestContext context) async {
               keepTheme: keepTheme,
               functionalRole: inferFunctionalRole(
                 name: name,
-                typeLine: originalCardByName[name.toLowerCase()]?['type_line']
-                        ?.toString() ??
-                    '',
-                oracleText: originalCardByName[name.toLowerCase()]
-                            ?['oracle_text']
-                        ?.toString() ??
-                    '',
+                typeLine: originalCard?['type_line']?.toString() ?? '',
+                oracleText: originalCard?['oracle_text']?.toString() ?? '',
               ),
+              functionalRoles: resolvedRoles,
               priority: detailPriority,
               risk: detailRisk,
             );

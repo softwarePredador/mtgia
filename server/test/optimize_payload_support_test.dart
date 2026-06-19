@@ -59,6 +59,8 @@ void main() {
         cmcBefore: 3.2,
         cmcAfter: 2.9,
         keepTheme: true,
+        functionalRole: 'ramp',
+        functionalRoles: const ['ramp', 'draw'],
       );
 
       expect(response['mode'], 'optimize');
@@ -68,6 +70,10 @@ void main() {
         contains('Sinal semântico v2'),
       );
       expect(detail['reason'], contains('Sugestão de saída'));
+      expect(detail['role'], 'ramp');
+      expect(detail['function'], 'ramp');
+      expect(detail['roles'], ['draw', 'ramp']);
+      expect(detail['functions'], ['draw', 'ramp']);
       expect(detail['impact_estimate']['curve'], 'ΔCMC -0.30');
       expect(detail['impact_estimate']['consistency'], 'alta');
     });

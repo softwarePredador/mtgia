@@ -12,6 +12,31 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-19 / optimize detailed payload multi-role
+
+- A triagem da branch `origin/codex/hermes-analysis-docs` tambem apontou um
+  gap app-facing no payload de optimize: `removals_detailed` preservava apenas
+  os campos escalares legados `role/function`, mesmo quando a carta possuia
+  multiplas funcoes verificadas por `functional_tags`, `semantic_tags_v2` ou
+  `card_intelligence_snapshot`.
+- Correção incorporada neste slice:
+  - `buildOptimizeRecommendationDetail` manteve compatibilidade com
+    `role/function`;
+  - o mesmo detalhe agora expõe campos aditivos `roles/functions` como arrays
+    ordenados;
+  - a rota `/ai/optimize` preenche esses arrays para removals usando
+    `optimizationFunctionalRolesForCard`, sem colapsar cartas multi-role para
+    uma unica funcao;
+  - consumidores antigos continuam lendo os campos escalares, e consumidores
+    novos podem usar os arrays para explicabilidade e validacao semântica.
+- Teste adicionado:
+  - recomendacao com `functionalRoles=[ramp, draw]` preserva `role/function`
+    legado e retorna `roles/functions=[draw, ramp]`.
+- Limite restante:
+  - `additions_detailed` ainda depende do payload vindo do gerador/IA e pode
+    precisar de enriquecimento posterior;
+  - o rebuild guiado ainda possui excecoes por nome e fica para slice proprio.
+
 ### Atualizacao de ciclo — 2026-06-19 / optimize replacement semantic intake
 
 - A triagem da branch `origin/codex/hermes-analysis-docs` apontou um gap ainda

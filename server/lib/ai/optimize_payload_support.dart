@@ -437,6 +437,7 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   required double cmcAfter,
   required bool keepTheme,
   String? functionalRole,
+  List<String>? functionalRoles,
   String? priority,
   String? risk,
 }) {
@@ -447,6 +448,14 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   final resolvedRole = (functionalRole == null || functionalRole.trim().isEmpty)
       ? 'utility'
       : functionalRole.trim();
+  final resolvedRoles = (functionalRoles == null || functionalRoles.isEmpty)
+      ? <String>[resolvedRole]
+      : (functionalRoles
+          .map((role) => role.trim())
+          .where((role) => role.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort());
 
   return {
     'type': type,
@@ -456,6 +465,8 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
     'is_basic_land': isBasicLand,
     'role': resolvedRole,
     'function': resolvedRole,
+    'roles': resolvedRoles,
+    'functions': resolvedRoles,
     'priority': priority ?? (type == 'add' ? 'High' : 'Medium'),
     'risk': risk ?? (keepTheme ? 'low' : 'medium'),
     'reason':
