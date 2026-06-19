@@ -12,6 +12,30 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-19 / rebuild guided basic-land identity
+
+- A triagem estrutural apontava variantes antigas de `_isBasicLandName`; a
+  revalidacao no código ativo encontrou um gap real no `rebuild_guided`:
+  `_basicMatchesCommander` pontuava positivamente qualquer basic W/U/B/R/G para
+  comandantes multicoloridos, mesmo fora da identidade do comandante, e nao
+  tratava snow basics/Wastes pela normalizacao canonica.
+- Correção incorporada neste slice:
+  - criado `rebuild_guided_land_support.dart` como helper testável;
+  - `rebuild_guided` agora usa `basic_land_utils` indiretamente para detectar
+    nomes básicos e normalizar hífens/case;
+  - Wastes e Snow-Covered Wastes só casam com comandante colorless;
+  - Plains/Island/Swamp/Mountain/Forest e variantes Snow-Covered só recebem
+    score quando a cor pertence à identidade do comandante.
+- Testes adicionados:
+  - snow basics são reconhecidos;
+  - basic fora da identidade multicolorida é rejeitado;
+  - Wastes é aceito apenas para identidade colorless.
+- Limite restante:
+  - a query `_loadBasicLandCatalog` ainda usa SQL explícito para montar o
+    catálogo de básicos do PostgreSQL; isso é aceitável por enquanto porque a
+    escolha final agora passa pelo helper canônico, mas pode virar view/helper
+    SQL em uma rodada futura de schema.
+
 ### Atualizacao de ciclo — 2026-06-19 / optimize detailed payload multi-role
 
 - A triagem da branch `origin/codex/hermes-analysis-docs` tambem apontou um

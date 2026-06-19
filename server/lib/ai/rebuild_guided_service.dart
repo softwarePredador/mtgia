@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:postgres/postgres.dart';
 
 import 'deck_state_analysis.dart';
+import 'rebuild_guided_land_support.dart';
 import '../color_identity.dart';
 import '../deck_rules_service.dart';
 import '../deck_schema_support.dart';
@@ -672,7 +673,10 @@ class RebuildGuidedService {
         if (_landProducesCommanderColor(oracle, commanderColorIdentity) ||
             _isAnyColorLand(oracle)) {
           score += 55;
-        } else if (_basicMatchesCommander(lower, commanderColorIdentity)) {
+        } else if (rebuildGuidedBasicMatchesCommander(
+          lower,
+          commanderColorIdentity,
+        )) {
           score += 40;
         } else if (lower == 'wastes' && commanderColorIdentity.isNotEmpty) {
           score -= 60;
@@ -1428,24 +1432,6 @@ class RebuildGuidedService {
     return 3;
   }
 
-  bool _basicMatchesCommander(
-      String lower, Set<String> commanderColorIdentity) {
-    if (commanderColorIdentity.isEmpty) return false;
-    if (commanderColorIdentity.length == 1) {
-      final color = commanderColorIdentity.first;
-      return (color == 'W' && lower == 'plains') ||
-          (color == 'U' && lower == 'island') ||
-          (color == 'B' && lower == 'swamp') ||
-          (color == 'R' && lower == 'mountain') ||
-          (color == 'G' && lower == 'forest');
-    }
-    return lower == 'plains' ||
-        lower == 'island' ||
-        lower == 'swamp' ||
-        lower == 'mountain' ||
-        lower == 'forest';
-  }
-
   bool _isLandCard(Map<String, dynamic> card) {
     final typeLine = (card['type_line'] as String?)?.toLowerCase() ?? '';
     return typeLine.contains('land');
@@ -1610,12 +1596,7 @@ class RebuildGuidedService {
   }
 
   bool _isBasicLandCardByName(String lower) {
-    return lower == 'plains' ||
-        lower == 'island' ||
-        lower == 'swamp' ||
-        lower == 'mountain' ||
-        lower == 'forest' ||
-        lower == 'wastes';
+    return isRebuildGuidedBasicLandName(lower);
   }
 
   int _totalCards(List<Map<String, dynamic>> cards) {
