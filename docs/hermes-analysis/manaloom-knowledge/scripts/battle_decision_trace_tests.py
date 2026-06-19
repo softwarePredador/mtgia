@@ -151,9 +151,106 @@ def register_tests(battle, replay_auditor):
         assert any("missing available_option_scores" in finding["finding"] for finding in findings)
         assert any("missing rejected_option_scores" in finding["finding"] for finding in findings)
 
+    def test_approach_topdeck_setup_trace_is_auditable_without_hard_executor():
+        traces = []
+        previous_handler = battle.DECISION_TRACE_HANDLER
+        battle.DECISION_TRACE_HANDLER = traces.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = battle.Player("Lorehold Pilot", None, [])
+            active.approach_count = 1
+            approach = {
+                "name": "Approach of the Second Sun",
+                "cmc": 7,
+                "type_line": "Sorcery",
+            }
+            top = {
+                "name": "Sensei's Divining Top",
+                "cmc": 1,
+                "type_line": "Artifact",
+            }
+            scroll_rack = {
+                "name": "Scroll Rack",
+                "cmc": 2,
+                "type_line": "Artifact",
+            }
+            brainstone = {
+                "name": "Brainstone",
+                "cmc": 1,
+                "type_line": "Artifact",
+            }
+
+            approach_effect = battle.get_card_effect(approach)
+            assert approach_effect["effect"] == "approach"
+            assert approach_effect["gain_life"] == 7
+            assert approach_effect["_rule_review_status"] == "verified"
+
+            def topdeck_option(card, score):
+                effect = battle.get_card_effect(card)
+                assert effect["effect"] == "topdeck_manipulation"
+                assert effect["_rule_review_status"] in {"active", "verified"}
+                return battle.decision_card_option(
+                    card,
+                    effect,
+                    score=score,
+                    action="prepare_approach_second_cast",
+                    battle_model_scope=effect.get("battle_model_scope"),
+                    rule_source=effect.get("_rule_source"),
+                    rule_status=effect.get("_rule_review_status"),
+                    rule_key=effect.get("_rule_logical_key"),
+                )
+
+            brainstone_option = topdeck_option(brainstone, 45)
+            top_option = topdeck_option(top, 40)
+            scroll_option = topdeck_option(scroll_rack, 35)
+
+            battle.emit_decision_trace(
+                decision_type="topdeck_setup",
+                player=active,
+                turn=6,
+                phase="precombat_main",
+                available_options=[brainstone_option, top_option, scroll_option],
+                chosen_option=brainstone_option,
+                rejected_options=[top_option, scroll_option],
+                score_components={
+                    "approach_already_resolved": active.approach_count,
+                    "second_cast_win_line": 30,
+                    "topdeck_setup_quality": 15,
+                },
+                rule_source=brainstone_option["rule_source"],
+                rule_status=brainstone_option["rule_status"],
+                confidence="medium",
+                expected_benefit_score=45,
+                actual_outcome="audit_only_setup_not_executed",
+                reason="setup_approach_second_cast",
+                expected_payoff_reason="prepare second Approach resolution without inventing a hard topdeck executor",
+                strategic_principle="topdeck tools should be used when they materially improve a known win line",
+                resource_delta={
+                    "approach_count": active.approach_count,
+                    "target_spell": "Approach of the Second Sun",
+                },
+                risk_flags=["topdeck_executor_not_hard_modeled"],
+            )
+        finally:
+            battle.DECISION_TRACE_HANDLER = previous_handler
+
+        assert len(traces) == 1
+        trace = traces[0]
+        assert trace["decision_type"] == "topdeck_setup"
+        assert trace["chosen_option"]["card"] == "Brainstone"
+        assert trace["chosen_option"]["battle_model_scope"] == "brainstone_draw_three_put_two_back_unexecuted_v1"
+        assert trace["score_components"]["approach_already_resolved"] == 1
+        assert trace["best_rejected_option_score"] == 40.0
+        assert trace["score_gap_vs_best_rejected"] == 5.0
+        assert trace["resource_delta"]["target_spell"] == "Approach of the Second Sun"
+        assert trace["risk_flags"] == ["topdeck_executor_not_hard_modeled"]
+        assert replay_auditor.audit_decision_traces(traces) == []
+
     return [
         test_emit_decision_trace_includes_chosen_option_and_scores,
         test_decision_trace_auditor_flags_missing_score_and_duplicate_id,
         test_decision_trace_auditor_flags_chosen_outside_options,
         test_decision_trace_auditor_flags_missing_comparative_fields_for_multi_option_choice,
+        test_approach_topdeck_setup_trace_is_auditable_without_hard_executor,
     ]

@@ -351,6 +351,14 @@ artefato sem texto explicito de mana nao pode cair em `ramp_permanent` apenas
 por possuir `Artifact` no `type_line`; nesses casos o fallback correto e
 `unknown` ate existir regra revisada ou heuristica rastreavel.
 
+Atualizacao 2026-06-19: a linha `Approach of the Second Sun` + ferramentas de
+topo ganhou evidencia de `decision_trace_v1`. O teste focado registra
+`Brainstone`, `Sensei's Divining Top` e `Scroll Rack` como opcoes
+comparativas de `topdeck_setup`, preserva `rule_source/status`, score e
+`risk_flags`. Isso ainda nao transforma a manipulacao de topo em executor duro:
+o trace prova que a decisao e auditavel, enquanto a execucao completa de
+reordenar/comprar/posicionar Approach permanece gap separado.
+
 Guardrails operacionais atuais:
 
 - `HANDCRAFTED_KNOWN_CARDS` deve permanecer vazio por padrao;
