@@ -158,6 +158,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para responder se cada etapa/jogada esta sendo auditada e quais gaps
     reais ainda impedem usar WR bruto como aprendizado forte.
 
+- `NEW_CARD_CANDIDATE_REVIEW_2026-06-18.md`
+  - Contrato da rotina geral de cartas novas/alteradas, incluindo
+    `needs_data`, `needs_rule_review`, focused evidence e promotion gate.
+  - Use para entender a cadencia normal das crons e o contrato report-only.
+
+- `ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md`
+  - Rodada full-scope contra 34.079 cartas e 24 comandantes rastreados.
+  - Use quando a pergunta for "todas as cartas", cobertura global de battle
+    rules, backlog real de templates ou impacto em Lorehold/generator/optimize.
+  - Registra a correcao de chave por `card_id` no SQLite operacional e a
+    validacao de `--limit 0` como modo sem limite para runs globais.
+
 - `BATTLE_GENERATOR_LOREHOLD_TRUTH_STUDY_2026-06-16.md`
   - Consolidacao canônica do estado real do battle simulator, do generator e do
   caso Lorehold.

@@ -213,6 +213,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                         str(knowledge_db),
                         "--output-dir",
                         str(tmp / "battle"),
+                        "--limit",
+                        "0",
                     ]
                 )
             )
@@ -509,6 +511,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                         str(knowledge_db),
                         "--output-dir",
                         str(tmp / "focused"),
+                        "--limit",
+                        "0",
                     ]
                 )
             )
@@ -529,6 +533,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                         str(knowledge_db),
                         "--output-dir",
                         str(tmp / "gate"),
+                        "--limit",
+                        "0",
                     ]
                 )
             )

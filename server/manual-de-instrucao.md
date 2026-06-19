@@ -18691,3 +18691,34 @@ na command zone, não para validação de deck no servidor.
 - Evidência controlada gerada em:
   - `server/test/artifacts/lorehold_battle_validation_2026-06-17/`
     com cenários de upkeep/topdeck e upkeep+miracle cast.
+
+## 2026-06-19 — All-card candidate review / fila global de battle rules
+
+- Rodada full-scope report-only validou o catálogo inteiro disponível para o
+  pipeline de deckbuilding/battle:
+  - `cards_scanned=34079`;
+  - `commanders_scanned=24`;
+  - `review_count=817896`;
+  - `needs_data=44096`;
+  - `needs_rule_review=159873`;
+  - `test=18370`;
+  - `draft_count=13883`;
+  - `focused_evidence_count=18`;
+  - `eligible_for_manual_verified_promotion=18`;
+  - `blocked=13865`.
+- Bug corrigido no cache operacional SQLite:
+  - `new_card_candidate_reviews` e `new_card_battle_rule_review_queue` agora
+    preservam `card_id` na chave;
+  - isso evita colapsar cartas com mesmo nome e set em rodadas globais;
+  - consumidores continuam compatíveis com SQLite legado.
+- `--limit 0` agora significa sem limite em:
+  - `manaloom_battle_rule_review_queue.py`;
+  - `manaloom_battle_rule_focused_evidence.py`;
+  - `manaloom_battle_rule_promotion_gate.py`.
+- Relatório canônico:
+  - `docs/hermes-analysis/ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md`.
+- Próximo caminho para Lorehold/generator/optimize:
+  - fechar `needs_data` via sync determinístico;
+  - criar templates focados para famílias frequentes;
+  - usar apenas candidatos `test` verificados ou gate elegível em scorecards;
+  - não usar fila bruta `needs_rule_review` como fonte de swap.

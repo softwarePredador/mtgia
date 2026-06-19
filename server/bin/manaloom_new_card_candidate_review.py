@@ -801,6 +801,7 @@ def ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         CREATE TABLE IF NOT EXISTS new_card_candidate_reviews (
             run_id TEXT NOT NULL,
             commander_name TEXT NOT NULL,
+            card_id TEXT NOT NULL,
             card_name TEXT NOT NULL,
             oracle_id TEXT,
             set_code TEXT,
@@ -812,7 +813,7 @@ def ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             battle_rule_status TEXT NOT NULL,
             payload_json TEXT NOT NULL,
             created_at TEXT NOT NULL,
-            PRIMARY KEY (run_id, commander_name, card_name, set_code)
+            PRIMARY KEY (run_id, commander_name, card_id, card_name, set_code)
         )
         """
     )
@@ -820,6 +821,7 @@ def ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         """
         CREATE TABLE IF NOT EXISTS new_card_battle_rule_review_queue (
             commander_name TEXT NOT NULL,
+            card_id TEXT NOT NULL,
             card_name TEXT NOT NULL,
             oracle_id TEXT,
             set_code TEXT,
@@ -828,7 +830,7 @@ def ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             first_seen_at TEXT NOT NULL,
             last_seen_at TEXT NOT NULL,
             latest_run_id TEXT NOT NULL,
-            PRIMARY KEY (commander_name, card_name, set_code)
+            PRIMARY KEY (commander_name, card_id, card_name, set_code)
         )
         """
     )
@@ -856,6 +858,106 @@ def ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    conn.commit()
+    migrate_sqlite_schema(conn)
+
+
+def sqlite_columns(conn: sqlite3.Connection, table: str) -> list[str]:
+    return [str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})").fetchall()]
+
+
+def sqlite_primary_key(conn: sqlite3.Connection, table: str) -> list[str]:
+    rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    return [str(row[1]) for row in sorted((row for row in rows if int(row[5] or 0)), key=lambda row: int(row[5]))]
+
+
+def migrate_sqlite_schema(conn: sqlite3.Connection) -> None:
+    """Rebuild old report-only cache tables whose keys collapsed same-name cards."""
+    candidate_pk = sqlite_primary_key(conn, "new_card_candidate_reviews")
+    if "card_id" not in candidate_pk:
+        conn.execute("ALTER TABLE new_card_candidate_reviews RENAME TO new_card_candidate_reviews_old")
+        conn.execute(
+            """
+            CREATE TABLE new_card_candidate_reviews (
+                run_id TEXT NOT NULL,
+                commander_name TEXT NOT NULL,
+                card_id TEXT NOT NULL,
+                card_name TEXT NOT NULL,
+                oracle_id TEXT,
+                set_code TEXT,
+                decision TEXT NOT NULL,
+                score INTEGER NOT NULL,
+                roles_json TEXT NOT NULL,
+                reasons_json TEXT NOT NULL,
+                risk_flags_json TEXT NOT NULL,
+                battle_rule_status TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                PRIMARY KEY (run_id, commander_name, card_id, card_name, set_code)
+            )
+            """
+        )
+        old_columns = set(sqlite_columns(conn, "new_card_candidate_reviews_old"))
+        old_card_id_expr = (
+            "COALESCE(card_id, oracle_id, card_name)"
+            if "card_id" in old_columns
+            else "COALESCE(oracle_id, card_name)"
+        )
+        conn.execute(
+            f"""
+            INSERT OR REPLACE INTO new_card_candidate_reviews (
+                run_id, commander_name, card_id, card_name, oracle_id, set_code,
+                decision, score, roles_json, reasons_json, risk_flags_json,
+                battle_rule_status, payload_json, created_at
+            )
+            SELECT
+                run_id, commander_name, {old_card_id_expr}, card_name, oracle_id, set_code,
+                decision, score, roles_json, reasons_json, risk_flags_json,
+                battle_rule_status, payload_json, created_at
+            FROM new_card_candidate_reviews_old
+            """
+        )
+        conn.execute("DROP TABLE new_card_candidate_reviews_old")
+
+    queue_pk = sqlite_primary_key(conn, "new_card_battle_rule_review_queue")
+    if "card_id" not in queue_pk:
+        conn.execute("ALTER TABLE new_card_battle_rule_review_queue RENAME TO new_card_battle_rule_review_queue_old")
+        conn.execute(
+            """
+            CREATE TABLE new_card_battle_rule_review_queue (
+                commander_name TEXT NOT NULL,
+                card_id TEXT NOT NULL,
+                card_name TEXT NOT NULL,
+                oracle_id TEXT,
+                set_code TEXT,
+                roles_json TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                first_seen_at TEXT NOT NULL,
+                last_seen_at TEXT NOT NULL,
+                latest_run_id TEXT NOT NULL,
+                PRIMARY KEY (commander_name, card_id, card_name, set_code)
+            )
+            """
+        )
+        old_columns = set(sqlite_columns(conn, "new_card_battle_rule_review_queue_old"))
+        old_card_id_expr = (
+            "COALESCE(card_id, oracle_id, card_name)"
+            if "card_id" in old_columns
+            else "COALESCE(oracle_id, card_name)"
+        )
+        conn.execute(
+            f"""
+            INSERT OR REPLACE INTO new_card_battle_rule_review_queue (
+                commander_name, card_id, card_name, oracle_id, set_code,
+                roles_json, reason, first_seen_at, last_seen_at, latest_run_id
+            )
+            SELECT
+                commander_name, {old_card_id_expr}, card_name, oracle_id, set_code,
+                roles_json, reason, first_seen_at, last_seen_at, latest_run_id
+            FROM new_card_battle_rule_review_queue_old
+            """
+        )
+        conn.execute("DROP TABLE new_card_battle_rule_review_queue_old")
     conn.commit()
 
 
@@ -894,14 +996,15 @@ def persist_sqlite(
             conn.execute(
                 """
                 INSERT OR REPLACE INTO new_card_candidate_reviews (
-                    run_id, commander_name, card_name, oracle_id, set_code,
+                    run_id, commander_name, card_id, card_name, oracle_id, set_code,
                     decision, score, roles_json, reasons_json, risk_flags_json,
                     battle_rule_status, payload_json, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     run_id,
                     review.commander_name,
+                    review.card_id,
                     review.card_name,
                     review.oracle_id,
                     review.set_code,
@@ -919,11 +1022,11 @@ def persist_sqlite(
                 conn.execute(
                     """
                     INSERT INTO new_card_battle_rule_review_queue (
-                        commander_name, card_name, oracle_id, set_code,
+                        commander_name, card_id, card_name, oracle_id, set_code,
                         roles_json, reason, first_seen_at, last_seen_at,
                         latest_run_id
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(commander_name, card_name, set_code) DO UPDATE SET
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(commander_name, card_id, card_name, set_code) DO UPDATE SET
                         roles_json = excluded.roles_json,
                         reason = excluded.reason,
                         last_seen_at = excluded.last_seen_at,
@@ -931,6 +1034,7 @@ def persist_sqlite(
                     """,
                     (
                         review.commander_name,
+                        review.card_id,
                         review.card_name,
                         review.oracle_id,
                         review.set_code,

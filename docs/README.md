@@ -55,23 +55,28 @@ as fontes canônicas abaixo.
      classificação de lacunas de dados, drafts `needs_review` de battle rules,
      report-only, sem LLM, sem auto-apply e com SQLite apenas como cache
      operacional.
-14. `server/manual-de-instrucao.md`
+14. `docs/hermes-analysis/ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md`
+   - rodada global full-scope contra 34.079 cartas e 24 comandantes
+     rastreados; valida `needs_data`, `needs_rule_review`, focused evidence,
+     promotion gate, correção de chave por `card_id` no cache operacional e
+     próximos templates P1 para battle/deckbuilding.
+15. `server/manual-de-instrucao.md`
    - diario operacional e ultimas decisoes aplicadas.
-15. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+16. `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
    - contratos app/backend, rotas, shapes e campos opcionais.
-16. `app/doc/APP_AUDIT_2026-04-29.md`
+17. `app/doc/APP_AUDIT_2026-04-29.md`
    - status consolidado do app mobile, riscos e validacoes recentes.
-17. `app/doc/UI_TEST_SURFACE_MAP.md`
+18. `app/doc/UI_TEST_SURFACE_MAP.md`
    - keys e superficies que testes runtime devem usar.
-18. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
+19. `docs/qa/MANALOOM_INTERNAL_TEST_CHECKLIST_2026-05-15.md`
    - checklist para rodada interna non-scanner.
-19. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
+20. `server/doc/INTERNAL_TEST_ROUND_READY_2026-05-15.md`
    - status de distribuicao interna com riscos aceitos.
-20. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
+21. `server/doc/GLOBAL_PRODUCT_RIGOR_AUDIT_2026-05-18.md`
    - veredito global atual de produto, gates restantes e ordem de execucao.
-21. `app/doc/runtime_flow_handoffs/README.md`
+22. `app/doc/runtime_flow_handoffs/README.md`
    - indice de runtime/handoffs e regra de evidencia fresca.
-22. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
+23. `server/doc/DOCS_ARTIFACT_RETENTION_AUDIT_2026-05-15.md`
    - matriz de retencao KEEP/ACTIVE, KEEP/HISTORICAL, ARCHIVE e
      DELETE_CANDIDATE para docs e artefatos versionados.
 

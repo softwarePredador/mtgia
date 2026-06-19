@@ -142,8 +142,10 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
 def load_latest_drafts(conn: sqlite3.Connection, limit: int) -> list[DraftRecord]:
     if not table_exists(conn, "new_card_battle_rule_review_drafts"):
         return []
+    limit_clause = "" if limit <= 0 else "LIMIT ?"
+    params: tuple[int, ...] = () if limit <= 0 else (limit,)
     rows = conn.execute(
-        """
+        f"""
         SELECT
             run_id,
             card_name,
@@ -164,9 +166,9 @@ def load_latest_drafts(conn: sqlite3.Connection, limit: int) -> list[DraftRecord
             LIMIT 1
         )
         ORDER BY card_name, set_code, draft_rule_key
-        LIMIT ?
+        {limit_clause}
         """,
-        (limit,),
+        params,
     ).fetchall()
     return [
         DraftRecord(
