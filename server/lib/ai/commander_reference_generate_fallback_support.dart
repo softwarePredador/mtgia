@@ -4,6 +4,15 @@ import 'commander_learned_deck_support.dart';
 import 'commander_reference_profile_support.dart';
 import '../color_identity.dart';
 
+const deterministicReferenceDeckSourcePrecedence = [
+  'active_learned_deck',
+  'reference_card_stats',
+  'reference_corpus_packages',
+  'profile_expected_packages',
+  'usage_hot_cards',
+  'deterministic_fallback',
+];
+
 class ReferenceGeneratedCardsIdentityFilterResult {
   const ReferenceGeneratedCardsIdentityFilterResult({
     required this.cards,
@@ -62,6 +71,7 @@ class DeterministicReferenceDeckBuildResult {
   final List<String> builtInFallbackOnlySample;
 
   Map<String, dynamic> toDiagnosticsJson({int sampleLimit = 10}) => {
+        'source_precedence': deterministicReferenceDeckSourcePrecedence,
         'main_deck_quantity': mainDeckQuantity,
         'distinct_card_count': distinctCardCount,
         'basic_land_quantity': basicLandQuantity,

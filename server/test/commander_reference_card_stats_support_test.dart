@@ -626,6 +626,17 @@ void main() {
       expect(result.sourceUsageCounts['reference_corpus_packages'], isNull);
       expect(result.sourceUsageCounts['profile_expected_packages'], isNull);
       expect(result.sourceUsageCounts['usage_hot_cards'], isNull);
+      expect(
+        result.toDiagnosticsJson()['source_precedence'],
+        equals([
+          'active_learned_deck',
+          'reference_card_stats',
+          'reference_corpus_packages',
+          'profile_expected_packages',
+          'usage_hot_cards',
+          'deterministic_fallback',
+        ]),
+      );
     });
 
     test(
