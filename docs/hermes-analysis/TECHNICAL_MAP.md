@@ -283,28 +283,26 @@ policy/dados versionados, nao mantidos como texto solto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-07 07:00 UTC no checkout local `82bb454e` e atualizado em
-  2026-06-11. `server/lib/sync_cards_utils.dart` deixou de ser test-only:
-  `server/bin/sync_cards.dart` agora importa o utilitário e usa
-  `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`.
-  Ainda seguem sem chamador runtime confirmado
-  `getRequestTrace`/`tryGetRequestId`,
-  `normalizedCommanderReferenceCandidate`,
+  2026-06-19 07:00 UTC no checkout local `895fb545`. A claim ampla de
+  `sync_cards_utils.dart` test-only ficou stale: o CLI operacional importa o
+  utilitario e chama `parseSinceDays`, `getNewSetCodesSinceFromData` e
+  `extractSetCardSyncRow`; restam P3 test-only `extractCardRow`,
+  `extractSetCardRow`, `extractOracleIds` e `extractLegalities`.
+  `MLKnowledgeService.recordFeedback` e `hasSuspiciousNonLandCmc` tambem sairam
+  da lista por terem chamador runtime. Permanecem sem chamador confirmado
+  `verifySwapIntegrity`, `buildOptimizeResponse`, o top-level
+  `respondWithOptimizeTelemetry`, `getRequestTrace`,
+  `ApiClient.loadTokenFromDisk`, `BinderProvider.applyFilters`,
+  `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`, APIs manuais
+  de `PerformanceService`, `EndpointCache.clearExpired`, conveniencias EDHREC,
+  read-side de `AiLogService`, alguns metodos de `ArchetypeCountersService`,
+  `PushNotificationService.sendToMultipleTokens`,
   `buildLoreholdReferenceCardStatsFromProfile`,
-  `extractMtgTop8FormatCodeFromSourceUrl`,
-  `buildCandidateQualitySamplePoolSql`,
-  `summarizeAggressiveOptimizeUtilitySamples`. `MLKnowledgeService.recordFeedback`
-  deixou de ser achado nessa categoria em 2026-06-11 porque `/ai/optimize`
-  passou a chamar `optimize_feedback.recordOptimizeMlFeedback(...)` dentro de
-  `respondWithOptimizeTelemetry`. Novo achado app-side:
-  `ApiClient.loadTokenFromDisk()` diz ser chamado 1x no boot, mas `rg`
-  encontrou somente a definicao; o boot real le `auth_token` via
-  `AuthProvider.initialize` e chama `ApiClient.setToken`. A API manual/custom
-  metrics/debug de `PerformanceService` e conveniencias EDHREC/cache
-  (`getTopByCategory`, `calculateFitScore`, `cleanupCache`, `isHighSynergy`,
-  `EndpointCache.clearExpired`) seguem sem chamador confirmado. A parte
-  automatica do `PerformanceService` (`init`, observer de tela e `traceAsync`
-  em smoke) foi separada como controle positivo, nao como codigo morto.
+  `summarizeAggressiveOptimizeUtilitySamples`, `normalize_commander` na copia
+  Hermes docs e helpers script-level `classify_loss_v2` /
+  `compute_loss_tags_from_replays`. Funcoes historicas
+  `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
+  e `buildCandidateQualitySamplePoolSql` nao existem mais no checkout vivo.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: o achado
   de 2026-06-07 foi superseded pela validação de 2026-06-15. `deck_matchups`
   e `deck_weakness_reports` têm leitura runtime nas próprias rotas de
