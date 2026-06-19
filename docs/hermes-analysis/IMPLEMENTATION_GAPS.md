@@ -2672,15 +2672,16 @@ Atualização do slice de 2026-06-19:
     não-wheel de `draw_cards`, permitindo auditoria explícita do número de
     cartas compradas;
   - `manaloom_battle_rule_focused_evidence.py` ganhou template estreito para
-    oracle text exato `Draw a card.`, usando regra temporária SQLite no
-    `battle_rule_registry` com `effect=draw_cards/count=1`;
+    oracle text exato `Draw a card.`, `Draw two cards.` ou
+    `Draw three cards.`, usando regra temporária SQLite no
+    `battle_rule_registry` com `effect=draw_cards/count=N`;
   - o teste prova que a carta comprada sai do grimório para a mão, o spell vai
     ao graveyard, o oponente não compra carta e o replay não tem findings
     críticos/high;
-  - o fixture controlado de consumidores passou de 12 para 13 drafts elegíveis.
-  - escopo propositalmente não cobre ainda `Draw two cards.`, loot/rummage,
-    impulse draw/exile play, wheel, cantrip com rider, compra condicional ou
-    draw engine permanente.
+  - o fixture controlado de consumidores passou de 12 para 14 drafts elegíveis.
+  - escopo propositalmente não cobre ainda loot/rummage, impulse
+    draw/exile play, wheel, cantrip com rider, compra condicional ou draw
+    engine permanente.
 
 Pendências P1 agora priorizadas:
 

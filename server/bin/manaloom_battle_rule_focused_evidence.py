@@ -351,11 +351,22 @@ def supports_simple_treasure_template(draft: DraftRecord) -> bool:
     )
 
 
-def supports_simple_draw_card_template(draft: DraftRecord) -> bool:
+def simple_draw_card_count(draft: DraftRecord) -> int:
     text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    if text == "draw a card.":
+        return 1
+    if text == "draw two cards.":
+        return 2
+    if text == "draw three cards.":
+        return 3
+    return 0
+
+
+def supports_simple_draw_card_template(draft: DraftRecord) -> bool:
+    draw_count = simple_draw_card_count(draft)
     return (
         "card_advantage_or_selection" in draft.effect_families
-        and text == "draw a card."
+        and draw_count > 0
         and draft.proposed_status == "needs_review"
     )
 
@@ -1699,6 +1710,13 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
             status="unsupported",
             reason="battle_rule_registry_unavailable",
         )
+    draw_count = simple_draw_card_count(draft)
+    if draw_count <= 0:
+        return EvidenceResult(
+            draft=draft,
+            status="unsupported",
+            reason="unsupported_simple_draw_count",
+        )
 
     replay_id = f"focused_{draft.draft_rule_key}"
     events: list[tuple[str, dict[str, Any]]] = []
@@ -1720,13 +1738,13 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
                 draft.card_name,
                 {
                     "effect": "draw_cards",
-                    "count": 1,
+                    "count": draw_count,
                 },
                 source="focused_evidence",
                 confidence=1.0,
                 review_status="verified",
                 oracle_hash=f"focused:{draft.oracle_id or draft.card_name}",
-                notes="Temporary focused-evidence rule for simple draw a card.",
+                notes=f"Temporary focused-evidence rule for simple draw {draw_count} card(s).",
             )
             conn.commit()
         battle.DB = str(runtime_db)
@@ -1734,18 +1752,21 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
 
         active = battle.Player("Active", None, [])
         opponent = battle.Player("Opponent", None, [])
-        library_card = {
-            "name": "Library Card",
-            "cmc": 2,
-            "type_line": "Creature",
-            "effect": "creature",
-        }
-        active.library = [library_card]
+        expected_drawn_names = [f"Library Card {index + 1}" for index in range(draw_count)]
+        active.library = [
+            {
+                "name": name,
+                "cmc": 2,
+                "type_line": "Creature",
+                "effect": "creature",
+            }
+            for name in expected_drawn_names
+        ]
         spell = {
             "name": draft.card_name,
             "cmc": 1,
             "type_line": "Sorcery",
-            "oracle_text": "Draw a card.",
+            "oracle_text": str(draft.draft.get("oracle_text_excerpt") or "Draw a card."),
         }
         battle.apply_effect_immediate(active, [opponent], spell, turn=4, rng=random.Random(24))
     finally:
@@ -1765,17 +1786,18 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
     draw_event = any(
         row.get("event") == "draw_cards_resolved"
         and row.get("card") == draft.card_name
-        and row.get("cards_drawn") == 1
-        and row.get("requested_draw_count") == 1
+        and row.get("cards_drawn") == draw_count
+        and row.get("requested_draw_count") == draw_count
         for row in event_rows
     )
-    card_drawn = any(card.get("name") == "Library Card" for card in active.hand)
+    drawn_names = [card.get("name") for card in active.hand]
+    cards_drawn = drawn_names == expected_drawn_names
     library_empty = len(active.library) == 0
     spell_finished = any(card.get("name") == draft.card_name for card in active.graveyard)
     opponent_unchanged = len(opponent.hand) == 0 and len(opponent.library) == 0
     focused_passed = bool(
         draw_event
-        and card_drawn
+        and cards_drawn
         and library_empty
         and spell_finished
         and opponent_unchanged
@@ -1804,14 +1826,15 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
         "passed": focused_passed,
         "checks": {
             "draw_event": draw_event,
-            "card_drawn_to_hand": card_drawn,
+            "cards_drawn_to_hand": cards_drawn,
+            "draw_count": draw_count,
             "library_empty_after_draw": library_empty,
             "spell_finished_in_graveyard": spell_finished,
             "opponent_unchanged": opponent_unchanged,
             "critical_findings": counts.get("critical", 0),
             "high_findings": counts.get("high", 0),
         },
-        "scope": "draw_a_card",
+        "scope": "simple_fixed_draw",
     }
     focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -1820,7 +1843,7 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
         "official_source_reviewed": True,
         "official_sources": [
             f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
-            "Oracle text template: Draw a card.",
+            f"Oracle text template: {draft.draft.get('oracle_text_excerpt')}",
         ],
         "focused_test_passed": focused_passed,
         "focused_test_refs": [str(focused_path)],
@@ -1828,13 +1851,13 @@ def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> Evi
         "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
         "critical_findings": counts.get("critical", 0),
         "high_findings": counts.get("high", 0),
-        "evidence_scope": "hard_behavior_draw_a_card_v1",
+        "evidence_scope": "hard_behavior_simple_fixed_draw_v1",
         "generated_by": "manaloom_battle_rule_focused_evidence",
     }
     return EvidenceResult(
         draft=draft,
         status="evidence_ready" if focused_passed else "evidence_failed",
-        reason="draw_a_card_supported",
+        reason="simple_fixed_draw_supported",
         evidence=evidence,
         artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
     )

@@ -1086,12 +1086,12 @@ Resultado de controle:
   específicos, não uma semântica universal para qualquer trigger/static effect.
   A promoção segura exige template por subtipo de engine, com replay e auditoria
   focados.
-- `Draw a card.` agora tem focused evidence próprio: o runtime emite
-  `draw_cards_resolved` para compra simples não-wheel, e o teste usa regra
-  temporária SQLite no `battle_rule_registry` com `effect=draw_cards/count=1`.
-  O escopo é intencionalmente pequeno: compra simples de uma carta. Wheels,
-  rummage/loot, impulse draw, compra condicional e draw engines permanentes
-  continuam exigindo templates separados.
+- `Draw a card.`, `Draw two cards.` e `Draw three cards.` agora têm focused
+  evidence próprio: o runtime emite `draw_cards_resolved` para compra simples
+  não-wheel, e o teste usa regra temporária SQLite no `battle_rule_registry`
+  com `effect=draw_cards/count=N`. O escopo é intencionalmente pequeno: compra
+  simples de quantidade fixa curta. Wheels, rummage/loot, impulse draw, compra
+  condicional e draw engines permanentes continuam exigindo templates separados.
 
 Correção crítica associada ao wipe:
 

@@ -330,10 +330,10 @@ P1:
   mas não deve promover trigger/static effect genérico sem template focado. Em
   2026-06-19 foi adicionado guardrail para ETB damage engine genérico: ele entra
   na fila, mas fica sem focused evidence e bloqueado no promotion gate;
-- `card_advantage_or_selection` começou a ser fechado por subtemplates: o caso
-  exato `Draw a card.` agora tem evento `draw_cards_resolved`, focused evidence
+- `card_advantage_or_selection` começou a ser fechado por subtemplates: os casos
+  exatos `Draw a card.`, `Draw two cards.` e `Draw three cards.` agora têm evento `draw_cards_resolved`, focused evidence
   com `battle_rule_registry` temporário e promotion gate report-only. Variantes
-  de draw de quantidade fixa, loot/rummage, impulse draw, wheel e draw engine
+  de loot/rummage, impulse draw, wheel, cantrip com rider e draw engine
   continuam separadas para evitar promoção ampla demais;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
