@@ -128,6 +128,44 @@ void main() {
       expect(withoutTags.droppedReasons, isEmpty);
     });
 
+    test('persisted functional_tags are not masked by semantic v2 drift', () {
+      final persistedWipeWithBadSemantic = _card(
+        name: 'Persisted Wipe With Bad Semantic',
+        typeLine: 'Sorcery',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Gain 2 life.',
+        functionalTags: const [
+          {'tag': 'board_wipe', 'confidence': 0.95, 'source': 'persisted'},
+        ],
+        semanticTagsV2: const [
+          {
+            'role_confidence': 0.95,
+            'tags': ['utility'],
+          },
+        ],
+      );
+      final blandCreature = _card(
+        name: 'Plain Bear',
+        typeLine: 'Creature — Bear',
+        manaCost: '{2}{W}{W}',
+        cmc: 4,
+        oracleText: 'Vigilance.',
+      );
+
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Persisted Wipe With Bad Semantic'],
+        additions: const ['Plain Bear'],
+        originalDeck: [persistedWipeWithBadSemantic],
+        additionsData: [blandCreature],
+        archetype: 'control',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons.single, contains('funções wipe'));
+    });
+
     test('can reduce aggressive requested scope without false success', () {
       final originalDeck = [
         for (var i = 0; i < 12; i++)
@@ -472,6 +510,21 @@ void main() {
           'Flash. Reach. When Endurance enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.',
           'protection',
         ],
+        'Flawless Maneuver': [
+          'Instant',
+          'If you control a commander, you may cast this spell without paying its mana cost. Creatures you control gain indestructible until end of turn.',
+          'protection',
+        ],
+        'Heroic Intervention': [
+          'Instant',
+          'Permanents you control gain hexproof and indestructible until end of turn.',
+          'protection',
+        ],
+        'Teferi\'s Protection': [
+          'Instant',
+          'Until your next turn, your life total can\'t change and you gain protection from everything. All permanents you control phase out.',
+          'protection',
+        ],
       };
 
       for (final entry in samples.entries) {
@@ -484,6 +537,21 @@ void main() {
 
         expect(role, equals(values[2]), reason: entry.key);
       }
+    });
+
+    test('curated free interaction preserves secondary removal role', () {
+      final card = {
+        'name': 'Deadly Rollick',
+        'type_line': 'Instant',
+        'oracle_text':
+            'If you control a commander, you may cast this spell without paying its mana cost. Exile target creature.',
+      };
+
+      final roles = optimizationFunctionalRolesForCard(card);
+
+      expect(roles, contains('protection'));
+      expect(roles, contains('removal'));
+      expect(classifyOptimizationFunctionalRole(card), equals('protection'));
     });
 
     test('keeps strategic heuristic roles aligned with multi-tag classifier',
@@ -635,6 +703,37 @@ void main() {
       expect(result.removals, isEmpty);
       expect(result.additions, isEmpty);
       expect(result.droppedReasons, hasLength(2));
+    });
+
+    test('drops unnamed temporary mana burst swaps outside combo', () {
+      final result = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Goblin Ringleader'],
+        additions: const ['Seething Song'],
+        originalDeck: [
+          _card(
+            name: 'Goblin Ringleader',
+            typeLine: 'Creature — Goblin',
+            manaCost: '{3}{R}',
+            cmc: 4,
+            oracleText:
+                'When Goblin Ringleader enters, reveal the top four cards of your library.',
+          ),
+        ],
+        additionsData: [
+          _card(
+            name: 'Seething Song',
+            typeLine: 'Instant',
+            manaCost: '{2}{R}',
+            cmc: 3,
+            oracleText: 'Add {R}{R}{R}{R}{R}.',
+          ),
+        ],
+        archetype: 'midrange',
+      );
+
+      expect(result.removals, isEmpty);
+      expect(result.additions, isEmpty);
+      expect(result.droppedReasons.single, contains('ramp'));
     });
 
     test('preserves critical ramp when a card has multiple functional tags',
@@ -798,6 +897,7 @@ Map<String, dynamic> _card({
   required String oracleText,
   int quantity = 1,
   List<Map<String, dynamic>>? functionalTags,
+  List<Map<String, dynamic>>? semanticTagsV2,
 }) {
   return {
     'name': name,
@@ -807,6 +907,7 @@ Map<String, dynamic> _card({
     'oracle_text': oracleText,
     'quantity': quantity,
     if (functionalTags != null) 'functional_tags': functionalTags,
+    if (semanticTagsV2 != null) 'semantic_tags_v2': semanticTagsV2,
   };
 }
 

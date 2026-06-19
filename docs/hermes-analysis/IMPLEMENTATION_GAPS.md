@@ -2308,3 +2308,43 @@ identidade semantica, singleton por identidade, visibilidade de metadados Hermes
 no app, excecao no-mox, explicacao "por que esta carta", execucao de
 `needs_review`, automacao futura de crons e prioridade do contrato
 `deck_card_semantics_v1`.
+
+---
+
+## Atualizacao 2026-06-18 - Optimize Role Gate / Lorehold Readiness
+
+Slice fechado no `master`:
+
+- `optimization_quality_gate.dart` deixou de permitir que
+  `semantic_tags_v2` parcial mascare `functional_tags` persistidos no gate.
+  A decisao agora usa uniao rastreavel das fontes conhecidas e normaliza
+  `board_wipe -> wipe`.
+- Rituais de mana temporaria sem "ritual" no nome, como `Seething Song`, passam
+  a ser barrados como swap seguro fora de combo quando o papel removido nao e
+  ramp.
+- `Smothering Tithe` e textos semelhantes com "opponent draws" nao entram mais
+  como `draw` proprio no classifier do optimizer.
+- `optimization_functional_roles.dart` e `edh_bracket_policy.dart` foram
+  alinhados para staples adicionais de `protection` e `infiniteCombo`.
+
+Validacoes:
+
+- `dart test test/optimization_quality_gate_test.dart -r expanded`
+- `dart test test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart -r expanded`
+- `dart analyze lib/ai/optimization_quality_gate.dart lib/ai/optimization_functional_roles.dart lib/edh_bracket_policy.dart test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart`
+- `dart test test/functional_card_tags_test.dart test/optimization_validator_test.dart test/optimize_route_bracket_policy_filter_support_test.dart -r expanded`
+- `git diff --check`
+
+Documento de ciclo:
+
+- `docs/hermes-analysis/BATTLE_GENERATOR_LOREHOLD_CYCLE_2026-06-18.md`
+
+Pendencia que permanece P1:
+
+- Criar evidencias focadas/replay audit para os drafts relevantes da fila
+  `needs_rule_review`, principalmente `Goblin Bombardment`, `Seize the Day`,
+  `Iron Man, Titan of Innovation` e proximas cartas novas que afetem Lorehold
+  ou oponentes recorrentes.
+- Rodar scorecard Lorehold apos deploy deste slice para medir o impacto real no
+  pool de candidatos e confirmar que nao houve regressao em legalidade,
+  singleton, color identity ou fallback.
