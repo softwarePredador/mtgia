@@ -515,6 +515,7 @@ python3 server/bin/generate_card_replays.py --games 5 --opponents 6 --deck-id 6
 python3 card_impact_analyzer.py --replay-dir /path/to/replays
 python3 card_impact_analyzer.py --replay-dir /path/to/replays --json-output /tmp/card_impact.json
 python3 card_impact_analyzer.py --replay-dir /path/to/replays --baseline-hash lorehold_round_001 --min-usable-sample 10
+python3 card_impact_analyzer.py --replay-dir /path/to/replays --json-summary-output /tmp/card_impact_summary.json
 ```
 
 - Lê todos os arquivos JSONL
@@ -528,6 +529,8 @@ python3 card_impact_analyzer.py --replay-dir /path/to/replays --baseline-hash lo
 - Emite `seen_wr`, `not_seen_wr`, `cast_wr`, `not_cast_wr`,
   `delta_vs_baseline`, `delta_seen_vs_not_seen`, `delta_cast_vs_not_cast`,
   `baseline_hash` e `sample_quality`
+- Pode emitir resumo operacional com `status=trusted|needs_more_samples|blocked`,
+  blockers, contagem de cartas utilizáveis e política `auto_apply=false`
 - Ordena por `seen_wr`/WDWR decrescente
 
 ### 4.4 Exemplo de Output
@@ -535,6 +538,7 @@ python3 card_impact_analyzer.py --replay-dir /path/to/replays --baseline-hash lo
 ```
 Baseline WR: 58.3%
 Baseline hash: lorehold_round_001
+Scorecard status: needs_more_samples — No tracked card reached the usable sample threshold.
 
 Top 15 — Highest WDWR:
   Boros Charm                    seen_wr=75.0% seen=4 cast=2 delta=+16.7pp vs_not_seen=8.4 quality=low_sample
@@ -543,9 +547,10 @@ Bottom 15 — Lowest WDWR:
   Surge to Victory               seen_wr=20.0% seen=5 cast=1 delta=-38.3pp vs_not_seen=-42.0 quality=low_sample
 ```
 
-O scorecard ainda nao autoriza swap sozinho. A conclusao continua bloqueada
-quando `sample_quality=low_sample`, quando o `baseline_hash` nao bate com a
-rodada comparada, ou quando o corpus nao foi segmentado por arquétipo/turno.
+O scorecard ainda nao autoriza swap sozinho. A conclusao fica
+`needs_more_samples` ou `blocked` quando `sample_quality=low_sample`, quando o
+`baseline_hash` nao bate com a rodada comparada, ou quando o corpus nao foi
+segmentado por arquétipo/turno.
 
 ---
 

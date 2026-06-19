@@ -703,12 +703,15 @@
   - WR com carta castada;
   - WR sem carta castada;
   - delta contra baseline por `baseline_hash`;
-  - `sample_quality` para bloquear conclusões de baixa amostra.
+  - `sample_quality` para bloquear conclusões de baixa amostra;
+  - resumo operacional opcional via `--json-summary-output`, com status
+    `trusted`, `needs_more_samples` ou `blocked`, blockers e política
+    `auto_apply=false`.
 - O que ainda falta para fechar o gap:
   - rodar corpus maior Lorehold/control decks com baseline congelado;
   - segmentar impacto por arquétipo de oponente e turno médio;
-  - produzir relatório de conclusão `trusted`, `needs_more_samples` ou
-    `blocked` antes de qualquer recomendação forte.
+  - usar o resumo operacional em lote maior antes de qualquer recomendação
+    forte.
 - Guardrail mantido: scorecard é laboratório/auditoria; não altera app/API
   pública e não aplica swap automaticamente.
 

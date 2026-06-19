@@ -76,6 +76,48 @@ class CardImpactAnalyzerTest(unittest.TestCase):
         self.assertIsNone(stats["Reforge the Soul"]["cast_wr"])
         self.assertEqual(stats["Reforge the Soul"]["not_seen_wr"], 100.0)
 
+    def test_scorecard_summary_blocks_low_sample_conclusions(self) -> None:
+        stats = {
+            "Sol Ring": {
+                "sample_quality": "low_sample",
+                "baseline_wr": 66.7,
+                "baseline_hash": "baseline-test",
+            },
+            "Reforge the Soul": {
+                "sample_quality": "low_sample",
+                "baseline_wr": 66.7,
+                "baseline_hash": "baseline-test",
+            },
+        }
+
+        summary = card_impact_analyzer._build_scorecard_summary(stats)
+
+        self.assertEqual(summary["status"], "needs_more_samples")
+        self.assertEqual(summary["usable_cards"], 0)
+        self.assertEqual(summary["low_sample_cards"], 2)
+        self.assertIn("no_usable_card_samples", summary["blockers"])
+        self.assertFalse(summary["policy"]["auto_apply"])
+
+    def test_scorecard_summary_trusts_usable_corpus_only(self) -> None:
+        stats = {
+            "Sol Ring": {
+                "sample_quality": "usable",
+                "baseline_wr": 66.7,
+                "baseline_hash": "baseline-test",
+            },
+            "Reforge the Soul": {
+                "sample_quality": "usable",
+                "baseline_wr": 66.7,
+                "baseline_hash": "baseline-test",
+            },
+        }
+
+        summary = card_impact_analyzer._build_scorecard_summary(stats)
+
+        self.assertEqual(summary["status"], "trusted")
+        self.assertEqual(summary["usable_cards"], 2)
+        self.assertEqual(summary["blockers"], [])
+
     def _write_replay(self, path: Path, events: list[dict]) -> None:
         path.write_text(
             "\n".join(json.dumps(event, sort_keys=True) for event in events) + "\n",

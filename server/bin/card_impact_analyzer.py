@@ -358,6 +358,77 @@ def _compute_from_replays(
     return result
 
 
+def _build_scorecard_summary(stats: dict) -> dict:
+    """Build an operational conclusion around replay-derived card impact stats.
+
+    The per-card metrics are useful, but they should not be treated as a swap
+    gate unless the corpus has enough usable samples. This summary makes that
+    guardrail explicit for Hermes/report consumers without changing the raw
+    per-card JSON shape.
+    """
+    total_cards = len(stats)
+    if not stats:
+        return {
+            "schema_version": "commander_safe_card_impact_summary_v1",
+            "status": "blocked",
+            "reason": "No replay-derived card data was found.",
+            "cards_tracked": 0,
+            "usable_cards": 0,
+            "low_sample_cards": 0,
+            "baseline_wr": 0,
+            "baseline_hash": "unknown",
+            "blockers": ["no_card_data"],
+            "policy": {
+                "auto_apply": False,
+                "commander_safe": True,
+                "requires_human_review_for_swaps": True,
+            },
+            "stats": stats,
+        }
+
+    values = list(stats.values())
+    baseline_wr = values[0].get("baseline_wr", 0)
+    baseline_hash = values[0].get("baseline_hash", "unknown")
+    usable_cards = sum(1 for value in values if value.get("sample_quality") == "usable")
+    low_sample_cards = sum(1 for value in values if value.get("sample_quality") == "low_sample")
+
+    blockers = []
+    status = "trusted"
+    reason = "Replay corpus has usable per-card impact samples."
+
+    if usable_cards == 0:
+        status = "needs_more_samples"
+        reason = "No tracked card reached the usable sample threshold."
+        blockers.append("no_usable_card_samples")
+    elif low_sample_cards > usable_cards:
+        status = "needs_more_samples"
+        reason = "Most tracked cards are still below the usable sample threshold."
+        blockers.append("low_sample_majority")
+
+    if baseline_hash == "unknown":
+        status = "blocked"
+        reason = "Baseline hash is unknown, so replay results are not reproducible."
+        blockers.append("unknown_baseline_hash")
+
+    return {
+        "schema_version": "commander_safe_card_impact_summary_v1",
+        "status": status,
+        "reason": reason,
+        "cards_tracked": total_cards,
+        "usable_cards": usable_cards,
+        "low_sample_cards": low_sample_cards,
+        "baseline_wr": baseline_wr,
+        "baseline_hash": baseline_hash,
+        "blockers": blockers,
+        "policy": {
+            "auto_apply": False,
+            "commander_safe": True,
+            "requires_human_review_for_swaps": True,
+        },
+        "stats": stats,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Card Impact Analyzer from forensic replays")
     parser.add_argument("--replay-dir",
@@ -367,6 +438,7 @@ def main():
     parser.add_argument("--min-usable-sample", type=int, default=10)
     parser.add_argument("--baseline-hash")
     parser.add_argument("--json-output")
+    parser.add_argument("--json-summary-output")
 
     args = parser.parse_args()
 
@@ -392,10 +464,12 @@ def main():
     total_cards = len(stats)
     baseline = next(iter(stats.values())).get("baseline_wr", 0)
     baseline_hash = next(iter(stats.values())).get("baseline_hash", "unknown")
+    summary = _build_scorecard_summary(stats)
 
     print(f"Cards tracked: {total_cards}")
     print(f"Baseline WR: {baseline:.1f}%")
     print(f"Baseline hash: {baseline_hash}")
+    print(f"Scorecard status: {summary['status']} — {summary['reason']}")
     print()
 
     sorted_cards = sorted(stats.items(), key=lambda x: x[1]["wdwr"], reverse=True)
@@ -421,6 +495,15 @@ def main():
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(stats, indent=2, sort_keys=True), encoding="utf-8")
         print(f"\nJSON written: {output}")
+
+    if args.json_summary_output:
+        output = Path(args.json_summary_output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(
+            json.dumps(summary, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        print(f"Summary JSON written: {output}")
 
     return 0
 
