@@ -67,6 +67,9 @@ void main() {
         'Generous Gift',
         'Lightning Greaves',
         'Boros Charm',
+        'Talisman of Conviction',
+        'Teferi\'s Protection',
+        'Unexpected Windfall',
       };
       final stats = buildLoreholdReferenceCardStatsFromProfile(
         profile: profile,
@@ -103,6 +106,15 @@ void main() {
         equals('interaction_and_resets'),
       );
       expect(byName['Lightning Greaves']!.role, equals('protection'));
+      expect(
+        byName['Talisman of Conviction']!.role,
+        equals('mana_rocks_treasure_ramp'),
+      );
+      expect(
+        byName['Unexpected Windfall']!.role,
+        equals('draw_rummage_opponent_turn_draw'),
+      );
+      expect(byName['Teferi\'s Protection']!.role, equals('protection'));
     });
 
     test('builds deterministic diagnostics and cache versions', () {

@@ -102,9 +102,18 @@ Atualização do slice 2026-06-19:
   para roles, confiança e score explícitos;
 - testes focados garantem que as 9 cartas P1 agora são deriváveis como
   `profile_expected_packages` e `reference_card_stats`;
-- pendência operacional: aplicar/resolver o profile no PostgreSQL e rerodar
-  `commander_generate_provenance_audit.dart` + `audit_commander_generator_source_mix.py`
-  para confirmar a queda do bucket no dado vivo.
+- na validação live subsequente surgiram mais 3 cartas ainda sem
+  profile/stats (`Talisman of Conviction`, `Teferi's Protection`,
+  `Unexpected Windfall`); elas foram incorporadas aos mesmos pacotes
+  canônicos;
+- o profile atualizado foi aplicado no PostgreSQL e gerou 46
+  `reference_card_stats` resolvidos, sem unresolved;
+- o rerun live `lorehold_generator_source_mix_2026-06-19_after_profile_backfill_v2.json`
+  confirmou:
+  - `fallback_without_profile_or_stats_count = 0`;
+  - `learned_plus_fallback_only_count = 0`;
+  - `fallback_profile_stats_no_empirical_support_count = 0`;
+  - `fallback_touched_count = 23`, agora sempre com fonte não-fallback.
 
 Leitura:
 
@@ -218,11 +227,13 @@ Ele deve atacar, nesta ordem:
 
 Status após o slice 2026-06-19:
 
-- o item 1 foi corrigido na camada de código/profile;
-- ainda falta reexecutar a cadeia com PostgreSQL atualizado para transformar a
-  correção em evidência live;
-- o próximo item real é corroborar `Fellwar Stone` e `Lightning Greaves` por
-  corpus/usage ou aceitá-las explicitamente como fallback-backed por política.
+- o item 1 foi corrigido na camada de código/profile e confirmado no
+  PostgreSQL vivo;
+- o item 2 também zerou no rerun live porque `Fellwar Stone` e
+  `Lightning Greaves` agora têm profile/stats;
+- o próximo item real é reduzir o uso auxiliar de `deterministic_fallback`
+  remanescente (`fallback_touched_count = 23`) sem perder a explicabilidade
+  multi-fonte já conquistada.
 
 Pergunta certa daqui para frente:
 

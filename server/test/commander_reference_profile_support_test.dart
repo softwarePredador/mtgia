@@ -168,6 +168,7 @@ void main() {
           'Arcane Signet',
           'Boros Signet',
           'Fellwar Stone',
+          'Talisman of Conviction',
         ]),
       );
       expect(
@@ -175,12 +176,17 @@ void main() {
         containsAll([
           'Esper Sentinel',
           'Faithless Looting',
+          'Unexpected Windfall',
         ]),
       );
       expect(packages['interaction_and_resets'], contains('Generous Gift'));
       expect(
         packages['protection_and_equipment'],
-        containsAll(['Boros Charm', 'Lightning Greaves']),
+        containsAll([
+          'Boros Charm',
+          'Lightning Greaves',
+          'Teferi\'s Protection',
+        ]),
       );
     });
 

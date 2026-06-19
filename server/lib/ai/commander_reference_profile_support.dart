@@ -146,10 +146,12 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
         'Arcane Signet',
         'Boros Signet',
         'Fellwar Stone',
+        'Talisman of Conviction',
       ],
       'draw_rummage_foundation': [
         'Esper Sentinel',
         'Faithless Looting',
+        'Unexpected Windfall',
       ],
       'miracle_payoffs_expensive_spells': [
         'Approach of the Second Sun',
@@ -177,6 +179,7 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
       'protection_and_equipment': [
         'Boros Charm',
         'Lightning Greaves',
+        'Teferi\'s Protection',
       ],
       'spell_payoff_copy_package': [
         'Storm-Kiln Artist',
