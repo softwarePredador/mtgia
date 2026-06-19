@@ -2427,17 +2427,17 @@ Rodada global read-only contra PostgreSQL:
   "persisted_reviews": 817896,
   "decisions": {
     "already_present": 24,
-    "backlog": 44203,
+    "backlog": 44197,
     "ignore": 551330,
-    "needs_data": 44096,
-    "needs_rule_review": 159873,
+    "needs_data": 44091,
+    "needs_rule_review": 159884,
     "test": 18370
   },
-  "queue_rows": 159873,
-  "draft_count": 13883,
-  "focused_evidence_count": 18,
-  "eligible_for_manual_verified_promotion": 18,
-  "blocked": 13865
+  "queue_rows": 159884,
+  "draft_count": 13885,
+  "focused_evidence_count": 113,
+  "eligible_for_manual_verified_promotion": 113,
+  "blocked": 13772
 }
 ```
 
@@ -2446,11 +2446,27 @@ Leitura correta:
 - O gargalo não é "só 8 cartas"; aqueles 8 eram apenas bloqueios do recorte
   Marvel/12 comandantes.
 - No catálogo inteiro, há 13.883 drafts únicos para revisão de regra battle.
-- A evidência focada automática atual cobre 18 drafts. Os demais permanecem
+- A evidência focada automática atual cobre 113 drafts. Os demais permanecem
   bloqueados corretamente por falta de fonte oficial, teste focado e replay
   audit.
 - `needs_data` ainda soma 3.232 cartas únicas, principalmente por legalidade
   Commander ausente e 358 casos de oracle text ausente.
+
+Atualização do slice de 2026-06-19:
+
+- `manaloom_battle_rule_focused_evidence.py` ganhou templates estreitos para:
+  - `Destroy target creature.`;
+  - `Destroy all creatures.`;
+- `battle_analyst_v9.py` corrigiu o executor de board wipe para preservar
+  permanentes não criatura enquanto move criaturas destruídas para o cemitério;
+- em fixture controlado, o promotion gate passou de 4 para 6 regras elegíveis;
+- em rodada full read-only, a evidência focada subiu de 18 para 113:
+  - 70 targeted creature removals simples;
+  - 25 creature board wipes simples;
+  - 15 sacrifice outlets de dano;
+  - 1 counterspell simples;
+  - 1 attack artifact tutor;
+  - 1 extra combat + flashback.
 
 Pendências P1 agora priorizadas:
 
@@ -2459,11 +2475,13 @@ Pendências P1 agora priorizadas:
 - Criar templates focados para as famílias mais frequentes:
   - `graveyard_or_zone_recursion`;
   - `protection_or_prevention`;
-  - `targeted_interaction`;
   - `triggered_or_static_engine`;
-  - `mass_removal_or_modal_wipe`;
   - `counter_manipulation`;
   - `mana_or_resource_acceleration`.
+- Expandir `targeted_interaction` e `mass_removal_or_modal_wipe` somente para
+  variantes que não sejam os templates simples já cobertos. Exemplos: destroy
+  target nonland permanent, exile target creature, modal wipe, asymmetric wipe,
+  damage-based removal e removal com restrições/conditional rider.
 - Calibrar inferência de roles para reduzir falsos scores 100 em cartas que
   acumulam `protection/ramp/recursion/tutor` por texto genérico.
 - Rodar scorecard Lorehold apenas com candidatos `test`/regra `verified` ou

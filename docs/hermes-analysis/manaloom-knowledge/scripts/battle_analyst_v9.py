@@ -11288,7 +11288,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         unprotected_seen = 0
         for p in [player] + list(opponents):
             survivors = []
-            for c in p.battlefield:
+            destroyed_cards = []
+            for c in list(p.battlefield):
                 if is_battlefield_creature(c):
                     creatures_seen += 1
                     # v8: indestructible per-creature
@@ -11297,11 +11298,13 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                         protected += 1
                         continue
                     unprotected_seen += 1
-                    move_creature_from_battlefield(p, c)
+                    destroyed_cards.append(c)
                     destroyed += 1
                 else:
                     survivors.append(c)
             p.battlefield = survivors
+            for c in destroyed_cards:
+                move_creature_from_battlefield(p, c)
         emit_replay_event(
             "board_wipe_resolved",
             player=player.name,

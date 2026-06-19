@@ -171,6 +171,32 @@ def _write_counterspell_gate_fixture(tmp: Path) -> Path:
                     {"tutor_type": "artifact_tutor"},
                 ],
             },
+            {
+                "card_id": "card-clean-execution",
+                "oracle_id": "oracle-clean-execution",
+                "name": "Clean Execution",
+                "mana_cost": "{1}{W}",
+                "type_line": "Instant",
+                "oracle_text": "Destroy target creature.",
+                "color_identity": ["W"],
+                "cmc": 2,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["removal"],
+            },
+            {
+                "card_id": "card-clean-sweeper",
+                "oracle_id": "oracle-clean-sweeper",
+                "name": "Clean Sweeper",
+                "mana_cost": "{2}{W}{W}",
+                "type_line": "Sorcery",
+                "oracle_text": "Destroy all creatures.",
+                "color_identity": ["W"],
+                "cmc": 4,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["board_wipe", "removal"],
+            },
         ],
     }
     path = tmp / "counterspell_gate_fixture.json"
@@ -456,7 +482,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             finally:
                 conn.close()
 
-    def test_focused_evidence_only_unblocks_supported_counterspell_template(self) -> None:
+    def test_focused_evidence_unblocks_supported_low_risk_templates(self) -> None:
         candidate = _load_module(
             "manaloom_new_card_candidate_review_for_focused_evidence",
             "bin/manaloom_new_card_candidate_review.py",
@@ -502,7 +528,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(battle_summary["draft_count"], 4)
+            self.assertEqual(battle_summary["draft_count"], 6)
 
             evidence_summary = focused_evidence.run(
                 focused_evidence.parse_args(
@@ -516,8 +542,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(evidence_summary["evaluated_count"], 4)
-            self.assertEqual(evidence_summary["evidence_count"], 4)
+            self.assertEqual(evidence_summary["evaluated_count"], 6)
+            self.assertEqual(evidence_summary["evidence_count"], 6)
 
             evidence_file = (
                 tmp
@@ -538,8 +564,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(gate_summary["evaluated_count"], 4)
-            self.assertEqual(gate_summary["eligible_count"], 4)
+            self.assertEqual(gate_summary["evaluated_count"], 6)
+            self.assertEqual(gate_summary["eligible_count"], 6)
             self.assertEqual(gate_summary["blocked_count"], 0)
             self.assertEqual(gate_summary["evidence_file"], str(evidence_file))
 
@@ -566,6 +592,14 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             )
             self.assertEqual(
                 decisions["Iron Man, Titan of Innovation"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertEqual(
+                decisions["Clean Execution"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertEqual(
+                decisions["Clean Sweeper"],
                 "eligible_for_manual_verified_promotion",
             )
 

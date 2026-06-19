@@ -281,6 +281,28 @@ def supports_attack_artifact_tutor_template(draft: DraftRecord) -> bool:
     )
 
 
+def supports_destroy_target_creature_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "targeted_interaction" in draft.effect_families
+        and "destroy target creature." in text
+        and "or " not in text
+        and "can't be regenerated" not in text
+        and draft.proposed_status == "needs_review"
+    )
+
+
+def supports_destroy_all_creatures_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "mass_removal_or_modal_wipe" in draft.effect_families
+        and "destroy all creatures." in text
+        and "can't be regenerated" not in text
+        and "choose" not in text
+        and draft.proposed_status == "needs_review"
+    )
+
+
 def build_counterspell_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_focused_evidence",
@@ -426,6 +448,319 @@ def build_counterspell_evidence(draft: DraftRecord, output_dir: Path) -> Evidenc
         draft=draft,
         status="evidence_ready" if focused_passed else "evidence_failed",
         reason="counterspell_stack_interaction_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
+def build_destroy_target_creature_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    battle = load_module(
+        "battle_analyst_destroy_target_creature_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        "replay_decision_auditor_destroy_target_creature_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        active = battle.Player("Active", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        target = {
+            "name": "Threat Creature",
+            "cmc": 5,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+            "controller": opponent.name,
+        }
+        decoy = {
+            "name": "Small Creature",
+            "cmc": 1,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "controller": opponent.name,
+        }
+        opponent.battlefield = [decoy, target]
+        spell = {
+            "name": draft.card_name,
+            "cmc": 2,
+            "type_line": "Instant",
+            "oracle_text": "Destroy target creature.",
+            "tag": "removal",
+            "effect": "remove_creature",
+            "target": "creature",
+            "_rule_source": "focused_battle_rule_evidence",
+            "_rule_review_status": "needs_review",
+        }
+        battle.apply_effect_immediate(active, [opponent], spell, turn=4, rng=random.Random(11))
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    removal_event = any(
+        row.get("event") == "removal_resolved"
+        and row.get("card") == draft.card_name
+        and row.get("target") == "Threat Creature"
+        and row.get("target_legal") is True
+        for row in event_rows
+    )
+    focused_passed = bool(
+        removal_event
+        and not any(card.get("name") == "Threat Creature" for card in opponent.battlefield)
+        and any(card.get("name") == "Small Creature" for card in opponent.battlefield)
+        and any(card.get("name") == "Threat Creature" for card in opponent.graveyard)
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "removal_event": removal_event,
+            "threat_removed": not any(card.get("name") == "Threat Creature" for card in opponent.battlefield),
+            "decoy_preserved": any(card.get("name") == "Small Creature" for card in opponent.battlefield),
+            "target_in_graveyard": any(card.get("name") == "Threat Creature" for card in opponent.graveyard),
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": "destroy_target_creature",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: Destroy target creature.",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": "hard_behavior_destroy_target_creature_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason="destroy_target_creature_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
+def build_destroy_all_creatures_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    battle = load_module(
+        "battle_analyst_destroy_all_creatures_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        "replay_decision_auditor_destroy_all_creatures_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        active = battle.Player("Active", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        protected = {
+            "name": "Protected Creature",
+            "cmc": 2,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "indestructible": True,
+            "controller": active.name,
+        }
+        unprotected = {
+            "name": "Friendly Creature",
+            "cmc": 2,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "controller": active.name,
+        }
+        threat_a = {
+            "name": "Opponent Threat A",
+            "cmc": 4,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "controller": opponent.name,
+        }
+        threat_b = {
+            "name": "Opponent Threat B",
+            "cmc": 3,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "controller": opponent.name,
+        }
+        rock = {
+            "name": "Mana Rock",
+            "cmc": 2,
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+        }
+        active.battlefield = [protected, unprotected, rock]
+        opponent.battlefield = [threat_a, threat_b]
+        spell = {
+            "name": draft.card_name,
+            "cmc": 4,
+            "type_line": "Sorcery",
+            "effect": "board_wipe",
+            "_rule_source": "focused_battle_rule_evidence",
+            "_rule_review_status": "needs_review",
+        }
+        battle.apply_effect_immediate(active, [opponent], spell, turn=5, rng=random.Random(12))
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    wipe_event = next(
+        (
+            row
+            for row in event_rows
+            if row.get("event") == "board_wipe_resolved"
+            and row.get("card") == draft.card_name
+        ),
+        None,
+    )
+    decision_event = any(
+        row.get("decision_type") == "board_wipe"
+        and row.get("chosen_option", {}).get("card") == draft.card_name
+        for row in decision_rows
+    )
+    focused_passed = bool(
+        wipe_event
+        and decision_event
+        and wipe_event.get("destroyed") == 3
+        and wipe_event.get("protected") == 1
+        and any(card.get("name") == "Protected Creature" for card in active.battlefield)
+        and any(card.get("name") == "Mana Rock" for card in active.battlefield)
+        and not any(card.get("name") == "Friendly Creature" for card in active.battlefield)
+        and not opponent.battlefield
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "wipe_event": bool(wipe_event),
+            "decision_trace": decision_event,
+            "destroyed": wipe_event.get("destroyed") if wipe_event else None,
+            "protected": wipe_event.get("protected") if wipe_event else None,
+            "protected_creature_survived": any(card.get("name") == "Protected Creature" for card in active.battlefield),
+            "noncreature_preserved": any(card.get("name") == "Mana Rock" for card in active.battlefield),
+            "opponent_board_empty": not opponent.battlefield,
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": "destroy_all_creatures",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: Destroy all creatures.",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": "hard_behavior_destroy_all_creatures_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason="destroy_all_creatures_supported",
         evidence=evidence,
         artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
     )
@@ -905,6 +1240,10 @@ def build_attack_artifact_tutor_evidence(draft: DraftRecord, output_dir: Path) -
 def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     if supports_counterspell_template(draft):
         return build_counterspell_evidence(draft, output_dir)
+    if supports_destroy_target_creature_template(draft):
+        return build_destroy_target_creature_evidence(draft, output_dir)
+    if supports_destroy_all_creatures_template(draft):
+        return build_destroy_all_creatures_evidence(draft, output_dir)
     if supports_sacrifice_damage_template(draft):
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):

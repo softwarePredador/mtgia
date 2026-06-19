@@ -184,21 +184,40 @@ Próximos templates com maior retorno:
 ```json
 {
   "focused_evidence": {
-    "evaluated_count": 13883,
-    "evidence_count": 18
+    "evaluated_count": 13885,
+    "evidence_count": 113
   },
   "promotion_gate": {
-    "eligible_count": 18,
-    "blocked_count": 13865
+    "eligible_count": 113,
+    "blocked_count": 13772
   }
 }
 ```
 
-Os 13.865 bloqueios são esperados e corretos: todos faltam fonte oficial
+Atualização do slice de 2026-06-19:
+
+- foram adicionados templates focados para oracle text simples:
+  - `Destroy target creature.`;
+  - `Destroy all creatures.`;
+- o executor de `board_wipe` em `battle_analyst_v9.py` foi corrigido para não
+  perder permanentes não criatura ao destruir criaturas durante a iteração do
+  battlefield;
+- a rodada full read-only passou a gerar 113 evidências focadas:
+  - 70 `destroy_target_creature_supported`;
+  - 25 `destroy_all_creatures_supported`;
+  - 15 `activated_sacrifice_creature_damage_supported`;
+  - 1 `counterspell_stack_interaction_supported`;
+  - 1 `attack_trigger_artifact_tutor_supported`;
+  - 1 `extra_combat_flashback_supported`.
+
+Os 13.772 bloqueios são esperados e corretos: todos faltam fonte oficial
 revisada, teste focado e replay/auditoria. Isso impede que `needs_review` vire
 comportamento duro por acidente.
 
-Elegíveis para promoção manual futura:
+Elegíveis para promoção manual futura aumentaram de 18 para 113. A lista abaixo
+é apenas a amostra original do primeiro slice; o conjunto completo fica nos
+artefatos da rodada e deve ser regenerado sob demanda para não versionar arquivo
+gigante:
 
 - `Barrage of Expendables` (`jmp`)
 - `Blasting Station` (`5dn`)
@@ -271,8 +290,11 @@ P1:
 - reduzir `needs_data` com sync determinístico de legalidade/oracle para 3.232
   cartas únicas;
 - criar templates focados para as famílias mais frequentes, começando por
-  `recursion/zone`, `protection/prevention`, `targeted_interaction`,
-  `triggered_or_static_engine` e `mass_removal_or_modal_wipe`;
+  `recursion/zone`, `protection/prevention`, `triggered_or_static_engine`,
+  `counter_manipulation` e `mana/resource_acceleration`;
+- ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
+  variantes que ainda não caem nos templates estreitos de `Destroy target
+  creature.` e `Destroy all creatures.`;
 - calibrar roles inferidos por texto para diminuir scores 100 genéricos em
   cartas utilitárias que hoje acumulam papéis demais;
 - rodar scorecard Lorehold usando apenas candidatos `test` ou

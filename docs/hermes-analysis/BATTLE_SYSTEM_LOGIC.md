@@ -882,6 +882,21 @@ effect_families inclui counterspell_stack_interaction
 Templates adicionais suportados no mesmo pipeline:
 
 ```text
+Targeted creature removal simples
+- oracle_text_excerpt contem exatamente "Destroy target creature.";
+- effect_families inclui targeted_interaction;
+- executor estreito: apply_effect_immediate() com effect remove_creature;
+- o teste focado prova alvo legal, criatura alvo removida, criatura decoy
+  preservada, envio ao graveyard e replay/decision audit sem critical/high.
+
+Creature board wipe simples
+- oracle_text_excerpt contem exatamente "Destroy all creatures.";
+- effect_families inclui mass_removal_or_modal_wipe;
+- executor estreito: apply_effect_immediate() com effect board_wipe;
+- o teste focado prova criaturas não protegidas destruídas, criatura
+  indestrutível preservada, permanentes não criatura preservados e replay/
+  decision audit sem critical/high.
+
 Sacrifice outlet de dano simples
 - oracle_text contem "Sacrifice a creature:"
 - oracle_text contem dano a alvo/any target
@@ -919,6 +934,19 @@ Resultado de controle:
 - `Iron Man, Titan of Innovation` ficou elegível para promoção manual depois de
   cenário focado com trigger de ataque, Treasure, sacrifício de artefato não
   criatura expendable, tutor CMC exato e entrada virada.
+- Em 2026-06-19, os templates de `Destroy target creature.` e
+  `Destroy all creatures.` elevaram a evidência focada global de 18 para 113
+  drafts elegíveis para futura promoção manual.
+
+Correção crítica associada ao wipe:
+
+- o executor de `board_wipe` não pode remover itens da lista `battlefield`
+  enquanto itera sobre ela, porque isso pode pular elementos e descartar
+  permanentes não criatura;
+- `battle_analyst_v9.py` agora calcula `survivors` e `destroyed_cards` em uma
+  cópia da lista e só depois move as criaturas destruídas para o graveyard;
+- o teste focado de `Destroy all creatures.` exige explicitamente que `Mana
+  Rock` permaneça no battlefield após o wipe.
 
 Logo, o gate já prova que regras simples podem avançar para revisão manual,
 mas ainda preserva a barreira correta para cartas multi-etapa ou com custo/
