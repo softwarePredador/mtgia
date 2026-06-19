@@ -2611,6 +2611,30 @@ Pendências P2:
 - Gerar ranking por comandante separando candidatos realmente prontos de
   candidatos bloqueados por template.
 
+### Atualizacao incremental — 2026-06-19 / Fallback gerado do pacote Lorehold
+
+- O runtime principal já não usa `known_cards_generated.json` como fonte
+  executável, mas esse arquivo ainda é usado por scripts de geração, validação,
+  sync seed e auditoria de drift. Por isso, manter classificações antigas ali
+  ainda é risco operacional.
+- Fechamento aplicado:
+  - `generate_known_cards.py` e `kc_validator.py` agora possuem overrides
+    completos para o pacote Lorehold/topdeck revisado:
+    `Lorehold, the Historian`, `Library of Leng`, `Sensei's Divining Top`,
+    `Scroll Rack`, `Brainstone` e `Approach of the Second Sun`;
+  - fallback genérico de `Artifact` sem texto explícito de mana deixou de virar
+    `ramp_permanent`;
+  - o artefato legado `known_cards_generated.json` foi alinhado para não marcar
+    `Library of Leng`, `Scroll Rack`, `Sensei's Divining Top` ou `Brainstone`
+    como ramp/draw genérico;
+  - `test_known_cards_consumer_guardrail.py` passou a falhar se essas cartas
+    voltarem ao fallback antigo.
+- Gap remanescente:
+  - criar replay controlado da linha `Approach of the Second Sun` com ferramenta
+    de topo (`Top`/`Scroll Rack`) e decision trace explicando a escolha;
+  - mover as capabilities de topdeck para policy reutilizável por outros
+    comandantes, sem depender exclusivamente do caminho seguro do Lorehold.
+
 Validações:
 
 - `python3 -m py_compile server/bin/manaloom_new_card_candidate_review.py server/bin/manaloom_battle_rule_review_queue.py server/bin/manaloom_battle_rule_focused_evidence.py server/bin/manaloom_battle_rule_promotion_gate.py`

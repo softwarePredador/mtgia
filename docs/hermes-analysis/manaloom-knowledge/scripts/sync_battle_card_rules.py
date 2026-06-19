@@ -235,6 +235,80 @@ def cleanup_stale_reviewed_rows(
     return int(deleted or 0)
 
 
+def load_active_snapshot_rows(sqlite_db: str | Path) -> list[dict]:
+    """Load SQLite rules with the metadata required by canonical snapshots."""
+    with sqlite3.connect(sqlite_db) as conn:
+        conn.row_factory = sqlite3.Row
+        ensure_battle_card_rules(conn)
+        active_rows = []
+        for row in conn.execute(
+            """
+            SELECT
+                card_name,
+                logical_rule_key,
+                effect_json,
+                source,
+                confidence,
+                review_status,
+                execution_status,
+                rule_version,
+                oracle_hash,
+                updated_at,
+                last_seen_at
+            FROM battle_card_rules
+            """
+        ):
+            active_rows.append(
+                {
+                    "card_name": row["card_name"],
+                    "logical_rule_key": row["logical_rule_key"],
+                    "effect_json": json.loads(row["effect_json"]),
+                    "source": row["source"],
+                    "confidence": row["confidence"],
+                    "review_status": row["review_status"],
+                    "execution_status": row["execution_status"],
+                    "rule_version": row["rule_version"],
+                    "oracle_hash": row["oracle_hash"],
+                    "updated_at": row["updated_at"],
+                    "last_seen_at": row["last_seen_at"],
+                }
+            )
+    return active_rows
+
+
+def apply_rows_to_sqlite_cache(sqlite_db: str | Path, rows: list[dict]) -> dict[str, int]:
+    """Apply reviewed/generated rows to SQLite without dropping rule identity metadata."""
+    report = {
+        "inserted_or_updated": 0,
+        "skipped_lower_priority": 0,
+        "deleted_stale_manual_rows": 0,
+        "deleted_stale_reviewed_rows": 0,
+    }
+    with closing(sqlite3.connect(sqlite_db)) as conn:
+        ensure_battle_card_rules(conn)
+        report["deleted_stale_manual_rows"] = cleanup_obsolete_manual_rows(conn)
+        report["deleted_stale_reviewed_rows"] = cleanup_stale_reviewed_rows(conn, rows)
+        for row in rows:
+            changed = upsert_battle_card_rule(
+                conn,
+                row["card_name"],
+                row["effect_json"],
+                source=row["source"],
+                confidence=row["confidence"],
+                review_status=row["review_status"],
+                execution_status=row.get("execution_status") or "auto",
+                deck_role_json=row.get("deck_role_json"),
+                notes=row["notes"],
+                oracle_hash=row.get("oracle_hash"),
+            )
+            if changed:
+                report["inserted_or_updated"] += 1
+            else:
+                report["skipped_lower_priority"] += 1
+        conn.commit()
+    return report
+
+
 def main() -> int:
     args = parse_args()
     rows = build_rows(
@@ -260,57 +334,10 @@ def main() -> int:
     }
 
     if args.apply:
-        with closing(sqlite3.connect(args.sqlite_db)) as conn:
-            ensure_battle_card_rules(conn)
-            report["deleted_stale_manual_rows"] = cleanup_obsolete_manual_rows(conn)
-            report["deleted_stale_reviewed_rows"] = cleanup_stale_reviewed_rows(conn, rows)
-            for row in rows:
-                changed = upsert_battle_card_rule(
-                    conn,
-                    row["card_name"],
-                    row["effect_json"],
-                    source=row["source"],
-                    confidence=row["confidence"],
-                    review_status=row["review_status"],
-                    notes=row["notes"],
-                )
-                if changed:
-                    report["inserted_or_updated"] += 1
-                else:
-                    report["skipped_lower_priority"] += 1
-            conn.commit()
+        apply_report = apply_rows_to_sqlite_cache(args.sqlite_db, rows)
+        report.update(apply_report)
 
-        with sqlite3.connect(args.sqlite_db) as conn:
-            conn.row_factory = sqlite3.Row
-            active_rows = []
-            for row in conn.execute(
-                """
-                SELECT
-                    card_name,
-                    effect_json,
-                    source,
-                    confidence,
-                    review_status,
-                    rule_version,
-                    oracle_hash,
-                    updated_at,
-                    last_seen_at
-                FROM battle_card_rules
-                """
-            ):
-                active_rows.append(
-                    {
-                        "card_name": row["card_name"],
-                        "effect_json": json.loads(row["effect_json"]),
-                        "source": row["source"],
-                        "confidence": row["confidence"],
-                        "review_status": row["review_status"],
-                        "rule_version": row["rule_version"],
-                        "oracle_hash": row["oracle_hash"],
-                        "updated_at": row["updated_at"],
-                        "last_seen_at": row["last_seen_at"],
-                    }
-                )
+        active_rows = load_active_snapshot_rows(args.sqlite_db)
         payload = build_snapshot_payload(active_rows)
         write_snapshot_payload(args.export_canonical_fallback_json, payload)
         report["canonical_snapshot_rows_exported"] = len(payload)

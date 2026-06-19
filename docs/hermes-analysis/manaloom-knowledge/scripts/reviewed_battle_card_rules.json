@@ -82,6 +82,7 @@
     "effect_json": {
       "cmc": 7.0,
       "effect": "approach",
+      "gain_life": 7,
       "battle_model_scope": "approach_second_cast_win_v1"
     },
     "deck_role_json": {
@@ -93,6 +94,27 @@
     "confidence": 0.99,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: on first resolution it gains 7 life and is put seventh from the top if cast from hand; on the second resolving cast by the same player, that player wins the game. Runtime models the explicit second-cast win state instead of collapsing the card into a generic finisher bucket."
+  },
+  "Brainstone": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "topdeck_manipulation",
+      "activation_cost_generic": 2,
+      "hand_to_top_exchange": true,
+      "requires_sacrifice_artifact": true,
+      "draw_count": 3,
+      "put_from_hand_on_top_count": 2,
+      "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "topdeck_manipulation",
+      "subtype": "activated_draw_topdeck_filter"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-19 against Scryfall API: {2}, {T}, Sacrifice this artifact: Draw three cards, then put two cards from your hand on top of your library in any order. Runtime must keep Brainstone as an activated topdeck/filter artifact, not as free draw on spell resolution; full sacrifice/draw/put-back activation executor remains pending."
   },
   "Ancient Den": {
     "effect_json": {

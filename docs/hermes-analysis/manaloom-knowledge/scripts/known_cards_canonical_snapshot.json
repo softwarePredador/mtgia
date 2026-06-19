@@ -513,14 +513,16 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Approach of the Second Sun": {
+    "cmc": 7.0,
     "effect": "approach",
     "gain_life": 7,
+    "battle_model_scope": "approach_second_cast_win_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.99,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c9594094630e58aa220dd4e82309f597"
+    "battle_rule_logical_key": "battle_rule_v1:09101297a604357352aeb80d9faad8b3"
   },
   "Arcane Bombardment": {
     "effect": "copy_spell",
@@ -1670,6 +1672,22 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3895145eecb0a2ac9b7805febd67ea54"
+  },
+  "Brainstone": {
+    "cmc": 1.0,
+    "effect": "topdeck_manipulation",
+    "activation_cost_generic": 2,
+    "hand_to_top_exchange": true,
+    "requires_sacrifice_artifact": true,
+    "draw_count": 3,
+    "put_from_hand_on_top_count": 2,
+    "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "active",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.88,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:03bed5506a427743723cd7676c6a67d9"
   },
   "Brainstorm": {
     "count": 1,
@@ -7627,8 +7645,8 @@
     "cmc": 1.0,
     "effect": "passive",
     "no_max_hand_size": true,
-    "battle_model_scope": "discard_replacement_to_top_v1",
     "discard_effect_to_top_replacement": true,
+    "battle_model_scope": "discard_replacement_to_top_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
@@ -7819,15 +7837,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Lorehold, the Historian": {
-    "haste": true,
-    "effect": "commander",
+    "cmc": 4.0,
+    "effect": "passive",
     "is_commander": true,
+    "haste": true,
+    "grants_miracle_cost": 2,
+    "opponent_upkeep_rummage": true,
+    "battle_model_scope": "lorehold_opponent_upkeep_miracle_v1",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4b13901834c35e2201143db3f94fd150"
+    "battle_rule_logical_key": "battle_rule_v1:91aa990f0d25b0aba2a1447bc1a47914"
   },
   "Lotho, Corrupt Shirriff": {
     "power": 2,
@@ -11650,13 +11672,17 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Scroll Rack": {
+    "cmc": 2.0,
     "effect": "topdeck_manipulation",
+    "activation_cost_generic": 1,
+    "hand_to_top_exchange": true,
+    "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.8,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:efb8905b224067dc9b1c61e0bf194bfe"
+    "battle_rule_logical_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2"
   },
   "Scrubland": {
     "effect": "land",
@@ -11958,13 +11984,19 @@
     "battle_rule_logical_key": "battle_rule_v1:d92c24f1ace81cb46fbe61588985054a"
   },
   "Sensei's Divining Top": {
+    "cmc": 1.0,
     "effect": "topdeck_manipulation",
+    "activation_cost_generic": 1,
+    "peek_top_count": 3,
+    "reorder_top": true,
+    "activated_draw_put_self_on_top": true,
+    "battle_model_scope": "senseis_top_reorder_draw_v1",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.88,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:efb8905b224067dc9b1c61e0bf194bfe"
+    "battle_rule_logical_key": "battle_rule_v1:72ccece2add50c83e8d3a94af631f4a4"
   },
   "Sequestered Stash": {
     "effect": "land",

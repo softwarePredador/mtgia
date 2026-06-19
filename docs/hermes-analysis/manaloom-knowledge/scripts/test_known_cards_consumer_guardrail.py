@@ -12,6 +12,7 @@ as executable truth again.
 
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
@@ -114,8 +115,8 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
         path = SCRIPT_DIR / "battle_analyst_v9.py"
         source = path.read_text(encoding="utf-8")
         registry_idx = source.index("battle_rule_registry.lookup_battle_card_rule")
-        handcrafted_idx = source.index("if name in HANDCRAFTED_KNOWN_CARDS")
-        canonical_idx = source.index("if name in CANONICAL_FALLBACK_KNOWN_CARDS")
+        handcrafted_idx = source.index("in HANDCRAFTED_KNOWN_CARDS")
+        canonical_idx = source.index("in CANONICAL_FALLBACK_KNOWN_CARDS")
         functional_idx = source.index("for tag in card_functional_tags(card):")
         self.assertLess(registry_idx, handcrafted_idx)
         self.assertLess(handcrafted_idx, canonical_idx)
@@ -129,6 +130,49 @@ class KnownCardsConsumerGuardrailTests(unittest.TestCase):
         self.assertIn("KNOWN_CARDS = {}", source)
         self.assertNotIn("\"Teferi's Protection\":", source)
         self.assertNotIn('"Sol Ring": {"effect": "ramp_permanent"', source)
+
+    def test_legacy_generated_lorehold_topdeck_fallback_is_not_stale_ramp(self) -> None:
+        path = SCRIPT_DIR / "known_cards_generated.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+
+        expected_effects = {
+            "Approach of the Second Sun": "approach",
+            "Brainstone": "topdeck_manipulation",
+            "Library of Leng": "passive",
+            "Lorehold, the Historian": "passive",
+            "Scroll Rack": "topdeck_manipulation",
+            "Sensei's Divining Top": "topdeck_manipulation",
+        }
+        for card_name, expected_effect in expected_effects.items():
+            with self.subTest(card_name=card_name):
+                entry = payload[card_name]
+                self.assertEqual(entry.get("effect"), expected_effect)
+                self.assertTrue(entry.get("manual_override"))
+
+        for card_name in (
+            "Brainstone",
+            "Library of Leng",
+            "Scroll Rack",
+            "Sensei's Divining Top",
+        ):
+            with self.subTest(card_name=card_name):
+                self.assertNotEqual(payload[card_name].get("effect"), "ramp_permanent")
+                self.assertNotIn("mana_produced", payload[card_name])
+
+        generator_source = (SCRIPT_DIR / "generate_known_cards.py").read_text(
+            encoding="utf-8"
+        )
+        validator_source = (SCRIPT_DIR / "kc_validator.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn(
+            'if "Artifact" in tl:\n        return {"effect": "ramp_permanent"',
+            generator_source,
+        )
+        self.assertNotIn(
+            'if "Artifact" in tl:\n        return {"effect": "ramp_permanent"',
+            validator_source,
+        )
 
     def test_no_unclassified_active_python_consumer_reads_legacy_json(self) -> None:
         candidates = list((SCRIPT_DIR).glob("*.py")) + list((REPO_ROOT / "server" / "bin").glob("*.py"))

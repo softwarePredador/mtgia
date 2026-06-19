@@ -24,6 +24,47 @@ REPORT_DIR = os.environ.get(
 BASELINE_WR = 81.8
 
 MANUAL_EFFECT_OVERRIDES = {
+    # Lorehold/topdeck cards are source-backed in reviewed battle rules. Keep
+    # this legacy generated fallback aligned so validator runs do not recreate
+    # stale ramp/draw classifications for these engine pieces.
+    "Approach of the Second Sun": {
+        "effect": "approach",
+        "gain_life": 7,
+    },
+    "Brainstone": {
+        "effect": "topdeck_manipulation",
+        "activation_cost_generic": 2,
+        "hand_to_top_exchange": True,
+        "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
+    },
+    "Library of Leng": {
+        "effect": "passive",
+        "no_max_hand_size": True,
+        "discard_effect_to_top_replacement": True,
+        "battle_model_scope": "discard_replacement_to_top_v1",
+    },
+    "Lorehold, the Historian": {
+        "effect": "passive",
+        "is_commander": True,
+        "haste": True,
+        "grants_miracle_cost": 2,
+        "opponent_upkeep_rummage": True,
+        "battle_model_scope": "lorehold_opponent_upkeep_miracle_v1",
+    },
+    "Scroll Rack": {
+        "effect": "topdeck_manipulation",
+        "activation_cost_generic": 1,
+        "hand_to_top_exchange": True,
+        "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+    },
+    "Sensei's Divining Top": {
+        "effect": "topdeck_manipulation",
+        "activation_cost_generic": 1,
+        "peek_top_count": 3,
+        "reorder_top": True,
+        "activated_draw_put_self_on_top": True,
+        "battle_model_scope": "senseis_top_reorder_draw_v1",
+    },
     # Large face-capable burn is treated as a closer in the simplified battle
     # engine; otherwise it wastes 7-damage spells as creature-only removal.
     "Cinder Storm": "finisher",
@@ -368,18 +409,22 @@ def classify(ot, tl, cmc_val):
     if "Creature" in tl:
         return {"effect": "creature", "power": max(1, int(float(cmc_val))), "cmc": cmc_val}
     if "Artifact" in tl:
-        return {"effect": "ramp_permanent", "mana_produced": 1, "cmc": cmc_val}
+        return {"effect": "unknown", "cmc": cmc_val}
     if "Enchantment" in tl:
         return {"effect": "draw_engine", "cmc": cmc_val}
     return {"effect": "unknown", "cmc": cmc_val}
 
 
 def apply_manual_override(name, entry):
-    expected_effect = MANUAL_EFFECT_OVERRIDES.get(name)
-    if not expected_effect:
+    override = MANUAL_EFFECT_OVERRIDES.get(name)
+    if not override:
         return entry
-    overridden = dict(entry)
-    overridden["effect"] = expected_effect
+    if isinstance(override, dict):
+        overridden = {"cmc": entry.get("cmc", override.get("cmc", 3))}
+        overridden.update(override)
+    else:
+        overridden = dict(entry)
+        overridden["effect"] = override
     overridden["manual_override"] = True
     return overridden
 

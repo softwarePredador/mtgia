@@ -110,6 +110,76 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
             {"draw_cards", "remove_creature"},
         )
 
+    def test_legacy_snapshot_export_preserves_rule_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with closing(sqlite3.connect(sqlite_db)) as conn:
+                sync_rules.ensure_battle_card_rules(conn)
+                sync_rules.upsert_battle_card_rule(
+                    conn,
+                    "Traceable Test Card",
+                    {"effect": "draw_cards", "amount": 2},
+                    source="curated",
+                    confidence=0.91,
+                    review_status="active",
+                    execution_status="annotation_only",
+                    oracle_hash="oracle-hash-test",
+                )
+                conn.commit()
+
+            rows = sync_rules.load_active_snapshot_rows(sqlite_db)
+            payload = sync_rules.build_snapshot_payload(rows)
+
+        entry = payload["Traceable Test Card"]
+        self.assertEqual(entry["effect"], "draw_cards")
+        self.assertEqual(entry["battle_rule_source"], "curated")
+        self.assertEqual(entry["battle_rule_review_status"], "active")
+        self.assertEqual(entry["battle_rule_execution_status"], "annotation_only")
+        self.assertEqual(entry["battle_rule_confidence"], 0.91)
+        self.assertEqual(entry["battle_rule_oracle_hash"], "oracle-hash-test")
+        self.assertTrue(entry["battle_rule_logical_key"].startswith("battle_rule_v1:"))
+
+    def test_legacy_apply_preserves_deck_role_in_logical_key(self) -> None:
+        effect = {
+            "effect": "topdeck_manipulation",
+            "activation_cost_generic": 2,
+        }
+        deck_role = {
+            "category": "draw",
+            "effect": "topdeck_manipulation",
+            "subtype": "activated_draw_topdeck_filter",
+        }
+        expected_key = battle_rule_registry.logical_rule_key(
+            {
+                "effect_json": effect,
+                "deck_role_json": deck_role,
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            sync_rules.apply_rows_to_sqlite_cache(
+                sqlite_db,
+                [
+                    {
+                        "card_name": "Traceable Role Card",
+                        "effect_json": effect,
+                        "deck_role_json": deck_role,
+                        "source": "curated",
+                        "confidence": 0.88,
+                        "review_status": "active",
+                        "execution_status": "annotation_only",
+                        "notes": "test",
+                        "oracle_hash": "oracle-hash-test",
+                    }
+                ],
+            )
+            rows = sync_rules.load_active_snapshot_rows(sqlite_db)
+            payload = sync_rules.build_snapshot_payload(rows)
+
+        entry = payload["Traceable Role Card"]
+        self.assertEqual(entry["battle_rule_logical_key"], expected_key)
+        self.assertEqual(entry["battle_rule_execution_status"], "annotation_only")
+
     def test_cleanup_obsolete_manual_rows_removes_stale_shadowing_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"

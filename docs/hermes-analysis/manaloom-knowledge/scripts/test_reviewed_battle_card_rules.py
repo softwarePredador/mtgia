@@ -220,6 +220,13 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Approach of the Second Sun"]["effect_json"]["effect"],
             "approach",
         )
+        self.assertEqual(by_name["Brainstone"]["source"], "curated")
+        self.assertEqual(by_name["Brainstone"]["review_status"], "active")
+        self.assertEqual(by_name["Brainstone"]["effect_json"]["effect"], "topdeck_manipulation")
+        self.assertEqual(by_name["Brainstone"]["effect_json"]["activation_cost_generic"], 2)
+        self.assertEqual(by_name["Brainstone"]["effect_json"]["draw_count"], 3)
+        self.assertTrue(by_name["Brainstone"]["effect_json"]["hand_to_top_exchange"])
+        self.assertTrue(by_name["Brainstone"]["effect_json"]["requires_sacrifice_artifact"])
         self.assertEqual(by_name["Ancient Tomb"]["source"], "curated")
         self.assertEqual(by_name["Ancient Tomb"]["review_status"], "verified")
         self.assertEqual(by_name["Ancient Tomb"]["effect_json"]["effect"], "land")

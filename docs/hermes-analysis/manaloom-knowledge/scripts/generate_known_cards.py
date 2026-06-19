@@ -12,6 +12,49 @@ SCRIPT_DIR = Path(os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", DEFAULT_SCRIPT_DI
 DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", str(SCRIPT_DIR / "knowledge.db"))
 OUT = os.environ.get("MANALOOM_KNOWN_CARDS_OUT", str(SCRIPT_DIR / "known_cards_generated.json"))
 
+MANUAL_ENTRY_OVERRIDES = {
+    # Lorehold/topdeck cards have battle-reviewed semantics. Keep the legacy
+    # generated fallback aligned so sync/audit jobs cannot reseed stale roles.
+    "Approach of the Second Sun": {
+        "effect": "approach",
+        "gain_life": 7,
+    },
+    "Brainstone": {
+        "effect": "topdeck_manipulation",
+        "activation_cost_generic": 2,
+        "hand_to_top_exchange": True,
+        "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
+    },
+    "Library of Leng": {
+        "effect": "passive",
+        "no_max_hand_size": True,
+        "discard_effect_to_top_replacement": True,
+        "battle_model_scope": "discard_replacement_to_top_v1",
+    },
+    "Lorehold, the Historian": {
+        "effect": "passive",
+        "is_commander": True,
+        "haste": True,
+        "grants_miracle_cost": 2,
+        "opponent_upkeep_rummage": True,
+        "battle_model_scope": "lorehold_opponent_upkeep_miracle_v1",
+    },
+    "Scroll Rack": {
+        "effect": "topdeck_manipulation",
+        "activation_cost_generic": 1,
+        "hand_to_top_exchange": True,
+        "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+    },
+    "Sensei's Divining Top": {
+        "effect": "topdeck_manipulation",
+        "activation_cost_generic": 1,
+        "peek_top_count": 3,
+        "reorder_top": True,
+        "activated_draw_put_self_on_top": True,
+        "battle_model_scope": "senseis_top_reorder_draw_v1",
+    },
+}
+
 
 def _pg_command():
     database_url = os.environ.get("DATABASE_URL")
@@ -116,6 +159,7 @@ for i in range(0, len(missing), 300):
     for r in rows:
         if len(r) >= 2 and r[1]:
             oracle_map[r[0].strip()] = {
+                "name": r[0].strip(),
                 "oracle_text": r[1],
                 "type_line": r[2] if len(r) > 2 else "",
                 "cmc": _safe_cmc(r[3]) if len(r) > 3 else 3,
@@ -354,6 +398,10 @@ EFFECT_DESC = {
 }
 
 def classify(cd):
+    override = MANUAL_ENTRY_OVERRIDES.get(str(cd.get("name") or ""))
+    if override:
+        return {"cmc": cd.get("cmc", 3), **override, "manual_override": True}
+
     ot = (cd.get("oracle_text") or "").lower()
     tl = cd.get("type_line", "")
     cmc = cd.get("cmc", 3)
@@ -426,7 +474,7 @@ def classify(cd):
     if "Creature" in tl:
         return {"effect": "creature", "power": max(1, int(cmc)), "cmc": cmc}
     if "Artifact" in tl:
-        return {"effect": "ramp_permanent", "mana_produced": 1, "cmc": cmc}
+        return {"effect": "unknown", "cmc": cmc}
     if "Enchantment" in tl:
         return {"effect": "draw_engine", "cmc": cmc}
     if "Planeswalker" in tl:

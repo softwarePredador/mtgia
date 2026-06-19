@@ -259,7 +259,9 @@
   },
   "Approach of the Second Sun": {
     "cmc": 7.0,
-    "effect": "finisher"
+    "effect": "approach",
+    "gain_life": 7,
+    "manual_override": true
   },
   "Aqueous Form": {
     "cmc": 1.0,
@@ -861,9 +863,12 @@
     "instant": true
   },
   "Brainstone": {
+    "activation_cost_generic": 2,
+    "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
     "cmc": 1.0,
-    "count": 3,
-    "effect": "draw_cards"
+    "effect": "topdeck_manipulation",
+    "hand_to_top_exchange": true,
+    "manual_override": true
   },
   "Brainstorm": {
     "cmc": 1.0,
@@ -4368,9 +4373,12 @@
     "effect": "draw_engine"
   },
   "Library of Leng": {
+    "battle_model_scope": "discard_replacement_to_top_v1",
     "cmc": 1.0,
-    "effect": "ramp_permanent",
-    "mana_produced": 1
+    "discard_effect_to_top_replacement": true,
+    "effect": "passive",
+    "manual_override": true,
+    "no_max_hand_size": true
   },
   "Lich-Knights' Conquest": {
     "cmc": 5.0,
@@ -4527,8 +4535,14 @@
     "instant": true
   },
   "Lorehold, the Historian": {
+    "battle_model_scope": "lorehold_opponent_upkeep_miracle_v1",
     "cmc": 5.0,
-    "effect": "draw_engine"
+    "effect": "passive",
+    "grants_miracle_cost": 2,
+    "haste": true,
+    "is_commander": true,
+    "manual_override": true,
+    "opponent_upkeep_rummage": true
   },
   "Losheel, Clockwork Scholar": {
     "cmc": 3.0,
@@ -6564,9 +6578,12 @@
     "trigger": "opponent_draw"
   },
   "Scroll Rack": {
+    "activation_cost_generic": 1,
+    "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
     "cmc": 2.0,
-    "effect": "ramp_permanent",
-    "mana_produced": 1
+    "effect": "topdeck_manipulation",
+    "hand_to_top_exchange": true,
+    "manual_override": true
   },
   "Sculpting Steel": {
     "cmc": 3.0,
@@ -6681,8 +6698,14 @@
     "mana_produced": 1
   },
   "Sensei's Divining Top": {
+    "activated_draw_put_self_on_top": true,
+    "activation_cost_generic": 1,
+    "battle_model_scope": "senseis_top_reorder_draw_v1",
     "cmc": 1.0,
-    "effect": "draw_cards"
+    "effect": "topdeck_manipulation",
+    "manual_override": true,
+    "peek_top_count": 3,
+    "reorder_top": true
   },
   "Senu, Keen-Eyed Protector": {
     "cmc": 2.0,

@@ -342,6 +342,15 @@ canonico por padrao. Consumidores operacionais como `slot_optimizer.py`,
 `known_cards_generated.json`; apenas scripts de geracao, sync seed e auditoria
 de drift podem pedir explicitamente esse arquivo.
 
+Atualizacao 2026-06-19: mesmo como legado, `known_cards_generated.json` nao
+deve recriar semantica falsa para cartas centrais. `generate_known_cards.py` e
+`kc_validator.py` passaram a manter overrides completos para
+`Lorehold, the Historian`, `Library of Leng`, `Sensei's Divining Top`,
+`Scroll Rack`, `Brainstone` e `Approach of the Second Sun`. Alem disso,
+artefato sem texto explicito de mana nao pode cair em `ramp_permanent` apenas
+por possuir `Artifact` no `type_line`; nesses casos o fallback correto e
+`unknown` ate existir regra revisada ou heuristica rastreavel.
+
 Guardrails operacionais atuais:
 
 - `HANDCRAFTED_KNOWN_CARDS` deve permanecer vazio por padrao;
