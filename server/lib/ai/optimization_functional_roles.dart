@@ -195,7 +195,7 @@ Set<String> _resolveHeuristicRoles({
               o.contains('any target')))) roles.add('removal');
   if (looksLikeOptimizationRampText(oracleText) ||
       (t.contains('artifact') && o.contains('add'))) roles.add('ramp');
-  if (o.contains('draw') ||
+  if (_looksLikeDraw(o) ||
       o.contains('look at the top') ||
       (o.contains('scry') && o.contains('draw'))) roles.add('draw');
   if (o.contains('search your library') && !o.contains('land'))
@@ -403,6 +403,30 @@ bool _looksLikeEngine(String oracle) =>
             oracle.contains('add'))) ||
     (oracle.contains('your end step') && oracle.contains('you may'));
 
+bool _looksLikeDraw(String oracle) {
+  if (oracle.contains('target opponent draws') ||
+      oracle.contains('an opponent draws') ||
+      oracle.contains('each opponent draws')) {
+    return false;
+  }
+  if (oracle.contains('search your library') &&
+      looksLikeOptimizationLandSearchText(oracle)) {
+    return false;
+  }
+  return oracle.contains('draw a card') ||
+      RegExp(
+        r'\bdraw (?:one|two|three|four|five|six|seven|eight|nine|ten|\d+) cards\b',
+      ).hasMatch(oracle) ||
+      oracle.contains('draw cards') ||
+      oracle.contains('draw x cards') ||
+      oracle.contains('draw that many cards') ||
+      oracle.contains('draw equal to') ||
+      (oracle.contains('whenever') && oracle.contains('draw a card')) ||
+      (oracle.contains('reveal') &&
+          oracle.contains('put') &&
+          oracle.contains('into your hand'));
+}
+
 bool _looksLikeComboPiece(String oracle, String name) =>
     name.contains('isochron scepter') ||
     name.contains('dramatic reversal') ||
@@ -514,18 +538,26 @@ const _knownEngineNames = <String>{
 
 const _knownComboPieceNames = <String>{
   'basalt monolith',
+  'demonic consultation',
   'dramatic reversal',
-  'underworld breach',
   'grand architect',
-  'sensei\'s divining top',
   'power artifact',
+  'sensei\'s divining top',
+  'tainted pact',
+  'thassa\'s oracle',
+  'underworld breach',
 };
 
 const _knownProtectionNames = <String>{
-  'fierce guardianship',
+  'boros charm',
+  'deadly rollick',
   'deflecting swat',
-  'swiftfoot boots',
   'endurance',
+  'fierce guardianship',
+  'flawless maneuver',
+  'heroic intervention',
+  'swiftfoot boots',
+  'teferi\'s protection',
 };
 
 // ============================================================================

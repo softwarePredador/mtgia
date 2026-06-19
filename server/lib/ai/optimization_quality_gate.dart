@@ -158,42 +158,55 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
 Set<String> _functionalRolesForGate(Map<String, dynamic> card) {
   final primaryRole = classifyOptimizationFunctionalRole(card);
-  final semanticRoles =
-      optimizationFunctionalRolesForCard(card, semanticOnly: true);
-  final inferredRoles = <String>{...semanticRoles};
+  final inferredRoles = <String>{};
   final typeLine = (card['type_line'] as String?) ?? '';
   final oracleText = (card['oracle_text'] as String?) ?? '';
 
-  if (semanticRoles.isEmpty) {
-    // Prefere os functional_tags PERSISTIDOS (card_function_tags) — fonte de
-    // maior qualidade do que re-derivar heuristicamente. Só cai para o
-    // inferFunctionalCardTags se a carta não tem tags persistidas (P1.a).
-    final persisted = _persistedFunctionalTagsForGate(card);
-    if (persisted.isNotEmpty) {
-      for (final entry in persisted) {
-        if (entry.confidence < 0.65) continue;
-        final role = _gateRoleForFunctionalTag(entry.tag);
-        if (role != null) inferredRoles.add(role);
-      }
+  // Para o gate de segurança, functional_tags persistidos não podem ser
+  // mascarados por semantic_tags_v2 parcial. A decisão usa a união rastreável
+  // das fontes conhecidas e só cai para heurística quando nenhuma fonte existe.
+  final persisted = _persistedFunctionalTagsForGate(card);
+  if (persisted.isNotEmpty) {
+    for (final entry in persisted) {
+      if (entry.confidence < 0.65) continue;
+      final role = _gateRoleForFunctionalTag(entry.tag);
+      if (role != null) inferredRoles.add(role);
     }
-    if (inferredRoles.isEmpty) {
-      for (final tag in inferFunctionalCardTags(
-        name: (card['name'] as String?) ?? '',
-        typeLine: typeLine,
-        oracleText: oracleText,
-        manaCost: card['mana_cost'] as String?,
-        cmc: card['cmc'],
-      )) {
-        if (tag.confidence < 0.65) continue;
-        final role = _gateRoleForFunctionalTag(tag.tag);
-        if (role != null) inferredRoles.add(role);
-      }
+  }
+
+  final semanticRoles =
+      optimizationFunctionalRolesForCard(card, semanticOnly: true);
+  for (final role in semanticRoles) {
+    final mapped = _gateRoleForFunctionalTag(role);
+    if (mapped != null) inferredRoles.add(mapped);
+  }
+
+  if (inferredRoles.isEmpty) {
+    for (final role in optimizationFunctionalRolesForCard(card)) {
+      final mapped = _gateRoleForFunctionalTag(role);
+      if (mapped != null) inferredRoles.add(mapped);
+    }
+  }
+
+  if (inferredRoles.isEmpty) {
+    for (final tag in inferFunctionalCardTags(
+      name: (card['name'] as String?) ?? '',
+      typeLine: typeLine,
+      oracleText: oracleText,
+      manaCost: card['mana_cost'] as String?,
+      cmc: card['cmc'],
+    )) {
+      if (tag.confidence < 0.65) continue;
+      final role = _gateRoleForFunctionalTag(tag.tag);
+      if (role != null) inferredRoles.add(role);
     }
   }
 
   final roles = inferredRoles.isEmpty ? <String>{primaryRole} : inferredRoles;
-  if (!{'draw', 'removal', 'ramp', 'wipe'}.contains(primaryRole)) {
-    roles.add(primaryRole);
+  final mappedPrimaryRole = _gateRoleForFunctionalTag(primaryRole);
+  if (mappedPrimaryRole != null &&
+      !{'draw', 'removal', 'ramp', 'wipe'}.contains(mappedPrimaryRole)) {
+    roles.add(mappedPrimaryRole);
   }
   if (typeLine.toLowerCase().contains('land')) roles.add('land');
   return roles;
@@ -347,7 +360,6 @@ _LandTrimContext _computeLandTrimContext(
 }
 
 bool _isTemporaryManaBurstCard(Map<String, dynamic> card) {
-  final name = ((card['name'] as String?) ?? '').toLowerCase();
   final typeLine = ((card['type_line'] as String?) ?? '').toLowerCase();
   final oracle = ((card['oracle_text'] as String?) ?? '').toLowerCase();
   final generatesMana =
@@ -358,9 +370,7 @@ bool _isTemporaryManaBurstCard(Map<String, dynamic> card) {
     return false;
   }
 
-  return name.contains('ritual') ||
-      oracle.contains('until end of turn') ||
-      oracle.contains('for each');
+  return true;
 }
 
 bool _isStructuralRecoveryUpgrade({
@@ -514,8 +524,10 @@ bool _looksLikeOffThemeRoleSwap({
   final normalized = archetype.trim().toLowerCase();
 
   if (normalized == 'aggro' &&
-      {'creature', 'ramp', 'removal', 'protection', 'wipe'}.contains(removedRole) &&
-      !{'creature', 'ramp', 'removal', 'protection', 'wipe'}.contains(addedRole)) {
+      {'creature', 'ramp', 'removal', 'protection', 'wipe'}
+          .contains(removedRole) &&
+      !{'creature', 'ramp', 'removal', 'protection', 'wipe'}
+          .contains(addedRole)) {
     return true;
   }
 

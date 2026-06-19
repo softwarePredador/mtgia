@@ -345,9 +345,14 @@ const _knownFreeInteractionNames = <String>{
 };
 
 const _knownInfiniteComboPieces = <String>{
-  'thassa\'s oracle',
+  'basalt monolith',
   'demonic consultation',
+  'dramatic reversal',
+  'grand architect',
+  'power artifact',
+  'sensei\'s divining top',
   'tainted pact',
+  'thassa\'s oracle',
   'underworld breach',
 };
 

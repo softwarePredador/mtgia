@@ -45,6 +45,32 @@ void main() {
       expect(breach.categories, contains(BracketCategory.infiniteCombo));
     });
 
+    test('aligns curated infinite combo pieces with optimize roles', () {
+      for (final name in const [
+        'Basalt Monolith',
+        'Demonic Consultation',
+        'Dramatic Reversal',
+        'Grand Architect',
+        'Power Artifact',
+        'Sensei\'s Divining Top',
+        'Tainted Pact',
+        'Thassa\'s Oracle',
+        'Underworld Breach',
+      ]) {
+        final tags = tagCardForBracket(
+          name: name,
+          typeLine: 'Permanent',
+          oracleText: '',
+        );
+
+        expect(
+          tags.categories,
+          contains(BracketCategory.infiniteCombo),
+          reason: name,
+        );
+      }
+    });
+
     test('detects curated free interaction even when oracle text is missing',
         () {
       final tags = tagCardForBracket(
