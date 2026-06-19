@@ -1092,6 +1092,10 @@ Resultado de controle:
   com `effect=draw_cards/count=N`. O escopo é intencionalmente pequeno: compra
   simples de quantidade fixa curta. Wheels, rummage/loot, impulse draw, compra
   condicional e draw engines permanentes continuam exigindo templates separados.
+- `Exile target creature.` agora tem guardrail: a carta entra na fila como
+  `targeted_interaction`, mas fica sem focused evidence e bloqueada no promotion
+  gate. O motivo é técnico: destroy templates movem para graveyard; exile exige
+  destino `exile` explícito, replay próprio e assertions diferentes.
 
 Correção crítica associada ao wipe:
 

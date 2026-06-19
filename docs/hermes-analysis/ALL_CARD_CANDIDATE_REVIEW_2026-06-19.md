@@ -335,6 +335,10 @@ P1:
   com `battle_rule_registry` temporário e promotion gate report-only. Variantes
   de loot/rummage, impulse draw, wheel, cantrip com rider e draw engine
   continuam separadas para evitar promoção ampla demais;
+- `targeted_interaction` com exílio continua separado dos destroys: `Exile
+  target creature.` agora tem guardrail report-only e não pode ser promovido
+  como `Destroy target creature.`. O futuro template precisa provar destino
+  `exile` no replay;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;

@@ -2682,6 +2682,14 @@ Atualização do slice de 2026-06-19:
   - escopo propositalmente não cobre ainda loot/rummage, impulse
     draw/exile play, wheel, cantrip com rider, compra condicional ou draw
     engine permanente.
+- Guardrail adicional de remoção por exílio:
+  - `Exile target creature.` entra na fila `needs_rule_review` como
+    `targeted_interaction`, mas permanece sem focused evidence e bloqueado no
+    promotion gate;
+  - motivo: os templates de remoção já cobertos removem para graveyard
+    (`Destroy target ...`). Exílio precisa executor/assertion própria que mova
+    o alvo para `exile`, preserve decoys e registre destino no replay;
+  - isso evita promover `exile target` como se fosse `destroy target`.
 
 Pendências P1 agora priorizadas:
 
