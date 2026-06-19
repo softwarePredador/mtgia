@@ -434,6 +434,27 @@ def supports_return_target_artifact_from_graveyard_template(draft: DraftRecord) 
     )
 
 
+def supports_return_target_enchantment_from_graveyard_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "graveyard_or_zone_recursion" in draft.effect_families
+        and text == "return target enchantment card from your graveyard to your hand."
+        and draft.proposed_status == "needs_review"
+    )
+
+
+def supports_return_target_artifact_or_enchantment_from_graveyard_template(
+    draft: DraftRecord,
+) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "graveyard_or_zone_recursion" in draft.effect_families
+        and text
+        == "return target artifact or enchantment card from your graveyard to your hand."
+        and draft.proposed_status == "needs_review"
+    )
+
+
 def build_counterspell_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_focused_evidence",
@@ -2485,13 +2506,17 @@ def build_return_target_creature_from_graveyard_evidence(
 def build_return_target_artifact_from_graveyard_evidence(
     draft: DraftRecord,
     output_dir: Path,
+    *,
+    target_type: str = "artifact",
+    target_label: str = "artifact",
+    target_type_line: str = "Artifact",
 ) -> EvidenceResult:
     battle = load_module(
-        "battle_analyst_artifact_graveyard_recursion_evidence",
+        f"battle_analyst_{target_type}_graveyard_recursion_evidence",
         HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
     )
     replay_auditor = load_module(
-        "replay_decision_auditor_artifact_graveyard_recursion_evidence",
+        f"replay_decision_auditor_{target_type}_graveyard_recursion_evidence",
         HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
     )
     if battle.battle_rule_registry is None:
@@ -2521,7 +2546,7 @@ def build_return_target_artifact_from_graveyard_evidence(
                 draft.card_name,
                 {
                     "effect": "recursion",
-                    "target": "artifact",
+                    "target": target_type,
                     "count": 1,
                     "destination": "hand",
                 },
@@ -2529,7 +2554,10 @@ def build_return_target_artifact_from_graveyard_evidence(
                 confidence=1.0,
                 review_status="verified",
                 oracle_hash=f"focused:{draft.oracle_id or draft.card_name}",
-                notes="Temporary focused-evidence rule for artifact-card recursion to hand.",
+                notes=(
+                    "Temporary focused-evidence rule for "
+                    f"{target_label}-card recursion to hand."
+                ),
             )
             conn.commit()
         battle.DB = str(runtime_db)
@@ -2537,11 +2565,23 @@ def build_return_target_artifact_from_graveyard_evidence(
 
         active = battle.Player("Active", None, [])
         opponent = battle.Player("Opponent", None, [])
-        artifact_target = {
-            "name": "Graveyard Artifact",
+        target_card = {
+            "name": f"Graveyard {target_label.title()}",
+            "cmc": 3,
+            "type_line": target_type_line,
+            "effect": "ramp_permanent",
+        }
+        artifact_decoy = {
+            "name": "Graveyard Artifact Decoy",
             "cmc": 3,
             "type_line": "Artifact",
             "effect": "ramp_permanent",
+        }
+        enchantment_decoy = {
+            "name": "Graveyard Enchantment Decoy",
+            "cmc": 3,
+            "type_line": "Enchantment",
+            "effect": "protection",
         }
         creature_decoy = {
             "name": "Graveyard Creature",
@@ -2557,12 +2597,21 @@ def build_return_target_artifact_from_graveyard_evidence(
             "type_line": "Sorcery",
             "effect": "draw_cards",
         }
-        active.graveyard = [sorcery_decoy, creature_decoy, artifact_target]
+        graveyard = [sorcery_decoy, creature_decoy]
+        if target_type == "artifact":
+            graveyard.extend([enchantment_decoy, target_card])
+        elif target_type == "enchantment":
+            graveyard.extend([artifact_decoy, target_card])
+        else:
+            graveyard.extend([target_card, artifact_decoy, enchantment_decoy])
+        active.graveyard = graveyard
         spell = {
             "name": draft.card_name,
             "cmc": 2,
             "type_line": "Sorcery",
-            "oracle_text": "Return target artifact card from your graveyard to your hand.",
+            "oracle_text": (
+                f"Return target {target_label} card from your graveyard to your hand."
+            ),
         }
         battle.apply_effect_immediate(active, [opponent], spell, turn=4, rng=random.Random(25))
     finally:
@@ -2583,18 +2632,30 @@ def build_return_target_artifact_from_graveyard_evidence(
         row.get("event") == "recursion_resolved"
         and row.get("card") == draft.card_name
         and row.get("destination") == "hand"
-        and row.get("recovered") == ["Graveyard Artifact"]
+        and row.get("recovered") == [f"Graveyard {target_label.title()}"]
         for row in event_rows
     )
-    artifact_recovered = any(card.get("name") == "Graveyard Artifact" for card in active.hand)
+    target_recovered = any(
+        card.get("name") == f"Graveyard {target_label.title()}" for card in active.hand
+    )
     creature_preserved = any(card.get("name") == "Graveyard Creature" for card in active.graveyard)
     sorcery_preserved = any(card.get("name") == "Graveyard Sorcery" for card in active.graveyard)
+    artifact_decoy_preserved = (
+        target_type == "artifact"
+        or any(card.get("name") == "Graveyard Artifact Decoy" for card in active.graveyard)
+    )
+    enchantment_decoy_preserved = (
+        target_type == "enchantment"
+        or any(card.get("name") == "Graveyard Enchantment Decoy" for card in active.graveyard)
+    )
     spell_finished = any(card.get("name") == draft.card_name for card in active.graveyard)
     focused_passed = bool(
         recursion_event
-        and artifact_recovered
+        and target_recovered
         and creature_preserved
         and sorcery_preserved
+        and artifact_decoy_preserved
+        and enchantment_decoy_preserved
         and spell_finished
         and counts.get("critical", 0) == 0
         and counts.get("high", 0) == 0
@@ -2621,14 +2682,16 @@ def build_return_target_artifact_from_graveyard_evidence(
         "passed": focused_passed,
         "checks": {
             "recursion_event": recursion_event,
-            "artifact_recovered_to_hand": artifact_recovered,
+            f"{target_type}_recovered_to_hand": target_recovered,
             "creature_decoy_preserved": creature_preserved,
             "sorcery_decoy_preserved": sorcery_preserved,
+            "artifact_decoy_preserved": artifact_decoy_preserved,
+            "enchantment_decoy_preserved": enchantment_decoy_preserved,
             "spell_finished_in_graveyard": spell_finished,
             "critical_findings": counts.get("critical", 0),
             "high_findings": counts.get("high", 0),
         },
-        "scope": "return_target_artifact_card_from_graveyard_to_hand",
+        "scope": f"return_target_{target_type}_card_from_graveyard_to_hand",
     }
     focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -2637,7 +2700,10 @@ def build_return_target_artifact_from_graveyard_evidence(
         "official_source_reviewed": True,
         "official_sources": [
             f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
-            "Oracle text template: Return target artifact card from your graveyard to your hand.",
+            (
+                "Oracle text template: Return target "
+                f"{target_label} card from your graveyard to your hand."
+            ),
         ],
         "focused_test_passed": focused_passed,
         "focused_test_refs": [str(focused_path)],
@@ -2645,13 +2711,15 @@ def build_return_target_artifact_from_graveyard_evidence(
         "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
         "critical_findings": counts.get("critical", 0),
         "high_findings": counts.get("high", 0),
-        "evidence_scope": "hard_behavior_return_target_artifact_card_from_graveyard_to_hand_v1",
+        "evidence_scope": (
+            f"hard_behavior_return_target_{target_type}_card_from_graveyard_to_hand_v1"
+        ),
         "generated_by": "manaloom_battle_rule_focused_evidence",
     }
     return EvidenceResult(
         draft=draft,
         status="evidence_ready" if focused_passed else "evidence_failed",
-        reason="return_target_artifact_card_from_graveyard_to_hand_supported",
+        reason=f"return_target_{target_type}_card_from_graveyard_to_hand_supported",
         evidence=evidence,
         artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
     )
@@ -3329,6 +3397,22 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
         return build_return_target_creature_from_graveyard_evidence(draft, output_dir)
     if supports_return_target_artifact_from_graveyard_template(draft):
         return build_return_target_artifact_from_graveyard_evidence(draft, output_dir)
+    if supports_return_target_enchantment_from_graveyard_template(draft):
+        return build_return_target_artifact_from_graveyard_evidence(
+            draft,
+            output_dir,
+            target_type="enchantment",
+            target_label="enchantment",
+            target_type_line="Enchantment",
+        )
+    if supports_return_target_artifact_or_enchantment_from_graveyard_template(draft):
+        return build_return_target_artifact_from_graveyard_evidence(
+            draft,
+            output_dir,
+            target_type="artifact_or_enchantment",
+            target_label="artifact or enchantment",
+            target_type_line="Enchantment",
+        )
     if supports_sacrifice_damage_template(draft):
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):

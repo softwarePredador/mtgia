@@ -2700,6 +2700,19 @@ Atualização do slice de 2026-06-19:
     ausente do graveyard, decoys preservados e auditoria sem findings
     critical/high;
   - isso preserva a separação correta entre `destroy target` e `exile target`.
+- Slice adicional de recursão simples para enchantments:
+  - `Return target enchantment card from your graveyard to your hand.` e
+    `Return target artifact or enchantment card from your graveyard to your
+    hand.` continuam entrando na fila `needs_rule_review`, mas agora têm
+    focused evidence próprio antes de qualquer promoção manual;
+  - `manaloom_battle_rule_focused_evidence.py` reutiliza o caminho canônico de
+    `card_battle_rules` com regra SQLite temporária, target específico e decoys
+    de artifact/enchantment/creature/sorcery para provar que o executor não
+    recupera tipo errado;
+  - a cobertura local de consumidores subiu para 11 testes e prova 2 novos
+    drafts elegíveis sem auto-promotion;
+  - isso ainda não cobre reanimate para battlefield, recursão modal, recursão
+    por custo alternativo ou recursão em massa.
 
 Pendências P1 agora priorizadas:
 
@@ -2707,7 +2720,8 @@ Pendências P1 agora priorizadas:
   Scryfall/MTGJSON/PostgreSQL, sem LLM.
 - Criar templates focados para as famílias mais frequentes:
   - `graveyard_or_zone_recursion` restante, excluindo o subcaso já coberto de
-    `Return target creature/artifact card from your graveyard to your hand.`;
+    `Return target creature/artifact/enchantment/artifact-or-enchantment card
+    from your graveyard to your hand.`;
   - `protection_or_prevention` restante, excluindo o subcaso já coberto de
     criaturas ganhando indestrutível até o fim do turno;
   - `triggered_or_static_engine`, que agora tem guardrail de bloqueio

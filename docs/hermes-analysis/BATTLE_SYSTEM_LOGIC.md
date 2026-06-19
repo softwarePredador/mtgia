@@ -1069,12 +1069,15 @@ Resultado de controle:
   entrar em `needs_rule_review` quando não há regra confiável, e o teste local
   de consumidores subiu de 10 para 11 drafts elegíveis sem auto-promotion.
 - Com os templates `Return target creature card from your graveyard to your
-  hand.` e `Return target artifact card from your graveyard to your hand.`,
-  recursão simples passou a entrar em `needs_rule_review` quando não há regra
-  confiável. Os testes usam regra temporária SQLite no `battle_rule_registry`,
-  porque o fallback heurístico de `recursion` não era evidência suficiente para
-  promoção. O executor agora filtra o graveyard por `target` real para impedir,
-  por exemplo, que recursão de artefato recupere sorcery/criatura.
+  hand.`, `Return target artifact card from your graveyard to your hand.`,
+  `Return target enchantment card from your graveyard to your hand.` e
+  `Return target artifact or enchantment card from your graveyard to your
+  hand.`, recursão simples passou a entrar em `needs_rule_review` quando não há
+  regra confiável. Os testes usam regra temporária SQLite no
+  `battle_rule_registry`, porque o fallback heurístico de `recursion` não era
+  evidência suficiente para promoção. O executor agora filtra o graveyard por
+  `target` real para impedir, por exemplo, que recursão de artefato recupere
+  sorcery/criatura ou que recursão de enchantment recupere artifact.
 - `counter_manipulation` agora tem teste guardrail: texto como
   `Put a +1/+1 counter on target creature.` entra na fila, mas fica sem
   focused evidence e bloqueado no promotion gate. O runtime só cobre counters
