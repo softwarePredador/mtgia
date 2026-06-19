@@ -359,6 +359,13 @@ comparativas de `topdeck_setup`, preserva `rule_source/status`, score e
 o trace prova que a decisao e auditavel, enquanto a execucao completa de
 reordenar/comprar/posicionar Approach permanece gap separado.
 
+Atualizacao 2026-06-19: a execucao completa da linha `Sensei's Divining Top` +
+`Lorehold, the Historian` + `Approach of the Second Sun` tambem passou a ter
+teste focado. O replay controlado prova: Top reordena `Approach` para o topo,
+o rummage do Lorehold descarta uma carta morta, compra `Approach`, miracle-casta
+a segunda copia e gera `game_won reason=approach`. `Scroll Rack` e `Brainstone`
+continuam em fila separada para cobertura executavel/policy reutilizavel.
+
 Guardrails operacionais atuais:
 
 - `HANDCRAFTED_KNOWN_CARDS` deve permanecer vazio por padrao;

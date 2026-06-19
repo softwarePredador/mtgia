@@ -2630,14 +2630,16 @@ Pendências P2:
   - `test_known_cards_consumer_guardrail.py` passou a falhar se essas cartas
     voltarem ao fallback antigo.
 - Gap remanescente:
-  - criar replay controlado completo da linha `Approach of the Second Sun` com
-    ferramenta de topo (`Top`/`Scroll Rack`/`Brainstone`) executando a
-    manipulacao de topo ponta a ponta. Em 2026-06-19 foi fechado o sub-slice de
-    evidencia auditavel: `battle_decision_trace_tests.py` agora prova que a
-    decisao `topdeck_setup` considera `Brainstone`, `Sensei's Divining Top` e
-    `Scroll Rack`, registra scores comparativos, preserva `rule_source/status`
-    e marca o risco `topdeck_executor_not_hard_modeled` sem inventar executor
-    duro;
+  - ampliar replay controlado da linha `Approach of the Second Sun` para
+    `Scroll Rack` e `Brainstone`. Em 2026-06-19 foram fechados dois sub-slices:
+    `battle_decision_trace_tests.py` prova que a decisao `topdeck_setup`
+    considera `Brainstone`, `Sensei's Divining Top` e `Scroll Rack`, registra
+    scores comparativos, preserva `rule_source/status` e marca o risco
+    `topdeck_executor_not_hard_modeled`; `battle_card_specific_tests.py` prova a
+    execucao ponta a ponta da linha `Sensei's Divining Top` + rummage do
+    Lorehold + segunda resolucao de `Approach`, incluindo eventos de
+    `topdeck_manipulation_activated`, `lorehold_upkeep_rummage`,
+    `miracle_cast` e `game_won`;
   - mover as capabilities de topdeck para policy reutilizável por outros
     comandantes, sem depender exclusivamente do caminho seguro do Lorehold.
 
