@@ -2639,6 +2639,16 @@ Atualização do slice de 2026-06-19:
   - escopo propositalmente não cobre ainda reanimate para battlefield, qualquer
     card recursion, land recursion, cast from graveyard/exile, loops ou
     recursão com múltiplos alvos/riders.
+- Guardrail adicional de `counter_manipulation`:
+  - o runtime atual possui Station/charge counters, lore counters de Saga e
+    cancelamento SBA de `+1/+1` com `-1/-1`, mas não possui executor genérico
+    seguro para `Put a +1/+1 counter on target creature.`;
+  - `server/test/manaloom_review_queue_consumers_test.py` agora prova que esse
+    texto entra na fila `needs_rule_review`, gera draft com
+    `counter_manipulation`, mas permanece sem focused evidence e bloqueado no
+    promotion gate;
+  - isso evita promoção falsa de counters até existir template próprio com alvo,
+    mudança de P/T, SBA e interação com counters negativos/proliferate.
 
 Pendências P1 agora priorizadas:
 
@@ -2650,7 +2660,8 @@ Pendências P1 agora priorizadas:
   - `protection_or_prevention` restante, excluindo o subcaso já coberto de
     criaturas ganhando indestrutível até o fim do turno;
   - `triggered_or_static_engine`;
-  - `counter_manipulation`;
+  - `counter_manipulation`, que hoje tem guardrail de bloqueio intencional e
+    ainda precisa executor próprio antes de qualquer promoção;
   - `mana_or_resource_acceleration`, excluindo o subcaso já coberto de
     `Create a Treasure token.`.
 - Expandir `targeted_interaction` e `mass_removal_or_modal_wipe` somente para

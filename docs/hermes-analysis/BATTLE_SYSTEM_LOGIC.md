@@ -1074,6 +1074,11 @@ Resultado de controle:
   elegíveis sem auto-promotion. O teste usa regra temporária SQLite no
   `battle_rule_registry`, porque o fallback heurístico de `recursion` não
   preserva o alvo `creature` e não é evidência suficiente para promoção.
+- `counter_manipulation` agora tem teste guardrail: texto como
+  `Put a +1/+1 counter on target creature.` entra na fila, mas fica sem
+  focused evidence e bloqueado no promotion gate. O runtime só cobre counters
+  especializados (`Station`, Saga/lore e SBA de +1/+1 vs -1/-1), então não há
+  promoção genérica segura para counters até existir executor dedicado.
 
 Correção crítica associada ao wipe:
 

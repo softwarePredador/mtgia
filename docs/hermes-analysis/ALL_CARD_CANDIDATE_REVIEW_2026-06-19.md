@@ -321,6 +321,10 @@ P1:
   temporária SQLite no focused evidence. Reanimate, land recursion, qualquer
   card recursion, recast from graveyard/exile, loops e variantes com riders
   continuam pendentes;
+- manter `counter_manipulation` bloqueado por design: o job detecta textos com
+  `+1/+1 counter`, mas o focused evidence ainda não tem template seguro. O
+  runtime atual só cobre counters especializados (`Station`, Saga/lore e SBA
+  de counters opostos), não aplicação genérica de counters em alvo;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;

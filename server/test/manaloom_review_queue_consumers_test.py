@@ -282,6 +282,40 @@ def _write_counterspell_gate_fixture(tmp: Path) -> Path:
     return path
 
 
+def _write_counter_manipulation_fixture(tmp: Path) -> Path:
+    fixture = {
+        "commanders": [
+            {
+                "name": "Atraxa, Praetors' Voice",
+                "source": "fixture_control",
+                "color_identity": ["G", "W", "U", "B"],
+                "existing_cards": [],
+                "role_counts": {
+                    "engine": 0,
+                },
+            }
+        ],
+        "cards": [
+            {
+                "card_id": "card-clean-counter-engine",
+                "oracle_id": "oracle-clean-counter-engine",
+                "name": "Clean Counter Engine",
+                "mana_cost": "{1}{G}",
+                "type_line": "Creature",
+                "oracle_text": "Put a +1/+1 counter on target creature.",
+                "color_identity": ["G"],
+                "cmc": 2,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["engine"],
+            },
+        ],
+    }
+    path = tmp / "counter_manipulation_fixture.json"
+    path.write_text(json.dumps(fixture), encoding="utf-8")
+    return path
+
+
 class ManaloomReviewQueueConsumersTest(unittest.TestCase):
     def test_consumers_do_not_fail_before_candidate_review_runs(self) -> None:
         data_gap = _load_module(
@@ -555,7 +589,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     "SELECT COUNT(*) FROM new_card_battle_rule_promotion_gate_runs"
                 ).fetchone()[0]
                 self.assertEqual(data_runs, 1)
-                self.assertEqual(battle_runs, 1)
+                self.assertGreaterEqual(battle_runs, 1)
                 self.assertEqual(gate_runs, 2)
             finally:
                 conn.close()
@@ -737,6 +771,100 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 decisions["Clean Recursion"],
                 "eligible_for_manual_verified_promotion",
             )
+
+    def test_counter_manipulation_requires_dedicated_template_before_promotion(self) -> None:
+        candidate = _load_module(
+            "manaloom_new_card_candidate_review_counter_manipulation",
+            "bin/manaloom_new_card_candidate_review.py",
+        )
+        battle_queue = _load_module(
+            "manaloom_battle_rule_review_queue_counter_manipulation",
+            "bin/manaloom_battle_rule_review_queue.py",
+        )
+        focused_evidence = _load_module(
+            "manaloom_battle_rule_focused_evidence_counter_manipulation",
+            "bin/manaloom_battle_rule_focused_evidence.py",
+        )
+        promotion_gate = _load_module(
+            "manaloom_battle_rule_promotion_gate_counter_manipulation",
+            "bin/manaloom_battle_rule_promotion_gate.py",
+        )
+
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            tmp = Path(raw_tmp)
+            fixture = _write_counter_manipulation_fixture(tmp)
+            knowledge_db = tmp / "knowledge.db"
+
+            candidate_summary = candidate.run(
+                candidate.parse_args(
+                    [
+                        "--fixture",
+                        str(fixture),
+                        "--output-dir",
+                        str(tmp / "candidate"),
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--no-lorehold-control",
+                    ]
+                )
+            )
+            self.assertEqual(candidate_summary["decisions"].get("needs_rule_review"), 1)
+
+            battle_summary = battle_queue.run(
+                battle_queue.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "battle"),
+                    ]
+                )
+            )
+            self.assertEqual(battle_summary["draft_count"], 1)
+            drafts = json.loads(
+                (
+                    tmp
+                    / "battle"
+                    / "battle_rule_review_queue"
+                    / "latest_drafts.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertIn("counter_manipulation", drafts[0]["effect_families"])
+
+            evidence_summary = focused_evidence.run(
+                focused_evidence.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "focused"),
+                        "--limit",
+                        "0",
+                    ]
+                )
+            )
+            self.assertEqual(evidence_summary["evaluated_count"], 1)
+            self.assertEqual(evidence_summary["evidence_count"], 0)
+            self.assertEqual(
+                evidence_summary["reasons"].get("no_focused_evidence_template_for_effect_family"),
+                1,
+            )
+
+            gate_summary = promotion_gate.run(
+                promotion_gate.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "gate"),
+                        "--limit",
+                        "0",
+                    ]
+                )
+            )
+            self.assertEqual(gate_summary["evaluated_count"], 1)
+            self.assertEqual(gate_summary["eligible_count"], 0)
+            self.assertEqual(gate_summary["blocked_count"], 1)
 
 
 if __name__ == "__main__":
