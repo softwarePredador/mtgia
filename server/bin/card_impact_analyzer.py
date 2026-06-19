@@ -6,7 +6,7 @@ Calcula When Drawn Win Rate, When Played Win Rate, e gera sugestoes
 de swap baseadas nos modos de derrota (loss-mode-driven swaps).
 """
 
-import argparse, importlib.util, json, os, sqlite3, sys, random
+import argparse, hashlib, importlib.util, json, os, sqlite3, sys, random
 from collections import defaultdict
 from pathlib import Path
 
@@ -197,12 +197,45 @@ def run_impact_analysis(db_path: str, deck_id: int, games_per_opp: int, seed: in
     return total_games, total_wins
 
 
-def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold", min_seen: int = 3):
-    """Parse forensic replay JSONL files for card impact data."""
+def _is_deck_player(player_name: str, deck_name: str) -> bool:
+    if not player_name:
+        return False
+    return player_name == deck_name or deck_name in player_name
+
+
+def _event_card_name(evt: dict) -> str:
+    return str(evt.get("card") or evt.get("card_name") or "").strip()
+
+
+def _record_seen_card(games: dict, game_id: str, card_name: str) -> None:
+    if card_name:
+        games[game_id]["cards_seen"].add(card_name)
+
+
+def _record_cast_card(games: dict, game_id: str, card_name: str) -> None:
+    if card_name:
+        games[game_id]["cards_cast"].add(card_name)
+        games[game_id]["cards_seen"].add(card_name)
+
+
+def _compute_from_replays(
+    replays_dir: str,
+    deck_name: str = "Lorehold",
+    min_seen: int = 3,
+    *,
+    baseline_hash: str | None = None,
+    min_usable_sample: int = 10,
+):
+    """Parse forensic replay JSONL files for Commander-safe card impact data.
+
+    This is intentionally replay-derived. It does not ask the simulator to make
+    new decisions and therefore can be used as a cheap post-run scorecard.
+    """
     jsonl_files = sorted(
         [f for f in os.listdir(replays_dir) if f.endswith(".jsonl")],
         reverse=True,
     )
+    replay_hash = hashlib.sha256()
 
     # Per-game: set of cards in hand, set of cards cast, won?
     games = {}
@@ -215,40 +248,48 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold", min_see
             games[game_id] = {"cards_seen": set(), "cards_cast": set(), "won": False}
 
         try:
-            with open(filepath) as f:
-                for line in f:
-                    line = line.strip()
-                    if not line: continue
-                    try:
-                        evt = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
+            replay_hash.update(filename.encode("utf-8"))
+            with open(filepath, "rb") as raw:
+                content = raw.read()
+            replay_hash.update(content)
+            for line in content.decode("utf-8", errors="replace").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    evt = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
 
-                    player = evt.get("player", "")
-                    is_us = player == "Lorehold" or deck_name in player
+                player = evt.get("player", "")
+                is_us = _is_deck_player(player, deck_name)
+                evt_type = evt.get("event", "")
 
-                    if not is_us: continue
+                if is_us:
+                    if evt_type in {"spell_cast", "miracle_cast", "commander_cast"}:
+                        _record_cast_card(games, game_id, _event_card_name(evt))
+                    elif evt_type in {
+                        "spell_resolved",
+                        "topdeck_manipulation_activated",
+                    }:
+                        _record_seen_card(games, game_id, _event_card_name(evt))
+                    if evt.get("drawn"):
+                        drawn = evt.get("drawn")
+                        if isinstance(drawn, list):
+                            for card_name in drawn:
+                                _record_seen_card(games, game_id, str(card_name))
+                        else:
+                            _record_seen_card(games, game_id, str(drawn))
+                    for card_name in evt.get("drawn_cards") or []:
+                        _record_seen_card(games, game_id, str(card_name))
 
-                    evt_type = evt.get("event", "")
-
-                    # Track casts from spell_cast events
-                    if evt_type == "spell_cast":
-                        cn = evt.get("card", "")
-                        if cn:
-                            games[game_id]["cards_cast"].add(cn)
-                            games[game_id]["cards_seen"].add(cn)  # cast implies seen
-                    if evt_type == "spell_cast":
-                        cn = evt.get("card", "")
-                        if cn:
-                            games[game_id]["cards_cast"].add(cn)
-
-                    # Track wins
-                    if evt_type == "game_ended":
-                        result = evt.get("result", "")
-                        reason = evt.get("reason", "")
-                        if result == "win" or "elimination" in reason.lower():
-                            games[game_id]["won"] = True
-
+                if evt_type == "game_won" and _is_deck_player(player, deck_name):
+                    games[game_id]["won"] = True
+                elif evt_type == "game_ended":
+                    result = evt.get("result", "")
+                    winner = str(evt.get("winner") or evt.get("player") or "")
+                    if result == "win" and _is_deck_player(winner, deck_name):
+                        games[game_id]["won"] = True
         except Exception:
             pass
 
@@ -256,6 +297,8 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold", min_see
     stats = defaultdict(lambda: {"seen": 0, "cast": 0, "won_when_seen": 0, "won_when_cast": 0})
     total_games = len(games)
     total_wins = sum(1 for data in games.values() if data["won"])
+    baseline_wr = round(total_wins / total_games * 100, 1) if total_games else 0
+    resolved_baseline_hash = baseline_hash or replay_hash.hexdigest()[:16]
 
     for game_id, data in games.items():
         won = data["won"]
@@ -275,20 +318,41 @@ def _compute_from_replays(replays_dir: str, deck_name: str = "Lorehold", min_see
             continue
         not_seen = max(0, total_games - s["seen"])
         won_when_not_seen = max(0, total_wins - s["won_when_seen"])
-        s["wdwr"] = round(s["won_when_seen"] / s["seen"] * 100, 1) if s["seen"] > 0 else 0
-        s["wpwr"] = round(s["won_when_cast"] / s["cast"] * 100, 1) if s["cast"] > 0 else 0
-        s["wns_wr"] = round(won_when_not_seen / not_seen * 100, 1) if not_seen > 0 else None
+        not_cast = max(0, total_games - s["cast"])
+        won_when_not_cast = max(0, total_wins - s["won_when_cast"])
+        seen_wr = round(s["won_when_seen"] / s["seen"] * 100, 1) if s["seen"] > 0 else 0
+        cast_wr = round(s["won_when_cast"] / s["cast"] * 100, 1) if s["cast"] > 0 else None
+        not_seen_wr = round(won_when_not_seen / not_seen * 100, 1) if not_seen > 0 else None
+        not_cast_wr = round(won_when_not_cast / not_cast * 100, 1) if not_cast > 0 else None
+        s["seen_wr"] = seen_wr
+        s["cast_wr"] = cast_wr
+        s["not_seen_wr"] = not_seen_wr
+        s["not_cast_wr"] = not_cast_wr
+        s["wdwr"] = seen_wr
+        s["wpwr"] = cast_wr or 0
+        s["wns_wr"] = not_seen_wr
         s["delta_vs_not_seen"] = (
-            round(s["wdwr"] - s["wns_wr"], 1)
-            if isinstance(s["wns_wr"], (int, float))
+            round(seen_wr - not_seen_wr, 1)
+            if isinstance(not_seen_wr, (int, float))
+            else None
+        )
+        s["delta_seen_vs_not_seen"] = s["delta_vs_not_seen"]
+        s["delta_vs_baseline"] = round(seen_wr - baseline_wr, 1)
+        s["delta_cast_vs_not_cast"] = (
+            round(cast_wr - not_cast_wr, 1)
+            if isinstance(cast_wr, (int, float)) and isinstance(not_cast_wr, (int, float))
             else None
         )
         s["not_seen"] = not_seen
+        s["not_cast"] = not_cast
         s["won_when_not_seen"] = won_when_not_seen
+        s["won_when_not_cast"] = won_when_not_cast
         s["sample_size"] = s["seen"]
-        s["sample_quality"] = "low_sample" if s["seen"] < max(10, min_seen) else "usable"
+        s["cast_sample_size"] = s["cast"]
+        s["sample_quality"] = "low_sample" if s["seen"] < max(min_usable_sample, min_seen) else "usable"
         s["total_games"] = total_games
-        s["baseline_wr"] = round(total_wins / total_games * 100, 1) if total_games else 0
+        s["baseline_wr"] = baseline_wr
+        s["baseline_hash"] = resolved_baseline_hash
         result[card] = s
 
     return result
@@ -300,6 +364,8 @@ def main():
         default=str(resolve_forensic_replays_dir()))
     parser.add_argument("--deck-name", default="Lorehold")
     parser.add_argument("--min-games", type=int, default=3)
+    parser.add_argument("--min-usable-sample", type=int, default=10)
+    parser.add_argument("--baseline-hash")
     parser.add_argument("--json-output")
 
     args = parser.parse_args()
@@ -311,36 +377,44 @@ def main():
     print(f"=== Card Impact Analysis from Forensic Replays ===")
     print()
 
-    stats = _compute_from_replays(args.replay_dir, args.deck_name, min_seen=args.min_games)
+    stats = _compute_from_replays(
+        args.replay_dir,
+        args.deck_name,
+        min_seen=args.min_games,
+        baseline_hash=args.baseline_hash,
+        min_usable_sample=args.min_usable_sample,
+    )
 
     if not stats:
         print("No card data found. Run forensic audit first to generate replays.")
         return 1
 
     total_cards = len(stats)
-    baseline = sum(s["won_when_seen"] for s in stats.values()) / max(1, sum(s["seen"] for s in stats.values())) * 100
+    baseline = next(iter(stats.values())).get("baseline_wr", 0)
+    baseline_hash = next(iter(stats.values())).get("baseline_hash", "unknown")
 
     print(f"Cards tracked: {total_cards}")
-    print(f"Baseline WDWR: {baseline:.1f}%")
+    print(f"Baseline WR: {baseline:.1f}%")
+    print(f"Baseline hash: {baseline_hash}")
     print()
 
     sorted_cards = sorted(stats.items(), key=lambda x: x[1]["wdwr"], reverse=True)
 
     print(f"Top 15 — Highest WDWR:")
     for card, s in sorted_cards[:15]:
-        delta = s["wdwr"] - baseline
-        print(f"  {card[:35]:35s} WDWR={s['wdwr']:5.1f}% "
+        print(f"  {card[:35]:35s} seen_wr={s['seen_wr']:5.1f}% "
               f"seen={s['seen']:3d} cast={s['cast']:3d} "
-              f"delta={delta:+.1f}pp "
-              f"vs_not_seen={s.get('delta_vs_not_seen')}")
+              f"delta={s['delta_vs_baseline']:+.1f}pp "
+              f"vs_not_seen={s.get('delta_seen_vs_not_seen')} "
+              f"quality={s.get('sample_quality')}")
 
     print(f"\nBottom 15 — Lowest WDWR:")
     for card, s in sorted_cards[-15:]:
-        delta = s["wdwr"] - baseline
-        print(f"  {card[:35]:35s} WDWR={s['wdwr']:5.1f}% "
+        print(f"  {card[:35]:35s} seen_wr={s['seen_wr']:5.1f}% "
               f"seen={s['seen']:3d} cast={s['cast']:3d} "
-              f"delta={delta:+.1f}pp "
-              f"vs_not_seen={s.get('delta_vs_not_seen')}")
+              f"delta={s['delta_vs_baseline']:+.1f}pp "
+              f"vs_not_seen={s.get('delta_seen_vs_not_seen')} "
+              f"quality={s.get('sample_quality')}")
 
     if args.json_output:
         output = Path(args.json_output)

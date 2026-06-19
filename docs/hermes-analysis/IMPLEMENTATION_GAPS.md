@@ -686,15 +686,23 @@
 
 #### P1 — Substituir WR bruto por scorecard Commander-safe
 
-- O battle/Lorehold ainda não tem uma métrica canônica equivalente a:
+- Status 2026-06-19: o primeiro slice foi implementado em
+  `server/bin/card_impact_analyzer.py` e testado por
+  `server/test/card_impact_analyzer_test.py`.
+- O analisador de replays agora emite:
   - WR com carta vista;
   - WR sem carta vista;
   - WR com carta castada;
   - WR sem carta castada;
-  - delta contra baseline fresco por `baseline_hash`;
-  - impacto por arquétipo e turno médio.
-- Isso continua sendo gap real de confiança. WR alto isolado não fecha verdade.
-- Implementar no laboratório Hermes, sem promover nada ao app/API pública.
+  - delta contra baseline por `baseline_hash`;
+  - `sample_quality` para bloquear conclusões de baixa amostra.
+- O que ainda falta para fechar o gap:
+  - rodar corpus maior Lorehold/control decks com baseline congelado;
+  - segmentar impacto por arquétipo de oponente e turno médio;
+  - produzir relatório de conclusão `trusted`, `needs_more_samples` ou
+    `blocked` antes de qualquer recomendação forte.
+- Guardrail mantido: scorecard é laboratório/auditoria; não altera app/API
+  pública e não aplica swap automaticamente.
 
 #### P1 — Materializar casos reais multi-row em `card_battle_rules`
 
@@ -2371,7 +2379,7 @@ Tasks priorizadas derivadas do estudo:
 | P1 | Refinar `Urza's Saga` depois do slice minimo ja implementado | Em 2026-06-16 o battle passou a inicializar capitulo/lore, avancar no upkeep, criar Construct no capitulo II e tutorar artefato cmc<=1 seguro no capitulo III antes do SBA. O gap remanescente e de refinamento: sizing dinamico do Construct e generalizacao prudente do fluxo de Saga | Menos ambiguidade medium-risk no Lorehold sem abrir uma engine de Saga agressiva demais |
 | P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; `Ashnod's Altar` tambem avancou e ja tem executor contextual minimo para `sacrifice_creature -> mana unlock`. Em 2026-06-18 um slice seguro promoveu mais seis recorrentes para a camada reviewed sem inventar executor novo: `Ancient Tomb` (`curated/verified`), `Fellwar Stone` (`curated/active`), `Mana Vault` (`curated/active`), `Path to Exile` (`curated/active`), `Seething Song` (`curated/verified`) e `Talisman of Conviction` (`curated/active`). No fechamento seguinte do mesmo dia, `Basking Broodscale` e `Scavenging Ooze` tambem sairam do replay vivo como `needs_review` ao serem promovidas para modelos conservadores de criatura | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review`; proximo gap real deixa de ser "falta regra" e passa a ser medir quais outliers residuais ainda justificam promotion conservador e quais habilidades ativadas/triggers merecem executor proprio |
 | P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
-| P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | WR bruto continua fraco como sinal de verdade | Aprendizado menos enganado por variance e jogos longos |
+| P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | Slice inicial de 2026-06-19 adicionou esses campos em `card_impact_analyzer.py`; falta rodar corpus maior, segmentar por arquétipo/turno e classificar conclusões | Aprendizado menos enganado por variance e jogos longos |
 | P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |
 | P1 | Formalizar a politica de mulligan Commander no auditor/trace como `curve + color + plan + sequencing + interaction` | A parte legal ja esta fechada; em 2026-06-17 o London Mulligan passou a escolher bottom por politica auditavel, e em 2026-06-18 o keep passou a rejeitar `reactive_only` land-heavy, `expensive_cluster_without_setup` e plano cedo apenas off-color. O gap restante agora e enriquecer o trace comparativo com alternativas rejeitadas e calibrar em corpus maior por comandante/arquetipo | Abertura de maos mais reproduzivel e melhor rastreabilidade do porquê keep/mull/bottom |
 | P1 | Sair do bucket hardcoded de arquétipo no quality gate e passar a usar `role_targets`/assinatura do profile | O erro mais gritante de `combo` ja foi corrigido, mas o gate ainda usa buckets grossos e land counts genericos por arquétipo | Optimize mais aderente ao profile real do comandante, inclusive Lorehold |

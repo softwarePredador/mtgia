@@ -483,7 +483,10 @@ vs Kinnan WR=0% [W:elimination=1, L:screw=4, L:out-valued=2]
 | WPWR | When Played Win Rate | jogos_ganhos_com_carta_jogada / jogos_que_carta_foi_jogada |
 | Impact Delta | WDWR - Baseline WR | Quanto a carta desvia da média |
 | WNS WR | Win Rate sem carta vista | jogos_ganhos_sem_carta_vista / jogos_sem_carta_vista |
+| Not Cast WR | Win Rate sem carta castada | jogos_ganhos_sem_carta_castada / jogos_sem_carta_castada |
+| Cast Delta | WPWR - Not Cast WR | Evita concluir impacto só porque a carta apareceu em jogos vencidos |
 | Delta vs Not Seen | WDWR - WNS WR | Evita confiar apenas em WR bruto |
+| Baseline Hash | Hash/identificador do corpus de replay | Impede comparar scorecards de bases diferentes como se fossem a mesma rodada |
 | Sample Quality | `low_sample` / `usable` | Bloqueia conclusao quando a amostra nao sustenta decisao |
 
 ### 4.2 Geração de Replays (generate_card_replays.py)
@@ -505,27 +508,38 @@ python3 server/bin/generate_card_replays.py --games 5 --opponents 6 --deck-id 6
 ```bash
 python3 card_impact_analyzer.py --replay-dir /path/to/replays
 python3 card_impact_analyzer.py --replay-dir /path/to/replays --json-output /tmp/card_impact.json
+python3 card_impact_analyzer.py --replay-dir /path/to/replays --baseline-hash lorehold_round_001 --min-usable-sample 10
 ```
 
 - Lê todos os arquivos JSONL
-- Rastreia `spell_cast` events para determinar quais cartas foram jogadas
-- Usa `game_ended` para classificar vitória/derrota
+- Rastreia `spell_cast`, `miracle_cast` e `commander_cast` para determinar
+  quais cartas foram jogadas
+- Rastreia cartas vistas por cast, resolução, manipulação de topo e eventos de
+  compra (`drawn`/`drawn_cards`)
+- Usa `game_won` ou `game_ended` com vencedor compatível para classificar
+  vitória/derrota do deck analisado
 - Filtra cartas com ≥3 aparições (min-games)
-- Ordena por WDWR decrescente
+- Emite `seen_wr`, `not_seen_wr`, `cast_wr`, `not_cast_wr`,
+  `delta_vs_baseline`, `delta_seen_vs_not_seen`, `delta_cast_vs_not_cast`,
+  `baseline_hash` e `sample_quality`
+- Ordena por `seen_wr`/WDWR decrescente
 
 ### 4.4 Exemplo de Output
 
 ```
-Top 10 WDWR:
-  Mox Opal                       WDWR=80.0% seen=5 won=4
-  Lotus Petal                    WDWR=75.0% seen=4 won=3
-  Boros Charm                    WDWR=75.0% seen=4 won=3
+Baseline WR: 58.3%
+Baseline hash: lorehold_round_001
+
+Top 15 — Highest WDWR:
+  Boros Charm                    seen_wr=75.0% seen=4 cast=2 delta=+16.7pp vs_not_seen=8.4 quality=low_sample
   ...
-Bottom 5:
-  Surge to Victory               WDWR=20.0% seen=5 won=1
-  Rapid Hybridization            WDWR= 0.0% seen=3 won=0
-  Arcane Signet                  WDWR= 0.0% seen=3 won=0
+Bottom 15 — Lowest WDWR:
+  Surge to Victory               seen_wr=20.0% seen=5 cast=1 delta=-38.3pp vs_not_seen=-42.0 quality=low_sample
 ```
+
+O scorecard ainda nao autoriza swap sozinho. A conclusao continua bloqueada
+quando `sample_quality=low_sample`, quando o `baseline_hash` nao bate com a
+rodada comparada, ou quando o corpus nao foi segmentado por arquétipo/turno.
 
 ---
 
