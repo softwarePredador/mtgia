@@ -6,6 +6,7 @@ import 'optimize_candidate_quality_support.dart';
 import 'optimize_filler_loader_support.dart';
 import 'optimize_functional_role_support.dart';
 import 'optimize_removal_candidate_support.dart';
+import 'optimization_functional_roles.dart';
 
 Future<List<Map<String, dynamic>>> findSynergyReplacements({
   required Pool pool,
@@ -100,14 +101,27 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
 
   final candidatesResult = await pool.execute(
     Sql.named('''
-      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost, sub.colors, sub.color_identity, sub.pop_score
+      SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost,
+             sub.colors, sub.color_identity, sub.pop_score,
+             sub.functional_tags, sub.semantic_tags_v2, sub.best_role_score
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
-          COALESCE(cmi.usage_count, 0) AS pop_score
+          COALESCE(cmi.usage_count, 0) AS pop_score,
+          ARRAY(
+            SELECT DISTINCT value
+            FROM unnest(
+              COALESCE(cis.function_tags, ARRAY[]::text[]) ||
+              COALESCE(cis.scored_roles, ARRAY[]::text[])
+            ) AS role(value)
+            WHERE value IS NOT NULL AND TRIM(value) <> ''
+          ) AS functional_tags,
+          COALESCE(cis.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+          COALESCE(cis.best_role_score, 0) AS best_role_score
         FROM cards c
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
+        LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
           AND c.type_line NOT ILIKE '%land%'
@@ -143,6 +157,11 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     final colors = (row[5] as List?)?.cast<String>() ?? const <String>[];
     final identity = (row[6] as List?)?.cast<String>() ?? const <String>[];
     final popScore = (row[7] as num?)?.toInt() ?? 0;
+    final functionalTags =
+        (row[8] as List?)?.map((entry) => entry.toString()).toList() ??
+            const <String>[];
+    final semanticTagsV2 = row[9];
+    final bestRoleScore = (row[10] as num?)?.toInt() ?? 0;
 
     if (!isWithinCommanderIdentity(
       cardIdentity: resolvedCardIdentityFromParts(
@@ -163,6 +182,9 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       'colors': colors,
       'color_identity': identity,
       'pop_score': popScore,
+      'functional_tags': functionalTags,
+      'semantic_tags_v2': semanticTagsV2,
+      'best_role_score': bestRoleScore,
     });
   }
 
@@ -184,20 +206,23 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
       final score = scoreOptimizeReplacementCandidate(
-        functionalNeed: need,
-        cardName: candidate['name'] as String? ?? '',
-        typeLine: candidate['type_line'] as String? ?? '',
-        oracleText: candidate['oracle_text'] as String? ?? '',
-        manaCost: candidate['mana_cost'] as String? ?? '',
-        popScore: (candidate['pop_score'] as int?) ?? 0,
-        preferredNames: normalizedPreferredNames,
-        rejectedAdditionCounts: rejectedAdditionCounts,
-        preferLowCurve: preferLowCurve,
-      );
-      final matches = matchesFunctionalNeed(
+            functionalNeed: need,
+            cardName: candidate['name'] as String? ?? '',
+            typeLine: candidate['type_line'] as String? ?? '',
+            oracleText: candidate['oracle_text'] as String? ?? '',
+            manaCost: candidate['mana_cost'] as String? ?? '',
+            popScore: (candidate['pop_score'] as int?) ?? 0,
+            preferredNames: normalizedPreferredNames,
+            rejectedAdditionCounts: rejectedAdditionCounts,
+            preferLowCurve: preferLowCurve,
+          ) +
+          semanticReplacementScoreBoost(
+            functionalNeed: need,
+            candidate: candidate,
+          );
+      final matches = matchesFunctionalNeedForCandidate(
         need,
-        oracleText: candidate['oracle_text'] as String? ?? '',
-        typeLine: candidate['type_line'] as String? ?? '',
+        candidate: candidate,
       );
 
       if (matches && score > bestScore) {
@@ -219,27 +244,31 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     }).toList()
       ..sort((a, b) {
         final scoreA = scoreOptimizeReplacementCandidate(
-          functionalNeed: 'utility',
-          cardName: a['name'] as String? ?? '',
-          typeLine: a['type_line'] as String? ?? '',
-          oracleText: a['oracle_text'] as String? ?? '',
-          manaCost: a['mana_cost'] as String? ?? '',
-          popScore: (a['pop_score'] as int?) ?? 0,
-          preferredNames: normalizedPreferredNames,
-          rejectedAdditionCounts: rejectedAdditionCounts,
-          preferLowCurve: preferLowCurve,
-        );
+              functionalNeed: 'utility',
+              cardName: a['name'] as String? ?? '',
+              typeLine: a['type_line'] as String? ?? '',
+              oracleText: a['oracle_text'] as String? ?? '',
+              manaCost: a['mana_cost'] as String? ?? '',
+              popScore: (a['pop_score'] as int?) ?? 0,
+              preferredNames: normalizedPreferredNames,
+              rejectedAdditionCounts: rejectedAdditionCounts,
+              preferLowCurve: preferLowCurve,
+            ) +
+            semanticReplacementScoreBoost(
+                functionalNeed: 'utility', candidate: a);
         final scoreB = scoreOptimizeReplacementCandidate(
-          functionalNeed: 'utility',
-          cardName: b['name'] as String? ?? '',
-          typeLine: b['type_line'] as String? ?? '',
-          oracleText: b['oracle_text'] as String? ?? '',
-          manaCost: b['mana_cost'] as String? ?? '',
-          popScore: (b['pop_score'] as int?) ?? 0,
-          preferredNames: normalizedPreferredNames,
-          rejectedAdditionCounts: rejectedAdditionCounts,
-          preferLowCurve: preferLowCurve,
-        );
+              functionalNeed: 'utility',
+              cardName: b['name'] as String? ?? '',
+              typeLine: b['type_line'] as String? ?? '',
+              oracleText: b['oracle_text'] as String? ?? '',
+              manaCost: b['mana_cost'] as String? ?? '',
+              popScore: (b['pop_score'] as int?) ?? 0,
+              preferredNames: normalizedPreferredNames,
+              rejectedAdditionCounts: rejectedAdditionCounts,
+              preferLowCurve: preferLowCurve,
+            ) +
+            semanticReplacementScoreBoost(
+                functionalNeed: 'utility', candidate: b);
         final byScore = scoreB.compareTo(scoreA);
         if (byScore != 0) return byScore;
         final nameA = (a['name'] as String? ?? '').toLowerCase();
@@ -258,6 +287,54 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   }
 
   return results;
+}
+
+bool matchesFunctionalNeedForCandidate(
+  String need, {
+  required Map<String, dynamic> candidate,
+}) {
+  final normalizedNeed = _normalizeReplacementNeed(need);
+  final roles = optimizationFunctionalRolesForCard(candidate);
+  if (normalizedNeed == 'utility') return true;
+  if (roles.map(_normalizeReplacementNeed).contains(normalizedNeed)) {
+    return true;
+  }
+  return matchesFunctionalNeed(
+    need,
+    oracleText: candidate['oracle_text'] as String? ?? '',
+    typeLine: candidate['type_line'] as String? ?? '',
+  );
+}
+
+int semanticReplacementScoreBoost({
+  required String functionalNeed,
+  required Map<String, dynamic> candidate,
+}) {
+  final normalizedNeed = _normalizeReplacementNeed(functionalNeed);
+  final roles = optimizationFunctionalRolesForCard(candidate)
+      .map(_normalizeReplacementNeed)
+      .toSet();
+  final roleScore = ((candidate['best_role_score'] as num?)?.toInt() ?? 0)
+      .clamp(0, 100)
+      .toInt();
+  if (normalizedNeed == 'utility') {
+    return roleScore ~/ 4;
+  }
+  if (!roles.contains(normalizedNeed)) return 0;
+  return 90 + (roleScore ~/ 3);
+}
+
+String _normalizeReplacementNeed(String value) {
+  return switch (value.trim().toLowerCase()) {
+    'board_wipe' || 'wipe' => 'wipe',
+    'counterspell' || 'interaction' => 'removal',
+    'ritual' || 'mana_fixing' => 'ramp',
+    'exile_value' || 'loot' => 'draw',
+    'token' || 'token_maker' => 'creature',
+    'sacrifice_outlet' => 'engine',
+    'combo_piece' => 'combo_piece',
+    _ => value.trim().toLowerCase(),
+  };
 }
 
 Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({

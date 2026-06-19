@@ -12,6 +12,32 @@
 
 ## Resumo
 
+### Atualizacao de ciclo — 2026-06-19 / optimize replacement semantic intake
+
+- A triagem da branch `origin/codex/hermes-analysis-docs` apontou um gap ainda
+  valido no caminho inicial de replacements do optimize: `findSynergyReplacements`
+  buscava candidatos com campos crus de `cards` e pontuava majoritariamente por
+  texto/nome antes dos gates posteriores.
+- Correção incorporada neste slice:
+  - a query inicial de replacement agora agrega `card_intelligence_snapshot`;
+  - `functional_tags`, `scored_roles`, `semantic_tags_v2` e `best_role_score`
+    entram no `candidatePool`;
+  - o match de necessidade (`draw`, `removal`, `ramp`, `wipe`, etc.) usa
+    `optimizationFunctionalRolesForCard`, preservando multi-role persistido e
+    semantic v2 antes de cair no matcher textual legado;
+  - o score inicial recebe boost semântico rastreável quando a role resolvida
+    casa com a necessidade.
+- Testes adicionados:
+  - candidato com `functional_tags=[engine, draw]` casa `draw` mesmo sem texto
+    explícito de compra;
+  - candidato com `semantic_tags_v2=[removal, protection]` casa `removal` mesmo
+    quando o oracle text é ambíguo.
+- Limite restante:
+  - `removals_detailed` ainda carrega campo legado escalar `role/function` e o
+    rebuild guiado ainda possui exceções por nome. Esses pontos ficam para
+    slices próprios para não misturar ranking inicial, payload app-facing e
+    rebuild em uma única mudança.
+
 ### Atualizacao de ciclo — 2026-06-19 / Hermes docs branch triage
 
 - A branch `origin/codex/hermes-analysis-docs` foi lida em `8ddc978a` sem merge

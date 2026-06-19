@@ -62,5 +62,61 @@ void main() {
       expect(result, isEmpty);
       expect(runtime.findSynergyReplacements, isA<Function>());
     });
+
+    test('matches replacement need from persisted multi-role tags', () {
+      final candidate = {
+        'name': 'Source-backed Engine',
+        'type_line': 'Enchantment',
+        'oracle_text': 'Whenever you cast your second spell each turn, scry 1.',
+        'functional_tags': const ['engine', 'draw'],
+        'semantic_tags_v2': const <Map<String, dynamic>>[],
+        'best_role_score': 72,
+      };
+
+      expect(
+        matchesFunctionalNeedForCandidate('draw', candidate: candidate),
+        isTrue,
+      );
+      expect(
+        matchesFunctionalNeedForCandidate('engine', candidate: candidate),
+        isTrue,
+      );
+      expect(
+        semanticReplacementScoreBoost(
+          functionalNeed: 'draw',
+          candidate: candidate,
+        ),
+        greaterThan(90),
+      );
+    });
+
+    test('matches replacement need from semantic v2 when text is ambiguous',
+        () {
+      final candidate = {
+        'name': 'Traceable Answer',
+        'type_line': 'Instant',
+        'oracle_text': 'Choose one — target player investigates.',
+        'functional_tags': const <String>[],
+        'semantic_tags_v2': const [
+          {
+            'role_confidence': 0.91,
+            'tags': ['removal', 'protection'],
+          },
+        ],
+        'best_role_score': 51,
+      };
+
+      expect(
+        matchesFunctionalNeedForCandidate('removal', candidate: candidate),
+        isTrue,
+      );
+      expect(
+        semanticReplacementScoreBoost(
+          functionalNeed: 'removal',
+          candidate: candidate,
+        ),
+        greaterThan(90),
+      );
+    });
   });
 }
