@@ -366,6 +366,14 @@ o rummage do Lorehold descarta uma carta morta, compra `Approach`, miracle-casta
 a segunda copia e gera `game_won reason=approach`. `Scroll Rack` e `Brainstone`
 continuam em fila separada para cobertura executavel/policy reutilizavel.
 
+Atualizacao 2026-06-19: `Scroll Rack` tambem passou a ter replay executavel na
+linha de Lorehold. O gate de `hand_to_top_exchange` agora aceita
+`opponent_upkeep`, que representa ativar Scroll Rack em resposta a trigger de
+upkeep do Lorehold antes do rummage resolver. O teste prova a troca
+`Approach` da mao para o topo, compra via rummage, miracle e vitoria por
+segunda resolucao. `Brainstone` permanece pendente por exigir executor proprio
+de `{2}, {T}, sacrifice: draw three, put two back`.
+
 Guardrails operacionais atuais:
 
 - `HANDCRAFTED_KNOWN_CARDS` deve permanecer vazio por padrao;

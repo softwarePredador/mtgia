@@ -1890,6 +1890,110 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def test_scroll_rack_sets_up_lorehold_approach_second_cast_on_opponent_upkeep():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            lorehold = player("Lorehold")
+            lorehold.is_human = True
+            lorehold.approach_count = 1
+            rack_card = {
+                "name": "Scroll Rack",
+                "cmc": 2,
+                "type_line": "Artifact",
+            }
+            rack_permanent = {
+                **rack_card,
+                **battle.get_card_effect(rack_card),
+            }
+            lorehold.battlefield = [
+                {
+                    "name": "Lorehold, the Historian",
+                    "effect": "creature",
+                    "type_line": "Legendary Creature",
+                    "haste": True,
+                },
+                rack_permanent,
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                {"name": "Sacred Foundry", "effect": "land", "type_line": "Land"},
+            ]
+            lorehold.hand = [
+                {
+                    "name": "Approach of the Second Sun",
+                    "cmc": 7,
+                    "type_line": "Sorcery",
+                },
+                {
+                    "name": "Nine Mana Spell",
+                    "cmc": 9,
+                    "type_line": "Sorcery",
+                    "effect": "draw_cards",
+                },
+            ]
+            lorehold.library = [
+                {"name": "Small Creature", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Land", "effect": "land"},
+            ]
+            opponent = player("Opponent")
+            opponent.library = [_card("Opponent Draw", cmc=1)]
+            lorehold.refresh_mana_sources(turn=6)
+
+            triggered = battle.process_lorehold_opponent_upkeep_rummage(
+                opponent,
+                [lorehold, opponent],
+                6,
+                random.Random(124),
+                battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert triggered == 1
+        assert lorehold.has_won() is True
+        assert lorehold.win_reason == "approach"
+        assert any(
+            event == "topdeck_manipulation_activated"
+            and data.get("card") == "Scroll Rack"
+            and data.get("activation_kind") == "scroll_rack_single_exchange_for_lorehold"
+            and data.get("top_before") == "Small Creature"
+            and data.get("top_after") == "Approach of the Second Sun"
+            and data.get("phase") == "opponent_upkeep"
+            for event, data in events
+        )
+        assert any(
+            event == "lorehold_upkeep_rummage"
+            and data.get("drawn") == "Approach of the Second Sun"
+            and data.get("discarded") == "Nine Mana Spell"
+            for event, data in events
+        )
+        assert any(
+            event == "miracle_cast"
+            and data.get("card") == "Approach of the Second Sun"
+            and data.get("source") == "lorehold_opponent_upkeep_rummage"
+            for event, data in events
+        )
+        assert any(
+            event == "game_won"
+            and data.get("player") == "Lorehold"
+            and data.get("reason") == "approach"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("card") == "Approach of the Second Sun"
+            and decision.get("chosen_option", {}).get("action") == "activate_scroll_rack_exchange"
+            and decision.get("actual_outcome") == "hand_spell_moved_to_top_for_next_draw"
+            for decision in decisions
+        )
+
     def test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2294,6 +2398,7 @@ def register_tests(battle, player):
         test_angels_grace_prevents_lethal_damage_and_life_zero_loss_this_turn,
         test_angels_grace_blocks_opponent_approach_win_this_turn,
         test_senseis_top_sets_up_lorehold_approach_second_cast,
+        test_scroll_rack_sets_up_lorehold_approach_second_cast_on_opponent_upkeep,
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,

@@ -2631,7 +2631,7 @@ Pendências P2:
     voltarem ao fallback antigo.
 - Gap remanescente:
   - ampliar replay controlado da linha `Approach of the Second Sun` para
-    `Scroll Rack` e `Brainstone`. Em 2026-06-19 foram fechados dois sub-slices:
+    `Brainstone`. Em 2026-06-19 foram fechados tres sub-slices:
     `battle_decision_trace_tests.py` prova que a decisao `topdeck_setup`
     considera `Brainstone`, `Sensei's Divining Top` e `Scroll Rack`, registra
     scores comparativos, preserva `rule_source/status` e marca o risco
@@ -2639,7 +2639,9 @@ Pendências P2:
     execucao ponta a ponta da linha `Sensei's Divining Top` + rummage do
     Lorehold + segunda resolucao de `Approach`, incluindo eventos de
     `topdeck_manipulation_activated`, `lorehold_upkeep_rummage`,
-    `miracle_cast` e `game_won`;
+    `miracle_cast` e `game_won`; o mesmo teste agora cobre `Scroll Rack` na
+    janela correta de `opponent_upkeep`, corrigindo o gate que antes limitava a
+    troca ao `upkeep` proprio;
   - mover as capabilities de topdeck para policy reutilizável por outros
     comandantes, sem depender exclusivamente do caminho seguro do Lorehold.
 

@@ -7329,7 +7329,7 @@ def activate_lorehold_topdeck_artifacts(
         and permanent.get("hand_to_top_exchange")
         and not permanent.get("utility_artifact_used_this_turn")
     ]
-    if phase == "upkeep" and exchange_artifacts and player.library:
+    if phase in {"upkeep", "opponent_upkeep"} and exchange_artifacts and player.library:
         for permanent in exchange_artifacts:
             activation_cost = int(permanent.get("activation_cost_generic") or 1)
             if player.available_mana() < activation_cost:
