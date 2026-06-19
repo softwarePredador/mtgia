@@ -4,7 +4,7 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-19 19:00 UTC
+> Data: 2026-06-19 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
@@ -20,6 +20,17 @@ autenticada sem herdar plano/rate-limit de IA custosa. Nao surgiu novo achado
 confiavel de coerencia no recorte `server/lib` <-> `server/routes` <->
 `app/lib`; o residual foi apenas operacional: `flutter test --no-pub` nao
 executou no app sem `app/.dart_tool/package_config.json`.
+
+A revalidacao de coerencia app/server de 2026-06-19 23:00 UTC no checkout
+`19f589e7` manteve os tres gaps antigos fechados e confirmou que o runtime de
+`swap_integrity` esta alinhado entre backend e app: a rota de optimize emite o
+payload, o app recalcula o hash e bloqueia apply com `deck_signature` stale. O
+novo achado P2 e documental/contratual: `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+nao lista `swap_integrity`/`deck_signature`, apesar de o campo ser consumido por
+`app/lib/features/decks/widgets/deck_optimize_flow_support.dart` e influenciar o
+caminho de aplicacao por IDs. Backend analyze/test focado ficou verde; testes
+app-side focados continuaram bloqueados localmente pela ausencia de
+`app/.dart_tool/package_config.json`.
 
 A revalidacao local de semantica de cartas de 2026-06-19 05:30 UTC no checkout
 `708541a5` encontrou delta amplo de produto desde a rodada anterior, mas fechou
@@ -153,6 +164,13 @@ o SCC app entre `life_counter_tabletop_engine.dart` e
     aberto nesta frente e o par
     `life_counter_tabletop_engine.dart` <->
     `life_counter_turn_tracker_engine.dart`, com analyzer focado verde.
+14. **P2 — Campo app-facing `swap_integrity` sem contrato documentado**:
+    revalidado em 2026-06-19 23:00 UTC no checkout `19f589e7`. A rota
+    `POST /ai/optimize` anexa `swap_integrity`, o app valida hash e
+    `deck_signature` antes de aplicar swaps por ID, mas
+    `server/doc/API_CONTRACTS_AND_DATA_MAP.md` nao lista o campo. O runtime
+    esta coerente; a pendencia e documentar o campo opcional/aditivo e manter
+    testes de app/contrato quando o package config local estiver disponivel.
 
 ## Achados priorizados
 
@@ -696,12 +714,13 @@ apenas para os demais helpers abaixo.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-18 23:00 UTC:** RESOLVIDO para os tres gaps estreitos
-  revalidados no checkout local `523589bc`. Os achados anteriores de ownership
-  em `/ai/optimize`, `/ai/archetypes` e jobs async de optimize/generate
-  continuam resolvidos/stale. A lacuna de activation telemetry foi fechada, o
-  contrato app-facing de `/ai/commander-learning` foi documentado, e a rota de
-  learned deck availability agora e auth-only no middleware de IA.
+- **Status 2026-06-19 23:00 UTC:** PARCIAL no checkout local `19f589e7`.
+  Os tres gaps estreitos revalidados em `523589bc` continuam resolvidos:
+  ownership de optimize/archetypes/jobs async, activation telemetry,
+  `/ai/commander-learning` documentado e auth-only de learned deck availability.
+  O novo residual P2 e o contrato documental de `swap_integrity`: o runtime
+  app/backend esta alinhado, mas o API contract map nao lista esse campo
+  app-facing agora consumido pelo app.
 - **Evidencia atualizada**:
   - O app envia `POST /ai/optimize` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`. A rota
@@ -714,6 +733,15 @@ apenas para os demais helpers abaixo.
     `server/lib/ai/optimize_request_support.dart:97`-`:123`. O classificador de
     roles declara precedencia `functional_tags -> semantic_tags_v2 ->
     heuristica` em `server/lib/ai/optimization_functional_roles.dart:301`-`:338`.
+  - `server/routes/ai/optimize/index.dart:723`-`:733` anexa
+    `swap_integrity`; `server/lib/ai/optimize_swap_integrity.dart:38`-`:45`
+    serializa `version`, `algo`, `hash`, `deck_signature`, `removal_count` e
+    `addition_count`. O app parseia/valida o mesmo payload em
+    `app/lib/features/decks/widgets/deck_optimize_flow_support.dart:341`-`:344`
+    e `:486`-`:517`, e bloqueia deck stale em
+    `app/lib/features/decks/providers/deck_provider.dart:927`-`:935`.
+    `server/doc/API_CONTRACTS_AND_DATA_MAP.md:165` documenta
+    `POST /ai/optimize`, mas nao contem `swap_integrity` nem `deck_signature`.
   - `POST /ai/archetypes` le `userId` e busca o deck por `id + user_id` em
     `server/routes/ai/archetypes/index.dart:35`-`:47`.
   - `OptimizeJobStore.create` exige `String userId` em
@@ -765,9 +793,10 @@ apenas para os demais helpers abaixo.
     declara `flutter_test`, mas sem package config o runner nao resolveu a
     dependencia.
 - **Impacto**: o risco de acesso cross-owner nos fluxos principais de optimize
-  continua removido. Os tres riscos remanescentes de confiabilidade/contrato
-  desta secao foram fechados no checkout atual; o risco residual e manter os
-  source guards quando o fluxo de learned decks evoluir.
+  continua removido, e a protecao runtime de `swap_integrity` esta coerente. O
+  risco atual e documental: consumidores e agentes podem nao saber que
+  `swap_integrity`/`deck_signature` sao campos opcionais/aditivos de
+  `/ai/optimize` que o app atual ja usa para bloquear apply stale.
 - **Acao recomendada**:
   1. manter `activation_events_contract_test.dart` quando novos eventos forem
      emitidos pelo app;
@@ -776,12 +805,17 @@ apenas para os demais helpers abaixo.
   3. preservar a decisao auth-only de `/ai/commander-learning` enquanto a rota
      seguir sendo leitura local de PostgreSQL sem chamada LLM/externa;
   4. manter testes owner vs non-owner para qualquer rota nova que aceite
-     `deck_id`, usando optimize/archetypes como padrao positivo atual.
+     `deck_id`, usando optimize/archetypes como padrao positivo atual;
+  5. documentar `swap_integrity` em `server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+     como campo opcional/aditivo de `POST /ai/optimize`, com shape e regra de
+     compatibilidade para clientes antigos.
 - **Validacao**:
   - `cd server && dart test test/activation_events_contract_test.dart test/ai_generate_learning_boundary_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`;
   - `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`;
+  - `cd server && dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_quality_gate.dart lib/edh_bracket_policy.dart lib/ai/optimize_swap_integrity.dart routes/ai/optimize/index.dart`;
+  - `cd server && dart test test/optimize_route_payload_support_test.dart test/optimize_route_response_support_test.dart test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart --reporter compact`;
   - apos restaurar `app/.dart_tool/package_config.json`, rodar
-    `cd app && flutter test --no-pub test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/providers/deck_provider_test.dart`.
+    `cd app && flutter test --no-pub test/features/decks/widgets/deck_optimize_flow_support_test.dart test/features/decks/providers/deck_provider_test.dart`.
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
 - **Status 2026-06-19 15:00 UTC: REVALIDADO no checkout `f80b2da2`.**

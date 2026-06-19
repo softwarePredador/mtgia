@@ -36,9 +36,159 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-19 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-19 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib` - revalidacao 2026-06-19 23:00 UTC
+
+Escopo desta rodada: somente coerencia de contratos, ownership, middleware,
+payloads e consumo entre `app/lib`, `server/routes` e `server/lib`. Nao foi
+executada auditoria ampla de classes sem uso, funcoes sem chamador,
+imports/ciclos, tabelas PostgreSQL sem uso ou duplicacao geral.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `19f589e7`.
+- `git diff --name-status 523589bc..HEAD -- app/lib server/lib server/routes ...`:
+  desde a ultima rodada de coerencia, o delta vivo no recorte auditado ficou em
+  `app/lib/features/decks/providers/deck_provider.dart`,
+  `app/lib/features/decks/providers/deck_provider_support_mutation.dart`,
+  `app/lib/features/decks/screens/deck_details_screen.dart`,
+  `app/lib/features/decks/widgets/deck_optimize_flow_support.dart`,
+  `server/lib/ai/optimization_functional_roles.dart`,
+  `server/lib/ai/optimization_quality_gate.dart` e
+  `server/lib/edh_bracket_policy.dart`. Nenhum arquivo em `server/routes` ou
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` mudou nesse intervalo.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, trechos relevantes de
+`server/manual-de-instrucao.md` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+A skill local `manaloom-data-semantic-layer` tambem foi carregada; a regra
+relevante para esta rodada e tratar PostgreSQL/backend como fonte de verdade de
+produto e Hermes como laboratorio/auditor/cache.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib` nem entende contrato app-facing, ownership ou middleware.
+- O script segue textual/regex e nao constroi grafo de contratos entre provider,
+  rota e helper.
+- A execucao voltou a inserir inventario gerado e duplicar historico manual sob
+  o marcador `## Historico gerado pelo auditor estrutural anterior`. Essa
+  mutacao mecanica foi revertida antes desta atualizacao, mantendo apenas os
+  numeros acima e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- Comparei o delta desde `523589bc` apenas em `app/lib`, `server/lib`,
+  `server/routes`, testes focados e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- Revalidei por `rg`/`nl -ba` os caminhos de optimize tocados pelo delta:
+  `swap_integrity`, `deck_signature`, `applyOptimizationWithIds`,
+  `removals_detailed`, `additions_detailed`, `buildOptimizeDeckSignature`,
+  `optimization_functional_roles`, `optimization_quality_gate` e
+  `edh_bracket_policy`.
+- Validacoes executadas:
+  - `cd server && dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_quality_gate.dart lib/edh_bracket_policy.dart lib/ai/optimize_swap_integrity.dart routes/ai/optimize/index.dart`: `No issues found!`.
+  - `cd server && dart test test/optimize_route_payload_support_test.dart test/optimize_route_response_support_test.dart test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart --reporter compact`: `All tests passed!`.
+  - `cd app && flutter test --no-pub test/features/decks/widgets/deck_optimize_flow_support_test.dart test/features/decks/providers/deck_provider_test.dart`: nao executou testes; `app/.dart_tool/package_config.json` esta ausente e o runner reportou que nao consegue resolver `flutter_test`/`test`, embora `app/pubspec.yaml:64`-`:66` declare `flutter_test`.
+
+### Achados revalidados
+
+#### Status ajustado - `swap_integrity` agora tem consumo app, mas falta contrato app-facing documentado
+
+- **Backend emite o payload:** `server/routes/ai/optimize/index.dart:723`-`:733`
+  anexa `swap_integrity` via `buildSwapIntegrityForResponse` quando a resposta
+  tem `removals_detailed` ou `additions_detailed`.
+- **Shape backend:** `server/lib/ai/optimize_swap_integrity.dart:38`-`:45`
+  serializa `version`, `algo`, `hash`, `deck_signature`, `removal_count` e
+  `addition_count`; `:139`-`:163` monta o bloco a partir das listas detailed.
+- **Consumo app atual:** `app/lib/features/decks/widgets/deck_optimize_flow_support.dart:341`-`:344`
+  parseia `swap_integrity`; `:398`-`:424` modela o payload; `:486`-`:517`
+  recalcula o hash e rejeita divergencia; `:805`-`:837` passa
+  `expectedDeckSignature` para o apply por IDs.
+- **Protecao app contra deck stale:** `app/lib/features/decks/providers/deck_provider.dart:927`-`:935`
+  recalcula a assinatura local antes do `PUT /decks/:id` e rejeita se o deck
+  mudou desde a sugestao.
+- **Assinatura coerente entre app e backend:** o backend monta
+  `deck_signature` como lista ordenada `cardId:quantity` em
+  `server/lib/ai/optimize_cache_support.dart:3`-`:11`; o app usa o mesmo
+  formato em `app/lib/features/decks/providers/deck_provider_support_mutation.dart:392`-`:403`.
+  A rota de detalhe separa commander e main board em
+  `server/routes/decks/[id]/index.dart:398`-`:407` e responde ambos em
+  `:512`-`:514`; o parser app le `commander` e `main_board` separadamente em
+  `app/lib/features/decks/models/deck_details.dart:34`-`:50`.
+- **Testes app existem mas nao rodaram localmente:** `app/test/features/decks/widgets/deck_optimize_flow_support_test.dart:50`-`:99`
+  cobre hash valido e propagacao de `expectedDeckSignature`;
+  `app/test/features/decks/providers/deck_provider_test.dart:1002`-`:1035`
+  cobre rejeicao de assinatura stale antes do PUT. A limitacao local e o
+  `package_config.json` ausente, nao a ausencia de testes no repo.
+- **Contrato app-facing ausente:** `server/doc/API_CONTRACTS_AND_DATA_MAP.md:165`
+  documenta `POST /ai/optimize` e enumera muitos campos de sucesso/diagnostico,
+  mas `rg -n "swap_integrity|deck_signature" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  nao encontra nenhum registro do payload agora consumido pelo app.
+- **Por que e incoerente:** `swap_integrity` deixou de ser apenas diagnostico
+  backend e passou a influenciar o caminho app de aplicacao de swaps. Pelo
+  proprio contrato documental, campo app-facing consumido por provider/widget
+  precisa estar descrito no API map.
+- **O que valida:** atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` para
+  listar `swap_integrity` como campo opcional/aditivo de `POST /ai/optimize`,
+  com shape e sem obrigatoriedade para clientes antigos; adicionar/ajustar
+  guard de contrato se necessario.
+- **O que falsifica:** decisao explicita de tratar `swap_integrity` como
+  puramente interno e remover o consumo app, ou prova de que outro documento
+  app-facing versionado ja cobre esse campo.
+
+#### Status preservado - ownership e middleware dos gaps anteriores continuam saneados
+
+- `POST /ai/optimize` continua owner-scoped: `server/routes/ai/optimize/index.dart`
+  exige usuario autenticado antes de carregar contexto, e
+  `server/lib/ai/optimize_request_support.dart:64`-`:84` consulta `decks` por
+  `id + user_id`.
+- O delta desde `523589bc` nao tocou `server/routes/ai/_middleware.dart`,
+  `server/routes/users/me/activation-events/index.dart`,
+  `server/routes/ai/commander-learning/index.dart` nem
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; portanto os fechamentos da
+  rodada anterior para `deck_rebuild_created`, `/ai/commander-learning` e
+  auth-only de learned decks permanecem validos.
+- As mudancas em `server/lib/ai/optimization_functional_roles.dart`,
+  `server/lib/ai/optimization_quality_gate.dart` e
+  `server/lib/edh_bracket_policy.dart` alteram classificacao/gate de optimize,
+  mas nao mudaram shape de request/response nem introduziram novo consumidor
+  direto em `app/lib`.
+
+### Resultado desta rodada
+
+Houve um achado P2 de coerencia documental: `swap_integrity` e
+`deck_signature` agora sao payload app-facing de `/ai/optimize`, com consumo e
+validacao no app, mas seguem ausentes do API contract map. O runtime app/backend
+esta coerente no algoritmo de hash e assinatura; o residual operacional e que
+os testes app-side focados nao puderam rodar localmente sem
+`app/.dart_tool/package_config.json`.
 
 ## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-19 19:00 UTC
 
