@@ -736,6 +736,10 @@
   `activation_cost=sacrifice_creature`, limitado a unlock contextual real no
   `precombat_main`, sem sacrificar comandante e sem gerar mana gratis na
   resolucao do permanente.
+- Atualização 2026-06-19: o teste focado
+  `test_ashnods_altar_sacrifices_token_only_for_contextual_mana_unlock`
+  valida o caminho genérico com token sacrificável, payoff real destravado,
+  evento `utility_artifact_activated` e `decision_trace`.
 - O gap real mudou:
   - falta ampliar a capability para outros permanentes recorrentes do corpus;
   - falta modelar melhor valor da criatura sacrificada vs payoff real;

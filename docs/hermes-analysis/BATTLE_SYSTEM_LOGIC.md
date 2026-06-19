@@ -1135,9 +1135,12 @@ Risco operacional remanescente:
   - `Incubation Druid` deixou de depender de `needs_review` generico e passou a
     ter comportamento parcial coerente com summoning sickness e mana baseline;
   - `Ashnod's Altar` deixou de colapsar em `ramp_ritual` e passou a ter
-    ativacao contextual minima para `sacrifice_creature -> mana unlock`, mas o
-    custo ainda nao esta coberto por executor generico completo nem por
-    heuristica de combo;
+    ativacao contextual minima para `sacrifice_creature -> mana unlock`;
+    em 2026-06-19 o teste
+    `test_ashnods_altar_sacrifices_token_only_for_contextual_mana_unlock`
+    validou que o runtime sacrifica token apenas quando a mana destrava payoff
+    real e registra replay event + decision trace. Isso ainda nao autoriza
+    heuristica de combo generica fora de cenarios focados;
   - no fechamento incremental seguinte do mesmo dia, `Basking Broodscale` e
     `Scavenging Ooze` deixaram de aparecer em cast ao vivo como
     `known_cards_canonical_snapshot/needs_review`: ambas foram promovidas para

@@ -2326,6 +2326,78 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_ashnods_altar_sacrifices_token_only_for_contextual_mana_unlock():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        active = player("Active")
+        opponent = player("Opponent")
+        token = battle.create_creature_token(
+            active,
+            name="Servo Token",
+            power=1,
+            toughness=1,
+        )
+        altar = {
+            "name": "Ashnod's Altar",
+            "cmc": 3,
+            "type_line": "Artifact",
+            "effect": "sacrifice_mana_outlet",
+            "activated_mana_ability": True,
+            "activation_cost": "sacrifice_creature",
+            "mana_produced": 2,
+            "produces": "C",
+            "_rule_source": "focused_test",
+            "_rule_review_status": "verified",
+        }
+        active.battlefield.extend(
+            [
+                altar,
+                {"name": "Wastes", "effect": "land", "type_line": "Basic Land", "produces": "C", "mana_produced": 1},
+            ]
+        )
+        active.hand = [
+            {
+                "name": "Approach of the Second Sun",
+                "cmc": 7,
+                "mana_cost": "{3}",
+                "type_line": "Sorcery",
+            }
+        ]
+        active.refresh_mana_sources(turn=4)
+
+        activations = battle.activate_sacrifice_mana_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            phase="precombat_main",
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+        battle.DECISION_TRACE_HANDLER = None
+
+        assert activations == 1
+        assert active.available_mana() == 3
+        assert token not in active.battlefield
+        assert altar in active.battlefield
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Ashnod's Altar"
+            and data.get("activation_kind") == "sacrifice_creature_for_mana_unlock"
+            and data.get("sacrificed") == "Servo Token"
+            and data.get("unlock_target") == "Approach of the Second Sun"
+            and data.get("mana_added") == 2
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("action") == "activate_sacrifice_mana_artifact"
+            and decision.get("chosen_option", {}).get("card") == "Approach of the Second Sun"
+            and "sacrifice_creature" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_goblin_bombardment_sacrifices_expendable_token_for_damage():
         events = []
         decisions = []
@@ -2549,6 +2621,7 @@ def register_tests(battle, player):
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
+        test_ashnods_altar_sacrifices_token_only_for_contextual_mana_unlock,
         test_goblin_bombardment_sacrifices_expendable_token_for_damage,
         test_goblin_bombardment_skips_without_expendable_creature,
         test_iron_man_attack_trigger_sacrifices_treasure_for_artifact_tutor,
