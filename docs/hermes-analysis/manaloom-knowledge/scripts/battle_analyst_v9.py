@@ -11386,7 +11386,18 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                 rng,
             )
         else:
-            player.draw(n, rng)
+            drawn = player.draw(n, rng)
+            emit_replay_event(
+                "draw_cards_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                cards_drawn=len(drawn),
+                requested_draw_count=int(n or 0),
+                library_remaining=len(player.library),
+                hand_size=len(player.hand),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "hand_filter":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):

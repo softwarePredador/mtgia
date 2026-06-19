@@ -2663,6 +2663,24 @@ Atualização do slice de 2026-06-19:
     qualquer promoção, cada subtipo precisa template próprio: ETB damage,
     static anthem, cost reducer, draw/ramp trigger, tax effect, token engine,
     upkeep trigger ou attack trigger.
+- Slice adicional de compra simples:
+  - `manaloom_new_card_candidate_review.py` passou a tratar papel `draw` como
+    exigindo `needs_rule_review` quando não há regra battle confiável. Compra
+    de cartas altera estado real da partida e não deve ficar apenas como backlog
+    sem replay;
+  - `battle_analyst_v9.py` agora emite `draw_cards_resolved` para resolução
+    não-wheel de `draw_cards`, permitindo auditoria explícita do número de
+    cartas compradas;
+  - `manaloom_battle_rule_focused_evidence.py` ganhou template estreito para
+    oracle text exato `Draw a card.`, usando regra temporária SQLite no
+    `battle_rule_registry` com `effect=draw_cards/count=1`;
+  - o teste prova que a carta comprada sai do grimório para a mão, o spell vai
+    ao graveyard, o oponente não compra carta e o replay não tem findings
+    críticos/high;
+  - o fixture controlado de consumidores passou de 12 para 13 drafts elegíveis.
+  - escopo propositalmente não cobre ainda `Draw two cards.`, loot/rummage,
+    impulse draw/exile play, wheel, cantrip com rider, compra condicional ou
+    draw engine permanente.
 
 Pendências P1 agora priorizadas:
 
@@ -2680,6 +2698,10 @@ Pendências P1 agora priorizadas:
     ainda precisa executor próprio antes de qualquer promoção;
   - `mana_or_resource_acceleration`, excluindo o subcaso já coberto de
     `Create a Treasure token.`.
+- Expandir `card_advantage_or_selection` somente por templates estreitos. O
+  subcaso `Draw a card.` já tem evidência; os próximos candidatos seguros são
+  compra simples de quantidade fixa e, separadamente, loot/rummage/impulse/wheel
+  com estratégia própria.
 - Expandir `targeted_interaction` e `mass_removal_or_modal_wipe` somente para
   variantes que não sejam os templates simples já cobertos. Exemplos: destroy
   target permanent com rider, exile target creature/permanent, modal wipe,

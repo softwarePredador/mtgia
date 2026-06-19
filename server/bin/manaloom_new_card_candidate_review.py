@@ -298,6 +298,7 @@ def battle_rule_status(card: CardRecord, roles: list[str]) -> str:
             "removal",
             "board_wipe",
             "protection",
+            "draw",
             "tutor",
             "engine",
             "wincon",
