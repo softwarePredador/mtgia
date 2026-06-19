@@ -1093,12 +1093,13 @@ Resultado de controle:
   simples de quantidade fixa curta. Wheels, rummage/loot, impulse draw, compra
   condicional e draw engines permanentes continuam exigindo templates separados.
 - `Exile target creature.`, `Exile target nonland permanent.`, `Exile target
-  artifact.` e `Exile target enchantment.` agora têm focused evidence próprio:
-  a carta entra na fila como `targeted_interaction`, o teste injeta regra
-  temporária com `destination=exile`, o replay registra `destination=exile` e o
-  alvo precisa terminar no exile, não no graveyard. A promoção segue
-  manual/report-only; exile target permanent genérico ou variantes com riders
-  ainda exigem templates separados.
+  artifact.`, `Exile target enchantment.` e `Exile target artifact or
+  enchantment.` agora têm focused evidence próprio: a carta entra na fila como
+  `targeted_interaction`, o teste injeta regra temporária com
+  `destination=exile`, o replay registra `destination=exile` e o alvo precisa
+  terminar no exile, não no graveyard. A promoção segue manual/report-only;
+  exile target permanent genérico ou variantes com riders ainda exigem
+  templates separados.
 
 Correção crítica associada ao wipe:
 

@@ -336,11 +336,12 @@ P1:
   de loot/rummage, impulse draw, wheel, cantrip com rider e draw engine
   continuam separadas para evitar promoção ampla demais;
 - `targeted_interaction` com exílio continua separado dos destroys: `Exile
-  target creature.`, `Exile target nonland permanent.`, `Exile target artifact.`
-  e `Exile target enchantment.` agora têm focused evidence report-only com
-  destino `exile` explícito no replay, alvo ausente do graveyard e promotion
-  gate apenas elegível para revisão manual. Exile target permanent genérico e
-  versões com riders ainda exigem templates próprios;
+  target creature.`, `Exile target nonland permanent.`, `Exile target artifact.`,
+  `Exile target enchantment.` e `Exile target artifact or enchantment.` agora
+  têm focused evidence report-only com destino `exile` explícito no replay,
+  alvo ausente do graveyard e promotion gate apenas elegível para revisão
+  manual. Exile target permanent genérico e versões com riders ainda exigem
+  templates próprios;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;

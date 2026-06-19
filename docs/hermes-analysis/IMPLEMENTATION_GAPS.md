@@ -2684,9 +2684,10 @@ Atualização do slice de 2026-06-19:
     engine permanente.
 - Slice adicional de remoção por exílio:
   - `Exile target creature.`, `Exile target nonland permanent.`, `Exile target
-    artifact.` e `Exile target enchantment.` continuam entrando na fila
-    `needs_rule_review` como `targeted_interaction`, mas agora têm focused
-    evidence próprio antes de qualquer promoção manual;
+    artifact.`, `Exile target enchantment.` e `Exile target artifact or
+    enchantment.` continuam entrando na fila `needs_rule_review` como
+    `targeted_interaction`, mas agora têm focused evidence próprio antes de
+    qualquer promoção manual;
   - `battle_analyst_v9.py` aceita `destination=exile` em regras verificadas de
     `remove_creature`/`remove_permanent` e registra esse destino no evento
     `removal_resolved`;

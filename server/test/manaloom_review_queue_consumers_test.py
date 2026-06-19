@@ -491,6 +491,40 @@ def _write_exile_permanent_type_fixture(tmp: Path) -> Path:
     return path
 
 
+def _write_exile_artifact_or_enchantment_fixture(tmp: Path) -> Path:
+    fixture = {
+        "commanders": [
+            {
+                "name": "Brago, King Eternal",
+                "source": "fixture_control",
+                "color_identity": ["W", "U"],
+                "existing_cards": [],
+                "role_counts": {
+                    "removal": 0,
+                },
+            }
+        ],
+        "cards": [
+            {
+                "card_id": "card-clean-exile-artifact-or-enchantment",
+                "oracle_id": "oracle-clean-exile-artifact-or-enchantment",
+                "name": "Clean Exile Artifact Or Enchantment",
+                "mana_cost": "{1}{W}",
+                "type_line": "Instant",
+                "oracle_text": "Exile target artifact or enchantment.",
+                "color_identity": ["W"],
+                "cmc": 2,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["removal"],
+            },
+        ],
+    }
+    path = tmp / "exile_artifact_or_enchantment_fixture.json"
+    path.write_text(json.dumps(fixture), encoding="utf-8")
+    return path
+
+
 class ManaloomReviewQueueConsumersTest(unittest.TestCase):
     def test_consumers_do_not_fail_before_candidate_review_runs(self) -> None:
         data_gap = _load_module(
@@ -1435,6 +1469,100 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             )
             self.assertEqual(gate_summary["evaluated_count"], 2)
             self.assertEqual(gate_summary["eligible_count"], 2)
+            self.assertEqual(gate_summary["blocked_count"], 0)
+
+    def test_exile_artifact_or_enchantment_uses_combined_template_before_promotion(self) -> None:
+        candidate = _load_module(
+            "manaloom_new_card_candidate_review_exile_artifact_or_enchantment",
+            "bin/manaloom_new_card_candidate_review.py",
+        )
+        battle_queue = _load_module(
+            "manaloom_battle_rule_review_queue_exile_artifact_or_enchantment",
+            "bin/manaloom_battle_rule_review_queue.py",
+        )
+        focused_evidence = _load_module(
+            "manaloom_battle_rule_focused_evidence_exile_artifact_or_enchantment",
+            "bin/manaloom_battle_rule_focused_evidence.py",
+        )
+        promotion_gate = _load_module(
+            "manaloom_battle_rule_promotion_gate_exile_artifact_or_enchantment",
+            "bin/manaloom_battle_rule_promotion_gate.py",
+        )
+
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            tmp = Path(raw_tmp)
+            fixture = _write_exile_artifact_or_enchantment_fixture(tmp)
+            knowledge_db = tmp / "knowledge.db"
+
+            candidate_summary = candidate.run(
+                candidate.parse_args(
+                    [
+                        "--fixture",
+                        str(fixture),
+                        "--output-dir",
+                        str(tmp / "candidate"),
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--no-lorehold-control",
+                    ]
+                )
+            )
+            self.assertEqual(candidate_summary["decisions"].get("needs_rule_review"), 1)
+
+            battle_summary = battle_queue.run(
+                battle_queue.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "battle"),
+                    ]
+                )
+            )
+            self.assertEqual(battle_summary["draft_count"], 1)
+            drafts = json.loads(
+                (
+                    tmp
+                    / "battle"
+                    / "battle_rule_review_queue"
+                    / "latest_drafts.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertIn("targeted_interaction", drafts[0]["effect_families"])
+
+            evidence_summary = focused_evidence.run(
+                focused_evidence.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "focused"),
+                        "--limit",
+                        "0",
+                    ]
+                )
+            )
+            self.assertEqual(evidence_summary["evaluated_count"], 1)
+            self.assertEqual(evidence_summary["evidence_count"], 1)
+            self.assertEqual(
+                evidence_summary["reasons"].get("exile_target_artifact_or_enchantment_supported"),
+                1,
+            )
+
+            gate_summary = promotion_gate.run(
+                promotion_gate.parse_args(
+                    [
+                        "--knowledge-db",
+                        str(knowledge_db),
+                        "--output-dir",
+                        str(tmp / "gate"),
+                        "--limit",
+                        "0",
+                    ]
+                )
+            )
+            self.assertEqual(gate_summary["evaluated_count"], 1)
+            self.assertEqual(gate_summary["eligible_count"], 1)
             self.assertEqual(gate_summary["blocked_count"], 0)
 
 
