@@ -5934,6 +5934,191 @@ def _utility_artifact_skip_event(player, permanent, turn, reason, *, phase, risk
     )
 
 
+def _sacrifice_damage_skip_event(player, permanent, turn, reason, *, phase, risk_flags=None):
+    emit_replay_event(
+        "activated_ability_skipped",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        reason="strategic_guardrail",
+        strategic_guardrail_reason=reason,
+        strategic_risk_flags=list(risk_flags or []),
+        activation_kind="sacrifice_creature_damage",
+        phase=phase,
+        turn=turn,
+    )
+
+
+def _is_expendable_sacrifice_creature(creature):
+    if not isinstance(creature, dict) or not is_battlefield_creature(creature):
+        return False
+    if creature.get("is_commander"):
+        return False
+    if creature.get("is_mana_source"):
+        return False
+    return True
+
+
+def _sacrifice_damage_creature_score(creature):
+    type_line = str(creature.get("type_line") or "").lower()
+    is_token = bool(creature.get("is_token")) or creature.get("tag") == "token" or "token" in type_line
+    power = int(float(creature.get("power") or 0))
+    toughness = int(float(creature.get("toughness") or 0))
+    cmc = int(float(creature.get("cmc") or 0))
+    score = 20
+    if is_token:
+        score += 18
+    score -= power * 3 + toughness * 2 + cmc * 2
+    if creature.get("summoning_sick"):
+        score += 3
+    return score
+
+
+def activate_sacrifice_damage_outlets(player, opponents, all_players, turn, rng, *, phase="precombat_main"):
+    """Activate simple sacrifice outlets that convert an expendable creature into damage.
+
+    This is intentionally narrow: it models permanents such as Goblin
+    Bombardment only when the rule explicitly marks a sacrifice-creature damage
+    outlet. It does not make all activated abilities executable.
+    """
+    if not player.is_alive():
+        return 0
+    outlets = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and not permanent.get("utility_activation_used_this_turn")
+        and (
+            permanent.get("activated_sacrifice_creature_damage")
+            or permanent.get("sacrifice_creature_damage")
+            or permanent.get("effect") == "sacrifice_damage_outlet"
+        )
+    ]
+    if not outlets:
+        return 0
+    targets = [opponent for opponent in opponents if opponent.is_alive()]
+    if not targets:
+        return 0
+
+    for outlet in outlets:
+        creatures = [
+            creature
+            for creature in player.battlefield
+            if creature is not outlet and _is_expendable_sacrifice_creature(creature)
+        ]
+        if not creatures:
+            _sacrifice_damage_skip_event(
+                player,
+                outlet,
+                turn,
+                "no_expendable_creature_to_sacrifice",
+                phase=phase,
+            )
+            continue
+
+        scored_creatures = sorted(
+            (
+                {
+                    "creature": creature,
+                    "score": _sacrifice_damage_creature_score(creature),
+                }
+                for creature in creatures
+            ),
+            key=lambda item: item["score"],
+            reverse=True,
+        )
+        chosen_creature = scored_creatures[0]["creature"]
+        if scored_creatures[0]["score"] < 18:
+            _sacrifice_damage_skip_event(
+                player,
+                outlet,
+                turn,
+                "creature_cost_too_high_for_one_damage",
+                phase=phase,
+                risk_flags=["high_board_value_creature"],
+            )
+            continue
+
+        target = min(targets, key=lambda opponent: opponent.life)
+        damage = int(outlet.get("damage") or outlet.get("activation_damage") or 1)
+        if chosen_creature in player.battlefield:
+            player.battlefield.remove(chosen_creature)
+        type_line = str(chosen_creature.get("type_line") or "").lower()
+        is_token = (
+            bool(chosen_creature.get("is_token"))
+            or chosen_creature.get("tag") == "token"
+            or "token" in type_line
+        )
+        if is_token:
+            emit_replay_event(
+                "token_ceased_to_exist",
+                player=player.name,
+                token=chosen_creature.get("name", "?"),
+                from_zone="battlefield",
+                turn=turn,
+            )
+        else:
+            player.graveyard.append(chosen_creature)
+        deal_damage(target, damage)
+        outlet["utility_activation_used_this_turn"] = True
+
+        available_options = [
+            decision_card_option(
+                item["creature"],
+                action="sacrifice_for_damage",
+                effect="sacrifice_damage_outlet",
+                score=item["score"],
+                target=target.name,
+            )
+            for item in scored_creatures[:8]
+        ]
+        emit_decision_trace(
+            decision_type="activated_sacrifice_damage",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=available_options,
+            chosen_option=available_options[0],
+            rejected_options=available_options[1:],
+            score_components={
+                "damage": damage,
+                "target": target.name,
+                "target_life_after": target.life,
+                "creature_options": len(scored_creatures),
+            },
+            rule_source=outlet.get("_rule_source", "focused_battle_rule_evidence"),
+            rule_status=outlet.get("_rule_review_status", "needs_review"),
+            confidence="medium",
+            expected_benefit_score=available_options[0].get("score", 0),
+            actual_outcome="creature_sacrificed_damage_dealt",
+            reason="sacrifice_low_value_creature_for_relevant_damage",
+            strategic_principle="convert_expendable_creature_into_reach_or_interaction",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "creatures": -1,
+                "damage": damage,
+                "target": target.name,
+            },
+            risk_flags=["sacrifice_creature"],
+            rejected_reason="lower_sacrifice_value_score",
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=outlet.get("name", "?"),
+            activation_kind="sacrifice_creature_damage",
+            sacrificed=chosen_creature.get("name", "?"),
+            target=target.name,
+            damage_dealt=damage,
+            target_life_after=target.life,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(outlet),
+        )
+        check_sbas_until_stable(all_players)
+        return 1
+    return 0
+
+
 def creature_sacrifice_has_strategic_benefit(player, creature, chosen_unlock):
     if not isinstance(creature, dict) or chosen_unlock is None:
         return False, ["missing_context"], "missing_context"

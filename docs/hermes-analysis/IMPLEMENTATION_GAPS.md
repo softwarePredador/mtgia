@@ -26,30 +26,42 @@
   - sem write em PostgreSQL;
   - sem promoção automática para `verified`;
   - sem comportamento duro no battle;
-  - template suportado apenas para `Counter target spell.` com família
-    `counterspell_stack_interaction`.
+  - templates suportados para counterspell simples, sacrifice outlet de dano
+    simples e extra combat + flashback simples.
 - Evidência gerada:
   - cenário focado no `battle_analyst_v9.py`;
   - replay events JSONL;
   - decision trace JSONL;
   - auditoria de replay/decisão sem critical/high;
   - arquivo `latest_evidence.json` consumido pelo promotion gate.
-- Resultado da rodada local `msh,msc,mar`, 8 comandantes e 166 cartas:
+- Resultado inicial da rodada local `msh,msc,mar`, 8 comandantes e 166 cartas:
   - candidate review: `1328` reviews, `needs_rule_review=11`,
     `needs_data=0`;
   - battle rule queue: `11` ocorrências agregadas em `4` drafts;
   - focused evidence: `4` drafts avaliados, `1` evidência gerada;
   - promotion gate com evidência padrão: `eligible=1`, `blocked=3`.
-- Draft elegível:
+- Resultado atualizado com templates focados adicionais:
+  - focused evidence: `4` drafts avaliados, `3` evidências geradas;
+  - promotion gate com evidência padrão: `eligible=3`, `blocked=1`.
+- Drafts elegíveis:
   - `Counterspell` ficou `eligible_for_manual_verified_promotion`;
+  - `Goblin Bombardment` ficou `eligible_for_manual_verified_promotion`
+    com cenário de sacrifice outlet de dano;
+  - `Seize the Day` ficou `eligible_for_manual_verified_promotion` com
+    cenário de extra combat + flashback;
   - isso **não** grava em `card_battle_rules` e **não** ativa regra dura.
 - Drafts ainda bloqueados:
-  - `Goblin Bombardment`: precisa template focado de habilidade ativada,
-    sacrifício de criatura e dano alvo;
   - `Iron Man, Titan of Innovation`: precisa executor contextual para trigger
-    de ataque, contagem de artefatos, treasure e tutor;
-  - `Seize the Day`: precisa template focado para extra combat +
-    flashback/recast.
+    de ataque, contagem de artefatos, treasure e tutor.
+- Rodada real read-only local contra PostgreSQL para `msh,msc,mar`, 8
+  comandantes e 166 cartas, confirmou:
+  - `needs_rule_review=22`;
+  - `7` drafts agregados;
+  - `3` evidências focadas;
+  - `3` elegíveis para promoção manual (`Counterspell`,
+    `Goblin Bombardment`, `Seize the Day`);
+  - `4` ainda bloqueados: `Concerted Effort`, `Final Showdown`,
+    `Iron Man, Titan of Innovation`, `Warleader's Call`.
 - Battle/replay:
   - `lorehold_upkeep_rummage` passou a registrar opções rejeitadas e scores
     comparativos;
@@ -188,6 +200,8 @@
     `card_battle_rules` `verified/active`, com diff auditável e teste focado;
   - conectar rules verified/active à derivação segura de `card_function_tags`
     somente quando trusted e traceable;
+  - criar executor focado para triggers de ataque + treasure + artifact tutor,
+    começando por `Iron Man, Titan of Innovation`;
   - rodar scorecard Lorehold apenas com candidatos que passaram por esse gate
     ou que não dependem de executor battle.
 

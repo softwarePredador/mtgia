@@ -98,6 +98,17 @@ def _write_counterspell_gate_fixture(tmp: Path) -> Path:
                     "removal": 0,
                 },
             },
+            {
+                "name": "Kykar, Wind's Fury",
+                "source": "fixture_control",
+                "color_identity": ["U", "R", "W"],
+                "existing_cards": [],
+                "role_counts": {
+                    "engine": 0,
+                    "tutor": 0,
+                    "ramp": 0,
+                },
+            },
         ],
         "cards": [
             {
@@ -128,6 +139,36 @@ def _write_counterspell_gate_fixture(tmp: Path) -> Path:
                 "semantic_tags_v2": [
                     {"protection_type": "sacrifice_outlet"},
                     {"recursion_type": "graveyard_synergy"},
+                ],
+            },
+            {
+                "card_id": "card-seize-the-day",
+                "oracle_id": "oracle-seize-the-day",
+                "name": "Seize the Day",
+                "mana_cost": "{3}{R}",
+                "type_line": "Sorcery",
+                "oracle_text": "Untap target creature. After this main phase, there is an additional combat phase followed by an additional main phase. Flashback {2}{R}",
+                "color_identity": ["R"],
+                "cmc": 4,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["recursion", "payoff"],
+            },
+            {
+                "card_id": "card-iron-man",
+                "oracle_id": "oracle-iron-man",
+                "name": "Iron Man, Titan of Innovation",
+                "mana_cost": "{2}{U}{R}",
+                "type_line": "Legendary Artifact Creature — Human Hero",
+                "oracle_text": "Whenever Iron Man attacks, create a Treasure token. Then you may sacrifice an artifact. If you do, search your library for an artifact card with mana value less than or equal to the number of artifacts you control, put it onto the battlefield, then shuffle.",
+                "color_identity": ["U", "R"],
+                "cmc": 4,
+                "set_code": "mar",
+                "legalities": {"commander": "legal"},
+                "function_tags": ["engine", "ramp", "tutor", "payoff"],
+                "semantic_tags_v2": [
+                    {"engine_type": "attack_trigger"},
+                    {"tutor_type": "artifact_tutor"},
                 ],
             },
         ],
@@ -459,7 +500,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(battle_summary["draft_count"], 2)
+            self.assertEqual(battle_summary["draft_count"], 4)
 
             evidence_summary = focused_evidence.run(
                 focused_evidence.parse_args(
@@ -471,8 +512,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(evidence_summary["evaluated_count"], 2)
-            self.assertEqual(evidence_summary["evidence_count"], 1)
+            self.assertEqual(evidence_summary["evaluated_count"], 4)
+            self.assertEqual(evidence_summary["evidence_count"], 3)
 
             evidence_file = (
                 tmp
@@ -493,8 +534,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                     ]
                 )
             )
-            self.assertEqual(gate_summary["evaluated_count"], 2)
-            self.assertEqual(gate_summary["eligible_count"], 1)
+            self.assertEqual(gate_summary["evaluated_count"], 4)
+            self.assertEqual(gate_summary["eligible_count"], 3)
             self.assertEqual(gate_summary["blocked_count"], 1)
 
             items = json.loads(
@@ -510,7 +551,15 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 decisions["Counterspell"],
                 "eligible_for_manual_verified_promotion",
             )
-            self.assertEqual(decisions["Goblin Bombardment"], "blocked")
+            self.assertEqual(
+                decisions["Goblin Bombardment"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertEqual(
+                decisions["Seize the Day"],
+                "eligible_for_manual_verified_promotion",
+            )
+            self.assertEqual(decisions["Iron Man, Titan of Innovation"], "blocked")
 
 
 if __name__ == "__main__":
