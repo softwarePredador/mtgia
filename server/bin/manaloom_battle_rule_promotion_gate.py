@@ -203,12 +203,44 @@ def load_latest_drafts(conn: sqlite3.Connection, limit: int) -> list[DraftRecord
     ]
 
 
-def load_evidence(path: str | None) -> dict[str, Any]:
-    if not path:
+def resolve_evidence_path(
+    explicit_path: str | None,
+    *,
+    db_path: Path,
+    output_dir: Path,
+) -> Path | None:
+    if explicit_path:
+        return Path(explicit_path)
+
+    candidates: list[Path] = []
+    focused_dir = os.environ.get("MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE_DIR")
+    if focused_dir:
+        candidates.append(Path(focused_dir) / "latest_evidence.json")
+    artifact_root = os.environ.get("MANALOOM_OPS_ARTIFACT_DIR")
+    if artifact_root:
+        candidates.append(
+            Path(artifact_root)
+            / "battle_rule_focused_evidence"
+            / "latest_evidence.json"
+        )
+    candidates.append(output_dir.parent / "battle_rule_focused_evidence" / "latest_evidence.json")
+    if db_path.parent.exists():
+        candidates.extend(
+            sorted(db_path.parent.glob("*/battle_rule_focused_evidence/latest_evidence.json"))
+        )
+
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def load_evidence(path: Path | None) -> dict[str, Any]:
+    if path is None:
         return {}
-    evidence_path = Path(path)
+    evidence_path = path
     if not evidence_path.is_file():
-        raise FileNotFoundError(path)
+        raise FileNotFoundError(str(path))
     payload = json.loads(evidence_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError("evidence file must contain a JSON object")
@@ -448,11 +480,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         output_dir = output_dir / "battle_rule_promotion_gate"
     generated_at = utc_now().isoformat(timespec="seconds")
     run_id = "battle_rule_promotion_gate_" + utc_now().strftime("%Y%m%d_%H%M%S_%f")
-    evidence = load_evidence(args.evidence_file)
+    evidence_path = resolve_evidence_path(
+        args.evidence_file,
+        db_path=db_path,
+        output_dir=output_dir,
+    )
+    evidence = load_evidence(evidence_path)
 
     if not db_path.exists():
         summary = summarize(run_id, generated_at, [])
         summary["blocked_reason"] = "knowledge_db_missing"
+        if evidence_path is not None:
+            summary["evidence_file"] = str(evidence_path)
         write_artifacts(output_dir, run_id, summary, [])
         print("MANALOOM_BATTLE_RULE_PROMOTION_GATE " + json.dumps(summary, sort_keys=True))
         return summary
@@ -466,6 +505,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             for draft in drafts
         ]
         summary = summarize(run_id, generated_at, items)
+        if evidence_path is not None:
+            summary["evidence_file"] = str(evidence_path)
         persist(conn, summary, items)
     finally:
         conn.close()

@@ -259,6 +259,26 @@ def supports_extra_combat_flashback_template(draft: DraftRecord) -> bool:
     )
 
 
+def supports_attack_artifact_tutor_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        (
+            "attack_trigger_artifact_tutor" in draft.effect_families
+            or (
+                "whenever" in text
+                and "attacks" in text
+                and "treasure token" in text
+                and "sacrifice" in text
+                and "artifact" in text
+                and "search your library" in text
+                and "artifact card" in text
+                and "onto the battlefield" in text
+            )
+        )
+        and draft.proposed_status == "needs_review"
+    )
+
+
 def build_counterspell_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_focused_evidence",
@@ -716,6 +736,170 @@ def build_extra_combat_flashback_evidence(draft: DraftRecord, output_dir: Path) 
     )
 
 
+def build_attack_artifact_tutor_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    battle = load_module(
+        "battle_analyst_attack_artifact_tutor_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        "replay_decision_auditor_attack_artifact_tutor_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        active = battle.Player("Active", None, [], strategy="midrange")
+        opponent = battle.Player("Opponent", None, [], strategy="midrange")
+        source = {
+            "name": draft.card_name,
+            "cmc": 4,
+            "type_line": "Legendary Artifact Creature — Human Hero",
+            "oracle_text": draft.draft.get("oracle_text_excerpt"),
+            "effect": "attack_artifact_tutor",
+            "artifact_attack_tutor": True,
+            "artifact_tutor_cmc_mode": "sacrificed_mana_value_plus",
+            "artifact_tutor_sacrifice_noncreature": True,
+            "artifact_tutor_enters_tapped": True,
+            "attack_trigger": True,
+            "power": 4,
+            "toughness": 4,
+            "summoning_sick": False,
+            "tapped": False,
+            "_rule_source": "focused_battle_rule_evidence",
+            "_rule_review_status": "needs_review",
+        }
+        active.battlefield = [
+            source,
+        ]
+        active.library = [
+            {
+                "name": "Sol Ring",
+                "cmc": 1,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "mana_produced": 2,
+            },
+            {
+                "name": "High Cost Artifact",
+                "cmc": 5,
+                "type_line": "Artifact",
+                "effect": "finisher",
+            },
+        ]
+        opponent.life = 40
+        battle.combat_phase_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            rng=random.Random(10),
+            stack=battle.Stack(),
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    trigger_event = any(
+        row.get("event") == "trigger_resolved"
+        and row.get("card") == draft.card_name
+        and row.get("activation_kind") == "artifact_attack_tutor"
+        and row.get("artifact_sacrificed") == "Treasure token"
+        and row.get("found") == "Sol Ring"
+        and row.get("destination") == "battlefield"
+        and row.get("target_cmc") == 1
+        and row.get("cmc_match") == "exact"
+        and row.get("enters_tapped") is True
+        for row in event_rows
+    )
+    decision_event = any(
+        row.get("decision_type") == "attack_trigger_artifact_tutor"
+        and row.get("chosen_option", {}).get("target") == "Sol Ring"
+        for row in decision_rows
+    )
+    focused_passed = bool(
+        trigger_event
+        and decision_event
+        and any(card.get("name") == "Sol Ring" and card.get("tapped") is True for card in active.battlefield)
+        and not any(card.get("name") == "Sol Ring" for card in active.library)
+        and active.treasures == 0
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "trigger_event": trigger_event,
+            "decision_trace": decision_event,
+            "artifact_tutored_to_battlefield": any(card.get("name") == "Sol Ring" for card in active.battlefield),
+            "artifact_entered_tapped": any(card.get("name") == "Sol Ring" and card.get("tapped") is True for card in active.battlefield),
+            "treasure_sacrificed": active.treasures == 0,
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": "attack_trigger_artifact_tutor",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: attack trigger creates Treasure, may sacrifice noncreature artifact, artifact tutor with mana value one greater to battlefield tapped.",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": "hard_behavior_attack_trigger_artifact_tutor_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason="attack_trigger_artifact_tutor_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
 def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     if supports_counterspell_template(draft):
         return build_counterspell_evidence(draft, output_dir)
@@ -723,6 +907,8 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):
         return build_extra_combat_flashback_evidence(draft, output_dir)
+    if supports_attack_artifact_tutor_template(draft):
+        return build_attack_artifact_tutor_evidence(draft, output_dir)
     return EvidenceResult(
         draft=draft,
         status="unsupported",

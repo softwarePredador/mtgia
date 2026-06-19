@@ -57,6 +57,14 @@ def infer_effect_families_from_text(oracle_text: str) -> list[str]:
         families.add("library_search_or_selection")
     if "treasure token" in text:
         families.add("treasure_resource_generation")
+    if (
+        "whenever" in text
+        and "attacks" in text
+        and "sacrifice" in text
+        and "artifact" in text
+        and "search your library" in text
+    ):
+        families.add("attack_trigger_artifact_tutor")
     if "draw a card" in text or "draw cards" in text:
         families.add("card_advantage_or_selection")
     if "destroy all" in text or "exile all" in text:
