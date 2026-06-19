@@ -38,10 +38,34 @@ ROLE_TO_EFFECT_FAMILY = {
     "ramp": "mana_or_resource_acceleration",
     "recursion": "graveyard_or_zone_recursion",
     "removal": "targeted_interaction",
+    "sacrifice_outlet": "activated_sacrifice_creature_damage",
     "token": "token_or_board_presence",
     "tutor": "library_search_or_selection",
     "wincon": "win_condition",
 }
+
+EFFECT_FAMILY_KEY_PRIORITY = [
+    "attack_trigger_artifact_tutor",
+    "activated_sacrifice_creature_damage",
+    "extra_combat_phase",
+    "graveyard_recast_replacement",
+    "graveyard_or_zone_recursion",
+    "counterspell_stack_interaction",
+    "mass_removal_or_modal_wipe",
+    "targeted_interaction",
+    "protection_or_prevention",
+    "mana_or_resource_acceleration",
+    "treasure_resource_generation",
+    "library_search_or_selection",
+    "triggered_or_static_engine",
+    "copy_spell_or_permanent",
+    "card_advantage_or_selection",
+    "counter_manipulation",
+    "token_or_board_presence",
+    "synergy_enabler",
+    "synergy_payoff",
+    "win_condition",
+]
 
 
 def infer_effect_families_from_text(oracle_text: str) -> list[str]:
@@ -65,6 +89,15 @@ def infer_effect_families_from_text(oracle_text: str) -> list[str]:
         and "search your library" in text
     ):
         families.add("attack_trigger_artifact_tutor")
+    if (
+        "sacrifice a creature:" in text
+        and (
+            "damage to any target" in text
+            or "damage to target" in text
+            or "deals 1 damage" in text
+        )
+    ):
+        families.add("activated_sacrifice_creature_damage")
     if "draw a card" in text or "draw cards" in text:
         families.add("card_advantage_or_selection")
     if "destroy all" in text or "exile all" in text:
@@ -144,14 +177,24 @@ class RuleDraft:
 
     @property
     def draft_rule_key(self) -> str:
-        role_hint = unique_sorted(self.roles)[0] if self.roles else "review"
-        return f"{normalize_name(self.card_name)}__{role_hint}__draft_v1"
+        key_hint = self.primary_effect_family
+        if not key_hint:
+            key_hint = unique_sorted(self.roles)[0] if self.roles else "review"
+        return f"{normalize_name(self.card_name)}__{normalize_name(key_hint)}__draft_v1"
 
     @property
     def effect_families(self) -> list[str]:
         from_roles = [ROLE_TO_EFFECT_FAMILY.get(role, role) for role in self.roles]
         from_text = infer_effect_families_from_text(str(self.payload.get("oracle_text") or ""))
         return unique_sorted([*from_roles, *from_text])
+
+    @property
+    def primary_effect_family(self) -> str | None:
+        families = set(self.effect_families)
+        for family in EFFECT_FAMILY_KEY_PRIORITY:
+            if family in families:
+                return family
+        return unique_sorted(families)[0] if families else None
 
     @property
     def confidence(self) -> str:

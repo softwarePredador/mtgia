@@ -581,6 +581,31 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 )
             )
             self.assertEqual(battle_summary["draft_count"], 10)
+            drafts = json.loads(
+                (
+                    tmp
+                    / "battle"
+                    / "battle_rule_review_queue"
+                    / "latest_drafts.json"
+                ).read_text(encoding="utf-8")
+            )
+            draft_keys = {draft["card_name"]: draft["draft_rule_key"] for draft in drafts}
+            self.assertEqual(
+                draft_keys["Goblin Bombardment"],
+                "goblin_bombardment__activated_sacrifice_creature_damage__draft_v1",
+            )
+            self.assertEqual(
+                draft_keys["Clean Formation"],
+                "clean_formation__protection_or_prevention__draft_v1",
+            )
+            self.assertEqual(
+                draft_keys["Clean Shatter"],
+                "clean_shatter__targeted_interaction__draft_v1",
+            )
+            self.assertEqual(
+                draft_keys["Clean Demystify"],
+                "clean_demystify__targeted_interaction__draft_v1",
+            )
 
             evidence_summary = focused_evidence.run(
                 focused_evidence.parse_args(

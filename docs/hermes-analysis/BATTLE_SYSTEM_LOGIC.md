@@ -998,6 +998,9 @@ Creatures gain indestructible até o fim do turno
 Sacrifice outlet de dano simples
 - oracle_text contem "Sacrifice a creature:"
 - oracle_text contem dano a alvo/any target
+- draft_rule_key usa a família principal `activated_sacrifice_creature_damage`,
+  não o primeiro role alfabético, para manter a fila legível em cartas
+  multi-função;
 - executor estreito: activate_sacrifice_damage_outlets()
 - so sacrifica criatura expendable; nao sacrifica commander, mana creature ou
   criatura de alto valor por um dano sem justificativa

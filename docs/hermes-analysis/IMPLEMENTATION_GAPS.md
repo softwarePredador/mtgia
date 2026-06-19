@@ -2649,10 +2649,11 @@ Pendências P1 agora priorizadas:
 
 Pendências P2:
 
-- Melhorar `draft_rule_key` para usar família/efeito principal em vez do
-  primeiro role ordenado. Hoje alguns sacrifice outlets aparecem como
-  `__protection__draft_v1`, o que é ruim para leitura, embora o gate continue
-  correto.
+- Fechado em 2026-06-19: `draft_rule_key` passou a usar a família de efeito
+  principal por prioridade explícita, não o primeiro role ordenado. Isso evita
+  chaves enganosas como sacrifice outlet agrupado sob `__protection__draft_v1`.
+  A chave continua sendo artefato operacional por rodada, não identificador
+  canônico de produto.
 - Compactar/paginar artefatos full-scope para rodadas frequentes, evitando
   `latest_reviews.json` gigante.
 - Gerar ranking por comandante separando candidatos realmente prontos de

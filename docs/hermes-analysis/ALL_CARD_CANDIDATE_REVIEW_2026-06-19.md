@@ -320,9 +320,10 @@ P1:
 
 P2:
 
-- melhorar `draft_rule_key` para usar família/efeito principal em vez do
-  primeiro role ordenado; exemplos atuais de sacrifice outlets aparecem como
-  `__protection__draft_v1`, o que é legível ruim embora o gate continue correto;
+- fechado em 2026-06-19: `draft_rule_key` agora usa família de efeito principal
+  com prioridade explícita, evitando agrupamentos enganosos por primeiro role
+  ordenado. Exemplo esperado: sacrifice outlets simples ficam sob
+  `activated_sacrifice_creature_damage`;
 - paginar ou compactar artefatos globais para evitar `latest_reviews.json`
   muito grande em runs full frequentes;
 - criar resumo por comandante com ranking de candidatos `test` já verificados
