@@ -1079,6 +1079,13 @@ Resultado de controle:
   focused evidence e bloqueado no promotion gate. O runtime só cobre counters
   especializados (`Station`, Saga/lore e SBA de +1/+1 vs -1/-1), então não há
   promoção genérica segura para counters até existir executor dedicado.
+- `triggered_or_static_engine` agora tem teste guardrail: texto como
+  `Whenever one or more creatures enter the battlefield under your control, this
+  enchantment deals 1 damage to each opponent.` entra na fila, mas fica sem
+  focused evidence e bloqueado no promotion gate. O runtime cobre engines
+  específicos, não uma semântica universal para qualquer trigger/static effect.
+  A promoção segura exige template por subtipo de engine, com replay e auditoria
+  focados.
 
 Correção crítica associada ao wipe:
 

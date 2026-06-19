@@ -2649,6 +2649,20 @@ Atualização do slice de 2026-06-19:
     promotion gate;
   - isso evita promoção falsa de counters até existir template próprio com alvo,
     mudança de P/T, SBA e interação com counters negativos/proliferate.
+- Guardrail adicional de `triggered_or_static_engine`:
+  - o runtime possui engines específicos (`landfall`, triggers de spell cast,
+    draw-tax, ramp/draw permanentes e rotinas especiais de Lorehold), mas não
+    possui executor genérico seguro para texto como `Whenever one or more
+    creatures enter the battlefield under your control, this enchantment deals
+    1 damage to each opponent.`;
+  - `server/test/manaloom_review_queue_consumers_test.py` agora prova que esse
+    tipo de engine entra em `needs_rule_review`, gera draft com
+    `triggered_or_static_engine`, mas permanece sem focused evidence e bloqueado
+    no promotion gate;
+  - isso evita colapsar engines muito diferentes em uma regra única. Antes de
+    qualquer promoção, cada subtipo precisa template próprio: ETB damage,
+    static anthem, cost reducer, draw/ramp trigger, tax effect, token engine,
+    upkeep trigger ou attack trigger.
 
 Pendências P1 agora priorizadas:
 
@@ -2659,7 +2673,9 @@ Pendências P1 agora priorizadas:
     `Return target creature card from your graveyard to your hand.`;
   - `protection_or_prevention` restante, excluindo o subcaso já coberto de
     criaturas ganhando indestrutível até o fim do turno;
-  - `triggered_or_static_engine`;
+  - `triggered_or_static_engine`, que agora tem guardrail de bloqueio
+    intencional para engines genéricos e precisa decomposição por subtipo antes
+    de qualquer promoção;
   - `counter_manipulation`, que hoje tem guardrail de bloqueio intencional e
     ainda precisa executor próprio antes de qualquer promoção;
   - `mana_or_resource_acceleration`, excluindo o subcaso já coberto de

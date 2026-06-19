@@ -325,6 +325,11 @@ P1:
   `+1/+1 counter`, mas o focused evidence ainda não tem template seguro. O
   runtime atual só cobre counters especializados (`Station`, Saga/lore e SBA
   de counters opostos), não aplicação genérica de counters em alvo;
+- manter `triggered_or_static_engine` bloqueado por design quando o texto não
+  cai em um executor específico já modelado. O job detecta engines por role/texto,
+  mas não deve promover trigger/static effect genérico sem template focado. Em
+  2026-06-19 foi adicionado guardrail para ETB damage engine genérico: ele entra
+  na fila, mas fica sem focused evidence e bloqueado no promotion gate;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;
