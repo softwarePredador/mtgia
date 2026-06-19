@@ -425,6 +425,15 @@ def supports_return_target_creature_from_graveyard_template(draft: DraftRecord) 
     )
 
 
+def supports_return_target_artifact_from_graveyard_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "graveyard_or_zone_recursion" in draft.effect_families
+        and text == "return target artifact card from your graveyard to your hand."
+        and draft.proposed_status == "needs_review"
+    )
+
+
 def build_counterspell_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_focused_evidence",
@@ -2473,6 +2482,181 @@ def build_return_target_creature_from_graveyard_evidence(
     )
 
 
+def build_return_target_artifact_from_graveyard_evidence(
+    draft: DraftRecord,
+    output_dir: Path,
+) -> EvidenceResult:
+    battle = load_module(
+        "battle_analyst_artifact_graveyard_recursion_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        "replay_decision_auditor_artifact_graveyard_recursion_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+    if battle.battle_rule_registry is None:
+        return EvidenceResult(
+            draft=draft,
+            status="unsupported",
+            reason="battle_rule_registry_unavailable",
+        )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    runtime_db = rule_dir / "runtime_rules.db"
+    old_db = battle.DB
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        with closing(sqlite3.connect(runtime_db)) as conn:
+            battle.battle_rule_registry.upsert_battle_card_rule(
+                conn,
+                draft.card_name,
+                {
+                    "effect": "recursion",
+                    "target": "artifact",
+                    "count": 1,
+                    "destination": "hand",
+                },
+                source="focused_evidence",
+                confidence=1.0,
+                review_status="verified",
+                oracle_hash=f"focused:{draft.oracle_id or draft.card_name}",
+                notes="Temporary focused-evidence rule for artifact-card recursion to hand.",
+            )
+            conn.commit()
+        battle.DB = str(runtime_db)
+        battle.battle_rule_registry._RULE_CACHE.clear()
+
+        active = battle.Player("Active", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        artifact_target = {
+            "name": "Graveyard Artifact",
+            "cmc": 3,
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+        }
+        creature_decoy = {
+            "name": "Graveyard Creature",
+            "cmc": 3,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        sorcery_decoy = {
+            "name": "Graveyard Sorcery",
+            "cmc": 2,
+            "type_line": "Sorcery",
+            "effect": "draw_cards",
+        }
+        active.graveyard = [sorcery_decoy, creature_decoy, artifact_target]
+        spell = {
+            "name": draft.card_name,
+            "cmc": 2,
+            "type_line": "Sorcery",
+            "oracle_text": "Return target artifact card from your graveyard to your hand.",
+        }
+        battle.apply_effect_immediate(active, [opponent], spell, turn=4, rng=random.Random(25))
+    finally:
+        battle.DB = old_db
+        if battle.battle_rule_registry is not None:
+            battle.battle_rule_registry._RULE_CACHE.clear()
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    recursion_event = any(
+        row.get("event") == "recursion_resolved"
+        and row.get("card") == draft.card_name
+        and row.get("destination") == "hand"
+        and row.get("recovered") == ["Graveyard Artifact"]
+        for row in event_rows
+    )
+    artifact_recovered = any(card.get("name") == "Graveyard Artifact" for card in active.hand)
+    creature_preserved = any(card.get("name") == "Graveyard Creature" for card in active.graveyard)
+    sorcery_preserved = any(card.get("name") == "Graveyard Sorcery" for card in active.graveyard)
+    spell_finished = any(card.get("name") == draft.card_name for card in active.graveyard)
+    focused_passed = bool(
+        recursion_event
+        and artifact_recovered
+        and creature_preserved
+        and sorcery_preserved
+        and spell_finished
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "recursion_event": recursion_event,
+            "artifact_recovered_to_hand": artifact_recovered,
+            "creature_decoy_preserved": creature_preserved,
+            "sorcery_decoy_preserved": sorcery_preserved,
+            "spell_finished_in_graveyard": spell_finished,
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": "return_target_artifact_card_from_graveyard_to_hand",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: Return target artifact card from your graveyard to your hand.",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": "hard_behavior_return_target_artifact_card_from_graveyard_to_hand_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason="return_target_artifact_card_from_graveyard_to_hand_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
 def build_simple_draw_card_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
     battle = load_module(
         "battle_analyst_simple_draw_card_evidence",
@@ -3143,6 +3327,8 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
         return build_simple_draw_card_evidence(draft, output_dir)
     if supports_return_target_creature_from_graveyard_template(draft):
         return build_return_target_creature_from_graveyard_evidence(draft, output_dir)
+    if supports_return_target_artifact_from_graveyard_template(draft):
+        return build_return_target_artifact_from_graveyard_evidence(draft, output_dir)
     if supports_sacrifice_damage_template(draft):
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):

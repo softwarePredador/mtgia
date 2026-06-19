@@ -9164,6 +9164,39 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
     return returned
 
 
+def graveyard_card_matches_recursion_target(card, target_type):
+    """Return whether a graveyard card matches a narrow recursion target."""
+    if not isinstance(card, dict) or is_land(card):
+        return False
+    target = str(target_type or "nonland").lower()
+    type_line = str(card.get("type_line") or "").lower()
+    if target in ("any", "nonland", "nonland_card"):
+        return (
+            is_instant(card)
+            or is_sorcery(card)
+            or any(
+                kind in type_line
+                for kind in ("artifact", "creature", "enchantment", "planeswalker", "battle")
+            )
+            or get_card_effect(card).get("effect") not in ("land", "unknown")
+        )
+    if target in ("creature", "creature_card"):
+        return is_creature_card(card)
+    if target in ("artifact", "artifact_card"):
+        return "artifact" in type_line
+    if target in ("enchantment", "enchantment_card"):
+        return "enchantment" in type_line
+    if target in ("artifact_or_enchantment", "artifact_enchantment", "artifact_or_enchantment_card"):
+        return "artifact" in type_line or "enchantment" in type_line
+    if target in ("instant", "instant_card"):
+        return is_instant(card)
+    if target in ("sorcery", "sorcery_card"):
+        return is_sorcery(card)
+    if target in ("instant_or_sorcery", "instant_or_sorcery_card"):
+        return is_instant(card) or is_sorcery(card)
+    return False
+
+
 def trigger_opponent_land_play_engines(
     active_player,
     opponents,
@@ -11877,18 +11910,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         candidates = [
             grave_card
             for grave_card in player.graveyard
-            if isinstance(grave_card, dict)
-            and not is_land(grave_card)
-            and (
-                target_type != "creature"
-                or is_creature_card(grave_card)
-            )
-            and (
-                target_type == "creature"
-                or is_instant(grave_card)
-                or is_sorcery(grave_card)
-                or get_card_effect(grave_card).get("effect") not in ("land", "unknown")
-            )
+            if graveyard_card_matches_recursion_target(grave_card, target_type)
         ]
         recovered = candidates[:count]
         destination = effect_data.get("destination", "hand")

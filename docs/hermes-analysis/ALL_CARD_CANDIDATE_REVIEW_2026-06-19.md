@@ -316,11 +316,12 @@ P1:
   `Create a Treasure token.`, com regra temporária SQLite no focused evidence,
   evento `treasure_created` e promotion gate report-only;
 - considerar papel `recursion` como fila `needs_rule_review` quando não há
-  regra battle confiável; em 2026-06-19 foi fechado apenas o template seguro
-  `Return target creature card from your graveyard to your hand.`, com regra
-  temporária SQLite no focused evidence. Reanimate, land recursion, qualquer
-  card recursion, recast from graveyard/exile, loops e variantes com riders
-  continuam pendentes;
+  regra battle confiável; em 2026-06-19 foram fechados os templates seguros
+  `Return target creature card from your graveyard to your hand.` e
+  `Return target artifact card from your graveyard to your hand.`, com regra
+  temporária SQLite no focused evidence e filtro real de target no executor.
+  Reanimate, land recursion, qualquer card recursion genérica, recast from
+  graveyard/exile, loops e variantes com riders continuam pendentes;
 - manter `counter_manipulation` bloqueado por design: o job detecta textos com
   `+1/+1 counter`, mas o focused evidence ainda não tem template seguro. O
   runtime atual só cobre counters especializados (`Station`, Saga/lore e SBA

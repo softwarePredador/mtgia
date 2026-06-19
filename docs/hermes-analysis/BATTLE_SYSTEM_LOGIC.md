@@ -1068,12 +1068,13 @@ Resultado de controle:
 - Com o template `Create a Treasure token.`, texto com `Treasure token` passou a
   entrar em `needs_rule_review` quando não há regra confiável, e o teste local
   de consumidores subiu de 10 para 11 drafts elegíveis sem auto-promotion.
-- Com o template `Return target creature card from your graveyard to your hand.`,
+- Com os templates `Return target creature card from your graveyard to your
+  hand.` e `Return target artifact card from your graveyard to your hand.`,
   recursão simples passou a entrar em `needs_rule_review` quando não há regra
-  confiável, e o teste local de consumidores subiu de 11 para 12 drafts
-  elegíveis sem auto-promotion. O teste usa regra temporária SQLite no
-  `battle_rule_registry`, porque o fallback heurístico de `recursion` não
-  preserva o alvo `creature` e não é evidência suficiente para promoção.
+  confiável. Os testes usam regra temporária SQLite no `battle_rule_registry`,
+  porque o fallback heurístico de `recursion` não era evidência suficiente para
+  promoção. O executor agora filtra o graveyard por `target` real para impedir,
+  por exemplo, que recursão de artefato recupere sorcery/criatura.
 - `counter_manipulation` agora tem teste guardrail: texto como
   `Put a +1/+1 counter on target creature.` entra na fila, mas fica sem
   focused evidence e bloqueado no promotion gate. O runtime só cobre counters

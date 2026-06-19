@@ -2629,16 +2629,20 @@ Atualização do slice de 2026-06-19:
   - `manaloom_new_card_candidate_review.py` passou a tratar `recursion` como
     papel que exige `needs_rule_review` quando não há regra battle confiável;
   - `manaloom_battle_rule_review_queue.py` passou a inferir
-    `graveyard_or_zone_recursion` para oracle text exato
-    `Return target creature card from your graveyard to your hand.`;
+    `graveyard_or_zone_recursion` para oracle texts exatos de retorno de
+    criatura ou artefato do graveyard para a mão;
   - `manaloom_battle_rule_focused_evidence.py` ganhou template estreito para
-    esse caso, usando regra temporária SQLite no `battle_rule_registry` para
-    provar o caminho canônico de `card_battle_rules`, não o fallback
-    heurístico `functional_tags_json`;
-  - o fixture controlado de consumidores passou de 11 para 12 drafts elegíveis.
+    `Return target creature card from your graveyard to your hand.` e
+    `Return target artifact card from your graveyard to your hand.`, usando
+    regra temporária SQLite no `battle_rule_registry` para provar o caminho
+    canônico de `card_battle_rules`, não o fallback heurístico
+    `functional_tags_json`;
+  - `battle_analyst_v9.py` passou a filtrar targets de `recursion` por tipo
+    (`creature`, `artifact`, `enchantment`, `instant_or_sorcery`, etc.) para
+    evitar que uma recursão de artefato recupere sorcery/criatura por acidente.
   - escopo propositalmente não cobre ainda reanimate para battlefield, qualquer
-    card recursion, land recursion, cast from graveyard/exile, loops ou
-    recursão com múltiplos alvos/riders.
+    card recursion genérica, land recursion, cast from graveyard/exile, loops
+    ou recursão com múltiplos alvos/riders.
 - Guardrail adicional de `counter_manipulation`:
   - o runtime atual possui Station/charge counters, lore counters de Saga e
     cancelamento SBA de `+1/+1` com `-1/-1`, mas não possui executor genérico
@@ -2703,7 +2707,7 @@ Pendências P1 agora priorizadas:
   Scryfall/MTGJSON/PostgreSQL, sem LLM.
 - Criar templates focados para as famílias mais frequentes:
   - `graveyard_or_zone_recursion` restante, excluindo o subcaso já coberto de
-    `Return target creature card from your graveyard to your hand.`;
+    `Return target creature/artifact card from your graveyard to your hand.`;
   - `protection_or_prevention` restante, excluindo o subcaso já coberto de
     criaturas ganhando indestrutível até o fim do turno;
   - `triggered_or_static_engine`, que agora tem guardrail de bloqueio
