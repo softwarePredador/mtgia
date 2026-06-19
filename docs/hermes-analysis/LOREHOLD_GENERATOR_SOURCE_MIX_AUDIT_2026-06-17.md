@@ -89,6 +89,23 @@ Cartas:
 - `Lightning Greaves`
 - `Sol Ring`
 
+Atualização do slice 2026-06-19:
+
+- o profile embutido de `Lorehold, the Historian` passou a declarar estes
+  slots em pacotes canônicos:
+  - `mana_ramp_foundation`: `Sol Ring`, `Arcane Signet`, `Boros Signet`,
+    `Fellwar Stone`;
+  - `draw_rummage_foundation`: `Esper Sentinel`, `Faithless Looting`;
+  - `interaction_and_resets`: `Generous Gift`;
+  - `protection_and_equipment`: `Boros Charm`, `Lightning Greaves`;
+- `commander_reference_card_stats_support.dart` passou a mapear esses pacotes
+  para roles, confiança e score explícitos;
+- testes focados garantem que as 9 cartas P1 agora são deriváveis como
+  `profile_expected_packages` e `reference_card_stats`;
+- pendência operacional: aplicar/resolver o profile no PostgreSQL e rerodar
+  `commander_generate_provenance_audit.dart` + `audit_commander_generator_source_mix.py`
+  para confirmar a queda do bucket no dado vivo.
+
 Leitura:
 
 - essas cartas ainda tocam `deterministic_fallback`, mas o profile canônico e o
@@ -198,6 +215,14 @@ Ele deve atacar, nesta ordem:
 2. slots `learned + fallback` ainda sem corroboracão adicional;
 3. pacotes temáticos que seguem em `fallback + profile/stats` sem evidência
    empírica.
+
+Status após o slice 2026-06-19:
+
+- o item 1 foi corrigido na camada de código/profile;
+- ainda falta reexecutar a cadeia com PostgreSQL atualizado para transformar a
+  correção em evidência live;
+- o próximo item real é corroborar `Fellwar Stone` e `Lightning Greaves` por
+  corpus/usage ou aceitá-las explicitamente como fallback-backed por política.
 
 Pergunta certa daqui para frente:
 

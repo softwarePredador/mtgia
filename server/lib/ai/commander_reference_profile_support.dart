@@ -141,6 +141,16 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
         'Mikokoro, Center of the Sea',
         'Victory Chimes',
       ],
+      'mana_ramp_foundation': [
+        'Sol Ring',
+        'Arcane Signet',
+        'Boros Signet',
+        'Fellwar Stone',
+      ],
+      'draw_rummage_foundation': [
+        'Esper Sentinel',
+        'Faithless Looting',
+      ],
       'miracle_payoffs_expensive_spells': [
         'Approach of the Second Sun',
         'Storm Herd',
@@ -158,10 +168,15 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
       'interaction_and_resets': [
         'Swords to Plowshares',
         'Path to Exile',
+        'Generous Gift',
         'Blasphemous Act',
         'Austere Command',
         'Terminus',
         'Bonfire of the Damned',
+      ],
+      'protection_and_equipment': [
+        'Boros Charm',
+        'Lightning Greaves',
       ],
       'spell_payoff_copy_package': [
         'Storm-Kiln Artist',
@@ -549,8 +564,29 @@ String _formatExpectedPackages(dynamic raw) {
         : 1;
     return '${entry.key} ($count candidates)';
   }).toList()
-    ..sort();
+    ..sort((a, b) {
+      final aKey = a.split(' ').first;
+      final bKey = b.split(' ').first;
+      final priorityCompare = _expectedPackagePromptPriority(aKey).compareTo(
+        _expectedPackagePromptPriority(bKey),
+      );
+      if (priorityCompare != 0) return priorityCompare;
+      return a.compareTo(b);
+    });
   return entries.take(6).join('; ');
+}
+
+int _expectedPackagePromptPriority(String packageKey) {
+  return switch (packageKey) {
+    'topdeck_and_miracle_setup' => 0,
+    'mana_ramp_foundation' => 1,
+    'draw_rummage_foundation' => 2,
+    'miracle_payoffs_expensive_spells' => 3,
+    'interaction_and_resets' => 4,
+    'protection_and_equipment' => 5,
+    'spell_payoff_copy_package' => 6,
+    _ => 99,
+  };
 }
 
 String _formatAvoidPatterns(dynamic raw) {

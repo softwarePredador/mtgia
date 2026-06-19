@@ -53,6 +53,58 @@ void main() {
       expect(unresolved.unresolved, isTrue);
     });
 
+    test('Lorehold P1 fallback staples are source-backed by profile stats', () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 6, 19, 12),
+      );
+      final p1Names = {
+        'Sol Ring',
+        'Arcane Signet',
+        'Boros Signet',
+        'Esper Sentinel',
+        'Faithless Looting',
+        'Fellwar Stone',
+        'Generous Gift',
+        'Lightning Greaves',
+        'Boros Charm',
+      };
+      final stats = buildLoreholdReferenceCardStatsFromProfile(
+        profile: profile,
+        resolvedCardsByName: {
+          for (final name in p1Names)
+            normalizeCommanderReferenceCardName(name): _resolvedCard(
+              id: '${normalizeCommanderReferenceCardName(name)}-id',
+              name: name,
+            ),
+        },
+      );
+      final byName = {
+        for (final stat in stats) stat.cardName: stat,
+      };
+
+      for (final name in p1Names) {
+        expect(byName, contains(name), reason: '$name missing from stats');
+        expect(byName[name]!.unresolved, isFalse);
+        expect(
+          byName[name]!.confidenceRank,
+          greaterThanOrEqualTo(commanderReferenceConfidenceRank('medium')),
+        );
+      }
+      expect(
+        byName['Sol Ring']!.role,
+        equals('mana_rocks_treasure_ramp'),
+      );
+      expect(
+        byName['Faithless Looting']!.role,
+        equals('draw_rummage_opponent_turn_draw'),
+      );
+      expect(
+        byName['Generous Gift']!.role,
+        equals('interaction_and_resets'),
+      );
+      expect(byName['Lightning Greaves']!.role, equals('protection'));
+    });
+
     test('builds deterministic diagnostics and cache versions', () {
       final stats = [
         _stat(
@@ -324,7 +376,8 @@ void main() {
       expect(result.builtInFallbackEnabled, isTrue);
       expect(result.builtInFallbackUsedCount, equals(6));
       expect(
-        result.sourceMixCounts['deterministic_fallback + reference_card_stats'],
+        result.sourceMixCounts[
+            'deterministic_fallback + profile_expected_packages + reference_card_stats'],
         equals(1),
       );
       final arcaneSignet = result.cardProvenance.singleWhere(
@@ -332,7 +385,11 @@ void main() {
       );
       expect(
         arcaneSignet.sources,
-        equals(['deterministic_fallback', 'reference_card_stats']),
+        equals([
+          'deterministic_fallback',
+          'profile_expected_packages',
+          'reference_card_stats',
+        ]),
       );
     });
 

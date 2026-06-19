@@ -1027,8 +1027,11 @@ CommanderReferenceCardStat _cardStatFromRow(Map<String, dynamic> row) {
 String _roleForPackage(String packageKey) {
   return switch (packageKey) {
     'topdeck_and_miracle_setup' => 'topdeck_miracle_setup',
+    'mana_ramp_foundation' => 'mana_rocks_treasure_ramp',
+    'draw_rummage_foundation' => 'draw_rummage_opponent_turn_draw',
     'miracle_payoffs_expensive_spells' => 'miracle_haymakers',
     'interaction_and_resets' => 'interaction_and_resets',
+    'protection_and_equipment' => 'protection',
     'spell_payoff_copy_package' => 'spell_payoffs_copy_engines',
     _ => packageKey,
   };
@@ -1037,8 +1040,11 @@ String _roleForPackage(String packageKey) {
 String _confidenceForPackage(String packageKey) {
   return switch (packageKey) {
     'topdeck_and_miracle_setup' => 'high',
+    'mana_ramp_foundation' => 'high',
+    'draw_rummage_foundation' => 'medium_high',
     'miracle_payoffs_expensive_spells' => 'medium_high',
     'interaction_and_resets' => 'medium_high',
+    'protection_and_equipment' => 'medium_high',
     'spell_payoff_copy_package' => 'medium',
     _ => 'medium',
   };
@@ -1047,8 +1053,11 @@ String _confidenceForPackage(String packageKey) {
 double _scoreForPackage(String packageKey) {
   return switch (packageKey) {
     'topdeck_and_miracle_setup' => 94,
+    'mana_ramp_foundation' => 90,
+    'draw_rummage_foundation' => 87,
     'miracle_payoffs_expensive_spells' => 88,
     'interaction_and_resets' => 86,
+    'protection_and_equipment' => 85,
     'spell_payoff_copy_package' => 84,
     _ => 75,
   };

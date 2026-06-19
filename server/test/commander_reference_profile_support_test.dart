@@ -149,6 +149,41 @@ void main() {
       );
     });
 
+    test('Lorehold profile declares fallback-touched P1 staples explicitly',
+        () {
+      final profile = buildLoreholdReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 6, 19, 12),
+      );
+      final packages = (profile['expected_packages'] as Map).map(
+        (key, value) => MapEntry(
+          key.toString(),
+          (value as List).map((entry) => entry.toString()).toSet(),
+        ),
+      );
+
+      expect(
+        packages['mana_ramp_foundation'],
+        containsAll([
+          'Sol Ring',
+          'Arcane Signet',
+          'Boros Signet',
+          'Fellwar Stone',
+        ]),
+      );
+      expect(
+        packages['draw_rummage_foundation'],
+        containsAll([
+          'Esper Sentinel',
+          'Faithless Looting',
+        ]),
+      );
+      expect(packages['interaction_and_resets'], contains('Generous Gift'));
+      expect(
+        packages['protection_and_equipment'],
+        containsAll(['Boros Charm', 'Lightning Greaves']),
+      );
+    });
+
     test('builds a generic commander profile payload for future commanders',
         () {
       final profile = buildCommanderReferenceProfilePayload(

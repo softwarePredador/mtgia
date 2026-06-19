@@ -69,7 +69,7 @@ Referências externas rechecadas nesta rodada:
 | P1 | Battle | Executor genérico de activated abilities recorrentes | `Ashnod's Altar` já tem metadata confiável, mas ainda não executa a habilidade ativada. | Criar família mínima de executor para `sacrifice_creature -> add mana` e outras activated abilities simples recorrentes. | Replays deixam de cair em `review_rule_used` para essas cartas e testes focados passam. |
 | P1 | Battle | Multi-row real em `card_battle_rules` | Infra pronta; PostgreSQL ainda com `multi_rule_card_count = 0`. | Persistir 3-5 cartas reais com escopos distintos: `spell_resolution`, `activated_ability`, `trigger_resolution`, `cost_annotation` ou `static_layer`. | Auditor multi-rule reencontra casos reais no PG e o runtime seleciona por escopo, não por nome cru. |
 | P1 | Generator | Política explícita de precedência do builder | O builder determinístico hoje usa `stats -> corpus -> profile -> learned -> usage -> fallback`, mas isso ainda é verdade de código, não decisão de produto documentada. | Congelar e documentar a ordem de precedência; depois refletir no código e nos auditores. | Geração, provenance audit e docs passam a convergir para a mesma política declarada. |
-| P1 | Generator | Curar `fallback_without_profile_or_stats` do Lorehold | Bucket factual atual: 9 cartas. | Backfill de `profile_expected_packages` e/ou `reference_card_stats` para essas staples/interações. | Bucket cai e as cartas deixam de depender de fallback sem profile/stats. |
+| P1 | Generator | Curar `fallback_without_profile_or_stats` do Lorehold | Bucket factual live5: 9 cartas. Slice 2026-06-19 adicionou pacotes canônicos no profile para essas 9 e testes de stats/profile. | Aplicar/resolver o profile atualizado no PostgreSQL e rerodar provenance/source-mix. | Bucket cai no dado vivo e as cartas deixam de depender de fallback sem profile/stats. |
 | P1 | Generator | Curar `learned_plus_fallback_only` do Lorehold | Bucket factual atual: 2 cartas (`Fellwar Stone`, `Lightning Greaves`). | Decidir se entram por corpus/usage/profile/stats ou se ficam explicitamente fallback-backed. | Bucket fica zerado ou explicitamente aceito/documentado como exceção de produto. |
 | P1 | Generator | Revisar `fallback_profile_stats_no_empirical_support` | Bucket factual atual: 18 cartas. | Auditar por pacote temático: `big-spell payoff`, `copy engine`, `wipe/closer`, `draw/filter artifacts`. | Cada carta fica em um de três estados: promovida por evidência, mantida por policy, ou rebaixada/removida. |
 | P1 | Lorehold | Revalidar o pacote de miracle/topdeck do comandante | A auditoria `LOREHOLD_MIRACLE_TOPDECK_READINESS_AUDIT_2026-06-17.md` confirmou que o generator já puxa `Top`, `Rack`, `Brainstone`, `Mikokoro` e `Library of Leng`, mas o battle ainda não modela explicitamente o rummage no upkeep do oponente, ainda trata `topdeck_manipulation` de forma rasa e ainda carrega `Library of Leng` como `ramp_permanent`. | Fechar o gap entre lista temática e execução real: promover regra expressiva do comandante, modelar o trigger de upkeep, quebrar `topdeck_manipulation` em capabilities reais e corrigir `Library of Leng`. | O deck final continua alinhado a `miracle/topdeck/spellslinger`, e o battle rastreia miracle/topdeck lines sem ambiguidade crítica nem carta-chave mal classificada. |
@@ -96,7 +96,8 @@ Motivo:
 ### Fase 2 — Generator com explicabilidade real
 
 5. decisão explícita de precedência
-6. backfill das 9 `fallback_without_profile_or_stats`
+6. backfill das 9 `fallback_without_profile_or_stats` no código/profile
+   concluído em 2026-06-19; falta aplicação/rerun live
 7. cura das 2 `learned_plus_fallback_only`
 8. revisão das 18 `fallback_profile_stats_no_empirical_support`
 
