@@ -861,13 +861,16 @@ Contrato:
 
 - `manaloom_battle_rule_review_queue` continua criando apenas drafts
   `proposed_status=needs_review`;
-- `manaloom_battle_rule_focused_evidence` executa cenários focados somente para
-  templates suportados e grava replay/decision trace/evidence em artefatos;
+- `manaloom_battle_rule_focused_evidence` executa cenários focados em harness
+  controlado somente para templates suportados e grava replay/decision
+  trace/evidence em artefatos;
 - `manaloom_battle_rule_promotion_gate` consome `latest_evidence.json` quando
   existir e decide se a regra está bloqueada ou elegível para promoção manual;
 - nenhum desses jobs escreve em PostgreSQL;
-- nenhum desses jobs ativa comportamento duro no runtime;
-- `needs_review` continua auditável, mas não executável.
+- nenhum desses jobs promove comportamento duro no runtime de produto;
+- `needs_review` vindo de banco/sync continua review-only; a execução em
+  `focused_evidence` é cenário isolado para provar se uma futura promoção manual
+  é segura.
 
 Template suportado no primeiro slice:
 
@@ -891,6 +894,16 @@ Extra combat + flashback simples
 - oracle_text contem flashback
 - prova resolucao da mao, cast via graveyard, replacement para exile e replay
   audit sem critical/high
+
+Attack trigger + Treasure + artifact tutor
+- oracle_text contem trigger de ataque, Treasure, sacrificio de artefato e
+  busca de artifact card para o campo;
+- executor estreito: `resolve_attack_artifact_tutor_trigger()`;
+- para `Iron Man, Titan of Innovation`, o cenário respeita o oracle atual:
+  sacrifica artefato **não criatura**, busca artefato com mana value exatamente
+  `1 +` mana value do artefato sacrificado e coloca no campo **virado**;
+- o cenário focado sacrifica Treasure expendable e busca `Sol Ring` CMC 1,
+  mantendo `rule_status=needs_review` e sem promover para comportamento duro.
 ```
 
 Resultado de controle:
@@ -903,9 +916,9 @@ Resultado de controle:
   trace;
 - `Seize the Day` ficou elegível para promoção manual depois de cenário focado
   de extra combat + flashback/recast;
-- `Iron Man, Titan of Innovation` permaneceu bloqueado porque exige executor
-  contextual próprio para trigger de ataque, geração de Treasure, contagem de
-  artefatos, sacrifício opcional e artifact tutor.
+- `Iron Man, Titan of Innovation` ficou elegível para promoção manual depois de
+  cenário focado com trigger de ataque, Treasure, sacrifício de artefato não
+  criatura expendable, tutor CMC exato e entrada virada.
 
 Logo, o gate já prova que regras simples podem avançar para revisão manual,
 mas ainda preserva a barreira correta para cartas multi-etapa ou com custo/
@@ -914,14 +927,20 @@ trigger/flashback complexo.
 Na rodada real read-only local contra `msh,msc,mar`, os bloqueadores restantes
 foram:
 
+- `Black Panther, Wakandan King`: precisa template para commander/engine com
+  counters, compra e recorrência.
+- `Captain America, First Avenger`: precisa template para engine/interaction
+  ligado a alvo/equip/ataque.
 - `Concerted Effort`: precisa modelo focado de compartilhamento contínuo de
   habilidades/keywords.
 - `Final Showdown`: precisa template focado para spell modal com wipe/protection
   e timing estratégico.
-- `Iron Man, Titan of Innovation`: precisa trigger de ataque + treasure +
-  artifact tutor.
+- `Ravenous Tyrannosaurus`: precisa template focado de combate/dano/counters.
+- `Storm, Force of Nature`: precisa template focado de copy/protection/removal
+  por trigger/spell.
 - `Warleader's Call`: precisa template de engine estática/trigger de dano em
   entrada de criaturas.
+- `Wolverine, Best There Is`: precisa template focado de engine/counters/combat.
 
 Campos tipicos encontrados no snapshot/fallback legado:
 

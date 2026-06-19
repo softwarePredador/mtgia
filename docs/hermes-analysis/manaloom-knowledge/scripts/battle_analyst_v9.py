@@ -5088,6 +5088,11 @@ def controlled_artifact_count(player):
     )
 
 
+def controlled_artifact_count_for_search(player):
+    """Battlefield artifact count plus simplified Treasure artifacts."""
+    return controlled_artifact_count(player) + int(getattr(player, "treasures", 0) or 0)
+
+
 def is_urzas_saga(permanent):
     return (
         isinstance(permanent, dict)
@@ -6117,6 +6122,312 @@ def activate_sacrifice_damage_outlets(player, opponents, all_players, turn, rng,
         check_sbas_until_stable(all_players)
         return 1
     return 0
+
+
+def _has_attack_artifact_tutor_trigger(permanent):
+    return bool(
+        isinstance(permanent, dict)
+        and (
+            permanent.get("artifact_attack_tutor")
+            or permanent.get("attack_artifact_tutor")
+            or permanent.get("effect") == "attack_artifact_tutor"
+        )
+    )
+
+
+def _artifact_search_candidates(player, target_cmc, opponents, turn, *, cmc_match="max"):
+    candidates = []
+    for candidate in list(player.library):
+        if not isinstance(candidate, dict) or not is_artifact_permanent(candidate):
+            continue
+        try:
+            cmc = int(float(candidate.get("cmc") or 0))
+        except (TypeError, ValueError):
+            cmc = 0
+        if cmc_match == "exact":
+            if cmc != target_cmc:
+                continue
+        elif cmc > target_cmc:
+            continue
+        score, reason = tutor_candidate_score(
+            candidate,
+            "artifact_to_battlefield",
+            player,
+            opponents,
+            turn,
+        )
+        candidates.append(
+            {
+                "card": candidate,
+                "score": score,
+                "reason": reason,
+                "cmc": cmc,
+            }
+        )
+    candidates.sort(
+        key=lambda item: (
+            -item["score"],
+            -item["cmc"],
+            str(item["card"].get("name", "")),
+        )
+    )
+    return candidates
+
+
+def _attack_artifact_sacrifice_options(player, source, opponents, turn):
+    options = []
+    oracle_text = str(source.get("oracle_text") or "").lower()
+    exact_plus_one = bool(
+        source.get("artifact_tutor_cmc_mode") == "sacrificed_mana_value_plus"
+        or "mana value equal to 1 plus the sacrificed artifact" in oracle_text
+    )
+    requires_noncreature = bool(
+        source.get("artifact_tutor_sacrifice_noncreature")
+        or "sacrifice a noncreature artifact" in oracle_text
+    )
+    enters_tapped = bool(
+        source.get("artifact_tutor_enters_tapped")
+        or "onto the battlefield tapped" in oracle_text
+    )
+    current_artifacts = controlled_artifact_count_for_search(player)
+    if int(getattr(player, "treasures", 0) or 0) > 0:
+        treasure_cmc = 0
+        target_cmc = treasure_cmc + 1 if exact_plus_one else max(0, current_artifacts - 1)
+        candidates = _artifact_search_candidates(
+            player,
+            target_cmc,
+            opponents,
+            turn,
+            cmc_match="exact" if exact_plus_one else "max",
+        )
+        if candidates:
+            options.append(
+                {
+                    "kind": "treasure",
+                    "name": "Treasure token",
+                    "permanent": None,
+                    "score": 120 + candidates[0]["score"],
+                    "target": candidates[0],
+                    "target_cmc": target_cmc,
+                    "cmc_match": "exact" if exact_plus_one else "max",
+                    "enters_tapped": enters_tapped,
+                    "reason": "sacrifice_expendable_treasure_for_artifact_tutor",
+                }
+            )
+
+    for permanent in player.battlefield:
+        if permanent is source or not isinstance(permanent, dict):
+            continue
+        if permanent.get("is_commander") or not is_artifact_permanent(permanent):
+            continue
+        try:
+            cmc = int(float(permanent.get("cmc") or 0))
+        except (TypeError, ValueError):
+            cmc = 0
+        type_line = str(permanent.get("type_line") or "").lower()
+        if requires_noncreature and "creature" in type_line:
+            continue
+        target_cmc = cmc + 1 if exact_plus_one else max(0, current_artifacts - 1)
+        candidates = _artifact_search_candidates(
+            player,
+            target_cmc,
+            opponents,
+            turn,
+            cmc_match="exact" if exact_plus_one else "max",
+        )
+        if not candidates:
+            continue
+        is_token = bool(permanent.get("is_token")) or permanent.get("tag") == "token" or "token" in type_line
+        permanent_score = 45
+        if is_token:
+            permanent_score += 25
+        permanent_score -= cmc * 5
+        if permanent.get("mana_produced") or permanent.get("effect") == "ramp_permanent":
+            permanent_score -= 18
+        if permanent_score < 20:
+            continue
+        options.append(
+            {
+                "kind": "permanent",
+                "name": permanent.get("name", "?"),
+                "permanent": permanent,
+                "score": permanent_score + candidates[0]["score"],
+                "target": candidates[0],
+                "target_cmc": target_cmc,
+                "cmc_match": "exact" if exact_plus_one else "max",
+                "enters_tapped": enters_tapped,
+                "reason": "sacrifice_low_value_artifact_for_artifact_tutor",
+            }
+        )
+
+    options.sort(key=lambda item: (-item["score"], str(item["name"])))
+    return options
+
+
+def resolve_attack_artifact_tutor_trigger(player, source, opponents, all_players, turn, *, phase="combat"):
+    """Resolve a narrow needs_review attack trigger: create Treasure, optionally artifact-tutor."""
+    if not _has_attack_artifact_tutor_trigger(source) or source not in player.battlefield:
+        return None
+
+    player.treasures += 1
+    options = _attack_artifact_sacrifice_options(player, source, opponents, turn)
+    if not options:
+        emit_decision_trace(
+            decision_type="attack_trigger_artifact_tutor",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                {
+                    "action": "keep_treasure",
+                    "card": source.get("name", "?"),
+                    "score": 25,
+                    "reason": "no_valid_artifact_tutor_target_after_optional_sacrifice",
+                }
+            ],
+            chosen_option={
+                "action": "keep_treasure",
+                "card": source.get("name", "?"),
+                "score": 25,
+                "reason": "no_valid_artifact_tutor_target_after_optional_sacrifice",
+            },
+            rejected_options=[],
+            score_components={
+                "treasures_created": 1,
+                "artifact_count_after_treasure": controlled_artifact_count_for_search(player),
+                "candidate_count": 0,
+            },
+            rule_source=source.get("_rule_source", "focused_battle_rule_evidence"),
+            rule_status=source.get("_rule_review_status", "needs_review"),
+            confidence="low",
+            expected_benefit_score=25,
+            actual_outcome="treasure_created_no_artifact_tutor",
+            reason="no_valid_artifact_tutor_target",
+            strategic_principle="attack_triggers_should_convert_expendable_artifacts_only_when_payoff_exists",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={"treasures": 1},
+            risk_flags=["needs_review_attack_trigger", "no_tutor_target"],
+        )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            trigger="attack",
+            activation_kind="artifact_attack_tutor",
+            treasures_created=1,
+            artifact_sacrificed=None,
+            found=None,
+            destination=None,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+        return {"treasures_created": 1, "artifact_sacrificed": None, "found": None}
+
+    chosen = options[0]
+    target = chosen["target"]["card"]
+    if chosen["kind"] == "treasure":
+        player.treasures = max(0, player.treasures - 1)
+        sacrificed_name = "Treasure token"
+    else:
+        sacrificed = chosen["permanent"]
+        sacrificed_name = sacrificed.get("name", "?")
+        if sacrificed in player.battlefield:
+            player.battlefield.remove(sacrificed)
+        type_line = str(sacrificed.get("type_line") or "").lower()
+        is_token = bool(sacrificed.get("is_token")) or sacrificed.get("tag") == "token" or "token" in type_line
+        if is_token:
+            emit_replay_event(
+                "token_ceased_to_exist",
+                player=player.name,
+                token=sacrificed_name,
+                from_zone="battlefield",
+                turn=turn,
+            )
+        else:
+            player.graveyard.append(sacrificed)
+
+    player.library.remove(target)
+    permanent_effect = get_card_effect(target)
+    permanent = prepare_entering_permanent(enrich_card({**target, **permanent_effect}))
+    if chosen.get("enters_tapped"):
+        permanent["tapped"] = True
+    player.battlefield.append(permanent)
+
+    available_options = [
+        {
+            "action": "sacrifice_artifact_for_tutor",
+            "card": option["name"],
+            "target": option["target"]["card"].get("name", "?"),
+            "score": option["score"],
+            "target_cmc": option["target_cmc"],
+            "cmc_match": option["cmc_match"],
+            "reason": option["reason"],
+        }
+        for option in options[:8]
+    ]
+    emit_decision_trace(
+        decision_type="attack_trigger_artifact_tutor",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=available_options,
+        chosen_option=available_options[0],
+        rejected_options=available_options[1:],
+        score_components={
+            "treasures_created": 1,
+            "artifact_count_after_sacrifice": controlled_artifact_count_for_search(player),
+            "candidate_count": len(
+                _artifact_search_candidates(
+                    player,
+                    chosen["target_cmc"],
+                    opponents,
+                    turn,
+                    cmc_match=chosen["cmc_match"],
+                )
+            ) + 1,
+            "selected_target_reason": chosen["target"]["reason"],
+        },
+        rule_source=source.get("_rule_source", "focused_battle_rule_evidence"),
+        rule_status=source.get("_rule_review_status", "needs_review"),
+        confidence="medium",
+        expected_benefit_score=chosen["score"],
+        actual_outcome="artifact_sacrificed_artifact_tutored_to_battlefield",
+        reason=chosen["reason"],
+        strategic_principle="attack_triggers_should_convert_expendable_artifacts_only_when_payoff_exists",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "treasures": 0 if chosen["kind"] == "treasure" else 1,
+            "artifact_sacrificed": sacrificed_name,
+            "found": target.get("name", "?"),
+            "destination": "battlefield",
+        },
+        risk_flags=["needs_review_attack_trigger", "sacrifice_artifact", "library_search"],
+        rejected_reason="lower_artifact_tutor_value_score",
+    )
+    emit_replay_event(
+        "trigger_resolved",
+        player=player.name,
+        card=source.get("name", "?"),
+        trigger="attack",
+        activation_kind="artifact_attack_tutor",
+        treasures_created=1,
+        artifact_sacrificed=sacrificed_name,
+        found=target.get("name", "?"),
+        destination="battlefield",
+        target_cmc=chosen["target_cmc"],
+        cmc_match=chosen["cmc_match"],
+        enters_tapped=bool(chosen.get("enters_tapped")),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(source),
+    )
+    check_sbas_until_stable(all_players)
+    return {
+        "treasures_created": 1,
+        "artifact_sacrificed": sacrificed_name,
+        "found": target.get("name", "?"),
+    }
 
 
 def creature_sacrifice_has_strategic_benefit(player, creature, chosen_unlock):
@@ -12200,6 +12511,15 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     if not declared:
         return
     attackers, alive_defenders, target, target_reason, attack_groups = declared
+    for attacking_creature in list(attackers):
+        resolve_attack_artifact_tutor_trigger(
+            attacker,
+            attacking_creature,
+            alive_defenders,
+            all_players,
+            turn,
+            phase="combat",
+        )
 
     total_power = sum(a.get("power", 2) for a in attackers)
     combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rng)

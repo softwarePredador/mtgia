@@ -583,11 +583,11 @@ Resumo:
   },
   "focused_evidence": {
     "evaluated_count": 4,
-    "evidence_count": 3
+    "evidence_count": 4
   },
   "promotion_gate": {
-    "eligible_count": 3,
-    "blocked_count": 1
+    "eligible_count": 4,
+    "blocked_count": 0
   }
 }
 ```
@@ -600,36 +600,38 @@ Resultado por draft:
 - `Goblin Bombardment`: elegível para
   `eligible_for_manual_verified_promotion` com evidência focada de habilidade
   ativada, sacrifício de criatura-token expendable e dano alvo.
-- `Iron Man, Titan of Innovation`: bloqueado; envolve trigger de ataque,
-  artifact count, treasure e tutor, exigindo executor contextual próprio.
+- `Iron Man, Titan of Innovation`: elegível para
+  `eligible_for_manual_verified_promotion` com evidência focada de trigger de
+  ataque, criação de Treasure, sacrifício de artefato não criatura expendable,
+  tutor de artefato com mana value exato e entrada virada.
 - `Seize the Day`: elegível para `eligible_for_manual_verified_promotion` com
   evidência focada de extra combat + flashback/recast do cemitério.
 
-Rodada real read-only local contra PostgreSQL para `msh,msc,mar`, 8
+Rodada real read-only local contra PostgreSQL para `msh,msc,mar`, 12
 comandantes e 166 cartas, após os templates adicionais:
 
 ```json
 {
   "candidate_review": {
     "cards_scanned": 166,
-    "commanders_scanned": 8,
+    "commanders_scanned": 12,
     "decisions": {
-      "backlog": 2,
-      "ignore": 1304,
-      "needs_rule_review": 22
+      "backlog": 3,
+      "ignore": 1950,
+      "needs_rule_review": 39
     }
   },
   "battle_rule_review_queue": {
-    "queue_rows": 22,
-    "draft_count": 7
+    "queue_rows": 39,
+    "draft_count": 12
   },
   "focused_evidence": {
-    "evaluated_count": 7,
-    "evidence_count": 3
+    "evaluated_count": 12,
+    "evidence_count": 4
   },
   "promotion_gate": {
-    "eligible_count": 3,
-    "blocked_count": 4
+    "eligible_count": 4,
+    "blocked_count": 8
   }
 }
 ```
@@ -638,21 +640,31 @@ Elegíveis nessa rodada real:
 
 - `Counterspell`;
 - `Goblin Bombardment`;
+- `Iron Man, Titan of Innovation`;
 - `Seize the Day`.
 
 Ainda bloqueados por falta de template focado/replay evidence:
 
+- `Black Panther, Wakandan King`;
+- `Captain America, First Avenger`;
 - `Concerted Effort`;
 - `Final Showdown`;
-- `Iron Man, Titan of Innovation`;
-- `Warleader's Call`.
+- `Ravenous Tyrannosaurus`;
+- `Storm, Force of Nature`;
+- `Warleader's Call`;
+- `Wolverine, Best There Is`.
 
-O wrapper `manaloom_battle_rule_promotion_gate.sh` passou a consumir
-automaticamente
-`$MANALOOM_OPS_ARTIFACT_DIR/battle_rule_focused_evidence/latest_evidence.json`
-quando o arquivo existir e `MANALOOM_BATTLE_RULE_PROMOTION_EVIDENCE_FILE` não
-estiver definido. Isso mantém o gate report-only, mas evita rodadas falsas sem
-evidência quando o job anterior já produziu prova focada.
+O gate `manaloom_battle_rule_promotion_gate.py` agora também descobre
+automaticamente a evidência focada quando ela estiver em:
+
+- `--evidence-file`;
+- `MANALOOM_BATTLE_RULE_PROMOTION_EVIDENCE_FILE`;
+- `MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE_DIR/latest_evidence.json`;
+- `$MANALOOM_OPS_ARTIFACT_DIR/battle_rule_focused_evidence/latest_evidence.json`;
+- diretório sibling do `knowledge.db` usado em rodadas locais.
+
+Isso mantém o gate report-only, mas evita rodadas falsas sem evidência quando o
+job anterior já produziu prova focada.
 
 ## Próximos Passos
 

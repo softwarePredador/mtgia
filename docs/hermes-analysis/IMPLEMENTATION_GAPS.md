@@ -41,27 +41,31 @@
   - focused evidence: `4` drafts avaliados, `1` evidência gerada;
   - promotion gate com evidência padrão: `eligible=1`, `blocked=3`.
 - Resultado atualizado com templates focados adicionais:
-  - focused evidence: `4` drafts avaliados, `3` evidências geradas;
-  - promotion gate com evidência padrão: `eligible=3`, `blocked=1`.
+  - focused evidence: `4` drafts avaliados, `4` evidências geradas;
+  - promotion gate com evidência padrão: `eligible=4`, `blocked=0`.
 - Drafts elegíveis:
   - `Counterspell` ficou `eligible_for_manual_verified_promotion`;
   - `Goblin Bombardment` ficou `eligible_for_manual_verified_promotion`
     com cenário de sacrifice outlet de dano;
   - `Seize the Day` ficou `eligible_for_manual_verified_promotion` com
     cenário de extra combat + flashback;
+  - `Iron Man, Titan of Innovation` ficou
+    `eligible_for_manual_verified_promotion` com cenário de trigger de ataque
+    que cria Treasure, sacrifica artefato não criatura expendable, busca artefato
+    com mana value exatamente `1 +` mana value do artefato sacrificado e coloca
+    no campo virado;
   - isso **não** grava em `card_battle_rules` e **não** ativa regra dura.
-- Drafts ainda bloqueados:
-  - `Iron Man, Titan of Innovation`: precisa executor contextual para trigger
-    de ataque, contagem de artefatos, treasure e tutor.
-- Rodada real read-only local contra PostgreSQL para `msh,msc,mar`, 8
+- Rodada real read-only local contra PostgreSQL para `msh,msc,mar`, 12
   comandantes e 166 cartas, confirmou:
-  - `needs_rule_review=22`;
-  - `7` drafts agregados;
-  - `3` evidências focadas;
-  - `3` elegíveis para promoção manual (`Counterspell`,
-    `Goblin Bombardment`, `Seize the Day`);
-  - `4` ainda bloqueados: `Concerted Effort`, `Final Showdown`,
-    `Iron Man, Titan of Innovation`, `Warleader's Call`.
+  - `needs_rule_review=39`;
+  - `12` drafts agregados;
+  - `4` evidências focadas;
+  - `4` elegíveis para promoção manual (`Counterspell`,
+    `Goblin Bombardment`, `Seize the Day`, `Iron Man, Titan of Innovation`);
+  - `8` ainda bloqueados por falta de template focado: `Black Panther,
+    Wakandan King`, `Captain America, First Avenger`, `Concerted Effort`,
+    `Final Showdown`, `Ravenous Tyrannosaurus`, `Storm, Force of Nature`,
+    `Warleader's Call`, `Wolverine, Best There Is`.
 - Battle/replay:
   - `lorehold_upkeep_rummage` passou a registrar opções rejeitadas e scores
     comparativos;

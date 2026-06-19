@@ -160,7 +160,7 @@ def _write_counterspell_gate_fixture(tmp: Path) -> Path:
                 "name": "Iron Man, Titan of Innovation",
                 "mana_cost": "{2}{U}{R}",
                 "type_line": "Legendary Artifact Creature — Human Hero",
-                "oracle_text": "Whenever Iron Man attacks, create a Treasure token. Then you may sacrifice an artifact. If you do, search your library for an artifact card with mana value less than or equal to the number of artifacts you control, put it onto the battlefield, then shuffle.",
+                "oracle_text": "Flying, haste\nGenius Industrialist — Whenever Iron Man attacks, create a Treasure token, then you may sacrifice a noncreature artifact. If you do, search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put it onto the battlefield tapped, then shuffle.",
                 "color_identity": ["U", "R"],
                 "cmc": 4,
                 "set_code": "mar",
@@ -513,7 +513,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 )
             )
             self.assertEqual(evidence_summary["evaluated_count"], 4)
-            self.assertEqual(evidence_summary["evidence_count"], 3)
+            self.assertEqual(evidence_summary["evidence_count"], 4)
 
             evidence_file = (
                 tmp
@@ -529,14 +529,13 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                         str(knowledge_db),
                         "--output-dir",
                         str(tmp / "gate"),
-                        "--evidence-file",
-                        str(evidence_file),
                     ]
                 )
             )
             self.assertEqual(gate_summary["evaluated_count"], 4)
-            self.assertEqual(gate_summary["eligible_count"], 3)
-            self.assertEqual(gate_summary["blocked_count"], 1)
+            self.assertEqual(gate_summary["eligible_count"], 4)
+            self.assertEqual(gate_summary["blocked_count"], 0)
+            self.assertEqual(gate_summary["evidence_file"], str(evidence_file))
 
             items = json.loads(
                 (
@@ -559,7 +558,10 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 decisions["Seize the Day"],
                 "eligible_for_manual_verified_promotion",
             )
-            self.assertEqual(decisions["Iron Man, Titan of Innovation"], "blocked")
+            self.assertEqual(
+                decisions["Iron Man, Titan of Innovation"],
+                "eligible_for_manual_verified_promotion",
+            )
 
 
 if __name__ == "__main__":

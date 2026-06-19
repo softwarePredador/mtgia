@@ -121,3 +121,73 @@ P2:
   aparecer em novas auditorias Hermes.
 - Expandir testes de role detection para mais exemplos reais de "opponent
   draws", "each player draws" e draw simetrico/wheel.
+
+---
+
+## Atualizacao 2026-06-19 - Focused Evidence Para Iron Man E Massa Marvel
+
+Este follow-up fechou o proximo slice testavel da fila `needs_rule_review`.
+O foco foi reduzir o gargalo de cartas candidatas novas sem promover regra
+automaticamente.
+
+### Alteracoes
+
+- `battle_analyst_v9.py`
+  - adicionou `resolve_attack_artifact_tutor_trigger()`;
+  - o trigger cria Treasure ao atacar;
+  - sacrifica apenas artefato nao criatura quando houver alvo valido;
+  - para o texto atual de `Iron Man, Titan of Innovation`, busca artefato com
+    mana value exatamente `1 +` mana value do artefato sacrificado;
+  - coloca o artefato no campo virado quando o oracle exigir;
+  - emite `decision_trace` e `trigger_resolved` com `rule_status=needs_review`.
+
+- `manaloom_battle_rule_focused_evidence.py`
+  - adicionou template `attack_trigger_artifact_tutor`;
+  - a evidência focada usa o oracle real de Iron Man: Treasure sacrificado busca
+    `Sol Ring` CMC 1 e entra tapped;
+  - continua report-only, sem write em PostgreSQL e sem auto-promotion.
+
+- `manaloom_battle_rule_review_queue.py`
+  - passou a classificar esse padrao como `attack_trigger_artifact_tutor`.
+
+### Validacoes executadas
+
+- `python3 -m py_compile server/bin/manaloom_battle_rule_review_queue.py server/bin/manaloom_battle_rule_focused_evidence.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+- `python3 server/test/manaloom_review_queue_consumers_test.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+- Pipeline read-only em massa contra `msh,msc,mar`, 12 comandantes e 166 cartas:
+  - `new_card_candidate_review`: `needs_rule_review=39`, `ignore=1950`,
+    `backlog=3`;
+  - `battle_rule_review_queue`: `12` drafts a partir de `39` rows;
+  - `battle_rule_focused_evidence`: `12` avaliados, `4` com evidência;
+  - `battle_rule_promotion_gate`: `4` elegíveis para promoção manual futura e
+    `8` bloqueados.
+
+### Resultado de cartas
+
+Elegíveis para promoção manual futura, ainda sem auto-promotion:
+
+- `Counterspell`
+- `Goblin Bombardment`
+- `Seize the Day`
+- `Iron Man, Titan of Innovation`
+
+Bloqueadas por falta de template focado:
+
+- `Black Panther, Wakandan King`
+- `Captain America, First Avenger`
+- `Concerted Effort`
+- `Final Showdown`
+- `Ravenous Tyrannosaurus`
+- `Storm, Force of Nature`
+- `Warleader's Call`
+- `Wolverine, Best There Is`
+
+### Impacto para Lorehold
+
+- `Goblin Bombardment` e `Seize the Day` continuam com evidência focada.
+- `Iron Man, Titan of Innovation` deixou de ser bloqueio por falta de executor;
+  agora tem evidência manual-gated e pode ser avaliado como candidato em
+  Commander UR/RW-adjacent quando legal/identidade permitir.
+- Nenhuma dessas regras foi promovida para `verified/active` em
+  `card_battle_rules`; o backend/banco continuam donos da decisão.

@@ -2064,6 +2064,73 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_iron_man_attack_trigger_sacrifices_treasure_for_artifact_tutor():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            iron_man = {
+                "name": "Iron Man, Titan of Innovation",
+                "cmc": 4,
+                "type_line": "Legendary Artifact Creature — Human Hero",
+                "oracle_text": "Flying, haste\nGenius Industrialist — Whenever Iron Man attacks, create a Treasure token, then you may sacrifice a noncreature artifact. If you do, search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put it onto the battlefield tapped, then shuffle.",
+                "effect": "attack_artifact_tutor",
+                "artifact_attack_tutor": True,
+                "artifact_tutor_cmc_mode": "sacrificed_mana_value_plus",
+                "artifact_tutor_sacrifice_noncreature": True,
+                "artifact_tutor_enters_tapped": True,
+                "attack_trigger": True,
+                "power": 4,
+                "toughness": 4,
+                "summoning_sick": False,
+                "tapped": False,
+                "_rule_source": "focused_battle_rule_evidence",
+                "_rule_review_status": "needs_review",
+            }
+            active.battlefield = [
+                iron_man,
+            ]
+            active.library = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent", "mana_produced": 2},
+                {"name": "High Cost Artifact", "cmc": 5, "type_line": "Artifact", "effect": "finisher"},
+            ]
+
+            battle.combat_phase_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=4,
+                rng=random.Random(111),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+            battle.DECISION_TRACE_HANDLER = None
+
+        assert active.treasures == 0
+        assert any(card.get("name") == "Sol Ring" and card.get("tapped") is True for card in active.battlefield)
+        assert not any(card.get("name") == "Sol Ring" for card in active.library)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Iron Man, Titan of Innovation"
+            and data.get("activation_kind") == "artifact_attack_tutor"
+            and data.get("artifact_sacrificed") == "Treasure token"
+            and data.get("found") == "Sol Ring"
+            and data.get("target_cmc") == 1
+            and data.get("cmc_match") == "exact"
+            and data.get("enters_tapped") is True
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "attack_trigger_artifact_tutor"
+            and decision.get("chosen_option", {}).get("target") == "Sol Ring"
+            and decision.get("rule_status") == "needs_review"
+            for decision in decisions
+        )
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -2118,4 +2185,5 @@ def register_tests(battle, player):
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
         test_goblin_bombardment_sacrifices_expendable_token_for_damage,
         test_goblin_bombardment_skips_without_expendable_creature,
+        test_iron_man_attack_trigger_sacrifices_treasure_for_artifact_tutor,
     ]
