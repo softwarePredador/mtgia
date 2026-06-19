@@ -3551,6 +3551,35 @@ def mulligan_decision(hand):
     return evaluation["keep"], 7
 
 
+def _mulligan_trace_keep_score(evaluation):
+    """Trace-only score for explaining keep vs mulligan choices."""
+    score = 0.0
+    lands = int(evaluation.get("lands") or 0)
+    if 2 <= lands <= 4:
+        score += 4.0
+    elif lands in (1, 5):
+        score -= 2.0
+    else:
+        score -= 5.0
+
+    if evaluation.get("early_ramp"):
+        score += 3.0
+    if evaluation.get("early_play"):
+        score += 2.5
+    if (evaluation.get("card_flow_count") or 0) > 0:
+        score += 1.5
+    if (evaluation.get("proactive_board_count") or 0) > 0:
+        score += 1.0
+    if (evaluation.get("off_color_early_count") or 0) > 0:
+        score -= 2.0
+    if (evaluation.get("high_cost_cluster_count") or 0) >= 3:
+        score -= 4.0
+
+    score -= len(evaluation.get("risk_flags") or []) * 2.0
+    score += 3.0 if evaluation.get("keep") else -3.0
+    return round(score, 2)
+
+
 def _emit_mulligan_decision_trace(
     player,
     evaluation,
@@ -3564,6 +3593,10 @@ def _emit_mulligan_decision_trace(
     if forced_keep:
         risk_flags.append("forced_keep_after_mulligan_cap")
     hand_summary = evaluation.get("hand_summary") or []
+    keep_score = _mulligan_trace_keep_score(evaluation)
+    mulligan_score = -keep_score
+    chosen_score = keep_score if chosen_action == "keep" else mulligan_score
+    rejected_score = keep_score if chosen_action == "mulligan" else mulligan_score
     emit_decision_trace(
         decision_type="mulligan_decision",
         player=player,
@@ -3575,23 +3608,28 @@ def _emit_mulligan_decision_trace(
                 "lands": evaluation.get("lands"),
                 "nonlands": evaluation.get("nonlands"),
                 "reason": evaluation.get("reason"),
+                "score": keep_score,
             },
             {
                 "action": "mulligan",
                 "lands": evaluation.get("lands"),
                 "nonlands": evaluation.get("nonlands"),
                 "reason": evaluation.get("reason"),
+                "score": mulligan_score,
+                "available": not forced_keep,
             },
         ],
         chosen_option={
             "action": chosen_action,
             "mulligan_count": mulligan_count,
             "forced_keep": forced_keep,
+            "score": chosen_score,
         },
         rejected_options=[
             {
                 "action": "keep" if chosen_action == "mulligan" else "mulligan",
                 "rejected_reason": "opening_hand_policy",
+                "score": rejected_score,
             }
         ],
         score_components={

@@ -680,6 +680,14 @@
   - replay local `20260618_065705` fechou com `strategy_findings=0`,
     `critical/high/medium=0` e só `2` findings low remanescentes vindos de
     `needs_review` em cartas de oponente, não de ausência de comparativo.
+- Atualização 2026-06-19:
+  - `mulligan_decision` passou a pontuar explicitamente `keep` vs `mulligan`
+    no trace, incluindo `chosen_option_score`, `best_rejected_option_score`,
+    `score_gap_vs_best_rejected` e `risk_flags` para mãos como `3 lands +
+    quatro spells custo 8/9`;
+  - novo teste focado
+    `test_mulligan_trace_scores_keep_vs_mulligan_for_heavy_dead_hand` cobre o
+    caso sem alterar a decisão da simulação.
 - Validação:
   - corpus pequeno com zero findings `critical/high` no auditor forense;
   - auditor estratégico apontando decisões sem justificativa comparativa.
@@ -2378,7 +2386,7 @@ Tasks priorizadas derivadas do estudo:
 |---|---|---|---|
 | P1 | Refinar `Urza's Saga` depois do slice minimo ja implementado | Em 2026-06-16 o battle passou a inicializar capitulo/lore, avancar no upkeep, criar Construct no capitulo II e tutorar artefato cmc<=1 seguro no capitulo III antes do SBA. O gap remanescente e de refinamento: sizing dinamico do Construct e generalizacao prudente do fluxo de Saga | Menos ambiguidade medium-risk no Lorehold sem abrir uma engine de Saga agressiva demais |
 | P1 | Fechar cartas recorrentes de oponentes que ainda aparecem como `review_rule_used` | O ruido residual do audit ainda passa por regras parciais de oponentes, nao por quebradeira do Lorehold. Em 2026-06-17 `Incubation Druid` saiu de `needs_review` ao ganhar baseline `curated/active` coerente com mana dork; `Ashnod's Altar` tambem avancou e ja tem executor contextual minimo para `sacrifice_creature -> mana unlock`. Em 2026-06-18 um slice seguro promoveu mais seis recorrentes para a camada reviewed sem inventar executor novo: `Ancient Tomb` (`curated/verified`), `Fellwar Stone` (`curated/active`), `Mana Vault` (`curated/active`), `Path to Exile` (`curated/active`), `Seething Song` (`curated/verified`) e `Talisman of Conviction` (`curated/active`). No fechamento seguinte do mesmo dia, `Basking Broodscale` e `Scavenging Ooze` tambem sairam do replay vivo como `needs_review` ao serem promovidas para modelos conservadores de criatura | Cobertura mais limpa para usar scorecards sem inflar `unknown`/`needs_review`; proximo gap real deixa de ser "falta regra" e passa a ser medir quais outliers residuais ainda justificam promotion conservador e quais habilidades ativadas/triggers merecem executor proprio |
-| P1 | Evoluir `decision_trace_v1` para decisao comparativa | O replay atual ja mostra o que foi feito, mas ainda nao explica sempre por que A venceu B | Base auditavel para julgar qualidade de decisao, nao so legalidade |
+| P1 | Evoluir `decision_trace_v1` para decisao comparativa | Pass/cast/rummage ja tinham comparativo e o slice 2026-06-19 adicionou score explícito de mulligan; falta ampliar cobertura para decisões complexas restantes de tutor/response/combat | Base auditavel para julgar qualidade de decisao, nao so legalidade |
 | P1 | Criar scorecard Commander-safe de decisao/impacto (com/sem carta vista, com/sem carta castada, delta vs baseline, amostra minima) | Slice inicial de 2026-06-19 adicionou esses campos em `card_impact_analyzer.py`; falta rodar corpus maior, segmentar por arquétipo/turno e classificar conclusões | Aprendizado menos enganado por variance e jogos longos |
 | P1 | Promover a mesma semântica canônica de `Mox Amber` também no rollout PG/Hermes remoto | O cache local ja foi corrigido para incluir `requires_legendary_creature_or_planeswalker_for_mana=true` e o waiver runtime foi removido; o risco restante e divergencia entre ambiente local e rollout remoto | Mulligan, mana refresh e fast-mana scoring coerentes em todos os ambientes, sem depender de hotfix local |
 | P1 | Formalizar a politica de mulligan Commander no auditor/trace como `curve + color + plan + sequencing + interaction` | A parte legal ja esta fechada; em 2026-06-17 o London Mulligan passou a escolher bottom por politica auditavel, e em 2026-06-18 o keep passou a rejeitar `reactive_only` land-heavy, `expensive_cluster_without_setup` e plano cedo apenas off-color. O gap restante agora e enriquecer o trace comparativo com alternativas rejeitadas e calibrar em corpus maior por comandante/arquetipo | Abertura de maos mais reproduzivel e melhor rastreabilidade do porquê keep/mull/bottom |

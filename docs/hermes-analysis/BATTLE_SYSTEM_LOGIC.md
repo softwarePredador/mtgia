@@ -216,6 +216,12 @@ com seed fixa gerou `1098` eventos estruturados e `152` decision traces; o
 fechou com `turn_findings=0`, `decision_findings=0`, `critical=0`, `high=0`,
 `medium=0` e `low=0`.
 
+No slice de 2026-06-19, `mulligan_decision` tambem passou a pontuar
+explicitamente `keep` vs `mulligan` no trace. Maos como `3 lands + quatro
+spells custo 8/9` agora registram `chosen_option_score`,
+`best_rejected_option_score`, `score_gap_vs_best_rejected` e `risk_flags`
+como `expensive_dead_hand`, sem mudar a decisao da simulação.
+
 Auditoria:
 
 ```bash

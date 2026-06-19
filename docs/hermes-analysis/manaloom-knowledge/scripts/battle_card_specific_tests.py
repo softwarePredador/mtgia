@@ -979,6 +979,47 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_mulligan_trace_scores_keep_vs_mulligan_for_heavy_dead_hand():
+        decisions = []
+        previous_trace_handler = battle.DECISION_TRACE_HANDLER
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            battle.DECISION_TRACE_HANDLER = lambda payload: decisions.append(payload)
+            active = player("Lorehold")
+            active.hand = [
+                {"name": "Plains", "cmc": 0, "type_line": "Land"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Land"},
+                {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land"},
+                {"name": "Eight Drop A", "cmc": 8, "type_line": "Sorcery"},
+                {"name": "Eight Drop B", "cmc": 8, "type_line": "Sorcery"},
+                {"name": "Nine Drop A", "cmc": 9, "type_line": "Sorcery"},
+                {"name": "Nine Drop B", "cmc": 9, "type_line": "Sorcery"},
+            ]
+
+            evaluation = battle.mulligan_evaluation(active.hand)
+            assert evaluation["keep"] is False
+            assert evaluation["reason"] == "expensive_cluster_without_setup"
+            battle._emit_mulligan_decision_trace(
+                active,
+                evaluation,
+                mulligan_count=0,
+                chosen_action="mulligan",
+                bottomed_cards=[],
+            )
+        finally:
+            battle.DECISION_TRACE_HANDLER = previous_trace_handler
+
+        assert len(decisions) == 1
+        trace = decisions[0]
+        assert trace["decision_type"] == "mulligan_decision"
+        assert trace["chosen_option"]["action"] == "mulligan"
+        assert trace["chosen_option_score"] > trace["best_rejected_option_score"]
+        assert trace["score_gap_vs_best_rejected"] > 0
+        assert any(item["option"] == "mulligan" for item in trace["available_option_scores"])
+        assert any(item["option"] == "keep" for item in trace["rejected_option_scores"])
+        assert "expensive_dead_hand" in trace["risk_flags"]
+
     def test_special_lands_are_modelled_as_lands_not_spell_heuristics():
         ancient_tomb_effect = battle.get_card_effect({"name": "Ancient Tomb", "type_line": "Land"})
         assert ancient_tomb_effect["effect"] == "land"
@@ -2480,6 +2521,7 @@ def register_tests(battle, player):
         test_birgi_adds_red_mana_when_controller_casts_spell,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_valakut_awakening_filters_hand_and_draws_plus_one,
+        test_mulligan_trace_scores_keep_vs_mulligan_for_heavy_dead_hand,
         test_special_lands_are_modelled_as_lands_not_spell_heuristics,
         test_war_room_activates_when_hand_is_low_and_life_is_safe,
         test_war_room_skips_when_life_is_too_low,
