@@ -98,6 +98,11 @@ def infer_effect_families_from_text(oracle_text: str) -> list[str]:
         )
     ):
         families.add("activated_sacrifice_creature_damage")
+    if (
+        "return target creature card from your graveyard to your hand" in text
+        or "return target creature card from your graveyard to your hand." in text
+    ):
+        families.add("graveyard_or_zone_recursion")
     if "draw a card" in text or "draw cards" in text:
         families.add("card_advantage_or_selection")
     if "destroy all" in text or "exile all" in text:

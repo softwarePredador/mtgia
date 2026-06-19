@@ -292,7 +292,19 @@ def battle_rule_status(card: CardRecord, roles: list[str]) -> str:
         return "missing"
     if "treasure token" in text:
         return "missing"
-    if any(role in roles for role in ("removal", "board_wipe", "protection", "tutor", "engine", "wincon", "combo")):
+    if any(
+        role in roles
+        for role in (
+            "removal",
+            "board_wipe",
+            "protection",
+            "tutor",
+            "engine",
+            "wincon",
+            "combo",
+            "recursion",
+        )
+    ):
         return "missing"
     return "not_required"
 

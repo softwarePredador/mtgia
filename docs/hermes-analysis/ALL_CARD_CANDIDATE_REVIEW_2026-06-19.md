@@ -315,6 +315,12 @@ P1:
   há regra battle confiável; em 2026-06-19 foi fechado o template seguro
   `Create a Treasure token.`, com regra temporária SQLite no focused evidence,
   evento `treasure_created` e promotion gate report-only;
+- considerar papel `recursion` como fila `needs_rule_review` quando não há
+  regra battle confiável; em 2026-06-19 foi fechado apenas o template seguro
+  `Return target creature card from your graveyard to your hand.`, com regra
+  temporária SQLite no focused evidence. Reanimate, land recursion, qualquer
+  card recursion, recast from graveyard/exile, loops e variantes com riders
+  continuam pendentes;
 - ampliar `targeted_interaction` e `mass_removal_or_modal_wipe` apenas para
   variantes que ainda não caem nos templates estreitos de `Destroy target
   creature.`, `Destroy target nonland permanent.` e `Destroy all creatures.`;

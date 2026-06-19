@@ -2625,13 +2625,28 @@ Atualização do slice de 2026-06-19:
   - escopo propositalmente não cobre ainda `Permanents you control gain
     indestructible`, prevenção ampla de dano ou proteção de alvo individual,
     porque esses casos exigem templates e assertions próprios.
+- Slice adicional de recursão simples:
+  - `manaloom_new_card_candidate_review.py` passou a tratar `recursion` como
+    papel que exige `needs_rule_review` quando não há regra battle confiável;
+  - `manaloom_battle_rule_review_queue.py` passou a inferir
+    `graveyard_or_zone_recursion` para oracle text exato
+    `Return target creature card from your graveyard to your hand.`;
+  - `manaloom_battle_rule_focused_evidence.py` ganhou template estreito para
+    esse caso, usando regra temporária SQLite no `battle_rule_registry` para
+    provar o caminho canônico de `card_battle_rules`, não o fallback
+    heurístico `functional_tags_json`;
+  - o fixture controlado de consumidores passou de 11 para 12 drafts elegíveis.
+  - escopo propositalmente não cobre ainda reanimate para battlefield, qualquer
+    card recursion, land recursion, cast from graveyard/exile, loops ou
+    recursão com múltiplos alvos/riders.
 
 Pendências P1 agora priorizadas:
 
 - Fechar `needs_data` material via sync determinístico
   Scryfall/MTGJSON/PostgreSQL, sem LLM.
 - Criar templates focados para as famílias mais frequentes:
-  - `graveyard_or_zone_recursion`;
+  - `graveyard_or_zone_recursion` restante, excluindo o subcaso já coberto de
+    `Return target creature card from your graveyard to your hand.`;
   - `protection_or_prevention` restante, excluindo o subcaso já coberto de
     criaturas ganhando indestrutível até o fim do turno;
   - `triggered_or_static_engine`;
