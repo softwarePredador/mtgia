@@ -1070,7 +1070,7 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
             self.assertEqual(gate_summary["eligible_count"], 0)
             self.assertEqual(gate_summary["blocked_count"], 1)
 
-    def test_exile_removal_requires_exile_template_before_promotion(self) -> None:
+    def test_exile_removal_uses_dedicated_exile_template_before_promotion(self) -> None:
         candidate = _load_module(
             "manaloom_new_card_candidate_review_exile_removal",
             "bin/manaloom_new_card_candidate_review.py",
@@ -1142,9 +1142,9 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 )
             )
             self.assertEqual(evidence_summary["evaluated_count"], 1)
-            self.assertEqual(evidence_summary["evidence_count"], 0)
+            self.assertEqual(evidence_summary["evidence_count"], 1)
             self.assertEqual(
-                evidence_summary["reasons"].get("no_focused_evidence_template_for_effect_family"),
+                evidence_summary["reasons"].get("exile_target_creature_supported"),
                 1,
             )
 
@@ -1161,8 +1161,8 @@ class ManaloomReviewQueueConsumersTest(unittest.TestCase):
                 )
             )
             self.assertEqual(gate_summary["evaluated_count"], 1)
-            self.assertEqual(gate_summary["eligible_count"], 0)
-            self.assertEqual(gate_summary["blocked_count"], 1)
+            self.assertEqual(gate_summary["eligible_count"], 1)
+            self.assertEqual(gate_summary["blocked_count"], 0)
 
 
 if __name__ == "__main__":

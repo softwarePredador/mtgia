@@ -11524,10 +11524,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     target_is_creature=is_battlefield_creature(t),
                     target_type_line=t.get("type_line", ""),
                     available_targets=len(targets),
+                    destination=str(effect_data.get("destination") or "graveyard").lower(),
                     turn=turn,
                     **decision,
                 )
-                move_permanent_from_battlefield(opp, t)
+                destination = str(effect_data.get("destination") or "graveyard").lower()
+                if destination == "exile":
+                    move_zone_object_to_exile(
+                        opp,
+                        "battlefield",
+                        t,
+                        reason="removal",
+                        source=card,
+                        turn=turn,
+                    )
+                else:
+                    move_permanent_from_battlefield(opp, t)
                 break
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "deal_damage":

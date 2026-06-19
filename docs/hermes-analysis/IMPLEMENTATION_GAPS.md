@@ -2682,14 +2682,17 @@ Atualização do slice de 2026-06-19:
   - escopo propositalmente não cobre ainda loot/rummage, impulse
     draw/exile play, wheel, cantrip com rider, compra condicional ou draw
     engine permanente.
-- Guardrail adicional de remoção por exílio:
-  - `Exile target creature.` entra na fila `needs_rule_review` como
-    `targeted_interaction`, mas permanece sem focused evidence e bloqueado no
-    promotion gate;
-  - motivo: os templates de remoção já cobertos removem para graveyard
-    (`Destroy target ...`). Exílio precisa executor/assertion própria que mova
-    o alvo para `exile`, preserve decoys e registre destino no replay;
-  - isso evita promover `exile target` como se fosse `destroy target`.
+- Slice adicional de remoção por exílio:
+  - `Exile target creature.` continua entrando na fila `needs_rule_review` como
+    `targeted_interaction`, mas agora tem focused evidence próprio antes de
+    qualquer promoção manual;
+  - `battle_analyst_v9.py` aceita `destination=exile` em regras verificadas de
+    `remove_creature` e registra esse destino no evento `removal_resolved`;
+  - `manaloom_battle_rule_focused_evidence.py` cria regra SQLite temporária com
+    `effect=remove_creature/target=creature/destination=exile`, executa replay
+    focado, exige alvo em `exile`, alvo ausente do graveyard, decoy preservado
+    e auditoria sem findings critical/high;
+  - isso preserva a separação correta entre `destroy target` e `exile target`.
 
 Pendências P1 agora priorizadas:
 
@@ -2712,10 +2715,10 @@ Pendências P1 agora priorizadas:
   compra simples de quantidade fixa e, separadamente, loot/rummage/impulse/wheel
   com estratégia própria.
 - Expandir `targeted_interaction` e `mass_removal_or_modal_wipe` somente para
-  variantes que não sejam os templates simples já cobertos. Exemplos: destroy
-  target permanent com rider, exile target creature/permanent, modal wipe,
-  asymmetric wipe, damage-based removal e removal com restrições/conditional
-  rider.
+  variantes que não sejam os templates simples já cobertos. Exemplos: exile
+  target permanent/nonland permanent/artifact/enchantment, destroy/exile com
+  rider, modal wipe, asymmetric wipe, damage-based removal e removal com
+  restrições/conditional rider.
 - Calibrar inferência de roles para reduzir falsos scores 100 em cartas que
   acumulam `protection/ramp/recursion/tutor` por texto genérico.
 - Rodar scorecard Lorehold apenas com candidatos `test`/regra `verified` ou
