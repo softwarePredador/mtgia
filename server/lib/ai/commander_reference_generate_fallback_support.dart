@@ -284,6 +284,10 @@ DeterministicReferenceDeckBuildResult buildDeterministicReferenceDeckResult({
 
   if (builtInFallbackEnabled) {
     for (final name in loreholdDeterministicReferenceFallbackCards) {
+      final normalizedName = normalizeCommanderReferenceCardName(name);
+      if ((sourceLabelsByName[normalizedName] ?? const <String>{}).isNotEmpty) {
+        continue;
+      }
       addCard(name, 'deterministic_fallback');
     }
   }

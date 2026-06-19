@@ -364,7 +364,8 @@ void main() {
       );
     });
 
-    test('captures deterministic source provenance for overlap cards', () {
+    test('does not label fallback when stronger sources already own a card',
+        () {
       final profile = buildLoreholdReferenceProfilePayload(
         updatedAt: DateTime.utc(2026, 5, 11, 12),
       );
@@ -386,19 +387,14 @@ void main() {
       expect(result.mainDeckQuantity, equals(6));
       expect(result.basicLandQuantity, equals(0));
       expect(result.builtInFallbackEnabled, isTrue);
-      expect(result.builtInFallbackUsedCount, equals(6));
-      expect(
-        result.sourceMixCounts[
-            'deterministic_fallback + profile_expected_packages + reference_card_stats'],
-        equals(1),
-      );
+      expect(result.builtInFallbackUsedCount, equals(0));
+      expect(result.sourceUsageCounts['deterministic_fallback'], isNull);
       final arcaneSignet = result.cardProvenance.singleWhere(
         (entry) => entry.cardName == 'Arcane Signet',
       );
       expect(
         arcaneSignet.sources,
         equals([
-          'deterministic_fallback',
           'profile_expected_packages',
           'reference_card_stats',
         ]),
@@ -555,7 +551,7 @@ void main() {
       );
       expect(
         fellwarStone.sources,
-        equals(['active_learned_deck', 'deterministic_fallback']),
+        equals(['active_learned_deck']),
       );
       final smugglersShare = result.cardProvenance.singleWhere(
         (entry) => entry.cardName == 'Smuggler\'s Share',

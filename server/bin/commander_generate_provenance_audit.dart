@@ -237,11 +237,20 @@ Future<void> main(List<String> args) async {
       sourceSets: sourceSets,
       canonicalNames: canonicalNames,
     );
-    final deterministicOwnership = classifyDeterministicDeckSources(
-      deckCardNames: deterministicDeckCards,
-      sourceSets: sourceSets,
-      canonicalNames: canonicalNames,
-    );
+    final deterministicOwnership = deterministicDeckResult == null
+        ? classifyDeterministicDeckSources(
+            deckCardNames: deterministicDeckCards,
+            sourceSets: sourceSets,
+            canonicalNames: canonicalNames,
+          )
+        : deterministicDeckResult.cardProvenance
+            .map(
+              (entry) => DeterministicDeckSourceEntry(
+                cardName: entry.cardName,
+                sources: entry.sources,
+              ),
+            )
+            .toList(growable: false);
 
     final summary = {
       'status': 'PASS_WITH_RISKS',
@@ -661,15 +670,16 @@ List<Map<String, dynamic>> _buildGaps({
     });
   }
   if (activeLearnedDeck != null) {
-    final normalizedCommander = normalizeAuditName(activeLearnedDeck.commanderName);
+    final normalizedCommander =
+        normalizeAuditName(activeLearnedDeck.commanderName);
     final learnedOnlyAbsent = normalizeNameSet(
       activeLearnedDeck.cards.map((card) => card.name),
     ).where(
       (name) =>
           name != normalizedCommander &&
           deterministicOwnership.every(
-        (entry) => normalizeAuditName(entry.cardName) != name,
-      ),
+            (entry) => normalizeAuditName(entry.cardName) != name,
+          ),
     );
     if (learnedOnlyAbsent.isNotEmpty) {
       gaps.add({

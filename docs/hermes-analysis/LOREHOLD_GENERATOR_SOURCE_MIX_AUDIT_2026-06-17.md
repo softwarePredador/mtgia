@@ -108,12 +108,25 @@ Atualização do slice 2026-06-19:
   canônicos;
 - o profile atualizado foi aplicado no PostgreSQL e gerou 46
   `reference_card_stats` resolvidos, sem unresolved;
-- o rerun live `lorehold_generator_source_mix_2026-06-19_after_profile_backfill_v2.json`
-  confirmou:
+- um rerun live intermediário confirmou:
   - `fallback_without_profile_or_stats_count = 0`;
   - `learned_plus_fallback_only_count = 0`;
   - `fallback_profile_stats_no_empirical_support_count = 0`;
   - `fallback_touched_count = 23`, agora sempre com fonte não-fallback.
+- o rerun v2 também expôs um bug no auditor: o builder já não precisava do
+  fallback como fonte, mas `commander_generate_provenance_audit.dart`
+  reconstruía ownership contra a lista fallback estática;
+- em seguida, o builder passou a rotular `deterministic_fallback` somente
+  quando fallback realmente introduz a carta, e o auditor passou a usar
+  `DeterministicReferenceDeckBuildResult.cardProvenance` como fonte canônica;
+- o rerun live final
+  `lorehold_generator_source_mix_2026-06-19_fallback_provenance_v4.json`
+  confirmou todos os buckets críticos zerados:
+  - `fallback_touched_count = 0`;
+  - `fallback_only_count = 0`;
+  - `learned_plus_fallback_only_count = 0`;
+  - `fallback_without_profile_or_stats_count = 0`;
+  - `fallback_profile_stats_no_empirical_support_count = 0`.
 
 Leitura:
 
@@ -231,9 +244,10 @@ Status após o slice 2026-06-19:
   PostgreSQL vivo;
 - o item 2 também zerou no rerun live porque `Fellwar Stone` e
   `Lightning Greaves` agora têm profile/stats;
-- o próximo item real é reduzir o uso auxiliar de `deterministic_fallback`
-  remanescente (`fallback_touched_count = 23`) sem perder a explicabilidade
-  multi-fonte já conquistada.
+- o item 3 também zerou no rerun live;
+- a provenance final não lista mais `deterministic_fallback` quando a carta já
+  tem fonte forte. Fallback permanece disponível como segurança, mas não polui
+  a explicabilidade do deck quando não contribuiu para a escolha.
 
 Pergunta certa daqui para frente:
 
