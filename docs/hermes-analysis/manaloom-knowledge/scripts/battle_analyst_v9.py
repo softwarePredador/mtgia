@@ -7327,6 +7327,8 @@ def activate_lorehold_topdeck_artifacts(
         if isinstance(permanent, dict)
         and permanent.get("effect") == "topdeck_manipulation"
         and permanent.get("hand_to_top_exchange")
+        and not permanent.get("requires_sacrifice_artifact")
+        and not permanent.get("draw_count")
         and not permanent.get("utility_artifact_used_this_turn")
     ]
     if phase in {"upkeep", "opponent_upkeep"} and exchange_artifacts and player.library:
@@ -7468,6 +7470,202 @@ def activate_lorehold_topdeck_artifacts(
                 exchange_count=1,
                 phase=phase,
                 turn=turn,
+            )
+            return 1
+
+    brainstone_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") == "topdeck_manipulation"
+        and permanent.get("requires_sacrifice_artifact")
+        and int(permanent.get("draw_count") or 0) >= 3
+        and int(permanent.get("put_from_hand_on_top_count") or 0) >= 2
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase in {"upkeep", "opponent_upkeep"} and brainstone_artifacts and player.library:
+        for permanent in brainstone_artifacts:
+            activation_cost = int(permanent.get("activation_cost_generic") or 2)
+            draw_count = int(permanent.get("draw_count") or 3)
+            putback_count = int(permanent.get("put_from_hand_on_top_count") or 2)
+            miracle_cost = lorehold_miracle_cost(player)
+            if miracle_cost is None:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_lorehold_miracle_cost_for_brainstone_line",
+                    phase=phase,
+                )
+                continue
+            if player.cards_drawn_this_turn != 0:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "brainstone_not_first_draw_window",
+                    phase=phase,
+                )
+                continue
+            if len(player.library) < draw_count:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "not_enough_library_for_brainstone_draw",
+                    phase=phase,
+                )
+                continue
+            first_draw_candidate = player.library[0]
+            first_draw_score = lorehold_draw_priority(first_draw_candidate, player)
+            if (
+                first_draw_score < 130
+                or not is_instant_or_sorcery_spell(first_draw_candidate)
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "brainstone_first_draw_not_miracle_candidate",
+                    phase=phase,
+                )
+                continue
+            expected_putback_slots = sum(
+                1 for card in player.hand if isinstance(card, dict)
+            ) + sum(
+                1
+                for card in player.library[1:draw_count]
+                if isinstance(card, dict)
+            )
+            if expected_putback_slots < putback_count:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "not_enough_non_miracle_cards_for_brainstone_putback",
+                    phase=phase,
+                )
+                continue
+            if player.available_mana() < activation_cost + miracle_cost:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_brainstone_plus_miracle",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana("{%d}" % activation_cost):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_brainstone_activation_cost",
+                    phase=phase,
+                )
+                continue
+
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            permanent["utility_artifact_used_this_turn"] = True
+            permanent["tapped"] = True
+            player.graveyard.append(permanent)
+            drawn = player.draw(draw_count, rng)
+            if not drawn:
+                continue
+            first_drawn = drawn[0]
+            putback_candidates = [
+                card
+                for card in player.hand
+                if isinstance(card, dict) and card is not first_drawn
+            ]
+            if len(putback_candidates) < putback_count:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "not_enough_non_miracle_cards_for_brainstone_putback",
+                    phase=phase,
+                )
+                continue
+            putback_cards = sorted(
+                putback_candidates,
+                key=lambda card: (
+                    lorehold_draw_priority(card, player),
+                    int(_opening_hand_card_cmc(card) or 0),
+                    card.get("name", "?"),
+                ),
+            )[:putback_count]
+            for card in putback_cards:
+                player.hand.remove(card)
+            for card in reversed(putback_cards):
+                player.library.insert(0, card)
+
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        first_draw_candidate,
+                        score=first_draw_score,
+                        action="activate_brainstone_for_first_draw_miracle",
+                        effect="topdeck_manipulation",
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    first_draw_candidate,
+                    score=first_draw_score,
+                    action="activate_brainstone_for_first_draw_miracle",
+                    effect="topdeck_manipulation",
+                ),
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "draw_count": len(drawn),
+                    "putback_count": len(putback_cards),
+                    "first_draw": first_drawn.get("name", "?"),
+                    "miracle_cost": miracle_cost,
+                },
+                rule_source="lorehold_topdeck_support_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=first_draw_score,
+                actual_outcome="brainstone_first_draw_miracle_window",
+                reason="use_brainstone_when_first_draw_is_known_miracle_win_line",
+                strategic_principle="sacrifice topdeck tool only when the first draw immediately enables a high-priority miracle",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "mana": -activation_cost,
+                    "artifacts": -1,
+                    "graveyard": 1,
+                    "drawn": [card.get("name", "?") for card in drawn],
+                    "putback": [card.get("name", "?") for card in putback_cards],
+                },
+                risk_flags=["sacrifice_artifact", "multi_draw_first_card_miracle"],
+                rejected_reason="requires_first_draw_miracle_candidate",
+            )
+            emit_replay_event(
+                "topdeck_manipulation_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="brainstone_draw_three_put_two_back_for_miracle",
+                first_draw=first_drawn.get("name", "?"),
+                drawn=[card.get("name", "?") for card in drawn],
+                putback=[card.get("name", "?") for card in putback_cards],
+                phase=phase,
+                turn=turn,
+            )
+            try_lorehold_miracle_cast(
+                player,
+                drawn,
+                turn,
+                phase,
+                all_players,
+                rng,
+                stack,
+                source="brainstone_first_draw",
+                miracle_candidate=first_drawn,
             )
             return 1
 
@@ -7765,13 +7963,28 @@ def choose_lorehold_rummage_discard(player):
     )
 
 
-def try_lorehold_miracle_cast(player, drawn_for_turn, turn, phase, all_players, rng, stack, *, source):
-    if not player.is_human or not drawn_for_turn or player.cards_drawn_this_turn != 1:
+def try_lorehold_miracle_cast(
+    player,
+    drawn_for_turn,
+    turn,
+    phase,
+    all_players,
+    rng,
+    stack,
+    *,
+    source,
+    miracle_candidate=None,
+):
+    if not player.is_human or not drawn_for_turn:
+        return False
+    if miracle_candidate is None and player.cards_drawn_this_turn != 1:
+        return False
+    if miracle_candidate is not None and drawn_for_turn[0] is not miracle_candidate:
         return False
     miracle_cost = lorehold_miracle_cost(player)
     if miracle_cost is None:
         return False
-    last_drawn = drawn_for_turn[-1]
+    last_drawn = miracle_candidate or drawn_for_turn[-1]
     if not last_drawn or not is_instant_or_sorcery_spell(last_drawn):
         return False
     if player.available_mana() < miracle_cost:
@@ -7825,6 +8038,8 @@ def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, r
             all_players=all_players,
             stack=stack,
         )
+        if player.has_won():
+            return triggered
         discarded, discard_reason, risk_flags, use_top_replacement, scored_options = choose_lorehold_rummage_discard(player)
         if discarded is None:
             emit_replay_event(

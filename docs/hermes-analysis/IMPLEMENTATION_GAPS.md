@@ -804,6 +804,10 @@
       castável;
     - `Scroll Rack` com slice seguro de upkeep: troca de 1
       instant/sorcery forte da mão para o topo para preparar a próxima draw step.
+    - `Brainstone` com slice seguro de upkeep: sacrifica apenas quando a
+      primeira compra conhecida ja e um alvo de miracle de alta prioridade, ha
+      mana para pagar ativacao + miracle, ha cartas suficientes para recolocar
+      duas no topo e a linha fecha valor imediato.
     - `known_cards_canonical_snapshot.json` deixou de usar o bug "last row wins"
       e passou a escolher a melhor regra por prioridade de
       `review_status/execution_status/source/confidence`.
@@ -819,6 +823,8 @@
 - permanece aberto:
   - `Scroll Rack` multi-card/full exchange;
   - policy genérica do draw mode do `Sensei's Divining Top`;
+  - policy genérica de `Brainstone` fora da linha segura
+    `first-draw miracle` do Lorehold;
   - migrar futuros fluxos de discard por efeito para o mesmo helper canônico;
   - transformar o trace do Lorehold em decisão mais comparativa
     (por que descartar A e não B).
@@ -2630,8 +2636,8 @@ Pendências P2:
   - `test_known_cards_consumer_guardrail.py` passou a falhar se essas cartas
     voltarem ao fallback antigo.
 - Gap remanescente:
-  - ampliar replay controlado da linha `Approach of the Second Sun` para
-    `Brainstone`. Em 2026-06-19 foram fechados tres sub-slices:
+  - ampliar a policy de topo para uso reutilizavel fora do caminho seguro
+    Lorehold/Approach. Em 2026-06-19 foram fechados quatro sub-slices:
     `battle_decision_trace_tests.py` prova que a decisao `topdeck_setup`
     considera `Brainstone`, `Sensei's Divining Top` e `Scroll Rack`, registra
     scores comparativos, preserva `rule_source/status` e marca o risco
@@ -2641,7 +2647,9 @@ Pendências P2:
     `topdeck_manipulation_activated`, `lorehold_upkeep_rummage`,
     `miracle_cast` e `game_won`; o mesmo teste agora cobre `Scroll Rack` na
     janela correta de `opponent_upkeep`, corrigindo o gate que antes limitava a
-    troca ao `upkeep` proprio;
+    troca ao `upkeep` proprio; e tambem cobre `Brainstone` comprando
+    `Approach` como primeira carta, colocando duas cartas de volta, miracle e
+    vitoria antes do rummage continuar;
   - mover as capabilities de topdeck para policy reutilizável por outros
     comandantes, sem depender exclusivamente do caminho seguro do Lorehold.
 

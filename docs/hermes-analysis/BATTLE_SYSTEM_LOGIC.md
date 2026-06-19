@@ -363,16 +363,27 @@ Atualizacao 2026-06-19: a execucao completa da linha `Sensei's Divining Top` +
 `Lorehold, the Historian` + `Approach of the Second Sun` tambem passou a ter
 teste focado. O replay controlado prova: Top reordena `Approach` para o topo,
 o rummage do Lorehold descarta uma carta morta, compra `Approach`, miracle-casta
-a segunda copia e gera `game_won reason=approach`. `Scroll Rack` e `Brainstone`
-continuam em fila separada para cobertura executavel/policy reutilizavel.
+a segunda copia e gera `game_won reason=approach`. Naquele ponto,
+`Scroll Rack` e `Brainstone` ainda estavam em fila separada para cobertura
+executavel/policy reutilizavel.
 
 Atualizacao 2026-06-19: `Scroll Rack` tambem passou a ter replay executavel na
 linha de Lorehold. O gate de `hand_to_top_exchange` agora aceita
 `opponent_upkeep`, que representa ativar Scroll Rack em resposta a trigger de
 upkeep do Lorehold antes do rummage resolver. O teste prova a troca
 `Approach` da mao para o topo, compra via rummage, miracle e vitoria por
-segunda resolucao. `Brainstone` permanece pendente por exigir executor proprio
-de `{2}, {T}, sacrifice: draw three, put two back`.
+segunda resolucao. Naquele ponto, `Brainstone` permanecia pendente por exigir
+executor proprio de `{2}, {T}, sacrifice: draw three, put two back`.
+
+Atualizacao 2026-06-19: `Brainstone` tambem passou a ter replay executavel
+conservador na linha de Lorehold. O runtime so sacrifica Brainstone quando a
+primeira carta comprada ja e um alvo de miracle de alta prioridade, ha mana
+para pagar `{2}` + o custo de miracle, ha cartas suficientes para colocar duas
+de volta no topo e a ativacao fecha uma janela imediata. O teste prova:
+Brainstone compra `Approach of the Second Sun` como primeira carta, coloca duas
+cartas de volta, miracle-casta a segunda resolucao e encerra com
+`game_won reason=approach` antes do rummage continuar. A policy genérica para
+outros comandantes/linhas ainda fica separada.
 
 Guardrails operacionais atuais:
 
