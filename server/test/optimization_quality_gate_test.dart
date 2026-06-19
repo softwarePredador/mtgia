@@ -886,6 +886,162 @@ void main() {
       expect(result.additions, equals(const ['Rite of the Combo Turn']));
       expect(result.droppedReasons, isEmpty);
     });
+
+    test('uses commander profile role_targets to protect plan engines', () {
+      final originalDeck = [
+        _card(
+          name: 'Thousand-Year Storm',
+          typeLine: 'Enchantment',
+          manaCost: '{4}{U}{R}',
+          cmc: 6,
+          oracleText:
+              'Whenever you cast an instant or sorcery spell, copy it for each other instant and sorcery spell you cast before it this turn.',
+          functionalTags: const [
+            {'tag': 'spellslinger', 'confidence': 0.95, 'source': 'persisted'},
+          ],
+        ),
+      ];
+      final additions = [
+        _card(
+          name: 'Generic Threat',
+          typeLine: 'Creature',
+          manaCost: '{4}{R}{R}',
+          cmc: 6,
+          oracleText: 'Trample.',
+        ),
+      ];
+
+      final archetypeOnly = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Thousand-Year Storm'],
+        additions: const ['Generic Threat'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+      );
+      expect(archetypeOnly.removals, equals(const ['Thousand-Year Storm']));
+
+      final profileAware = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Thousand-Year Storm'],
+        additions: const ['Generic Threat'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+        profileRoleTargets: const {
+          'spell_payoffs_copy_engines': {'min': 5, 'max': 8},
+        },
+      );
+
+      expect(profileAware.removals, isEmpty);
+      expect(profileAware.additions, isEmpty);
+      expect(profileAware.droppedReasons.single, contains('engine'));
+    });
+
+    test('uses profile land targets before generic archetype land trimming',
+        () {
+      final originalDeck = [
+        _card(
+          name: 'Wastes',
+          typeLine: 'Basic Land',
+          manaCost: '',
+          cmc: 0,
+          oracleText: '{T}: Add {C}.',
+          quantity: 37,
+        ),
+        _card(
+          name: 'Plan Filler',
+          typeLine: 'Creature',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText: 'Vigilance.',
+          quantity: 63,
+        ),
+      ];
+      final additions = [
+        _card(
+          name: 'Ichor Wellspring',
+          typeLine: 'Artifact',
+          manaCost: '{2}',
+          cmc: 2,
+          oracleText:
+              'When Ichor Wellspring enters the battlefield or is put into a graveyard from the battlefield, draw a card.',
+        ),
+      ];
+
+      final genericMidrange = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Wastes'],
+        additions: const ['Ichor Wellspring'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+      );
+      expect(genericMidrange.removals, equals(const ['Wastes']));
+
+      final loreholdProfileRange = filterUnsafeOptimizeSwapsByCardData(
+        removals: const ['Wastes'],
+        additions: const ['Ichor Wellspring'],
+        originalDeck: originalDeck,
+        additionsData: additions,
+        archetype: 'midrange',
+        profileRoleTargets: const {
+          'lands': {'min': 36, 'max': 38},
+        },
+      );
+
+      expect(loreholdProfileRange.removals, isEmpty);
+      expect(loreholdProfileRange.additions, isEmpty);
+      expect(
+        loreholdProfileRange.droppedReasons.single,
+        contains('papel land -> draw'),
+      );
+    });
+
+    test('uses profile role_targets in final rejection reasons', () {
+      final validation = ValidationReport(
+        score: 72,
+        verdict: 'reprovado',
+        monteCarlo: MonteCarloComparison(
+          before: _goldfish(keepableRate: 0.84, turn2PlayRate: 0.7),
+          after: _goldfish(keepableRate: 0.84, turn2PlayRate: 0.7),
+          beforeMulligan: _mulligan(),
+          afterMulligan: _mulligan(),
+        ),
+        functional: FunctionalReport(
+          swaps: const [],
+          upgrades: 0,
+          sidegrades: 0,
+          tradeoffs: 1,
+          questionable: 0,
+          roleDelta: const {'engine': -1},
+        ),
+        warnings: const [],
+      );
+
+      final genericReasons = buildOptimizationRejectionReasons(
+        validationReport: validation,
+        archetype: 'midrange',
+        preCurve: 3.0,
+        postCurve: 3.0,
+        preManaAssessment: 'Base de mana equilibrada',
+        postManaAssessment: 'Base de mana equilibrada',
+      );
+      expect(
+          genericReasons.any((reason) => reason.contains('"engine"')), isFalse);
+
+      final profileReasons = buildOptimizationRejectionReasons(
+        validationReport: validation,
+        archetype: 'midrange',
+        preCurve: 3.0,
+        postCurve: 3.0,
+        preManaAssessment: 'Base de mana equilibrada',
+        postManaAssessment: 'Base de mana equilibrada',
+        profileRoleTargets: const {
+          'spell_payoffs_copy_engines': {'min': 5, 'max': 8},
+        },
+      );
+
+      expect(
+          profileReasons.any((reason) => reason.contains('"engine"')), isTrue);
+    });
   });
 }
 

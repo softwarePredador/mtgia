@@ -27,6 +27,7 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
   required String archetype,
   String? commanderName,
   Map<String, Map<String, dynamic>>? cardDeckProfiles,
+  Map<String, dynamic>? profileRoleTargets,
 }) {
   final pairCount = [
     removals.length,
@@ -39,7 +40,12 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
 
   final structuralRecoveryScenario =
       _isStructuralRecoveryScenario(originalDeck);
-  final landTrimContext = _computeLandTrimContext(originalDeck, archetype);
+  final profileGatePolicy = _resolveProfileGatePolicy(profileRoleTargets);
+  final landTrimContext = _computeLandTrimContext(
+    originalDeck,
+    archetype,
+    profileGatePolicy: profileGatePolicy,
+  );
 
   for (var i = 0; i < pairCount; i++) {
     final removalName = removals[i];
@@ -64,7 +70,10 @@ OptimizationSwapGateResult filterUnsafeOptimizeSwapsByCardData({
         (removedRole == 'utility' && addedRole == 'utility') ||
         removedRoles.intersection(addedRoles).isNotEmpty;
 
-    final criticalRoles = _criticalRolesForArchetype(archetype);
+    final criticalRoles = _criticalRolesForArchetype(
+      archetype,
+      profileGatePolicy: profileGatePolicy,
+    );
     final removedCriticalRoles = removedRoles.intersection(criticalRoles);
     final losingCriticalRole =
         removedCriticalRoles.difference(addedRoles).isNotEmpty;
@@ -327,6 +336,121 @@ class _LandTrimContext {
   int get excessLands => landCount - recommendedLandCount;
 }
 
+class _ProfileGatePolicy {
+  const _ProfileGatePolicy({
+    required this.criticalRoles,
+    required this.recommendedLandCount,
+  });
+
+  final Set<String> criticalRoles;
+  final int? recommendedLandCount;
+}
+
+_ProfileGatePolicy? _resolveProfileGatePolicy(
+  Map<String, dynamic>? roleTargets,
+) {
+  if (roleTargets == null || roleTargets.isEmpty) return null;
+
+  final criticalRoles = <String>{};
+  int? recommendedLandCount;
+
+  for (final entry in roleTargets.entries) {
+    final key = entry.key.toString().trim().toLowerCase();
+    if (key.isEmpty) continue;
+
+    final targetMax = _readRoleTargetMax(entry.value);
+    final targetMin = _readRoleTargetMin(entry.value);
+    final hasPositiveTarget = (targetMax ?? targetMin ?? 0) > 0;
+    if (!hasPositiveTarget) continue;
+
+    final normalizedKey = key.replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+    if (normalizedKey == 'lands' || normalizedKey == 'land') {
+      recommendedLandCount = targetMax ?? targetMin;
+      continue;
+    }
+
+    criticalRoles.addAll(_rolesForProfileTargetKey(normalizedKey));
+  }
+
+  if (criticalRoles.isEmpty && recommendedLandCount == null) return null;
+  return _ProfileGatePolicy(
+    criticalRoles: criticalRoles,
+    recommendedLandCount: recommendedLandCount,
+  );
+}
+
+int? _readRoleTargetMin(Object? value) => _readRoleTargetBound(value, 'min');
+
+int? _readRoleTargetMax(Object? value) => _readRoleTargetBound(value, 'max');
+
+int? _readRoleTargetBound(Object? value, String key) {
+  if (value is num) return value.round();
+  if (value is String) return int.tryParse(value.trim());
+  if (value is Map) {
+    final raw = value[key] ?? value[key.toUpperCase()];
+    if (raw is num) return raw.round();
+    if (raw is String) return int.tryParse(raw.trim());
+  }
+  return null;
+}
+
+Set<String> _rolesForProfileTargetKey(String key) {
+  final roles = <String>{};
+
+  if (key.contains('ramp') ||
+      key.contains('mana_rock') ||
+      key.contains('treasure') ||
+      key.contains('acceleration')) {
+    roles.add('ramp');
+  }
+  if (key.contains('draw') ||
+      key.contains('rummage') ||
+      key.contains('loot') ||
+      key.contains('cantrip')) {
+    roles.add('draw');
+  }
+  if (key.contains('spot_interaction') ||
+      key.contains('interaction') ||
+      key.contains('removal')) {
+    roles.add('removal');
+  }
+  if (key.contains('wipe') || key.contains('reset')) {
+    roles.add('wipe');
+  }
+  if (key.contains('protection') ||
+      key.contains('protect') ||
+      key.contains('equipment')) {
+    roles.add('protection');
+  }
+  if (key.contains('recursion') ||
+      key.contains('graveyard') ||
+      key.contains('flashback')) {
+    roles.add('recursion');
+  }
+  if (key.contains('win_condition') ||
+      key.contains('wincon') ||
+      key.contains('finisher') ||
+      key.contains('haymaker')) {
+    roles.add('wincon');
+  }
+  if (key.contains('engine') ||
+      key.contains('payoff') ||
+      key.contains('copy') ||
+      key.contains('spellslinger') ||
+      key.contains('topdeck') ||
+      key.contains('miracle_setup')) {
+    roles.add('engine');
+  }
+  if (key.contains('tutor')) {
+    roles.add('tutor');
+  }
+  if (key.contains('combo')) {
+    roles.add('combo_piece');
+  }
+
+  return roles;
+}
+
 int _recommendedLandCountForArchetype(String archetype) {
   final normalized = archetype.trim().toLowerCase();
   if (normalized.contains('aggro')) return 34;
@@ -337,8 +461,9 @@ int _recommendedLandCountForArchetype(String archetype) {
 
 _LandTrimContext _computeLandTrimContext(
   List<Map<String, dynamic>> originalDeck,
-  String archetype,
-) {
+  String archetype, {
+  _ProfileGatePolicy? profileGatePolicy,
+}) {
   var totalCards = 0;
   var landCount = 0;
 
@@ -355,7 +480,8 @@ _LandTrimContext _computeLandTrimContext(
   return _LandTrimContext(
     totalCards: totalCards,
     landCount: landCount,
-    recommendedLandCount: _recommendedLandCountForArchetype(archetype),
+    recommendedLandCount: profileGatePolicy?.recommendedLandCount ??
+        _recommendedLandCountForArchetype(archetype),
   );
 }
 
@@ -426,6 +552,7 @@ List<String> buildOptimizationRejectionReasons({
   required double postCurve,
   required String preManaAssessment,
   required String postManaAssessment,
+  Map<String, dynamic>? profileRoleTargets,
 }) {
   final reasons = <String>[];
 
@@ -447,7 +574,10 @@ List<String> buildOptimizationRejectionReasons({
     );
   }
 
-  final criticalRoles = _criticalRolesForArchetype(archetype);
+  final criticalRoles = _criticalRolesForArchetype(
+    archetype,
+    profileGatePolicy: _resolveProfileGatePolicy(profileRoleTargets),
+  );
   for (final role in criticalRoles) {
     if ((validationReport.functional.roleDelta[role] ?? 0) < 0) {
       reasons.add('A otimização piorou a categoria crítica "$role".');
@@ -500,8 +630,11 @@ List<String> buildOptimizationRejectionReasons({
   return reasons.toSet().toList();
 }
 
-Set<String> _criticalRolesForArchetype(String archetype) {
-  return switch (archetype.trim().toLowerCase()) {
+Set<String> _criticalRolesForArchetype(
+  String archetype, {
+  _ProfileGatePolicy? profileGatePolicy,
+}) {
+  final baseline = switch (archetype.trim().toLowerCase()) {
     'aggro' => {'creature', 'ramp', 'removal', 'protection', 'wipe', 'wincon'},
     'control' => {'removal', 'draw', 'wipe', 'ramp', 'protection', 'wincon'},
     'midrange' => {'removal', 'ramp', 'draw', 'wipe', 'wincon'},
@@ -514,6 +647,9 @@ Set<String> _criticalRolesForArchetype(String archetype) {
       },
     _ => {'removal', 'ramp', 'wipe', 'wincon'},
   };
+  final profileRoles = profileGatePolicy?.criticalRoles ?? const <String>{};
+  if (profileRoles.isEmpty) return baseline;
+  return {...baseline, ...profileRoles};
 }
 
 bool _looksLikeOffThemeRoleSwap({

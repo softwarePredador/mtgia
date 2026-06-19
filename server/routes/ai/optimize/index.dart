@@ -621,6 +621,7 @@ Future<Response> onRequest(RequestContext context) async {
         commanders.isNotEmpty ? commanders.first.trim() : 'unknown';
     var optimizeCommanderPrioritySource = 'none';
     final optimizeCommanderPriorityNames = <String>[];
+    Map<String, dynamic>? optimizeCommanderRoleTargets;
     String? optimizeMetaEvidenceContext;
     Map<String, dynamic>? optimizeMetaReferenceContext;
     final deterministicSwapCandidates = <Map<String, dynamic>>[];
@@ -860,6 +861,11 @@ Future<Response> onRequest(RequestContext context) async {
           ]);
           final commanderReferenceProfile = results[0] as Map<String, dynamic>?;
           final metaSelection = results[1] as MetaDeckReferenceSelectionResult;
+          final rawRoleTargets = commanderReferenceProfile?['role_targets'];
+          if (rawRoleTargets is Map) {
+            optimizeCommanderRoleTargets =
+                rawRoleTargets.cast<String, dynamic>();
+          }
 
           if (metaSelection.priorityCardNames.isNotEmpty) {
             optimizeCommanderPrioritySource =
@@ -1684,6 +1690,7 @@ Future<Response> onRequest(RequestContext context) async {
               originalDeck: allCardData,
               additionsData: additionsData,
               archetype: effectiveOptimizeArchetype,
+              profileRoleTargets: optimizeCommanderRoleTargets,
             );
 
             if (gateResult.changed) {
@@ -1906,6 +1913,7 @@ Future<Response> onRequest(RequestContext context) async {
         postCurve: postCurve,
         preManaAssessment: preManaAssessment,
         postManaAssessment: postManaAssessment,
+        profileRoleTargets: optimizeCommanderRoleTargets,
       );
 
       if (finalQualityGateDecision.rejected) {
@@ -1961,6 +1969,7 @@ Future<Response> onRequest(RequestContext context) async {
         postCurve: postCurve,
         preManaAssessment: preManaAssessment,
         postManaAssessment: postManaAssessment,
+        profileRoleTargets: optimizeCommanderRoleTargets,
       );
       if (serializedValidationDecision.rejected) {
         return respondWithOptimizeTelemetry(

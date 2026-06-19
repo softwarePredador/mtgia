@@ -28,6 +28,7 @@ OptimizeRouteQualityGateDecision evaluateOptimizeRouteQualityGate({
   required double postCurve,
   required String preManaAssessment,
   required String postManaAssessment,
+  Map<String, dynamic>? profileRoleTargets,
 }) {
   if (isComplete || validationReport == null) {
     return OptimizeRouteQualityGateDecision.none;
@@ -43,6 +44,7 @@ OptimizeRouteQualityGateDecision evaluateOptimizeRouteQualityGate({
           postCurve: postCurve,
           preManaAssessment: preManaAssessment,
           postManaAssessment: postManaAssessment,
+          profileRoleTargets: profileRoleTargets,
         )
       : const <String>[];
 
@@ -80,6 +82,7 @@ OptimizeRouteSerializedValidationDecision evaluateSerializedOptimizeValidation({
   required double postCurve,
   required String preManaAssessment,
   required String postManaAssessment,
+  Map<String, dynamic>? profileRoleTargets,
 }) {
   if (isComplete || serializedValidation == null) {
     return OptimizeRouteSerializedValidationDecision.none;
@@ -101,6 +104,7 @@ OptimizeRouteSerializedValidationDecision evaluateSerializedOptimizeValidation({
           postCurve: postCurve,
           preManaAssessment: preManaAssessment,
           postManaAssessment: postManaAssessment,
+          profileRoleTargets: profileRoleTargets,
         )
       : <String>[
           'A validação final não fechou como "aprovado" (score $score/100). Optimize só retorna sucesso quando a melhoria é aprovada sem ressalvas.',
