@@ -1780,12 +1780,27 @@ def normalize_effect_by_oracle(card, effect_data):
             return normalized
         if normalized.get("effect") == "remove_artifact_or_3dmg":
             return normalized
-        if re.search(r"\b(destroy|exile)\s+target\s+artifact\b", text):
+        if re.search(r"\b(destroy|exile)\s+target\s+artifact\s+or\s+enchantment\b", text):
             normalized["effect"] = "remove_permanent"
+            normalized["target"] = "artifact_or_enchantment"
             return normalized
-        normalized["effect"] = (
-            "remove_creature" if "target creature" in text else "remove_permanent"
-        )
+        if re.search(r"\b(destroy|exile)\s+target\s+artifact(?:[.;\n]|$)", text):
+            normalized["effect"] = "remove_permanent"
+            normalized["target"] = "artifact"
+            return normalized
+        if re.search(r"\b(destroy|exile)\s+target\s+enchantment(?:[.;\n]|$)", text):
+            normalized["effect"] = "remove_permanent"
+            normalized["target"] = "enchantment"
+            return normalized
+        if "target nonland permanent" in text:
+            normalized["effect"] = "remove_permanent"
+            normalized["target"] = "nonland_permanent"
+            return normalized
+        if "target creature" in text:
+            normalized["effect"] = "remove_creature"
+            normalized["target"] = "creature"
+        else:
+            normalized["effect"] = "remove_permanent"
         return normalized
 
     if "from your graveyard" in text and re.search(r"\breturn target\b", text):

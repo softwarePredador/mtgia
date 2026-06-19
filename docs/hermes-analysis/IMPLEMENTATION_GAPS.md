@@ -2556,6 +2556,29 @@ Atualização do slice de 2026-06-19:
   - o teste controlado de consumidores passou de 6 para 7 drafts elegíveis para
     promoção manual futura. A rodada full não foi repetida nesse sub-slice para
     evitar novo artefato gigante no disco local.
+- Slice adicional no mesmo dia:
+  - `battle_analyst_v9.py` passou a preservar target type específico para
+    textos oracle exatos de `Destroy/Exile target artifact`,
+    `Destroy/Exile target enchantment`, `target artifact or enchantment`,
+    `target nonland permanent` e `target creature`. Antes esses casos podiam
+    degradar para `nonland_permanent`, gerando replay legal, mas evidência
+    fraca para promoção de regra focada;
+  - `manaloom_battle_rule_focused_evidence.py` ganhou templates estreitos para
+    `Destroy target artifact.` e `Destroy target enchantment.`;
+  - o fixture controlado de consumidores passou de 7 para 9 drafts elegíveis
+    para promoção manual futura;
+  - a rodada full read-only foi repetida: `evaluated_count=13883`,
+    `focused_evidence_count=118`, `eligible_for_manual_verified_promotion=118`
+    e `blocked=13765`.
+  - distribuição nova de evidência focada:
+    - 70 targeted creature removals simples;
+    - 25 creature board wipes simples;
+    - 15 sacrifice outlets de dano;
+    - 3 targeted artifact removals simples;
+    - 2 targeted enchantment removals simples;
+    - 1 counterspell simples;
+    - 1 attack artifact tutor;
+    - 1 extra combat + flashback.
 
 Pendências P1 agora priorizadas:
 

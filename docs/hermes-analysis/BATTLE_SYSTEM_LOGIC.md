@@ -897,6 +897,16 @@ Targeted nonland permanent removal simples
   decoy preservada, land preservada, envio ao graveyard e replay/decision
   audit sem critical/high.
 
+Targeted artifact/enchantment removal simples
+- oracle_text_excerpt contem exatamente "Destroy target artifact." ou
+  "Destroy target enchantment.";
+- effect_families inclui targeted_interaction;
+- executor estreito: apply_effect_immediate() com effect remove_permanent e
+  target específico `artifact` ou `enchantment`;
+- o teste focado prova que o alvo correto é removido, o outro tipo de
+  permanente usado como decoy é preservado, land é preservada e replay/
+  decision audit fica sem critical/high.
+
 Creature board wipe simples
 - oracle_text_excerpt contem exatamente "Destroy all creatures.";
 - effect_families inclui mass_removal_or_modal_wipe;
@@ -949,6 +959,15 @@ Resultado de controle:
   fixture/harness controlado, elevando o teste local de consumidores de 6 para
   7 drafts elegíveis. A rodada full não foi repetida neste slice para evitar
   novo artefato gigante no disco local.
+- Em seguida, o runtime passou a preservar target type específico para
+  `artifact`, `enchantment`, `artifact_or_enchantment`, `nonland_permanent` e
+  `creature` durante normalização por oracle text; isso corrigiu a degradação
+  de `Destroy target artifact/enchantment` para `nonland_permanent`.
+- Com os templates `Destroy target artifact.` e `Destroy target enchantment.`,
+  o teste local de consumidores subiu de 7 para 9 drafts elegíveis e a rodada
+  full report-only passou para `118` evidências focadas / `118` elegíveis no
+  promotion gate, ainda com `13765` drafts bloqueados corretamente por falta de
+  template/fonte/replay.
 
 Correção crítica associada ao wipe:
 

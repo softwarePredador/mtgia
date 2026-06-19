@@ -301,6 +301,24 @@ def supports_destroy_target_nonland_permanent_template(draft: DraftRecord) -> bo
     )
 
 
+def supports_destroy_target_artifact_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "targeted_interaction" in draft.effect_families
+        and text == "destroy target artifact."
+        and draft.proposed_status == "needs_review"
+    )
+
+
+def supports_destroy_target_enchantment_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "targeted_interaction" in draft.effect_families
+        and text == "destroy target enchantment."
+        and draft.proposed_status == "needs_review"
+    )
+
+
 def supports_destroy_all_creatures_template(draft: DraftRecord) -> bool:
     text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
     return (
@@ -742,6 +760,186 @@ def build_destroy_target_nonland_permanent_evidence(draft: DraftRecord, output_d
         reason="destroy_target_nonland_permanent_supported",
         evidence=evidence,
         artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
+def build_destroy_target_permanent_type_evidence(
+    draft: DraftRecord,
+    output_dir: Path,
+    *,
+    target_type: str,
+    target_name: str,
+    target_type_line: str,
+    decoy_name: str,
+    decoy_type_line: str,
+    template_text: str,
+) -> EvidenceResult:
+    battle = load_module(
+        f"battle_analyst_destroy_target_{target_type}_evidence",
+        HERMES_SCRIPTS_DIR / "battle_analyst_v9.py",
+    )
+    replay_auditor = load_module(
+        f"replay_decision_auditor_destroy_target_{target_type}_evidence",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+
+    replay_id = f"focused_{draft.draft_rule_key}"
+    events: list[tuple[str, dict[str, Any]]] = []
+    decisions: list[dict[str, Any]] = []
+    previous_event_handler = battle.REPLAY_EVENT_HANDLER
+    previous_decision_handler = battle.DECISION_TRACE_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.DECISION_TRACE_HANDLER = decisions.append
+    try:
+        if hasattr(battle, "reset_decision_trace_counter"):
+            battle.reset_decision_trace_counter()
+        active = battle.Player("Active", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        target = {
+            "name": target_name,
+            "cmc": 3,
+            "type_line": target_type_line,
+            "effect": "engine",
+            "controller": opponent.name,
+        }
+        decoy = {
+            "name": decoy_name,
+            "cmc": 2,
+            "type_line": decoy_type_line,
+            "effect": "decoy",
+            "controller": opponent.name,
+        }
+        land = {
+            "name": "Basic Land",
+            "type_line": "Basic Land",
+            "effect": "land",
+            "controller": opponent.name,
+        }
+        opponent.battlefield = [land, decoy, target]
+        spell = {
+            "name": draft.card_name,
+            "cmc": 2,
+            "type_line": "Instant",
+            "oracle_text": template_text,
+            "tag": "removal",
+            "effect": "remove_permanent",
+            "target": target_type,
+            "_rule_source": "focused_battle_rule_evidence",
+            "_rule_review_status": "needs_review",
+        }
+        battle.apply_effect_immediate(active, [opponent], spell, turn=4, rng=random.Random(17))
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_event_handler
+        battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(decisions, replay_id)
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+
+    removal_event = any(
+        row.get("event") == "removal_resolved"
+        and row.get("card") == draft.card_name
+        and row.get("target") == target_name
+        and row.get("target_legal") is True
+        and row.get("target_type") == target_type
+        and row.get("target_is_creature") is False
+        for row in event_rows
+    )
+    focused_passed = bool(
+        removal_event
+        and not any(card.get("name") == target_name for card in opponent.battlefield)
+        and any(card.get("name") == target_name for card in opponent.graveyard)
+        and any(card.get("name") == decoy_name for card in opponent.battlefield)
+        and any(card.get("name") == "Basic Land" for card in opponent.battlefield)
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            "removal_event": removal_event,
+            "target_removed": not any(card.get("name") == target_name for card in opponent.battlefield),
+            "target_in_graveyard": any(card.get("name") == target_name for card in opponent.graveyard),
+            "decoy_preserved": any(card.get("name") == decoy_name for card in opponent.battlefield),
+            "land_preserved": any(card.get("name") == "Basic Land" for card in opponent.battlefield),
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": f"destroy_target_{target_type}",
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": [
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            f"Oracle text template: {template_text}",
+        ],
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": f"hard_behavior_destroy_target_{target_type}_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason=f"destroy_target_{target_type}_supported",
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
+def build_destroy_target_artifact_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return build_destroy_target_permanent_type_evidence(
+        draft,
+        output_dir,
+        target_type="artifact",
+        target_name="Problem Artifact",
+        target_type_line="Artifact",
+        decoy_name="Problem Enchantment",
+        decoy_type_line="Enchantment",
+        template_text="Destroy target artifact.",
+    )
+
+
+def build_destroy_target_enchantment_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return build_destroy_target_permanent_type_evidence(
+        draft,
+        output_dir,
+        target_type="enchantment",
+        target_name="Problem Enchantment",
+        target_type_line="Enchantment",
+        decoy_name="Problem Artifact",
+        decoy_type_line="Artifact",
+        template_text="Destroy target enchantment.",
     )
 
 
@@ -1398,6 +1596,10 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
         return build_destroy_target_creature_evidence(draft, output_dir)
     if supports_destroy_target_nonland_permanent_template(draft):
         return build_destroy_target_nonland_permanent_evidence(draft, output_dir)
+    if supports_destroy_target_artifact_template(draft):
+        return build_destroy_target_artifact_evidence(draft, output_dir)
+    if supports_destroy_target_enchantment_template(draft):
+        return build_destroy_target_enchantment_evidence(draft, output_dir)
     if supports_destroy_all_creatures_template(draft):
         return build_destroy_all_creatures_evidence(draft, output_dir)
     if supports_sacrifice_damage_template(draft):
