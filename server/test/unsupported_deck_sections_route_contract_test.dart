@@ -51,5 +51,79 @@ void main() {
         isNot(contains('_unsupportedRawListSections')),
       );
     });
+
+    test('import validate keeps documented softer preview behavior', () {
+      final validateSource =
+          File('routes/import/validate/index.dart').readAsStringSync();
+      final apiContract =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+
+      expect(
+        validateSource,
+        contains('notFoundLines.addAll(parseResult.invalidLines)'),
+      );
+      expect(
+        validateSource,
+        isNot(contains('parseResult.unsupportedSectionLines.isNotEmpty')),
+        reason:
+            '/import/validate is a non-mutating preview; write routes own hard rejection.',
+      );
+      expect(
+        apiContract,
+        contains(
+          'Preview is intentionally softer than write routes: unsupported '
+          'Sideboard/Wishboard/Maybeboard/outside sections are returned through '
+          '`not_found_lines`',
+        ),
+      );
+      expect(
+        apiContract,
+        contains('`POST /import` and `POST /import/to-deck` reject'),
+      );
+    });
+
+    test('import preview and update pass preferred format into card lookup',
+        () {
+      final validateSource =
+          File('routes/import/validate/index.dart').readAsStringSync();
+      final importToDeckSource =
+          File('routes/import/to-deck/index.dart').readAsStringSync();
+      final apiContract =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+
+      expect(validateSource, contains('preferredFormat: normalizedFormat'));
+      expect(importToDeckSource, contains('preferredFormat: normalizedFormat'));
+      expect(
+        apiContract,
+        contains(
+          'All import entry points pass the normalized target format into card '
+          'lookup so legal/restricted printings are preferred consistently.',
+        ),
+      );
+    });
+
+    test('import validate copy warnings use DeckRulesService physical key', () {
+      final validateSource =
+          File('routes/import/validate/index.dart').readAsStringSync();
+      final lookupSource =
+          File('lib/import_card_lookup_service.dart').readAsStringSync();
+      final apiContract =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+
+      expect(lookupSource, contains('c.oracle_id::text AS oracle_id'));
+      expect(validateSource, contains("'oracle_id': cardData['oracle_id']"));
+      expect(validateSource, contains(r"'oracle:$oracleId'"));
+      expect(
+        validateSource,
+        contains(r"'name:${normalizePhysicalCardCopyName(name)}'"),
+      );
+      expect(
+        apiContract,
+        contains(
+          'copy-limit warnings use the same physical copy key as '
+          '`DeckRulesService`',
+        ),
+      );
+    });
   });
 }

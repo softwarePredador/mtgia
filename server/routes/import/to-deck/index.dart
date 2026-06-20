@@ -4,10 +4,8 @@ import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/deck_rules_service.dart';
 import '../../../lib/import_card_lookup_service.dart';
 import '../../../lib/import_list_service.dart';
+import '../../../lib/import_to_deck_merge_support.dart';
 import '../../../lib/http_responses.dart';
-
-int _sumQuantities(List<Map<String, dynamic>> cards) =>
-    cards.fold<int>(0, (sum, c) => sum + (c['quantity'] as int? ?? 0));
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method == HttpMethod.post) {
@@ -78,7 +76,11 @@ Future<Response> _importToDeck(RequestContext context) async {
   }
 
   // 2) Resolve nomes em lote (exato + clean + split fallback)
-  final foundCardsMap = await resolveImportCardNames(pool, parsedItems);
+  final foundCardsMap = await resolveImportCardNames(
+    pool,
+    parsedItems,
+    preferredFormat: normalizedFormat,
+  );
 
   // 5. Montagem da lista final
   for (final item in parsedItems) {
@@ -184,9 +186,9 @@ Future<Response> _importToDeck(RequestContext context) async {
     var commanderPreserved = false;
     var commanderDetected =
         consolidatedCards.any((card) => card['is_commander'] == true);
-    var finalTotalCards = _sumQuantities(consolidatedCards);
+    var finalTotalCards = sumImportToDeckQuantities(consolidatedCards);
     await pool.runTx((session) async {
-      final finalCards = <Map<String, dynamic>>[];
+      final existingCards = <Map<String, dynamic>>[];
 
       if (!replaceAll) {
         final existingResult = await session.execute(
@@ -200,7 +202,7 @@ Future<Response> _importToDeck(RequestContext context) async {
 
         for (final row in existingResult) {
           final cardId = row[0] as String;
-          finalCards.add({
+          existingCards.add({
             'card_id': cardId,
             'quantity': row[1] as int,
             'is_commander': row[2] as bool? ?? false,
@@ -220,7 +222,7 @@ Future<Response> _importToDeck(RequestContext context) async {
         );
 
         for (final row in existingCommanderResult) {
-          finalCards.add({
+          existingCards.add({
             'card_id': row[0] as String,
             'quantity': row[1] as int,
             'is_commander': row[2] as bool? ?? false,
@@ -231,33 +233,16 @@ Future<Response> _importToDeck(RequestContext context) async {
         commanderDetected = commanderPreserved;
       }
 
-      final byId = <String, Map<String, dynamic>>{
-        for (final card in finalCards) card['card_id'] as String: card,
-      };
+      final mergeResult = mergeImportToDeckCards(
+        importedCards: consolidatedCards,
+        existingCards: existingCards,
+        commanderPreserved: commanderPreserved,
+      );
+      final validatedCards = mergeResult.cards;
+      finalTotalCards = mergeResult.totalCards;
+      commanderDetected = mergeResult.commanderDetected;
+      commanderPreserved = mergeResult.commanderPreserved;
 
-      for (final card in consolidatedCards) {
-        final cardId = card['card_id'] as String;
-        final existing = byId[cardId];
-        if (existing == null) {
-          byId[cardId] = {
-            'card_id': cardId,
-            'quantity': card['quantity'],
-            'is_commander': card['is_commander'] ?? false,
-            'condition': 'NM',
-          };
-          continue;
-        }
-
-        byId[cardId] = {
-          ...existing,
-          'quantity': (existing['quantity'] as int) + (card['quantity'] as int),
-          'is_commander': (existing['is_commander'] as bool? ?? false) ||
-              (card['is_commander'] as bool? ?? false),
-        };
-      }
-
-      final validatedCards = byId.values.toList();
-      finalTotalCards = _sumQuantities(validatedCards);
       await DeckRulesService(session).validateAndThrow(
         format: normalizedFormat,
         cards: validatedCards,
@@ -295,21 +280,19 @@ Future<Response> _importToDeck(RequestContext context) async {
       }
     });
 
-    return Response.json(body: {
-      'success': true,
-      'deck_id': deckId,
-      'cards_imported': _sumQuantities(consolidatedCards),
-      'total_cards': finalTotalCards,
-      'not_found_lines': notFoundCards,
-      'localized_matches': localizedMatches,
-      'localized_matches_count': localizedMatches.length,
-      'warnings': warnings,
-      'commander_detected': commanderDetected,
-      'missing_commander':
-          (normalizedFormat == 'commander' || normalizedFormat == 'brawl') &&
-              !commanderDetected,
-      'commander_preserved': commanderPreserved,
-    });
+    return Response.json(
+      body: buildImportToDeckSuccessBody(
+        deckId: deckId,
+        normalizedFormat: normalizedFormat,
+        importedCards: consolidatedCards,
+        totalCards: finalTotalCards,
+        notFoundLines: notFoundCards,
+        localizedMatches: localizedMatches,
+        warnings: warnings,
+        commanderDetected: commanderDetected,
+        commanderPreserved: commanderPreserved,
+      ),
+    );
   } on DeckRulesException catch (e) {
     return badRequest(e.message);
   } catch (e) {

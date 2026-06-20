@@ -125,8 +125,9 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              c.color_identity,
              c.id::text,
              $semanticV2Select,
-             $functionalTagsSelect
-      FROM deck_cards dc 
+             $functionalTagsSelect,
+             dc.condition
+      FROM deck_cards dc
       $cardSourceJoin
       WHERE dc.deck_id = @id
     '''),
@@ -151,8 +152,9 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
              c.color_identity,
              c.id::text,
              $semanticV2Select,
-             $functionalTagsSelect
-      FROM deck_cards dc 
+             $functionalTagsSelect,
+             dc.condition
+      FROM deck_cards dc
       $cardSourceJoin
       WHERE dc.deck_id = @id
     '''),
@@ -202,6 +204,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     final cardId = row[9] as String;
     final semanticTagsV2 = row.length > 10 ? row[10] : null;
     final functionalTags = row.length > 11 ? row[11] : null;
+    final condition = row.length > 12 ? row[12] : null;
 
     currentTotalCards += quantity;
     originalCountsById[cardId] = (originalCountsById[cardId] ?? 0) + quantity;
@@ -220,6 +223,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
       'card_id': cardId,
       'semantic_tags_v2': semanticTagsV2,
       'functional_tags': functionalTags,
+      'condition': condition,
     };
     allCardData.add(cardData);
 

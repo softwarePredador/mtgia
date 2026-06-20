@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:server/card_query_contract.dart';
 import 'package:test/test.dart';
 
@@ -12,6 +14,38 @@ void main() {
       expect(normalizeCardSetFilter(null), isNull);
       expect(normalizeCardSetFilter(''), isNull);
       expect(normalizeCardSetFilter('   '), isNull);
+    });
+
+    test('cards route keeps default dedupe and token exclusion explicit', () {
+      final source = File('routes/cards/index.dart').readAsStringSync();
+
+      expect(
+        source,
+        contains("params['include_tokens']?.toLowerCase() == 'true'"),
+      );
+      expect(
+        source,
+        contains("params['dedupe']?.toLowerCase() != 'false'"),
+      );
+      expect(source, contains('final safeLimit = limit.clamp(1, 200)'));
+      expect(source, contains("params['limit'] ?? '50'"));
+      expect(source, contains("params['page'] ?? '1'"));
+    });
+
+    test('printings sync boundary is explicit and write-capable', () {
+      final source =
+          File('routes/cards/printings/index.dart').readAsStringSync();
+
+      expect(source,
+          contains("final syncFromScryfall = params['sync'] == 'true'"));
+      expect(
+        source,
+        contains('if (syncFromScryfall && data.length <= 1)'),
+      );
+      expect(source, contains('_syncPrintingsFromScryfall'));
+      expect(source, contains('INSERT INTO cards'));
+      expect(source, contains('ON CONFLICT (scryfall_id) DO UPDATE SET'));
+      expect(source, contains('INSERT INTO sets'));
     });
   });
 }

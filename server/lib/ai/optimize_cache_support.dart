@@ -5,7 +5,11 @@ String buildOptimizeDeckSignature(List<ResultRow> cardsResult) {
   for (final row in cardsResult) {
     final cardId = row[9].toString();
     final quantity = (row[2] as int?) ?? 1;
-    entries.add('$cardId:$quantity');
+    final condition = row.length > 12 ? row[12]?.toString() : null;
+    final normalizedCondition = (condition == null || condition.trim().isEmpty)
+        ? 'NM'
+        : condition.trim().toUpperCase();
+    entries.add('$cardId:$quantity:$normalizedCondition');
   }
   entries.sort();
   return entries.join('|');

@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/archetype_counters_service.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/ai/optimization_functional_roles.dart';
 import '../../../lib/meta/meta_deck_card_list_support.dart';
 
 /// Endpoint para simular matchup entre dois decks
@@ -24,7 +25,8 @@ Future<Response> onRequest(RequestContext context) async {
     final body = await context.request.json() as Map<String, dynamic>;
     final myDeckId = body['my_deck_id'] as String?;
     final opponentDeckId = body['opponent_deck_id'] as String?;
-    final simulationCount = body['simulations'] as int? ?? 50;
+    final simulationCount = _normalizedSimulationCount(body['simulations']);
+    final simulationSeed = body['seed'] is int ? body['seed'] as int : null;
     final userId = context.read<String>();
 
     if (myDeckId == null || opponentDeckId == null) {
@@ -64,6 +66,7 @@ Future<Response> onRequest(RequestContext context) async {
         myDeck: myDeckData,
         opponentDeck: metaDeckData,
         simulationCount: simulationCount,
+        simulationSeed: simulationSeed,
         isMetaDeck: true,
       );
     }
@@ -74,6 +77,7 @@ Future<Response> onRequest(RequestContext context) async {
       myDeck: myDeckData,
       opponentDeck: opponentDeckData,
       simulationCount: simulationCount,
+      simulationSeed: simulationSeed,
       isMetaDeck: false,
     );
   } catch (e, stack) {
@@ -90,6 +94,18 @@ Future<Map<String, dynamic>?> _getDeckData(
   bool allowPublicDeck = false,
 }) async {
   try {
+    final hasCardIntelligenceSnapshot =
+        await _hasTable(pool, 'card_intelligence_snapshot');
+    final cardSourceJoin = hasCardIntelligenceSnapshot
+        ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+        : 'JOIN cards c ON c.id = dc.card_id';
+    final functionalTagsSelect = hasCardIntelligenceSnapshot
+        ? 'c.function_tag_details AS functional_tags'
+        : await _functionalTagsSelectSql(pool);
+    final semanticV2Select = hasCardIntelligenceSnapshot
+        ? 'c.semantic_tags_v2 AS semantic_tags_v2'
+        : await _semanticV2SelectSql(pool);
+
     final deckResult = await pool.execute(
       Sql.named('''
         SELECT id, name, format
@@ -114,7 +130,7 @@ Future<Map<String, dynamic>?> _getDeckData(
         SELECT c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, dc.quantity, dc.is_commander,
                COALESCE(
                  (SELECT SUM(
-                   CASE 
+                   CASE
                      WHEN m[1] ~ '^[0-9]+\$' THEN m[1]::int
                      WHEN m[1] IN ('W','U','B','R','G','C') THEN 1
                      WHEN m[1] = 'X' THEN 0
@@ -122,9 +138,12 @@ Future<Map<String, dynamic>?> _getDeckData(
                    END
                  ) FROM regexp_matches(c.mana_cost, '\\{([^}]+)\\}', 'g') AS m(m)),
                  0
-               ) as cmc
-        FROM deck_cards dc 
-        JOIN cards c ON c.id = dc.card_id 
+               ) as cmc,
+               c.color_identity,
+               $functionalTagsSelect,
+               $semanticV2Select
+        FROM deck_cards dc
+        $cardSourceJoin
         WHERE dc.deck_id = @id
       '''),
       parameters: {'id': deckId},
@@ -139,31 +158,53 @@ Future<Map<String, dynamic>?> _getDeckData(
     int counterspellCount = 0;
     double totalCMC = 0;
     int nonLandCards = 0;
-    final colors = <String>{};
+    final observedDeckColors = <String>{};
+    final commanderColorIdentity = <String>{};
 
     for (final row in cardsResult) {
       final name = row[0] as String;
       final typeLine = (row[1] as String?) ?? '';
       final oracleText = ((row[2] as String?) ?? '').toLowerCase();
+      final manaCost = (row[3] as String?) ?? '';
       final quantity = row[5] as int;
       final isCommander = row[6] as bool;
       final cmc = (row[7] as num?)?.toDouble() ?? 0;
       final cardColors = (row[4] as List?)?.cast<String>() ?? [];
+      final colorIdentity = (row[8] as List?)?.cast<String>() ?? [];
+      final functionalTags = row[9];
+      final semanticTagsV2 = row[10];
 
-      colors.addAll(cardColors);
+      observedDeckColors.addAll(cardColors);
 
-      if (isCommander) commander = name;
+      if (isCommander) {
+        commander = name;
+        commanderColorIdentity.addAll(colorIdentity);
+      }
 
       cards.add({
         'name': name,
         'type_line': typeLine,
         'oracle_text': oracleText,
+        'mana_cost': manaCost,
+        'colors': cardColors,
+        'color_identity': colorIdentity,
         'quantity': quantity,
         'cmc': cmc,
         'is_commander': isCommander,
+        'functional_tags': functionalTags,
+        'semantic_tags_v2': semanticTagsV2,
       });
 
       final typeLineLower = typeLine.toLowerCase();
+      final cardRoles = resolveCardFunctionalRoles(
+        functionalTags: functionalTags,
+        semanticTagsV2: semanticTagsV2,
+        oracleText: oracleText,
+        typeLine: typeLine,
+        name: name,
+        manaCost: manaCost,
+        cmc: cmc,
+      );
 
       if (typeLineLower.contains('land')) {
         landCount += quantity;
@@ -173,13 +214,27 @@ Future<Map<String, dynamic>?> _getDeckData(
       }
 
       if (typeLineLower.contains('creature')) creatureCount += quantity;
-      if (oracleText.contains('add {') ||
-          oracleText.contains('search your library for a') &&
-              oracleText.contains('land')) rampCount += quantity;
-      if (oracleText.contains('destroy target') ||
-          oracleText.contains('exile target')) removalCount += quantity;
-      if (oracleText.contains('counter target')) counterspellCount += quantity;
+      if (cardRoles.contains('ramp') || cardRoles.contains('ritual')) {
+        rampCount += quantity;
+      }
+      if (cardRoles.contains('removal') ||
+          cardRoles.contains('wipe') ||
+          cardRoles.contains('board_wipe')) {
+        removalCount += quantity;
+      }
+      if (cardRoles.contains('counterspell') ||
+          cardRoles.contains('counter_magic') ||
+          oracleText.contains('counter target')) {
+        counterspellCount += quantity;
+      }
     }
+
+    final recommendationColors = commanderColorIdentity.isNotEmpty
+        ? commanderColorIdentity
+        : observedDeckColors;
+    final colorIdentitySource = commanderColorIdentity.isNotEmpty
+        ? 'commander_color_identity'
+        : 'observed_card_colors';
 
     return {
       'id': deckResult.first[0] as String,
@@ -187,7 +242,8 @@ Future<Map<String, dynamic>?> _getDeckData(
       'format': deckResult.first[2] as String,
       'commander': commander,
       'cards': cards,
-      'colors': colors.toList(),
+      'colors': recommendationColors.toList()..sort(),
+      'color_identity_source': colorIdentitySource,
       'stats': {
         'lands': landCount,
         'creatures': creatureCount,
@@ -246,6 +302,7 @@ Future<Response> _analyzeMatchup({
   required Map<String, dynamic> myDeck,
   required Map<String, dynamic> opponentDeck,
   required int simulationCount,
+  required int? simulationSeed,
   required bool isMetaDeck,
 }) async {
   // Detectar arquétipos
@@ -356,7 +413,13 @@ Future<Response> _analyzeMatchup({
   }
 
   // Simular partidas (Monte Carlo simplificado)
-  final random = Random();
+  final seed = simulationSeed ??
+      _stableMatchupSeed(
+        myDeck,
+        opponentDeck,
+        simulationCount,
+      );
+  final random = Random(seed);
   int wins = 0;
   int totalTurns = 0;
 
@@ -391,7 +454,7 @@ Future<Response> _analyzeMatchup({
       Sql.named('''
         INSERT INTO deck_matchups (deck_id, opponent_deck_id, win_rate, notes)
         VALUES (@my_deck, @opp_deck, @win_rate, @notes)
-        ON CONFLICT (deck_id, opponent_deck_id) 
+        ON CONFLICT (deck_id, opponent_deck_id)
         DO UPDATE SET win_rate = @win_rate, notes = @notes, updated_at = CURRENT_TIMESTAMP
       '''),
       parameters: {
@@ -412,15 +475,20 @@ Future<Response> _analyzeMatchup({
       'name': myDeck['name'],
       'archetype': myArchetype,
       'commander': myDeck['commander'],
+      'colors': myDeck['colors'],
+      'color_identity_source': myDeck['color_identity_source'],
     },
     'opponent_deck': {
       'id': opponentDeck['id'],
       'name': opponentDeck['name'],
       'archetype': opponentArchetype,
       'is_meta_deck': isMetaDeck,
+      if (!isMetaDeck)
+        'color_identity_source': opponentDeck['color_identity_source'],
     },
     'simulation': {
       'runs': simulationCount,
+      'seed': seed,
       'wins': wins,
       'losses': simulationCount - wins,
       'win_rate': (winRate * 100).toStringAsFixed(1) + '%',
@@ -502,4 +570,85 @@ String _getMatchupVerdict(double winRate) {
   if (winRate >= 0.45) return 'Matchup equilibrado ⚖️';
   if (winRate >= 0.35) return 'Matchup desfavorável 👎';
   return 'Matchup MUITO desfavorável ❌';
+}
+
+Future<bool> _hasTable(Pool pool, String tableName) async {
+  final result = await pool.execute(
+    Sql.named('''
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = @tableName
+      )
+    '''),
+    parameters: {'tableName': tableName},
+  );
+  return result.isNotEmpty && result.first[0] == true;
+}
+
+Future<String> _functionalTagsSelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_function_tags');
+  if (!exists) return "'[]'::jsonb AS functional_tags";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tag', cft.tag,
+                       'confidence', cft.confidence,
+                       'evidence', cft.evidence,
+                       'source', cft.source
+                     )
+                     ORDER BY cft.confidence DESC, cft.tag
+                   )
+                   FROM card_function_tags cft
+                   WHERE cft.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS functional_tags''';
+}
+
+Future<String> _semanticV2SelectSql(Pool pool) async {
+  final exists = await _hasTable(pool, 'card_semantic_tags_v2');
+  if (!exists) return "'[]'::jsonb AS semantic_tags_v2";
+  return '''
+               COALESCE(
+                 (
+                   SELECT jsonb_agg(
+                     jsonb_build_object(
+                       'tags', cstv2.tags,
+                       'role_confidence', cstv2.role_confidence,
+                       'engine', cstv2.engine,
+                       'payoff', cstv2.payoff,
+                       'enabler', cstv2.enabler,
+                       'wincon', cstv2.wincon,
+                       'combo_piece', cstv2.combo_piece
+                     )
+                     ORDER BY cstv2.role_confidence DESC, cstv2.source
+                   )
+                   FROM card_semantic_tags_v2 cstv2
+                   WHERE cstv2.card_id = c.id
+                 ),
+                 '[]'::jsonb
+               ) AS semantic_tags_v2''';
+}
+
+int _normalizedSimulationCount(Object? value) {
+  final parsed = value is int ? value : 50;
+  return parsed.clamp(1, 5000);
+}
+
+int _stableMatchupSeed(
+  Map<String, dynamic> myDeck,
+  Map<String, dynamic> opponentDeck,
+  int simulationCount,
+) {
+  final raw = '${myDeck['id']}|${opponentDeck['id']}|$simulationCount';
+  var hash = 0x811c9dc5;
+  for (final unit in raw.codeUnits) {
+    hash ^= unit;
+    hash = (hash * 0x01000193) & 0x7fffffff;
+  }
+  return hash == 0 ? 1 : hash;
 }

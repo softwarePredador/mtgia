@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:server/ai/commander_reference_generate_fallback_support.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('AI generate learning boundary guards', () {
     test(
-        '/ai/generate stays reference-driven and does not read learned decks directly',
+        '/ai/generate has no direct learned-deck SQL but can use learned-deck evidence',
         () {
       final generateRoute =
           File('routes/ai/generate/index.dart').readAsStringSync();
@@ -23,6 +24,11 @@ void main() {
         contains('loadCommanderReferenceDeckCorpusGuidance('),
       );
       expect(generateRoute, contains('loadUsageHotCards('));
+      expect(generateRoute, contains('loadActiveCommanderLearnedDeck('));
+      expect(
+        generateRoute,
+        contains('activeCommanderLearnedDeckCardNames(activeLearnedDeck)'),
+      );
       expect(generateRoute, contains('buildDeterministicReferenceDeck('));
       expect(generateRoute, contains('GeneratedDeckValidationService('));
       expect(
@@ -30,6 +36,14 @@ void main() {
         contains("generationMode: 'reference_deterministic'"),
       );
       expect(generateRoute, contains('isMock: false'));
+      expect(
+        generateRoute,
+        contains('activeLearnedDeck: activeLearnedDeck'),
+      );
+      expect(
+        generateRoute,
+        contains('promotedLearnedCardNames: promotedLearnedCardNames'),
+      );
 
       expect(generateRoute, isNot(contains('commander_learned_decks')));
       expect(generateRoute, isNot(contains('commander_learning_snapshot')));
@@ -40,6 +54,64 @@ void main() {
       expect(
         generateRoute,
         isNot(contains('GET /ai/commander-learning')),
+      );
+    });
+
+    test('deterministic generate source precedence names learned deck first',
+        () {
+      expect(
+        deterministicReferenceDeckSourcePrecedence,
+        equals([
+          'active_learned_deck',
+          'reference_card_stats',
+          'reference_corpus_packages',
+          'profile_expected_packages',
+          'usage_hot_cards',
+          'deterministic_fallback',
+        ]),
+      );
+    });
+
+    test('coherent generate response exposes deterministic source diagnostics',
+        () {
+      final generateRoute =
+          File('routes/ai/generate/index.dart').readAsStringSync();
+      final primaryResponseStart = generateRoute.indexOf(
+        'final referenceDeterministicDeckDiagnostics = referenceProfile == null',
+      );
+      final fallbackHelperStart = generateRoute
+          .indexOf('Future<Map<String, dynamic>> _buildMockGenerateResponse');
+
+      expect(primaryResponseStart, greaterThanOrEqualTo(0));
+      expect(fallbackHelperStart, greaterThan(primaryResponseStart));
+      final primaryResponseSegment = generateRoute.substring(
+        primaryResponseStart,
+        fallbackHelperStart,
+      );
+
+      expect(
+        primaryResponseSegment,
+        contains('referenceDeterministicDeckDiagnostics'),
+      );
+      expect(
+        primaryResponseSegment,
+        contains('buildDeterministicReferenceDeckResult('),
+      );
+      expect(primaryResponseSegment, contains('toDiagnosticsJson()'));
+    });
+
+    test('generate fallback preserves original validation quality evidence',
+        () {
+      final generateRoute =
+          File('routes/ai/generate/index.dart').readAsStringSync();
+
+      expect(
+        generateRoute,
+        contains("'original_validation_quality_evidence'"),
+      );
+      expect(
+        generateRoute,
+        contains('validation.qualityEvidenceSummary()'),
       );
     });
 

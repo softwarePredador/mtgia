@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../../lib/deck_cards_bulk_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -92,41 +93,25 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       // Carrega estado atual
       final existingResult = await session.execute(
         Sql.named(
-          'SELECT card_id::text, quantity::int, is_commander FROM deck_cards WHERE deck_id = @deckId',
+          'SELECT card_id::text, quantity::int, is_commander, condition FROM deck_cards WHERE deck_id = @deckId',
         ),
         parameters: {'deckId': deckId},
       );
 
-      final current = <String, Map<String, dynamic>>{};
-      for (final row in existingResult) {
-        final cardId = row[0] as String;
-        current[cardId] = {
-          'card_id': cardId,
-          'quantity': row[1] as int,
-          'is_commander': row[2] as bool? ?? false,
-        };
-      }
+      final current = [
+        for (final row in existingResult)
+          {
+            'card_id': row[0] as String,
+            'quantity': row[1] as int,
+            'is_commander': row[2] as bool? ?? false,
+            'condition': row[3] as String? ?? 'NM',
+          },
+      ];
 
-      // Aplica incrementos
-      for (final item in parsed) {
-        final cardId = item['card_id'] as String;
-        final qty = item['quantity'] as int;
-        if (current.containsKey(cardId)) {
-          final existing = current[cardId]!;
-          current[cardId] = {
-            ...existing,
-            'quantity': (existing['quantity'] as int) + qty,
-          };
-        } else {
-          current[cardId] = {
-            'card_id': cardId,
-            'quantity': qty,
-            'is_commander': false,
-          };
-        }
-      }
-
-      final normalized = current.values.toList();
+      final normalized = mergeBulkCardIncrementsPreservingCondition(
+        currentCards: current,
+        increments: parsed,
+      );
 
       // Valida regras (inclui identidade/banlist/limites)
       await DeckRulesService(session).validateAndThrow(
@@ -150,14 +135,16 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           final pId = 'c$i';
           final pQty = 'q$i';
           final pCmd = 'cmd$i';
-          values.add('(@deckId, @$pId, @$pQty, @$pCmd)');
+          final pCond = 'cond$i';
+          values.add('(@deckId, @$pId, @$pQty, @$pCmd, @$pCond)');
           params[pId] = card['card_id'];
           params[pQty] = card['quantity'];
           params[pCmd] = card['is_commander'] ?? false;
+          params[pCond] = card['condition'] ?? 'NM';
         }
 
         final sql =
-            'INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander) VALUES ${values.join(', ')}';
+            'INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander, condition) VALUES ${values.join(', ')}';
         await session.execute(Sql.named(sql), parameters: params);
       }
 

@@ -41,7 +41,10 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final simType = (data['type'] as String?) ?? 'goldfish';
-    final simCount = (data['simulations'] as int?) ?? 1000;
+    final simCount = _normalizedSimulationCount(
+      data['simulations'],
+      defaultValue: 1000,
+    );
 
     // Busca cartas do deck principal sempre dentro do escopo do usuário.
     final deckCards = await _fetchDeckCards(
@@ -159,6 +162,16 @@ Future<Response> onRequest(RequestContext context) async {
     Log.e('Error in /ai/simulate: $e\n$st');
     return internalServerError('Internal server error');
   }
+}
+
+int _normalizedSimulationCount(
+  Object? value, {
+  required int defaultValue,
+  int min = 1,
+  int max = 5000,
+}) {
+  final parsed = value is int ? value : defaultValue;
+  return parsed.clamp(min, max);
 }
 
 /// Busca cartas de um deck com todos os dados necessários

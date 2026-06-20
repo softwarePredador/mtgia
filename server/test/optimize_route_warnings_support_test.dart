@@ -7,6 +7,7 @@ void main() {
       invalidCards: const [],
       suggestions: const {},
       filteredByColorIdentity: const [],
+      filteredByMissingIdentity: const [],
       commanderColorIdentity: const {'R', 'W'},
       blockedByBracket: const [],
       bracket: null,
@@ -28,6 +29,7 @@ void main() {
         'Unknown Card': ['Known Card'],
       },
       filteredByColorIdentity: const [],
+      filteredByMissingIdentity: const [],
       commanderColorIdentity: const {'U'},
       blockedByBracket: const [],
       bracket: null,
@@ -50,6 +52,7 @@ void main() {
       invalidCards: const [],
       suggestions: const {},
       filteredByColorIdentity: const ['Swords to Plowshares'],
+      filteredByMissingIdentity: const ['Unknown Identity Card'],
       commanderColorIdentity: const {'R', 'W'},
       blockedByBracket: const [
         {'name': 'Mana Crypt', 'reason': 'game_changer_limit'},
@@ -69,6 +72,10 @@ void main() {
     expect(
       (warnings['filtered_by_color_identity'] as Map)['removed_additions'],
       ['Swords to Plowshares'],
+    );
+    expect(
+      (warnings['filtered_by_missing_identity'] as Map)['removed_additions'],
+      ['Unknown Identity Card'],
     );
     expect((warnings['blocked_by_bracket'] as Map)['bracket'], 2);
     expect(

@@ -37,15 +37,18 @@ void main() {
   });
 
   test(
-      'missing identity data is treated as colorless like previous route logic',
+      'missing identity data is blocked instead of treated as proven colorless',
       () {
     final result = filterOptimizeAdditionsByCommanderIdentity(
-      validAdditions: const ['Unknown Card'],
-      identityByName: const {},
+      validAdditions: const ['Unknown Card', 'Sol Ring'],
+      identityByName: const {
+        'sol ring': [],
+      },
       commanderColorIdentity: const {'R'},
     );
 
-    expect(result.additions, ['Unknown Card']);
+    expect(result.additions, ['Sol Ring']);
     expect(result.filteredByColorIdentity, isEmpty);
+    expect(result.filteredByMissingIdentity, ['Unknown Card']);
   });
 }

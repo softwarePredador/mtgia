@@ -30,6 +30,13 @@ void main() {
       expect(result.generatedDeck['commander'], isNull);
       expect(result.invalidCards, equals(['Mountan']));
       expect(result.suggestions['Mountan'], equals(['Mountain']));
+      expect(result.validationSummary(), contains('quality_evidence'));
+      final qualityEvidence = result.qualityEvidenceSummary();
+      expect(qualityEvidence['has_quality_events'], isTrue);
+      expect(qualityEvidence['has_removed_invalid_cards'], isTrue);
+      expect(qualityEvidence['invalid_cards_removed_count'], equals(1));
+      expect(qualityEvidence['input_to_resolved_card_delta'], equals(1));
+      expect(qualityEvidence['invalid_card_sample'], equals(['Mountan']));
       expect((result.generatedDeck['cards'] as List).single, {
         'name': 'Mountain',
         'quantity': 60,
@@ -73,6 +80,15 @@ void main() {
 
       expect(result.isValid, isTrue);
       expect(result.warnings.join('\n'), contains('Auto-reparo'));
+      final qualityEvidence = result.qualityEvidenceSummary();
+      expect(qualityEvidence['has_quality_events'], isTrue);
+      expect(qualityEvidence['has_auto_repair'], isTrue);
+      expect(qualityEvidence['repair_warning_count'], greaterThan(0));
+      expect(qualityEvidence['warning_count'], greaterThan(0));
+      expect(
+        qualityEvidence['repair_warning_sample'],
+        contains(contains('Auto-reparo')),
+      );
       expect(
         (result.generatedDeck['cards'] as List).fold<int>(
           0,
@@ -253,6 +269,10 @@ void main() {
         contains('Integridade CMC: 1 carta(s)'),
       );
       expect(result.warnings.join('\n'), contains('Mana Vault'));
+      final qualityEvidence = result.qualityEvidenceSummary();
+      expect(qualityEvidence['has_quality_events'], isTrue);
+      expect(qualityEvidence['has_auto_repair'], isFalse);
+      expect(qualityEvidence['cmc_integrity_warning_count'], equals(1));
     });
 
     test(

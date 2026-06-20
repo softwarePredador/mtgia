@@ -52,7 +52,11 @@ Future<Response> _validateList(RequestContext context) async {
   notFoundLines.addAll(parseResult.invalidLines);
 
   // 2) Resolve nomes em lote (exato + clean + split fallback)
-  final foundCardsMap = await resolveImportCardNames(pool, parsedItems);
+  final foundCardsMap = await resolveImportCardNames(
+    pool,
+    parsedItems,
+    preferredFormat: normalizedFormat,
+  );
 
   // 5. Montagem da lista de resultados
   for (final item in parsedItems) {
@@ -72,6 +76,7 @@ Future<Response> _validateList(RequestContext context) async {
 
       foundCards.add({
         'card_id': cardData['id'],
+        'oracle_id': cardData['oracle_id'],
         'name': cardData['name'],
         'type_line': cardData['type_line'],
         'image_url': cardData['image_url'],
@@ -106,10 +111,11 @@ Future<Response> _validateList(RequestContext context) async {
   }
   final consolidated = byId.values.toList();
 
-  final copiesByName = <String, Map<String, dynamic>>{};
+  final copiesByPhysicalKey = <String, Map<String, dynamic>>{};
 
   for (final card in consolidated) {
     final name = (card['name'] as String).trim();
+    final oracleId = card['oracle_id']?.toString().trim();
     final typeLine = card['type_line'] as String;
     final quantity = card['quantity'] as int;
     final isCommander = card['is_commander'] == true;
@@ -126,23 +132,40 @@ Future<Response> _validateList(RequestContext context) async {
 
     if (isCommander || isBasicLand) continue;
 
-    final key = name.toLowerCase();
-    final existing = copiesByName[key];
+    final key = oracleId != null && oracleId.isNotEmpty
+        ? 'oracle:$oracleId'
+        : 'name:${normalizePhysicalCardCopyName(name)}';
+    final existing = copiesByPhysicalKey[key];
     if (existing == null) {
-      copiesByName[key] = {'name': name, 'qty': quantity};
+      copiesByPhysicalKey[key] = {
+        'name': name,
+        'qty': quantity,
+        'source_names': <String>{name},
+      };
     } else {
-      copiesByName[key] = {
+      final sourceNames = existing['source_names'] as Set<String>;
+      sourceNames.add(name);
+      copiesByPhysicalKey[key] = {
         'name': existing['name'] as String,
         'qty': (existing['qty'] as int) + quantity,
+        'source_names': sourceNames,
       };
     }
   }
 
-  for (final entry in copiesByName.values) {
+  for (final entry in copiesByPhysicalKey.values) {
     final name = entry['name'] as String;
     final qty = entry['qty'] as int;
     if (qty > limit) {
-      warnings.add('$name tem $qty cópias (limite: $limit)');
+      final sourceNames = entry['source_names'] as Set<String>;
+      if (sourceNames.length > 1) {
+        final names = sourceNames.join('" / "');
+        warnings.add(
+          '"$names" contam como a mesma carta física e têm $qty cópias (limite: $limit)',
+        );
+      } else {
+        warnings.add('$name tem $qty cópias (limite: $limit)');
+      }
     }
   }
 

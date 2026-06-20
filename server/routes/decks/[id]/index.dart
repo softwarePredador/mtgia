@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../lib/deck_rules_service.dart';
+import '../../../lib/deck_card_name_resolution_support.dart';
 import '../../../lib/deck_schema_support.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/scryfall_image_url.dart';
@@ -165,16 +166,14 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           }
 
           if (cardId == null || cardId.isEmpty) {
-            final lookup = await session.execute(
-              Sql.named(
-                'SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1',
-              ),
-              parameters: {'name': cardName!},
+            cardId = await resolveDeckCardIdByName(
+              session: session,
+              name: cardName!,
+              preferredFormat: currentFormat,
             );
-            if (lookup.isEmpty) {
+            if (cardId == null || cardId.isEmpty) {
               throw Exception('Card not found: $cardName');
             }
-            cardId = lookup.first[0] as String;
           }
 
           normalized.add({

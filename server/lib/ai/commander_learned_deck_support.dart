@@ -6,6 +6,16 @@ import 'commander_reference_helpers.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderLearnedDecksTable = 'commander_learned_decks';
+const commanderLearnedDeckRoleSummarySourceCanonical =
+    'card_list_canonicalized';
+const commanderLearnedDeckRoleSummarySourcePersistedFallback =
+    'persisted_metadata_fallback';
+const commanderLearnedDeckRoleSummaryFallbackReasonEmptyCardList =
+    'empty_card_list';
+const commanderLearnedDeckRoleSummaryFallbackReasonNoResolvableCardNames =
+    'no_resolvable_card_names';
+const commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed =
+    'metadata_canonicalization_failed';
 
 class CommanderLearnedDeckCardLine {
   const CommanderLearnedDeckCardLine({
@@ -116,7 +126,27 @@ class CommanderLearnedDeckValidationResult {
         'main_quantity': mainQuantity,
         'blockers': blockers,
         'warnings': warnings,
-  };
+      };
+}
+
+class CommanderLearnedDeckMetadataCanonicalizationResult {
+  const CommanderLearnedDeckMetadataCanonicalizationResult.canonicalized(
+    this.metadata,
+  )   : source = commanderLearnedDeckRoleSummarySourceCanonical,
+        fallbackReason = null;
+
+  const CommanderLearnedDeckMetadataCanonicalizationResult.persistedFallback(
+    this.metadata, {
+    required String reason,
+  })  : source = commanderLearnedDeckRoleSummarySourcePersistedFallback,
+        fallbackReason = reason;
+
+  final Map<String, dynamic> metadata;
+  final String source;
+  final String? fallbackReason;
+
+  bool get usedFallback =>
+      source == commanderLearnedDeckRoleSummarySourcePersistedFallback;
 }
 
 const Map<String, String> _learnedDeckSummaryTagToRole = {
@@ -124,14 +154,20 @@ const Map<String, String> _learnedDeckSummaryTagToRole = {
   'counterspell': 'removal',
   'mana_fixing': 'ramp',
   'ritual': 'ramp',
+  'cost_reduction': 'ramp',
+  'political_mana': 'ramp',
   'loot': 'draw',
   'exile_value': 'draw',
   'blink': 'protection',
+  'stax': 'protection',
+  'combo_protection': 'protection',
   'graveyard_synergy': 'engine',
   'aristocrat_payoff': 'engine',
   'spellslinger': 'engine',
   'artifact_synergy': 'engine',
   'enchantment_synergy': 'engine',
+  'topdeck_setup': 'engine',
+  'miracle_setup': 'engine',
   'sacrifice_outlet': 'engine',
   'payoff': 'engine',
   'enabler': 'engine',
@@ -146,6 +182,34 @@ const Map<String, String> _learnedDeckSummaryTagToRole = {
   'recursion': 'recursion',
   'wincon': 'wincon',
   'engine': 'engine',
+};
+
+const Map<String, Set<String>> _learnedDeckCanonicalRoleTagOverrides = {
+  "orim's chant": {
+    'protection',
+    'stax',
+    'combo_protection',
+  },
+  'ruby medallion': {
+    'ramp',
+    'cost_reduction',
+    'spellslinger',
+  },
+  'scroll rack': {
+    'draw',
+    'topdeck_setup',
+    'miracle_setup',
+  },
+  'victory chimes': {
+    'ramp',
+    'political_mana',
+  },
+  'lorehold, the historian': {
+    'draw',
+    'enabler',
+    'engine',
+    'loot',
+  },
 };
 
 Map<String, int> computeCommanderLearnedDeckRoleSummary({
@@ -176,12 +240,17 @@ Map<String, int> computeCommanderLearnedDeckRoleSummary({
     if (quantity <= 0) continue;
 
     final tags = tagsByName[normalizedName] ?? const <String>{};
-    if (landNames.contains(normalizedName) || tags.contains('land')) {
+    final canonicalOverrides =
+        _learnedDeckCanonicalRoleTagOverrides[normalizedName];
+    final effectiveTags = canonicalOverrides == null
+        ? tags
+        : <String>{...tags, ...canonicalOverrides};
+    if (landNames.contains(normalizedName) || effectiveTags.contains('land')) {
       summary['total_lands'] = summary['total_lands']! + quantity;
       continue;
     }
 
-    final roles = tags
+    final roles = effectiveTags
         .map((tag) => _learnedDeckSummaryTagToRole[tag])
         .whereType<String>()
         .toSet();
@@ -203,8 +272,7 @@ Map<String, int> computeCommanderLearnedDeckRoleSummary({
           summary['board_wipe_count'] = summary['board_wipe_count']! + quantity;
           break;
         case 'protection':
-          summary['protection_count'] =
-              summary['protection_count']! + quantity;
+          summary['protection_count'] = summary['protection_count']! + quantity;
           break;
         case 'recursion':
           summary['recursion_count'] = summary['recursion_count']! + quantity;
@@ -226,8 +294,23 @@ Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
   Pool pool,
   CommanderLearnedDeckInput input,
 ) async {
+  final result =
+      await canonicalizeCommanderLearnedDeckMetadataWithStatus(pool, input);
+  return result.metadata;
+}
+
+Future<CommanderLearnedDeckMetadataCanonicalizationResult>
+    canonicalizeCommanderLearnedDeckMetadataWithStatus(
+  Pool pool,
+  CommanderLearnedDeckInput input,
+) async {
   final cards = input.cards;
-  if (cards.isEmpty) return input.metadata;
+  if (cards.isEmpty) {
+    return CommanderLearnedDeckMetadataCanonicalizationResult.persistedFallback(
+      input.metadata,
+      reason: commanderLearnedDeckRoleSummaryFallbackReasonEmptyCardList,
+    );
+  }
 
   final distinctNames = <String>{};
   for (final card in cards) {
@@ -235,7 +318,13 @@ Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
     if (normalizedName.isEmpty) continue;
     distinctNames.add(normalizedName);
   }
-  if (distinctNames.isEmpty) return input.metadata;
+  if (distinctNames.isEmpty) {
+    return CommanderLearnedDeckMetadataCanonicalizationResult.persistedFallback(
+      input.metadata,
+      reason:
+          commanderLearnedDeckRoleSummaryFallbackReasonNoResolvableCardNames,
+    );
+  }
 
   final placeholders = <String>[];
   final parameters = <String, dynamic>{};
@@ -325,12 +414,16 @@ Future<Map<String, dynamic>> canonicalizeCommanderLearnedDeckMetadata(
       landNames: landNames,
     );
 
-    return {
+    return CommanderLearnedDeckMetadataCanonicalizationResult.canonicalized({
       ...input.metadata,
       ...summary,
-    };
+    });
   } catch (_) {
-    return input.metadata;
+    return CommanderLearnedDeckMetadataCanonicalizationResult.persistedFallback(
+      input.metadata,
+      reason:
+          commanderLearnedDeckRoleSummaryFallbackReasonCanonicalizationFailed,
+    );
   }
 }
 
@@ -449,17 +542,74 @@ CommanderLearnedDeckValidationResult validateCommanderLearnedDeckInput(
   );
 }
 
+List<Map<String, dynamic>> buildCommanderLearnedDeckResponseDecklist({
+  required CommanderLearnedDeckInput learnedDeck,
+  required Map<String, Map<String, dynamic>> metadataByName,
+}) {
+  final normalizedCommander = learnedDeck.commanderNameNormalized;
+  return learnedDeck.cards.map((card) {
+    final normalizedName = normalizeCommanderReferenceName(card.name);
+    final metadata = metadataByName[normalizedName];
+    final canonicalName = metadata?['name']?.toString();
+    return {
+      'name': card.name,
+      'quantity': card.quantity,
+      'is_commander': normalizedName == normalizedCommander,
+      if (metadata?['id'] != null) 'card_id': metadata!['id'],
+      if (canonicalName != null &&
+          canonicalName.isNotEmpty &&
+          canonicalName != card.name)
+        'canonical_name': canonicalName,
+      if (metadata?['type_line'] != null) 'type_line': metadata!['type_line'],
+      'commander_legal_status': metadata?['commander_legal_status'],
+    };
+  }).toList(growable: false);
+}
+
+List<Map<String, dynamic>> normalizeCommanderLearnedDecklistForDeckCreate(
+  Iterable<Map<String, dynamic>> decklist,
+) {
+  return decklist.map((card) {
+    final cardId = card['card_id']?.toString().trim();
+    final name = card['name']?.toString().trim();
+    return {
+      if (cardId != null && cardId.isNotEmpty) 'card_id': cardId,
+      if ((cardId == null || cardId.isEmpty) && name != null && name.isNotEmpty)
+        'name': name,
+      'quantity': intValue(card['quantity']),
+      'is_commander': card['is_commander'] == true,
+    };
+  }).toList(growable: false);
+}
+
 List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCardList(
   String cardList,
 ) {
-  final byName = <String, int>{};
+  final trimmed = cardList.trim();
+  if (trimmed.startsWith('[')) {
+    final jsonCards = _tryParseCommanderLearnedDeckJsonCards(trimmed);
+    if (jsonCards != null) return _mergeCommanderLearnedDeckCards(jsonCards);
+  }
+
+  final cards = <CommanderLearnedDeckCardLine>[];
   for (final rawLine in cardList.split(RegExp(r'\r?\n'))) {
     final line = rawLine.trim();
     if (line.isEmpty || line.startsWith('#')) continue;
 
     final parsed = _parseCommanderLearnedDeckCardLine(line);
     if (parsed == null) continue;
-    byName[parsed.name] = (byName[parsed.name] ?? 0) + parsed.quantity;
+    cards.add(parsed);
+  }
+  return _mergeCommanderLearnedDeckCards(cards);
+}
+
+List<CommanderLearnedDeckCardLine> _mergeCommanderLearnedDeckCards(
+  Iterable<CommanderLearnedDeckCardLine> cards,
+) {
+  final byName = <String, int>{};
+  for (final card in cards) {
+    if (card.quantity <= 0) continue;
+    byName[card.name] = (byName[card.name] ?? 0) + card.quantity;
   }
   return [
     for (final entry in byName.entries)
@@ -471,6 +621,45 @@ List<CommanderLearnedDeckCardLine> parseCommanderLearnedDeckCards(
   String cardList,
 ) =>
     parseCommanderLearnedDeckCardList(cardList);
+
+List<CommanderLearnedDeckCardLine>? _tryParseCommanderLearnedDeckJsonCards(
+  String cardList,
+) {
+  Object? decoded;
+  try {
+    decoded = jsonDecode(cardList);
+  } catch (_) {
+    return null;
+  }
+  if (decoded is! List) return null;
+
+  final cards = <CommanderLearnedDeckCardLine>[];
+  for (final item in decoded) {
+    if (item is String) {
+      cards.addAll(parseCommanderLearnedDeckCardList(item));
+      continue;
+    }
+    if (item is! Map) continue;
+
+    final name = _stringValue(
+      item['name'] ?? item['card_name'] ?? item['cardName'],
+    );
+    if (name == null) continue;
+
+    final quantityValue = item['quantity'] ?? item['qty'] ?? item['count'];
+    final quantity = quantityValue == null ? 1 : _intValue(quantityValue);
+    final cleanedName = _cleanCommanderLearnedDeckCardName(name);
+    if (quantity <= 0 || cleanedName.isEmpty) continue;
+
+    cards.add(
+      CommanderLearnedDeckCardLine(
+        name: cleanedName,
+        quantity: quantity,
+      ),
+    );
+  }
+  return cards;
+}
 
 Future<CommanderLearnedDeckInput?> loadActiveCommanderLearnedDeck({
   required Pool pool,

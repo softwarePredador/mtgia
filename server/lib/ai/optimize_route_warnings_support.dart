@@ -2,6 +2,7 @@ Map<String, dynamic> buildOptimizeWarnings({
   required List<String> invalidCards,
   required Map<String, List<String>> suggestions,
   required List<String> filteredByColorIdentity,
+  required List<String> filteredByMissingIdentity,
   required Set<String> commanderColorIdentity,
   required List<Map<String, dynamic>> blockedByBracket,
   required int? bracket,
@@ -28,6 +29,14 @@ Map<String, dynamic> buildOptimizeWarnings({
       'removed_additions': filteredByColorIdentity,
       'message':
           'Algumas adições sugeridas pela IA foram removidas por estarem fora da identidade de cor do comandante.',
+    };
+  }
+
+  if (filteredByMissingIdentity.isNotEmpty) {
+    warnings['filtered_by_missing_identity'] = {
+      'removed_additions': filteredByMissingIdentity,
+      'message':
+          'Algumas adições sugeridas pela IA foram removidas porque a identidade de cor da carta não pôde ser comprovada.',
     };
   }
 

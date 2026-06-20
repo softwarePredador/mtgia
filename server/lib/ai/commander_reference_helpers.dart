@@ -73,7 +73,79 @@ Future<Map<String, Map<String, dynamic>>> loadCardMetadataByName({
       names.map((name) => name.trim()).where((name) => name.isNotEmpty).toSet();
   if (normalizedNames.isEmpty) return const {};
 
-  final result = await pool.execute(
+  Result result;
+  try {
+    result = await _loadCardMetadataRowsFromIdentityBridge(
+      pool: pool,
+      normalizedNames: normalizedNames,
+    );
+  } catch (error) {
+    if (!isUndefinedIdentityBridgeError(error)) rethrow;
+    result = await _loadCardMetadataRowsFromCards(
+      pool: pool,
+      normalizedNames: normalizedNames,
+    );
+  }
+
+  return {
+    for (final row in result) ...metadataAliasesFromRow(row),
+  };
+}
+
+Future<Result> _loadCardMetadataRowsFromIdentityBridge({
+  required Pool pool,
+  required Set<String> normalizedNames,
+}) {
+  return pool.execute(
+    Sql.named('''
+      WITH input_names AS (
+        SELECT unnest(@names::text[]) AS input_name
+      )
+      SELECT DISTINCT ON (input_names.input_name)
+        input_names.input_name,
+        cib.card_id::text,
+        cib.canonical_name,
+        cib.type_line,
+        cib.image_url,
+        cl.status
+      FROM input_names
+      JOIN card_identity_bridge cib
+        ON cib.normalized_lookup_name = input_names.input_name
+        OR cib.normalized_canonical_name = input_names.input_name
+        OR cib.normalized_canonical_name LIKE input_names.input_name || ' // %'
+      LEFT JOIN card_legalities cl
+        ON cl.card_id = cib.card_id
+       AND cl.format = 'commander'
+      ORDER BY input_names.input_name,
+        CASE
+          WHEN cib.normalized_lookup_name = input_names.input_name THEN 0
+          WHEN cib.normalized_canonical_name = input_names.input_name THEN 1
+          WHEN cib.normalized_canonical_name LIKE input_names.input_name || ' // %' THEN 2
+          ELSE 3
+        END,
+        CASE
+          WHEN cl.status = 'legal' THEN 0
+          WHEN cl.status = 'restricted' THEN 1
+          WHEN cl.status IS NULL THEN 2
+          ELSE 3
+        END,
+        COALESCE(cib.match_priority, 999),
+        cib.card_id::text
+    '''),
+    parameters: {
+      'names': TypedValue(
+        Type.textArray,
+        normalizedNames.map((name) => name.toLowerCase()).toList(),
+      ),
+    },
+  );
+}
+
+Future<Result> _loadCardMetadataRowsFromCards({
+  required Pool pool,
+  required Set<String> normalizedNames,
+}) {
+  return pool.execute(
     Sql.named('''
       WITH input_names AS (
         SELECT unnest(@names::text[]) AS input_name
@@ -109,10 +181,14 @@ Future<Map<String, Map<String, dynamic>>> loadCardMetadataByName({
       ),
     },
   );
+}
 
-  return {
-    for (final row in result) ...metadataAliasesFromRow(row),
-  };
+bool isUndefinedIdentityBridgeError(Object error) {
+  final text = error.toString().toLowerCase();
+  return text.contains('card_identity_bridge') &&
+      (text.contains('does not exist') ||
+          text.contains('undefined_table') ||
+          text.contains('42p01'));
 }
 
 Map<String, Map<String, dynamic>> metadataAliasesFromRow(ResultRow row) {

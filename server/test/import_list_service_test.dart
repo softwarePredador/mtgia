@@ -80,6 +80,56 @@ void main() {
     });
   });
 
+  group('split import lookup fallback', () {
+    test('queries both front-face and back-face split card patterns', () {
+      expect(
+        splitImportLookupPatternsForName('Fire'),
+        unorderedEquals(['fire // %', '% // fire']),
+      );
+      expect(
+        splitImportLookupPatternsForName('Ice'),
+        unorderedEquals(['ice // %', '% // ice']),
+      );
+      expect(
+        splitImportLookupPatternsForName('Wear // Tear'),
+        unorderedEquals(['wear // %', '% // wear', 'tear // %', '% // tear']),
+      );
+    });
+
+    test('indexes all faces from a split card database name', () {
+      expect(
+        splitImportLookupAliasesForDbName('Fire // Ice'),
+        unorderedEquals(['fire // ice', 'fire', 'ice']),
+      );
+      expect(
+        splitImportLookupAliasesForDbName('Wear // Tear'),
+        unorderedEquals(['wear // tear', 'wear', 'tear']),
+      );
+    });
+
+    test('resolves back-face-only split card imports from split aliases', () {
+      final fireIce = <String, dynamic>{
+        'id': 'fire-ice-id',
+        'name': 'Fire // Ice',
+      };
+      final wearTear = <String, dynamic>{
+        'id': 'wear-tear-id',
+        'name': 'Wear // Tear',
+      };
+      final foundCardsMap = <String, Map<String, dynamic>>{};
+
+      for (final alias in splitImportLookupAliasesForDbName('Fire // Ice')) {
+        foundCardsMap[alias] = fireIce;
+      }
+      for (final alias in splitImportLookupAliasesForDbName('Wear // Tear')) {
+        foundCardsMap[alias] = wearTear;
+      }
+
+      expect(findResolvedImportCard(foundCardsMap, 'Ice'), same(fireIce));
+      expect(findResolvedImportCard(foundCardsMap, 'Tear'), same(wearTear));
+    });
+  });
+
   group('card identity bridge schema', () {
     test('normalizes canonical and localized names without replacing card id',
         () {

@@ -1369,6 +1369,7 @@ Future<Response> onRequest(RequestContext context) async {
       // Filtrar adiÃ§Ãµes ilegais para Commander/Brawl (identidade de cor do comandante).
       // ObservaÃ§Ã£o: para colorless commander (identity vazia), apenas cartas colorless passam.
       final filteredByColorIdentity = <String>[];
+      final filteredByMissingIdentity = <String>[];
       if (commanders.isNotEmpty && validAdditions.isNotEmpty) {
         final additionsIdentityResult = await pool.execute(
           Sql.named('''
@@ -1382,15 +1383,19 @@ Future<Response> onRequest(RequestContext context) async {
         final identityByName = <String, List<String>>{};
         for (final row in additionsIdentityResult) {
           final name = (row[0] as String).toLowerCase();
+          final rawColorIdentity = row[1] as List?;
           final colorIdentity =
-              (row[1] as List?)?.cast<String>() ?? const <String>[];
+              rawColorIdentity?.cast<String>() ?? const <String>[];
           final colors = (row[2] as List?)?.cast<String>() ?? const <String>[];
           final oracleText = row[3] as String? ?? '';
-          identityByName[name] = resolvedCardIdentityFromParts(
+          final resolvedIdentity = resolvedCardIdentityFromParts(
             colorIdentity: colorIdentity,
             colors: colors,
             oracleText: oracleText,
           ).toList();
+          if (rawColorIdentity != null || resolvedIdentity.isNotEmpty) {
+            identityByName[name] = resolvedIdentity;
+          }
         }
 
         final colorIdentityFilter = optimize_route_color_identity_filter
@@ -1402,6 +1407,8 @@ Future<Response> onRequest(RequestContext context) async {
         validAdditions = colorIdentityFilter.additions;
         filteredByColorIdentity
             .addAll(colorIdentityFilter.filteredByColorIdentity);
+        filteredByMissingIdentity
+            .addAll(colorIdentityFilter.filteredByMissingIdentity);
       }
 
       // Bracket policy (intermediÃ¡rio): bloqueia cartas "acima do bracket" baseado no deck atual.
@@ -1502,7 +1509,10 @@ Future<Response> onRequest(RequestContext context) async {
           removals: validRemovals,
           additions: validAdditions,
           deckNamesLower: deckNamesLower,
-          filteredByColorIdentity: filteredByColorIdentity,
+          filteredByColorIdentity: [
+            ...filteredByColorIdentity,
+            ...filteredByMissingIdentity,
+          ],
         );
 
         if (rebalancePlan.needsReplacements) {
@@ -2256,6 +2266,7 @@ Future<Response> onRequest(RequestContext context) async {
         invalidCards: invalidCards,
         suggestions: suggestions,
         filteredByColorIdentity: filteredByColorIdentity,
+        filteredByMissingIdentity: filteredByMissingIdentity,
         commanderColorIdentity: commanderColorIdentity,
         blockedByBracket: blockedByBracket,
         bracket: bracket,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/deck_rules_service.dart';
@@ -18,6 +20,15 @@ void main() {
       expect(parseDeckRulesCmcValue(null), isNull);
       expect(parseDeckRulesCmcValue('not-a-number'), isNull);
       expect(parseDeckRulesCmcValue(const <String>[]), isNull);
+    });
+  });
+
+  group('DeckRulesService source guards', () {
+    test('does not emit copy-limit debug prints during validation', () {
+      final source = File('lib/deck_rules_service.dart').readAsStringSync();
+
+      expect(source, isNot(contains('[DEBUG] DeckRulesService')));
+      expect(source, isNot(contains('commander ignorado')));
     });
   });
 }

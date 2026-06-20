@@ -1,3 +1,4 @@
+import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
 import '../lib/ai/optimize_cache_support.dart' as cache_support;
@@ -65,6 +66,23 @@ void main() {
       expect(wrapped, equals(direct));
     });
 
+    test('deck signature includes physical condition with NM fallback', () {
+      final rows = [
+        _optimizeResultRow(cardId: 'card-b', quantity: 2, condition: 'lp'),
+        _optimizeResultRow(cardId: 'card-a', quantity: 1, condition: 'HP'),
+        _legacyOptimizeResultRow(cardId: 'card-c', quantity: 1),
+      ];
+
+      expect(
+        cache_support.buildOptimizeDeckSignature(rows),
+        'card-a:1:HP|card-b:2:LP|card-c:1:NM',
+      );
+      expect(
+        runtime_support.buildOptimizeDeckSignature(rows),
+        'card-a:1:HP|card-b:2:LP|card-c:1:NM',
+      );
+    });
+
     test('stableOptimizeHash returns deterministic lowercase hex', () {
       final first = cache_support.stableOptimizeHash('mana-loom');
       final second = cache_support.stableOptimizeHash('mana-loom');
@@ -74,4 +92,50 @@ void main() {
       expect(cache_support.stableOptimizeHash('mana-loon'), isNot(first));
     });
   });
+}
+
+ResultRow _optimizeResultRow({
+  required String cardId,
+  required int quantity,
+  required String condition,
+}) {
+  return _row([
+    'Test Card',
+    false,
+    quantity,
+    'Artifact',
+    '{2}',
+    <String>[],
+    2,
+    '',
+    <String>[],
+    cardId,
+    null,
+    null,
+    condition,
+  ]);
+}
+
+ResultRow _legacyOptimizeResultRow({
+  required String cardId,
+  required int quantity,
+}) {
+  return _row([
+    'Legacy Test Card',
+    false,
+    quantity,
+    'Artifact',
+    '{2}',
+    <String>[],
+    2,
+    '',
+    <String>[],
+    cardId,
+    null,
+    null,
+  ]);
+}
+
+ResultRow _row(List<Object?> values) {
+  return ResultRow(values: values, schema: ResultSchema(const []));
 }

@@ -66,13 +66,10 @@ class DeckRulesService {
     }
 
     final limit = isCommanderStyleFormat(normalizedFormat) ? 1 : 4;
-    print(
-        '[DEBUG] DeckRulesService: Validando limite de cópias (limit=$limit, format=$normalizedFormat)');
     for (final entry in copiesByName.entries) {
       final value = entry.value;
       final name = value.displayName;
       final qty = value.quantity;
-      print('[DEBUG]   "$name" = $qty cópias (commander ignorado)');
       if (qty > limit) {
         final hasMultipleNames = value.sourceNames.length > 1;
         final sourceNames = value.sourceNames.join('" / "');

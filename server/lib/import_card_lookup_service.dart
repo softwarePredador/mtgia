@@ -191,11 +191,49 @@ Map<String, dynamic> _withLocalizedMetadata(
       '_localized_source': source,
     };
 
+List<String> splitImportLookupPatternsForName(String rawName) {
+  final normalized = canonicalizeImportLookupName(
+    cleanImportLookupKey(rawName.trim().toLowerCase()),
+  ).trim();
+  if (normalized.isEmpty) return const <String>[];
+
+  final faces = normalized
+      .split(RegExp(r'\s*//\s*'))
+      .map((face) => face.trim())
+      .where((face) => face.isNotEmpty)
+      .toList();
+  final lookupFaces = faces.length > 1 ? faces : <String>[normalized];
+  final patterns = <String>{};
+
+  for (final face in lookupFaces) {
+    patterns.add('$face // %');
+    patterns.add('% // $face');
+  }
+
+  return patterns.toList(growable: false);
+}
+
+List<String> splitImportLookupAliasesForDbName(String dbName) {
+  final normalized = dbName.trim().toLowerCase();
+  if (normalized.isEmpty) return const <String>[];
+
+  final aliases = <String>{
+    canonicalizeImportLookupName(cleanImportLookupKey(normalized)),
+  };
+  final faces = normalized
+      .split(RegExp(r'\s*//\s*'))
+      .map((face) => canonicalizeImportLookupName(cleanImportLookupKey(face)))
+      .where((face) => face.isNotEmpty);
+  aliases.addAll(faces);
+
+  return aliases.toList(growable: false);
+}
+
 /// Resolve nomes de cartas para dados do banco em lote.
 ///
 /// Estratégia:
 /// 1) match exato case-insensitive por nome original e versão "limpa" (ex: Forest 96 -> Forest)
-/// 2) fallback para split cards via pattern `<nome> // %`
+/// 2) fallback para split cards via padrões de face frontal e traseira
 Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   Pool pool,
   List<Map<String, dynamic>> parsedItems, {
@@ -254,8 +292,9 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
     final exactSql = hasPreferredFormat
         ? '''
         SELECT DISTINCT ON (lower(c.name))
-          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
-          c.oracle_text, c.mana_cost, c.cmc
+          c.id, c.oracle_id::text AS oracle_id, c.name, c.type_line,
+          c.image_url, c.color_identity, c.colors, c.oracle_text, c.mana_cost,
+          c.cmc
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id
@@ -272,8 +311,9 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       '''
         : '''
         SELECT DISTINCT ON (lower(c.name))
-          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
-          c.oracle_text, c.mana_cost, c.cmc
+          c.id, c.oracle_id::text AS oracle_id, c.name, c.type_line,
+          c.image_url, c.color_identity, c.colors, c.oracle_text, c.mana_cost,
+          c.cmc
         FROM cards c
         WHERE lower(c.name) = ANY(@names)
         ORDER BY lower(c.name), c.id::text
@@ -288,17 +328,19 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
 
     for (final row in exactResult) {
       final id = row[0] as String;
-      final name = row[1] as String;
-      final typeLine = row[2] as String;
-      final imageUrl = row[3] as String?;
-      final colorIdentity = row[4];
-      final colors = row[5];
-      final oracleText = row[6] as String?;
-      final manaCost = row[7] as String?;
-      final cmc = row[8];
+      final oracleId = row[1] as String?;
+      final name = row[2] as String;
+      final typeLine = row[3] as String;
+      final imageUrl = row[4] as String?;
+      final colorIdentity = row[5];
+      final colors = row[6];
+      final oracleText = row[7] as String?;
+      final manaCost = row[8] as String?;
+      final cmc = row[9];
       final key = name.toLowerCase();
       final card = {
         'id': id,
+        'oracle_id': oracleId,
         'name': name,
         'type_line': typeLine,
         'image_url': imageUrl,
@@ -329,9 +371,9 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
     final localizedSql = hasPreferredFormat
         ? '''
         SELECT DISTINCT ON (l.normalized_printed_name)
-          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
-          c.oracle_text, c.mana_cost, c.cmc, l.normalized_printed_name,
-          l.printed_name, l.lang
+          c.id, c.oracle_id::text AS oracle_id, c.name, c.type_line,
+          c.image_url, c.color_identity, c.colors, c.oracle_text, c.mana_cost,
+          c.cmc, l.normalized_printed_name, l.printed_name, l.lang
         FROM card_localized_names l
         JOIN cards c
           ON c.id = l.card_id
@@ -359,9 +401,9 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
       '''
         : '''
         SELECT DISTINCT ON (l.normalized_printed_name)
-          c.id, c.name, c.type_line, c.image_url, c.color_identity, c.colors,
-          c.oracle_text, c.mana_cost, c.cmc, l.normalized_printed_name,
-          l.printed_name, l.lang
+          c.id, c.oracle_id::text AS oracle_id, c.name, c.type_line,
+          c.image_url, c.color_identity, c.colors, c.oracle_text, c.mana_cost,
+          c.cmc, l.normalized_printed_name, l.printed_name, l.lang
         FROM card_localized_names l
         JOIN cards c
           ON c.id = l.card_id
@@ -391,20 +433,22 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
 
     for (final row in localizedResult) {
       final id = row[0] as String;
-      final name = row[1] as String;
-      final typeLine = row[2] as String;
-      final imageUrl = row[3] as String?;
-      final colorIdentity = row[4];
-      final colors = row[5];
-      final oracleText = row[6] as String?;
-      final manaCost = row[7] as String?;
-      final cmc = row[8];
-      final normalizedPrintedName = row[9] as String;
-      final printedName = row[10] as String;
-      final lang = row[11] as String;
+      final oracleId = row[1] as String?;
+      final name = row[2] as String;
+      final typeLine = row[3] as String;
+      final imageUrl = row[4] as String?;
+      final colorIdentity = row[5];
+      final colors = row[6];
+      final oracleText = row[7] as String?;
+      final manaCost = row[8] as String?;
+      final cmc = row[9];
+      final normalizedPrintedName = row[10] as String;
+      final printedName = row[11] as String;
+      final lang = row[12] as String;
       final card = _withLocalizedMetadata(
         {
           'id': id,
+          'oracle_id': oracleId,
           'name': name,
           'type_line': typeLine,
           'image_url': imageUrl,
@@ -429,23 +473,22 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
   }
 
   // Fallback para Split Cards / Double-Faced
-  final splitPatternsToQuery = <String>[];
+  final splitPatternsToQuery = <String>{};
   for (final item in parsedItems) {
     final rawName = item['name']?.toString().trim();
     if (rawName == null || rawName.isEmpty) continue;
 
     if (findResolvedImportCard(foundCardsMap, rawName) == null) {
-      splitPatternsToQuery.add(
-        '${canonicalizeImportLookupName(cleanImportLookupKey(rawName.toLowerCase()))} // %',
-      );
+      splitPatternsToQuery.addAll(splitImportLookupPatternsForName(rawName));
     }
   }
 
   if (splitPatternsToQuery.isNotEmpty) {
     final splitSql = hasPreferredFormat
         ? '''
-        SELECT c.id, c.name, c.type_line, c.image_url, c.color_identity,
-          c.colors, c.oracle_text, c.mana_cost, c.cmc
+        SELECT c.id, c.oracle_id::text AS oracle_id, c.name, c.type_line,
+          c.image_url, c.color_identity, c.colors, c.oracle_text, c.mana_cost,
+          c.cmc
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id
@@ -462,8 +505,8 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
           c.id::text
       '''
         : '''
-        SELECT id, name, type_line, image_url, color_identity, colors,
-          oracle_text, mana_cost, cmc
+        SELECT id, oracle_id::text AS oracle_id, name, type_line, image_url,
+          color_identity, colors, oracle_text, mana_cost, cmc
         FROM cards
         WHERE lower(name) LIKE ANY(@patterns)
         ORDER BY lower(name), id::text
@@ -471,39 +514,36 @@ Future<Map<String, Map<String, dynamic>>> resolveImportCardNames(
     final splitResult = await pool.execute(
       Sql.named(splitSql),
       parameters: {
-        'patterns': TypedValue(Type.textArray, splitPatternsToQuery),
+        'patterns': TypedValue(Type.textArray, splitPatternsToQuery.toList()),
         if (hasPreferredFormat) 'preferredFormat': normalizedPreferredFormat,
       },
     );
 
     for (final row in splitResult) {
       final id = row[0] as String;
-      final dbName = row[1] as String;
-      final typeLine = row[2] as String;
-      final imageUrl = row[3] as String?;
-      final colorIdentity = row[4];
-      final colors = row[5];
-      final oracleText = row[6] as String?;
-      final manaCost = row[7] as String?;
-      final cmc = row[8];
-      final dbNameLower = dbName.toLowerCase();
-
-      final parts = dbNameLower.split(RegExp(r'\s*//\s*'));
-      if (parts.isEmpty) continue;
-
-      final prefix = parts.first.trim();
-      if (!foundCardsMap.containsKey(prefix)) {
-        foundCardsMap[prefix] = {
-          'id': id,
-          'name': dbName,
-          'type_line': typeLine,
-          'image_url': imageUrl,
-          'color_identity': colorIdentity,
-          'colors': colors,
-          'oracle_text': oracleText,
-          'mana_cost': manaCost,
-          'cmc': cmc,
-        };
+      final oracleId = row[1] as String?;
+      final dbName = row[2] as String;
+      final typeLine = row[3] as String;
+      final imageUrl = row[4] as String?;
+      final colorIdentity = row[5];
+      final colors = row[6];
+      final oracleText = row[7] as String?;
+      final manaCost = row[8] as String?;
+      final cmc = row[9];
+      final card = {
+        'id': id,
+        'oracle_id': oracleId,
+        'name': dbName,
+        'type_line': typeLine,
+        'image_url': imageUrl,
+        'color_identity': colorIdentity,
+        'colors': colors,
+        'oracle_text': oracleText,
+        'mana_cost': manaCost,
+        'cmc': cmc,
+      };
+      for (final alias in splitImportLookupAliasesForDbName(dbName)) {
+        foundCardsMap.putIfAbsent(alias, () => card);
       }
     }
   }

@@ -13,6 +13,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 Future<Response> _simulateDeck(RequestContext context, String deckId) async {
   final pool = context.read<Pool>();
   final userId = context.read<String>();
+  final config = _simulationConfig(context.request);
 
   try {
     // 1. Confirmar ownership antes de derivar qualquer estatística do deck.
@@ -82,12 +83,12 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
     }
 
     // 4. Executar Simulação de Monte Carlo
-    const iterations = 1000;
+    final iterations = config.iterations;
     final landCountStats =
         List<int>.filled(8, 0); // 0 a 7 terrenos na mão inicial
     final onCurveStats = List<int>.filled(6, 0); // Turno 1 a 5 (index 1..5)
 
-    final rng = Random();
+    final rng = config.seed == null ? Random() : Random(config.seed);
 
     for (var i = 0; i < iterations; i++) {
       // Embaralhar
@@ -159,6 +160,23 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
     return Response.json(body: {
       'deck_id': deckId,
       'iterations': iterations,
+      'seed': config.seed,
+      'engine': 'legacy_monte_carlo',
+      'advisory': true,
+      'simulation_contract': const {
+        'status': 'legacy_consistency_only',
+        'advisory_only': true,
+        'uses_goldfish_simulator': false,
+        'canonical_legality_source': false,
+        'strategy_or_swap_proof': false,
+        'simplifications': [
+          'draws_on_turn_1',
+          'ignores_london_mulligan_bottoming',
+          'ignores_color_availability',
+          'ignores_tapped_land_timing',
+          'ignores_ramp_and_interaction_sequencing',
+        ],
+      },
       'opening_hand': {
         'land_distribution': landDistribution,
         'analysis': _analyzeOpeningHand(landCountStats, iterations),
@@ -174,6 +192,30 @@ Future<Response> _simulateDeck(RequestContext context, String deckId) async {
   }
 }
 
+_SimulationConfig _simulationConfig(Request request) {
+  final params = request.uri.queryParameters;
+  return _SimulationConfig(
+    iterations: _boundedIntParam(
+      params['iterations'],
+      defaultValue: 1000,
+      min: 1,
+      max: 5000,
+    ),
+    seed: int.tryParse(params['seed'] ?? ''),
+  );
+}
+
+int _boundedIntParam(
+  String? value, {
+  required int defaultValue,
+  required int min,
+  required int max,
+}) {
+  final parsed = int.tryParse(value ?? '');
+  if (parsed == null) return defaultValue;
+  return parsed.clamp(min, max).toInt();
+}
+
 String _analyzeOpeningHand(List<int> stats, int total) {
   // Soma chances de mãos ruins (0, 1, 6, 7 terrenos)
   final badHands = stats[0] + stats[1] + stats[6] + stats[7];
@@ -186,6 +228,16 @@ String _analyzeOpeningHand(List<int> stats, int total) {
   } else {
     return 'Excellent consistency! Most hands will be playable.';
   }
+}
+
+class _SimulationConfig {
+  const _SimulationConfig({
+    required this.iterations,
+    required this.seed,
+  });
+
+  final int iterations;
+  final int? seed;
 }
 
 class _SimCard {

@@ -63,6 +63,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       return Response.json(
         body: {
           'deck_id': deckId,
+          'archetype': archetype,
+          'bracket': bracket,
           'synergy_score': existingScore,
           'strengths': existingStrengths,
           'weaknesses': existingWeaknesses,
@@ -224,6 +226,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     return Response.json(
       body: {
         'deck_id': deckId,
+        'archetype': archetype,
+        'bracket': bracket,
         'synergy_score': synergyScore,
         'strengths': strengths,
         'weaknesses': weaknesses,
@@ -391,7 +395,7 @@ Map<String, dynamic> _heuristicAnalysis({
   // Terrenos
   if (format == 'commander') {
     score += _bandScore(metrics.landCount,
-        idealMin: 34, idealMax: 39, maxPoints: 15);
+        idealMin: 33, idealMax: 38, maxPoints: 15);
   } else if (format == 'brawl') {
     score += _bandScore(metrics.landCount,
         idealMin: 22, idealMax: 26, maxPoints: 12);
@@ -430,7 +434,7 @@ Map<String, dynamic> _heuristicAnalysis({
     weaknesses.add('Deck incompleto: ${metrics.totalCards}/$maxTotal');
   }
   if (format == 'commander' && metrics.landCount < 33) {
-    weaknesses.add('Poucos terrenos (${metrics.landCount}) — ideal 35-38');
+    weaknesses.add('Poucos terrenos (${metrics.landCount}) — ideal 33-38');
   }
   if (metrics.rampCount < 8)
     weaknesses.add('Falta ramp (${metrics.rampCount}) — ideal 10-12');
@@ -476,7 +480,7 @@ Gere uma análise curta e objetiva em JSON, seguindo EXATAMENTE este formato:
 }
 Critérios de pontuação (synergy_score):
 - Completude do deck (Commander=100, Brawl=60): se incompleto, penalize proporcionalmente (ex: 60/100 cartas = máximo 60 pontos).
-- Distribuição funcional (Regra dos 8s): 10-12 ramp, 10+ draw, 8-10 removal, 3-4 board wipes, 35-38 terrenos. Cada categoria abaixo do mínimo = -5 pontos.
+- Distribuição funcional (Regra dos 8s): 10-12 ramp, 10+ draw, 8-10 removal, 3-4 board wipes, 33-38 terrenos. Cada categoria abaixo do mínimo = -5 pontos.
 - Curva de mana: MV médio > 3.5 para não-control = -10 pontos. MV > 4.0 = -15 pontos.
 - Sinergia com comandante: cartas que ativam/amplificam a habilidade = bônus. Cartas genéricas sem sinergia = penalidade leve.
 - Base de mana: terrenos que entram virados em excesso (>5) = -5 pontos. Falta de color fixing = -5 pontos.

@@ -1,0 +1,60 @@
+import 'dart:io';
+
+import 'package:server/deck_rules_service.dart';
+import 'package:server/deck_validation_route_support.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('deck validation route support', () {
+    test('owner scope query requires deck id and user id', () {
+      expect(deckValidationOwnerScopeSql, contains('FROM decks'));
+      expect(deckValidationOwnerScopeSql, contains('id = @deckId'));
+      expect(deckValidationOwnerScopeSql, contains('user_id = @userId'));
+      expect(deckValidationOwnerScopeSql, contains('LIMIT 1'));
+    });
+
+    test('success body matches validate endpoint contract', () {
+      expect(
+        buildDeckValidationSuccessBody(
+          deckId: 'deck-1',
+          format: 'commander',
+        ),
+        {
+          'ok': true,
+          'format': 'commander',
+          'deck_id': 'deck-1',
+        },
+      );
+    });
+
+    test('not-found body is explicit and distinguishable', () {
+      final body = buildDeckValidationNotFoundBody();
+
+      expect(body['ok'], isFalse);
+      expect(body['error'], 'Deck not found or permission denied.');
+      expect(body['error_code'], 'deck_not_found');
+      expect(isDeckValidationNotFoundBody(body), isTrue);
+    });
+
+    test('DeckRulesException body preserves optional card name', () {
+      final body = buildDeckValidationRuleErrorBody(
+        DeckRulesException('Carta ilegal.', cardName: 'Vendetta'),
+      );
+
+      expect(body['ok'], isFalse);
+      expect(body['error'], 'Carta ilegal.');
+      expect(body['card_name'], 'Vendetta');
+    });
+
+    test('route source uses JSON method-not-allowed and helper bodies', () {
+      final source =
+          File('routes/decks/[id]/validate/index.dart').readAsStringSync();
+
+      expect(source, contains('methodNotAllowed()'));
+      expect(source, contains('deckValidationOwnerScopeSql'));
+      expect(source, contains('buildDeckValidationSuccessBody'));
+      expect(source, contains('buildDeckValidationNotFoundBody'));
+      expect(source, contains('buildDeckValidationRuleErrorBody'));
+    });
+  });
+}

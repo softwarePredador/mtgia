@@ -682,6 +682,16 @@ $metaContext
       generatedDeck: validation.generatedDeck,
       guidance: referenceDeckCorpusGuidance,
     );
+    final referenceDeterministicDeckDiagnostics = referenceProfile == null
+        ? null
+        : buildDeterministicReferenceDeckResult(
+            profile: referenceProfile,
+            referenceCardStats: referenceCardStats,
+            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+            activeLearnedDeck: activeLearnedDeck,
+            promotedLearnedCardNames: promotedLearnedCardNames,
+            usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
+          ).toDiagnosticsJson();
 
     final responseBody = <String, dynamic>{
       'prompt': prompt,
@@ -708,6 +718,8 @@ $metaContext
           ),
           referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
           referenceDeckEvaluation: referenceDeckEvaluation,
+          referenceDeterministicDeckDiagnostics:
+              referenceDeterministicDeckDiagnostics,
         ),
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
@@ -776,6 +788,8 @@ $metaContext
       if (_aiGenerateBodyIsValidWithoutInvalidCards(fallbackBody)) {
         fallbackBody['ai_generation_repaired_by_fallback'] = true;
         fallbackBody['original_validation_errors'] = validation.errors;
+        fallbackBody['original_validation_quality_evidence'] =
+            validation.qualityEvidenceSummary();
         if (validation.invalidCards.isNotEmpty) {
           fallbackBody['original_invalid_cards_count'] =
               validation.invalidCards.length;

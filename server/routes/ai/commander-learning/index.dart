@@ -42,15 +42,29 @@ Future<Response> onRequest(RequestContext context) async {
       });
     }
 
+    final roleMetadataResult =
+        await canonicalizeCommanderLearnedDeckMetadataWithStatus(
+      pool,
+      learnedDeck,
+    );
+    final roleMetadata = roleMetadataResult.metadata;
     final recommendedDeck = await _buildRecommendedDeck(
       pool: pool,
       learnedDeck: learnedDeck,
+      roleMetadata: roleMetadata,
+      roleSummarySource: roleMetadataResult.source,
+      roleSummaryFallbackReason: roleMetadataResult.fallbackReason,
     );
     return Response.json(body: {
       'commander': learnedDeck.commanderName,
       'available': true,
       'source': 'pg_commander_learned_decks',
-      'promoted_deck': _promotedDeckSummary(learnedDeck),
+      'promoted_deck': _promotedDeckSummary(
+        learnedDeck,
+        roleMetadata: roleMetadata,
+        roleSummarySource: roleMetadataResult.source,
+        roleSummaryFallbackReason: roleMetadataResult.fallbackReason,
+      ),
       'recommended_deck': recommendedDeck,
     });
   } catch (error) {
@@ -231,6 +245,9 @@ CommanderLearnedDeckInput _learnedDeckFromRow(
 Future<Map<String, dynamic>> _buildRecommendedDeck({
   required Pool pool,
   required CommanderLearnedDeckInput learnedDeck,
+  required Map<String, dynamic> roleMetadata,
+  required String roleSummarySource,
+  required String? roleSummaryFallbackReason,
 }) async {
   final commanderName = learnedDeck.commanderName;
   final normalizedCommander = normalizeCommanderReferenceName(commanderName);
@@ -244,21 +261,10 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
     pool: pool,
     names: deckEntries.map((card) => card.name),
   );
-  final decklist = deckEntries.map((card) {
-    final metadata = metadataByName[normalizeCommanderReferenceName(card.name)];
-    final isCommander =
-        normalizeCommanderReferenceName(card.name) == normalizedCommander;
-    return {
-      'name': card.name,
-      'quantity': card.quantity,
-      'is_commander': isCommander,
-      if (metadata?['id'] != null) 'card_id': metadata!['id'],
-      if (metadata?['name'] != null && metadata!['name'] != card.name)
-        'canonical_name': metadata['name'],
-      if (metadata?['type_line'] != null) 'type_line': metadata!['type_line'],
-      'commander_legal_status': metadata?['commander_legal_status'],
-    };
-  }).toList(growable: false);
+  final decklist = buildCommanderLearnedDeckResponseDecklist(
+    learnedDeck: learnedDeck,
+    metadataByName: metadataByName,
+  );
 
   final validation = await GeneratedDeckValidationService(
     PostgresGeneratedDeckRepository(pool, preferredFormat: 'commander'),
@@ -287,7 +293,10 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
     ),
     'last_synced_at': learnedDeck.updatedAt?.toIso8601String(),
     'win_conditions': _winConditions(learnedDeck),
-    'role_summary': _roleSummary(learnedDeck),
+    'role_summary': _roleSummaryFromMetadata(roleMetadata),
+    'role_summary_source': roleSummarySource,
+    if (roleSummaryFallbackReason != null)
+      'role_summary_fallback_reason': roleSummaryFallbackReason,
     'commander': {
       'name': commanderName,
       'commander_legal_status': metadataByName[normalizedCommander]
@@ -308,7 +317,13 @@ Future<Map<String, dynamic>> _buildRecommendedDeck({
   };
 }
 
-Map<String, dynamic> _promotedDeckSummary(CommanderLearnedDeckInput deck) => {
+Map<String, dynamic> _promotedDeckSummary(
+  CommanderLearnedDeckInput deck, {
+  required Map<String, dynamic> roleMetadata,
+  required String roleSummarySource,
+  required String? roleSummaryFallbackReason,
+}) =>
+    {
       'commander': deck.commanderName,
       'deck_name': deck.deckName,
       'source_system': deck.sourceSystem,
@@ -321,7 +336,10 @@ Map<String, dynamic> _promotedDeckSummary(CommanderLearnedDeckInput deck) => {
       'promoted_at': deck.promotedAt?.toIso8601String(),
       'last_synced_at': deck.updatedAt?.toIso8601String(),
       'win_conditions': _winConditions(deck),
-      'role_summary': _roleSummary(deck),
+      'role_summary': _roleSummaryFromMetadata(roleMetadata),
+      'role_summary_source': roleSummarySource,
+      if (roleSummaryFallbackReason != null)
+        'role_summary_fallback_reason': roleSummaryFallbackReason,
     };
 
 List<Map<String, dynamic>> _winConditions(CommanderLearnedDeckInput deck) {
@@ -342,8 +360,7 @@ List<Map<String, dynamic>> _winConditions(CommanderLearnedDeckInput deck) {
   return wincons;
 }
 
-Map<String, int> _roleSummary(CommanderLearnedDeckInput deck) {
-  final metadata = deck.metadata;
+Map<String, int> _roleSummaryFromMetadata(Map<String, dynamic> metadata) {
   final keys = {
     'lands': 'total_lands',
     'ramp': 'ramp_count',

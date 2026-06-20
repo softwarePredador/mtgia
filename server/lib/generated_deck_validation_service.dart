@@ -86,6 +86,34 @@ class GeneratedDeckValidationResult {
 
   bool get isValid => errors.isEmpty;
 
+  Map<String, dynamic> qualityEvidenceSummary() {
+    final repairWarnings =
+        warnings.where(_isGeneratedDeckRepairWarning).toList(growable: false);
+    final cmcIntegrityWarnings = warnings
+        .where(_isGeneratedDeckCmcIntegrityWarning)
+        .toList(growable: false);
+    final inputToResolvedCardDelta = totalSuggestedCards - totalResolvedCards;
+
+    return {
+      'has_quality_events':
+          errors.isNotEmpty || invalidCards.isNotEmpty || warnings.isNotEmpty,
+      'has_auto_repair': repairWarnings.isNotEmpty,
+      'has_warnings': warnings.isNotEmpty,
+      'has_removed_invalid_cards': invalidCards.isNotEmpty,
+      'warning_count': warnings.length,
+      'repair_warning_count': repairWarnings.length,
+      'cmc_integrity_warning_count': cmcIntegrityWarnings.length,
+      'validation_error_count': errors.length,
+      'invalid_cards_removed_count': invalidCards.length,
+      'input_to_resolved_card_delta': inputToResolvedCardDelta,
+      if (repairWarnings.isNotEmpty)
+        'repair_warning_sample': repairWarnings.take(5).toList(),
+      if (warnings.isNotEmpty) 'warning_sample': warnings.take(5).toList(),
+      if (invalidCards.isNotEmpty)
+        'invalid_card_sample': invalidCards.take(12).toList(),
+    };
+  }
+
   Map<String, dynamic> validationSummary() {
     return {
       'is_valid': isValid,
@@ -93,8 +121,23 @@ class GeneratedDeckValidationResult {
       'invalid_cards': invalidCards,
       'suggestions': suggestions,
       'warnings': warnings,
+      'quality_evidence': qualityEvidenceSummary(),
     };
   }
+}
+
+bool _isGeneratedDeckRepairWarning(String warning) {
+  final normalized = warning.toLowerCase();
+  return normalized.contains('auto-reparo') ||
+      normalized.contains('descartad') ||
+      normalized.contains('foram removidas') ||
+      normalized.contains('foi removida') ||
+      normalized.contains('foram removidos') ||
+      normalized.contains('foi removido');
+}
+
+bool _isGeneratedDeckCmcIntegrityWarning(String warning) {
+  return warning.toLowerCase().contains('integridade cmc');
 }
 
 class GeneratedDeckValidationService {

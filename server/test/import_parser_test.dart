@@ -1,337 +1,183 @@
 import 'package:test/test.dart';
 
-/// Testes unitários para o parser de importação de decks
-/// 
-/// O parser está implementado em routes/import/index.dart
-/// Estes testes validam a lógica de regex e transformação de texto
+import '../lib/basic_land_utils.dart' as basic_lands;
+import '../lib/import_card_lookup_service.dart';
+import '../lib/import_list_service.dart';
+
 void main() {
-  group('Deck Import Parser - Regex Validation', () {
-    test('should parse standard format: "1x Sol Ring"', () {
-      final line = '1x Sol Ring';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('1')); // Quantity
-      expect(match.group(2)!.trim(), equals('Sol Ring')); // Card name
+  group('normalizeImportLines', () {
+    test('accepts raw decklist text', () {
+      expect(
+        normalizeImportLines('1 Sol Ring\n4 Lightning Bolt'),
+        equals(['1 Sol Ring', '4 Lightning Bolt']),
+      );
     });
 
-    test('should parse format without "x": "4 Lightning Bolt"', () {
-      final line = '4 Lightning Bolt';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('4'));
-      expect(match.group(2)!.trim(), equals('Lightning Bolt'));
+    test('accepts list objects with supported quantity and name keys', () {
+      expect(
+        normalizeImportLines([
+          {'quantity': 4, 'name': 'Lightning Bolt'},
+          {'amount': 3, 'card': 'Counterspell'},
+          {'qtd': 2, 'card_name': 'Brainstorm'},
+          {'name': 'Sol Ring'},
+          {'quantity': 1, 'name': ''},
+        ]),
+        equals([
+          '4 Lightning Bolt',
+          '3 Counterspell',
+          '2 Brainstorm',
+          '1 Sol Ring',
+        ]),
+      );
     });
 
-    test('should parse format with set code: "1x Command Tower (cmm)"', () {
-      final line = '1x Command Tower (cmm)';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('1'));
-      expect(match.group(2)!.trim(), equals('Command Tower'));
-      expect(match.group(3), equals('cmm')); // Set code
-    });
-
-    test('should parse format with foil marker: "1x Sol Ring (cmm) *F*"', () {
-      final line = '1x Sol Ring (cmm) *F*';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('1'));
-      expect(match.group(2)!.trim(), equals('Sol Ring'));
-      expect(match.group(3), equals('cmm'));
-    });
-
-    test('should parse cards with numbers in name: "1x Forest 96"', () {
-      final line = '1x Forest 96';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('1'));
-      expect(match.group(2)!.trim(), equals('Forest 96'));
-    });
-
-    test('should parse cards with special characters: "1x Urza\'s Saga"', () {
-      final line = "1x Urza's Saga";
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('1'));
-      expect(match.group(2)!.trim(), equals("Urza's Saga"));
-    });
-
-    test('should parse double-digit quantities: "24 Island"', () {
-      final line = '24 Island';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('24'));
-      expect(match.group(2)!.trim(), equals('Island'));
+    test('rejects unsupported list payload types', () {
+      expect(() => normalizeImportLines(42), throwsFormatException);
     });
   });
 
-  group('Deck Import Parser - Commander Tag Detection', () {
-    test('should detect [commander] tag', () {
-      final line = '1x Atraxa, Praetors\' Voice [commander]';
-      final lineLower = line.toLowerCase();
-      
-      final isCommander = lineLower.contains('[commander') || 
-                         lineLower.contains('*cmdr*') || 
-                         lineLower.contains('!commander');
+  group('parseImportLines', () {
+    test('parses common decklist line formats through the real parser', () {
+      final result = parseImportLines([
+        '1x Sol Ring',
+        '4 Lightning Bolt',
+        '1x Command Tower (cmm)',
+        '1x Sol Ring (cmm) *F*',
+        "1x Urza's Saga",
+        '24 Island',
+        "1x Atraxa, Praetors' Voice",
+        '  4x   Lightning Bolt  ',
+      ]);
 
-      expect(isCommander, isTrue);
+      expect(result.invalidLines, isEmpty);
+      expect(
+        result.parsedItems
+            .map((item) => [item['quantity'], item['name']])
+            .toList(),
+        equals([
+          [1, 'Sol Ring'],
+          [4, 'Lightning Bolt'],
+          [1, 'Command Tower'],
+          [1, 'Sol Ring'],
+          [1, "Urza's Saga"],
+          [24, 'Island'],
+          [1, "Atraxa, Praetors' Voice"],
+          [4, 'Lightning Bolt'],
+        ]),
+      );
     });
 
-    test('should detect *cmdr* tag', () {
-      final line = '1x Chulane, Teller of Tales *cmdr*';
-      final lineLower = line.toLowerCase();
-      
-      final isCommander = lineLower.contains('[commander') || 
-                         lineLower.contains('*cmdr*') || 
-                         lineLower.contains('!commander');
+    test('keeps collector numbers for lookup fallback cleanup', () {
+      final result = parseImportLines(['1x Forest 96']);
 
-      expect(isCommander, isTrue);
+      expect(result.invalidLines, isEmpty);
+      expect(result.parsedItems.single['name'], equals('Forest 96'));
+      expect(cleanImportLookupKey('Forest 96'), equals('Forest'));
     });
 
-    test('should detect !commander tag', () {
-      final line = '1x Edgar Markov !commander';
-      final lineLower = line.toLowerCase();
-      
-      final isCommander = lineLower.contains('[commander') || 
-                         lineLower.contains('*cmdr*') || 
-                         lineLower.contains('!commander');
+    test('strips commander markers and keeps commander intent separate', () {
+      final result = parseImportLines([
+        '1x Atraxa, Praetors\' Voice [commander]',
+        '1 Chulane, Teller of Tales *cmdr*',
+        '1 Edgar Markov !commander',
+        '1 Commanding Presence',
+      ]);
 
-      expect(isCommander, isTrue);
+      expect(result.invalidLines, isEmpty);
+      expect(
+        result.parsedItems.map((item) => item['name']).toList(),
+        equals([
+          "Atraxa, Praetors' Voice",
+          'Chulane, Teller of Tales',
+          'Edgar Markov',
+          'Commanding Presence',
+        ]),
+      );
+      expect(
+        result.parsedItems.map((item) => item['isCommanderTag']).toList(),
+        equals([true, true, true, false]),
+      );
     });
 
-    test('should not detect commander in card names', () {
-      final line = '1x Commanding Presence';
-      final lineLower = line.toLowerCase();
-      
-      // A regex deveria ser mais precisa, mas para teste básico
-      final isCommander = lineLower.contains('[commander') || 
-                         lineLower.contains('*cmdr*') || 
-                         lineLower.contains('!commander');
+    test('ignores empty lines and reports malformed quantity lines', () {
+      final result = parseImportLines([
+        '',
+        '   \t  ',
+        'x4 Sol Ring',
+        'Sol Ring',
+        '1 Arcane Signet',
+      ]);
 
-      expect(isCommander, isFalse);
-    });
-  });
-
-  group('Deck Import Parser - Name Cleaning (Fallback)', () {
-    test('should clean collector numbers from names: "Forest 96" -> "Forest"', () {
-      final cardName = 'Forest 96';
-      final cleanName = cardName.replaceAll(RegExp(r'\s+\d+$'), '');
-
-      expect(cleanName, equals('Forest'));
+      expect(result.parsedItems.map((item) => item['name']), ['Arcane Signet']);
+      expect(result.invalidLines, equals(['x4 Sol Ring', 'Sol Ring']));
     });
 
-    test('should clean collector numbers: "Island 123" -> "Island"', () {
-      final cardName = 'Island 123';
-      final cleanName = cardName.replaceAll(RegExp(r'\s+\d+$'), '');
+    test('rejects unsupported sections instead of parsing them as main deck',
+        () {
+      final result = parseImportLines([
+        '1 Talrand, Sky Summoner [Commander]',
+        '99 Island',
+        'Sideboard:',
+        '1 Blue Elemental Blast',
+      ]);
 
-      expect(cleanName, equals('Island'));
-    });
-
-    test('should not affect cards without trailing numbers', () {
-      final cardName = 'Sol Ring';
-      final cleanName = cardName.replaceAll(RegExp(r'\s+\d+$'), '');
-
-      expect(cleanName, equals('Sol Ring'));
-    });
-
-    test('should not affect cards with numbers in middle: "Sword of Fire and Ice"', () {
-      final cardName = 'Emrakul, the Aeons Torn';
-      final cleanName = cardName.replaceAll(RegExp(r'\s+\d+$'), '');
-
-      expect(cleanName, equals('Emrakul, the Aeons Torn'));
-    });
-
-    test('should handle multiple spaces before number', () {
-      final cardName = 'Mountain   42';
-      final cleanName = cardName.replaceAll(RegExp(r'\s+\d+$'), '');
-
-      expect(cleanName, equals('Mountain'));
-    });
-  });
-
-  group('Deck Import Parser - Split Card Handling', () {
-    test('should generate LIKE pattern for split cards', () {
-      final cardName = 'fire';
-      final pattern = '$cardName // %';
-
-      expect(pattern, equals('fire // %'));
-    });
-
-    test('should extract prefix from split card: "Fire // Ice"', () {
-      final dbName = 'Fire // Ice';
-      final parts = dbName.toLowerCase().split(RegExp(r'\s*//\s*'));
-
-      expect(parts.length, equals(2));
-      expect(parts[0].trim(), equals('fire'));
-      expect(parts[1].trim(), equals('ice'));
-    });
-
-    test('should handle split cards with multiple slashes: "Wear // Tear"', () {
-      final dbName = 'Wear // Tear';
-      final parts = dbName.toLowerCase().split(RegExp(r'\s*//\s*'));
-
-      expect(parts.length, equals(2));
-      expect(parts[0].trim(), equals('wear'));
-    });
-
-    test('should handle inconsistent spacing in split names', () {
-      final dbName1 = 'Fire//Ice'; // Sem espaços
-      final dbName2 = 'Fire  //  Ice'; // Espaços extras
-      
-      final parts1 = dbName1.toLowerCase().split(RegExp(r'\s*//\s*'));
-      final parts2 = dbName2.toLowerCase().split(RegExp(r'\s*//\s*'));
-
-      expect(parts1[0].trim(), equals('fire'));
-      expect(parts2[0].trim(), equals('fire'));
+      expect(
+        result.parsedItems.map((item) => item['name']),
+        equals(['Talrand, Sky Summoner', 'Island']),
+      );
+      expect(result.invalidLines, contains('Sideboard:'));
+      expect(result.invalidLines, contains('1 Blue Elemental Blast'));
+      expect(result.unsupportedSectionLines, contains('Sideboard:'));
+      expect(
+        result.unsupportedSectionLines,
+        contains('1 Blue Elemental Blast'),
+      );
     });
   });
 
-  group('Deck Import Parser - Format Validation', () {
-    test('should validate Commander copy limit (1 copy)', () {
-      final format = 'commander';
-      final limit = (format == 'commander' || format == 'brawl') ? 1 : 4;
-
-      expect(limit, equals(1));
+  group('lookup support functions', () {
+    test(
+        'cleans collector suffixes without touching names that contain numbers',
+        () {
+      expect(cleanImportLookupKey('Forest 96'), equals('Forest'));
+      expect(cleanImportLookupKey('Island 123'), equals('Island'));
+      expect(cleanImportLookupKey('Mountain   42'), equals('Mountain'));
+      expect(cleanImportLookupKey('Sword of Fire and Ice'),
+          equals('Sword of Fire and Ice'));
+      expect(cleanImportLookupKey('Sol Ring'), equals('Sol Ring'));
     });
 
-    test('should validate Standard copy limit (4 copies)', () {
-      final format = 'standard';
-      final limit = (format == 'commander' || format == 'brawl') ? 1 : 4;
-
-      expect(limit, equals(4));
+    test('maps split and DFC face names through shared lookup helpers', () {
+      expect(
+        splitImportLookupPatternsForName('Fire'),
+        unorderedEquals(['fire // %', '% // fire']),
+      );
+      expect(
+        splitImportLookupPatternsForName('Ice'),
+        unorderedEquals(['ice // %', '% // ice']),
+      );
+      expect(
+        splitImportLookupAliasesForDbName('Wear // Tear'),
+        unorderedEquals(['wear // tear', 'wear', 'tear']),
+      );
     });
 
-    test('should validate Brawl copy limit (1 copy)', () {
-      final format = 'brawl';
-      final limit = (format == 'commander' || format == 'brawl') ? 1 : 4;
-
-      expect(limit, equals(1));
-    });
-
-    test('should allow unlimited basic lands', () {
-      final typeLine = 'Basic Land — Forest';
-      final isBasicLand = typeLine.toLowerCase().contains('basic land');
-
-      expect(isBasicLand, isTrue);
-    });
-
-    test('should not classify non-basic lands as basic', () {
-      final typeLine = 'Land — Forest Plains';
-      final isBasicLand = typeLine.toLowerCase().contains('basic land');
-
-      expect(isBasicLand, isFalse);
-    });
-  });
-
-  group('Deck Import Parser - Edge Cases', () {
-    test('should handle empty lines', () {
-      final line = '';
-      final trimmed = line.trim();
-
-      expect(trimmed.isEmpty, isTrue);
-    });
-
-    test('should handle lines with only whitespace', () {
-      final line = '   \t\n  ';
-      final trimmed = line.trim();
-
-      expect(trimmed.isEmpty, isTrue);
-    });
-
-    test('should handle malformed quantity: "x4 Sol Ring"', () {
-      final line = 'x4 Sol Ring';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      // Este formato não será capturado pela regex atual (quantidade deve vir primeiro)
-      expect(match, isNull);
-    });
-
-    test('should handle missing quantity: "Sol Ring"', () {
-      final line = 'Sol Ring';
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNull);
-    });
-
-    test('should parse cards with comma in name: "Atraxa, Praetors\' Voice"', () {
-      final line = "1x Atraxa, Praetors' Voice";
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(line);
-
-      expect(match, isNotNull);
-      expect(match!.group(2)!.trim(), equals("Atraxa, Praetors' Voice"));
-    });
-
-    test('should handle extra whitespace: "  4x   Lightning Bolt  "', () {
-      final line = '  4x   Lightning Bolt  ';
-      final trimmed = line.trim();
-      final regex = RegExp(r'^(\d+)x?\s+([^(]+)\s*(?:\(([\w\d]+)\))?.*$');
-      final match = regex.firstMatch(trimmed);
-
-      expect(match, isNotNull);
-      expect(match!.group(1), equals('4'));
-      expect(match.group(2)!.trim(), equals('Lightning Bolt'));
-    });
-  });
-
-  group('Deck Import Parser - List Format Variations', () {
-    test('should parse JSON-like object format', () {
-      final item = {
-        'quantity': 4,
-        'name': 'Lightning Bolt',
-      };
-
-      final qty = item['quantity'] ?? item['amount'] ?? item['qtd'] ?? 1;
-      final name = item['name'] ?? item['card_name'] ?? item['card'] ?? '';
-
-      expect(qty, equals(4));
-      expect(name, equals('Lightning Bolt'));
-    });
-
-    test('should handle alternative quantity keys', () {
-      final item1 = {'amount': 3, 'card': 'Counterspell'};
-      final item2 = {'qtd': 2, 'card_name': 'Brainstorm'};
-
-      final qty1 = item1['quantity'] ?? item1['amount'] ?? item1['qtd'] ?? 1;
-      final name1 = item1['name'] ?? item1['card_name'] ?? item1['card'] ?? '';
-
-      final qty2 = item2['quantity'] ?? item2['amount'] ?? item2['qtd'] ?? 1;
-      final name2 = item2['name'] ?? item2['card_name'] ?? item2['card'] ?? '';
-
-      expect(qty1, equals(3));
-      expect(name1, equals('Counterspell'));
-      expect(qty2, equals(2));
-      expect(name2, equals('Brainstorm'));
-    });
-
-    test('should use default quantity when missing', () {
-      final item = {'name': 'Sol Ring'};
-
-      final qty = item['quantity'] ?? item['amount'] ?? item['qtd'] ?? 1;
-      expect(qty, equals(1));
-    });
-
-    test('should handle empty name gracefully', () {
-      final item = {'quantity': 4, 'name': ''};
-
-      final name = item['name'] ?? item['card_name'] ?? item['card'] ?? '';
-      expect(name.toString().isEmpty, isTrue);
+    test('uses real basic-land classifier for import copy-limit exemptions',
+        () {
+      expect(
+        basic_lands.isBasicLandCard(
+          name: 'Forest',
+          typeLine: 'Basic Land - Forest',
+        ),
+        isTrue,
+      );
+      expect(
+        basic_lands.isBasicLandCard(
+          name: 'Temple Garden',
+          typeLine: 'Land - Forest Plains',
+        ),
+        isFalse,
+      );
     });
   });
 }

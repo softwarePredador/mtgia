@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_schema_support.dart';
+import '../../lib/deck_card_name_resolution_support.dart';
 import '../../lib/deck_rules_service.dart';
 import '../../lib/http_responses.dart';
 import '../../lib/logger.dart';
@@ -352,35 +353,14 @@ Future<Response> _createDeck(RequestContext context) async {
         }
 
         if (cardId == null || cardId.isEmpty) {
-          final lookup = await session.execute(
-            Sql.named(
-              '''
-              SELECT c.id::text
-              FROM cards c
-              LEFT JOIN card_legalities cl
-                ON cl.card_id = c.id
-               AND cl.format = @format
-              WHERE LOWER(c.name) = LOWER(@name)
-              ORDER BY
-                CASE
-                  WHEN cl.status = 'legal' THEN 0
-                  WHEN cl.status = 'restricted' THEN 1
-                  WHEN cl.status IS NULL THEN 2
-                  ELSE 3
-                END,
-                c.id::text
-              LIMIT 1
-              ''',
-            ),
-            parameters: {
-              'name': cardName!.trim(),
-              'format': format.toLowerCase(),
-            },
+          cardId = await resolveDeckCardIdByName(
+            session: session,
+            name: cardName!.trim(),
+            preferredFormat: format,
           );
-          if (lookup.isEmpty) {
+          if (cardId == null || cardId.isEmpty) {
             throw Exception('Card not found: ${cardName.trim()}');
           }
-          cardId = lookup.first[0] as String;
         }
 
         normalizedCards.add({

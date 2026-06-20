@@ -3,10 +3,12 @@ import '../color_identity.dart';
 class OptimizeColorIdentityFilterResult {
   final List<String> additions;
   final List<String> filteredByColorIdentity;
+  final List<String> filteredByMissingIdentity;
 
   const OptimizeColorIdentityFilterResult({
     required this.additions,
     required this.filteredByColorIdentity,
+    this.filteredByMissingIdentity = const <String>[],
   });
 }
 
@@ -17,9 +19,16 @@ OptimizeColorIdentityFilterResult filterOptimizeAdditionsByCommanderIdentity({
 }) {
   final allowed = <String>[];
   final filtered = <String>[];
+  final missingIdentity = <String>[];
 
   for (final name in validAdditions) {
-    final identity = identityByName[name.toLowerCase()] ?? const <String>[];
+    final normalizedName = name.toLowerCase();
+    if (!identityByName.containsKey(normalizedName)) {
+      missingIdentity.add(name);
+      continue;
+    }
+
+    final identity = identityByName[normalizedName] ?? const <String>[];
     final ok = isWithinCommanderIdentity(
       cardIdentity: identity,
       commanderIdentity: commanderColorIdentity,
@@ -34,5 +43,6 @@ OptimizeColorIdentityFilterResult filterOptimizeAdditionsByCommanderIdentity({
   return OptimizeColorIdentityFilterResult(
     additions: allowed,
     filteredByColorIdentity: filtered,
+    filteredByMissingIdentity: missingIdentity,
   );
 }

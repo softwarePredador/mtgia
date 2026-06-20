@@ -74,6 +74,8 @@ Future<Response> onRequest(RequestContext context) async {
                  0
                ) as cmc,
                COALESCE(c.oracle_id::text, c.scryfall_id::text) as oracle_id,
+               c.color_identity,
+               dc.is_commander,
                $functionalTagsSelect,
                $semanticV2Select
         FROM deck_cards dc 
@@ -84,7 +86,8 @@ Future<Response> onRequest(RequestContext context) async {
     );
 
     final cards = <Map<String, dynamic>>[];
-    final deckColors = <String>{};
+    final observedDeckColors = <String>{};
+    final commanderColorIdentity = <String>{};
     final deckOracleIds = <String>{};
     final deckCardNames = <String>{};
 
@@ -109,10 +112,15 @@ Future<Response> onRequest(RequestContext context) async {
       final quantity = row[5] as int;
       final cmc = (row[6] as num?)?.toDouble() ?? 0;
       final oracleId = (row[7] as String?) ?? '';
-      final functionalTags = row[8];
-      final semanticTagsV2 = row[9];
+      final colorIdentity = (row[8] as List?)?.cast<String>() ?? [];
+      final isCommanderCard = row[9] == true;
+      final functionalTags = row[10];
+      final semanticTagsV2 = row[11];
 
-      deckColors.addAll(colors);
+      observedDeckColors.addAll(colors);
+      if (isCommanderCard) {
+        commanderColorIdentity.addAll(colorIdentity);
+      }
       if (oracleId.isNotEmpty) deckOracleIds.add(oracleId);
       deckCardNames.add(name.toLowerCase());
       totalCards += quantity;
@@ -165,6 +173,12 @@ Future<Response> onRequest(RequestContext context) async {
       if (cardRoles.contains('recursion') || cardRoles.contains('graveyard'))
         graveyardInteractionCount += quantity;
     }
+    final recommendationColors = commanderColorIdentity.isNotEmpty
+        ? commanderColorIdentity
+        : observedDeckColors;
+    final colorIdentitySource = commanderColorIdentity.isNotEmpty
+        ? 'commander_color_identity'
+        : 'observed_card_colors';
 
     // 3. Detectar arquétipo do deck
     final archetypeAnalysis =
@@ -185,13 +199,13 @@ Future<Response> onRequest(RequestContext context) async {
           'type': 'low_land_count',
           'severity': 'high',
           'description':
-              'Deck tem apenas $landCount terrenos. Commander decks geralmente precisam de 35-38.',
+              'Deck tem apenas $landCount terrenos. Commander decks geralmente precisam de 33-38 conforme perfil, curva e ramp.',
           'recommendations': [
-            'Adicionar ${35 - landCount} terrenos',
+            'Adicionar ${33 - landCount} terrenos',
             'Considerar terrenos que produzem múltiplas cores'
           ],
           'current_value': landCount,
-          'recommended_value': 36,
+          'recommended_value': 33,
         });
       } else if (landCount > 40) {
         weaknesses.add({
@@ -223,7 +237,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%search your library%land%',
             '%put%land%onto the battlefield%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 5,
@@ -248,7 +262,7 @@ Future<Response> onRequest(RequestContext context) async {
           pool: pool,
           roles: const ['draw', 'loot'],
           oraclePatterns: const ['%draw%card%', '%draw%cards%'],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 4,
@@ -277,7 +291,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%exile target%',
             '%damage%target%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 4,
@@ -306,7 +320,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%exile all%',
             '%each creature%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 4,
@@ -352,7 +366,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%indestructible%',
             '%protection from%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 4,
@@ -381,7 +395,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%protection from%',
             '%ward%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 4,
@@ -427,7 +441,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%destroy target nonland permanent%',
             '%exile target nonland permanent%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 5,
@@ -472,7 +486,7 @@ Future<Response> onRequest(RequestContext context) async {
       comboResult = await CommanderSpellbookService().findDeckCombos(
         pool: pool,
         deckOracleIds: deckOracleIds,
-        commanderColorIdentity: deckColors,
+        commanderColorIdentity: recommendationColors,
       );
     } catch (e) {
       print('[weakness-analysis] combo detection falhou: $e');
@@ -573,7 +587,7 @@ Future<Response> onRequest(RequestContext context) async {
             '%instant%',
             '%flash%',
           ],
-          deckColors: deckColors,
+          deckColors: recommendationColors,
           excludeNames: deckCardNames,
           format: deckFormat,
           limit: 5,
@@ -591,7 +605,7 @@ Future<Response> onRequest(RequestContext context) async {
     // 6. Buscar hate cards recomendados para o arquétipo detectado
     final hateCards = await countersService.getHateCards(
       archetype: detectedArchetype,
-      colors: deckColors.toList(),
+      colors: recommendationColors.toList(),
     );
 
     // 7. Salvar análise no banco (opcional)
@@ -667,7 +681,8 @@ Future<Response> onRequest(RequestContext context) async {
             .toList(),
       },
       'hate_cards_for_archetype': hateCards,
-      'colors': deckColors.toList(),
+      'colors': recommendationColors.toList()..sort(),
+      'color_identity_source': colorIdentitySource,
       'advanced': {
         'wincon_diversity': winconDiversity.data,
         'removal_to_threat': removalToThreat.data,

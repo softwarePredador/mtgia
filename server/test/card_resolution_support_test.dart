@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../lib/card_resolution_support.dart';
@@ -64,6 +66,53 @@ void main() {
 
       expect(decision.isResolved, isFalse);
       expect(decision.isAmbiguous, isFalse);
+    });
+  });
+
+  group('deck card name resolution source guards', () {
+    test(
+        'shared deck resolver prefers card identity bridge with cards fallback',
+        () {
+      final source =
+          File('lib/deck_card_name_resolution_support.dart').readAsStringSync();
+
+      expect(source, contains('JOIN card_identity_bridge cib'));
+      expect(source, contains('cib.normalized_lookup_name'));
+      expect(source, contains('cib.normalized_canonical_name'));
+      expect(source, contains('card_identity_bridge'));
+      expect(source, contains('cards_fallback'));
+      expect(source, contains('isUndefinedCardIdentityBridgeError'));
+      expect(source, contains('LOWER(SPLIT_PART(c.name'));
+      expect(
+        source,
+        contains('ORDER BY match_rank, match_priority, legality_rank, card_id'),
+      );
+      expect(
+        source,
+        contains(
+          'ORDER BY match_rank, match_priority, legality_rank, candidate_name, card_id',
+        ),
+      );
+    });
+
+    test('deck write and batch routes use shared bridge-backed resolver', () {
+      final batchRoute =
+          File('routes/cards/resolve/batch/index.dart').readAsStringSync();
+      final createRoute = File('routes/decks/index.dart').readAsStringSync();
+      final updateRoute =
+          File('routes/decks/[id]/index.dart').readAsStringSync();
+
+      expect(batchRoute, contains('resolveDeckCardNameCandidates'));
+      expect(createRoute, contains('resolveDeckCardIdByName'));
+      expect(updateRoute, contains('resolveDeckCardIdByName'));
+      expect(
+        createRoute,
+        isNot(contains('WHERE LOWER(c.name) = LOWER(@name)')),
+      );
+      expect(
+        updateRoute,
+        isNot(contains('WHERE LOWER(name) = LOWER(@name)')),
+      );
     });
   });
 }
