@@ -238,3 +238,22 @@ Execution boundary:
   batch.
 - Until then, this thread will keep validating and reconciling the files without
   changing Git index state.
+
+## Publication Branch Observation - 2026-06-20 13:28 -0300
+
+The Batch 0/1 readiness section above is historical checkpoint evidence from
+before staging/publication. The current workspace observation is:
+
+- branch: `codex/manaloom-batches-20260620`
+- upstream alignment: `git rev-list --left-right --count HEAD...@{upstream}`
+  returned `0 0`
+- worktree state: `git status --porcelain=v1` returned `0` rows
+- current branch commits above `origin/master`:
+  - `9ffe002b docs: publish ManaLoom audit evidence batch`
+  - `7310111f chore: add ManaLoom audit tooling batch`
+  - `764a3255 feat: harden ManaLoom deck backend flows`
+  - `ca939026 feat: refine deck app flows`
+
+This heartbeat only reconciled and documented the observed state. It did not
+stage, commit, push, apply PostgreSQL, apply a deck swap, clean files, stash, or
+revert anything.

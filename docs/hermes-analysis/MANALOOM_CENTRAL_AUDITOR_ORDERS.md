@@ -622,3 +622,73 @@ Latest executed step:
 6. Before any commit discussion, review the broad dirty source diff by
    ownership area; aggregate tests passed, but that does not prove live backend
    deploy, live OpenAI behavior, or real-device Flutter behavior.
+
+## Publication Branch Observation - 2026-06-20 13:28 -0300
+
+Scope:
+
+- Heartbeat re-read the current Git state, central registers, Lorehold register,
+  latest learned-deck coherence artifact, and latest battle summary.
+- No PostgreSQL write, deck swap, cleanup, stash, revert, stage, commit, push,
+  live app route call, or OpenAI call was performed by this heartbeat.
+
+Current evidence:
+
+- `git status --short --branch`:
+  `## codex/manaloom-batches-20260620...origin/codex/manaloom-batches-20260620`.
+- `git status --porcelain=v1 | wc -l`: `0`.
+- `git rev-list --left-right --count HEAD...@{upstream}`: `0 0`.
+- Current commits on the publication branch are:
+  `9ffe002b docs: publish ManaLoom audit evidence batch`,
+  `7310111f chore: add ManaLoom audit tooling batch`,
+  `764a3255 feat: harden ManaLoom deck backend flows`, and
+  `ca939026 feat: refine deck app flows`.
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`.
+- Lorehold `learned_deck:82` still has `issues=[]`, `metadata.total_lands=33`,
+  and excluded fast mana remains `Chrome Mox`, `Mox Diamond`, `Mox Opal`.
+- Latest battle summary resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`
+  and reports `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, complete forensic lineage, and tests `16/16`.
+
+Current conclusion:
+
+- The earlier Batch 0/1 readiness entries are historical checkpoint evidence.
+  The current working tree is clean and aligned with the publication branch
+  upstream.
+- No new PostgreSQL apply is ready from the current Lorehold/deck register
+  state.
+- PG-001, PG-002, PG-006, PG-007, and PG-008 remain closed unless future
+  SELECT, sync report, or battle artifact evidence proves rollback or drift.
+
+## Master Migration Closure - 2026-06-20 13:31 -0300
+
+Scope:
+
+- Migrated the publication branch into `master` by fast-forward after Rafael
+  requested migration so the work would not remain detached from the main line.
+- Pushed `master` to GitHub.
+- Verified public backend health after deploy.
+- No PostgreSQL write, deck swap, cleanup, stash, revert, or new app/backend
+  code edit was performed in this closure.
+
+Evidence:
+
+- Merge path: `master` fast-forwarded from `3908e88c` to `ca939026`.
+- Pushed range: `3908e88c..ca939026 master -> master`.
+- Final Git state:
+  `git status --short --branch` reports `## master...origin/master`.
+- Final divergence: `git rev-list --left-right --count HEAD...origin/master`
+  reports `0 0`.
+- Untracked non-ignored files: `0`.
+- Public `/health` reports `status=healthy`, `environment=production`, and
+  `git_sha=ca93902621728baefd0715f11fecccd0bfd62f03`.
+
+Current conclusion:
+
+- The batch branch has been migrated to `master` and production is running the
+  migrated SHA.
+- The local worktree is clean except for intentionally ignored SQLite backup
+  files under `docs/hermes-analysis/manaloom-knowledge/backups/`.
+- No current PostgreSQL apply is ready after this migration.

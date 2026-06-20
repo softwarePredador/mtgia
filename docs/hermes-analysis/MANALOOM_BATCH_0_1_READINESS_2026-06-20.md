@@ -174,3 +174,18 @@ git add -- .gitignore \
 
 Batch 0/1 is ready for explicit staging approval. Product code remains outside
 this batch and must be handled by later backend/app batches.
+
+## Post-Readiness Observation - 2026-06-20 13:28 -0300
+
+This readiness manifest is now historical checkpoint evidence. Current Git
+state observed by the heartbeat:
+
+- `git status --short --branch`:
+  `## codex/manaloom-batches-20260620...origin/codex/manaloom-batches-20260620`
+- `git status --porcelain=v1 | wc -l`: `0`
+- `git rev-list --left-right --count HEAD...@{upstream}`: `0 0`
+- Current publication branch commits:
+  `9ffe002b`, `7310111f`, `764a3255`, and `ca939026`
+
+The heartbeat that wrote this note did not stage, commit, push, clean files,
+revert, stash, apply PostgreSQL, or apply a deck swap.

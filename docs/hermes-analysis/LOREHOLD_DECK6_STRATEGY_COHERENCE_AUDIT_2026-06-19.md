@@ -15578,3 +15578,49 @@ Conclusion:
 - Lorehold deck `6` remains coherent and unchanged.
 - The current task is publication governance and residual QA, not a deck swap.
 - No new PostgreSQL apply is ready from the Lorehold/deck register state.
+
+### Auditor Central Publication Branch Reconciliation - 2026-06-20 13:28 -03
+
+Scope:
+
+- Rechecked the current Git state, central registers, Lorehold register, latest
+  learned-deck coherence artifact, and latest battle artifact.
+- No Lorehold deck `6` mutation, deck swap, PostgreSQL write, cleanup, stash,
+  revert, stage, commit, push, live app route call, or OpenAI call was
+  performed by this heartbeat.
+
+Evidence:
+
+- Current branch:
+  `codex/manaloom-batches-20260620`.
+- `git status --short --branch`:
+  `## codex/manaloom-batches-20260620...origin/codex/manaloom-batches-20260620`.
+- `git status --porcelain=v1 | wc -l`: `0`.
+- `git rev-list --left-right --count HEAD...@{upstream}`: `0 0`.
+- Publication branch commits observed:
+  `9ffe002b docs: publish ManaLoom audit evidence batch`,
+  `7310111f chore: add ManaLoom audit tooling batch`,
+  `764a3255 feat: harden ManaLoom deck backend flows`, and
+  `ca939026 feat: refine deck app flows`.
+- Latest learned-deck coherence artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`.
+- That artifact still reports Lorehold `learned_deck:82` with `issues=[]`,
+  `metadata.total_lands=33`, and excluded fast mana:
+  `Chrome Mox`, `Mox Diamond`, `Mox Opal`.
+- Aggregate learned-deck residuals remain non-Lorehold:
+  `commander_deck_quantity_mismatch=1`, `commander_quantity_mismatch=1`,
+  `land_count_high_review=1`, `land_count_low_review=7`, and
+  `some_core_metadata_zero=5`.
+- Latest battle:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`.
+- Latest battle result:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`, and tests `16/16`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- The Batch 0/1 readiness manifests are now historical checkpoint evidence; the
+  current worktree is clean and aligned with the publication branch upstream.
+- No new PostgreSQL apply is ready from the Lorehold/deck register state.
