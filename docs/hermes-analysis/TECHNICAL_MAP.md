@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 15:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 19:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -185,12 +185,14 @@ mtgia/
   `/ai/optimize`. Testes/analyze backend focados verdes; testes app focados
   seguem bloqueados localmente sem `app/.dart_tool/package_config.json`.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em
-  2026-06-19 19:00 UTC no checkout `ced006f2`. `resolveOptimizeArchetype`
-  tem fonte canonica em `optimize_archetype_support.dart`; os roles estrategicos em
-  `functional_card_tags.dart` usam `resolveCardFunctionalRoles`;
-  basic/snow basic lands seguem centralizados em `server/lib/basic_land_utils.dart`;
-  `sync_cards.dart` ja consome `sync_cards_utils.dart` no caminho principal; e
-  `server/bin/export_hermes_learned_deck.py` virou wrapper da implementacao
+  2026-06-20 19:00 UTC no checkout `b372e3ce`. Nao houve delta de produto desde
+  a ultima rodada focada de duplicacao; somente docs de Hermes mudaram.
+  `resolveOptimizeArchetype` segue canonico em
+  `optimize_archetype_support.dart`; roles estrategicos em
+  `functional_card_tags.dart` usam `resolveCardFunctionalRoles`; basic/snow
+  basic lands seguem centralizados em `server/lib/basic_land_utils.dart`;
+  `sync_cards.dart` ja consome `sync_cards_utils.dart`; e
+  `server/bin/export_hermes_learned_deck.py` segue wrapper da implementacao
   canonica em docs. Permanecem duplicacoes relevantes em analise de estado
   rebuild/optimize (`deck_state_analysis.dart` vs `optimize_state_support.dart`),
   fallback/scoring funcional do optimize, request/log social, trust
