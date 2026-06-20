@@ -1,5 +1,11 @@
 # Lorehold Battle Model Coverage Matrix - 2026-06-16
 
+> Status 2026-06-19: documento historico/superseded para cobertura atual.
+> Use como baseline antigo; valide cobertura contra runtime-safe coverage e o
+> register vivo. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Summary
 
 This matrix checks the 100-card Lorehold canonical snapshot against the current

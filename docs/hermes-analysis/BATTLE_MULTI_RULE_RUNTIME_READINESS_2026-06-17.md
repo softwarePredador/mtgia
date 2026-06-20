@@ -1,5 +1,10 @@
 # Battle Multi-Rule Runtime Readiness — 2026-06-17
 
+> Status 2026-06-19: documento historico. A leitura atual precisa separar
+> runtime-safe, review-only e needs-review conforme o register vivo. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Objetivo
 
 Responder com evidência atualizada se já faz sentido "simplesmente executar

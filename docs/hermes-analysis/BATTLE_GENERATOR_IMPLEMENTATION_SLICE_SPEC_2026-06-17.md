@@ -1,5 +1,10 @@
 # Battle + Generator Implementation Slice Spec - 2026-06-17
 
+> Status 2026-06-19: documento historico de especificacao. Use como contexto
+> de implementacao, nao como prova de estado atual. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Objetivo
 
 Traduzir o backlog consolidado em pontos exatos de implementação:

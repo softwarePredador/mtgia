@@ -4,6 +4,7 @@ from __future__ import annotations
 import importlib.util
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -67,8 +68,41 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
         battle.DB = self._old_db
         self._tmp.cleanup()
 
-    def test_runtime_no_longer_has_active_handcrafted_inventory(self) -> None:
-        self.assertEqual(battle.HANDCRAFTED_KNOWN_CARDS, set())
+    def test_runtime_handcrafted_inventory_is_limited_to_explicit_incident_waivers(self) -> None:
+        self.assertEqual(
+            battle.HANDCRAFTED_KNOWN_CARDS,
+            battle.MANUAL_RULE_RUNTIME_WAIVERS,
+        )
+        self.assertEqual(
+            set(battle.MANUAL_RULE_RUNTIME_WAIVER_METADATA),
+            battle.MANUAL_RULE_RUNTIME_WAIVERS,
+        )
+        self.assertTrue(
+            battle.HANDCRAFTED_KNOWN_CARDS.isdisjoint(PROMOTED_CANONICAL_NAMES)
+        )
+
+    def test_manual_runtime_waivers_have_owner_expiry_and_promotion_target(self) -> None:
+        inventory = battle.manual_runtime_waiver_inventory()
+        self.assertEqual(
+            {entry["card"] for entry in inventory},
+            battle.MANUAL_RULE_RUNTIME_WAIVERS,
+        )
+        for entry in inventory:
+            with self.subTest(card=entry["card"]):
+                opened_at = datetime.fromisoformat(
+                    entry["opened_at_utc"].replace("Z", "+00:00")
+                )
+                expires_at = datetime.fromisoformat(
+                    entry["expires_at_utc"].replace("Z", "+00:00")
+                )
+                self.assertEqual(entry["owner"], "battle-engine-data-governance")
+                self.assertEqual(entry["promotion_target"], "card_battle_rules")
+                self.assertEqual(opened_at.tzinfo, timezone.utc)
+                self.assertGreater(expires_at, opened_at)
+                self.assertLessEqual(opened_at, datetime(2026, 6, 19, 23, 59, 59, tzinfo=timezone.utc))
+                self.assertTrue(entry["reason"])
+                self.assertTrue(entry["source_runs"])
+                self.assertTrue(entry["rule_logical_key"].startswith("battle_rule_v1:"))
 
     def test_canonicalized_overrides_resolve_from_sqlite_without_manual_override(self) -> None:
         for card_name in PROMOTED_CANONICAL_NAMES:

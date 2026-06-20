@@ -56,6 +56,21 @@ RESOURCE_BENEFIT_REASONS = {
     "untapped_net_mana_upgrade",
 }
 
+BAD_FORCED_KEEP_RISK_FLAGS = {
+    "expensive_dead_hand",
+    "mana_screw",
+    "no_early_game_plan",
+    "too_few_lands",
+}
+
+LOW_CONFIDENCE_LEARNING_CODES = {
+    "forced_keep_after_bad_mulligan",
+}
+
+GLOBAL_LEARNING_ELIGIBILITY_POLICY = (
+    "requires_high_confidence_strategy_seed_and_all_mandatory_gates_pass"
+)
+
 
 def load_jsonl(path: Path | None) -> list[dict[str, Any]]:
     if path is None or not path.exists():
@@ -100,6 +115,43 @@ def has_score(decision: dict[str, Any], key: str) -> bool:
     return key in (decision.get("score_components") or {})
 
 
+def _float_or_none(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _forced_keep_bad_reasons(decision: dict[str, Any], chosen: dict[str, Any], risk_flags: set[str]) -> list[str]:
+    score = decision.get("score_components") or {}
+    resource_delta = decision.get("resource_delta") or {}
+    reasons = sorted(BAD_FORCED_KEEP_RISK_FLAGS & risk_flags)
+    reason = str(chosen.get("reason") or decision.get("reason") or score.get("reason") or "")
+    if reason == "too_few_lands" and "too_few_lands" not in reasons:
+        reasons.append("too_few_lands")
+    lands = _float_or_none(
+        chosen.get("lands")
+        if chosen.get("lands") is not None
+        else score.get("lands")
+        if score.get("lands") is not None
+        else resource_delta.get("lands")
+    )
+    if lands is not None and lands <= 1 and "too_few_lands" not in reasons:
+        reasons.append("too_few_lands")
+    score_values = [
+        chosen.get("score"),
+        decision.get("chosen_option_score"),
+        decision.get("expected_benefit_score"),
+        score.get("score"),
+        score.get("keep_score"),
+        score.get("hand_score"),
+        score.get("total_score"),
+    ]
+    if any((value := _float_or_none(score_value)) is not None and value < 0 for score_value in score_values):
+        reasons.append("negative_keep_score")
+    return reasons
+
+
 def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
     decision_id = str(decision.get("decision_id") or "?")
     decision_type = str(decision.get("decision_type") or "unknown")
@@ -134,11 +186,22 @@ def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
                 "Mulligan policy must consider curve, ramp, draw/filter and payoff, not only land count.",
                 decision_id=decision_id,
             ))
-        if forced and ("no_early_game_plan" in risk_flags or "expensive_dead_hand" in risk_flags):
+        bad_forced_keep_reasons = _forced_keep_bad_reasons(decision, chosen, risk_flags)
+        if (
+            action == "keep"
+            and forced
+            and (
+                "forced_keep_after_mulligan_cap" in risk_flags
+                or bad_forced_keep_reasons
+            )
+            and bad_forced_keep_reasons
+        ):
             findings.append(finding(
                 "medium",
                 "forced_keep_after_bad_mulligan",
-                "Mulligan cap forced a risky keep.",
+                "Mulligan cap forced a risky keep: "
+                + ", ".join(sorted(set(bad_forced_keep_reasons)))
+                + ".",
                 "Track this replay separately; do not treat resulting WR as high-confidence deck quality.",
                 decision_id=decision_id,
             ))
@@ -387,27 +450,314 @@ def audit_strategy(
         findings.extend(audit_decision(decision))
     findings.extend(audit_events(events))
 
+    low_confidence_findings = [
+        item for item in findings if item["code"] in LOW_CONFIDENCE_LEARNING_CODES
+    ]
+    non_low_confidence_findings = [
+        item for item in findings if item["code"] not in LOW_CONFIDENCE_LEARNING_CODES
+    ]
     severity_counts: Counter[str] = Counter(f["severity"] for f in findings)
     code_counts: Counter[str] = Counter(f["code"] for f in findings)
+    review_severity_counts: Counter[str] = Counter(
+        f["severity"] for f in non_low_confidence_findings
+    )
     highest = "info"
     for severity in severity_counts:
         if SEVERITY_ORDER.get(severity, 0) > SEVERITY_ORDER.get(highest, 0):
             highest = severity
-    verdict = "blocked" if highest in {"high"} else (
-        "needs_review" if highest in {"medium"} else "usable_for_strategy_learning"
-    )
+    highest_review = "info"
+    for severity in review_severity_counts:
+        if SEVERITY_ORDER.get(severity, 0) > SEVERITY_ORDER.get(highest_review, 0):
+            highest_review = severity
+    if non_low_confidence_findings:
+        verdict = "blocked" if highest_review in {"high"} else (
+            "needs_review" if highest_review in {"medium"} else "usable_for_strategy_learning"
+        )
+    elif low_confidence_findings:
+        verdict = "low_confidence_replay"
+    else:
+        verdict = "usable_for_strategy_learning"
+    if low_confidence_findings and not non_low_confidence_findings:
+        learning_confidence = "low_confidence_replay"
+        high_confidence_learning_eligible = False
+        high_confidence_learning_weight = 0.0
+        learning_confidence_reason = "forced_keep_after_bad_mulligan"
+    elif verdict == "usable_for_strategy_learning":
+        learning_confidence = "high_confidence_replay"
+        high_confidence_learning_eligible = True
+        high_confidence_learning_weight = 1.0
+        learning_confidence_reason = "no_strategy_findings"
+    else:
+        learning_confidence = "not_learning_eligible"
+        high_confidence_learning_eligible = False
+        high_confidence_learning_weight = 0.0
+        learning_confidence_reason = "strategy_findings_require_review"
     return {
         "summary": {
             "events": len(events),
             "decisions": len(decisions),
             "findings": len(findings),
+            "review_required_findings": len(non_low_confidence_findings),
+            "low_confidence_learning_findings": len(low_confidence_findings),
             "verdict": verdict,
+            "learning_confidence": learning_confidence,
+            "learning_confidence_reason": learning_confidence_reason,
+            "high_confidence_learning_eligible": high_confidence_learning_eligible,
+            "high_confidence_learning_weight": high_confidence_learning_weight,
+            "low_confidence_learning_codes": sorted({
+                item["code"] for item in low_confidence_findings
+            }),
             "highest_severity": highest if findings else "none",
             "severity_counts": dict(sorted(severity_counts.items())),
             "decision_types": dict(sorted(decision_types.items())),
             "code_counts": dict(sorted(code_counts.items())),
         },
         "findings": findings,
+    }
+
+
+def _dedup_reasons(reasons: list[Any]) -> list[str]:
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for reason in reasons:
+        text = str(reason or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        deduped.append(text)
+    return deduped
+
+
+def _positive_int(value: Any) -> int:
+    try:
+        parsed = int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+    return max(0, parsed)
+
+
+def _append_count_reason(reasons: list[str], row: dict[str, Any], field: str, label: str) -> None:
+    value = _positive_int(row.get(field))
+    if value:
+        reasons.append(f"{label}={value}")
+
+
+def compute_global_learning_eligibility(
+    seed_gate_rows: list[dict[str, Any]],
+    *,
+    final_status: str | None,
+    mandatory_gate_divergences: list[str] | None = None,
+) -> dict[str, Any]:
+    """Return global learning eligibility after all mandatory gates are known."""
+    eligible: list[str] = []
+    not_eligible: list[str] = []
+    reasons_by_seed: dict[str, list[str]] = {}
+    divergences = [str(item) for item in (mandatory_gate_divergences or []) if item]
+    run_blocks_learning = final_status != "trusted_for_strategy_learning"
+
+    for row in seed_gate_rows:
+        seed = str(row.get("seed") or row.get("seed_name") or "").strip()
+        if not seed:
+            continue
+        reasons = [str(item) for item in (row.get("reasons") or []) if item]
+        strategy_confidence = str(row.get("strategy_confidence") or "unknown")
+        if strategy_confidence != "high_confidence_replay":
+            reasons.append(f"strategy_audit:{strategy_confidence}")
+        _append_count_reason(reasons, row, "action_findings", "action_critic_findings")
+        _append_count_reason(
+            reasons,
+            row,
+            "strategy_review_required_findings",
+            "strategy_review_required_findings",
+        )
+        _append_count_reason(
+            reasons,
+            row,
+            "decision_turn_findings",
+            "replay_decision_turn_findings",
+        )
+        _append_count_reason(
+            reasons,
+            row,
+            "decision_decision_findings",
+            "replay_decision_findings",
+        )
+        _append_count_reason(reasons, row, "forensic_rule_findings", "forensic_rule_findings")
+        _append_count_reason(reasons, row, "forensic_turn_findings", "forensic_turn_findings")
+        if row.get("action_high_or_critical"):
+            reasons.append("action_critic_high_or_critical")
+        if row.get("strategy_blocked"):
+            reasons.append("strategy_audit:blocked")
+        if row.get("decision_high_or_critical"):
+            reasons.append("replay_decision_audit_high_or_critical")
+        if row.get("forensic_high_or_critical"):
+            reasons.append("forensic_audit_high_or_critical")
+        if run_blocks_learning:
+            reasons.append(f"final_status:{final_status or 'unknown'}")
+            for divergence in divergences:
+                reasons.append(f"mandatory_gate:{divergence}")
+
+        seed_reasons = _dedup_reasons(reasons)
+        reasons_by_seed[seed] = seed_reasons
+        if seed_reasons:
+            not_eligible.append(seed)
+        else:
+            eligible.append(seed)
+
+    return {
+        "global_learning_eligibility_policy": GLOBAL_LEARNING_ELIGIBILITY_POLICY,
+        "global_learning_eligible_seeds": eligible,
+        "global_not_learning_eligible_seeds": not_eligible,
+        "global_learning_eligibility_reasons": reasons_by_seed,
+    }
+
+
+def _common_value(values: list[Any]) -> Any:
+    unique: list[Any] = []
+    for value in values:
+        if value not in unique:
+            unique.append(value)
+    if len(unique) == 1:
+        return unique[0]
+    return unique
+
+
+def _source_row_id(source_ref: str) -> int | str | None:
+    if not source_ref.startswith("learned_deck:"):
+        return None
+    suffix = source_ref.split(":", 1)[1]
+    try:
+        return int(suffix)
+    except ValueError:
+        return suffix or None
+
+
+def summarize_learned_opponent_provenance(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Aggregate learned-deck opponent provenance rows for the audit summary."""
+    grouped: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    source_counts: Counter[str] = Counter()
+    construction_missing = 0
+    coherence_missing = 0
+
+    for row in rows:
+        source_kind = str(row.get("source_kind") or "")
+        source_ref = str(row.get("source_ref") or "")
+        if source_kind != "learned_decks" and not source_ref.startswith("learned_deck:"):
+            continue
+        source_system = str(row.get("source_system") or "unknown")
+        source_url = str(row.get("source_url") or "")
+        name = str(row.get("name") or source_ref or "unknown")
+        key = (source_system, source_ref, source_url, name)
+        item = grouped.setdefault(
+            key,
+            {
+                "source_system": source_system,
+                "source_ref": source_ref,
+                "source_url": source_url or None,
+                "source_row_id": _source_row_id(source_ref),
+                "name": name,
+                "commander": row.get("commander"),
+                "deck_name": row.get("deck_name"),
+                "appearances": 0,
+                "seeds": [],
+                "_source_card_counts": [],
+                "_battle_card_counts": [],
+                "_metrics_basis": [],
+                "_cached_metadata_used": [],
+                "_blocker_domains": [],
+                "_construction_present": 0,
+                "_coherence_present": 0,
+                "metrics_sample": row.get("metrics") or {},
+            },
+        )
+        item["appearances"] += 1
+        seed = str(row.get("seed") or "").replace("seed_", "")
+        if seed and seed not in item["seeds"]:
+            item["seeds"].append(seed)
+        item["_source_card_counts"].append(row.get("source_card_count"))
+        item["_battle_card_counts"].append(row.get("battle_card_count"))
+        item["_metrics_basis"].append(row.get("metrics_basis"))
+        item["_cached_metadata_used"].append(row.get("cached_metadata_used_for_metrics"))
+        item["_blocker_domains"].append(row.get("blocker_domain") or "none")
+        if row.get("construction_report"):
+            item["_construction_present"] += 1
+        else:
+            construction_missing += 1
+        if row.get("deck_coherence_report"):
+            item["_coherence_present"] += 1
+        else:
+            coherence_missing += 1
+        source_counts.update([source_system])
+
+    opponents: list[dict[str, Any]] = []
+    for item in sorted(grouped.values(), key=lambda value: (str(value["source_system"]), str(value["source_ref"]), str(value["name"]))):
+        appearances = int(item.pop("appearances"))
+        construction_present = int(item.pop("_construction_present"))
+        coherence_present = int(item.pop("_coherence_present"))
+        source_card_counts = item.pop("_source_card_counts")
+        battle_card_counts = item.pop("_battle_card_counts")
+        metrics_basis = item.pop("_metrics_basis")
+        cached_metadata = item.pop("_cached_metadata_used")
+        blocker_domains = item.pop("_blocker_domains")
+        item["appearances"] = appearances
+        item["seeds"] = sorted(
+            item["seeds"],
+            key=lambda seed: (0, int(seed)) if str(seed).isdigit() else (1, str(seed)),
+        )
+        item["source_card_count"] = _common_value(source_card_counts)
+        item["battle_card_count"] = _common_value(battle_card_counts)
+        item["metrics_basis"] = _common_value(metrics_basis)
+        item["cached_metadata_used_for_metrics"] = _common_value(cached_metadata)
+        item["blocker_domain"] = _common_value(blocker_domains)
+        item["construction_report_present"] = construction_present == appearances
+        item["deck_coherence_report_present"] = coherence_present == appearances
+        item["construction_status"] = (
+            "present"
+            if construction_present == appearances
+            else "waived_not_emitted_by_replay_deck_provenance"
+        )
+        item["deck_coherence_status"] = (
+            "present"
+            if coherence_present == appearances
+            else "waived_not_emitted_by_replay_deck_provenance"
+        )
+        item["source_url_status"] = "present" if item.get("source_url") else "missing_from_local_knowledge_db"
+        if construction_present != appearances or coherence_present != appearances:
+            item["waiver_reason"] = (
+                "learned_deck_construction_and_coherence_reports_not_emitted_by_battle_replay_deck_provenance"
+            )
+        item["provenance_status"] = (
+            "source_identity_and_shape_present_with_coherence_waiver"
+            if item.get("waiver_reason")
+            else "source_identity_shape_and_coherence_present"
+        )
+        opponents.append(item)
+
+    appearance_count = sum(int(item["appearances"]) for item in opponents)
+    provenance = {
+        "status": (
+            "learned_opponent_provenance_present"
+            if opponents and construction_missing == 0 and coherence_missing == 0
+            else "learned_opponent_provenance_present_with_shape_waiver"
+            if opponents
+            else "no_learned_opponents_observed"
+        ),
+        "learned_opponent_unique_count": len(opponents),
+        "learned_opponent_appearance_count": appearance_count,
+        "source_counts": dict(sorted(source_counts.items())),
+        "construction_report_missing_count": construction_missing,
+        "deck_coherence_report_missing_count": coherence_missing,
+        "source_url_missing_count": sum(1 for item in opponents if not item.get("source_url")),
+        "waiver_reason": (
+            "learned_deck_construction_and_coherence_reports_not_emitted_by_battle_replay_deck_provenance"
+            if construction_missing or coherence_missing
+            else None
+        ),
+    }
+    return {
+        "learned_deck_opponents": opponents,
+        "opponent_deck_provenance": provenance,
+        "learned_opponent_source_counts": dict(sorted(source_counts.items())),
     }
 
 
@@ -425,6 +775,10 @@ def render_markdown(result: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- Verdict: `{summary['verdict']}`",
+        f"- Learning confidence: `{summary['learning_confidence']}`",
+        f"- High-confidence learning eligible: `{summary['high_confidence_learning_eligible']}`",
+        f"- High-confidence learning weight: `{summary['high_confidence_learning_weight']}`",
+        f"- Learning confidence reason: `{summary['learning_confidence_reason']}`",
         f"- Decisions: `{summary['decisions']}`",
         f"- Events: `{summary['events']}`",
         f"- Findings: `{summary['findings']}`",

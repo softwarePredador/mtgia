@@ -1,5 +1,11 @@
 # Battle + Generator + Lorehold Truth Study - 2026-06-17
 
+> Status 2026-06-19: documento historico. As conclusoes devem ser cruzadas
+> com o register vivo e com os artefatos latest antes de qualquer decisao de
+> pronto. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Objetivo
 
 Consolidar, com evidência atual de código, artefatos e fontes externas, o que é

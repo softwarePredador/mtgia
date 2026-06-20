@@ -1,5 +1,13 @@
 # ManaLoom Cron Status
 
+> **Supersedencia operacional - 2026-06-19:** os trechos de Lorehold neste
+> relatorio sao historicos. Para Lorehold deck `6`, use
+> `docs/hermes-analysis/LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`
+> como fonte corrente: Hermes deck `6`, active learned `learned_deck:82`, PG
+> deck `528c877f-f829-4207-95e6-73981776c323`, `100` cards, and `33` lands.
+> Linhas antigas com `31 lands`, unknown tags, or CMC corruption are retained
+> only as historical cron evidence.
+
 > Relatório gerencial de todos os crons do projeto.
 > Atualização manual segura por OpenCode após ajustes de governança.
 > Última atualização: **2026-06-01T16:46:31Z** (opencode-operational-adjustment)

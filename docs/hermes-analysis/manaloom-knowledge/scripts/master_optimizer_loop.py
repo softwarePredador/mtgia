@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from master_optimizer_common import battle_gate_cli_lines, battle_gate_report_lines
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
@@ -236,6 +238,7 @@ def render_report(checks: list[CheckResult]) -> str:
     lines.extend(
         [
             "",
+            *battle_gate_report_lines(),
             "## Next action",
             "",
             "- If status is `approved`, run baseline battle and isolated slot scan.",
@@ -267,6 +270,9 @@ def print_plan() -> None:
 8. Handoff: write approved swaps, risks, evidence, and battle fixes.
 """
     )
+    print("Battle Replay Gate")
+    for line in battle_gate_cli_lines():
+        print(line)
 
 
 def parse_args() -> argparse.Namespace:

@@ -1,5 +1,10 @@
 # Battle Audit Coverage Status - 2026-06-16
 
+> Status 2026-06-19: documento historico/superseded para prontidao atual.
+> Use como contexto da rodada de 2026-06-16, nao como prova de estado atual.
+> Fonte viva: [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Resumo executivo
 
 O battle/Hermes esta consistente para continuar como simulador Commander

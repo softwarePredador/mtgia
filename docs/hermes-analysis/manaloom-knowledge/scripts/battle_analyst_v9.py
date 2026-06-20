@@ -560,7 +560,147 @@ class CastingContext:
             "role": self.role,
             "source_zone": self.source_zone,
             "alternative_cost_kind": self.alternative_cost_kind,
+        } | replay_primary_target_fields(self.targets)
+
+
+def replay_primary_target_fields(targets):
+    if not targets:
+        return {}
+    first = targets[0]
+    if isinstance(first, dict):
+        target = first.get("target") or first.get("target_name")
+        return {
+            key: value
+            for key, value in {
+                "target": target,
+                "target_controller": first.get("target_controller"),
+                "target_type": first.get("target_type"),
+                "target_legal": first.get("target_legal"),
+            }.items()
+            if value is not None
         }
+    return {"target": str(first)}
+
+
+def store_cast_context_fields(effect_data, fields):
+    if isinstance(effect_data, dict):
+        effect_data["_cast_context"] = copy.deepcopy(fields)
+    return effect_data
+
+
+def resolved_spell_destination(card, effect_data, effect):
+    if isinstance(card, dict) and card.get("_flashback_cast"):
+        return "exile"
+    if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
+        return "exile"
+    if effect_data.get("exiles_self"):
+        return "exile"
+    if effect == "approach":
+        return "library"
+    if is_instant_or_sorcery_spell(card):
+        return "graveyard"
+    if effect == "land":
+        return "none"
+    return "battlefield"
+
+
+def spell_resolution_context_fields(card, effect_data, effect):
+    fields = {}
+    if isinstance(effect_data, dict):
+        fields.update(copy.deepcopy(effect_data.get("_cast_context") or {}))
+        fields.update(copy.deepcopy(effect_data.get("_resolution_context") or {}))
+    destination = resolved_spell_destination(card, effect_data, effect)
+    source_zone = fields.get("source_zone") or effect_data.get("source_zone")
+    fields.setdefault("stack_object", card.get("name", "?"))
+    fields.setdefault("result", "resolved")
+    if source_zone:
+        fields["source_zone"] = source_zone
+        fields.setdefault("from_zone", source_zone)
+    if destination:
+        fields.setdefault("destination", destination)
+        fields.setdefault("zone_after", destination)
+        fields.setdefault("to_zone", destination)
+    allowed = {
+        "phase",
+        "priority_window",
+        "stack_depth",
+        "stack_object",
+        "stack_object_id",
+        "source_zone",
+        "from_zone",
+        "to_zone",
+        "destination",
+        "zone_after",
+        "cast_pipeline",
+        "locked_cost",
+        "resolved_from_stack",
+        "result",
+        "targets",
+        "target",
+        "target_controller",
+        "target_type",
+        "target_legal",
+        "role",
+        "additional_generic",
+        "alternative_cost",
+        "alternative_cost_kind",
+        "x_value",
+        "additional_costs",
+        "modes",
+    }
+    return {
+        key: value
+        for key, value in fields.items()
+        if key in allowed and value not in (None, [], {})
+    }
+
+
+def attach_stack_resolution_context(effect_data, stack_item, phase, stack_depth):
+    fields = copy.deepcopy(effect_data.get("_cast_context") or {})
+    fields.update(
+        {
+            "phase": phase or fields.get("phase"),
+            "priority_window": "stack_resolution",
+            "stack_depth": stack_depth,
+            "stack_object": stack_item.card.get("name", "?"),
+            "resolved_from_stack": True,
+            "result": "resolved",
+        }
+    )
+    store_cast_context_fields(effect_data, fields)
+    effect_data["_resolution_context"] = copy.deepcopy(fields)
+    return effect_data
+
+
+def attach_direct_resolution_context(
+    effect_data,
+    card,
+    phase,
+    *,
+    priority_window,
+    source_zone="hand",
+    locked_cost=None,
+    targets=None,
+):
+    fields = copy.deepcopy(effect_data.get("_cast_context") or {})
+    fields.update(
+        {
+            "phase": phase or fields.get("phase"),
+            "priority_window": priority_window,
+            "stack_depth": 0,
+            "stack_object": card.get("name", "?"),
+            "source_zone": source_zone,
+            "cast_pipeline": fields.get("cast_pipeline") or "direct_resolution",
+            "locked_cost": locked_cost or fields.get("locked_cost"),
+            "targets": list(targets or fields.get("targets") or []),
+            "resolved_from_stack": False,
+            "result": "resolved",
+        }
+    )
+    fields.update(replay_primary_target_fields(fields.get("targets") or []))
+    store_cast_context_fields(effect_data, fields)
+    effect_data["_resolution_context"] = copy.deepcopy(fields)
+    return effect_data
 
 
 def can_cast_in_phase(card, effect_data, phase):
@@ -615,6 +755,13 @@ def begin_cast_context(
         x_value=ctx.x_value,
         additional_costs=ctx.additional_costs,
     )
+    store_cast_context_fields(
+        ctx.effect_data,
+        {
+            "phase": phase,
+            **ctx.to_replay_fields(),
+        },
+    )
     emit_replay_event(
         "cast_announced",
         player=player.name,
@@ -649,9 +796,31 @@ def commit_cast_payment(ctx):
             **ctx.to_replay_fields(),
         )
         return False
+    mana_before = ctx.controller.available_mana()
+    mana_pool_before = ctx.controller.mana_pool.snapshot()
+    treasures_before = ctx.controller.treasures
+    life_before = ctx.controller.life
     ctx.paid = ctx.controller.spend_mana(ctx.locked_cost)
     if not ctx.paid:
         return False
+    emit_replay_event(
+        "cost_paid",
+        player=ctx.controller.name,
+        card=ctx.card.get("name", "?"),
+        effect=ctx.effect_data.get("effect", "unknown"),
+        phase=ctx.phase,
+        mana_before=mana_before,
+        mana_after=ctx.controller.available_mana(),
+        mana_pool_before=mana_pool_before,
+        mana_pool_after=ctx.controller.mana_pool.snapshot(),
+        treasures_before=treasures_before,
+        treasures_after=ctx.controller.treasures,
+        life_before=life_before,
+        life_after=ctx.controller.life,
+        life_paid=max(0, life_before - ctx.controller.life),
+        **ctx.to_replay_fields(),
+        **replay_rule_fields(ctx.effect_data),
+    )
     return True
 
 
@@ -1663,21 +1832,350 @@ def load_deck_with_construction_report(deck_id=6):
 # ═══════════════════════════════════════════
 
 KNOWN_CARDS = {}
-# Manual runtime rules are intentionally empty in normal operation. Tests or
-# incident waivers may inject explicit entries, but production semantics must
-# come from battle_card_rules or the canonical snapshot. Generated legacy known
-# cards are intentionally not a battle runtime fallback anymore: the current
-# canonical snapshot fully covers that file and avoids stale generated effects.
-HANDCRAFTED_KNOWN_CARD_RULES = {}
-HANDCRAFTED_KNOWN_CARDS = set()
+
+
+def handcrafted_runtime_rule(effect_json):
+    rule = dict(effect_json)
+    if battle_rule_registry is not None:
+        try:
+            deck_role = battle_rule_registry.deck_role_from_effect(effect_json)
+            rule.setdefault(
+                "_rule_logical_key",
+                battle_rule_registry.logical_rule_key(
+                    {
+                        "effect_json": effect_json,
+                        "deck_role_json": deck_role,
+                    }
+                ),
+            )
+        except Exception:
+            pass
+    return rule
+
+
+# Manual runtime rules are intentionally tiny and must be backed by an incident
+# waiver. They let the replay engine stop trusting broad functional tags while
+# the canonical battle-rule cache is refreshed.
+HANDCRAFTED_KNOWN_CARD_RULES = {
+    "Veil of Summer": handcrafted_runtime_rule(
+        {
+            "effect": "draw_cards",
+            "count": 1,
+            "instant": True,
+            "battle_model_scope": "veil_of_summer_draw_and_protection_waiver_v1",
+        }
+    ),
+    "Reckless Barbarian": handcrafted_runtime_rule(
+        {
+            "effect": "creature",
+            "is_mana_source": True,
+            "mana_produced": 2,
+            "produces": "R",
+            "battle_model_scope": "reckless_barbarian_creature_mana_source_waiver_v1",
+        }
+    ),
+    "Ephemerate": handcrafted_runtime_rule(
+        {
+            "effect": "protect_creature",
+            "instant": True,
+            "target": "own_creature",
+            "blink_approximation": True,
+            "battle_model_scope": "ephemerate_blink_as_protect_creature_waiver_v1",
+        }
+    ),
+    "Moonsnare Prototype": handcrafted_runtime_rule(
+        {
+            "effect": "ramp_permanent",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "C",
+            "activation_cost": "tap_artifact_or_creature",
+            "battle_model_scope": "moonsnare_prototype_mana_artifact_waiver_v1",
+        }
+    ),
+    "Sacrifice": handcrafted_runtime_rule(
+        {
+            "effect": "ramp_ritual",
+            "instant": True,
+            "requires_sacrifice_creature": True,
+            "mana_produced_from_sacrificed_cmc": True,
+            "produces": "B",
+            "battle_model_scope": "sacrifice_creature_cmc_black_ritual_waiver_v1",
+        }
+    ),
+    "Infernal Plunge": handcrafted_runtime_rule(
+        {
+            "effect": "ramp_ritual",
+            "requires_sacrifice_creature": True,
+            "mana_produced": 3,
+            "produces": "R",
+            "battle_model_scope": "infernal_plunge_creature_sacrifice_red_ritual_waiver_v1",
+        }
+    ),
+    "Geosurge": handcrafted_runtime_rule(
+        {
+            "effect": "ramp_ritual",
+            "mana_produced": 7,
+            "produces": "R",
+            "restricted_to_spell_categories": ["artifact_spell", "creature_spell"],
+            "battle_model_scope": "geosurge_red_creature_artifact_ritual_waiver_v1",
+        }
+    ),
+    "Mardu Devotee": handcrafted_runtime_rule(
+        {
+            "effect": "creature",
+            "power": 1,
+            "toughness": 2,
+            "etb_scry_count": 2,
+            "mana_filter_once_per_turn": True,
+            "activation_cost_generic": 1,
+            "produces": "RWB",
+            "battle_model_scope": "mardu_devotee_scry_and_mana_filter_waiver_v1",
+        }
+    ),
+    "Orcish Lumberjack": handcrafted_runtime_rule(
+        {
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "is_mana_source": True,
+            "mana_produced": 3,
+            "produces": "RG",
+            "requires_sacrifice_forest_for_mana": True,
+            "battle_model_scope": "orcish_lumberjack_forest_sacrifice_mana_waiver_v1",
+        }
+    ),
+    "Prized Statue": handcrafted_runtime_rule(
+        {
+            "effect": "ramp_permanent",
+            "treasure_count": 1,
+            "dies_or_graveyard_from_battlefield_treasure": True,
+            "battle_model_scope": "prized_statue_treasure_artifact_waiver_v1",
+        }
+    ),
+    "Rishkar, Peema Renegade": handcrafted_runtime_rule(
+        {
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "etb_plus_one_counter_targets": 2,
+            "countered_creatures_tap_for_mana": True,
+            "produces": "G",
+            "battle_model_scope": "rishkar_counter_mana_creature_waiver_v1",
+        }
+    ),
+    "Jeweled Amulet": handcrafted_runtime_rule(
+        {
+            "effect": "ramp_permanent",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "requires_charge_counter_before_mana": True,
+            "battle_model_scope": "jeweled_amulet_charge_counter_mana_waiver_v1",
+        }
+    ),
+    "Ponder": handcrafted_runtime_rule(
+        {
+            "effect": "draw_cards",
+            "count": 1,
+            "topdeck_look_count": 3,
+            "may_shuffle": True,
+            "battle_model_scope": "ponder_top_three_draw_waiver_v1",
+        }
+    ),
+    "Vivi Ornitier": handcrafted_runtime_rule(
+        {
+            "effect": "creature",
+            "power": 0,
+            "toughness": 3,
+            "is_mana_source": True,
+            "mana_produced_from_power": True,
+            "produces": "UR",
+            "noncreature_spell_counter_and_ping": True,
+            "battle_model_scope": "vivi_ornitier_creature_mana_trigger_waiver_v1",
+        }
+    ),
+    "Faeburrow Elder": handcrafted_runtime_rule(
+        {
+            "effect": "creature",
+            "is_mana_source": True,
+            "mana_produced_from_colors_among_permanents": True,
+            "produces": "WUBRG",
+            "battle_model_scope": "faeburrow_elder_color_diversity_mana_creature_waiver_v1",
+        }
+    ),
+    "Neoform": handcrafted_runtime_rule(
+        {
+            "effect": "tutor",
+            "target_type": "creature",
+            "destination": "battlefield",
+            "requires_sacrifice_creature": True,
+            "sacrificed_creature_mv_plus_one": True,
+            "enters_with_plus_one_counter": True,
+            "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
+        }
+    ),
+    "Aura of Silence": handcrafted_runtime_rule(
+        {
+            "effect": "remove_permanent",
+            "target": "artifact_or_enchantment",
+            "taxes_opponent_artifact_enchantment_spells": 2,
+            "activation_cost": "sacrifice_self",
+            "card_id": "e7faf8eb-e829-4109-8dfe-42865a23ba86",
+            "semantic_hash": "e6276e51fdd5341a5632356f36fb5333eb2ac061679dd0605a557b903affb060",
+            "battle_model_scope": "aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
+        }
+    ),
+}
+HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 
 # Cards listed here intentionally bypass card_battle_rules and resolve from the
-# handcrafted table first. Keep this empty by default and require an explicit
-# operational waiver for any temporary runtime-first exception.
-# Runtime hotfixes for cards whose reviewed battle semantics need to override
-# stale promoted rows until the canonical snapshot/SQLite pipeline is refreshed.
-# Keep empty by default; any temporary waiver must be audited and short-lived.
-MANUAL_RULE_RUNTIME_WAIVERS = set()
+# handcrafted table first. They are runtime hotfixes for cards whose reviewed
+# battle semantics need to override stale promoted rows until the canonical
+# snapshot/SQLite pipeline is refreshed. Any temporary waiver must be audited
+# and short-lived.
+MANUAL_RULE_RUNTIME_WAIVERS = {
+    "Veil of Summer",
+    "Reckless Barbarian",
+    "Ephemerate",
+    "Moonsnare Prototype",
+    "Sacrifice",
+    "Infernal Plunge",
+    "Geosurge",
+    "Mardu Devotee",
+    "Orcish Lumberjack",
+    "Prized Statue",
+    "Rishkar, Peema Renegade",
+    "Jeweled Amulet",
+    "Ponder",
+    "Vivi Ornitier",
+    "Faeburrow Elder",
+    "Neoform",
+    "Aura of Silence",
+}
+
+
+_WAIVER_OWNER = "battle-engine-data-governance"
+_WAIVER_PROMOTION_TARGET = "card_battle_rules"
+_WAIVER_EXPIRES_AT_UTC = "2026-06-26T23:59:59Z"
+
+
+def manual_runtime_waiver_metadata(reason, source_runs, opened_at_utc):
+    return {
+        "owner": _WAIVER_OWNER,
+        "opened_at_utc": opened_at_utc,
+        "expires_at_utc": _WAIVER_EXPIRES_AT_UTC,
+        "source_runs": list(source_runs),
+        "reason": reason,
+        "promotion_target": _WAIVER_PROMOTION_TARGET,
+        "disposition": "temporary_runtime_override_pending_canonical_rule_promotion",
+    }
+
+
+MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
+    "Veil of Summer": manual_runtime_waiver_metadata(
+        "Replace heuristic draw/protection runtime evidence from functional_tags_json.",
+        ["20260619_174452", "20260619_175415"],
+        "2026-06-19T17:54:15Z",
+    ),
+    "Reckless Barbarian": manual_runtime_waiver_metadata(
+        "Replace heuristic creature mana-source runtime evidence from functional_tags_json.",
+        ["20260619_174452", "20260619_175415"],
+        "2026-06-19T17:54:15Z",
+    ),
+    "Ephemerate": manual_runtime_waiver_metadata(
+        "Model blink as protect_creature so exile-removal heuristics do not override return text.",
+        ["lorehold_deck6_manual_waiver_forensic_20260619_seed_63201745", "20260619_181408"],
+        "2026-06-19T18:14:08Z",
+    ),
+    "Moonsnare Prototype": manual_runtime_waiver_metadata(
+        "Replace heuristic ramp_permanent spell-cast evidence with verified artifact mana-source semantics.",
+        ["20260619_175911", "20260619_181408"],
+        "2026-06-19T18:14:08Z",
+    ),
+    "Sacrifice": manual_runtime_waiver_metadata(
+        "Replace heuristic ramp_permanent evidence with sacrificed-creature mana-value ritual semantics.",
+        ["20260619_175911", "20260619_181408"],
+        "2026-06-19T18:14:08Z",
+    ),
+    "Infernal Plunge": manual_runtime_waiver_metadata(
+        "Replace functional-tag ramp evidence with creature-sacrifice red ritual semantics.",
+        ["20260619_215228"],
+        "2026-06-19T21:52:28Z",
+    ),
+    "Geosurge": manual_runtime_waiver_metadata(
+        "Replace functional-tag ramp_permanent blocker with red ritual semantics restricted to artifact and creature spells.",
+        ["20260619_223518"],
+        "2026-06-19T22:35:18Z",
+    ),
+    "Mardu Devotee": manual_runtime_waiver_metadata(
+        "Replace functional-tag lineage blocker with conservative creature, ETB scry, and mana-filter semantics.",
+        ["20260619_193733", "20260619_200324"],
+        "2026-06-19T19:55:00Z",
+    ),
+    "Orcish Lumberjack": manual_runtime_waiver_metadata(
+        "Replace functional-tag lineage blocker with creature forest-sacrifice mana-source semantics.",
+        ["20260619_193733", "20260619_200324"],
+        "2026-06-19T19:55:00Z",
+    ),
+    "Prized Statue": manual_runtime_waiver_metadata(
+        "Replace heuristic artifact ramp evidence with Treasure trigger semantics.",
+        ["20260619_200324", "20260619_202628"],
+        "2026-06-19T20:26:28Z",
+    ),
+    "Rishkar, Peema Renegade": manual_runtime_waiver_metadata(
+        "Replace heuristic ramp evidence with counter-granting creature mana-source semantics.",
+        ["20260619_200324", "20260619_202628"],
+        "2026-06-19T20:26:28Z",
+    ),
+    "Jeweled Amulet": manual_runtime_waiver_metadata(
+        "Replace heuristic ramp evidence with charge-counter mana-source semantics.",
+        ["20260619_200324", "20260619_202628"],
+        "2026-06-19T20:26:28Z",
+    ),
+    "Ponder": manual_runtime_waiver_metadata(
+        "Replace broad draw heuristic with top-three look, optional shuffle, and draw-one semantics.",
+        ["20260619_200324", "20260619_202628"],
+        "2026-06-19T20:26:28Z",
+    ),
+    "Vivi Ornitier": manual_runtime_waiver_metadata(
+        "Replace heuristic ramp evidence with creature mana-from-power and noncreature-trigger semantics.",
+        ["20260619_200324", "20260619_202628"],
+        "2026-06-19T20:26:28Z",
+    ),
+    "Faeburrow Elder": manual_runtime_waiver_metadata(
+        "Replace functional-tag lineage blocker with conservative color-diversity creature mana-source semantics.",
+        ["20260619_213957", "20260619_214539"],
+        "2026-06-19T21:45:39Z",
+    ),
+    "Neoform": manual_runtime_waiver_metadata(
+        "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
+        ["20260619_202217", "20260619_202628"],
+        "2026-06-19T20:26:28Z",
+    ),
+    "Aura of Silence": manual_runtime_waiver_metadata(
+        "Replace functional-tag removal blocker with artifact/enchantment tax plus sacrifice-removal semantics and stable local card identity.",
+        ["20260620_002832"],
+        "2026-06-19T21:32:00Z",
+    ),
+}
+
+
+def manual_runtime_waiver_inventory():
+    inventory = []
+    for card_name in sorted(MANUAL_RULE_RUNTIME_WAIVERS):
+        rule = HANDCRAFTED_KNOWN_CARD_RULES[card_name]
+        metadata = MANUAL_RULE_RUNTIME_WAIVER_METADATA[card_name]
+        inventory.append(
+            {
+                "card": card_name,
+                "effect": rule.get("effect"),
+                "rule_logical_key": rule.get("_rule_logical_key"),
+                **metadata,
+            }
+        )
+    return inventory
+
 
 TAG_EFFECTS = {
     "ramp": {"effect": "ramp_permanent", "mana_produced": 1},
@@ -1712,6 +2210,21 @@ def annotate_effect_identity(card, effect_data):
     for key, value in replay_card_identity_fields(card).items():
         annotated.setdefault(key, value)
     return annotated
+
+
+def apply_oracle_effect_normalization(effect_data, effect, *, target=None):
+    previous_effect = effect_data.get("effect")
+    previous_target = effect_data.get("target")
+    if previous_effect and previous_effect != effect:
+        effect_data["_rule_oracle_normalized_effect_from"] = previous_effect
+        effect_data["_rule_oracle_normalized_effect_to"] = effect
+    effect_data["effect"] = effect
+    if target is not None:
+        if previous_target and previous_target != target:
+            effect_data["_rule_oracle_normalized_target_from"] = previous_target
+            effect_data["_rule_oracle_normalized_target_to"] = target
+        effect_data["target"] = target
+    return effect_data
 
 
 def normalize_effect_by_oracle(card, effect_data):
@@ -1755,6 +2268,47 @@ def normalize_effect_by_oracle(card, effect_data):
             normalized["utility_land_profile"] = "ancient_tomb_contextual_fast_mana_v1"
         return normalized
 
+    if (
+        normalized_name == "rise of the eldrazi"
+        and "destroy target permanent" in text
+        and "draws four cards" in text
+        and "extra turn" in text
+        and "exile rise of the eldrazi" in text
+    ):
+        metadata = {
+            key: value
+            for key, value in normalized.items()
+            if key.startswith("_rule_")
+            or key in {"card_id", "semantic_hash", "semantics_hash"}
+        }
+        components = []
+        for component in (
+            {
+                "effect": "remove_permanent",
+                "target": "permanent",
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "draw_cards",
+                "count": 4,
+                "target_player_draw": True,
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "extra_turn",
+                "turns": 1,
+                "compose_on_resolution": True,
+            },
+        ):
+            component_with_metadata = dict(metadata)
+            component_with_metadata.update(component)
+            components.append(component_with_metadata)
+        normalized["effect"] = "composite_resolution"
+        normalized["uncounterable"] = True
+        normalized["exiles_self"] = True
+        normalized["_composite_rule_components"] = components
+        return normalized
+
     if "counter target" in text:
         normalized["effect"] = "counter"
         normalized["instant"] = True
@@ -1763,6 +2317,17 @@ def normalize_effect_by_oracle(card, effect_data):
     if "return target spell" in text:
         normalized["effect"] = "counter"
         normalized["instant"] = True
+        return normalized
+
+    if (
+        normalized_name == "ephemerate"
+        and "exile target creature you control" in text
+        and "return it to the battlefield" in text
+    ):
+        normalized["effect"] = "protect_creature"
+        normalized["target"] = "own_creature"
+        normalized["instant"] = True
+        normalized["blink_approximation"] = True
         return normalized
 
     if re.search(r"\b(destroy|exile)\s+target\b", text):
@@ -1803,12 +2368,18 @@ def normalize_effect_by_oracle(card, effect_data):
             normalized["effect"] = "remove_permanent"
         return normalized
 
-    if "from your graveyard" in text and re.search(r"\breturn target\b", text):
+    if "graveyard" in text and re.search(r"\breturn target\b", text):
         is_immediate_spell = "instant" in type_line.lower() or "sorcery" in type_line.lower()
         if not is_immediate_spell and effect not in ("recursion", "overload_recursion"):
             return normalized
-        normalized["effect"] = "recursion"
-        return normalized
+        return apply_oracle_effect_normalization(normalized, "recursion")
+
+    if re.search(r"\breturn target\s+creature\b", text):
+        return apply_oracle_effect_normalization(
+            normalized,
+            "remove_creature",
+            target="creature",
+        )
 
     if re.search(r"\breturn target\b", text):
         normalized["effect"] = "remove_permanent"
@@ -1874,6 +2445,18 @@ def replay_rule_fields(effect_data):
         or effect_data.get("semantics_hash"),
         "rule_logical_key": effect_data.get("_rule_logical_key"),
         "rule_oracle_hash": effect_data.get("_rule_oracle_hash"),
+        "rule_oracle_normalized_effect_from": effect_data.get(
+            "_rule_oracle_normalized_effect_from"
+        ),
+        "rule_oracle_normalized_effect_to": effect_data.get(
+            "_rule_oracle_normalized_effect_to"
+        ),
+        "rule_oracle_normalized_target_from": effect_data.get(
+            "_rule_oracle_normalized_target_from"
+        ),
+        "rule_oracle_normalized_target_to": effect_data.get(
+            "_rule_oracle_normalized_target_to"
+        ),
         "variant_kind": effect_data.get("variant_kind"),
         "source_zone": effect_data.get("source_zone"),
         "alternative_cost_kind": effect_data.get("alternative_cost_kind")
@@ -2271,7 +2854,7 @@ def get_card_effect(card):
                 card,
                 with_rule_metadata(
                     HANDCRAFTED_KNOWN_CARD_RULES[lookup_name],
-                    source="known_cards_manual",
+                    source="manual_runtime_waiver",
                     review_status="verified",
                     confidence=1.0,
                 ),
@@ -2596,7 +3179,9 @@ class Player:
         self.strategy = strategy
         self.indestructible = False
         self.life_cant_change = False
+        self.life_cant_change_source = None
         self.protection_from_everything = False
+        self.protection_from_everything_source = None
         self.cannot_lose_this_turn = False
         self.damage_life_floor = None
         self.damage_prevention_shields = []
@@ -2931,7 +3516,15 @@ class Player:
             ]
         return counters
 
-    def use_counterspell(self, turn=None, target_card=None):
+    def use_counterspell(
+        self,
+        turn=None,
+        target_card=None,
+        stack_item=None,
+        stack_depth=None,
+        phase=None,
+        priority_window=None,
+    ):
         counters = self.counterspell_cards(castable_only=True)
         if not counters:
             self.counters_available = len(self.counterspell_cards())
@@ -2947,14 +3540,25 @@ class Player:
         draw_count = int(effect.get("draw_on_counter") or 0)
         if draw_count:
             self.draw(draw_count, random.Random(turn or 0))
+        target_name = (target_card or {}).get("name", "?")
+        target_controller = getattr(getattr(stack_item, "controller", None), "name", None)
+        target_effect = (getattr(stack_item, "effect_data", None) or {}).get("effect")
         emit_replay_event(
             "spell_countered",
             player=self.name,
             counter=counter.get("name", "?"),
-            target=(target_card or {}).get("name", "?"),
+            target=target_name,
+            stack_object=target_name,
+            target_controller=target_controller,
+            target_effect=target_effect,
+            result="countered",
+            stack_depth=stack_depth,
+            phase=phase,
+            priority_window=priority_window or "stack_response",
             cost=cost,
             cards_drawn=draw_count,
             turn=turn,
+            **replay_rule_fields(effect),
         )
         return counter
 
@@ -3028,6 +3632,7 @@ def flush_triggers_in_apnap(active_player, all_players, stack):
                 card=source_name,
                 trigger=trigger.get("event_type"),
                 timestamp=trigger.get("timestamp", 0),
+                **(trigger.get("data") or {}),
             )
             pushed += 1
 
@@ -3816,6 +4421,93 @@ def targeting_decision(spell, target, controller, *, target_controller=None, tar
     }
 
 
+TARGETED_REMOVAL_EFFECTS = {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg"}
+
+
+def removal_target_type(effect_data):
+    target_type = str((effect_data or {}).get("target") or "").lower()
+    if target_type:
+        return target_type
+    return (
+        "creature"
+        if (effect_data or {}).get("effect") == "remove_creature"
+        else "nonland_permanent"
+    )
+
+
+def declared_target_replay_entry(decision):
+    return {
+        "target": decision.get("target_name"),
+        "target_controller": decision.get("target_controller"),
+        "target_type": decision.get("target_type"),
+        "target_legal": decision.get("target_legal"),
+        "targeting_pipeline": decision.get("targeting_pipeline"),
+    }
+
+
+def replay_fields_for_declared_targets(effect_data):
+    replay_targets = []
+    for entry in (effect_data or {}).get("declared_targets") or []:
+        target = entry.get("target") if isinstance(entry, dict) else entry
+        controller = entry.get("controller") if isinstance(entry, dict) else None
+        target_type = (
+            entry.get("target_type")
+            if isinstance(entry, dict)
+            else removal_target_type(effect_data)
+        )
+        decision = targeting_decision(
+            effect_data,
+            target,
+            entry.get("declared_by") if isinstance(entry, dict) else None,
+            target_controller=controller,
+            target_type=target_type,
+        )
+        replay_targets.append(declared_target_replay_entry(decision))
+    if not replay_targets:
+        return {}
+    return {"targets": replay_targets} | replay_primary_target_fields(replay_targets)
+
+
+def prepare_declared_removal_targets(player, opponents, card, effect_data):
+    if (effect_data or {}).get("effect") not in TARGETED_REMOVAL_EFFECTS:
+        return effect_data, []
+    if (effect_data or {}).get("declared_targets"):
+        replay = replay_fields_for_declared_targets(effect_data).get("targets", [])
+        return effect_data, replay
+
+    target_type = removal_target_type(effect_data)
+    for opponent in opponents:
+        candidates = removal_target_candidates(
+            opponent,
+            effect_data,
+            controller=player,
+            source=card,
+        )
+        if not candidates:
+            continue
+        target = choose_best_creature_target(candidates)
+        decision = targeting_decision(
+            card,
+            target,
+            player,
+            target_controller=opponent,
+            target_type=target_type,
+        )
+        declared = {
+            "target": target,
+            "controller": opponent,
+            "target_type": target_type,
+            "declared_by": player,
+        }
+        replay = [declared_target_replay_entry(decision)]
+        return {**effect_data, "declared_targets": [declared]}, replay
+    return effect_data, []
+
+
+def missing_required_declared_removal_target(effect_data, declared_targets):
+    return (effect_data or {}).get("effect") in TARGETED_REMOVAL_EFFECTS and not declared_targets
+
+
 def controller_for_target(players, target):
     for candidate in players:
         if target in getattr(candidate, "battlefield", []):
@@ -3848,13 +4540,22 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             target_controller=target_controller,
             target_type=target_type,
         )
-        if not decision["target_legal"] or target_controller is None:
+        target_still_present = (
+            target_controller is not None
+            and target in getattr(target_controller, "battlefield", [])
+        )
+        if not decision["target_legal"] or not target_still_present:
             illegal.append(decision["target_name"])
             continue
         if check_ward(target, card, player, rng):
             ward_countered.append(decision["target_name"])
             continue
-        move_permanent_from_battlefield(target_controller, target)
+        move_permanent_from_battlefield(
+            target_controller,
+            target,
+            reason="multi_target_removal",
+            source=card,
+        )
         resolved.append(decision["target_name"])
 
     emit_replay_event(
@@ -3869,6 +4570,267 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
         turn=turn,
     )
     return True
+
+
+def resolve_declared_single_removal(player, opponents, card, effect_data, turn, rng):
+    declared_targets = effect_data.get("declared_targets") or []
+    if len(declared_targets) != 1:
+        return False
+
+    entry = declared_targets[0]
+    target = entry.get("target") if isinstance(entry, dict) else entry
+    players = [player] + list(opponents)
+    target_controller = (
+        entry.get("controller") if isinstance(entry, dict) else None
+    ) or controller_for_target(players, target)
+    target_type = (
+        entry.get("target_type") if isinstance(entry, dict) else None
+    ) or removal_target_type(effect_data)
+    decision = targeting_decision(
+        card,
+        target,
+        player,
+        target_controller=target_controller,
+        target_type=target_type,
+    )
+    target_name = decision.get("target_name") or "?"
+    target_still_present = (
+        target_controller is not None
+        and target in getattr(target_controller, "battlefield", [])
+    )
+    if not decision["target_legal"] or not target_still_present:
+        emit_replay_event(
+            "removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=getattr(target_controller, "name", None),
+            target=target_name,
+            available_targets=1,
+            result="no_legal_target",
+            turn=turn,
+            **decision,
+        )
+        return True
+
+    if check_ward(target, card, player, rng):
+        emit_replay_event(
+            "removal_countered_by_ward",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=target_controller.name,
+            target=target_name,
+            turn=turn,
+            **decision,
+        )
+        return True
+
+    if effect_data.get("target_controller_gains_life"):
+        gain_life(target_controller, int(effect_data.get("target_controller_gains_life") or 0))
+
+    if effect_data.get("uses_stat_modifier_removal"):
+        try:
+            power_delta = int(effect_data.get("power_boost") or 0)
+        except Exception:
+            power_delta = 0
+        try:
+            toughness_delta = int(effect_data.get("toughness_boost") or 0)
+        except Exception:
+            toughness_delta = 0
+        remember_until_eot(target, "power")
+        remember_until_eot(target, "toughness")
+        target["power"] = int(target.get("power") or 0) + power_delta
+        target["toughness"] = int(target.get("toughness") or 0) + toughness_delta
+        emit_replay_event(
+            "removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=target_controller.name,
+            target=target_name,
+            target_effect=get_card_effect(target).get("effect", target.get("effect")),
+            target_power=target.get("power"),
+            target_toughness=target.get("toughness"),
+            target_is_creature=is_battlefield_creature(target),
+            target_type_line=target.get("type_line", ""),
+            available_targets=1,
+            result="stat_modifier_until_eot_applied",
+            power_delta=power_delta,
+            toughness_delta=toughness_delta,
+            turn=turn,
+            **decision,
+        )
+        return True
+
+    emit_replay_event(
+        "removal_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=target_controller.name,
+        target=target_name,
+        target_effect=get_card_effect(target).get("effect", target.get("effect")),
+        target_power=target.get("power"),
+        target_toughness=target.get("toughness"),
+        target_is_creature=is_battlefield_creature(target),
+        target_type_line=target.get("type_line", ""),
+        available_targets=1,
+        destination=str(effect_data.get("destination") or "graveyard").lower(),
+        turn=turn,
+        **decision,
+    )
+    destination = str(effect_data.get("destination") or "graveyard").lower()
+    if destination == "exile":
+        move_zone_object_to_exile(
+            target_controller,
+            "battlefield",
+            target,
+            reason="removal",
+            source=card,
+            turn=turn,
+        )
+    else:
+        move_permanent_from_battlefield(
+            target_controller,
+            target,
+            reason="removal",
+            source=card,
+        )
+    return True
+
+
+def redirectable_stack_context(redirector, all_players, stack_item):
+    if stack_item is None or redirector is getattr(stack_item, "controller", None):
+        return None
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    if effect_data.get("effect") not in TARGETED_REMOVAL_EFFECTS:
+        return None
+    declared_targets = effect_data.get("declared_targets") or []
+    if len(declared_targets) != 1:
+        return None
+
+    entry = declared_targets[0]
+    old_target = entry.get("target") if isinstance(entry, dict) else entry
+    old_controller = (
+        entry.get("controller") if isinstance(entry, dict) else None
+    ) or controller_for_target(all_players, old_target)
+    target_type = (
+        entry.get("target_type") if isinstance(entry, dict) else None
+    ) or removal_target_type(effect_data)
+
+    candidates = []
+    seen_targets = set()
+    for candidate_controller in all_players:
+        for candidate in removal_target_candidates(
+            candidate_controller,
+            effect_data,
+            controller=stack_item.controller,
+            source=stack_item.card,
+        ):
+            if candidate is old_target or id(candidate) in seen_targets:
+                continue
+            seen_targets.add(id(candidate))
+            candidates.append({
+                "target": candidate,
+                "controller": candidate_controller,
+            })
+
+    if not candidates:
+        return {
+            "stack_item": stack_item,
+            "declared_entry": entry,
+            "old_target": old_target,
+            "old_controller": old_controller,
+            "target_type": target_type,
+            "legal_redirect_opportunity": False,
+            "result": "no_legal_new_target",
+        }
+
+    chosen_target = choose_best_creature_target([candidate["target"] for candidate in candidates])
+    chosen = next(candidate for candidate in candidates if candidate["target"] is chosen_target)
+    return {
+        "stack_item": stack_item,
+        "declared_entry": entry,
+        "old_target": old_target,
+        "old_controller": old_controller,
+        "new_target": chosen["target"],
+        "new_controller": chosen["controller"],
+        "target_type": target_type,
+        "legal_redirect_opportunity": True,
+        "result": "redirected",
+    }
+
+
+def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase=None):
+    context = (effect_data or {}).get("_redirect_context") or {}
+    stack_item = context.get("stack_item")
+    if not context or stack_item is None:
+        emit_replay_event(
+            "redirect_removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            redirected_object=None,
+            old_target=None,
+            new_target=None,
+            target_type=None,
+            legal_redirect_opportunity=False,
+            target_change_applied=False,
+            result="no_redirect_target",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data or {}),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return False
+
+    old_target = context.get("old_target")
+    new_target = context.get("new_target")
+    target_type = context.get("target_type")
+    redirected_object = (getattr(stack_item, "card", None) or {}).get("name", "?")
+    if not new_target:
+        emit_replay_event(
+            "redirect_removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            redirected_object=redirected_object,
+            old_target=old_target.get("name", "?") if isinstance(old_target, dict) else None,
+            new_target=None,
+            target_type=target_type,
+            legal_redirect_opportunity=False,
+            target_change_applied=False,
+            result=context.get("result") or "no_legal_new_target",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data or {}),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return False
+
+    entry = context["declared_entry"]
+    if isinstance(entry, dict):
+        entry["target"] = new_target
+        entry["controller"] = context.get("new_controller")
+        entry["target_type"] = target_type
+        entry["declared_by"] = stack_item.controller
+    old_target_name = old_target.get("name", "?") if isinstance(old_target, dict) else None
+    new_target_name = new_target.get("name", "?") if isinstance(new_target, dict) else None
+    emit_replay_event(
+        "redirect_removal_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        redirected_object=redirected_object,
+        old_target=old_target_name,
+        old_target_controller=getattr(context.get("old_controller"), "name", None),
+        new_target=new_target_name,
+        new_target_controller=getattr(context.get("new_controller"), "name", None),
+        target_type=target_type,
+        legal_redirect_opportunity=True,
+        target_change_applied=True,
+        result="redirected",
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data or {}),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+    return True
+
 
 def game_winner(all_players):
     for player in all_players:
@@ -4126,6 +5088,11 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     top_item = stack.items[-1] if stack.items else None
     if not top_item:
         return False
+    if phase is None:
+        phase = (
+            (top_item.effect_data.get("_cast_context") or {}).get("phase")
+            or (top_item.effect_data.get("_resolution_context") or {}).get("phase")
+        )
     if top_item.countered:
         stack.resolve_top()
         return False
@@ -4140,6 +5107,76 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             or top_item.controller.silenced_opponents_until_eot
         ):
             continue
+        if player != top_item.controller:
+            instants = [c for c in player.hand if is_instant(c) and player.can_pay_card(c)]
+            for c in instants:
+                eff = get_card_effect(c)
+                if eff.get("effect") != "redirect_removal":
+                    continue
+                redirect_context = redirectable_stack_context(player, all_players, top_item)
+                if not redirect_context or not redirect_context.get("new_target"):
+                    continue
+                fields = replay_rule_fields(eff)
+                emit_decision_trace(
+                    decision_type="response",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            action="respond",
+                        )
+                        for option_card in instants[:8]
+                    ],
+                    chosen_option=decision_card_option(c, eff, action="redirect"),
+                    rejected_options=[
+                        decision_card_option(
+                            option_card,
+                            get_card_effect(option_card),
+                            action="reject_response",
+                        )
+                        for option_card in instants
+                        if option_card is not c
+                    ][:8],
+                    score_components={
+                        "stack_threat_score": score,
+                        "available_instants": len(instants),
+                        "redirectable_stack_target": 1,
+                    },
+                    rule_source=fields.get("rule_source", "battle_heuristic"),
+                    rule_status=fields.get("rule_review_status", "heuristic"),
+                    confidence="medium",
+                    expected_benefit_score=score,
+                    actual_outcome="redirect_response_cast",
+                    reason="redirect_targeted_stack_object",
+                )
+                if not player.spend_card_mana(c):
+                    continue
+                player.hand.remove(c)
+                emit_replay_event(
+                    "spell_cast",
+                    player=player.name,
+                    card=c.get("name", "?"),
+                    effect=eff.get("effect", "unknown"),
+                    type_line=c.get("type_line", ""),
+                    cmc=c.get("cmc", 0),
+                    turn=turn,
+                    phase=phase,
+                    role="response",
+                    response_to=top_item.card.get("name", "?"),
+                    **fields,
+                )
+                resolve_redirect_removal(
+                    player,
+                    all_players,
+                    c,
+                    {**eff, "_redirect_context": redirect_context},
+                    turn,
+                    phase=phase,
+                )
+                return True
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             if score >= 40:
@@ -4199,13 +5236,34 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 response_to=top_item.card.get("name", "?"),
                                 **replay_rule_fields(eff),
                             )
-                            apply_effect_immediate(player, [p for p in all_players if p != player], c, turn, rng)
+                            attach_direct_resolution_context(
+                                eff,
+                                c,
+                                phase,
+                                priority_window="response_direct_resolution",
+                                locked_cost=replay_cost_snapshot(card_mana_cost(c)),
+                            )
+                            apply_effect_immediate(
+                                player,
+                                [p for p in all_players if p != player],
+                                c,
+                                turn,
+                                rng,
+                                effect_data_override=eff,
+                            )
                             return True
         else:
             # v8.2: Smart counter decision based on threat score
             if player != top_item.controller and counter_worth(score, player, rng):
                 counters = player.counterspell_cards(castable_only=True)
-                counter = player.use_counterspell(turn, top_item.card)
+                counter = player.use_counterspell(
+                    turn,
+                    top_item.card,
+                    stack_item=top_item,
+                    stack_depth=len(stack.items),
+                    phase=phase,
+                    priority_window="stack_response",
+                )
                 if counter:
                     fields = replay_rule_fields(get_card_effect(counter))
                     emit_decision_trace(
@@ -4255,6 +5313,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
         reason="stack_top_no_response",
         stack_item=top_item,
     )
+    stack_depth_before_resolution = len(stack.items)
     item = stack.resolve_top()
     if item:
         if item.effect_data.get("effect") == "triggered_ability":
@@ -4268,7 +5327,20 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             return True
         controller = item.controller
         opponents = [p for p in all_players if p != controller]
-        apply_effect_immediate(controller, opponents, item.card, turn, rng)
+        attach_stack_resolution_context(
+            item.effect_data,
+            item,
+            phase,
+            stack_depth_before_resolution,
+        )
+        apply_effect_immediate(
+            controller,
+            opponents,
+            item.card,
+            turn,
+            rng,
+            effect_data_override=item.effect_data,
+        )
         if game_winner(all_players):
             return True
         check_sbas_until_stable(all_players)
@@ -4573,34 +5645,62 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
 
 
 def choose_best_creature_target(creatures):
-    def target_priority(target):
-        effect = get_card_effect(target).get("effect") or target.get("effect")
-        if effect == "unknown":
-            effect = target.get("effect")
-        engine_priority = {
-            "commander": 10,
-            "combo": 9,
-            "finisher": 8,
-            "draw_engine": 7,
-            "silence_opponents": 7,
-            "ramp_engine": 6,
-            "copy_spell": 6,
-            "ripple_engine": 6,
-            "hate_artifact": 5,
-            "creature": 1,
-        }.get(effect, 0)
-        return (
-            bool(target.get("is_commander")),
-            engine_priority,
-            int(target.get("cmc") or 0),
-            int(target.get("power") or 0),
-            int(target.get("toughness") or 0),
-        )
-
     return max(
         creatures,
         key=target_priority,
     )
+
+
+def target_priority(target):
+    effect = get_card_effect(target).get("effect") or target.get("effect")
+    if effect == "unknown":
+        effect = target.get("effect")
+    engine_priority = {
+        "commander": 10,
+        "combo": 9,
+        "finisher": 8,
+        "draw_engine": 7,
+        "silence_opponents": 7,
+        "ramp_engine": 6,
+        "copy_spell": 6,
+        "ripple_engine": 6,
+        "hate_artifact": 5,
+        "creature": 1,
+    }.get(effect, 0)
+    return (
+        int(bool(target.get("is_commander"))),
+        engine_priority,
+        int(target.get("cmc") or 0),
+        int(target.get("power") or 0),
+        int(target.get("toughness") or 0),
+    )
+
+
+def target_option_replay_entry(target):
+    effect = get_card_effect(target).get("effect") or target.get("effect")
+    if effect == "unknown":
+        effect = target.get("effect")
+    return {
+        "target": target.get("name", "?"),
+        "target_effect": effect,
+        "target_power": target.get("power"),
+        "target_toughness": target.get("toughness"),
+        "target_cmc": target.get("cmc"),
+        "target_is_commander": bool(target.get("is_commander")),
+        "target_score": list(target_priority(target)),
+    }
+
+
+def target_selection_replay_fields(target, candidates):
+    options = sorted(
+        [target_option_replay_entry(candidate) for candidate in candidates],
+        key=lambda option: option.get("target_score") or [],
+        reverse=True,
+    )
+    return {
+        "target_score": list(target_priority(target)),
+        "target_options": options[:8],
+    }
 
 
 def _land_resource_cost_option(land, color_counts, *, zone):
@@ -4968,7 +6068,15 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
                 turn=turn,
             )
             return False
-        destination = move_creature_from_battlefield(player, sacrifice)
+        destination = move_creature_from_battlefield(
+            player,
+            sacrifice,
+            reason=cost_name,
+            source=card,
+        )
+        if effect_data.get("mana_produced_from_sacrificed_cmc"):
+            effect_data["_last_sacrificed_cmc"] = int(float(sacrifice.get("cmc") or 0))
+            effect_data["_last_sacrificed_name"] = sacrifice.get("name", "?")
         emit_replay_event(
             "additional_cost_paid",
             player=player.name,
@@ -5124,6 +6232,8 @@ def everflowing_chalice_additional_costs(kicker_count):
 
 
 def ritual_mana_produced(player, effect_data):
+    if effect_data.get("mana_produced_from_sacrificed_cmc"):
+        return max(0, int(float(effect_data.get("_last_sacrificed_cmc") or 0)))
     threshold_count = effect_data.get("threshold_graveyard_count")
     threshold_mana = effect_data.get("threshold_mana_produced")
     if threshold_count and threshold_mana and len(player.graveyard) >= int(threshold_count):
@@ -5899,6 +7009,7 @@ def activate_precombat_utility_mana_lands(
         return 0
 
     chosen = candidates[0]
+    life_before = player.life
     change_life(player, -2)
     player.mana_pool.add("colorless", 1)
     ancient_tomb["utility_land_used_this_turn"] = True
@@ -5970,6 +7081,7 @@ def activate_precombat_utility_mana_lands(
         card=ancient_tomb.get("name", "?"),
         activation_kind="contextual_fast_mana",
         life_paid=2,
+        life_before=life_before,
         bonus_mana=1,
         unlock_target=chosen["card"].get("name", "?"),
         unlock_reason=chosen["reason"],
@@ -6657,7 +7769,12 @@ def activate_sacrifice_mana_artifacts(
             )
             continue
 
-        destination = move_creature_from_battlefield(player, creature)
+        destination = move_creature_from_battlefield(
+            player,
+            creature,
+            reason="utility_artifact_activation_cost",
+            source=permanent,
+        )
         player.mana_pool.add(bonus_color, bonus_amount)
         permanent["utility_artifact_used_this_turn"] = True
 
@@ -8028,6 +9145,8 @@ def try_lorehold_miracle_cast(
     if player.available_mana() < miracle_cost:
         return False
     eff = get_card_effect(last_drawn)
+    if eff.get("effect") == "counter":
+        return False
     if last_drawn not in player.hand:
         return False
     opponents = [candidate for candidate in all_players if candidate is not player]
@@ -8038,6 +9157,32 @@ def try_lorehold_miracle_cast(
     if eff.get("effect") == "draw_cards" and is_wheel_like_card(last_drawn, eff):
         if not should_cast_wheel(player, opponents, {**eff, "name": last_drawn.get("name")}):
             return False
+    eff, declared_targets = prepare_declared_removal_targets(
+        player,
+        opponents,
+        last_drawn,
+        eff,
+    )
+    if missing_required_declared_removal_target(eff, declared_targets):
+        return False
+    miracle_locked_cost = replay_cost_snapshot(
+        card_mana_cost(last_drawn, alternative_cost=f"{{{miracle_cost}}}")
+    )
+    miracle_context = {
+        "phase": phase,
+        "cast_pipeline": "miracle_601.2_minimal",
+        "locked_cost": miracle_locked_cost,
+        "targets": list(declared_targets),
+        "role": "miracle",
+        "source_zone": "hand",
+        "alternative_cost": f"{{{miracle_cost}}}",
+        "alternative_cost_kind": "miracle",
+    }
+    miracle_context.update(replay_primary_target_fields(declared_targets))
+    store_cast_context_fields(eff, miracle_context)
+    declared_target_fields = {"targets": declared_targets} | replay_primary_target_fields(
+        declared_targets
+    ) if declared_targets else {}
     player.hand.remove(last_drawn)
     player.spend_mana(miracle_cost)
     emit_replay_event(
@@ -8046,12 +9191,14 @@ def try_lorehold_miracle_cast(
         card=last_drawn.get("name", "?"),
         effect=eff.get("effect", "unknown"),
         type_line=last_drawn.get("type_line", ""),
+        cmc=last_drawn.get("cmc", 0),
         miracle_cost=miracle_cost,
         lorehold_on_board=True,
         cards_drawn_this_turn=player.cards_drawn_this_turn,
         phase=phase,
         source=source,
         turn=turn,
+        **declared_target_fields,
         **replay_rule_fields(eff),
     )
     stack.push(last_drawn, player, eff)
@@ -8388,6 +9535,7 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
                     phase=phase,
                 )
                 continue
+            life_before = player.life
             change_life(player, -life_cost)
             drawn = player.draw(1, rng)
             permanent["utility_land_used_this_turn"] = True
@@ -8432,6 +9580,8 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
                 activation_kind="draw_card",
                 cards_drawn=len(drawn),
                 life_paid=life_cost,
+                life_before=life_before,
+                life_after=player.life,
                 mana_paid=3,
                 hand_before=hand_size,
                 hand_after=len(player.hand),
@@ -8967,6 +10117,25 @@ def trigger_landfall(
     active_player=None,
     all_players=None,
 ):
+    landfall_sources = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and (
+            permanent.get("landfall_token_maker")
+            or permanent.get("landfall_damage_each_opponent")
+        )
+    ]
+    if not landfall_sources:
+        return False
+    trigger_source = landfall_sources[0]
+    if len(landfall_sources) > 1:
+        trigger_source = {
+            "name": "; ".join(
+                sorted(source.get("name", "?") for source in landfall_sources)
+            )
+        }
+
     def resolve_landfall():
         created = []
         for permanent in list(player.battlefield):
@@ -9033,13 +10202,20 @@ def trigger_landfall(
 
     resolve_or_enqueue_trigger(
         player,
-        land_permanent,
+        trigger_source,
         "landfall",
         resolve_landfall,
         stack=stack,
         active_player=active_player,
         all_players=all_players,
+        data={
+            "trigger_land": land_permanent.get("name", "?")
+            if isinstance(land_permanent, dict)
+            else "Land",
+            "source_event": source_event,
+        },
     )
+    return True
 
 
 def sacrifice_land_for_effect(player, card, turn, *, required=True, effect_data=None):
@@ -9698,7 +10874,12 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         ]
         if targets:
             target = choose_best_creature_target(targets)
-            destination = move_creature_from_battlefield(opp, target)
+            destination = move_creature_from_battlefield(
+                opp,
+                target,
+                reason="damage",
+                source=card,
+            )
             emit_replay_event(
                 "damage_resolved",
                 player=player.name,
@@ -9715,6 +10896,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     alive_opponents = [opp for opp in opponents if opp.is_alive()]
     if alive_opponents:
         target_player = min(alive_opponents, key=lambda opp: opp.life)
+        life_before = target_player.life
         dealt = deal_damage(target_player, amount)
         emit_replay_event(
             "damage_resolved",
@@ -9723,6 +10905,8 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             amount=amount,
             target_player=target_player.name,
             result="player_damage" if dealt else "prevented",
+            cause="direct_damage",
+            life_before=life_before,
             life_after=target_player.life,
             turn=turn,
         )
@@ -10416,6 +11600,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 card=cmd.get("name", "?"),
                 effect=cmd_eff.get("effect", "unknown"),
                 type_line=cmd_copy.get("type_line", ""),
+                cmc=cmd.get("cmc", cost),
                 cost=cost,
                 turn=turn,
                 phase=phase,
@@ -10768,7 +11953,22 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     c = None
                     eff = None
             if c is not None and c in player.hand and player.can_pay_card(c):
-                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="high_threat")
+                eff, declared_targets = prepare_declared_removal_targets(
+                    player,
+                    opponents,
+                    c,
+                    eff,
+                )
+                if missing_required_declared_removal_target(eff, declared_targets):
+                    return False
+                cast_ctx = begin_cast_context(
+                    player,
+                    c,
+                    phase,
+                    effect_data=eff,
+                    role="high_threat",
+                    targets=declared_targets,
+                )
                 if not commit_cast_payment(cast_ctx):
                     return False
                 chosen_score = next((s for card_item, s in scored if card_item is c), scored[0][1])
@@ -11021,7 +12221,22 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             else:
                 if not additional_card_costs_are_payable(player, c, eff):
                     continue
-                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="normal")
+                eff, declared_targets = prepare_declared_removal_targets(
+                    player,
+                    opponents,
+                    c,
+                    eff,
+                )
+                if missing_required_declared_removal_target(eff, declared_targets):
+                    continue
+                cast_ctx = begin_cast_context(
+                    player,
+                    c,
+                    phase,
+                    effect_data=eff,
+                    role="normal",
+                    targets=declared_targets,
+                )
                 if not commit_cast_payment(cast_ctx):
                     continue
                 normal_score = threat_score(eff.get("effect", ""), c.get("name", ""), player, all_players, turn)
@@ -11216,7 +12431,12 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                             **decision,
                         )
                         break
-                    destination = move_creature_from_battlefield(opp, target)
+                    destination = move_creature_from_battlefield(
+                        opp,
+                        target,
+                        reason=component_effect,
+                        source=card,
+                    )
                     emit_replay_event(
                         "removal_resolved",
                         player=player.name,
@@ -11229,6 +12449,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                         target_is_creature=is_battlefield_creature(target),
                         target_type_line=target.get("type_line", ""),
                         available_targets=len(targets),
+                        **target_selection_replay_fields(target, targets),
                         destination=destination,
                         component_index=index,
                         turn=turn,
@@ -11254,10 +12475,15 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
     return {"applied": applied, "skipped": skipped}
 
 
-def apply_effect_immediate(player, opponents, card, turn, rng):
+def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_override=None):
     """v8: Apply card effect (called when spell resolves from stack)."""
-    effect_data = get_card_effect(card)
+    effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect = effect_data.get("effect", "unknown")
+    spell_resolved_fields = {
+        **spell_resolution_context_fields(card, effect_data, effect),
+        **replay_fields_for_declared_targets(effect_data),
+        **replay_rule_fields(effect_data),
+    }
     emit_replay_event(
         "spell_resolved",
         player=player.name,
@@ -11266,7 +12492,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         type_line=card.get("type_line", ""),
         effect=effect,
         turn=turn,
-        **replay_rule_fields(effect_data),
+        **spell_resolved_fields,
     )
 
     if effect == "composite_resolution":
@@ -11289,7 +12515,10 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-        finish_resolved_spell(player, card, turn=turn)
+        if effect_data.get("exiles_self"):
+            move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
+        else:
+            finish_resolved_spell(player, card, turn=turn)
     elif effect == "land": pass
     elif effect == "creature":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
@@ -11482,7 +12711,18 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         return_graveyard_lands_to_battlefield(player, card, turn, opponents=opponents)
         finish_resolved_spell(player, card, turn=turn)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
-        if resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng):
+        declared_targets = effect_data.get("declared_targets") or []
+        if len(declared_targets) == 1 and resolve_declared_single_removal(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+        ):
+            finish_resolved_spell(player, card, turn=turn)
+            return
+        if len(declared_targets) > 1 and resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng):
             finish_resolved_spell(player, card, turn=turn)
             return
         for opp in opponents:
@@ -11538,6 +12778,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                         target_is_creature=is_battlefield_creature(t),
                         target_type_line=t.get("type_line", ""),
                         available_targets=len(targets),
+                        **target_selection_replay_fields(t, targets),
                         result="stat_modifier_until_eot_applied",
                         power_delta=power_delta,
                         toughness_delta=toughness_delta,
@@ -11557,6 +12798,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     target_is_creature=is_battlefield_creature(t),
                     target_type_line=t.get("type_line", ""),
                     available_targets=len(targets),
+                    **target_selection_replay_fields(t, targets),
                     destination=str(effect_data.get("destination") or "graveyard").lower(),
                     turn=turn,
                     **decision,
@@ -11572,7 +12814,12 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                         turn=turn,
                     )
                 else:
-                    move_permanent_from_battlefield(opp, t)
+                    move_permanent_from_battlefield(
+                        opp,
+                        t,
+                        reason="removal",
+                        source=card,
+                    )
                 break
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "deal_damage":
@@ -11643,7 +12890,12 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
                     survivors.append(c)
             p.battlefield = survivors
             for c in destroyed_cards:
-                move_creature_from_battlefield(p, c)
+                move_creature_from_battlefield(
+                    p,
+                    c,
+                    reason="board_wipe",
+                    source=card,
+                )
         emit_replay_event(
             "board_wipe_resolved",
             player=player.name,
@@ -11762,7 +13014,9 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         player.phased_out = [c for c in player.battlefield if isinstance(c, dict) and c.get("effect") not in ("land",)]
         player.battlefield = [c for c in player.battlefield if c == "land" or (isinstance(c, dict) and c.get("effect") == "land")]
         player.life_cant_change = True
+        player.life_cant_change_source = card
         player.protection_from_everything = True
+        player.protection_from_everything_source = card
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "phase_creatures":
         targets = [c for c in player.battlefield if is_battlefield_creature(c)]
@@ -12156,7 +13410,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng):
         if total_power > 0:
             alive_opps = [o for o in opponents if o.is_alive()]
             if alive_opps:
-                deal_damage(rng.choice(alive_opps), total_power)
+                target = rng.choice(alive_opps)
+                life_before = target.life
+                dealt = deal_damage(target, total_power)
+                emit_replay_event(
+                    "damage_resolved",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    amount=total_power,
+                    target_player=target.name,
+                    result="player_damage" if dealt else "prevented_or_no_damage",
+                    cause="finisher_total_power",
+                    life_before=life_before,
+                    life_after=target.life,
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "extra_turn":
         turns = int(effect_data.get("turns") or 1)
@@ -12539,7 +13808,12 @@ def combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rn
                         **replay_rule_fields(eff),
                     )
                     attackers.remove(target)
-                    move_creature_from_battlefield(attacker, target)
+                    move_creature_from_battlefield(
+                        attacker,
+                        target,
+                        reason="instant_removal",
+                        source=c,
+                    )
 
 
 def declare_blockers_step(target, attackers, turn, rng):
@@ -12687,7 +13961,11 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                     or id(creature) in deathtouch_damage
                 )
                 if lethal and not creature.get("indestructible") and creature in owner.battlefield:
-                    move_creature_from_battlefield(owner, creature)
+                    move_creature_from_battlefield(
+                        owner,
+                        creature,
+                        reason="combat_damage",
+                    )
 
     def combat_damage_step(first_strike_phase):
         for attacking_creature, declared_blockers in block_assignments:
@@ -12964,7 +14242,9 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.battlefield.extend(player.phased_out)
     player.phased_out = []
     player.life_cant_change = False
+    player.life_cant_change_source = None
     player.protection_from_everything = False
+    player.protection_from_everything_source = None
     player.refresh_mana_sources(turn)
     process_upkeep_utility_lands(player, turn)
 
@@ -13037,6 +14317,11 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             player=player.name,
             card=land.get("name", "?"),
             effect=eff.get("effect", "land"),
+            type_line=land_permanent.get("type_line", ""),
+            mana_produced=int(land_permanent.get("mana_produced") or 1),
+            mana_pool_after=player.mana_pool.snapshot(),
+            board_snapshot=[replay_card_snapshot(card) for card in player.battlefield],
+            life_after=player.life,
             turn=turn,
             **replay_rule_fields(eff),
         )
@@ -13150,10 +14435,34 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                 and is_instant(c)
                 and is_modeled_battle_card(c)
                 and opp.can_pay_card(c)
+                and get_card_effect(c).get("effect") != "counter"
             ]
             for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
                 if opp.can_pay_card(c):
                     eff = get_card_effect(c)
+                    eff, declared_targets = prepare_declared_removal_targets(
+                        opp,
+                        [p for p in all_players if p != opp],
+                        c,
+                        eff,
+                    )
+                    if missing_required_declared_removal_target(eff, declared_targets):
+                        continue
+                    declared_target_fields = (
+                        {"targets": declared_targets}
+                        | replay_primary_target_fields(declared_targets)
+                        if declared_targets
+                        else {}
+                    )
+                    locked_cost = replay_cost_snapshot(card_mana_cost(c))
+                    attach_direct_resolution_context(
+                        eff,
+                        c,
+                        "end_step",
+                        priority_window="end_step_direct_resolution",
+                        locked_cost=locked_cost,
+                        targets=declared_targets,
+                    )
                     opp.hand.remove(c)
                     opp.spend_card_mana(c)
                     emit_replay_event(
@@ -13162,12 +14471,24 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                         card=c.get("name", "?"),
                         effect=eff.get("effect", "unknown"),
                         type_line=c.get("type_line", ""),
+                        cmc=c.get("cmc", 0),
                         instant_speed_reason="flash" if card_has_keyword(c, "flash") else "instant",
                         active_player=player.name,
                         turn=turn,
+                        phase="end_step",
+                        source_zone="hand",
+                        locked_cost=locked_cost,
+                        **declared_target_fields,
                         **replay_rule_fields(eff),
                     )
-                    apply_effect_immediate(opp, [p for p in all_players if p != opp], c, turn, rng)
+                    apply_effect_immediate(
+                        opp,
+                        [p for p in all_players if p != opp],
+                        c,
+                        turn,
+                        rng,
+                        effect_data_override=eff,
+                    )
 
 
     # ── CLEANUP ──
@@ -13185,6 +14506,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         life=player.life,
         hand=len(player.hand),
         board=len(player.battlefield),
+        board_snapshot=[replay_card_snapshot(card) for card in player.battlefield],
         graveyard=len(player.graveyard),
         discarded=discarded,
     )

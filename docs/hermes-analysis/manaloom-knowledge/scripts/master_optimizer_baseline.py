@@ -7,6 +7,7 @@ import argparse
 import json
 
 from master_optimizer_common import (
+    battle_gate_report_lines,
     connect,
     ensure_optimizer_tables,
     get_deck_summary,
@@ -34,11 +35,14 @@ def render_report(deck_summary: dict[str, object], result, baseline_id: int) -> 
         f"- overall_wr: {result.win_rate:.1f}%",
         f"- record: {result.wins}W/{result.losses}L/{result.stalls}S",
         "",
+    ]
+    lines.extend(battle_gate_report_lines())
+    lines.extend([
         "## Matchups",
         "",
         "| Opponent | WR | W | L | S | Avg Turn | Reasons |",
         "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
-    ]
+    ])
     for matchup in result.matchups:
         lines.append(
             "| {opponent} | {wr:.1f}% | {wins} | {losses} | {stalls} | "

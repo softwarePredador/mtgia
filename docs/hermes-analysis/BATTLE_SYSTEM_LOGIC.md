@@ -1,9 +1,16 @@
 # Battle System Logic — Documentação Completa
 
+> Status de prontidao atual: este documento e referencia de arquitetura e
+> logica, nao prova de que battle esta pronto. Antes de concluir status atual,
+> consulte `BATTLE_VALIDATION_REGISTER_2026-06-19.md`, o latest
+> `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+> e `BATTLE_REPLAY_GATE_MATRIX.md`. Snapshots pontuais antigos citados neste
+> documento sao historicos e nao devem ser lidos como status atual.
+
 > Documento canônico da lógica de simulação de batalha, otimização e validação.
 > Tudo que é usado e pensado em cada etapa do pipeline de análise de deck.
 
-Última atualização: 2026-06-18
+Última atualização: 2026-06-19
 
 Revisão estratégica oficial: 2026-06-11
 (`BATTLE_RULES_2026_STRATEGIC_REVIEW_2026-06-11.md`).

@@ -1,5 +1,10 @@
 # Lorehold Miracle + Topdeck Readiness Audit - 2026-06-17
 
+> Status 2026-06-19: documento historico. Use como contexto de miracle/topdeck,
+> nao como prova de estado atual depois dos fixes e event-contract findings.
+> Fonte viva: [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Objetivo
 
 Validar, com evidência de código e artefatos, se o projeto hoje realmente

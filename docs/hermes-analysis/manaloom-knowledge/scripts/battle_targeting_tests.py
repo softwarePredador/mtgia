@@ -167,6 +167,102 @@ def register_tests(battle, player):
                 battle.MANUAL_RULE_RUNTIME_WAIVERS.discard("Forked Removal")
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
+    def test_targeted_removal_declares_target_at_cast_time():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            opponent = player("Opponent")
+            target = {
+                "name": "Declared Target",
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            opponent.battlefield = [target]
+            spell = {
+                "name": "Swords to Plowshares",
+                "type_line": "Instant",
+                "colors": ["W"],
+            }
+            effect = {"effect": "remove_creature", "target": "creature"}
+
+            effect, replay_targets = battle.prepare_declared_removal_targets(
+                caster,
+                [opponent],
+                spell,
+                effect,
+            )
+            ctx = battle.begin_cast_context(
+                caster,
+                spell,
+                "precombat_main",
+                effect_data=effect,
+                targets=replay_targets,
+            )
+
+            announced = next(data for event, data in events if event == "cast_announced")
+            assert announced["target"] == "Declared Target"
+            assert announced["targets"][0]["target"] == "Declared Target"
+            assert ctx.effect_data["declared_targets"][0]["target"] is target
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    def test_declared_removal_target_is_revalidated_not_reselected():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            opponent = player("Opponent")
+            declared = {
+                "name": "Original Target",
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            later_best = {
+                "name": "Later Best Target",
+                "type_line": "Creature",
+                "effect": "commander",
+                "is_commander": True,
+                "power": 5,
+                "toughness": 5,
+            }
+            opponent.battlefield = [declared, later_best]
+            spell = {
+                "name": "Path to Exile",
+                "type_line": "Instant",
+                "colors": ["W"],
+            }
+            effect, _replay_targets = battle.prepare_declared_removal_targets(
+                caster,
+                [opponent],
+                spell,
+                {"effect": "remove_creature", "target": "creature", "destination": "exile"},
+            )
+            opponent.battlefield.remove(effect["declared_targets"][0]["target"])
+
+            battle.apply_effect_immediate(
+                caster,
+                [opponent],
+                spell,
+                turn=7,
+                rng=random.Random(170),
+                effect_data_override=effect,
+            )
+
+            removal_event = next(data for event, data in events if event == "removal_resolved")
+            assert removal_event["target"] == "Later Best Target"
+            assert removal_event["result"] == "no_legal_target"
+            assert declared in opponent.battlefield
+            assert later_best not in opponent.battlefield
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
     def test_ward_counters_targeted_removal_when_unpaid():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -240,6 +336,8 @@ def register_tests(battle, player):
         test_formal_targeting_keeps_ward_as_legal_target,
         test_removal_replay_includes_formal_targeting_metadata,
         test_multi_target_removal_partially_resolves_legal_targets,
+        test_targeted_removal_declares_target_at_cast_time,
+        test_declared_removal_target_is_revalidated_not_reselected,
         test_ward_counters_targeted_removal_when_unpaid,
         test_ward_paid_allows_targeted_removal_to_resolve,
     ]

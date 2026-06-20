@@ -1,5 +1,10 @@
 # Battle Decision Strategy Audit — 2026-06-15
 
+> Status 2026-06-19: documento historico. Use como contexto da evolucao do
+> decision trace, nao como prova de prontidao atual. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Resumo
 
 Esta auditoria separa duas perguntas que estavam misturadas nos replays Hermes:

@@ -9,6 +9,7 @@ import sqlite3
 from pathlib import Path
 
 from master_optimizer_common import (
+    battle_gate_report_lines,
     connect,
     deck_hash,
     ensure_optimizer_tables,
@@ -140,6 +141,7 @@ def main() -> int:
             f"- lands_after: {summary['lands']}",
             f"- avg_cmc_after: {summary['avg_cmc']}",
             "",
+            *battle_gate_report_lines(),
             "No production database was mutated. This restores only the Hermes local SQLite deck.",
         ]
     ) + "\n"

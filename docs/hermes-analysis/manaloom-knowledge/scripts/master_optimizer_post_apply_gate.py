@@ -7,7 +7,13 @@ import argparse
 import sqlite3
 from pathlib import Path
 
-from master_optimizer_common import connect, ensure_optimizer_tables, latest_baseline, write_report
+from master_optimizer_common import (
+    battle_gate_report_lines,
+    connect,
+    ensure_optimizer_tables,
+    latest_baseline,
+    write_report,
+)
 from master_optimizer_rollback import rollback
 
 ROLLBACK_EXIT = 20
@@ -107,6 +113,7 @@ def main() -> int:
             f"- min_post_delta: {args.min_post_delta:+.1f}pp",
             f"- rollback_path: `{applied['rollback_path']}`",
             "",
+            *battle_gate_report_lines(),
             "No production database was mutated.",
         ]
     ) + "\n"

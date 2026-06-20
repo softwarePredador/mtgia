@@ -1,5 +1,10 @@
 # Decision Trace v1 — Hermes Battle Slice
 
+> Status 2026-06-19: documento historico de schema/slice. Use como contexto,
+> nao como prova de cobertura atual de replay humano, regras ou estrategia.
+> Fonte viva: [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 Data: 2026-06-15
 
 ## Objetivo

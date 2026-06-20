@@ -23,6 +23,10 @@ from master_optimizer_common import REPORT_DIR, connect, ensure_optimizer_tables
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPLAY_GENERATOR = SCRIPT_DIR / "battle_replay_v10_3.py"
+AUDIT_SCOPE = "turn_and_decision_trace_invariants"
+CLEAN_STATUS = "turn_invariants_clean"
+BLOCKED_STATUS = "blocked_turn_or_decision_invariants"
+NOT_EVALUATED = "not_evaluated_by_replay_decision_auditor"
 
 KNOWN_LAND_NAMES = {
     "plains",
@@ -402,6 +406,18 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 target_power_value = int(target_power)
             except (TypeError, ValueError):
                 target_power_value = 0
+            target_options = event.get("target_options") or []
+            selected_score = event.get("target_score")
+            better_target_available = None
+            if isinstance(target_options, list) and selected_score is not None:
+                better_target_available = any(
+                    isinstance(option, dict)
+                    and option.get("target") != event.get("target")
+                    and (option.get("target_score") or []) > selected_score
+                    for option in target_options
+                )
+            if better_target_available is False:
+                continue
             if available_targets >= 3 and target_power_value <= 1:
                 add_finding(
                     findings,
@@ -589,6 +605,29 @@ def severity_counts(findings: list[dict[str, Any]]) -> dict[str, int]:
     return counts
 
 
+def audit_summary(
+    *,
+    turn_findings: list[dict[str, Any]],
+    decision_findings: list[dict[str, Any]],
+    event_count: int,
+    decision_count: int,
+) -> dict[str, Any]:
+    counts = severity_counts(turn_findings + decision_findings)
+    critical_or_high = counts.get("critical", 0) + counts.get("high", 0)
+    return {
+        "status": BLOCKED_STATUS if critical_or_high else CLEAN_STATUS,
+        "status_scope": AUDIT_SCOPE,
+        "structured_trace_usable": critical_or_high == 0,
+        "human_replay_complete": NOT_EVALUATED,
+        "rules_interaction_trusted": NOT_EVALUATED,
+        "structured_events": event_count,
+        "decision_traces": decision_count,
+        "turn_findings": len(turn_findings),
+        "decision_findings": len(decision_findings),
+        "severity_counts": counts,
+    }
+
+
 def render_report(
     *,
     deck_id: int,
@@ -600,17 +639,25 @@ def render_report(
     decision_count: int,
     replay_files: list[tuple[Path, Path, Path | None]],
 ) -> str:
-    counts = severity_counts(turn_findings + decision_findings)
+    summary = audit_summary(
+        turn_findings=turn_findings,
+        decision_findings=decision_findings,
+        event_count=event_count,
+        decision_count=decision_count,
+    )
+    counts = summary["severity_counts"]
     turn_counts = severity_counts(turn_findings)
     decision_counts = severity_counts(decision_findings)
-    critical_or_high = counts.get("critical", 0) + counts.get("high", 0)
-    status = "blocked_turn_decisions" if critical_or_high else "turn_by_turn_clean"
     lines = [
         "# Hermes Replay Decision Audit",
         "",
         f"- deck_id: {deck_id}",
         f"- baseline_id: {baseline_id}",
-        f"- status: {status}",
+        f"- status: {summary['status']}",
+        f"- status_scope: {summary['status_scope']}",
+        f"- structured_trace_usable: {summary['structured_trace_usable']}",
+        f"- human_replay_complete: {summary['human_replay_complete']}",
+        f"- rules_interaction_trusted: {summary['rules_interaction_trusted']}",
         f"- structured_events: {event_count}",
         f"- decision_traces: {decision_count}",
         f"- turn_findings: {len(turn_findings)}",
@@ -698,6 +745,7 @@ def render_report(
             "",
             "- `critical` or `high` turn findings block optimizer trust until battle logic is fixed.",
             "- `critical` or `high` decision findings block optimizer trust until trace quality is fixed.",
+            "- This auditor only validates turn and decision-trace invariants; it does not prove human replay completeness or full rules-interaction trust.",
             "- `medium` findings require review before product-facing deck mutation.",
             "- `low` findings are polish/heuristic notes and do not block a Hermes-local experiment.",
             f"- Turn finding counts: {turn_counts}.",
@@ -716,6 +764,7 @@ def main() -> int:
     parser.add_argument("--generate", type=int, default=3, help="fresh replays to generate when --events is omitted")
     parser.add_argument("--seed-start", type=int, default=42)
     parser.add_argument("--report", action="store_true")
+    parser.add_argument("--json-output", type=Path)
     args = parser.parse_args()
 
     if args.skip_baseline:
@@ -767,6 +816,31 @@ def main() -> int:
     if args.report:
         path = write_report("master_optimizer_replay_audit", markdown)
         print(f"Report written: {path}")
+    if args.json_output:
+        summary = audit_summary(
+            turn_findings=turn_findings,
+            decision_findings=decision_findings,
+            event_count=len(events),
+            decision_count=len(decisions),
+        )
+        payload = {
+            "summary": summary,
+            "turn_findings": turn_findings,
+            "decision_findings": decision_findings,
+            "baseline_findings": baseline_findings,
+            "replay_files": [
+                {
+                    "text": str(txt),
+                    "events": str(jsonl),
+                    "decision_trace": str(decision_jsonl) if decision_jsonl else None,
+                }
+                for txt, jsonl, decision_jsonl in replay_files
+            ],
+        }
+        args.json_output.write_text(
+            json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     return 0
 
 

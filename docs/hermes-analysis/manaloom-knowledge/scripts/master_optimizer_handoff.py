@@ -8,6 +8,7 @@ import json
 
 from master_optimizer_common import (
     assert_current_deck_matches_baseline,
+    battle_gate_report_lines,
     connect,
     ensure_optimizer_tables,
     latest_baseline,
@@ -68,11 +69,14 @@ def main() -> int:
         f"- baseline_record: {baseline['wins']}W/{baseline['losses']}L/{baseline['stalls']}S",
         f"- status: {status}",
         "",
+    ]
+    lines.extend(battle_gate_report_lines())
+    lines.extend([
         "## Confirmed Candidates",
         "",
         "| Verdict | Phase | Add | Cut | Confirm WR | Delta | Record |",
         "| --- | --- | --- | --- | ---: | ---: | --- |",
-    ]
+    ])
     for row in confirmations:
         delta = float(row["delta_pp"] or 0)
         if row["phase"] == "full_confirmation" and delta >= 0.5:

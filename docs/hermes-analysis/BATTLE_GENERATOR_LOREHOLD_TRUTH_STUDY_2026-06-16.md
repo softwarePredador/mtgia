@@ -1,5 +1,10 @@
 # Battle + Generator + Lorehold Truth Study - 2026-06-16
 
+> Status 2026-06-19: documento historico/background. Use para contexto, nao
+> como criterio atual de pronto. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Summary
 
 Este documento consolida o estado real do battle simulator Hermes, da geracao

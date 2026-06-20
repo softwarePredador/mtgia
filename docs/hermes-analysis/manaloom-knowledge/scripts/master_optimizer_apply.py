@@ -9,6 +9,7 @@ import json
 from master_optimizer_common import (
     REPORT_DIR,
     assert_current_deck_matches_baseline,
+    battle_gate_report_lines,
     card_metadata,
     connect,
     deck_hash,
@@ -217,6 +218,7 @@ def main() -> int:
             f"- lands_after: {after_summary['lands']}",
             f"- avg_cmc_after: {after_summary['avg_cmc']}",
             "",
+            *battle_gate_report_lines(),
             "No production database was mutated. This applies only to the Hermes local SQLite knowledge deck.",
         ]
     ) + "\n"

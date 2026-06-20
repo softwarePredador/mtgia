@@ -21,6 +21,7 @@ from master_optimizer_common import (
     PROTECTED_CARDS,
     SCRIPT_DIR,
     assert_current_deck_matches_baseline,
+    battle_gate_cli_lines,
     card_metadata,
     commander_legality,
     connect,
@@ -610,6 +611,8 @@ def main() -> int:
             print(f"baseline_hash={baseline_hash}")
             print(f"baseline_semantics_hash={baseline_semantics_hash or 'legacy-missing'}")
             print(f"baseline_ruleset_hash={baseline_ruleset_hash or 'legacy-missing'}")
+            for line in battle_gate_cli_lines():
+                print(line)
             print(f"games_per_opponent={args.games}")
             print(f"max_per_category={args.max_per_category}")
             print(f"selected_candidates={total}")

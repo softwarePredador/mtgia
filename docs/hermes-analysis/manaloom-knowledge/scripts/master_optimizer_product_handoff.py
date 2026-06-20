@@ -13,6 +13,7 @@ import json
 import sqlite3
 
 from master_optimizer_common import (
+    battle_gate_report_lines,
     connect,
     ensure_optimizer_tables,
     get_deck_summary,
@@ -91,6 +92,7 @@ def render_report(deck_summary, baseline, applied, confirmation) -> tuple[str, d
         f"- full_confirmation_delta_pp: {confirmation_delta if confirmation_delta is not None else 'missing'}",
         f"- full_confirmation_record: {confirmation_record}",
         "",
+        *battle_gate_report_lines(),
         "## Product Gate",
         "",
         "- This handoff does not mutate production.",

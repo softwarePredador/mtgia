@@ -29,9 +29,11 @@ REPLAY_GENERATOR = SCRIPT_DIR / "battle_replay_v10_3.py"
 REPORT_DIR = SCRIPT_DIR.parents[1] / "master_optimizer_reports"
 
 SUPPORTED_EFFECTS = {
+    "add_mana",
     "approach",
     "board_wipe",
     "combo",
+    "composite_resolution",
     "commander",
     "copy_creature_token",
     "copy_spell",
@@ -143,6 +145,10 @@ LEGACY_FALLBACK_SOURCES = {
     "known_cards_generated",
 }
 
+TRUSTED_EVENT_RULE_OVERRIDE_SOURCES = {
+    "manual_runtime_waiver",
+}
+
 
 def md(value: Any) -> str:
     return str(value if value is not None else "").replace("|", "\\|").replace("\n", " ")
@@ -235,9 +241,16 @@ def rule_for_event(
     rules: dict[str, dict[str, Any]],
 ) -> dict[str, Any] | None:
     card = event.get("card")
-    if not card:
-        return None
-    return rules.get(battle_rule_registry.normalize_card_name(str(card)))
+    if card:
+        rule = rules.get(battle_rule_registry.normalize_card_name(str(card)))
+        if rule is not None:
+            return rule
+    logical_key = str(event.get("rule_logical_key") or "")
+    if logical_key:
+        for rule in rules.values():
+            if str(rule.get("logical_rule_key") or "") == logical_key:
+                return rule
+    return None
 
 
 def event_rule_source(event: dict[str, Any], rule: dict[str, Any] | None) -> str:
@@ -269,6 +282,46 @@ def event_semantic_hash(event: dict[str, Any]) -> str:
     return str(event.get("semantic_hash") or event.get("semantics_hash") or "")
 
 
+def event_has_explicit_oracle_effect_normalization(
+    event: dict[str, Any],
+    rule_effect: str,
+) -> bool:
+    return (
+        bool(rule_effect)
+        and event.get("rule_oracle_normalized_effect_from") == rule_effect
+        and event.get("rule_oracle_normalized_effect_to") == event.get("effect")
+    )
+
+
+def accepted_lineage_missing_reason(
+    event: dict[str, Any],
+    rule: dict[str, Any] | None,
+    source: str,
+    effect: str,
+    missing_field: str,
+) -> str:
+    if source == "type_line_creature" and effect == "creature":
+        return "type_line_creature_fact_no_rule_identity"
+    if source == "manual_runtime_waiver":
+        return "manual_runtime_waiver_without_pg_identity"
+    if (
+        event.get("event") == "land_played"
+        and effect == "land"
+        and source == "curated"
+        and event.get("rule_logical_key")
+        and missing_field in {"card_id", "semantic_hash"}
+    ):
+        return "land_played_curated_runtime_rule_without_pg_card_identity"
+    if rule is not None and source in {"curated", "generated"}:
+        if missing_field in {"card_id", "semantic_hash"}:
+            return "battle_rule_registry_without_card_identity_columns"
+        if missing_field == "rule_logical_key" and rule.get("logical_rule_key"):
+            return "rule_registry_logical_key_available"
+    if event.get("event") == "land_played" and effect == "land" and rule is not None:
+        return "land_rule_registry_without_card_identity_columns"
+    return ""
+
+
 def audit_rule_provenance(
     events: list[dict[str, Any]],
     rules: dict[str, dict[str, Any]],
@@ -283,8 +336,16 @@ def audit_rule_provenance(
     missing_logical_rule_key = 0
     card_id_present = 0
     card_id_missing = 0
+    card_id_missing_accepted = 0
+    card_id_missing_unaccepted = 0
     semantic_hash_present = 0
     semantic_hash_missing = 0
+    semantic_hash_missing_accepted = 0
+    semantic_hash_missing_unaccepted = 0
+    rule_logical_key_missing_accepted = 0
+    rule_logical_key_missing_unaccepted = 0
+    lineage_missing_waiver_reasons: Counter[str] = Counter()
+    lineage_unaccepted_missing_samples: list[dict[str, Any]] = []
     unique_cards: set[str] = set()
 
     for event in events:
@@ -307,14 +368,58 @@ def audit_rule_provenance(
             by_logical_rule_key[logical_key] += 1
         else:
             missing_logical_rule_key += 1
+            reason = accepted_lineage_missing_reason(
+                event, rule, source, effect, "rule_logical_key"
+            )
+            if reason:
+                rule_logical_key_missing_accepted += 1
+                lineage_missing_waiver_reasons[reason] += 1
+            else:
+                rule_logical_key_missing_unaccepted += 1
+                if len(lineage_unaccepted_missing_samples) < 40:
+                    lineage_unaccepted_missing_samples.append({
+                        "event": event.get("event"),
+                        "card": event.get("card"),
+                        "effect": effect,
+                        "source": source,
+                        "missing_field": "rule_logical_key",
+                    })
         if card_id:
             card_id_present += 1
         else:
             card_id_missing += 1
+            reason = accepted_lineage_missing_reason(event, rule, source, effect, "card_id")
+            if reason:
+                card_id_missing_accepted += 1
+                lineage_missing_waiver_reasons[reason] += 1
+            else:
+                card_id_missing_unaccepted += 1
+                if len(lineage_unaccepted_missing_samples) < 40:
+                    lineage_unaccepted_missing_samples.append({
+                        "event": event.get("event"),
+                        "card": event.get("card"),
+                        "effect": effect,
+                        "source": source,
+                        "missing_field": "card_id",
+                    })
         if semantic_hash:
             semantic_hash_present += 1
         else:
             semantic_hash_missing += 1
+            reason = accepted_lineage_missing_reason(event, rule, source, effect, "semantic_hash")
+            if reason:
+                semantic_hash_missing_accepted += 1
+                lineage_missing_waiver_reasons[reason] += 1
+            else:
+                semantic_hash_missing_unaccepted += 1
+                if len(lineage_unaccepted_missing_samples) < 40:
+                    lineage_unaccepted_missing_samples.append({
+                        "event": event.get("event"),
+                        "card": event.get("card"),
+                        "effect": effect,
+                        "source": source,
+                        "missing_field": "semantic_hash",
+                    })
         if card:
             cards_by_status[status].add(card)
             cards_by_source[source].add(card)
@@ -379,14 +484,20 @@ def audit_rule_provenance(
                 "Refresh the SQLite/PG rule cache and regenerate the canonical snapshot if drift is expected.",
             )
 
-        if rule:
+        if rule and source not in TRUSTED_EVENT_RULE_OVERRIDE_SOURCES:
             rule_effect = str((rule.get("effect_json") or {}).get("effect") or "")
             is_trigger_effect = event.get("event") == "trigger_resolved"
+            is_composite_effect = event.get("effect") == "composite_resolution"
             if (
                 rule_effect
                 and event.get("effect")
                 and rule_effect != event["effect"]
                 and not is_trigger_effect
+                and not is_composite_effect
+                and not event_has_explicit_oracle_effect_normalization(
+                    event,
+                    rule_effect,
+                )
             ):
                 add_finding(
                     findings,
@@ -422,10 +533,18 @@ def audit_rule_provenance(
         "by_effect": dict(sorted(by_effect.items())),
         "rule_logical_key_present": sum(by_logical_rule_key.values()),
         "rule_logical_key_missing": missing_logical_rule_key,
+        "rule_logical_key_missing_accepted": rule_logical_key_missing_accepted,
+        "rule_logical_key_missing_unaccepted": rule_logical_key_missing_unaccepted,
         "card_id_present": card_id_present,
         "card_id_missing": card_id_missing,
+        "card_id_missing_accepted": card_id_missing_accepted,
+        "card_id_missing_unaccepted": card_id_missing_unaccepted,
         "semantic_hash_present": semantic_hash_present,
         "semantic_hash_missing": semantic_hash_missing,
+        "semantic_hash_missing_accepted": semantic_hash_missing_accepted,
+        "semantic_hash_missing_unaccepted": semantic_hash_missing_unaccepted,
+        "lineage_missing_waiver_reasons": dict(sorted(lineage_missing_waiver_reasons.items())),
+        "lineage_unaccepted_missing_samples": lineage_unaccepted_missing_samples,
         "by_rule_logical_key": dict(by_logical_rule_key.most_common(40)),
         "cards_by_status": {
             status: sorted(cards)[:40] for status, cards in sorted(cards_by_status.items())
@@ -480,10 +599,16 @@ def render_report(
         f"- unique_cards_seen: {summary.get('unique_cards', 0)}",
         f"- rule_logical_key_present: {summary.get('rule_logical_key_present', 0)}",
         f"- rule_logical_key_missing: {summary.get('rule_logical_key_missing', 0)}",
+        f"- rule_logical_key_missing_accepted: {summary.get('rule_logical_key_missing_accepted', 0)}",
+        f"- rule_logical_key_missing_unaccepted: {summary.get('rule_logical_key_missing_unaccepted', 0)}",
         f"- card_id_present: {summary.get('card_id_present', 0)}",
         f"- card_id_missing: {summary.get('card_id_missing', 0)}",
+        f"- card_id_missing_accepted: {summary.get('card_id_missing_accepted', 0)}",
+        f"- card_id_missing_unaccepted: {summary.get('card_id_missing_unaccepted', 0)}",
         f"- semantic_hash_present: {summary.get('semantic_hash_present', 0)}",
         f"- semantic_hash_missing: {summary.get('semantic_hash_missing', 0)}",
+        f"- semantic_hash_missing_accepted: {summary.get('semantic_hash_missing_accepted', 0)}",
+        f"- semantic_hash_missing_unaccepted: {summary.get('semantic_hash_missing_unaccepted', 0)}",
         f"- findings_total: {len(all_findings)}",
         f"- critical: {counts.get('critical', 0)}",
         f"- high: {counts.get('high', 0)}",
@@ -504,6 +629,12 @@ def render_report(
     lines.extend(render_counter_table("Rule Sources Used", summary.get("by_source", {})))
     lines.extend(render_counter_table("Review Status Used", summary.get("by_status", {})))
     lines.extend(render_counter_table("Effects Seen", summary.get("by_effect", {})))
+    lines.extend(
+        render_counter_table(
+            "Accepted Lineage Missing Waiver Reasons",
+            summary.get("lineage_missing_waiver_reasons", {}),
+        )
+    )
     lines.extend(
         render_counter_table(
             "Rule Logical Keys Seen",

@@ -119,9 +119,11 @@ def register_tests(battle, player):
             assert active.battlefield[0]["name"] == "Warp Creature"
             assert [event for event, _ in events] == [
                 "cast_announced",
+                "cost_paid",
                 "warp_cast",
                 "warp_exiled_end_step",
                 "cast_announced",
+                "cost_paid",
                 "warp_recast_from_exile",
             ]
         finally:

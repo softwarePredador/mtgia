@@ -371,6 +371,15 @@ def _rule_rank(rule: dict[str, Any]) -> tuple[int, int, int, float, int, str]:
     )
 
 
+def _is_runtime_safe_rule(rule: dict[str, Any]) -> bool:
+    review_status = str(rule.get("review_status") or "").lower()
+    execution_status = str(rule.get("execution_status") or "auto").lower()
+    return (
+        review_status in {"verified", "active"}
+        and execution_status in {"auto", "executable"}
+    )
+
+
 def _db_mtime(db_path: Path) -> int | None:
     try:
         return int(db_path.stat().st_mtime_ns)
@@ -389,10 +398,16 @@ def _invalidate_rule_caches_for_connection(conn: sqlite3.Connection) -> None:
 
 def load_active_battle_card_rule_lists(
     db_path: str | Path = DEFAULT_DB,
+    *,
+    include_review_only: bool = True,
+    runtime_safe_only: bool = False,
 ) -> dict[str, list[dict[str, Any]]]:
     path = Path(db_path)
     mtime = _db_mtime(path)
-    cache_key = str(path)
+    cache_key = (
+        f"{path}|include_review_only={int(include_review_only)}|"
+        f"runtime_safe_only={int(runtime_safe_only)}"
+    )
     cached = _RULE_LIST_CACHE.get(cache_key)
     if cached and cached[0] == mtime:
         return {
@@ -440,6 +455,10 @@ def load_active_battle_card_rule_lists(
             "oracle_hash": row["oracle_hash"],
             "notes": row["notes"],
         }
+        if runtime_safe_only and not _is_runtime_safe_rule(rule):
+            continue
+        if not include_review_only and not _is_runtime_safe_rule(rule):
+            continue
         rules.setdefault(row["normalized_name"], []).append(rule)
 
     for normalized_name, values in rules.items():
@@ -452,15 +471,27 @@ def load_active_battle_card_rule_lists(
     }
 
 
-def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str, dict[str, Any]]:
+def load_active_battle_card_rules(
+    db_path: str | Path = DEFAULT_DB,
+    *,
+    include_review_only: bool = True,
+    runtime_safe_only: bool = False,
+) -> dict[str, dict[str, Any]]:
     path = Path(db_path)
     mtime = _db_mtime(path)
-    cache_key = str(path)
+    cache_key = (
+        f"{path}|include_review_only={int(include_review_only)}|"
+        f"runtime_safe_only={int(runtime_safe_only)}"
+    )
     cached = _RULE_CACHE.get(cache_key)
     if cached and cached[0] == mtime:
         return {key: dict(value) for key, value in cached[1].items()}
 
-    rule_lists = load_active_battle_card_rule_lists(path)
+    rule_lists = load_active_battle_card_rule_lists(
+        path,
+        include_review_only=include_review_only,
+        runtime_safe_only=runtime_safe_only,
+    )
     rules = {
         normalized_name: values[0]
         for normalized_name, values in rule_lists.items()
@@ -473,8 +504,15 @@ def load_active_battle_card_rules(db_path: str | Path = DEFAULT_DB) -> dict[str,
 def lookup_battle_card_rule(
     db_path: str | Path,
     card_name: str,
+    *,
+    include_review_only: bool = True,
+    runtime_safe_only: bool = False,
 ) -> dict[str, Any] | None:
-    rules = load_active_battle_card_rules(db_path)
+    rules = load_active_battle_card_rules(
+        db_path,
+        include_review_only=include_review_only,
+        runtime_safe_only=runtime_safe_only,
+    )
     normalized = normalize_card_name(card_name)
     rule = rules.get(normalized)
     if rule:
@@ -490,8 +528,15 @@ def lookup_battle_card_rule(
 def lookup_battle_card_rule_list(
     db_path: str | Path,
     card_name: str,
+    *,
+    include_review_only: bool = True,
+    runtime_safe_only: bool = False,
 ) -> list[dict[str, Any]]:
-    rules = load_active_battle_card_rule_lists(db_path)
+    rules = load_active_battle_card_rule_lists(
+        db_path,
+        include_review_only=include_review_only,
+        runtime_safe_only=runtime_safe_only,
+    )
     normalized = normalize_card_name(card_name)
     values = rules.get(normalized)
     if values:

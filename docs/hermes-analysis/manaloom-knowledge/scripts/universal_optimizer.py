@@ -17,6 +17,7 @@ from pathlib import Path
 
 import battle_rule_registry
 from known_cards_fallback_snapshot import load_layered_known_cards
+from master_optimizer_common import battle_gate_cli_lines
 
 DB = os.environ.get('MANALOOM_KNOWLEDGE_DB', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
 BATTLE = os.environ.get('MANALOOM_BATTLE_SCRIPT', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py')
@@ -37,6 +38,13 @@ REAL_CATEGORY_PRIORITY = [
     "engine",
     "land",
 ]
+
+
+def print_legacy_battle_gate_banner() -> None:
+    print("universal_optimizer_status=legacy_deprecated_not_authorized_for_handoff")
+    print("universal_optimizer_auto_apply_warning=use_master_optimizer_apply_pipeline_instead")
+    for line in battle_gate_cli_lines():
+        print(line)
 
 
 def choose_primary_category(categories: list[str]) -> str | None:
@@ -78,6 +86,7 @@ def load_known_cards(db_path: str) -> dict[str, dict[str, object]]:
     return known_cards
 
 # ── Concurrency lock ──
+print_legacy_battle_gate_banner()
 if os.path.exists(LOCK_FILE):
     age = time.time() - os.path.getmtime(LOCK_FILE)
     if age < 36000:  # 10h max runtime

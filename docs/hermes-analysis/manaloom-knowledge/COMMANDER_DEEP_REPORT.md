@@ -1,5 +1,14 @@
 # Commander Deep Knowledge Report
 
+> **Supersedencia operacional - 2026-06-19:** este relatorio e historico para
+> Lorehold deck `6`. A verdade corrente esta em
+> `docs/hermes-analysis/LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`:
+> Hermes deck `6`, active learned `learned_deck:82`, PG deck
+> `528c877f-f829-4207-95e6-73981776c323`, `100` cards, `33` lands, and no
+> current missing oracle structure on that linked PG saved deck. Counts below
+> such as `31 lands`, old unknown-tag totals, and stale hashes are retained only
+> as historical evidence.
+
 > **Generated:** 2026-06-01 ~21:10 UTC | **Updated:** 2026-06-06 ~04:30 UTC
 > **Commander:** Lorehold, the Historian
 > **Color Identity:** Boros (RW)

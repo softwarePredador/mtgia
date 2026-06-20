@@ -19,7 +19,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 import battle_rule_registry
 
@@ -32,6 +32,12 @@ KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v9.py"))
+DEFAULT_BATTLE_GATE_SUMMARY = Path(
+    os.environ.get(
+        "MANALOOM_BATTLE_GATE_SUMMARY",
+        str(Path.home() / ".manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json"),
+    )
+)
 
 PROTECTED_CARDS = {
     "Lorehold, the Historian",
@@ -550,6 +556,108 @@ def write_report(name: str, markdown: str) -> Path:
     path = REPORT_DIR / f"{name}_{stamp}.md"
     path.write_text(markdown, encoding="utf-8")
     return path
+
+
+def load_battle_gate_summary(summary_path: Path | None = None) -> dict[str, Any]:
+    path = summary_path or DEFAULT_BATTLE_GATE_SUMMARY
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {
+            "battle_replay_final_status": "missing_summary",
+            "battle_replay_final_status_reason": f"summary_not_found:{path}",
+            "mandatory_gate_divergences": ["battle_gate_summary_missing"],
+            "_summary_path": str(path),
+        }
+
+
+def _sample(values: object, limit: int = 8) -> list[object]:
+    if isinstance(values, list):
+        return values[:limit]
+    return []
+
+
+def battle_gate_report_lines(summary: dict[str, Any] | None = None) -> list[str]:
+    data = summary or load_battle_gate_summary()
+    summary_path = str(data.get("_summary_path") or DEFAULT_BATTLE_GATE_SUMMARY)
+    gate_statuses = data.get("mandatory_gate_statuses") or {}
+    gate_rollup = {
+        name: (gate or {}).get("status")
+        for name, gate in sorted(gate_statuses.items())
+    }
+    return [
+        "## Battle Replay Gate",
+        "",
+        f"- audit_summary: `{summary_path}`",
+        f"- audit_run_dir: `{data.get('run_dir') or '-'}`",
+        f"- battle_replay_final_status: `{data.get('battle_replay_final_status') or 'unknown'}`",
+        f"- battle_replay_final_status_reason: `{data.get('battle_replay_final_status_reason') or 'unknown'}`",
+        f"- battle_gate_weight: `required_for_optimizer_wr_evidence`",
+        f"- mandatory_gate_divergences: `{json.dumps(data.get('mandatory_gate_divergences') or [], sort_keys=True)}`",
+        f"- mandatory_gate_statuses: `{json.dumps(gate_rollup, sort_keys=True)}`",
+        f"- strategy_learning_confidence_counts: `{json.dumps(data.get('strategy_learning_confidence_counts') or {}, sort_keys=True)}`",
+        f"- strategy_low_confidence_seed_sample: `{json.dumps(_sample(data.get('strategy_low_confidence_seeds')), sort_keys=True)}`",
+        f"- strategy_high_confidence_learning_seed_sample: `{json.dumps(_sample(data.get('strategy_high_confidence_learning_seeds')), sort_keys=True)}`",
+        f"- global_learning_eligibility_policy: `{data.get('global_learning_eligibility_policy') or '-'}`",
+        f"- global_learning_eligible_seed_sample: `{json.dumps(_sample(data.get('global_learning_eligible_seeds')), sort_keys=True)}`",
+        f"- global_not_learning_eligible_seed_sample: `{json.dumps(_sample(data.get('global_not_learning_eligible_seeds')), sort_keys=True)}`",
+        f"- focused_template_dispatch_status: `{data.get('focused_template_dispatch_status') or '-'}`",
+        f"- focused_template_evidence_ready: `{data.get('focused_template_evidence_ready', '-')}`",
+        f"- focused_template_evidence_not_ready_unwaived: `{data.get('focused_template_evidence_not_ready_unwaived', '-')}`",
+        f"- effect_coverage_residual_status: `{data.get('effect_coverage_residual_status') or '-'}`",
+        f"- effect_coverage_residual_raw_flag_total: `{data.get('effect_coverage_residual_raw_flag_total', '-')}`",
+        f"- effect_coverage_residual_accepted_unaccepted_rows: `{data.get('effect_coverage_residual_accepted_card_flag_rows', '-')}/{data.get('effect_coverage_residual_unaccepted_card_flag_rows', '-')}`",
+        "- effect_coverage_residual_scope_note: `accepted_residual_is_not_full_runtime_coverage`",
+        f"- review_rule_denominators: `review_only={data.get('review_only_rule_names', '-')} needs_review={data.get('needs_review_rule_names', '-')} non_runtime_safe={data.get('non_runtime_safe_rule_names', '-')} runtime_safe={data.get('runtime_safe_rule_names', '-')}`",
+        "- review_rule_denominator_scope_note: `review_only_zero_is_not_review_backlog_zero`",
+        f"- review_status_counts: `{json.dumps(data.get('review_status_counts') or {}, sort_keys=True)}`",
+        f"- decision_trace_taxonomy_scope: `rows={data.get('decision_trace_taxonomy_rows', '-')} observed={data.get('decision_trace_kinds_observed', '-')}/{data.get('decision_trace_kinds_total', '-')} uncovered={data.get('decision_trace_kinds_uncovered', '-')}`",
+        f"- decision_trace_static_uncovered_types: `{json.dumps(data.get('decision_trace_static_uncovered_types') or [], sort_keys=True)}`",
+        f"- forensic_lineage_status: `{data.get('forensic_lineage_status') or '-'}`",
+        f"- forensic_card_id_present_missing: `{data.get('forensic_card_id_present', '-')}/{data.get('forensic_card_id_missing', '-')}`",
+        f"- forensic_card_id_missing_accepted_unaccepted: `{data.get('forensic_card_id_missing_accepted', '-')}/{data.get('forensic_card_id_missing_unaccepted', '-')}`",
+        f"- forensic_semantic_hash_present_missing: `{data.get('forensic_semantic_hash_present', '-')}/{data.get('forensic_semantic_hash_missing', '-')}`",
+        f"- forensic_semantic_hash_missing_accepted_unaccepted: `{data.get('forensic_semantic_hash_missing_accepted', '-')}/{data.get('forensic_semantic_hash_missing_unaccepted', '-')}`",
+        f"- forensic_rule_logical_key_present_missing: `{data.get('forensic_rule_logical_key_present', '-')}/{data.get('forensic_rule_logical_key_missing', '-')}`",
+        f"- forensic_rule_logical_key_missing_accepted_unaccepted: `{data.get('forensic_rule_logical_key_missing_accepted', '-')}/{data.get('forensic_rule_logical_key_missing_unaccepted', '-')}`",
+        "- forensic_lineage_scope_note: `complete_means_zero_unaccepted_missing_not_full_identity_coverage`",
+        f"- forensic_lineage_missing_waiver_reasons: `{json.dumps(data.get('forensic_lineage_missing_waiver_reasons') or {}, sort_keys=True)}`",
+        "",
+    ]
+
+
+def battle_gate_cli_lines(summary: dict[str, Any] | None = None) -> list[str]:
+    data = summary or load_battle_gate_summary()
+    return [
+        f"battle_replay_final_status={data.get('battle_replay_final_status') or 'unknown'}",
+        f"battle_replay_final_status_reason={data.get('battle_replay_final_status_reason') or 'unknown'}",
+        f"battle_gate_weight=required_for_optimizer_wr_evidence",
+        f"mandatory_gate_divergences={json.dumps(data.get('mandatory_gate_divergences') or [], sort_keys=True)}",
+        f"strategy_learning_confidence_counts={json.dumps(data.get('strategy_learning_confidence_counts') or {}, sort_keys=True)}",
+        f"strategy_low_confidence_seed_sample={json.dumps(_sample(data.get('strategy_low_confidence_seeds')), sort_keys=True)}",
+        f"strategy_high_confidence_learning_seed_sample={json.dumps(_sample(data.get('strategy_high_confidence_learning_seeds')), sort_keys=True)}",
+        f"global_learning_eligibility_policy={data.get('global_learning_eligibility_policy') or '-'}",
+        f"global_learning_eligible_seed_sample={json.dumps(_sample(data.get('global_learning_eligible_seeds')), sort_keys=True)}",
+        f"global_not_learning_eligible_seed_sample={json.dumps(_sample(data.get('global_not_learning_eligible_seeds')), sort_keys=True)}",
+        f"focused_template_dispatch_status={data.get('focused_template_dispatch_status') or '-'}",
+        f"focused_template_evidence_ready={data.get('focused_template_evidence_ready', '-')}",
+        f"focused_template_evidence_not_ready_unwaived={data.get('focused_template_evidence_not_ready_unwaived', '-')}",
+        f"effect_coverage_residual_status={data.get('effect_coverage_residual_status') or '-'}",
+        f"effect_coverage_residual_raw_flag_total={data.get('effect_coverage_residual_raw_flag_total', '-')}",
+        f"effect_coverage_residual_accepted_unaccepted_rows={data.get('effect_coverage_residual_accepted_card_flag_rows', '-')}/{data.get('effect_coverage_residual_unaccepted_card_flag_rows', '-')}",
+        "effect_coverage_residual_scope_note=accepted_residual_is_not_full_runtime_coverage",
+        f"review_rule_denominators=review_only:{data.get('review_only_rule_names', '-')} needs_review:{data.get('needs_review_rule_names', '-')} non_runtime_safe:{data.get('non_runtime_safe_rule_names', '-')} runtime_safe:{data.get('runtime_safe_rule_names', '-')}",
+        "review_rule_denominator_scope_note=review_only_zero_is_not_review_backlog_zero",
+        f"decision_trace_taxonomy_scope=rows:{data.get('decision_trace_taxonomy_rows', '-')} observed:{data.get('decision_trace_kinds_observed', '-')}/{data.get('decision_trace_kinds_total', '-')} uncovered:{data.get('decision_trace_kinds_uncovered', '-')}",
+        f"forensic_lineage_status={data.get('forensic_lineage_status') or '-'}",
+        f"forensic_card_id_present_missing={data.get('forensic_card_id_present', '-')}/{data.get('forensic_card_id_missing', '-')}",
+        f"forensic_card_id_missing_accepted_unaccepted={data.get('forensic_card_id_missing_accepted', '-')}/{data.get('forensic_card_id_missing_unaccepted', '-')}",
+        f"forensic_semantic_hash_present_missing={data.get('forensic_semantic_hash_present', '-')}/{data.get('forensic_semantic_hash_missing', '-')}",
+        f"forensic_semantic_hash_missing_accepted_unaccepted={data.get('forensic_semantic_hash_missing_accepted', '-')}/{data.get('forensic_semantic_hash_missing_unaccepted', '-')}",
+        f"forensic_rule_logical_key_present_missing={data.get('forensic_rule_logical_key_present', '-')}/{data.get('forensic_rule_logical_key_missing', '-')}",
+        f"forensic_rule_logical_key_missing_accepted_unaccepted={data.get('forensic_rule_logical_key_missing_accepted', '-')}/{data.get('forensic_rule_logical_key_missing_unaccepted', '-')}",
+        "forensic_lineage_scope_note=complete_means_zero_unaccepted_missing_not_full_identity_coverage",
+    ]
 
 
 def card_metadata(conn: sqlite3.Connection, card_name: str) -> sqlite3.Row | None:

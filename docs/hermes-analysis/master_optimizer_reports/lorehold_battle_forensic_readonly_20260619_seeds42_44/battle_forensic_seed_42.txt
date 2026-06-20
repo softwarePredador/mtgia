@@ -1,0 +1,498 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Commander: Lorehold, the Historian
+Opponents available: 12
+Opponents picked: Thrasios, Triton Hero #115 (real), Rograkh, Son of Rohgahh #62 (real), The Emperor of Palamecia #42 (real)
+======================================================================
+
+DECK SOURCE PROVENANCE
+  Metrics are derived from the resolved runtime card lists; cached learned-deck metadata is not used for replay lands/CMC/curve.
+  Deck-source blockers are reported separately from battle-engine action/strategy/forensic blockers.
+  Lorehold: source=sqlite_deck_cards metrics=runtime_derived_from_resolved_card_list cards=99 lands=33 avg_nonland_cmc=2.97 curve={"0": 2, "1": 16, "2": 13, "3": 19, "4": 7, "5": 2, "6": 2, "7+": 5} blockers=none
+  Thrasios, Triton Hero #115 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=27 avg_nonland_cmc=1.82 curve={"0": 5, "1": 29, "2": 22, "3": 10, "4": 4, "5": 1, "6": 0, "7+": 1} blockers=none
+  Rograkh, Son of Rohgahh #62 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=27 avg_nonland_cmc=2.06 curve={"0": 6, "1": 19, "2": 22, "3": 18, "4": 4, "5": 3, "6": 0, "7+": 0} blockers=none
+  The Emperor of Palamecia #42 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=36 avg_nonland_cmc=4.22 curve={"0": 1, "1": 1, "2": 11, "3": 9, "4": 21, "5": 7, "6": 2, "7+": 11} blockers=none
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 3 lands
+  Thrasios, Triton Hero #115 (real): 1 mulligan(s), 7 cards, 4 lands
+  Rograkh, Son of Rohgahh #62 (real): 2 mulligan(s), 6 cards, 2 lands
+  The Emperor of Palamecia #42 (real): 3 mulligan(s), 5 cards, 0 lands
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Lorehold: Sunbaked Canyon mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/active
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  ILLEGAL CAST Lorehold: Lorehold, the Historian reason=cannot_pay_locked_cost locked_cost={generic=3, red=1, white=1} phase=precombat_main
+  ANNOUNCE Lorehold: Sol Ring role=ramp phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Lorehold: Sol Ring cost={generic=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Lorehold: Sol Ring (CMC=1.0) [ramp_permanent] phase=precombat_main cost={generic=1} rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  ILLEGAL CAST Lorehold: Lorehold, the Historian reason=cannot_pay_locked_cost locked_cost={generic=3, red=1, white=1} phase=precombat_main
+  ANNOUNCE Lorehold: Lightning Greaves role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Lorehold: Lightning Greaves cost={generic=2} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] phase=precombat_main cost={generic=2} rule=curated/verified
+  RESOLVE SPELL Lorehold: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/verified
+  END Lorehold: Life=40 Hand=5 Board=3 Grave=0 Discarded=0 Permanents=[Sunbaked Canyon, Sol Ring, Lightning Greaves]
+
+TURN 1 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=7 Board=0
+  MANA Thrasios, Triton Hero #115 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Thrasios, Triton Hero #115 (real): Bayou mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Chain of Vapor role=normal phase=precombat_main locked_cost={blue=1} targets=-
+  PAY COST Thrasios, Triton Hero #115 (real): Chain of Vapor cost={blue=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Thrasios, Triton Hero #115 (real): Chain of Vapor (CMC=1.0) [remove_permanent] phase=precombat_main cost={blue=1} rule=curated/verified
+  RESOLVE SPELL Thrasios, Triton Hero #115 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Thrasios, Triton Hero #115 (real): Chain of Vapor removed Lightning Greaves from Lorehold
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=6 Board=0 Grave=2 Discarded=0 Permanents=[-]
+
+TURN 1 - Rograkh, Son of Rohgahh #62 (real) | Life=40 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #62 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Forest mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 1 - The Emperor of Palamecia #42 (real) | Life=40 Hand=5 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0 Permanents=[-]
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=2
+  MANA Lorehold: 3 available (2 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Lorehold: Bloodstained Mire mana+=1 pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  ILLEGAL CAST Lorehold: Lorehold, the Historian reason=cannot_pay_locked_cost locked_cost={generic=3, red=1, white=1} phase=precombat_main
+  ANNOUNCE Lorehold: Deflecting Swat role=normal phase=precombat_main locked_cost={generic=2, red=1} targets=-
+  PAY COST Lorehold: Deflecting Swat cost={generic=2, red=1} mana 4->1 life 40->40 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] phase=precombat_main cost={generic=2, red=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  ILLEGAL CAST Lorehold: Lorehold, the Historian reason=cannot_pay_locked_cost locked_cost={generic=3, red=1, white=1} phase=precombat_main
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=postcombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  ILLEGAL CAST Lorehold: Lorehold, the Historian reason=cannot_pay_locked_cost locked_cost={generic=3, red=1, white=1} phase=postcombat_main
+  END Lorehold: Life=40 Hand=4 Board=3 Grave=2 Discarded=0 Permanents=[Sunbaked Canyon, Sol Ring, Bloodstained Mire]
+
+TURN 2 - Thrasios, Triton Hero #115 (real) | Life=40 Hand=6 Board=0
+  MANA Thrasios, Triton Hero #115 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Thrasios, Triton Hero #115 (real): Tropical Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Elvish Mystic role=creature phase=precombat_main locked_cost={green=1} targets=-
+  PAY COST Thrasios, Triton Hero #115 (real): Elvish Mystic cost={green=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Thrasios, Triton Hero #115 (real): Elvish Mystic (CMC=1.0) [creature] phase=precombat_main cost={green=1} rule=curated/verified
+  END Thrasios, Triton Hero #115 (real): Life=40 Hand=5 Board=1 Grave=3 Discarded=0 Permanents=[Elvish Mystic]
+
+TURN 2 - Rograkh, Son of Rohgahh #62 (real) | Life=40 Hand=6 Board=0
+  MANA Rograkh, Son of Rohgahh #62 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Gemstone Caverns mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/active
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Birds of Paradise role=creature phase=precombat_main locked_cost={green=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Birds of Paradise cost={green=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Rograkh, Son of Rohgahh #62 (real): Birds of Paradise (CMC=1.0) [creature] phase=precombat_main cost={green=1} rule=curated/verified
+  END Rograkh, Son of Rohgahh #62 (real): Life=40 Hand=5 Board=1 Grave=2 Discarded=0 Permanents=[Birds of Paradise]
+
+TURN 2 - The Emperor of Palamecia #42 (real) | Life=40 Hand=6 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Spinerock Knoll mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST The Emperor of Palamecia #42 (real): The Emperor of Palamecia reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 3 - Lorehold | Life=40 Hand=4 Board=3
+  MANA Lorehold: 4 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Lorehold: Ancient Den mana+=1 pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  PAY COST Lorehold: Lorehold, the Historian cost={generic=3, red=1, white=1} mana 5->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Lorehold: Lorehold, the Historian (CMC=?) [passive] phase=precombat_main cost={generic=3, red=1, white=1} rule=curated/active
+  COMBAT Lorehold -> Thrasios, Triton Hero #115 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #115 (real): 5 player damage, target life 35, target_dead=False
+  END Lorehold: Life=40 Hand=4 Board=5 Grave=2 Discarded=0 Permanents=[Sunbaked Canyon, Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped)]
+
+TURN 3 - Thrasios, Triton Hero #115 (real) | Life=35 Hand=5 Board=1
+  MANA Thrasios, Triton Hero #115 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Thrasios, Triton Hero #115 (real): Savannah mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Biomancer's Familiar role=creature phase=precombat_main locked_cost={blue=1, green=1} targets=-
+  PAY COST Thrasios, Triton Hero #115 (real): Biomancer's Familiar cost={blue=1, green=1} mana 2->0 life 35->35 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Thrasios, Triton Hero #115 (real): Biomancer's Familiar (CMC=2.0) [creature] phase=precombat_main cost={blue=1, green=1} rule=type_line_creature/fact
+  COMBAT Thrasios, Triton Hero #115 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=40)
+  DAMAGE Thrasios, Triton Hero #115 (real) -> Lorehold: 1 player damage, target life 39, target_dead=False
+  END Thrasios, Triton Hero #115 (real): Life=35 Hand=4 Board=2 Grave=4 Discarded=0 Permanents=[Elvish Mystic (tapped), Biomancer's Familiar]
+
+TURN 3 - Rograkh, Son of Rohgahh #62 (real) | Life=40 Hand=5 Board=1
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=postcombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=postcombat_main
+  END Rograkh, Son of Rohgahh #62 (real): Life=40 Hand=6 Board=1 Grave=2 Discarded=0 Permanents=[Birds of Paradise]
+
+TURN 3 - The Emperor of Palamecia #42 (real) | Life=40 Hand=6 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=7 Board=0 Grave=1 Discarded=0 Permanents=[-]
+
+TURN 4 - Lorehold | Life=39 Hand=4 Board=5
+  MANA Lorehold: 5 available (4 sources, 0 treasures, pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  CAST Lorehold: Boros Charm (CMC=?) [modal_boros_charm] phase=draw_step cost={} rule=curated/verified
+  RESOLVE SPELL Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=curated/verified
+  PLAY LAND Lorehold: Scalding Tarn mana+=1 pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Lorehold: Mizzix's Mastery role=normal phase=precombat_main locked_cost={generic=3, red=1} targets=-
+  PAY COST Lorehold: Mizzix's Mastery cost={generic=3, red=1} mana 4->0 life 39->39 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] phase=precombat_main cost={generic=3, red=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Mizzix's Mastery (CMC=4.0) [overload_recursion] rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #115 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=31)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #115 (real): 5 player damage, target life 26, target_dead=False
+  END Lorehold: Life=39 Hand=2 Board=6 Grave=5 Discarded=0 Permanents=[Sunbaked Canyon, Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn]
+
+TURN 4 - Thrasios, Triton Hero #115 (real) | Life=26 Hand=4 Board=2
+  MANA Thrasios, Triton Hero #115 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Thrasios, Triton Hero #115 (real): Misty Rainforest mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 4 - Rograkh, Son of Rohgahh #62 (real) | Life=36 Hand=6 Board=1
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Noxious Revival role=normal phase=precombat_main locked_cost={phyrexian=['green']} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Noxious Revival cost={phyrexian=['green']} mana 1->0 life 36->36 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #62 (real): Noxious Revival (CMC=1.0) [recursion] phase=precombat_main cost={phyrexian=['green']} rule=curated/verified
+  RESOLVE SPELL Rograkh, Son of Rohgahh #62 (real): Noxious Revival (CMC=1.0) [recursion] rule=curated/verified
+  END Rograkh, Son of Rohgahh #62 (real): Life=36 Hand=6 Board=1 Grave=3 Discarded=0 Permanents=[Birds of Paradise]
+
+TURN 4 - The Emperor of Palamecia #42 (real) | Life=36 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST The Emperor of Palamecia #42 (real): The Emperor of Palamecia reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 5 - Lorehold | Life=39 Hand=2 Board=6
+  MANA Lorehold: 6 available (5 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Lorehold: Plateau mana+=1 pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2} rule=curated/verified
+  ANNOUNCE Lorehold: Mana Vault role=ramp phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Lorehold: Mana Vault cost={generic=1} mana 7->6 life 39->39 life_paid=0 pool={'generic': 3, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2}
+  CAST Lorehold: Mana Vault (CMC=1.0) [ramp_permanent] phase=precombat_main cost={generic=1} rule=curated/active
+  COMBAT Lorehold -> Thrasios, Triton Hero #115 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=26)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #115 (real): 5 player damage, target life 21, target_dead=False
+  ACTIVATE Lorehold: Sunbaked Canyon kind=sacrifice_draw mana_paid=1
+  END Lorehold: Life=39 Hand=2 Board=7 Grave=6 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault]
+
+TURN 5 - Thrasios, Triton Hero #115 (real) | Life=21 Hand=4 Board=2
+  MANA Thrasios, Triton Hero #115 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  COMBAT Thrasios, Triton Hero #115 (real) -> Rograkh, Son of Rohgahh #62 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=36)
+  DAMAGE Thrasios, Triton Hero #115 (real) -> Rograkh, Son of Rohgahh #62 (real): 2 player damage, target life 34, target_dead=False
+  DAMAGE Thrasios, Triton Hero #115 (real) -> The Emperor of Palamecia #42 (real): 1 player damage, target life 35, target_dead=False
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=postcombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=postcombat_main
+  END Thrasios, Triton Hero #115 (real): Life=21 Hand=5 Board=2 Grave=5 Discarded=0 Permanents=[Elvish Mystic (tapped), Biomancer's Familiar (tapped)]
+
+TURN 5 - Rograkh, Son of Rohgahh #62 (real) | Life=34 Hand=6 Board=1
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Verdant Catacombs mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Badgermole Cub role=creature phase=precombat_main locked_cost={generic=1, green=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Badgermole Cub cost={generic=1, green=1} mana 2->0 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Rograkh, Son of Rohgahh #62 (real): Badgermole Cub (CMC=2.0) [creature] phase=precombat_main cost={generic=1, green=1} rule=curated/verified
+  END Rograkh, Son of Rohgahh #62 (real): Life=34 Hand=5 Board=2 Grave=4 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub]
+
+TURN 5 - The Emperor of Palamecia #42 (real) | Life=35 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=35 Hand=7 Board=0 Grave=3 Discarded=1 Permanents=[-]
+
+TURN 6 - Lorehold | Life=39 Hand=2 Board=7
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  CAST Lorehold: Path to Exile (CMC=?) [remove_creature] phase=draw_step cost={} rule=curated/active
+  RESOLVE SPELL Lorehold: Path to Exile (CMC=1.0) [remove_creature] rule=curated/active
+  REMOVAL Lorehold: Path to Exile removed Biomancer's Familiar from Thrasios, Triton Hero #115 (real)
+  ANNOUNCE Lorehold: Guttersnipe role=creature phase=precombat_main locked_cost={generic=2, red=1} targets=-
+  PAY COST Lorehold: Guttersnipe cost={generic=2, red=1} mana 7->4 life 39->39 life_paid=0 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0}
+  CAST CREATURE Lorehold: Guttersnipe (CMC=3.0) [creature] phase=precombat_main cost={generic=2, red=1} rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #115 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=21)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #115 (real): 5 player damage, target life 16, target_dead=False
+  END Lorehold: Life=39 Hand=1 Board=8 Grave=7 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe]
+
+TURN 6 - Thrasios, Triton Hero #115 (real) | Life=16 Hand=5 Board=1
+  MANA Thrasios, Triton Hero #115 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  COMBAT Thrasios, Triton Hero #115 (real) -> Rograkh, Son of Rohgahh #62 (real): 1 attackers, 1 blockers, 0 gang blocks, 1 power (reason=default_low_life, target_life=34)
+  DAMAGE Thrasios, Triton Hero #115 (real) -> Rograkh, Son of Rohgahh #62 (real): 0 player damage, target life 34, target_dead=False
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=postcombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=postcombat_main
+  END Thrasios, Triton Hero #115 (real): Life=16 Hand=6 Board=0 Grave=7 Discarded=0 Permanents=[-]
+
+TURN 6 - Rograkh, Son of Rohgahh #62 (real) | Life=34 Hand=5 Board=2
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Misty Rainforest mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Sylvan Scrying role=normal phase=precombat_main locked_cost={generic=1, green=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Sylvan Scrying cost={generic=1, green=1} mana 2->0 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #62 (real): Sylvan Scrying (CMC=2.0) [tutor] phase=precombat_main cost={generic=1, green=1} rule=curated/verified
+  RESOLVE SPELL Rograkh, Son of Rohgahh #62 (real): Sylvan Scrying (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Rograkh, Son of Rohgahh #62 (real): Sylvan Scrying found Ancient Tomb (land)
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> Thrasios, Triton Hero #115 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=16)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Thrasios, Triton Hero #115 (real): 2 player damage, target life 14, target_dead=False
+  END Rograkh, Son of Rohgahh #62 (real): Life=34 Hand=5 Board=2 Grave=6 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped)]
+
+TURN 6 - The Emperor of Palamecia #42 (real) | Life=35 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=35 Hand=7 Board=0 Grave=4 Discarded=1 Permanents=[-]
+
+TURN 7 - Lorehold | Life=39 Hand=1 Board=8
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1})
+  PLAY LAND Lorehold: Inspiring Vantage mana+=1 pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2} rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #115 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=14)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #115 (real): 5 player damage, target life 9, target_dead=False
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 2 player damage, target life 32, target_dead=False
+  END Lorehold: Life=39 Hand=1 Board=9 Grave=7 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe (tapped), Inspiring Vantage]
+
+TURN 7 - Thrasios, Triton Hero #115 (real) | Life=9 Hand=6 Board=0
+  MANA Thrasios, Triton Hero #115 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Thrasios, Triton Hero #115 (real): Thrasios, Triton Hero reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Thrasios, Triton Hero #115 (real): Noxious Revival role=normal phase=precombat_main locked_cost={phyrexian=['green']} targets=-
+  PAY COST Thrasios, Triton Hero #115 (real): Noxious Revival cost={phyrexian=['green']} mana 0->0 life 9->7 life_paid=2 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Thrasios, Triton Hero #115 (real): Noxious Revival (CMC=1.0) [recursion] phase=precombat_main cost={phyrexian=['green']} rule=curated/verified
+  RESOLVE SPELL Thrasios, Triton Hero #115 (real): Noxious Revival (CMC=1.0) [recursion] rule=curated/verified
+  END Thrasios, Triton Hero #115 (real): Life=7 Hand=7 Board=0 Grave=7 Discarded=0 Permanents=[-]
+
+TURN 7 - Rograkh, Son of Rohgahh #62 (real) | Life=32 Hand=5 Board=2
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Ancient Tomb mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 1} rule=curated/verified
+  ACTIVATE Rograkh, Son of Rohgahh #62 (real): Ancient Tomb kind=contextual_fast_mana mana_paid=- life=?->30 life_paid=2
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Formidable Speaker role=creature phase=precombat_main locked_cost={generic=2, green=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Formidable Speaker cost={generic=2, green=1} mana 3->0 life 30->30 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Rograkh, Son of Rohgahh #62 (real): Formidable Speaker (CMC=3.0) [creature] phase=precombat_main cost={generic=2, green=1} rule=curated/active
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> Thrasios, Triton Hero #115 (real): 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=default_low_life, target_life=7)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Thrasios, Triton Hero #115 (real): 2 player damage, target life 5, target_dead=False
+  END Rograkh, Son of Rohgahh #62 (real): Life=30 Hand=4 Board=3 Grave=7 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Formidable Speaker]
+
+TURN 7 - The Emperor of Palamecia #42 (real) | Life=35 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=35 Hand=7 Board=0 Grave=5 Discarded=1 Permanents=[-]
+
+TURN 8 - Lorehold | Life=39 Hand=1 Board=9
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  ANNOUNCE Lorehold: Mother of Runes role=creature phase=precombat_main locked_cost={white=1} targets=-
+  PAY COST Lorehold: Mother of Runes cost={white=1} mana 10->9 life 39->39 life_paid=0 pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2}
+  CAST CREATURE Lorehold: Mother of Runes (CMC=1.0) [creature] phase=precombat_main cost={white=1} rule=curated/verified
+  COMBAT Lorehold -> Thrasios, Triton Hero #115 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=lethal, target_life=5)
+  DAMAGE Lorehold -> Thrasios, Triton Hero #115 (real): 7 player damage, target life -2, target_dead=True
+  >>> DIED: Thrasios, Triton Hero #115 (real) (life_zero) <<<
+
+TURN 8 - Rograkh, Son of Rohgahh #62 (real) | Life=30 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Gaea's Cradle mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Thrasios, Triton Hero role=creature phase=precombat_main locked_cost={blue=1, green=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Thrasios, Triton Hero cost={blue=1, green=1} mana 2->0 life 30->30 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Rograkh, Son of Rohgahh #62 (real): Thrasios, Triton Hero (CMC=2.0) [creature] phase=precombat_main cost={blue=1, green=1} rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=35)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 player damage, target life 33, target_dead=False
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Lorehold: 2 player damage, target life 37, target_dead=False
+  END Rograkh, Son of Rohgahh #62 (real): Life=30 Hand=3 Board=4 Grave=8 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Formidable Speaker (tapped), Thrasios, Triton Hero]
+
+TURN 8 - The Emperor of Palamecia #42 (real) | Life=33 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=33 Hand=7 Board=0 Grave=6 Discarded=1 Permanents=[-]
+
+TURN 9 - Lorehold | Life=37 Hand=1 Board=10
+  MANA Lorehold: 10 available (7 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  PLAY LAND Lorehold: Great Furnace mana+=1 pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2} rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #62 (real): 3 attackers, 1 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 5 player damage, target life 25, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 2 player damage, target life 31, target_dead=False
+  END Lorehold: Life=37 Hand=1 Board=10 Grave=8 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe (tapped), Inspiring Vantage, Great Furnace]
+
+TURN 9 - Rograkh, Son of Rohgahh #62 (real) | Life=25 Hand=3 Board=4
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 3 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=31)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 3 player damage, target life 28, target_dead=False
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Lorehold: 2 player damage, target life 35, target_dead=False
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=postcombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=postcombat_main
+  END Rograkh, Son of Rohgahh #62 (real): Life=25 Hand=4 Board=4 Grave=8 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Formidable Speaker (tapped), Thrasios, Triton Hero (tapped)]
+
+TURN 9 - The Emperor of Palamecia #42 (real) | Life=28 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=28 Hand=7 Board=0 Grave=7 Discarded=1 Permanents=[-]
+
+TURN 10 - Lorehold | Life=35 Hand=1 Board=10
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  CAST Lorehold: Rise of the Eldrazi (CMC=?) [remove_permanent] phase=draw_step cost={} rule=curated/verified
+  RESOLVE SPELL Lorehold: Rise of the Eldrazi (CMC=12.0) [remove_permanent] rule=curated/verified
+  REMOVAL Lorehold: Rise of the Eldrazi removed Formidable Speaker from Rograkh, Son of Rohgahh #62 (real)
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #62 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=25)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 5 player damage, target life 20, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 2 player damage, target life 26, target_dead=False
+  END Lorehold: Life=35 Hand=1 Board=10 Grave=9 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe (tapped), Inspiring Vantage, Great Furnace]
+
+TURN 10 - Rograkh, Son of Rohgahh #62 (real) | Life=20 Hand=4 Board=3
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=26)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 player damage, target life 24, target_dead=False
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Lorehold: 1 player damage, target life 34, target_dead=False
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=postcombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=postcombat_main
+  END Rograkh, Son of Rohgahh #62 (real): Life=20 Hand=5 Board=3 Grave=9 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Thrasios, Triton Hero (tapped)]
+
+TURN 10 - The Emperor of Palamecia #42 (real) | Life=24 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST The Emperor of Palamecia #42 (real): The Emperor of Palamecia reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 11 - Lorehold | Life=34 Hand=1 Board=10
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  CAST Lorehold: Mana Geyser (CMC=?) [ramp_ritual] phase=draw_step cost={} rule=curated/verified
+  RESOLVE SPELL Lorehold: Mana Geyser (CMC=5.0) [ramp_ritual] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #62 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=20)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 5 player damage, target life 15, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 2 player damage, target life 22, target_dead=False
+  END Lorehold: Life=34 Hand=1 Board=10 Grave=10 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe (tapped), Inspiring Vantage, Great Furnace]
+
+TURN 11 - Rograkh, Son of Rohgahh #62 (real) | Life=15 Hand=5 Board=3
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=22)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 player damage, target life 20, target_dead=False
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Lorehold: 1 player damage, target life 33, target_dead=False
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=postcombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=postcombat_main
+  END Rograkh, Son of Rohgahh #62 (real): Life=15 Hand=6 Board=3 Grave=9 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Thrasios, Triton Hero (tapped)]
+
+TURN 11 - The Emperor of Palamecia #42 (real) | Life=20 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST The Emperor of Palamecia #42 (real): The Emperor of Palamecia reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 12 - Lorehold | Life=33 Hand=1 Board=10
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  ANNOUNCE Lorehold: Giver of Runes role=creature phase=precombat_main locked_cost={white=1} targets=-
+  PAY COST Lorehold: Giver of Runes cost={white=1} mana 11->10 life 33->33 life_paid=0 pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2}
+  CAST CREATURE Lorehold: Giver of Runes (CMC=1.0) [creature] phase=precombat_main cost={white=1} rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #62 (real): 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=default_low_life, target_life=15)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 5 player damage, target life 10, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 2 player damage, target life 18, target_dead=False
+  END Lorehold: Life=33 Hand=1 Board=11 Grave=10 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe (tapped), Inspiring Vantage, Great Furnace, Giver of Runes]
+
+TURN 12 - Rograkh, Son of Rohgahh #62 (real) | Life=10 Hand=6 Board=3
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Wooded Foothills mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Oboro Breezecaller role=creature phase=precombat_main locked_cost={generic=1, blue=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Oboro Breezecaller cost={generic=1, blue=1} mana 2->0 life 10->10 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Rograkh, Son of Rohgahh #62 (real): Oboro Breezecaller (CMC=2.0) [creature] phase=precombat_main cost={generic=1, blue=1} rule=type_line_creature/fact
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 attackers, 0 blockers, 0 gang blocks, 3 power (reason=default_low_life, target_life=18)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 2 player damage, target life 16, target_dead=False
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Lorehold: 1 player damage, target life 32, target_dead=False
+  END Rograkh, Son of Rohgahh #62 (real): Life=10 Hand=5 Board=4 Grave=10 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Thrasios, Triton Hero (tapped), Oboro Breezecaller]
+
+TURN 12 - The Emperor of Palamecia #42 (real) | Life=16 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST The Emperor of Palamecia #42 (real): The Emperor of Palamecia reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 13 - Lorehold | Life=32 Hand=1 Board=11
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  CAST Lorehold: Reverberate (CMC=?) [copy_spell] phase=draw_step cost={} rule=curated/verified
+  RESOLVE SPELL Lorehold: Reverberate (CMC=2.0) [copy_spell] rule=curated/verified
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #62 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=default_low_life, target_life=10)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 6 player damage, target life 4, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 2 player damage, target life 14, target_dead=False
+  END Lorehold: Life=32 Hand=1 Board=12 Grave=10 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Lorehold, the Historian (tapped), Scalding Tarn, Plateau, Mana Vault, Guttersnipe (tapped), Inspiring Vantage, Great Furnace, Giver of Runes (tapped), Reverberate]
+
+TURN 13 - Rograkh, Son of Rohgahh #62 (real) | Life=4 Hand=5 Board=4
+  MANA Rograkh, Son of Rohgahh #62 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  PLAY LAND Rograkh, Son of Rohgahh #62 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST Rograkh, Son of Rohgahh #62 (real): Rograkh, Son of Rohgahh reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+  ANNOUNCE Rograkh, Son of Rohgahh #62 (real): Kinnan, Bonder Prodigy role=creature phase=precombat_main locked_cost={blue=1, green=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #62 (real): Kinnan, Bonder Prodigy cost={blue=1, green=1} mana 2->0 life 4->4 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Rograkh, Son of Rohgahh #62 (real): Kinnan, Bonder Prodigy (CMC=2.0) [creature] phase=precombat_main cost={blue=1, green=1} rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 3 attackers, 0 blockers, 0 gang blocks, 4 power (reason=default_low_life, target_life=14)
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> The Emperor of Palamecia #42 (real): 3 player damage, target life 11, target_dead=False
+  DAMAGE Rograkh, Son of Rohgahh #62 (real) -> Lorehold: 1 player damage, target life 31, target_dead=False
+  END Rograkh, Son of Rohgahh #62 (real): Life=4 Hand=4 Board=5 Grave=11 Discarded=0 Permanents=[Birds of Paradise, Badgermole Cub (tapped), Thrasios, Triton Hero (tapped), Oboro Breezecaller (tapped), Kinnan, Bonder Prodigy]
+
+TURN 13 - The Emperor of Palamecia #42 (real) | Life=11 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  ILLEGAL CAST The Emperor of Palamecia #42 (real): The Emperor of Palamecia reason=cannot_pay_locked_cost locked_cost={generic=4} phase=precombat_main
+
+TURN 14 - Lorehold | Life=31 Hand=1 Board=12
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  CAST Lorehold: Blasphemous Act (CMC=?) [board_wipe] phase=draw_step cost={} rule=curated/verified
+  RESOLVE SPELL Lorehold: Blasphemous Act (CMC=9.0) [board_wipe] rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=5, red=1, white=1} targets=-
+  PAY COST Lorehold: Lorehold, the Historian cost={generic=5, red=1, white=1} mana 9->2 life 31->31 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2}
+  CAST COMMANDER Lorehold: Lorehold, the Historian (CMC=?) [passive] phase=precombat_main cost={generic=5, red=1, white=1} rule=curated/active
+  COMBAT Lorehold -> Rograkh, Son of Rohgahh #62 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=lethal, target_life=4)
+  DAMAGE Lorehold -> Rograkh, Son of Rohgahh #62 (real): 5 player damage, target life -1, target_dead=True
+  >>> DIED: Rograkh, Son of Rohgahh #62 (real) (life_zero) <<<
+
+TURN 14 - The Emperor of Palamecia #42 (real) | Life=11 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=11 Hand=7 Board=0 Grave=12 Discarded=1 Permanents=[-]
+
+TURN 15 - Lorehold | Life=31 Hand=1 Board=10
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  ANNOUNCE Lorehold: Esper Sentinel role=normal phase=precombat_main locked_cost={white=1} targets=-
+  PAY COST Lorehold: Esper Sentinel cost={white=1} mana 11->10 life 31->31 life_paid=0 pool={'generic': 4, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2}
+  CAST Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] phase=precombat_main cost={white=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Esper Sentinel (CMC=1.0) [draw_engine] rule=curated/verified
+  ANNOUNCE Lorehold: Past in Flames role=normal phase=precombat_main locked_cost={generic=3, red=1} targets=-
+  PAY COST Lorehold: Past in Flames cost={generic=3, red=1} mana 10->6 life 31->31 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2}
+  CAST Lorehold: Past in Flames (CMC=4.0) [recursion] phase=precombat_main cost={generic=3, red=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Past in Flames (CMC=4.0) [recursion] rule=curated/verified
+  ANNOUNCE Lorehold: Boros Charm role=normal phase=precombat_main locked_cost={red=1, white=1} targets=-
+  PAY COST Lorehold: Boros Charm cost={red=1, white=1} mana 6->4 life 31->31 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0}
+  CAST Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] phase=precombat_main cost={red=1, white=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Boros Charm (CMC=2.0) [modal_boros_charm] rule=curated/verified
+  COMBAT Lorehold -> The Emperor of Palamecia #42 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=11)
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 5 player damage, target life 6, target_dead=False
+  END Lorehold: Life=31 Hand=4 Board=11 Grave=12 Discarded=0 Permanents=[Sol Ring, Bloodstained Mire, Ancient Den, Scalding Tarn, Plateau, Mana Vault, Inspiring Vantage, Great Furnace, Reverberate, Lorehold, the Historian (tapped), Esper Sentinel]
+
+TURN 15 - The Emperor of Palamecia #42 (real) | Life=6 Hand=7 Board=0
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=6 Hand=7 Board=0 Grave=13 Discarded=1 Permanents=[-]
+
+TURN 16 - Lorehold | Life=31 Hand=4 Board=11
+  MANA Lorehold: 11 available (8 sources, 0 treasures, pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2})
+  PLAY LAND Lorehold: Windswept Heath mana+=1 pool={'generic': 5, 'white': 1, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 3, 'wildcard': 2} rule=curated/verified
+  ANNOUNCE Lorehold: Twinflame role=high_threat phase=precombat_main locked_cost={generic=1, red=1} targets=-
+  PAY COST Lorehold: Twinflame cost={generic=1, red=1} mana 12->10 life 31->31 life_paid=0 pool={'generic': 4, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2}
+  CAST Lorehold: Twinflame (CMC=2.0) [token_maker] phase=precombat_main cost={generic=1, red=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Twinflame (CMC=2.0) [token_maker] rule=curated/verified
+  ANNOUNCE Lorehold: Deflecting Swat role=normal phase=precombat_main locked_cost={generic=2, red=1} targets=-
+  PAY COST Lorehold: Deflecting Swat cost={generic=2, red=1} mana 10->7 life 31->31 life_paid=0 pool={'generic': 2, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1}
+  CAST Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] phase=precombat_main cost={generic=2, red=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Deflecting Swat (CMC=3.0) [redirect_removal] rule=curated/verified
+  COMBAT Lorehold -> The Emperor of Palamecia #42 (real): 3 attackers, 0 blockers, 0 gang blocks, 8 power (reason=lethal, target_life=6)
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 8 player damage, target life -2, target_dead=True
+  >>> DIED: The Emperor of Palamecia #42 (real) (life_zero) <<<
+
+GAME OVER - Turn 16
+  >>> WIN: Lorehold (elimination) turn 16 <<<
+Winner: Lorehold (elimination)
+Lorehold: ALIVE Life=31 Hand=2
+Thrasios, Triton Hero #115 (real): DEAD Life=-2 Hand=7
+Rograkh, Son of Rohgahh #62 (real): DEAD Life=-1 Hand=4
+The Emperor of Palamecia #42 (real): DEAD Life=-2 Hand=7

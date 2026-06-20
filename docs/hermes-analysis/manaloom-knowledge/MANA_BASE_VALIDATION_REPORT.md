@@ -1,5 +1,12 @@
 # Mana Base Validation Report
 
+> **Supersedencia operacional - 2026-06-19:** este relatorio e uma fotografia
+> historica do validador de mana. Para Lorehold deck `6`, use
+> `docs/hermes-analysis/LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`
+> como fonte corrente: Hermes deck `6`, active learned `learned_deck:82`, PG
+> deck `528c877f-f829-4207-95e6-73981776c323`, `100` cards, and `33` lands.
+> A linha antiga com `31 lands` nao deve ser usada como estado atual.
+
 > **Data:** 2026-06-05T08:39:35Z
 > **Cron:** manaloom-mana-base-validator
 > **Decks analisados:** 8

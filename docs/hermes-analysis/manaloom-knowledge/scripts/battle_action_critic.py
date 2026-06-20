@@ -23,16 +23,19 @@ ACTION_EVENTS = {
     "combat_result",
     "combat_step",
     "creature_cast",
+    "cost_paid",
     "end_step_instant",
     "game_won",
     "land_played",
     "miracle_cast",
     "multi_defender_attack",
     "player_eliminated",
+    "redirect_removal_resolved",
     "recursion_resolved",
     "removal_resolved",
     "replacement_applied",
     "spell_cast",
+    "spell_countered",
     "spell_resolved",
     "trigger_put_on_stack",
     "trigger_resolved",
@@ -56,7 +59,11 @@ CARD_ACTION_EVENTS = {
     "miracle_cast",
     "spell_cast",
     "spell_resolved",
+    "spell_countered",
+    "redirect_removal_resolved",
 }
+
+TARGETED_REMOVAL_EFFECTS = {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg"}
 
 DECISION_ACTION_EVENTS = {
     "commander_cast",
@@ -66,6 +73,297 @@ DECISION_ACTION_EVENTS = {
     "end_step_instant",
     "miracle_cast",
     "spell_cast",
+}
+
+EVENT_CONTRACT_OVERRIDES = {
+    "activated_ability_skipped": (
+        "ignored_with_reason",
+        "activation was considered but skipped; no action legality verdict expected.",
+    ),
+    "activated_ability": (
+        "strategy_signal",
+        "resolved activated ability; renderer/decision trace carry the action-specific context.",
+    ),
+    "additional_cost_paid": (
+        "technical",
+        "additional cost ledger detail; primary payment is audited through cost_paid.",
+    ),
+    "adventure_cast": (
+        "strategy_signal",
+        "alternate cast mode represented in stack/cast context and human replay.",
+    ),
+    "adventure_creature_cast_from_exile": (
+        "strategy_signal",
+        "follow-up adventure creature cast represented in stack/cast context and human replay.",
+    ),
+    "attachment_sba": (
+        "ignored_with_reason",
+        "state-based attachment cleanup; legality is checked by the SBA helper.",
+    ),
+    "battle_back_face_cast": (
+        "strategy_signal",
+        "battle transformation/cast signal consumed by replay and future strategy checks.",
+    ),
+    "battle_damage": (
+        "renderer_only",
+        "battle damage state evidence for replay continuity.",
+    ),
+    "board_wipe_resolved": (
+        "strategy_signal",
+        "board wipe resolution is consumed by decision strategy and replay state checks.",
+    ),
+    "cannot_lose_turn_resolved": (
+        "strategy_signal",
+        "cannot-lose effect is game-state strategy context, not a standalone action verdict.",
+    ),
+    "cantrip_mana_filter_artifact_resolved": (
+        "strategy_signal",
+        "cantrip/filter resolution is represented by card-flow and decision context.",
+    ),
+    "composite_rule_component_resolved": (
+        "strategy_signal",
+        "component of a composite rule; consumed with the parent composite resolution.",
+    ),
+    "composite_rule_resolved": (
+        "strategy_signal",
+        "composite rule resolution signal consumed by replay/forensic checks.",
+    ),
+    "copy_creature_token_failed": (
+        "ignored_with_reason",
+        "copy-token path was considered but skipped or failed with reason metadata.",
+    ),
+    "copy_creature_token_created": (
+        "renderer_only",
+        "token creation is rendered as state evidence, not a decision/action verdict.",
+    ),
+    "counters_cancelled": (
+        "ignored_with_reason",
+        "state-based counter cleanup; not a player decision action.",
+    ),
+    "creature_to_battlefield": (
+        "renderer_only",
+        "battlefield placement state evidence for human replay continuity.",
+    ),
+    "damage_resolved": (
+        "renderer_only",
+        "life-change explanation for human replay continuity.",
+    ),
+    "draw_cards_resolved": (
+        "strategy_signal",
+        "draw resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
+    "end_step_token_sacrificed": (
+        "renderer_only",
+        "scheduled token cleanup state evidence.",
+    ),
+    "equipment_attached": (
+        "renderer_only",
+        "attachment state evidence, not a standalone strategy action.",
+    ),
+    "equipment_unattached": (
+        "renderer_only",
+        "attachment state evidence, not a standalone strategy action.",
+    ),
+    "extra_combat_cap_reached": (
+        "ignored_with_reason",
+        "extra combat was blocked by cap and should carry cap reason metadata.",
+    ),
+    "extra_combat_scheduled": (
+        "strategy_signal",
+        "future-combat scheduling signal for strategy/replay context.",
+    ),
+    "extra_combat_taken": (
+        "strategy_signal",
+        "extra-combat consumption signal for strategy/replay context.",
+    ),
+    "extra_turn_cap_reached": (
+        "ignored_with_reason",
+        "extra turn was blocked by cap and should carry cap reason metadata.",
+    ),
+    "extra_turn_scheduled": (
+        "strategy_signal",
+        "future-turn scheduling signal for strategy/replay context.",
+    ),
+    "extra_turn_taken": (
+        "strategy_signal",
+        "extra-turn consumption signal for strategy/replay context.",
+    ),
+    "flashback_cast": (
+        "strategy_signal",
+        "alternate graveyard cast mode represented in stack/cast context and human replay.",
+    ),
+    "game_lost": (
+        "strategy_signal",
+        "game loss terminal state consumed by replay outcome checks.",
+    ),
+    "game_win_prevented": (
+        "strategy_signal",
+        "win-prevention signal consumed by game-outcome and replay checks.",
+    ),
+    "hand_filter_resolved": (
+        "strategy_signal",
+        "hand filtering resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
+    "hate_artifact_resolved": (
+        "strategy_signal",
+        "hate artifact resolution is effect evidence consumed by replay/forensic checks.",
+    ),
+    "imprint_failed": (
+        "ignored_with_reason",
+        "imprint path was considered but skipped or failed with reason metadata.",
+    ),
+    "imprint_resolved": (
+        "strategy_signal",
+        "imprint resolution is resource-context evidence for later cast decisions.",
+    ),
+    "instant_removal": (
+        "forensic_card_event",
+        "instant removal is a card-event kind checked by forensic lineage.",
+    ),
+    "land_ramp_resolved": (
+        "strategy_signal",
+        "land ramp resolution is resource-development evidence for replay/strategy context.",
+    ),
+    "land_recursion_creature_resolved": (
+        "strategy_signal",
+        "land recursion creature resolution is resource-development evidence.",
+    ),
+    "land_recursion_resolved": (
+        "strategy_signal",
+        "land recursion resolution is resource-development evidence.",
+    ),
+    "lander_token_created": (
+        "renderer_only",
+        "token creation is rendered as state evidence, not a standalone action verdict.",
+    ),
+    "life_artifact_resolved": (
+        "strategy_signal",
+        "life artifact resolution is effect evidence consumed by replay state checks.",
+    ),
+    "loot_resolved": (
+        "strategy_signal",
+        "loot resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
+    "loyalty_ability_activated": (
+        "strategy_signal",
+        "planeswalker loyalty activation is represented in replay state and decision context.",
+    ),
+    "lorehold_upkeep_rummage": (
+        "strategy_signal",
+        "decision-trace backed upkeep rummage signal.",
+    ),
+    "lorehold_upkeep_rummage_skipped": (
+        "ignored_with_reason",
+        "upkeep rummage was considered and skipped.",
+    ),
+    "multi_target_resolution": (
+        "forensic_card_event",
+        "multi-target spell resolution is effect evidence consumed by forensic/replay checks.",
+    ),
+    "multikicker_paid": (
+        "technical",
+        "kicker payment ledger detail; primary cast remains the audited action.",
+    ),
+    "paradigm_exiled": (
+        "renderer_only",
+        "library/exile state transition for Paradigm Shift-style effects.",
+    ),
+    "permanent_moved_by_sba": (
+        "ignored_with_reason",
+        "state-based permanent movement; not a player decision action.",
+    ),
+    "phase_creatures_resolved": (
+        "strategy_signal",
+        "phase effect resolution is board-state evidence for replay/forensic checks.",
+    ),
+    "planeswalker_damage": (
+        "renderer_only",
+        "planeswalker damage state evidence for replay continuity.",
+    ),
+    "prepared_copies_removed": (
+        "technical",
+        "scheduled copy cleanup ledger detail.",
+    ),
+    "prepared_copy_created": (
+        "renderer_only",
+        "copy setup state evidence for later replay resolution.",
+    ),
+    "protection_resolved": (
+        "strategy_signal",
+        "protection effect resolution is consumed by replay/forensic checks.",
+    ),
+    "removal_countered_by_ward": (
+        "strategy_signal",
+        "ward counter result is stack/interaction context for replay checks.",
+    ),
+    "saga_chapter_progressed": (
+        "strategy_signal",
+        "saga progression signal consumed through decision/replay context.",
+    ),
+    "saga_chapter_resolved": (
+        "strategy_signal",
+        "saga resolution signal consumed through decision/replay context.",
+    ),
+    "saga_sacrificed_by_sba": (
+        "ignored_with_reason",
+        "state-based action cleanup after final saga chapter.",
+    ),
+    "station_activated": (
+        "strategy_signal",
+        "station activation is represented in replay state and decision context.",
+    ),
+    "token_ceased_to_exist": (
+        "renderer_only",
+        "token zone cleanup state evidence.",
+    ),
+    "topdeck_manipulation_activated": (
+        "strategy_signal",
+        "topdeck manipulation is represented in decision trace score components.",
+    ),
+    "treasure_created": (
+        "renderer_only",
+        "token/resource state evidence, not a standalone action verdict.",
+    ),
+    "utility_artifact_activated": (
+        "strategy_signal",
+        "utility artifact activation is represented in decision trace score components.",
+    ),
+    "utility_land_activated": (
+        "strategy_signal",
+        "utility land activation is represented in decision trace score components.",
+    ),
+    "utility_land_triggered": (
+        "strategy_signal",
+        "utility land trigger is replay state context.",
+    ),
+    "ward_countered": (
+        "strategy_signal",
+        "ward counter result is stack/interaction context for replay checks.",
+    ),
+    "ward_paid": (
+        "technical",
+        "ward payment ledger detail; primary interaction remains the audited action.",
+    ),
+    "warp_cast": (
+        "strategy_signal",
+        "alternate warp cast mode represented in stack/cast context and human replay.",
+    ),
+    "warp_exiled_end_step": (
+        "technical",
+        "warp delayed exile ledger detail.",
+    ),
+    "warp_recast_from_exile": (
+        "strategy_signal",
+        "warp recast is represented in stack/cast context and human replay.",
+    ),
+    "wheel_resolved": (
+        "strategy_signal",
+        "wheel decision/effect signal consumed by strategy review.",
+    ),
+    "worldfire_resolved": (
+        "strategy_signal",
+        "Worldfire-style reset resolution is consumed by strategy and replay outcome checks.",
+    ),
 }
 
 SEVERITY_ORDER = {
@@ -147,6 +445,13 @@ def is_card_spell_event(event: dict[str, Any]) -> bool:
     }
 
 
+def has_declared_target(event: dict[str, Any]) -> bool:
+    if event.get("target"):
+        return True
+    targets = event.get("targets")
+    return isinstance(targets, list) and len(targets) > 0
+
+
 def action_finding(
     severity: str,
     code: str,
@@ -181,6 +486,70 @@ def build_decision_index(decisions: list[dict[str, Any]]) -> dict[tuple[Any, str
     return index
 
 
+def pop_matching_decision(
+    decision_index: dict[tuple[Any, str, str], deque[dict[str, Any]]],
+    event: dict[str, Any],
+) -> dict[str, Any] | None:
+    key = (event.get("turn", "?"), str(event.get("player") or "?"), str(event.get("card") or ""))
+    queue = decision_index.get(key)
+    if not queue:
+        return None
+    event_phase = str(event.get("phase") or "")
+    if event_phase:
+        for decision in list(queue):
+            if str(decision.get("phase") or "") == event_phase:
+                queue.remove(decision)
+                return decision
+        for decision in list(queue):
+            if not decision.get("phase"):
+                queue.remove(decision)
+                return decision
+        return None
+    return queue.popleft()
+
+
+def classify_event_contract(kind: str) -> tuple[str, str]:
+    if kind in ACTION_EVENTS:
+        return "action_audited", "included in ACTION_EVENTS and receives action critic checks."
+    if kind in TECHNICAL_EVENTS:
+        return "technical", "technical ledger event; included only in ledger mode."
+    return EVENT_CONTRACT_OVERRIDES.get(
+        kind,
+        ("unclassified", "event type has no explicit action contract classification."),
+    )
+
+
+def summarize_event_contract(events: list[dict[str, Any]]) -> dict[str, Any]:
+    event_type_counts = Counter(str(event.get("event") or "missing") for event in events)
+    event_class_counts: Counter[str] = Counter()
+    event_type_class_counts: Counter[str] = Counter()
+    event_rows: list[dict[str, Any]] = []
+    unclassified_types: list[str] = []
+
+    for kind, count in sorted(event_type_counts.items()):
+        classification, reason = classify_event_contract(kind)
+        event_class_counts[classification] += count
+        event_type_class_counts[classification] += 1
+        if classification == "unclassified":
+            unclassified_types.append(kind)
+        event_rows.append({
+            "event": kind,
+            "count": count,
+            "classification": classification,
+            "reason": reason,
+        })
+
+    return {
+        "events_total": sum(event_type_counts.values()),
+        "event_types_total": len(event_type_counts),
+        "event_class_counts": dict(sorted(event_class_counts.items())),
+        "event_type_class_counts": dict(sorted(event_type_class_counts.items())),
+        "events_unclassified": int(event_class_counts.get("unclassified", 0)),
+        "event_types_unclassified": unclassified_types,
+        "event_rows": event_rows,
+    }
+
+
 def criticize_actions(
     events: list[dict[str, Any]],
     decisions: list[dict[str, Any]] | None = None,
@@ -188,6 +557,7 @@ def criticize_actions(
     include_technical: bool = False,
 ) -> dict[str, Any]:
     decisions = decisions or []
+    event_contract = summarize_event_contract(events)
     decision_index = build_decision_index(decisions)
     cast_stack: dict[tuple[Any, str, str], list[dict[str, Any]]] = defaultdict(list)
     land_plays: Counter[tuple[Any, str, Any]] = Counter()
@@ -223,6 +593,8 @@ def criticize_actions(
             source = str(event.get("rule_source") or "missing")
             status = str(event.get("rule_review_status") or "missing")
             effect = str(event.get("effect") or "unknown")
+            if kind == "spell_countered":
+                effect = str(event.get("effect") or "counter")
             evidence.append(f"rule={source}/{status}")
             evidence.append(f"effect={effect}")
             if source == "missing" or status == "missing":
@@ -238,6 +610,216 @@ def criticize_actions(
                     "review_rule_used",
                     f"Action used rule status {status}.",
                     "Keep this action audit-only until the card rule is verified.",
+                ))
+
+        if kind == "cost_paid":
+            evidence.append(f"card={event.get('card', '-')}")
+            evidence.append(f"cost={event.get('locked_cost', '-')}")
+            evidence.append(f"mana={event.get('mana_before', '-')}->{event.get('mana_after', '-')}")
+            evidence.append(f"life={event.get('life_before', '-')}->{event.get('life_after', '-')}")
+
+        effect = str(event.get("effect") or "")
+        if kind in {"end_step_instant", "spell_cast", "spell_resolved"} and effect == "counter":
+            if not event.get("target") and not event.get("stack_object"):
+                findings.append(action_finding(
+                    "high",
+                    "counter_without_stack_target",
+                    "Counterspell action lacks target/stack object evidence.",
+                    "Emit target, stack object and result, or block the counter as no_legal_target/fizzled.",
+                ))
+            if kind == "spell_resolved":
+                findings.append(action_finding(
+                    "high",
+                    "counter_resolved_as_normal_spell",
+                    "Counterspell resolved as a normal spell action instead of a stack interaction result.",
+                    "Route counters through spell_countered/fizzled/no_legal_target events before strategy learning.",
+                ))
+
+        if (
+            kind
+            in {"cast_announced", "end_step_instant", "miracle_cast", "spell_cast", "spell_resolved"}
+            and effect in TARGETED_REMOVAL_EFFECTS
+        ):
+            if not has_declared_target(event):
+                findings.append(action_finding(
+                    "high",
+                    "targeted_removal_without_declared_target",
+                    "Targeted removal action lacks declared target metadata.",
+                    "Declare and persist target metadata at cast time, then revalidate the same target at resolution.",
+                ))
+            evidence.append(f"target={event.get('target') or '-'}")
+
+        if kind == "spell_resolved":
+            def _resolution_field_missing(field):
+                value = event.get(field)
+                if field == "resolved_from_stack":
+                    return value is None
+                return value in (None, "", [], {})
+
+            missing_resolution_fields = [
+                field
+                for field in (
+                    "phase",
+                    "priority_window",
+                    "stack_object",
+                    "stack_depth",
+                    "source_zone",
+                    "from_zone",
+                    "to_zone",
+                    "destination",
+                    "zone_after",
+                    "resolved_from_stack",
+                    "result",
+                    "cast_pipeline",
+                    "locked_cost",
+                )
+                if _resolution_field_missing(field)
+            ]
+            evidence.append(f"resolved_from_stack={event.get('resolved_from_stack', '-')}")
+            evidence.append(f"destination={event.get('destination') or event.get('zone_after') or event.get('to_zone') or '-'}")
+            if missing_resolution_fields:
+                findings.append(action_finding(
+                    "medium",
+                    "spell_resolved_without_resolution_provenance",
+                    "spell_resolved lacks required provenance: "
+                    + ", ".join(sorted(set(missing_resolution_fields))),
+                    "Emit resolution provenance on spell_resolved or add an explicit linked-zone waiver.",
+                ))
+
+        if kind == "spell_countered":
+            evidence.append(f"target={event.get('target') or '-'}")
+            evidence.append(f"stack_object={event.get('stack_object') or '-'}")
+            evidence.append(f"result={event.get('result') or '-'}")
+            evidence.append(f"phase={event.get('phase') or '-'}")
+            evidence.append(f"priority_window={event.get('priority_window') or '-'}")
+            if not event.get("target") or not event.get("stack_object"):
+                findings.append(action_finding(
+                    "high",
+                    "counter_without_stack_target",
+                    "Counter event lacks target or stack object.",
+                    "Emit both target and stack_object for every counter interaction.",
+                ))
+            if not event.get("phase") or not event.get("priority_window"):
+                findings.append(action_finding(
+                    "medium",
+                    "counter_without_priority_window",
+                    "Counter event lacks priority provenance.",
+                    "Emit phase and priority_window for every counter interaction.",
+                ))
+            if event.get("result") not in {"countered", "fizzled", "no_legal_target"}:
+                findings.append(action_finding(
+                    "medium",
+                    "counter_without_result",
+                    "Counter event lacks a legal interaction result.",
+                    "Record result as countered, fizzled or no_legal_target.",
+                ))
+
+        if kind == "redirect_removal_resolved":
+            result = event.get("result")
+            required_redirect_fields = [
+                "redirected_object",
+                "old_target",
+                "new_target",
+                "target_type",
+            ]
+            evidence.append(f"redirected_object={event.get('redirected_object') or '-'}")
+            evidence.append(f"old_target={event.get('old_target') or '-'}")
+            evidence.append(f"new_target={event.get('new_target') or '-'}")
+            evidence.append(f"legal_redirect_opportunity={event.get('legal_redirect_opportunity')}")
+            evidence.append(f"target_change_applied={event.get('target_change_applied')}")
+            evidence.append(f"result={result or '-'}")
+            if result == "redirected":
+                missing_redirect_fields = [
+                    field
+                    for field in required_redirect_fields
+                    if event.get(field) in (None, "", [], {})
+                ]
+                if (
+                    missing_redirect_fields
+                    or event.get("legal_redirect_opportunity") is not True
+                    or event.get("target_change_applied") is not True
+                ):
+                    findings.append(action_finding(
+                        "high",
+                        "redirect_without_target_change_provenance",
+                        "Redirect effect resolved without complete target-change provenance.",
+                        "Emit redirected_object, old_target, new_target, target_type, legal opportunity and applied change.",
+                    ))
+            elif result not in {"no_redirect_target", "no_legal_new_target"}:
+                findings.append(action_finding(
+                    "medium",
+                    "redirect_without_result",
+                    "Redirect effect lacks a legal interaction result.",
+                    "Record result as redirected, no_redirect_target or no_legal_new_target.",
+                ))
+
+        if kind == "trigger_put_on_stack":
+            trigger_source = event.get("source") or event.get("card")
+            trigger_name = (
+                event.get("trigger")
+                or event.get("trigger_event")
+                or event.get("event_type")
+            )
+            stack_order = event.get("stack_depth")
+            if stack_order is None:
+                stack_order = event.get("timestamp")
+            evidence.append(f"source={trigger_source or '-'}")
+            evidence.append(f"trigger={trigger_name or '-'}")
+            evidence.append(f"stack={stack_order if stack_order is not None else '-'}")
+            if not trigger_source or not trigger_name or stack_order is None:
+                findings.append(action_finding(
+                    "high",
+                    "trigger_without_auditable_stack_metadata",
+                    "Trigger reached the stack without source, trigger name or stack order metadata.",
+                    "Emit source/card, trigger and stack_depth/timestamp for every trigger_put_on_stack event.",
+                ))
+
+        if kind == "replacement_applied":
+            affected = event.get("card") or event.get("affected_object")
+            affected_player = event.get("affected_player")
+            source = event.get("source")
+            reason = event.get("reason")
+            causal_event = event.get("causal_event")
+            replacements = event.get("replacements") or []
+            from_zone = event.get("from_zone")
+            to_zone = event.get("to_zone")
+            event_type = event.get("event_type")
+            amount = event.get("amount")
+            delta = event.get("delta")
+            original_amount = event.get("original_amount")
+            final_amount = event.get("final_amount")
+            original_delta = event.get("original_delta")
+            final_delta = event.get("final_delta")
+            replacement_rule_source = event.get("replacement_rule_source")
+            replacement_rule_sources = event.get("replacement_rule_sources") or []
+            evidence.append(f"card={affected or '-'}")
+            evidence.append(f"affected_player={affected_player or '-'}")
+            evidence.append(f"source={source or '-'}")
+            evidence.append(f"reason={reason or '-'}")
+            evidence.append(f"zone={from_zone or '-'}->{to_zone or '-'}")
+            evidence.append(f"value={original_amount if original_amount is not None else original_delta}->{final_amount if final_amount is not None else final_delta}")
+            evidence.append(f"replacement_rule_source={replacement_rule_source or '-'}")
+            has_life_or_damage_metadata = (
+                event_type in {"damage", "life_change"}
+                and bool(affected_player)
+                and (amount is not None or delta is not None)
+                and (original_amount is not None or original_delta is not None)
+                and (final_amount is not None or final_delta is not None)
+            )
+            has_zone_metadata = bool(affected and from_zone and to_zone)
+            if not replacements or not (has_zone_metadata or has_life_or_damage_metadata):
+                findings.append(action_finding(
+                    "high",
+                    "replacement_without_zone_or_object_metadata",
+                    "Replacement event lacks affected object, zone transition, life/damage metadata or replacement list.",
+                    "Emit affected object plus from/to zones for zone changes, or affected player plus amount/delta for life and damage replacements.",
+                ))
+            if not source and not replacement_rule_source and not replacement_rule_sources and not reason and not causal_event:
+                findings.append(action_finding(
+                    "high",
+                    "replacement_without_causal_metadata",
+                    "Replacement event lacks source, reason and causal_event metadata.",
+                    "Emit the causal spell/ability/rule or a structured justification before accepting the replacement.",
                 ))
 
         if kind == "land_played":
@@ -341,9 +923,8 @@ def criticize_actions(
 
         decision = None
         if kind in DECISION_ACTION_EVENTS and event.get("card"):
-            key = (turn, player, str(event.get("card") or ""))
-            if decision_index.get(key):
-                decision = decision_index[key].popleft()
+            decision = pop_matching_decision(decision_index, event)
+            if decision:
                 evidence.append(f"decision={decision.get('decision_id')}")
                 if not decision.get("score_components"):
                     findings.append(action_finding(
@@ -416,10 +997,16 @@ def criticize_actions(
     ]
     return {
         "summary": {
+            "events_total": event_contract["events_total"],
+            "event_types_total": event_contract["event_types_total"],
+            "event_contract": event_contract,
+            "events_unclassified": event_contract["events_unclassified"],
+            "event_types_unclassified": event_contract["event_types_unclassified"],
             "total_actions": len(action_rows),
             "verdict_counts": dict(sorted(counts.items())),
             "findings": len(findings),
             "technical_events_included": include_technical,
+            "technical_events_mode": "ledger" if include_technical else "default_action_only",
         },
         "actions": action_rows,
         "findings": findings,
@@ -434,9 +1021,15 @@ def render_markdown(result: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- total_actions: {summary['total_actions']}",
+        f"- events_total: {summary.get('events_total', 0)}",
+        f"- event_types_total: {summary.get('event_types_total', 0)}",
+        f"- event_contract_class_counts: `{json.dumps(summary.get('event_contract', {}).get('event_class_counts', {}), sort_keys=True)}`",
+        f"- events_unclassified: {summary.get('events_unclassified', 0)}",
+        f"- event_types_unclassified: `{json.dumps(summary.get('event_types_unclassified', []), sort_keys=True)}`",
         f"- findings: {summary['findings']}",
         f"- verdict_counts: `{json.dumps(summary['verdict_counts'], sort_keys=True)}`",
         f"- technical_events_included: {summary['technical_events_included']}",
+        f"- technical_events_mode: {summary.get('technical_events_mode', 'default_action_only')}",
         "",
         "## Findings",
         "",

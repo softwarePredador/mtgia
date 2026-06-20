@@ -31,6 +31,12 @@ def register_tests(battle, player):
         assert replacement["prevented"] is True
         assert replacement["replacements"] == ["life_total_cant_change"]
         assert replacement["replacement_order"] == ["life_total_cant_change"]
+        assert replacement["original_amount"] == 5
+        assert replacement["final_amount"] == 0
+        assert replacement["original_delta"] == -5
+        assert replacement["final_delta"] == 0
+        assert replacement["replacement_rule_source"] == "life_total_cant_change"
+        assert replacement["causal_event"]["replacement_rule_sources"] == ["life_total_cant_change"]
 
     def test_replacement_registry_moves_commander_to_command_zone():
         events = []
@@ -57,9 +63,16 @@ def register_tests(battle, player):
         assert commander not in active.graveyard
         replacement = next(event for event in events if event["event"] == "replacement_applied")
         assert replacement["event_type"] == "zone_change"
+        assert replacement["original_to_zone"] == "graveyard"
+        assert replacement["final_to_zone"] == "command_zone"
         assert replacement["to_zone"] == "command_zone"
+        assert replacement["source"] == "test"
+        assert replacement["reason"] == "destroy"
+        assert replacement["causal_event"]["source"] == "test"
+        assert replacement["causal_event"]["reason"] == "destroy"
         assert replacement["replacements"] == ["commander_to_command_zone"]
         assert replacement["replacement_order"] == ["commander_to_command_zone"]
+        assert replacement["replacement_rule_source"] == "commander_replacement_rule"
 
     def test_replacement_registry_uses_deterministic_priority_order():
         events = []
@@ -79,6 +92,8 @@ def register_tests(battle, player):
         replacement = next(event for event in events if event["event"] == "replacement_applied")
         assert replacement["replacement_order"] == ["life_total_cant_change"]
         assert replacement["replacements"] == ["life_total_cant_change"]
+        assert replacement["original_amount"] == 4
+        assert replacement["final_amount"] == 0
 
     def test_commander_zone_replacement_covers_exile_hand_and_library():
         active = player("Active")

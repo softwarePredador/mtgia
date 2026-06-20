@@ -39,14 +39,23 @@ def register_tests(battle, player):
         stack = battle.Stack()
         stack.push(spell, active, battle.get_card_effect(spell))
 
-        assert battle.priority_round(active, [active, responder], stack, 2, random.Random(6)) is True
+        assert battle.priority_round(
+            active,
+            [active, responder],
+            stack,
+            2,
+            random.Random(6),
+            phase="precombat_main",
+        ) is True
         assert stack.items[-1].countered is True
         assert responder.available_mana() == 0
         assert responder.hand == []
         assert responder.graveyard[0]["name"] == "Real Counter"
-        assert any(event == "spell_countered" for event, _ in events)
+        counter_event = next(data for event, data in events if event == "spell_countered")
+        assert counter_event["phase"] == "precombat_main"
+        assert counter_event["priority_window"] == "stack_response"
 
-        battle.priority_round(active, [active, responder], stack, 2, random.Random(6))
+        battle.priority_round(active, [active, responder], stack, 2, random.Random(6), phase="precombat_main")
         assert stack.empty()
         assert active.graveyard[0]["name"] == "Approach of the Second Sun"
 
@@ -245,6 +254,58 @@ def register_tests(battle, player):
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
+    def test_spell_resolved_includes_stack_and_zone_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            active.mana_pool.add_generic(1)
+            stack = battle.Stack()
+            spell = {
+                "name": "Audited Draw",
+                "cmc": 1,
+                "mana_cost": "{1}",
+                "type_line": "Sorcery",
+            }
+            effect = {"effect": "draw_cards", "count": 1}
+            ctx = battle.begin_cast_context(
+                active,
+                spell,
+                "precombat_main",
+                effect_data=effect,
+                role="normal",
+            )
+            assert battle.commit_cast_payment(ctx) is True
+            stack.push(spell, active, effect)
+
+            battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                2,
+                random.Random(112),
+                phase="precombat_main",
+            )
+
+            resolved = next(data for event, data in events if event == "spell_resolved")
+            assert resolved["phase"] == "precombat_main"
+            assert resolved["priority_window"] == "stack_resolution"
+            assert resolved["stack_depth"] == 1
+            assert resolved["stack_object"] == "Audited Draw"
+            assert resolved["source_zone"] == "hand"
+            assert resolved["from_zone"] == "hand"
+            assert resolved["to_zone"] == "graveyard"
+            assert resolved["destination"] == "graveyard"
+            assert resolved["zone_after"] == "graveyard"
+            assert resolved["cast_pipeline"] == "601.2_minimal"
+            assert resolved["resolved_from_stack"] is True
+            assert resolved["result"] == "resolved"
+            assert resolved["locked_cost"]["generic"] == 1
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
     def test_casting_context_locks_cost_before_payment():
         active = player("Active")
         spell = {
@@ -263,6 +324,34 @@ def register_tests(battle, player):
         assert dict(ctx.locked_cost["colored"]) == {"blue": 1}
         assert battle.commit_cast_payment(ctx) is True
         assert active.available_mana() == 0
+
+    def test_casting_context_emits_cost_paid_event():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            spell = {
+                "name": "Audited Cost Spell",
+                "cmc": 2,
+                "mana_cost": "{1}{U}",
+                "type_line": "Sorcery",
+            }
+            active.mana_pool.add("blue", 1)
+            active.mana_pool.add_generic(1)
+
+            ctx = battle.begin_cast_context(active, spell, "precombat_main")
+
+            assert battle.commit_cast_payment(ctx) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        paid = next(data for event, data in events if event == "cost_paid")
+        assert paid["card"] == "Audited Cost Spell"
+        assert paid["mana_before"] == 2
+        assert paid["mana_after"] == 0
+        assert paid["locked_cost"]["generic"] == 1
+        assert paid["locked_cost"]["colored"] == {"blue": 1}
 
     def test_casting_context_locks_x_alternative_and_additional_costs():
         active = player("Active")
@@ -415,6 +504,41 @@ def register_tests(battle, player):
         assert active.hand[0]["name"] == "Own Counter"
         assert active.available_mana() == 2
 
+    def test_end_step_interaction_does_not_cast_counter_without_stack_target():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            responder.hand = [
+                {
+                    "name": "Empty Stack Counter",
+                    "cmc": 1,
+                    "tag": "counter",
+                    "effect": "counter",
+                    "type_line": "Instant",
+                }
+            ]
+            responder.mana_pool.add_generic(1)
+
+            battle.play_turn_v8(
+                active,
+                [responder],
+                [active, responder],
+                1,
+                random.Random(212),
+                battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert responder.hand[0]["name"] == "Empty Stack Counter"
+        assert not any(
+            event == "end_step_instant" and data.get("card") == "Empty Stack Counter"
+            for event, data in events
+        )
+
     return [
         test_counterspell_consumes_card_mana_and_counters_target,
         test_empty_stack_priority_requires_main_phase,
@@ -424,11 +548,14 @@ def register_tests(battle, player):
         test_main_phase_pass_trace_explains_held_interaction,
         test_main_phase_pass_trace_explains_mana_constrained_hand,
         test_stack_resolution_emits_apnap_pass_sequence_before_resolve,
+        test_spell_resolved_includes_stack_and_zone_provenance,
         test_casting_context_locks_cost_before_payment,
+        test_casting_context_emits_cost_paid_event,
         test_casting_context_locks_x_alternative_and_additional_costs,
         test_casting_context_replay_exposes_modes_targets_and_x_value,
         test_casting_context_rejects_illegal_timing_without_payment,
         test_cast_spells_emits_minimal_601_pipeline_fields,
         test_conformance_stack_resolves_lifo,
         test_player_does_not_counter_own_spell,
+        test_end_step_interaction_does_not_cast_counter_without_stack_target,
     ]

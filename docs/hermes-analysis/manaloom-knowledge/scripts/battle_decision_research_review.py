@@ -203,9 +203,13 @@ def classify_status(
 def aggregate(input_dir: Path) -> dict[str, Any]:
     decision_counts: Counter[str] = Counter()
     finding_counts: Counter[str] = Counter()
+    strategy_learning_confidence_counts: Counter[str] = Counter()
     severity_by_code: dict[str, Counter[str]] = defaultdict(Counter)
     finding_items: list[dict[str, Any]] = []
     examples: dict[str, dict[str, Any]] = {}
+    strategy_low_confidence_seeds: list[str] = []
+    strategy_high_confidence_learning_seeds: list[str] = []
+    strategy_not_learning_eligible_seeds: list[str] = []
     seeds = seed_dirs(input_dir)
 
     for seed_dir in seeds:
@@ -223,6 +227,16 @@ def aggregate(input_dir: Path) -> dict[str, Any]:
                 "risk_flags": decision.get("risk_flags"),
             })
         strategy = load_json(seed_dir / "strategy_audit.json")
+        strategy_summary = strategy.get("summary") or {}
+        confidence = str(strategy_summary.get("learning_confidence") or "unknown")
+        strategy_learning_confidence_counts[confidence] += 1
+        seed_name = seed_dir.name.replace("seed_", "")
+        if confidence == "low_confidence_replay":
+            strategy_low_confidence_seeds.append(seed_name)
+        elif confidence == "high_confidence_replay":
+            strategy_high_confidence_learning_seeds.append(seed_name)
+        elif confidence == "not_learning_eligible":
+            strategy_not_learning_eligible_seeds.append(seed_name)
         for item in strategy.get("findings", []):
             code = str(item.get("code") or "unknown")
             severity = str(item.get("severity") or "unknown")
@@ -279,6 +293,10 @@ def aggregate(input_dir: Path) -> dict[str, Any]:
         "seeds": len(seeds),
         "decision_counts": dict(sorted(decision_counts.items())),
         "finding_counts": dict(sorted(finding_counts.items())),
+        "strategy_learning_confidence_counts": dict(sorted(strategy_learning_confidence_counts.items())),
+        "strategy_high_confidence_learning_seeds": strategy_high_confidence_learning_seeds,
+        "strategy_low_confidence_seeds": strategy_low_confidence_seeds,
+        "strategy_not_learning_eligible_seeds": strategy_not_learning_eligible_seeds,
         "categories": categories,
         "examples": examples,
     }
@@ -301,6 +319,10 @@ def render_markdown(result: dict[str, Any]) -> str:
         f"- Seeds: `{result['seeds']}`",
         f"- Decision counts: `{json.dumps(result['decision_counts'], sort_keys=True)}`",
         f"- Finding counts: `{json.dumps(result['finding_counts'], sort_keys=True)}`",
+        f"- Strategy learning confidence counts: `{json.dumps(result.get('strategy_learning_confidence_counts', {}), sort_keys=True)}`",
+        f"- Strategy high-confidence learning seeds: `{result.get('strategy_high_confidence_learning_seeds', [])}`",
+        f"- Strategy low-confidence seeds: `{result.get('strategy_low_confidence_seeds', [])}`",
+        f"- Strategy not-learning-eligible seeds: `{result.get('strategy_not_learning_eligible_seeds', [])}`",
         "",
         "## Category Matrix",
         "",
@@ -351,6 +373,9 @@ def main() -> int:
         "seeds": result["seeds"],
         "decision_counts": result["decision_counts"],
         "finding_counts": result["finding_counts"],
+        "strategy_learning_confidence_counts": result["strategy_learning_confidence_counts"],
+        "strategy_high_confidence_learning_seeds": result["strategy_high_confidence_learning_seeds"],
+        "strategy_low_confidence_seeds": result["strategy_low_confidence_seeds"],
         "statuses": {k: v["status"] for k, v in result["categories"].items()},
     }, sort_keys=True))
     return 0

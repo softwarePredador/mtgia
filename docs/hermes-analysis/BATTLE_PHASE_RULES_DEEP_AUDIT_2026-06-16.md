@@ -1,5 +1,10 @@
 # Battle Phase Rules Deep Audit - 2026-06-16
 
+> Status 2026-06-19: documento historico de auditoria de fases. Use como
+> contexto tecnico, nao como prova de cobertura atual. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Escopo
 
 Auditoria profunda das etapas de batalha do Hermes contra regras oficiais atuais

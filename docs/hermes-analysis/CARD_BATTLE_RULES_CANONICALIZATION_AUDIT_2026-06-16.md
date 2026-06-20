@@ -1,5 +1,10 @@
 # Card Battle Rules Canonicalization Audit - 2026-06-16
 
+> Status 2026-06-19: documento historico. Use como contexto de canonicalizacao,
+> nao como estado atual da fila/template/gates. Fonte viva:
+> [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md).
+> Indice: [BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md](BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md).
+
 ## Objetivo
 
 Validar se o runtime atual do battle/Hermes ainda depende de overrides manuais

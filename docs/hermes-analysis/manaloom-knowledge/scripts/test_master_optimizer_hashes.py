@@ -167,6 +167,142 @@ class MasterOptimizerHashTests(unittest.TestCase):
             "removal",
         )
 
+    def test_battle_gate_report_lines_expose_optimizer_guardrail(self) -> None:
+        summary = {
+            "run_dir": "/tmp/battle-audit-run",
+            "battle_replay_final_status": "review_required",
+            "battle_replay_final_status_reason": "focused_template_dispatch",
+            "mandatory_gate_divergences": ["focused_template_dispatch=review_required"],
+            "mandatory_gate_statuses": {
+                "focused_template_dispatch": {"status": "review_required"},
+                "strategy_audit": {"status": "pass"},
+            },
+            "strategy_learning_confidence_counts": {
+                "high_confidence_replay": 13,
+                "low_confidence_replay": 3,
+            },
+            "strategy_low_confidence_seeds": ["63201739", "63201740"],
+            "strategy_high_confidence_learning_seeds": ["63201734"],
+            "global_learning_eligibility_policy": "requires_high_confidence_strategy_seed_and_all_mandatory_gates_pass",
+            "global_learning_eligible_seeds": ["63201734"],
+            "global_not_learning_eligible_seeds": ["63201739", "63201740"],
+            "focused_template_dispatch_status": "review_required",
+            "focused_template_evidence_ready": 5,
+            "focused_template_evidence_not_ready_unwaived": 24,
+            "effect_coverage_residual_status": "effect_coverage_residual_accepted",
+            "effect_coverage_residual_raw_flag_total": 539,
+            "effect_coverage_residual_accepted_card_flag_rows": 293,
+            "effect_coverage_residual_unaccepted_card_flag_rows": 0,
+            "review_only_rule_names": 0,
+            "needs_review_rule_names": 1457,
+            "non_runtime_safe_rule_names": 1457,
+            "runtime_safe_rule_names": 1702,
+            "review_status_counts": {"needs_review": 1457, "verified": 1675},
+            "decision_trace_taxonomy_rows": 2221,
+            "decision_trace_kinds_total": 15,
+            "decision_trace_kinds_observed": 12,
+            "decision_trace_kinds_uncovered": 3,
+            "decision_trace_static_uncovered_types": ["worldfire_reset"],
+            "forensic_lineage_status": "complete",
+            "forensic_card_id_present": 862,
+            "forensic_card_id_missing": 527,
+            "forensic_card_id_missing_accepted": 527,
+            "forensic_card_id_missing_unaccepted": 0,
+            "forensic_semantic_hash_present": 862,
+            "forensic_semantic_hash_missing": 527,
+            "forensic_semantic_hash_missing_accepted": 527,
+            "forensic_semantic_hash_missing_unaccepted": 0,
+            "forensic_rule_logical_key_present": 1371,
+            "forensic_rule_logical_key_missing": 18,
+            "forensic_rule_logical_key_missing_accepted": 18,
+            "forensic_rule_logical_key_missing_unaccepted": 0,
+            "forensic_lineage_missing_waiver_reasons": {"accepted": 1},
+        }
+
+        markdown = "\n".join(optimizer.battle_gate_report_lines(summary))
+        cli = "\n".join(optimizer.battle_gate_cli_lines(summary))
+
+        self.assertIn("battle_replay_final_status: `review_required`", markdown)
+        self.assertIn("battle_gate_weight: `required_for_optimizer_wr_evidence`", markdown)
+        self.assertIn("focused_template_dispatch=review_required", markdown)
+        self.assertIn("strategy_low_confidence_seed_sample", markdown)
+        self.assertIn("strategy_high_confidence_learning_seed_sample", markdown)
+        self.assertIn("global_learning_eligibility_policy", markdown)
+        self.assertIn("global_learning_eligible_seed_sample", markdown)
+        self.assertIn("global_not_learning_eligible_seed_sample", markdown)
+        self.assertIn("effect_coverage_residual_raw_flag_total: `539`", markdown)
+        self.assertIn(
+            "effect_coverage_residual_scope_note: `accepted_residual_is_not_full_runtime_coverage`",
+            markdown,
+        )
+        self.assertIn("review_rule_denominators", markdown)
+        self.assertIn(
+            "review_rule_denominator_scope_note: `review_only_zero_is_not_review_backlog_zero`",
+            markdown,
+        )
+        self.assertIn("needs_review=1457", markdown)
+        self.assertIn("decision_trace_taxonomy_scope: `rows=2221 observed=12/15 uncovered=3`", markdown)
+        self.assertIn("forensic_card_id_present_missing: `862/527`", markdown)
+        self.assertIn(
+            "forensic_lineage_scope_note: `complete_means_zero_unaccepted_missing_not_full_identity_coverage`",
+            markdown,
+        )
+        self.assertIn("forensic_lineage_missing_waiver_reasons", markdown)
+        self.assertIn("battle_replay_final_status=review_required", cli)
+        self.assertIn("battle_gate_weight=required_for_optimizer_wr_evidence", cli)
+        self.assertIn(
+            "global_learning_eligibility_policy=requires_high_confidence_strategy_seed_and_all_mandatory_gates_pass",
+            cli,
+        )
+        self.assertIn("global_learning_eligible_seed_sample", cli)
+        self.assertIn("global_not_learning_eligible_seed_sample", cli)
+        self.assertIn("effect_coverage_residual_raw_flag_total=539", cli)
+        self.assertIn(
+            "effect_coverage_residual_scope_note=accepted_residual_is_not_full_runtime_coverage",
+            cli,
+        )
+        self.assertIn("review_rule_denominators=review_only:0 needs_review:1457", cli)
+        self.assertIn(
+            "review_rule_denominator_scope_note=review_only_zero_is_not_review_backlog_zero",
+            cli,
+        )
+        self.assertIn("decision_trace_taxonomy_scope=rows:2221 observed:12/15 uncovered:3", cli)
+        self.assertIn("forensic_card_id_present_missing=862/527", cli)
+        self.assertIn(
+            "forensic_lineage_scope_note=complete_means_zero_unaccepted_missing_not_full_identity_coverage",
+            cli,
+        )
+
+    def test_optimizer_operational_surfaces_publish_battle_gate(self) -> None:
+        report_scripts = [
+            "master_optimizer_apply.py",
+            "master_optimizer_baseline.py",
+            "master_optimizer_confirmation.py",
+            "master_optimizer_handoff.py",
+            "master_optimizer_loop.py",
+            "master_optimizer_post_apply_gate.py",
+            "master_optimizer_product_handoff.py",
+            "master_optimizer_quality_gate.py",
+            "master_optimizer_rollback.py",
+        ]
+        for filename in report_scripts:
+            with self.subTest(filename=filename):
+                source = (optimizer.SCRIPT_DIR / filename).read_text(encoding="utf-8")
+                self.assertIn("battle_gate_report_lines", source)
+
+        cli_scripts = [
+            "master_optimizer_loop.py",
+            "slot_optimizer.py",
+        ]
+        for filename in cli_scripts:
+            with self.subTest(filename=filename):
+                source = (optimizer.SCRIPT_DIR / filename).read_text(encoding="utf-8")
+                self.assertIn("battle_gate_cli_lines", source)
+
+        universal_source = (optimizer.SCRIPT_DIR / "universal_optimizer.py").read_text(encoding="utf-8")
+        self.assertIn("legacy_deprecated_not_authorized_for_handoff", universal_source)
+        self.assertIn("battle_gate_cli_lines", universal_source)
+
 
 if __name__ == "__main__":
     unittest.main()

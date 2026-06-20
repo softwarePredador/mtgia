@@ -153,6 +153,110 @@ def register_tests(battle, player):
         assert not any(event == "miracle_cast" for event, _ in events)
         assert any(c.get("name") == "Reforge the Soul" for c in active.hand)
 
+    def test_lorehold_miracle_does_not_cast_counter_without_stack_target():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            py = {
+                "name": "Pyroblast",
+                "cmc": 1,
+                "type_line": "Instant",
+                "effect": "counter",
+                "tag": "counter",
+            }
+            active = player("Lorehold", [py])
+            active.hand = [py]
+            active.is_human = True
+            active.battlefield = [
+                {"name": "Lorehold, the Historian", "effect": "creature", "power": 3},
+            ]
+            active.mana_pool.add_generic(2)
+            stack = battle.Stack()
+
+            cast = battle.try_lorehold_miracle_cast(
+                active,
+                [py],
+                turn=2,
+                phase="upkeep",
+                all_players=[active],
+                rng=random.Random(192),
+                stack=stack,
+                source="test_topdeck",
+                miracle_candidate=py,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert cast is False
+        assert py in active.hand
+        assert stack.empty()
+        assert not any(event == "miracle_cast" for event, _ in events)
+
+    def test_landfall_does_not_enqueue_without_real_landfall_source():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            land = {"name": "Sunbillow Verge", "effect": "land", "type_line": "Land"}
+            active.battlefield = [land]
+            stack = battle.Stack()
+
+            triggered = battle.trigger_landfall(
+                active,
+                land,
+                turn=2,
+                source_event="land_played",
+                stack=stack,
+                active_player=active,
+                all_players=[active],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert triggered is False
+        assert stack.empty()
+        assert not any(event == "trigger_put_on_stack" for event, _ in events)
+
+    def test_landfall_enqueue_with_real_landfall_source():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            source = {
+                "name": "Landfall Source",
+                "effect": "token_maker",
+                "landfall_token_maker": True,
+                "token_power": 1,
+                "token_toughness": 1,
+            }
+            land = {"name": "Sunbillow Verge", "effect": "land", "type_line": "Land"}
+            active.battlefield = [source, land]
+            stack = battle.Stack()
+
+            triggered = battle.trigger_landfall(
+                active,
+                land,
+                turn=2,
+                source_event="land_played",
+                stack=stack,
+                active_player=active,
+                all_players=[active],
+            )
+            pushed = battle.flush_triggers_in_apnap(active, [active], stack)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert triggered is True
+        assert pushed == 1
+        assert not stack.empty()
+        assert any(
+            event == "trigger_put_on_stack"
+            and data.get("card") == "Landfall Source"
+            and data.get("trigger") == "landfall"
+            and data.get("trigger_land") == "Sunbillow Verge"
+            for event, data in events
+        )
+
     def test_reforge_resolution_draws_seven_when_count_missing():
         active = player("Active")
         opponent = player("Opponent")
@@ -455,6 +559,58 @@ def register_tests(battle, player):
         assert ooze["effect"] == "creature"
         assert ooze["effect"] != "remove_permanent"
         assert ooze["is_creature_permanent"] is True
+
+    def test_snapback_return_target_creature_stays_creature_removal():
+        snapback = battle.get_card_effect(
+            {
+                "name": "Snapback",
+                "cmc": 2,
+                "type_line": "Instant",
+                "oracle_text": (
+                    "You may exile a blue card from your hand rather than pay this "
+                    "spell's mana cost. Return target creature to its owner's hand."
+                ),
+                "functional_tags_json": '["removal"]',
+            }
+        )
+        rule_selection = snapback.get("_rule_runtime_selection") or {}
+
+        assert snapback["effect"] == "remove_creature"
+        assert snapback["target"] == "creature"
+        assert rule_selection.get("selected_effect") == "remove_creature"
+
+    def test_functional_tag_gate_cards_resolve_from_manual_waivers():
+        mardu = battle.get_card_effect(
+            {
+                "name": "Mardu Devotee",
+                "type_line": "Creature — Human Scout",
+                "functional_tags_json": '["ramp"]',
+            }
+        )
+        lumberjack = battle.get_card_effect(
+            {
+                "name": "Orcish Lumberjack",
+                "type_line": "Creature — Orc",
+                "functional_tags_json": '["ramp"]',
+            }
+        )
+        mardu_fields = battle.replay_rule_fields(mardu)
+        lumberjack_fields = battle.replay_rule_fields(lumberjack)
+
+        assert mardu["effect"] == "creature"
+        assert mardu["etb_scry_count"] == 2
+        assert mardu["mana_filter_once_per_turn"] is True
+        assert mardu_fields["rule_source"] == "manual_runtime_waiver"
+        assert mardu_fields["rule_review_status"] == "verified"
+        assert mardu_fields["rule_logical_key"]
+
+        assert lumberjack["effect"] == "creature"
+        assert lumberjack["is_mana_source"] is True
+        assert lumberjack["mana_produced"] == 3
+        assert lumberjack["requires_sacrifice_forest_for_mana"] is True
+        assert lumberjack_fields["rule_source"] == "manual_runtime_waiver"
+        assert lumberjack_fields["rule_review_status"] == "verified"
+        assert lumberjack_fields["rule_logical_key"]
 
     def test_basking_broodscale_enters_as_creature_not_immediate_token_maker():
         events = []
@@ -2570,6 +2726,9 @@ def register_tests(battle, player):
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
         test_lorehold_miracle_does_not_use_second_draw_of_turn,
         test_lorehold_miracle_skips_bad_wheel_refill,
+        test_lorehold_miracle_does_not_cast_counter_without_stack_target,
+        test_landfall_does_not_enqueue_without_real_landfall_source,
+        test_landfall_enqueue_with_real_landfall_source,
         test_reforge_resolution_draws_seven_when_count_missing,
         test_boros_charm_protects_creatures_until_cleanup,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
@@ -2580,6 +2739,8 @@ def register_tests(battle, player):
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
+        test_snapback_return_target_creature_stays_creature_removal,
+        test_functional_tag_gate_cards_resolve_from_manual_waivers,
         test_basking_broodscale_enters_as_creature_not_immediate_token_maker,
         test_scavenging_ooze_enters_as_creature_not_immediate_removal,
         test_mox_diamond_discards_land_when_it_unlocks_commander,

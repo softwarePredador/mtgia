@@ -36,6 +36,49 @@ def test_strategy_auditor_flags_bad_mulligan_keep():
     assert result["summary"]["verdict"] == "blocked"
 
 
+def test_strategy_auditor_flags_forced_keep_after_mana_screw_cap():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "decision-000004",
+                "decision_type": "mulligan_decision",
+                "chosen_option": {
+                    "action": "keep",
+                    "forced_keep": True,
+                    "score": -7.0,
+                },
+                "score_components": {
+                    "lands": 1,
+                    "keep": False,
+                },
+                "strategic_principle": "opening_hand_must_have_mana_and_early_plan",
+                "heuristic_version": "test",
+                "resource_delta": {"mulligans_taken": 3, "cards_in_hand": 4},
+                "risk_flags": [
+                    "mana_screw",
+                    "forced_keep_after_mulligan_cap",
+                ],
+                "alternatives_considered": [{"name": "Expensive Spell", "cmc": 8}],
+                "reason": "too_few_lands",
+            }
+        ],
+    )
+
+    findings = result["findings"]
+    codes = {finding["code"] for finding in findings}
+
+    assert "forced_keep_after_bad_mulligan" in codes
+    assert result["summary"]["code_counts"]["forced_keep_after_bad_mulligan"] == 1
+    assert result["summary"]["verdict"] == "low_confidence_replay"
+    assert result["summary"]["learning_confidence"] == "low_confidence_replay"
+    assert result["summary"]["high_confidence_learning_eligible"] is False
+    assert result["summary"]["high_confidence_learning_weight"] == 0.0
+    assert result["summary"]["review_required_findings"] == 0
+    assert result["summary"]["low_confidence_learning_findings"] == 1
+    assert result["summary"]["low_confidence_learning_codes"] == ["forced_keep_after_bad_mulligan"]
+
+
 def test_strategy_auditor_flags_one_shot_mana_without_unlock_signal():
     result = auditor.audit_strategy(
         events=[],
@@ -414,17 +457,164 @@ def test_strategy_auditor_flags_worldfire_without_known_follow_up():
     assert "worldfire_without_known_win_line" in codes
 
 
+def test_global_learning_eligibility_blocks_high_strategy_seed_when_other_gates_review_required():
+    result = auditor.compute_global_learning_eligibility(
+        [
+            {
+                "seed": "63202364",
+                "strategy_confidence": "high_confidence_replay",
+                "action_findings": 1,
+                "decision_decision_findings": 1,
+                "forensic_rule_findings": 1,
+                "forensic_high_or_critical": True,
+            }
+        ],
+        final_status="review_required",
+        mandatory_gate_divergences=[
+            "action_critic=review_required",
+            "forensic_audit=blocked",
+        ],
+    )
+
+    reasons = result["global_learning_eligibility_reasons"]["63202364"]
+    assert result["global_learning_eligible_seeds"] == []
+    assert result["global_not_learning_eligible_seeds"] == ["63202364"]
+    assert "action_critic_findings=1" in reasons
+    assert "replay_decision_findings=1" in reasons
+    assert "forensic_rule_findings=1" in reasons
+    assert "forensic_audit_high_or_critical" in reasons
+    assert "final_status:review_required" in reasons
+    assert "mandatory_gate:forensic_audit=blocked" in reasons
+
+
+def test_global_learning_eligibility_allows_clean_high_seed_and_excludes_low_confidence_seed():
+    result = auditor.compute_global_learning_eligibility(
+        [
+            {
+                "seed": "63202355",
+                "strategy_confidence": "high_confidence_replay",
+            },
+            {
+                "seed": "63202357",
+                "strategy_confidence": "low_confidence_replay",
+            },
+        ],
+        final_status="trusted_for_strategy_learning",
+        mandatory_gate_divergences=[],
+    )
+
+    assert result["global_learning_eligible_seeds"] == ["63202355"]
+    assert result["global_not_learning_eligible_seeds"] == ["63202357"]
+    assert result["global_learning_eligibility_reasons"]["63202355"] == []
+    assert result["global_learning_eligibility_reasons"]["63202357"] == [
+        "strategy_audit:low_confidence_replay"
+    ]
+    assert (
+        result["global_learning_eligibility_policy"]
+        == "requires_high_confidence_strategy_seed_and_all_mandatory_gates_pass"
+    )
+
+
+def test_summarize_learned_opponent_provenance_groups_sources_and_seeds():
+    result = auditor.summarize_learned_opponent_provenance(
+        [
+            {
+                "seed": "63210007",
+                "source_kind": "learned_decks",
+                "source_system": "pg_meta_decks",
+                "source_ref": "learned_deck:58",
+                "source_url": "pg:meta_decks:eceb0abb-e46d-4b79-9f82-c8f426f3e91b",
+                "name": "Thrasios, Triton Hero #58 (real)",
+                "commander": "Thrasios, Triton Hero",
+                "deck_name": "Thrasios, Triton Hero + Vial Smasher the Fierce",
+                "source_card_count": 100,
+                "battle_card_count": 99,
+                "cached_metadata_used_for_metrics": False,
+                "metrics_basis": "runtime_derived_from_resolved_built_deck",
+                "blocker_domain": "none",
+            },
+            {
+                "seed": "63210008",
+                "source_kind": "learned_decks",
+                "source_system": "pg_meta_decks",
+                "source_ref": "learned_deck:58",
+                "source_url": "pg:meta_decks:eceb0abb-e46d-4b79-9f82-c8f426f3e91b",
+                "name": "Thrasios, Triton Hero #58 (real)",
+                "commander": "Thrasios, Triton Hero",
+                "deck_name": "Thrasios, Triton Hero + Vial Smasher the Fierce",
+                "source_card_count": 100,
+                "battle_card_count": 99,
+                "cached_metadata_used_for_metrics": False,
+                "metrics_basis": "runtime_derived_from_resolved_built_deck",
+                "blocker_domain": "none",
+            },
+        ]
+    )
+
+    assert result["learned_opponent_source_counts"] == {"pg_meta_decks": 2}
+    assert result["opponent_deck_provenance"]["learned_opponent_unique_count"] == 1
+    assert result["opponent_deck_provenance"]["learned_opponent_appearance_count"] == 2
+    assert result["opponent_deck_provenance"]["status"] == "learned_opponent_provenance_present_with_shape_waiver"
+    opponent = result["learned_deck_opponents"][0]
+    assert opponent["source_row_id"] == 58
+    assert opponent["source_url"] == "pg:meta_decks:eceb0abb-e46d-4b79-9f82-c8f426f3e91b"
+    assert opponent["source_url_status"] == "present"
+    assert opponent["commander"] == "Thrasios, Triton Hero"
+    assert opponent["deck_name"] == "Thrasios, Triton Hero + Vial Smasher the Fierce"
+    assert opponent["appearances"] == 2
+    assert opponent["seeds"] == ["63210007", "63210008"]
+    assert opponent["source_card_count"] == 100
+    assert opponent["battle_card_count"] == 99
+    assert opponent["cached_metadata_used_for_metrics"] is False
+    assert opponent["construction_status"] == "waived_not_emitted_by_replay_deck_provenance"
+    assert opponent["deck_coherence_status"] == "waived_not_emitted_by_replay_deck_provenance"
+    assert "waiver_reason" in opponent
+    assert result["opponent_deck_provenance"]["source_url_missing_count"] == 0
+
+
+def test_summarize_learned_opponent_provenance_marks_present_reports():
+    result = auditor.summarize_learned_opponent_provenance(
+        [
+            {
+                "seed": "63210009",
+                "source_kind": "learned_decks",
+                "source_system": "pg_meta_decks",
+                "source_ref": "learned_deck:25",
+                "source_url": "pg:meta_decks:94ae22cd-7c7f-412c-b15f-2892c0b9d21d",
+                "name": "Tayam, Luminous Enigma #25 (real)",
+                "source_card_count": 100,
+                "battle_card_count": 99,
+                "cached_metadata_used_for_metrics": False,
+                "metrics_basis": "runtime_derived_from_resolved_built_deck",
+                "blocker_domain": "none",
+                "construction_report": {"is_valid": True},
+                "deck_coherence_report": {"status": "pass"},
+            }
+        ]
+    )
+
+    assert result["opponent_deck_provenance"]["status"] == "learned_opponent_provenance_present"
+    opponent = result["learned_deck_opponents"][0]
+    assert opponent["construction_report_present"] is True
+    assert opponent["deck_coherence_report_present"] is True
+    assert opponent["construction_status"] == "present"
+    assert opponent["deck_coherence_status"] == "present"
+    assert "waiver_reason" not in opponent
+
+
 def test_strategy_auditor_renders_markdown():
     result = auditor.audit_strategy(events=[], decisions=[])
     markdown = auditor.render_markdown(result)
 
     assert "# Battle Decision Strategy Auditor" in markdown
     assert "usable_for_strategy_learning" in markdown
+    assert "Learning confidence" in markdown
 
 
 if __name__ == "__main__":
     tests = [
         test_strategy_auditor_flags_bad_mulligan_keep,
+        test_strategy_auditor_flags_forced_keep_after_mana_screw_cap,
         test_strategy_auditor_flags_one_shot_mana_without_unlock_signal,
         test_strategy_auditor_accepts_one_shot_mana_with_unlock_context,
         test_strategy_auditor_flags_land_cost_without_selection_context,
@@ -437,6 +627,10 @@ if __name__ == "__main__":
         test_strategy_auditor_accepts_contextual_pass_no_action,
         test_strategy_auditor_accepts_multiplayer_wheel_with_payoff,
         test_strategy_auditor_flags_worldfire_without_known_follow_up,
+        test_global_learning_eligibility_blocks_high_strategy_seed_when_other_gates_review_required,
+        test_global_learning_eligibility_allows_clean_high_seed_and_excludes_low_confidence_seed,
+        test_summarize_learned_opponent_provenance_groups_sources_and_seeds,
+        test_summarize_learned_opponent_provenance_marks_present_reports,
         test_strategy_auditor_renders_markdown,
     ]
     for test in tests:

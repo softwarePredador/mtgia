@@ -8,6 +8,7 @@ import json
 
 from master_optimizer_common import (
     assert_current_deck_matches_baseline,
+    battle_gate_report_lines,
     candidate_rows,
     connect,
     ensure_optimizer_tables,
@@ -63,9 +64,12 @@ def main() -> int:
         f"- baseline_wr: {float(baseline['wr']):.1f}%",
         f"- candidates_reviewed: {len(reviews)}",
         "",
+    ]
+    lines.extend(battle_gate_report_lines())
+    lines.extend([
         "| Status | Category | Add | Cut | Scan WR | Reasons | Warnings |",
         "| --- | --- | --- | --- | ---: | --- | --- |",
-    ]
+    ])
     for row, review in reviews:
         lines.append(
             "| {status} | {category} | {add} | {cut} | {wr:.1f}% | {reasons} | {warnings} |".format(

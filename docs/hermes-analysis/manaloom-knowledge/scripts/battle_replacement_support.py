@@ -23,8 +23,12 @@ class ReplacementEvent:
         self.card = card
         self.amount = amount
         self.delta = delta
+        self.original_amount = amount
+        self.original_delta = delta
         self.from_zone = from_zone
         self.to_zone = to_zone
+        self.original_from_zone = from_zone
+        self.original_to_zone = to_zone
         self.source = source
         self.reason = reason
         self.prevented = False
@@ -38,7 +42,85 @@ class ReplacementEvent:
         self.delta = 0
         self.replacements.append(replacement)
 
+    @staticmethod
+    def _source_field(source, *keys):
+        if not isinstance(source, dict):
+            return None
+        for key in keys:
+            value = source.get(key)
+            if value not in (None, ""):
+                return value
+        return None
+
+    @staticmethod
+    def _source_name(source):
+        if isinstance(source, dict):
+            return (
+                source.get("name")
+                or source.get("card_name")
+                or source.get("oracle_id")
+                or source.get("id")
+            )
+        return source
+
+    def _replacement_rule_source(self, replacement):
+        name = str(replacement).split(":", 1)[0]
+        player = self.affected_player
+        if name == "life_total_cant_change":
+            return (
+                self._source_name(getattr(player, "life_cant_change_source", None))
+                or "life_total_cant_change"
+            )
+        if name == "protection_from_everything":
+            return (
+                self._source_name(getattr(player, "protection_from_everything_source", None))
+                or "protection_from_everything"
+            )
+        if name == "damage_life_floor":
+            return "damage_life_floor"
+        if name == "damage_prevention_shield":
+            parts = str(replacement).split(":")
+            return parts[1] if len(parts) > 1 and parts[1] else "damage_prevention_shield"
+        if name == "commander_to_command_zone":
+            return "commander_replacement_rule"
+        return name
+
+    def _inferred_reason(self):
+        if self.reason:
+            return self.reason
+        if not self.replacements:
+            return None
+        replacement = str(self.replacements[0]).split(":", 1)[0]
+        if self.event_type == "zone_change" and replacement == "commander_to_command_zone":
+            return "commander_zone_replacement"
+        if self.prevented:
+            return f"prevention:{replacement}"
+        return f"replacement:{replacement}"
+
     def to_replay_fields(self):
+        replacement_sources = [
+            self._replacement_rule_source(replacement)
+            for replacement in self.replacements
+        ]
+        source_name = self._source_name(self.source) or (replacement_sources[0] if replacement_sources else None)
+        reason = self._inferred_reason()
+        causal_event = {
+            "event_type": self.event_type,
+            "reason": reason,
+            "source": source_name,
+            "from_zone": self.from_zone,
+            "to_zone": self.to_zone,
+            "original_from_zone": self.original_from_zone,
+            "original_to_zone": self.original_to_zone,
+            "final_from_zone": self.from_zone,
+            "final_to_zone": self.to_zone,
+            "original_amount": self.original_amount,
+            "final_amount": self.amount,
+            "original_delta": self.original_delta,
+            "final_delta": self.delta,
+            "replacements": list(self.replacements),
+            "replacement_rule_sources": list(replacement_sources),
+        }
         return {
             "replacement_pipeline": "replacement_prevention_minimal",
             "event_type": self.event_type,
@@ -46,13 +128,29 @@ class ReplacementEvent:
             "card": self.card.get("name", "?") if isinstance(self.card, dict) else self.card,
             "amount": self.amount,
             "delta": self.delta,
+            "original_amount": self.original_amount,
+            "final_amount": self.amount,
+            "original_delta": self.original_delta,
+            "final_delta": self.delta,
+            "original_from_zone": self.original_from_zone,
+            "original_to_zone": self.original_to_zone,
+            "final_from_zone": self.from_zone,
+            "final_to_zone": self.to_zone,
             "from_zone": self.from_zone,
             "to_zone": self.to_zone,
-            "source": self.source,
-            "reason": self.reason,
+            "source": source_name,
+            "source_card_id": self._source_field(self.source, "card_id", "id"),
+            "source_controller": self._source_field(self.source, "controller", "owner"),
+            "source_effect": self._source_field(self.source, "effect"),
+            "source_type_line": self._source_field(self.source, "type_line"),
+            "source_semantic_hash": self._source_field(self.source, "semantic_hash"),
+            "reason": reason,
+            "causal_event": causal_event,
             "prevented": self.prevented,
             "replacements": list(self.replacements),
             "replacement_order": list(self.replacement_order),
+            "replacement_rule_source": replacement_sources[0] if replacement_sources else None,
+            "replacement_rule_sources": list(replacement_sources),
         }
 
 
