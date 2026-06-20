@@ -281,26 +281,29 @@ policy/dados versionados, nao mantidos como texto solto.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-19 07:00 UTC no checkout local `895fb545`. A claim ampla de
-  `sync_cards_utils.dart` test-only ficou stale: o CLI operacional importa o
-  utilitario e chama `parseSinceDays`, `getNewSetCodesSinceFromData` e
-  `extractSetCardSyncRow`; restam P3 test-only `extractCardRow`,
-  `extractSetCardRow`, `extractOracleIds` e `extractLegalities`.
-  `MLKnowledgeService.recordFeedback` e `hasSuspiciousNonLandCmc` tambem sairam
-  da lista por terem chamador runtime. Permanecem sem chamador confirmado
-  `verifySwapIntegrity`, `buildOptimizeResponse`, o top-level
-  `respondWithOptimizeTelemetry`, `getRequestTrace`,
-  `ApiClient.loadTokenFromDisk`, `BinderProvider.applyFilters`,
-  `CommunityProvider.clearFilters`, `DeckProvider.clearAllCache`, APIs manuais
-  de `PerformanceService`, `EndpointCache.clearExpired`, conveniencias EDHREC,
-  read-side de `AiLogService`, alguns metodos de `ArchetypeCountersService`,
+  2026-06-20 07:00 UTC no checkout local `6244d33b`. Nao surgiu novo achado no
+  delta app recente. A claim ampla de `sync_cards_utils.dart` test-only segue
+  stale: o CLI operacional importa o utilitario e chama `parseSinceDays`,
+  `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`; restam P3 test-only
+  `extractCardRow`, `extractSetCardRow`, `extractOracleIds` e
+  `extractLegalities`. `swap_integrity` agora tem validacao app e bloqueio de
+  deck stale antes do apply por IDs; o achado vivo e mais estreito:
+  `server/lib/ai/optimize_swap_integrity.dart` ainda exporta
+  `verifySwapIntegrity` sem chamador backend. Permanecem sem chamador confirmado
+  `buildOptimizeResponse`, o top-level `respondWithOptimizeTelemetry`,
+  `getRequestTrace`, `ApiClient.loadTokenFromDisk`,
+  `BinderProvider.applyFilters`, `CommunityProvider.clearFilters`,
+  `DeckProvider.clearAllCache`, APIs manuais de `PerformanceService`,
+  `EndpointCache.clearExpired`, conveniencias EDHREC, read-side de
+  `AiLogService`, alguns metodos de `ArchetypeCountersService`,
   `PushNotificationService.sendToMultipleTokens`,
   `buildLoreholdReferenceCardStatsFromProfile`,
   `summarizeAggressiveOptimizeUtilitySamples`, `normalize_commander` na copia
   Hermes docs e helpers script-level `classify_loss_v2` /
   `compute_loss_tags_from_replays`. Funcoes historicas
+  `MLKnowledgeService.recordFeedback`, `hasSuspiciousNonLandCmc`,
   `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
-  e `buildCandidateQualitySamplePoolSql` nao existem mais no checkout vivo.
+  e `buildCandidateQualitySamplePoolSql` nao devem ser reabertas sem novo delta.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado em
   2026-06-19 15:00 UTC no checkout `f80b2da2`. `deck_matchups` e
   `deck_weakness_reports` têm leitura runtime nas próprias rotas de

@@ -9,7 +9,7 @@
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-19 07:00 UTC no checkout `895fb545` encontrou delta amplo desde `88fa4a1e`: fechou como stale o achado P1 amplo de `sync_cards_utils.dart` test-only e confirmou `MLKnowledgeService.recordFeedback`/`hasSuspiciousNonLandCmc` como vivos, mas manteve abertos `verifySwapIntegrity`, a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada e helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
 
 A revalidacao de coerencia app/server de 2026-06-18 23:00 UTC no checkout
 `523589bc` fechou os tres gaps estreitos da rodada anterior:
@@ -134,23 +134,28 @@ o SCC app entre `life_counter_tabletop_engine.dart` e
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-19 07:00 UTC no checkout `895fb545`. `sync_cards_utils.dart` deixou
-    de ser achado P1 amplo porque `server/bin/sync_cards.dart` importa o
+    2026-06-20 07:00 UTC no checkout `6244d33b`. O delta app recente nao gerou
+    novo achado; os helpers do fluxo de optimize agora possuem chamadas runtime
+    em `deck_details_screen.dart` ou no proprio fluxo. `sync_cards_utils.dart`
+    segue fora do achado P1 amplo porque `server/bin/sync_cards.dart` importa o
     utilitario e chama `parseSinceDays`, `getNewSetCodesSinceFromData` e
     `extractSetCardSyncRow`; restam apenas helpers legados/test-only no mesmo
     arquivo (`extractCardRow`, `extractSetCardRow`, `extractOracleIds`,
-    `extractLegalities`). `MLKnowledgeService.recordFeedback` e
-    `hasSuspiciousNonLandCmc` sairam da lista por terem chamador runtime.
-    Permanecem abertos `verifySwapIntegrity`, `buildOptimizeResponse` e o
-    top-level `respondWithOptimizeTelemetry` extraidos mas nao ligados ao fluxo,
-    wrappers/conveniencias em request trace, app providers, token boot,
-    performance manual, `EndpointCache.clearExpired`, EDHREC/log/counter/push
-    auxiliares, `buildLoreholdReferenceCardStatsFromProfile`,
+    `extractLegalities`). `swap_integrity` agora tem validacao app e bloqueio de
+    deck stale antes do apply por IDs; o residual e o helper backend
+    `verifySwapIntegrity` exportado sem chamador. Permanecem abertos
+    `buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry`
+    extraidos mas nao ligados ao fluxo, wrappers/conveniencias em request trace,
+    app providers, token boot, performance manual, `EndpointCache.clearExpired`,
+    EDHREC/log/counter/push auxiliares,
+    `buildLoreholdReferenceCardStatsFromProfile`,
     `summarizeAggressiveOptimizeUtilitySamples`, `normalize_commander` na copia
     Hermes docs e dois helpers script-level (`classify_loss_v2`,
     `compute_loss_tags_from_replays`). Funcoes historicas
+    `MLKnowledgeService.recordFeedback`, `hasSuspiciousNonLandCmc`,
     `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
-    e `buildCandidateQualitySamplePoolSql` nao existem mais no checkout vivo.
+    e `buildCandidateQualitySamplePoolSql` nao devem ser reabertas sem novo
+    delta.
 13. **P1/P2 — Imports quebrados e dependencias circulares**: revalidado em
     2026-06-19 11:00 UTC no checkout `8ddc978a`. O auditor base reportou
     `Imports quebrados: 0`; o scanner ampliado encontrou `0` diretivas Dart
@@ -637,14 +642,16 @@ focado nao encontrou SCC com esses dois arquivos.
     abrir perfil a partir de deck publico e abrir deck publico a partir do
     perfil.
 
-### P1/P2 — Quebrar ciclo entre engines do life counter
+### P1/P2 — Remover ou reconectar funcoes publicas sem chamador runtime
 
-**Status 2026-06-11:** **PARCIAL.** O item de maior risco operacional desta
-seção foi resolvido: `sync_cards_utils.dart` agora é importado por
+**Status 2026-06-20 07:00 UTC:** **PARCIAL.** O item de maior risco operacional
+desta seção segue resolvido: `sync_cards_utils.dart` é importado por
 `server/bin/sync_cards.dart`, e o CLI usa os helpers compartilhados para
 parsing de `--since-days`, seleção incremental de sets e extração completa de
-cards de Set.json. As anotações históricas de 2026-06-07 continuam válidas
-apenas para os demais helpers abaixo.
+cards de Set.json. A revalidacao atual tambem ajustou `verifySwapIntegrity`:
+o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas
+o helper backend exportado continua sem chamador. As anotações históricas de
+2026-06-07 continuam válidas apenas para os demais helpers abaixo.
 
 - **Evidência**:
   - ✅ Resolvido 2026-06-11: `server/bin/sync_cards.dart` importa
@@ -655,6 +662,12 @@ apenas para os demais helpers abaixo.
     `extractSetCardRow` foi preservado como projeção compatível de 12 colunas,
     enquanto `extractSetCardSyncRow` expõe a linha operacional de 15 colunas
     com `power`, `toughness` e `keywords`.
+  - Ajustado 2026-06-20: `server/lib/ai/optimize_swap_integrity.dart:112`
+    define `verifySwapIntegrity`, mas `rg` em `server` e `app` encontra apenas
+    a definicao. O app agora tem verificacao equivalente:
+    `deck_optimize_flow_support.dart:486` define `validateOptimizeSwapIntegrity`,
+    `:645` a chama antes do preview e `deck_provider.dart:918`-`:931` rejeita
+    `expectedDeckSignature` stale antes do apply por IDs.
   - `server/lib/request_trace.dart:48` e `:51` definem
     `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
     `context.read<RequestTrace>()` diretamente, por exemplo
@@ -664,7 +677,7 @@ apenas para os demais helpers abaixo.
   - `server/lib/ai/commander_reference_card_stats_support.dart:252` define
     `buildLoreholdReferenceCardStatsFromProfile`, mas a busca encontrou apenas
     teste e definicao; o builder generico e usado no mesmo arquivo em `:363`.
-  - `server/lib/ai/optimize_runtime_support.dart:1671` define
+  - `server/lib/ai/optimize_payload_support.dart:369` define
     `summarizeAggressiveOptimizeUtilitySamples`; a busca encontrou apenas teste
     e definicao.
   - `app/lib/core/api/api_client.dart:140` define
@@ -684,7 +697,7 @@ apenas para os demais helpers abaixo.
     `buildLoreholdReferenceCardStatsFromProfile`, chamado apenas por teste e
     pela propria delegacao para `buildCommanderReferenceCardStatsFromProfile`;
     o builder generico segue vivo no mesmo arquivo em `:363`.
-    `server/lib/ai/optimize_runtime_support.dart:1671` define
+    `server/lib/ai/optimize_payload_support.dart:369` define
     `summarizeAggressiveOptimizeUtilitySamples`, com chamada encontrada apenas
     em `server/test/optimize_runtime_support_test.dart:215`.
   - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
