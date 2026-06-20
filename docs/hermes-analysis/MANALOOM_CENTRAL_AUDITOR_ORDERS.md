@@ -655,8 +655,11 @@ Current evidence:
 Current conclusion:
 
 - The earlier Batch 0/1 readiness entries are historical checkpoint evidence.
-  The current working tree is clean and aligned with the publication branch
-  upstream.
+  At this 13:28 checkpoint, the working tree was clean and aligned with the
+  publication branch upstream.
+- This checkpoint was superseded by the `Master Migration Closure -
+  2026-06-20 13:31 -0300` section below, which records the later
+  fast-forward/push of `master`.
 - No new PostgreSQL apply is ready from the current Lorehold/deck register
   state.
 - PG-001, PG-002, PG-006, PG-007, and PG-008 remain closed unless future
@@ -692,3 +695,44 @@ Current conclusion:
 - The local worktree is clean except for intentionally ignored SQLite backup
   files under `docs/hermes-analysis/manaloom-knowledge/backups/`.
 - No current PostgreSQL apply is ready after this migration.
+
+## Heartbeat Documentation Reconciliation - 2026-06-20 13:33 -0300
+
+Scope:
+
+- Rechecked the post-migration state during the Lorehold monitor heartbeat and
+  documented the 13:28 publication-branch checkpoint as historical/superseded
+  by the 13:31 `master` migration closure.
+- No PostgreSQL write, deck swap, cleanup, stash, revert, stage, commit, push,
+  app/backend code edit, live app route call, or OpenAI call was performed by
+  this heartbeat.
+
+Evidence:
+
+- `git status --short --branch` now reports `## master...origin/master` plus
+  five modified documentation files from this reconciliation:
+  `LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`,
+  `MANALOOM_BATCH_0_1_READINESS_2026-06-20.md`,
+  `MANALOOM_CENTRAL_AUDITOR_ORDERS.md`,
+  `MANALOOM_PUBLICATION_BATCH_PLAN_2026-06-20.md`, and
+  `POSTGRES_DEPLOY_REGISTER_2026-06-20.md`.
+- `git rev-list --left-right --count HEAD...origin/master`: `0 0`.
+- `HEAD`: `ca93902621728baefd0715f11fecccd0bfd62f03`
+  (`feat: refine deck app flows`).
+- Public `/health` recheck reports `status=healthy`,
+  `environment=production`, and
+  `git_sha=ca93902621728baefd0715f11fecccd0bfd62f03`.
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`.
+- Latest battle summary remains
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, complete forensic lineage, and tests `16/16`.
+
+Current conclusion:
+
+- The only active local delta from this heartbeat is documentation evidence.
+- PG-001, PG-002, PG-006, PG-007, and PG-008 remain closed.
+- PG-003 remains policy-blocked and PG-005 remains no-apply-needed.
+- No current PostgreSQL apply is ready.

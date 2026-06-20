@@ -242,7 +242,8 @@ Execution boundary:
 ## Publication Branch Observation - 2026-06-20 13:28 -0300
 
 The Batch 0/1 readiness section above is historical checkpoint evidence from
-before staging/publication. The current workspace observation is:
+before staging/publication. At the 13:28 heartbeat, before the later `master`
+migration closure, the workspace observation was:
 
 - branch: `codex/manaloom-batches-20260620`
 - upstream alignment: `git rev-list --left-right --count HEAD...@{upstream}`
@@ -256,4 +257,6 @@ before staging/publication. The current workspace observation is:
 
 This heartbeat only reconciled and documented the observed state. It did not
 stage, commit, push, apply PostgreSQL, apply a deck swap, clean files, stash, or
-revert anything.
+revert anything. This 13:28 observation is superseded by the later central
+register evidence that `master` was fast-forwarded to `ca939026` and production
+health reported that SHA.

@@ -177,8 +177,8 @@ this batch and must be handled by later backend/app batches.
 
 ## Post-Readiness Observation - 2026-06-20 13:28 -0300
 
-This readiness manifest is now historical checkpoint evidence. Current Git
-state observed by the heartbeat:
+This readiness manifest is now historical checkpoint evidence. Git state
+observed at the 13:28 heartbeat before the later `master` migration closure:
 
 - `git status --short --branch`:
   `## codex/manaloom-batches-20260620...origin/codex/manaloom-batches-20260620`
@@ -188,4 +188,6 @@ state observed by the heartbeat:
   `9ffe002b`, `7310111f`, `764a3255`, and `ca939026`
 
 The heartbeat that wrote this note did not stage, commit, push, clean files,
-revert, stash, apply PostgreSQL, or apply a deck swap.
+revert, stash, apply PostgreSQL, or apply a deck swap. This 13:28 observation
+was later superseded by the central/deploy-register evidence that `master` was
+fast-forwarded to `ca939026`.
