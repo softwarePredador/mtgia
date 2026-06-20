@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 11:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 15:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -307,16 +307,18 @@ policy/dados versionados, nao mantidos como texto solto.
   `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
   e `buildCandidateQualitySamplePoolSql` nao devem ser reabertas sem novo delta.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado em
-  2026-06-19 15:00 UTC no checkout `f80b2da2`. `deck_matchups` e
+  2026-06-20 15:00 UTC no checkout `956f630e`. Nao houve delta de produto desde
+  a rodada focada `ced006f2`; so docs de Hermes mudaram. `deck_matchups` e
   `deck_weakness_reports` têm leitura runtime nas próprias rotas de
-  matchup/weakness-analysis; o risco atual é produto/retroalimentação baixa,
-  não ausência total de consumidor. `ml_prompt_feedback` tem writer runtime em
-  `/ai/optimize`, schema em `database_setup.sql`/`verify_schema.dart` e contador
-  operacional em `/ai/ml-status`; o risco restante é consumir esse histórico
-  para seleção/score de prompt, não coletá-lo. `commander_reference_decks` e
-  `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN` direto
-  confirmado, enquanto o produto le o agregado `commander_reference_deck_analysis`.
-  `deck_learning_events`, `commander_card_usage`, `commander_card_synergy` e
+  matchup/weakness-analysis e agora tambem estao descritas no manual como
+  historico/cache operacional. `ml_prompt_feedback` tem writer runtime em
+  `/ai/optimize`, schema em `database_setup.sql`/`verify_schema.dart`, contador
+  em `/ai/ml-status` e policy documental de historico/retencao; o risco restante
+  é consumir esse payload para seleção/score de prompt. `commander_reference_decks`
+  e `commander_reference_deck_cards` persistem raw corpus sem `SELECT/JOIN`
+  direto confirmado, enquanto o produto le o agregado
+  `commander_reference_deck_analysis`. `deck_learning_events`,
+  `commander_card_usage`, `commander_card_synergy` e
   `commander_learning_snapshot` possuem leitores/escritores ou consumidores
   operacionais confirmados e nao entraram como achados.
 - Plano documentado em `docs/hermes-analysis/PLANO_CORRECAO.md`.

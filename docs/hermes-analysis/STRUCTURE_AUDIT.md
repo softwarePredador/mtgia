@@ -36,9 +36,181 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-20 11:00 UTC
-> Rotacao: `broken-imports-and-circular-dependencies`
+> Atualizacao local Codex: 2026-06-20 15:00 UTC
+> Rotacao: `postgresql-tables-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-20 15:00 UTC
+
+Escopo desta rodada: somente tabelas PostgreSQL persistidas sem uso, write-only
+ou parcialmente consumidas. Nao foi feita auditoria ampla de classes sem uso,
+funcoes sem chamador, imports/ciclos, duplicacao ou coerencia app/server fora do
+necessario para validar ou falsificar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `956f630e`.
+- Delta desde a ultima rodada focada neste tema (`ced006f2..HEAD`): somente
+  docs de Hermes (`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`,
+  `TECHNICAL_MAP.md`). Nao houve delta de produto em `server/database_setup.sql`,
+  `server/bin`, `server/lib`, `server/routes` ou `app/lib`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, trechos relevantes de
+`server/manual-de-instrucao.md` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+A skill local `manaloom-data-semantic-layer` tambem foi carregada; a regra
+relevante aqui e tratar PostgreSQL/backend como fonte de verdade de produto e
+Hermes como laboratorio/auditor/cache.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib`, `server/bin`, `server/database_setup.sql` nem scripts Python.
+- O script e textual/regex; ele nao compila o projeto nem diferencia tabelas
+  PostgreSQL de caches SQLite em scripts Python.
+- A execucao ainda reescreve `STRUCTURE_AUDIT.md` com inventario gerado quando
+  encontra marcadores historicos. Essa mutacao mecanica foi revertida; os
+  numeros acima foram preservados aqui como evidencia da execucao, e a
+  classificacao abaixo veio de triagem manual focada.
+
+### Metodo manual focado
+
+- Reexecutei as buscas DDL/SQL do foco anterior em `server/database_setup.sql`,
+  `server/bin`, `server/lib`, `server/routes` e `app/lib`.
+- Comandos de validacao usados:
+  - `rg -n "\b(deck_matchups|deck_weakness_reports|ml_prompt_feedback|commander_reference_decks|commander_reference_deck_cards|commander_reference_deck_analysis|commander_learning_snapshot|deck_learning_events|commander_card_usage|commander_card_synergy)\b" server/database_setup.sql server/bin server/lib server/routes app/lib --glob '*.dart' --glob '*.sql' --glob '*.py' --glob '*.sh'`
+  - `rg -n "\b(FROM|JOIN)\s+(deck_matchups|deck_weakness_reports|ml_prompt_feedback|commander_reference_decks|commander_reference_deck_cards|commander_reference_deck_analysis|commander_learning_snapshot|deck_learning_events|commander_card_usage|commander_card_synergy)\b" server/database_setup.sql server/bin server/lib server/routes app/lib --glob '*.dart' --glob '*.sql' --glob '*.py' --glob '*.sh'`
+  - `rg -n "\b(INSERT\s+INTO|INSERT\s+OR\s+REPLACE\s+INTO|UPDATE|DELETE\s+FROM)\s+(deck_matchups|deck_weakness_reports|ml_prompt_feedback|commander_reference_decks|commander_reference_deck_cards|commander_reference_deck_analysis|commander_learning_snapshot|deck_learning_events|commander_card_usage|commander_card_synergy)\b" server/database_setup.sql server/bin server/lib server/routes app/lib --glob '*.dart' --glob '*.sql' --glob '*.py' --glob '*.sh'`
+- Controle documental: `server/manual-de-instrucao.md:18326`-`:18331`
+  classifica `deck_matchups`, `deck_weakness_reports` e `ml_prompt_feedback`
+  como historico/cache operacional, com retencao recomendada em `:18333`.
+- Controle de contrato: `server/doc/API_CONTRACTS_AND_DATA_MAP.md:286`-`:288`
+  documenta `deck_matchups`, `deck_weakness_reports` e `ml_prompt_feedback`
+  como fontes internas/experimentais, e `:313` lista os metadados AI como
+  tabelas/views internas.
+
+### Achados revalidados
+
+#### P3 - `commander_reference_decks` e `commander_reference_deck_cards` seguem raw corpus sem leitor direto
+
+- **Tabelas:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **Definicao:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1166`
+  cria `commander_reference_decks`; `:1189` cria
+  `commander_reference_deck_cards`; `:1204` cria o agregado consumido
+  `commander_reference_deck_analysis`.
+- **Escrita confirmada:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1234`
+  faz `INSERT INTO commander_reference_decks`; `:1318` apaga cards antigos por
+  `source_deck_key`; `:1334` faz `INSERT INTO commander_reference_deck_cards`;
+  `:1383` faz `INSERT INTO commander_reference_deck_analysis`.
+- **Leitura/consumo encontrado:** o produto le o agregado em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:378`
+  (`FROM commander_reference_deck_analysis`). A busca focada por
+  `FROM/JOIN commander_reference_decks` e
+  `FROM/JOIN commander_reference_deck_cards` em `server`, `app` e scripts
+  operacionais nao encontrou leitor direto; a unica ocorrencia `FROM
+  commander_reference_deck_cards` continua sendo o `DELETE FROM` de reingestao.
+- **Por que parece parcialmente nao usada:** as tabelas raw guardam lineage e
+  detalhe do corpus, mas os consumidores runtime usam apenas o resumo agregado.
+  Como staging/auditoria isso pode ser aceitavel, mas precisa permanecer com
+  retencao/reprocessamento ou leitor diagnostico claro.
+- **O que valida:** documentar essas tabelas como lineage bruto com retencao e
+  job de reprocessamento, ou criar leitor real de auditoria/diagnostico com
+  teste.
+- **O que falsifica:** aparecer um `SELECT ... FROM commander_reference_decks`
+  ou `SELECT/JOIN ... commander_reference_deck_cards` em rota, lib ou job
+  operacional vivo que consuma o raw corpus diretamente.
+
+#### P3 - `ml_prompt_feedback` coleta e conta, mas ainda nao consome payload para selecao de prompt
+
+- **Tabela:** `ml_prompt_feedback`.
+- **Definicao:** `server/database_setup.sql:550` cria a tabela e
+  `:566`-`:571` cria indices por deck, usuario e arquetipo.
+- **Escrita confirmada:** `server/lib/ml_knowledge_service.dart:264` faz
+  `INSERT INTO ml_prompt_feedback`; `server/lib/ai/optimize_feedback_support.dart:101`
+  chama `MLKnowledgeService.recordFeedback`; a rota
+  `server/routes/ai/optimize/index.dart:761` chama
+  `optimize_feedback.recordOptimizeMlFeedback(...)`.
+- **Leitura/consumo encontrado:** `/ai/ml-status` conta rows em
+  `server/routes/ai/ml-status/index.dart:108`, mas a busca focada encontrou
+  somente `SELECT COUNT(*)::int as c FROM ml_prompt_feedback`, nenhum
+  `SELECT`/`JOIN` do payload para ajustar prompt, modelo, ranking ou score.
+- **Contexto documental atual:** `server/manual-de-instrucao.md:18329`-`:18331`
+  ja classifica a tabela como historico operacional para futura metrica/selecao
+  de prompts, com retencao recomendada em `:18333`.
+- **Por que parece parcialmente nao usada:** a coleta esta viva e agora existe
+  politica documental minima de historico/cache, entao o achado antigo
+  "sem chamador/sem DDL" continua stale. O risco restante e produto/ML: o
+  payload ainda nao retroalimenta selecao de prompt nem avaliacao de qualidade
+  alem do contador operacional.
+- **O que valida:** consumidor de `ml_prompt_feedback` que agregue accepted/
+  rejected/effectiveness por archetype/commander/prompt_version, com teste de
+  contrato ou job operacional.
+- **O que falsifica:** decisao final de manter a tabela apenas como log
+  operacional com retencao aplicada, ou remocao/migration segura se o payload
+  nao sera usado.
+
+### Suspeitas revalidadas e descartadas nesta rodada
+
+- `deck_matchups` nao e write-only: a rota grava em
+  `server/routes/ai/simulate-matchup/index.dart:392`, le historico em
+  `:458`-`:459` e retorna `stored_matchup.previous` em `:430`-`:431`.
+- `deck_weakness_reports` nao e write-only: a rota grava em
+  `server/routes/ai/weakness-analysis/index.dart:602`, carrega historico em
+  `:692`-`:709` e retorna `history` em `:677`.
+- `deck_learning_events` nao e tabela sem uso: `server/lib/ai/deck_learning_event_support.dart:226`
+  e `:254` escrevem eventos; `server/bin/pull_learning_events.py:76` le
+  pendentes; `:158` marca sincronizados.
+- `commander_card_usage` nao e tabela sem uso: `server/lib/ai/deck_learning_event_support.dart:82`
+  faz upsert, e `loadUsageHotCardsSql` le `FROM commander_card_usage` em
+  `server/lib/ai/deck_learning_event_support.dart:14`.
+- `commander_card_synergy` nao e tabela sem uso: o DDL fica em
+  `server/lib/ai/candidate_quality_data_support.dart:76`, o snapshot de
+  qualidade agrega `FROM commander_card_synergy` em `:320`, e
+  `server/lib/ai/optimize_candidate_quality_support.dart:240` tambem consulta a
+  tabela; backfills escrevem em `server/bin/candidate_quality_data_foundation.dart:971`
+  e `server/bin/candidate_quality_meta_signals.dart:1312`.
+- `commander_learning_snapshot` nao e tabela raw sem uso: e view interna
+  lida por auditoria operacional em
+  `server/bin/commander_generate_provenance_audit.dart:530`.
+- As tabelas `new_card_battle_rule_*`, `new_card_data_gap_review_*` e
+  `new_card_candidate_*` que aparecem em scripts Python continuam caches
+  SQLite/Hermes, nao tabelas PostgreSQL; os scripts importam `sqlite3`.
+
+### Resultado
+
+Nenhum novo achado P1/P2 app-facing de tabela PostgreSQL totalmente sem uso foi
+confirmado no checkout `956f630e`. Como nao houve delta de produto desde
+`ced006f2`, o status operacional permanece estavel: `deck_matchups` e
+`deck_weakness_reports` sao historico/cache das proprias rotas; tabelas de
+learning/candidate quality possuem leitores/escritores; e permanecem apenas os
+dois riscos P3 de consumo parcial (`commander_reference_decks` /
+`commander_reference_deck_cards` raw e `ml_prompt_feedback` sem consumidor de
+payload para selecao/score de prompts).
 
 ## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-20 11:00 UTC
 

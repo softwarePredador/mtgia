@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-20 11:00 UTC
+> Data: 2026-06-20 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-20 11:00 UTC no checkout `2e69bb4c`: 0 imports/exports/parts locais quebrados no runtime e no controle incluindo testes, 0 imports Python locais quebrados e somente 1 SCC app restante. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-20 15:00 UTC no checkout `956f630e` confirmou que nao houve delta de produto desde a rodada focada `ced006f2`; so docs de Hermes mudaram. O auditor base continuou compatível (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados) e a triagem manual nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` seguem com leitura runtime nas proprias rotas e estao documentadas como historico/cache operacional, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count e policy documental de historico/retencao mas segue sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-20 11:00 UTC no checkout `2e69bb4c`: 0 imports/exports/parts locais quebrados no runtime e no controle incluindo testes, 0 imports Python locais quebrados e somente 1 SCC app restante. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
 
 A revalidacao de coerencia app/server de 2026-06-18 23:00 UTC no checkout
 `523589bc` fechou os tres gaps estreitos da rodada anterior:
@@ -97,14 +97,16 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    e `edh_bracket_policy.dart` continuam excecoes intencionais por policy
    versionada/regra externa, desde que mantenham fonte, escopo e teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado em 2026-06-19 15:00 UTC no checkout `f80b2da2`.
-   `deck_matchups` e `deck_weakness_reports` ja possuem leitura runtime nas
-   proprias rotas; o risco atual e baixa retroalimentacao de produto, nao
-   ausencia total de consumidor. `ml_prompt_feedback` tem schema, writer runtime
-   em `/ai/optimize` e contador em `/ai/ml-status`; o risco restante e usar esse
-   historico para selecao/score de prompts. `commander_reference_decks` e
-   `commander_reference_deck_cards` seguem como raw corpus P3 sem `SELECT/JOIN`
-   direto confirmado, enquanto o produto le o agregado
+   revalidado em 2026-06-20 15:00 UTC no checkout `956f630e`.
+   Nao houve delta de produto desde a ultima rodada focada. `deck_matchups` e
+   `deck_weakness_reports` ja possuem leitura runtime nas proprias rotas e estao
+   documentadas como historico/cache operacional; o risco atual e baixa
+   retroalimentacao de produto, nao ausencia total de consumidor.
+   `ml_prompt_feedback` tem schema, writer runtime em `/ai/optimize`, contador
+   em `/ai/ml-status` e policy documental de historico/retencao; o risco restante
+   e usar esse payload para selecao/score de prompts. `commander_reference_decks`
+   e `commander_reference_deck_cards` seguem como raw corpus P3 sem
+   `SELECT/JOIN` direto confirmado, enquanto o produto le o agregado
    `commander_reference_deck_analysis`. `deck_learning_events`,
    `commander_card_usage`, `commander_card_synergy` e
    `commander_learning_snapshot` foram descartadas como achados por terem
@@ -837,12 +839,11 @@ o helper backend exportado continua sem chamador. As anotações históricas de
     `cd app && flutter test --no-pub test/features/decks/widgets/deck_optimize_flow_support_test.dart test/features/decks/providers/deck_provider_test.dart`.
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-19 15:00 UTC: REVALIDADO no checkout `f80b2da2`.**
-  A rodada local focada em `postgresql-tables-not-used` encontrou delta amplo
-  desde `cac5012b`, mas nao confirmou novo achado P1/P2 app-facing de tabela
-  PostgreSQL totalmente sem uso. O auditor base executou com sucesso
-  (`221` arquivos backend, `116` tabelas PostgreSQL textualmente
-  referenciadas, `0` imports quebrados), mas ainda e textual e limitado a
+- **Status 2026-06-20 15:00 UTC: REVALIDADO no checkout `956f630e`.**
+  Nao houve delta de produto desde a rodada focada `ced006f2`; o delta ate esta
+  rodada ficou restrito a docs de Hermes. A nova execucao local do auditor base
+  foi compativel (`221` arquivos backend, `116` tabelas PostgreSQL textualmente
+  referenciadas, `0` imports quebrados), mas ele segue textual e limitado a
   `server/lib`/`server/routes`; a classificacao abaixo veio de varredura manual
   de DDL versus `SELECT/JOIN/INSERT/UPDATE/DELETE` em
   `server/database_setup.sql`, `server/bin`, `server/lib`, `server/routes` e
@@ -852,17 +853,23 @@ o helper backend exportado continua sem chamador. As anotações históricas de
     `server/database_setup.sql:245`, recebe upsert em
     `server/routes/ai/simulate-matchup/index.dart:392`, le historico em
     `:458`-`:459` e retorna `stored_matchup.previous` em `:430`-`:431`.
+    `server/manual-de-instrucao.md:18326`-`:18328` tambem a classifica como
+    historico/cache operacional da propria rota.
   - `deck_weakness_reports` e uma suspeita descartada: e definida em
     `server/database_setup.sql:509`, recebe insert em
     `server/routes/ai/weakness-analysis/index.dart:602`, le historico em
     `:690`-`:709` e retorna `history` em `:677`.
+    `server/manual-de-instrucao.md:18326`-`:18328` tambem a classifica como
+    historico/cache operacional da propria rota.
   - `ml_prompt_feedback` e definida em `server/database_setup.sql:550`, recebe
     insert via `server/lib/ml_knowledge_service.dart:264`, tem chamador runtime
     em `server/routes/ai/optimize/index.dart:761` por meio de
-    `server/lib/ai/optimize_feedback_support.dart:94`, e `/ai/ml-status` conta
-    rows em `server/routes/ai/ml-status/index.dart:108`. A busca focada ainda
-    encontrou apenas `COUNT(*)`, nenhum consumidor de payload para
-    selecao/score de prompt.
+    `server/lib/ai/optimize_feedback_support.dart:101`, e `/ai/ml-status` conta
+    rows em `server/routes/ai/ml-status/index.dart:108`. O manual agora a
+    classifica como historico operacional para futura metrica/selecao de prompts
+    (`server/manual-de-instrucao.md:18329`-`:18331`) e recomenda retencao em
+    `:18333`. A busca focada ainda encontrou apenas `COUNT(*)`, nenhum
+    consumidor de payload para selecao/score de prompt.
   - `commander_reference_decks` e `commander_reference_deck_cards` sao definidas
     em `server/lib/ai/commander_reference_deck_corpus_support.dart:1166` e
     `:1189`; recebem insert/delete/insert em `:1234`, `:1318` e `:1334`, mas
@@ -883,22 +890,24 @@ o helper backend exportado continua sem chamador. As anotações históricas de
     qualidade agrega `FROM commander_card_synergy` em `:320`, e
     `server/lib/ai/optimize_candidate_quality_support.dart:240` tambem consulta
     a tabela.
+  - `commander_learning_snapshot` foi descartada como achado: e view interna
+    lida por auditoria operacional em
+    `server/bin/commander_generate_provenance_audit.dart:530`.
   - As tabelas `new_card_battle_rule_*`, `new_card_data_gap_review_*` e
     `new_card_candidate_*` que apareceram no classificador sao caches SQLite de
-    ferramentas Python, nao tabelas PostgreSQL: por exemplo
-    `server/bin/manaloom_battle_rule_focused_evidence.py:9` declara que nao
-    escreve em PostgreSQL e `:19` importa `sqlite3`; o mesmo padrao aparece em
-    `server/bin/manaloom_card_data_gap_review.py:5`/`:14`.
+    ferramentas Python, nao tabelas PostgreSQL; os scripts importam `sqlite3`.
 - **Impacto**: para as raws Commander Reference, acumulacao de dados sem
-  politica documentada de lineage/retencao ou reprocessamento. Para
-  `ml_prompt_feedback`, a coleta esta viva; o risco residual e acumular payload
-  sem usar esse historico em metrica, selecao de prompt ou score.
+  politica clara de lineage/retencao ou reprocessamento. Para
+  `ml_prompt_feedback`, a coleta e a politica documental minima estao vivas; o
+  risco residual e acumular payload sem usar esse historico em metrica, selecao
+  de prompt ou score.
 - **Ação recomendada**:
   1. documentar as tabelas raw do Commander Reference Corpus como lineage/audit,
      com retencao e job de reprocessamento, ou persistir apenas o agregado
      consumido;
   2. usar o histórico de `ml_prompt_feedback` em metrica/selecao de prompt
-     quando houver volume suficiente, ou documentar retencao de log operacional;
+     quando houver volume suficiente, ou aplicar explicitamente a retencao de log
+     operacional ja recomendada no manual;
   3. manter `deck_matchups` e `deck_weakness_reports` fora da lista de
      write-only enquanto suas rotas continuarem lendo historico/cache.
 - **Validação**:
