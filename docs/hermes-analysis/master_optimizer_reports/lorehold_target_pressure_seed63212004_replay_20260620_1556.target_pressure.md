@@ -1,0 +1,16 @@
+# Battle Target Pressure Audit
+
+- events: `docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_seed63212004_replay_20260620_1556.events.jsonl`
+- status: `pass`
+- target_player: `Lorehold`
+- combat_total: `14`
+- opponent_combat_total: `0`
+- opponent_combat_to_target: `0`
+- opponent_combat_to_other: `0`
+- opponent_multi_defender_attack: `0`
+- opponent_combat_missing_pressure_reason: `0`
+- findings: `0`
+
+## Findings
+
+- No target-pressure violations found.

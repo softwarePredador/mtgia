@@ -2,9 +2,12 @@
 
 Owner: Auditor Central / single operator
 Controller: Auditor Central
-Status: active register, PG-001, PG-002, PG-006, PG-007, and PG-008 applied and
-validated; PG-006, PG-007, and PG-008 runtime cache sync completed; PG-003
-remains not ready; PG-005 remains no-apply-needed
+Status: active register, PG-001, PG-002, PG-006, PG-007, PG-008, PG-009, and
+Lorehold canonical Wheel apply applied and validated; PG-006, PG-007, PG-008,
+and Lorehold canonical Wheel runtime cache sync completed; PG-003 remains not
+ready; PG-005 remains no-apply-needed; latest official full battle now resolves
+to `20260620_212035` and is trusted for strategy learning; no new apply was
+executed by this heartbeat
 
 ## Purpose
 
@@ -35,10 +38,254 @@ Every PostgreSQL write requires:
 11. SELECT post-apply
 12. register update with result and evidence
 
-No deck swaps, commits, pushes, or destructive cleanup are authorized by this
-register.
+No additional deck swaps, commits, pushes, or destructive cleanup are authorized
+by this register. The Lorehold canonical Wheel apply below is historical
+evidence of an already-executed approved deck/data correction, not standing
+authorization for any future swap.
 
 ## Current Database Deploy Queue
+
+### Lorehold canonical Wheel apply - 2026-06-20 15:15 -0300
+
+Status: `applied_validated_runtime_synced_battle_trusted`
+Source front: Lorehold Deck 6 canonical deck decision
+Target tables: `deck_cards`, `commander_learned_decks`
+Target deck: `528c877f-f829-4207-95e6-73981776c323`
+Target learned deck: `f46c0421-71b4-4de3-bb79-05a916b4988b`
+Apply authorized: documented approved canonical Lorehold decision
+DB mutations executed by this historical event: `true`
+DB mutations executed by the 15:28 heartbeat reconciliation: `false`
+
+Pre-apply blocker evidence:
+
+- Before the apply, Lorehold canonical strategy expected
+  `Wheel of Misfortune` and rejected `Reforge the Soul`.
+- Precheck artifact
+  `docs/hermes-analysis/master_optimizer_reports/pg_precheck_aven_lorehold_20260620_180309.json`
+  showed the materialized Lorehold deck still had `Reforge the Soul` and the
+  active `learned_deck:82` card list still had `Reforge the Soul`.
+
+Deploy result:
+
+- Apply result artifact:
+  `docs/hermes-analysis/master_optimizer_reports/pg_apply_lorehold_wheel_swap_result_20260620_180448.json`.
+- Materialized deck check after apply:
+  `wheel=1`, `reforge=0`, `rows=100`, `total_cards=100`.
+- Active learned-deck check after apply:
+  `has_wheel=true`, `has_reforge=false`, `card_count=100`, and metadata
+  `canonical_lorehold_swap_20260620`.
+- Backup artifact:
+  `docs/hermes-analysis/master_optimizer_reports/pg_apply_lorehold_wheel_swap_backup_20260620_180448.json`.
+
+Runtime sync and battle proof:
+
+- PostgreSQL -> Hermes deck sync evidence:
+  `sync_pg_target_deck_to_hermes_lorehold_post_wheel_20260620_1805.json`.
+- Approved canonical deck snapshot after sync:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_post_pg_swap_check_20260620_1806.md`
+  with 100 cards, 33 lands, `Wheel of Misfortune` present, and
+  `Reforge the Soul` absent.
+- Fresh read-only learned-deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`
+  with Lorehold `learned_deck:82` `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`, and strategy package pass.
+- Full recurring battle rerun:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_181004/summary.json`.
+- Battle result: `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":16}`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`, `decision_audit_turn_findings=0`, and
+  `action_findings=0`.
+- Later target-pressure battle validation:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185748/summary.json`
+  supersedes the `181004` battle proof for current strategy-learning
+  readiness. It performed no PostgreSQL write and reports
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":17}`,
+  `target_pressure_statuses={"pass":16}`, `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=117`, and
+  `target_pressure_opponent_combat_to_other=0`.
+- Later official battle drift:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_191248/summary.json`
+  supersedes `185748` as the live `latest` pointer and is `blocked`, but the
+  blocker is a battle runtime safety defect: seed `63211917` executed
+  `Goblin Bombardment` from a `needs_review` / `review_only` canonical snapshot
+  rule. Target-pressure still passes `16/16` with `84/84` opponent combats into
+  Lorehold and `0` opponent combats into other defenders. No PostgreSQL write
+  is justified by this blocker.
+- Later official battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_195007/summary.json`
+  supersedes `191248`; the Goblin blocker and target-pressure blocker are
+  closed, but the run remains `blocked` by `forensic_audit=blocked` and
+  `replay_decision_audit=review_required`. Current forensic blockers are
+  learned-opponent card-rule lineage gaps from `functional_tags_json`, not a
+  rollback of the Lorehold Wheel apply.
+- Latest official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_200409/summary.json`
+  supersedes `195007`; the prior table-intent metadata false positive is
+  closed by focused proof `20260620_200322`, but the full run remains
+  `blocked` by `forensic_audit=blocked` and `table_intent=blocked`. This is
+  not evidence of a rollback of the Lorehold Wheel apply.
+- Later official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_203616/summary.json`
+  supersedes `200409`; the recurring wrapper now includes `target_pressure` in
+  the mandatory gate list and status map. The full run remains `blocked` by
+  `forensic_audit=blocked` and `target_pressure=blocked`, with `table_intent`
+  passing `16/16`. This is not evidence of a rollback of the Lorehold Wheel
+  apply or any prior PostgreSQL package.
+- Current official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_204002/summary.json`
+  supersedes `203616`; the full run remains `blocked` by
+  `forensic_audit=blocked` and `target_pressure=blocked`, with `table_intent`,
+  `event_contract_static`, `replay_decision_audit`, and `action_critic`
+  passing. This is not evidence of a rollback of the Lorehold Wheel apply or
+  any prior PostgreSQL package.
+- New current official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_205821/summary.json`
+  supersedes `204002`; the full run is now `review_required` by
+  `forensic_audit=review_required`. Target-pressure, table-intent,
+  event-contract, replay-decision, and action gates pass. The remaining
+  findings are two low `Goblin Bombardment` registry/runtime drift findings.
+  This is not evidence of a rollback of the Lorehold Wheel apply or any prior
+  PostgreSQL package.
+- Current official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_210513/summary.json`
+  supersedes `205821`; the full run is now `blocked` by
+  `forensic_audit=blocked`. Target-pressure, table-intent, event-contract,
+  replay-decision, and action gates pass. Current high/medium blockers are
+  opponent cards `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, and
+  `The Unagi of Kyoshi Island` using `functional_tags_json`. This is not
+  evidence of a rollback of the Lorehold Wheel apply or any prior PostgreSQL
+  package.
+- Current official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_211217/summary.json`
+  supersedes `210513`; the full run remains `blocked` by
+  `forensic_audit=blocked`. Target-pressure, table-intent, event-contract,
+  replay-decision, and action gates pass. Current high/medium blockers are
+  opponent cards `Tellah, Great Sage` and `Practical Research` using
+  `functional_tags_json`. This is not evidence of a rollback of the Lorehold
+  Wheel apply or any prior PostgreSQL package.
+- Current official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_211648/summary.json`
+  supersedes `211217`; the full run is now `review_required` by
+  `forensic_audit=review_required`. Target-pressure, table-intent,
+  event-contract, replay-decision, and action gates pass. The remaining
+  findings are two low `Breena, the Demagogue` registry/runtime drift
+  findings. This is not evidence of a rollback of the Lorehold Wheel apply or
+  any prior PostgreSQL package.
+- Current official full battle state:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`
+  supersedes `211648`; the full run is now
+  `trusted_for_strategy_learning` with `mandatory_gate_divergences=[]`.
+  Target-pressure, forensic, table-intent, event-contract, replay-decision,
+  and action gates pass. This is not evidence of a rollback of the Lorehold
+  Wheel apply or any prior PostgreSQL package.
+
+### PG-010 candidate - opponent card battle-rule lineage gaps
+
+Status: `externally_advanced_latest_trusted_no_apply_by_this_heartbeat`
+Source front: latest battle forensic audit
+Target table if approved later: `card_battle_rules`
+DB mutations executed by this checkpoint: `false`
+
+Current evidence:
+
+- Latest full run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`.
+- Table-intent passes in the latest full run:
+  `table_intent.statuses={"pass":16}`, `findings=0`.
+- Target-pressure passes in the latest full run:
+  `target_pressure_statuses={"pass":16}`, `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=214`, and
+  `target_pressure_opponent_combat_to_other=3`.
+
+Detected round5 artifact evidence:
+
+- `card_battle_rules_pg_table_intent_promotions_round5_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=3`, selected cards
+  `Big Score` and `Spelltwine`, `input_rows=3`, `curated_rows=2`, and
+  `generated_rows=1`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round5_20260620.json`
+  declares `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5224`, `sqlite_inserted_or_updated=5142`, and
+  `canonical_snapshot_rows_exported=3181`.
+- This heartbeat detected the files and latest battle effect but did not run
+  PostgreSQL apply, SQLite sync, cleanup, stage, commit, or push.
+
+Detected round6 artifact evidence:
+
+- `card_battle_rules_pg_table_intent_promotions_round6_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=2`, selected card
+  `Goblin Bombardment`, `input_rows=2`, `curated_rows=1`, and
+  `generated_rows=1`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round6_20260620.json`
+  declares `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5225`, `sqlite_inserted_or_updated=5143`, and
+  `canonical_snapshot_rows_exported=3181`.
+- This heartbeat detected the files and latest battle effect but did not run
+  PostgreSQL apply, SQLite sync, cleanup, stage, commit, or push.
+
+Detected round7 artifact evidence after latest `210513`:
+
+- `card_battle_rules_pg_table_intent_promotions_round7_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=6`, selected cards
+  `Apex of Power`, `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, and
+  `The Unagi of Kyoshi Island`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round7_20260620.json`
+  declares `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5230`, `sqlite_inserted_or_updated=5148`, and
+  `canonical_snapshot_rows_exported=3185`.
+- The later latest battle `20260620_212035` supersedes `211648`: the prior
+  `210513`, `211217`, and `211648` blocker/review sets are superseded, and no
+  current forensic finding remains.
+- This heartbeat did not run PostgreSQL apply, SQLite sync, cleanup, stage,
+  commit, or push.
+
+Detected round8 artifact evidence:
+
+- `card_battle_rules_pg_table_intent_promotions_round8_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=2`, selected cards
+  `Practical Research` and `Tellah, Great Sage`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round8_20260620.json`
+  declares `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5232`, `sqlite_inserted_or_updated=5150`, and
+  `canonical_snapshot_rows_exported=3187`.
+- This heartbeat detected the files and latest battle effect but did not run
+  PostgreSQL apply, SQLite sync, cleanup, stage, commit, or push.
+
+Detected round9 artifact evidence:
+
+- `card_battle_rules_pg_table_intent_promotions_round9_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=2`, selected card
+  `Breena, the Demagogue`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round9_20260620.json`
+  declares `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5233`, `sqlite_inserted_or_updated=5151`, and
+  `canonical_snapshot_rows_exported=3187`.
+- This heartbeat detected the files and latest battle effect but did not run
+  PostgreSQL apply, SQLite sync, cleanup, stage, commit, or push.
+
+Read-only local cache evidence:
+
+- `card_oracle_cache` has oracle metadata for `Abandon Attachments`,
+  `Channeled Force`, `Hypothesizzle`, `The Emperor of Palamecia`,
+  `Firemind Vessel`, `Sisay, Weatherlight Captain`, and
+  `Kraum, Ludevic's Opus`.
+- Local `battle_card_rules` has generated `needs_review` / `review_only` rows
+  for `Laughing Mad`, `One with the Multiverse`, `Shark Typhoon`, and
+  `Stonespeaker Crystal`, which now surface only as low passive/review
+  mismatches after the canonical snapshot safety fix.
+
+Next safe step:
+
+- No current PostgreSQL apply is ready. Keep PG-010 as a watch item only:
+  if a future full battle reintroduces card-rule lineage drift, start from
+  read-only evidence, dry-run/precheck/rollback, and exact Rafael approval
+  before any apply.
 
 ### PG-008 - Machine God's Effigy battle-rule lineage blocker
 
@@ -908,7 +1155,7 @@ Evidence:
   `source='curated'`, `review_status='active'`,
   `execution_status='auto'`, `confidence=0.820`; snapshot exposes the battle
   rule.
-- Current latest battle:
+- Battle artifact at that 11:19 heartbeat:
   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_140016/summary.json`
   reports `battle_replay_final_status=trusted_for_strategy_learning`,
   `mandatory_gate_divergences=[]`, forensic lineage complete, and tests
@@ -1012,3 +1259,33 @@ Conclusion:
 | `2026-06-20 13:43 -0300` | Heartbeat loop closure policy | Closed the documentation loop created by tracking exact "current HEAD" in heartbeat docs after a documentation-only deploy verification. | Rafael requested worktree cleanup before the next product cycle | `false` | Stable rule: exact deploy SHA proof remains required for deploy/smoke validation, but tracked heartbeat docs must not recursively restamp the SHA created by the previous heartbeat commit. Future current-state proof should be command evidence or bounded smoke artifacts, not endless tracked doc churn. No PostgreSQL write, deck swap, cleanup of data, or app/backend code change was performed. No current PostgreSQL apply is ready. |
 | `2026-06-20 14:24 -0300` | `PG-009` Korvold learned-deck replacement | Replaced the active partial Korvold learned deck row with accepted `commander_reference_decks` corpus data and added runtime guards so product loaders skip incomplete active learned decks. | Rafael active goal authorization for end-to-end Korvold cycle and PostgreSQL deploy with gates | `true` for PostgreSQL | Precheck passed: old partial active `1`, replacement source `1`, source quantity `100`, commander quantity `1`, unresolved `0`, off-color `0`, no existing replacement row. First apply deactivated old `edhrec/learned_deck:7` and inserted replacement. Reapply updated canonical metadata counters. Postcheck passed: exactly one active Korvold row, `source_system=commander_reference_decks`, source ref `edhrec_korvold_fae_cursed_king_default_average_sprint3_lot_b_2026_05_14`, `card_count=100`, parsed quantity `100`, commander quantity `1`, old partial active `0`. Fresh coherence artifact `learned_deck_coherence_audit_20260620_172437` shows Korvold `issues=[]` and global `severity_counts={"medium":13}` with no high findings. |
 | `2026-06-20 14:28 -0300` | Latest battle review regression | Rechecked latest battle after PG-009 closure and learned-deck artifact `20260620_172437`. | n/a | `false` | Latest battle moved to `20260620_170724` and is `review_required` with mandatory divergences `forensic_audit=review_required` and `replay_decision_audit=review_required`; tests still pass `16/16`, forensic lineage is complete, `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`. The concrete finding is seed `63211720`, turn `12`, player `Lorehold`, event `board_wipe_resolved`, severity `low`: protected creatures `5` versus destroyed `3`. This is battle/auditor follow-up, not a PostgreSQL apply or deck swap. PG-001, PG-002, PG-006, PG-007, PG-008, and PG-009 remain closed unless future evidence proves rollback or drift. No current PostgreSQL apply is ready. |
+| `2026-06-20 15:15 -0300` | Lorehold canonical Wheel apply | Applied the documented Lorehold canonical decision `Wheel of Misfortune` over `Reforge the Soul` to the materialized PG deck and active learned deck, then synced Hermes deck `6` and reran learned-deck/battle validation. | documented approved canonical Lorehold decision | `true` for PostgreSQL; `true` for local SQLite cache | Apply artifact `pg_apply_lorehold_wheel_swap_result_20260620_180448.json` shows materialized deck `wheel=1`, `reforge=0`, `rows=100`, `total_cards=100`, and active learned deck `has_wheel=true`, `has_reforge=false`, metadata `canonical_lorehold_swap_20260620`; learned-deck audit `20260620_181429` keeps Lorehold `issues=[]`; latest battle `20260620_181004` is `trusted_for_strategy_learning` with `mandatory_gate_divergences=[]`, forensic/decision/action findings `0`, and tests `16/16`. |
+| `2026-06-20 15:28 -0300` | Lorehold canonical Wheel reconciliation heartbeat | Re-read Git state, central registers, Lorehold register, latest learned-deck coherence artifact, Wheel apply artifacts, quality gate, and current battle latest after the Wheel apply. | n/a | `false` | Worktree started clean on `master...origin/master`; current battle latest resolves to `20260620_181004` and is trusted with all mandatory gates pass; the old `20260620_170724` board-wipe finding is historical/superseded. No new PostgreSQL write, deck swap, cleanup, stage, commit, or push was performed. No current PostgreSQL apply is ready. |
+| `2026-06-20 16:00 -0300` | Battle target-pressure validation | Corrected the battle methodology so Lorehold deck evaluation forces opponent combat/removal pressure onto Lorehold and added target-pressure as a mandatory recurring battle gate. | n/a | `false` for PostgreSQL | Latest battle now resolves to `20260620_185748`, is `trusted_for_strategy_learning`, has `mandatory_gate_divergences=[]`, tests `17/17`, and target-pressure evidence `117/117` opponent combats into Lorehold with `0` opponent combats into other defenders and `0` findings. No current PostgreSQL apply is ready. |
+| `2026-06-20 16:30 -0300` | Battle runtime review-only suppression | Latest official battle drifted to `20260620_191248` blocked by seed `63211917`, where `Goblin Bombardment` executed a `needs_review` / `review_only` canonical snapshot rule as `remove_creature`. Runtime fallback now suppresses non-runtime-safe snapshot rules to passive provenance and a focused regression/auditors passed. | n/a | `false` for PostgreSQL | Evidence: latest summary has `forensic_audit=blocked`, `action_critic=review_required`, `replay_decision_audit=review_required`, while target-pressure remains pass `16/16`; `test_battle_analyst_v10_3.py`, `test_battle_target_pressure_audit.py`, `py_compile`, and `/tmp/lorehold_seed63211917_post_review_only_fix.*` focused auditors are clean. Official full rerun still pending before `latest` is green again. |
+| `2026-06-20 16:50 -0300` | Battle target-pressure false-positive closure + PG-010 candidate classification | Reran full recurring battle after the Goblin review-only fix and target-pressure post-target-elimination audit fix. | n/a | `false` for PostgreSQL | Latest battle now resolves to `20260620_195007`, still `blocked` but with target-pressure pass `16/16`, `193/193` opponent combats into Lorehold, `0` into other defenders, and `action_findings=0`. Remaining blockers are `functional_tags_json` card-rule lineage for learned-opponent cards and one low board-wipe review finding. No PostgreSQL apply is approved or executed. |
+| `2026-06-20 17:06 -0300` | Battle table-intent metadata false-positive closure + latest full blocker classification | Accepted `table_intent_*` target reasons as valid target-pressure metadata when Lorehold is the active evaluation target, reran focused seed `63213000`, and then reran the full recurring battle audit. | n/a | `false` for PostgreSQL | Focused latest `20260620_200322` is trusted with `mandatory_gate_divergences=[]`, target-pressure pass `1/1`, forensic `0`, decision `0`, action `0`, and tests `18/18`. Latest full `20260620_200409` remains `blocked` with `mandatory_gate_divergences=["forensic_audit=blocked","table_intent=blocked"]`; remaining blockers are `Woodland Bellower` and `Shantotto, Tactician Magician` via `functional_tags_json`, table-intent `opponent_interaction_absent` on seeds `63212004`, `63212009`, `63212019`, and one target-pressure split attack on seed `63212012`. No PostgreSQL apply is approved or executed. |
+| `2026-06-20 17:39 -0300` | Battle target-pressure mandatory-wrapper reconciliation | Reaudited `20260620_202211` event-contract with current code, fixed the local recurring wrapper to include `target_pressure` in the final-status mandatory gate map, dry-ran the wrapper, and reran full recurring battle. | n/a | `false` for PostgreSQL | Event-contract current-code artifact `/tmp/event_contract_static_202211_current_code.*` is clean; `test_battle_event_contract_static_audit.py` passed `7/7`; wrapper `bash -n` and `--dry-run --seeds 16` passed. Latest full `20260620_203616` remains `blocked` with `mandatory_gate_divergences=["forensic_audit=blocked","target_pressure=blocked"]`; table-intent now passes `16/16`; current blockers are forensic `functional_tags_json` lineage and target-pressure attacks away from Lorehold. No PostgreSQL apply is approved or executed. |
+| `2026-06-20 17:40 -0300` | Battle latest artifact reconciliation after wrapper dry-run | Re-read the latest artifact generated by the wrapper recheck. | n/a | `false` for PostgreSQL | Latest full `20260620_204002` supersedes `203616` and remains `blocked` with `mandatory_gate_divergences=["forensic_audit=blocked","target_pressure=blocked"]`; target-pressure is `{"blocked":2,"pass":14}` with blockers `63212042` and `63212046`; forensic has `21` rule findings on seeds `63212042`, `63212047`, `63212048`, and `63212050`; table-intent/event-contract/replay-decision/action all pass; tests `18/18`. No PostgreSQL apply is approved or executed. |
+| `2026-06-20 18:01 -0300` | Round5 artifact detection + latest battle review residual | Re-read latest battle and detected new round5 PG/sync artifacts generated externally before this heartbeat. | not by this heartbeat | `false` by this heartbeat; round5 artifact declares prior `apply_pg=true` | Latest full `20260620_205821` supersedes `204002` and is `review_required` with `mandatory_gate_divergences=["forensic_audit=review_required"]`; target-pressure passes `16/16`; forensic has two low `Goblin Bombardment` passive-vs-remove registry drift findings on seed `63212068`; round5 artifact declares `pg_inserted_or_updated=3` for selected cards `Big Score` and `Spelltwine` plus SQLite sync `pg_rows_loaded=5224`, `sqlite_inserted_or_updated=5142`. This heartbeat did not execute apply/sync and did not reapply anything. |
+| `2026-06-20 18:05 -0300` | Round6 artifact detection + latest battle blocker regression | Re-read latest battle and detected new round6 PG/sync artifacts generated externally before this heartbeat finished. | not by this heartbeat | `false` by this heartbeat; round6 artifact declares prior `apply_pg=true` | Latest full `20260620_210513` supersedes `205821` and is `blocked` with `mandatory_gate_divergences=["forensic_audit=blocked"]`; target-pressure passes `16/16`; forensic has `11` rule findings from `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, `The Unagi of Kyoshi Island`, and low `Apex of Power`; round6 artifact declares `pg_inserted_or_updated=2` for selected card `Goblin Bombardment` plus SQLite sync `pg_rows_loaded=5225`, `sqlite_inserted_or_updated=5143`. This heartbeat did not execute apply/sync and did not reapply anything. |
+| `2026-06-20 18:12 -0300` | Round7 artifact detection awaiting battle rerun | Rechecked latest after new round7 PG/sync artifacts appeared. | not by this heartbeat | `false` by this heartbeat; round7 artifact declares prior `apply_pg=true` | Round7 artifact declares `pg_inserted_or_updated=6` for selected cards `Apex of Power`, `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, and `The Unagi of Kyoshi Island`; paired SQLite sync declares `pg_rows_loaded=5230`, `sqlite_inserted_or_updated=5148`, `canonical_snapshot_rows_exported=3185`. Latest remained `20260620_210513` after 20s, so a post-round7 battle rerun is still pending. |
+| `2026-06-20 18:13 -0300` | Post-round7 latest battle reconciliation | Re-read latest battle after the round7 artifacts. | not by this heartbeat | `false` by this heartbeat; round7 artifacts declare prior `apply_pg=true` and `apply_sqlite_from_pg=true` | Latest full `20260620_211217` supersedes `210513` and is still `blocked` with `mandatory_gate_divergences=["forensic_audit=blocked"]`; target-pressure passes `16/16` with `186` opponent combats into Lorehold, `3` into other defenders, and `0` multi-defender attacks; forensic has `4` rule findings from `Tellah, Great Sage` and `Practical Research` via `functional_tags_json`. The prior round7 blocker set is superseded, but a new opponent-card lineage backlog remains. This heartbeat did not execute apply/sync/rerun and did not reapply anything. |
+| `2026-06-20 18:17 -0300` | Latest battle review residual reconciliation | Re-read latest battle after `211217` advanced again. | not by this heartbeat | `false` | Latest full `20260620_211648` supersedes `211217` and is `review_required` with `mandatory_gate_divergences=["forensic_audit=review_required"]`; target-pressure passes `16/16` with `200` opponent combats into Lorehold and `0` into other defenders; forensic has `2` low findings from `Breena, the Demagogue` runtime `passive` vs registry `draw_engine` on seed `63212130`. There is no current high/medium blocker and no PostgreSQL apply is ready. This heartbeat did not execute apply/sync/rerun and did not reapply anything. |
+| `2026-06-20 18:27 -0300` | Table-intent real-battle PG/cache closure | Consolidated round5 through round9 battle-rule promotions and the final post-sync recurring battle audit under Rafael's full single-operator authorization. | Rafael authorized this thread to handle PostgreSQL/cache/docs/worktree/commit/push for the functional real-battle cycle | `true` for prior PG rounds; `true` for local SQLite cache sync | Round5 selected `Big Score` and `Spelltwine` with `pg_inserted_or_updated=3`; round6 selected `Goblin Bombardment` with `pg_inserted_or_updated=2`; round7 selected `Apex of Power`, `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, and `The Unagi of Kyoshi Island` with `pg_inserted_or_updated=6`; round8 selected `Practical Research` and `Tellah, Great Sage` with `pg_inserted_or_updated=2`; round9 selected `Breena, the Demagogue` with `pg_inserted_or_updated=2`; final cache sync reports `pg_rows_loaded=5233`, `sqlite_inserted_or_updated=5151`, `canonical_snapshot_rows_exported=3187`, and `curated_rows=104`; latest battle `20260620_212035` is trusted with all mandatory gates pass. |
+
+## Current PostgreSQL Reading - 2026-06-20 18:27 -0300
+
+- PostgreSQL-backed battle-rule promotions through round9 are reflected in the
+  local Hermes battle runtime cache.
+- Current final cache-sync artifact:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_full_after_table_intent_round9_20260620.json`.
+- Current battle gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":18}`.
+- No additional PostgreSQL write is pending at this exact checkpoint. The next
+  database apply should be generated only from a new concrete battle/deck
+  blocker with row-level diff, source policy, precheck, apply, rollback,
+  postcheck, and runtime evidence.
+| `2026-06-20 18:21 -0300` | Latest battle trusted reconciliation | Re-read latest battle after round8/round9 artifacts appeared. | not by this heartbeat | `false` by this heartbeat; round8/round9 artifacts declare prior `apply_pg=true` and `apply_sqlite_from_pg=true` | Latest full `20260620_212035` supersedes `211648` and is `trusted_for_strategy_learning` with `mandatory_gate_divergences=[]`; target-pressure passes `16/16` with `214` opponent combats into Lorehold, `3` into other defenders, and `0` findings; forensic, decision, action, and table-intent findings are `0`; tests pass `18/18`. Round8 declares `pg_inserted_or_updated=2` for `Practical Research` and `Tellah, Great Sage`; round9 declares `pg_inserted_or_updated=2` for `Breena, the Demagogue`. This heartbeat did not execute apply/sync/rerun and no current PostgreSQL apply is ready. |

@@ -70,6 +70,30 @@ def register_tests(battle, player, card):
         assert creature not in active.battlefield
         assert creature in active.graveyard
 
+    def test_noncreature_zero_toughness_permanents_survive_sba():
+        active = player("Active")
+        land = {
+            "name": "Flooded Strand",
+            "effect": "land",
+            "type_line": "Land",
+            "power": 0,
+            "toughness": 0,
+        }
+        artifact = {
+            "name": "Sol Ring",
+            "effect": "ramp_permanent",
+            "type_line": "Artifact",
+            "power": 0,
+            "toughness": 0,
+        }
+        active.battlefield = [land, artifact]
+
+        battle.check_sbas_until_stable([active])
+
+        assert land in active.battlefield
+        assert artifact in active.battlefield
+        assert active.graveyard == []
+
     def test_illegal_aura_goes_to_graveyard_and_equipment_detaches():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -202,6 +226,7 @@ def register_tests(battle, player, card):
         test_cleanup_runs_with_previously_eliminated_player,
         test_plus_minus_counters_cancel_as_sba,
         test_zero_or_negative_toughness_dies_even_if_indestructible,
+        test_noncreature_zero_toughness_permanents_survive_sba,
         test_illegal_aura_goes_to_graveyard_and_equipment_detaches,
         test_saga_final_chapter_sacrifices_after_pending_ability_resolves,
         test_zone_change_records_lki_and_advances_zone_identity,

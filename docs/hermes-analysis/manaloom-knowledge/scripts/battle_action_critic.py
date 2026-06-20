@@ -152,9 +152,17 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "draw resolution is card-flow evidence consumed by replay/strategy context.",
     ),
+    "draw_equal_to_discarded_hand_resolved": (
+        "strategy_signal",
+        "discard-hand-then-draw resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
     "end_step_token_sacrificed": (
         "renderer_only",
         "scheduled token cleanup state evidence.",
+    ),
+    "etb_tutor_resolved": (
+        "strategy_signal",
+        "enter-the-battlefield tutor resolution is card-flow evidence consumed by replay/strategy context.",
     ),
     "equipment_attached": (
         "renderer_only",

@@ -15,6 +15,760 @@ Regra operacional: toda falha deve ter evidencia concreta antes de virar
 implementacao. Nao aplicar swaps, nao alterar PostgreSQL e nao tratar WR ou
 replay aprovado como prova absoluta sem auditoria.
 
+## Checkpoint Auditor Central - latest 212035 trusted - 2026-06-20 18:21 -0300
+
+Escopo:
+
+- Reconciliar o latest full `20260620_212035`, que supersede o `211648`.
+- Classificar os novos artefatos externos `round8` e `round9`.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit, push, SQLite
+  sync ou battle rerun foi executado por este heartbeat.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212120`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- `test_results_status_counts={"pass":18}`.
+- Gates limpos: `action_critic`, `replay_decision_audit`, `strategy_audit`,
+  `table_intent`, `target_pressure`, `effect_coverage`,
+  `focused_template_dispatch`, `unknown_template_backlog`,
+  `decision_trace_taxonomy` e `event_contract_static`.
+
+Battle evidence:
+
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`.
+- `table_intent_statuses={"pass":16}`.
+- `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=214`,
+  `target_pressure_opponent_combat_to_other=3`,
+  `target_pressure_opponent_multi_defender_attack=2`.
+- `strategy_findings=2`, `strategy_low_confidence_findings=2`,
+  `strategy_review_required_findings=0`.
+
+Round8/round9 reconciliados:
+
+- `card_battle_rules_pg_table_intent_promotions_round8_20260620.json`
+  declara `apply_pg=true`, `pg_inserted_or_updated=2`, selected cards
+  `Practical Research` e `Tellah, Great Sage`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round8_20260620.json`
+  declara `apply_sqlite_from_pg=true`, `pg_rows_loaded=5232`,
+  `sqlite_inserted_or_updated=5150`, `canonical_snapshot_rows_exported=3187`.
+- `card_battle_rules_pg_table_intent_promotions_round9_20260620.json`
+  declara `apply_pg=true`, `pg_inserted_or_updated=2`, selected card
+  `Breena, the Demagogue`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round9_20260620.json`
+  declara `apply_sqlite_from_pg=true`, `pg_rows_loaded=5233`,
+  `sqlite_inserted_or_updated=5151`, `canonical_snapshot_rows_exported=3187`.
+- Este heartbeat detectou os artefatos e o latest verde, mas nao executou
+  apply, sync ou rerun.
+
+Classificacao:
+
+- Os blockers/reviews `210513`, `211217` e `211648` estao superseded pelo
+  latest full trusted `212035`.
+- Nao ha pendencia real ativa de battle gate neste snapshot.
+- Nao ha apply PostgreSQL autorizado ou necessario por este heartbeat.
+
+## Checkpoint Auditor Central - latest 211648 forensic review residual - 2026-06-20 18:17 -0300
+
+Escopo:
+
+- Reconciliar o latest full `20260620_211648`, que supersede o `211217`.
+- Classificar a pendencia remanescente como review residual low.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit, push, SQLite
+  sync ou battle rerun foi executado por este heartbeat.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_211648/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212116`.
+- `battle_replay_final_status=review_required`.
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- `test_results_status_counts={"pass":18}`.
+- Gates limpos: `action_critic`, `replay_decision_audit`, `strategy_audit`,
+  `table_intent`, `target_pressure`, `effect_coverage`,
+  `focused_template_dispatch`, `unknown_template_backlog`,
+  `decision_trace_taxonomy` e `event_contract_static`.
+
+Pendencia real restante:
+
+- `forensic_rule_findings=2`, `forensic_turn_findings=0`,
+  `forensic_severity_counts={"low":2}`.
+- Seed `63212130`: `Breena, the Demagogue` de
+  `Tayam, Luminous Enigma #25 (real)` tem runtime effect `passive` diferente
+  do registry effect `draw_engine` em `spell_cast` e `spell_resolved`.
+- A recomendacao do auditor e revisar apenas se o comportamento parecer errado
+  no replay; por si so, isto e residual de oracle/registry normalization.
+
+Target-pressure:
+
+- `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=200`,
+  `target_pressure_opponent_combat_to_other=0`,
+  `target_pressure_opponent_multi_defender_attack=0`.
+- O gate esta fechado no latest atual.
+
+Classificacao:
+
+- O blocker high/medium `Tellah, Great Sage` / `Practical Research` do
+  `211217` foi superseded.
+- O latest atual nao esta bloqueado; esta em review por dois achados low de
+  registry/runtime drift.
+- Nao ha apply PostgreSQL autorizado por este heartbeat; qualquer pacote futuro
+  precisa de dry-run/precheck/rollback e aprovacao explicita do comando exato.
+
+## Checkpoint Auditor Central - latest 211217 post-round7 forensic blocked - 2026-06-20 18:13 -0300
+
+Escopo:
+
+- Reconciliar o latest full `20260620_211217`, que supersede o `210513`
+  depois dos artefatos `round7`.
+- Classificar a evidencia pos-round7 sem atribuir execucao ao heartbeat.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit, push, SQLite
+  sync ou battle rerun foi executado por este heartbeat.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_211217/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212112`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- Gates limpos: `action_critic`, `replay_decision_audit`, `strategy_audit`,
+  `table_intent`, `target_pressure`, `effect_coverage`,
+  `focused_template_dispatch`, `unknown_template_backlog`,
+  `decision_trace_taxonomy` e `event_contract_static`.
+
+Pendencia real restante:
+
+- `forensic_rule_findings=4`, `forensic_turn_findings=0`.
+- Seed `63212112`: `Tellah, Great Sage` de
+  `The Emperor of Palamecia #42 (real)` usou lineage
+  `functional_tags_json` para `draw_cards` em `spell_cast` e
+  `spell_resolved`.
+- Seed `63212123`: `Practical Research` de
+  `The Emperor of Palamecia #42 (real)` usou lineage
+  `functional_tags_json` para `draw_cards` em `spell_cast` e
+  `spell_resolved`.
+
+Target-pressure:
+
+- `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=186`,
+  `target_pressure_opponent_combat_to_other=3`,
+  `target_pressure_opponent_multi_defender_attack=0`.
+- O gate esta fechado no latest atual.
+
+Round7 reconciliado:
+
+- O `210513` tinha blockers em `Apex of Power`, `Arcane Endeavor`,
+  `Curator's Ward`, `Magma Opus` e `The Unagi of Kyoshi Island`.
+- O `round7` declara `apply_pg=true`, `pg_inserted_or_updated=6`,
+  `selected_cards=["Apex of Power","Arcane Endeavor","Curator's Ward","Magma Opus","The Unagi of Kyoshi Island"]`.
+- O sync pareado declara `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5230`, `sqlite_inserted_or_updated=5148` e
+  `canonical_snapshot_rows_exported=3185`.
+- O latest `211217` e a primeira evidencia pos-round7 observada neste
+  heartbeat; ele remove o blocker anterior do current set, mas ainda bloqueia
+  por novas cartas de oponente (`Tellah, Great Sage` e
+  `Practical Research`).
+- Este heartbeat nao executou apply, sync ou rerun.
+
+Classificacao:
+
+- O blocker ativo continua sendo curadoria/runtime de cartas de oponentes via
+  `functional_tags_json`; nao e decklist Lorehold.
+- Nao ha apply PostgreSQL autorizado por este heartbeat; qualquer pacote futuro
+  precisa de dry-run/precheck/rollback e aprovacao explicita do comando exato.
+
+## Checkpoint Auditor Central - latest 210513 forensic blocked - 2026-06-20 18:05 -0300
+
+Escopo:
+
+- Reconciliar o latest full `20260620_210513`, que supersede o `205821`.
+- Classificar os novos artefatos `round6` detectados em
+  `master_optimizer_reports`.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado por este heartbeat.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_210513/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212105`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- Gates limpos: `action_critic`, `replay_decision_audit`, `strategy_audit`,
+  `table_intent`, `target_pressure`, `effect_coverage`,
+  `focused_template_dispatch`, `unknown_template_backlog`,
+  `decision_trace_taxonomy` e `event_contract_static`.
+
+Pendencia real restante:
+
+- `forensic_rule_findings=11`, `forensic_turn_findings=0`.
+- High/medium `functional_tags_json` lineage:
+  `Arcane Endeavor`, `Curator's Ward`, `Magma Opus` e
+  `The Unagi of Kyoshi Island`.
+- Low registry/runtime drift:
+  `Apex of Power` runtime effect `passive` difere do registry effect
+  `draw_cards` em `spell_cast` e `spell_resolved`.
+
+Target-pressure:
+
+- `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=179`,
+  `target_pressure_opponent_combat_to_other=5`,
+  `target_pressure_opponent_multi_defender_attack=1`.
+- O gate esta fechado no latest atual.
+
+Round6 detectado:
+
+- `card_battle_rules_pg_table_intent_promotions_round6_20260620.json`
+  declara `apply_pg=true`, `pg_inserted_or_updated=2`,
+  `selected_cards=["Goblin Bombardment"]`, `input_rows=2`,
+  `curated_rows=1`, `generated_rows=1`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round6_20260620.json`
+  declara `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5225`, `sqlite_inserted_or_updated=5143` e
+  `canonical_snapshot_rows_exported=3181`.
+- Este heartbeat nao executou o apply; os arquivos ficam classificados como
+  evidencia detectada/sync, nao como autorizacao para reexecutar.
+
+Classificacao:
+
+- O `205821` review residual de `Goblin Bombardment` foi superseded por
+  `210513`.
+- O blocker ativo voltou a ser curadoria/runtime de cartas de oponentes via
+  `functional_tags_json`; nao e decklist Lorehold.
+- Nao ha apply PostgreSQL autorizado por este heartbeat; qualquer pacote futuro
+  precisa de dry-run/precheck/rollback e aprovacao explicita do comando exato.
+
+Round7 pos-latest:
+
+- Depois do `210513`, foram detectados
+  `card_battle_rules_pg_table_intent_promotions_round7_20260620.json` e
+  `battle_card_rules_sqlite_from_pg_full_after_table_intent_round7_20260620.json`.
+- O round7 declara `apply_pg=true`, `pg_inserted_or_updated=6`,
+  `selected_cards=["Apex of Power","Arcane Endeavor","Curator's Ward","Magma Opus","The Unagi of Kyoshi Island"]`.
+- O sync pareado declara `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5230`, `sqlite_inserted_or_updated=5148` e
+  `canonical_snapshot_rows_exported=3185`.
+- Recheck 20s depois manteve latest em `20260620_210513`; ainda nao existe
+  battle rerun pos-round7.
+- Este heartbeat nao executou apply, sync ou rerun.
+
+## Checkpoint Auditor Central - latest 205821 forensic review residual - 2026-06-20 18:01 -0300
+
+Escopo:
+
+- Reconciliar o novo latest full `20260620_205821`.
+- Classificar os novos artefatos `round5` detectados em
+  `master_optimizer_reports`.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado por este heartbeat.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_205821/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212058`.
+- `battle_replay_final_status=review_required`.
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- `test_results_status_counts={"pass":18}`.
+- Gates limpos: `action_critic`, `replay_decision_audit`, `strategy_audit`,
+  `table_intent`, `target_pressure`, `effect_coverage`,
+  `focused_template_dispatch`, `unknown_template_backlog`,
+  `decision_trace_taxonomy` e `event_contract_static`.
+
+Pendencia real restante:
+
+- `forensic_rule_findings=2`, `forensic_turn_findings=0`.
+- Ambos os achados sao low severity no seed `63212068`:
+  `Goblin Bombardment` runtime effect `passive` difere do registry effect
+  `remove_creature` em `spell_cast` e `spell_resolved`.
+- Classificacao: review residual de registry/runtime drift; nao e bloqueio de
+  decklist Lorehold e nao justifica PostgreSQL apply sem pacote aprovado.
+
+Target-pressure:
+
+- `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=196`,
+  `target_pressure_opponent_combat_to_other=3`,
+  `target_pressure_opponent_multi_defender_attack=0`.
+- O gate esta fechado no latest atual.
+
+Round5 detectado:
+
+- `card_battle_rules_pg_table_intent_promotions_round5_20260620.json`
+  declara `apply_pg=true`, `pg_inserted_or_updated=3`,
+  `selected_cards=["Big Score","Spelltwine"]`, `input_rows=3`,
+  `curated_rows=2`, `generated_rows=1`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round5_20260620.json`
+  declara `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5224`, `sqlite_inserted_or_updated=5142` e
+  `canonical_snapshot_rows_exported=3181`.
+- Este heartbeat nao executou o apply; os arquivos ficam classificados como
+  evidencia detectada/sync, nao como autorizacao para reexecutar.
+
+Classificacao:
+
+- O blocker `target_pressure=blocked` do `204002` esta superseded.
+- O blocker `forensic_audit=blocked` tambem esta superseded; agora resta apenas
+  `forensic_audit=review_required`.
+- Nao ha apply PostgreSQL autorizado; qualquer pacote futuro precisa de
+  dry-run/precheck/rollback e aprovacao explicita do comando exato.
+
+## Checkpoint Auditor Central - latest 204002 target-pressure mandatory - 2026-06-20 17:40 -0300
+
+Escopo:
+
+- Tratar o novo full `20260620_202211`, que tinha
+  `event_contract_static=review_required`, `forensic_audit=blocked` e
+  `replay_decision_audit=blocked`.
+- Corrigir o wrapper local para que `target_pressure` entre explicitamente nos
+  mandatory gates do `summary.json`.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado nesta tratativa.
+
+Tratamento concluido:
+
+- Reauditoria event-contract sobre `20260620_202211` com o codigo atual gravou
+  `/tmp/event_contract_static_202211_current_code.*` e retornou
+  `status=event_contract_static_ready`,
+  `observed_unclassified_total=0`, `static_unclassified_total=0` e
+  `static_fixture_unaccepted_types=[]`.
+- O wrapper
+  `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+  agora lista `target_pressure` em
+  `mandatory_gates_required_for_final_status` e em
+  `mandatory_gate_statuses`.
+- `bash -n /Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+  passou.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh --dry-run --seeds 16`
+  saiu `0` e gerou o artefato latest `20260620_204002`.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_204002/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212040`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","target_pressure=blocked"]`.
+- `mandatory_gates_required_for_final_status` agora inclui
+  `target_pressure`.
+- `test_results_status_counts={"pass":18}`.
+- Gates limpos: `action_critic`, `replay_decision_audit`, `strategy_audit`,
+  `table_intent`, `effect_coverage`, `focused_template_dispatch`,
+  `unknown_template_backlog`, `decision_trace_taxonomy` e
+  `event_contract_static`.
+
+Pendencias reais restantes:
+
+- Target-pressure:
+  `target_pressure_statuses={"blocked":2,"pass":14}`,
+  `target_pressure_findings=4`,
+  `target_pressure_opponent_combat_to_target=188`,
+  `target_pressure_opponent_combat_to_other=3`,
+  `target_pressure_opponent_multi_defender_attack=1`.
+- Target-pressure blocking seeds:
+  `63212042`, `63212046`.
+- Forensic:
+  `forensic_rule_findings=21`, `forensic_turn_findings=0`,
+  blocking seeds `63212042`, `63212047`, `63212048`, `63212050`.
+- High/medium forensic lineage continua vindo de cartas de oponentes via
+  `functional_tags_json`, incluindo `Electric Revelation`,
+  `Rakdos, the Muscle`, `Fateful Showdown` e `Ur-Golem's Eye`.
+
+Classificacao:
+
+- `event_contract_static` e `replay_decision_audit` estao fechados no latest
+  atual.
+- O blocker restante e de curadoria/runtime de cartas de oponentes e de
+  comportamento target-pressure, nao de decklist Lorehold.
+- Nao ha apply PostgreSQL autorizado; qualquer pacote futuro precisa de
+  dry-run/precheck/rollback e aprovacao explicita do comando exato.
+
+## Checkpoint Auditor Central - latest 200409 full blockers - 2026-06-20 17:06 -0300
+
+Escopo:
+
+- Tratar o novo `latest` focado `20260620_200056`, que bloqueou
+  target-pressure por metadado `table_intent_*`, e revalidar com novo focused
+  e full rerun.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado nesta tratativa.
+
+Tratamento concluido:
+
+- `battle_target_pressure_audit.py` agora aceita `target_reason` com prefixo
+  `table_intent_` como metadado valido quando
+  `evaluation_target_active=true` e o defensor e `Lorehold`.
+- `test_battle_target_pressure_audit.py` cobre
+  `test_accepts_table_intent_target_reason_when_evaluation_target_is_active`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passou com `5` checks.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_target_pressure_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passou.
+- Reauditoria direta de seed `63213000` gravada em
+  `/tmp/lorehold_seed63213000_target_pressure_post_table_intent_metadata_fix.*`
+  retornou `status=pass`, `opponent_combat_to_target=14`,
+  `opponent_combat_to_other=0`,
+  `opponent_combat_missing_pressure_reason=0`, e `findings=0`.
+- Focused rerun
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_200322/summary.json`
+  retornou `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `target_pressure_statuses={"pass":1}`,
+  `forensic_rule_findings=0`, `decision_audit_turn_findings=0`,
+  `action_findings=0`, e testes `18/18` pass.
+
+Estado oficial full atual:
+
+- Latest full:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_200409/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63212004`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","table_intent=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`.
+- `replay_decision_audit` esta limpo:
+  `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`.
+- Target-pressure tem `15/16` pass e `1/16` blocked:
+  `target_pressure_findings=2`,
+  `target_pressure_opponent_combat_total=172`,
+  `target_pressure_opponent_combat_to_target=171`,
+  `target_pressure_opponent_combat_to_other=1`,
+  `target_pressure_opponent_multi_defender_attack=1`.
+
+Pendencias reais restantes:
+
+- Seed `63212012`: `Kinnan, Bonder Prodigy #104 (real)` fez
+  `multi_defender_attack` no turno `9`, com grupos para `Lorehold` e
+  `Tayam, Luminous Enigma #25 (real)`, gerando um combate de oponente contra
+  outro defensor em run de avaliacao Lorehold.
+- Forensic blockers:
+  `Woodland Bellower` em seed `63212015` e
+  `Shantotto, Tactician Magician` em seed `63212017`, ambos executando via
+  `functional_tags_json`.
+- Table-intent blockers:
+  seeds `63212004`, `63212009`, e `63212019`, todos com
+  `opponent_interaction_absent`.
+
+Classificacao:
+
+- A pendencia resolvida neste heartbeat era bug de auditoria/instrumentacao
+  para `table_intent_*`, nao composicao do deck Lorehold.
+- As pendencias restantes sao battle runtime/curadoria de regra e modelo de
+  comportamento de oponente; nao justificam PostgreSQL apply sem pacote
+  dry-run/precheck/rollback explicitamente aprovado.
+
+## Checkpoint Auditor Central - latest 195007 forensic blockers - 2026-06-20 16:50 -0300
+
+Escopo:
+
+- Rerodar o full recurring battle audit depois da correcao do
+  `Goblin Bombardment` `review_only` e da correcao do falso positivo de
+  target-pressure pos-morte do alvo.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado nesta tratativa.
+
+Estado oficial atual:
+
+- Latest:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_195007/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63211944`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","replay_decision_audit=review_required"]`.
+- `test_results_total=17`, `test_results_status_counts={"pass":17}`.
+- `action_findings=0`.
+- Target-pressure esta limpo:
+  `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_total=193`,
+  `target_pressure_opponent_combat_to_target=193`,
+  `target_pressure_opponent_combat_to_other=0`,
+  `target_pressure_opponent_multi_defender_attack=0`.
+
+Tratamento concluido:
+
+- `battle_target_pressure_audit.py` agora ignora combates de oponentes depois
+  que `Lorehold` ja foi eliminado.
+- `test_battle_target_pressure_audit.py` cobre
+  `test_ignores_opponent_combat_after_lorehold_is_eliminated`.
+- A revalidacao focada do seed `63211952` retornou `status=pass`,
+  `target_player_eliminated=true`,
+  `post_target_elimination_opponent_combat_ignored=1`,
+  `opponent_combat_to_target=10` e `opponent_combat_to_other=0`.
+- O full rerun `20260620_195007` confirma target-pressure pass `16/16`.
+
+Pendencias reais restantes:
+
+- `forensic_audit` segue `blocked` com `forensic_rule_findings=26` e
+  `forensic_turn_findings=1`.
+- Seeds blocking: `63211954` e `63211958`.
+- High forensic findings por `functional_tags_json`:
+  `Abandon Attachments`, `Channeled Force` e `Hypothesizzle`.
+- Medium forensic lineage recorrente:
+  `The Emperor of Palamecia`, `Firemind Vessel`,
+  `Sisay, Weatherlight Captain` e `Kraum, Ludevic's Opus`.
+- Low review/passive mismatches:
+  `Laughing Mad`, `Shark Typhoon`, `One with the Multiverse` e
+  `Stonespeaker Crystal`.
+- `replay_decision_audit` segue `review_required` por uma pendencia low:
+  seed `63211944`, turn `7`, `board_wipe_resolved`,
+  `Board wipe left more protected creatures (5) than destroyed (4).`
+
+Classificacao:
+
+- A pendencia restante e de curadoria de `card_battle_rules`/dados para cartas
+  de oponentes learned, nao de decklist Lorehold, target-pressure, action
+  critic ou bug `review_only` do Goblin.
+- Sem aprovacao explicita de pacote PostgreSQL, o proximo passo seguro e
+  preparar pacote dry-run/precheck/rollback para as cartas acima ou revisar se
+  alguma deve virar waiver runtime; nao aplicar.
+
+## Checkpoint Auditor Central - review-only canonical snapshot suppression - 2026-06-20 16:30 -0300
+
+Escopo:
+
+- Tratar o novo `latest` oficial
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_191248/summary.json`.
+- Separar defeito de runtime de qualquer evidencia de rollback PostgreSQL,
+  deck swap ou nova pendencia real no deck Lorehold.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado nesta tratativa.
+
+Estado observado no `latest`:
+
+- `battle_replay_final_status=blocked`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_blocked`.
+- `mandatory_gate_divergences=["action_critic=review_required","forensic_audit=blocked","replay_decision_audit=review_required"]`.
+- `forensic_rule_findings=2`, `action_findings=2`,
+  `decision_audit_decision_findings=1`.
+- `test_results_total=17`, `test_results_status_counts={"pass":17}`.
+- `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=84`,
+  `target_pressure_opponent_combat_to_other=0`.
+
+Blocker real:
+
+- Seed `63211917`.
+- `Goblin Bombardment`, controlado por `Dargo, the Shipwrecker #74 (real)`,
+  entrou no runtime como `remove_creature` a partir de
+  `known_cards_canonical_snapshot`.
+- A regra local em `battle_card_rules`/snapshot tem
+  `review_status=needs_review` e `execution_status=review_only`; logo ela
+  deve ser auditavel, mas nao executavel como remocao.
+
+Mudanca feita:
+
+- `battle_analyst_v9.py` passou a suprimir regras de snapshot canonico que nao
+  sejam runtime-safe em um efeito `passive`, preservando a proveniencia com
+  `battle_model_scope=canonical_snapshot_rule_not_runtime_safe`.
+- `battle_card_specific_tests.py` ganhou
+  `test_goblin_bombardment_review_only_snapshot_does_not_remove_on_cast`,
+  cobrindo que `Goblin Bombardment` `review_only` nao emite
+  `removal_resolved` nem remove `Lorehold, the Historian`.
+
+Evidencia:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passou, incluindo a nova regressao.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passou.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passou.
+- Replay/auditores focados em `/tmp/lorehold_seed63211917_post_review_only_fix.*`
+  retornaram `action_findings=0`, `forensic rule_findings=0`,
+  `forensic turn_findings=0`, `decision_findings=0` e
+  `decision turn_findings=0`.
+- Artefatos locais auxiliares
+  `docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_20260620_192955.md`
+  e
+  `docs/hermes-analysis/master_optimizer_reports/master_optimizer_replay_audit_20260620_192955.md`
+  nao sao novo `summary.json` oficial; eles mostram forensic limpo no replay
+  auditado e uma pendencia baixa de decision trace em outro seed.
+
+Conclusao operacional:
+
+- O defeito de runtime foi tratado localmente.
+- O `latest` oficial ainda deve ser considerado `blocked` ate um novo full
+  recurring rerun substituir `20260620_191248`.
+- Nao ha evidencia nova que autorize PostgreSQL apply ou deck swap.
+
+## Checkpoint Auditor Central - table intent / opponent effectiveness study - 2026-06-20 16:24 -0300
+
+Escopo:
+
+- Estudar a objecao de Rafael sobre intencao real de defesa/ameaca: se
+  Lorehold ataca, remove permanente, monta Approach/combo ou passa a frente,
+  ele pode virar nemesis/foco de um jogador ou da mesa.
+- Separar regra oficial de combate de heuristica politica de Commander.
+- Medir se as cartas dos oponentes realmente estao executando algo.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado nesta tratativa.
+
+Artefato:
+
+- `docs/hermes-analysis/master_optimizer_reports/battle_table_intent_and_opponent_effectiveness_audit_20260620.md`.
+
+Fontes:
+
+- Wizards rules page: `https://magic.wizards.com/en/rules`.
+- Comprehensive Rules TXT:
+  `https://media.wizards.com/2026/downloads/MagicCompRules%2020260417.txt`.
+- Latest battle:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185748/summary.json`.
+- Eventos estruturados por seed em
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185748/seed_*/replay.events.jsonl`.
+
+Leitura de regra:
+
+- A regra oficial define atacantes, defensores e bloqueadores legais.
+- Ela nao define "intencao politica" de jogadores.
+- Em Commander real, a intencao precisa ser modelada por IA: vinganca,
+  auto-preservacao, ameaca de mesa, combo iminente e oportunidade de matar.
+
+Evidencia de funcionamento dos oponentes:
+
+- Oponentes tiveram `106` `spell_cast`, `51` `creature_cast`, `33`
+  `spell_resolved`, `117` combates, `44` triggers resolvidos, `3` removals
+  resolvidos, `7` counters e `5/16` vitorias no latest.
+- Interacoes reais observadas incluem `Mental Misstep`/`An Offer You Can't
+  Refuse` contra `Silence`, `Flusterstorm` contra `The One Ring`,
+  `Pact of Negation` contra `Twinflame`, `Flusterstorm` contra
+  `Mizzix's Mastery` e `Blasphemous Act`, `Chain of Vapor` em mana rocks de
+  Lorehold, e `Swords to Plowshares` em token de Lorehold.
+
+Red flags:
+
+- `target_pressure` e um stress-test limpo, mas ainda nao e um modelo politico
+  real de Commander.
+- `target_pressure_opponent_combat_to_target=117` e
+  `target_pressure_opponent_combat_to_other=0` provam foco em Lorehold, mas
+  tambem mostram que o modo esta rigido demais para representar mesa real.
+- `cast_illegal` dos oponentes foi `648`; principais repeticoes:
+  `Kinnan, Bonder Prodigy=129`, `Thrasios, Triton Hero=107`,
+  `Tayam, Luminous Enigma=95`, `Etali, Primal Conqueror=38`,
+  `Rograkh, Son of Rohgahh=37`.
+- Bloqueios totais em `263` eventos de combate foram apenas `16`.
+
+Conclusao operacional:
+
+- E falso dizer que as cartas dos oponentes nao fazem nada.
+- Tambem e falso dizer que o battle ja representa uma mesa Commander real.
+- O WR atual de Lorehold deve ser tratado como evidencia sob stress-test, nao
+  como prova final de que o deck e o melhor.
+- Proxima correcao antes de novos swaps: criar camada `table_intent` com
+  memoria de nemesis por jogador, score de ameaca de mesa, auto-preservacao,
+  oportunidade de lethal e auditor de efetividade dos oponentes.
+
+## Checkpoint Auditor Central - target-pressure battle validation - 2026-06-20 16:00 -0300
+
+Escopo:
+
+- Corrigir a falha metodologica apontada por Rafael: a avaliacao do deck
+  Lorehold nao pode deixar os tres oponentes se baterem enquanto Lorehold
+  executa o proprio plano sem pressao real.
+- Transformar `Lorehold` em alvo de avaliacao sob pressao nas simulacoes de
+  battle usadas para estrategia.
+- Nenhum PostgreSQL write, deck swap, cleanup, stage, commit ou push foi
+  executado nesta tratativa.
+
+Mudancas de runtime/auditoria:
+
+- `battle_analyst_v9.py` agora aceita
+  `MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER`, default `Lorehold`, e direciona
+  ataques/removals dos oponentes para o alvo de avaliacao quando ele esta vivo.
+- `battle_replay_v10_3.py` para o replay quando Lorehold morre, evitando que
+  combates posteriores entre oponentes sejam lidos como evidencia de
+  estrategia do deck avaliado.
+- `master_optimizer_common.py` passa o alvo de avaliacao para as batalhas do
+  otimizador.
+- `battle_target_pressure_audit.py` e
+  `test_battle_target_pressure_audit.py` foram adicionados como gate de
+  auditoria recorrente.
+- O wrapper local
+  `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+  agora roda o target-pressure audit por seed e agrega o resultado como
+  mandatory gate `target_pressure`.
+
+Evidencia principal:
+
+- Latest battle vivo:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185748/summary.json`.
+- `latest` aponta para esse run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- `mandatory_gates_required_for_final_status` inclui
+  `target_pressure`.
+- `target_pressure_statuses={"pass":16}`.
+- `target_pressure_findings=0`.
+- `target_pressure_opponent_combat_total=117`.
+- `target_pressure_opponent_combat_to_target=117`.
+- `target_pressure_opponent_combat_to_other=0`.
+- `target_pressure_opponent_multi_defender_attack=0`.
+- `action_findings=0`, `forensic_rule_findings=0`,
+  `forensic_turn_findings=0`, `decision_audit_turn_findings=0`, e
+  `decision_audit_decision_findings=0`.
+- `test_results_total=17`,
+  `test_results_status_counts={"pass":17}`.
+- Runtime surface manifest atualizado:
+  `runtime_surface_manifest_total_files=112`,
+  `recurring audit gate=26`, `covered_by_recurring_run=31`, e
+  `recurring_audit_required=31`.
+
+Evidencia de replay inspectavel:
+
+- Replay manual:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_replay_20260620_153647.txt`.
+- Eventos:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_replay_20260620_153647.events.jsonl`.
+- Auditor target-pressure:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_replay_20260620_153647.target_pressure.json`.
+- Resultado do auditor nesse replay: `opponent_combat_total=14`,
+  `opponent_combat_to_target=14`, `opponent_combat_to_other=0`,
+  `opponent_multi_defender_attack=0`, `findings=0`.
+- O replay terminou com `WIN: Lorehold (elimination) turn 14`, mas essa vitoria
+  passa a ser evidenciada sob pressao direta de combate dos oponentes.
+
+Leitura operacional:
+
+- WR ou baseline gerado antes desta correcao nao deve ser usado como prova de
+  otimalidade do deck, porque podia incluir jogos em que Lorehold nao era
+  pressionado como alvo real.
+- A partir deste checkpoint, qualquer revisao de deck Lorehold para swap,
+  baseline ou strategy learning deve exigir o mandatory gate
+  `target_pressure` limpo no latest full run.
+- A simulacao sob pressao reduziu a leitura operacional do smoke de battle para
+  `83.3% (10W/2L/0S)` no run agregado manual, tornando o resultado mais
+  plausivel para avaliacao do deck do que o snapshot anterior sem essa pressao.
+
 ## Checkpoint Auditor Central - PG-008 Machine God's Effigy - 2026-06-20T15:16Z
 
 Estado atual verificado:
@@ -11091,3 +11845,57 @@ Conclusion:
   `action_findings=0`.
 - The latest quality gate with the clean audit is
   `docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260620_181826.md`.
+
+## Auditor Central Table-Intent Real Battle Closure - 2026-06-20 18:27 -0300
+
+Scope:
+
+- Consolidated Rafael's full authorization for this thread to own battle
+  correction, PostgreSQL promotion, Hermes SQLite cache refresh, documentation,
+  worktree organization, commit, and push for the real-battle cycle.
+- Reconciled the stale latest states `20260620_210513`, `20260620_211217`, and
+  `20260620_211648` against the current latest full recurring audit.
+
+Evidence:
+
+- Current latest summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`.
+- `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `test_results_status_counts={"pass":18}`.
+- Mandatory blockers are clean:
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `target_pressure_findings=0`, and `table_intent_findings=0`.
+- Table-intent proof:
+  `combat_total=294`, `scored_combat_total=294`, `missing_scores=0`,
+  `opponent_spell_cast=270`, `opponent_spell_resolved=153`,
+  `opponent_creature_cast=101`, `opponent_commander_cast=59`,
+  `opponent_cast_illegal=0`, `opponent_interaction_events=72`,
+  `opponent_trigger_interaction_events=32`, `opponent_wins=15`,
+  `target_wins=1`.
+- Target-pressure proof:
+  `target_pressure_statuses={"pass":16}`, `opponent_combat_to_target=214`,
+  `opponent_combat_to_other=3`, and `opponent_multi_defender_attack=2`.
+- Unknown-template/effect residual gates are accepted:
+  `unknown_template_backlog_cards=0`,
+  `effect_coverage_residual_raw_unaccepted_flags=[]`, and
+  `effect_coverage_residual_unaccepted_cards=[]`.
+- Human-readable seed evidence:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/seed_63212120/replay.txt`,
+  with `table-intent-realistic`, target `Lorehold`, three real learned-deck
+  opponents, `action_critic findings=0`, table-intent pass, target-pressure
+  pass, and Lorehold eliminated on turn `11`.
+- Closure report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_table_intent_real_battle_closure_20260620_1827.md`.
+
+Conclusion:
+
+- Current battle is trusted for strategy learning under table-intent pressure.
+- The result does not prove Lorehold is optimized; it proves the battle surface
+  can now evaluate Lorehold under realistic opponent pressure. The latest
+  16-seed result is harsh for Lorehold (`opponent_wins=15`, `target_wins=1`)
+  and should become the baseline for the next deck-improvement cycle.

@@ -33,12 +33,23 @@ def test_known_static_and_observed_events_are_classified():
     with tempfile.TemporaryDirectory() as tmp_name:
         tmp = Path(tmp_name)
         engine = tmp / "engine.py"
-        write_engine(engine, ["activated_ability", "adventure_cast", "worldfire_resolved"])
+        write_engine(
+            engine,
+            [
+                "activated_ability",
+                "adventure_cast",
+                "draw_equal_to_discarded_hand_resolved",
+                "etb_tutor_resolved",
+                "worldfire_resolved",
+            ],
+        )
         write_events(
             tmp / "seed_1/replay.events.jsonl",
             [
                 {"event": "activated_ability", "turn": 1, "player": "A"},
                 {"event": "adventure_cast", "turn": 2, "player": "A"},
+                {"event": "draw_equal_to_discarded_hand_resolved", "turn": 3, "player": "A"},
+                {"event": "etb_tutor_resolved", "turn": 3, "player": "A"},
                 {"event": "worldfire_resolved", "turn": 3, "player": "A"},
             ],
         )

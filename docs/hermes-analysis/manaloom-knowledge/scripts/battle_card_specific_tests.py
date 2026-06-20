@@ -2611,6 +2611,77 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def test_goblin_bombardment_review_only_snapshot_does_not_remove_on_cast():
+        events = []
+        fixture_name = "Review-Only Bombardment Fixture"
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_entry = battle.KNOWN_CARDS.get(fixture_name)
+        had_fallback = fixture_name in battle.CANONICAL_FALLBACK_KNOWN_CARDS
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.KNOWN_CARDS[fixture_name] = {
+            "effect": "remove_creature",
+            "cmc": 2,
+            "battle_rule_source": "generated",
+            "battle_rule_review_status": "needs_review",
+            "battle_rule_execution_status": "review_only",
+            "battle_rule_confidence": 0.55,
+            "battle_rule_logical_key": "battle_rule_v1:test_review_only_bombardment",
+            "battle_rule_version": 1,
+        }
+        battle.CANONICAL_FALLBACK_KNOWN_CARDS.add(fixture_name)
+        try:
+            active = player("Active")
+            opponent = player("Lorehold")
+            lorehold = {
+                "name": "Lorehold, the Historian",
+                "cmc": 5,
+                "type_line": "Legendary Creature — Elder Dragon",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+            }
+            opponent.battlefield = [lorehold]
+            card = {
+                "name": fixture_name,
+                "cmc": 2,
+                "type_line": "Enchantment",
+                "oracle_text": "Sacrifice a creature: this enchantment deals 1 damage to any target.",
+            }
+
+            effect = battle.get_card_effect(card)
+            assert effect["effect"] == "passive"
+            assert effect["suppressed_effect"] == "remove_creature"
+            assert effect["_rule_review_status"] == "review_only"
+            assert effect["_rule_execution_status"] == "review_only"
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                turn=9,
+                rng=random.Random(112),
+                effect_data_override=effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_entry is None:
+                battle.KNOWN_CARDS.pop(fixture_name, None)
+            else:
+                battle.KNOWN_CARDS[fixture_name] = previous_entry
+            if not had_fallback:
+                battle.CANONICAL_FALLBACK_KNOWN_CARDS.discard(fixture_name)
+
+        assert lorehold in opponent.battlefield
+        assert any(card.get("name") == fixture_name for card in active.battlefield)
+        assert not any(event == "removal_resolved" for event, _ in events)
+        assert any(
+            event == "spell_resolved"
+            and data.get("card") == fixture_name
+            and data.get("effect") == "passive"
+            and data.get("rule_review_status") == "review_only"
+            for event, data in events
+        )
+
     def test_goblin_bombardment_skips_without_expendable_creature():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -2784,6 +2855,7 @@ def register_tests(battle, player):
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
         test_ashnods_altar_sacrifices_token_only_for_contextual_mana_unlock,
         test_goblin_bombardment_sacrifices_expendable_token_for_damage,
+        test_goblin_bombardment_review_only_snapshot_does_not_remove_on_cast,
         test_goblin_bombardment_skips_without_expendable_creature,
         test_iron_man_attack_trigger_sacrifices_treasure_for_artifact_tutor,
     ]

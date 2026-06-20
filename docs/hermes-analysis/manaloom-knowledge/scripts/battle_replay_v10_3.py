@@ -449,6 +449,23 @@ def main():
         replay.write("=" * 70 + "\n")
         replay.write("BATTLE v10.3 - STRUCTURED REPLAY\n")
         replay.write(f"Commander: {commander['name']}\n")
+        evaluation_target = (
+            battle.evaluation_target_player_name()
+            if hasattr(battle, "evaluation_target_player_name")
+            else ""
+        )
+        evaluation_mode = (
+            {
+                "target_pressure": "target-deck-under-pressure",
+                "table_intent": "table-intent-realistic",
+                "free_for_all": "free-for-all",
+            }.get(battle.battle_evaluation_mode(), battle.battle_evaluation_mode())
+            if hasattr(battle, "battle_evaluation_mode")
+            else ("target-deck-under-pressure" if evaluation_target else "free-for-all")
+        )
+        replay.write(f"Evaluation mode: {evaluation_mode}\n")
+        if evaluation_target:
+            replay.write(f"Evaluation target player: {evaluation_target}\n")
         replay.write(f"Opponents available: {len(source)}\n")
         replay.write(
             "Opponents picked: "
@@ -479,14 +496,7 @@ def main():
         opponents = []
         for profile in picked:
             if profile.get("is_real") and profile.get("built_deck"):
-                opp_cmd = {
-                    "name": profile["commander_name"],
-                    "cmc": 4,
-                    "tag": "creature",
-                    "type_line": "Legendary Creature",
-                    "is_commander": True,
-                    "owner": profile["name"],
-                }
+                opp_cmd = battle.learned_opponent_commander_card(profile)
                 opp = battle.Player(
                     profile["name"],
                     opp_cmd,
@@ -503,6 +513,15 @@ def main():
                     "metrics_basis": "runtime_derived_from_resolved_built_deck",
                     "cached_metadata_used_for_metrics": False,
                     "metrics": deck_metrics(profile["built_deck"]),
+                    "commander": {
+                        "name": opp_cmd.get("oracle_name") or opp_cmd.get("name"),
+                        "cmc": opp_cmd.get("cmc"),
+                        "mana_cost": opp_cmd.get("mana_cost"),
+                        "type_line": opp_cmd.get("type_line"),
+                        "power": opp_cmd.get("power"),
+                        "toughness": opp_cmd.get("toughness"),
+                        "metadata_source": opp_cmd.get("_commander_metadata_source"),
+                    },
                     "blocker_domain": "none",
                 })
             else:
@@ -577,6 +596,16 @@ def main():
                     continue
                 others = [other for other in all_players if other is not player]
                 battle.play_turn_v8(player, others, all_players, turn, rng, stack)
+                if not lorehold.is_alive():
+                    winner = next(
+                        (
+                            candidate
+                            for candidate in all_players
+                            if candidate is not lorehold and candidate.is_alive()
+                        ),
+                        player if player is not lorehold and player.is_alive() else None,
+                    )
+                    break
                 winner = next(
                     (candidate for candidate in all_players if candidate.has_won()),
                     None,

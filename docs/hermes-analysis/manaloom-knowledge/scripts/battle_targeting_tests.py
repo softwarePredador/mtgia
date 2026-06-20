@@ -330,6 +330,56 @@ def register_tests(battle, player):
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
+    def test_evaluation_mode_prioritizes_lorehold_for_targeted_removal():
+        previous_target = battle.os.environ.get(battle.EVALUATION_TARGET_ENV)
+        battle.os.environ[battle.EVALUATION_TARGET_ENV] = "Lorehold"
+        try:
+            caster = player("Opponent")
+            other = player("Other Opponent")
+            lorehold = player("Lorehold")
+            other.battlefield = [
+                {
+                    "name": "Other Best Creature",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "is_commander": True,
+                    "power": 9,
+                    "toughness": 9,
+                }
+            ]
+            lorehold.battlefield = [
+                {
+                    "name": "Lorehold Engine",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                }
+            ]
+            spell = {
+                "name": "Swords to Plowshares",
+                "type_line": "Instant",
+                "colors": ["W"],
+            }
+
+            effect, replay_targets = battle.prepare_declared_removal_targets(
+                caster,
+                [other, lorehold],
+                spell,
+                {"effect": "remove_creature", "target": "creature"},
+            )
+
+            declared = effect["declared_targets"][0]
+            assert declared["controller"] is lorehold
+            assert declared["target"]["name"] == "Lorehold Engine"
+            assert replay_targets[0]["target_controller"] == "Lorehold"
+            assert replay_targets[0]["target"] == "Lorehold Engine"
+        finally:
+            if previous_target is None:
+                battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
+
     return [
         test_formal_targeting_rejects_opponent_hexproof_creature,
         test_formal_targeting_respects_protection_from_source_color,
@@ -340,4 +390,5 @@ def register_tests(battle, player):
         test_declared_removal_target_is_revalidated_not_reselected,
         test_ward_counters_targeted_removal_when_unpaid,
         test_ward_paid_allows_targeted_removal_to_resolve,
+        test_evaluation_mode_prioritizes_lorehold_for_targeted_removal,
     ]

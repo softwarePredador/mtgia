@@ -1,4 +1,48 @@
 {
+  "Abandon Attachments": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "draw_cards",
+      "count": 2,
+      "instant": true,
+      "requires_discard_card": true,
+      "battle_model_scope": "optional_discard_draw_two_lesson_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Abandon Attachments may discard a card to draw two cards. Runtime models the payoff path with an explicit discard-card cost instead of relying on functional_tags_json."
+  },
+  "Aether Channeler": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 1,
+      "etb_draw_count": 1,
+      "etb_modal_options": [
+        "create_1_1_flying_bird",
+        "bounce_nonland_permanent",
+        "draw_card"
+      ],
+      "battle_model_scope": "modal_etb_creature_draw_default_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "creature",
+      "subtype": "modal_etb_value_creature"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Aether Channeler is a 2/1 creature with a modal ETB. Runtime keeps the creature body and uses the safe draw mode until a modal target selector supports token and bounce choices."
+  },
   "Ashnod's Altar": {
     "effect_json": {
       "cmc": 3.0,
@@ -140,6 +184,26 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: on first resolution it gains 7 life and is put seventh from the top if cast from hand; on the second resolving cast by the same player, that player wins the game. Runtime models the explicit second-cast win state instead of collapsing the card into a generic finisher bucket."
   },
+  "Arcane Endeavor": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "draw_cards",
+      "sorcery": true,
+      "count": 4,
+      "roll_two_d8_choose_draw_count": true,
+      "free_cast_instant_or_sorcery_by_other_d8": true,
+      "battle_model_scope": "d8_draw_plus_free_spell_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "subtype": "variable_draw_payoff"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: rolls two d8, draws by one result, and may cast an instant or sorcery with mana value up to the other result for free. Runtime uses a conservative fixed draw floor with the free-cast branch annotated."
+  },
   "Brainstone": {
     "effect_json": {
       "cmc": 1.0,
@@ -160,6 +224,29 @@
     "confidence": 0.88,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-19 against Scryfall API: {2}, {T}, Sacrifice this artifact: Draw three cards, then put two cards from your hand on top of your library in any order. Runtime must keep Brainstone as an activated topdeck/filter artifact, not as free draw on spell resolution; full sacrifice/draw/put-back activation executor remains pending."
+  },
+  "Breena, the Demagogue": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 1,
+      "toughness": 3,
+      "flying": true,
+      "political_attack_draw_trigger": true,
+      "attack_trigger_draw_attacking_player": true,
+      "attack_trigger_put_counters_on_own_creature": 2,
+      "battle_model_scope": "flying_creature_political_attack_draw_counter_trigger_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "political_attack_draw_engine"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: 1/3 flying creature with a political attack trigger that can draw the attacking player a card and place two +1/+1 counters. Runtime models the creature body and records the attack trigger metadata instead of treating it as immediate draw."
   },
   "Ancient Den": {
     "effect_json": {
@@ -199,6 +286,25 @@
     "confidence": 0.98,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Ancient Tomb taps for {C} and deals 2 damage to you while effectively producing an extra colorless mana over a normal land under the current pooled-mana abstraction. Runtime uses the explicit life-cost and bonus-mana fields instead of collapsing it into a generic land."
+  },
+  "Apex of Power": {
+    "effect_json": {
+      "cmc": 10.0,
+      "effect": "passive",
+      "sorcery": true,
+      "impulse_top_seven_until_eot": true,
+      "adds_ten_mana_if_cast_from_hand": true,
+      "battle_model_scope": "impulse_top_seven_plus_hand_cast_mana_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "payoff",
+      "effect": "passive",
+      "subtype": "impulse_cast_mana_payoff"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: exiles top seven for same-turn casting and adds ten mana only if cast from hand. Runtime keeps this as a passive annotated payoff instead of treating it as normal draw."
   },
   "Chromatic Star": {
     "effect_json": {
@@ -248,6 +354,27 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against Scryfall API: cost is {1}{B/P}{B/P}; target creature gets -5/-5 until end of turn. Runtime models this as a stat modifier, not destroy/exile."
   },
+  "Drown in Dreams": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "passive",
+      "instant": true,
+      "x_spell": true,
+      "modal_draw_x": true,
+      "modal_mill_twice_x": true,
+      "commander_allows_choose_both": true,
+      "battle_model_scope": "x_draw_mill_spell_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "x_draw_mill",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Drown in Dreams is an X modal instant that draws X and/or mills twice X if a commander is controlled. Runtime records the reviewed X-spell semantics but leaves execution passive until X payment and modal targeting are implemented."
+  },
   "Crop Rotation": {
     "effect_json": {
       "cmc": 1.0,
@@ -267,6 +394,25 @@
     "confidence": 0.97,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost sacrifice a land, then search for any land card and put it onto the battlefield. Runtime uses the explicit sacrifice-land gate and contextual land-target scoring instead of treating this as permanent ramp."
+  },
+  "Curator's Ward": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "passive",
+      "aura": true,
+      "enchanted_permanent_has_hexproof": true,
+      "draw_two_when_historic_enchanted_permanent_leaves": true,
+      "battle_model_scope": "aura_hexproof_historic_leave_draw_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "passive",
+      "subtype": "aura_hexproof_delayed_draw"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: enchants a permanent, grants hexproof, and draws two only when the enchanted permanent leaves if it was historic. Runtime keeps it as a passive aura annotation instead of immediate draw on cast."
   },
   "Entomb": {
     "effect_json": {
@@ -288,6 +434,127 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for a card and put that card into your graveyard. Runtime must not degrade this into draw."
   },
+  "Empowered Autogenerator": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "WUBRGC",
+      "enters_tapped": true,
+      "charge_counter_scaling_mana": true,
+      "battle_model_scope": "enters_tapped_charge_counter_scaling_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "charge_counter_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: enters tapped; tap to add a charge counter and add X mana of one color equal to charge counters. Runtime uses a conservative one-mana baseline plus scaling annotation."
+  },
+  "Ether": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "passive",
+      "activated_exile_self_for_mana": true,
+      "mana_produced": 1,
+      "produces": "U",
+      "copy_next_instant_or_sorcery_this_turn": true,
+      "battle_model_scope": "one_shot_exile_mana_spell_copy_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "passive",
+      "subtype": "one_shot_spell_copy_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: artifact exiles itself for U and copies the next instant or sorcery this turn. Runtime keeps it as a permanent annotation rather than a reusable mana rock."
+  },
+  "Electric Revelation": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "draw_cards",
+      "instant": true,
+      "count": 2,
+      "requires_discard_card": true,
+      "flashback_cost": "{3}{R}",
+      "battle_model_scope": "discard_draw_two_flashback_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: additional discard cost, draw two, flashback 3R. Runtime executes discard/draw and keeps flashback as annotation."
+  },
+  "Fateful Showdown": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "draw_cards",
+      "instant": true,
+      "draw_equal_to_discarded_hand": true,
+      "damage_any_target_equal_hand_size": true,
+      "battle_model_scope": "hand_size_damage_discard_draw_same_count_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: deals damage equal to hand size, discards hand, then draws that many. Runtime executes discard/draw parity and annotates the damage target."
+  },
+  "Big Score": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "treasure_maker",
+      "instant": true,
+      "requires_discard_card": true,
+      "draw_count": 2,
+      "treasure_count": 2,
+      "battle_model_scope": "discard_draw_two_create_two_treasures_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "treasure_maker",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: additional discard cost, draw two, create two Treasure tokens. Runtime uses the existing treasure-maker executor instead of passive/ramp-engine fallback."
+  },
+  "Spelltwine": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "copy_spell",
+      "sorcery": true,
+      "target": "instant_or_sorcery_graveyards",
+      "copy_own_and_opponent_graveyard_spell": true,
+      "casts_copies_without_paying_mana": true,
+      "exiles_target_cards": true,
+      "exiles_self": true,
+      "battle_model_scope": "graveyard_instant_sorcery_copy_cast_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "value",
+      "effect": "copy_spell",
+      "target": "graveyard_instant_or_sorcery"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: exiles one instant or sorcery from your graveyard and one from an opponent graveyard, copies them, casts copies if able without paying costs, then exiles Spelltwine. Runtime uses the existing copy-spell payoff with graveyard-copy annotations until full dual graveyard target execution exists."
+  },
   "Fellwar Stone": {
     "effect_json": {
       "cmc": 2.0,
@@ -306,6 +573,87 @@
     "confidence": 0.9,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Fellwar Stone taps for one mana of any color that a land an opponent controls could produce. Runtime intentionally models the safe baseline as a live one-mana rock with conditional color flexibility, while exact opponent color derivation remains a tracked refinement."
+  },
+  "Pirate's Pillage": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "treasure_maker",
+      "sorcery": true,
+      "requires_discard_card": true,
+      "draw_count": 2,
+      "treasure_count": 2,
+      "battle_model_scope": "discard_draw_two_create_two_treasures_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "treasure_maker",
+      "timing": "main_phase"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: additional discard cost, draw two, create two Treasure tokens. Runtime uses the same discard/draw/treasure executor as Unexpected Windfall."
+  },
+  "Prismatic Lens": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "CWUBRG",
+      "activation_cost_generic_for_colored_filter": 1,
+      "battle_model_scope": "colorless_mana_rock_with_color_filter_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "filter_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: taps for colorless or pays one and taps for one mana of any color. Runtime models the one-mana rock baseline and tracks the color-filter activation."
+  },
+  "Practical Research": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "draw_cards",
+      "instant": true,
+      "count": 4,
+      "discard_count": 2,
+      "discard_count_reduced_if_discard_instant_or_sorcery": true,
+      "battle_model_scope": "draw_four_discard_two_or_spell_card_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: draws four, then discards two unless an instant or sorcery is discarded. Runtime executes the draw baseline and carries the discard-condition metadata."
+  },
+  "Rakdos, the Muscle": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 6,
+      "toughness": 5,
+      "keywords": ["flying", "trample"],
+      "sacrifice_creature_grants_indestructible": true,
+      "sacrifice_trigger_exile_top_by_mana_value": true,
+      "battle_model_scope": "flying_trample_sacrifice_indestructible_exile_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "threat",
+      "effect": "creature",
+      "subtype": "sacrifice_payoff_commander"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: 6/5 flying trample, sacrifice payoff exile/play cards, and once-per-turn sacrifice another creature to gain indestructible and tap. Runtime models the creature body and annotates sacrifice abilities."
   },
   "Rampant Growth": {
     "effect_json": {
@@ -381,6 +729,25 @@
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Gemstone Caverns has a pregame luck-counter branch that changes its output. Runtime keeps the current broad fixing abstraction for battle consistency until dedicated pregame modeling exists."
   },
+  "Goblin Bombardment": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "passive",
+      "activated_sacrifice_creature_damage": true,
+      "sacrifice_creature_damage": true,
+      "damage": 1,
+      "target": "any",
+      "battle_model_scope": "sacrifice_creature_damage_outlet_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "sacrifice_damage_outlet"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: enchantment with activated ability 'Sacrifice a creature: this enchantment deals 1 damage to any target.' Runtime models it as a passive permanent with an explicit sacrifice-creature damage outlet, not as immediate removal on cast."
+  },
   "Great Furnace": {
     "effect_json": {
       "cmc": 0.0,
@@ -417,6 +784,44 @@
     "confidence": 0.9,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is primarily a colorless utility land with enchantment-recursion activation. Runtime keeps the recursion profile as reviewed metadata while preserving the baseline colorless land behavior."
+  },
+  "Hypothesizzle": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "draw_cards",
+      "count": 2,
+      "instant": true,
+      "optional_discard_nonland_damage": 4,
+      "battle_model_scope": "draw_two_optional_discard_damage_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Hypothesizzle draws two, then may discard a nonland card to deal 4 damage to a creature. Runtime executes the draw and records the conditional damage mode for a future discard-target selector."
+  },
+  "Ichor Elixir": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 2,
+      "produces": "C",
+      "planar_dice_replacement_unexecuted": true,
+      "battle_model_scope": "two_colorless_mana_rock_planar_dice_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Ichor Elixir taps for two colorless mana and has a planar dice replacement irrelevant to current Commander replay. Runtime treats it as a two-mana artifact source, not a functional tag heuristic."
   },
   "Incubation Druid": {
     "effect_json": {
@@ -455,6 +860,27 @@
     "confidence": 0.93,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer-Scryfall text: you have no maximum hand size, and if an effect causes you to discard a card you may discard it to the top of your library instead of to your graveyard. This is especially relevant for Lorehold miracle turns and rummage lines; it is not a mana rock."
+  },
+  "Laughing Mad": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "draw_cards",
+      "count": 2,
+      "instant": true,
+      "requires_discard_card": true,
+      "flashback": true,
+      "flashback_cost": "{3}{R}",
+      "battle_model_scope": "discard_draw_two_flashback_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Laughing Mad has an additional discard-card cost, draws two cards, and has flashback. Runtime models the normal cast payoff with explicit discard-card cost instead of suppressing the generated rule."
   },
   "Lorehold, the Historian": {
     "effect_json": {
@@ -495,6 +921,29 @@
     "confidence": 0.96,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Lumra is a creature whose power and toughness each equal the number of lands you control and whose ETB mills four, then returns all land cards from your graveyard to the battlefield tapped. Runtime uses the dedicated land-recursion-creature executor instead of degrading this into generic recursion."
+  },
+  "Magma Opus": {
+    "effect_json": {
+      "cmc": 8.0,
+      "effect": "draw_cards",
+      "instant": true,
+      "count": 2,
+      "damage_divided_any_targets": 4,
+      "tap_target_permanents": 2,
+      "creates_elemental_token_power": 4,
+      "creates_elemental_token_toughness": 4,
+      "discard_for_treasure": true,
+      "battle_model_scope": "draw_two_with_damage_tap_token_treasure_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "subtype": "modal_big_spell"
+    },
+    "source": "curated",
+    "confidence": 0.89,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: instant that deals four divided, taps two permanents, creates a 4/4 Elemental, draws two, and can be discarded for a Treasure. Runtime executes the draw floor and annotates damage/tap/token/treasure branches."
   },
   "Mox Amber": {
     "effect_json": {
@@ -576,6 +1025,25 @@
     "confidence": 0.96,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield."
+  },
+  "One with the Multiverse": {
+    "effect_json": {
+      "cmc": 8.0,
+      "effect": "passive",
+      "ability_kind": "static",
+      "look_at_top_card": true,
+      "play_from_top_of_library": true,
+      "free_spell_once_each_turn": true,
+      "battle_model_scope": "topdeck_casting_static_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "topdeck_manipulation"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: One with the Multiverse is a static topdeck/cast permission engine. Runtime preserves it as a passive battlefield enchantment with reviewed metadata until top-library permission and free-cast policy are executable."
   },
   "Path to Exile": {
     "effect_json": {
@@ -702,6 +1170,28 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a graveyard-hate artifact with a later self-sacrifice draw mode. Runtime must not degrade it into a generic draw spell because the draw is conditional and delayed."
   },
+  "Stonespeaker Crystal": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 2,
+      "produces": "C",
+      "activated_self_sacrifice_draw": true,
+      "activation_cost_generic": 2,
+      "activation_requires_tap": true,
+      "activated_exile_target_player_graveyards": true,
+      "battle_model_scope": "two_mana_rock_graveyard_hate_cantrip_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "graveyard_hate_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.92,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Stonespeaker Crystal taps for two colorless and can later pay two, tap, sacrifice, exile graveyards, and draw. Runtime treats it as a mana rock first and uses existing self-sacrifice draw machinery when appropriate."
+  },
   "Staff of Compleation": {
     "effect_json": {
       "cmc": 3.0,
@@ -739,6 +1229,24 @@
     "confidence": 0.9,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Talisman of Conviction can tap for colorless freely or for red/white while dealing 1 damage to its controller. Runtime safely models the card as a one-mana rock with tracked pain-color metadata; exact per-tap color-choice and pain sequencing remain partial."
+  },
+  "Ur-Golem's Eye": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 2,
+      "produces": "C",
+      "battle_model_scope": "two_colorless_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "colorless_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: tap to add two colorless mana. Runtime models it as a verified two-mana rock, replacing functional-tag fallback."
   },
   "Unexpected Windfall": {
     "effect_json": {
@@ -946,6 +1454,26 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: whenever you cast a spell, add {R} until end of turn. Runtime keeps the creature body and the spell-cast mana trigger without modeling every backside/modal nuance."
   },
+  "Channeled Force": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "draw_cards",
+      "count": 2,
+      "instant": true,
+      "requires_discard_card": true,
+      "optional_damage_to_creature": 4,
+      "battle_model_scope": "variable_discard_draw_damage_safe_floor_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Channeled Force discards X cards, draws X cards for target player, and can damage a creature or planeswalker. Runtime uses a conservative discard-one draw floor and records the damage mode until variable-X targeting is implemented."
+  },
   "Electroduplicate": {
     "effect_json": {
       "cmc": 3.0,
@@ -962,6 +1490,25 @@
     "confidence": 0.91,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against mechanics coverage: runtime should create a hasty token copy that sacrifices at the next end step, not collapse this into a generic token-maker bucket."
+  },
+  "Firemind Vessel": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 2,
+      "produces": "WUBRG",
+      "enters_tapped": true,
+      "battle_model_scope": "enters_tapped_two_color_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.92,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Firemind Vessel enters tapped and taps for two mana of different colors. Runtime preserves it as a tapped mana permanent, not a functional tag heuristic."
   },
   "Runaway Steam-Kin": {
     "effect_json": {
@@ -1063,6 +1610,28 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: front face is the hand-filter instant, back face is Valakut Stoneforge tapped red land. Runtime keeps both faces together so split-name lookups do not degrade into generic draw heuristics."
   },
+  "Volcanic Vision": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "recursion",
+      "sorcery": true,
+      "count": 1,
+      "target": "instant_or_sorcery",
+      "destination": "hand",
+      "damage_opponent_creatures_equal_recovered_cmc": true,
+      "exiles_self": true,
+      "battle_model_scope": "instant_sorcery_recursion_with_opponent_creature_damage_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "recursion",
+      "effect": "recursion",
+      "target": "instant_or_sorcery"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: return target instant or sorcery from graveyard to hand, deal its mana value to opponent creatures, then exile Volcanic Vision. Runtime executes the recursion baseline and tracks damage/exile semantics."
+  },
   "Wall of Omens": {
     "effect_json": {
       "cmc": 2.0,
@@ -1139,6 +1708,28 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against current mechanics coverage: runtime should treat this as a gain-life plus Lander-token spell, not as a tutor bucket."
   },
+  "Sazacap's Brew": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "draw_cards",
+      "instant": true,
+      "count": 2,
+      "target_player_draw": true,
+      "requires_discard_card": true,
+      "gift_tapped_fish": true,
+      "gift_promised_power_pump": 2,
+      "battle_model_scope": "discard_draw_two_gift_fish_pump_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.92,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: additional discard cost, target player draws two, optional gift tapped Fish and +2/+0 pump. Runtime executes the discard/draw baseline and tracks gift/pump as annotation."
+  },
   "Scavenging Ooze": {
     "effect_json": {
       "cmc": 2.0,
@@ -1160,6 +1751,27 @@
     "confidence": 0.9,
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Scavenging Ooze is a creature permanent with a repeatable graveyard-exile activation that can grow itself and gain life. Runtime must not resolve it as immediate removal on spell cast; it should enter the battlefield as a creature first. The activated exile/counter/life mode remains tracked until a dedicated graveyard-hate creature executor exists."
+  },
+  "Shark Typhoon": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "passive",
+      "trigger": "noncreature_spell_cast",
+      "spell_cast_token_power_from_spell_cmc": true,
+      "spell_cast_token_name": "Shark Token",
+      "spell_cast_token_flying": true,
+      "cycling_token_mode_unexecuted": true,
+      "battle_model_scope": "noncreature_spell_cast_shark_token_trigger_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "token_maker",
+      "subtype": "noncreature_spell_trigger"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Shark Typhoon is an enchantment that creates an X/X flying Shark when its controller casts a noncreature spell. Runtime executes the noncreature spell trigger and records cycling as unexecuted metadata."
   },
   "Seething Song": {
     "effect_json": {
@@ -1196,6 +1808,246 @@
     "confidence": 0.97,
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: opponents cannot cast spells this turn. Runtime should set the until-end-of-turn silence state, not materialize a battlefield permanent."
+  },
+  "The Emperor of Palamecia": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "is_mana_source": true,
+      "mana_produced": 1,
+      "produces": "UR",
+      "mana_spend_restriction": "noncreature_spell",
+      "power": 2,
+      "toughness": 2,
+      "transform_counter_threshold": 3,
+      "battle_model_scope": "legendary_mana_creature_transform_unexecuted_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "creature",
+      "subtype": "noncreature_spell_mana_commander"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: The Emperor of Palamecia is a 2/2 legendary creature that taps for blue or red usable on noncreature spells and transforms after counters from large noncreature casts. Runtime models the creature and mana-source baseline; transform/counter policy remains tracked."
+  },
+  "Tellah, Great Sage": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 3,
+      "toughness": 3,
+      "noncreature_spell_creates_hero_token": true,
+      "hero_token_power": 1,
+      "hero_token_toughness": 1,
+      "spell_cast_draw_if_cmc_at_least": 4,
+      "spell_cast_draw_count": 2,
+      "spell_cast_sacrifice_damage_if_mana_spent_at_least": 8,
+      "battle_model_scope": "noncreature_spell_token_draw_damage_engine_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "noncreature_spell_payoff"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: 3/3 legendary creature that makes a 1/1 Hero on noncreature spells, draws two if four or more mana was spent, and sacrifices to deal damage to each opponent at eight or more mana. Runtime uses the existing high-CMC spell draw trigger and annotates token/damage branches."
+  },
+  "The Unagi of Kyoshi Island": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 5,
+      "toughness": 5,
+      "flash": true,
+      "ward_cost": 4,
+      "waterbend_ward": true,
+      "opponent_second_draw_each_turn_draw_count": 2,
+      "battle_model_scope": "flash_ward_opponent_second_draw_engine_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "opponent_draw_trigger"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: 5/5 legendary Serpent with flash, Ward-Waterbend 4, and a trigger that draws two whenever an opponent draws their second card each turn. Runtime models the creature body and carries the draw trigger as reviewed metadata until second-draw trigger execution exists."
+  },
+  "Decaying Time Loop": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "draw_cards",
+      "instant": true,
+      "draw_equal_to_discarded_hand": true,
+      "retrace_unexecuted": true,
+      "battle_model_scope": "controller_discard_hand_draw_same_count_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: controller discards their hand, then draws that many cards. Runtime now models the self-only discard/draw baseline; retrace remains annotated but unexecuted."
+  },
+  "Izzet Signet": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "UR",
+      "activation_cost_generic": 1,
+      "battle_model_scope": "signet_filter_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "mana_filter_rock"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: {1}, tap: add UR. Runtime models it as a live one-mana filter rock with activation-cost annotation, replacing passive fallback behavior."
+  },
+  "Kraum, Ludevic's Opus": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "draw_engine",
+      "is_creature_permanent": true,
+      "power": 4,
+      "toughness": 4,
+      "keywords": ["flying", "haste", "partner"],
+      "trigger": "opponent_spell",
+      "opponent_second_spell_each_turn": true,
+      "tax": 0,
+      "draw_on_enter": false,
+      "battle_model_scope": "second_opponent_spell_draw_engine_creature_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_engine",
+      "subtype": "second_spell_commander"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: 4/4 flying haste partner; whenever an opponent casts their second spell each turn, draw a card. Runtime tracks per-turn spell count and disables the generic draw-engine ETB draw."
+  },
+  "Ring of the Lucii": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 2,
+      "produces": "C",
+      "activated_tap_nonland_permanent": true,
+      "activation_cost_generic": 2,
+      "activation_life_cost": 1,
+      "battle_model_scope": "two_colorless_mana_rock_tap_nonland_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "legendary_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: taps for CC and can pay 2, tap, pay 1 life to tap a nonland permanent. Runtime models the mana baseline and records the tap ability as an unexecuted interaction annotation."
+  },
+  "Shantotto, Tactician Magician": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 0,
+      "toughness": 4,
+      "trigger": "noncreature_spell_cast",
+      "spell_cast_draw_if_cmc_at_least": 4,
+      "spell_cast_draw_count": 1,
+      "temporary_power_pump_from_spell_cmc": true,
+      "battle_model_scope": "noncreature_cmc4_draw_trigger_power_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "creature",
+      "subtype": "noncreature_spell_payoff"
+    },
+    "source": "curated",
+    "confidence": 0.89,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: noncreature spells pump Shantotto by mana spent and draw if 4+ was spent. Runtime uses spell CMC as the mana-spent proxy for the draw trigger and annotates the pump."
+  },
+  "Sisay's Ring": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 2,
+      "produces": "C",
+      "battle_model_scope": "two_colorless_mana_rock_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "colorless_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: tap to add two colorless mana. Runtime models it as a verified two-mana rock, replacing functional-tag fallback."
+  },
+  "Sisay, Weatherlight Captain": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 2,
+      "activated_legendary_tutor": true,
+      "activation_cost": "WUBRG",
+      "tutor_destination": "battlefield",
+      "tutor_power_less_than": true,
+      "battle_model_scope": "legendary_power_tutor_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "creature",
+      "subtype": "legendary_commander_tutor"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Sisay grows by colors among other legendary permanents and pays WUBRG to put a lower-mana-value legendary permanent onto the battlefield. Runtime models the creature baseline and keeps the activated tutor as an annotation."
+  },
+  "Woodland Bellower": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 6,
+      "toughness": 5,
+      "etb_tutor_nonlegendary_green_creature_mv_lte": 3,
+      "etb_tutor_destination": "battlefield",
+      "battle_model_scope": "etb_nonlegendary_green_creature_mv3_to_battlefield_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "creature",
+      "subtype": "etb_creature_tutor"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: when it enters, may search for a nonlegendary green creature card with mana value 3 or less and put it onto the battlefield. Runtime now models that ETB tutor."
   },
   "Worldfire": {
     "effect_json": {

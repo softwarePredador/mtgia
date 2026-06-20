@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "combat_total": 24,
+    "events_total": 1091,
+    "findings": 0,
+    "opponent_combat_missing_pressure_reason": 0,
+    "opponent_combat_to_other": 0,
+    "opponent_combat_to_target": 14,
+    "opponent_combat_total": 14,
+    "opponent_multi_defender_attack": 0,
+    "status": "pass",
+    "target_player": "Lorehold",
+    "target_player_combat_total": 10,
+    "violations": []
+  }
+}

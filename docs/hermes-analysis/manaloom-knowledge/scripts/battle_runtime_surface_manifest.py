@@ -68,6 +68,7 @@ DIRECT_RECURRING_RUN_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_runtime_surface_manifest.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/battle_target_pressure_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_unknown_template_backlog_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_action_critic.py",
@@ -83,6 +84,7 @@ DIRECT_RECURRING_RUN_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_forensic_audit_supported_effects.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_replay_decision_auditor_scope.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_unknown_template_backlog_audit.py",
 }
 
@@ -134,6 +136,8 @@ RECURRING_GATE_BASENAMES = {
     "battle_forensic_audit.py",
     "replay_decision_auditor.py",
     "battle_runtime_surface_manifest.py",
+    "battle_table_intent_audit.py",
+    "battle_target_pressure_audit.py",
     "battle_unknown_template_backlog_audit.py",
     "test_battle_action_critic.py",
     "test_battle_decision_strategy_auditor.py",
@@ -146,6 +150,8 @@ RECURRING_GATE_BASENAMES = {
     "test_battle_forensic_audit_supported_effects.py",
     "test_replay_decision_auditor_scope.py",
     "test_battle_runtime_surface_manifest.py",
+    "test_battle_table_intent_audit.py",
+    "test_battle_target_pressure_audit.py",
     "test_battle_unknown_template_backlog_audit.py",
 }
 

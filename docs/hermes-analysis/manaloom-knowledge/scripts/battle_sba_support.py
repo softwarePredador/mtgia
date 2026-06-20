@@ -254,6 +254,7 @@ def check_sbas(
     move_creature_from_battlefield,
     move_to_exile,
     resolve_battle_back_face,
+    is_battlefield_creature,
     is_planeswalker_permanent,
     is_battle_permanent,
     emit_replay_event,
@@ -313,8 +314,12 @@ def check_sbas(
         for card in list(player_obj.battlefield):
             if not isinstance(card, dict):
                 continue
-            toughness = card.get("toughness", 1)
-            damage = card.get("damage_marked", 0)
+            if not is_battlefield_creature(card):
+                continue
+            toughness = numeric_stat(card.get("toughness"))
+            if toughness is None:
+                toughness = 1
+            damage = numeric_stat(card.get("damage_marked")) or 0
             if toughness <= 0 or (damage >= toughness and not card.get("indestructible")):
                 move_creature_from_battlefield(player_obj, card, "sba_lethal", None, all_players)
                 return True

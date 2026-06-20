@@ -174,6 +174,56 @@ def register_tests(battle, player, card, module_path):
         assert enriched["trample"] is True
         conn.close()
 
+    def test_learned_opponent_commander_uses_oracle_metadata():
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.execute(
+            """
+            CREATE TABLE card_oracle_cache (
+                normalized_name TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                mana_cost TEXT,
+                colors_json TEXT,
+                color_identity_json TEXT,
+                type_line TEXT,
+                oracle_text TEXT,
+                cmc REAL,
+                power TEXT,
+                toughness TEXT,
+                keywords_json TEXT,
+                scryfall_id TEXT
+            )
+            """
+        )
+        _insert_oracle_card(
+            conn,
+            "Thrasios, Triton Hero",
+            color_identity=["G", "U"],
+            type_line="Legendary Creature - Merfolk Wizard",
+            oracle_text="{4}: Scry 1, then reveal the top card of your library.",
+            mana_cost="{G}{U}",
+            cmc=2,
+            power=1,
+            toughness=3,
+        )
+
+        cache = battle.load_card_oracle_cache(conn, ["Thrasios, Triton Hero"])
+        commander = battle.build_learned_commander_card(
+            "Thrasios, Triton Hero",
+            cache,
+            owner="Thrasios #101 (real)",
+        )
+
+        assert commander["cmc"] == 2
+        assert commander["mana_cost"] == "{G}{U}"
+        assert commander["type_line"] == "Legendary Creature - Merfolk Wizard"
+        assert commander["power"] == 1
+        assert commander["toughness"] == 3
+        assert commander["is_commander"] is True
+        assert commander["owner"] == "Thrasios #101 (real)"
+        assert commander["_commander_metadata_source"] == "oracle_cache"
+        conn.close()
+
     def test_battle_card_rules_table_overrides_fallbacks():
         if battle.battle_rule_registry is None:
             raise AssertionError("battle_rule_registry failed to import")
@@ -618,6 +668,7 @@ def register_tests(battle, player, card, module_path):
 
     return [
         test_card_oracle_cache_enriches_battle_cards,
+        test_learned_opponent_commander_uses_oracle_metadata,
         test_battle_card_rules_table_overrides_fallbacks,
         test_load_deck_preserves_semantic_snapshot_identity_fields,
         test_load_deck_construction_report_accepts_valid_commander_shape,

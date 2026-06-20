@@ -512,7 +512,7 @@ def parse_battle_output(output: str, games_per_opponent: int) -> BattleResult:
 
 
 def run_battle(games_per_opponent: int, battle_path: Path = DEFAULT_BATTLE) -> BattleResult:
-    env_extra = {}
+    env_extra = {"MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER": "Lorehold"}
     metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
     if metrics_dir:
         Path(metrics_dir).mkdir(parents=True, exist_ok=True)

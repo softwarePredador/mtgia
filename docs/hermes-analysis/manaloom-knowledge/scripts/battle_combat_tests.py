@@ -109,6 +109,253 @@ def register_tests(battle, player):
         combat = next(data for event, data in events if event == "combat")
         assert combat["target"] == "Approach Caster"
 
+    def test_evaluation_mode_forces_opponents_to_pressure_lorehold():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_target = battle.os.environ.get(battle.EVALUATION_TARGET_ENV)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.os.environ[battle.EVALUATION_TARGET_ENV] = "Lorehold"
+        try:
+            attacker = player("Opponent")
+            lorehold = player("Lorehold")
+            low_life_other = player("Other Opponent")
+            lorehold.life = 40
+            low_life_other.life = 1
+            attacker.battlefield = [
+                {
+                    "name": "Three Power",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                }
+            ]
+
+            battle.combat_phase_v8(
+                attacker,
+                [low_life_other, lorehold],
+                [attacker, low_life_other, lorehold],
+                turn=2,
+                rng=random.Random(18),
+                stack=battle.Stack(),
+            )
+
+            combat = next(data for event, data in events if event == "combat")
+            assert combat["target"] == "Lorehold"
+            assert combat["target_reason"] == "evaluation_target_pressure"
+            assert combat["evaluation_target_active"] is True
+            assert lorehold.life == 37
+            assert low_life_other.life == 1
+            assert not any(event == "multi_defender_attack" for event, _ in events)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_target is None:
+                battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
+
+    def test_evaluation_mode_tags_lorehold_lethal_pressure_as_lethal():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_target = battle.os.environ.get(battle.EVALUATION_TARGET_ENV)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.os.environ[battle.EVALUATION_TARGET_ENV] = "Lorehold"
+        try:
+            attacker = player("Opponent")
+            lorehold = player("Lorehold")
+            other = player("Other Opponent")
+            lorehold.life = 7
+            other.life = 1
+            attacker.battlefield = [
+                {
+                    "name": "Seven Power",
+                    "effect": "creature",
+                    "power": 7,
+                    "toughness": 7,
+                    "summoning_sick": False,
+                    "tapped": False,
+                }
+            ]
+
+            battle.combat_phase_v8(
+                attacker,
+                [other, lorehold],
+                [attacker, other, lorehold],
+                turn=2,
+                rng=random.Random(19),
+                stack=battle.Stack(),
+            )
+
+            combat = next(data for event, data in events if event == "combat")
+            assert combat["target"] == "Lorehold"
+            assert combat["target_reason"] == "lethal"
+            assert combat["evaluation_target_active"] is True
+            assert lorehold.life == 0
+            assert other.life == 1
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_target is None:
+                battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
+
+    def test_table_intent_uses_nemesis_memory_for_attack_targeting():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_mode = battle.os.environ.get(battle.EVALUATION_MODE_ENV)
+        previous_target = battle.os.environ.get(battle.EVALUATION_TARGET_ENV)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.os.environ[battle.EVALUATION_MODE_ENV] = "table_intent"
+        battle.os.environ[battle.EVALUATION_TARGET_ENV] = "Lorehold"
+        try:
+            attacker = player("Opponent")
+            lorehold = player("Lorehold")
+            other = player("Other Opponent")
+            other.life = 20
+            attacker.table_hostility[lorehold.name] = 70
+            attacker.battlefield = [
+                {
+                    "name": "Three Power",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                }
+            ]
+
+            battle.combat_phase_v8(
+                attacker,
+                [other, lorehold],
+                [attacker, other, lorehold],
+                turn=4,
+                rng=random.Random(20),
+                stack=battle.Stack(),
+            )
+
+            combat = next(data for event, data in events if event == "combat")
+            assert combat["target"] == "Lorehold"
+            assert combat["target_reason"] == "table_intent_nemesis_hostility"
+            assert combat["table_intent_enabled"] is True
+            assert any(
+                row["target"] == "Lorehold"
+                and row["components"]["nemesis_hostility"] == 70
+                for row in combat["table_intent_scores"]
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_mode is None:
+                battle.os.environ.pop(battle.EVALUATION_MODE_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_MODE_ENV] = previous_mode
+            if previous_target is None:
+                battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
+
+    def test_table_intent_records_combat_damage_as_future_hostility():
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_mode = battle.os.environ.get(battle.EVALUATION_MODE_ENV)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: None
+        battle.os.environ[battle.EVALUATION_MODE_ENV] = "table_intent"
+        try:
+            attacker = player("Lorehold")
+            defender = player("Opponent")
+            other = player("Other Opponent")
+            defender.life = 38
+            attacker.battlefield = [
+                {
+                    "name": "Four Power",
+                    "effect": "creature",
+                    "power": 4,
+                    "toughness": 4,
+                    "summoning_sick": False,
+                    "tapped": False,
+                }
+            ]
+
+            battle.combat_phase_v8(
+                attacker,
+                [other, defender],
+                [attacker, other, defender],
+                turn=4,
+                rng=random.Random(21),
+                stack=battle.Stack(),
+            )
+
+            assert defender.life == 34
+            assert defender.table_hostility["Lorehold"] >= 4
+            assert defender.table_hostility_events[-1]["reason"] == "combat_damage_received"
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_mode is None:
+                battle.os.environ.pop(battle.EVALUATION_MODE_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_MODE_ENV] = previous_mode
+
+    def test_table_intent_lethal_keeps_attackers_on_chosen_target():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_mode = battle.os.environ.get(battle.EVALUATION_MODE_ENV)
+        previous_target = battle.os.environ.get(battle.EVALUATION_TARGET_ENV)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.os.environ[battle.EVALUATION_MODE_ENV] = "table_intent"
+        battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+        try:
+            attacker = player("Attacker")
+            lethal_target = player("Low Life")
+            other_a = player("Other A")
+            other_b = player("Other B")
+            lethal_target.life = 7
+            other_a.life = 40
+            other_b.life = 40
+            attacker.battlefield = [
+                {
+                    "name": "Six Power",
+                    "effect": "creature",
+                    "power": 6,
+                    "toughness": 6,
+                    "summoning_sick": False,
+                    "tapped": False,
+                },
+                {
+                    "name": "Three Power",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "summoning_sick": False,
+                    "tapped": False,
+                },
+            ]
+
+            battle.combat_phase_v8(
+                attacker,
+                [other_a, lethal_target, other_b],
+                [attacker, other_a, lethal_target, other_b],
+                turn=5,
+                rng=random.Random(21),
+                stack=battle.Stack(),
+            )
+
+            combat = next(data for event, data in events if event == "combat")
+            assert combat["target"] == "Low Life"
+            assert combat["target_reason"] == "lethal"
+            assert combat["target_group_power"] == 9
+            assert len(combat["attack_groups"]) == 1
+            assert lethal_target.life == -2
+            assert not any(event == "multi_defender_attack" for event, _ in events)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_mode is None:
+                battle.os.environ.pop(battle.EVALUATION_MODE_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_MODE_ENV] = previous_mode
+            if previous_target is None:
+                battle.os.environ.pop(battle.EVALUATION_TARGET_ENV, None)
+            else:
+                battle.os.environ[battle.EVALUATION_TARGET_ENV] = previous_target
+
     def test_first_strike_does_not_deal_regular_damage_twice():
         attacker = player("Attacker")
         defender = player("Defender")
@@ -464,6 +711,11 @@ def register_tests(battle, player):
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
         test_combat_focuses_known_approach_caster,
+        test_evaluation_mode_forces_opponents_to_pressure_lorehold,
+        test_evaluation_mode_tags_lorehold_lethal_pressure_as_lethal,
+        test_table_intent_uses_nemesis_memory_for_attack_targeting,
+        test_table_intent_records_combat_damage_as_future_hostility,
+        test_table_intent_lethal_keeps_attackers_on_chosen_target,
         test_first_strike_does_not_deal_regular_damage_twice,
         test_must_attack_zero_power_creature_attacks_if_able,
         test_cant_attack_alone_creature_does_not_attack_by_itself,

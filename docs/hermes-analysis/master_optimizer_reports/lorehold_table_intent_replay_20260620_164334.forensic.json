@@ -1,0 +1,241 @@
+{
+  "replay_files": [],
+  "rule_findings": [
+    {
+      "card": "Aether Channeler",
+      "effect": "passive",
+      "event": "spell_cast",
+      "finding": "Runtime effect `passive` differs from registry effect `token_maker`.",
+      "phase": "precombat_main",
+      "player": "Yorion, Sky Nomad #38 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_63213000",
+      "severity": "low",
+      "turn": 2
+    },
+    {
+      "card": "Aether Channeler",
+      "effect": "passive",
+      "event": "spell_resolved",
+      "finding": "Runtime effect `passive` differs from registry effect `token_maker`.",
+      "phase": "precombat_main",
+      "player": "Yorion, Sky Nomad #38 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_63213000",
+      "severity": "low",
+      "turn": 2
+    }
+  ],
+  "summary": {
+    "by_effect": {
+      "creature": 11,
+      "draw_cards": 6,
+      "draw_engine": 8,
+      "land": 19,
+      "passive": 4,
+      "ramp_engine": 1,
+      "ramp_permanent": 2,
+      "ramp_ritual": 2,
+      "remove_permanent": 2,
+      "silence_opponents": 2,
+      "tutor": 6
+    },
+    "by_rule_logical_key": {
+      "battle_rule_v1:030b2f3e0f549a462c3c8ea429877980": 2,
+      "battle_rule_v1:0ab3867d7118abc751d3258d103b8135": 2,
+      "battle_rule_v1:1b5e5a972556d30833f4aca67274b791": 2,
+      "battle_rule_v1:1df9dc00a60496c01bba430b498146c5": 2,
+      "battle_rule_v1:218c49467c254e7a90f54d85b4dbb9dc": 1,
+      "battle_rule_v1:2ea9e585d59c7695a81a681b22589e91": 10,
+      "battle_rule_v1:4bddcb4c084d969a7ac60a4e378b06dd": 1,
+      "battle_rule_v1:5f5c28a5289affadfc624c0ed212e287": 15,
+      "battle_rule_v1:684c7ea91b4b39134868269f9c5cf723": 1,
+      "battle_rule_v1:7b1efc300c303a2b54bcfc758f5698e6": 2,
+      "battle_rule_v1:7bc994e4653e295f9c0d2ef91c2dcaa6": 2,
+      "battle_rule_v1:b116fd57d8e26a39bffd9b52bbd95b3d": 2,
+      "battle_rule_v1:b62b6dfa5cdc9db4b8b21faf7bfc0498": 1,
+      "battle_rule_v1:b6e48063a7c24833bfe7fe9f493ea861": 1,
+      "battle_rule_v1:c06a3fad9aad3336c216a9cdd662f016": 2,
+      "battle_rule_v1:c11487143935b327650306d7e7e8c8e2": 1,
+      "battle_rule_v1:c364544e9bd651211acf851db2313ccd": 1,
+      "battle_rule_v1:c9e98658950070eddbc1386956ba728d": 1,
+      "battle_rule_v1:d512a33dfde0db70a2f0851a61f97ad6": 1,
+      "battle_rule_v1:d92558b449d8ace543f8ce653a9757df": 2,
+      "battle_rule_v1:ed17512d1b7cbca757828380b896c98b": 2,
+      "battle_rule_v1:f052c961703873e8bce9d44815a698a7": 1,
+      "battle_rule_v1:faf0412d36f280c62b14904ec21807cc": 1,
+      "battle_rule_v1:fcd399a7889d5ab307d06c1aba3fa5f9": 2
+    },
+    "by_source": {
+      "curated": 55,
+      "known_cards_canonical_snapshot": 2,
+      "manual_runtime_waiver": 1,
+      "type_line_creature": 5
+    },
+    "by_status": {
+      "active": 3,
+      "fact": 5,
+      "review_only": 2,
+      "verified": 53
+    },
+    "card_event_count": 63,
+    "card_id_missing": 48,
+    "card_id_missing_accepted": 46,
+    "card_id_missing_unaccepted": 2,
+    "card_id_present": 15,
+    "cards_by_source": {
+      "curated": [
+        "Ancient Tomb",
+        "Azorius Chancery",
+        "Breeding Pool",
+        "Cabal Ritual",
+        "Delighted Halfling",
+        "Demonic Consultation",
+        "Esper Sentinel",
+        "Eternal Witness",
+        "Gamble",
+        "Generous Gift",
+        "Glacial Fortress",
+        "Hall of Heliod's Generosity",
+        "Imperial Seal",
+        "Inventors' Fair",
+        "Island",
+        "Land Tax",
+        "Lotus Petal",
+        "Magda, Brazen Outlaw",
+        "Mana Confluence",
+        "Plains",
+        "Polluted Delta",
+        "Professional Face-Breaker",
+        "Rhystic Study",
+        "Sacred Foundry",
+        "Scalding Tarn",
+        "Scrubland",
+        "Sejiri Refuge",
+        "Sol Ring",
+        "Spectator Seating",
+        "Starting Town",
+        "Tataru Taru",
+        "The One Ring",
+        "Thrasios, Triton Hero",
+        "Urza's Saga",
+        "Verdant Catacombs",
+        "Victory Chimes",
+        "Voice of Victory"
+      ],
+      "known_cards_canonical_snapshot": [
+        "Aether Channeler"
+      ],
+      "manual_runtime_waiver": [
+        "Mardu Devotee"
+      ],
+      "type_line_creature": [
+        "Glimmerpoint Stag",
+        "Mnemonic Wall",
+        "Mockingbird",
+        "Stitcher's Supplier",
+        "Yorion, Sky Nomad"
+      ]
+    },
+    "cards_by_status": {
+      "active": [
+        "Hall of Heliod's Generosity",
+        "Inventors' Fair",
+        "Urza's Saga"
+      ],
+      "fact": [
+        "Glimmerpoint Stag",
+        "Mnemonic Wall",
+        "Mockingbird",
+        "Stitcher's Supplier",
+        "Yorion, Sky Nomad"
+      ],
+      "review_only": [
+        "Aether Channeler"
+      ],
+      "verified": [
+        "Ancient Tomb",
+        "Azorius Chancery",
+        "Breeding Pool",
+        "Cabal Ritual",
+        "Delighted Halfling",
+        "Demonic Consultation",
+        "Esper Sentinel",
+        "Eternal Witness",
+        "Gamble",
+        "Generous Gift",
+        "Glacial Fortress",
+        "Imperial Seal",
+        "Island",
+        "Land Tax",
+        "Lotus Petal",
+        "Magda, Brazen Outlaw",
+        "Mana Confluence",
+        "Mardu Devotee",
+        "Plains",
+        "Polluted Delta",
+        "Professional Face-Breaker",
+        "Rhystic Study",
+        "Sacred Foundry",
+        "Scalding Tarn",
+        "Scrubland",
+        "Sejiri Refuge",
+        "Sol Ring",
+        "Spectator Seating",
+        "Starting Town",
+        "Tataru Taru",
+        "The One Ring",
+        "Thrasios, Triton Hero",
+        "Verdant Catacombs",
+        "Victory Chimes",
+        "Voice of Victory"
+      ]
+    },
+    "lineage_missing_waiver_reasons": {
+      "battle_rule_registry_without_card_identity_columns": 52,
+      "land_played_curated_runtime_rule_without_pg_card_identity": 28,
+      "manual_runtime_waiver_without_pg_identity": 2,
+      "type_line_creature_fact_no_rule_identity": 15
+    },
+    "lineage_unaccepted_missing_samples": [
+      {
+        "card": "Aether Channeler",
+        "effect": "passive",
+        "event": "spell_cast",
+        "missing_field": "card_id",
+        "source": "known_cards_canonical_snapshot"
+      },
+      {
+        "card": "Aether Channeler",
+        "effect": "passive",
+        "event": "spell_cast",
+        "missing_field": "semantic_hash",
+        "source": "known_cards_canonical_snapshot"
+      },
+      {
+        "card": "Aether Channeler",
+        "effect": "passive",
+        "event": "spell_resolved",
+        "missing_field": "card_id",
+        "source": "known_cards_canonical_snapshot"
+      },
+      {
+        "card": "Aether Channeler",
+        "effect": "passive",
+        "event": "spell_resolved",
+        "missing_field": "semantic_hash",
+        "source": "known_cards_canonical_snapshot"
+      }
+    ],
+    "rule_logical_key_missing": 5,
+    "rule_logical_key_missing_accepted": 5,
+    "rule_logical_key_missing_unaccepted": 0,
+    "rule_logical_key_present": 58,
+    "semantic_hash_missing": 48,
+    "semantic_hash_missing_accepted": 46,
+    "semantic_hash_missing_unaccepted": 2,
+    "semantic_hash_present": 15,
+    "unique_cards": 44
+  },
+  "turn_findings": []
+}

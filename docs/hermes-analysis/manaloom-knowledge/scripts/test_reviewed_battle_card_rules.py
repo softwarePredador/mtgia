@@ -33,6 +33,23 @@ battle = _load_module(BATTLE_MODULE_PATH, "battle_reviewed_rule_runtime_test")
 
 
 class ReviewedBattleCardRulesTests(unittest.TestCase):
+    def _seed_reviewed_rules_db(self, db_path: Path) -> None:
+        with closing(sqlite3.connect(db_path)) as conn:
+            battle_rule_registry.ensure_battle_card_rules(conn)
+            for row in load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH):
+                battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    row["card_name"],
+                    row["effect_json"],
+                    source=row["source"],
+                    confidence=row["confidence"],
+                    review_status=row["review_status"],
+                    deck_role_json=row.get("deck_role_json"),
+                    notes=row.get("notes", ""),
+                    oracle_hash=row.get("oracle_hash"),
+                )
+            conn.commit()
+
     def test_snapshot_payload_uses_registry_priority_instead_of_last_row_wins(self) -> None:
         payload = build_snapshot_payload(
             [
@@ -136,33 +153,54 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         rows = load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH)
         by_name = {row["card_name"]: row for row in rows}
 
+        self.assertEqual(by_name["Abandon Attachments"]["source"], "curated")
+        self.assertEqual(by_name["Abandon Attachments"]["review_status"], "verified")
+        self.assertEqual(by_name["Abandon Attachments"]["effect_json"]["effect"], "draw_cards")
+        self.assertTrue(by_name["Abandon Attachments"]["effect_json"]["requires_discard_card"])
+        self.assertEqual(by_name["Aether Channeler"]["source"], "curated")
+        self.assertEqual(by_name["Aether Channeler"]["effect_json"]["effect"], "creature")
+        self.assertEqual(by_name["Aether Channeler"]["effect_json"]["etb_draw_count"], 1)
         self.assertIn("Ashnod's Altar", by_name)
         self.assertIn("Akroma's Will", by_name)
         self.assertIn("Ancient Den", by_name)
         self.assertIn("Angel's Grace", by_name)
+        self.assertIn("Apex of Power", by_name)
         self.assertIn("Approach of the Second Sun", by_name)
         self.assertIn("Ancient Tomb", by_name)
+        self.assertIn("Arcane Endeavor", by_name)
         self.assertIn("Aven Mindcensor", by_name)
         self.assertIn("Basking Broodscale", by_name)
+        self.assertIn("Big Score", by_name)
         self.assertIn("Birgi, God of Storytelling", by_name)
+        self.assertIn("Breena, the Demagogue", by_name)
         self.assertIn("Chrome Mox", by_name)
         self.assertIn("Chromatic Star", by_name)
         self.assertIn("Crop Rotation", by_name)
+        self.assertIn("Curator's Ward", by_name)
+        self.assertIn("Decaying Time Loop", by_name)
         self.assertIn("Dismember", by_name)
+        self.assertIn("Electric Revelation", by_name)
         self.assertIn("Electroduplicate", by_name)
         self.assertIn("Entomb", by_name)
+        self.assertIn("Empowered Autogenerator", by_name)
+        self.assertIn("Ether", by_name)
         self.assertIn("Everflowing Chalice", by_name)
+        self.assertIn("Fateful Showdown", by_name)
         self.assertIn("Fellwar Stone", by_name)
         self.assertIn("Formidable Speaker", by_name)
         self.assertIn("Gemstone Caverns", by_name)
+        self.assertIn("Goblin Bombardment", by_name)
         self.assertIn("Great Furnace", by_name)
         self.assertIn("Hall of Heliod's Generosity", by_name)
         self.assertIn("Incubation Druid", by_name)
         self.assertIn("Inventors' Fair", by_name)
+        self.assertIn("Izzet Signet", by_name)
+        self.assertIn("Kraum, Ludevic's Opus", by_name)
         self.assertIn("Library of Leng", by_name)
         self.assertIn("Lightning Greaves", by_name)
         self.assertIn("Lorehold, the Historian", by_name)
         self.assertIn("Lumra, Bellow of the Woods", by_name)
+        self.assertIn("Magma Opus", by_name)
         self.assertIn("Mana Vault", by_name)
         self.assertIn("Miscast", by_name)
         self.assertIn("Mystical Tutor", by_name)
@@ -172,10 +210,16 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Nature's Claim", by_name)
         self.assertIn("Natural Order", by_name)
         self.assertIn("Path to Exile", by_name)
+        self.assertIn("Pirate's Pillage", by_name)
+        self.assertIn("Prismatic Lens", by_name)
+        self.assertIn("Practical Research", by_name)
         self.assertIn("Rampant Growth", by_name)
+        self.assertIn("Rakdos, the Muscle", by_name)
         self.assertIn("Reanimate", by_name)
         self.assertIn("Runaway Steam-Kin", by_name)
+        self.assertIn("Ring of the Lucii", by_name)
         self.assertIn("Sami's Curiosity", by_name)
+        self.assertIn("Sazacap's Brew", by_name)
         self.assertIn("Scavenging Ooze", by_name)
         self.assertIn("Scroll Rack", by_name)
         self.assertIn("Seething Song", by_name)
@@ -183,18 +227,27 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Sensei's Divining Top", by_name)
         self.assertIn("Soul-Guide Lantern", by_name)
         self.assertIn("Splendid Reclamation", by_name)
+        self.assertIn("Spelltwine", by_name)
         self.assertIn("Staff of Compleation", by_name)
         self.assertIn("Talisman of Conviction", by_name)
+        self.assertIn("Tellah, Great Sage", by_name)
+        self.assertIn("The Unagi of Kyoshi Island", by_name)
         self.assertIn("Silence", by_name)
+        self.assertIn("Shantotto, Tactician Magician", by_name)
+        self.assertIn("Sisay's Ring", by_name)
+        self.assertIn("Sisay, Weatherlight Captain", by_name)
         self.assertIn("Sunbaked Canyon", by_name)
         self.assertIn("Unexpected Windfall", by_name)
+        self.assertIn("Ur-Golem's Eye", by_name)
         self.assertIn("Urza's Saga", by_name)
         self.assertIn("Valakut Awakening", by_name)
         self.assertIn("Valakut Awakening // Valakut Stoneforge", by_name)
         self.assertIn("Vexing Bauble", by_name)
+        self.assertIn("Volcanic Vision", by_name)
         self.assertIn("Wall of Omens", by_name)
         self.assertIn("War Room", by_name)
         self.assertIn("Wayfarer's Bauble", by_name)
+        self.assertIn("Woodland Bellower", by_name)
         self.assertIn("Worldfire", by_name)
         self.assertIn("Zuran Orb", by_name)
         self.assertEqual(by_name["Ashnod's Altar"]["source"], "curated")
@@ -215,12 +268,18 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Angel's Grace"]["source"], "curated")
         self.assertEqual(by_name["Angel's Grace"]["review_status"], "verified")
         self.assertEqual(by_name["Angel's Grace"]["effect_json"]["effect"], "cannot_lose_turn")
+        self.assertEqual(by_name["Apex of Power"]["source"], "curated")
+        self.assertEqual(by_name["Apex of Power"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["Apex of Power"]["effect_json"]["impulse_top_seven_until_eot"])
         self.assertEqual(by_name["Approach of the Second Sun"]["source"], "curated")
         self.assertEqual(by_name["Approach of the Second Sun"]["review_status"], "verified")
         self.assertEqual(
             by_name["Approach of the Second Sun"]["effect_json"]["effect"],
             "approach",
         )
+        self.assertEqual(by_name["Arcane Endeavor"]["source"], "curated")
+        self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
+        self.assertTrue(by_name["Arcane Endeavor"]["effect_json"]["roll_two_d8_choose_draw_count"])
         self.assertEqual(by_name["Brainstone"]["source"], "curated")
         self.assertEqual(by_name["Brainstone"]["review_status"], "active")
         self.assertEqual(by_name["Brainstone"]["effect_json"]["effect"], "topdeck_manipulation")
@@ -228,6 +287,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Brainstone"]["effect_json"]["draw_count"], 3)
         self.assertTrue(by_name["Brainstone"]["effect_json"]["hand_to_top_exchange"])
         self.assertTrue(by_name["Brainstone"]["effect_json"]["requires_sacrifice_artifact"])
+        self.assertEqual(by_name["Breena, the Demagogue"]["source"], "curated")
+        self.assertEqual(by_name["Breena, the Demagogue"]["effect_json"]["effect"], "creature")
+        self.assertTrue(by_name["Breena, the Demagogue"]["effect_json"]["political_attack_draw_trigger"])
         self.assertEqual(by_name["Ancient Tomb"]["source"], "curated")
         self.assertEqual(by_name["Ancient Tomb"]["review_status"], "verified")
         self.assertEqual(by_name["Ancient Tomb"]["effect_json"]["effect"], "land")
@@ -259,6 +321,15 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Birgi, God of Storytelling"]["effect_json"]["spell_cast_add_mana"],
             1,
         )
+        self.assertEqual(by_name["Big Score"]["source"], "curated")
+        self.assertEqual(by_name["Big Score"]["review_status"], "verified")
+        self.assertEqual(by_name["Big Score"]["effect_json"]["effect"], "treasure_maker")
+        self.assertEqual(by_name["Big Score"]["effect_json"]["draw_count"], 2)
+        self.assertEqual(by_name["Big Score"]["effect_json"]["treasure_count"], 2)
+        self.assertTrue(by_name["Big Score"]["effect_json"]["requires_discard_card"])
+        self.assertEqual(by_name["Channeled Force"]["source"], "curated")
+        self.assertEqual(by_name["Channeled Force"]["effect_json"]["effect"], "draw_cards")
+        self.assertTrue(by_name["Channeled Force"]["effect_json"]["requires_discard_card"])
         self.assertEqual(by_name["Chrome Mox"]["source"], "curated")
         self.assertEqual(by_name["Chrome Mox"]["review_status"], "verified")
         self.assertTrue(
@@ -272,14 +343,34 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Crop Rotation"]["effect_json"]["effect"], "land_ramp")
         self.assertTrue(by_name["Crop Rotation"]["effect_json"]["requires_sacrifice_land"])
         self.assertFalse(by_name["Crop Rotation"]["effect_json"]["land_enters_tapped"])
+        self.assertEqual(by_name["Curator's Ward"]["source"], "curated")
+        self.assertEqual(by_name["Curator's Ward"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["Curator's Ward"]["effect_json"]["enchanted_permanent_has_hexproof"])
         self.assertEqual(by_name["Dismember"]["source"], "curated")
         self.assertEqual(by_name["Dismember"]["review_status"], "verified")
         self.assertEqual(by_name["Dismember"]["effect_json"]["effect"], "remove_creature")
         self.assertEqual(by_name["Dismember"]["effect_json"]["target"], "creature")
         self.assertEqual(by_name["Dismember"]["effect_json"]["toughness_boost"], -5)
         self.assertTrue(by_name["Dismember"]["effect_json"]["uses_stat_modifier_removal"])
+        self.assertEqual(by_name["Decaying Time Loop"]["source"], "curated")
+        self.assertEqual(by_name["Decaying Time Loop"]["effect_json"]["effect"], "draw_cards")
+        self.assertTrue(by_name["Decaying Time Loop"]["effect_json"]["draw_equal_to_discarded_hand"])
+        self.assertEqual(by_name["Drown in Dreams"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["Drown in Dreams"]["effect_json"]["x_spell"])
+        self.assertTrue(by_name["Drown in Dreams"]["effect_json"]["modal_draw_x"])
+        self.assertEqual(by_name["Electric Revelation"]["source"], "curated")
+        self.assertEqual(by_name["Electric Revelation"]["effect_json"]["effect"], "draw_cards")
+        self.assertTrue(by_name["Electric Revelation"]["effect_json"]["requires_discard_card"])
         self.assertEqual(by_name["Entomb"]["effect_json"]["effect"], "tutor")
         self.assertEqual(by_name["Entomb"]["effect_json"]["target"], "graveyard")
+        self.assertEqual(by_name["Empowered Autogenerator"]["source"], "curated")
+        self.assertEqual(by_name["Empowered Autogenerator"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertTrue(by_name["Empowered Autogenerator"]["effect_json"]["enters_tapped"])
+        self.assertTrue(by_name["Empowered Autogenerator"]["effect_json"]["charge_counter_scaling_mana"])
+        self.assertEqual(by_name["Ether"]["source"], "curated")
+        self.assertEqual(by_name["Ether"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["Ether"]["effect_json"]["activated_exile_self_for_mana"])
+        self.assertTrue(by_name["Ether"]["effect_json"]["copy_next_instant_or_sorcery_this_turn"])
         self.assertEqual(by_name["Fellwar Stone"]["source"], "curated")
         self.assertEqual(by_name["Fellwar Stone"]["review_status"], "active")
         self.assertEqual(by_name["Fellwar Stone"]["effect_json"]["effect"], "ramp_permanent")
@@ -289,19 +380,43 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Electroduplicate"]["effect_json"]["effect"],
             "copy_creature_token",
         )
+        self.assertEqual(by_name["Firemind Vessel"]["source"], "curated")
+        self.assertEqual(by_name["Firemind Vessel"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Firemind Vessel"]["effect_json"]["mana_produced"], 2)
+        self.assertTrue(by_name["Firemind Vessel"]["effect_json"]["enters_tapped"])
         self.assertEqual(by_name["Everflowing Chalice"]["source"], "curated")
         self.assertEqual(by_name["Everflowing Chalice"]["review_status"], "verified")
         self.assertEqual(
             by_name["Everflowing Chalice"]["effect_json"]["multikicker_generic_cost"],
             2,
         )
+        self.assertEqual(by_name["Fateful Showdown"]["source"], "curated")
+        self.assertTrue(by_name["Fateful Showdown"]["effect_json"]["draw_equal_to_discarded_hand"])
         self.assertEqual(by_name["Formidable Speaker"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Gemstone Caverns"]["effect_json"]["produces"], "WUBRGC")
+        self.assertEqual(by_name["Goblin Bombardment"]["source"], "curated")
+        self.assertEqual(by_name["Goblin Bombardment"]["review_status"], "verified")
+        self.assertEqual(by_name["Goblin Bombardment"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["Goblin Bombardment"]["effect_json"]["activated_sacrifice_creature_damage"])
+        self.assertEqual(by_name["Goblin Bombardment"]["effect_json"]["damage"], 1)
         self.assertEqual(by_name["Great Furnace"]["effect_json"]["produces"], "R")
         self.assertEqual(
             by_name["Hall of Heliod's Generosity"]["effect_json"]["utility_land_profile"],
             "hall_of_heliods_generosity_v1",
         )
+        self.assertEqual(by_name["Hypothesizzle"]["source"], "curated")
+        self.assertEqual(by_name["Hypothesizzle"]["effect_json"]["effect"], "draw_cards")
+        self.assertEqual(by_name["Hypothesizzle"]["effect_json"]["count"], 2)
+        self.assertEqual(by_name["Ichor Elixir"]["source"], "curated")
+        self.assertEqual(by_name["Ichor Elixir"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Ichor Elixir"]["effect_json"]["mana_produced"], 2)
+        self.assertEqual(by_name["Izzet Signet"]["source"], "curated")
+        self.assertEqual(by_name["Izzet Signet"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Izzet Signet"]["effect_json"]["produces"], "UR")
+        self.assertEqual(by_name["Kraum, Ludevic's Opus"]["source"], "curated")
+        self.assertEqual(by_name["Kraum, Ludevic's Opus"]["effect_json"]["effect"], "draw_engine")
+        self.assertTrue(by_name["Kraum, Ludevic's Opus"]["effect_json"]["opponent_second_spell_each_turn"])
+        self.assertFalse(by_name["Kraum, Ludevic's Opus"]["effect_json"]["draw_on_enter"])
         self.assertEqual(by_name["Incubation Druid"]["source"], "curated")
         self.assertEqual(by_name["Incubation Druid"]["review_status"], "active")
         self.assertEqual(by_name["Incubation Druid"]["effect_json"]["effect"], "creature")
@@ -323,6 +438,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Lightning Greaves"]["effect_json"]["effect"],
             "equipment_haste_shroud",
         )
+        self.assertEqual(by_name["Laughing Mad"]["source"], "curated")
+        self.assertEqual(by_name["Laughing Mad"]["effect_json"]["effect"], "draw_cards")
+        self.assertTrue(by_name["Laughing Mad"]["effect_json"]["requires_discard_card"])
         self.assertEqual(by_name["Lorehold, the Historian"]["source"], "curated")
         self.assertEqual(by_name["Lorehold, the Historian"]["review_status"], "active")
         self.assertEqual(by_name["Lorehold, the Historian"]["effect_json"]["effect"], "passive")
@@ -335,6 +453,10 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         )
         self.assertEqual(by_name["Lumra, Bellow of the Woods"]["effect_json"]["effect"], "land_recursion_creature")
         self.assertEqual(by_name["Lumra, Bellow of the Woods"]["effect_json"]["mill_count"], 4)
+        self.assertEqual(by_name["Magma Opus"]["source"], "curated")
+        self.assertEqual(by_name["Magma Opus"]["effect_json"]["effect"], "draw_cards")
+        self.assertEqual(by_name["Magma Opus"]["effect_json"]["count"], 2)
+        self.assertTrue(by_name["Magma Opus"]["effect_json"]["discard_for_treasure"])
         self.assertEqual(by_name["Mana Vault"]["source"], "curated")
         self.assertEqual(by_name["Mana Vault"]["review_status"], "active")
         self.assertEqual(by_name["Mana Vault"]["effect_json"]["effect"], "ramp_permanent")
@@ -373,36 +495,88 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(
             by_name["Natural Order"]["effect_json"]["requires_sacrifice_green_creature"]
         )
+        self.assertEqual(by_name["One with the Multiverse"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["One with the Multiverse"]["effect_json"]["play_from_top_of_library"])
         self.assertEqual(by_name["Path to Exile"]["source"], "curated")
         self.assertEqual(by_name["Path to Exile"]["review_status"], "active")
         self.assertEqual(by_name["Path to Exile"]["effect_json"]["effect"], "remove_creature")
         self.assertTrue(by_name["Path to Exile"]["effect_json"]["exile_target"])
         self.assertTrue(by_name["Path to Exile"]["effect_json"]["target_controller_basic_land_tapped"])
+        self.assertEqual(by_name["Pirate's Pillage"]["source"], "curated")
+        self.assertEqual(by_name["Pirate's Pillage"]["effect_json"]["effect"], "treasure_maker")
+        self.assertEqual(by_name["Pirate's Pillage"]["effect_json"]["treasure_count"], 2)
+        self.assertEqual(by_name["Prismatic Lens"]["source"], "curated")
+        self.assertEqual(by_name["Prismatic Lens"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Prismatic Lens"]["effect_json"]["mana_produced"], 1)
+        self.assertEqual(by_name["Practical Research"]["source"], "curated")
+        self.assertEqual(by_name["Practical Research"]["effect_json"]["effect"], "draw_cards")
+        self.assertEqual(by_name["Practical Research"]["effect_json"]["count"], 4)
+        self.assertEqual(by_name["Practical Research"]["effect_json"]["discard_count"], 2)
         self.assertEqual(by_name["Rampant Growth"]["effect_json"]["effect"], "land_ramp")
         self.assertTrue(by_name["Rampant Growth"]["effect_json"]["basic_only"])
         self.assertTrue(by_name["Rampant Growth"]["effect_json"]["land_enters_tapped"])
+        self.assertEqual(by_name["Rakdos, the Muscle"]["source"], "curated")
+        self.assertEqual(by_name["Rakdos, the Muscle"]["effect_json"]["effect"], "creature")
+        self.assertTrue(by_name["Rakdos, the Muscle"]["effect_json"]["sacrifice_creature_grants_indestructible"])
         self.assertEqual(by_name["Reanimate"]["effect_json"]["effect"], "recursion")
         self.assertEqual(by_name["Reanimate"]["effect_json"]["destination"], "battlefield")
+        self.assertEqual(by_name["Ring of the Lucii"]["source"], "curated")
+        self.assertEqual(by_name["Ring of the Lucii"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Ring of the Lucii"]["effect_json"]["mana_produced"], 2)
         self.assertEqual(by_name["Runaway Steam-Kin"]["source"], "curated")
         self.assertEqual(by_name["Runaway Steam-Kin"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Runaway Steam-Kin"]["effect_json"]["is_creature_permanent"])
         self.assertEqual(by_name["Sami's Curiosity"]["source"], "curated")
         self.assertEqual(by_name["Sami's Curiosity"]["effect_json"]["effect"], "lander_token_maker")
         self.assertEqual(by_name["Sami's Curiosity"]["effect_json"]["life_gain"], 2)
+        self.assertEqual(by_name["Sazacap's Brew"]["source"], "curated")
+        self.assertEqual(by_name["Sazacap's Brew"]["effect_json"]["effect"], "draw_cards")
+        self.assertEqual(by_name["Sazacap's Brew"]["effect_json"]["count"], 2)
+        self.assertTrue(by_name["Sazacap's Brew"]["effect_json"]["requires_discard_card"])
         self.assertEqual(by_name["Scavenging Ooze"]["source"], "curated")
         self.assertEqual(by_name["Scavenging Ooze"]["review_status"], "active")
         self.assertEqual(by_name["Scavenging Ooze"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Scavenging Ooze"]["effect_json"]["activated_graveyard_exile"])
+        self.assertEqual(by_name["Shark Typhoon"]["effect_json"]["effect"], "passive")
+        self.assertEqual(by_name["Shark Typhoon"]["effect_json"]["trigger"], "noncreature_spell_cast")
+        self.assertTrue(
+            by_name["Shark Typhoon"]["effect_json"]["spell_cast_token_power_from_spell_cmc"]
+        )
+        self.assertEqual(by_name["Shantotto, Tactician Magician"]["source"], "curated")
+        self.assertEqual(by_name["Shantotto, Tactician Magician"]["effect_json"]["effect"], "creature")
+        self.assertEqual(
+            by_name["Shantotto, Tactician Magician"]["effect_json"]["spell_cast_draw_if_cmc_at_least"],
+            4,
+        )
+        self.assertEqual(by_name["Sisay, Weatherlight Captain"]["source"], "curated")
+        self.assertEqual(by_name["Sisay, Weatherlight Captain"]["effect_json"]["effect"], "creature")
+        self.assertTrue(by_name["Sisay, Weatherlight Captain"]["effect_json"]["activated_legendary_tutor"])
+        self.assertEqual(by_name["Sisay's Ring"]["source"], "curated")
+        self.assertEqual(by_name["Sisay's Ring"]["review_status"], "verified")
+        self.assertEqual(by_name["Sisay's Ring"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Sisay's Ring"]["effect_json"]["mana_produced"], 2)
         self.assertEqual(by_name["Seething Song"]["source"], "curated")
         self.assertEqual(by_name["Seething Song"]["review_status"], "verified")
         self.assertEqual(by_name["Seething Song"]["effect_json"]["effect"], "ramp_ritual")
         self.assertEqual(by_name["Seething Song"]["effect_json"]["mana_produced"], 5)
+        self.assertEqual(by_name["Spelltwine"]["source"], "curated")
+        self.assertEqual(by_name["Spelltwine"]["review_status"], "active")
+        self.assertEqual(by_name["Spelltwine"]["effect_json"]["effect"], "copy_spell")
+        self.assertEqual(
+            by_name["Spelltwine"]["effect_json"]["target"],
+            "instant_or_sorcery_graveyards",
+        )
+        self.assertTrue(by_name["Spelltwine"]["effect_json"]["casts_copies_without_paying_mana"])
+        self.assertTrue(by_name["Spelltwine"]["effect_json"]["exiles_self"])
         self.assertEqual(by_name["Sunbaked Canyon"]["effect_json"]["produces"], "WR")
         self.assertEqual(by_name["Talisman of Conviction"]["source"], "curated")
         self.assertEqual(by_name["Talisman of Conviction"]["review_status"], "active")
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["effect"], "ramp_permanent")
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["mana_produced"], 1)
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["life_for_colored_mana"], 1)
+        self.assertEqual(by_name["Ur-Golem's Eye"]["source"], "curated")
+        self.assertEqual(by_name["Ur-Golem's Eye"]["review_status"], "verified")
+        self.assertEqual(by_name["Ur-Golem's Eye"]["effect_json"]["mana_produced"], 2)
         self.assertEqual(by_name["Valakut Awakening"]["source"], "curated")
         self.assertEqual(by_name["Valakut Awakening"]["effect_json"]["effect"], "hand_filter")
         self.assertEqual(by_name["Valakut Awakening"]["effect_json"]["draw_extra"], 1)
@@ -411,6 +585,10 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Valakut Awakening // Valakut Stoneforge"]["effect_json"]["mdfc_land_face"]["produces"],
             "R",
         )
+        self.assertEqual(by_name["Volcanic Vision"]["source"], "curated")
+        self.assertEqual(by_name["Volcanic Vision"]["effect_json"]["effect"], "recursion")
+        self.assertEqual(by_name["Volcanic Vision"]["effect_json"]["target"], "instant_or_sorcery")
+        self.assertTrue(by_name["Volcanic Vision"]["effect_json"]["exiles_self"])
         self.assertEqual(by_name["Scroll Rack"]["source"], "curated")
         self.assertEqual(by_name["Scroll Rack"]["review_status"], "active")
         self.assertTrue(by_name["Scroll Rack"]["effect_json"]["hand_to_top_exchange"])
@@ -436,11 +614,26 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Sensei's Divining Top"]["effect_json"]["reorder_top"]
         )
         self.assertEqual(by_name["Soul-Guide Lantern"]["effect_json"]["effect"], "hate_artifact")
+        self.assertEqual(by_name["Stonespeaker Crystal"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Stonespeaker Crystal"]["effect_json"]["mana_produced"], 2)
+        self.assertTrue(by_name["Stonespeaker Crystal"]["effect_json"]["activated_self_sacrifice_draw"])
         self.assertEqual(by_name["Splendid Reclamation"]["effect_json"]["effect"], "land_recursion")
         self.assertEqual(by_name["Staff of Compleation"]["effect_json"]["effect"], "ramp_permanent")
         self.assertEqual(by_name["Silence"]["source"], "curated")
         self.assertEqual(by_name["Silence"]["review_status"], "verified")
         self.assertEqual(by_name["Silence"]["effect_json"]["effect"], "silence_spell")
+        self.assertEqual(by_name["The Emperor of Palamecia"]["effect_json"]["effect"], "creature")
+        self.assertTrue(by_name["The Emperor of Palamecia"]["effect_json"]["is_mana_source"])
+        self.assertEqual(by_name["The Emperor of Palamecia"]["effect_json"]["produces"], "UR")
+        self.assertEqual(by_name["Tellah, Great Sage"]["source"], "curated")
+        self.assertEqual(by_name["Tellah, Great Sage"]["effect_json"]["effect"], "creature")
+        self.assertEqual(by_name["Tellah, Great Sage"]["effect_json"]["spell_cast_draw_if_cmc_at_least"], 4)
+        self.assertEqual(by_name["The Unagi of Kyoshi Island"]["source"], "curated")
+        self.assertEqual(by_name["The Unagi of Kyoshi Island"]["effect_json"]["effect"], "creature")
+        self.assertEqual(
+            by_name["The Unagi of Kyoshi Island"]["effect_json"]["opponent_second_draw_each_turn_draw_count"],
+            2,
+        )
         self.assertEqual(by_name["Unexpected Windfall"]["source"], "curated")
         self.assertEqual(by_name["Unexpected Windfall"]["review_status"], "verified")
         self.assertEqual(
@@ -465,6 +658,13 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Wayfarer's Bauble"]["effect_json"]["effect"], "ramp_permanent")
         self.assertTrue(by_name["Wayfarer's Bauble"]["effect_json"]["activated_self_sacrifice_land_tutor"])
         self.assertTrue(by_name["Wayfarer's Bauble"]["effect_json"]["basic_only"])
+        self.assertEqual(by_name["Woodland Bellower"]["source"], "curated")
+        self.assertEqual(by_name["Woodland Bellower"]["review_status"], "verified")
+        self.assertEqual(by_name["Woodland Bellower"]["effect_json"]["effect"], "creature")
+        self.assertEqual(
+            by_name["Woodland Bellower"]["effect_json"]["etb_tutor_nonlegendary_green_creature_mv_lte"],
+            3,
+        )
         self.assertEqual(by_name["Worldfire"]["source"], "curated")
         self.assertEqual(by_name["Worldfire"]["review_status"], "verified")
         self.assertEqual(by_name["Worldfire"]["effect_json"]["effect"], "worldfire_reset")
@@ -493,16 +693,25 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Akroma's Will"]["effect_json"]["effect"], "pump_all")
         self.assertEqual(by_name["Angel's Grace"]["source"], "curated")
         self.assertEqual(by_name["Angel's Grace"]["effect_json"]["effect"], "cannot_lose_turn")
+        self.assertEqual(by_name["Apex of Power"]["source"], "curated")
+        self.assertEqual(by_name["Apex of Power"]["effect_json"]["effect"], "passive")
         self.assertEqual(by_name["Approach of the Second Sun"]["source"], "curated")
         self.assertEqual(
             by_name["Approach of the Second Sun"]["effect_json"]["effect"],
             "approach",
         )
+        self.assertEqual(by_name["Arcane Endeavor"]["source"], "curated")
+        self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
         self.assertEqual(by_name["Birgi, God of Storytelling"]["source"], "curated")
         self.assertEqual(
             by_name["Birgi, God of Storytelling"]["effect_json"]["spell_cast_add_mana"],
             1,
         )
+        self.assertEqual(by_name["Big Score"]["source"], "curated")
+        self.assertEqual(by_name["Big Score"]["effect_json"]["effect"], "treasure_maker")
+        self.assertEqual(by_name["Big Score"]["effect_json"]["treasure_count"], 2)
+        self.assertEqual(by_name["Breena, the Demagogue"]["source"], "curated")
+        self.assertEqual(by_name["Breena, the Demagogue"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Chrome Mox"]["source"], "curated")
         self.assertTrue(
             by_name["Chrome Mox"]["effect_json"]["requires_imprint_nonartifact_nonland"]
@@ -515,11 +724,21 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Crop Rotation"]["source"], "curated")
         self.assertEqual(by_name["Crop Rotation"]["effect_json"]["effect"], "land_ramp")
         self.assertTrue(by_name["Crop Rotation"]["effect_json"]["requires_sacrifice_land"])
+        self.assertEqual(by_name["Curator's Ward"]["source"], "curated")
+        self.assertEqual(by_name["Curator's Ward"]["effect_json"]["effect"], "passive")
         self.assertEqual(by_name["Dismember"]["source"], "curated")
         self.assertEqual(by_name["Dismember"]["effect_json"]["effect"], "remove_creature")
         self.assertTrue(by_name["Dismember"]["effect_json"]["uses_stat_modifier_removal"])
+        self.assertEqual(by_name["Decaying Time Loop"]["source"], "curated")
+        self.assertTrue(by_name["Decaying Time Loop"]["effect_json"]["draw_equal_to_discarded_hand"])
+        self.assertEqual(by_name["Electric Revelation"]["source"], "curated")
+        self.assertTrue(by_name["Electric Revelation"]["effect_json"]["requires_discard_card"])
         self.assertEqual(by_name["Entomb"]["source"], "curated")
         self.assertEqual(by_name["Entomb"]["effect_json"]["target"], "graveyard")
+        self.assertEqual(by_name["Empowered Autogenerator"]["source"], "curated")
+        self.assertTrue(by_name["Empowered Autogenerator"]["effect_json"]["enters_tapped"])
+        self.assertEqual(by_name["Ether"]["source"], "curated")
+        self.assertEqual(by_name["Ether"]["effect_json"]["effect"], "passive")
         self.assertEqual(by_name["Electroduplicate"]["source"], "curated")
         self.assertEqual(
             by_name["Electroduplicate"]["effect_json"]["effect"],
@@ -530,10 +749,19 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Everflowing Chalice"]["effect_json"]["multikicker_generic_cost"],
             2,
         )
+        self.assertEqual(by_name["Fateful Showdown"]["source"], "curated")
+        self.assertTrue(by_name["Fateful Showdown"]["effect_json"]["draw_equal_to_discarded_hand"])
+        self.assertEqual(by_name["Goblin Bombardment"]["source"], "curated")
+        self.assertEqual(by_name["Goblin Bombardment"]["effect_json"]["effect"], "passive")
+        self.assertTrue(by_name["Goblin Bombardment"]["effect_json"]["sacrifice_creature_damage"])
         self.assertEqual(by_name["Incubation Druid"]["source"], "curated")
         self.assertEqual(by_name["Incubation Druid"]["review_status"], "active")
         self.assertEqual(by_name["Incubation Druid"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Incubation Druid"]["effect_json"]["is_mana_source"])
+        self.assertEqual(by_name["Izzet Signet"]["source"], "curated")
+        self.assertEqual(by_name["Izzet Signet"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Kraum, Ludevic's Opus"]["source"], "curated")
+        self.assertEqual(by_name["Kraum, Ludevic's Opus"]["effect_json"]["effect"], "draw_engine")
         self.assertEqual(by_name["Library of Leng"]["source"], "curated")
         self.assertTrue(by_name["Library of Leng"]["effect_json"]["no_max_hand_size"])
         self.assertEqual(by_name["Lightning Greaves"]["source"], "curated")
@@ -545,6 +773,8 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Lorehold, the Historian"]["effect_json"]["grants_miracle_cost"], 2)
         self.assertEqual(by_name["Lumra, Bellow of the Woods"]["source"], "curated")
         self.assertEqual(by_name["Lumra, Bellow of the Woods"]["effect_json"]["effect"], "land_recursion_creature")
+        self.assertEqual(by_name["Magma Opus"]["source"], "curated")
+        self.assertEqual(by_name["Magma Opus"]["effect_json"]["effect"], "draw_cards")
         self.assertEqual(by_name["Miscast"]["source"], "curated")
         self.assertEqual(by_name["Miscast"]["effect_json"]["effect"], "counter")
         self.assertEqual(by_name["Mystical Tutor"]["source"], "curated")
@@ -563,17 +793,44 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Natural Order"]["effect_json"]["target"],
             "green_creature_to_battlefield",
         )
+        self.assertEqual(by_name["Pirate's Pillage"]["source"], "curated")
+        self.assertEqual(by_name["Pirate's Pillage"]["effect_json"]["effect"], "treasure_maker")
+        self.assertEqual(by_name["Prismatic Lens"]["source"], "curated")
+        self.assertEqual(by_name["Prismatic Lens"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Practical Research"]["source"], "curated")
+        self.assertEqual(by_name["Practical Research"]["effect_json"]["effect"], "draw_cards")
         self.assertEqual(by_name["Rampant Growth"]["source"], "curated")
         self.assertEqual(by_name["Rampant Growth"]["effect_json"]["effect"], "land_ramp")
         self.assertTrue(by_name["Rampant Growth"]["effect_json"]["land_enters_tapped"])
+        self.assertEqual(by_name["Rakdos, the Muscle"]["source"], "curated")
+        self.assertEqual(by_name["Rakdos, the Muscle"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Reanimate"]["source"], "curated")
         self.assertEqual(by_name["Reanimate"]["effect_json"]["destination"], "battlefield")
+        self.assertEqual(by_name["Ring of the Lucii"]["source"], "curated")
+        self.assertEqual(by_name["Ring of the Lucii"]["effect_json"]["mana_produced"], 2)
         self.assertEqual(by_name["Runaway Steam-Kin"]["source"], "curated")
         self.assertEqual(by_name["Runaway Steam-Kin"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Sami's Curiosity"]["source"], "curated")
         self.assertEqual(by_name["Sami's Curiosity"]["effect_json"]["effect"], "lander_token_maker")
+        self.assertEqual(by_name["Sazacap's Brew"]["source"], "curated")
+        self.assertTrue(by_name["Sazacap's Brew"]["effect_json"]["requires_discard_card"])
+        self.assertEqual(by_name["Shantotto, Tactician Magician"]["source"], "curated")
+        self.assertEqual(by_name["Shantotto, Tactician Magician"]["effect_json"]["effect"], "creature")
+        self.assertEqual(by_name["Sisay, Weatherlight Captain"]["source"], "curated")
+        self.assertTrue(by_name["Sisay, Weatherlight Captain"]["effect_json"]["activated_legendary_tutor"])
+        self.assertEqual(by_name["Sisay's Ring"]["source"], "curated")
+        self.assertEqual(by_name["Sisay's Ring"]["effect_json"]["mana_produced"], 2)
+        self.assertEqual(by_name["Spelltwine"]["source"], "curated")
+        self.assertEqual(by_name["Spelltwine"]["effect_json"]["effect"], "copy_spell")
+        self.assertTrue(by_name["Spelltwine"]["effect_json"]["copy_own_and_opponent_graveyard_spell"])
+        self.assertEqual(by_name["Tellah, Great Sage"]["source"], "curated")
+        self.assertEqual(by_name["Tellah, Great Sage"]["effect_json"]["effect"], "creature")
+        self.assertEqual(by_name["The Unagi of Kyoshi Island"]["source"], "curated")
+        self.assertEqual(by_name["The Unagi of Kyoshi Island"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Valakut Awakening"]["source"], "curated")
         self.assertEqual(by_name["Valakut Awakening"]["effect_json"]["effect"], "hand_filter")
+        self.assertEqual(by_name["Volcanic Vision"]["source"], "curated")
+        self.assertEqual(by_name["Volcanic Vision"]["effect_json"]["target"], "instant_or_sorcery")
         self.assertEqual(by_name["Scroll Rack"]["source"], "curated")
         self.assertEqual(by_name["Skullclamp"]["source"], "curated")
         self.assertEqual(by_name["Skullclamp"]["effect_json"]["effect"], "passive")
@@ -590,6 +847,8 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Unexpected Windfall"]["effect_json"]["effect"],
             "treasure_maker",
         )
+        self.assertEqual(by_name["Ur-Golem's Eye"]["source"], "curated")
+        self.assertEqual(by_name["Ur-Golem's Eye"]["effect_json"]["mana_produced"], 2)
         self.assertTrue(
             by_name["Unexpected Windfall"]["effect_json"]["requires_discard_card"]
         )
@@ -598,6 +857,8 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Vexing Bauble"]["effect_json"]["effect"],
             "hate_artifact",
         )
+        self.assertEqual(by_name["Woodland Bellower"]["source"], "curated")
+        self.assertEqual(by_name["Woodland Bellower"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Worldfire"]["source"], "curated")
         self.assertEqual(by_name["Worldfire"]["effect_json"]["effect"], "worldfire_reset")
         self.assertEqual(by_name["Zuran Orb"]["source"], "curated")
@@ -644,6 +905,12 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                 entomb = battle.get_card_effect(
                     {"name": "Entomb", "type_line": "Instant"}
                 )
+                empowered_autogenerator = battle.get_card_effect(
+                    {"name": "Empowered Autogenerator", "type_line": "Artifact"}
+                )
+                ether = battle.get_card_effect({"name": "Ether", "type_line": "Artifact"})
+                electric_revelation = battle.get_card_effect({"name": "Electric Revelation", "type_line": "Instant"})
+                fateful_showdown = battle.get_card_effect({"name": "Fateful Showdown", "type_line": "Instant"})
                 rampant_growth = battle.get_card_effect(
                     {"name": "Rampant Growth", "type_line": "Sorcery"}
                 )
@@ -679,20 +946,34 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                 path_to_exile = battle.get_card_effect(
                     {"name": "Path to Exile", "type_line": "Instant"}
                 )
+                pirates_pillage = battle.get_card_effect({"name": "Pirate's Pillage", "type_line": "Sorcery"})
+                prismatic_lens = battle.get_card_effect({"name": "Prismatic Lens", "type_line": "Artifact"})
+                decaying_time_loop = battle.get_card_effect({"name": "Decaying Time Loop", "type_line": "Instant"})
+                izzet_signet = battle.get_card_effect({"name": "Izzet Signet", "type_line": "Artifact"})
+                kraum = battle.get_card_effect({"name": "Kraum, Ludevic's Opus", "type_line": "Legendary Creature — Zombie Horror"})
+                rakdos = battle.get_card_effect({"name": "Rakdos, the Muscle", "type_line": "Legendary Creature — Demon Mercenary"})
+                ring = battle.get_card_effect({"name": "Ring of the Lucii", "type_line": "Legendary Artifact"})
+                sazacaps_brew = battle.get_card_effect({"name": "Sazacap's Brew", "type_line": "Instant"})
                 scroll_rack = battle.get_card_effect({"name": "Scroll Rack", "type_line": "Artifact"})
                 seething_song = battle.get_card_effect({"name": "Seething Song", "type_line": "Instant"})
+                shantotto = battle.get_card_effect({"name": "Shantotto, Tactician Magician", "type_line": "Legendary Creature — Dwarf Wizard"})
+                sisay = battle.get_card_effect({"name": "Sisay, Weatherlight Captain", "type_line": "Legendary Creature — Human Soldier"})
+                sisays_ring = battle.get_card_effect({"name": "Sisay's Ring", "type_line": "Artifact"})
                 skullclamp = battle.get_card_effect({"name": "Skullclamp", "type_line": "Artifact — Equipment"})
                 talisman = battle.get_card_effect(
                     {"name": "Talisman of Conviction", "type_line": "Artifact"}
                 )
+                ur_golems_eye = battle.get_card_effect({"name": "Ur-Golem's Eye", "type_line": "Artifact"})
                 top = battle.get_card_effect({"name": "Sensei's Divining Top", "type_line": "Artifact"})
                 mystical_tutor = battle.get_card_effect({"name": "Mystical Tutor", "type_line": "Instant"})
+                volcanic_vision = battle.get_card_effect({"name": "Volcanic Vision", "type_line": "Sorcery"})
                 wall_of_omens = battle.get_card_effect(
                     {"name": "Wall of Omens", "type_line": "Creature — Wall"}
                 )
                 wayfarers_bauble = battle.get_card_effect(
                     {"name": "Wayfarer's Bauble", "type_line": "Artifact"}
                 )
+                woodland_bellower = battle.get_card_effect({"name": "Woodland Bellower", "type_line": "Creature — Beast"})
                 worldfire = battle.get_card_effect({"name": "Worldfire", "type_line": "Sorcery"})
             finally:
                 battle.DB = old_db
@@ -761,6 +1042,17 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(entomb["_rule_source"], "curated")
         self.assertEqual(entomb["effect"], "tutor")
         self.assertEqual(entomb["target"], "graveyard")
+        self.assertEqual(empowered_autogenerator["_rule_source"], "curated")
+        self.assertEqual(empowered_autogenerator["effect"], "ramp_permanent")
+        self.assertTrue(empowered_autogenerator["enters_tapped"])
+        self.assertEqual(ether["_rule_source"], "curated")
+        self.assertEqual(ether["effect"], "passive")
+        self.assertTrue(ether["activated_exile_self_for_mana"])
+        self.assertEqual(electric_revelation["_rule_source"], "curated")
+        self.assertEqual(electric_revelation["effect"], "draw_cards")
+        self.assertTrue(electric_revelation["requires_discard_card"])
+        self.assertEqual(fateful_showdown["_rule_source"], "curated")
+        self.assertTrue(fateful_showdown["draw_equal_to_discarded_hand"])
         self.assertEqual(rampant_growth["_rule_source"], "curated")
         self.assertEqual(rampant_growth["effect"], "land_ramp")
         self.assertTrue(rampant_growth["basic_only"])
@@ -773,12 +1065,28 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(dismember["effect"], "remove_creature")
         self.assertEqual(dismember["toughness_boost"], -5)
         self.assertTrue(dismember["uses_stat_modifier_removal"])
+        self.assertEqual(decaying_time_loop["_rule_source"], "curated")
+        self.assertEqual(decaying_time_loop["effect"], "draw_cards")
+        self.assertTrue(decaying_time_loop["draw_equal_to_discarded_hand"])
+        self.assertEqual(izzet_signet["_rule_source"], "curated")
+        self.assertEqual(izzet_signet["effect"], "ramp_permanent")
+        self.assertEqual(izzet_signet["produces"], "UR")
+        self.assertEqual(kraum["_rule_source"], "curated")
+        self.assertEqual(kraum["effect"], "draw_engine")
+        self.assertTrue(kraum["opponent_second_spell_each_turn"])
+        self.assertFalse(kraum["draw_on_enter"])
         self.assertEqual(path_to_exile["_rule_source"], "curated")
         self.assertEqual(path_to_exile["_rule_review_status"], "active")
         self.assertEqual(path_to_exile["effect"], "remove_creature")
         self.assertEqual(path_to_exile["target"], "creature")
         self.assertTrue(path_to_exile["exile_target"])
         self.assertTrue(path_to_exile["target_controller_basic_land_tapped"])
+        self.assertEqual(pirates_pillage["_rule_source"], "curated")
+        self.assertEqual(pirates_pillage["effect"], "treasure_maker")
+        self.assertEqual(pirates_pillage["treasure_count"], 2)
+        self.assertEqual(prismatic_lens["_rule_source"], "curated")
+        self.assertEqual(prismatic_lens["effect"], "ramp_permanent")
+        self.assertEqual(prismatic_lens["mana_produced"], 1)
         self.assertEqual(scroll_rack["_rule_source"], "curated")
         self.assertEqual(scroll_rack["effect"], "topdeck_manipulation")
         self.assertTrue(scroll_rack["hand_to_top_exchange"])
@@ -791,6 +1099,24 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(seething_song["effect"], "ramp_ritual")
         self.assertEqual(seething_song["mana_produced"], 5)
         self.assertTrue(seething_song["instant"])
+        self.assertEqual(rakdos["_rule_source"], "curated")
+        self.assertEqual(rakdos["effect"], "creature")
+        self.assertTrue(rakdos["sacrifice_creature_grants_indestructible"])
+        self.assertEqual(ring["_rule_source"], "curated")
+        self.assertEqual(ring["effect"], "ramp_permanent")
+        self.assertEqual(ring["mana_produced"], 2)
+        self.assertEqual(sazacaps_brew["_rule_source"], "curated")
+        self.assertEqual(sazacaps_brew["effect"], "draw_cards")
+        self.assertTrue(sazacaps_brew["requires_discard_card"])
+        self.assertEqual(shantotto["_rule_source"], "curated")
+        self.assertEqual(shantotto["effect"], "creature")
+        self.assertEqual(shantotto["spell_cast_draw_if_cmc_at_least"], 4)
+        self.assertEqual(sisay["_rule_source"], "curated")
+        self.assertEqual(sisay["effect"], "creature")
+        self.assertTrue(sisay["activated_legendary_tutor"])
+        self.assertEqual(sisays_ring["_rule_source"], "curated")
+        self.assertEqual(sisays_ring["_rule_review_status"], "verified")
+        self.assertEqual(sisays_ring["mana_produced"], 2)
         self.assertEqual(skullclamp["_rule_source"], "curated")
         self.assertEqual(skullclamp["effect"], "passive")
         self.assertEqual(skullclamp["draw_on_equipped_death"], 2)
@@ -800,6 +1126,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(talisman["mana_produced"], 1)
         self.assertEqual(talisman["produces"], "CRW")
         self.assertEqual(talisman["life_for_colored_mana"], 1)
+        self.assertEqual(ur_golems_eye["_rule_source"], "curated")
+        self.assertEqual(ur_golems_eye["_rule_review_status"], "verified")
+        self.assertEqual(ur_golems_eye["mana_produced"], 2)
         self.assertEqual(top["_rule_source"], "curated")
         self.assertEqual(top["effect"], "topdeck_manipulation")
         self.assertEqual(top["peek_top_count"], 3)
@@ -807,6 +1136,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(mystical_tutor["_rule_source"], "curated")
         self.assertEqual(mystical_tutor["effect"], "tutor")
         self.assertEqual(mystical_tutor["target"], "instant_or_sorcery")
+        self.assertEqual(volcanic_vision["_rule_source"], "curated")
+        self.assertEqual(volcanic_vision["effect"], "recursion")
+        self.assertEqual(volcanic_vision["target"], "instant_or_sorcery")
         self.assertEqual(wall_of_omens["_rule_source"], "curated")
         self.assertEqual(wall_of_omens["effect"], "creature")
         self.assertEqual(wall_of_omens["etb_draw_count"], 1)
@@ -814,10 +1146,253 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(wayfarers_bauble["effect"], "ramp_permanent")
         self.assertTrue(wayfarers_bauble["activated_self_sacrifice_land_tutor"])
         self.assertTrue(wayfarers_bauble["basic_only"])
+        self.assertEqual(woodland_bellower["_rule_source"], "curated")
+        self.assertEqual(woodland_bellower["_rule_review_status"], "verified")
+        self.assertEqual(woodland_bellower["effect"], "creature")
+        self.assertEqual(woodland_bellower["etb_tutor_nonlegendary_green_creature_mv_lte"], 3)
         self.assertEqual(worldfire["_rule_source"], "curated")
         self.assertEqual(worldfire["_rule_review_status"], "verified")
         self.assertEqual(worldfire["effect"], "worldfire_reset")
         self.assertEqual(worldfire["battle_model_scope"], "worldfire_total_reset_v1")
+
+    def test_kraum_draws_only_on_second_opponent_spell(self) -> None:
+        old_db = battle.DB
+        old_turn = battle.CURRENT_REPLAY_TURN
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.CURRENT_REPLAY_TURN = 7
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                kraum = battle.get_card_effect(
+                    {
+                        "name": "Kraum, Ludevic's Opus",
+                        "type_line": "Legendary Creature — Zombie Horror",
+                    }
+                )
+                controller = battle.Player("Kraum Player", None, [])
+                controller.library = [
+                    {"name": "Draw A", "type_line": "Instant"},
+                    {"name": "Draw B", "type_line": "Instant"},
+                ]
+                controller.battlefield = [
+                    {
+                        **kraum,
+                        "name": "Kraum, Ludevic's Opus",
+                        "type_line": "Legendary Creature — Zombie Horror",
+                    }
+                ]
+                caster = battle.Player("Caster", None, [])
+                spell = {"name": "Ponder", "type_line": "Sorcery", "cmc": 1}
+
+                caster.record_spell_cast(7)
+                battle.trigger_opponent_spell_draw_engines(
+                    caster,
+                    [controller],
+                    spell,
+                    7,
+                    "precombat_main",
+                    __import__("random").Random(1),
+                )
+                self.assertEqual(len(controller.hand), 0)
+
+                caster.record_spell_cast(7)
+                battle.trigger_opponent_spell_draw_engines(
+                    caster,
+                    [controller],
+                    spell,
+                    7,
+                    "precombat_main",
+                    __import__("random").Random(1),
+                )
+                self.assertEqual([card["name"] for card in controller.hand], ["Draw A"])
+            finally:
+                battle.DB = old_db
+                battle.CURRENT_REPLAY_TURN = old_turn
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+    def test_shantotto_draws_on_large_noncreature_spell(self) -> None:
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                shantotto = battle.get_card_effect(
+                    {
+                        "name": "Shantotto, Tactician Magician",
+                        "type_line": "Legendary Creature — Dwarf Wizard",
+                    }
+                )
+                controller = battle.Player("Shantotto Player", None, [])
+                controller.library = [{"name": "Triggered Draw", "type_line": "Instant"}]
+                controller.battlefield = [
+                    {
+                        **shantotto,
+                        "name": "Shantotto, Tactician Magician",
+                        "type_line": "Legendary Creature — Dwarf Wizard",
+                    }
+                ]
+                battle.trigger_spell_cast_engines(
+                    controller,
+                    [controller],
+                    {"name": "Fact or Fiction", "type_line": "Instant", "cmc": 4},
+                    3,
+                    "precombat_main",
+                )
+                self.assertEqual([card["name"] for card in controller.hand], ["Triggered Draw"])
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+    def test_decaying_time_loop_discards_own_hand_and_draws_same_count(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Caster", None, [])
+                player.hand = [
+                    {"name": "Old A", "type_line": "Instant"},
+                    {"name": "Old B", "type_line": "Sorcery"},
+                ]
+                player.library = [
+                    {"name": "New A", "type_line": "Instant"},
+                    {"name": "New B", "type_line": "Sorcery"},
+                    {"name": "New C", "type_line": "Creature"},
+                ]
+                card = {"name": "Decaying Time Loop", "type_line": "Instant", "cmc": 4}
+                effect = battle.get_card_effect(card)
+                battle.apply_effect_immediate(
+                    player,
+                    [],
+                    card,
+                    4,
+                    __import__("random").Random(1),
+                    effect_data_override=effect,
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        resolved = [
+            data
+            for event, data in events
+            if event == "draw_equal_to_discarded_hand_resolved"
+        ]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["discarded"], 2)
+        self.assertEqual(resolved[0]["cards_drawn"], 2)
+        self.assertEqual([card["name"] for card in player.hand], ["New A", "New B"])
+
+    def test_woodland_bellower_etb_tutors_nonlegendary_green_creature_to_battlefield(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Caster", None, [])
+                player.library = [
+                    {
+                        "name": "Legendary Green",
+                        "type_line": "Legendary Creature — Elf",
+                        "colors": ["G"],
+                        "cmc": 2,
+                        "power": 2,
+                        "toughness": 2,
+                    },
+                    {
+                        "name": "Elvish Mystic",
+                        "type_line": "Creature — Elf Druid",
+                        "colors": ["G"],
+                        "cmc": 1,
+                        "power": 1,
+                        "toughness": 1,
+                    },
+                    {
+                        "name": "Blue Creature",
+                        "type_line": "Creature — Merfolk",
+                        "colors": ["U"],
+                        "cmc": 1,
+                        "power": 1,
+                        "toughness": 1,
+                    },
+                ]
+                card = {
+                    "name": "Woodland Bellower",
+                    "type_line": "Creature — Beast",
+                    "cmc": 6,
+                    "power": 6,
+                    "toughness": 5,
+                }
+                effect = battle.get_card_effect(card)
+                battle.apply_effect_immediate(
+                    player,
+                    [],
+                    card,
+                    6,
+                    __import__("random").Random(1),
+                    effect_data_override=effect,
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        self.assertIn("Elvish Mystic", [card.get("name") for card in player.battlefield])
+        resolved = [data for event, data in events if event == "etb_tutor_resolved"]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["found"], "Elvish Mystic")
+
+    def test_volcanic_vision_recovers_spell_and_exiles_itself(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Caster", None, [])
+                recovered = {"name": "Lightning Bolt", "type_line": "Instant", "cmc": 1}
+                card = {"name": "Volcanic Vision", "type_line": "Sorcery", "cmc": 7}
+                player.graveyard = [recovered, card]
+                effect = battle.get_card_effect(card)
+                battle.apply_effect_immediate(
+                    player,
+                    [],
+                    card,
+                    6,
+                    __import__("random").Random(1),
+                    effect_data_override=effect,
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        self.assertIn(recovered, player.hand)
+        self.assertIn(card, player.exile)
+        resolved = [data for event, data in events if event == "recursion_resolved"]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["recovered"], ["Lightning Bolt"])
+        spell_resolved = [data for event, data in events if event == "spell_resolved"]
+        self.assertEqual(spell_resolved[0]["destination"], "exile")
 
     def test_draw_counter_resets_on_global_turn_change(self) -> None:
         player = battle.Player("Tester", None, [])
@@ -1444,6 +2019,100 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(player.battlefield[0]["name"], "Wall of Omens")
         self.assertTrue(any(card.get("name") == "Drawn Card" for card in player.hand))
         self.assertEqual(player.graveyard, [])
+
+    def test_firemind_vessel_enters_tapped_as_mana_rock(self) -> None:
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            with closing(sqlite3.connect(db_path)) as conn:
+                battle_rule_registry.ensure_battle_card_rules(conn)
+                for row in load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH):
+                    battle_rule_registry.upsert_battle_card_rule(
+                        conn,
+                        row["card_name"],
+                        row["effect_json"],
+                        source=row["source"],
+                        confidence=row["confidence"],
+                        review_status=row["review_status"],
+                        execution_status=row.get("execution_status") or "auto",
+                        deck_role_json=row.get("deck_role_json"),
+                        notes=row.get("notes", ""),
+                    )
+                conn.commit()
+
+            try:
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+                player = battle.Player("Tester", None, [])
+                spell = {"name": "Firemind Vessel", "type_line": "Artifact", "cmc": 4}
+                battle.apply_effect_immediate(player, [], spell, turn=1, rng=__import__("random").Random(2))
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+
+        self.assertEqual(len(player.battlefield), 1)
+        vessel = player.battlefield[0]
+        self.assertEqual(vessel["name"], "Firemind Vessel")
+        self.assertEqual(vessel["effect"], "ramp_permanent")
+        self.assertEqual(vessel["mana_produced"], 2)
+        self.assertTrue(vessel["tapped"])
+
+    def test_shark_typhoon_creates_token_on_noncreature_spell_cast(self) -> None:
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            with closing(sqlite3.connect(db_path)) as conn:
+                battle_rule_registry.ensure_battle_card_rules(conn)
+                for row in load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH):
+                    battle_rule_registry.upsert_battle_card_rule(
+                        conn,
+                        row["card_name"],
+                        row["effect_json"],
+                        source=row["source"],
+                        confidence=row["confidence"],
+                        review_status=row["review_status"],
+                        execution_status=row.get("execution_status") or "auto",
+                        deck_role_json=row.get("deck_role_json"),
+                        notes=row.get("notes", ""),
+                    )
+                conn.commit()
+
+            try:
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+                player = battle.Player("Tester", None, [])
+                typhoon = {"name": "Shark Typhoon", "type_line": "Enchantment", "cmc": 6}
+                typhoon_effect = battle.get_card_effect(typhoon)
+                battle.apply_effect_immediate(
+                    player,
+                    [],
+                    typhoon,
+                    turn=1,
+                    rng=__import__("random").Random(3),
+                    effect_data_override=typhoon_effect,
+                )
+                battle.trigger_spell_cast_engines(
+                    player,
+                    [player],
+                    {"name": "Ponder", "type_line": "Sorcery", "cmc": 1},
+                    turn=1,
+                    phase="precombat_main",
+                    stack=None,
+                    active_player=player,
+                )
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+
+        tokens = [card for card in player.battlefield if card.get("name") == "Shark Token"]
+        self.assertEqual(len(tokens), 1)
+        self.assertEqual(tokens[0]["power"], 1)
+        self.assertEqual(tokens[0]["toughness"], 1)
+        self.assertTrue(tokens[0]["flying"])
 
     def test_mind_stone_resolves_as_mana_rock_and_can_cash_in_for_draw(self) -> None:
         old_db = battle.DB

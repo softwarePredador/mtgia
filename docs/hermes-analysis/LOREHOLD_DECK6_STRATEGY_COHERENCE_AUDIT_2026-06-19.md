@@ -193,6 +193,124 @@ warn that raw WR numbers moved across snapshots and should be treated as
 operational evidence, not absolute truth. Any proposed swap should still rerun
 baseline, hash guard, slot scan, quality gate, confirmation, and handoff.
 
+## Pressure-Simulation Correction - 2026-06-20 16:00 -0300
+
+Rafael's review exposed a methodology bug in the prior battle interpretation:
+the Lorehold deck cannot be judged by a free-for-all simulation where the other
+three decks are allowed to attack each other while Lorehold executes its own
+plan with insufficient pressure.
+
+The battle runtime and recurring audit now treat `Lorehold` as the evaluation
+target under pressure:
+
+- `battle_analyst_v9.py` uses
+  `MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER=Lorehold` by default for the
+  evaluation flow.
+- Opponent attacks and prioritized targeted removal now pressure Lorehold while
+  Lorehold is alive.
+- Multi-defender split is disabled for opponent attacks whose primary defender
+  is the evaluation target.
+- `battle_replay_v10_3.py` stops the replay once Lorehold dies, so post-death
+  combat between other opponents is not counted as deck-evaluation evidence.
+- `battle_target_pressure_audit.py` is now a recurring mandatory gate and
+  checks whether opponent combat is actually directed at Lorehold.
+
+Latest full-run evidence after this correction:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185748/summary.json`
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `mandatory_gate_divergences=[]`.
+- `mandatory_gates_required_for_final_status` includes `target_pressure`.
+- `target_pressure_statuses={"pass":16}`.
+- `target_pressure_findings=0`.
+- `target_pressure_opponent_combat_total=117`.
+- `target_pressure_opponent_combat_to_target=117`.
+- `target_pressure_opponent_combat_to_other=0`.
+- `target_pressure_opponent_multi_defender_attack=0`.
+- `test_results_total=17`, `test_results_status_counts={"pass":17}`.
+
+Replay evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_replay_20260620_153647.txt`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_replay_20260620_153647.target_pressure.json`
+- In that replay, opponent combat was `14/14` against Lorehold, with `0`
+  attacks against other defenders and `0` target-pressure findings.
+
+Operational conclusion:
+
+- Lorehold deck `6` remains strategically coherent after the `Wheel of
+  Misfortune` correction, but future claims that it is the best version must be
+  based on target-pressure battle evidence, not older unpressured WR.
+- The current pressure-mode aggregate smoke is `83.3% (10W/2L/0S)`, which is
+  lower than prior free-pressure snapshots and therefore more realistic as
+  deck-evaluation evidence.
+- No additional deck swap is justified from this checkpoint alone; this
+  checkpoint corrects the simulator methodology and gate, not the 100-card list.
+
+## Runtime Gate Drift Checkpoint - 2026-06-20 16:30 -0300
+
+New official battle evidence since the target-pressure clean run:
+
+- `latest/summary.json` now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_191248/summary.json`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["action_critic=review_required","forensic_audit=blocked","replay_decision_audit=review_required"]`.
+- `forensic_rule_findings=2`, `action_findings=2`,
+  `decision_audit_decision_findings=1`.
+- Target pressure remains clean: `target_pressure_statuses={"pass":16}`,
+  `target_pressure_findings=0`, `target_pressure_opponent_combat_to_target=84`,
+  and `target_pressure_opponent_combat_to_other=0`.
+- Tests still pass in the wrapper: `test_results_total=17`,
+  `test_results_status_counts={"pass":17}`.
+
+Interpretation:
+
+- The blocking finding is not a Lorehold deck-list or learned-deck coherence
+  regression.
+- Seed `63211917` let `Dargo, the Shipwrecker #74 (real)` execute
+  `Goblin Bombardment` as `remove_creature` from
+  `known_cards_canonical_snapshot` even though the rule is
+  `review_status=needs_review` and `execution_status=review_only`.
+- This is a battle runtime safety bug in canonical snapshot fallback handling.
+
+Treatment performed:
+
+- `battle_analyst_v9.py` now suppresses non-runtime-safe canonical snapshot
+  rules into a passive provenance effect with
+  `battle_model_scope=canonical_snapshot_rule_not_runtime_safe`.
+- `battle_card_specific_tests.py` adds
+  `test_goblin_bombardment_review_only_snapshot_does_not_remove_on_cast`.
+
+Evidence:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the new Goblin Bombardment regression.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passed.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused seed replay/auditors under
+  `/tmp/lorehold_seed63211917_post_review_only_fix.*` returned
+  `action_findings=0`, `forensic rule_findings=0`,
+  `forensic turn_findings=0`, `decision_findings=0`, and
+  `decision turn_findings=0`.
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+
+Current active pending item:
+
+- Run a fresh full recurring battle audit so official `latest` can supersede
+  `20260620_191248`.
+
+Not active from this checkpoint:
+
+- No PostgreSQL apply is justified by this blocker.
+- No Lorehold deck swap is justified by this blocker.
+- No learned-deck coherence issue reopened for Lorehold.
+
 ## Divergences Found
 
 ### D1 - Active learned-deck metadata still disagrees with resolved card list
@@ -15824,3 +15942,719 @@ Conclusion:
   `action_findings=0`.
 - The latest quality gate with the clean audit is
   `docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260620_181826.md`.
+
+### Auditor Central Target-Pressure Battle Gate - 2026-06-20 16:00 -03
+
+Scope:
+
+- Revalidated Lorehold deck `6` after the battle methodology was tightened so
+  opponents must pressure the evaluated deck (`Lorehold`) instead of freely
+  fighting each other.
+- Fixed the battle event metadata path where an evaluation-target attack that
+  was also lethal could still be emitted as `evaluation_target_pressure` instead
+  of `lethal`.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed for this checkpoint.
+
+Evidence:
+
+- Historical blocked run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185202/summary.json`
+  reported `battle_replay_final_status=blocked`,
+  `mandatory_gate_divergences=["forensic_audit=blocked","replay_decision_audit=blocked"]`,
+  `forensic_turn_findings=4`, and `decision_audit_turn_findings=4`.
+- The blocked invariant was the same in seeds `63212004`, `63212007`,
+  `63212009`, and `63212014`: a potential lethal attack against Lorehold was
+  not tagged as lethal.
+- Focused validation passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`;
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`;
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py`;
+  and `python3 -m py_compile` for `battle_analyst_v9.py`,
+  `battle_target_pressure_audit.py`, and `battle_replay_v10_3.py`.
+- Current latest full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_185748/summary.json`.
+- That run reports `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":17}`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`, `decision_audit_turn_findings=0`, and
+  `action_findings=0`.
+- Target pressure evidence in the same run:
+  `target_pressure_statuses={"pass":16}`, `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_total=117`,
+  `target_pressure_opponent_combat_to_target=117`,
+  `target_pressure_opponent_combat_to_other=0`, and
+  `target_pressure_opponent_multi_defender_attack=0`.
+- `docs/hermes-analysis/manaloom-knowledge/decks/lorehold-the-historian/BATTLE_LOG.md`
+  records the new under-pressure aggregate as `83.3%` (`10W/2L/0S`).
+- `docs/hermes-analysis/BATTLE_VALIDATION_REGISTER_2026-06-19.md` records the
+  target-pressure checkpoint and the new mandatory gate.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and battle-trusted under the stricter
+  target-pressure methodology.
+- Earlier WR/baseline evidence before this checkpoint should not be treated as
+  proof of optimality because it did not require direct pressure on Lorehold.
+- The active Lorehold deck state remains no-swap; any future swap still requires
+  explicit approval plus a clean full run with `target_pressure` passing.
+
+### Auditor Central Review-Only Runtime Safety Fix - 2026-06-20 16:30 -03
+
+Scope:
+
+- Rechecked the live battle `latest` after the target-pressure checkpoint.
+- Treated a runtime safety bug where a canonical snapshot rule marked
+  `review_only` was still executable through fallback effect resolution.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed for this checkpoint.
+
+Evidence:
+
+- Current latest full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_191248/summary.json`.
+- That run reports `battle_replay_final_status=blocked`,
+  `battle_replay_final_status_reason=one_or_more_mandatory_gates_blocked`, and
+  `mandatory_gate_divergences=["action_critic=review_required","forensic_audit=blocked","replay_decision_audit=review_required"]`.
+- Blocking details: seed `63211917`, `Goblin Bombardment`, player
+  `Dargo, the Shipwrecker #74 (real)`, turn `9`.
+- The runtime used `Goblin Bombardment` as `effect=remove_creature` from
+  `known_cards_canonical_snapshot` while the local rule metadata is
+  `review_status=needs_review` and `execution_status=review_only`.
+- Target-pressure remains clean in the same run:
+  `target_pressure_statuses={"pass":16}`, `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_total=84`,
+  `target_pressure_opponent_combat_to_target=84`,
+  `target_pressure_opponent_combat_to_other=0`, and
+  `target_pressure_opponent_multi_defender_attack=0`.
+
+Treatment and validation:
+
+- `battle_analyst_v9.py` now suppresses non-runtime-safe canonical snapshot
+  rules into passive provenance with
+  `battle_model_scope=canonical_snapshot_rule_not_runtime_safe`.
+- `battle_card_specific_tests.py` adds
+  `test_goblin_bombardment_review_only_snapshot_does_not_remove_on_cast`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the new regression.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passed.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused seed replay/auditors under
+  `/tmp/lorehold_seed63211917_post_review_only_fix.*` returned
+  `action_findings=0`, `forensic rule_findings=0`,
+  `forensic turn_findings=0`, `decision_findings=0`, and
+  `decision turn_findings=0`.
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- The official battle `latest` is not currently trusted because
+  `20260620_191248` is still the live blocked artifact.
+- The identified runtime defect is locally fixed; next required proof is a
+  fresh full recurring battle rerun that supersedes `20260620_191248`.
+- No PostgreSQL apply or Lorehold deck swap is justified by this checkpoint.
+
+### Auditor Central Latest 195007 Battle State - 2026-06-20 16:50 -03
+
+Scope:
+
+- Superseded the `191248` Goblin-specific blocker with a fresh full recurring
+  battle rerun after runtime fixes.
+- Confirmed target-pressure no longer blocks after the post-target-elimination
+  audit fix.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed for this checkpoint.
+
+Evidence:
+
+- Current latest full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_195007/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63211944`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","replay_decision_audit=review_required"]`.
+- `test_results_total=17`, `test_results_status_counts={"pass":17}`.
+- `action_findings=0`.
+- Target-pressure is clean:
+  `target_pressure_statuses={"pass":16}`, `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_total=193`,
+  `target_pressure_opponent_combat_to_target=193`,
+  `target_pressure_opponent_combat_to_other=0`, and
+  `target_pressure_opponent_multi_defender_attack=0`.
+
+Treatment completed:
+
+- `battle_target_pressure_audit.py` now ignores opponent combat after the
+  evaluation target has been eliminated.
+- `test_battle_target_pressure_audit.py` adds
+  `test_ignores_opponent_combat_after_lorehold_is_eliminated`.
+- Focused seed `63211952` validation returned `status=pass`,
+  `target_player_eliminated=true`,
+  `post_target_elimination_opponent_combat_ignored=1`,
+  `opponent_combat_to_target=10`, and `opponent_combat_to_other=0`.
+
+Remaining active blockers:
+
+- `forensic_audit` is blocked by opponent card-rule lineage, not Lorehold deck
+  composition.
+- Blocking seeds: `63211954` and `63211958`.
+- High forensic cards: `Abandon Attachments`, `Channeled Force`, and
+  `Hypothesizzle`, all executing through `functional_tags_json` instead of
+  verified/active `card_battle_rules`.
+- Other recurring lineage cards:
+  `The Emperor of Palamecia`, `Firemind Vessel`,
+  `Sisay, Weatherlight Captain`, and `Kraum, Ludevic's Opus`.
+- Low passive/review-only mismatches remain visible for `Laughing Mad`,
+  `Shark Typhoon`, `One with the Multiverse`, and `Stonespeaker Crystal`.
+- Replay decision review remains low severity on seed `63211944`, turn `7`,
+  `board_wipe_resolved`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean in
+  `learned_deck_coherence_audit_20260620_181429.json`.
+- The active battle blocker is a learned-opponent card-rule curation backlog.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved rule package.
+
+### Auditor Central Latest 200409 Battle State - 2026-06-20 17:06 -03
+
+Scope:
+
+- Treated the focused `20260620_200056` target-pressure metadata false positive
+  where attacks into Lorehold carried `target_reason=table_intent_*` but were
+  still counted as missing evaluation-pressure metadata.
+- Reran focused seed `63213000` and then a full recurring 16-seed audit.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed for this checkpoint.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Direct target-pressure re-audit for seed `63213000`:
+  `/tmp/lorehold_seed63213000_target_pressure_post_table_intent_metadata_fix.*`
+  returned `status=pass`, `opponent_combat_to_target=14`,
+  `opponent_combat_to_other=0`,
+  `opponent_combat_missing_pressure_reason=0`, and `findings=0`.
+- Focused proof:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_200322/summary.json`
+  returned `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `target_pressure_statuses={"pass":1}`,
+  `forensic_rule_findings=0`, `decision_audit_turn_findings=0`,
+  `action_findings=0`, and tests `18/18` pass.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_200409/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212004`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","table_intent=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`, and
+  `decision_audit_turn_findings=0`.
+
+Treatment completed:
+
+- `battle_target_pressure_audit.py` now accepts `table_intent_*` target
+  reasons as valid pressure metadata when `evaluation_target_active=true` and
+  the defender is Lorehold.
+- `test_battle_target_pressure_audit.py` adds
+  `test_accepts_table_intent_target_reason_when_evaluation_target_is_active`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passed.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_target_pressure_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+  passed.
+
+Remaining active blockers:
+
+- Full target-pressure has one real violation on seed `63212012`: opponent
+  `Kinnan, Bonder Prodigy #104 (real)` split combat between `Lorehold` and
+  `Tayam, Luminous Enigma #25 (real)` on turn `9`.
+- Full target-pressure aggregate:
+  `target_pressure_statuses={"blocked":1,"pass":15}`,
+  `target_pressure_findings=2`,
+  `target_pressure_opponent_combat_to_target=171`,
+  `target_pressure_opponent_combat_to_other=1`, and
+  `target_pressure_opponent_multi_defender_attack=1`.
+- Forensic blockers are opponent cards `Woodland Bellower` on seed `63212015`
+  and `Shantotto, Tactician Magician` on seed `63212017`, both from
+  `functional_tags_json` lineage.
+- Table-intent blockers are seeds `63212004`, `63212009`, and `63212019`,
+  each with `opponent_interaction_absent`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- The current blockers are battle runtime/curation and opponent behavior
+  modeling, not Lorehold deck composition or learned-deck coherence.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### Auditor Central Latest 203616 Battle State - 2026-06-20 17:39 -03
+
+Scope:
+
+- Rechecked the new official full recurring battle after the `20260620_202211`
+  event-contract drift and the `20260620_203302` wrapper rerun.
+- Corrected the local recurring wrapper so `target_pressure` is included in
+  `mandatory_gates_required_for_final_status` and in
+  `mandatory_gate_statuses`.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed for this checkpoint.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Reauditing event-contract over
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_202211`
+  with the current code wrote `/tmp/event_contract_static_202211_current_code.*`
+  and returned `status=event_contract_static_ready`,
+  `observed_unclassified_total=0`, and `static_unclassified_total=0`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_event_contract_static_audit.py`
+  passed with `7` tests.
+- `bash -n /Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+  passed.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh --dry-run --seeds 16`
+  passed.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_203616/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212036`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gates_required_for_final_status` now includes
+  `target_pressure`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","target_pressure=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, and `table_intent` passes `16/16`.
+
+Remaining active blockers:
+
+- Target-pressure blockers are seeds `63212036`, `63212042`, and `63212046`.
+- Target-pressure aggregate:
+  `target_pressure_statuses={"blocked":3,"pass":13}`,
+  `target_pressure_findings=9`,
+  `target_pressure_opponent_combat_to_target=190`,
+  `target_pressure_opponent_combat_to_other=8`, and
+  `target_pressure_opponent_multi_defender_attack=1`.
+- Forensic blockers are seeds `63212038`, `63212042`, `63212047`,
+  `63212048`, and `63212050`, with `forensic_rule_findings=25` and
+  `forensic_turn_findings=0`.
+- High/medium forensic lineage is concentrated in learned-opponent cards
+  executing through `functional_tags_json`, including `Curator's Ward`,
+  `Electric Revelation`, `Rakdos, the Muscle`, `Fateful Showdown`, and mana
+  rocks such as `Sisay's Ring`, `Ur-Golem's Eye`, and
+  `Empowered Autogenerator`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- The active battle blockers are battle runtime/opponent-behavior pressure and
+  learned-opponent card-rule lineage, not Lorehold deck composition.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### Auditor Central Latest 204002 Battle State - 2026-06-20 17:40 -03
+
+Scope:
+
+- The wrapper recheck generated a newer official latest artifact,
+  superseding `20260620_203616`.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed for this checkpoint.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_204002/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212040`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked","target_pressure=blocked"]`.
+- `mandatory_gates_required_for_final_status` includes `target_pressure`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`, and
+  `event_contract_static` passes with `observed_unclassified_total=0` and
+  `static_unclassified_total=0`.
+
+Remaining active blockers:
+
+- Target-pressure blockers are seeds `63212042` and `63212046`.
+- Target-pressure aggregate:
+  `target_pressure_statuses={"blocked":2,"pass":14}`,
+  `target_pressure_findings=4`,
+  `target_pressure_opponent_combat_to_target=188`,
+  `target_pressure_opponent_combat_to_other=3`, and
+  `target_pressure_opponent_multi_defender_attack=1`.
+- Forensic blockers are seeds `63212042`, `63212047`, `63212048`, and
+  `63212050`, with `forensic_rule_findings=21` and
+  `forensic_turn_findings=0`.
+- High/medium forensic lineage is concentrated in learned-opponent cards
+  executing through `functional_tags_json`, including `Electric Revelation`,
+  `Rakdos, the Muscle`, `Fateful Showdown`, and `Ur-Golem's Eye`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- The active battle blockers are still battle runtime/opponent-behavior
+  pressure and learned-opponent card-rule lineage, not Lorehold deck
+  composition.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### Auditor Central Latest 205821 Battle State - 2026-06-20 18:01 -03
+
+Scope:
+
+- Rechecked the new official latest full recurring battle after the `round5`
+  artifacts appeared in `master_optimizer_reports`.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_205821/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212058`.
+- `battle_replay_final_status=review_required`.
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`,
+  `target_pressure` passes `16/16`, and `event_contract_static` passes.
+
+Remaining active review item:
+
+- `forensic_rule_findings=2`, `forensic_turn_findings=0`.
+- Both findings are low severity on seed `63212068`: `Goblin Bombardment`
+  runtime effect `passive` differs from registry effect `remove_creature` on
+  `spell_cast` and `spell_resolved`.
+- This is a battle registry/runtime review residual, not a Lorehold decklist
+  coherence issue.
+
+Round5 artifact classification:
+
+- `card_battle_rules_pg_table_intent_promotions_round5_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=3`, selected cards
+  `Big Score` and `Spelltwine`, generated at `2026-06-20T20:57:21Z`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round5_20260620.json`
+  declares `apply_sqlite_from_pg=true`, `pg_rows_loaded=5224`,
+  `sqlite_inserted_or_updated=5142`, and
+  `canonical_snapshot_rows_exported=3181`.
+- This heartbeat detected those artifacts but did not execute any PostgreSQL
+  write or cache sync.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- Target-pressure is not an active blocker in the current latest run.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### Auditor Central 212035 Table-Intent Real Battle Closure - 2026-06-20 18:27 -03
+
+Scope:
+
+- Rechecked Lorehold deck `6` after the table-intent battle work, PostgreSQL
+  battle-rule promotions through round9, and Hermes SQLite/cache refresh.
+- No new Lorehold card swap was applied in this closure. The prior canonical
+  Wheel state remains the active deck state.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` remains clean with `issues=[]`,
+  `parsed_quantity=100`, `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`.
+- Current status:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":18}`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `action_findings=0`, `decision_audit_decision_findings=0`,
+  `target_pressure_findings=0`, and `table_intent_findings=0`.
+- Table-intent realism is active:
+  `table_intent_combat_total=294`, `table_intent_scored_combat_total=294`,
+  `table_intent_missing_scores=0`,
+  `table_intent_opponent_interaction_events=72`,
+  `table_intent_opponent_trigger_interaction_events=32`,
+  `table_intent_opponent_wins=15`, and `table_intent_target_wins=1`.
+- Example seed for human review:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/seed_63212120/replay.txt`.
+  It uses `table-intent-realistic`, evaluates target `Lorehold`, selects three
+  real learned-deck opponents, passes action/table-intent/target-pressure
+  audits, and ends with Lorehold eliminated on turn `11`.
+- Closure report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_table_intent_real_battle_closure_20260620_1827.md`.
+
+Conclusion:
+
+- Lorehold deck `6` is coherent and testable, but the current real-battle
+  baseline is not a high-confidence "best deck" result. Under table-intent
+  pressure, opponents won `15/16` and Lorehold won `1/16`.
+- The next Lorehold deck work should optimize from this latest table-intent
+  baseline, preserving the no-swap-without-explicit-decision rule for decklist
+  changes.
+
+### Auditor Central Latest 211648 Battle State - 2026-06-20 18:17 -03
+
+Scope:
+
+- Rechecked the latest full recurring battle after `211217` advanced again.
+- No Lorehold deck swap, PostgreSQL write, SQLite cache sync, cleanup, stage,
+  commit, push, battle rerun, live app route call, or OpenAI call was performed
+  by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_211648/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212116`.
+- `battle_replay_final_status=review_required`.
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`,
+  `target_pressure` passes `16/16`, and `event_contract_static` passes.
+
+Remaining review residual:
+
+- `forensic_rule_findings=2`, `forensic_turn_findings=0`,
+  `forensic_severity_counts={"low":2}`.
+- Low registry/runtime drift appears for opponent card
+  `Breena, the Demagogue` in seed `63212130`: runtime effect `passive`
+  differs from registry effect `draw_engine` on `spell_cast` and
+  `spell_resolved`.
+- This is not a Lorehold decklist coherence issue.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- Target-pressure is not an active blocker in the current latest run.
+- The latest battle is no longer blocked; it is in low forensic review.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### Auditor Central Latest 212035 Battle State - 2026-06-20 18:21 -03
+
+Scope:
+
+- Rechecked the latest full recurring battle after `211648` advanced again.
+- No Lorehold deck swap, PostgreSQL write, SQLite cache sync, cleanup, stage,
+  commit, push, battle rerun, live app route call, or OpenAI call was performed
+  by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_212035/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212120`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- `test_results_status_counts={"pass":18}`.
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`,
+  `target_pressure` passes `16/16`, and `event_contract_static` passes.
+- `strategy_findings=2`, both low-confidence only;
+  `strategy_review_required_findings=0`.
+
+Round8/round9 reconciliation:
+
+- Round8 artifacts declare external `apply_pg=true` for
+  `Practical Research` and `Tellah, Great Sage`, plus SQLite sync from
+  PostgreSQL with `pg_rows_loaded=5232` and
+  `sqlite_inserted_or_updated=5150`.
+- Round9 artifacts declare external `apply_pg=true` for
+  `Breena, the Demagogue`, plus SQLite sync from PostgreSQL with
+  `pg_rows_loaded=5233` and `sqlite_inserted_or_updated=5151`.
+- This heartbeat detected those artifacts and the green latest, but did not
+  execute apply, sync, or rerun.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- Current target-pressure and battle mandatory gates pass.
+- The latest full recurring battle is trusted for strategy learning.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### Auditor Central Latest 211217 Battle State - 2026-06-20 18:13 -03
+
+Scope:
+
+- Rechecked the latest full recurring battle after the externally generated
+  `round7` artifacts.
+- No Lorehold deck swap, PostgreSQL write, SQLite cache sync, cleanup, stage,
+  commit, push, battle rerun, live app route call, or OpenAI call was performed
+  by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_211217/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212112`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`,
+  `target_pressure` passes `16/16`, and `event_contract_static` passes.
+
+Remaining active blocker:
+
+- `forensic_rule_findings=4`, `forensic_turn_findings=0`.
+- High/medium `functional_tags_json` lineage appears on opponent cards:
+  `Tellah, Great Sage` in seed `63212112` and `Practical Research` in seed
+  `63212123`, both from `The Emperor of Palamecia #42 (real)` and both on
+  `draw_cards` at `spell_cast` and `spell_resolved`.
+- This is a battle card-rule governance issue, not a Lorehold decklist
+  coherence issue.
+
+Round7 reconciliation:
+
+- The prior `210513` blocker set (`Apex of Power`, `Arcane Endeavor`,
+  `Curator's Ward`, `Magma Opus`, and `The Unagi of Kyoshi Island`) is
+  superseded by `211217`.
+- The `round7` artifact declares `apply_pg=true`,
+  `pg_inserted_or_updated=6` for those prior cards, and the paired sync
+  declares `apply_sqlite_from_pg=true`, `pg_rows_loaded=5230`,
+  `sqlite_inserted_or_updated=5148`, and
+  `canonical_snapshot_rows_exported=3185`.
+- This heartbeat detected those artifacts and the post-round7 battle result,
+  but did not execute apply, sync, or rerun.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- Target-pressure is not an active blocker in the current latest run.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+Post-latest round7 evidence:
+
+- After `20260620_210513`, round7 artifacts appeared for the current blocker
+  cards, but no battle rerun after round7 was observed in this heartbeat.
+- `card_battle_rules_pg_table_intent_promotions_round7_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=6`, selected cards
+  `Apex of Power`, `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, and
+  `The Unagi of Kyoshi Island`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round7_20260620.json`
+  declares `apply_sqlite_from_pg=true`, `pg_rows_loaded=5230`,
+  `sqlite_inserted_or_updated=5148`, and
+  `canonical_snapshot_rows_exported=3185`.
+- A 20s recheck still found latest at `20260620_210513`.
+- This heartbeat detected those artifacts but did not execute apply, sync, or
+  rerun.
+
+### Auditor Central Latest 210513 Battle State - 2026-06-20 18:05 -03
+
+Scope:
+
+- Rechecked the latest full recurring battle after the `round6` artifacts
+  appeared in `master_optimizer_reports`.
+- No Lorehold deck swap, PostgreSQL write, cleanup, stage, commit, push, live
+  app route call, or OpenAI call was performed by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`;
+  Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_210513/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212105`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- `test_results_status_counts={"pass":18}`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`,
+  `target_pressure` passes `16/16`, and `event_contract_static` passes.
+
+Remaining active blocker:
+
+- `forensic_rule_findings=11`, `forensic_turn_findings=0`.
+- High/medium `functional_tags_json` lineage appears on opponent cards:
+  `Arcane Endeavor`, `Curator's Ward`, `Magma Opus`, and
+  `The Unagi of Kyoshi Island`.
+- Low registry/runtime drift also appears for `Apex of Power`.
+- This is a battle card-rule governance issue, not a Lorehold decklist
+  coherence issue.
+
+Round6 artifact classification:
+
+- `card_battle_rules_pg_table_intent_promotions_round6_20260620.json`
+  declares `apply_pg=true`, `pg_inserted_or_updated=2`, selected card
+  `Goblin Bombardment`, generated at `2026-06-20T21:03:38Z`.
+- `battle_card_rules_sqlite_from_pg_full_after_table_intent_round6_20260620.json`
+  declares `apply_sqlite_from_pg=true`, `pg_rows_loaded=5225`,
+  `sqlite_inserted_or_updated=5143`, and
+  `canonical_snapshot_rows_exported=3181`.
+- This heartbeat detected those artifacts but did not execute any PostgreSQL
+  write or cache sync.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- Target-pressure is not an active blocker in the current latest run.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
