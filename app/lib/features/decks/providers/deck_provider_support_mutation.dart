@@ -32,13 +32,19 @@ Future<DeckCreateResult> createDeckRequest(
   required String name,
   required String format,
   String? description,
+  String? archetype,
+  int? bracket,
   required bool isPublic,
   required List<Map<String, dynamic>> cards,
 }) async {
+  final normalizedArchetype = archetype?.trim();
   final response = await apiClient.post('/decks', {
     'name': name,
     'format': format,
     'description': description,
+    if (normalizedArchetype != null && normalizedArchetype.isNotEmpty)
+      'archetype': normalizedArchetype,
+    if (bracket != null) 'bracket': bracket,
     'is_public': isPublic,
     'cards': cards,
   });
@@ -314,6 +320,7 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
       'card_id': commander.id,
       'quantity': 1,
       'is_commander': true,
+      'condition': commander.condition.code,
     };
   }
 
@@ -324,6 +331,7 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
         'card_id': card.id,
         'quantity': card.quantity,
         'is_commander': false,
+        'condition': card.condition.code,
       };
     }
   }
@@ -392,11 +400,12 @@ List<Map<String, dynamic>> buildOptimizedCardPayload({
 String buildDeckOptimizationSignature(DeckDetails deck) {
   final entries = <String>[];
   for (final commander in deck.commander) {
-    entries.add('${commander.id}:1');
+    entries.add('${commander.id}:1:${commander.condition.code}');
   }
   for (final cards in deck.mainBoard.values) {
     for (final card in cards) {
-      entries.add('${card.id}:${card.quantity <= 0 ? 1 : card.quantity}');
+      final quantity = card.quantity <= 0 ? 1 : card.quantity;
+      entries.add('${card.id}:$quantity:${card.condition.code}');
     }
   }
   entries.sort();

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../models/deck_card_item.dart';
+import '../models/deck_analysis.dart';
 import '../models/deck_details.dart';
 import 'deck_details_aux_widgets.dart';
 import 'deck_diagnostic_panel.dart';
@@ -21,6 +22,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final bool isPricingLoading;
   final Map<String, dynamic>? validationResult;
   final Map<String, dynamic>? pricing;
+  final DeckAnalysisData? diagnosticAnalysis;
   final bool Function(DeckCardItem card) isCardInvalid;
   final String Function(int bracket) bracketLabel;
   final VoidCallback onValidateNow;
@@ -46,6 +48,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.isPricingLoading,
     required this.validationResult,
     required this.pricing,
+    this.diagnosticAnalysis,
     required this.isCardInvalid,
     required this.bracketLabel,
     required this.onValidateNow,
@@ -382,7 +385,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               onEditDescription: onEditDescription,
             ),
             const SizedBox(height: 16),
-            DeckDiagnosticPanel(deck: deck),
+            DeckDiagnosticPanel(deck: deck, analysis: diagnosticAnalysis),
             const SizedBox(height: 16),
             SampleHandWidget(deck: deck, compact: true),
           ],

@@ -198,16 +198,16 @@ class OptimizeApplyPlan {
 }
 
 typedef OptimizeAddBulkExecutor =
-    Future<void> Function(String deckId, List<Map<String, dynamic>> cards);
+    Future<bool> Function(String deckId, List<Map<String, dynamic>> cards);
 typedef OptimizeApplyWithIdsExecutor =
-    Future<void> Function(
+    Future<bool> Function(
       String deckId,
       List<Map<String, dynamic>> removalsDetailed,
       List<Map<String, dynamic>> additionsDetailed, {
       String? expectedDeckSignature,
     });
 typedef OptimizeApplyByNamesExecutor =
-    Future<void> Function(
+    Future<bool> Function(
       String deckId,
       List<String> removals,
       List<String> additions,
@@ -816,7 +816,7 @@ OptimizeApplyPlan buildOptimizeApplyPlan(
   );
 }
 
-Future<void> executeOptimizeApplyPlan({
+Future<bool> executeOptimizeApplyPlan({
   required String deckId,
   required OptimizeApplyPlan plan,
   required OptimizeAddBulkExecutor addBulk,
@@ -825,21 +825,18 @@ Future<void> executeOptimizeApplyPlan({
 }) async {
   switch (plan.mode) {
     case OptimizeApplyMode.none:
-      return;
+      return false;
     case OptimizeApplyMode.addBulk:
-      await addBulk(deckId, plan.bulkCards);
-      return;
+      return addBulk(deckId, plan.bulkCards);
     case OptimizeApplyMode.applyWithIds:
-      await applyWithIds(
+      return applyWithIds(
         deckId,
         plan.removalsDetailed,
         plan.additionsDetailed,
         expectedDeckSignature: plan.expectedDeckSignature,
       );
-      return;
     case OptimizeApplyMode.applyByNames:
-      await applyByNames(deckId, plan.removals, plan.additions);
-      return;
+      return applyByNames(deckId, plan.removals, plan.additions);
   }
 }
 
@@ -853,13 +850,18 @@ Future<void> executeConfirmedOptimization({
   required OptimizeApplyByNamesExecutor applyByNames,
   required DeckStrategyUpdateExecutor updateDeckStrategy,
 }) async {
-  await executeOptimizeApplyPlan(
+  final applied = await executeOptimizeApplyPlan(
     deckId: deckId,
     plan: plan,
     addBulk: addBulk,
     applyWithIds: applyWithIds,
     applyByNames: applyByNames,
   );
+  if (!applied) {
+    throw Exception(
+      'A otimização foi recusada pela validação final. Revise o deck antes de continuar.',
+    );
+  }
 
   await updateDeckStrategy(
     deckId: deckId,

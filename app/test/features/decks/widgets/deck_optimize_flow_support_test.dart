@@ -54,9 +54,10 @@ void main() {
     final additionsDetailed = const [
       {'card_id': 'add-1', 'name': 'Arcane Signet'},
     ];
+    const deckSignature = 'cmd-1:1:NM|remove-1:1:NM';
     final hash = computeOptimizeSwapIntegrityHash(
       deckId: 'deck-1',
-      deckSignature: 'cmd-1:1|remove-1:1',
+      deckSignature: deckSignature,
       removalsDetailed: removalsDetailed,
       additionsDetailed: additionsDetailed,
     );
@@ -85,7 +86,7 @@ void main() {
             'version': 'v1',
             'algo': 'sha256',
             'hash': hash,
-            'deck_signature': 'cmd-1:1|remove-1:1',
+            'deck_signature': deckSignature,
             'removal_count': 1,
             'addition_count': 1,
           },
@@ -94,8 +95,8 @@ void main() {
       onProgressUpdate: (_) {},
     );
 
-    expect(outcome.preview.swapIntegrity?.deckSignature, 'cmd-1:1|remove-1:1');
-    expect(outcome.applyPlan.expectedDeckSignature, 'cmd-1:1|remove-1:1');
+    expect(outcome.preview.swapIntegrity?.deckSignature, deckSignature);
+    expect(outcome.applyPlan.expectedDeckSignature, deckSignature);
   });
 
   test(
@@ -133,7 +134,7 @@ void main() {
                 'version': 'v1',
                 'algo': 'sha256',
                 'hash': 'bad-hash',
-                'deck_signature': 'cmd-1:1|remove-1:1',
+                'deck_signature': 'cmd-1:1:NM|remove-1:1:NM',
                 'removal_count': 1,
                 'addition_count': 1,
               },
@@ -454,11 +455,18 @@ void main() {
         ],
         expectedDeckSignature: 'sig-1',
       ),
-      addBulk: (_, __) async => calls.add('bulk'),
+      addBulk: (_, __) async {
+        calls.add('bulk');
+        return true;
+      },
       applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
         calls.add('ids:$expectedDeckSignature');
+        return true;
       },
-      applyByNames: (_, __, ___) async => calls.add('names'),
+      applyByNames: (_, __, ___) async {
+        calls.add('names');
+        return true;
+      },
     );
 
     expect(calls, ['ids:sig-1']);
@@ -478,11 +486,17 @@ void main() {
           removals: ['Mind Stone'],
           additions: ['Arcane Signet'],
         ),
-        addBulk: (_, __) async => calls.add('bulk'),
-        applyWithIds:
-            (_, __, ___, {expectedDeckSignature}) async => calls.add('ids'),
+        addBulk: (_, __) async {
+          calls.add('bulk');
+          return true;
+        },
+        applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+          calls.add('ids');
+          return true;
+        },
         applyByNames: (_, removals, additions) async {
           calls.add('names:${removals.join(",")}:${additions.join(",")}');
+          return true;
         },
         updateDeckStrategy: ({
           required deckId,
@@ -684,11 +698,17 @@ void main() {
       onSuccess: () => calls.add('success'),
       onAiError: (_) async => calls.add('ai-error'),
       onGenericError: (_) => calls.add('generic-error'),
-      addBulk: (_, __) async => calls.add('bulk'),
-      applyWithIds:
-          (_, __, ___, {expectedDeckSignature}) async => calls.add('ids'),
+      addBulk: (_, __) async {
+        calls.add('bulk');
+        return true;
+      },
+      applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+        calls.add('ids');
+        return true;
+      },
       applyByNames: (_, removals, additions) async {
         calls.add('names:${removals.join(",")}:${additions.join(",")}');
+        return true;
       },
       updateDeckStrategy: ({
         required deckId,
@@ -708,6 +728,77 @@ void main() {
       'success',
     ]);
   });
+
+  test(
+    'executeOptimizeFlow stops strategy and success when apply returns false',
+    () async {
+      final calls = <String>[];
+
+      await executeOptimizeFlow(
+        deckId: 'deck-1',
+        archetype: 'control',
+        bracket: 2,
+        keepTheme: true,
+        intensity: OptimizeIntensity.focused,
+        executeRequest: (
+          _,
+          __, {
+          required bracket,
+          required keepTheme,
+          required intensity,
+          required onProgress,
+        }) async {
+          return {
+            'mode': 'optimize',
+            'removals': const ['Mind Stone'],
+            'additions': const ['Arcane Signet'],
+          };
+        },
+        onProgressUpdate: (_) {},
+        confirmPreview: (outcome) async {
+          calls.add('preview:${outcome.preview.mode}');
+          return outcome.applyPlan;
+        },
+        onApplyStart: () => calls.add('apply-start'),
+        onNoChanges: (_) async => calls.add('no-changes'),
+        onSuccess: () => calls.add('success'),
+        onAiError: (_) async => calls.add('ai-error'),
+        onGenericError: (error) => calls.add('generic-error:$error'),
+        addBulk: (_, __) async {
+          calls.add('bulk');
+          return true;
+        },
+        applyWithIds: (_, __, ___, {expectedDeckSignature}) async {
+          calls.add('ids');
+          return true;
+        },
+        applyByNames: (_, removals, additions) async {
+          calls.add('names:${removals.join(",")}:${additions.join(",")}');
+          return false;
+        },
+        updateDeckStrategy: ({
+          required deckId,
+          required archetype,
+          required bracket,
+        }) async {
+          calls.add('strategy:$deckId:$archetype:$bracket');
+        },
+      );
+
+      expect(calls.take(3).toList(), [
+        'preview:optimize',
+        'apply-start',
+        'names:Mind Stone:Arcane Signet',
+      ]);
+      expect(calls, hasLength(4));
+      expect(
+        calls.last,
+        contains('generic-error:Exception: A otimização foi recusada'),
+      );
+      expect(calls, isNot(contains('strategy:deck-1:control:2')));
+      expect(calls, isNot(contains('success')));
+    },
+  );
 
   test(
     'executeOptimizeNeedsRepairFlow orchestrates rebuild callbacks',

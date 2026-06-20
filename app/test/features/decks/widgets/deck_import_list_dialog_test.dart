@@ -79,5 +79,113 @@ void main() {
     expect(refreshedDecks, ['deck-1']);
     expect(snackMessage, '2 cartas importadas!');
     expect(snackColor, AppTheme.darkTheme.colorScheme.primary);
+    expect(find.byKey(const Key('deck-import-list-dialog')), findsNothing);
   });
+
+  testWidgets(
+    'showDeckImportListDialog keeps review visible for import status',
+    (tester) async {
+      final refreshedDecks = <String>[];
+      String? snackMessage;
+      Color? snackColor;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showDeckImportListDialog(
+                        context: context,
+                        deckId: 'deck-1',
+                        importListToDeck: ({
+                          required deckId,
+                          required list,
+                          required replaceAll,
+                        }) async {
+                          return {
+                            'success': true,
+                            'cards_imported': 2,
+                            'not_found_lines': const ['1 Carta Fantasma'],
+                            'localized_matches_count': 1,
+                            'warnings': const [
+                              'Deck ainda sem comandante importado.',
+                            ],
+                            'missing_commander': true,
+                            'commander_preserved': true,
+                          };
+                        },
+                        refreshDeckDetails: (deckId) async {
+                          refreshedDecks.add(deckId);
+                        },
+                        showSnackBar: ({
+                          required message,
+                          required backgroundColor,
+                        }) {
+                          snackMessage = message;
+                          snackColor = backgroundColor;
+                        },
+                      );
+                    },
+                    child: const Text('abrir'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('deck-import-list-dialog-field')),
+        '1 Sol Ring',
+      );
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(refreshedDecks, ['deck-1']);
+      expect(
+        snackMessage,
+        '2 cartas importadas (1 não encontradas); revise os avisos',
+      );
+      expect(snackColor, AppTheme.warning);
+      expect(find.byKey(const Key('deck-import-list-dialog')), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-import-list-dialog-not-found')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-import-list-dialog-import-status')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-import-list-dialog-warnings')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-import-list-dialog-missing-commander')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-import-list-dialog-commander-preserved')),
+        findsOneWidget,
+      );
+      expect(find.text('Concluído'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('deck-import-list-dialog')), findsNothing);
+    },
+  );
 }

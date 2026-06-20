@@ -289,6 +289,8 @@ void main() {
             },
             '/decks': (body) {
               expect(body['is_public'], isTrue);
+              expect(body['archetype'], 'spellslinger');
+              expect(body['bracket'], 3);
               expect(
                 body['cards'],
                 equals([
@@ -304,7 +306,16 @@ void main() {
                   },
                 ]),
               );
-              return ApiResponse(201, {'id': 'deck-1'});
+              return ApiResponse(201, {
+                'id': 'deck-1',
+                'name': 'Test Deck',
+                'format': 'commander',
+                'description': null,
+                'is_public': true,
+                'created_at': '2026-06-20T12:00:00.000Z',
+                'card_count': 0,
+                'color_identity': const <String>[],
+              });
             },
           },
           getHandlers: {'/decks': () => ApiResponse(200, const [])},
@@ -324,6 +335,8 @@ void main() {
         final created = await provider.createDeck(
           name: 'Test Deck',
           format: 'commander',
+          archetype: ' spellslinger ',
+          bracket: 3,
           isPublic: true,
           cards: const [
             {'card_id': 'commander-id', 'quantity': 1, 'is_commander': true},
@@ -333,6 +346,8 @@ void main() {
 
         expect(created, isTrue);
         expect(apiClient.postCalls, equals(['/cards/resolve/batch', '/decks']));
+        expect(provider.decks.single.archetype, 'spellslinger');
+        expect(provider.decks.single.bracket, 3);
       },
     );
   });
@@ -1037,6 +1052,119 @@ void main() {
           ),
         );
         expect(apiClient.putCalls, isEmpty);
+      },
+    );
+
+    test(
+      'applyOptimizationWithIds rejects signature when only condition changed',
+      () async {
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1':
+                () => ApiResponse(200, _buildDeckDetailsJson({'remove-1': 1})),
+          },
+          putHandlers: {
+            '/decks/deck-1': (_) {
+              fail(
+                'PUT should not be called when deck condition signature is stale',
+              );
+            },
+          },
+        );
+
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDeckDetails('deck-1');
+
+        expect(
+          () => provider.applyOptimizationWithIds(
+            deckId: 'deck-1',
+            removalsDetailed: const [
+              {'card_id': 'remove-1', 'name': 'Mind Stone'},
+            ],
+            additionsDetailed: const [
+              {'card_id': 'add-1', 'name': 'Arcane Signet'},
+            ],
+            expectedDeckSignature: 'cmd-1:1:LP|remove-1:1:NM',
+          ),
+          throwsA(
+            predicate(
+              (error) => error.toString().contains(
+                'O deck mudou desde que a otimização foi gerada',
+              ),
+            ),
+          ),
+        );
+        expect(apiClient.putCalls, isEmpty);
+      },
+    );
+
+    test(
+      'applyOptimizationWithIds returns false when post-save validation fails',
+      () async {
+        final currentCards = <String, int>{'remove-1': 1, 'land-1': 36};
+
+        final apiClient = _FakeApiClient(
+          getHandlers: {
+            '/decks/deck-1':
+                () => ApiResponse(200, _buildDeckDetailsJson(currentCards)),
+            '/cards?name=Arcane+Signet&limit=1':
+                () => ApiResponse(200, {
+                  'data': const [
+                    {
+                      'id': 'add-1',
+                      'name': 'Arcane Signet',
+                      'type_line': 'Artifact',
+                      'color_identity': <String>[],
+                    },
+                  ],
+                }),
+          },
+          putHandlers: {
+            '/decks/deck-1': (body) {
+              final cards =
+                  (body['cards'] as List).cast<Map<String, dynamic>>();
+              expect(
+                cards.any((entry) => entry['card_id'] == 'remove-1'),
+                isFalse,
+              );
+              expect(cards.any((entry) => entry['card_id'] == 'add-1'), isTrue);
+
+              currentCards
+                ..remove('remove-1')
+                ..['add-1'] = 1;
+
+              return ApiResponse(200, {'ok': true});
+            },
+          },
+          postHandlers: {
+            '/decks/deck-1/validate':
+                (_) => ApiResponse(400, {
+                  'ok': false,
+                  'error': 'Commander deck must contain exactly 100 cards.',
+                }),
+          },
+        );
+
+        final provider = DeckProvider(apiClient: apiClient);
+        await provider.fetchDeckDetails('deck-1');
+
+        final applied = await provider.applyOptimizationWithIds(
+          deckId: 'deck-1',
+          removalsDetailed: const [
+            {'card_id': 'remove-1', 'name': 'Mind Stone'},
+          ],
+          additionsDetailed: const [
+            {'card_id': 'add-1', 'name': 'Arcane Signet'},
+          ],
+        );
+
+        expect(applied, isFalse);
+        expect(apiClient.putCalls, contains('/decks/deck-1'));
+        expect(apiClient.postCalls, contains('/decks/deck-1/validate'));
+        expect(
+          apiClient.getCalls.where((call) => call == '/decks/deck-1'),
+          hasLength(2),
+        );
       },
     );
 

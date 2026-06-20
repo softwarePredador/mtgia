@@ -44,6 +44,8 @@ class _FakeApiClient extends ApiClient {
           'source_system': 'hermes',
           'source_ref': 'learned_deck:82',
           'deck_name': 'Lorehold Learned',
+          'archetype': 'spellslinger',
+          'bracket': 3,
           'score': 136.5,
           'source_confidence': 'high',
           'commander': {'name': 'Lorehold, the Historian'},
@@ -184,9 +186,10 @@ void main() {
       );
       expect(find.text('Deck aprendido Hermes'), findsOneWidget);
       expect(
-        find.textContaining('Origem: HERMES learned_deck:82'),
+        find.textContaining('Origem: Deck aprendido Hermes'),
         findsOneWidget,
       );
+      expect(find.textContaining('learned_deck:82'), findsNothing);
       expect(find.text('Score: 136.5'), findsOneWidget);
       expect(find.text('Legalidade: commander_legal'), findsOneWidget);
       expect(find.text('Confiança: high'), findsOneWidget);
@@ -255,6 +258,8 @@ void main() {
           expect(main.first['card_id'], isNotNull);
           expect(main.first['card_id'], isNotEmpty);
           expect(body['format'], 'commander');
+          expect(body['archetype'], 'spellslinger');
+          expect(body['bracket'], 3);
         }
       }
     },

@@ -9,9 +9,21 @@ import 'package:manaloom/features/decks/widgets/deck_analysis_tab.dart';
 import 'package:provider/provider.dart';
 
 class _FakeApiClient extends ApiClient {
-  _FakeApiClient(this.analysisPayload);
+  _FakeApiClient(
+    this.analysisPayload, {
+    Map<String, dynamic>? aiAnalysisPayload,
+  }) : aiAnalysisPayload =
+           aiAnalysisPayload ??
+           {
+             'deck_id': 'deck',
+             'synergy_score': 70,
+             'strengths': 'Leitura gerada em teste.',
+             'weaknesses': 'Sem pontos críticos no teste.',
+           };
 
   final Map<String, dynamic> analysisPayload;
+  final Map<String, dynamic> aiAnalysisPayload;
+  final List<_RecordedPost> postRequests = [];
 
   @override
   Future<ApiResponse> get(String endpoint) async {
@@ -20,6 +32,28 @@ class _FakeApiClient extends ApiClient {
     }
     throw UnimplementedError('No GET handler for $endpoint');
   }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    if (endpoint.endsWith('/ai-analysis')) {
+      postRequests.add(
+        _RecordedPost(endpoint, Map<String, dynamic>.from(body)),
+      );
+      return ApiResponse(200, aiAnalysisPayload);
+    }
+    throw UnimplementedError('No POST handler for $endpoint');
+  }
+}
+
+class _RecordedPost {
+  const _RecordedPost(this.endpoint, this.body);
+
+  final String endpoint;
+  final Map<String, dynamic> body;
 }
 
 DeckDetails _makeDeck({
@@ -101,27 +135,33 @@ DeckDetails _makeDeck({
   );
 }
 
-Widget _subject(DeckDetails deck, {Map<String, dynamic>? analysisPayload}) {
+Widget _subject(
+  DeckDetails deck, {
+  Map<String, dynamic>? analysisPayload,
+  _FakeApiClient? apiClient,
+}) {
   return MaterialApp(
     theme: AppTheme.darkTheme,
     home: ChangeNotifierProvider(
       create:
           (_) => DeckProvider(
-            apiClient: _FakeApiClient(
-              analysisPayload ??
-                  {
-                    'deck_id': deck.id,
-                    'stats': {
-                      'composition': {
-                        'ramp': 0,
-                        'draw': 0,
-                        'removal': 0,
-                        'board_wipes': 0,
-                        'protection': 0,
+            apiClient:
+                apiClient ??
+                _FakeApiClient(
+                  analysisPayload ??
+                      {
+                        'deck_id': deck.id,
+                        'stats': {
+                          'composition': {
+                            'ramp': 0,
+                            'draw': 0,
+                            'removal': 0,
+                            'board_wipes': 0,
+                            'protection': 0,
+                          },
+                        },
                       },
-                    },
-                  },
-            ),
+                ),
           ),
       child: Scaffold(
         body: SingleChildScrollView(child: DeckAnalysisTab(deck: deck)),
@@ -169,13 +209,66 @@ void main() {
       name: 'Novo Talrand',
       cardCount: 30,
     );
+    final apiClient = _FakeApiClient({
+      'deck_id': deck.id,
+      'stats': {
+        'composition': {
+          'ramp': 0,
+          'draw': 0,
+          'removal': 0,
+          'board_wipes': 0,
+          'protection': 0,
+        },
+      },
+    });
 
-    await tester.pumpWidget(_subject(deck));
+    await tester.pumpWidget(_subject(deck, apiClient: apiClient));
     await tester.pumpAndSettle();
 
     expect(find.text('Leitura pendente'), findsOneWidget);
     expect(find.text('Gerar análise'), findsOneWidget);
     expect(find.text('Sinergia ainda não gerada'), findsOneWidget);
+    expect(apiClient.postRequests, isEmpty);
+  });
+
+  testWidgets('auto-generates AI summary for complete unanalyzed decks', (
+    tester,
+  ) async {
+    final deck = _makeDeck(
+      id: 'deck-auto-ai',
+      name: 'Auto Talrand',
+      cardCount: 60,
+    );
+    final apiClient = _FakeApiClient(
+      {
+        'deck_id': deck.id,
+        'stats': {
+          'composition': {
+            'ramp': 0,
+            'draw': 0,
+            'removal': 0,
+            'board_wipes': 0,
+            'protection': 0,
+          },
+        },
+      },
+      aiAnalysisPayload: {
+        'deck_id': deck.id,
+        'synergy_score': 76,
+        'strengths': 'Plano funcional para o teste.',
+        'weaknesses': 'Base ainda precisa de revisão.',
+      },
+    );
+
+    await tester.pumpWidget(_subject(deck, apiClient: apiClient));
+    await tester.pumpAndSettle();
+
+    expect(apiClient.postRequests, hasLength(1));
+    expect(
+      apiClient.postRequests.single.endpoint,
+      '/decks/deck-auto-ai/ai-analysis',
+    );
+    expect(apiClient.postRequests.single.body, equals({'force': false}));
   });
 
   testWidgets('renders functional tag counts and expandable samples', (

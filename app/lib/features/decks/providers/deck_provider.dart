@@ -362,10 +362,17 @@ class DeckProvider extends ChangeNotifier {
     required String name,
     required String format,
     String? description,
+    String? archetype,
+    int? bracket,
     List<Map<String, dynamic>>? cards,
     bool isPublic = false,
   }) async {
     try {
+      final normalizedArchetype = archetype?.trim();
+      final effectiveArchetype =
+          (normalizedArchetype == null || normalizedArchetype.isEmpty)
+              ? null
+              : normalizedArchetype;
       final normalizedCards = await normalizeCreateDeckCards(
         _apiClient,
         cards ?? [],
@@ -375,6 +382,8 @@ class DeckProvider extends ChangeNotifier {
         name: name,
         format: format,
         description: description,
+        archetype: effectiveArchetype,
+        bracket: bracket,
         isPublic: isPublic,
         cards: normalizedCards,
       );
@@ -382,7 +391,11 @@ class DeckProvider extends ChangeNotifier {
       if (result.isSuccess) {
         final created =
             (result.deck != null)
-                ? result.deck!.copyWith(description: description)
+                ? result.deck!.copyWith(
+                  description: description,
+                  archetype: effectiveArchetype,
+                  bracket: bracket,
+                )
                 : null;
 
         if (created != null) {
@@ -852,10 +865,12 @@ class DeckProvider extends ChangeNotifier {
     try {
       final isValid = isDeckValidationOk(result.validation);
       if (!isValid) {
-        final errors = (result.validation['errors'] as List?)?.join(', ') ?? '';
+        final errors = deckValidationFailureMessage(result.validation);
         AppLogger.warning(
-          '[DeckProvider] Deck salvo mas com avisos de validação: $errors',
+          '[DeckProvider] Deck salvo mas falhou na validação estrita: $errors',
         );
+        await _refreshDeckDetailsAfterMutation(deckId);
+        return false;
       }
     } catch (validationError) {
       AppLogger.warning(

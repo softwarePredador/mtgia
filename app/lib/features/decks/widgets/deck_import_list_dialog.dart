@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import 'deck_feedback_dialogs.dart';
 
 typedef DeckImportListExecutor =
     Future<Map<String, dynamic>> Function({
@@ -25,7 +26,11 @@ Future<void> showDeckImportListDialog({
   bool isImporting = false;
   bool replaceAll = false;
   List<String> notFoundLines = [];
+  List<String> importWarnings = [];
   int localizedMatchesCount = 0;
+  bool missingCommander = false;
+  bool commanderPreserved = false;
+  bool importReviewVisible = false;
   String? error;
 
   await showDialog(
@@ -273,6 +278,91 @@ Future<void> showDeckImportListDialog({
                               ),
                             ),
                           ],
+                          if (importWarnings.isNotEmpty ||
+                              missingCommander ||
+                              commanderPreserved) ...[
+                            const SizedBox(height: 12),
+                            DeckDialogSectionCard(
+                              key: const Key(
+                                'deck-import-list-dialog-import-status',
+                              ),
+                              title: 'Status da importação',
+                              accent:
+                                  importWarnings.isNotEmpty || missingCommander
+                                      ? AppTheme.warning
+                                      : AppTheme.success,
+                              icon:
+                                  importWarnings.isNotEmpty || missingCommander
+                                      ? Icons.info_outline_rounded
+                                      : Icons.verified_outlined,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (importWarnings.isNotEmpty)
+                                    Column(
+                                      key: const Key(
+                                        'deck-import-list-dialog-warnings',
+                                      ),
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children:
+                                          importWarnings
+                                              .map(
+                                                (warning) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        bottom: 8,
+                                                      ),
+                                                  child: Text(
+                                                    '• $warning',
+                                                    style: theme
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          color:
+                                                              AppTheme
+                                                                  .textPrimary,
+                                                          height: 1.35,
+                                                        ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                    ),
+                                  if (missingCommander)
+                                    Padding(
+                                      key: const Key(
+                                        'deck-import-list-dialog-missing-commander',
+                                      ),
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Text(
+                                        'Nenhum comandante foi identificado na lista importada.',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color: AppTheme.textPrimary,
+                                              height: 1.35,
+                                            ),
+                                      ),
+                                    ),
+                                  if (commanderPreserved)
+                                    Padding(
+                                      key: const Key(
+                                        'deck-import-list-dialog-commander-preserved',
+                                      ),
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Text(
+                                        'O comandante atual do deck foi preservado.',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color: AppTheme.textPrimary,
+                                              height: 1.35,
+                                            ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -281,13 +371,15 @@ Future<void> showDeckImportListDialog({
                     TextButton(
                       key: const Key('deck-import-list-dialog-cancel-button'),
                       onPressed: isImporting ? null : () => Navigator.pop(ctx),
-                      child: const Text('Cancelar'),
+                      child: Text(importReviewVisible ? 'Fechar' : 'Cancelar'),
                     ),
                     ElevatedButton.icon(
                       key: const Key('deck-import-list-dialog-submit-button'),
                       onPressed:
                           isImporting
                               ? null
+                              : importReviewVisible
+                              ? () => Navigator.pop(ctx)
                               : () async {
                                 if (listController.text.trim().isEmpty) {
                                   setDialogState(
@@ -300,7 +392,11 @@ Future<void> showDeckImportListDialog({
                                   isImporting = true;
                                   error = null;
                                   notFoundLines = [];
+                                  importWarnings = [];
                                   localizedMatchesCount = 0;
+                                  missingCommander = false;
+                                  commanderPreserved = false;
+                                  importReviewVisible = false;
                                 });
 
                                 final result = await importListToDeck(
@@ -311,36 +407,64 @@ Future<void> showDeckImportListDialog({
 
                                 if (!ctx.mounted) return;
 
+                                final resultNotFoundLines = _stringListFrom(
+                                  result['not_found_lines'],
+                                );
+                                final resultWarnings = _stringListFrom(
+                                  result['warnings'],
+                                );
+                                final resultLocalizedMatchesCount = _intFrom(
+                                  result['localized_matches_count'],
+                                );
+                                final resultMissingCommander =
+                                    result['missing_commander'] == true;
+                                final resultCommanderPreserved =
+                                    result['commander_preserved'] == true;
+                                final hasReviewDetails =
+                                    resultNotFoundLines.isNotEmpty ||
+                                    resultWarnings.isNotEmpty ||
+                                    resultMissingCommander ||
+                                    resultCommanderPreserved;
+
                                 setDialogState(() {
                                   isImporting = false;
-                                  notFoundLines = List<String>.from(
-                                    result['not_found_lines'] ?? const [],
-                                  );
+                                  notFoundLines = resultNotFoundLines;
+                                  importWarnings = resultWarnings;
                                   localizedMatchesCount =
-                                      result['localized_matches_count']
-                                          as int? ??
-                                      0;
+                                      resultLocalizedMatchesCount;
+                                  missingCommander = resultMissingCommander;
+                                  commanderPreserved = resultCommanderPreserved;
+                                  importReviewVisible =
+                                      result['success'] == true &&
+                                      hasReviewDetails;
                                 });
 
                                 if (result['success'] == true) {
-                                  Navigator.pop(ctx);
-
-                                  final imported =
-                                      result['cards_imported'] ?? 0;
+                                  final imported = _intFrom(
+                                    result['cards_imported'],
+                                  );
                                   showSnackBar(
-                                    message:
-                                        notFoundLines.isEmpty
-                                            ? localizedMatchesCount > 0
-                                                ? '$imported cartas importadas ($localizedMatchesCount traduzidas)'
-                                                : '$imported cartas importadas!'
-                                            : '$imported cartas importadas (${notFoundLines.length} não encontradas)',
+                                    message: _buildImportToDeckSnackMessage(
+                                      imported: imported,
+                                      notFoundCount: resultNotFoundLines.length,
+                                      localizedMatchesCount:
+                                          resultLocalizedMatchesCount,
+                                      hasReviewDetails: hasReviewDetails,
+                                    ),
                                     backgroundColor:
-                                        notFoundLines.isEmpty
+                                        resultNotFoundLines.isEmpty &&
+                                                resultWarnings.isEmpty &&
+                                                !resultMissingCommander
                                             ? theme.colorScheme.primary
                                             : AppTheme.warning,
                                   );
 
                                   await refreshDeckDetails(deckId);
+                                  if (!ctx.mounted || hasReviewDetails) {
+                                    return;
+                                  }
+
+                                  Navigator.pop(ctx);
                                 } else {
                                   setDialogState(() {
                                     error =
@@ -358,12 +482,56 @@ Future<void> showDeckImportListDialog({
                                   strokeWidth: 2,
                                 ),
                               )
-                              : const Icon(Icons.upload),
-                      label: Text(isImporting ? 'Importando...' : 'Importar'),
+                              : Icon(
+                                importReviewVisible
+                                    ? Icons.check
+                                    : Icons.upload,
+                              ),
+                      label: Text(
+                        isImporting
+                            ? 'Importando...'
+                            : importReviewVisible
+                            ? 'Concluído'
+                            : 'Importar',
+                      ),
                     ),
                   ],
                 ),
               ),
         ),
   );
+}
+
+List<String> _stringListFrom(dynamic value) {
+  if (value is! List) return const <String>[];
+  return value
+      .map((entry) => entry.toString().trim())
+      .where((entry) => entry.isNotEmpty)
+      .toList();
+}
+
+int _intFrom(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+String _buildImportToDeckSnackMessage({
+  required int imported,
+  required int notFoundCount,
+  required int localizedMatchesCount,
+  required bool hasReviewDetails,
+}) {
+  if (hasReviewDetails) {
+    if (notFoundCount > 0) {
+      return '$imported cartas importadas ($notFoundCount não encontradas); revise os avisos';
+    }
+    return '$imported cartas importadas; revise os avisos';
+  }
+
+  if (localizedMatchesCount > 0) {
+    return '$imported cartas importadas ($localizedMatchesCount traduzidas)';
+  }
+
+  return '$imported cartas importadas!';
 }

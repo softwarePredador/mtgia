@@ -2,23 +2,26 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/mana_helper.dart';
+import '../models/deck_analysis.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 
 class DeckDiagnosticPanel extends StatelessWidget {
   final DeckDetails deck;
+  final DeckAnalysisData? analysis;
   final VoidCallback? onOpenAnalysis;
 
   const DeckDiagnosticPanel({
     super.key,
     required this.deck,
+    this.analysis,
     this.onOpenAnalysis,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final snapshot = _DeckDiagnosticSnapshot.fromDeck(deck);
+    final snapshot = _DeckDiagnosticSnapshot.fromDeck(deck, analysis: analysis);
     final hasWarnings = snapshot.metrics.any(
       (metric) =>
           identical(metric.tone, _DiagnosticTone.danger) ||
@@ -66,7 +69,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Resumo local de mana, curva e interação para orientar os próximos ajustes.',
+                              'Resumo de mana, curva e funções para orientar os próximos ajustes.',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: AppTheme.textSecondary,
                               ),
@@ -150,7 +153,7 @@ class DeckDiagnosticPanel extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Cartas detectadas localmente em cada indicador. Tutores não entram como compra.',
+            'Cartas consideradas em cada indicador. Tutores não entram como compra.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.3,
@@ -494,7 +497,10 @@ class _DeckDiagnosticSnapshot {
     required this.insights,
   });
 
-  factory _DeckDiagnosticSnapshot.fromDeck(DeckDetails deck) {
+  factory _DeckDiagnosticSnapshot.fromDeck(
+    DeckDetails deck, {
+    DeckAnalysisData? analysis,
+  }) {
     final cards = deck.mainBoard.values.expand((list) => list).toList();
     final targets = _DeckDiagnosticTargets.fromDeck(deck);
 
@@ -515,11 +521,32 @@ class _DeckDiagnosticSnapshot {
       cards,
       (card) => !_isLand(card) && _isWipe(card),
     );
+    final rampAnalysis = _analysisBucket(
+      analysis,
+      tagKey: 'ramp',
+      compositionKey: 'ramp',
+    );
+    final drawAnalysis = _analysisBucket(
+      analysis,
+      tagKey: 'draw',
+      compositionKey: 'draw',
+    );
+    final interactionAnalysis = _analysisBucket(
+      analysis,
+      tagKey: 'removal',
+      compositionKey: 'removal',
+    );
+    final wipeAnalysis = _analysisBucket(
+      analysis,
+      tagKey: 'board_wipe',
+      compositionKey: 'board_wipes',
+    );
     final landCount = _sumQuantities(landCards);
-    final rampCount = _sumQuantities(rampCards);
-    final drawCount = _sumQuantities(drawCards);
-    final interactionCount = _sumQuantities(interactionCards);
-    final wipeCount = _sumQuantities(wipeCards);
+    final rampCount = rampAnalysis?.count ?? _sumQuantities(rampCards);
+    final drawCount = drawAnalysis?.count ?? _sumQuantities(drawCards);
+    final interactionCount =
+        interactionAnalysis?.count ?? _sumQuantities(interactionCards);
+    final wipeCount = wipeAnalysis?.count ?? _sumQuantities(wipeCards);
 
     var weightedCmc = 0;
     var nonLandCount = 0;
@@ -641,25 +668,27 @@ class _DeckDiagnosticSnapshot {
         label: 'Ramp',
         count: rampCount,
         icon: Icons.bolt_rounded,
-        cardLabels: _formatEvidenceCards(rampCards),
+        cardLabels: rampAnalysis?.cardLabels ?? _formatEvidenceCards(rampCards),
       ),
       _DiagnosticEvidence(
         label: 'Compra',
         count: drawCount,
         icon: Icons.auto_stories_rounded,
-        cardLabels: _formatEvidenceCards(drawCards),
+        cardLabels: drawAnalysis?.cardLabels ?? _formatEvidenceCards(drawCards),
       ),
       _DiagnosticEvidence(
         label: 'Interação',
         count: interactionCount,
         icon: Icons.shield_outlined,
-        cardLabels: _formatEvidenceCards(interactionCards),
+        cardLabels:
+            interactionAnalysis?.cardLabels ??
+            _formatEvidenceCards(interactionCards),
       ),
       _DiagnosticEvidence(
         label: 'Wipes',
         count: wipeCount,
         icon: Icons.cleaning_services_outlined,
-        cardLabels: _formatEvidenceCards(wipeCards),
+        cardLabels: wipeAnalysis?.cardLabels ?? _formatEvidenceCards(wipeCards),
       ),
     ];
 
@@ -840,6 +869,35 @@ class _DeckDiagnosticSnapshot {
               card.quantity > 1 ? '${card.name} x${card.quantity}' : card.name,
         )
         .toList(growable: false);
+  }
+
+  static _DiagnosticFunctionalBucket? _analysisBucket(
+    DeckAnalysisData? analysis, {
+    required String tagKey,
+    required String compositionKey,
+  }) {
+    if (analysis == null) return null;
+    final hasFunctionalCount =
+        analysis.functionalTags?.counts.containsKey(tagKey) ?? false;
+    final hasLegacyCount = analysis.composition.containsKey(compositionKey);
+    if (!hasFunctionalCount && !hasLegacyCount) return null;
+
+    return _DiagnosticFunctionalBucket(
+      count: analysis.countFor(tagKey: tagKey, compositionKey: compositionKey),
+      cardLabels: _formatFunctionalSamples(analysis.samplesFor(tagKey)),
+    );
+  }
+
+  static List<String> _formatFunctionalSamples(
+    List<DeckFunctionalTagSample> samples,
+  ) {
+    final labels = samples
+        .map((sample) => sample.name.trim())
+        .where((name) => name.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+    labels.sort();
+    return labels;
   }
 
   static bool _isLand(DeckCardItem card) =>
@@ -1025,7 +1083,7 @@ class _DeckDiagnosticTargets {
     final format = deck.format.toLowerCase();
     if (format == 'commander') {
       return const _DeckDiagnosticTargets(
-        minLands: 34,
+        minLands: 33,
         maxLands: 38,
         minRamp: 8,
         minDraw: 8,
@@ -1109,6 +1167,16 @@ class _DiagnosticEvidence {
     required this.label,
     required this.count,
     required this.icon,
+    required this.cardLabels,
+  });
+}
+
+class _DiagnosticFunctionalBucket {
+  final int count;
+  final List<String> cardLabels;
+
+  const _DiagnosticFunctionalBucket({
+    required this.count,
     required this.cardLabels,
   });
 }

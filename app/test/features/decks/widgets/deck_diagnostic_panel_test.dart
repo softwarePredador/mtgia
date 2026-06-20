@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/features/decks/models/deck_analysis.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/widgets/deck_diagnostic_panel.dart';
@@ -242,14 +243,96 @@ void main() {
     );
   }
 
-  Widget createSubject(DeckDetails deck, {double width = 400}) {
+  DeckDetails makeLoreholdThirtyThreeLandDeck() {
+    return DeckDetails(
+      id: 'deck-lorehold-33',
+      name: 'Lorehold Learned Control',
+      format: 'commander',
+      commanderName: 'Lorehold, the Historian',
+      isPublic: false,
+      createdAt: DateTime(2026, 6, 19),
+      cardCount: 100,
+      stats: const {},
+      commander: [
+        card(
+          id: 'cmdr-lorehold',
+          name: 'Lorehold, the Historian',
+          typeLine: 'Legendary Creature — Human Cleric',
+          manaCost: '{R}{W}',
+          quantity: 1,
+          isCommander: true,
+        ),
+      ],
+      mainBoard: {
+        'Mainboard': [
+          card(
+            id: 'lorehold-land',
+            name: 'Sacred Foundry',
+            typeLine: 'Land — Mountain Plains',
+            quantity: 33,
+          ),
+          card(
+            id: 'lorehold-ramp',
+            name: 'Arcane Signet',
+            typeLine: 'Artifact',
+            manaCost: '{2}',
+            oracleText: '{T}: Add one mana of any color.',
+            quantity: 8,
+          ),
+          card(
+            id: 'lorehold-draw',
+            name: 'Reckless Impulse',
+            typeLine: 'Sorcery',
+            manaCost: '{1}{R}',
+            oracleText:
+                'Exile the top two cards of your library. Until the end of your next turn, you may play those cards.',
+            quantity: 8,
+          ),
+          card(
+            id: 'lorehold-interaction',
+            name: 'Swords to Plowshares',
+            typeLine: 'Instant',
+            manaCost: '{W}',
+            oracleText: 'Exile target creature.',
+            quantity: 8,
+          ),
+          card(
+            id: 'lorehold-wipe',
+            name: 'Wrath of God',
+            typeLine: 'Sorcery',
+            manaCost: '{2}{W}{W}',
+            oracleText: "Destroy all creatures. They can't be regenerated.",
+            quantity: 2,
+          ),
+          card(
+            id: 'lorehold-filler',
+            name: 'Lorehold Apprentice',
+            typeLine: 'Creature — Human Cleric',
+            manaCost: '{1}{R}{W}',
+            oracleText: 'Magecraft — Create a 3/2 Spirit creature token.',
+            quantity: 40,
+          ),
+        ],
+      },
+    );
+  }
+
+  Widget createSubject(
+    DeckDetails deck, {
+    double width = 400,
+    DeckAnalysisData? analysis,
+  }) {
     return MaterialApp(
       theme: AppTheme.darkTheme,
       home: Scaffold(
         body: SizedBox(
           width: width,
           child: SingleChildScrollView(
-            child: DeckDiagnosticPanel(deck: deck, onOpenAnalysis: () {}),
+            child: DeckDiagnosticPanel(
+              deck: deck,
+              analysis: analysis,
+              onOpenAnalysis: () {},
+            ),
           ),
         ),
       ),
@@ -327,5 +410,146 @@ void main() {
         expect(find.textContaining('Enlightened Tutor'), findsNothing);
       },
     );
+
+    testWidgets(
+      'treats 33 Commander lands as in range for Lorehold-style deck',
+      (tester) async {
+        await tester.pumpWidget(
+          createSubject(makeLoreholdThirtyThreeLandDeck()),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Alvo 33-38'), findsOneWidget);
+        expect(find.text('Na faixa'), findsOneWidget);
+        expect(
+          find.text('Base de mana curta para o tamanho atual da lista.'),
+          findsNothing,
+        );
+        expect(
+          find.text('Base de mana na faixa esperada para o formato.'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('prefers backend functional tags over local oracle heuristics', (
+      tester,
+    ) async {
+      final deck = DeckDetails(
+        id: 'deck-lorehold-backend-tags',
+        name: 'Lorehold Backend Tags',
+        format: 'commander',
+        commanderName: 'Lorehold, the Historian',
+        isPublic: false,
+        createdAt: DateTime(2026, 6, 19),
+        cardCount: 100,
+        stats: const {},
+        commander: [
+          card(
+            id: 'cmdr-backend',
+            name: 'Lorehold, the Historian',
+            typeLine: 'Legendary Creature — Human Cleric',
+            manaCost: '{R}{W}',
+            quantity: 1,
+            isCommander: true,
+          ),
+        ],
+        mainBoard: {
+          'Mainboard': [
+            card(
+              id: 'land-backend',
+              name: 'Sacred Foundry',
+              typeLine: 'Land — Mountain Plains',
+              quantity: 33,
+            ),
+            card(
+              id: 'ruby-medallion',
+              name: 'Ruby Medallion',
+              typeLine: 'Artifact',
+              manaCost: '{2}',
+              oracleText: 'Red spells you cast cost {1} less to cast.',
+            ),
+            card(
+              id: 'scroll-rack',
+              name: 'Scroll Rack',
+              typeLine: 'Artifact',
+              manaCost: '{2}',
+              oracleText:
+                  '{1}, {T}: Exile any number of cards from your hand face down. Put that many cards from the top of your library into your hand.',
+            ),
+            card(
+              id: 'chaos-warp',
+              name: 'Chaos Warp',
+              typeLine: 'Instant',
+              manaCost: '{2}{R}',
+              oracleText:
+                  'The owner of target permanent shuffles it into their library.',
+            ),
+            card(
+              id: 'filler-backend',
+              name: 'Lorehold Apprentice',
+              typeLine: 'Creature — Human Cleric',
+              manaCost: '{1}{R}{W}',
+              oracleText: 'Magecraft — Create a 3/2 Spirit creature token.',
+              quantity: 64,
+            ),
+          ],
+        },
+      );
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': deck.id,
+        'format': 'commander',
+        'stats': {
+          'composition': {
+            'ramp': 0,
+            'draw': 0,
+            'removal': 0,
+            'board_wipes': 0,
+            'protection': 0,
+          },
+        },
+        'functional_tags': {
+          'schema_version': 'functional_card_tags_v1_2026_05_18',
+          'semantic_schema_version': 'semantic_layer_v2_2026_05_18',
+          'source': {
+            'priority': 'persisted_then_heuristic',
+            'persisted_rows': 3,
+            'persisted_copies': 3,
+            'heuristic_rows': 0,
+            'heuristic_copies': 0,
+          },
+          'counts': {'ramp': 1, 'draw': 1, 'removal': 1},
+          'sample_details': {
+            'ramp': [
+              {'name': 'Ruby Medallion', 'evidence': 'persisted_semantic_v2'},
+            ],
+            'draw': [
+              {'name': 'Scroll Rack', 'evidence': 'persisted_semantic_v2'},
+            ],
+            'removal': [
+              {'name': 'Chaos Warp', 'evidence': 'persisted_semantic_v2'},
+            ],
+          },
+          'coverage': {
+            'card_rows': 5,
+            'card_copies': 100,
+            'tagged_rows': 3,
+            'tagged_copies': 3,
+            'other_rows': 2,
+            'other_copies': 97,
+          },
+        },
+      });
+
+      await tester.pumpWidget(createSubject(deck, analysis: analysis));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ramp (1)'), findsOneWidget);
+      expect(find.text('Compra (1)'), findsOneWidget);
+      expect(find.text('Interação (1)'), findsOneWidget);
+      expect(find.text('Ruby Medallion'), findsOneWidget);
+      expect(find.text('Scroll Rack'), findsOneWidget);
+      expect(find.text('Chaos Warp'), findsOneWidget);
+    });
   });
 }

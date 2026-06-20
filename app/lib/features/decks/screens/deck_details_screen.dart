@@ -8,6 +8,7 @@ import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
 import '../providers/deck_provider.dart';
+import '../models/deck_analysis.dart';
 import '../models/deck_card_item.dart';
 import '../models/deck_details.dart';
 import '../../cards/providers/card_provider.dart';
@@ -51,6 +52,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   Map<String, dynamic>? _validationResult;
   Set<String> _invalidCardNames = {};
   String? _lastValidationDeckSignature;
+  final Set<String> _autoFetchedDiagnosticAnalysisDeckIds = <String>{};
 
   /// Extrai o nome da carta problemática do resultado da validação.
   /// Usa o campo estruturado 'card_name' quando disponível,
@@ -299,6 +301,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             format: deck.format,
             totalCards: totalCards,
           );
+          final diagnosticAnalysis = context
+              .select<DeckProvider, DeckAnalysisData?>(
+                (p) => p.deckAnalysisFor(deck.id),
+              );
+          final diagnosticAnalysisLoading = context.select<DeckProvider, bool>(
+            (p) => p.isDeckAnalysisLoading(deck.id),
+          );
           final cardQuery = _cardSearchController.text.trim().toLowerCase();
           List<DeckCardItem> filterCards(List<DeckCardItem> cards) {
             if (cardQuery.isEmpty) return cards;
@@ -332,6 +341,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
             });
           }
 
+          if (hasMeaningfulDeckState &&
+              diagnosticAnalysis == null &&
+              !diagnosticAnalysisLoading &&
+              _autoFetchedDiagnosticAnalysisDeckIds.add(deck.id)) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                context.read<DeckProvider>().fetchDeckAnalysis(deck.id);
+              }
+            });
+          }
+
           return TabBarView(
             controller: _tabController,
             children: [
@@ -346,6 +366,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 isPricingLoading: _isPricingLoading,
                 validationResult: _validationResult,
                 pricing: _pricing,
+                diagnosticAnalysis: diagnosticAnalysis,
                 isCardInvalid: _isCardInvalid,
                 bracketLabel: _bracketLabel,
                 onValidateNow: _validateDeck,

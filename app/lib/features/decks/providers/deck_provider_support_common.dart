@@ -409,6 +409,20 @@ bool isDeckValidationOk(Map<String, dynamic> validation) {
       validation['is_valid'] == true;
 }
 
+String deckValidationFailureMessage(Map<String, dynamic> validation) {
+  final errors = validation['errors'];
+  if (errors is List && errors.isNotEmpty) {
+    return errors.map((entry) => entry.toString()).join(', ');
+  }
+
+  final error = validation['error'];
+  if (error != null && error.toString().trim().isNotEmpty) {
+    return error.toString();
+  }
+
+  return 'Validação estrita não aprovada.';
+}
+
 Map<String, dynamic> buildExportConnectionFailureResult(Object error) {
   return {'error': FriendlyErrorMapper.fromException(error)};
 }
@@ -431,6 +445,7 @@ Map<String, Map<String, dynamic>> buildCurrentCardsMap(DeckDetails deck) {
       'card_id': commander.id,
       'quantity': commander.quantity,
       'is_commander': true,
+      'condition': commander.condition.code,
     };
   }
 
@@ -441,6 +456,7 @@ Map<String, Map<String, dynamic>> buildCurrentCardsMap(DeckDetails deck) {
           'card_id': card.id,
           'quantity': card.quantity,
           'is_commander': false,
+          'condition': card.condition.code,
         };
       }
     }

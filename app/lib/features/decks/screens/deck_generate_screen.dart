@@ -356,6 +356,48 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     return true;
   }
 
+  String? _generatedDeckArchetype() {
+    final root = _generatedDeck;
+    if (root == null) return null;
+    final diagnostics = root['diagnostics'];
+
+    for (final candidate in [
+      root,
+      root['generated_deck'],
+      if (diagnostics is Map) diagnostics['recommended_deck'],
+      if (diagnostics is Map) diagnostics['promoted_deck'],
+    ]) {
+      if (candidate is! Map) continue;
+      final archetype = candidate['archetype']?.toString().trim();
+      if (archetype != null && archetype.isNotEmpty) {
+        return archetype;
+      }
+    }
+    return null;
+  }
+
+  int? _generatedDeckBracket() {
+    final root = _generatedDeck;
+    if (root == null) return null;
+    final diagnostics = root['diagnostics'];
+
+    for (final candidate in [
+      root,
+      root['generated_deck'],
+      if (diagnostics is Map) diagnostics['recommended_deck'],
+      if (diagnostics is Map) diagnostics['promoted_deck'],
+    ]) {
+      if (candidate is! Map) continue;
+      final rawBracket = candidate['bracket'];
+      final bracket =
+          rawBracket is int ? rawBracket : int.tryParse('$rawBracket');
+      if (bracket != null && bracket > 0) {
+        return bracket;
+      }
+    }
+    return null;
+  }
+
   Future<void> _saveDeck() async {
     if (_generatedDeck == null) return;
     if (!_isGeneratedDeckValid()) {
@@ -459,6 +501,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         name: deckName,
         format: _selectedFormat.toLowerCase(),
         description: _promptController.text.trim(),
+        archetype: _generatedDeckArchetype(),
+        bracket: _generatedDeckBracket(),
         cards: cardsToAdd.cast<Map<String, dynamic>>(),
       );
 
@@ -988,9 +1032,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         textValue(promotedDeck, 'source_system') ??
         textValue(recommendedDeck, 'source_system') ??
         'hermes';
-    final sourceRef =
-        textValue(promotedDeck, 'source_ref') ??
-        textValue(recommendedDeck, 'source_ref');
+    final sourceLabel =
+        sourceSystem.toLowerCase() == 'hermes'
+            ? 'Deck aprendido Hermes'
+            : sourceSystem.toUpperCase();
     final score = promotedDeck['score'] ?? recommendedDeck['score'];
     final legalStatus =
         textValue(promotedDeck, 'legal_status') ??
@@ -998,7 +1043,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     final confidence = textValue(recommendedDeck, 'source_confidence');
 
     return <String>[
-      'Origem: ${sourceSystem.toUpperCase()}${sourceRef == null ? '' : ' $sourceRef'}',
+      'Origem: $sourceLabel',
       if (score != null) 'Score: $score',
       if (legalStatus != null) 'Legalidade: $legalStatus',
       if (confidence != null) 'Confiança: $confidence',

@@ -186,6 +186,8 @@ Future<DeckColorIdentityEnrichmentResult> fetchMissingDeckColorIdentities(
       final details = state.selectedDeck;
       if (details != null && details.colorIdentity.isNotEmpty) {
         detailsByDeckId[deck.id] = details;
+      } else if (state.statusCode != 200) {
+        failedDeckIds.add(deck.id);
       }
     } catch (_) {
       failedDeckIds.add(deck.id);
