@@ -551,6 +551,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
                 source,
                 float(row.get("confidence", 1.0)),
                 review_status,
+                str(row.get("execution_status") or "auto"),
                 row.get("oracle_hash"),
                 str(row.get("notes") or ""),
                 reviewed_at,
@@ -583,6 +584,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
               source,
               confidence,
               review_status,
+              execution_status,
               rule_version,
               oracle_hash,
               notes,
@@ -600,6 +602,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
               source = EXCLUDED.source,
               confidence = EXCLUDED.confidence,
               review_status = EXCLUDED.review_status,
+              execution_status = EXCLUDED.execution_status,
               oracle_hash = EXCLUDED.oracle_hash,
               notes = EXCLUDED.notes,
               reviewed_at = CASE
@@ -612,7 +615,7 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
             """,
             values,
             template=(
-                "(%s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, 1, %s, %s, "
+                "(%s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, %s, 1, %s, %s, "
                 "%s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
             ),
             page_size=250,

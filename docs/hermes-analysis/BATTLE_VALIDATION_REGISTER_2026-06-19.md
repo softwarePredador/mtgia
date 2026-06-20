@@ -11030,3 +11030,57 @@ Conclusion:
 - Current battle remains trusted after PG-008.
 - Batch 0/1 is ready for explicit staging approval, but it was not staged.
 - No current PostgreSQL apply is ready.
+
+## Auditor Central Aven Mindcensor Runtime Rule Closure - 2026-06-20 15:15 -0300
+
+Scope:
+
+- Closed the concrete `Aven Mindcensor` blocker found in the post-fix Lorehold
+  battle review.
+- Applied a PostgreSQL battle-rule correction, refreshed the Hermes SQLite rule
+  cache, regenerated the canonical known-cards snapshot, and audited one
+  structured replay.
+
+PostgreSQL/runtime changes:
+
+- `Aven Mindcensor` now has a curated verified primary creature rule:
+  `effect=creature`, `power=2`, `toughness=1`, `flash=true`, `flying=true`,
+  `execution_status=auto`.
+- Its static anti-tutor text is preserved as a separate curated active
+  annotation-only rule:
+  `opponent_library_search_limited_to_top_cards=4`,
+  `execution_status=annotation_only`.
+- The old generated `needs_review/review_only` generic creature row remains as
+  lower-priority historical evidence and is no longer selected by runtime.
+
+Evidence:
+
+- PG apply report:
+  `docs/hermes-analysis/master_optimizer_reports/pg_apply_aven_mindcensor_rules_20260620_1803.json`
+  with `pg_inserted_or_updated=2`.
+- Runtime refresh:
+  `docs/hermes-analysis/master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_1803_post_aven.json`
+  with `pg_rows_loaded=5192`, `sqlite_inserted_or_updated=5110`, and
+  `canonical_snapshot_rows_exported=3161`.
+- Runtime direct check selected `curated/verified/auto` for the creature body
+  and reported the anti-tutor static rule as `execution_status_annotation_only`.
+- Single structured replay:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_single_battle_replay_20260620_1810.txt`.
+- Replay action critic:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_single_battle_replay_20260620_1810.action_critic.json`
+  with `total_actions=458`, `findings=0`, and `verdict_counts={"ok":458}`.
+- Replay forensic audit:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_single_battle_replay_20260620_1810.forensic.json`
+  with `findings_total=0`.
+- Replay decision audit:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_single_battle_replay_20260620_1810.decision_audit.json`
+  with `turn_findings=0` and `decision_findings=0`.
+
+Conclusion:
+
+- The Aven-specific `needs_review` blocker is resolved for runtime selection.
+- The fix does not pretend the static search-limiter replacement layer is fully
+  implemented; it records that ability as annotation-only until a library-search
+  replacement executor exists.
+- A full 16-seed battle-strategy audit was already active at the end of this
+  checkpoint and had not yet replaced `latest/summary.json`.

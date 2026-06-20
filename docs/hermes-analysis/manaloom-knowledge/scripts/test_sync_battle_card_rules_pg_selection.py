@@ -6,6 +6,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -150,6 +151,46 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             [row["logical_rule_key"] for row in filtered if row["source"] == "generated"],
             ["generated"],
         )
+
+    def test_upsert_pg_rules_preserves_execution_status_in_batch_values(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_execute_values(cur, sql, values, template, page_size):
+            captured["sql"] = sql
+            captured["values"] = values
+            captured["template"] = template
+
+        row = {
+            "card_name": "Aven Mindcensor",
+            "logical_rule_key": "battle_rule_v1:static",
+            "effect_json": {
+                "effect": "passive",
+                "ability_kind": "static",
+                "opponent_library_search_limited_to_top_cards": 4,
+            },
+            "deck_role_json": {
+                "category": "stax",
+                "effect": "library_search_limiter",
+            },
+            "source": "curated",
+            "confidence": 0.93,
+            "review_status": "active",
+            "execution_status": "annotation_only",
+            "notes": "static annotation",
+        }
+
+        with (
+            mock.patch.object(sync_pg, "load_current_sources", return_value={}),
+            mock.patch.object(sync_pg, "load_card_id_lookup", return_value={}),
+            mock.patch("psycopg2.extras.execute_values", side_effect=fake_execute_values),
+        ):
+            changed, skipped = sync_pg.upsert_pg_rules(mock.Mock(), [row])
+
+        self.assertEqual(changed, 1)
+        self.assertEqual(skipped, 0)
+        self.assertIn("execution_status", str(captured["sql"]))
+        self.assertIn("annotation_only", captured["values"][0])
+        self.assertIn("%s, %s, 1", str(captured["template"]))
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 import sqlite3
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import master_optimizer_common as optimizer
@@ -138,6 +139,30 @@ class MasterOptimizerHashTests(unittest.TestCase):
         self.assertEqual(optimizer.deck_hash(self.conn, 6), before_deck_hash)
         with self.assertRaisesRegex(RuntimeError, "ruleset hash"):
             optimizer.assert_current_deck_matches_baseline(self.conn, 6, baseline)
+
+    def test_run_battle_uses_current_games_cli_argument(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_run_command(command, cwd=None, timeout=900, env_extra=None):
+            captured["command"] = command
+            captured["cwd"] = cwd
+            captured["timeout"] = timeout
+            return (
+                0,
+                "\n".join(
+                    [
+                        "vs Test Opponent WR= 100.0% W=1 L=0 S=0 T=4.0 [elimination]",
+                        "OVERALL v9: WR=100.0% (1W/0L/0S)",
+                    ]
+                ),
+            )
+
+        with mock.patch.object(optimizer, "run_command", side_effect=fake_run_command):
+            result = optimizer.run_battle(1, battle_path=Path("/tmp/battle_analyst_v9.py"))
+
+        self.assertEqual(captured["command"][-2:], ["--games", "1"])
+        self.assertEqual(result.win_rate, 100.0)
+        self.assertEqual(result.total_games, 1)
 
     def test_battle_rule_deck_categories_preserve_multiple_roles_same_name(self) -> None:
         optimizer.battle_rule_registry.ensure_battle_card_rules(self.conn)

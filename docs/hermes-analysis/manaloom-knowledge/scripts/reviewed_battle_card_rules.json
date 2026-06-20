@@ -19,6 +19,51 @@
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: Sacrifice a creature: Add {C}{C}. Runtime intentionally models this as a passive artifact with reviewed activated-mana metadata, not as free ramp on spell resolution. Full activation needs a dedicated sacrifice-creature mana executor."
   },
+  "Aven Mindcensor": {
+    "rules": [
+      {
+        "effect_json": {
+          "cmc": 3.0,
+          "effect": "passive",
+          "ability_kind": "static",
+          "opponent_library_search_limited_to_top_cards": 4,
+          "battle_model_scope": "opponent_library_search_limiter_annotation_v1"
+        },
+        "deck_role_json": {
+          "category": "stax",
+          "effect": "library_search_limiter",
+          "subtype": "anti_tutor_hatebear"
+        },
+        "source": "curated",
+        "confidence": 0.93,
+        "review_status": "active",
+        "execution_status": "annotation_only",
+        "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: opponents searching a library search only the top four cards instead. Runtime records the static search-limiter metadata as annotation-only until a library-search replacement layer exists."
+      },
+      {
+        "effect_json": {
+          "cmc": 3.0,
+          "effect": "creature",
+          "is_creature_permanent": true,
+          "power": 2,
+          "toughness": 1,
+          "flash": true,
+          "flying": true,
+          "battle_model_scope": "flash_flying_hatebear_body_v1"
+        },
+        "deck_role_json": {
+          "category": "stax",
+          "effect": "creature",
+          "subtype": "anti_tutor_hatebear"
+        },
+        "source": "curated",
+        "confidence": 0.96,
+        "review_status": "verified",
+        "execution_status": "auto",
+        "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Aven Mindcensor is a 2/1 flash flying creature. Runtime may cast it as a creature permanent while carrying the static search-limiter rule as a separate annotation-only rule."
+      }
+    ]
+  },
   "Basking Broodscale": {
     "effect_json": {
       "cmc": 2.0,

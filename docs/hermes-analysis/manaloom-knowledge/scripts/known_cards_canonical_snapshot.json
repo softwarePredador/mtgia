@@ -1595,14 +1595,19 @@
   },
   "Aven Mindcensor": {
     "cmc": 3.0,
-    "power": 3,
+    "flash": true,
+    "power": 2,
     "effect": "creature",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "flying": true,
+    "toughness": 1,
+    "battle_model_scope": "flash_flying_hatebear_body_v1",
+    "is_creature_permanent": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:905d605e9436a924b0c013a8ade1733f"
+    "battle_rule_logical_key": "battle_rule_v1:460e4af6bc803c971825453c4378427a"
   },
   "Avenger of Zendikar": {
     "cmc": 7.0,

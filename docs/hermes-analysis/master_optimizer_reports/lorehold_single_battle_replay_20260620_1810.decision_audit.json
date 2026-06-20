@@ -1,0 +1,23 @@
+{
+  "baseline_findings": [],
+  "decision_findings": [],
+  "replay_files": [],
+  "summary": {
+    "decision_findings": 0,
+    "decision_traces": 161,
+    "human_replay_complete": "not_evaluated_by_replay_decision_auditor",
+    "rules_interaction_trusted": "not_evaluated_by_replay_decision_auditor",
+    "severity_counts": {
+      "critical": 0,
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "status": "turn_invariants_clean",
+    "status_scope": "turn_and_decision_trace_invariants",
+    "structured_events": 1139,
+    "structured_trace_usable": true,
+    "turn_findings": 0
+  },
+  "turn_findings": []
+}

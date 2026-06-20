@@ -142,6 +142,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Angel's Grace", by_name)
         self.assertIn("Approach of the Second Sun", by_name)
         self.assertIn("Ancient Tomb", by_name)
+        self.assertIn("Aven Mindcensor", by_name)
         self.assertIn("Basking Broodscale", by_name)
         self.assertIn("Birgi, God of Storytelling", by_name)
         self.assertIn("Chrome Mox", by_name)
@@ -232,6 +233,23 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Ancient Tomb"]["effect_json"]["effect"], "land")
         self.assertEqual(by_name["Ancient Tomb"]["effect_json"]["ancient_tomb_bonus_mana"], 1)
         self.assertEqual(by_name["Ancient Tomb"]["effect_json"]["ancient_tomb_bonus_life_cost"], 2)
+        aven_rows = [
+            row for row in rows if row["card_name"] == "Aven Mindcensor"
+        ]
+        self.assertEqual(len(aven_rows), 2)
+        self.assertEqual(by_name["Aven Mindcensor"]["source"], "curated")
+        self.assertEqual(by_name["Aven Mindcensor"]["review_status"], "verified")
+        self.assertEqual(by_name["Aven Mindcensor"]["execution_status"], "auto")
+        self.assertEqual(by_name["Aven Mindcensor"]["effect_json"]["effect"], "creature")
+        self.assertEqual(by_name["Aven Mindcensor"]["effect_json"]["power"], 2)
+        self.assertEqual(by_name["Aven Mindcensor"]["effect_json"]["toughness"], 1)
+        self.assertTrue(
+            any(
+                row["effect_json"].get("opponent_library_search_limited_to_top_cards") == 4
+                and row["execution_status"] == "annotation_only"
+                for row in aven_rows
+            )
+        )
         self.assertEqual(by_name["Basking Broodscale"]["source"], "curated")
         self.assertEqual(by_name["Basking Broodscale"]["review_status"], "active")
         self.assertEqual(by_name["Basking Broodscale"]["effect_json"]["effect"], "creature")

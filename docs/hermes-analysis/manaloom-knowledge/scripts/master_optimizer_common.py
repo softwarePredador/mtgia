@@ -512,42 +512,24 @@ def parse_battle_output(output: str, games_per_opponent: int) -> BattleResult:
 
 
 def run_battle(games_per_opponent: int, battle_path: Path = DEFAULT_BATTLE) -> BattleResult:
-    source = battle_path.read_text(encoding="utf-8")
-    patched = re.sub(
-        r"(?m)^    GAMES = \d+\s*$",
-        f"    GAMES = {games_per_opponent}",
-        source,
-        count=1,
-    )
-    if patched == source and games_per_opponent != 50:
-        raise RuntimeError("Could not patch GAMES in battle script")
-
-    tmp_path = battle_path.with_name("_battle_optimizer_tmp.py")
-    tmp_path.write_text(patched, encoding="utf-8")
-    try:
-        env_extra = {}
-        metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
-        if metrics_dir:
-            Path(metrics_dir).mkdir(parents=True, exist_ok=True)
-            stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-            env_extra["MANALOOM_ENGINE_METRICS_OUT"] = str(
-                Path(metrics_dir)
-                / f"battle_engine_metrics_{battle_path.stem}_{games_per_opponent}_{stamp}.json"
-            )
-        code, output = run_command(
-            [sys.executable, str(tmp_path)],
-            cwd=SCRIPT_DIR,
-            timeout=1200,
-            env_extra=env_extra,
+    env_extra = {}
+    metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
+    if metrics_dir:
+        Path(metrics_dir).mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        env_extra["MANALOOM_ENGINE_METRICS_OUT"] = str(
+            Path(metrics_dir)
+            / f"battle_engine_metrics_{battle_path.stem}_{games_per_opponent}_{stamp}.json"
         )
-        if code != 0:
-            raise RuntimeError(output[-2000:])
-        return parse_battle_output(output, games_per_opponent)
-    finally:
-        try:
-            tmp_path.unlink()
-        except FileNotFoundError:
-            pass
+    code, output = run_command(
+        [sys.executable, str(battle_path), "--games", str(games_per_opponent)],
+        cwd=SCRIPT_DIR,
+        timeout=1200,
+        env_extra=env_extra,
+    )
+    if code != 0:
+        raise RuntimeError(output[-2000:])
+    return parse_battle_output(output, games_per_opponent)
 
 
 def write_report(name: str, markdown: str) -> Path:

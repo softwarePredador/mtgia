@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-06-20T18:03:10.261852+00:00",
+  "database_target": "143.198.230.247:5433/halder",
+  "aven_rules": [
+    {
+      "normalized_name": "aven mindcensor",
+      "logical_rule_key": "battle_rule_v1:905d605e9436a924b0c013a8ade1733f",
+      "card_id": "e8879ed0-85e0-46cf-9734-7ad05b76e3fa",
+      "card_name": "Aven Mindcensor",
+      "effect_json": {
+        "cmc": 3.0,
+        "power": 3,
+        "effect": "creature"
+      },
+      "deck_role_json": {
+        "effect": "creature",
+        "category": "unknown"
+      },
+      "source": "generated",
+      "confidence": 0.55,
+      "review_status": "needs_review",
+      "execution_status": "review_only",
+      "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "updated_at": "2026-06-09 12:11:37.739966+00"
+    }
+  ],
+  "lorehold_deck_cards": [
+    {
+      "deck_id": "528c877f-f829-4207-95e6-73981776c323",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "deck_card_id": "5577cc58-78aa-4187-9a38-f8bb3bc2cb2e",
+      "card_id": "b192e670-a234-470f-90ef-58d8bf2ebb73",
+      "name": "Reforge the Soul",
+      "quantity": 1,
+      "is_commander": false
+    }
+  ],
+  "active_lorehold_learned": [
+    {
+      "id": "f46c0421-71b4-4de3-bb79-05a916b4988b",
+      "commander_name": "Lorehold, the Historian",
+      "source_system": "hermes",
+      "source_ref": "learned_deck:82",
+      "is_active": true,
+      "card_count": 100,
+      "score": 136.5,
+      "card_list": "1 Aetherflux Reservoir\n1 Ancient Den\n1 Ancient Tomb\n1 Approach of the Second Sun\n1 Arcane Signet\n1 Arid Mesa\n1 Battlefield Forge\n1 Birgi, God of Storytelling\n1 Blasphemous Act\n1 Bloodstained Mire\n1 Boros Charm\n1 Boros Signet\n1 City of Brass\n1 Clifftop Retreat\n1 Command Tower\n1 Deflecting Swat\n1 Drannith Magistrate\n1 Dualcaster Mage\n1 Electroduplicate\n1 Elegant Parlor\n1 Enlightened Tutor\n1 Esper Sentinel\n1 Faithless Looting\n1 Fellwar Stone\n1 Fiery Emancipation\n1 Flawless Maneuver\n1 Flooded Strand\n1 Gamble\n1 Gemstone Caverns\n1 Generous Gift\n1 Giver of Runes\n1 Grand Abolisher\n1 Great Furnace\n1 Guttersnipe\n1 Hall of Heliod's Generosity\n1 Heat Shimmer\n1 Imperial Recruiter\n1 Inspiring Vantage\n1 Inventors' Fair\n1 Jeska's Will\n1 Land Tax\n1 Lightning Greaves\n1 Lorehold, the Historian\n1 Lotus Petal\n1 Mana Confluence\n1 Mana Geyser\n1 Mana Vault\n1 Marsh Flats\n1 Mizzix's Mastery\n1 Molten Duplication\n1 Monument to Endurance\n1 Mother of Runes\n1 Mountain\n1 Mox Amber\n1 Needleverge Pathway\n1 Orim's Chant\n1 Past in Flames\n1 Path to Exile\n1 Plains\n1 Plateau\n1 Prismatic Vista\n1 Pyroblast\n1 Ranger-Captain of Eos\n1 Recruiter of the Guard\n1 Reforge the Soul\n1 Reiterate\n1 Reverberate\n1 Rise of the Eldrazi\n1 Rite of Flame\n1 Rite of the Dragoncaller\n1 Ruby Medallion\n1 Rugged Prairie\n1 Sacred Foundry\n1 Scalding Tarn\n1 Scroll Rack\n1 Seething Song\n1 Sensei's Divining Top\n1 Silence\n1 Smothering Tithe\n1 Sol Ring\n1 Spectator Seating\n1 Storm Herd\n1 Storm-Kiln Artist\n1 Sunbaked Canyon\n1 Sunbillow Verge\n1 Sundown Pass\n1 Swords to Plowshares\n1 Talisman of Conviction\n1 Teferi's Protection\n1 The One Ring\n1 Twinflame\n1 Unexpected Windfall\n1 Urza's Saga\n1 Valakut Awakening\n1 Victory Chimes\n1 War Room\n1 Wheel of Fortune\n1 Windswept Heath\n1 Wooded Foothills\n1 Worldfire",
+      "metadata": {
+        "avg_cmc": 2.15,
+        "draw_count": 18,
+        "ramp_count": 20,
+        "source_hash": "f3d63c68be1f3fa7",
+        "total_lands": 33,
+        "tutor_count": 5,
+        "engine_count": 37,
+        "wincon_count": 13,
+        "removal_count": 8,
+        "excluded_cards": [
+          "Chrome Mox",
+          "Mox Diamond",
+          "Mox Opal"
+        ],
+        "recursion_count": 4,
+        "board_wipe_count": 2,
+        "protection_count": 13,
+        "promoted_at_hermes": "2026-06-02 18:37:39",
+        "hermes_promotion_id": 1,
+        "hermes_active_deck_id": 6,
+        "hermes_learned_deck_id": 82,
+        "learned_deck_created_at": "2026-06-02T18:19:52Z"
+      }
+    }
+  ]
+}

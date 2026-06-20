@@ -39,18 +39,46 @@ def load_reviewed_rule_rows(
         if not isinstance(card_name, str) or not card_name.strip():
             continue
         payload_dict = _as_dict(payload)
-        effect_json = _as_dict(payload_dict.get("effect_json"))
-        if not effect_json:
-            continue
-        row = {
-            "card_name": card_name.strip(),
-            "effect_json": effect_json,
-            "deck_role_json": _as_dict(payload_dict.get("deck_role_json")) or None,
-            "source": str(payload_dict.get("source") or "curated"),
-            "confidence": float(payload_dict.get("confidence") or 1.0),
-            "review_status": str(payload_dict.get("review_status") or "verified"),
-            "notes": str(payload_dict.get("notes") or "").strip(),
-            "oracle_hash": payload_dict.get("oracle_hash"),
-        }
-        rows.append(row)
+        rule_payloads = payload_dict.get("rules")
+        if isinstance(rule_payloads, list):
+            candidate_payloads = [
+                _as_dict(rule_payload)
+                for rule_payload in rule_payloads
+                if isinstance(rule_payload, dict)
+            ]
+        else:
+            candidate_payloads = [payload_dict]
+
+        for rule_payload in candidate_payloads:
+            effect_json = _as_dict(rule_payload.get("effect_json"))
+            if not effect_json:
+                continue
+            row = {
+                "card_name": card_name.strip(),
+                "effect_json": effect_json,
+                "deck_role_json": _as_dict(rule_payload.get("deck_role_json")) or None,
+                "source": str(rule_payload.get("source") or payload_dict.get("source") or "curated"),
+                "confidence": float(
+                    rule_payload.get("confidence")
+                    or payload_dict.get("confidence")
+                    or 1.0
+                ),
+                "review_status": str(
+                    rule_payload.get("review_status")
+                    or payload_dict.get("review_status")
+                    or "verified"
+                ),
+                "execution_status": str(
+                    rule_payload.get("execution_status")
+                    or payload_dict.get("execution_status")
+                    or "auto"
+                ),
+                "notes": str(
+                    rule_payload.get("notes")
+                    or payload_dict.get("notes")
+                    or ""
+                ).strip(),
+                "oracle_hash": rule_payload.get("oracle_hash") or payload_dict.get("oracle_hash"),
+            }
+            rows.append(row)
     return rows

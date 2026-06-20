@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-06-20T18:04:52.102474+00:00",
+  "database_target": "143.198.230.247:5433/halder",
+  "backup_artifact": "docs/hermes-analysis/master_optimizer_reports/pg_apply_lorehold_wheel_swap_backup_20260620_180448.json",
+  "updated_deck_cards": [
+    "5577cc58-78aa-4187-9a38-f8bb3bc2cb2e"
+  ],
+  "updated_learned_decks": [
+    "f46c0421-71b4-4de3-bb79-05a916b4988b"
+  ],
+  "deck_check": {
+    "deck_id": "528c877f-f829-4207-95e6-73981776c323",
+    "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+    "rows": 100,
+    "total_cards": 100,
+    "wheel": 1,
+    "reforge": 0
+  },
+  "learned_check": {
+    "id": "f46c0421-71b4-4de3-bb79-05a916b4988b",
+    "card_count": 100,
+    "has_wheel": true,
+    "has_reforge": false,
+    "swap_meta": {
+      "add": "Wheel of Misfortune",
+      "reason": "Align active Lorehold learned deck and materialized deck with documented approved canonical decision.",
+      "remove": "Reforge the Soul",
+      "applied_at": "2026-06-20T18:04:50.106355+00:00",
+      "backup_artifact": "docs/hermes-analysis/master_optimizer_reports/pg_apply_lorehold_wheel_swap_backup_20260620_180448.json",
+      "card_list_sha256_after": "58bbce98febc52b52aff3d80c93b9bb9b1be04225eb6b70fef6d070c3f321722",
+      "card_list_sha256_before": "2a62f3fe6d6ed5733b9f6d41979b9e65cb7f0941f67a21ea7b953268c4ed2559"
+    }
+  }
+}

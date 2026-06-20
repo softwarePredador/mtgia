@@ -15753,3 +15753,67 @@ Conclusion:
 - This is a battle/auditor follow-up around board-wipe protection accounting or
   gate policy. It is not evidence for a PostgreSQL apply or deck swap.
 - No current PostgreSQL apply is ready from the Lorehold/deck register state.
+
+### Auditor Central Canonical Wheel Apply and Single-Replay Verification - 2026-06-20 15:15 -03
+
+Scope:
+
+- Applied the documented Lorehold canonical decision:
+  `Wheel of Misfortune` over `Reforge the Soul`.
+- Updated both the materialized PostgreSQL deck and the active Lorehold learned
+  deck source, then synced PostgreSQL to Hermes SQLite deck `6`.
+- Froze a new local optimizer baseline and audited one structured battle replay.
+
+PostgreSQL/Hermes changes:
+
+- Materialized deck:
+  `528c877f-f829-4207-95e6-73981776c323`
+  (`Runtime Lorehold Learned 19e93de3cca`) now has `Wheel=1`,
+  `Reforge=0`, `rows=100`, and `total_cards=100`.
+- Active learned deck:
+  `f46c0421-71b4-4de3-bb79-05a916b4988b`
+  (`source_ref=learned_deck:82`) now has `Wheel of Misfortune` in
+  `card_list`, no `Reforge the Soul`, and metadata
+  `canonical_lorehold_swap_20260620`.
+- Hermes deck `6` was refreshed from PostgreSQL with
+  `sync_pg_target_deck_to_hermes_lorehold_post_wheel_20260620_1805.json`.
+
+Evidence:
+
+- Precheck/backup:
+  `docs/hermes-analysis/master_optimizer_reports/pg_precheck_aven_lorehold_20260620_180309.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg_apply_lorehold_wheel_swap_backup_20260620_180448.json`.
+- Apply result:
+  `docs/hermes-analysis/master_optimizer_reports/pg_apply_lorehold_wheel_swap_result_20260620_180448.json`.
+- Approved canonical snapshot after PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_post_pg_swap_check_20260620_1806.md`.
+- New local optimizer baseline:
+  `docs/hermes-analysis/master_optimizer_reports/master_optimizer_baseline_20260620_180839.md`
+  with `baseline_id=6`, `cards=100`, `lands=33`,
+  `games_per_opponent=1`, `total_games=12`, `overall_wr=100.0%`.
+- Quality gate after new baseline:
+  `docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260620_180849.md`
+  passed the deck/baseline hash guard and reviewed `0` current slot candidates.
+- Current aggregate run after the swap:
+  `docs/hermes-analysis/manaloom-knowledge/decks/lorehold-the-historian/BATTLE_LOG.md`
+  records `11W/1L/0S`, `91.7%` over 12 one-game real-opponent matchups.
+- Single structured replay evidence:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_single_battle_replay_20260620_1810.txt`
+  ended with `WIN: Lorehold (elimination) turn 17`.
+- Single replay audits:
+  action critic `findings=0`, forensic `findings_total=0`, and decision audit
+  `turn_findings=0`, `decision_findings=0`.
+- Learned-deck coherence artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.md`
+  reports Lorehold `learned_deck:82` with `issues=[]`.
+
+Conclusion:
+
+- Lorehold deck `6` is now aligned with the documented canonical
+  `Wheel of Misfortune` decision in PostgreSQL, active learned-deck source, and
+  Hermes SQLite.
+- The one-replay verification is clean and directly inspectable, but it is not
+  a statistical proof of optimality.
+- A full 16-seed battle-strategy audit was already active at checkpoint close
+  and had not yet replaced `latest/summary.json`.
