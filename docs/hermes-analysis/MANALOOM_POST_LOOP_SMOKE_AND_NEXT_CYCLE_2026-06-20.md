@@ -71,26 +71,30 @@ Battle smoke boundary:
 ### 1. Deck Learned-Deck QA
 
 Source:
-`docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`.
+`docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_172437.json`.
 
 Aggregate state:
 
 - active learned decks: `60`;
-- high severity: `2`;
 - medium severity: `13`;
-- `commander_deck_quantity_mismatch=1`;
-- `commander_quantity_mismatch=1`;
+- high severity: `0`;
+- `commander_deck_quantity_mismatch=0`;
+- `commander_quantity_mismatch=0`;
 - `land_count_low_review=7`;
 - `land_count_high_review=1`;
 - `some_core_metadata_zero=5`.
 
-Highest priority:
+Closed since the original post-loop register:
 
-- `learned_deck:7` / `Korvold, Fae-Cursed King`:
-  `parsed_quantity=90`, `resolved_quantity=90`, expected `100`;
-  commander quantity actual `0`, expected `1`. This is a real deck-quality
-  issue and should be investigated before any strategic use of this learned
-  deck.
+- PG-009 replaced the partial active `learned_deck:7` /
+  `Korvold, Fae-Cursed King` row with accepted
+  `commander_reference_decks` corpus data.
+- Fresh coherence artifact `learned_deck_coherence_audit_20260620_172437`
+  reports Korvold `parsed_quantity=100`, `resolved_quantity=100`,
+  commander quantity `1`, and `issues=[]`.
+- The global high-severity count dropped from `2` to `0`.
+
+Current highest-priority learned-deck work:
 
 Medium land-count reviews:
 
@@ -118,8 +122,33 @@ Lorehold status:
 
 ### 2. Battle Follow-Up
 
-Latest battle is trusted and has no mandatory gate divergences. Remaining
-strategy observations are not blockers:
+Original post-loop latest battle was trusted. The later heartbeat at
+`2026-06-20 14:28 -0300` found a newer latest artifact:
+`/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_170724/summary.json`.
+
+Current latest battle status:
+
+- `battle_replay_final_status=review_required`;
+- mandatory divergences:
+  `forensic_audit=review_required` and
+  `replay_decision_audit=review_required`;
+- tests still pass: `16/16`;
+- forensic lineage is complete;
+- `forensic_rule_findings=0`;
+- `forensic_turn_findings=1`;
+- `decision_audit_decision_findings=0`.
+
+Concrete finding:
+
+- seed `63211720`, turn `12`, player `Lorehold`;
+- event `board_wipe_resolved`;
+- severity `low`;
+- finding: board wipe left more protected creatures (`5`) than destroyed (`3`).
+
+This does not indicate a PostgreSQL deploy or deck swap by itself. It is a
+battle/auditor follow-up around board-wipe protection accounting or gate policy.
+
+Previous trusted-run strategy observations were not blockers:
 
 - `strategy_findings=5`;
 - all five are `forced_keep_after_bad_mulligan`;
@@ -130,9 +159,10 @@ strategy observations are not blockers:
 - `forensic_rule_findings=0`;
 - `forensic_turn_findings=0`.
 
-Next battle work should improve confidence labeling around forced mulligan-cap
-keeps or add specific decision-trace contracts for currently uncovered accepted
-types. It should not trigger a PostgreSQL deploy by itself.
+Next battle work should first classify the seed `63211720` low turn finding,
+then improve confidence labeling around forced mulligan-cap keeps or add
+specific decision-trace contracts for currently uncovered accepted types. It
+should not trigger a PostgreSQL deploy by itself.
 
 ### 3. Production Smoke Gap
 

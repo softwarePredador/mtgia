@@ -15288,9 +15288,13 @@ Conclusion:
   current artifact evidence.
 - Do not keep `metadata_total_lands_mismatch`, `metadata_zero_lands`, or
   `all_core_metadata_zero` in the active Deck/Lorehold pending list.
-- Current active Deck/Lorehold pending list is now:
-  1. residual learned-deck QA: Korvold quantity/commander mismatch, land-count
-     review rows, and `5` partial zero-core metadata rows;
+- Historical note: this `20260620_115918` pending list was later superseded by
+  PG-009 and artifact `learned_deck_coherence_audit_20260620_172437`, which
+  closed the Korvold quantity/commander mismatch. The active list after PG-009
+  no longer includes Korvold.
+- Current active Deck/Lorehold pending list after later superseding evidence:
+  1. residual learned-deck QA: land-count review rows and `5` partial
+     zero-core metadata rows;
   2. strict-oracle/global card backlog, still policy-blocked under PG-003;
   3. `/ai/simulate-matchup` advisory-only/write-capable boundary.
 
@@ -15673,4 +15677,79 @@ Conclusion:
 - This entry is intentionally stable: it records the heartbeat-loop closure
   policy rather than attempting to self-update to the commit created by this
   entry.
+- No current PostgreSQL apply is ready from the Lorehold/deck register state.
+
+### Auditor Central PG-009 Learned-Deck QA Closure - 2026-06-20 14:24 -03
+
+Scope:
+
+- Reconciled the latest learned-deck coherence artifact after PG-009 closed the
+  non-Lorehold Korvold high-severity finding.
+- No Lorehold deck `6` mutation, deck swap, cleanup, stash, revert, stage,
+  commit, push, app/backend code edit, live app route call, or OpenAI call was
+  performed by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_172437.json`.
+- Artifact generated at `2026-06-20T17:24:35.282802+00:00` with
+  `read_only=true`.
+- Aggregate issue state:
+  `active_learned_decks=60`, `land_count_high_review=1`,
+  `land_count_low_review=7`, and `some_core_metadata_zero=5`.
+- Severity state is now `{"medium":13}` with no high findings.
+- Korvold replacement row:
+  `commander_name="Korvold, Fae-Cursed King"`,
+  `source_system="commander_reference_decks"`,
+  `source_ref="edhrec_korvold_fae_cursed_king_default_average_sprint3_lot_b_2026_05_14"`,
+  `parsed_quantity=100`, `resolved_quantity=100`, commander quantity `1`,
+  and `issues=[]`.
+- Lorehold `learned_deck:82` remains clean in the same artifact with
+  `issues=[]`, parsed quantity `100`, and no strategy failures.
+- Latest battle still points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, complete forensic lineage, and tests `16/16`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Korvold is no longer an active pending item after PG-009.
+- Active learned-deck QA is now medium-only: land-count reviews and
+  `some_core_metadata_zero=5`.
+- No current PostgreSQL apply is ready from the Lorehold/deck register state.
+
+### Auditor Central Latest Battle Review Regression - 2026-06-20 14:28 -03
+
+Scope:
+
+- Rechecked the latest battle artifact after PG-009 learned-deck closure.
+- No Lorehold deck `6` mutation, deck swap, PostgreSQL write, cleanup, stash,
+  revert, stage, commit, push, app/backend code edit, live app route call, or
+  OpenAI call was performed.
+
+Evidence:
+
+- Latest battle:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_170724/summary.json`.
+- `battle_replay_final_status=review_required`.
+- Mandatory divergences:
+  `forensic_audit=review_required` and
+  `replay_decision_audit=review_required`.
+- Tests still pass: `16/16`.
+- Forensic lineage is complete.
+- `forensic_rule_findings=0`, `forensic_turn_findings=1`,
+  `decision_audit_decision_findings=0`.
+- Concrete finding:
+  seed `63211720`, event `board_wipe_resolved`, player `Lorehold`, turn `12`,
+  severity `low`, finding
+  `Board wipe left more protected creatures (5) than destroyed (3).`
+
+Conclusion:
+
+- Lorehold learned deck `6` remains coherent and unchanged, but the current
+  battle latest is no longer trusted for strategy learning.
+- This is a battle/auditor follow-up around board-wipe protection accounting or
+  gate policy. It is not evidence for a PostgreSQL apply or deck swap.
 - No current PostgreSQL apply is ready from the Lorehold/deck register state.

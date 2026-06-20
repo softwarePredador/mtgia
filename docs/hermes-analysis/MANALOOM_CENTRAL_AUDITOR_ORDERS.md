@@ -739,3 +739,70 @@ Current conclusion:
 - PG-001, PG-002, PG-006, PG-007, and PG-008 remain closed.
 - PG-003 remains policy-blocked and PG-005 remains no-apply-needed.
 - No current PostgreSQL apply is ready.
+
+## PG-009 Korvold Learned-Deck Closure - 2026-06-20 14:24 -0300
+
+Scope:
+
+- Closed the global learned-deck high-severity Korvold backlog that had been
+  identified after the post-loop smoke.
+- This is not a Lorehold deck `6` mutation and not a deck swap.
+
+Evidence:
+
+- Deploy register entry `PG-009` records the authorized PostgreSQL replacement
+  of the old active partial Korvold row.
+- Old partial source `edhrec/learned_deck:7` is no longer the active learned
+  Korvold row.
+- Active replacement source is
+  `commander_reference_decks` /
+  `edhrec_korvold_fae_cursed_king_default_average_sprint3_lot_b_2026_05_14`.
+- Fresh read-only learned-deck artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_172437.json`.
+- That artifact reports Korvold `parsed_quantity=100`,
+  `resolved_quantity=100`, commander quantity `1`, and `issues=[]`.
+- Global learned-deck severity is now `{"medium":13}` with no high findings.
+- Lorehold `learned_deck:82` remains clean in the same artifact with
+  `issues=[]`.
+
+Current conclusion:
+
+- PG-009 is closed unless future PostgreSQL SELECT, sync report, or learned-deck
+  artifact evidence proves rollback or drift.
+- Active learned-deck QA now consists of medium land-count review rows and
+  `some_core_metadata_zero=5`.
+- No current PostgreSQL apply is ready.
+
+## Latest Battle Review Regression - 2026-06-20 14:28 -0300
+
+Scope:
+
+- Rechecked `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  after PG-009 and the learned-deck artifact update.
+- No PostgreSQL write, deck swap, cleanup, stash, revert, stage, commit, push,
+  app/backend code edit, live app route call, or OpenAI call was performed.
+
+Evidence:
+
+- Latest battle now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_170724/summary.json`.
+- `battle_replay_final_status=review_required`.
+- Mandatory divergences:
+  `forensic_audit=review_required` and
+  `replay_decision_audit=review_required`.
+- Tests still pass: `16/16`.
+- Forensic lineage is complete.
+- `forensic_rule_findings=0`, `forensic_turn_findings=1`,
+  `decision_audit_decision_findings=0`.
+- Concrete finding appears in both `forensic_audit.json` and
+  `replay_decision_audit.json` for seed `63211720`: event
+  `board_wipe_resolved`, player `Lorehold`, turn `12`, severity `low`, finding
+  `Board wipe left more protected creatures (5) than destroyed (3).`
+
+Current conclusion:
+
+- This is a battle/auditor follow-up, not a PostgreSQL deployment item.
+- PG-001, PG-002, PG-006, PG-007, PG-008, and PG-009 remain closed unless
+  future SELECT, sync report, learned-deck artifact, or battle artifact evidence
+  proves rollback or drift.
+- No current PostgreSQL apply is ready.
