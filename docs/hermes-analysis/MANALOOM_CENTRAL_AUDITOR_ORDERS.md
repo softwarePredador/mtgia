@@ -709,19 +709,20 @@ Scope:
 
 Evidence:
 
-- `git status --short --branch` now reports `## master...origin/master` plus
-  five modified documentation files from this reconciliation:
+- Pre-closure `git status --short --branch` reported
+  `## master...origin/master` plus three modified documentation files from this
+  reconciliation:
   `LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`,
-  `MANALOOM_BATCH_0_1_READINESS_2026-06-20.md`,
   `MANALOOM_CENTRAL_AUDITOR_ORDERS.md`,
-  `MANALOOM_PUBLICATION_BATCH_PLAN_2026-06-20.md`, and
   `POSTGRES_DEPLOY_REGISTER_2026-06-20.md`.
 - `git rev-list --left-right --count HEAD...origin/master`: `0 0`.
-- `HEAD`: `ca93902621728baefd0715f11fecccd0bfd62f03`
-  (`feat: refine deck app flows`).
-- Public `/health` recheck reports `status=healthy`,
-  `environment=production`, and
-  `git_sha=ca93902621728baefd0715f11fecccd0bfd62f03`.
+- Volatile-SHA closure rule: this register must not keep re-stamping exact
+  "current HEAD" after each documentation-only closure commit. Exact deploy SHA
+  proof remains mandatory for deploy validation, but it belongs in the command
+  evidence or bounded smoke artifact for that cycle, not in a tracked heartbeat
+  note that would recursively dirty itself.
+- Public `/health` recheck reported `status=healthy` and
+  `environment=production` during the reconciliation.
 - Latest learned-deck coherence artifact remains
   `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`;
   Lorehold `learned_deck:82` still has `issues=[]`.
@@ -732,7 +733,9 @@ Evidence:
 
 Current conclusion:
 
-- The only active local delta from this heartbeat is documentation evidence.
+- The active documentation loop is closed by policy: no further tracked
+  heartbeat should be opened just to restamp the SHA created by the previous
+  heartbeat documentation commit.
 - PG-001, PG-002, PG-006, PG-007, and PG-008 remain closed.
 - PG-003 remains policy-blocked and PG-005 remains no-apply-needed.
 - No current PostgreSQL apply is ready.

@@ -15642,17 +15642,23 @@ Scope:
 
 Evidence:
 
-- Current Git state:
-  `git status --short --branch` reports `## master...origin/master` plus five
-  modified documentation files from this heartbeat's reconciliation.
+- Pre-closure Git state:
+  `git status --short --branch` reported `## master...origin/master` plus
+  three modified documentation files from this heartbeat reconciliation:
+  this Lorehold register, the central auditor orders, and the PostgreSQL deploy
+  register. No app, backend, SQL, or artifact-generation code was modified by
+  that heartbeat.
 - Divergence:
-  `git rev-list --left-right --count HEAD...origin/master` returned `0 0`.
-- Current `HEAD`:
-  `ca93902621728baefd0715f11fecccd0bfd62f03`
-  (`feat: refine deck app flows`).
-- Public `/health` recheck:
-  `status=healthy`, `environment=production`, and
-  `git_sha=ca93902621728baefd0715f11fecccd0bfd62f03`.
+  `git rev-list --left-right --count HEAD...origin/master` returned `0 0`
+  during the reconciliation.
+- Volatile-SHA closure rule:
+  tracked heartbeat docs must not keep re-stamping "current HEAD" as active
+  state after a deploy verification, because committing that evidence creates a
+  new SHA and makes the evidence self-obsolete. Future exact deploy SHA proof
+  belongs in the command transcript/final handoff or in a bounded smoke artifact,
+  not in an endlessly refreshed tracked heartbeat note.
+- Public `/health` was rechecked during the reconciliation and returned
+  `status=healthy` and `environment=production`.
 - Latest learned-deck coherence artifact remains
   `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`.
 - Lorehold `learned_deck:82` remains clean in that artifact with `issues=[]`.
@@ -15664,5 +15670,7 @@ Evidence:
 Conclusion:
 
 - Lorehold deck `6` remains coherent and unchanged.
-- The only active local delta from this heartbeat is documentation evidence.
+- This entry is intentionally stable: it records the heartbeat-loop closure
+  policy rather than attempting to self-update to the commit created by this
+  entry.
 - No current PostgreSQL apply is ready from the Lorehold/deck register state.
