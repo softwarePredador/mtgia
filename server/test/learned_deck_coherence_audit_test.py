@@ -29,6 +29,13 @@ def load_audit_module():
 audit = load_audit_module()
 
 
+def nonzero_core_metadata(extra: dict | None = None) -> dict:
+    metadata = {key: 1 for key in audit.CORE_METADATA_KEYS}
+    if extra:
+        metadata.update(extra)
+    return metadata
+
+
 def identity(
     name: str,
     colors: list[str],
@@ -432,6 +439,83 @@ class LearnedDeckCoherenceAuditTest(unittest.TestCase):
         self.assertEqual(model["status"], "combined_identity_inferred")
         self.assertEqual(model["source"], "deck_name_commander_component")
         self.assertEqual(model["combined_color_identity"], ["G", "R", "U", "W"])
+
+    def partner_identity_audit(
+        self,
+        metadata_model: dict | None,
+    ) -> object:
+        model = {
+            "status": "combined_identity_inferred",
+            "source": "partner_text",
+            "requires_first_class_persistence": True,
+            "primary_commander_name": "Kraum, Ludevic's Opus",
+            "declared_deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
+            "base_color_identity": ["R", "U"],
+            "combined_color_identity": ["B", "R", "U", "W"],
+            "identity_components": [
+                {
+                    "name": "Tymna the Weaver",
+                    "color_identity": ["B", "W"],
+                    "source": "partner_text",
+                }
+            ],
+        }
+        metadata = nonzero_core_metadata({"total_lands": 1})
+        if metadata_model is not None:
+            metadata["commander_identity_model"] = metadata_model
+        return audit.LearnedDeckAudit(
+            commander_name="Kraum, Ludevic's Opus",
+            deck_name="Kraum, Ludevic's Opus + Tymna the Weaver",
+            source_system="pg_meta_decks",
+            source_ref="learned_deck:89",
+            row_id="kraum-tymna-row",
+            card_count_declared=0,
+            metadata=metadata,
+            parsed_cards=[],
+            resolved_cards=[],
+            derived_metadata={
+                "total_lands": 1,
+                "missing_oracle_id_quantity": 0,
+                "missing_oracle_text_quantity": 0,
+                "off_color_candidates": ["Ad Nauseam", "Tymna the Weaver"],
+                "partner_identity_candidates": [
+                    {
+                        "name": "Tymna the Weaver",
+                        "color_identity": ["B", "W"],
+                        "reason": "partner_text",
+                    }
+                ],
+                "off_color_after_partner_inference": [],
+                "commander_identity_model": model,
+                "commander_deck_shape": {
+                    "parsed_quantity": audit.COMMANDER_EXPECTED_QUANTITY,
+                    "commander_quantity": 1,
+                    "review_flags": [],
+                },
+            },
+        )
+
+    def test_compare_metadata_reports_unpersisted_partner_identity_model(self) -> None:
+        learned_deck = self.partner_identity_audit(metadata_model=None)
+
+        audit.compare_metadata(learned_deck)
+
+        self.assertIn(
+            "partner_identity_not_modeled",
+            [issue["code"] for issue in learned_deck.issues],
+        )
+
+    def test_compare_metadata_respects_persisted_partner_identity_model(self) -> None:
+        learned_deck = self.partner_identity_audit(metadata_model=None)
+        model = learned_deck.derived_metadata["commander_identity_model"]
+        learned_deck.metadata["commander_identity_model"] = model
+
+        audit.compare_metadata(learned_deck)
+
+        self.assertNotIn(
+            "partner_identity_not_modeled",
+            [issue["code"] for issue in learned_deck.issues],
+        )
 
     def test_active_metadata_gate_fails_required_invariant_codes(self) -> None:
         payload = {

@@ -1000,6 +1000,15 @@ def issue(
     return result
 
 
+def persisted_commander_identity_model_matches(audit: LearnedDeckAudit) -> bool:
+    derived_model = audit.derived_metadata.get("commander_identity_model")
+    if not isinstance(derived_model, dict):
+        return False
+    if not derived_model.get("requires_first_class_persistence"):
+        return False
+    return audit.metadata.get("commander_identity_model") == derived_model
+
+
 def package_card_presence(
     expected_cards: Iterable[str],
     present_normalized: set[str],
@@ -1116,6 +1125,7 @@ def compare_metadata(audit: LearnedDeckAudit) -> None:
         derived.get("off_color_candidates")
         and derived.get("partner_identity_candidates")
         and len(effective_off_color) < len(derived["off_color_candidates"])
+        and not persisted_commander_identity_model_matches(audit)
     ):
         audit.issues.append(
             issue(

@@ -3866,7 +3866,14 @@ def build_extra_combat_flashback_evidence(draft: DraftRecord, output_dir: Path) 
             {"name": "Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
         ]
         active.refresh_mana_sources(turn=4)
-        battle.apply_effect_immediate(active, [opponent], spell, turn=4, rng=random.Random(8))
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=4,
+            rng=random.Random(8),
+            effect_data_override=spell,
+        )
         hand_resolution_ok = active.extra_combats == 1 and attacker.get("tapped") is False
 
         flashback_card = next((card for card in active.graveyard if card.get("name") == draft.card_name), None)
@@ -3886,7 +3893,14 @@ def build_extra_combat_flashback_evidence(draft: DraftRecord, output_dir: Path) 
         )
         item = stack.resolve_top()
         if item:
-            battle.apply_effect_immediate(active, [opponent], item.card, turn=5, rng=random.Random(9))
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                item.card,
+                turn=5,
+                rng=random.Random(9),
+                effect_data_override={**item.effect_data, **spell},
+            )
         flashback_exiled = any(card.get("name") == draft.card_name and card.get("_flashback_cast") for card in active.exile)
     finally:
         battle.REPLAY_EVENT_HANDLER = previous_event_handler

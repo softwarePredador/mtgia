@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sqlite3
 import sys
 import tempfile
@@ -28,11 +29,17 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             env_file = Path(tmp) / ".env"
             env_file.write_text("DB_HOST=db.example\nDB_NAME=mana\n", encoding="utf-8")
             original_env_file = module.ENV_FILE
+            original_db_host = os.environ.pop("DB_HOST", None)
+            original_db_name = os.environ.pop("DB_NAME", None)
             try:
                 module.ENV_FILE = env_file
                 env = module._base_env()
             finally:
                 module.ENV_FILE = original_env_file
+                if original_db_host is not None:
+                    os.environ["DB_HOST"] = original_db_host
+                if original_db_name is not None:
+                    os.environ["DB_NAME"] = original_db_name
         self.assertEqual(env["DB_HOST"], "db.example")
         self.assertEqual(env["DB_NAME"], "mana")
 

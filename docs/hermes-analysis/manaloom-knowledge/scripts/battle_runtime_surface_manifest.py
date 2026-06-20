@@ -174,6 +174,7 @@ LEARNED_DECK_BASENAMES = {
     "auto_promote_learned_decks.py",
     "auto_sync_learned_decks.py",
     "learned_deck_coherence_audit.py",
+    "plan_learned_deck_partner_identity_backfill.py",
     "test_export_hermes_learned_deck_metadata.py",
     "test_export_hermes_learned_deck_wrapper_parity.py",
     "test_learned_deck_completeness.py",
@@ -181,6 +182,7 @@ LEARNED_DECK_BASENAMES = {
     "auto_promote_learned_decks_test.py",
     "auto_sync_learned_decks_test.py",
     "learned_deck_coherence_audit_test.py",
+    "plan_learned_deck_partner_identity_backfill_test.py",
 }
 
 OPTIMIZER_BASENAMES = {

@@ -288,7 +288,10 @@ def _compute_from_replays(
                 elif evt_type == "game_ended":
                     result = evt.get("result", "")
                     winner = str(evt.get("winner") or evt.get("player") or "")
-                    if result == "win" and _is_deck_player(winner, deck_name):
+                    won_flag = evt.get("won") is True
+                    if result == "win" and (
+                        _is_deck_player(winner, deck_name) or won_flag
+                    ):
                         games[game_id]["won"] = True
         except Exception:
             pass
@@ -389,6 +392,9 @@ def _build_scorecard_summary(stats: dict) -> dict:
     values = list(stats.values())
     baseline_wr = values[0].get("baseline_wr", 0)
     baseline_hash = values[0].get("baseline_hash", "unknown")
+    baseline_hashes = {
+        str(value.get("baseline_hash", "unknown")) for value in values
+    }
     usable_cards = sum(1 for value in values if value.get("sample_quality") == "usable")
     low_sample_cards = sum(1 for value in values if value.get("sample_quality") == "low_sample")
 
@@ -409,6 +415,10 @@ def _build_scorecard_summary(stats: dict) -> dict:
         status = "blocked"
         reason = "Baseline hash is unknown, so replay results are not reproducible."
         blockers.append("unknown_baseline_hash")
+    elif len(baseline_hashes) > 1:
+        status = "blocked"
+        reason = "Mixed baseline hashes found, so replay results are not comparable."
+        blockers.append("mixed_baseline_hashes")
 
     return {
         "schema_version": "commander_safe_card_impact_summary_v1",
@@ -419,6 +429,7 @@ def _build_scorecard_summary(stats: dict) -> dict:
         "low_sample_cards": low_sample_cards,
         "baseline_wr": baseline_wr,
         "baseline_hash": baseline_hash,
+        "baseline_hashes": sorted(baseline_hashes),
         "blockers": blockers,
         "policy": {
             "auto_apply": False,

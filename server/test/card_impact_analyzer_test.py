@@ -118,6 +118,56 @@ class CardImpactAnalyzerTest(unittest.TestCase):
         self.assertEqual(summary["usable_cards"], 2)
         self.assertEqual(summary["blockers"], [])
 
+    def test_replay_scorecard_accepts_game_ended_won_flag_from_generator(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            replay_dir = Path(tmp)
+            self._write_replay(
+                replay_dir / "game_1.jsonl",
+                [
+                    {"event": "spell_cast", "player": "Lorehold", "card": "Sol Ring"},
+                    {"event": "game_ended", "result": "win", "won": True},
+                ],
+            )
+            self._write_replay(
+                replay_dir / "game_2.jsonl",
+                [
+                    {"event": "spell_cast", "player": "Lorehold", "card": "Lightning Greaves"},
+                    {"event": "game_ended", "result": "loss", "won": False},
+                ],
+            )
+
+            stats = card_impact_analyzer._compute_from_replays(
+                str(replay_dir),
+                deck_name="Lorehold",
+                min_seen=1,
+                baseline_hash="baseline-test",
+                min_usable_sample=2,
+            )
+
+        self.assertEqual(stats["Sol Ring"]["baseline_wr"], 50.0)
+        self.assertEqual(stats["Sol Ring"]["seen_wr"], 100.0)
+        self.assertEqual(stats["Lightning Greaves"]["seen_wr"], 0.0)
+
+    def test_scorecard_summary_blocks_mixed_baseline_hashes(self) -> None:
+        stats = {
+            "Sol Ring": {
+                "sample_quality": "usable",
+                "baseline_wr": 66.7,
+                "baseline_hash": "baseline-a",
+            },
+            "Reforge the Soul": {
+                "sample_quality": "usable",
+                "baseline_wr": 66.7,
+                "baseline_hash": "baseline-b",
+            },
+        }
+
+        summary = card_impact_analyzer._build_scorecard_summary(stats)
+
+        self.assertEqual(summary["status"], "blocked")
+        self.assertIn("mixed_baseline_hashes", summary["blockers"])
+        self.assertEqual(summary["baseline_hashes"], ["baseline-a", "baseline-b"])
+
     def _write_replay(self, path: Path, events: list[dict]) -> None:
         path.write_text(
             "\n".join(json.dumps(event, sort_keys=True) for event in events) + "\n",
