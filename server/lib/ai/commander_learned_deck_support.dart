@@ -542,6 +542,9 @@ CommanderLearnedDeckValidationResult validateCommanderLearnedDeckInput(
   );
 }
 
+bool isCompleteCommanderLearnedDeckInput(CommanderLearnedDeckInput input) =>
+    validateCommanderLearnedDeckInput(input).ok;
+
 List<Map<String, dynamic>> buildCommanderLearnedDeckResponseDecklist({
   required CommanderLearnedDeckInput learnedDeck,
   required Map<String, Map<String, dynamic>> metadataByName,
@@ -692,33 +695,37 @@ Future<CommanderLearnedDeckInput?> loadActiveCommanderLearnedDeck({
         WHERE commander_name_normalized = @commander
           AND is_active = TRUE
         ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
-        LIMIT 1
+        LIMIT 10
       '''),
       parameters: {
         'commander': normalizeCommanderReferenceName(commander),
       },
     );
-    if (result.isEmpty) return null;
-    final row = result.first;
-    return CommanderLearnedDeckInput(
-      commanderName: row[0]?.toString() ?? commander,
-      deckName: row[1]?.toString() ?? commander,
-      sourceSystem: row[2]?.toString() ?? 'hermes',
-      sourceRef: row[3]?.toString() ?? 'learned_deck:unknown',
-      sourceUrl: row[4]?.toString(),
-      archetype: row[5]?.toString(),
-      cardList: row[6]?.toString() ?? '',
-      cardCount: _intValue(row[7]),
-      score: _nullableDouble(row[8]),
-      winconPrimary: row[9]?.toString(),
-      winconBackup: row[10]?.toString(),
-      legalStatus: row[11]?.toString(),
-      notes: row[12]?.toString(),
-      metadata: _jsonObject(row[13]),
-      isActive: row[14] == true,
-      promotedAt: _dateTimeValue(row[15]),
-      updatedAt: _dateTimeValue(row[16]),
-    );
+    for (final row in result) {
+      final candidate = CommanderLearnedDeckInput(
+        commanderName: row[0]?.toString() ?? commander,
+        deckName: row[1]?.toString() ?? commander,
+        sourceSystem: row[2]?.toString() ?? 'hermes',
+        sourceRef: row[3]?.toString() ?? 'learned_deck:unknown',
+        sourceUrl: row[4]?.toString(),
+        archetype: row[5]?.toString(),
+        cardList: row[6]?.toString() ?? '',
+        cardCount: _intValue(row[7]),
+        score: _nullableDouble(row[8]),
+        winconPrimary: row[9]?.toString(),
+        winconBackup: row[10]?.toString(),
+        legalStatus: row[11]?.toString(),
+        notes: row[12]?.toString(),
+        metadata: _jsonObject(row[13]),
+        isActive: row[14] == true,
+        promotedAt: _dateTimeValue(row[15]),
+        updatedAt: _dateTimeValue(row[16]),
+      );
+      if (isCompleteCommanderLearnedDeckInput(candidate)) {
+        return candidate;
+      }
+    }
+    return null;
   } catch (error) {
     if (isUndefinedLearnedDeckTableError(error)) return null;
     rethrow;

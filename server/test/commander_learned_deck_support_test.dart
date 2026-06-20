@@ -117,6 +117,25 @@ void main() {
       );
     });
 
+    test('runtime completeness helper rejects partial active learned decks',
+        () {
+      final input = parseCommanderLearnedDeckInput({
+        'source_system': 'edhrec',
+        'source_ref': 'learned_deck:7',
+        'commander_name': 'Korvold, Fae-Cursed King',
+        'deck_name': 'EDHREC Average - Korvold, Fae-Cursed King',
+        'card_list':
+            List.generate(90, (index) => '1 Korvold Card $index').join('\n'),
+        'card_count': 90,
+      });
+
+      expect(isCompleteCommanderLearnedDeckInput(input), isFalse);
+      expect(
+        validateCommanderLearnedDeckInput(input).blockers.join('\n'),
+        contains('deck Commander aprendido precisa ter 100 cartas'),
+      );
+    });
+
     test('computes canonical learned deck role summary from multi-tags', () {
       final summary = computeCommanderLearnedDeckRoleSummary(
         cards: const [
@@ -252,6 +271,9 @@ void main() {
       expect(route, contains("'source': 'pg_commander_learned_decks'"));
       expect(route, contains("'commanders': activeDecks"));
       expect(route, contains('WITH active AS'));
+      expect(route, contains('AND card_count = 100'));
+      expect(
+          route, contains("AND card_list ILIKE '%' || commander_name || '%'"));
       expect(route, isNot(contains('FROM commander_learning_snapshot')));
       expect(route, contains("'recommended_deck': recommendedDeck"));
       expect(route, contains("'source': 'promoted_learned_deck_pg'"));
@@ -430,6 +452,20 @@ void main() {
       expect(route, contains('_roleSummaryFromMetadata(roleMetadata)'));
       expect(route, isNot(contains('_roleSummary(learnedDeck)')));
       expect(route, isNot(contains('_roleSummary(deck)')));
+    });
+
+    test('commander learning snapshot excludes partial active learned decks',
+        () {
+      final support = File(
+        'lib/ai/commander_learning_snapshot_support.dart',
+      ).readAsStringSync();
+
+      expect(support, contains('WHERE is_active = TRUE'));
+      expect(support, contains('AND card_count = 100'));
+      expect(
+        support,
+        contains("AND card_list ILIKE '%' || commander_name || '%'"),
+      );
     });
 
     test(

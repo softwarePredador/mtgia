@@ -12,6 +12,7 @@ import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_reference_helpers.dart';
 import '../../../lib/ai/commander_reference_profile_support.dart';
 import '../../../lib/ai/commander_reference_readiness_support.dart';
+import '../../../lib/ai/commander_learned_deck_support.dart';
 import '../../../lib/ai/deck_learning_event_support.dart';
 import '../../../lib/ai/edhrec_service.dart';
 import '../../../lib/basic_land_utils.dart' as basic_lands;
@@ -535,34 +536,40 @@ Future<Map<String, dynamic>?> _loadPromotedCommanderLearnedDeck({
         WHERE commander_name_normalized = @commander
           AND is_active = TRUE
         ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
-        LIMIT 1
+        LIMIT 10
       '''),
       parameters: {
         'commander': normalizeCommanderReferenceName(commanderName),
       },
     );
     if (result.isEmpty) return null;
-    final row = result.first;
-    return {
-      'id': row[0]?.toString(),
-      'commander_name': row[1]?.toString(),
-      'deck_name': row[2]?.toString(),
-      'source_system': row[3]?.toString(),
-      'source_ref': row[4]?.toString(),
-      'source_url': row[5]?.toString(),
-      'archetype': row[6]?.toString(),
-      'card_list': row[7]?.toString() ?? '',
-      'card_count': intValue(row[8]),
-      'score': _doubleValue(row[9]),
-      'wincon_primary': row[10]?.toString(),
-      'wincon_backup': row[11]?.toString(),
-      'legal_status': row[12]?.toString(),
-      'notes': row[13]?.toString(),
-      'metadata': jsonObject(row[14]),
-      'is_active': row[15] == true,
-      'promoted_at': row[16]?.toString(),
-      'updated_at': row[17]?.toString(),
-    };
+    for (final row in result) {
+      final learnedDeck = {
+        'id': row[0]?.toString(),
+        'commander_name': row[1]?.toString(),
+        'deck_name': row[2]?.toString(),
+        'source_system': row[3]?.toString(),
+        'source_ref': row[4]?.toString(),
+        'source_url': row[5]?.toString(),
+        'archetype': row[6]?.toString(),
+        'card_list': row[7]?.toString() ?? '',
+        'card_count': intValue(row[8]),
+        'score': _doubleValue(row[9]),
+        'wincon_primary': row[10]?.toString(),
+        'wincon_backup': row[11]?.toString(),
+        'legal_status': row[12]?.toString(),
+        'notes': row[13]?.toString(),
+        'metadata': jsonObject(row[14]),
+        'is_active': row[15] == true,
+        'promoted_at': row[16]?.toString(),
+        'updated_at': row[17]?.toString(),
+      };
+      final input = parseCommanderLearnedDeckInput(learnedDeck);
+      if (isCompleteCommanderLearnedDeckInput(input)) {
+        return learnedDeck;
+      }
+    }
+    return null;
   } catch (error) {
     if (isUndefinedLearnedDeckTableError(error)) return null;
     rethrow;

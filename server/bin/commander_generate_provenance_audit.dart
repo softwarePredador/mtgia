@@ -490,35 +490,39 @@ Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck(
       WHERE LOWER(commander_name) = LOWER(@commander)
         AND is_active = TRUE
       ORDER BY score DESC NULLS LAST, promoted_at DESC NULLS LAST, updated_at DESC
-      LIMIT 1
+      LIMIT 10
     '''),
     parameters: {'commander': commander},
   );
-  if (result.isEmpty) return null;
-  final row = result.first;
-  return CommanderLearnedDeckInput(
-    commanderName: row[0]?.toString() ?? commander,
-    deckName: row[1]?.toString() ?? commander,
-    sourceSystem: row[2]?.toString() ?? 'unknown',
-    sourceRef: row[3]?.toString() ?? 'unknown',
-    sourceUrl: row[4]?.toString(),
-    archetype: row[5]?.toString(),
-    cardList: row[6]?.toString() ?? '',
-    cardCount: int.tryParse(row[7]?.toString() ?? '') ?? 0,
-    score: double.tryParse(row[8]?.toString() ?? ''),
-    winconPrimary: row[9]?.toString(),
-    winconBackup: row[10]?.toString(),
-    legalStatus: row[11]?.toString(),
-    notes: row[12]?.toString(),
-    metadata: row[13] is Map<String, dynamic>
-        ? Map<String, dynamic>.from(row[13] as Map<String, dynamic>)
-        : row[13] is Map
-            ? (row[13] as Map).cast<String, dynamic>()
-            : const <String, dynamic>{},
-    isActive: row[14] == true,
-    promotedAt: row[15] is DateTime ? row[15] as DateTime : null,
-    updatedAt: row[16] is DateTime ? row[16] as DateTime : null,
-  );
+  for (final row in result) {
+    final candidate = CommanderLearnedDeckInput(
+      commanderName: row[0]?.toString() ?? commander,
+      deckName: row[1]?.toString() ?? commander,
+      sourceSystem: row[2]?.toString() ?? 'unknown',
+      sourceRef: row[3]?.toString() ?? 'unknown',
+      sourceUrl: row[4]?.toString(),
+      archetype: row[5]?.toString(),
+      cardList: row[6]?.toString() ?? '',
+      cardCount: int.tryParse(row[7]?.toString() ?? '') ?? 0,
+      score: double.tryParse(row[8]?.toString() ?? ''),
+      winconPrimary: row[9]?.toString(),
+      winconBackup: row[10]?.toString(),
+      legalStatus: row[11]?.toString(),
+      notes: row[12]?.toString(),
+      metadata: row[13] is Map<String, dynamic>
+          ? Map<String, dynamic>.from(row[13] as Map<String, dynamic>)
+          : row[13] is Map
+              ? (row[13] as Map).cast<String, dynamic>()
+              : const <String, dynamic>{},
+      isActive: row[14] == true,
+      promotedAt: row[15] is DateTime ? row[15] as DateTime : null,
+      updatedAt: row[16] is DateTime ? row[16] as DateTime : null,
+    );
+    if (isCompleteCommanderLearnedDeckInput(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
 }
 
 Future<Map<String, dynamic>?> _loadLearningSnapshot(

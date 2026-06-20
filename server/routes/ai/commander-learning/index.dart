@@ -104,15 +104,21 @@ Future<CommanderLearnedDeckInput?> _loadActiveLearnedDeck({
         WHERE commander_name_normalized = @commander
           AND is_active = TRUE
         ORDER BY promoted_at DESC NULLS LAST, updated_at DESC
-        LIMIT 1
+        LIMIT 10
       '''),
       parameters: {
         'commander': normalizeCommanderReferenceName(commanderName),
       },
     );
     if (result.isEmpty) return null;
-    final row = result.first;
-    return _learnedDeckFromRow(row, fallbackCommanderName: commanderName);
+    for (final row in result) {
+      final candidate =
+          _learnedDeckFromRow(row, fallbackCommanderName: commanderName);
+      if (isCompleteCommanderLearnedDeckInput(candidate)) {
+        return candidate;
+      }
+    }
+    return null;
   } catch (error) {
     if (isUndefinedLearnedDeckTableError(error)) return null;
     rethrow;
@@ -140,6 +146,8 @@ Future<List<Map<String, dynamic>>> _loadActiveLearnedDeckSummaries(
           updated_at
         FROM commander_learned_decks
         WHERE is_active = TRUE
+          AND card_count = 100
+          AND card_list ILIKE '%' || commander_name || '%'
       ),
       aggregate AS (
         SELECT

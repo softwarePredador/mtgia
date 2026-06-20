@@ -26,6 +26,8 @@ WITH active_learned_decks AS (
       AS active_learned_decks
   FROM commander_learned_decks
   WHERE is_active = TRUE
+    AND card_count = 100
+    AND card_list ILIKE '%' || commander_name || '%'
   GROUP BY commander_name_normalized
 ),
 bridge_names AS (
