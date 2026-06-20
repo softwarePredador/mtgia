@@ -36,9 +36,158 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-20 19:00 UTC
-> Rotacao: `duplicated-or-similar-logic`
+> Atualizacao local Codex: 2026-06-20 23:00 UTC
+> Rotacao: `module-coherence-server-lib-routes-app-lib`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib` - revalidacao 2026-06-20 23:00 UTC
+
+Escopo desta rodada: somente coerencia de contratos, payloads, ownership,
+middleware e consumo entre `server/lib`, `server/routes` e `app/lib`. Nao foi
+feita auditoria ampla de classes sem uso, funcoes sem chamador, imports/ciclos,
+tabelas PostgreSQL sem uso ou duplicacao fora do necessario para validar este
+foco.
+
+### Setup executado
+
+- `pwd` e `git rev-parse --show-toplevel` confirmaram o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida antes da auditoria manual.
+- `git rev-parse --short HEAD`: `7857d7ef`.
+- Delta desde a ultima rodada deste foco (`02b822c6..HEAD`) no recorte
+  `app/lib`, `server/lib`, `server/routes` e
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`: nenhum arquivo de produto ou
+  contrato API mudou; o delta ficou restrito a `docs/hermes-analysis`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, secoes relevantes de
+`server/manual-de-instrucao.md` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+A skill local `manaloom-data-semantic-layer` tambem foi carregada; a regra
+relevante aqui e tratar PostgreSQL/backend como fonte de verdade de produto e
+Hermes como laboratorio/auditor/cache.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib` nem entende contrato app-facing, middleware ou ownership.
+- O script e textual/regex. Ele voltou a duplicar historico manual porque seu
+  marcador apareceu citado em texto preservado; a mutacao mecanica foi
+  restaurada para o estado de `HEAD`, mantendo somente os numeros acima como
+  evidencia da execucao.
+
+### Metodo manual focado
+
+- Comparei `02b822c6..HEAD` apenas no recorte desta rotacao:
+  `app/lib`, `server/lib`, `server/routes`,
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` e os docs Hermes permitidos.
+- Revalidei por `rg`/`nl -ba` os caminhos app/backend ja apontados na ultima
+  rodada de coerencia: `swap_integrity`, `deck_signature`,
+  `applyOptimizationWithIds`, activation telemetry, `/ai/commander-learning`,
+  ownership de optimize e jobs async.
+- Rodei validacoes backend focadas. Testes app-side nao foram executados porque
+  `app/.dart_tool/package_config.json` esta ausente no checkout local.
+
+### Achados revalidados
+
+#### Status preservado - nao houve novo delta de produto no recorte app/server
+
+- **Evidencia de delta:** `git diff --name-status 02b822c6..HEAD -- app/lib server/lib server/routes server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/hermes-analysis/STRUCTURE_AUDIT.md docs/hermes-analysis/PLANO_CORRECAO.md docs/hermes-analysis/TECHNICAL_MAP.md`
+  retornou somente `STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md` e
+  `TECHNICAL_MAP.md`.
+- **Por que importa:** sem alteracao em `app/lib`, `server/lib`,
+  `server/routes` ou no API contract map desde a ultima rodada de coerencia, nao
+  ha base para abrir novo achado runtime neste foco sem evidencia nova.
+- **O que falsifica:** um proximo delta em produto/contrato no recorte acima, ou
+  teste/analyzer apontando quebra nova entre app, rota e helper.
+
+#### P2 - Campo app-facing `swap_integrity` segue sem contrato documentado
+
+- **Backend emite o payload:** `server/routes/ai/optimize/index.dart:723`-`:733`
+  anexa `swap_integrity` via `buildSwapIntegrityForResponse` quando a resposta
+  ainda nao contem esse bloco.
+- **Shape backend:** `server/lib/ai/optimize_swap_integrity.dart:38`-`:45`
+  serializa `version`, `algo`, `hash`, `deck_signature`, `removal_count` e
+  `addition_count`.
+- **Consumo app atual:** `app/lib/features/decks/widgets/deck_optimize_flow_support.dart:341`-`:345`
+  parseia `swap_integrity`; `:398`-`:424` modela o payload; `:486`-`:517`
+  recalcula o hash esperado e rejeita versao/algoritmo/campos/contagens/hash
+  invalidos.
+- **Protecao app contra deck stale:**
+  `app/lib/features/decks/providers/deck_provider.dart:918`-`:935` aceita
+  `expectedDeckSignature` no apply por IDs, recalcula a assinatura atual e
+  bloqueia a mutacao quando o deck mudou.
+- **Formato da assinatura no app:**
+  `app/lib/features/decks/providers/deck_provider_support_mutation.dart:392`-`:403`
+  monta a lista ordenada `cardId:quantity`, o mesmo contrato documentado na
+  rodada anterior para o backend.
+- **Contrato app-facing ausente:**
+  `rg -n "swap_integrity|deck_signature" server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  nao retornou ocorrencias; a linha de `POST /ai/optimize` em
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md:165` lista muitos campos de sucesso
+  e diagnostico, mas nao esse bloco consumido pelo app.
+- **Por que e incoerente:** a protecao deixou de ser apenas diagnostico
+  interno; o app usa o campo para bloquear apply stale antes de mutar
+  `deck_cards`. O runtime esta coerente, mas o contrato app-facing segue
+  incompleto para clientes, agentes e guard tests.
+- **O que valida:** atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md` para
+  listar `swap_integrity` como campo opcional/aditivo de `POST /ai/optimize`,
+  incluindo o shape e a regra de que clientes antigos podem ignorar o bloco.
+- **O que falsifica:** decisao explicita e testada de remover o consumo app do
+  payload ou tratar o campo como apenas interno, sem dependencia no fluxo de
+  apply por IDs.
+
+#### Status preservado - gaps de 2026-06-18 continuam fechados
+
+- `POST /ai/optimize` e jobs async continuam owner-scoped:
+  `server/lib/ai/optimize_request_support.dart:53` expoe o loader atual,
+  `server/routes/ai/optimize/index.dart:523` chama o loader, e
+  `server/routes/ai/optimize/jobs/[id].dart:39` rejeita job sem owner ou de
+  outro usuario com `job.userId.isEmpty || job.userId != userId`.
+- Activation telemetry continua alinhada: o app emite `deck_rebuild_created` em
+  `app/lib/features/decks/providers/deck_provider.dart:606`, a rota aceita em
+  `server/routes/users/me/activation-events/index.dart:17`, e
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md:61` documenta o evento.
+- Learned decks continuam com rota product explicitamente auth-only:
+  `app/lib/features/decks/providers/deck_provider.dart:788` e `:805` chamam
+  `/ai/commander-learning`; `server/routes/ai/_middleware.dart:17`-`:30`
+  separa `authOnlyHandler` de `costlyAiHandler` e encaminha esse path para
+  auth-only; `server/doc/API_CONTRACTS_AND_DATA_MAP.md:290` documenta o
+  endpoint e `commander_learned_decks`.
+
+### Validacao executada
+
+- `cd server && dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_quality_gate.dart lib/edh_bracket_policy.dart lib/ai/optimize_swap_integrity.dart routes/ai/optimize/index.dart`:
+  `No issues found!`.
+- `cd server && dart test test/optimize_route_payload_support_test.dart test/optimize_route_response_support_test.dart test/optimization_quality_gate_test.dart test/edh_bracket_policy_test.dart --reporter compact`:
+  `All tests passed!`.
+- `cd server && dart test test/activation_events_contract_test.dart test/ai_generate_learning_boundary_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`:
+  `All tests passed!`.
+- `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`:
+  `All tests passed!`.
+- `test -f app/.dart_tool/package_config.json`: `APP_PACKAGE_CONFIG_MISSING`;
+  por isso nao rodei `flutter test --no-pub` para
+  `deck_optimize_flow_support_test.dart`/`deck_provider_test.dart`.
 
 ## Rodada focada: Duplicated or similar logic - revalidacao 2026-06-20 19:00 UTC
 

@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 19:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 23:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -175,12 +175,14 @@ mtgia/
   os blocos de seleção de candidatos, fallback/recovery estrutural e
   orquestração remanescente da rota.
 - **P1/P2 — Coerencia app-facing de IA/deck revalidada no checkout local**:
-  status 2026-06-19 23:00 UTC no checkout `19f589e7`. Ownership em
-  `POST /ai/optimize`, `/ai/archetypes`, jobs async, activation telemetry e
-  `/ai/commander-learning` permanecem saneados. O runtime de `swap_integrity`
-  esta coerente entre backend e app: a rota de optimize emite o payload e o app
-  valida hash/`deck_signature` antes de aplicar swaps por ID. Residual P2:
-  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` ainda nao documenta
+  status 2026-06-20 23:00 UTC no checkout `7857d7ef`. Nao houve delta de
+  produto/contrato em `app/lib`, `server/lib`, `server/routes` ou
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` desde a ultima rodada deste foco.
+  Ownership em `POST /ai/optimize`, `/ai/archetypes`, jobs async, activation
+  telemetry e `/ai/commander-learning` permanecem saneados. O runtime de
+  `swap_integrity` esta coerente entre backend e app: a rota de optimize emite o
+  payload e o app valida hash/`deck_signature` antes de aplicar swaps por ID.
+  Residual P2: `server/doc/API_CONTRACTS_AND_DATA_MAP.md` ainda nao documenta
   `swap_integrity`/`deck_signature` como campo opcional/aditivo de
   `/ai/optimize`. Testes/analyze backend focados verdes; testes app focados
   seguem bloqueados localmente sem `app/.dart_tool/package_config.json`.
