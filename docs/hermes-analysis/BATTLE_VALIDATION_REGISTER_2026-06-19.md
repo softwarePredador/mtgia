@@ -15,6 +15,69 @@ Regra operacional: toda falha deve ter evidencia concreta antes de virar
 implementacao. Nao aplicar swaps, nao alterar PostgreSQL e nao tratar WR ou
 replay aprovado como prova absoluta sem auditoria.
 
+## Checkpoint Auditor Central - PG-008 Machine God's Effigy - 2026-06-20T15:16Z
+
+Estado atual verificado:
+
+- Latest battle vivo:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_151437/summary.json`.
+- Resultado: `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `test_results_total=16`, `test_results_status_counts={"pass":16}`.
+- Runtime counts: `execution_status_counts={"auto":1704,"review_only":1457}`.
+
+Tratativa fechada:
+
+- O latest anterior
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_150241/summary.json`
+  entrou em `review_required` por `forensic_audit=review_required`.
+- O blocker era `Machine God's Effigy`, seed `63211509`, turno `10`, evento
+  `spell_cast`, efeito `ramp_permanent`, fonte `functional_tags_json`; o auditor
+  recomendou mover a carta para `card_battle_rules` com status
+  `verified/active`.
+- PostgreSQL precheck PG-008 confirmou: carta alvo `1`, regra alvo existente
+  `0`, qualquer regra para a carta `0`, snapshot antes `battle_rules=[]`,
+  `battle_rule_count=0`, `function_tags={ramp}`.
+- PG-008 aplicado: `INSERT 0 1`, `COMMIT`.
+- Postcheck PG-008: `pg008_target_rule_count=1`; snapshot passou a expor a
+  regra em `battle_rules`; backup rows `0`.
+- Sync PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_1210_post_pg008.json`
+  com `pg_rows_loaded=5190`, `sqlite_inserted_or_updated=5108`,
+  `canonical_snapshot_rows_exported=3161`.
+- Backup SQLite:
+  `docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-pg008-runtime-sync.20260620_1210.bak`.
+
+Conclusao operacional: PG-008 fecha o blocker de lineage do latest `150241`.
+Nao houve deck swap, commit, push ou deploy de codigo nesta tratativa.
+
+## Checkpoint Auditor Central - publication batch validation - 2026-06-20T15:54Z
+
+Estado atual verificado:
+
+- Latest battle vivo:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_155445/summary.json`.
+- Invocation kind: `manual_publication_batch_validation`.
+- Resultado: `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `test_results_total=16`, `test_results_status_counts={"pass":16}`.
+- Runtime counts: `execution_status_counts={"auto":1704,"review_only":1457}`.
+
+Validacoes relacionadas:
+
+- Fresh battle audit executado com `--seeds 16` e exit `0`.
+- `test_battle_runtime_surface_manifest.py`: `PASS`.
+- PG-008 postcheck read-only manteve `pg008_target_rule_count=1`.
+- Migracoes seguem `29/29` executadas e `0` pendentes.
+
+Conclusao operacional: battle segue confiavel para strategy learning depois da
+validacao de lotes de publicacao. Nao houve novo PostgreSQL write, deck swap,
+commit, push ou deploy de codigo neste checkpoint.
+
 ## Artefato base desta rodada
 
 - Run manual: `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/manual-battle-simulation/20260619_135854/`
@@ -6130,15 +6193,13 @@ isolado limpo para declarar battle pronto.
 | ID | Severidade | Area | Evidencia | Risco | Avaliar / ajustar | Criterio de fechamento |
 | --- | --- | --- | --- | --- | --- | --- |
 | `BV-082` | P2 | Learned-deck source lineage / coherence | Latest `20260620_040120` publica `12` learned opponents, `48` aparicoes e `opponent_deck_provenance.source_url_missing_count=0`, mas `construction_report_missing_count=48` e `deck_coherence_report_missing_count=48` continuam sob shape waiver. O report read-only mais novo `learned_deck_coherence_audit_20260620_034458` mostra `60` learned decks ativos com `high=167` e `medium=22`; o cruzamento atual por `summary.source_url` contra `row_id`/`source_url` do coherence achou `0/12` matches, e por `source_ref` achou `5/12` matches, todos por colisao de namespace entre artifacts (`104` Kinnan vs Ral, `105` Etali vs Aang, `116` Tayam vs K-9, `83` Kraum vs Ob Nixilis, `84` Kinnan vs Sisay). | Consumidores podem juntar reports por `source_ref` errado ou ler status final do battle como se tambem validasse coerencia do corpus learned usado como oponente. | Chat "Ajustar battle": namespacear explicitamente `source_ref` local Hermes versus `commander_learned_decks.source_ref`; publicar uma chave estavel comum nos dois artifacts (`source_url`/PG UUID/backend id) e um status agregado de source-coherence por learned opponent usado no battle, separado do status de engine. | Os `12` learned opponents do latest casam 1:1 com um report de coherence por chave estavel, sem colisao por `source_ref`; cada `deck_provenance.json` por seed inclui a mesma chave estavel; o summary mostra `source_coherence_status`/waiver por opponent e a gate matrix declara explicitamente se isso entra ou nao no final status. |
-| `BV-083` | P2 | `summary.json` action-event denominators | Latest `20260620_040120`: `summary.action_event_types_total=532` e `summary.action_event_type_class_counts={"action_audited":327,"forensic_card_event":2,"ignored_with_reason":35,"renderer_only":22,"strategy_signal":73,"technical":73}` sao somas dos tipos unicos por seed. O mesmo run publica `event_contract_static_observed_event_types_total=55`; o wrapper ainda soma tipos por seed no agregado, enquanto o auditor estatico publica o denominador global. | Consumidor pode interpretar `action_event_types_total=532` como quantidade global de tipos distintos e inflar a cobertura/event-surface do replay. | Chat "Ajustar battle": renomear os campos para `action_event_types_seed_sum`/`action_event_type_class_seed_sum` ou publicar tambem `action_event_types_distinct_total` e `action_event_type_class_distinct_counts`; atualizar `summary.md` para deixar explicito quando a metrica e soma por seed versus denominador global. | `summary.json` e `summary.md` distinguem soma por seed de tipos globais distintos, e fixture testa um run multi-seed em que o mesmo evento aparece em mais de uma seed sem inflar o campo global. |
 | `BV-085` | P2 | Decision trace field-contract waivers / learning grade | Latest `20260620_040120`: `decision_trace_taxonomy.json` passa com `contract_findings=0`, mas `179` decisoes observadas estao em tipos `accepted_field_contract_waiver` com `strategy_auditor=generic_strategy_fields_only` e `research_category=null`: `lorehold_upkeep_rummage=109`, `saga_chapter_resolution=2`, `utility_artifact_activation=50` e `utility_land_activation=18`. Recomputacao dos `16` `seed_*/replay.decision_trace.jsonl` mostrou `parent_link_rows=0` e `rows_missing_parent_link=179`; o `summary.json` lista apenas `decision_trace_accepted_waivers`, sem contador observado nem `learning_grade` por tipo. | Consumidor pode ler `decision_trace_taxonomy_ready` como se todas as `2326` decisoes fossem strategy-audited, quando `179` linhas sao apenas field-contract/generic. Para `lorehold_upkeep_rummage`, a waiver fala que a qualidade estrategica fica coberta por escolhas de engine pai, mas o trace nao publica link explicito para essa decisao pai. | Chat "Ajustar battle": publicar no `summary.json`/taxonomy contadores de `accepted_field_contract_waiver_observed_rows` por tipo e um `decision_learning_grade` (`strategy_audited`, `research_specific`, `field_contract_only`, `not_observed`); quando uma waiver depender de "parent engine choices", emitir `parent_decision_id`/`source_decision_id` ou rebaixar para non-learning/needs-review. | O latest mostra contadores de waiver observada por tipo e separa explicitamente linhas field-contract-only das linhas strategy/research-specific; `lorehold_upkeep_rummage` tem link de decisao pai ou waiver revisada que nao dependa de parent implicito; fixture cobre waiver observada sem branch estrategico dedicada. |
 | `BV-086` | P2 | Forensic / `functional_tags_json` regression coverage | Run `20260620_014808` expos `Machine God's Effigy` via `functional_tags_json`; o run `20260620_033246` reativou a mesma classe em `seed=63210333`, turno `10`, com `Breena, the Demagogue` como `spell_cast`/`spell_resolved`, `effect=draw_cards`, `rule_source=functional_tags_json`, `rule_review_status=heuristic`, sem `card_id`/`semantic_hash` aceitos e com `forensic_audit=blocked`. O latest `20260620_040120` esta `trusted_for_strategy_learning`, `forensic_rule_findings=0` e `forensic_lineage_status=complete`, mas isso nao publica contador zero da classe nem cobre os cards recorrentes com regra/waiver dedicada. | A classe ja reapareceu com cards diferentes; um run limpo sem ocorrencia nao prova regressao fechada nem fornece observabilidade do fallback. | Chat "Ajustar battle": publicar `functional_tags_json_event_count`/cards no summary e promover cada card recorrente (`Machine God's Effigy`, `Breena, the Demagogue`) para regra battle verified/active com identidade e `rule_logical_key`, ou adicionar waiver runtime explicito e testado quando a aproximacao for intencional. | Novo run 16-seed mostra `battle_replay_final_status=trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`, nenhum evento `functional_tags_json` learning/action-audited sem regra/waiver, summary publica contador da classe mesmo quando zero, e fixtures cobrem os cards recorrentes ou os rebaixam explicitamente para non-learning. |
 | `BV-087` | P2 | Unknown template backlog / effect-unknown contract | Latest `20260620_040120`: `summary.effect_coverage_unknowns=0`, mas `effect_coverage_effect_totals_unknown=41`, `effect_coverage_unknown_effect_cards` tem `34` cards, `focused_template_ready_unknown_effect_count=28`, `needs_review_unknown_effect_count=5` e `unknown_template_backlog.json` publica `status=focused_template_backlog_ready`, `items=[]`, `source_unknown_cards=0`, `effect_unknown_cards=34`, `without_plan_or_waiver=0` e `without_focused_template_match=0`. O script `battle_unknown_template_backlog_audit.py` monta `items` apenas de `coverage.get("unknown_cards")`, enquanto apenas conta `unknown_effect_cards`; o teste `test_backlog_separates_source_unknown_from_effect_unknown_denominator` valida essa separacao, mas nao exige contrato por carta para os `34` effect-unknown. | Consumidor pode ler `unknown_template_backlog_status=focused_template_backlog_ready` ou `unknown_template_backlog_cards=0` como se o denominador de `effect=unknown` estivesse todo planejado/waived, quando o contrato por carta esta vazio para esse denominador. Isto nao e prova de erro de replay e nao cria mandatory-gate divergence sozinho; e uma lacuna de contrato/observabilidade entre source-unknown e effect-unknown. | Chat "Ajustar battle": renomear o status atual para `source_unknown_template_backlog_status` ou publicar campos separados para `effect_unknown_template_contract_status`; gerar `items`/contadores por carta para `unknown_effect_cards`, distinguindo `focused_template_ready`, `needs_review` e `waived_curated_unknown_effect`; ajustar `summary.md` para nao apresentar backlog ready como cobertura de todo `effect=unknown`. | O latest separa explicitamente source-unknown backlog de effect-unknown contract; `unknown_template_backlog.md/json` mostram contrato por carta ou waiver para os `34` effect-unknown atuais, incluindo os `5` needs-review, e teste falha se `effect_unknown_cards>0` mas o contrato por efeito ficar vazio sem explicitar o escopo. |
 | `BV-088` | P1 | Forensic final gate / lineage incompleta | Latest `20260620_040120` esta `trusted_for_strategy_learning` com `forensic_lineage_status=complete`, mas a falha latente do gate permanece sem fixture: no wrapper, `mandatory_gate_statuses.forensic_audit.status` ainda depende de `forensic_rule_findings`/`forensic_turn_findings` e blockers high/critical; o teste `test_forensic_keeps_unaccepted_lineage_missing_visible` prova que um evento com lineage faltante nao aceita pode ter `findings == []` enquanto os tres contadores unaccepted ficam `1`. O run `20260620_033246` mostrou a classe operacional com lineage incompleta, embora ja bloqueada por finding high. | Um run futuro pode ficar com lineage unaccepted visivel e `forensic_rule_findings=0`, fazendo o `forensic_audit` passar e liberando `trusted_for_strategy_learning`/elegibilidade global sem lineage confiavel. | Chat "Ajustar battle": incluir `forensic_*_missing_unaccepted` ou `forensic_lineage_status=incomplete` diretamente na condicao de review do `mandatory_gate_statuses.forensic_audit`; calcular/publicar essa condicao antes de `compute_global_learning_eligibility`; adicionar fixture do wrapper em que `forensic_rule_findings=0` mas missing unaccepted > 0 resulte em `battle_replay_final_status=review_required`. | Teste do wrapper cobre lineage unaccepted sem findings; novo run mostra `forensic_audit.status=review_required` sempre que qualquer `forensic_*_missing_unaccepted>0`, ou `pass` somente quando `forensic_lineage_status=complete`; `global_learning_eligibility_reasons` inclui o motivo de lineage quando aplicavel. |
 
 Estado atual do quadro aberto: `BV-082` permanece aberto contra a linhagem
-cross-artifact dos oponentes learned-deck, `BV-083` permanece aberto contra a
-nomenclatura/denominador de action-event no `summary.json`, `BV-085` permanece
+cross-artifact dos oponentes learned-deck, `BV-085` permanece
 aberto contra a falta de grade/contador explicito para decisoes
 `accepted_field_contract_waiver` observadas, `BV-086` permanece aberto contra a
 cobertura/observabilidade do fallback heuristico `functional_tags_json`,
@@ -6151,6 +6212,148 @@ O latest atual `20260620_040120` esta `trusted_for_strategy_learning`, com
 `BV-084`, mas nao fecha automaticamente as pendencias de governanca/contrato
 que ainda exigem campos, fixtures ou chaves estaveis dedicadas. `BV-081` e
 `BV-089` permanecem removidos do quadro aberto.
+
+Atualizacao Auditor Central - latest `20260620_090636`:
+
+- Esta atualizacao prevalece sobre as leituras de estado corrente ainda
+  escritas como `latest 20260620_040120` no quadro aberto acima.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`
+  agora aponta para `20260620_090636`.
+- `summary.json`: `battle_replay_final_status=review_required`,
+  `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`,
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`,
+  `forensic_rule_findings=1`, `forensic_turn_findings=0`,
+  `forensic_lineage_status=incomplete`,
+  `forensic_card_id_missing_unaccepted=1`,
+  `forensic_semantic_hash_missing_unaccepted=1`,
+  `forensic_rule_logical_key_missing_unaccepted=1`,
+  `strategy_low_confidence_findings=3`,
+  `strategy_review_required_findings=0`,
+  `global_learning_eligible_seeds=[]`, `test_results_total=16` e
+  `test_results_status_counts={"pass":16}`.
+- O finding atual reforca `BV-086`: seed `63210916`, turno `12`,
+  `Leyline of Abundance`, `spell_cast`, `effect=ramp_permanent`,
+  `rule_source=functional_tags_json`, severity `medium`,
+  recomendacao do forensic: mover a carta para `card_battle_rules` com status
+  `verified/active` ou fornecer waiver runtime explicito e testado.
+- O mesmo run reforca `BV-088`: a lineage incompleta aparece junto de finding
+  forensic; ainda falta fixture para o caso sem findings mas com
+  `forensic_*_missing_unaccepted>0`.
+- `BV-083` esta fechado pelo run `090636`: o summary distingue
+  `action_event_types_seed_sum=561` de
+  `action_event_types_distinct_total=55` e o `summary.md` renderiza os dois
+  denominadores.
+
+## Passo de auditoria - runtime surface manifest latest 040120 recheck 2026-06-20T06:07-03:00
+
+Fonte atual:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/runtime_surface_manifest.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/runtime_surface_manifest.md`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/test_results.jsonl`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py`
+- `docs/hermes-analysis/BATTLE_REPLAY_GATE_MATRIX.md`
+
+Recheck:
+
+- `latest` aponta para
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120`.
+- O `runtime_surface_manifest.md` foi gerado em
+  `2026-06-20T04:04:05Z`.
+- `summary.json` publica `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `runtime_surface_manifest_total_files=108`,
+  `runtime_surface_manifest_unclassified_files=[]`,
+  `runtime_surface_manifest_automation_coverage_counts={"covered_by_recurring_run":29,"imported_by_core_runtime":6,"outside_recurring_run":73}`,
+  `runtime_surface_manifest_gate_expected_counts={"core_runtime_import_regression":6,"recurring_audit_required":29,"targeted_manual_gate_required_before_change":31,"targeted_test_required_before_change":42}` e
+  `runtime_surface_manifest_category_counts={"core runtime":31,"focused evidence/promotion":4,"learned-deck source":14,"optimizer/scorecard":15,"recurring audit gate":24,"renderer":4,"review queue":1,"rule registry/sync":15}`.
+- O `runtime_surface_manifest.json.summary` bate com esses denominadores:
+  `total_files=108`, `unclassified_files=[]`,
+  `automation_coverage_counts={"covered_by_recurring_run":29,"imported_by_core_runtime":6,"outside_recurring_run":73}` e
+  `gate_expected_counts={"core_runtime_import_regression":6,"recurring_audit_required":29,"targeted_manual_gate_required_before_change":31,"targeted_test_required_before_change":42}`.
+- Dentro dos `73` arquivos `outside_recurring_run`, a distribuicao atual e:
+  `23` `core runtime`, `4` `focused evidence/promotion`, `14`
+  `learned-deck source`, `15` `optimizer/scorecard`, `2` `renderer`,
+  `1` `review queue` e `14` `rule registry/sync`.
+- Esses `73` arquivos se dividem em `31`
+  `targeted_manual_gate_required_before_change` e `42`
+  `targeted_test_required_before_change`.
+- `test_results.jsonl` do run `040120` registra
+  `test_battle_runtime_surface_manifest` com `status=pass`, finalizado em
+  `2026-06-20T04:01:29Z`; o stdout contem
+  `PASS test_manifest_classifies_current_battle_surface`.
+- O teste fixa `EXPECTED_TOTAL_FILES=108`, `EXPECTED_CATEGORY_COUNTS`,
+  `EXPECTED_AUTOMATION_COVERAGE_COUNTS`,
+  `EXPECTED_GATE_EXPECTED_COUNTS` e `REQUIRED_HIGH_SIGNAL_PATHS`.
+
+Leitura: nenhum novo BV aberto nesta fatia. O manifest atual esta coerente com
+o `summary.json`, com o teste de denominador e com a gate matrix. A restricao
+operacional segue valida: `battle_replay_final_status=trusted_for_strategy_learning`
+do run `040120` cobre a recorrencia e seus imports declarados, mas nao deve ser
+usado como evidencia unica para mudancas nos `73` arquivos
+`outside_recurring_run`; nesses casos, o chat "Ajustar battle" precisa rodar o
+gate alvo indicado pelo proprio manifest antes de declarar readiness.
+
+## Passo de auditoria - BV-082 learned opponent coherence 040120/034458 recheck 2026-06-20T06:13-03:00
+
+Fonte atual:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/seed_*/deck_provenance.json`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.md`
+- `docs/hermes-analysis/BATTLE_REPLAY_GATE_MATRIX.md`
+
+Recheck:
+
+- `summary.json` atual publica `learned_deck_source_lookup_status=loaded`,
+  `learned_deck_source_lookup_rows=120`,
+  `opponent_deck_provenance.status=learned_opponent_provenance_present_with_shape_waiver`,
+  `learned_opponent_appearance_count=48`,
+  `learned_opponent_unique_count=12`,
+  `source_counts={"pg_meta_decks":48}`,
+  `source_url_missing_count=0`,
+  `construction_report_missing_count=48` e
+  `deck_coherence_report_missing_count=48`.
+- Os `12` registros de `summary.learned_deck_opponents[]` tem
+  `source_url_status=present`, `source_system=pg_meta_decks`,
+  `source_card_count=100`, `battle_card_count=99`,
+  `construction_report_present=false`,
+  `deck_coherence_report_present=false` e
+  `waiver_reason=learned_deck_construction_and_coherence_reports_not_emitted_by_battle_replay_deck_provenance`.
+- Scan dos `16` `seed_*/deck_provenance.json` do run `040120` encontrou `48`
+  registros learned (`source_kind=learned_decks` ou
+  `source_system=pg_meta_decks`), todos com `source_url_missing=48`,
+  `construction_report_missing=48` e `deck_coherence_report_missing=48`.
+  Exemplo atual: `Kinnan, Bonder Prodigy #84 (real)` tem
+  `source_ref=learned_deck:84`, `source_system=pg_meta_decks`,
+  `source_card_count=100`, `battle_card_count=99`, mas nao traz
+  `source_url` no artifact por seed.
+- O coherence report `034458` foi gerado em
+  `2026-06-20T03:44:55.241649+00:00`, checou `60` learned decks ativos e
+  reporta `High issues=167`, `Medium issues=22`; para `pg_meta_decks`, sao
+  `52` ativos, `154` high e `19` medium.
+- Cruzamento dos `12` oponentes do battle summary contra
+  `learned_deck_coherence_audit_20260620_034458.json` por
+  `summary.source_url` convertido de `pg:meta_decks:<uuid>` para
+  `coherence.decks[].row_id` achou `0/12` matches.
+- Cruzamento por `source_ref` achou `5/12` matches, todos colisao de namespace
+  entre artifacts:
+  `learned_deck:104` = Kinnan no battle e Ral no coherence,
+  `learned_deck:105` = Etali no battle e Aang no coherence,
+  `learned_deck:116` = Tayam no battle e K-9 no coherence,
+  `learned_deck:83` = Kraum no battle e Ob Nixilis no coherence,
+  `learned_deck:84` = Kinnan no battle e Sisay no coherence.
+
+Conclusao: `BV-082` permanece aberto no estado atual. Isto nao invalida o
+`battle_replay_final_status=trusted_for_strategy_learning` da engine no run
+`040120`, porque o proprio artifact trata construction/coherence por opponent
+como shape waiver; tambem nao autoriza alterar PostgreSQL ou aplicar swaps. A
+pendencia real para o chat "Ajustar battle" e publicar uma chave estavel comum
+entre `summary.learned_deck_opponents[]`, cada `seed_*/deck_provenance.json` e
+o coherence report, ou publicar um crosswalk explicito, alem de separar no
+summary o `source_coherence_status` dos oponentes learned do final status da
+engine.
 
 ## Fechamento BV-089 - 2026-06-20T00:16:00-03:00
 
@@ -10249,3 +10452,581 @@ Evidencia oficial final:
 Resultado: `BV-084` fechado. As mencoes historicas anteriores de `BV-084`
 aberto foram superadas pelo run oficial `20260620_040120`; o quadro aberto
 atual nao contem mais linha `BV-084`.
+
+## Fechamento cronologico - BV-083 action-event denominator 2026-06-20T06:12-03:00
+
+Escopo: tratativa posterior aos rechecks historicos acima; sem PostgreSQL
+write, sem deck swap, sem promocao de regra battle e sem alteracao de deck
+builder.
+
+Evidencia oficial final:
+
+- Wrapper local:
+  `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`.
+- Sintaxe do wrapper: `bash -n /Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+  - PASS.
+- Latest recorrente:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_090636/summary.json`.
+- `summary.json`: `run_scope=recurring_full`, `run_profile=recurring_16_seed`,
+  `seeds_requested=16`, `seeds_completed=16`, `test_results_total=16` e
+  `test_results_status_counts={"pass":16}`.
+- `summary.json`: `action_event_types_total=561`,
+  `action_event_types_total_semantics=legacy_seed_sum_across_seed_action_critics`,
+  `action_event_types_seed_sum=561` e
+  `action_event_types_distinct_total=55`.
+- `summary.json`: `action_event_type_class_seed_sum={"action_audited":328,"ignored_with_reason":39,"renderer_only":33,"strategy_signal":85,"technical":76}`.
+- `summary.json`: `action_event_type_class_distinct_counts={"action_audited":24,"ignored_with_reason":4,"renderer_only":6,"strategy_signal":16,"technical":5}`.
+- `summary.json`: `event_contract_static_observed_event_types_total=55` e
+  `event_contract_static_observed_type_class_counts={"action_audited":24,"ignored_with_reason":4,"renderer_only":6,"strategy_signal":16,"technical":5}`.
+- `summary.md`: renderiza `Action event types seed-sum: 561`,
+  `Action event types distinct global: 55`, `Action event type class seed-sum`
+  e `Action event type class distinct global`.
+- Report persistente:
+  `docs/hermes-analysis/master_optimizer_reports/battle_latest_090636_action_event_denominator_bv083_closure_20260620_0612.md`.
+
+Resultado: `BV-083` fechado. O `summary.json` e o `summary.md` agora distinguem
+explicitamente a soma por seed do denominador global distinto. O run
+`20260620_090636` ficou `battle_replay_final_status=review_required` por
+`mandatory_gate_divergences=["forensic_audit=review_required"]`; isso e pendencia
+de forensic/gate separada, nao reabre `BV-083`. As mencoes historicas anteriores
+de `BV-083` aberto foram superadas por este fechamento; o quadro aberto atual
+nao contem mais linha `BV-083`.
+
+## Reconciliacao Auditor Central single-operator - latest 090636 - 2026-06-20 07:48 -0300
+
+Escopo: leitura e reconciliacao de estado corrente pelo Auditor Central em
+modo single-operator. Nao houve PostgreSQL write, deck swap, promocao de regra
+battle, commit, push, revert, stash ou cleanup.
+
+Evidencia executada:
+
+- `git status --short --branch`: worktree segue em `master...origin/master`,
+  com alteracoes amplas em `app/`, `server/`, `docs/` e artefatos untracked.
+- `git diff --shortstat`: `67 files changed, 7967 insertions(+), 1768 deletions(-)`.
+- `bash -n /Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+  - PASS.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  aponta para `run_dir=.../20260620_090636`, `run_scope=recurring_full`,
+  `run_profile=recurring_16_seed`.
+- `test_results.jsonl`: `16` entradas, todas com `status=pass`.
+
+Estado atual prevalente:
+
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- `forensic_lineage_status=incomplete`.
+- `forensic_rule_findings=1`, `forensic_turn_findings=0`.
+- Unaccepted lineage faltante:
+  `forensic_rule_logical_key_missing_unaccepted=1`,
+  `forensic_card_id_missing_unaccepted=1`,
+  `forensic_semantic_hash_missing_unaccepted=1`.
+- Amostra nao aceita atual: `Leyline of Abundance`, seed `63210916`,
+  `event=spell_cast`, `effect=ramp_permanent`,
+  `source=functional_tags_json`.
+- Gates obrigatorios que passaram no artifact atual: `action_critic`,
+  `strategy_audit`, `replay_decision_audit`, `effect_coverage`,
+  `focused_template_dispatch`, `unknown_template_backlog`,
+  `decision_trace_taxonomy` e `event_contract_static`.
+- `effect_coverage_unknown_effect_status_counts` permanece:
+  `{"focused_template_ready":28,"needs_review":5,"waived_curated_unknown_effect":1}`.
+- `decision_trace_taxonomy`: `rows=2207`, `kinds_observed=12/15`,
+  `contract_findings=0`, `missing_required_fields=0`.
+
+Pendencias ainda abertas por estado corrente:
+
+- `BV-082`: source lineage/coherence dos learned opponents segue aberto; o
+  status final do engine nao valida automaticamente a coerencia do corpus
+  learned usado como oponente.
+- `BV-085`: waivers `accepted_field_contract_waiver` ainda precisam de
+  contadores/grade de aprendizado explicitos para impedir leitura indevida como
+  strategy-audited.
+- `BV-086`: `functional_tags_json` voltou a aparecer no latest atual, agora em
+  `Leyline of Abundance`; requer decisao tecnica entre regra battle
+  verified/active, waiver runtime explicito, ou ajuste de observabilidade/gate.
+- `BV-087`: contrato effect-unknown segue separado do backlog source-unknown;
+  os `needs_review=5` continuam exigindo contrato/waiver claro.
+- `BV-088`: o latest atual ja bloqueia por forensic finding, mas ainda falta
+  fixture de gate para o caso em que `forensic_*_missing_unaccepted>0` ocorra
+  com `forensic_rule_findings=0`.
+
+Conclusao operacional:
+
+- `BV-081`, `BV-083`, `BV-084` e `BV-089` permanecem fechados.
+- Battle nao tem deploy PostgreSQL autorizado nem pronto neste momento.
+- Um futuro `PG-004` so deve existir depois de uma decisao documentada sobre
+  `Leyline of Abundance` e de um pacote com precheck/apply/rollback/postcheck.
+- A proxima acao correta para battle e desenhar e testar a correcao
+  `BV-086/BV-088` no runtime/gate antes de qualquer escrita em banco.
+
+## Reconciliacao Auditor Central - PG-006 execution_status drift - 2026-06-20 08:08 -0300
+
+Escopo: leitura read-only de PostgreSQL, migration status e latest
+`summary.json`, seguida de atualizacao documental. Nao houve PostgreSQL write,
+deck swap, promocao de regra battle, commit, push, revert, stash ou cleanup.
+
+Evidencia PostgreSQL read-only:
+
+- `dart run bin/migrate.dart --status` reporta a migration `029
+  add_card_battle_rules_execution_status` como pendente.
+- `card_battle_rules.execution_status` ja existe em PostgreSQL, esta `NOT NULL`
+  e tem default `'auto'::text`.
+- A constraint `chk_card_battle_rules_execution_status` nao existe no banco
+  atual.
+- `schema_migrations.version='029'` nao esta registrado.
+- Distribuicao atual de `card_battle_rules`:
+  - `curated / active / auto = 26`;
+  - `curated / verified / auto = 1725`;
+  - `generated / needs_review / auto = 1970`;
+  - `generated / needs_review / review_only = 1467`.
+- O precheck PG-006 em
+  `docs/hermes-analysis/master_optimizer_reports/card_battle_rules_execution_status_pg006_precheck_20260620_0808.sql`
+  retornou `pg006_rows_to_normalize=1970`.
+
+Evidencia latest battle:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  reporta `battle_replay_final_status=review_required`,
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`,
+  `forensic_lineage_status=incomplete`,
+  `execution_status_counts={"auto":3159}`,
+  `needs_review_rule_names=1457`, `review_only_rule_names=0` e
+  `review_only_rule_instances=0`.
+
+Conclusao operacional:
+
+- PG-006 foi aberto no PostgreSQL deploy register como drift de migracao/dados,
+  status `package_ready_for_approval`, com pacote em
+  `docs/hermes-analysis/master_optimizer_reports/card_battle_rules_execution_status_pg006_package_20260620_0808.md`.
+- PG-006 nao fecha `BV-086` nem `BV-088`: ele normaliza a governanca
+  `execution_status` e registra a migration `029`; a lineage incompleta de
+  `Leyline of Abundance` e o acoplamento do forensic gate continuam sendo
+  trabalho de runtime/gate.
+- Nao rodar `dart run bin/migrate.dart` como solucao isolada para este drift:
+  a migration nativa so normaliza linhas com `execution_status` nulo/vazio, e
+  as `1970` linhas problematicas ja estao como `auto`.
+
+## Reconciliacao Auditor Central - PG-006 aplicado e latest battle confiavel - 2026-06-20 08:51 -0300
+
+Escopo:
+
+- Fechamento operacional do drift PG-006 em PostgreSQL.
+- Rerun do auditor battle depois do deploy e correcao do manifest de superficie
+  runtime.
+
+Evidencia PostgreSQL:
+
+- PG-006 apply executado em
+  `docs/hermes-analysis/master_optimizer_reports/card_battle_rules_execution_status_pg006_apply_20260620_0808.sql`.
+- Resultado do apply: `COMMIT`, `normalized_rows=1970`, backup rollback
+  `1970` linhas.
+- Postcheck PG-006:
+  `execution_status_counts={"auto":1751,"review_only":3437}`,
+  `generated / needs_review / review_only = 3437`,
+  `remaining_needs_review_not_review_only=0`,
+  `rollback_backup_rows=1970`, constraint
+  `chk_card_battle_rules_execution_status` presente, migration `029` presente,
+  e `card_intelligence_snapshot_view.mentions_execution_status=true`.
+- `dart run bin/migrate.dart --status` depois do apply reportou `29/29`
+  migrations executadas e `0` pendentes.
+
+Evidencia runtime/battle:
+
+- Primeiro rerun manual apos PG-006 criou
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_114638`,
+  mas falhou em `test_battle_runtime_surface_manifest` porque dois arquivos de
+  learned-deck entraram na superficie sem classificacao:
+  `server/bin/plan_learned_deck_partner_identity_backfill.py` e
+  `server/test/plan_learned_deck_partner_identity_backfill_test.py`.
+- `battle_runtime_surface_manifest.py` passou a classificar esses dois arquivos
+  como `learned-deck source`; `test_battle_runtime_surface_manifest.py` foi
+  atualizado para `EXPECTED_TOTAL_FILES=110`,
+  `learned-deck source=16`, `outside_recurring_run=75`,
+  `targeted_manual_gate_required_before_change=32` e
+  `targeted_test_required_before_change=43`.
+- Validacoes da correcao:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py`
+  PASS; manifest com `--fail-on-unclassified` PASS; `py_compile` dos dois
+  arquivos PASS.
+- Rerun completo do auditor battle concluiu com exit `0` e atualizou `latest`
+  para
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_115516`.
+- Novo `summary.json`: `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `test_results_total=16`, `test_results_status_counts={"pass":16}`.
+- Novo manifest runtime: `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `runtime_surface_manifest_total_files=110`,
+  `runtime_surface_manifest_category_counts={"core runtime":31,"focused evidence/promotion":4,"learned-deck source":16,"optimizer/scorecard":15,"recurring audit gate":24,"renderer":4,"review queue":1,"rule registry/sync":15}`.
+
+Conclusao operacional:
+
+- O blocker forensic de `090636` esta superado pelo latest `115516`; nao criar
+  pacote PG-004/Leyline com base no run antigo.
+- PG-006 esta aplicado e validado em PostgreSQL.
+- O `summary.json` battle pre-sync `20260620_115516` ainda reportava
+  `execution_status_counts={"auto":3159}` e `review_only_rule_names=0` porque
+  esse contador pertencia a superficie Hermes/runtime do auditor, nao ao
+  postcheck PostgreSQL. Esse follow-up foi fechado depois pelo sync
+  `20260620_120904` e pelo latest `20260620_121005`.
+
+## Reconciliacao Auditor Central - PG-006 runtime cache sync - 2026-06-20 09:15 -0300
+
+Escopo:
+
+- Fechamento do follow-up de alinhamento entre PostgreSQL PG-006 e a superficie
+  Hermes/runtime usada pelo auditor battle.
+- Operacao local em SQLite Hermes e snapshot canonico. Nao houve novo write em
+  PostgreSQL, deck swap, rule promotion, commit, push, revert, stash ou cleanup.
+
+Evidencia de origem:
+
+- PostgreSQL ja estava limpo pelo PG-006:
+  `execution_status_counts={"auto":1751,"review_only":3437}`,
+  `generated / needs_review / review_only = 3437`,
+  `remaining_needs_review_not_review_only=0`, migration `029` presente e
+  `dart run bin/migrate.dart --status` com `29/29` executadas.
+- Antes do sync, SQLite Hermes ainda tinha `battle_card_rules` com:
+  `curated/active/auto=27`, `curated/verified/auto=1675` e
+  `generated/needs_review/auto=1981`.
+
+Aplicacao controlada:
+
+- Backup criado:
+  `docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-pg006-runtime-sync.20260620_120904.bak`.
+- Comando executado:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db --include-needs-review --apply-sqlite-from-pg --export-canonical-fallback-json docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json --report docs/hermes-analysis/master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_120904.json`.
+- Report:
+  `apply_pg=false`, `apply_sqlite_from_pg=true`, `pg_rows_loaded=5188`,
+  `sqlite_inserted_or_updated=5106`,
+  `canonical_snapshot_rows_exported=3159`.
+
+Evidencia pos-sync:
+
+- SQLite direto:
+  `execution_status auto = 1702` e `review_only = 1981` linhas; por nome,
+  `auto = 1702` e `review_only = 1981`.
+- Caminho do auditor battle apos colapso por nome/prioridade:
+  `runtime_safe_rule_names=1702`,
+  `active_or_review_rule_names=3159`,
+  `execution_status_counts={"auto":1702,"review_only":1457}`,
+  `needs_review_rule_names=1457`, `review_only_rule_names=1457`.
+- Efeito/cobertura pos-sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260620_120904_post_sqlite_sync.json`
+  e `.md`.
+- O script tambem gerou
+  `battle_effect_coverage_audit_20260620_120952.json` e `.md`; esses arquivos
+  tem hash identico ao par `120904_post_sqlite_sync` e foram movidos para a
+  proposta de cleanup, sem apagar nada.
+
+Latest battle:
+
+- Full recurring audit executado com
+  `MANALOOM_BATTLE_STRATEGY_RUN_PROFILE=manual_post_pg006_sqlite_sync`,
+  `MANALOOM_BATTLE_STRATEGY_INVOCATION_KIND=manual_auditor_post_sqlite_sync`,
+  `--seeds 16 --start-seed 61620904`.
+- Latest agora aponta para
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_121005`.
+- `summary.json`:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `test_results_total=16`, `test_results_status_counts={"pass":16}`,
+  `execution_status_counts={"auto":1702,"review_only":1457}`,
+  `needs_review_rule_names=1457`, `review_only_rule_names=1457`.
+
+Conclusao operacional:
+
+- O follow-up de escopo PG-006 versus Hermes/runtime esta fechado para o cache
+  local atual: PostgreSQL segue como fonte final, e o runtime Hermes agora
+  reflete `review_only` no `summary.json`.
+- `review_only_rule_instances=0` permanece como contador estreito do corpus
+  jogado; os `34` usos no corpus aparecem como
+  `battle_rule_needs_review_generated` / `needs_review_rule`, nao como falha do
+  sync.
+- Nao ha pacote PG-004/Leyline pronto nem necessario a partir do latest
+  `20260620_121005`.
+
+## Reconciliacao Auditor Central - focused evidence extra combat - 2026-06-20 10:09 -0300
+
+Escopo:
+
+- Correcao do harness focado de evidencia para contratos de extra combat com
+  flashback.
+- Correcao de isolamento do teste de ambiente do daemon operacional.
+- Nao houve novo write em PostgreSQL, rule promotion, deck swap, cleanup,
+  commit, push, revert ou stash.
+
+Evidencia:
+
+- `server/bin/manaloom_battle_rule_focused_evidence.py` agora passa o effect
+  data original da spell ao resolver evidencia de `extra_combat` e tambem ao
+  resolver o item de stack de flashback.
+- O caso que expunha o problema era `Seize the Day`: sem o effect data original,
+  a evidencia focada podia ser reclassificada pelo snapshot conhecido e falhar
+  contra o contrato esperado `extra_combat`.
+- `python3 -m unittest server.test.manaloom_review_queue_consumers_test.ManaloomReviewQueueConsumersTest.test_focused_evidence_unblocks_supported_low_risk_templates -v`
+  passou e registrou `MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE` com
+  `evaluated_count=14` e `evidence_count=14`.
+- `server/test/manaloom_ops_daemon_test.py` agora isola `DB_HOST` e `DB_NAME`
+  durante o teste de carregamento do `.env`.
+- `python3 -m unittest server.test.manaloom_ops_daemon_test.ManaLoomOpsDaemonTest.test_base_env_loads_database_values_from_env_file -v`
+  passou.
+- `python3 -m py_compile server/bin/manaloom_battle_rule_focused_evidence.py server/test/manaloom_ops_daemon_test.py`
+  passou.
+- `python3 -m unittest discover -s server/test -p '*_test.py' -v` passou
+  `96/96`; houve um `ResourceWarning` de sqlite nao fechado em teste de
+  learned-deck, sem falha de exit status.
+
+Conclusao:
+
+- A fila de promocao/evidencia focada volta a desbloquear os `14` templates
+  suportados de baixo risco.
+- Esta reconciliacao nao muda o status do latest battle `20260620_121005`,
+  que continua `trusted_for_strategy_learning`.
+- Nao ha novo pacote PG-004 ou outro deploy PostgreSQL a partir desta correcao.
+
+## Reconciliacao Auditor Central - latest voltou para review_required / PG-007 preparado - 2026-06-20 10:22 -0300
+
+Escopo:
+
+- Releitura obrigatoria do `latest/summary.json` depois do ciclo anterior.
+- Preparacao de pacote PostgreSQL para o novo blocker de forensic lineage.
+- Nenhum write em PostgreSQL foi executado nesta reconciliacao.
+
+Latest atual:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_125745/summary.json`
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63211257`
+- `battle_replay_final_status=review_required`
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`
+- `forensic_lineage_status=incomplete`
+- `forensic_rule_findings=1`, `forensic_turn_findings=0`
+- `test_results_total=16`, `test_results_status_counts={"pass":16}`
+
+Finding ativo:
+
+- Seed:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_125745/seed_63211258/forensic_audit.json`
+- Card: `Leyline of Abundance`
+- Evento: `spell_cast`
+- Efeito: `ramp_permanent`
+- Fonte atual: `functional_tags_json`
+- Severidade: `medium`
+- Recomendacao do auditor forensic: mover a carta para `card_battle_rules`
+  com status `verified/active`.
+
+Evidencia PostgreSQL read-only:
+
+- `cards` possui `Leyline of Abundance` com
+  `id=d524183f-6430-411b-8a9b-48eda6cb0f7d`.
+- `card_battle_rules` ainda nao possui nenhuma linha para Leyline:
+  `pg007_existing_target_rule=0` e `pg007_existing_any_leyline_rule=0`.
+- `card_intelligence_snapshot` atual tem `battle_rules=[]` e
+  `function_tags={engine}` para a carta.
+
+Pacote preparado:
+
+- `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_package_20260620_1018.md`
+- `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_precheck_20260620_1018.sql`
+- `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_apply_20260620_1018.sql`
+- `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_rollback_20260620_1018.sql`
+- `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_postcheck_20260620_1018.sql`
+
+Conclusao:
+
+- O latest `20260620_121005` virou evidencia historica; ele nao e mais o estado
+  ativo.
+- Naquele checkpoint historico de 10:22, o estado de battle era
+  `review_required`.
+- Naquele checkpoint historico, PG-007 estava preparado, mas nao aplicado.
+  Aplicar requeria aprovacao explicita do comando exato, postcheck, sync PG ->
+  SQLite Hermes e rerun battle.
+
+## Reconciliacao Auditor Central - PG-007 aplicado / latest trusted - 2026-06-20 10:31 -0300
+
+Escopo:
+
+- Aplicacao PostgreSQL do pacote PG-007 para `Leyline of Abundance`.
+- Postcheck PostgreSQL.
+- Sync PostgreSQL -> SQLite Hermes.
+- Rerun completo do battle recurring gate com `16` seeds.
+
+Evidencia PostgreSQL:
+
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_apply_20260620_1018.sql`.
+- Resultado do apply: `INSERT 0 1` e `COMMIT`.
+- Linha aplicada em `card_battle_rules`:
+  `normalized_name='leyline of abundance'`,
+  `logical_rule_key='battle_rule_v1:f3c990ed2e762aaab17c617ac3a42941'`,
+  `source='curated'`, `review_status='active'`,
+  `execution_status='auto'`, `confidence=0.820`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/leyline_abundance_battle_rule_pg007_postcheck_20260620_1018.sql`.
+- Resultado do postcheck: `pg007_target_rule_count=1`; o
+  `card_intelligence_snapshot` da carta passou a expor a regra em
+  `battle_rules`.
+
+Evidencia runtime:
+
+- Backup SQLite:
+  `docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-pg007-runtime-sync.20260620_102701.bak`.
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_102701_post_pg007.json`.
+- Resultado do sync: `pg_rows_loaded=5189`,
+  `sqlite_inserted_or_updated=5107`,
+  `canonical_snapshot_rows_exported=3160`.
+- Coverage pos-sync:
+  `runtime_safe_rule_names=1703`,
+  `active_or_review_rule_names=3160`,
+  `execution_status_counts={"auto":1703,"review_only":1457}`.
+
+Latest atual:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_132812/summary.json`
+- `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `start_seed=63211328`
+- `battle_replay_final_status=trusted_for_strategy_learning`
+- `mandatory_gate_divergences=[]`
+- `forensic_lineage_status=complete`
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`
+- `test_results_total=16`, `test_results_status_counts={"pass":16}`
+- Checagem programatica dos seeds: `forensic_files=16`,
+  `bad_forensic_files=0`.
+
+Conclusao:
+
+- PG-007 esta fechado.
+- O blocker `Leyline of Abundance` de `20260620_125745` virou historico
+  pre-apply.
+- O estado ativo de battle volta a ser `trusted_for_strategy_learning` com base
+  no latest `20260620_132812`.
+
+## Reconciliacao Auditor Central - heartbeat single-operator - 2026-06-20 10:57 -0300
+
+Escopo:
+
+- Continuidade do modo Auditor Central como operador unico.
+- Releitura do estado real do repo, docs obrigatorios e latest battle.
+- Nenhum write em PostgreSQL, rule promotion, deck swap, cleanup, commit, push,
+  revert ou stash.
+
+Evidencia atual:
+
+- `git status --short --branch`: `master...origin/master`, `72 M`, `78 ??`.
+- `git diff --shortstat`:
+  `72 files changed, 24397 insertions(+), 2028 deletions(-)`.
+- `git ls-files --others --exclude-standard | wc -l`: `79`.
+- `git diff --check`: clean.
+- Latest battle continua:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_132812/summary.json`.
+- Latest result:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`, tests `16/16`.
+- O deploy register foi reconciliado para rotular a antiga secao PG-004 /
+  `20260620_121005` como historica e supersedida por PG-007.
+
+Conclusao:
+
+- O estado ativo de battle permanece confiavel para estrategia pelo latest
+  `20260620_132812`.
+- Nao ha novo pacote PostgreSQL ou promocao de regra battle pronto a partir
+  deste heartbeat.
+- Cleanup segue nao autorizado; os artefatos de evidencia devem ser preservados
+  ate aprovacao explicita de uma lista exata.
+
+## Reconciliacao Auditor Central - latest 140016 / fila PG sem apply - 2026-06-20 11:19 -0300
+
+Escopo:
+
+- Releitura do latest battle depois da mudanca de symlink para `20260620_140016`.
+- Recheck do manifesto de superficie runtime battle.
+- Recheck read-only da fila PostgreSQL aplicada.
+- Nenhum write em PostgreSQL, promocao de regra, deck swap, cleanup, commit,
+  push, stash ou revert foi executado.
+
+Latest atual:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_140016/summary.json`
+- `battle_replay_final_status=trusted_for_strategy_learning`
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`
+- `mandatory_gate_divergences=[]`
+- `forensic_lineage_status=complete`
+- `forensic_rule_findings=0`
+- `forensic_turn_findings=0`
+- `test_results_total=16`
+- `test_results_status_counts={"pass":16}`
+- `execution_status_counts={"auto":1703,"review_only":1457}`
+- `strategy_high_confidence_learning_seeds=14`
+- `strategy_low_confidence_seeds=["63211407","63211414"]`
+- `strategy_review_required_findings=0`
+- `unknown_template_backlog_cards=0`
+- `focused_template_dispatch_status=focused_template_dispatch_ready`
+- `focused_template_evidence_ready=29`
+- `focused_template_evidence_not_ready_unwaived=0`
+
+Manifesto runtime:
+
+- `python3 test_battle_runtime_surface_manifest.py` retornou
+  `PASS test_manifest_classifies_current_battle_surface`.
+- Scan do manifesto: `total_files=110`, `unclassified_files=[]`.
+- Cobertura: `covered_by_recurring_run=29`, `imported_by_core_runtime=6`,
+  `outside_recurring_run=75`.
+
+PostgreSQL read-only:
+
+- Migracoes: `29/29` executadas, `0` pendentes.
+- PG-001 planner: `planned_row_count=0`, `db_mutations=false`.
+- PG-002 postcheck: `after_matches=59`, `still_before_rows=0`,
+  `all_post_apply_checks_ok=true`.
+- PG-003 oracle planner: `backfill_ready=0`, `db_mutations=false`.
+- PG-005 Lorehold dry-run: `applied_counts=0`, `db_mutations=false`.
+- PG-006 postcheck: migracao `029` presente, constraint presente,
+  `remaining_needs_review_not_review_only=0`.
+- PG-007 postcheck: `pg007_target_rule_count=1`.
+
+Conclusao:
+
+- O latest ativo e `20260620_140016` e esta confiavel para strategy learning.
+- `20260620_132812` continua sendo evidencia historica de fechamento PG-007,
+  mas nao e mais o latest ativo.
+- Nao ha novo apply PostgreSQL pronto neste heartbeat.
+
+## Checkpoint Auditor Central - Batch 0/1 readiness - 2026-06-20 13:12 -0300
+
+Scope:
+
+- Re-read live latest battle and current dirty worktree before preparing the
+  first publication boundary.
+- Created `MANALOOM_BATCH_0_1_READINESS_2026-06-20.md` to isolate Batch 0
+  local-evidence hygiene and Batch 1 audit/PostgreSQL/Battle/Lorehold docs.
+- No stage, commit, push, deck swap, cleanup, PostgreSQL write, code deploy, or
+  app/backend source edit was performed.
+
+Evidence:
+
+- Latest battle now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`.
+- Latest status: `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `test_results_total=16`, and `test_results_status_counts={'pass': 16}`.
+- `git diff --check`: clean.
+- Worktree checkpoint before this register addition: `73` tracked modified
+  files, `75` untracked files, and shortstat
+  `73 files changed, 24752 insertions(+), 2022 deletions(-)`.
+
+Conclusion:
+
+- Current battle remains trusted after PG-008.
+- Batch 0/1 is ready for explicit staging approval, but it was not staged.
+- No current PostgreSQL apply is ready.

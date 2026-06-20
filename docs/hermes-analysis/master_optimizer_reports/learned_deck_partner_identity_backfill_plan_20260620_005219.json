@@ -1,0 +1,949 @@
+{
+  "apply_requires_explicit_approval": true,
+  "apply_supported": false,
+  "db_mutations": false,
+  "mode": "dry_run",
+  "planned_row_count": 10,
+  "planned_rows": [
+    {
+      "base_color_identity": [
+        "R",
+        "W"
+      ],
+      "combined_color_identity": [
+        "G",
+        "R",
+        "U",
+        "W"
+      ],
+      "commander_name": "Akiri, Line-Slinger",
+      "deck_name": "Akiri, Line-Slinger + Thrasios, Triton Hero",
+      "identity_components": [
+        {
+          "color_identity": [
+            "G",
+            "U"
+          ],
+          "name": "Thrasios, Triton Hero",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "G",
+          "R",
+          "U",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "R",
+            "W"
+          ],
+          "combined_color_identity": [
+            "G",
+            "R",
+            "U",
+            "W"
+          ],
+          "declared_deck_name": "Akiri, Line-Slinger + Thrasios, Triton Hero",
+          "identity_components": [
+            {
+              "color_identity": [
+                "G",
+                "U"
+              ],
+              "name": "Thrasios, Triton Hero",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Akiri, Line-Slinger",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:112"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "G",
+              "U"
+            ],
+            "name": "Thrasios, Triton Hero",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"G\",\"R\",\"U\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"R\",\"W\"],\"combined_color_identity\":[\"G\",\"R\",\"U\",\"W\"],\"declared_deck_name\":\"Akiri, Line-Slinger + Thrasios, Triton Hero\",\"identity_components\":[{\"color_identity\":[\"G\",\"U\"],\"name\":\"Thrasios, Triton Hero\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Akiri, Line-Slinger\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:112\"},\"partner_identity_candidates\":[{\"color_identity\":[\"G\",\"U\"],\"name\":\"Thrasios, Triton Hero\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '0d9058af-51f1-4e2c-9dfa-d813880ae91c'::uuid AND source_ref = 'learned_deck:112';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '0d9058af-51f1-4e2c-9dfa-d813880ae91c'::uuid AND source_ref = 'learned_deck:112';",
+      "row_id": "0d9058af-51f1-4e2c-9dfa-d813880ae91c",
+      "source_ref": "learned_deck:112",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "R"
+      ],
+      "combined_color_identity": [
+        "B",
+        "R",
+        "W"
+      ],
+      "commander_name": "Dargo, the Shipwrecker",
+      "deck_name": "Dargo, the Shipwrecker + Tymna the Weaver",
+      "identity_components": [
+        {
+          "color_identity": [
+            "B",
+            "W"
+          ],
+          "name": "Tymna the Weaver",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "B",
+          "R",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "R"
+          ],
+          "combined_color_identity": [
+            "B",
+            "R",
+            "W"
+          ],
+          "declared_deck_name": "Dargo, the Shipwrecker + Tymna the Weaver",
+          "identity_components": [
+            {
+              "color_identity": [
+                "B",
+                "W"
+              ],
+              "name": "Tymna the Weaver",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Dargo, the Shipwrecker",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:93"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "B",
+              "W"
+            ],
+            "name": "Tymna the Weaver",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"B\",\"R\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"R\"],\"combined_color_identity\":[\"B\",\"R\",\"W\"],\"declared_deck_name\":\"Dargo, the Shipwrecker + Tymna the Weaver\",\"identity_components\":[{\"color_identity\":[\"B\",\"W\"],\"name\":\"Tymna the Weaver\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Dargo, the Shipwrecker\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:93\"},\"partner_identity_candidates\":[{\"color_identity\":[\"B\",\"W\"],\"name\":\"Tymna the Weaver\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = 'b8221a6b-af2b-4f7e-89c3-cea07e2d071f'::uuid AND source_ref = 'learned_deck:93';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = 'b8221a6b-af2b-4f7e-89c3-cea07e2d071f'::uuid AND source_ref = 'learned_deck:93';",
+      "row_id": "b8221a6b-af2b-4f7e-89c3-cea07e2d071f",
+      "source_ref": "learned_deck:93",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "U",
+        "W"
+      ],
+      "combined_color_identity": [
+        "R",
+        "U",
+        "W"
+      ],
+      "commander_name": "Ishai, Ojutai Dragonspeaker",
+      "deck_name": "Ishai, Ojutai Dragonspeaker + Rograkh, Son of Rohgahh",
+      "identity_components": [
+        {
+          "color_identity": [
+            "R"
+          ],
+          "name": "Rograkh, Son of Rohgahh",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "R",
+          "U",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "U",
+            "W"
+          ],
+          "combined_color_identity": [
+            "R",
+            "U",
+            "W"
+          ],
+          "declared_deck_name": "Ishai, Ojutai Dragonspeaker + Rograkh, Son of Rohgahh",
+          "identity_components": [
+            {
+              "color_identity": [
+                "R"
+              ],
+              "name": "Rograkh, Son of Rohgahh",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Ishai, Ojutai Dragonspeaker",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:110"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "R"
+            ],
+            "name": "Rograkh, Son of Rohgahh",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"R\",\"U\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"U\",\"W\"],\"combined_color_identity\":[\"R\",\"U\",\"W\"],\"declared_deck_name\":\"Ishai, Ojutai Dragonspeaker + Rograkh, Son of Rohgahh\",\"identity_components\":[{\"color_identity\":[\"R\"],\"name\":\"Rograkh, Son of Rohgahh\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Ishai, Ojutai Dragonspeaker\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:110\"},\"partner_identity_candidates\":[{\"color_identity\":[\"R\"],\"name\":\"Rograkh, Son of Rohgahh\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '7a7001a1-aebe-4963-830f-31031f92c105'::uuid AND source_ref = 'learned_deck:110';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '7a7001a1-aebe-4963-830f-31031f92c105'::uuid AND source_ref = 'learned_deck:110';",
+      "row_id": "7a7001a1-aebe-4963-830f-31031f92c105",
+      "source_ref": "learned_deck:110",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "R"
+      ],
+      "combined_color_identity": [
+        "B",
+        "R",
+        "W"
+      ],
+      "commander_name": "Jeska, Thrice Reborn",
+      "deck_name": "Jeska, Thrice Reborn + Tymna the Weaver",
+      "identity_components": [
+        {
+          "color_identity": [
+            "B",
+            "W"
+          ],
+          "name": "Tymna the Weaver",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "B",
+          "R",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "R"
+          ],
+          "combined_color_identity": [
+            "B",
+            "R",
+            "W"
+          ],
+          "declared_deck_name": "Jeska, Thrice Reborn + Tymna the Weaver",
+          "identity_components": [
+            {
+              "color_identity": [
+                "B",
+                "W"
+              ],
+              "name": "Tymna the Weaver",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Jeska, Thrice Reborn",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:100"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "B",
+              "W"
+            ],
+            "name": "Tymna the Weaver",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"B\",\"R\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"R\"],\"combined_color_identity\":[\"B\",\"R\",\"W\"],\"declared_deck_name\":\"Jeska, Thrice Reborn + Tymna the Weaver\",\"identity_components\":[{\"color_identity\":[\"B\",\"W\"],\"name\":\"Tymna the Weaver\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Jeska, Thrice Reborn\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:100\"},\"partner_identity_candidates\":[{\"color_identity\":[\"B\",\"W\"],\"name\":\"Tymna the Weaver\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = 'de69e590-452b-4e2d-bc64-df7145a930f3'::uuid AND source_ref = 'learned_deck:100';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = 'de69e590-452b-4e2d-bc64-df7145a930f3'::uuid AND source_ref = 'learned_deck:100';",
+      "row_id": "de69e590-452b-4e2d-bc64-df7145a930f3",
+      "source_ref": "learned_deck:100",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "U"
+      ],
+      "combined_color_identity": [
+        "G",
+        "R",
+        "U",
+        "W"
+      ],
+      "commander_name": "K-9, Mark I",
+      "deck_name": "K-9, Mark I + The Fourteenth Doctor",
+      "identity_components": [
+        {
+          "color_identity": [
+            "G",
+            "R",
+            "U",
+            "W"
+          ],
+          "name": "The Fourteenth Doctor",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "G",
+          "R",
+          "U",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "U"
+          ],
+          "combined_color_identity": [
+            "G",
+            "R",
+            "U",
+            "W"
+          ],
+          "declared_deck_name": "K-9, Mark I + The Fourteenth Doctor",
+          "identity_components": [
+            {
+              "color_identity": [
+                "G",
+                "R",
+                "U",
+                "W"
+              ],
+              "name": "The Fourteenth Doctor",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "K-9, Mark I",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:116"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "G",
+              "R",
+              "U",
+              "W"
+            ],
+            "name": "The Fourteenth Doctor",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"G\",\"R\",\"U\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"U\"],\"combined_color_identity\":[\"G\",\"R\",\"U\",\"W\"],\"declared_deck_name\":\"K-9, Mark I + The Fourteenth Doctor\",\"identity_components\":[{\"color_identity\":[\"G\",\"R\",\"U\",\"W\"],\"name\":\"The Fourteenth Doctor\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"K-9, Mark I\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:116\"},\"partner_identity_candidates\":[{\"color_identity\":[\"G\",\"R\",\"U\",\"W\"],\"name\":\"The Fourteenth Doctor\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '421b13ef-c325-42e4-821c-8123dea59d15'::uuid AND source_ref = 'learned_deck:116';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '421b13ef-c325-42e4-821c-8123dea59d15'::uuid AND source_ref = 'learned_deck:116';",
+      "row_id": "421b13ef-c325-42e4-821c-8123dea59d15",
+      "source_ref": "learned_deck:116",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "R"
+      ],
+      "combined_color_identity": [
+        "R",
+        "U"
+      ],
+      "commander_name": "Krark, the Thumbless",
+      "deck_name": "Krark, the Thumbless + Sakashima of a Thousand Faces",
+      "identity_components": [
+        {
+          "color_identity": [
+            "U"
+          ],
+          "name": "Sakashima of a Thousand Faces // Sakashima of a Thousand Faces",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "R",
+          "U"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "R"
+          ],
+          "combined_color_identity": [
+            "R",
+            "U"
+          ],
+          "declared_deck_name": "Krark, the Thumbless + Sakashima of a Thousand Faces",
+          "identity_components": [
+            {
+              "color_identity": [
+                "U"
+              ],
+              "name": "Sakashima of a Thousand Faces // Sakashima of a Thousand Faces",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Krark, the Thumbless",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:173"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "U"
+            ],
+            "name": "Sakashima of a Thousand Faces // Sakashima of a Thousand Faces",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"R\",\"U\"],\"commander_identity_model\":{\"base_color_identity\":[\"R\"],\"combined_color_identity\":[\"R\",\"U\"],\"declared_deck_name\":\"Krark, the Thumbless + Sakashima of a Thousand Faces\",\"identity_components\":[{\"color_identity\":[\"U\"],\"name\":\"Sakashima of a Thousand Faces // Sakashima of a Thousand Faces\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Krark, the Thumbless\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:173\"},\"partner_identity_candidates\":[{\"color_identity\":[\"U\"],\"name\":\"Sakashima of a Thousand Faces // Sakashima of a Thousand Faces\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '2d18afa2-561b-4c69-ad89-ce4bfb432770'::uuid AND source_ref = 'learned_deck:173';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '2d18afa2-561b-4c69-ad89-ce4bfb432770'::uuid AND source_ref = 'learned_deck:173';",
+      "row_id": "2d18afa2-561b-4c69-ad89-ce4bfb432770",
+      "source_ref": "learned_deck:173",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "R",
+        "U"
+      ],
+      "combined_color_identity": [
+        "B",
+        "R",
+        "U",
+        "W"
+      ],
+      "commander_name": "Kraum, Ludevic's Opus",
+      "deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "identity_components": [
+        {
+          "color_identity": [
+            "B",
+            "W"
+          ],
+          "name": "Tymna the Weaver",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "B",
+          "R",
+          "U",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "R",
+            "U"
+          ],
+          "combined_color_identity": [
+            "B",
+            "R",
+            "U",
+            "W"
+          ],
+          "declared_deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
+          "identity_components": [
+            {
+              "color_identity": [
+                "B",
+                "W"
+              ],
+              "name": "Tymna the Weaver",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Kraum, Ludevic's Opus",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:89"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "B",
+              "W"
+            ],
+            "name": "Tymna the Weaver",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"B\",\"R\",\"U\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"R\",\"U\"],\"combined_color_identity\":[\"B\",\"R\",\"U\",\"W\"],\"declared_deck_name\":\"Kraum, Ludevic''s Opus + Tymna the Weaver\",\"identity_components\":[{\"color_identity\":[\"B\",\"W\"],\"name\":\"Tymna the Weaver\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Kraum, Ludevic''s Opus\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:89\"},\"partner_identity_candidates\":[{\"color_identity\":[\"B\",\"W\"],\"name\":\"Tymna the Weaver\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '367003b1-36f2-42ec-a015-fa605d0a9b97'::uuid AND source_ref = 'learned_deck:89';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '367003b1-36f2-42ec-a015-fa605d0a9b97'::uuid AND source_ref = 'learned_deck:89';",
+      "row_id": "367003b1-36f2-42ec-a015-fa605d0a9b97",
+      "source_ref": "learned_deck:89",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "U"
+      ],
+      "combined_color_identity": [
+        "B",
+        "R",
+        "U"
+      ],
+      "commander_name": "Malcolm, Keen-Eyed Navigator",
+      "deck_name": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+      "identity_components": [
+        {
+          "color_identity": [
+            "B",
+            "R"
+          ],
+          "name": "Vial Smasher the Fierce",
+          "source": "deck_name_commander_component"
+        },
+        {
+          "color_identity": [
+            "R"
+          ],
+          "name": "Kediss, Emberclaw Familiar",
+          "source": "partner_text"
+        }
+      ],
+      "inference_source": "mixed_commander_identity_inference",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "B",
+          "R",
+          "U"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "U"
+          ],
+          "combined_color_identity": [
+            "B",
+            "R",
+            "U"
+          ],
+          "declared_deck_name": "Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce",
+          "identity_components": [
+            {
+              "color_identity": [
+                "B",
+                "R"
+              ],
+              "name": "Vial Smasher the Fierce",
+              "source": "deck_name_commander_component"
+            },
+            {
+              "color_identity": [
+                "R"
+              ],
+              "name": "Kediss, Emberclaw Familiar",
+              "source": "partner_text"
+            }
+          ],
+          "primary_commander_name": "Malcolm, Keen-Eyed Navigator",
+          "requires_first_class_persistence": true,
+          "source": "mixed_commander_identity_inference",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:90"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "B",
+              "R"
+            ],
+            "name": "Vial Smasher the Fierce",
+            "reason": "deck_name_commander_component"
+          },
+          {
+            "color_identity": [
+              "R"
+            ],
+            "name": "Kediss, Emberclaw Familiar",
+            "reason": "partner_text"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"B\",\"R\",\"U\"],\"commander_identity_model\":{\"base_color_identity\":[\"U\"],\"combined_color_identity\":[\"B\",\"R\",\"U\"],\"declared_deck_name\":\"Malcolm, Keen-Eyed Navigator + Vial Smasher the Fierce\",\"identity_components\":[{\"color_identity\":[\"B\",\"R\"],\"name\":\"Vial Smasher the Fierce\",\"source\":\"deck_name_commander_component\"},{\"color_identity\":[\"R\"],\"name\":\"Kediss, Emberclaw Familiar\",\"source\":\"partner_text\"}],\"primary_commander_name\":\"Malcolm, Keen-Eyed Navigator\",\"requires_first_class_persistence\":true,\"source\":\"mixed_commander_identity_inference\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:90\"},\"partner_identity_candidates\":[{\"color_identity\":[\"B\",\"R\"],\"name\":\"Vial Smasher the Fierce\",\"reason\":\"deck_name_commander_component\"},{\"color_identity\":[\"R\"],\"name\":\"Kediss, Emberclaw Familiar\",\"reason\":\"partner_text\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '5e6d0cbe-6b58-4bbd-8f2f-62aa03bf0cd9'::uuid AND source_ref = 'learned_deck:90';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '5e6d0cbe-6b58-4bbd-8f2f-62aa03bf0cd9'::uuid AND source_ref = 'learned_deck:90';",
+      "row_id": "5e6d0cbe-6b58-4bbd-8f2f-62aa03bf0cd9",
+      "source_ref": "learned_deck:90",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "R"
+      ],
+      "combined_color_identity": [
+        "B",
+        "R",
+        "U"
+      ],
+      "commander_name": "Rograkh, Son of Rohgahh",
+      "deck_name": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+      "identity_components": [
+        {
+          "color_identity": [
+            "B",
+            "U"
+          ],
+          "name": "Silas Renn, Seeker Adept",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "B",
+          "R",
+          "U"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "R"
+          ],
+          "combined_color_identity": [
+            "B",
+            "R",
+            "U"
+          ],
+          "declared_deck_name": "Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept",
+          "identity_components": [
+            {
+              "color_identity": [
+                "B",
+                "U"
+              ],
+              "name": "Silas Renn, Seeker Adept",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Rograkh, Son of Rohgahh",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:85"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "B",
+              "U"
+            ],
+            "name": "Silas Renn, Seeker Adept",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"B\",\"R\",\"U\"],\"commander_identity_model\":{\"base_color_identity\":[\"R\"],\"combined_color_identity\":[\"B\",\"R\",\"U\"],\"declared_deck_name\":\"Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept\",\"identity_components\":[{\"color_identity\":[\"B\",\"U\"],\"name\":\"Silas Renn, Seeker Adept\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Rograkh, Son of Rohgahh\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:85\"},\"partner_identity_candidates\":[{\"color_identity\":[\"B\",\"U\"],\"name\":\"Silas Renn, Seeker Adept\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '5242b94b-954e-4a32-abc6-8b5fa2a4cabb'::uuid AND source_ref = 'learned_deck:85';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '5242b94b-954e-4a32-abc6-8b5fa2a4cabb'::uuid AND source_ref = 'learned_deck:85';",
+      "row_id": "5242b94b-954e-4a32-abc6-8b5fa2a4cabb",
+      "source_ref": "learned_deck:85",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    },
+    {
+      "base_color_identity": [
+        "G",
+        "U"
+      ],
+      "combined_color_identity": [
+        "G",
+        "U",
+        "W"
+      ],
+      "commander_name": "Thrasios, Triton Hero",
+      "deck_name": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+      "identity_components": [
+        {
+          "color_identity": [
+            "W"
+          ],
+          "name": "Yoshimaru, Ever Faithful",
+          "source": "deck_name_commander_component"
+        }
+      ],
+      "inference_source": "deck_name_commander_component",
+      "metadata_patch": {
+        "combined_commander_color_identity": [
+          "G",
+          "U",
+          "W"
+        ],
+        "commander_identity_model": {
+          "base_color_identity": [
+            "G",
+            "U"
+          ],
+          "combined_color_identity": [
+            "G",
+            "U",
+            "W"
+          ],
+          "declared_deck_name": "Thrasios, Triton Hero + Yoshimaru, Ever Faithful",
+          "identity_components": [
+            {
+              "color_identity": [
+                "W"
+              ],
+              "name": "Yoshimaru, Ever Faithful",
+              "source": "deck_name_commander_component"
+            }
+          ],
+          "primary_commander_name": "Thrasios, Triton Hero",
+          "requires_first_class_persistence": true,
+          "source": "deck_name_commander_component",
+          "status": "combined_identity_inferred"
+        },
+        "partner_identity_backfill": {
+          "mode": "dry_run_plan_only",
+          "requires_explicit_postgresql_mutation_approval": true,
+          "source": "learned_deck_partner_identity_inference_2026_06_20",
+          "source_ref": "learned_deck:87"
+        },
+        "partner_identity_candidates": [
+          {
+            "color_identity": [
+              "W"
+            ],
+            "name": "Yoshimaru, Ever Faithful",
+            "reason": "deck_name_commander_component"
+          }
+        ]
+      },
+      "planned_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"combined_commander_color_identity\":[\"G\",\"U\",\"W\"],\"commander_identity_model\":{\"base_color_identity\":[\"G\",\"U\"],\"combined_color_identity\":[\"G\",\"U\",\"W\"],\"declared_deck_name\":\"Thrasios, Triton Hero + Yoshimaru, Ever Faithful\",\"identity_components\":[{\"color_identity\":[\"W\"],\"name\":\"Yoshimaru, Ever Faithful\",\"source\":\"deck_name_commander_component\"}],\"primary_commander_name\":\"Thrasios, Triton Hero\",\"requires_first_class_persistence\":true,\"source\":\"deck_name_commander_component\",\"status\":\"combined_identity_inferred\"},\"draw_count\":0,\"engine_count\":0,\"partner_identity_backfill\":{\"mode\":\"dry_run_plan_only\",\"requires_explicit_postgresql_mutation_approval\":true,\"source\":\"learned_deck_partner_identity_inference_2026_06_20\",\"source_ref\":\"learned_deck:87\"},\"partner_identity_candidates\":[{\"color_identity\":[\"W\"],\"name\":\"Yoshimaru, Ever Faithful\",\"reason\":\"deck_name_commander_component\"}],\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '0e37c8b3-f931-47b9-9eec-7d4b755ccd78'::uuid AND source_ref = 'learned_deck:87';",
+      "previous_metadata_keys": [
+        "board_wipe_count",
+        "draw_count",
+        "engine_count",
+        "protection_count",
+        "ramp_count",
+        "recursion_count",
+        "removal_count",
+        "total_lands",
+        "tutor_count",
+        "wincon_count"
+      ],
+      "rollback_sql": "UPDATE commander_learned_decks\nSET metadata = '{\"board_wipe_count\":0,\"draw_count\":0,\"engine_count\":0,\"protection_count\":0,\"ramp_count\":0,\"recursion_count\":0,\"removal_count\":0,\"total_lands\":0,\"tutor_count\":0,\"wincon_count\":0}'::jsonb\nWHERE id = '0e37c8b3-f931-47b9-9eec-7d4b755ccd78'::uuid AND source_ref = 'learned_deck:87';",
+      "row_id": "0e37c8b3-f931-47b9-9eec-7d4b755ccd78",
+      "source_ref": "learned_deck:87",
+      "source_system": "pg_meta_decks",
+      "status": "combined_identity_inferred"
+    }
+  ],
+  "rollback_scope": {
+    "column": "metadata",
+    "row_ids": [
+      "0d9058af-51f1-4e2c-9dfa-d813880ae91c",
+      "b8221a6b-af2b-4f7e-89c3-cea07e2d071f",
+      "7a7001a1-aebe-4963-830f-31031f92c105",
+      "de69e590-452b-4e2d-bc64-df7145a930f3",
+      "421b13ef-c325-42e4-821c-8123dea59d15",
+      "2d18afa2-561b-4c69-ad89-ce4bfb432770",
+      "367003b1-36f2-42ec-a015-fa605d0a9b97",
+      "5e6d0cbe-6b58-4bbd-8f2f-62aa03bf0cd9",
+      "5242b94b-954e-4a32-abc6-8b5fa2a4cabb",
+      "0e37c8b3-f931-47b9-9eec-7d4b755ccd78"
+    ],
+    "table": "commander_learned_decks"
+  },
+  "source": "learned_deck_partner_identity_inference_2026_06_20",
+  "status": "PASS"
+}

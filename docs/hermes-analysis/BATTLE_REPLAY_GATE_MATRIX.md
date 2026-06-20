@@ -1,6 +1,6 @@
 # Battle Replay Gate Matrix
 
-Status: current as of `2026-06-20T04:01Z`.
+Status: current as of `2026-06-20T16:04Z`.
 
 This matrix defines the mandatory gates that must run before a battle replay is
 interpreted as final evidence. A green result in one auditor is not a global
@@ -75,6 +75,28 @@ The wrapper also writes:
 - `runtime_surface_manifest_gate_expected_counts`
 - `runtime_surface_manifest_status`
 
+## Current Latest Reading - 2026-06-20T16:04Z
+
+- Latest artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`
+- Run scope: `recurring_full`
+- Invocation kind: `manual_cli`
+- Seeds: `16/16`
+- Start seed: `63211604`
+- Final status: `trusted_for_strategy_learning`
+- Mandatory gate divergences: `[]`
+- Forensic lineage: `complete`
+- Forensic findings: `rule=0`, `turn=0`
+- Test gate: `16/16` pass
+- Runtime status counts:
+  `execution_status_counts={"auto":1704,"review_only":1457}`
+
+Operational conclusion: the previous latest `20260620_150241` was a valid
+pre-PG-008 blocker snapshot for `Machine God's Effigy`, but it is now superseded
+by `20260620_151437`, `20260620_155445`, and the current `20260620_160459`
+after PG-008, PostgreSQL -> SQLite sync, and full 16-seed battle reruns. The older
+`20260620_125745` remains retained as the pre-PG-007 Leyline blocker snapshot.
+
 Operational reading: if `mandatory_gate_divergences` is non-empty, the replay
 has mixed gate signals and must be read by the aggregate final status, not by
 the cleanest individual auditor.
@@ -99,119 +121,161 @@ all Python battle files. Use `runtime_surface_manifest.json` to decide whether a
 changed area is covered by the recurring run, imported by core runtime, or needs
 a targeted gate before claiming readiness.
 
-## Current Gate Reading
+## Historical Gate Reading - superseded by 20260620_125745
 
-Latest official run checked by this matrix:
+Previously checked run:
 
-- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/summary.json`
-- This is a recurring run: `run_profile=recurring_16_seed`,
-  `run_scope=recurring_full`, `invocation_kind=default_or_scheduled`,
-  `seeds_requested=16`, `seeds_completed=16`, and `start_seed=63210401`.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_121005/summary.json`
+- This is a recurring run: `run_profile=manual_post_pg006_sqlite_sync`,
+  `run_scope=recurring_full`,
+  `invocation_kind=manual_auditor_post_sqlite_sync`,
+  `seeds_requested=16`, `seeds_completed=16`, and `start_seed=61620904`.
 - `battle_replay_final_status=trusted_for_strategy_learning`
 - `battle_replay_final_status_reason=all_mandatory_gates_pass`
 - `mandatory_gate_divergences=[]`
-- `global_learning_eligible_seeds` has `11/16` seeds; `5/16` seeds remain
-  not learning eligible because `strategy_audit` marked them low confidence.
-- `action_critic`: pass with `findings=0`,
-  `seeds_with_high_or_critical_action_findings=[]`,
-  `action_events_total=15136`, `action_verdict_counts={"ok":6205}`,
-  `action_event_contract_class_counts={"action_audited":6205,"forensic_card_event":2,"ignored_with_reason":366,"renderer_only":22,"strategy_signal":238,"technical":8303}`,
-  and `action_events_unclassified=0`.
-- Action event type denominator caveat remains open: `action_event_types_total=532`
-  and `action_event_type_class_counts={"action_audited":327,"forensic_card_event":2,"ignored_with_reason":35,"renderer_only":22,"strategy_signal":73,"technical":73}`
-  are seed-summed counts, while the global distinct observed event type count is
-  `event_contract_static_observed_event_types_total=55`. See `BV-083`.
-- `strategy_audit`: pass with `findings=6`,
-  `low_confidence_findings=6`, `review_required_findings=0`, no strategy
-  blocker seeds, and `strategy_code_counts={"forced_keep_after_bad_mulligan":6}`.
-- `research_review`: pass as an artifact contract for `BV-084`; the latest
-  `research_review.json` publishes
-  `categories.mulligan.finding_samples` with `6` entries, and
-  `research_review.md` renders the `Seed | Decision | Code | Severity` table
-  for `forced_keep_after_bad_mulligan`.
-- `replay_decision_audit`: pass with `turn_findings=0` and
-  `decision_findings=0`.
-- `forensic_audit`: pass with `forensic_rule_findings=0`,
-  `forensic_turn_findings=0`, `forensic_severity_counts={}`,
-  `seeds_with_high_or_critical_forensic_findings=[]`, and
-  `forensic_lineage_status=complete`.
-- `BV-086` remains open even though this run is clean: prior official runs
-  `014808` and `033246` reproduced the `functional_tags_json` fallback class,
-  and the summary still needs a zero/nonzero counter plus dedicated rule or
-  waiver coverage for recurring cards.
-- `BV-088` remains open as a latent gate-coupling issue: this run has complete
-  lineage, but a fixture is still needed for the case where unaccepted lineage
-  is visible with zero forensic findings.
-- `effect_coverage`: pass with source-unknown `unknown_effects=0`,
-  `residual_status=effect_coverage_residual_accepted`,
-  `residual_unaccepted_card_flag_rows=0`,
-  `needs_review_rule_names=1457`, `heuristic_effects=114`,
-  `cast_permission_not_explicit=89`, `trigger_not_explicit=147`, and
-  `land_utility_ability_not_modeled=48`.
-- Residual effect denominator remains visible and must not be read as runtime
-  completeness: `effect_coverage_effect_totals_unknown=41`,
-  `effect_coverage_unknown_effect_status_counts={"focused_template_ready":28,"needs_review":5,"waived_curated_unknown_effect":1}`,
-  and `needs_review_unknown_effect_count=5`. See `BV-087`.
-- `focused_template_dispatch`: pass; `29/29` focused-template cards have
-  focused evidence ready and `evidence_runner_status_counts={"evidence_ready":29}`.
-- `unknown_template_backlog`: pass with
-  `status_detail=focused_template_backlog_ready` and all missing-plan counters
-  at `0`. This status is source-unknown scoped; `effect_unknown_cards=34`
-  remains a separate denominator without per-card contract in this artifact.
-  See `BV-087`.
-- `decision_trace_taxonomy`: pass with `rows=2326`,
-  `kinds_observed=11/15`, `contract_findings=0`, and
-  `missing_required_fields=0`. The four static kinds not observed in this run
-  are `activated_sacrifice_damage`, `attack_trigger_artifact_tutor`,
-  `board_wipe`, and `worldfire_reset`.
-- Decision trace waiver caveat: `179` observed decision rows are
-  `accepted_field_contract_waiver`/`generic_strategy_fields_only`, not
-  strategy-audited branches: `lorehold_upkeep_rummage=109`,
-  `saga_chapter_resolution=2`, `utility_artifact_activation=50`, and
-  `utility_land_activation=18`. A direct scan found `parent_link_rows=0`.
-  See `BV-085`.
-- `event_contract_static`: pass; `observed_event_types_total=55`,
-  `static_event_types_total=101`,
-  `observed_missing_required_fields=0`, and `waiver_until_forced_fixture=0`.
-- Human replay renderer status after the `Lightning Bolt` fallback fix:
-  the official `summary.json` publishes
-  `human_replay_resolve_ability_kind_unknown_lines=0`,
-  `human_replay_damage_cause_unknown_lines=0`,
-  `human_replay_unknown_lines=0`, `human_replay_placeholder_lines=0`, and
-  `human_replay_placeholder_samples=[]`. A direct scan of the `16` current
-  `replay.txt` files found `kind=?=0`, `cause=?=0`, `UNKNOWN=0`, and
-  `PLACEHOLDER=0`; `test_battle_replay_v10_3_renderer` passed in
-  `test_results.jsonl` with `log_lines=9`, including trigger-kind fallback,
-  noncombat damage, and card-as-damage-cause fallback.
+- `global_learning_eligible_seeds` is no longer globally blocked by final
+  status.
+- `action_critic`: pass with `findings=0`; `action_findings=0`.
+- `strategy_audit`: pass; low-confidence strategy findings remain visible but
+  do not force aggregate review by themselves.
+- `replay_decision_audit`: pass with no high/critical decision audit findings.
+- `forensic_audit`: pass with `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `forensic_rule_logical_key_missing_unaccepted=0`,
+  `forensic_card_id_missing_unaccepted=0`, and
+  `forensic_semantic_hash_missing_unaccepted=0`.
+- `effect_coverage`, `focused_template_dispatch`,
+  `unknown_template_backlog`, `decision_trace_taxonomy`, and
+  `event_contract_static` all pass under the wrapper aggregate.
 - `runtime_surface_manifest`: ready with
-  `runtime_surface_manifest_gate_expected_counts={"core_runtime_import_regression":6,"recurring_audit_required":29,"targeted_manual_gate_required_before_change":31,"targeted_test_required_before_change":42}`.
-- Runtime-surface scope for this run: `total_files=108`,
-  `unclassified_files=[]`,
-  `automation_coverage_counts={"covered_by_recurring_run":29,"imported_by_core_runtime":6,"outside_recurring_run":73}`.
-  The recurring run covers the main replay/audit pipeline; the `73` files
-  outside it still require targeted gates before changes.
-- Learned-opponent aggregate is present for the recurring run:
-  `opponent_deck_provenance.status=learned_opponent_provenance_present_with_shape_waiver`,
-  `learned_opponent_appearance_count=48`,
-  `learned_opponent_unique_count=12`,
-  `learned_opponent_source_counts={"pg_meta_decks":48}`, and
-  `opponent_deck_provenance.source_url_missing_count=0`.
-- Learned-opponent source coherence is explicitly outside the final engine
-  status for this run: `construction_report_missing_count=48` and
-  `deck_coherence_report_missing_count=48` are covered by the shape waiver.
-  Current cross-check still found `0/12` matches by
-  `summary.learned_deck_opponents[].source_url` versus coherence `row_id` or
-  `source_url`. `source_ref=learned_deck:<id>` can name different commanders
-  across artifacts; source-ref cross-check found `5/12` namespace collisions.
-  See `BV-082`.
-- Follow-ups not closed by the current aggregate status: `BV-082` remains open
-  for learned-deck source lineage/coherence joins across artifacts; `BV-083`
-  remains open for action-event type denominator naming; `BV-085` remains open
-  for learning-grade counts on field-contract waivers; `BV-086` remains open
-  for `functional_tags_json` coverage/observability; `BV-087` remains open for
-  source-unknown versus effect-unknown backlog contract; `BV-088` remains open
-  for direct lineage/gate coupling. `BV-081`, `BV-084`, and `BV-089` are closed
-  by run-scope, research-review sample, and renderer artifact/test evidence.
+  `runtime_surface_manifest_total_files=110`,
+  `runtime_surface_manifest_category_counts={"core runtime":31,"focused evidence/promotion":4,"learned-deck source":16,"optimizer/scorecard":15,"recurring audit gate":24,"renderer":4,"review queue":1,"rule registry/sync":15}`,
+  `runtime_surface_manifest_automation_coverage_counts={"covered_by_recurring_run":29,"imported_by_core_runtime":6,"outside_recurring_run":75}`,
+  and
+  `runtime_surface_manifest_gate_expected_counts={"core_runtime_import_regression":6,"recurring_audit_required":29,"targeted_manual_gate_required_before_change":32,"targeted_test_required_before_change":43}`.
+- The manifest denominator changed from `108` to `110` because
+  `server/bin/plan_learned_deck_partner_identity_backfill.py` and
+  `server/test/plan_learned_deck_partner_identity_backfill_test.py` are now
+  classified as `learned-deck source`.
 - Test provenance: `test_results_total=16`,
   `test_results_status_counts={"pass":16}`, `test_result_failures=[]`, and
-  `test_results_jsonl=/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/test_results.jsonl`.
+  `test_results_jsonl=/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_121005/test_results.jsonl`.
+
+Open-source-scope caveats:
+
+- The PG-006 source-scope caveat was reconciled after the local Hermes SQLite
+  cache was refreshed from PostgreSQL with
+  `sync_battle_card_rules_pg.py --apply-sqlite-from-pg --include-needs-review`.
+  The latest runtime summary now reports
+  `execution_status_counts={"auto":1702,"review_only":1457}`,
+  `needs_review_rule_names=1457`, and `review_only_rule_names=1457`.
+- `review_only_rule_instances=0` is a corpus label counter, not the global
+  rule-name backlog. The latest effect audit still exposes the `34` corpus
+  uses as `battle_rule_needs_review_generated` / `needs_review_rule`.
+- The superseded `090636` forensic blocker must not be used to justify a new
+  PG-004/Leyline write unless a future latest artifact reproduces it.
+- Learned-opponent/source-coherence caveats remain reportable separately when
+  the task is source lineage, but they no longer block the current aggregate
+  battle final status.
+
+## Historical Gate Reading - 2026-06-20 10:18 -0300 - Pre-PG-007
+
+Latest official run checked by this matrix:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_125745/summary.json`
+- This is a recurring run: `run_profile=recurring_16_seed`,
+  `run_scope=recurring_full`, `invocation_kind=manual_cli`,
+  `seeds_requested=16`, `seeds_completed=16`, and `start_seed=63211257`.
+- `battle_replay_final_status=review_required`
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`
+- `mandatory_gate_divergences=["forensic_audit=review_required"]`
+- `forensic_lineage_status=incomplete`
+- `forensic_rule_findings=1`
+- `forensic_turn_findings=0`
+- `test_results_total=16`
+- `test_results_status_counts={"pass":16}`
+- `execution_status_counts={"auto":1702,"review_only":1457}`
+- `needs_review_rule_names=1457`
+- `review_only_rule_names=1457`
+
+Blocking finding:
+
+- Seed artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_125745/seed_63211258/forensic_audit.json`
+- Card: `Leyline of Abundance`
+- Event: `spell_cast`
+- Effect: `ramp_permanent`
+- Source: `functional_tags_json`
+- Severity: `medium`
+- Recommendation from forensic auditor: move this card into
+  `card_battle_rules` with verified/active status.
+
+Gate reading:
+
+- At this historical point, battle was not trusted for strategy learning until
+  the Leyline forensic blocker was handled and a new latest run proved the gate
+  clean.
+- This state was superseded by PG-007 apply/postcheck, PG -> Hermes SQLite sync,
+  PG-007 closure battle `20260620_132812`, and current latest battle
+  `20260620_151437`.
+
+## Targeted Focused-Evidence Closure - 2026-06-20 10:09 -0300
+
+Latest recurring gate at that time:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_121005/summary.json`
+- `battle_replay_final_status=trusted_for_strategy_learning`
+- `mandatory_gate_divergences=[]`
+
+Additional targeted evidence after the latest recurring run:
+
+- `server/bin/manaloom_battle_rule_focused_evidence.py` now preserves original
+  spell effect data when validating extra-combat flashback evidence.
+- Targeted test:
+  `python3 -m unittest server.test.manaloom_review_queue_consumers_test.ManaloomReviewQueueConsumersTest.test_focused_evidence_unblocks_supported_low_risk_templates -v`
+  passed with `evaluated_count=14` and `evidence_count=14`.
+- Full Python discover passed `96/96`.
+
+Gate reading:
+
+- This targeted closure validates the focused-evidence/promotion harness slice.
+- It does not replace the recurring `16`-seed latest summary and does not
+  authorize PostgreSQL rule promotion by itself.
+- No new PG-004 package is ready from this targeted evidence.
+
+## Historical Gate Reading - 2026-06-20 11:19 -0300
+
+Latest official run checked by this matrix:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_140016/summary.json`
+- `seeds_requested=16`
+- `seeds_completed=16`
+- `battle_replay_final_status=trusted_for_strategy_learning`
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`
+- `mandatory_gate_divergences=[]`
+- `forensic_lineage_status=complete`
+- `forensic_rule_findings=0`
+- `forensic_turn_findings=0`
+- `test_results_total=16`
+- `test_results_status_counts={"pass":16}`
+- `execution_status_counts={"auto":1703,"review_only":1457}`
+- `strategy_review_required_findings=0`
+- `unknown_template_backlog_cards=0`
+- `focused_template_dispatch_status=focused_template_dispatch_ready`
+- `focused_template_evidence_ready=29`
+- `focused_template_evidence_not_ready_unwaived=0`
+
+Runtime surface evidence:
+
+- `python3 test_battle_runtime_surface_manifest.py` passed.
+- Manifest scan reports `total_files=110` and `unclassified_files=[]`.
+
+Gate reading:
+
+- At that time, battle was trusted for strategy learning.
+- The historical `20260620_125745` Leyline blocker is superseded by PG-007.
+- The `20260620_132812` run remains PG-007 closure evidence, but the active
+  latest is now `20260620_160459`.
+- The later `20260620_150241` Machine God's Effigy blocker is superseded by
+  PG-008, closure battle `20260620_151437`, and current latest
+  `20260620_160459`.

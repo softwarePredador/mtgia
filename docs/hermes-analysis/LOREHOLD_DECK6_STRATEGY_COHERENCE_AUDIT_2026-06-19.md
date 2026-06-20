@@ -3236,68 +3236,19 @@ Closed or reduced by this checkpoint:
 - Not closed: route/handler non-live tests, UX behavior, rollback semantics,
   DB backfills, battle-model fidelity, and live product data mutations.
 
-Remaining pending work after 2026-06-19 20:29 -03 update:
+Current remaining pending work as of 2026-06-20 09:36 -03:
 
-1. Apply the backend learned-deck metadata canonicalizer with explicit mutation
-   approval for active rows, starting with
-   `commander_learned_decks.id = f46c0421-71b4-4de3-bb79-05a916b4988b`, so
-   Lorehold `learned_deck:82` stores `total_lands = 33` instead of `30`.
-   Revalidated at 22:37 -03: dry-run still reports `db_mutations=false`,
-   `changed=1`, `applied=0`, and recomputes `total_lands` from `30` to `33`.
-   Revalidated at 23:13 -03: current dry-run for `learned_deck:82` still
-   reports `status=PASS`, `mode=dry_run`, `db_mutations=false`, `checked=1`,
-   `changed=1`, `applied=0`; persisted selected metadata is still
-   `total_lands=30`, `ramp_count=17`, `draw_count=16`, `engine_count=33`,
-   `protection_count=8`, while canonical selected metadata would be
-   `total_lands=33`, `ramp_count=20`, `draw_count=18`, `engine_count=36`,
-   `protection_count=13`. Keep open until explicit PG mutation approval and
-   post-apply verification.
-2. Backfill missing PostgreSQL functional tags, semantic v2 rows, and Lorehold
-   commander synergy rows for the current Lorehold gap set. Runtime
-   learned-deck role-summary impact is partially covered by deterministic
-   canonical overrides, but the database backfill itself is still pending.
-   Detail-mode `/ai/commander-learning` rederives `role_summary` on the normal
-   path and now reports `role_summary_source=card_list_canonicalized`; if the
-   bridge/tag canonicalization cannot run, it reports
-   `role_summary_source=persisted_metadata_fallback` plus
-   `role_summary_fallback_reason` instead of silently presenting stale metadata.
-   Revalidated at 22:42 -03: the four focused Lorehold gap cards still resolve
-   through `card_identity_bridge` but have empty `card_function_tags`, zero
-   `card_semantic_tags_v2` rows, and zero Lorehold `commander_card_synergy`
-   rows in PostgreSQL.
-   Revalidated at 23:22 -03: current runtime still merges deterministic
-   canonical role overrides before counting roles, detail-mode
-   `/ai/commander-learning` still emits `role_summary_source`, and the read-only
-   PostgreSQL gap query still returns `function_tags=[]`,
-   `semantic_v2_rows=0`, and `lorehold_synergy_rows=0` for `Orim's Chant`,
-   `Ruby Medallion`, `Scroll Rack`, and `Victory Chimes`. `Lorehold, the
-   Historian` itself has persisted `function_tags=['draw','enabler','engine',
-   'loot']` and one semantic v2 row, but still has zero Lorehold synergy rows.
-   Keep open until approved PG backfill materializes durable tags/semantic rows
-   and commander synergy rows.
-3. Fix the learned-deck identity-resolution rows that create false off-color
-   cards: raw `Vendetta` resolving as white `Vengeance`, raw `Endurance`
-   resolving as white `Endure`, and the `K-9, Mark I + The Fourteenth Doctor`
-   combined commander identity model. Any data/backfill path still requires
-   explicit DB mutation approval.
-   Revalidated at 22:47 -03: PostgreSQL `card_identity_bridge` currently has
-   both correct and wrong alias rows for `Vendetta` and `Endurance`; the
-   auditor's current lookup resolves `vendetta -> Vengeance/W` and
-   `endurance -> Endure/W`, so the real adjustment is either bridge/view data
-   de-duplication or deterministic resolver precedence before closing this as a
-   data-quality item.
-   Revalidated at 23:27 -03: the current auditor still reports
-   `off_color_cards=5`, `partner_identity_not_modeled=9`, and an
-   `off_color_resolution_plan` with `status=ready_for_review`,
-   `db_mutations=false`, `apply_requires_explicit_approval=true`,
-   `entry_count=5`. Direct PG read-only evidence now shows correct
-   `card_identity_bridge` rows with `match_priority=0` for `Vendetta/B` and
-   `Endurance/G`, but also wrong alias rows where `Vendetta` points to
-   `Vengeance/W` and `Endurance` points to `Endure/W`. Current
-   `load_card_lookup(...)` still lacks deterministic `ORDER BY`/precedence and
-   keeps the first alias with `lookup.setdefault(...)`, so keep open until exact
-   canonical/priority-0 identity wins in audit and product resolver evidence.
-4. Continue strict-oracle data modeling/backfill work for the broader PG
+1. Keep partner/background identity persistence closed unless a future SELECT
+   or learned-deck coherence artifact proves rollback or drift. PG-001 applied
+   `10` rows, the post-apply planner returns `planned_row_count=0`, and current
+   coherence evidence reports `partner_identity_not_modeled=0`.
+2. Keep global learned-deck metadata canonicalization closed unless a future
+   SELECT or full coherence artifact proves rollback or drift. PG-002 applied
+   `59` rows, postcheck reports `all_post_apply_checks_ok=true`, and the current
+   full artifact `learned_deck_coherence_audit_20260620_115918` reports
+   `metadata_total_lands_mismatch=0`, `metadata_zero_lands=0`, and
+   `all_core_metadata_zero=0`.
+3. Continue strict-oracle data modeling/backfill work for the broader PG
    backlog, while keeping Scryfall no-rules-text cards out of active
    learned-deck oracle-text failures. Current `20260620_005400` read-only
    evidence still keeps the broader base-card backlog at `363` not fully
@@ -3321,34 +3272,7 @@ Remaining pending work after 2026-06-19 20:29 -03 update:
    `backfill_ready=0`; the live Scryfall-limited run found four official
    no-rules-text cards with `oracle_text_present=false` and returned exact-name
    `404` for the two `A-` variants.
-5. Close `BV-076` by modeling `redirect_removal` as actual target
-   redirection/change provenance. Latest evidence still lacks redirected object,
-   old target, new target, legal redirect opportunity, and human replay output
-   proving target mutation. This remains a battle-engine item and was not changed
-   here.
-   Revalidated at 23:05 -03: latest `20260620_014808` contains 34 runtime
-   `Deflecting Swat` / `redirect_removal` rows across `cast_announced`,
-   `cost_paid`, `spell_cast`, `miracle_cast`, and `spell_resolved`, but no
-   observed `redirect_removal_resolved` event and no runtime `old_target`,
-   `new_target`, or `target_change_applied` proof. The static contract knows
-   the event shape, but reports `observed_count=0`; keep `BV-076` open until a
-   targeted regression or natural replay proves actual target mutation.
-6. Track the residual battle coverage queues that are separate from the focused
-   `BV-067` closure. Latest `20260620_014808` supersedes `20260620_004504` and
-   is not trusted for strategy learning: `battle_replay_final_status =
-   review_required`, with `mandatory_gate_divergences =
-   [forensic_audit=review_required]`. It still completed `16/16` seeds and has
-   `16/16` test-result passes, `action_findings=0`,
-   `strategy_review_required_findings=0`, `unknown_template_backlog_cards=0`,
-   and accepted residual effect coverage, but has `forensic_rule_findings=1`
-   for `Machine God's Effigy` using heuristic `functional_tags_json` in seed
-   `63210153`. It also still reports `needs_review_rule_names=1457`,
-   `non_runtime_safe_rule_names=1457`, `global_learning_eligible_seeds=[]`, and
-   six low-confidence replay seeds (`63210149`, `63210150`, `63210158`,
-   `63210160`, `63210161`, `63210162`). This remains
-   battle-engine/rule-coverage scope and was not changed without Auditor
-   authorization.
-7. Keep `/ai/simulate-matchup` advisory-only in deck-builder guidance. Saved
+4. Keep `/ai/simulate-matchup` advisory-only in deck-builder guidance. Saved
    and public deck stats now prefer canonical functional roles and commander
    color identity, but the route still writes `deck_matchups`, meta-deck
    opponent stats remain sparse, counterspell counting keeps a limited
@@ -3363,8 +3287,66 @@ Remaining pending work after 2026-06-19 20:29 -03 update:
    guards. It still reads and attempts to write `deck_matchups`, meta-deck
    opponents still lack canonical role/stats payloads, and counterspell counting
    still has the narrow oracle-text fallback. Keep advisory-only.
+   Revalidated at 03:00 -03: current
+   `server/routes/ai/simulate-matchup/index.dart` still prefers
+   `card_intelligence_snapshot` when present and falls back to aggregated
+   `card_function_tags`/`card_semantic_tags_v2`, still owner/public scopes deck
+   reads, still writes `deck_matchups` and reads it back into
+   `stored_matchup`, and still counts counters via canonical roles plus the
+   limited `oracleText.contains('counter target')` fallback. Current contract
+   row in `server/doc/API_CONTRACTS_AND_DATA_MAP.md` explicitly marks the route
+   as write-capable/advisory and says not to treat it as competitive prediction,
+   deck-construction proof, or swap input. Keep active until product scope
+   either makes the route non-writing/fixture-safe for audits or accepts the
+   advisory-only limitation as final.
 Closed or removed from the active list in and after the 20:29 -03 update:
 
+- The former metadata canonicalization active item for Lorehold
+  `learned_deck:82` is closed as of 2026-06-20 00:23 -03 after explicit
+  mutation approval in the prior focused goal. Row
+  `f46c0421-71b4-4de3-bb79-05a916b4988b` now dry-runs with `changed=0`,
+  `applied=0`, `db_mutations=false`, and selected metadata
+  `total_lands=33`, `ramp_count=20`, `draw_count=18`, `engine_count=37`,
+  `protection_count=13`.
+- The former focused PostgreSQL tag/semantic/synergy backfill active item for
+  `Orim's Chant`, `Ruby Medallion`, `Scroll Rack`, `Victory Chimes`, and
+  `Lorehold, the Historian` is closed as of 2026-06-20 00:23 -03 after explicit
+  mutation approval in the prior focused goal. Post-apply dry-run reports the
+  planned source `lorehold_critical_gap_manual_2026_06_20` already has
+  `11` function-tag rows, `4` semantic-v2 rows, and `5` Lorehold
+  commander-synergy rows, with `db_mutations=false` and `applied_counts=0`.
+- The residual battle coverage item opened by `20260620_014808` is no longer
+  active. Current latest artifact `20260620_025107` reports
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_rule_findings=0`,
+  `forensic_turn_findings=0`, and `16/16` test-result passes.
+  `/ai/simulate-matchup` guidance remains active as item `4`; it is not the
+  only active item in the current list.
+  Superseded at 00:56 -03 by latest artifact `20260620_033246`: the prior
+  trusted battle state remains historical only. Current `latest/summary.json`
+  was blocked by `forensic_audit=blocked`.
+  Superseded again at 01:01 -03 by latest artifact `20260620_040120`, which
+  reports `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_rule_findings=0`, and
+  `forensic_turn_findings=0`.
+- The transient `20260620_033246` `Breena, the Demagogue` forensic blocker is
+  no longer active as of `20260620_040120`. Latest
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  resolves to `20260620_040120`, with `run_scope=recurring_full`,
+  `seeds_completed=16`, `test_results_total=16`,
+  `test_results_status_counts={"pass":16}`, all mandatory gates passing,
+  `forensic_rule_findings=0`, and `forensic_turn_findings=0`. The historical
+  `20260620_033246` blocker remains useful as lineage history, but it is not a
+  current active pending item.
+- `BV-076` redirect-removal target mutation/provenance and the latest
+  `20260620_090636` `Leyline of Abundance` forensic lineage regression are no
+  longer active Deck/Lorehold backlog items after the Auditor Central order
+  `2026-06-20 06:24 -03`. They remain monitored evidence from
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  and are handed off to the Battle and PostgreSQL/DBA registers. Current
+  PostgreSQL deploy register classifies `Leyline of Abundance` as `PG-004`,
+  status `not_ready`, with no PostgreSQL plan yet. No battle-engine code or
+  PostgreSQL row was changed from this Deck register.
 - The create/full-persist/optimize apply follow-up item is no longer active as
   of the 22:28 -03 revalidation. Current code/test state closes shared
   bridge-first name resolution, current optimize stale signatures already cover
@@ -8193,22 +8175,28 @@ Current conclusion:
 
 ### Opening-hand/sample-hand divergences
 
-244. Treat `GET /decks/:id/simulate` as an experimental legacy consistency
-     route, not as a strategy, legality, or coherence verdict.
-245. Do not use `GET /decks/:id/simulate` output for reproducible audits until
-     it exposes seed/iteration controls or delegates to deterministic
-     `GoldfishSimulator`; current source uses fixed `1000` iterations with
-     unseeded `Random()`.
+244. Closed for backend response/API-contract labeling on 2026-06-20 06:08 -03:
+     `GET /decks/:id/simulate` now returns `engine=legacy_monte_carlo`,
+     `advisory=true`, and `simulation_contract.status=legacy_consistency_only`.
+     It remains a legacy consistency surface, not a strategy, legality, learned
+     package, oracle-identity, or swap verdict source.
+245. Reduced on 2026-06-20 06:08 -03: the route now exposes optional
+     `iterations` (`1..5000`) and `seed` query controls, and a non-live adapter
+     test proves deterministic output for the same seed. It still does not
+     delegate to `GoldfishSimulator`, so use only for reproducible legacy
+     consistency snapshots, not full deck-construction audits.
 246. Do not use `GET /decks/:id/simulate` to validate Lorehold identity,
      oracle-backed singleton identity, functional roles, learned packages, or
      candidate quality. The route does not read `oracle_id`,
      `card_identity_bridge`, semantic/function tags, or learned/reference data.
-247. Mark the route's on-curve percentages as simplified. It draws on turn 1,
-     ignores London mulligan, color availability, tapped lands, ramp sequencing,
-     commander tax, interaction, and actual game-plan dependencies.
-248. Avoid mixing `GET /decks/:id/simulate` and `POST /ai/simulate` results as
-     equivalent metrics. They use different engines, response contracts, fields,
-     and randomness behavior.
+247. Closed for backend/API-contract disclosure on 2026-06-20 06:08 -03: the
+     response now includes `simulation_contract.simplifications[]`, and the API
+     contract names turn-1 draw, London mulligan, color availability,
+     tapped-land timing, and sequencing limits.
+248. Reduced on 2026-06-20 06:08 -03: the API contract now separates
+     `GET /decks/:id/simulate` as `legacy_monte_carlo` from `POST /ai/simulate`
+     goldfish as the stronger tested simulator path. Keep this caution active
+     for product/UI copy until consumers visibly distinguish both metrics.
 249. Treat `SampleHandWidget` as a local human-facing playtest widget only. It
      excludes commanders from the pool and does not call the backend simulation
      route.
@@ -8219,13 +8207,16 @@ Current conclusion:
 251. If sample-hand data is shown in chat "Ajustar deck", use it after the
      candidate list has already passed learned/reference, bridge/identity,
      optimize/analysis, and strict validation checks.
-252. Update the API contract to separate three concepts explicitly:
-     app-local sample hand, legacy `GET /decks/:id/simulate`, and
-     `POST /ai/simulate` goldfish. Only the last currently has the stronger
-     simulator test coverage.
-253. Add focused non-live tests for `GET /decks/:id/simulate` response shape,
-     method-not-allowed, owner-scope not-found, empty deck behavior, and its
-     advisory-only limits.
+252. Reduced on 2026-06-20 06:08 -03: the API contract now separates legacy
+     `GET /decks/:id/simulate` from `POST /ai/simulate` goldfish and states
+     that the latter is the stronger tested backend path. The app-local
+     `SampleHandWidget` copy/consumer distinction remains active under items
+     `249-251`.
+253. Closed on 2026-06-20 06:08 -03: `server/test/deck_simulate_route_adapter_test.dart`
+     covers method-not-allowed, owner-scope not-found before card loading,
+     empty owned deck behavior, response shape, advisory-only metadata,
+     deterministic seed behavior, and iteration clamping without live
+     PostgreSQL.
 
 ## Import Existing-Deck UI Reconciliation - 2026-06-19T23:50Z
 
@@ -11106,6 +11097,2382 @@ Scope guard:
 - No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
   swap, battle-engine edit, commit, or push was performed.
 
+### Partner Identity Audit Drift Closure - 2026-06-20 06:55 -03
+
+Scope:
+
+- Executed under Auditor Central order for Ajustar Deck after PG-001 was already
+  applied and validated.
+- Did not rerun PG-001 apply, did not alter PostgreSQL, did not apply deck swaps,
+  and did not commit/push.
+- Fixed only the learned-deck audit metric drift where
+  `partner_identity_not_modeled` ignored the persisted
+  `metadata.commander_identity_model`.
+
+Code adjustment:
+
+- Updated `server/bin/learned_deck_coherence_audit.py` with
+  `persisted_commander_identity_model_matches(...)`.
+- `compare_metadata(...)` now emits `partner_identity_not_modeled` only when the
+  partner/background inference is present and the persisted
+  `metadata.commander_identity_model` does not match the derived
+  `derived_metadata.commander_identity_model`.
+- The planner semantics remain unchanged: it already skipped rows where
+  persisted metadata matched the derived combined commander identity model.
+
+Validation evidence:
+
+- `cd server && python3 test/learned_deck_coherence_audit_test.py`
+  - result: `19/19` tests passed.
+- `cd server && python3 test/plan_learned_deck_partner_identity_backfill_test.py`
+  - result: `2/2` tests passed.
+- `cd server && python3 -m py_compile bin/learned_deck_coherence_audit.py bin/plan_learned_deck_partner_identity_backfill.py test/learned_deck_coherence_audit_test.py test/plan_learned_deck_partner_identity_backfill_test.py`
+  - result: pass.
+- `cd server && python3 bin/plan_learned_deck_partner_identity_backfill.py --dry-run --summary-only --output ../docs/hermes-analysis/master_optimizer_reports/learned_deck_partner_identity_backfill_plan_20260620_095139_post_pg001_audit_fix.json`
+  - result: `status=PASS`, `mode=dry_run`, `db_mutations=false`,
+    `apply_supported=false`, `apply_requires_explicit_approval=true`,
+    `planned_row_count=0`, `planned_rows=[]`.
+- `cd server && python3 bin/learned_deck_coherence_audit.py --output-dir ../docs/hermes-analysis/master_optimizer_reports`
+  - generated
+    `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_095253.json`
+    and
+    `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_095253.md`.
+
+Current artifact evidence:
+
+- New artifact `learned_deck_coherence_audit_20260620_095253.json`:
+  - `generated_at=2026-06-20T09:52:51.281581+00:00`
+  - `read_only=true`
+  - `active_learned_decks=60`
+  - `partner_identity_not_modeled=0`
+  - `medium=12`, down from `22` in
+    `learned_deck_coherence_audit_20260620_034458.json`
+  - `high=167`, unchanged from the comparison artifact
+  - `metadata_total_lands_mismatch=57`, unchanged
+  - `metadata_zero_lands=54`, unchanged
+  - `off_color_resolution_plan.status=no_current_off_color_manual_entries`
+  - `off_color_resolution_plan.entry_count=0`
+- Direct JSON check over the new artifact:
+  - combined identity rows requiring first-class persistence: `10`
+  - rows where persisted `metadata.commander_identity_model` equals derived
+    `derived_metadata.commander_identity_model`: `10`
+  - rows still carrying `partner_identity_not_modeled`: `0`
+  - residual partner issue refs: `[]`
+- The 10 now-modeled source refs are:
+  `learned_deck:112`, `learned_deck:93`, `learned_deck:110`,
+  `learned_deck:100`, `learned_deck:116`, `learned_deck:173`,
+  `learned_deck:89`, `learned_deck:90`, `learned_deck:85`, and
+  `learned_deck:87`.
+
+Status change:
+
+- Closed the active partner/background identity item for current Deck/Ajustar
+  scope. PG-001 is applied/validated, the post-fix planner has
+  `planned_row_count=0`, and the learned-deck coherence audit no longer reports
+  `partner_identity_not_modeled`.
+- Removed `partner_identity_not_modeled=10` from the current active Deck pending
+  list. It remains only as historical evidence in older sections.
+- Current active Deck/Lorehold list is now:
+  1. global learned-deck metadata canonicalization backlog
+     (`metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`,
+     `all_core_metadata_zero=54`, `some_core_metadata_zero=4`);
+  2. strict-oracle/global card backlog, still separate from Lorehold deck `6`
+     composition;
+  3. `/ai/simulate-matchup` advisory-only/write-capable boundary.
+
+Deck file classification from current `git status`:
+
+- Required source for this closure:
+  `server/bin/learned_deck_coherence_audit.py`.
+- Required tests for this closure:
+  `server/test/learned_deck_coherence_audit_test.py` and existing
+  `server/test/plan_learned_deck_partner_identity_backfill_test.py`.
+- Required evidence for this closure:
+  `learned_deck_partner_identity_backfill_plan_20260620_095139_post_pg001_audit_fix.json`,
+  `learned_deck_coherence_audit_20260620_095253.json`, and
+  `learned_deck_coherence_audit_20260620_095253.md`.
+- Existing Deck source already modified/untracked before this checkpoint and
+  still classified as required source unless the Auditor Central later narrows
+  it: app deck provider/screens/widgets, server deck/import/optimize/generate/
+  simulate/recommendations/validation routes and support libraries, plus the
+  existing planner/source files under `server/bin`.
+- Existing Deck tests already modified/untracked before this checkpoint and
+  still classified as required tests unless superseded: app deck provider/screen/
+  widget tests and server deck/import/optimize/generate/recommendations/
+  validation tests.
+- Evidence/register files to preserve:
+  Auditor Central orders, PostgreSQL deploy register, PG-001 SQL package
+  artifacts, battle/latest summaries, and learned-deck coherence/planner
+  artifacts.
+- Future cleanup candidates only after Auditor Central consolidation:
+  superseded learned-deck coherence snapshots from intermediate cycles
+  (`20260620_031157`, `20260620_033941`, `20260620_034324`) and the pre-apply
+  partner planner artifact `learned_deck_partner_identity_backfill_plan_20260620_005219.json`.
+  No cleanup was performed.
+
+Scope guard:
+
+- No PostgreSQL write, PG-001 reapply, live route call, OpenAI call, deck `6`
+  mutation, deck swap, battle-engine edit, commit, push, or file cleanup was
+  performed.
+
+### Role Summary Runtime Recheck - 2026-06-20 06:10 -03
+
+Scope:
+
+- Rechecked current learned-deck `role_summary` behavior after the latest
+  worktree state, focusing on Lorehold learned deck `82`, deck `6` relevance,
+  route contract, app consumption, and dry-run metadata evidence.
+- This is a read-only audit slice. It does not imply a deck mutation, metadata
+  backfill, swap, or code change.
+
+Current backend evidence:
+
+- `server/routes/ai/commander-learning/index.dart` still canonicalizes learned
+  deck metadata once in detail mode through
+  `canonicalizeCommanderLearnedDeckMetadataWithStatus(pool, learnedDeck)`.
+- Both `promoted_deck.role_summary` and `recommended_deck.role_summary` are
+  built from `_roleSummaryFromMetadata(roleMetadata)`.
+- The detail response still exposes `role_summary_source` and, when relevant,
+  `role_summary_fallback_reason`.
+- `server/lib/ai/commander_learned_deck_support.dart` still resolves learned
+  deck card names through `card_identity_bridge`, aggregates
+  `card_function_tags`, handles split/alias matching, skips lands from nonland
+  role accumulation, and keeps role counts additive across multi-tags.
+- Current Lorehold-specific overrides remain:
+  `Orim's Chant`, `Ruby Medallion`, `Scroll Rack`, `Victory Chimes`, and
+  `Lorehold, the Historian`.
+
+Lorehold deck `82` dry-run evidence:
+
+- Command:
+  `cd server && dart run bin/canonicalize_learned_deck_metadata.dart --dry-run --source-ref=learned_deck:82 --include-unchanged`
+- Result:
+  - `status=PASS`
+  - `mode=dry_run`
+  - `db_mutations=false`
+  - `checked=1`
+  - `reported=1`
+  - `changed=0`
+  - `applied=0`
+- Before and after role metadata are identical:
+  - `total_lands=33`
+  - `ramp_count=20`
+  - `draw_count=18`
+  - `removal_count=8`
+  - `tutor_count=5`
+  - `engine_count=37`
+  - `wincon_count=13`
+  - `protection_count=13`
+  - `recursion_count=4`
+  - `board_wipe_count=2`
+- This proves current persisted Lorehold learned-deck metadata already matches
+  the dry-run canonicalizer for the fields used by product `role_summary`.
+
+Current app evidence:
+
+- Focused app search found learned-deck usage in `DeckGenerateScreen` through
+  `recommended_deck`, `promoted_deck`, preview/save diagnostics, legality,
+  validation, score, source confidence, archetype, and bracket.
+- No direct app `role_summary` rendering or parsing contract was found in the
+  focused `app/lib/features/decks` and `app/test/features/decks` search.
+- App behavior therefore treats `role_summary` as backend diagnostic/source
+  evidence, not as a visible role-count UI contract today.
+
+Validation evidence:
+
+- `cd server && dart analyze routes/ai/commander-learning/index.dart lib/ai/commander_learned_deck_support.dart lib/ai/commander_reference_helpers.dart test/commander_learned_deck_support_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/commander_learned_deck_support_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `25/25` tests passed.
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider.dart lib/features/decks/screens/deck_generate_screen.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/providers/deck_provider_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart`
+  - result: `33/33` tests passed.
+
+Current learning:
+
+- Current Lorehold `role_summary` is coherent with the dry-run canonicalizer for
+  learned deck `82`; there is no current deck `6` role-summary metadata repair
+  item from this slice.
+- `role_summary` remains an additive role coverage summary, not an exclusive
+  partition of the 100 cards.
+- For chat "Ajustar deck", the exact Lorehold counts above can be used as role
+  coverage evidence only when the source is canonicalized or the dry-run proves
+  `changed=0` for the same learned deck/source ref.
+- Product app behavior still does not prove a user-facing role-count display;
+  it proves learned-deck preview/save flow around `recommended_deck` cards and
+  validation.
+
+Additional required adjustments:
+
+525. Treat learned deck `82` role metadata as current for this audit slice:
+     dry-run canonicalizer returned `changed=0` and `db_mutations=false`.
+526. Keep using the exact Lorehold role counts as coverage evidence, not as a
+     one-card-one-role total that must add to `100`.
+527. Do not claim the mobile app displays `role_summary`; current app evidence
+     only shows learned preview/save diagnostics and `recommended_deck` card
+     consumption.
+528. Keep `role_summary_source=persisted_metadata_fallback` as review-only; it
+     cannot justify deck swaps or closure without a successful canonicalized
+     path or dry-run proof.
+529. Treat the canonicalizer dry-run as validation evidence only. Applying a
+     metadata backfill remains a PostgreSQL write and requires explicit approval.
+530. Preserve Lorehold role overrides unless a new source-backed role audit and
+     focused tests prove a narrower or broader mapping.
+531. For "Ajustar deck", combine role summary with exact card identity,
+     strict validation, legality, and strategy-package evidence before
+     recommending any card action.
+532. Keep no-commander learned-deck list mode free of `role_summary`, raw
+     metadata, decklists, and cards.
+533. For other learned decks, if the dry-run canonicalizer reports `changed>0`,
+     classify it as metadata/backfill divergence first, not as a deck swap
+     request.
+534. Deck `6` has no active role-summary repair from this recheck; continue the
+     broader audit on remaining builder/optimize/analysis boundaries.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### Legacy Deck Simulate Advisory Contract - 2026-06-20 06:08 -03
+
+Treatment performed:
+
+- Rechecked `GET /decks/:id/simulate` against the opening-hand/sample-hand
+  backlog. The route was owner-scoped already, but still had fixed `1000`
+  iterations, unseeded `Random()`, no response-level advisory marker, and no
+  non-live adapter test.
+- Updated `server/routes/decks/[id]/simulate/index.dart` additively:
+  - optional `iterations` query param, clamped to `1..5000`;
+  - optional integer `seed` query param for deterministic legacy Monte Carlo
+    snapshots;
+  - response fields `seed`, `engine=legacy_monte_carlo`, `advisory=true`, and
+    `simulation_contract`.
+- `simulation_contract` explicitly records
+  `status=legacy_consistency_only`, `uses_goldfish_simulator=false`,
+  `canonical_legality_source=false`, `strategy_or_swap_proof=false`, and the
+  known simplifications: turn-1 draw, no London mulligan bottoming, no color
+  availability, no tapped-land timing, and no ramp/interaction sequencing.
+- Added `server/test/deck_simulate_route_adapter_test.dart` with fake
+  `RequestContext`/`Pool` coverage for:
+  - method-not-allowed without touching the pool;
+  - owner-scope not-found before loading cards;
+  - empty owned deck not-found;
+  - deterministic response body for the same seed;
+  - advisory/legacy response shape;
+  - iteration lower/upper clamp.
+- Updated `server/doc/API_CONTRACTS_AND_DATA_MAP.md` so the API contract
+  separates this legacy route from `POST /ai/simulate` goldfish and says the
+  legacy route is advisory consistency support only, not legality, strategy,
+  learned-package, oracle identity, or swap proof.
+- Updated source/contract guards in
+  `server/test/experimental_deck_ai_authorization_source_test.dart` and
+  `server/test/api_contracts_data_map_guard_test.dart`.
+
+Validation evidence:
+
+- `cd server && dart format 'routes/decks/[id]/simulate/index.dart' test/deck_simulate_route_adapter_test.dart test/experimental_deck_ai_authorization_source_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: formatted `4` files, `1` changed.
+- `cd server && dart analyze 'routes/decks/[id]/simulate/index.dart' test/deck_simulate_route_adapter_test.dart test/experimental_deck_ai_authorization_source_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/deck_simulate_route_adapter_test.dart test/experimental_deck_ai_authorization_source_test.dart test/api_contracts_data_map_guard_test.dart test/goldfish_simulator_test.dart -r expanded`
+  - result: `39/39` tests passed.
+
+Artifact recheck:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  changed during this checkpoint and now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_090636/summary.json`.
+- Current battle summary no longer remains trusted:
+  `battle_replay_final_status=review_required`,
+  `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`,
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`,
+  `forensic_rule_findings=1`, `forensic_turn_findings=0`,
+  `forensic_severity_counts={"medium":1}`, and
+  `test_results_status_counts={"pass":16}`.
+- The active forensic blocker is seed `63210916`: `Leyline of Abundance`,
+  event `spell_cast`, effect `ramp_permanent`, source
+  `functional_tags_json`, missing `rule_logical_key`, `card_id`, and
+  `semantic_hash`; seed forensic audit recommends moving the card into
+  `card_battle_rules` with `verified`/`active` status.
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`.
+
+Status change:
+
+- Closed opening-hand/sample-hand item `253`.
+- Closed item `244` for backend/API-contract labeling and item `247` for
+  response/API-contract simplification disclosure.
+- Reduced item `245`: seed/iteration controls exist, but this route still does
+  not delegate to `GoldfishSimulator`, so it remains legacy consistency-only.
+- Reduced item `248`: API docs now separate legacy deck simulate from
+  `POST /ai/simulate`; product/UI wording still must not merge both metrics.
+- Reduced item `252`: backend API contracts now separate legacy simulate from
+  goldfish; app-local `SampleHandWidget` guidance remains active under items
+  `249-251`.
+- Opened/kept the new active battle forensic lineage item for
+  `20260620_090636`; this was not treated in code because it is
+  battle/Hermes rule-lineage scope and needs Auditor authorization for any
+  battle-engine or PostgreSQL mutation.
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Battle Latest 090636 Forensic Recheck - 2026-06-20 06:10 -03
+
+Artifact recheck:
+
+- Latest battle symlink:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  -> `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_090636/summary.json`.
+- Summary status:
+  `timestamp_utc=2026-06-20T09:06:36Z`,
+  `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `seeds_requested=16`, `seeds_completed=16`,
+  `battle_replay_final_status=review_required`,
+  `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`,
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`,
+  `forensic_rule_findings=1`, `forensic_turn_findings=0`,
+  `forensic_severity_counts={"medium":1}`, and `16/16` test results passed.
+- New auditor artifact
+  `docs/hermes-analysis/master_optimizer_reports/battle_latest_090636_action_event_denominator_bv083_closure_20260620_0612.md`
+  closes `BV-083` as an observability/naming issue: `summary.json` now
+  separates `action_event_types_seed_sum=561` from
+  `action_event_types_distinct_total=55` and exposes matching per-class
+  seed-sum versus distinct-global denominators. This closure does not make the
+  latest trusted because the same artifact confirms
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- The latest learned-deck coherence artifact is unchanged:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`,
+  `generated_at=2026-06-20T03:44:55.241649+00:00`, `read_only=true`.
+
+Forensic blocker evidence:
+
+- Seed artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_090636/seed_63210916/forensic_audit.md`.
+- Seed `63210916` forensic summary:
+  `findings_total=1`, `critical=0`, `high=0`, `medium=1`, `low=0`,
+  `rule_logical_key_missing_unaccepted=1`,
+  `card_id_missing_unaccepted=1`, and
+  `semantic_hash_missing_unaccepted=1`.
+- Finding row: turn `12`, phase `precombat_main`, player
+  `Tayam, Luminous Enigma #25 (real)`, event `spell_cast`, card
+  `Leyline of Abundance`, effect `ramp_permanent`, finding
+  `Game event depended on heuristic source functional_tags_json`, and
+  recommendation to move this card into `card_battle_rules` with
+  `verified`/`active` status.
+- Event evidence in `seed_63210916/replay.events.jsonl`: Leyline rows `805-807`
+  have `rule_source=functional_tags_json`, `rule_review_status=heuristic`,
+  `rule_confidence=0.35`, and no `card_id`, `semantic_hash`, or
+  `rule_logical_key`; the comparable next verified `Twinflame` rows carry all
+  three lineage fields.
+
+Status change:
+
+- The prior latest `20260620_040120` trusted state is now historical only.
+- `BV-083` is closed by the new denominator artifact and is not part of the
+  active list.
+- The active battle/latest item is reopened as a forensic lineage backlog for
+  `Leyline of Abundance` heuristic runtime dependency. This is not a Lorehold
+  decklist or deck-builder code defect; it is battle/Hermes rule-lineage
+  coverage.
+- No battle-engine code, PostgreSQL row, deck `6`, deck swap, live route,
+  OpenAI call, commit, or push was changed.
+
+### Auditor Central Deck Reconciliation - 2026-06-20 06:28 -03
+
+Scope:
+
+- Rechecked the updated Auditor Central order
+  `docs/hermes-analysis/MANALOOM_CENTRAL_AUDITOR_ORDERS.md` after its
+  `2026-06-20 06:24 -03` update.
+- Rechecked `docs/CONTEXTO_PRODUTO_ATUAL.md`,
+  `docs/hermes-analysis/PROJECT_MEMORY.md`,
+  `docs/hermes-analysis/POSTGRES_DEPLOY_REGISTER_2026-06-20.md`,
+  `learned_deck_coherence_audit_20260620_034458.json`,
+  `learned_deck_partner_identity_backfill_plan_20260620_005219.json`, and
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`.
+
+Evidence:
+
+- Auditor Central current Deck order says Deck/Lorehold should reconcile docs,
+  avoid code changes during this cycle, avoid PostgreSQL writes, avoid swaps,
+  and keep active only the real Deck backlogs:
+  `partner_identity_not_modeled=10`, global learned-deck metadata backlog,
+  oracle gap `363`, and `/ai/simulate-matchup` advisory-only.
+- PostgreSQL deploy register:
+  - `PG-001` partner/background identity metadata backfill is
+    `package_required`, `apply authorized=false`, `planned_row_count=10`.
+  - `PG-002` global learned-deck metadata canonicalization is `not_ready`:
+    `metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`,
+    `all_core_metadata_zero=54`, `some_core_metadata_zero=4`, and no full
+    row-by-row dry-run plan yet.
+  - `PG-003` oracle/card text/type backfill is `not_ready`; current inventory
+    is `34,329` cards, `33,966` strict structured, `363` relevant gaps, and
+    current planner has `backfill_ready=0`.
+  - `PG-004` battle rule promotion for `Leyline of Abundance` is `not_ready`
+    and owned by Battle/DBA decisioning, not this Deck register.
+- Latest learned-deck coherence artifact remains
+  `learned_deck_coherence_audit_20260620_034458.json`, generated at
+  `2026-06-20T03:44:55.241649+00:00`, `read_only=true`.
+- Latest battle remains `20260620_090636`, with
+  `battle_replay_final_status=review_required`,
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`,
+  `forensic_rule_findings=1`, and `16/16` test results passing.
+
+Status change:
+
+- The central active Deck list now contains four items:
+  partner/background identity persistence, global learned-deck metadata
+  canonicalization backlog, strict-oracle/global card backlog, and
+  `/ai/simulate-matchup` advisory-only.
+- `BV-076` and the `20260620_090636` `Leyline of Abundance` forensic finding
+  are retained as monitored battle/latest evidence and handoff items, but are
+  no longer active Deck/Lorehold backlog items.
+- No code, PostgreSQL row, deck `6`, deck swap, live route, OpenAI call,
+  commit, or push was changed in this checkpoint.
+
+### Learned-Deck Combined Commander Inference Closure - 2026-06-20 00:44 -03
+
+Treatment performed:
+
+- Updated `server/bin/learned_deck_coherence_audit.py` so
+  `infer_partner_identity_context(...)` also parses declared deck-name
+  commander components separated by `+`.
+- This lets `K-9, Mark I + The Fourteenth Doctor` infer
+  `The Fourteenth Doctor` as a combined commander component even when the
+  secondary commander is not detected by generic `partner` text markers.
+- Updated `build_commander_identity_model(...)` to preserve the inference source
+  as `deck_name_commander_component`.
+- Updated `audit_to_json(...)` and `build_off_color_resolution_plan(...)` so
+  inactive manual off-color reviews are not emitted as current active review
+  plans when the present resolved card list is no longer off-color after
+  combined identity inference.
+- Updated Markdown recommendations generated by the auditor so zero current
+  off-color findings are reported as monitoring, not as a manual-review backlog.
+
+Validation evidence:
+
+- `cd server && python3 test/learned_deck_coherence_audit_test.py`
+  - result: `17/17` tests passed.
+- `cd server && python3 -m py_compile bin/learned_deck_coherence_audit.py test/learned_deck_coherence_audit_test.py`
+  - result: pass.
+- Generated read-only artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.md`.
+- Artifact `20260620_034458` aggregate:
+  - `active_learned_decks=60`
+  - `metadata_total_lands_mismatch=57`
+  - `metadata_zero_lands=54`
+  - `all_core_metadata_zero=54`
+  - `partner_identity_not_modeled=10`
+  - no `off_color_cards` aggregate key
+  - severity `high=167`, `medium=22`
+- Artifact `20260620_034458` off-color plan:
+  - `status=no_current_off_color_manual_entries`
+  - `entry_count=0`
+  - `db_mutations=false`
+- Artifact `20260620_034458` K-9 evidence:
+  - source ref `learned_deck:116`
+  - issues: `partner_identity_not_modeled`, `metadata_total_lands_mismatch`,
+    `metadata_zero_lands`, `all_core_metadata_zero`
+  - `commander_identity_model.status=combined_identity_inferred`
+  - `commander_identity_model.source=deck_name_commander_component`
+  - `combined_color_identity=G,R,U,W`
+  - `identity_components=The Fourteenth Doctor`
+  - `off_color_after_partner_inference=[]`
+- Generated Markdown now says:
+  `No current off-color cards remain after partner/deck-name inference; keep monitoring new audit artifacts.`
+
+Status change:
+
+- Closed the current off-color residual portion of active item `1`.
+- Active item `1` remains open only for durable partner/background identity
+  persistence/backfill, which still requires explicit PostgreSQL mutation
+  approval. The current read-only artifact proves the runtime auditor can infer
+  all combined identities but still reports `partner_identity_not_modeled=10`.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Simulate Matchup Advisory Recheck - 2026-06-20 03:00 -03
+
+Current evidence:
+
+- `server/routes/ai/simulate-matchup/index.dart` still owner-scopes
+  `my_deck_id`, allows only caller-owned or public saved opponent decks, and
+  separately tries `meta_decks` when the saved opponent deck is not readable.
+- Saved/public deck stats still prefer `card_intelligence_snapshot`; when the
+  snapshot is unavailable, the route falls back to aggregated
+  `card_function_tags` and `card_semantic_tags_v2` by `card_id`.
+- The route still writes/upserts `deck_matchups` and reads prior matchup data
+  into `stored_matchup`; it remains write-capable and was not executed live in
+  this audit.
+- Counterspell counting still uses canonical role resolution plus the limited
+  `oracleText.contains('counter target')` fallback.
+- `server/doc/API_CONTRACTS_AND_DATA_MAP.md` currently documents
+  `POST /ai/simulate-matchup` as write-capable and advisory, with explicit
+  warning not to treat it as authoritative competitive prediction,
+  deck-construction proof, or swap input.
+
+Validation evidence:
+
+- `cd server && dart test test/experimental_deck_ai_authorization_source_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `17/17` tests passed.
+- `git diff --check -- docs/hermes-analysis/LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`
+  - result: no whitespace errors.
+
+Status change:
+
+- Active item `4` remains open with current source/test/doc evidence. This is
+  not a decklist correction and not a Lorehold deck `6` mutation.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Battle Strategy Latest Summary Recheck - 2026-06-20 01:01 -03
+
+Current evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`
+  now resolves to `20260620_040120`, superseding the previous blocked
+  `20260620_033246` run.
+- Latest `summary.json` reports:
+  - `timestamp_utc=2026-06-20T04:01:20Z`
+  - `run_profile=recurring_16_seed`
+  - `run_scope=recurring_full`
+  - `seeds_requested=16`
+  - `seeds_completed=16`
+  - `test_results_total=16`
+  - `test_results_status_counts={"pass":16}`
+  - `battle_replay_final_status=trusted_for_strategy_learning`
+  - `battle_replay_final_status_reason=all_mandatory_gates_pass`
+  - `mandatory_gate_divergences=[]`
+  - `forensic_rule_findings=0`
+  - `forensic_turn_findings=0`
+  - `forensic_severity_counts={}`
+  - `seeds_with_high_or_critical_forensic_findings=[]`
+- Direct scan of all latest `seed_*/forensic_audit.json` files found no
+  remaining `rule_findings` or `turn_findings`.
+- Existing artifact
+  `docs/hermes-analysis/master_optimizer_reports/battle_latest_040120_research_review_bv084_closure_20260620_0101.md`
+  independently records the same `summary.json` trusted status and `16` passing
+  test results while closing `BV-084` research-review observability.
+
+Status change:
+
+- Removed the transient `20260620_033246` `Breena, the Demagogue` forensic
+  blocker from the active pending list. It is historical evidence only now.
+- Did not change `BV-076`; redirect target/change provenance remains open
+  because current trusted status does not prove `redirect_removal_resolved`
+  target mutation evidence.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Partner Identity Backfill Dry-Run Plan - 2026-06-20 00:52 -03
+
+Treatment performed:
+
+- Added `server/bin/plan_learned_deck_partner_identity_backfill.py`.
+- The planner imports the current read-only learned-deck coherence audit,
+  opens PostgreSQL in a read-only session, reuses the existing combined
+  commander identity inference, and emits metadata patches only for active
+  learned decks whose `commander_identity_model.requires_first_class_persistence`
+  is true and not already persisted in `metadata`.
+- The script intentionally has no apply mode. It emits planned `UPDATE
+  commander_learned_decks SET metadata = ...` SQL and matching rollback SQL
+  scoped by both `id` and `source_ref`; applying those statements remains a
+  separate PostgreSQL mutation that requires explicit approval.
+- Added `server/test/plan_learned_deck_partner_identity_backfill_test.py` to
+  guard dry-run flags, patch contents, skip behavior for already-persisted or
+  single-identity rows, and scoped SQL/rollback SQL.
+- Generated full dry-run artifact
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_partner_identity_backfill_plan_20260620_005219.json`.
+
+Validation evidence:
+
+- `python3 -m py_compile server/bin/plan_learned_deck_partner_identity_backfill.py server/test/plan_learned_deck_partner_identity_backfill_test.py`
+  - result: pass.
+- `python3 server/test/plan_learned_deck_partner_identity_backfill_test.py`
+  - result: `2/2` tests passed.
+- `python3 server/test/learned_deck_coherence_audit_test.py`
+  - result before planner artifact generation: `17/17` tests passed.
+- `cd server && python3 bin/plan_learned_deck_partner_identity_backfill.py --dry-run --summary-only --output ../docs/hermes-analysis/master_optimizer_reports/learned_deck_partner_identity_backfill_plan_20260620_005219.json`
+  - result: `status=PASS`, `mode=dry_run`, `db_mutations=false`,
+    `apply_supported=false`, `apply_requires_explicit_approval=true`,
+    `planned_row_count=10`.
+- Artifact validation script confirmed:
+  - `source_refs=learned_deck:112, learned_deck:93, learned_deck:110,
+    learned_deck:100, learned_deck:116, learned_deck:173, learned_deck:89,
+    learned_deck:90, learned_deck:85, learned_deck:87`
+  - `all_update_sql_has_source_ref=True`
+  - `all_rollback_sql_has_source_ref=True`
+- `git diff --check -- server/bin/plan_learned_deck_partner_identity_backfill.py server/test/plan_learned_deck_partner_identity_backfill_test.py docs/hermes-analysis/master_optimizer_reports/learned_deck_partner_identity_backfill_plan_20260620_005219.json`
+  - result: no whitespace errors.
+
+Status change:
+
+- Active item `1` is reduced from an undefined persistence backlog to an
+  executable dry-run plan with exact row ids, source refs, metadata patches,
+  apply SQL, and rollback SQL.
+- Active item `1` remains open because no PostgreSQL write was authorized or
+  applied, and the latest coherence artifact still reports
+  `partner_identity_not_modeled=10`.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Battle Strategy Latest Summary Recheck - 2026-06-20 00:56 -03
+
+Current evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`
+  now resolves to `20260620_033246`, not the earlier trusted
+  `20260620_025107` result.
+- Latest `summary.json` reports:
+  - `battle_replay_final_status=blocked`
+  - `battle_replay_final_status_reason=one_or_more_mandatory_gates_blocked`
+  - `mandatory_gate_divergences=["forensic_audit=blocked"]`
+  - `forensic_rule_findings=4`
+  - `forensic_turn_findings=0`
+  - `forensic_severity_counts={"high":1,"medium":1,"low":2}`
+  - `seeds_with_high_or_critical_forensic_findings=["63210333"]`
+- The same run still completed `16/16` tests with `16` pass results and
+  `py_compile` pass, so the blocker is forensic/provenance quality rather than
+  test execution failure.
+- `seed_63210333/forensic_audit.json` contains the four findings for
+  `Breena, the Demagogue` on turn `10`, phase `precombat_main`, player
+  `Tayam, Luminous Enigma #25 (real)`:
+  - high: `spell_resolved` depended on heuristic source `functional_tags_json`
+    for runtime effect `draw_cards`.
+  - medium: `spell_cast` depended on heuristic source `functional_tags_json`
+    for runtime effect `draw_cards`.
+  - low x2: runtime effect `draw_cards` differs from registry effect
+    `draw_engine` on `spell_cast` and `spell_resolved`.
+- The artifact recommendation is to move this card into verified/active
+  `card_battle_rules`; that is a battle-rule/provenance item and remains out of
+  scope for deck-builder code without Auditor central authorization.
+
+Status change:
+
+- Added active item `5` for the new latest battle forensic blocker.
+- The earlier note that latest battle was trusted is now historical only and is
+  explicitly superseded by current latest artifact `20260620_033246`.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Deck Product Identity Resolver Precedence Closure - 2026-06-20 00:36 -03
+
+Treatment performed:
+
+- Adjusted `server/lib/deck_card_name_resolution_support.dart` so the shared
+  deck-builder resolver ranks `card_identity_bridge.match_priority` before
+  preferred-format legality rank for both candidate deduplication and per-input
+  ordering.
+- This makes exact/canonical bridge identity win before preferred-printing
+  selection in batch resolve, deck create, and deck update name-only paths.
+- Updated `server/test/card_resolution_support_test.dart` to guard the exact
+  SQL ordering:
+  `ORDER BY match_rank, match_priority, legality_rank, ...`.
+- Updated `server/doc/API_CONTRACTS_AND_DATA_MAP.md` and
+  `server/test/api_contracts_data_map_guard_test.dart` so the batch resolver,
+  deck create, and deck update contract rows state that bridge `match_priority`
+  ranks canonical/localized identity before preferred-printing
+  `card_legalities`.
+
+Validation evidence:
+
+- `cd server && dart analyze lib/deck_card_name_resolution_support.dart test/card_resolution_support_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/card_resolution_support_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `14/14` tests passed.
+- `cd server && python3 test/learned_deck_coherence_audit_test.py`
+  - result: `15/15` tests passed.
+- `cd server && python3 bin/learned_deck_coherence_audit.py --stdout`
+  - result: `metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`,
+    `all_core_metadata_zero=54`, `off_color_cards=1`,
+    `partner_identity_not_modeled=9`, severity `high=168`, `medium=21`.
+- `git diff --check -- server/lib/deck_card_name_resolution_support.dart server/test/card_resolution_support_test.dart server/doc/API_CONTRACTS_AND_DATA_MAP.md server/test/api_contracts_data_map_guard_test.dart docs/hermes-analysis/LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`
+  - result: no whitespace errors.
+
+Status change:
+
+- Active item `1` is reduced again. Product create/update/batch name-only
+  resolution now has code, contract, and test evidence for canonical bridge
+  priority before preferred-printing rank.
+- Active item `1` remains open only for the current residual audit facts:
+  `off_color_cards=1`, `partner_identity_not_modeled=9`, and any bridge
+  data/backfill work that would require explicit PostgreSQL mutation approval.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Saved-Deck Fetch/Hydration Read-Model Recheck - 2026-06-20 00:28 -03
+
+Current backend evidence:
+
+- `GET /decks` in `server/routes/decks/index.dart` is owner-scoped by
+  `WHERE d.user_id = @userId`, returns a legacy raw JSON array, and computes
+  `card_count` as `COALESCE(SUM(dc.quantity), 0)::int`.
+- The same list route fetches one commander display row through a lateral join
+  and computes list `color_identity` by unnested `cards.color_identity` across
+  current deck cards. That color list is presentation metadata; it is not
+  commander legality proof.
+- `GET /decks/:id` in `server/routes/decks/[id]/index.dart` is owner-scoped by
+  `FROM decks WHERE id = @deckId AND user_id = @userId` and returns root deck
+  fields directly, not a nested root `deck` wrapper.
+- Detail card rows include persisted `dc.condition` plus display/runtime fields
+  from `cards`: `id`, `name`, `mana_cost`, `type_line`, `oracle_text`, `colors`,
+  `color_identity`, `image_url`, `set_code`, `rarity`, `collector_number`,
+  `foil`, and optional `set_name` / `set_release_date`.
+- Detail card rows intentionally do not expose `oracle_id`, `layout`,
+  `card_faces`, or `scryfall_id`; `server/test/deck_fetch_hydration_contract_test.dart`
+  asserts that boundary.
+- Route-side `stats.total_cards`, `unique_cards`, `mana_curve`, and
+  `color_distribution` are UI/read-model aggregates built from the fetched card
+  rows. They are not a strategy or legality verdict.
+- Name-only create/update resolution is separate from fetch:
+  `server/lib/deck_card_name_resolution_support.dart` queries
+  `card_identity_bridge` first, ranks candidates with `card_legalities`, and
+  falls back to `cards` only when the bridge view is unavailable.
+
+Current app evidence:
+
+- `DeckDetails.fromJson(...)` parses `commander`, `main_board`, root
+  `color_identity`, and falls back to card-level `color_identity`/`colors` only
+  when the root color list is empty.
+- `DeckProvider` list hydration uses cached detail records or best-effort
+  detail fetches to fill missing list colors. Non-200 detail fetches are stored
+  as failed enrichment, not as deck invalidity.
+- `buildCurrentCardsMap(...)` builds mutation payloads from hydrated
+  `DeckCardItem.id`, `quantity`, `is_commander`, and physical `condition`.
+  It does not attempt canonical oracle identity decisions in the app.
+- `getCommanderIdentitySet(...)` uses commander `colorIdentity` or `colors` for
+  app prefiltering. Backend `DeckRulesService` remains the authority for final
+  Commander legality and singleton/canonical identity.
+
+Validation evidence:
+
+- `cd server && dart analyze routes/decks/index.dart 'routes/decks/[id]/index.dart' lib/deck_card_name_resolution_support.dart test/deck_fetch_hydration_contract_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/deck_fetch_hydration_contract_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `9/9` tests passed.
+- `cd app && flutter analyze lib/features/decks/models/deck.dart lib/features/decks/models/deck_details.dart lib/features/decks/models/deck_card_item.dart lib/features/decks/providers/deck_provider_support_fetch.dart lib/features/decks/providers/deck_provider_support_common.dart lib/features/decks/providers/deck_provider_support_mutation.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart`
+  - result: `65/65` tests passed.
+
+Current learning:
+
+- Saved-deck fetch/hydration is coherent as the app's read-model for visible
+  deck state, card quantities, display grouping, physical condition, and
+  presentation color identity.
+- It is not coherent as a canonical identity or strategy source. Because detail
+  rows do not expose `oracle_id` or face/layout identity fields, any claim about
+  physical-copy equivalence, singleton identity across printings, or official
+  canonical identity must come from backend validation/import/resolve paths,
+  PostgreSQL identity views, or explicit read-only DB evidence.
+- For Lorehold deck `6`, fresh detail fetch is necessary before user-facing
+  mutation planning, but it is not sufficient. It must be paired with strict
+  validation and package/role review before any "Ajustar deck" recommendation.
+
+Additional required adjustments:
+
+435. Treat `GET /decks` color identity as list display metadata only; never use
+     it as Commander legality, deck `6` coherence, or swap authority.
+436. Treat `GET /decks/:id` as the fresh persisted-state read model for
+     quantities, grouping, saved conditions, and visible card text.
+437. Do not use detail `all_cards_flat` to infer canonical identity beyond
+     persisted `card_id`; fetch/detail currently lacks `oracle_id`, `layout`,
+     `card_faces`, and `scryfall_id`.
+438. For chat "Ajustar deck", require fresh detail fetch before planning, then
+     backend strict validation and strategy/package review before any apply.
+439. Keep app-side commander identity filtering as a convenience prefilter only;
+     backend `DeckRulesService` remains the authority.
+440. Preserve physical `condition` through every app mutation payload derived
+     from fetched details.
+441. If future UX needs canonical identity in deck detail, add tested additive
+     fields instead of inferring from display names or set metadata.
+442. Keep `card_identity_bridge` usage in create/update/name resolution and
+     batch resolve; do not move canonical identity decisions into the mobile
+     detail parser.
+443. Treat route-side `mana_curve`, `color_distribution`, and `stats` as UI
+     approximations only; use analysis/functional tags and deck audits for
+     strategic role evidence.
+444. Keep failed list color enrichment non-blocking; it is missing display
+     enrichment, not proof that the deck is illegal or strategically incoherent.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, battle-engine edit, commit, or push was performed.
+
+### Manual/Bulk Deck Mutation Boundary Recheck - 2026-06-20 00:32 -03
+
+Current backend evidence:
+
+- `POST /decks/:id/cards` is a write route. It accepts only `POST`, validates
+  JSON, requires `card_id` and positive `quantity`, owner-scopes by
+  `deck_id + user_id`, loads card legality/color/type data, normalizes
+  `condition`, and writes `deck_cards`.
+- Single-card add validates banned/not-legal/restricted status, copy limits,
+  Commander/Brawl total caps, commander eligibility, current commander color
+  identity, and the composed next deck through `DeckRulesService(...,
+  strict:false)` before writing. Normal add upserts quantity/commander flag and
+  `condition`.
+- `is_commander=true` on the single-card route is a commander-slot mutation for
+  Commander/Brawl. It forces quantity `1`, validates commander eligibility, can
+  replace a single existing commander slot, and protects multi-commander decks
+  from blind replacement.
+- `POST /decks/:id/cards/bulk` is a write route. It rejects empty payloads,
+  invalid `card_id`/quantity, and `is_commander=true`; merges increments into
+  current rows through `mergeBulkCardIncrementsPreservingCondition(...)`; runs
+  `DeckRulesService(... strict:false)` before delete/reinsert; preserves
+  existing `condition`; and defaults newly inserted rows to `NM`.
+- `POST /decks/:id/cards/set` is absolute quantity, not increment. It supports
+  `replace_same_name=true`, but that is same-name printing behavior. It is not
+  `oracle_id` or `physicalCopyKey` replacement. It validates the composed deck
+  with `DeckRulesService(... strict:false)` before delete/reinsert.
+- `POST /decks/:id/cards/replace` is same-name-only edition replacement. It
+  rejects old/new rows whose `cards.name` values differ case-insensitively,
+  does not use `oracle_id`/`physicalCopyKey`, validates the composed deck with
+  `DeckRulesService(... strict:false)`, and then updates/merges persisted rows.
+- Current condition nuance: in-place `replace` keeps the row's existing
+  condition because it only updates `card_id`; merge-into-existing replacement
+  updates the target row's quantity/commander flag and deletes the old row, so
+  per-copy old condition cannot be preserved under the current one-row-per-card
+  condition model.
+
+Current app evidence:
+
+- `DeckProvider.addCardToDeck(...)` ensures details are loaded, calls
+  `POST /decks/:id/cards`, does an optimistic list count increment on success,
+  then calls `_refreshDeckDetailsAfterMutation(...)`.
+- `DeckProvider.removeCardFromDeck(...)` builds a full replacement payload from
+  hydrated details and calls `PUT /decks/:id`; it then refreshes details.
+- `DeckProvider.updateDeckCardEntry(...)` routes commander/consolidation flows
+  through `POST /decks/:id/cards/set` with `replace_same_name=true`; otherwise
+  it calls `replaceCardEdition(...)` first when the printing changed, then calls
+  `cards/set` with `replace_same_name=false`.
+- `DeckProvider.addCardsBulk(...)` calls `POST /decks/:id/cards/bulk` and then
+  refreshes details on success.
+- `_refreshDeckDetailsAfterMutation(...)` invalidates deck/detail/analysis cache
+  and forces fresh details plus a silent list refresh.
+- Important boundary: manual add/remove/set/replace/bulk flows refresh details
+  after success, but they do not automatically call the strict
+  `/decks/:id/validate` route. They rely on route-level construction validation
+  (`strict:false`) unless the caller explicitly validates afterward.
+
+Validation evidence:
+
+- `cd server && dart analyze 'routes/decks/[id]/cards/index.dart' 'routes/decks/[id]/cards/bulk/index.dart' 'routes/decks/[id]/cards/set/index.dart' 'routes/decks/[id]/cards/replace/index.dart' lib/deck_cards_bulk_support.dart lib/deck_rules_service.dart test/deck_cards_bulk_support_test.dart test/deck_manual_mutation_route_contract_test.dart test/api_contracts_data_map_guard_test.dart test/deck_rules_service_test.dart test/deck_rules_service_identity_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/deck_cards_bulk_support_test.dart test/deck_manual_mutation_route_contract_test.dart test/api_contracts_data_map_guard_test.dart test/deck_rules_service_test.dart test/deck_rules_service_identity_test.dart -r expanded`
+  - result: `20/20` tests passed.
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider.dart lib/features/decks/providers/deck_provider_support_mutation.dart lib/features/decks/providers/deck_provider_support_common.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart -r expanded`
+  - result: `65/65` tests passed.
+
+Current learning:
+
+- Manual/bulk routes are coherent as user-approved persisted edit paths with
+  construction validation and owner scoping. They are not read-only audit tools
+  and must not be called against deck `6` during audits.
+- These routes prevent many illegal writes before persistence, but
+  `strict:false` means they do not prove Commander readiness such as exactly
+  `100` cards after remove/set or a fully strategy-coherent Lorehold package.
+- `set`/`replace` are edition/quantity tools, not strategic swap tools.
+  Strategy-driven deck changes still need fresh detail, learned/reference
+  package review, strict validation, and explicit user approval.
+
+Additional required adjustments:
+
+445. Do not call manual/bulk mutation routes during read-only deck `6` audits;
+     all four write `deck_cards`.
+446. Treat single-card add as a guarded write path, not final strategy proof.
+447. Treat bulk add as atomic construction validation only; it rejects commander
+     rows and preserves/defaults physical condition, but still needs post-action
+     strict validation for Commander readiness.
+448. Treat `cards/set` quantity as absolute and `replace_same_name` as
+     same-name printing consolidation only.
+449. Treat `cards/replace` as edition replacement only; it is not
+     `oracle_id`/canonical identity replacement and not an archetype swap.
+450. After any manual add/remove/set/replace/bulk change, require fresh detail
+     fetch plus explicit strict `/decks/:id/validate` before success is claimed
+     for chat "Ajustar deck".
+451. Preserve physical `condition` in app-derived payloads and bulk merges.
+452. Document or redesign condition behavior when replacing into an existing
+     target printing if per-copy condition fidelity becomes product-critical.
+453. Keep app-side commander/color checks as convenience only; backend rules are
+     authoritative for legality and singleton/canonical identity.
+454. Never use manual mutation response bodies as strategy evidence; use them
+     only as mutation acknowledgements.
+455. Keep remove-card full-list `PUT` in the same safety bucket as optimize
+     apply: route construction validation first, strict validation still
+     required afterward.
+456. For Lorehold deck `6`, any future manual mutation must be preceded by user
+     approval and followed by strict validation plus package/role coherence
+     review.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, battle-engine edit, commit, or push was performed.
+
+### Card Identity Batch Resolution Boundary Recheck - 2026-06-20 00:37 -03
+
+Current backend evidence:
+
+- `POST /cards/resolve/batch` is a read-side identity resolution endpoint for
+  name payloads. It is `POST`-only, rejects empty/invalid JSON, requires
+  `names` to be a list of strings, rejects empty cleaned input, and caps input
+  at `200` names.
+- The route delegates to `resolveDeckCardNameCandidates(..., allowFuzzy:true)`
+  and then to `resolveCardCandidateNames(...)`.
+- `resolveDeckCardNameCandidates(...)` queries `card_identity_bridge` first and
+  falls back to `cards` only when the bridge view/table is unavailable. That
+  matches the semantic-layer guidance: identity resolution belongs in the
+  bridge, not in ad-hoc display-name logic.
+- Bridge ranking currently orders by `match_rank`, then bridge
+  `match_priority`, then `legality_rank`, then card id/name. That means
+  canonical/localized bridge priority wins before preferred-printing legality
+  rank.
+- The batch route does not pass `preferredFormat`; it calls the shared resolver
+  with the default blank format. Format-aware name-only resolution still exists
+  in create/update write paths through `resolveDeckCardIdByName(...,
+  preferredFormat)`.
+- `resolveCardCandidateNames(...)` resolves exact single matches first, then
+  unique prefix matches, then unique contains matches. Multiple prefix/contains
+  candidates are returned in the explicit `ambiguous` bucket, not silently
+  chosen.
+- The batch response shape is explicit: resolved `data`, sorted `unresolved`,
+  sorted `ambiguous`, plus `total_input`, `total_resolved`, and
+  `total_ambiguous`.
+- API contract rows for `POST /cards/resolve/batch`, `POST /decks`, and
+  `PUT /decks/:id` now state that bridge `match_priority` ranks
+  canonical/localized identity before preferred-printing `card_legalities`.
+
+Current app evidence:
+
+- `normalizeCreateDeckCards(...)` keeps direct `card_id` rows, aggregates
+  name-only rows by lowercased name plus commander flag, and calls
+  `POST /cards/resolve/batch` with only `{"names":[...]}`.
+- The app blocks create when the batch endpoint fails, returns unresolved
+  names, or returns ambiguous names. In those cases it does not call
+  `POST /decks`.
+- When batch resolution succeeds, the app converts name-only cards to persisted
+  `card_id` entries and merges them with direct ids before creation.
+- `DeckProvider.createDeck(...)` runs this normalization before
+  `createDeckRequest(...)`, so generated/learned/manual create flows using
+  names pass through the same pre-create identity gate.
+- The runtime/widget tests also keep optimize/apply paths centered on durable
+  ids where available; name resolution is a fallback boundary, not preferred
+  swap authority.
+
+Validation evidence:
+
+- `cd server && dart analyze routes/cards/resolve/batch/index.dart lib/card_resolution_support.dart lib/deck_card_name_resolution_support.dart routes/decks/index.dart 'routes/decks/[id]/index.dart' test/card_resolution_support_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/card_resolution_support_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `14/14` tests passed.
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider_support_generation.dart lib/features/decks/providers/deck_provider_support_mutation.dart lib/features/decks/providers/deck_provider.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart -r expanded`
+  - result: `70/70` tests passed.
+
+Current learning:
+
+- The current batch identity path is coherent as a pre-create name-to-card-id
+  gate for generated/learned/manual deck creation.
+- It is not a legality, singleton, or strategy-coherence proof. It maps names
+  to representative card ids and exposes unresolved/ambiguous cases; final
+  construction proof remains in deck write validation and strict
+  `/decks/:id/validate`.
+- Because app batch resolution does not pass `preferredFormat`, its success
+  should never be described as format-preferred printing proof. It only proves
+  the input name could be mapped by the current bridge/cards resolver.
+- For Lorehold deck `6`, this path is relevant when creating or saving a deck
+  from learned/generated names. It does not prove that deck `6` itself is
+  currently coherent, legal, or strategically correct.
+- For chat "Ajustar deck", durable card ids from fresh deck details,
+  optimizer/detail payloads, or reviewed package artifacts should be preferred.
+  Name-only flows must stop on unresolved or ambiguous identities.
+
+Additional required adjustments:
+
+457. Use `/cards/resolve/batch` only as a pre-create name-to-card-id gate, not
+     as legality, singleton, or strategy proof.
+458. Keep `card_identity_bridge` as the first identity source; fallback to
+     `cards` should remain missing-bridge compatibility, not the primary
+     product path.
+459. Treat unresolved and ambiguous batch results as blocking for
+     generated/learned/manual deck creation.
+460. Do not call `POST /decks` after unresolved or ambiguous batch resolution.
+461. Because batch resolve currently sends no `preferredFormat`, require the
+     deck write routes and strict validation to prove format legality.
+462. Do not describe bridge resolution as preferred printing selection:
+     bridge `match_priority` intentionally wins before legality rank.
+463. For chat "Ajustar deck", prefer durable `card_id` evidence from fresh
+     details, optimizer/detail output, or reviewed artifacts before falling
+     back to name resolution.
+464. Keep exact/prefix/contains strategy labels as resolution diagnostics only;
+     they are not sufficient confidence for automatic deck mutation.
+465. Preserve split/DFC alias support through the shared resolver and avoid
+     reintroducing ad-hoc lowercase `cards.name` SQL in create/update paths.
+466. If product needs format-aware batch resolution later, add a tested request
+     field and propagate it from the app instead of relying on the current
+     blank default.
+467. Treat successful batch resolution as dependent on current
+     `card_identity_bridge`/`cards` data quality; use current DB/validation
+     evidence before claiming exact deck `6` identity.
+468. Keep generated/learned preview save as new deck creation; batch success
+     only proves names mapped to ids, not Lorehold role/package coherence.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### Import Flow Boundary Recheck - 2026-06-20 00:41 -03
+
+Current backend evidence:
+
+- `POST /import/validate` is a non-mutating preview route. It requires
+  `format` and `list`, normalizes string/list payloads through
+  `normalizeImportLines(...)`, parses quantities/commander markers through
+  `parseImportLines(...)`, resolves names, returns `found_cards`,
+  `not_found_lines`, `localized_matches`, `warnings`, `total_cards`, and
+  `total_unique`, and does not create or update a deck.
+- Preview validation intentionally has softer unsupported-section behavior:
+  unsupported sections from `parseImportLines(...)` are added to
+  `not_found_lines`; it does not hard reject them. Contract tests assert that
+  this differs from write routes.
+- `POST /import` is a deck-creation write route. It requires `name`, `format`,
+  and `list`, owner-scopes through authenticated `userId`, rejects unsupported
+  sections before persistence, resolves list cards, can resolve a separate
+  `commander` field, consolidates by `card_id`, and inserts `decks` plus
+  `deck_cards` inside a transaction.
+- `POST /import` calls `DeckRulesService(... strict: requiresCommander)` before
+  inserting. For Commander/Brawl this is stricter than existing-deck import:
+  the route can return `is_partial` on a successful write when warnings or
+  unresolved lines remain, but `DeckRulesException` blocks creation before DB
+  insert.
+- `POST /import/to-deck` is an existing-deck write route. It owner-scopes by
+  `deck_id + user_id`, reads the deck format, rejects unsupported raw/parsed
+  sections, resolves names using the existing deck format, and writes
+  `deck_cards` inside a transaction.
+- `replace_all=true` on `/import/to-deck` deletes/reinserts final deck rows. For
+  Commander/Brawl, if the imported list has no commander, the route seeds the
+  existing commander row before merge and reports `commander_preserved=true`.
+- `/import/to-deck` validates the merged deck with
+  `DeckRulesService(... strict:false)` before deleting/reinserting. That guards
+  construction rules, but it is not final Commander readiness or strategy
+  coherence proof.
+- Import name lookup is not the same surface as `/cards/resolve/batch`.
+  `resolveImportCardNames(...)` currently queries `cards`, optional
+  `card_localized_names`, static localized aliases, and split/DFC LIKE
+  fallback. It returns `oracle_id` and passes `preferredFormat`, but it does
+  not query the shared bridge-backed deck name resolver used by
+  `/cards/resolve/batch`.
+- `POST /import/validate` copy-limit warnings use an oracle-aware physical key:
+  `oracle_id` when present, then normalized physical card name fallback.
+  `/import/to-deck` warning text still groups by name before final
+  `DeckRulesService` validation.
+
+Current app evidence:
+
+- `DeckProvider.validateImportList(...)` calls `POST /import/validate` through
+  `validateImportListRequest(...)` and returns parsed preview fields only; it
+  does not persist a deck.
+- `DeckImportScreen` calls `DeckProvider.importDeckFromList(...)`, displays
+  partial-import review when `is_partial`, warnings, or not-found lines exist,
+  and only navigates directly to the deck when the import succeeds without
+  review details.
+- `DeckProvider.importListToDeck(...)` calls `POST /import/to-deck`; on
+  `success=true` it refreshes selected deck details through
+  `_refreshDeckDetailsAfterMutation(...)`.
+- `showDeckImportListDialog(...)` exposes `replaceAll`, keeps the review dialog
+  visible when warnings/not-found/missing commander/preserved commander exist,
+  and calls an explicit `refreshDeckDetails` callback after success.
+- App parsing treats `warnings`, `missing_commander`,
+  `commander_preserved`, and `localized_matches_count` as user-review status,
+  not as proof that a deck is ready for optimize or battle strategy learning.
+
+Validation evidence:
+
+- `cd server && dart analyze routes/import/index.dart routes/import/validate/index.dart routes/import/to-deck/index.dart lib/import_list_service.dart lib/import_card_lookup_service.dart lib/import_to_deck_merge_support.dart test/import_parser_test.dart test/import_list_service_test.dart test/import_to_deck_merge_support_test.dart test/unsupported_deck_sections_route_contract_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/import_parser_test.dart test/import_list_service_test.dart test/import_to_deck_merge_support_test.dart test/unsupported_deck_sections_route_contract_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `35/35` tests passed.
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider_support_import.dart lib/features/decks/providers/deck_provider.dart lib/features/decks/screens/deck_import_screen.dart lib/features/decks/widgets/deck_import_list_dialog.dart lib/features/decks/screens/deck_details_screen.dart test/features/decks/screens/deck_import_screen_test.dart test/features/decks/widgets/deck_import_list_dialog_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/screens/deck_import_screen_test.dart test/features/decks/widgets/deck_import_list_dialog_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart -r expanded`
+  - result: `70/70` tests passed.
+
+Current learning:
+
+- Import preview is coherent as a user-facing review tool, but it is not a
+  go/no-go proof for deck `6` or any Lorehold adjustment.
+- Import write routes are coherent as guarded persistence paths, but they are
+  not read-only audit tools and must not be called against deck `6` during this
+  persistent audit.
+- `/import/to-deck` is especially important for "Ajustar deck" because
+  `replace_all=true` can rewrite persisted deck rows. Even with commander
+  preservation and route validation, success must be followed by fresh detail,
+  strict validation, and role/package review before any success claim.
+- The import resolver is a real identity-surface divergence: it is
+  format-aware and oracle-aware in important places, but it is not unified with
+  the `card_identity_bridge` resolver used by `/cards/resolve/batch`. This is
+  acceptable as current behavior only if documented; long term, import and deck
+  creation should converge on the same identity abstraction.
+
+Additional required adjustments:
+
+469. Use `/import/validate` only as preview/review evidence; never as final
+     legality, singleton, or strategy proof.
+470. Keep unsupported section handling distinct: preview can surface unsupported
+     sections as `not_found_lines`, but write routes must reject them before
+     persistence.
+471. Do not call `POST /import` during read-only Lorehold/deck `6` audits; it
+     creates a new deck and writes `deck_cards`.
+472. Treat `POST /import` success with `is_partial=true`, warnings, or
+     not-found lines as draft/review state, not ready-to-optimize.
+473. Keep Commander/Brawl `POST /import` strict validation before insert; do
+     not downgrade failed strict import to a silent draft write.
+474. Do not call `POST /import/to-deck` during read-only deck `6` audits; it
+     mutates an existing deck.
+475. Treat `replace_all=true` as destructive deck-row rewrite, even when the
+     backend preserves an existing Commander/Brawl commander.
+476. After any `/import/to-deck` success, require fresh details plus explicit
+     strict `/decks/:id/validate` before claiming Commander readiness.
+477. Treat `/import/to-deck` `warnings`, `missing_commander`, and
+     `commander_preserved` as review status, not strategy proof.
+478. Keep app review dialogs visible when import status fields exist; do not
+     auto-navigate to optimize/battle learning from partial imports.
+479. Reconcile import identity lookup with the shared `card_identity_bridge`
+     resolver later, or keep documenting import as a separate legacy/localized
+     lookup surface.
+480. Do not assume import uses `/cards/resolve/batch`; current source uses
+     `cards`, optional `card_localized_names`, static aliases, and split/DFC
+     fallback.
+481. Preserve `preferredFormat` propagation in all import entry points so legal
+     or restricted printings are preferred where lookup supports it.
+482. Preserve oracle-aware physical copy warnings in `/import/validate`.
+483. Treat `/import/to-deck` name-grouped warning text as advisory; rely on
+     `DeckRulesService` and strict validation for canonical singleton proof.
+484. For chat "Ajustar deck", imported lists must pass the same post-write
+     checklist as optimize/manual edits: fresh details, strict validation,
+     package/role review, and explicit approval.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### Learned-Deck Metadata Current Recheck - 2026-06-20 00:46 -03
+
+Scope:
+
+- Rechecked the newest learned-deck coherence artifact currently present in the
+  worktree, the official `--stdout` summary, and the Lorehold
+  `learned_deck:82` metadata canonicalizer dry-run.
+- This section supersedes older local conclusions that still describe Lorehold
+  `learned_deck:82` as having stale cached metadata `total_lands=30` versus
+  resolved `33`.
+
+Current artifact evidence:
+
+- Newest full learned-deck coherence artifact present:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`
+  / `.md`.
+- Artifact generated at `2026-06-20T03:44:55.241649+00:00` with
+  `read_only=true`.
+- Artifact aggregate summary:
+  - active learned decks: `60`
+  - `metadata_total_lands_mismatch=57`
+  - `metadata_zero_lands=54`
+  - `all_core_metadata_zero=54`
+  - `some_core_metadata_zero=4`
+  - `partner_identity_not_modeled=10`
+  - `commander_deck_quantity_mismatch=1`
+  - `commander_quantity_mismatch=1`
+  - severity counts: `high=167`, `medium=22`
+- Artifact source summary:
+  - `hermes`: `1` active, no active high/medium issue counts
+  - `edhrec`: `7` active, `13` high, `3` medium
+  - `pg_meta_decks`: `52` active, `154` high, `19` medium
+
+Lorehold focused evidence:
+
+- Active learned source ref remains `learned_deck:82`, row id
+  `f46c0421-71b4-4de3-bb79-05a916b4988b`, commander
+  `Lorehold, the Historian`.
+- Current active learned metadata now has `total_lands=33`; derived metadata
+  also has `total_lands=33`; the active learned row has `issues=[]`.
+- Linked PG saved deck
+  `528c877f-f829-4207-95e6-73981776c323` still has `100` rows, total quantity
+  `100`, commander quantity `1`, and land quantity `33`.
+- Name-diff checks remain clean:
+  `active_vs_pg_missing_from_pg=[]`,
+  `pg_extra_vs_active=[]`,
+  `active_vs_sqlite_missing_from_sqlite=[]`, and
+  `sqlite_extra_vs_active=[]`.
+- Lorehold strategy packages all pass in the artifact:
+  - Commander identity: `1/1`
+  - Copy combo core: `7/4`
+  - Topdeck/miracle setup: `5/3`
+  - Graveyard/spell value: `5/4` with `Wheel of Misfortune` absent but minimum
+    still satisfied
+  - Big spell finishers: `7/4`
+  - Protection/stack control: `10/6`
+  - Mana acceleration: `14/10`
+- Forbidden Premium Mox present: none.
+
+Current command evidence:
+
+- `python3 server/bin/learned_deck_coherence_audit.py --stdout`
+  - result summary:
+    - active learned decks: `60`
+    - `metadata_total_lands_mismatch=57`
+    - `metadata_zero_lands=54`
+    - `all_core_metadata_zero=54`
+    - `some_core_metadata_zero=4`
+    - `partner_identity_not_modeled=10`
+    - severity counts: `high=167`, `medium=22`
+- `cd server && dart run bin/canonicalize_learned_deck_metadata.dart --dry-run --source-ref=learned_deck:82 --include-unchanged`
+  - result: `status=PASS`, `mode=dry_run`, `db_mutations=false`,
+    `checked=1`, `reported=1`, `changed=0`, `applied=0`.
+  - before and after selected metadata are identical:
+    `total_lands=33`, `ramp_count=20`, `draw_count=18`,
+    `removal_count=8`, `tutor_count=5`, `engine_count=37`,
+    `wincon_count=13`, `protection_count=13`, `recursion_count=4`,
+    and `board_wipe_count=2`.
+
+Validation evidence:
+
+- `python3 -m py_compile server/bin/learned_deck_coherence_audit.py server/test/learned_deck_coherence_audit_test.py`
+  - result: pass.
+- `python3 -m unittest server/test/learned_deck_coherence_audit_test.py`
+  - result: `17` tests passed.
+- `cd server && dart analyze bin/canonicalize_learned_deck_metadata.dart lib/ai/commander_learned_deck_support.dart test/commander_learned_deck_support_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`
+  - result: `19/19` tests passed.
+
+Current learning:
+
+- Focused Lorehold stale-metadata item is closed for current state. Current
+  PostgreSQL/read-only evidence no longer requires an apply for
+  `learned_deck:82`; the canonicalizer dry-run reports no change.
+- This does not close the global learned-deck metadata backlog. The current
+  aggregate still has `57` total-land metadata mismatches, `54` zero-metadata
+  learned decks, and `10` partner identity modeling gaps.
+- Deck `6` should not receive swaps from this area. The current evidence says
+  the active learned list, PG saved deck, name alignment, no-premium-Mox policy,
+  and Lorehold strategy package thresholds are coherent.
+- The remaining action is data/modeling governance for non-Lorehold learned
+  decks, not Lorehold deck composition repair.
+
+Additional required adjustments:
+
+485. Mark the focused Lorehold `learned_deck:82` stale metadata item as closed
+     in current audits; do not keep asking for `--apply` on that source ref
+     unless a future dry-run again reports `changed>0`.
+486. Supersede older notes that say Lorehold active metadata is
+     `total_lands=30`; current evidence is `total_lands=33`.
+487. Keep the global learned-deck metadata backlog open with current counts:
+     `metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`, and
+     `partner_identity_not_modeled=10`.
+488. Do not use global learned-deck metadata backlog as a reason to mutate deck
+     `6`; current Lorehold strategy packages pass.
+489. Treat `Wheel of Misfortune` absence as non-blocking for the current
+     Lorehold graveyard/spell-value package because the package still satisfies
+     `5/4`.
+490. Keep Premium Mox exclusion satisfied for Lorehold; current artifact shows
+     no `Chrome Mox`, `Mox Diamond`, or `Mox Opal`.
+491. For chat "Ajustar deck", use this current artifact as evidence that deck
+     `6` does not need learned-metadata card swaps.
+492. For non-Lorehold learned decks, separate zero metadata, partner identity,
+     and quantity mismatch remediation; do not collapse them into a single deck
+     swap task.
+493. If a future artifact changes Lorehold counts again, rerun
+     `learned_deck_coherence_audit.py --stdout` and the source-ref dry-run
+     before reopening the Lorehold metadata item.
+494. Preserve read-only proof discipline: learned metadata closure requires
+     artifact, stdout aggregate, and canonicalizer dry-run evidence, not just
+     one stale Markdown report.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### PostgreSQL Card Oracle Structure Current Recheck - 2026-06-20 00:50 -03
+
+Scope:
+
+- Rechecked the current PostgreSQL card Oracle structure through the latest
+  learned-deck coherence artifact and the read-only Oracle backfill planner.
+- Definition used here: an Oracle-structured card has `oracle_id`,
+  `oracle_text`, and `type_line` present in the current card intelligence
+  inventory. Official no-rules-text cards need an accepted-empty policy rather
+  than invented oracle text.
+
+Current PostgreSQL Oracle inventory evidence:
+
+- Latest artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`,
+  generated at `2026-06-20T03:44:55.241649+00:00`, `read_only=true`.
+- `postgres_oracle_inventory` reports:
+  - total cards in `card_intelligence_snapshot`: `34,329`
+  - Oracle-structured cards: `33,966`
+  - Oracle-structured rate: `0.9894`
+  - with `oracle_id`: `34,325`
+  - with `oracle_text`: `33,969`
+  - with `type_line`: `34,328`
+  - missing `oracle_id`: `4`
+  - missing `oracle_text`: `360`
+  - missing `type_line`: `1`
+- Sample unstructured cards include Arena/Alchemy style names and official
+  no-rules-text-looking bodies:
+  `A-Alrund's Epiphany`, `A-Omnath, Locus of Creation`, `A-Unholy Heat`,
+  `Aegis Turtle`, `Ageless Guardian`, `Alpha Myr`, and similar cards with
+  missing `oracle_text`.
+
+Read-only planner evidence:
+
+- `python3 server/bin/plan_oracle_text_backfill.py --no-scryfall`
+  - result: `status=PASS`, `mode=read_only`, `db_mutations=false`.
+  - base summary:
+    - `total_cards=34329`
+    - `missing_oracle_id=4`
+    - `missing_oracle_text=360`
+    - `missing_any=363`
+  - impact counts:
+    - `active_learned_gap_items=0`
+    - `deck_card_gap_items=6`
+    - `planned_items=6`
+    - `backfill_ready=0`
+    - `scryfall_found=0` because this run intentionally used
+      `--no-scryfall`.
+- Persisted deck-impact items from the planner:
+  - `Isamaru, Hound of Konda`: missing `oracle_text`, `17` deck rows /
+    quantity `17`
+  - `A-Alrund's Epiphany`: missing `oracle_id`, `16` rows / quantity `16`
+  - `Grizzly Bears`: missing `oracle_text`, `7` rows / quantity `7`
+  - `Runeclaw Bear`: missing `oracle_text`, `7` rows / quantity `7`
+  - `A-Omnath, Locus of Creation`: missing `oracle_id`, `6` rows /
+    quantity `6`
+  - `Yargle and Multani`: missing `oracle_text`, `3` rows / quantity `3`
+
+Lorehold deck `6` evidence:
+
+- From artifact `034458`, active Lorehold learned deck has:
+  - `missing_oracle_id_quantity=0`
+  - `missing_oracle_text_quantity=0`
+  - `missing_legalities=[]`
+- Linked PG saved deck
+  `528c877f-f829-4207-95e6-73981776c323` has:
+  - `missing_oracle_id=[]`
+  - `missing_oracle_text=[]`
+  - `missing_legalities=[]`
+- Therefore the current Oracle-structure backlog is not a deck `6`
+  construction problem and is not a Lorehold swap signal.
+
+Validation evidence:
+
+- `python3 -m py_compile server/bin/plan_oracle_text_backfill.py server/bin/learned_deck_coherence_audit.py server/test/plan_oracle_text_backfill_test.py server/test/learned_deck_coherence_audit_test.py`
+  - result: pass.
+- `python3 -m unittest server/test/plan_oracle_text_backfill_test.py server/test/learned_deck_coherence_audit_test.py`
+  - result: `20` tests passed.
+
+Current learning:
+
+- PostgreSQL card Oracle structure is high coverage but not complete:
+  `33,966 / 34,329` cards are currently structured by the artifact definition,
+  leaving `363` cards with at least one relevant Oracle gap.
+- The current known product impact is narrow: `6` card names appear in saved
+  deck rows, and `0` active learned deck gap items are reported.
+- Because `backfill_ready=0` in the no-Scryfall planner run, this is a data
+  policy/backfill planning item, not a safe automatic update.
+- Some gaps likely require separate policies:
+  Arena/Alchemy `A-` identities for missing `oracle_id`, and official
+  no-rules-text/empty-text handling for missing `oracle_text`.
+
+Additional required adjustments:
+
+495. Use the latest artifact inventory as the current Oracle-structure answer:
+     `34,329` total cards, `33,966` structured, and `363` with a relevant gap.
+496. Track the exact gap classes separately: `4` missing `oracle_id`, `360`
+     missing `oracle_text`, and `1` missing `type_line`.
+497. Do not propose deck `6` swaps from Oracle-structure backlog; current
+     Lorehold active and PG saved decks have no missing oracle id/text impact.
+498. Keep the `6` saved-deck impacted names as data-quality follow-up, not
+     deck-building strategy work.
+499. Treat `active_learned_gap_items=0` as the current learned-deck safety
+     signal for this Oracle backlog.
+500. Do not backfill official no-rules-text cards with invented text; model
+     accepted empty `oracle_text` explicitly.
+501. Treat Arena/Alchemy `A-` names as identity-policy work, not ordinary
+     exact-name Scryfall misses.
+502. Do not run apply/backfill against PostgreSQL without explicit approval;
+     current planner evidence is read-only and `db_mutations=false`.
+503. If Scryfall probing is needed later, run it as a separate read-only
+     evidence step and keep `backfill_ready` distinct from approval to write.
+504. For chat "Ajustar deck", use Oracle-structure gaps only as data-quality
+     caveats unless the target deck itself has a current missing oracle impact.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### Learned-Deck Partner Identity Persistence Recheck - 2026-06-20 00:53 -03
+
+Scope:
+
+- Rechecked current partner/background identity inference for learned decks.
+- Goal was to separate three states:
+  - real off-color/manual review entries,
+  - read-only inferred combined commander identity,
+  - durable PostgreSQL metadata/modeling persistence.
+
+Current artifact evidence:
+
+- Latest learned-deck coherence artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`,
+  generated at `2026-06-20T03:44:55.241649+00:00`, `read_only=true`.
+- Aggregate still reports `partner_identity_not_modeled=10`.
+- `off_color_resolution_plan` now reports:
+  - `status=no_current_off_color_manual_entries`
+  - `entry_count=0`
+  - `db_mutations=false`
+  - `apply_requires_explicit_approval=true`
+- Lorehold `learned_deck:82` remains a single commander identity:
+  - `commander_identity_model.status=single_commander_identity`
+  - `base_color_identity=['R','W']`
+  - `combined_color_identity=['R','W']`
+  - `identity_components=[]`
+  - `requires_first_class_persistence=false`
+
+Planner source evidence:
+
+- `server/bin/plan_learned_deck_partner_identity_backfill.py` intentionally has
+  no apply mode.
+- The planner loads the same current learned-deck audit model, selects only
+  rows where `commander_identity_model.requires_first_class_persistence=true`
+  and persisted metadata does not already match, and emits metadata patches,
+  scoped SQL, and rollback SQL for explicit future review.
+- Planner output is explicitly:
+  `mode=dry_run`, `db_mutations=false`, `apply_supported=false`,
+  `apply_requires_explicit_approval=true`.
+
+Read-only planner evidence:
+
+- `python3 server/bin/plan_learned_deck_partner_identity_backfill.py --dry-run --summary-only`
+  - result: `status=PASS`, `planned_row_count=10`, `db_mutations=false`,
+    `apply_supported=false`.
+- Planned rows:
+  - `learned_deck:112` / `Akiri, Line-Slinger + Thrasios, Triton Hero`:
+    combined `['G','R','U','W']`
+  - `learned_deck:93` / `Dargo, the Shipwrecker + Tymna the Weaver`:
+    combined `['B','R','W']`
+  - `learned_deck:110` / `Ishai, Ojutai Dragonspeaker + Rograkh, Son of
+    Rohgahh`: combined `['R','U','W']`
+  - `learned_deck:100` / `Jeska, Thrice Reborn + Tymna the Weaver`:
+    combined `['B','R','W']`
+  - `learned_deck:116` / `K-9, Mark I + The Fourteenth Doctor`:
+    combined `['G','R','U','W']`
+  - `learned_deck:173` / `Krark, the Thumbless + Sakashima of a Thousand
+    Faces`: combined `['R','U']`
+  - `learned_deck:89` / `Kraum, Ludevic's Opus + Tymna the Weaver`:
+    combined `['B','R','U','W']`
+  - `learned_deck:90` / `Malcolm, Keen-Eyed Navigator + Vial Smasher the
+    Fierce`, plus `Kediss, Emberclaw Familiar` from partner text:
+    combined `['B','R','U']`
+  - `learned_deck:85` / `Rograkh, Son of Rohgahh + Silas Renn, Seeker Adept`:
+    combined `['B','R','U']`
+  - `learned_deck:87` / `Thrasios, Triton Hero + Yoshimaru, Ever Faithful`:
+    combined `['G','U','W']`
+
+Validation evidence:
+
+- `python3 -m py_compile server/bin/plan_learned_deck_partner_identity_backfill.py server/bin/learned_deck_coherence_audit.py server/test/plan_learned_deck_partner_identity_backfill_test.py server/test/learned_deck_coherence_audit_test.py`
+  - result: pass.
+- `python3 -m unittest server/test/plan_learned_deck_partner_identity_backfill_test.py server/test/learned_deck_coherence_audit_test.py`
+  - result: `19` tests passed.
+
+Current learning:
+
+- Current audit inference can explain the previously problematic partner color
+  identities well enough that no current manual off-color entries remain.
+- That inference is not yet durable product truth for the `10` affected
+  learned decks. The planner shows exactly which metadata rows need a future
+  explicit PostgreSQL mutation or product model decision.
+- This is not a Lorehold deck `6` issue. Lorehold remains single-commander RW
+  and requires no partner/background persistence.
+- For chat "Ajustar deck", the safe behavior is to treat these `10` decks as
+  requiring identity-modeling review before using them as color-identity
+  training/reference truth.
+
+Additional required adjustments:
+
+505. Treat `off_color_resolution_plan.entry_count=0` as current off-color
+     review closure, not as durable partner identity persistence.
+506. Keep `partner_identity_not_modeled=10` open until combined commander
+     identity is persisted or otherwise modeled as first-class product data.
+507. Do not apply the partner identity planner without explicit PostgreSQL
+     mutation approval; current script has no apply mode and emits dry-run SQL
+     only for review.
+508. Keep Lorehold/deck `6` out of partner identity backfill scope because its
+     model is `single_commander_identity` and `requires_first_class_persistence=false`.
+509. For chat "Ajustar deck", do not use the `10` affected learned decks as
+     authoritative color-identity examples until partner identity modeling is
+     persisted or explicitly accepted as inference.
+510. Preserve source provenance for combined identity: distinguish
+     `deck_name_commander_component`, `partner_text`, and
+     `mixed_commander_identity_inference`.
+511. If persistence is approved later, require rollback SQL/artifact evidence
+     and a post-apply learned-deck coherence audit proving
+     `partner_identity_not_modeled` decreased.
+512. Treat `Malcolm + Vial Smasher + Kediss` as a mixed-inference case, not the
+     same evidence class as simple `deck_name_commander_component` rows.
+513. Do not collapse partner identity remediation into deck swaps; this is
+     commander model metadata, not card-list composition.
+514. Keep partner/background learned-deck limitations visible in any global
+     deck-builder quality summary until the `10` planned rows are resolved.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### Card Identity Bridge Coverage And Fanout Recheck - 2026-06-20 06:05 -03
+
+Scope:
+
+- Rechecked current PostgreSQL `card_identity_bridge` coverage, alias fanout,
+  deck `6` impact, and learned-deck resolution impact.
+- This is a read-only identity-source audit. It does not imply any card swap or
+  PostgreSQL mutation.
+
+Current PostgreSQL evidence:
+
+- Read-only query through the existing learned-deck auditor connection reported:
+  - `cards_total=34329`
+  - `card_identity_bridge` rows: `305905`
+  - distinct `card_id` values in bridge: `34329`
+  - cards missing bridge rows: `0`
+  - distinct `oracle_id` values in bridge: `34077`
+  - distinct normalized lookup names: `169190`
+  - rows from canonical `cards` source: `34329`
+  - non-`cards` localized/source rows: `271576`
+- Source/language row counts:
+  - `scryfall/fr`: `60576` rows / `29284` distinct cards
+  - `scryfall/de`: `60298` rows / `29299` distinct cards
+  - `scryfall/es`: `55227` rows / `28714` distinct cards
+  - `scryfall/it`: `54030` rows / `28899` distinct cards
+  - `scryfall/pt`: `41445` rows / `24728` distinct cards
+  - `cards/en`: `34329` rows / `34329` distinct cards
+- Bridge fanout summary:
+  - average aliases per card: `8.91`
+  - max aliases for a single card id: `1922`
+  - cards with more than one bridge row: `29579`
+  - lookup names mapping to more than one card id: `361`
+  - max card ids for one normalized lookup name: `32`
+- Top multi-card lookup names include localized/high-reprint aliases such as
+  `relampago`, `befehlsturm`, `tour de commandement`, `sonnenring`,
+  `anneau solaire`, `anillo solar`, `torre de mando`, `anel solar`, and
+  localized Counterspell names. This is expected fanout from localized aliases
+  and many printings, not automatically an error.
+
+Deck `6` evidence:
+
+- Read-only `EXISTS` coverage check for linked PG saved deck
+  `528c877f-f829-4207-95e6-73981776c323` returned:
+  - deck rows: `100`
+  - deck quantity: `100`
+  - rows missing bridge: `0`
+  - quantity missing bridge: `0`
+- This keeps `card_identity_bridge` coverage out of the current Lorehold deck
+  `6` adjustment backlog.
+
+Learned-deck artifact evidence:
+
+- Latest artifact
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`
+  remains `read_only=true`.
+- Across `60` active learned decks in that artifact:
+  - decks with unresolved card names: `0`
+  - unresolved quantity: `0`
+  - decks with missing `oracle_id` quantity: `0`
+  - decks with missing `oracle_text` quantity: `0`
+  - decks with off-color cards after partner inference: `0`
+
+Validation evidence:
+
+- `cd server && dart analyze lib/deck_card_name_resolution_support.dart lib/card_resolution_support.dart routes/cards/resolve/batch/index.dart test/card_resolution_support_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/card_resolution_support_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `14/14` tests passed.
+- `cd server && dart analyze lib/ai/commander_learned_deck_support.dart test/commander_learned_deck_support_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`
+  - result: `19/19` tests passed.
+
+Current learning:
+
+- `card_identity_bridge` currently covers every row in `cards`. Coverage is not
+  the active risk.
+- The active risk is grain/fanout. `card_identity_bridge` is an alias and
+  localized lookup surface, not a one-row-per-card or one-row-per-oracle-id
+  analytical fact table.
+- Deck-builder flows must keep using resolver helpers and ordered candidate
+  selection. Direct joins from `deck_cards` to `card_identity_bridge` can
+  multiply deck rows unless they use `EXISTS`, aggregation, or a constrained
+  representative row.
+- For Lorehold deck `6`, current evidence shows full bridge coverage and no
+  unresolved learned-deck identity impact.
+
+Additional required adjustments:
+
+515. Treat current `card_identity_bridge` coverage as complete for base
+     `cards`: `34329/34329` card ids covered.
+516. Do not treat `card_identity_bridge` as one-row-per-card; it has `305905`
+     rows and expected alias/localization fanout.
+517. Never join `deck_cards` directly to raw `card_identity_bridge` for counts
+     or deck composition without `EXISTS`, aggregation, or representative-row
+     selection.
+518. Preserve resolver-helper usage for deck create/update/batch and learned
+     deck canonicalization; do not reintroduce ad-hoc lowercase `cards.name`
+     lookup as the product identity path.
+519. Treat multi-card lookup names such as localized Sol Ring, Command Tower,
+     Lightning Bolt, and Counterspell aliases as expected ambiguity requiring
+     ranking/review, not automatic evidence of bad data.
+520. Keep bridge fanout separate from Oracle-structure backlog; current bridge
+     coverage is complete even though some cards still have oracle field gaps.
+521. Keep deck `6` out of bridge-coverage remediation; its linked PG deck has
+     `0` rows and `0` quantity missing bridge.
+522. For chat "Ajustar deck", require durable `card_id` or bridge-backed
+     resolver output before considering any name-based card action.
+523. If future analytics need bridge fields, create a one-row-per-card
+     projection or use `card_intelligence_snapshot`; do not use raw bridge
+     rows as analytical grain.
+524. Continue treating localized bridge data as internal resolution support,
+     not normal user-facing raw metadata.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, source-code edit, battle-engine edit, commit, or push was performed.
+
+### Lorehold Learned Metadata And Critical Role Backfill Apply - 2026-06-20 00:23 -03
+
+Scope note:
+
+- This checkpoint closes the prior focused objective that explicitly requested
+  dry-run preparation and final apply after validation. The persistent objective
+  was later reset to the broader no-PostgreSQL-write default. No additional
+  PostgreSQL writes were performed after that reset.
+- No deck `6` card composition change, deck swap, battle-engine edit, commit,
+  push, live route call, or OpenAI call was performed.
+
+Code added for the focused backfill:
+
+- Added `server/bin/plan_lorehold_critical_role_backfill.py`.
+  - Default mode is dry-run.
+  - `--apply` is required for writes.
+  - Source label:
+    `lorehold_critical_gap_manual_2026_06_20`.
+  - Planned durable rows:
+    `11` `card_function_tags`, `4` `card_semantic_tags_v2`, and `5`
+    `commander_card_synergy` rows.
+- Added `server/test/plan_lorehold_critical_role_backfill_test.py`.
+  - Tests assert the focused row counts/source and rollback scoping.
+
+Baseline validation before apply:
+
+- `cd server && dart analyze bin/canonicalize_learned_deck_metadata.dart lib/ai/commander_learned_deck_support.dart test/commander_learned_deck_support_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`
+  - result: `19/19` tests passed.
+- `python3 -m py_compile server/bin/plan_lorehold_critical_role_backfill.py server/test/plan_lorehold_critical_role_backfill_test.py`
+  - result: pass.
+- `python3 server/test/plan_lorehold_critical_role_backfill_test.py`
+  - result: `2` tests passed.
+
+Required metadata dry-run before apply:
+
+- Command:
+  `cd server && dart run bin/canonicalize_learned_deck_metadata.dart --dry-run --source-ref=learned_deck:82 --include-unchanged`
+- Result:
+  - `status=PASS`
+  - `mode=dry_run`
+  - `db_mutations=false`
+  - `checked=1`, `reported=1`, `changed=1`, `applied=0`
+  - affected row id:
+    `f46c0421-71b4-4de3-bb79-05a916b4988b`
+  - source ref: `learned_deck:82`
+  - commander: `Lorehold, the Historian`
+  - deck: `Lorehold Best-of Learned No Premium Mox 2026-06-02`
+  - `card_count=100`, `parsed_card_count=100`
+- Selected metadata before:
+  - `total_lands=30`
+  - `ramp_count=17`
+  - `draw_count=16`
+  - `removal_count=8`
+  - `tutor_count=5`
+  - `engine_count=33`
+  - `wincon_count=13`
+  - `protection_count=8`
+  - `recursion_count=4`
+  - `board_wipe_count=2`
+- Selected metadata after dry-run recomputation:
+  - `total_lands=33`
+  - `ramp_count=20`
+  - `draw_count=18`
+  - `removal_count=8`
+  - `tutor_count=5`
+  - `engine_count=36`
+  - `wincon_count=13`
+  - `protection_count=13`
+  - `recursion_count=4`
+  - `board_wipe_count=2`
+- Fields changing in the initial metadata apply:
+  `total_lands 30 -> 33`, `ramp_count 17 -> 20`,
+  `draw_count 16 -> 18`, `engine_count 33 -> 36`,
+  and `protection_count 8 -> 13`.
+
+Read-only PostgreSQL gap query before apply:
+
+- The query resolved the five names through `card_identity_bridge` and did not
+  write to PostgreSQL.
+- Before apply:
+  - `Orim's Chant`: `function_tags=[]`, `function_tag_rows=0`,
+    `semantic_v2_rows=0`, `lorehold_synergy_rows=0`.
+  - `Ruby Medallion`: `function_tags=[]`, `function_tag_rows=0`,
+    `semantic_v2_rows=0`, `lorehold_synergy_rows=0`.
+  - `Scroll Rack`: `function_tags=[]`, `function_tag_rows=0`,
+    `semantic_v2_rows=0`, `lorehold_synergy_rows=0`.
+  - `Victory Chimes`: `function_tags=[]`, `function_tag_rows=0`,
+    `semantic_v2_rows=0`, `lorehold_synergy_rows=0`.
+  - `Lorehold, the Historian`: persisted `function_tags=['draw','enabler',
+    'engine','loot']`, one deterministic semantic-v2 row, and zero Lorehold
+    commander-synergy rows.
+
+Backfill planner dry-run before apply:
+
+- Command:
+  `cd server && python3 bin/plan_lorehold_critical_role_backfill.py --dry-run`
+- Result:
+  - `status=PASS`
+  - `mode=dry_run`
+  - `db_mutations=false`
+  - `counts_before`: `existing_function_tag_rows=0`,
+    `existing_semantic_v2_rows=0`, `existing_commander_synergy_rows=0`
+  - `planned_counts`: `function_tag_rows=11`, `semantic_v2_rows=4`,
+    `commander_synergy_rows=5`
+  - `applied_counts`: all zero.
+  - proposed apply command:
+    `cd server && python3 bin/plan_lorehold_critical_role_backfill.py --apply`
+
+Apply commands executed after validation:
+
+- Metadata apply:
+  `cd server && dart run bin/canonicalize_learned_deck_metadata.dart --apply --source-ref=learned_deck:82 --include-unchanged`
+  - result: `status=PASS`, `mode=apply`, `db_mutations=true`,
+    `changed=1`, `applied=1`.
+  - initial selected metadata changed from `30/17/16/33/8`
+    lands/ramp/draw/engine/protection to `33/20/18/36/13`.
+- Critical role backfill apply:
+  `cd server && python3 bin/plan_lorehold_critical_role_backfill.py --apply`
+  - result: `status=PASS`, `mode=apply`, `db_mutations=true`.
+  - `applied_counts`: `function_tag_rows=11`, `semantic_v2_rows=4`,
+    `commander_synergy_rows=5`.
+  - `counts_after`: `existing_function_tag_rows=11`,
+    `existing_semantic_v2_rows=4`, `existing_commander_synergy_rows=5`.
+- Final metadata apply after durable tag rows:
+  `cd server && dart run bin/canonicalize_learned_deck_metadata.dart --apply --source-ref=learned_deck:82 --include-unchanged`
+  - reason: after `Scroll Rack` gained durable `engine`, the canonical metadata
+    moved `engine_count` from `36` to `37`.
+  - result: `status=PASS`, `mode=apply`, `db_mutations=true`,
+    `changed=1`, `applied=1`.
+  - before: `engine_count=36`; after: `engine_count=37`. Other selected fields
+    stayed `total_lands=33`, `ramp_count=20`, `draw_count=18`,
+    `removal_count=8`, `tutor_count=5`, `wincon_count=13`,
+    `protection_count=13`, `recursion_count=4`, `board_wipe_count=2`.
+
+Post-apply verification:
+
+- Metadata no-change proof:
+  `cd server && dart run bin/canonicalize_learned_deck_metadata.dart --dry-run --source-ref=learned_deck:82 --include-unchanged`
+  - result: `status=PASS`, `mode=dry_run`, `db_mutations=false`,
+    `checked=1`, `reported=1`, `changed=0`, `applied=0`.
+  - before and after selected metadata are identical:
+    `total_lands=33`, `ramp_count=20`, `draw_count=18`,
+    `removal_count=8`, `tutor_count=5`, `engine_count=37`,
+    `wincon_count=13`, `protection_count=13`, `recursion_count=4`,
+    `board_wipe_count=2`.
+- Backfill no-op proof:
+  `cd server && python3 bin/plan_lorehold_critical_role_backfill.py --dry-run`
+  - result: `status=PASS`, `mode=dry_run`, `db_mutations=false`,
+    `applied_counts=0/0/0`.
+  - `counts_before` and `counts_after` both show
+    `existing_function_tag_rows=11`, `existing_semantic_v2_rows=4`,
+    `existing_commander_synergy_rows=5`.
+- Read-only PostgreSQL verification after apply used
+  `transaction_read_only=on` and returned:
+  - `Orim's Chant`: function tags `protection`, `stax`; one semantic-v2 table
+    row from `lorehold_critical_gap_manual_2026_06_20`; one Lorehold synergy
+    row with role `protection`.
+  - `Ruby Medallion`: function tags `artifact_synergy`, `ramp`,
+    `spellslinger`; one semantic-v2 table row from
+    `lorehold_critical_gap_manual_2026_06_20`; one Lorehold synergy row with
+    role `ramp`.
+  - `Scroll Rack`: function tags `artifact_synergy`, `draw`, `enabler`,
+    `engine`; one semantic-v2 table row from
+    `lorehold_critical_gap_manual_2026_06_20`; one Lorehold synergy row with
+    role `draw`.
+  - `Victory Chimes`: function tags `artifact_synergy`, `ramp`; one semantic-v2
+    table row from `lorehold_critical_gap_manual_2026_06_20`; one Lorehold
+    synergy row with role `ramp`.
+  - `Lorehold, the Historian`: existing function tags `draw`, `enabler`,
+    `engine`, `loot`; existing deterministic semantic-v2 table row; one new
+    Lorehold synergy row from `lorehold_critical_gap_manual_2026_06_20` with
+    role `engine`.
+- Learned-deck coherence audit after apply:
+  `cd server && python3 bin/learned_deck_coherence_audit.py --stdout`
+  - result summary: `active_learned_decks=60`,
+    `metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`,
+    `all_core_metadata_zero=54`, `some_core_metadata_zero=4`,
+    `off_color_cards=1`, `partner_identity_not_modeled=9`.
+  - severity summary: `high=168`, `medium=21`.
+  - This confirms the focused Lorehold metadata mismatch was removed while the
+    broader fleet metadata backlog remains active.
+
+Validation after apply:
+
+- `cd server && dart analyze bin/canonicalize_learned_deck_metadata.dart lib/ai/commander_learned_deck_support.dart test/commander_learned_deck_support_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/commander_learned_deck_support_test.dart -r expanded`
+  - result: `19/19` tests passed.
+- `cd server && python3 -m py_compile bin/plan_lorehold_critical_role_backfill.py test/plan_lorehold_critical_role_backfill_test.py`
+  - result: pass.
+- `cd server && python3 test/plan_lorehold_critical_role_backfill_test.py`
+  - result: `2` tests passed.
+
+Rollback, if explicitly authorized:
+
+```sql
+BEGIN;
+UPDATE commander_learned_decks
+SET metadata = '{"avg_cmc": 2.15, "board_wipe_count": 2, "draw_count": 16, "engine_count": 33, "excluded_cards": ["Chrome Mox", "Mox Diamond", "Mox Opal"], "hermes_active_deck_id": 6, "hermes_learned_deck_id": 82, "hermes_promotion_id": 1, "learned_deck_created_at": "2026-06-02T18:19:52Z", "promoted_at_hermes": "2026-06-02 18:37:39", "protection_count": 8, "ramp_count": 17, "recursion_count": 4, "removal_count": 8, "source_hash": "f3d63c68be1f3fa7", "total_lands": 30, "tutor_count": 5, "wincon_count": 13}'::jsonb,
+    updated_at = NOW()
+WHERE id = 'f46c0421-71b4-4de3-bb79-05a916b4988b'::uuid;
+DELETE FROM card_function_tags
+WHERE source = 'lorehold_critical_gap_manual_2026_06_20'
+  AND card_id IN (
+    '99166b3a-4bcb-453c-ae4c-30d78756cc8c'::uuid,
+    'dcb0b2ea-f534-4b04-8f93-9ccbcb240484'::uuid,
+    '4463bb2f-eb7e-4021-b9a4-99f03a2ce969'::uuid,
+    '166c82b2-f988-4073-9cf4-73a0bf4645a6'::uuid,
+    '82e491ce-b461-4e87-95fb-51f3048b4c1b'::uuid
+  );
+DELETE FROM card_semantic_tags_v2
+WHERE source = 'lorehold_critical_gap_manual_2026_06_20'
+  AND card_id IN (
+    '99166b3a-4bcb-453c-ae4c-30d78756cc8c'::uuid,
+    'dcb0b2ea-f534-4b04-8f93-9ccbcb240484'::uuid,
+    '4463bb2f-eb7e-4021-b9a4-99f03a2ce969'::uuid,
+    '166c82b2-f988-4073-9cf4-73a0bf4645a6'::uuid,
+    '82e491ce-b461-4e87-95fb-51f3048b4c1b'::uuid
+  );
+DELETE FROM commander_card_synergy
+WHERE source = 'lorehold_critical_gap_manual_2026_06_20'
+  AND commander_name_normalized = 'lorehold, the historian'
+  AND card_id IN (
+    '99166b3a-4bcb-453c-ae4c-30d78756cc8c'::uuid,
+    'dcb0b2ea-f534-4b04-8f93-9ccbcb240484'::uuid,
+    '4463bb2f-eb7e-4021-b9a4-99f03a2ce969'::uuid,
+    '166c82b2-f988-4073-9cf4-73a0bf4645a6'::uuid,
+    '82e491ce-b461-4e87-95fb-51f3048b4c1b'::uuid
+  );
+COMMIT;
+```
+
+Status change:
+
+- Closed the focused metadata canonicalization item for Lorehold
+  `learned_deck:82`.
+- Closed the focused missing tag/semantic/synergy backfill item for the current
+  Lorehold critical gap set.
+- Kept the broader fleet metadata backlog active through current audit evidence:
+  `metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`, and
+  `all_core_metadata_zero=54`.
+- Kept the broader identity-resolution/off-color item active:
+  current audit still reports `off_color_cards=1` and
+  `partner_identity_not_modeled=9`.
+
+### Saved-Deck Strict Validation Current Recheck - 2026-06-20 00:24 -03
+
+Current backend evidence:
+
+- `server/routes/decks/[id]/validate/index.dart` is `POST`-only and reads the
+  current user plus `Pool` from the request context.
+- The owner-scope read uses `deckValidationOwnerScopeSql`:
+  `SELECT id::text, format FROM decks WHERE id = @deckId AND user_id = @userId
+  LIMIT 1`.
+- Owner-scope miss returns HTTP `404` with
+  `{ok:false,error:"Deck not found or permission denied.",error_code:"deck_not_found"}`.
+- The route reloads persisted `deck_cards` for the deck, then calls
+  `DeckRulesService(session).validateAndThrow(format: format, cards: cards,
+  strict: true)`.
+- Success returns `{ok:true, format, deck_id}`. `DeckRulesException` returns
+  HTTP `400` with `{ok:false,error,card_name?}`; other errors return HTTP
+  `500` with `{ok:false,error}`.
+- `server/lib/deck_validation_route_support.dart` centralizes the SQL and
+  response-body helpers, and `server/test/deck_validation_route_support_test.dart`
+  covers owner-scope SQL, success, 404, 400, and 500 body shapes without a live
+  PostgreSQL call.
+
+Current app evidence:
+
+- `validateDeckRequest(...)` performs `POST /decks/$deckId/validate` with an
+  empty JSON body and parses the current `{ok:...}` shape.
+- `isDeckValidationOk(...)` accepts `ok`, `valid`, or `is_valid` only as
+  response-shape compatibility; the current backend contract is `ok`.
+- `persistDeckCardsPayloadWithValidation(...)` performs `PUT /decks/:id`, then
+  validates strictly. If strict validation is not ok, `_persistDeckCardsPayload`
+  logs a warning, refreshes details, and returns `false`.
+- Important divergence: the post-write validation failure path is surfaced as a
+  failed apply, but it does not rollback the already attempted `PUT`. For chat
+  "Ajustar deck", this remains rollback-worthy/manual-review behavior, not a
+  success claim.
+
+Validation evidence:
+
+- `cd server && dart analyze 'routes/decks/[id]/validate/index.dart' lib/deck_validation_route_support.dart lib/deck_rules_service.dart lib/generated_deck_validation_service.dart test/deck_validation_route_support_test.dart test/deck_rules_service_test.dart test/deck_rules_service_identity_test.dart test/generated_deck_validation_service_test.dart test/api_contracts_data_map_guard_test.dart test/deck_validation_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/deck_validation_route_support_test.dart test/deck_rules_service_test.dart test/deck_rules_service_identity_test.dart test/generated_deck_validation_service_test.dart test/api_contracts_data_map_guard_test.dart test/deck_validation_test.dart -r expanded`
+  - result: `72/72` tests passed.
+- `cd app && flutter analyze lib/features/decks/providers/deck_provider_support_mutation.dart lib/features/decks/providers/deck_provider_support_common.dart lib/features/decks/providers/deck_provider.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart test/features/decks/screens/deck_details_screen_smoke_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart test/features/decks/screens/deck_details_screen_smoke_test.dart`
+  - result: `74/74` tests passed.
+
+Current learning:
+
+- `/decks/:id/validate` is coherent as the current final legality/shape gate:
+  owner-scoped, strict, persisted-state based, and source/test covered for
+  success plus known failure body shapes.
+- Strict validation is necessary but insufficient for Lorehold/deck `6`
+  strategy coherence. It proves legality/shape, not package fit, role balance,
+  graveyard-artifact recursion density, draw/rummage cadence, removal posture,
+  or battle-plan consistency.
+- No live `/decks/:id/validate` call was made against deck `6` in this read-only
+  audit slice.
+
+Additional required adjustments:
+
+428. Keep `/decks/:id/validate` as the final legality/shape gate after any
+     generated, imported, optimized, or manual persisted mutation.
+429. Do not treat strict validation success as strategic coherence; every
+     Lorehold or non-Lorehold builder path still needs package/role review.
+430. Treat post-write validation failure as failed and rollback-worthy/manual
+     review, not as a completed deck adjustment.
+431. Add transactional apply or rollback design later if product wants automatic
+     safety after failed post-`PUT` strict validation.
+432. Preserve owner-scope `404` behavior and generic client display for unknown
+     validation issue types.
+433. Keep app compatibility for `ok`/`valid`/`is_valid` only as response-shape
+     compatibility; the current backend contract is `ok`.
+434. During read-only Lorehold/deck `6` audits, do not call the live validation
+     route against deck `6` unless explicitly approved; rely on code/tests and
+     read-only current deck evidence.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, battle-engine edit, commit, or push was performed.
+
+### PostgreSQL Oracle / Learned Identity Refresh - 2026-06-20 00:20 -03
+
+Scope:
+
+- Rechecked current PostgreSQL oracle structure, persisted-deck impact,
+  Scryfall exact-name readiness, Lorehold PG saved deck oracle cleanliness, and
+  latest learned-deck coherence artifact.
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, commit, or push was performed.
+
+Read-only oracle evidence:
+
+- `python3 server/bin/plan_oracle_text_backfill.py --no-scryfall` summarized
+  current PostgreSQL state as `status=PASS`, `mode=read_only`,
+  `db_mutations=false`.
+- Current `cards` base oracle counts remain unchanged:
+  - total cards: `34,329`
+  - missing `oracle_id`: `4`
+  - missing `oracle_text`: `360`
+  - missing either `oracle_id` or `oracle_text`: `363`
+- Persisted-deck gap impact remains exactly `6` names and no active learned
+  gap items:
+  - `Isamaru, Hound of Konda`: `17` deck rows / quantity `17`, missing
+    `oracle_text`
+  - `A-Alrund's Epiphany`: `16` rows / quantity `16`, missing `oracle_id`
+  - `Grizzly Bears`: `7` rows / quantity `7`, missing `oracle_text`
+  - `Runeclaw Bear`: `7` rows / quantity `7`, missing `oracle_text`
+  - `A-Omnath, Locus of Creation`: `6` rows / quantity `6`, missing
+    `oracle_id`
+  - `Yargle and Multani`: `3` rows / quantity `3`, missing `oracle_text`
+- `active_learned_gap_items=0`, `deck_card_gap_items=6`, `planned_items=6`,
+  and `backfill_ready=0`.
+- `python3 server/bin/plan_oracle_text_backfill.py --limit=6 --delay-ms=75 --timeout-seconds=20`
+  still found `4` Scryfall exact-name candidates and `0` automatic
+  backfill-ready items.
+  - `Isamaru, Hound of Konda`, `Grizzly Bears`, `Runeclaw Bear`, and
+    `Yargle and Multani` were found through curl fallback, but all have
+    `oracle_text_present=false`.
+  - `A-Alrund's Epiphany` and `A-Omnath, Locus of Creation` still return
+    exact-name `404`, so they need Arena/Alchemy identity handling rather than
+    ordinary exact-name Scryfall backfill.
+
+Lorehold deck `6` evidence:
+
+- Direct read-only PostgreSQL query for linked PG deck
+  `528c877f-f829-4207-95e6-73981776c323` returned:
+  - name: `Runtime Lorehold Learned 19e93de3cca`
+  - format: `commander`
+  - rows / quantity: `100 / 100`
+  - commander quantity: `1`
+  - land quantity by `type_line`: `33`
+  - missing `card_identity_bridge` rows / quantity: `0 / 0`
+  - missing `card_intelligence_snapshot` rows / quantity: `0 / 0`
+  - missing `oracle_id` rows / quantity: `0 / 0`
+  - missing `oracle_text` rows / quantity: `0 / 0`
+  - missing `type_line` rows / quantity: `0 / 0`
+- This keeps the oracle/backfill backlog out of deck `6` construction. It is a
+  global card-data policy issue, not a Lorehold swap signal.
+
+Learned-deck artifact evidence:
+
+- Current latest full artifact checked in the worktree is
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_031157.json`,
+  generated at `2026-06-20T03:11:54.074960+00:00`, with `read_only=true`.
+- Its aggregate summary now reports:
+  - active learned decks: `60`
+  - `metadata_total_lands_mismatch=58`
+  - `metadata_zero_lands=54`
+  - `off_color_cards=1`
+  - `partner_identity_not_modeled=9`
+  - severity counts: `high=169`, `medium=21`
+- The same artifact keeps Lorehold `learned_deck:82` strategy checks passing,
+  with `combined_commander_color_identity=['R','W']`, `resolved_quantity=100`,
+  `total_lands=33`, no missing oracle fields, no off-color candidates, and only
+  the stale cached metadata issue `metadata_total_lands_mismatch expected=33
+  actual=30`.
+- The `off_color_resolution_plan` still has `entry_count=5` and
+  `status=ready_for_review`, but entries are now classified as
+  identity-bridge misresolution or combined commander identity modeling. The
+  plan remains `db_mutations=false` and `apply_requires_explicit_approval=true`.
+
+Validation evidence:
+
+- `python3 -m py_compile server/bin/learned_deck_coherence_audit.py server/bin/plan_oracle_text_backfill.py server/test/learned_deck_coherence_audit_test.py server/test/plan_oracle_text_backfill_test.py`
+  - result: pass.
+- `python3 -m unittest server/test/learned_deck_coherence_audit_test.py server/test/plan_oracle_text_backfill_test.py`
+  - result: `18` tests passed.
+- `python3 server/bin/learned_deck_coherence_audit.py --stdout`
+  - result: current summary matches artifact-level aggregate for
+    `active_learned_decks=60`, `metadata_total_lands_mismatch=58`,
+    `metadata_zero_lands=54`, `off_color_cards=1`, and
+    `partner_identity_not_modeled=9`.
+
+Current conclusion:
+
+- Active oracle/backfill item remains open as data policy, not decklist work.
+- Deck `6` remains clean for oracle/id/text/type-line structure and should not
+  receive swaps for this backlog.
+- The prior broad `off_color_cards=5` learned-deck reading is superseded by the
+  current artifact/readout: only `1` remains counted as active off-color after
+  the current inference/classification, while the review plan still tracks `5`
+  resolution/modeling entries.
+
+Additional required adjustments:
+
+419. Keep the PostgreSQL oracle backlog open until accepted-empty-oracle policy
+     and Arena/Alchemy identity handling are explicitly modeled or approved.
+420. Do not backfill official no-rules-text cards with invented oracle text; if
+     the official Scryfall oracle text is empty, model that as accepted empty
+     text instead.
+421. Do not treat `A-` Arena/Alchemy names as ordinary exact-name Scryfall
+     failures; they need a separate identity policy.
+422. Keep deck `6` out of this backlog. Its linked PG deck has complete
+     identity bridge, intelligence snapshot, `oracle_id`, `oracle_text`, and
+     `type_line` coverage.
+423. For chat "Ajustar deck", never propose card swaps from oracle-structure
+     backlog alone. Use it only as a data-quality warning.
+424. Treat latest learned-deck off-color count as `1`, but keep the
+     `off_color_resolution_plan` with `5` review entries until identity-bridge
+     ordering and combined commander identity are closed.
+425. Keep `learned_deck:82` Lorehold issue scoped to stale cached metadata
+     (`total_lands=30` vs resolved `33`), not card identity or oracle gaps.
+426. Continue using `card_intelligence_snapshot` plus `EXISTS`/pre-aggregation
+     for deck-card oracle counts; direct joins to `card_identity_bridge` can
+     fan out rows.
+427. Any future PostgreSQL mutation for this area requires explicit approval;
+     current evidence is read-only planning only.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, battle-engine edit, commit, or push was performed.
+
+### Optimize / Ajustar Deck Boundary Recheck - 2026-06-20 00:03 -03
+
+Safe evidence collected:
+
+- Re-read the current `/ai/optimize` route, optimize request/cache/swap
+  integrity/final-gate/quality-gate support files, app optimize flow/provider
+  apply files, focused tests, and the API contract row.
+- `/ai/optimize` remains owner-scoped before deck context load and before async
+  job creation. `loadOptimizeDeckContext(...)` reads
+  `decks WHERE id = deck_id AND user_id = user_id`, prefers
+  `card_intelligence_snapshot`, aggregates/falls back semantic and functional
+  tags per card, and builds a deck signature from `card_id:quantity:condition`.
+- `/ai/optimize` is not a read-only probe. Success can write
+  `ai_optimize_cache` and user AI preferences; the common response path writes
+  `optimization_analysis_logs` and ML feedback when deck/user context exists;
+  the fallback path can write `ai_optimize_fallback_telemetry`.
+- The optimize route itself does not mutate `deck_cards`. It returns preview
+  suggestions, detailed additions/removals, validation/post-analysis evidence,
+  warnings, diagnostics, and optional `swap_integrity`.
+- Backend gates before success include unsafe-swap filtering,
+  color-identity/bracket checks, virtual post-analysis, final validation score
+  gate, and optional semantic v2 partial enforcement. Semantic v2 remains
+  environment-controlled and is not a replacement for legal/color/bracket/final
+  validation gates.
+- `buildSwapIntegrityForResponse(...)` signs detailed swaps only when
+  `removals_detailed` or `additions_detailed` exist. Name-only suggestions and
+  empty detailed payloads have no signature.
+- Current cache divergence: `saveOptimizeCache(...)` is called before
+  `respondWithOptimizeTelemetry(...)` attaches `swap_integrity`, while the
+  cache-hit branch returns `buildCachedOptimizeResponse(...)` directly and does
+  not recompute `swap_integrity`. The cache key includes deck signature, so the
+  cached preview is tied to the deck state at request time, but the app may
+  receive a detailed cached response without `expectedDeckSignature`; that means
+  apply-time drift between preview and confirmation is not signature-blocked in
+  that cache-hit path.
+- App `requestOptimizePreview(...)` validates `swap_integrity` when present and
+  rejects bad hashes/counts. Missing integrity is accepted as `null`.
+- App `buildOptimizeApplyPlan(...)` routes complete mode to `addBulk`, detailed
+  swaps to `applyOptimizationWithIds(...)`, and name-only swaps to
+  `applyOptimization(...)`.
+- `applyOptimizationWithIds(...)` rejects stale `expectedDeckSignature` before
+  `PUT`, including condition-only drift, and refilters additions outside the
+  current commander identity before persistence.
+- `applyOptimization(...)` by names is weaker: it resolves names against the
+  current API data and can filter by identity, but it carries no
+  `expectedDeckSignature`.
+- For `applyOptimizationWithIds(...)` and name-based apply, the app persists via
+  `PUT /decks/:id`, then calls `POST /decks/:id/validate`. Tests prove a failed
+  post-save validation returns `false` and refreshes details, but the mutation
+  was already attempted.
+- Complete-mode `addBulk` calls `POST /decks/:id/cards/bulk` and refreshes
+  details in the app. The backend bulk route owner-scopes, merges increments
+  preserving `condition`, runs `DeckRulesService(... strict:false)` inside the
+  transaction before delete/reinsert, and rejects commander entries, but the app
+  does not perform the same explicit post-save `/validate` step after bulk.
+
+Validation evidence:
+
+- `cd server && dart analyze routes/ai/optimize/index.dart lib/ai/optimize_request_support.dart lib/ai/optimize_cache_support.dart lib/ai/optimize_swap_integrity.dart lib/ai/optimize_route_final_gate_support.dart lib/ai/optimization_quality_gate.dart lib/ai/optimize_response_support.dart lib/ai/optimize_route_response_support.dart lib/ai/optimize_runtime_support.dart lib/ai/optimize_analysis_support.dart test/ai_optimize_authorization_source_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart test/optimize_route_final_gate_support_test.dart test/optimize_cache_support_test.dart test/optimization_quality_gate_test.dart test/optimize_route_request_support_test.dart test/optimize_runtime_support_test.dart test/optimize_route_async_support_test.dart test/optimize_payload_support_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/ai_optimize_authorization_source_test.dart test/ai_optimize_semantic_enforcement_route_contract_test.dart test/optimize_route_final_gate_support_test.dart test/optimize_cache_support_test.dart test/optimization_quality_gate_test.dart test/optimize_route_request_support_test.dart test/optimize_runtime_support_test.dart test/optimize_route_async_support_test.dart test/optimize_payload_support_test.dart -r expanded`
+  - result: `78/78` tests passed.
+- `cd app && flutter analyze lib/features/decks/widgets/deck_optimize_flow_support.dart lib/features/decks/providers/deck_provider.dart lib/features/decks/providers/deck_provider_support_ai.dart lib/features/decks/providers/deck_provider_support_mutation.dart lib/features/decks/screens/deck_details_screen.dart test/features/decks/widgets/deck_optimize_flow_support_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/screens/deck_details_screen_smoke_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/widgets/deck_optimize_flow_support_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/screens/deck_details_screen_smoke_test.dart`
+  - result: `97/97` tests passed.
+- `cd server && dart analyze 'routes/decks/[id]/cards/bulk/index.dart' lib/deck_cards_bulk_support.dart test/deck_cards_bulk_support_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/deck_cards_bulk_support_test.dart -r expanded`
+  - result: `3/3` tests passed.
+
+Current learning:
+
+- For deck `6`, chat "Ajustar deck" may use optimize as a candidate preview
+  surface, not as authority to mutate the deck.
+- Do not call live `POST /ai/optimize` during read-only audits. It is
+  write-capable through cache/preferences/log/feedback tables even when no
+  deck-card swap is applied.
+- The safest product path is detailed `removals_detailed` /
+  `additions_detailed` with valid `swap_integrity` and current
+  `expectedDeckSignature`; name-only apply and cache-hit responses without
+  integrity are weaker review-only inputs.
+- A failed app post-save validation is correctly not reported as success, but
+  it is not transactional rollback evidence. Deck `6` audit language must say
+  "mutation attempted, validation failed, details refreshed" if that ever
+  occurs.
+- `rebuild_guided` is a repair/draft workflow, not automatic replacement of
+  Lorehold deck `6`.
+
+Additional required adjustments:
+
+397. Do not run live `/ai/optimize` during read-only Lorehold/deck `6` audits;
+     it can write cache, preferences, analysis logs, fallback telemetry, and ML
+     feedback.
+398. Treat `/ai/optimize` as preview/suggestion only. No deck `6` swap is
+     allowed without explicit user approval.
+399. Prefer detailed card-id swaps with valid `swap_integrity`. Name-only apply
+     is review-only for deck `6` unless a fresh signature and validation plan is
+     added.
+400. Fix or document the cache-hit integrity gap: either save the response after
+     `swap_integrity` is attached or recompute it in
+     `buildCachedOptimizeResponse(...)` before returning cached suggestions.
+401. If a cached or name-only optimize response lacks `expectedDeckSignature`,
+     require fresh deck fetch and fresh preview before mutation.
+402. Add pre-mutation or transactional validation/rollback for optimize apply,
+     because current app strict validation happens after `PUT`.
+403. Give complete-mode `addBulk` the same explicit post-apply strict
+     validation/reporting contract as the `PUT` apply path, or surface the
+     backend bulk route's validation status clearly.
+404. Keep semantic v2 optimize enforcement as additive safety only; do not use
+     it as a substitute for legal/color/bracket/final validation.
+405. Treat `rebuild_guided` as draft/repair workflow, not automatic replacement
+     of the original deck.
+406. Preserve physical condition codes in optimize deck signatures and cache
+     keys; condition-only drift must invalidate apply.
+407. Treat cache responses as safe only under identical deck signature,
+     intensity, bracket, and keep-theme inputs. If strategy context changes
+     outside the key, force a fresh optimize preview.
+408. After any applied optimize/bulk change, require fresh details plus strict
+     `/decks/:id/validate`; if validation fails, refresh and do not report
+     success.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, battle-engine edit, commit, or push was performed.
+
+### Generate / Learned Deck Async+Save Recheck - 2026-06-20 00:13 -03
+
+Scope:
+
+- Rechecked the current async `/ai/generate` job path, generate cache support,
+  learning-event support, generated-deck validation, app generation provider,
+  learned-deck preview, and save path.
+- No live route call, PostgreSQL write, OpenAI call, deck `6` mutation, deck
+  swap, code edit, commit, or push was performed.
+
+Current backend learning:
+
+- `POST /ai/generate` async mode is auth-required and write-capable: it creates
+  an `ai_generate_jobs` row, can create the `ai_generate_jobs` table/indexes
+  lazily, then stores the completed result or failure for owner-scoped polling.
+- The job polling route returns `404` when the job is missing, expired, has no
+  owner, or belongs to a different user. This keeps async generated deck output
+  owner-scoped.
+- Sync generation uses `EndpointCache` via `buildAiGenerateCacheKey(...)`,
+  `readAiGenerateCache(...)`, and `writeAiGenerateCache(...)`. Valid generated
+  or fallback bodies are cacheable; cached bodies are not proof of fresh deck
+  state.
+- Valid Commander generation can still write `deck_learning_events` through
+  `logGeneratedDeckForLearning(...)`. `POST /ai/generate` remains unsuitable as
+  a read-only audit probe.
+- Important divergence: the route starts `logGeneratedDeckForLearning(...)`
+  before the invalid-card fallback branch. Because `validation.isValid` is based
+  on validation errors, a primary generation with unresolved cards but no errors
+  can enqueue a learning event for the cleaned primary `validation.generatedDeck`
+  and then return deterministic fallback to the app. This is edge-case evidence
+  drift between "learned from" and "returned to user".
+- `GeneratedDeckValidationService` returns generated deck names/quantities, not
+  stable `card_id` payloads. Identity resolution remains a separate step before
+  save.
+
+Current app learning:
+
+- `DeckProvider.generateDeck(...)` sends `async: true`, polls
+  `/ai/generate/jobs/:id`, and preserves `commander_name` in both async and sync
+  fallback paths.
+- The provider accepts a completed async job whose `result_status_code` is `422`
+  as a reviewable result map. Validity is not implied by provider success; the
+  screen's save gate is the attached `validation.is_valid` value.
+- Server `poll_interval_ms=1000` is treated as a hint. The app clamps accepted
+  poll intervals to 5-10 seconds unless tests inject a custom interval.
+- `DeckGenerateScreen` refuses save when `validation.is_valid != true`.
+- Save from generate or learned preview builds a new `POST /decks` payload, with
+  the commander separated from main cards, and does not mutate Lorehold deck
+  `6`.
+- `createDeck(...)` pre-resolves name-only cards through `/cards/resolve/batch`
+  and refuses unresolved or ambiguous names before POSTing `/decks`.
+- Backend `POST /decks` resolves any remaining name-only rows, validates with
+  `DeckRulesService(strict: false)`, inserts `decks`/`deck_cards`, and then
+  writes learning evidence through `_logDeckCreateLearning(...)`: commander card
+  usage plus `deck_learning_events` when a commander is present.
+- The app create path can also emit a user activation event after create. Saving
+  a generated or learned preview is therefore a product write path, not an audit
+  read.
+
+Validation evidence:
+
+- `cd server && dart analyze routes/ai/generate/index.dart 'routes/ai/generate/jobs/[id].dart' routes/ai/commander-learning/index.dart lib/ai_generate_job.dart lib/ai_generate_internal_url_support.dart lib/ai_generate_performance_support.dart lib/generated_deck_validation_service.dart lib/ai/commander_learned_deck_support.dart lib/ai/commander_reference_generate_fallback_support.dart lib/ai/deck_learning_event_support.dart test/ai_generate_learning_boundary_test.dart test/generated_deck_validation_service_test.dart test/commander_learned_deck_support_test.dart test/ai_generate_job_authorization_source_test.dart test/ai_generate_internal_url_support_test.dart test/api_contracts_data_map_guard_test.dart`
+  - result: no issues found.
+- `cd server && dart test test/ai_generate_learning_boundary_test.dart test/generated_deck_validation_service_test.dart test/commander_learned_deck_support_test.dart test/ai_generate_job_authorization_source_test.dart test/ai_generate_internal_url_support_test.dart test/api_contracts_data_map_guard_test.dart -r expanded`
+  - result: `46/46` tests passed.
+- `cd app && flutter analyze lib/features/decks/screens/deck_generate_screen.dart lib/features/decks/providers/deck_provider_support_generation.dart lib/features/decks/providers/deck_provider.dart test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart`
+  - result: no issues found.
+- `cd app && flutter test test/features/decks/providers/deck_provider_test.dart test/features/decks/providers/deck_provider_support_test.dart test/features/decks/screens/deck_flow_entry_screens_test.dart test/features/decks/screens/deck_runtime_widget_flow_test.dart`
+  - result: `70/70` tests passed.
+
+Required adjustments:
+
+409. Treat `/ai/generate` async as write-capable because it persists job rows and
+     completed results.
+410. Treat `/ai/generate` sync as write-capable because it can cache responses
+     and log Commander learning events.
+411. Move or gate `logGeneratedDeckForLearning(...)` after the final fallback
+     decision, or record whether the learned event came from the primary
+     generation versus the returned fallback.
+412. Treat a provider-level generated result as a reviewable preview only; a
+     completed `422` job can still return a map, so `validation.is_valid` is the
+     save gate.
+413. Do not use generate cache hits as freshness proof for deck `6` or any saved
+     deck; cache keys describe prompt/reference inputs, not current deck state.
+414. Preserve `/cards/resolve/batch` before generated/learned save and reject
+     unresolved or ambiguous names before writing a new deck.
+415. Treat learned/generated save as new-deck creation plus learning telemetry,
+     not as deck `6` repair or mutation.
+416. After any generated or learned deck is saved, require fresh fetch and strict
+     validation before claiming the saved deck is coherent or optimizer-ready.
+417. Keep raw `source_ref`/Hermes identifiers out of normal learned-deck preview
+     UI unless an explicit admin/debug contract is added.
+418. For Lorehold and every other builder archetype, legality validation is only
+     the floor; strategic package balance, role coverage, win lines, recursion,
+     ramp, draw, interaction, and land plan still require separate review.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, code edit, battle-engine edit, commit, or push was performed.
+
 ### Role Summary Current Boundary Recheck - 2026-06-19 23:55 -03
 
 Safe evidence collected:
@@ -12524,3 +14891,690 @@ Scope guard:
 
 - No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
   swap, battle-engine edit, commit, or push was performed.
+
+### Battle Latest Summary Trusted Recheck - 2026-06-20 00:03 -03
+
+Artifact recheck:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`
+  now points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_025107`.
+- Current `summary.json` reports:
+  - `timestamp_utc=2026-06-20T02:51:07Z`
+  - `battle_replay_final_status=trusted_for_strategy_learning`
+  - `battle_replay_final_status_reason=all_mandatory_gates_pass`
+  - `mandatory_gate_divergences=[]`
+  - `forensic_rule_findings=0`
+  - `forensic_turn_findings=0`
+  - `test_results_total=16`
+  - `test_results_status_counts={"pass":16}`
+  - `unknown_template_backlog_cards=0`
+  - `effect_coverage_unknown_effect_cards=34`
+  - `lorehold_deck_source_ref=deck_id:6`
+  - `lorehold_deck_lands=33`
+  - `lorehold_deck_metrics_basis=runtime_derived_from_resolved_card_list`
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_005400.json`.
+
+`BV-076` recheck:
+
+- A focused scan of current latest seed `replay.events.jsonl` files still finds
+  no `redirect_removal_resolved` event.
+- Current `Deflecting Swat` / `redirect_removal` event counts are limited to
+  `cast_announced=5`, `cost_paid=5`, `spell_cast=5`, `miracle_cast=1`,
+  `spell_resolved=7`, plus supporting priority/trigger/recursion/rummage/wheel
+  rows. Field counts only expose `targets`; no `old_target`, `new_target`, or
+  `target_change_applied` proof was observed.
+
+Status change:
+
+- Removed the former residual battle coverage active item opened by
+  `20260620_014808`. The newer official run is trusted for strategy learning
+  and no longer has the `Machine God's Effigy` forensic finding.
+- Kept `BV-076` active because the latest trusted run still does not prove
+  actual redirected target mutation/provenance.
+- The former `/ai/simulate-matchup` guidance item is renumbered as active item
+  `4` in the central remaining-pending list after removing the resolved battle
+  coverage item.
+
+Scope guard:
+
+- No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
+  swap, battle-engine edit, commit, or push was performed.
+
+### Current Deck Active List After Partner Closure - 2026-06-20 06:59 -03
+
+Current state:
+
+- The detailed checkpoint
+  `Partner Identity Audit Drift Closure - 2026-06-20 06:55 -03` records the
+  code change, tests, read-only planner result, fresh coherence audit, and Deck
+  file classification for the partner/background closure.
+- `partner_identity_not_modeled` is no longer an active Deck pending item:
+  the post-PG-001 planner reports `planned_row_count=0`, the new learned-deck
+  coherence audit reports `partner_identity_not_modeled=0`, and all 10 combined
+  identity rows have persisted `metadata.commander_identity_model` matching the
+  derived model.
+- Current active Deck/Lorehold pending list contains only:
+  1. global learned-deck metadata canonicalization backlog;
+  2. strict-oracle/global card backlog;
+  3. `/ai/simulate-matchup` advisory-only/write-capable boundary.
+
+Scope guard:
+
+- No PostgreSQL write, PG-001 reapply, live route call, OpenAI call, deck `6`
+  mutation, deck swap, battle-engine edit, commit, push, or file cleanup was
+  performed.
+
+### Auditor Central Single-Operator Recheck - 2026-06-20 07:06 -03
+
+Scope:
+
+- Rafael paused the executor-chat model and assigned audit, worktree control,
+  PostgreSQL deploy governance, validation, and next execution to the Auditor
+  Central thread.
+- This recheck did not execute PostgreSQL writes, deck swaps, commits, pushes,
+  stashes, reverts, or cleanup.
+
+Evidence:
+
+- `git status --short --branch`: worktree remains dirty with `67` tracked
+  modified files and `52` untracked files.
+- `python3 -m unittest server/test/learned_deck_coherence_audit_test.py server/test/plan_learned_deck_partner_identity_backfill_test.py`
+  returned `21` tests passed.
+- `set -a && source server/.env && set +a && python3 server/bin/plan_learned_deck_partner_identity_backfill.py --dry-run --summary-only`
+  returned `status=PASS`, `planned_row_count=0`, `planned_rows=[]`, and
+  `db_mutations=false`.
+- `set -a && source server/.env && set +a && python3 server/bin/learned_deck_coherence_audit.py --stdout`
+  returned `active_learned_decks=60`, `metadata_total_lands_mismatch=57`,
+  `metadata_zero_lands=54`, `all_core_metadata_zero=54`,
+  `some_core_metadata_zero=4`, severity `high=167`, `medium=12`, and no
+  `partner_identity_not_modeled` entry in the compact summary.
+- `docs/hermes-analysis/MANALOOM_CENTRAL_AUDITOR_ORDERS.md` was rewritten to
+  single-operator mode.
+- `docs/hermes-analysis/WORKTREE_TRIAGE_REGISTER_2026-06-20.md` was created to
+  classify evidence, source candidates, and cleanup candidates.
+- `docs/hermes-analysis/POSTGRES_DEPLOY_REGISTER_2026-06-20.md` was updated so
+  PostgreSQL deploy ownership is this Auditor Central thread while other chats
+  remain paused.
+- PG-002 package artifacts were generated after the single-operator handoff:
+  - `learned_deck_metadata_canonicalization_pg002_dryrun_20260620_0718.json`
+  - `learned_deck_metadata_canonicalization_pg002_precheck_20260620_0718.sql`
+  - `learned_deck_metadata_canonicalization_pg002_apply_20260620_0718.sql`
+  - `learned_deck_metadata_canonicalization_pg002_rollback_20260620_0718.sql`
+  - `learned_deck_metadata_canonicalization_pg002_postcheck_20260620_0718.sql`
+  - `learned_deck_metadata_canonicalization_pg002_package_20260620_0718.md`
+- PG-002 SELECT-only precheck returned `expected_rows=59`,
+  `matched_rows=59`, `before_matches=59`, `already_after_rows=0`,
+  `would_change_rows=59`, and `active_matches=59`.
+- Backend Deck route/support validation after PG-002 packaging:
+  - read the new helper boundaries for bridge-first card-name resolution,
+    bulk-card condition preservation, validation response bodies,
+    import-to-deck merge, and advisory recommendations route core;
+  - `cd server && dart analyze ...` over the focused backend Deck route/support
+    slice returned no issues;
+  - `cd server && dart test ... -r expanded` over the focused backend Deck
+    slice returned `52/52` tests passed.
+- Flutter Deck provider/UI validation after backend slice:
+  - read the modified app diff for generated/learned archetype and bracket
+    propagation, physical-condition preservation in optimize payloads,
+    strict-validation failure handling, diagnostic-analysis hydration, and
+    diagnostic-panel backend-analysis preference;
+  - `cd app && flutter analyze ...` over the focused Deck provider/UI slice
+    returned no issues;
+  - `cd app && flutter test ...` over the focused Deck provider/UI slice
+    returned `105/105` tests passed.
+
+Conclusion:
+
+- PG-001 is still closed and must not be re-applied.
+- Historical Deck/Lorehold database backlog at that point was PG-002/global
+  learned-deck metadata canonicalization. That backlog is now superseded by the
+  later PG-002 apply/postcheck closure in the PostgreSQL deploy register.
+- Separate non-Deck deploy items are controlled by
+  `POSTGRES_DEPLOY_REGISTER_2026-06-20.md`.
+- `partner_identity_not_modeled` is no longer an active Deck pending item in the
+  current code/artifact state.
+
+Current active Deck/Lorehold pending list:
+
+1. Global learned-deck metadata canonicalization backlog
+   (`metadata_total_lands_mismatch=57`, `metadata_zero_lands=54`).
+2. Strict-oracle/global card backlog.
+3. `/ai/simulate-matchup` advisory-only/write-capable boundary.
+
+### Auditor Central AI/Import/Planner Recheck - 2026-06-20 07:54 -03
+
+Scope:
+
+- Single-operator validation of remaining backend AI/import/simulate and
+  PostgreSQL planner changes visible in the dirty worktree.
+- No PostgreSQL write, deck `6` mutation, deck swap, battle-engine edit,
+  cleanup, stash, revert, commit, or push was performed.
+
+Evidence:
+
+- `cd server && dart analyze ...` over the focused AI/import/simulate slice
+  returned no issues.
+- `cd server && dart test test/ai_generate_learning_boundary_test.dart test/commander_learned_deck_support_test.dart test/deck_rules_service_test.dart test/generated_deck_validation_service_test.dart test/import_list_service_test.dart test/import_parser_test.dart test/optimize_cache_support_test.dart test/optimize_route_color_identity_filter_support_test.dart test/optimize_route_warnings_support_test.dart test/cards_route_test.dart test/deck_simulate_route_adapter_test.dart -r expanded`
+  returned `76/76` tests passed.
+- `python3 -m unittest server/test/card_impact_analyzer_test.py`
+  returned `5` tests passed.
+- Planner validation:
+  `python3 -m py_compile server/bin/plan_lorehold_critical_role_backfill.py server/bin/plan_oracle_text_backfill.py server/bin/plan_learned_deck_partner_identity_backfill.py`
+  returned PASS, and
+  `python3 -m unittest server/test/plan_lorehold_critical_role_backfill_test.py server/test/plan_oracle_text_backfill_test.py server/test/plan_learned_deck_partner_identity_backfill_test.py`
+  returned `7` tests passed.
+- `plan_lorehold_critical_role_backfill.py --dry-run` returned `status=PASS`,
+  `db_mutations=false`, `applied_counts=0`, and existing rows already present:
+  `5` commander synergy rows, `11` function-tag rows, and `4` semantic-v2 rows.
+- `plan_oracle_text_backfill.py --no-scryfall --limit 10` returned
+  `status=PASS`, `mode=read_only`, `db_mutations=false`,
+  `missing_any=363`, `missing_oracle_id=4`, `missing_oracle_text=360`,
+  `planned_items=6`, `active_learned_gap_items=0`, and `backfill_ready=0`.
+
+Conclusion:
+
+- The AI/import/simulate source slice has focused non-live evidence and no
+  analyzer/test failure in this cycle.
+- Lorehold critical role rows do not require a new database apply right now;
+  the dry-run shows they are already present.
+- Oracle/card text remains an open global backlog, but there is still no
+  apply-ready PostgreSQL package.
+- PG-002 remains the package-ready Deck/Lorehold database deploy awaiting
+  explicit approval.
+- Supersession note from `2026-06-20 08:08 -0300`: the central PostgreSQL
+  register also opened PG-006 for `card_battle_rules.execution_status`
+  migration drift. PG-006 is battle/data governance, not a Lorehold deck swap
+  or a Lorehold card-list change.
+
+### Auditor Central PG-006 Cross-Register Note - 2026-06-20 08:08 -03
+
+Scope:
+
+- Cross-register correction after read-only PostgreSQL migration/status audit.
+- No PostgreSQL write, deck `6` mutation, deck swap, battle-engine edit,
+  cleanup, stash, revert, commit, or push was performed.
+
+Evidence:
+
+- `dart run bin/migrate.dart --status` reports migration `029
+  add_card_battle_rules_execution_status` pending.
+- Live PostgreSQL already has `card_battle_rules.execution_status` as
+  `NOT NULL` with default `'auto'::text`, but lacks
+  `chk_card_battle_rules_execution_status`.
+- PG-006 precheck reports `pg006_rows_to_normalize=1970` for
+  `generated/needs_review/auto` battle rules.
+- PG-006 package:
+  `docs/hermes-analysis/master_optimizer_reports/card_battle_rules_execution_status_pg006_package_20260620_0808.md`.
+
+Conclusion:
+
+- This does not change deck `6`, learned-deck PG-002 scope, or Lorehold card
+  recommendations.
+- Do not describe PG-002 as the only package-ready database item globally after
+  this point. Correct global queue is PG-002 plus PG-006, both pending explicit
+  approval.
+
+### Auditor Central Backend Aggregate Validation - 2026-06-20 07:58 -03
+
+Scope:
+
+- Broader no-write validation for all changed/untracked Dart backend files and
+  all changed/untracked Dart backend tests currently visible in the worktree.
+- This does not claim live route, OpenAI, deck mutation, or PostgreSQL apply
+  coverage.
+
+Evidence:
+
+- Aggregate Dart analyze over changed/untracked backend Dart files returned no
+  issues.
+- Aggregate Dart test over changed/untracked backend Dart tests returned
+  `145/145` tests passed.
+- Aggregate Python unittest over changed Python test files returned `31` tests
+  passed.
+- The valid commands were run from repo root with paths normalized into
+  `server/`; an earlier wrong-prefix attempt was ignored as evidence.
+
+Conclusion:
+
+- Backend source/test risk is materially lower for the dirty worktree slices
+  currently under audit.
+- Remaining open work is not caused by failing local backend tests in this
+  cycle; it is governance/approval work: PG-002 approval, cleanup-list
+  approval, and battle `BV-086/BV-088` design.
+
+### Auditor Central App Aggregate Validation - 2026-06-20 07:58 -03
+
+Scope:
+
+- Broader no-write validation for all changed/untracked Dart files under
+  `app/` and all changed/untracked Flutter tests under `app/test`.
+
+Evidence:
+
+- Aggregate `flutter analyze` over changed/untracked app Dart files analyzed
+  `17` items and returned no issues.
+- Aggregate `flutter test` over changed/untracked app tests returned
+  `105/105` tests passed.
+
+Conclusion:
+
+- Current app-side Deck provider/UI changes remain green under the aggregate
+  changed-file test set.
+- This is still local test evidence only; no live app run, real device run,
+  backend live call, PostgreSQL write, or deck mutation was performed.
+
+### Auditor Central PG-002/PG-006 Deploy Closure - 2026-06-20 08:51 -03
+
+Scope:
+
+- Single-operator deploy and validation after Rafael instructed this thread to
+  handle deploy, PostgreSQL, validation, and worktree control directly.
+- No deck swap, commit, push, cleanup, real-device run, or live app route
+  mutation was performed.
+
+PG-002 evidence:
+
+- Same-cycle precheck for
+  `learned_deck_metadata_canonicalization_pg002_precheck_20260620_0718.sql`
+  returned `expected_rows=59`, `matched_rows=59`, `before_matches=59`,
+  `already_after_rows=0`, `would_change_rows=59`, and `active_matches=59`.
+- Apply executed:
+  `learned_deck_metadata_canonicalization_pg002_apply_20260620_0718.sql`.
+- Apply result: `UPDATE 59`, `COMMIT`.
+- Postcheck:
+  `expected_rows=59`, `matched_rows=59`, `after_matches=59`,
+  `still_before_rows=0`, `active_matches=59`,
+  `all_post_apply_checks_ok=true`.
+- Canonicalizer post-apply dry-run with `--dry-run --limit=60 --progress`:
+  `status=PASS`, `db_mutations=false`, `checked=60`, `reported=0`,
+  `changed=0`, `applied=0`.
+- Learned-deck coherence audit after apply reduced the global metadata backlog:
+  `active_learned_decks=60`, `high=2`, `medium=13`,
+  `commander_deck_quantity_mismatch=1`, `commander_quantity_mismatch=1`,
+  `land_count_high_review=1`, `land_count_low_review=7`,
+  `some_core_metadata_zero=5`.
+
+PG-006 / Battle data-governance evidence:
+
+- Apply executed:
+  `card_battle_rules_execution_status_pg006_apply_20260620_0808.sql`.
+- Apply result: `COMMIT`, `normalized_rows=1970`, rollback backup rows `1970`.
+- Postcheck:
+  `execution_status_counts={"auto":1751,"review_only":3437}`,
+  `generated / needs_review / review_only = 3437`,
+  `remaining_needs_review_not_review_only=0`,
+  `chk_card_battle_rules_execution_status` present, migration `029` present,
+  and `card_intelligence_snapshot_view.mentions_execution_status=true`.
+- `dart run bin/migrate.dart --status` now reports all `29/29` migrations
+  executed.
+- Full battle recurring audit was rerun after fixing the runtime-surface
+  manifest for two learned-deck planner files. Latest now points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_115516`.
+- Latest battle status:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `test_results_total=16`,
+  `test_results_status_counts={"pass":16}`.
+
+Conclusion:
+
+- PG-002 is no longer pending for Deck/Lorehold metadata canonicalization.
+- PG-006 is no longer pending for PostgreSQL migration/data governance.
+- The remaining learned-deck issues are now small residual data-quality checks,
+  not the broad zero/mismatched metadata backlog PG-002 addressed.
+- The battle summary execution-status counters remain Hermes/runtime-scoped and
+  do not replace the PostgreSQL PG-006 postcheck.
+
+### Auditor Central Post-PG-002 Learned-Deck Artifact Recheck - 2026-06-20 08:59 -03
+
+Scope:
+
+- Heartbeat recheck after the registers reported PG-002 and PG-006 applied and
+  validated.
+- Generated a fresh learned-deck coherence artifact read-only to replace the
+  older pre-PG-002 `20260620_095253` artifact as current evidence.
+- No PostgreSQL write, deck `6` mutation, deck swap, cleanup, stash, revert,
+  commit, or push was performed in this heartbeat.
+
+Evidence:
+
+- New read-only artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.md`.
+- New artifact generated at `2026-06-20T11:59:16.179911+00:00` with
+  `read_only=true`.
+- Aggregate change versus `learned_deck_coherence_audit_20260620_095253.json`:
+  - `metadata_total_lands_mismatch`: `57 -> 0`
+  - `metadata_zero_lands`: `54 -> 0`
+  - `all_core_metadata_zero`: `54 -> 0`
+  - `partner_identity_not_modeled`: remains `0`
+  - severity `high`: `167 -> 2`
+  - severity `medium`: `12 -> 13`
+- Current residual learned-deck issue counts:
+  - `commander_deck_quantity_mismatch=1`
+  - `commander_quantity_mismatch=1`
+  - `land_count_high_review=1`
+  - `land_count_low_review=7`
+  - `some_core_metadata_zero=5`
+- Current residual issue refs:
+  - `learned_deck:7` / `Korvold, Fae-Cursed King`:
+    `commander_deck_quantity_mismatch`, `commander_quantity_mismatch`
+  - `learned_deck:105`, `learned_deck:150`, `learned_deck:173`,
+    `learned_deck:104`, `learned_deck:114`, `learned_deck:137`, and
+    `learned_deck:95`: land-count review
+  - `learned_deck:5`, `learned_deck:1`, `learned_deck:127`,
+    `learned_deck:124`, and `learned_deck:120`: `some_core_metadata_zero`
+- Lorehold control row remains clean:
+  - active source ref `learned_deck:82`
+  - active issues `[]`
+  - metadata `total_lands=33`
+  - derived `total_lands=33`
+  - PG saved deck lands `33`
+  - strategy checks pass
+  - no Premium Mox present
+- Latest battle now points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_115516`
+  and reports `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`, and `16/16` tests
+  passing.
+
+Conclusion:
+
+- The PG-002 global learned-deck metadata canonicalization backlog is closed in
+  current artifact evidence.
+- Do not keep `metadata_total_lands_mismatch`, `metadata_zero_lands`, or
+  `all_core_metadata_zero` in the active Deck/Lorehold pending list.
+- Current active Deck/Lorehold pending list is now:
+  1. residual learned-deck QA: Korvold quantity/commander mismatch, land-count
+     review rows, and `5` partial zero-core metadata rows;
+  2. strict-oracle/global card backlog, still policy-blocked under PG-003;
+  3. `/ai/simulate-matchup` advisory-only/write-capable boundary.
+
+### Auditor Central PG-006 Runtime Cache Sync Closure - 2026-06-20 09:15 -03
+
+Scope:
+
+- Closed the follow-up that remained after PG-006: PostgreSQL was clean, but
+  the local Hermes runtime cache still reported all battle rule names as
+  `auto`.
+- This was a local Hermes SQLite/cache sync plus battle rerun, not a deck swap
+  and not a new PostgreSQL write.
+
+Evidence:
+
+- Backup before SQLite mutation:
+  `docs/hermes-analysis/manaloom-knowledge/backups/knowledge.db.pre-pg006-runtime-sync.20260620_120904.bak`.
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_120904.json`
+  with `apply_pg=false`, `pg_rows_loaded=5188`,
+  `sqlite_inserted_or_updated=5106`, and
+  `canonical_snapshot_rows_exported=3159`.
+- Post-sync effect audit:
+  `docs/hermes-analysis/master_optimizer_reports/battle_effect_coverage_audit_20260620_120904_post_sqlite_sync.json`
+  reports `execution_status_counts={"auto":1702,"review_only":1457}`,
+  `needs_review_rule_names=1457`, and `review_only_rule_names=1457`.
+- Full battle recurring audit now points latest to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_121005`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `test_results_total=16`, and
+  `test_results_status_counts={"pass":16}`.
+
+Conclusion:
+
+- PG-006 is closed in both PostgreSQL and the local Hermes runtime cache.
+- Do not keep the old `execution_status_counts={"auto":3159}` /
+  `review_only_rule_names=0` note as an active pending item.
+- This does not authorize deck swaps or battle-rule promotion; PG-004 remains
+  closed unless a future latest artifact reproduces a row-level finding.
+
+### Auditor Central Source Patch Reconciliation - 2026-06-20 10:09 -03
+
+Scope:
+
+- Recommendation advisory output safety.
+- Battle focused-evidence harness.
+- Worktree validation after the single-operator audit slice.
+
+Evidence:
+
+- `server/lib/deck_recommendations_advisory_support.dart` now restores
+  backend-owned fallback fields after parsed OpenAI text is merged. The
+  protected fields are `power_level`, `statistics`, `colors`,
+  `candidate_color_identity`, `color_identity_source`, `trending`, and
+  `message`.
+- `server/test/deck_recommendations_advisory_support_test.dart` adds the
+  regression where model text tries to override those fields.
+- Focused recommendations validation passed: `dart analyze` no issues and
+  `dart test` `16/16`.
+- Focused app deck validation passed: `flutter analyze` no issues and
+  `flutter test` `105/105`.
+- Focused backend deck/API validation passed: `dart test` `143/143`.
+- `server/bin/manaloom_battle_rule_focused_evidence.py` now validates
+  extra-combat flashback evidence with original spell effect data; the focused
+  evidence test passed with `evaluated_count=14` and `evidence_count=14`.
+- Full backend Python discover passed `96/96`.
+- `git diff --check` returned no output.
+
+Conclusion:
+
+- This closes a code/contract safety gap in advisory recommendations; it is not
+  a deck `6` swap and not a PostgreSQL deploy.
+- No new PostgreSQL package is ready from this slice.
+- Lorehold learned deck row `learned_deck:82` remains governed by the prior
+  PG-002/PG-006 closure evidence and the current latest battle artifact
+  `20260620_121005`.
+
+### Auditor Central Latest Battle Regression Watch - 2026-06-20 10:22 -03
+
+Scope:
+
+- Recheck of the live `latest/summary.json` after the previous source-patch
+  cycle.
+
+Evidence:
+
+- `latest/summary.json` now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_125745/summary.json`.
+- At that 10:22 historical checkpoint, latest was `review_required`, not
+  `trusted_for_strategy_learning`.
+- The only mandatory divergence is `forensic_audit=review_required`.
+- The blocker is `Leyline of Abundance` in seed `63211258`, event
+  `spell_cast`, source `functional_tags_json`, effect `ramp_permanent`.
+- PostgreSQL read-only precheck confirms the card exists but has no
+  `card_battle_rules` row and no battle rules in `card_intelligence_snapshot`.
+- At this historical point, PG-007 was still in prepared/pre-apply state.
+
+Conclusion:
+
+- This does not mutate Lorehold deck `6` and does not change the PG-002
+  learned-deck metadata closure.
+- At that 10:22 historical checkpoint, battle status was not green. Treat
+  `20260620_121005` as historical evidence only until PG-007 or another proven
+  fix is applied and a newer battle run passes.
+
+### Auditor Central Latest Battle Closure - PG-007 Applied - 2026-06-20 10:31 -03
+
+Scope:
+
+- PostgreSQL deploy and battle validation after the `Leyline of Abundance`
+  blocker from `20260620_125745`.
+
+Evidence:
+
+- PG-007 applied one `card_battle_rules` row for `Leyline of Abundance`.
+- Postcheck returned `pg007_target_rule_count=1` and the
+  `card_intelligence_snapshot` row now exposes a `battle_rules` entry.
+- PG -> SQLite sync report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_102701_post_pg007.json`.
+- Sync result:
+  `pg_rows_loaded=5189`, `sqlite_inserted_or_updated=5107`,
+  `canonical_snapshot_rows_exported=3160`.
+- Latest battle now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_132812/summary.json`.
+- Latest result: `trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`, tests `16/16` pass.
+
+Conclusion:
+
+- This did not mutate Lorehold deck `6` and did not apply a deck swap.
+- Current battle status is green again for strategy learning.
+- PG-007 is closed unless future SELECT/artifact evidence proves rollback or
+  drift.
+
+### Auditor Central Single-Operator Heartbeat - 2026-06-20 10:57 -03
+
+Scope:
+
+- Recheck of the current repository state, required operating docs, latest
+  battle artifact, and deploy register after the 10:50 PostgreSQL queue
+  heartbeat.
+- No Lorehold deck `6` mutation, deck swap, PostgreSQL write, cleanup, stash,
+  revert, commit, push, live app route call, or OpenAI call was performed.
+
+Current evidence:
+
+- `git status --short --branch`: `master...origin/master`, `72 M`, `78 ??`.
+- `git diff --shortstat`:
+  `72 files changed, 24397 insertions(+), 2028 deletions(-)`.
+- `git ls-files --others --exclude-standard | wc -l`: `79`.
+- `git diff --check`: clean.
+- Latest battle remains
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_132812/summary.json`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, complete forensic lineage, `0` forensic
+  findings, and tests `16/16`.
+- PostgreSQL queue evidence remains governed by
+  `docs/hermes-analysis/POSTGRES_DEPLOY_REGISTER_2026-06-20.md`: PG-001,
+  PG-002, PG-006, and PG-007 are closed unless future SELECT/artifact evidence
+  proves rollback or drift; PG-003 is still policy-blocked; PG-005 is still
+  no-apply-needed.
+- The historical deploy-register section for PG-004 / `20260620_121005` was
+  relabeled as superseded by the later PG-007 apply/postcheck/runtime-sync
+  closure, so it cannot be mistaken for current deploy state.
+
+Current conclusion:
+
+- Lorehold deck `6` itself was not changed in this heartbeat.
+- The active Lorehold/deck work remains evidence/QA and worktree governance,
+  not a deck swap.
+- No new PostgreSQL apply is ready from the current Lorehold/deck register
+  state.
+- Cleanup remains blocked until an exact deletion list is explicitly approved.
+
+### Auditor Central Single-Operator Heartbeat - latest 140016 / no new PG apply - 2026-06-20 11:19 -03
+
+Scope:
+
+- Rechecked current latest battle, PostgreSQL deploy queue, runtime surface
+  manifest, and dirty worktree after the single-operator source-slice audits.
+- No Lorehold deck `6` mutation, deck swap, PostgreSQL write, cleanup, stash,
+  revert, commit, push, live app route call, or OpenAI call was performed.
+
+Current evidence:
+
+- `git status --short --branch`: `master...origin/master`, `72 M`, `78 ??`.
+- `git diff --shortstat`:
+  `72 files changed, 24491 insertions(+), 2029 deletions(-)`.
+- `git diff --check`: clean.
+- Latest battle now resolves to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_140016/summary.json`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, complete forensic lineage, `0` forensic
+  findings, and tests `16/16`.
+- Runtime surface manifest: `110` related Python files,
+  `unclassified_files=[]`.
+- PostgreSQL migration status remains `29/29` executed and `0` pending.
+- PG-001 planner: `planned_row_count=0`, `db_mutations=false`.
+- PG-002 postcheck: `after_matches=59`, `still_before_rows=0`,
+  `all_post_apply_checks_ok=true`.
+- PG-003 oracle/card text planner: `backfill_ready=0`,
+  `db_mutations=false`.
+- PG-005 Lorehold critical-role dry-run: `applied_counts=0`,
+  `db_mutations=false`; existing rows remain `commander_synergy=5`,
+  `function_tag=11`, `semantic_v2=4`.
+- PG-006 postcheck: migration `029` and constraint present,
+  `remaining_needs_review_not_review_only=0`.
+- PG-007 postcheck: `pg007_target_rule_count=1`; Leyline remains present in
+  `card_intelligence_snapshot.battle_rules`.
+
+Current conclusion:
+
+- Lorehold deck `6` still has no authorized swap or decklist mutation from this
+  heartbeat.
+- `20260620_132812` remains PG-007 closure evidence; current battle state is
+  now the newer `20260620_140016` trusted artifact.
+- No new PostgreSQL apply is ready from the current Lorehold/deck register
+  state.
+- Cleanup remains blocked until Rafael explicitly approves the exact
+  `8`-file proposal.
+
+### Auditor Central Publication Batch Validation - 2026-06-20 12:58 -03
+
+Scope:
+
+- Rechecked current docs, worktree, PostgreSQL, app/backend tests, and battle
+  before splitting the dirty worktree into publication batches.
+- No Lorehold deck `6` mutation, deck swap, PostgreSQL write, commit, push, or
+  code deploy was performed.
+
+Evidence:
+
+- Publication plan added:
+  `docs/hermes-analysis/MANALOOM_PUBLICATION_BATCH_PLAN_2026-06-20.md`.
+- `flutter analyze`: no issues; `flutter test`: `619/619` tests passed.
+- `cd server && dart analyze`: no issues; `cd server && dart test`: `634/634`
+  tests passed.
+- `python3 -m unittest discover -s server/test -p '*_test.py' -v`: `96/96`
+  tests passed.
+- `cd server && dart run bin/migrate.dart --status`: `29/29` executed, `0`
+  pending.
+- PG-008 postcheck still reports `pg008_target_rule_count=1`.
+- Fresh battle latest:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_155445/summary.json`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, complete forensic lineage, `0` forensic
+  findings, and tests `16/16`.
+- `docs/hermes-analysis/manaloom-knowledge/backups/*.bak` is now ignored by
+  `.gitignore` as local recovery evidence; the files were preserved on disk.
+
+Current conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Active Lorehold/deck work remains publication governance, residual
+  learned-deck QA, PG-003 policy, and advisory-only `/ai/simulate-matchup`
+  boundaries.
+- No new PostgreSQL apply is ready from the current Lorehold/deck register
+  state.
+
+### Auditor Central Batch 0/1 Readiness - 2026-06-20 13:12 -03
+
+Scope:
+
+- Rechecked the current battle latest and worktree boundary before preparing
+  the first publication batch.
+- No Lorehold deck `6` mutation, deck swap, PostgreSQL write, app/backend code
+  edit, cleanup, stage, commit, or push was performed.
+
+Evidence:
+
+- Latest battle:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`.
+- Latest battle result:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`, and tests `16/16`.
+- Batch 0/1 readiness manifest:
+  `docs/hermes-analysis/MANALOOM_BATCH_0_1_READINESS_2026-06-20.md`.
+- `git diff --check`: clean.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- The current task is publication governance and residual QA, not a deck swap.
+- No new PostgreSQL apply is ready from the Lorehold/deck register state.

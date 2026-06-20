@@ -8,6 +8,24 @@ divergencia, omissao ou artefato novo ainda nao listado aqui, o register
 prevalece. A tabela de fontes atuais e um roteador de leitura, nao uma lista
 exaustiva de todos os artefatos citados no register.
 
+Ultima reconciliacao do Auditor Central: `2026-06-20 13:12 -0300`.
+O latest battle vivo neste momento e
+`/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_160459/summary.json`.
+
+Snapshot atual do latest vivo:
+
+- `run_scope=recurring_full`
+- `invocation_kind=manual_cli`
+- `seeds_requested=16`, `seeds_completed=16`
+- `start_seed=63211604`
+- `battle_replay_final_status=trusted_for_strategy_learning`
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`
+- `mandatory_gate_divergences=[]`
+- `forensic_lineage_status=complete`
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`
+- `test_results_total=16`, `test_results_status_counts={"pass":16}`
+- `execution_status_counts={"auto":1704,"review_only":1457}`
+
 Fonte viva para achados abertos e fechados:
 
 - [BATTLE_VALIDATION_REGISTER_2026-06-19.md](BATTLE_VALIDATION_REGISTER_2026-06-19.md)
@@ -28,7 +46,7 @@ Regra operacional:
 | `BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md` | current | Matriz de trabalho atualizada em 2026-06-19; usar como backlog/priorizacao. |
 | `ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md` | current | Fila atual de candidatos/templates/review. |
 | `LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md` | current | Fonte atual sobre coerencia do deck aprendido Lorehold e metadata resolvida. |
-| `master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.md` | current | Snapshot read-only atual de coerencia do corpus learned-deck: `60` decks ativos, `high=167`, `medium=22`, e plano off-color sem mutacao. Usar com o register porque `BV-082` mostra que este report ainda nao junta 1:1 com os learned opponents do battle latest por chave estavel; no cruzamento atual, `0/12` `source_url` do latest `20260620_040120` apareceram como `row_id`/`source_url` neste report, e os `5/12` matches por `source_ref` ainda indicam colisao de namespace entre artifacts. |
+| `master_optimizer_reports/learned_deck_coherence_audit_20260620_115918.md` | current | Snapshot read-only atual de coerencia do corpus learned-deck apos PG-002: `60` decks ativos, `high=2`, `medium=13`, `metadata_total_lands_mismatch=0`, `metadata_zero_lands=0`, `all_core_metadata_zero=0` e `partner_identity_not_modeled=0`. Usar com o register porque os residuais atuais sao QA pontual: Korvold quantity/commander mismatch, land-count review e `some_core_metadata_zero=5`. |
 | `master_optimizer_reports/battle_flow_inventory_audit_20260619_154320.md` | current | Inventario atual de fluxo/gates battle. |
 | `master_optimizer_reports/battle_template_gap_audit_20260619_155005.md` | current | Inventario atual de template gaps contra unknowns. |
 | `master_optimizer_reports/battle_event_contract_audit_20260619_155726.md` | current | Inventario atual de superficie de eventos/consumidores. |
@@ -36,7 +54,14 @@ Regra operacional:
 | `master_optimizer_reports/battle_documentation_runtime_inventory_audit_20260619_1608.md` | current | Inventario que motivou este indice. |
 | `master_optimizer_reports/battle_runtime_logic_map_audit_20260619_161623.md` | current | Mapa atual da superficie runtime/decision/effect/test, ainda report-only. |
 | `BATTLE_DECISION_TRACE_TAXONOMY.md` | current | Taxonomia atual de tipos de decision trace, campos obrigatorios e dono/auditor por tipo; atualizada para o latest `20260620_040120`, com `2326` rows e `179` linhas field-contract-only (`BV-085`). |
-| `BATTLE_REPLAY_GATE_MATRIX.md` | current | Matriz atual de gates obrigatorios e status final agregado de replay; atualizada para o latest recorrente `20260620_040120` (`run_scope=recurring_full`, 16 seeds), que esta `trusted_for_strategy_learning` com `mandatory_gate_divergences=[]` e `test_results_status_counts={"pass":16}`. `BV-081`, `BV-084` e `BV-089` estao fechados; `BV-082`, `BV-083`, `BV-085`, `BV-086`, `BV-087` e `BV-088` seguem abertos como pendencias de contrato/governanca/cobertura. |
+| `BATTLE_REPLAY_GATE_MATRIX.md` | current | Matriz atual de gates obrigatorios e status final agregado de replay; atualizada para o latest recorrente `20260620_160459` (16 seeds), que esta `trusted_for_strategy_learning` com `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`, `test_results_status_counts={"pass":16}` e `execution_status_counts={"auto":1704,"review_only":1457}`. O run `20260620_150241` fica retido como blocker pre-PG-008 e `20260620_132812` fica retido como fechamento PG-007. |
+| `master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_1210_post_pg008.json` | current | Fonte atual do fechamento PG-008 -> Hermes runtime cache: `apply_pg=false`, `apply_sqlite_from_pg=true`, `pg_rows_loaded=5190`, `sqlite_inserted_or_updated=5108` e `canonical_snapshot_rows_exported=3161`. |
+| `master_optimizer_reports/machine_gods_effigy_battle_rule_pg008_package_20260620_1210.md` | current | Pacote de deploy PG-008 aplicado/validado: `Machine God's Effigy` foi promovida para `card_battle_rules` como `curated/active/auto`, fechando o blocker `functional_tags_json` do latest `20260620_150241`. |
+| `master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_102701_post_pg007.json` | historical | Fonte retida do fechamento PG-007 -> Hermes runtime cache: `apply_pg=false`, `apply_sqlite_from_pg=true`, `pg_rows_loaded=5189`, `sqlite_inserted_or_updated=5107` e `canonical_snapshot_rows_exported=3160`; superada pelo sync PG-008 `20260620_1210`. |
+| `master_optimizer_reports/battle_effect_coverage_audit_20260620_102701_post_pg007_sync.md` | historical | Coverage pos-PG-007 retida: `runtime_safe_rule_names=1703`, `active_or_review_rule_names=3160`, `execution_status_counts={"auto":1703,"review_only":1457}`, `needs_review_rule_names=1457` e `review_only_rule_names=1457`; superada pela validacao PG-008/latest `20260620_160459`. |
+| `master_optimizer_reports/battle_runtime_execution_status_sqlite_refresh_20260620_120904.json` | historical | Fonte retida do fechamento PG-006 -> Hermes runtime cache: `apply_pg=false`, `apply_sqlite_from_pg=true`, `pg_rows_loaded=5188`, `sqlite_inserted_or_updated=5106` e `canonical_snapshot_rows_exported=3159`; superada pelo sync PG-007 `20260620_102701`. |
+| `master_optimizer_reports/battle_effect_coverage_audit_20260620_120904_post_sqlite_sync.md` | historical | Coverage pos-PG-006 retida para comparacao: `runtime_safe_rule_names=1702`, `active_or_review_rule_names=3159`, `execution_status_counts={"auto":1702,"review_only":1457}`; superada pela coverage pos-PG-007 `20260620_102701`. |
+| `master_optimizer_reports/battle_latest_090636_action_event_denominator_bv083_closure_20260620_0612.md` | historical | Evidencia retida de fechamento de `BV-083`: wrapper local publica `action_event_types_seed_sum=561`, `action_event_types_distinct_total=55`, `action_event_type_class_seed_sum` e `action_event_type_class_distinct_counts`; nao usar como latest atual porque foi superado pelo latest recorrente vivo `20260620_160459`. |
 | `master_optimizer_reports/battle_latest_040120_research_review_bv084_closure_20260620_0101.md` | current | Fonte corrente de fechamento de `BV-084`: `research_review.json/md` do run oficial `20260620_040120` publicam `finding_samples` e tabela Markdown para as seis ocorrencias `forced_keep_after_bad_mulligan`; `test_battle_decision_research_review` passou no `test_results.jsonl`. |
 | `master_optimizer_reports/battle_latest_033246_run_scope_and_replay_renderer_revalidation_20260620_0039.md` | current | Fonte corrente de fechamento de `BV-081` e revalidacao de `BV-089`: compara run focado `033208` contra run recorrente `033246`, prova `run_scope`/`run_profile`/`invocation_kind`, corrige fallback de dano `Lightning Bolt`, e confirma placeholders humanos zerados no latest recorrente. |
 | `master_optimizer_reports/battle_latest_031128_human_replay_renderer_bv089_closure_20260620_0016.md` | superseded | Fechamento historico de `BV-089` para o run `20260620_031128`; continua util como evidencia da correcao de `kind=?`, mas foi superado pela revalidacao atual `20260620_033246`. |
