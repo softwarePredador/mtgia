@@ -193,6 +193,26 @@ def test_renderer_uses_real_trigger_put_on_stack_fields():
     assert "stack=?" not in trigger_line
 
 
+def test_renderer_uses_trigger_fields_for_resolved_ability_kind():
+    trigger_line = render(
+        "trigger_resolved",
+        {
+            "player": "Lorehold",
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "trigger": "spell_cast",
+            "trigger_spell": "Jeska's Will",
+            "effect": "add_mana",
+        },
+    )
+
+    assert trigger_line == (
+        "  RESOLVE ABILITY Lorehold: "
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty "
+        "kind=spell_cast trigger_spell=Jeska's Will\n"
+    )
+    assert "kind=?" not in trigger_line
+
+
 def test_renderer_explains_noncombat_damage_life_change():
     damage_line = render(
         "damage_resolved",
@@ -269,6 +289,7 @@ if __name__ == "__main__":
         test_renderer_differentiates_spell_ability_trigger_and_counter,
         test_renderer_uses_cmc_for_special_cast_events,
         test_renderer_uses_real_trigger_put_on_stack_fields,
+        test_renderer_uses_trigger_fields_for_resolved_ability_kind,
         test_renderer_explains_noncombat_damage_life_change,
         test_deck_metrics_are_derived_from_resolved_cards,
         test_provenance_line_names_source_metrics_and_blocker_domain,

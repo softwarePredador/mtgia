@@ -288,12 +288,23 @@ def write_replay_event(replay, event, data):
             )
         )
     elif event == "trigger_resolved":
+        trigger_kind = (
+            data.get("activation_kind")
+            or data.get("trigger_kind")
+            or data.get("trigger")
+            or data.get("trigger_event")
+            or data.get("event_type")
+            or "?"
+        )
+        trigger_spell = data.get("trigger_spell")
+        trigger_note = f" trigger_spell={trigger_spell}" if trigger_spell else ""
         replay.write(
-            "  RESOLVE ABILITY {player}: {card} kind={activation_kind}\n".format(
+            "  RESOLVE ABILITY {player}: {card} kind={activation_kind}{trigger_note}\n".format(
                 **{
                     **data,
                     "card": data.get("card", data.get("source", "?")),
-                    "activation_kind": data.get("activation_kind", data.get("trigger_kind", "?")),
+                    "activation_kind": trigger_kind,
+                    "trigger_note": trigger_note,
                 }
             )
         )

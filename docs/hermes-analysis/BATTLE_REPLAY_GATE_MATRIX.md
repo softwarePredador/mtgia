@@ -1,6 +1,6 @@
 # Battle Replay Gate Matrix
 
-Status: current as of `2026-06-20T02:51Z`.
+Status: current as of `2026-06-20T03:11Z`.
 
 This matrix defines the mandatory gates that must run before a battle replay is
 interpreted as final evidence. A green result in one auditor is not a global
@@ -103,50 +103,41 @@ a targeted gate before claiming readiness.
 
 Latest official run checked by this matrix:
 
-- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_025107/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_031128/summary.json`
 - Run scope: recurring 16-seed audit with `seeds_requested=16`,
-  `seeds_completed=16`, and `start_seed=63210251`.
-- `battle_replay_final_status=trusted_for_strategy_learning`
-- `battle_replay_final_status_reason=all_mandatory_gates_pass`
-- `mandatory_gate_divergences=[]`
-- `action_critic`: pass with `findings=0` and no blocking seeds.
-- Action/event denominator is fully classified but not fully action-audited:
-  `events=15048`, `action_events_total=15048`,
-  `action_verdict_counts={"ok":6122}`,
-  `action_event_contract_class_counts={"action_audited":6122,"forensic_card_event":1,"ignored_with_reason":324,"renderer_only":24,"strategy_signal":221,"technical":8356}`,
-  `action_events_unclassified=0`, and `action_event_types_unclassified={}`.
-- Action event type denominator caveat: `summary.action_event_types_total=520`
-  and `summary.action_event_type_class_counts` are seed-summed counts, while
-  the global distinct observed event type count for this run is
+  `seeds_completed=16`, and `start_seed=63210311`.
+- `battle_replay_final_status=blocked`
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_blocked`
+- `mandatory_gate_divergences=["forensic_audit=blocked","strategy_audit=review_required"]`
+- `global_learning_eligible_seeds=[]`; all `16` seeds are globally
+  ineligible because the final status is blocked.
+- `action_critic`: pass with `findings=0`,
+  `seeds_with_high_or_critical_action_findings=[]`,
+  `action_events_total=14788`, `action_verdict_counts={"ok":5820}`,
+  `action_event_contract_class_counts={"action_audited":5820,"forensic_card_event":2,"ignored_with_reason":345,"renderer_only":26,"strategy_signal":226,"technical":8369}`,
+  and `action_events_unclassified=0`.
+- Action event type denominator caveat remains open: `action_event_types_total=535`
+  and `action_event_type_class_counts` are seed-summed counts, while the global
+  distinct observed event type count is
   `event_contract_static_observed_event_types_total=55`. See `BV-083`.
-- `strategy_audit`: pass with `findings=5`,
-  `low_confidence_findings=5`, `review_required_findings=0` and no blocking
-  seeds.
+- `strategy_audit`: `review_required` with `findings=3`,
+  `low_confidence_findings=2`, `review_required_findings=1`, no strategy
+  blocker seeds, and `strategy_code_counts={"board_wipe_without_timing_justification":1,"forced_keep_after_bad_mulligan":2}`.
 - `replay_decision_audit`: pass with `turn_findings=0` and
   `decision_findings=0`.
-- Human replay renderer is still not a global replay-completeness gate:
-  `decision_audit_human_replay_complete` and
-  `decision_audit_rules_interaction_trusted` are both
-  `not_evaluated_by_replay_decision_auditor`.
-- Human replay placeholder caveat: the current `replay.txt` files still contain
-  `100` `RESOLVE ABILITY ... kind=?` lines and `0` `DAMAGE ... cause=?` lines.
-  The renderer still does not use `trigger` as a `trigger_resolved` fallback;
-  see `BV-089`.
-- `forensic_audit`: pass with `blocking_seeds=[]`,
-  `forensic_rule_findings=0`, `forensic_turn_findings=0`, and
-  `forensic_lineage_status=complete`.
-- Forensic lineage unaccepted counts for this run are all zero:
-  `forensic_card_id_missing_unaccepted=0`,
-  `forensic_semantic_hash_missing_unaccepted=0`, and
-  `forensic_rule_logical_key_missing_unaccepted=0`.
-- Replay JSONL scan found no `functional_tags_json` events in this run:
-  `rule_source_counts={"curated":2549,"manual_runtime_waiver":11,"type_line_creature":543}`.
-  The previous `BV-086` blocker is not reproduced here, but regression coverage
-  for `Machine God's Effigy` remains open.
-- Gate-coupling caveat: this run has complete forensic lineage, but the wrapper
-  still does not directly turn `forensic_*_missing_unaccepted>0` into a
-  `forensic_audit` divergence if `forensic_rule_findings=0` and
-  `forensic_turn_findings=0`. See `BV-088`.
+- `forensic_audit`: blocked with `blocking_seeds=["63210319"]`,
+  `forensic_rule_findings=4`, `forensic_turn_findings=0`, and
+  `forensic_severity_counts={"high":1,"medium":1,"low":2}`.
+  The blocker is `Breena, the Demagogue` in seed `63210319`, turn `10`:
+  `spell_cast` and `spell_resolved` used `rule_source=functional_tags_json`,
+  `rule_review_status=heuristic`, `effect=draw_cards`, no `card_id`, and no
+  `semantic_hash`. See `BV-086`.
+- Forensic lineage is incomplete in this run:
+  `forensic_card_id_missing_unaccepted=2`,
+  `forensic_semantic_hash_missing_unaccepted=2`, and
+  `forensic_rule_logical_key_missing_unaccepted=0`. This run is already
+  blocked by high forensic finding; `BV-088` remains open for the latent case
+  where lineage is unaccepted but no forensic findings are emitted.
 - `effect_coverage`: pass with source-unknown `unknown_effects=0`,
   `residual_status=effect_coverage_residual_accepted`,
   `residual_unaccepted_card_flag_rows=0`,
@@ -156,7 +147,7 @@ Latest official run checked by this matrix:
 - Residual effect denominator remains visible and must not be read as runtime
   completeness: `effect_coverage_effect_totals_unknown=41`,
   `effect_coverage_unknown_effect_status_counts={"focused_template_ready":28,"needs_review":5,"waived_curated_unknown_effect":1}`,
-  and `needs_review_unknown_effect_count=5`.
+  and `needs_review_unknown_effect_count=5`. See `BV-087`.
 - `focused_template_dispatch`: pass; `29/29` focused-template cards have
   focused evidence ready and `evidence_runner_status_counts={"evidence_ready":29}`.
 - `unknown_template_backlog`: pass with
@@ -164,20 +155,31 @@ Latest official run checked by this matrix:
   at `0`. This status is source-unknown scoped; `effect_unknown_cards=34`
   remains a separate denominator without per-card contract in this artifact.
   See `BV-087`.
-- `decision_trace_taxonomy`: pass with `rows=2306`,
+- `decision_trace_taxonomy`: pass with `rows=2241`,
   `kinds_observed=12/15`, `contract_findings=0`, and
   `missing_required_fields=0`. The three static kinds not observed in this
   run are `activated_sacrifice_damage`, `attack_trigger_artifact_tutor`, and
   `worldfire_reset`.
-- Decision trace waiver caveat: `168` observed decision rows are
+- Decision trace waiver caveat: `164` observed decision rows are
   `accepted_field_contract_waiver`/`generic_strategy_fields_only`, not
-  strategy-audited branches: `lorehold_upkeep_rummage=96`,
-  `saga_chapter_resolution=3`, `utility_artifact_activation=48`, and
-  `utility_land_activation=21`. A direct scan found `parent_link_rows=0`.
+  strategy-audited branches: `lorehold_upkeep_rummage=104`,
+  `saga_chapter_resolution=4`, `utility_artifact_activation=36`, and
+  `utility_land_activation=20`. A direct scan found `parent_link_rows=0`.
   See `BV-085`.
-- `event_contract_static`: pass; `events_observed_total=15048`,
+- `event_contract_static`: pass; `events_observed_total=14788`,
   `observed_event_types_total=55`, `static_event_types_total=101`,
   `observed_missing_required_fields=0`, and `waiver_until_forced_fixture=0`.
+- Human replay renderer status changed in the current worktree/run:
+  the official `summary.json` publishes
+  `human_replay_resolve_ability_kind_unknown_lines=0`,
+  `human_replay_damage_cause_unknown_lines=0`,
+  `human_replay_unknown_lines=0`, `human_replay_placeholder_lines=0`, and
+  `human_replay_placeholder_samples=[]`. A direct scan of the `16` current
+  `replay.txt` files found `kind=?=0`, `cause=?=0`, `UNKNOWN=0`, and
+  `PLACEHOLDER=0`; `test_battle_replay_v10_3_renderer` passed in
+  `test_results.jsonl`, including trigger-kind fallback and noncombat damage.
+  The old placeholder issue is closed for current evidence; do not reopen it
+  unless a later recurring run reintroduces placeholders.
 - `runtime_surface_manifest`: ready with
   `runtime_surface_manifest_gate_expected_counts={"core_runtime_import_regression":6,"recurring_audit_required":29,"targeted_manual_gate_required_before_change":31,"targeted_test_required_before_change":42}`.
 - Runtime-surface scope for this run: `total_files=108`,
@@ -185,14 +187,6 @@ Latest official run checked by this matrix:
   `automation_coverage_counts={"covered_by_recurring_run":29,"imported_by_core_runtime":6,"outside_recurring_run":73}`.
   The recurring run covers the main replay/audit pipeline; the `73` files
   outside it still require targeted gates before changes.
-- `global_learning_eligible_seeds=["63210251","63210254","63210255","63210256","63210257","63210258","63210259","63210260","63210263","63210265","63210266"]`.
-- `global_not_learning_eligible_seeds=["63210252","63210253","63210261","63210262","63210264"]`, all due to
-  `strategy_audit:low_confidence_replay`.
-- `research_review`: `mulligan` is `blocked_or_needs_review` with
-  `finding_codes={"forced_keep_after_bad_mulligan":5}`. This does not create a
-  strategy mandatory-gate divergence because global learning eligibility
-  excludes those seeds, but `research_review` does not yet publish
-  per-category finding samples. See `BV-084`.
 - Learned-opponent aggregate is present for the recurring run:
   `opponent_deck_provenance.status=learned_opponent_provenance_present_with_shape_waiver`,
   `learned_opponent_appearance_count=48`,
@@ -202,24 +196,22 @@ Latest official run checked by this matrix:
 - Learned-opponent source coherence is explicitly outside the final engine
   status for this run: `construction_report_missing_count=48` and
   `deck_coherence_report_missing_count=48` are covered by the shape waiver.
-  Current cross-check found `0/12` matches by
+  Current cross-check still found `0/12` matches by
   `summary.learned_deck_opponents[].source_url` versus coherence `row_id`, and
   per-seed `deck_provenance.json` still omits `source_url` for all `48`
   learned opponent appearances. `source_ref=learned_deck:<id>` can name
   different commanders across artifacts; source-ref cross-check found `5/12`
-  matches, all mismatched by commander. See `BV-082`.
+  matches. See `BV-082`.
 - Follow-ups not closed by the current aggregate status: `BV-081` remains open
   for `latest` scope observability; `BV-082` remains open for learned-deck
   source lineage/coherence joins across artifacts; `BV-083` remains open for
   action-event type denominator naming; `BV-084` remains open for
   research-review finding samples; `BV-085` remains open for learning-grade
-  counts on field-contract waivers; `BV-086` remains open as regression
-  coverage/observability for `functional_tags_json`; `BV-087` remains open for
-  source-unknown versus effect-unknown backlog contract; `BV-088` remains open
-  for direct lineage/gate coupling; `BV-089` remains open for human replay
-  placeholders. This run is trusted by aggregate engine gates, but that does
-  not close all governance/auditability follow-ups.
+  counts on field-contract waivers; `BV-086` is a current blocker for
+  `functional_tags_json`; `BV-087` remains open for source-unknown versus
+  effect-unknown backlog contract; `BV-088` remains open for direct
+  lineage/gate coupling. The previous human-replay placeholder follow-up
+  `BV-089` is closed by current artifact/code/test evidence.
 - Test provenance: `test_results_total=16`,
-  `test_results_status_counts={"pass":16}`, `test_result_failures=[]`,
-  `test_log_empty_successes=[]`, `test_log_empty_failures=[]`, and
-  `test_results_jsonl=/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_025107/test_results.jsonl`.
+  `test_results_status_counts={"pass":16}`, `test_result_failures=[]`, and
+  `test_results_jsonl=/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_031128/test_results.jsonl`.
