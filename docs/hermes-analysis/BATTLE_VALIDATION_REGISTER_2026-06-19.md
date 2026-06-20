@@ -6129,34 +6129,28 @@ isolado limpo para declarar battle pronto.
 
 | ID | Severidade | Area | Evidencia | Risco | Avaliar / ajustar | Criterio de fechamento |
 | --- | --- | --- | --- | --- | --- | --- |
-| `BV-081` | P2 | `latest` / escopo de automacao | Historico validado: `latest` apontou para run focado `20260620_003647` com `seeds_requested=1` apos um run 16-seed `20260620_002832` `blocked`. Estado atual: `latest` aponta para `20260620_031128`, run recorrente 16-seed com `battle_replay_final_status=blocked`; o `summary.json` ainda nao publica `run_profile`, `run_scope` nem `invocation_kind`. | Leitura de `latest/summary.json` pode voltar a confundir fechamento focado de seed com readiness recorrente de 16 seeds quando qualquer recheck manual atualizar o symlink; nesta propria auditoria o symlink avancou entre rodadas recorrentes enquanto os docs eram atualizados. | Chat "Ajustar battle": publicar `run_profile`/`run_scope`/`invocation_kind` e/ou separar `latest_full` de `latest_focused`; consumidores devem validar `seeds_requested`, `seeds_completed`, `start_seed` e `run_dir`. | Run focado e run recorrente distinguiveis no `summary.json`/`summary.md`, com fixture cobrindo `--seeds 1 --start-seed`, e docs/gates usando o escopo antes de declarar readiness recorrente. |
-| `BV-082` | P2 | Learned-deck source lineage / coherence | Latest `20260620_031128` publica `12` learned opponents, `48` aparicoes e `opponent_deck_provenance.source_url_missing_count=0`, mas os `deck_provenance.json` por seed continuam sem `source_url`, `construction_report` e `deck_coherence_report` nos `48/48` learned opponent records. O report read-only `learned_deck_coherence_audit_20260620_005400` mostra `60` learned decks ativos com `high=173` e `medium=21`; o cruzamento atual por `summary.source_url`/coherence `row_id` achou `0/12` matches, e por `source_ref` achou `5/12` matches, com colisao de namespace entre artifacts. | Consumidores podem juntar reports por `source_ref` errado ou ler status final do battle como se tambem validasse coerencia do corpus learned usado como oponente. | Chat "Ajustar battle": namespacear explicitamente `source_ref` local Hermes versus `commander_learned_decks.source_ref`; publicar uma chave estavel comum nos dois artifacts (`source_url`/PG UUID/backend id) e um status agregado de source-coherence por learned opponent usado no battle, separado do status de engine. | Os `12` learned opponents do latest casam 1:1 com um report de coherence por chave estavel, sem colisao por `source_ref`; cada `deck_provenance.json` por seed inclui a mesma chave estavel; o summary mostra `source_coherence_status`/waiver por opponent e a gate matrix declara explicitamente se isso entra ou nao no final status. |
-| `BV-083` | P2 | `summary.json` action-event denominators | Latest `20260620_031128`: `summary.action_event_types_total=535` e `summary.action_event_type_class_counts={"action_audited":321,"forensic_card_event":2,"ignored_with_reason":35,"renderer_only":26,"strategy_signal":81,"technical":70}` sao somas dos tipos unicos por seed. O mesmo run publica `event_contract_static_observed_event_types_total=55`; o wrapper soma em `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:714` e `:718-719`, enquanto o auditor estatico publica o denominador global em `:1025`. | Consumidor pode interpretar `action_event_types_total=535` como quantidade global de tipos distintos e inflar a cobertura/event-surface do replay. | Chat "Ajustar battle": renomear os campos para `action_event_types_seed_sum`/`action_event_type_class_seed_sum` ou publicar tambem `action_event_types_distinct_total` e `action_event_type_class_distinct_counts`; atualizar `summary.md` para deixar explicito quando a metrica e soma por seed versus denominador global. | `summary.json` e `summary.md` distinguem soma por seed de tipos globais distintos, e fixture testa um run multi-seed em que o mesmo evento aparece em mais de uma seed sem inflar o campo global. |
-| `BV-084` | P3 | Research review finding samples | Latest `20260620_031128`: `research_review.md/json` marca `mulligan.status=blocked_or_needs_review`, `board_wipe_wheel.status=blocked_or_needs_review`, `finding_codes={"forced_keep_after_bad_mulligan":2}` em mulligan e `{"board_wipe_without_timing_justification":1}` em board_wipe_wheel, mas o report nao publica amostras por seed/decision para esses findings. A amostra real de board wipe permanece em `seed_63210320/decision-000111`, com `Blasphemous Act`, `creatures_seen=0`, `destroyed=0`, `timing_justified=false`; os mulligans reais incluem `seed_63210311` e `seed_63210320`. O codigo usa `examples.setdefault(...)` para a primeira decisao por tipo em `battle_decision_research_review.py:219` e guarda `finding_items` sem `seed`/`decision_id` em `:245-249`. | Consumidor pode ver categoria bloqueada sem saber quais seeds/decisoes investigar, ou interpretar o exemplo neutro/primeira ocorrencia como representativo do bloqueio. | Chat "Ajustar battle": adicionar `finding_samples` por categoria em `research_review.json/md`, incluindo `seed`, `decision_id`, `code`, `severity`, `detail`, `chosen_option`, `reason` e `risk_flags`; manter `examples` como exemplo neutro/primeira ocorrencia ou renomear para evitar confusao. | `research_review.md/json` mostram as amostras atuais de `forced_keep_after_bad_mulligan` e `board_wipe_without_timing_justification`, e teste cobre categoria bloqueada com exemplo neutro sem perder os finding samples. |
-| `BV-085` | P2 | Decision trace field-contract waivers / learning grade | Latest `20260620_031128`: `decision_trace_taxonomy.json` passa com `contract_findings=0`, mas `164` decisoes observadas estao em tipos `accepted_field_contract_waiver` com `strategy_auditor=generic_strategy_fields_only` e `research_category=null`: `lorehold_upkeep_rummage=104`, `saga_chapter_resolution=4`, `utility_artifact_activation=36` e `utility_land_activation=20`. Recomputacao dos `16` `seed_*/replay.decision_trace.jsonl` mostrou `parent_link_rows=0` e `rows_missing_parent_link=164`; o `summary.json` lista apenas `decision_trace_accepted_waivers`, sem contador observado nem `learning_grade` por tipo. | Consumidor pode ler `decision_trace_taxonomy_ready` como se todas as `2241` decisoes fossem strategy-audited, quando `164` linhas sao apenas field-contract/generic. Para `lorehold_upkeep_rummage`, a waiver fala que a qualidade estrategica fica coberta por escolhas de engine pai, mas o trace nao publica link explicito para essa decisao pai. | Chat "Ajustar battle": publicar no `summary.json`/taxonomy contadores de `accepted_field_contract_waiver_observed_rows` por tipo e um `decision_learning_grade` (`strategy_audited`, `research_specific`, `field_contract_only`, `not_observed`); quando uma waiver depender de "parent engine choices", emitir `parent_decision_id`/`source_decision_id` ou rebaixar para non-learning/needs-review. | O latest mostra contadores de waiver observada por tipo e separa explicitamente linhas field-contract-only das linhas strategy/research-specific; `lorehold_upkeep_rummage` tem link de decisao pai ou waiver revisada que nao dependa de parent implícito; fixture cobre waiver observada sem branch estrategico dedicada. |
-| `BV-086` | P2 | Forensic / `functional_tags_json` regression coverage | Run `20260620_014808` expôs `Machine God's Effigy` via `functional_tags_json`; o run `20260620_031128` reativou a mesma classe em `seed=63210319`, turno `10`, com `Breena, the Demagogue` como `spell_cast` e `spell_resolved`, `effect=draw_cards`, `rule_source=functional_tags_json`, `rule_review_status=heuristic`, sem `card_id`/`semantic_hash` aceitos e com `forensic_audit=blocked`, `forensic_rule_findings=4`, `forensic_severity_counts={"high":1,"medium":1,"low":2}`. | O replay atual nao pode ser tratado como trusted/global-learning: um evento action-audited executou por fallback heuristico sem lineage aceita; a classe reapareceu com outro card, provando que o problema e cobertura/regressao de fallback, nao apenas `Machine God's Effigy`. | Chat "Ajustar battle": publicar `functional_tags_json_event_count`/cards no summary e promover cada card recorrente (`Machine God's Effigy`, `Breena, the Demagogue`) para regra battle verified/active com identidade e `rule_logical_key`, ou adicionar waiver runtime explicito e testado quando a aproximacao for intencional. | Novo run 16-seed mostra `battle_replay_final_status=trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`, nenhum evento `functional_tags_json` learning/action-audited sem regra/waiver, summary publica contador da classe mesmo quando zero, e fixtures cobrem os cards recorrentes ou os rebaixam explicitamente para non-learning. |
-| `BV-087` | P2 | Unknown template backlog / effect-unknown contract | Latest `20260620_031128`: `summary.effect_coverage_unknowns=0`, mas `effect_coverage_effect_totals_unknown=41`, `effect_coverage_unknown_effect_cards` tem `34` cards, `focused_template_ready_unknown_effect_count=28`, `needs_review_unknown_effect_count=5` e `unknown_template_backlog.json` publica `status=focused_template_backlog_ready`, `items=[]`, `source_unknown_cards=0`, `effect_unknown_cards=34`, `without_plan_or_waiver=0` e `without_focused_template_match=0`. O script `battle_unknown_template_backlog_audit.py` monta `items` apenas de `coverage.get("unknown_cards")`, enquanto apenas conta `unknown_effect_cards`; o teste `test_backlog_separates_source_unknown_from_effect_unknown_denominator` valida essa separacao, mas nao exige contrato por carta para os `34` effect-unknown. | Consumidor pode ler `unknown_template_backlog_status=focused_template_backlog_ready` ou `unknown_template_backlog_cards=0` como se o denominador de `effect=unknown` estivesse todo planejado/waived, quando o contrato por carta esta vazio para esse denominador. Isto nao e prova de erro de replay e nao cria mandatory-gate divergence sozinho; e uma lacuna de contrato/observabilidade entre source-unknown e effect-unknown. | Chat "Ajustar battle": renomear o status atual para `source_unknown_template_backlog_status` ou publicar campos separados para `effect_unknown_template_contract_status`; gerar `items`/contadores por carta para `unknown_effect_cards`, distinguindo `focused_template_ready`, `needs_review` e `waived_curated_unknown_effect`; ajustar `summary.md` para nao apresentar backlog ready como cobertura de todo `effect=unknown`. | O latest separa explicitamente source-unknown backlog de effect-unknown contract; `unknown_template_backlog.md/json` mostram contrato por carta ou waiver para os `34` effect-unknown atuais, incluindo os `5` needs-review, e teste falha se `effect_unknown_cards>0` mas o contrato por efeito ficar vazio sem explicitar o escopo. |
-| `BV-088` | P1 | Forensic final gate / lineage incompleta | Latest `20260620_031128` esta `blocked` por high forensic finding e tambem mostra `forensic_lineage_status=incomplete` (`card_id_missing_unaccepted=2`, `semantic_hash_missing_unaccepted=2`, `rule_logical_key_missing_unaccepted=0`). Esse run nao prova o bug latente porque ja ha `forensic_rule_findings=4`, mas o wrapper ainda calcula `mandatory_gate_statuses.forensic_audit.status` por `forensic_rule_findings`/`forensic_turn_findings` e blockers high/critical; `forensic_lineage_status` e calculado depois. O teste `test_forensic_keeps_unaccepted_lineage_missing_visible` prova que um evento com lineage faltante nao aceita pode ter `findings == []` enquanto os tres contadores unaccepted ficam `1`. | Falha latente: um run futuro pode ficar com lineage unaccepted visivel e `forensic_rule_findings=0`, fazendo o `forensic_audit` passar e liberando `trusted_for_strategy_learning`/elegibilidade global sem lineage confiavel. | Chat "Ajustar battle": incluir `forensic_*_missing_unaccepted` ou `forensic_lineage_status=incomplete` diretamente na condicao de review do `mandatory_gate_statuses.forensic_audit`; calcular/publicar essa condicao antes de `compute_global_learning_eligibility`; adicionar fixture do wrapper em que `forensic_rule_findings=0` mas missing unaccepted > 0 resulte em `battle_replay_final_status=review_required`. | Teste do wrapper cobre lineage unaccepted sem findings; novo run mostra `forensic_audit.status=review_required` sempre que qualquer `forensic_*_missing_unaccepted>0`, ou `pass` somente quando `forensic_lineage_status=complete`; `global_learning_eligibility_reasons` inclui o motivo de lineage quando aplicavel. |
+| `BV-082` | P2 | Learned-deck source lineage / coherence | Latest `20260620_040120` publica `12` learned opponents, `48` aparicoes e `opponent_deck_provenance.source_url_missing_count=0`, mas `construction_report_missing_count=48` e `deck_coherence_report_missing_count=48` continuam sob shape waiver. O report read-only mais novo `learned_deck_coherence_audit_20260620_034458` mostra `60` learned decks ativos com `high=167` e `medium=22`; o cruzamento atual por `summary.source_url` contra `row_id`/`source_url` do coherence achou `0/12` matches, e por `source_ref` achou `5/12` matches, todos por colisao de namespace entre artifacts (`104` Kinnan vs Ral, `105` Etali vs Aang, `116` Tayam vs K-9, `83` Kraum vs Ob Nixilis, `84` Kinnan vs Sisay). | Consumidores podem juntar reports por `source_ref` errado ou ler status final do battle como se tambem validasse coerencia do corpus learned usado como oponente. | Chat "Ajustar battle": namespacear explicitamente `source_ref` local Hermes versus `commander_learned_decks.source_ref`; publicar uma chave estavel comum nos dois artifacts (`source_url`/PG UUID/backend id) e um status agregado de source-coherence por learned opponent usado no battle, separado do status de engine. | Os `12` learned opponents do latest casam 1:1 com um report de coherence por chave estavel, sem colisao por `source_ref`; cada `deck_provenance.json` por seed inclui a mesma chave estavel; o summary mostra `source_coherence_status`/waiver por opponent e a gate matrix declara explicitamente se isso entra ou nao no final status. |
+| `BV-083` | P2 | `summary.json` action-event denominators | Latest `20260620_040120`: `summary.action_event_types_total=532` e `summary.action_event_type_class_counts={"action_audited":327,"forensic_card_event":2,"ignored_with_reason":35,"renderer_only":22,"strategy_signal":73,"technical":73}` sao somas dos tipos unicos por seed. O mesmo run publica `event_contract_static_observed_event_types_total=55`; o wrapper ainda soma tipos por seed no agregado, enquanto o auditor estatico publica o denominador global. | Consumidor pode interpretar `action_event_types_total=532` como quantidade global de tipos distintos e inflar a cobertura/event-surface do replay. | Chat "Ajustar battle": renomear os campos para `action_event_types_seed_sum`/`action_event_type_class_seed_sum` ou publicar tambem `action_event_types_distinct_total` e `action_event_type_class_distinct_counts`; atualizar `summary.md` para deixar explicito quando a metrica e soma por seed versus denominador global. | `summary.json` e `summary.md` distinguem soma por seed de tipos globais distintos, e fixture testa um run multi-seed em que o mesmo evento aparece em mais de uma seed sem inflar o campo global. |
+| `BV-085` | P2 | Decision trace field-contract waivers / learning grade | Latest `20260620_040120`: `decision_trace_taxonomy.json` passa com `contract_findings=0`, mas `179` decisoes observadas estao em tipos `accepted_field_contract_waiver` com `strategy_auditor=generic_strategy_fields_only` e `research_category=null`: `lorehold_upkeep_rummage=109`, `saga_chapter_resolution=2`, `utility_artifact_activation=50` e `utility_land_activation=18`. Recomputacao dos `16` `seed_*/replay.decision_trace.jsonl` mostrou `parent_link_rows=0` e `rows_missing_parent_link=179`; o `summary.json` lista apenas `decision_trace_accepted_waivers`, sem contador observado nem `learning_grade` por tipo. | Consumidor pode ler `decision_trace_taxonomy_ready` como se todas as `2326` decisoes fossem strategy-audited, quando `179` linhas sao apenas field-contract/generic. Para `lorehold_upkeep_rummage`, a waiver fala que a qualidade estrategica fica coberta por escolhas de engine pai, mas o trace nao publica link explicito para essa decisao pai. | Chat "Ajustar battle": publicar no `summary.json`/taxonomy contadores de `accepted_field_contract_waiver_observed_rows` por tipo e um `decision_learning_grade` (`strategy_audited`, `research_specific`, `field_contract_only`, `not_observed`); quando uma waiver depender de "parent engine choices", emitir `parent_decision_id`/`source_decision_id` ou rebaixar para non-learning/needs-review. | O latest mostra contadores de waiver observada por tipo e separa explicitamente linhas field-contract-only das linhas strategy/research-specific; `lorehold_upkeep_rummage` tem link de decisao pai ou waiver revisada que nao dependa de parent implicito; fixture cobre waiver observada sem branch estrategico dedicada. |
+| `BV-086` | P2 | Forensic / `functional_tags_json` regression coverage | Run `20260620_014808` expos `Machine God's Effigy` via `functional_tags_json`; o run `20260620_033246` reativou a mesma classe em `seed=63210333`, turno `10`, com `Breena, the Demagogue` como `spell_cast`/`spell_resolved`, `effect=draw_cards`, `rule_source=functional_tags_json`, `rule_review_status=heuristic`, sem `card_id`/`semantic_hash` aceitos e com `forensic_audit=blocked`. O latest `20260620_040120` esta `trusted_for_strategy_learning`, `forensic_rule_findings=0` e `forensic_lineage_status=complete`, mas isso nao publica contador zero da classe nem cobre os cards recorrentes com regra/waiver dedicada. | A classe ja reapareceu com cards diferentes; um run limpo sem ocorrencia nao prova regressao fechada nem fornece observabilidade do fallback. | Chat "Ajustar battle": publicar `functional_tags_json_event_count`/cards no summary e promover cada card recorrente (`Machine God's Effigy`, `Breena, the Demagogue`) para regra battle verified/active com identidade e `rule_logical_key`, ou adicionar waiver runtime explicito e testado quando a aproximacao for intencional. | Novo run 16-seed mostra `battle_replay_final_status=trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`, `forensic_lineage_status=complete`, nenhum evento `functional_tags_json` learning/action-audited sem regra/waiver, summary publica contador da classe mesmo quando zero, e fixtures cobrem os cards recorrentes ou os rebaixam explicitamente para non-learning. |
+| `BV-087` | P2 | Unknown template backlog / effect-unknown contract | Latest `20260620_040120`: `summary.effect_coverage_unknowns=0`, mas `effect_coverage_effect_totals_unknown=41`, `effect_coverage_unknown_effect_cards` tem `34` cards, `focused_template_ready_unknown_effect_count=28`, `needs_review_unknown_effect_count=5` e `unknown_template_backlog.json` publica `status=focused_template_backlog_ready`, `items=[]`, `source_unknown_cards=0`, `effect_unknown_cards=34`, `without_plan_or_waiver=0` e `without_focused_template_match=0`. O script `battle_unknown_template_backlog_audit.py` monta `items` apenas de `coverage.get("unknown_cards")`, enquanto apenas conta `unknown_effect_cards`; o teste `test_backlog_separates_source_unknown_from_effect_unknown_denominator` valida essa separacao, mas nao exige contrato por carta para os `34` effect-unknown. | Consumidor pode ler `unknown_template_backlog_status=focused_template_backlog_ready` ou `unknown_template_backlog_cards=0` como se o denominador de `effect=unknown` estivesse todo planejado/waived, quando o contrato por carta esta vazio para esse denominador. Isto nao e prova de erro de replay e nao cria mandatory-gate divergence sozinho; e uma lacuna de contrato/observabilidade entre source-unknown e effect-unknown. | Chat "Ajustar battle": renomear o status atual para `source_unknown_template_backlog_status` ou publicar campos separados para `effect_unknown_template_contract_status`; gerar `items`/contadores por carta para `unknown_effect_cards`, distinguindo `focused_template_ready`, `needs_review` e `waived_curated_unknown_effect`; ajustar `summary.md` para nao apresentar backlog ready como cobertura de todo `effect=unknown`. | O latest separa explicitamente source-unknown backlog de effect-unknown contract; `unknown_template_backlog.md/json` mostram contrato por carta ou waiver para os `34` effect-unknown atuais, incluindo os `5` needs-review, e teste falha se `effect_unknown_cards>0` mas o contrato por efeito ficar vazio sem explicitar o escopo. |
+| `BV-088` | P1 | Forensic final gate / lineage incompleta | Latest `20260620_040120` esta `trusted_for_strategy_learning` com `forensic_lineage_status=complete`, mas a falha latente do gate permanece sem fixture: no wrapper, `mandatory_gate_statuses.forensic_audit.status` ainda depende de `forensic_rule_findings`/`forensic_turn_findings` e blockers high/critical; o teste `test_forensic_keeps_unaccepted_lineage_missing_visible` prova que um evento com lineage faltante nao aceita pode ter `findings == []` enquanto os tres contadores unaccepted ficam `1`. O run `20260620_033246` mostrou a classe operacional com lineage incompleta, embora ja bloqueada por finding high. | Um run futuro pode ficar com lineage unaccepted visivel e `forensic_rule_findings=0`, fazendo o `forensic_audit` passar e liberando `trusted_for_strategy_learning`/elegibilidade global sem lineage confiavel. | Chat "Ajustar battle": incluir `forensic_*_missing_unaccepted` ou `forensic_lineage_status=incomplete` diretamente na condicao de review do `mandatory_gate_statuses.forensic_audit`; calcular/publicar essa condicao antes de `compute_global_learning_eligibility`; adicionar fixture do wrapper em que `forensic_rule_findings=0` mas missing unaccepted > 0 resulte em `battle_replay_final_status=review_required`. | Teste do wrapper cobre lineage unaccepted sem findings; novo run mostra `forensic_audit.status=review_required` sempre que qualquer `forensic_*_missing_unaccepted>0`, ou `pass` somente quando `forensic_lineage_status=complete`; `global_learning_eligibility_reasons` inclui o motivo de lineage quando aplicavel. |
 
-Estado atual do quadro aberto: `BV-081` permanece aberto contra o contrato de
-observabilidade do `latest`, `BV-082` permanece aberto contra a linhagem
+Estado atual do quadro aberto: `BV-082` permanece aberto contra a linhagem
 cross-artifact dos oponentes learned-deck, `BV-083` permanece aberto contra a
-nomenclatura/denominador de action-event no `summary.json`, `BV-084`
-permanece aberto contra a rastreabilidade de samples no `research_review`, e
-`BV-085` permanece aberto contra a falta de grade/contador explicito para
-decisoes `accepted_field_contract_waiver` observadas; `BV-086` permanece
-aberto contra o fallback heuristico `functional_tags_json`, agora reproduzido
-no latest `20260620_031128` com `Breena, the Demagogue`; `BV-087` permanece aberto
-contra a ambiguidade entre backlog
-source-unknown e contrato effect-unknown; `BV-088` permanece aberto contra a
-falta de acoplamento direto entre lineage unaccepted e o gate final
-`forensic_audit`.
-O latest atual `20260620_031128` nao esta trusted:
-`battle_replay_final_status=blocked`,
-`mandatory_gate_divergences=["forensic_audit=blocked","strategy_audit=review_required"]`
-e `global_learning_eligible_seeds=[]`. `BV-089` foi removido do quadro aberto
-porque o renderer humano e o summary agora possuem evidencia oficial sem
-placeholders genericos.
+nomenclatura/denominador de action-event no `summary.json`, `BV-085` permanece
+aberto contra a falta de grade/contador explicito para decisoes
+`accepted_field_contract_waiver` observadas, `BV-086` permanece aberto contra a
+cobertura/observabilidade do fallback heuristico `functional_tags_json`,
+`BV-087` permanece aberto contra a ambiguidade entre backlog source-unknown e
+contrato effect-unknown, e `BV-088` permanece aberto contra a falta de
+acoplamento direto entre lineage unaccepted e o gate final `forensic_audit`.
+O latest atual `20260620_040120` esta `trusted_for_strategy_learning`, com
+`mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":16}` e
+`global_learning_eligible_seeds` preenchido para `11/16` seeds. Isto fecha
+`BV-084`, mas nao fecha automaticamente as pendencias de governanca/contrato
+que ainda exigem campos, fixtures ou chaves estaveis dedicadas. `BV-081` e
+`BV-089` permanecem removidos do quadro aberto.
 
 ## Fechamento BV-089 - 2026-06-20T00:16:00-03:00
 
@@ -6195,9 +6189,208 @@ Validacao:
 - `test_battle_replay_v10_3_renderer` no `test_results.jsonl` oficial - PASS,
   `exit_code=0`, `log_lines=8`.
 
-Resultado: `BV-089` removido do quadro aberto como gap de auditabilidade do
-`replay.txt` humano. O latest segue `blocked` por `BV-086`/forensic e
-`strategy_audit=review_required`; isso permanece separado deste fechamento.
+Resultado historico: `BV-089` foi removido do quadro aberto naquele snapshot
+como gap de auditabilidade do `replay.txt` humano. Esse fechamento foi
+superseded pelo run recorrente `20260620_032709`, que reintroduziu
+`human_replay_damage_cause_unknown_lines=1`.
+
+## Regressao temporaria BV-089 - 2026-06-20T00:39:00-03:00
+
+Escopo: leitura read-only do run recorrente atual `20260620_032709`; sem
+PostgreSQL, sem deck swap, sem alteracao de codigo e sem commit/push.
+
+Fontes:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_032709/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_032709/seed_63210337/replay.txt`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_032709/seed_63210337/action_critic.md`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_032709/test_results.jsonl`
+
+Evidencia:
+
+- O summary do run recorrente atual publica
+  `human_replay_damage_cause_unknown_lines=1`,
+  `human_replay_resolve_ability_kind_unknown_lines=0`,
+  `human_replay_unknown_lines=0` e `human_replay_placeholder_lines=0`.
+- Scan direto dos `16` `seed_*/replay.txt` encontrou uma unica linha com
+  `cause=?`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_032709/seed_63210337/replay.txt:201`.
+- Linha real:
+  `DAMAGE Etali, Primal Conqueror #105 (real): Lightning Bolt -> Kraum, Ludevic's Opus #83 (real) amount=3 result=creature_destroyed cause=?`.
+- Contexto do replay: linhas `195-200` anunciam, pagam, conjuram e resolvem
+  `Lightning Bolt` com `rule=curated/verified` e `[deal_damage]`, antes da
+  linha de dano com `cause=?`.
+- `action_critic.md` para `seed_63210337` reporta `findings=0`, e
+  `test_battle_replay_v10_3_renderer` esta `pass` no `test_results.jsonl`; a
+  regressao portanto e de auditabilidade do replay humano/contador de summary,
+  nao de action gate.
+
+Conclusao historica intermediaria: `BV-089` teria voltado ao quadro aberto se o
+run `032709` fosse a evidencia final. A secao seguinte corrige e revalida a
+regressao no run recorrente `033246`; portanto esta secao nao representa
+pendencia aberta atual.
+
+## Fechamento BV-081 e revalidacao BV-089 - 2026-06-20T00:39:00-03:00
+
+Escopo: ajuste no wrapper local da automacao, renderer humano, teste focado e
+runs oficiais; sem PostgreSQL, sem deck swap, sem commit/push.
+
+Fontes:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033208/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246/summary.md`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246/test_results.jsonl`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_replay_v10_3_renderer.py`
+- `docs/hermes-analysis/master_optimizer_reports/battle_latest_033246_run_scope_and_replay_renderer_revalidation_20260620_0039.md`
+
+Tratativa:
+
+- O wrapper calcula `run_profile`, `run_scope`, `invocation_kind`,
+  `seeds_source`, `start_seed_source` e `run_scope_contract` antes do run.
+- `SEEDS=1` vira `run_scope=focused_seed` e `run_profile=focused_single_seed`.
+- `SEEDS=16` vira `run_scope=recurring_full` e `run_profile=recurring_16_seed`.
+- `summary.json` e `summary.md` publicam esses campos no topo do artifact.
+- Durante a validacao de `BV-081`, o run `20260620_032709` reintroduziu uma
+  regressao de `BV-089`: `human_replay_damage_cause_unknown_lines=1` em
+  `seed_63210337/replay.txt`, linha de `Lightning Bolt` com `cause=?`.
+- O renderer de `damage_resolved` agora usa fallback
+  `cause -> effect -> reason -> source -> card -> ?`, e o teste do renderer
+  cobre `Lightning Bolt` sem `cause/effect/reason` explicito.
+
+Validacao:
+
+- `bash -n /Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh` - PASS.
+- Dry-run `--seeds 1 --start-seed 63219981` registrou no log
+  `run_profile=focused_single_seed run_scope=focused_seed invocation_kind=manual_cli`.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_replay_v10_3_renderer.py` - PASS.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_replay_v10_3_renderer.py` - PASS, `9` testes, incluindo
+  `test_renderer_uses_trigger_fields_for_resolved_ability_kind` e
+  `test_renderer_uses_card_as_damage_cause_fallback`.
+- Re-render do run `20260620_032709`: `original_cause_unknown=1` e
+  `rerendered_cause_unknown=0`; `kind=?` permaneceu `0`.
+- Run focado oficial `20260620_033208`: `run_scope=focused_seed`,
+  `run_profile=focused_single_seed`, `invocation_kind=manual_cli`,
+  `seeds_requested=1`, `seeds_completed=1`, `start_seed=63219981`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]` e placeholders humanos todos `0`.
+- Run recorrente oficial `20260620_033246`: `run_scope=recurring_full`,
+  `run_profile=recurring_16_seed`, `invocation_kind=default_or_scheduled`,
+  `seeds_requested=16`, `seeds_completed=16`, `start_seed=63210332`,
+  `battle_replay_final_status=blocked`,
+  `mandatory_gate_divergences=["forensic_audit=blocked"]`, `test_results_total=16`
+  e `test_results_status_counts={"pass":16}`.
+- No run `033246`: `human_replay_resolve_ability_kind_unknown_lines=0`,
+  `human_replay_damage_cause_unknown_lines=0`, `human_replay_unknown_lines=0`,
+  `human_replay_placeholder_lines=0` e `human_replay_placeholder_samples=[]`.
+- Scan direto dos `16` `seed_*/replay.txt` do run `033246`: `kind_unknown=0`,
+  `cause_unknown=0`, `UNKNOWN=0`, `PLACEHOLDER=0`.
+
+Resultado: `BV-081` fechado e removido do quadro aberto. `latest` ainda pode
+apontar para run focado ou recorrente, mas cada summary agora declara o escopo
+de forma consumivel e a gate matrix exige `run_scope=recurring_full` para
+readiness recorrente. `BV-089` permanece fechado apos a regressao de
+`Lightning Bolt` ser corrigida e revalidada no run recorrente `033246`.
+
+## Passo de auditoria - BV-082 learned coherence 034458/033246 cross-check 2026-06-20T00:45-03:00
+
+Escopo: leitura read-only dos artifacts atuais; sem PostgreSQL, sem deck swap,
+sem alteracao de codigo e sem commit/push.
+
+Fontes:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246/summary.json`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.json`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_034458.md`
+- `seed_*/deck_provenance.json` do run `20260620_033246`
+
+Evidencia:
+
+- O latest recorrente principal continua `blocked`:
+  `battle_replay_final_status=blocked`,
+  `mandatory_gate_divergences=["forensic_audit=blocked"]`
+  e `global_learning_eligible_seeds=[]`.
+- O report `learned_deck_coherence_audit_20260620_034458` e read-only,
+  `generated_at=2026-06-20T03:44:55.241649+00:00`, cobre `60` learned decks
+  ativos e reporta `high=167`, `medium=22`.
+- O summary do battle publica `12` learned opponents, `48` aparicoes,
+  `opponent_deck_provenance.source_url_missing_count=0` e
+  `learned_opponent_source_counts={"pg_meta_decks":48}`.
+- Cruzamento `summary.learned_deck_opponents[].source_url`
+  (`pg:meta_decks:<uuid>`) contra `coherence.decks[].row_id`: `0/12` matches.
+- Cruzamento por `source_ref=learned_deck:<id>`: `5/12` matches, mas todos
+  indicam colisao de namespace e nao podem ser usados como join estavel:
+  `104` Kinnan vs Ral, `105` Etali vs Aang, `116` Tayam vs K-9,
+  `83` Kraum vs Ob Nixilis, `84` Kinnan vs Sisay.
+- Os `deck_provenance.json` por seed ainda registram `48` learned opponent
+  records sem `source_url`, sem `construction_report` e sem
+  `deck_coherence_report`.
+
+Conclusao: `BV-082` permanece aberto. O novo report reduziu o total de high
+issues do corpus (`169` -> `167` em comparacao ao snapshot `031157`), mas nao
+fechou a lacuna de chave estavel entre oponentes learned usados no battle e o
+report de coherence. A tarefa para o chat "Ajustar battle" permanece publicar
+uma chave comum estavel nos dois artifacts e separar explicitamente
+source-coherence de status de engine.
+
+## Fechamento BV-084 - 2026-06-20T01:01:00-03:00
+
+Escopo: ajuste do `research_review`, teste focado, run oficial recorrente e
+atualizacao documental; sem PostgreSQL write, sem deck swap e sem promover
+regra battle.
+
+Fontes:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_decision_research_review.py`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/summary.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/research_review.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/research_review.md`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/test_results.jsonl`
+- `docs/hermes-analysis/master_optimizer_reports/battle_latest_040120_research_review_bv084_closure_20260620_0101.md`
+
+Tratativa:
+
+- `battle_decision_research_review.py` agora preserva `finding_samples` por
+  categoria, juntando cada finding do `strategy_audit.json` com a decisao de
+  `replay.decision_trace.jsonl` pelo `decision_id`.
+- Cada sample publica `seed`, `decision_id`, `decision_type`, `code`,
+  `severity`, `detail`, `recommendation`, `chosen_option`, `reason`,
+  `risk_flags`, `player`, `turn`, `phase` e `actual_outcome`.
+- `research_review.md` renderiza uma tabela de findings por categoria com
+  `Seed | Decision | Code | Severity | Chosen option | Reason | Risk flags | Detail`.
+- O teste focado cobre categoria bloqueada com exemplo neutro preservado e
+  `finding_samples` apontando para a decisao real do finding.
+
+Validacao:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_decision_research_review.py` - PASS.
+- `python3 test_battle_decision_research_review.py` - PASS, `2` testes.
+- Recalculo local do run `20260620_033246` antes do wrapper gerou
+  `mulligan.finding_samples` com `6` entries e a tabela Markdown esperada.
+- Run oficial recorrente `20260620_040120`: `run_scope=recurring_full`,
+  `seeds_requested=16`, `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`,
+  `test_results_total=16` e `test_results_status_counts={"pass":16}`.
+- `test_results.jsonl` do run `040120`: `test_battle_decision_research_review`
+  passou com `exit_code=0`.
+- `research_review.json` do run `040120` mostra
+  `categories.mulligan.status=blocked_or_needs_review`,
+  `finding_codes={"forced_keep_after_bad_mulligan":6}` e
+  `finding_samples` com `6` entries:
+  `63210405/decision-000007`, `63210405/decision-000011`,
+  `63210407/decision-000006`, `63210410/decision-000010`,
+  `63210415/decision-000005` e `63210416/decision-000009`.
+- `research_review.md` do run `040120` contem a tabela `Seed | Decision | Code
+  | Severity` para `forced_keep_after_bad_mulligan`.
+
+Resultado: `BV-084` fechado e removido do quadro aberto. A categoria
+`mulligan` continua `blocked_or_needs_review` por qualidade estrategica de
+algumas seeds, mas agora o artifact aponta exatamente quais seeds/decisoes
+devem ser investigadas.
 
 ## Passo de auditoria - latest 014808 forensic review 2026-06-19T22:58-03:00
 
@@ -9556,6 +9749,420 @@ A task resumida correspondente foi registrada na matriz:
 - `docs/hermes-analysis/BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md`
   - task P1: `Replay textual auditavel e coerente com JSONL`.
 
+## Passo de auditoria - BV-088 current latest gate/lineage recheck 2026-06-20T00:55-03:00
+
+Escopo: leitura read-only do latest recorrente, do wrapper produtor de
+`summary.json`, da matriz de gates e dos testes ja executados pelo proprio
+artefato. Nao houve alteracao de codigo, PostgreSQL, deck swap, commit ou push.
+
+Evidencia de artefato atual:
+
+- `latest` aponta para
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246`.
+- `summary.json`: `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`, `battle_replay_final_status=blocked`,
+  `battle_replay_final_status_reason=one_or_more_mandatory_gates_blocked` e
+  `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- O mesmo `summary.json` mostra que nao ha high/critical em action nem strategy
+  blockers: `seeds_with_high_or_critical_action_findings=[]` e
+  `seeds_with_strategy_blockers=[]`.
+- O bloqueio atual vem de forensic: `seeds_with_high_or_critical_forensic_findings=["63210333"]`,
+  `forensic_rule_findings=4` e
+  `mandatory_gate_statuses.forensic_audit.status=blocked`.
+- A linhagem forensic tambem esta incompleta:
+  `forensic_lineage_status=incomplete`,
+  `forensic_card_id_missing_unaccepted=2`,
+  `forensic_semantic_hash_missing_unaccepted=2` e
+  `forensic_rule_logical_key_missing_unaccepted=0`.
+- `global_learning_eligible_seeds=[]`; portanto este latest nao e elegivel para
+  aprendizado global.
+
+Evidencia de codigo:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:1182-1195`
+  monta `mandatory_gate_statuses.forensic_audit` a partir de
+  `forensic_blocking`, `forensic_rule_findings`, `forensic_turn_findings` e
+  seeds high/critical. Os contadores `forensic_*_missing_unaccepted` nao entram
+  diretamente nessa decisao.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:1296-1311`
+  calcula `mandatory_gate_divergences` e `battle_replay_final_status` a partir
+  de `gate_statuses`.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:1313-1317`
+  chama `compute_global_learning_eligibility` depois do status final ja
+  calculado.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:1320-1327`
+  calcula `forensic_lineage_status` depois da elegibilidade global e depois do
+  status final.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_strategy_auditor.py:545-612`
+  bloqueia elegibilidade global por `final_status`,
+  `mandatory_gate_divergences` e findings por seed; nao recebe
+  `forensic_*_missing_unaccepted` como motivo proprio.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_forensic_audit_supported_effects.py:720-745`
+  mantem uma fixture em que lineage unaccepted faltante fica visivel
+  (`rule_logical_key_missing_unaccepted=1`,
+  `card_id_missing_unaccepted=1`, `semantic_hash_missing_unaccepted=1`) sem
+  gerar `findings`.
+
+Evidencia de teste no artefato:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246/test_results.jsonl`
+  registra `py_compile` e `16` testes com `status=pass`.
+- O mesmo arquivo registra
+  `test_battle_forensic_audit_supported_effects` com `status=pass`,
+  `exit_code=0`, `log_lines=13` e log em
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_033246/test_battle_forensic_audit_supported_effects.log`.
+
+Conclusao validada:
+
+- `BV-088` permanece aberto. O latest corrente ja esta bloqueado por forensic
+  high/critical, entao nao ha falsa liberacao neste run. Ainda assim, a falha
+  latente permanece real por codigo: se um run futuro tiver
+  `forensic_rule_findings=0`, `forensic_turn_findings=0` e nenhum
+  high/critical, mas mantiver `forensic_*_missing_unaccepted>0`, o gate
+  `forensic_audit` pode passar antes de `forensic_lineage_status` ser
+  calculado.
+
+Tarefa clara para o chat "Ajustar battle":
+
+- Alterar o wrapper para fazer qualquer `forensic_*_missing_unaccepted>0` ou
+  `forensic_lineage_status=incomplete` participar do
+  `mandatory_gate_statuses.forensic_audit` antes de calcular
+  `battle_replay_final_status` e `compute_global_learning_eligibility`.
+- Adicionar fixture do wrapper cobrindo o caso
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `seeds_with_high_or_critical_forensic_findings=[]` e
+  `forensic_*_missing_unaccepted>0`, exigindo
+  `mandatory_gate_statuses.forensic_audit.status=review_required`,
+  `battle_replay_final_status=review_required` e motivo explicito em
+  `global_learning_eligibility_reasons`.
+
+## Passo de auditoria - BV-086 Breena forensic blocker 2026-06-20T01:05-03:00
+
+Escopo: leitura read-only da seed bloqueadora atual, replay humano, JSONL de
+eventos, action critic, decision trace, replay decision audit, strategy audit e
+codigo de origem do fallback. Nao houve alteracao de codigo, PostgreSQL, deck
+swap, commit ou push.
+
+Evidencia de artefato atual:
+
+- Latest `20260620_033246`, seed `63210333`, arquivo
+  `seed_63210333/forensic_audit.json`: `rule_findings` contem `4` findings
+  para `Breena, the Demagogue`, turno `10`, fase `precombat_main`, player
+  `Tayam, Luminous Enigma #25 (real)`.
+- Os findings forensic sao:
+  `spell_resolved` high e `spell_cast` medium por
+  `Game event depended on heuristic source functional_tags_json`, mais dois
+  lows por divergencia `draw_cards` versus registry `draw_engine`.
+- `forensic_audit.md:118-121` renderiza os mesmos quatro findings; a
+  recomendacao high/medium e mover a carta para `card_battle_rules` com status
+  `verified/active`.
+- `replay.txt:422-425` mostra a jogada humana: announce, pay cost, cast e
+  resolve de `Breena, the Demagogue` como `[draw_cards]` com
+  `rule=functional_tags_json/heuristic`.
+- `replay.events.jsonl` para Breena inclui `cast_announced`, `cost_paid`,
+  `spell_cast`, `spell_resolved` e `draw_cards_resolved`; todos os eventos de
+  regra carregam `rule_source=functional_tags_json`,
+  `rule_review_status=heuristic`, `rule_confidence=0.35` e `rule_version=null`.
+- O mesmo `forensic_audit.json` mostra lineage unaccepted exatamente nesses
+  eventos: `card_id_missing_unaccepted=2`,
+  `semantic_hash_missing_unaccepted=2`,
+  `lineage_unaccepted_missing_samples` para `spell_cast` e `spell_resolved`
+  de Breena; `rule_logical_key_missing_unaccepted=0` porque a ausencia de
+  logical key foi aceita para essa classe.
+- `action_critic.json` desta seed tem `findings=[]`,
+  `verdict_counts={"ok":457}` e `events_unclassified=0`; em
+  `action_critic.md:412-413`, `spell_cast` e `spell_resolved` de Breena estao
+  `ok` com `rule=functional_tags_json/heuristic`.
+- `replay_decision_audit.json` desta seed tem `decision_findings=0`,
+  `turn_findings=0` e `status=turn_invariants_clean`.
+- `strategy_audit.json` desta seed tem uma finding medium
+  `forced_keep_after_bad_mulligan` em `decision-000006`, rebaixando a seed para
+  `low_confidence_replay`; isso e separado do blocker forensic de Breena.
+- `summary.json.global_learning_eligibility_reasons["63210333"]` contem
+  `strategy_audit:low_confidence_replay`, `forensic_rule_findings=4`,
+  `forensic_audit_high_or_critical`, `final_status:blocked` e
+  `mandatory_gate:forensic_audit=blocked`.
+
+Evidencia de codigo:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py:2914-2925`
+  usa `card_functional_tags(card)` como fallback e anota o efeito com
+  `source="functional_tags_json"`, `review_status="heuristic"` e
+  `confidence=0.35`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py:134-141`
+  classifica `functional_tags_json` como `HEURISTIC_SOURCES`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py:459-467`
+  transforma qualquer evento de carta com source heuristico e efeito diferente
+  de `creature`/`land` em finding, com severidade high quando o evento e
+  `spell_resolved` e medium nos demais.
+
+Conclusao validada:
+
+- `BV-086` permanece aberto como blocker real do latest. O fluxo operacional
+  funcionou no sentido de impedir aprendizado global: o action critic aceitou a
+  acao como legal/coerente no replay, mas o forensic detectou que a execucao de
+  efeito veio de fallback heuristico sem lineage confiavel e bloqueou o gate
+  final. A falha nao e "so log"; e runtime-safe vs needs-review: Breena esta
+  sendo executada como efeito de carta por `functional_tags_json` quando deveria
+  ter regra battle `verified/active` com identidade e hash, ou waiver runtime
+  explicito testado.
+
+Tarefa clara para o chat "Ajustar battle":
+
+- Criar/promover regra battle para `Breena, the Demagogue` com
+  `effect_json` coerente com a semantica esperada (`draw_engine` ou
+  normalizacao explicita para `draw_cards`), `review_status=verified/active`,
+  `rule_logical_key`, `card_id` e `semantic_hash`; ou declarar waiver runtime
+  especifico, com teste, se o fallback for intencional.
+- Adicionar fixture garantindo que `functional_tags_json/heuristic` em
+  `spell_resolved` de efeito impactante continua bloqueando forensic/global
+  learning, enquanto a regra promovida de Breena deixa de emitir
+  `functional_tags_json` e zera os missing unaccepted dessa carta.
+
+## Passo de auditoria - BV-083 action-event denominator recheck 2026-06-20T01:15-03:00
+
+Escopo: leitura read-only do latest recorrente, `summary.json`, todos os
+`seed_*/action_critic.json`, wrapper produtor do summary e auditores de
+contrato de evento. Nao houve alteracao de codigo, PostgreSQL, deck swap,
+commit ou push.
+
+Evidencia de artefato atual:
+
+- Latest `20260620_033246`, `summary.json`:
+  `action_events_total=14198`, `action_event_types_total=530`,
+  `event_contract_static_events_observed_total=14198` e
+  `event_contract_static_observed_event_types_total=54`.
+- Recomputacao dos `16` `seed_*/action_critic.json`:
+  `summary.event_contract.event_types_total` soma `530`, com minimo `26` e
+  maximo `42` tipos por seed.
+- Recomputacao global dos mesmos `action_critic.json` por `event` unico:
+  `global_distinct_count=54`.
+- Distribuicao global distinta por classe, recomputada por `event` unico:
+  `action_audited=24`, `ignored_with_reason=4`, `renderer_only=6`,
+  `strategy_signal=15`, `technical=5`.
+- O `summary.json` atual publica `action_event_type_class_counts` como soma por
+  seed: `{"action_audited":310,"ignored_with_reason":33,"renderer_only":34,"strategy_signal":77,"technical":76}`.
+- Portanto, `action_event_types_total=530` nao e denominador global distinto;
+  e soma de tipos unicos por seed. O denominador global distinto atual e `54`.
+
+Evidencia de codigo:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_action_critic.py:522-548`
+  calcula `event_types_total=len(event_type_counts)` e
+  `event_type_class_counts` dentro de um unico arquivo de eventos/seed.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:782-795`
+  soma por seed: adiciona `events_total`, adiciona `event_types_total` e faz
+  `Counter.update(...)` de `event_type_class_counts`.
+- `/Users/desenvolvimentomobile/.manaloom-agents/bin/manaloom-battle-strategy-audit.sh:1090-1102`
+  tambem copia do auditor estatico o denominador global observado,
+  incluindo `event_contract_static_observed_event_types_total`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_contract_static_audit.py:288-300`
+  define esse denominador global como `observed_event_types_total=len(observed_types)`.
+
+Conclusao validada:
+
+- `BV-083` permanece aberto como problema de nomenclatura/observabilidade, nao
+  como blocker de legalidade: os eventos estao classificados e
+  `event_contract_static_observed_unclassified_total=0`, mas o nome
+  `action_event_types_total` induz leitura de superficie global distinta quando
+  na verdade publica soma por seed.
+
+Tarefa clara para o chat "Ajustar battle":
+
+- Renomear os campos atuais para `action_event_types_seed_sum` e
+  `action_event_type_class_seed_sum`, ou publicar adicionalmente
+  `action_event_types_distinct_total=54` e
+  `action_event_type_class_distinct_counts={"action_audited":24,"ignored_with_reason":4,"renderer_only":6,"strategy_signal":15,"technical":5}`.
+- Atualizar `summary.md` e fixture multi-seed para provar que o mesmo tipo de
+  evento aparecendo em varias seeds nao infla o denominador global distinto.
+
+## Passo de auditoria - BV-087 unknown backlog/effect contract recheck 2026-06-20T01:25-03:00
+
+Escopo: leitura read-only do latest recorrente, `summary.json`,
+`effect_coverage.json`, `unknown_template_backlog.json/md` e script/teste do
+backlog. Nao houve alteracao de codigo, PostgreSQL, deck swap, commit ou push.
+
+Evidencia de artefato atual:
+
+- Latest `20260620_033246`, `summary.json`:
+  `effect_coverage_unknowns=0`, mas
+  `effect_coverage_effect_totals_unknown=41`.
+- O mesmo summary publica `effect_coverage_unknown_effect_cards` com `34`
+  cartas, sendo `focused_template_ready_unknown_effect_count=28` e
+  `needs_review_unknown_effect_count=5`.
+- `unknown_template_backlog.json.summary` mostra
+  `status=focused_template_backlog_ready`, `source_unknown_cards=0`,
+  `effect_unknown_cards=34`,
+  `effect_unknown_source_counts={"battle_rule_curated":1,"battle_rule_needs_review_generated":5,"focused_template_ready":28}` e
+  `effect_unknown_status_counts={"focused_template_ready":28,"needs_review":5,"waived_curated_unknown_effect":1}`.
+- O mesmo `unknown_template_backlog.json` tem `items=[]`; portanto
+  `items_count=0` apesar de `effect_unknown_cards=34`.
+- `unknown_template_backlog.md` mostra `Effect-unknown cards: 34`, mas a tabela
+  `Per-Card Contract` fica vazia. Os campos `With focused template match`,
+  `Without focused template match`, `With plan or waiver` e
+  `Without plan or waiver` aparecem todos `0` porque sao calculados sobre
+  `items=[]`, nao sobre as `34` cartas effect-unknown.
+- `mandatory_gate_statuses.unknown_template_backlog.status=pass` com
+  `unknown_cards=0`, `without_plan_or_waiver=0` e
+  `without_focused_template_match=0`.
+
+Evidencia de codigo:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_unknown_template_backlog_audit.py:315-323`
+  le `unknown_effect_cards` apenas para contagens de source/status.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_unknown_template_backlog_audit.py:324-327`
+  monta `items` exclusivamente a partir de `coverage.get("unknown_cards")`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_unknown_template_backlog_audit.py:335-379`
+  calcula `without_*`, `with_*` e `status` sobre `items`; com `items=[]`, o
+  status vira `focused_template_backlog_ready`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_unknown_template_backlog_audit.py:68-105`
+  fixa a separacao atual: com `unknown_cards=[]` e `unknown_effect_cards`
+  preenchido, o teste exige `unknown_cards=0`, `source_unknown_cards=0` e
+  contagens de effect unknown, mas nao exige tabela/contrato por carta para os
+  effect-unknown.
+
+Conclusao validada:
+
+- `BV-087` permanece aberto como lacuna de contrato/escopo. O artifact nao
+  esconde totalmente o denominador effect-unknown, porque summary e Markdown
+  publicam `effect_unknown_cards=34` e contagens por status/source. A falha e
+  que o gate `unknown_template_backlog` e a tabela `Per-Card Contract` avaliam
+  apenas source-unknown (`unknown_cards`), entao passam com contrato vazio mesmo
+  quando existem `34` cartas `effect=unknown`, incluindo `5` `needs_review`.
+
+Tarefa clara para o chat "Ajustar battle":
+
+- Separar explicitamente `source_unknown_template_backlog_status` de
+  `effect_unknown_template_contract_status`, ou gerar `items`/contrato por
+  carta tambem para `unknown_effect_cards`.
+- A fixture deve falhar quando `effect_unknown_cards>0` e a tabela/JSON de
+  contrato por effect-unknown estiver vazia sem escopo explicito, especialmente
+  quando houver status `needs_review`.
+
+## Passo de auditoria - BV-084 research review samples recheck 2026-06-20T01:35-03:00
+
+Escopo: leitura read-only do latest recorrente, `research_review.json/md`,
+`seed_*/strategy_audit.json` e codigo local atual do auditor de research
+review. Nao houve alteracao de codigo, PostgreSQL, deck swap, commit ou push.
+
+Evidencia de artefato atual:
+
+- Latest `20260620_033246`, `research_review.md`: `Finding counts` mostra
+  `{"forced_keep_after_bad_mulligan": 6}` e `Strategy low-confidence seeds`
+  mostra `["63210332","63210333","63210338","63210345","63210346"]`.
+- `research_review.json.categories.mulligan` tem as chaves
+  `current_guardrail`, `expected_trace`, `finding_codes`, `finding_count`,
+  `observed_decisions`, `official_sources`, `status` e `strategy_sources`.
+  Nao ha chave `finding_samples` no artifact oficial.
+- `research_review.md` mostra `Findings: {"forced_keep_after_bad_mulligan": 6}`
+  em `mulligan`, mas nao renderiza tabela `Seed | Decision | Code | Severity`.
+- Recomputacao direta dos `16` `seed_*/strategy_audit.json` identificou os
+  seis findings reais:
+  `63210332/decision-000010`, `63210333/decision-000006`,
+  `63210338/decision-000007`, `63210338/decision-000011`,
+  `63210345/decision-000009` e `63210346/decision-000011`.
+- O `summary.json` confirma `strategy_findings=6`,
+  `strategy_low_confidence_findings=6`,
+  `strategy_review_required_findings=0`,
+  `strategy_learning_confidence_counts={"high_confidence_replay":11,"low_confidence_replay":5}`
+  e `strategy_not_learning_eligible_seeds=[]`.
+
+Evidencia de codigo local atual:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py:203-225`
+  define `finding_sample(...)` com `seed`, `decision_id`, `code`,
+  `severity`, `detail`, `chosen_option`, `reason`, `risk_flags`, `player`,
+  `turn`, `phase` e `actual_outcome`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py:300-315`
+  adiciona `finding_samples=category_items[:20]` nas categorias.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_decision_research_review.py:382-400`
+  renderiza a tabela Markdown de samples quando `data["finding_codes"]`
+  existe.
+
+Conclusao validada:
+
+- `BV-084` permanece aberto contra o latest oficial. A lacuna ja parece
+  parcialmente tratada no codigo local modificado, mas o artifact oficial
+  `20260620_033246` ainda nao publica `finding_samples` nem a tabela de samples
+  no Markdown. Portanto, nao ha evidencia oficial para fechar o BV ate um novo
+  run gerar `research_review.json/md` com as seis seeds/decisions listadas.
+
+Tarefa clara para o chat "Ajustar battle":
+
+- Garantir que o wrapper recorrente rode a versao do
+  `battle_decision_research_review.py` que publica `finding_samples`, e
+  revalidar em novo run oficial.
+- O criterio de fechamento e `research_review.json.categories.mulligan.finding_samples`
+  contendo os seis findings atuais com seed/decision/detail, e
+  `research_review.md` contendo a tabela `Seed | Decision | Code | Severity`
+  para `forced_keep_after_bad_mulligan`.
+
+## Passo de auditoria - BV-085 decision trace waiver/grade recheck 2026-06-20T01:45-03:00
+
+Escopo: leitura read-only do latest recorrente, `decision_trace_taxonomy.json/md`,
+`summary.json`, todos os `seed_*/replay.decision_trace.jsonl` e documento de
+taxonomia. Nao houve alteracao de codigo, PostgreSQL, deck swap, commit ou
+push.
+
+Evidencia de artefato atual:
+
+- Latest `20260620_033246`, `decision_trace_taxonomy.json.summary`:
+  `decision_trace_rows=2214`, `decision_trace_contract_findings=0`,
+  `decision_trace_kinds_observed=11`, `decision_trace_kinds_total=15`,
+  `decision_trace_observed_without_contract=0` e
+  `decision_trace_observed_without_specific_contract=0`.
+- O mesmo summary lista waivers aceitas:
+  `["activated_sacrifice_damage","attack_trigger_artifact_tutor","lorehold_upkeep_rummage","saga_chapter_resolution","utility_artifact_activation","utility_land_activation"]`.
+- O artifact oficial nao publica `accepted_field_contract_waiver_observed_rows`,
+  `decision_learning_grade_counts` nem `observed_status_counts`; esses campos
+  voltaram `null` na leitura direta do JSON.
+- O `summary.json` principal publica `decision_trace_accepted_waivers`, mas nao
+  publica quantas linhas observadas caem nessa classe nem grade de aprendizado
+  por tipo.
+- Recomputacao direta dos `16` `replay.decision_trace.jsonl` confirmou os
+  `2214` rows e estes tipos observados:
+  `cast_spell=496`, `combat_attack=279`,
+  `lorehold_upkeep_rummage=79`, `mulligan_decision=125`,
+  `pass_no_action=1127`, `response=9`, `saga_chapter_resolution=3`,
+  `tutor=30`, `utility_artifact_activation=46`,
+  `utility_land_activation=11`, `wheel=9`.
+- Linhas observadas em tipos `accepted_field_contract_waiver`: `139` no total:
+  `lorehold_upkeep_rummage=79`, `saga_chapter_resolution=3`,
+  `utility_artifact_activation=46`, `utility_land_activation=11`.
+- Recomputacao direta encontrou `parent_link_rows=0` quando procurando
+  `parent_decision_id`, `source_decision_id` ou `parent_decision`.
+
+Evidencia documental:
+
+- `docs/hermes-analysis/BATTLE_DECISION_TRACE_TAXONOMY.md:15-16` ja declara que
+  tipos `accepted_field_contract_waiver` sao field-contract-only ate o
+  summary/taxonomy publicar `decision_learning_grade`.
+- `docs/hermes-analysis/BATTLE_DECISION_TRACE_TAXONOMY.md:44`,
+  `:48`, `:50` e `:51` classificam os quatro tipos observados acima como
+  `accepted_field_contract_waiver`.
+- `docs/hermes-analysis/BATTLE_DECISION_TRACE_TAXONOMY.md:59` diz que a
+  qualidade estrategica de `lorehold_upkeep_rummage` permanece coberta por
+  escolhas de engine pai, mas os traces atuais nao publicam link para essa
+  decisao pai.
+
+Conclusao validada:
+
+- `BV-085` permanece aberto. O gate de taxonomia esta correto ao passar o
+  contrato de campos, mas ainda nao torna consumivel no `summary.json` que `139`
+  linhas observadas sao field-contract-only. Sem `decision_learning_grade` e sem
+  `parent_decision_id`/`source_decision_id`, consumidor pode tratar essas linhas
+  como strategy-audited quando elas sao apenas aceitacao de contrato de campo.
+
+Tarefa clara para o chat "Ajustar battle":
+
+- Publicar no `summary.json` e em `decision_trace_taxonomy.json/md`
+  `accepted_field_contract_waiver_observed_rows=139`, contadores por tipo e
+  `decision_learning_grade` por tipo (`strategy_audited`,
+  `research_specific`, `field_contract_only`, `not_observed`).
+- Para waivers que dependem de "parent engine choices", emitir
+  `parent_decision_id`/`source_decision_id`; se o link nao existir, marcar a
+  linha como `field_contract_only`/non-learning de forma explicita.
+
 ## Passo de auditoria - producer de gate final e lineage forensic 2026-06-20T00:08-03:00
 
 Escopo: leitura read-only do produtor real de `summary.json` e dos testes
@@ -9612,3 +10219,33 @@ Conclusao validada:
   fazer `forensic_*_missing_unaccepted>0` ou
   `forensic_lineage_status=incomplete` participar do gate forensic antes de
   computar `battle_replay_final_status` e elegibilidade global.
+
+## Fechamento cronologico - BV-084 research review samples 2026-06-20T01:01-03:00
+
+Escopo: validacao posterior aos rechecks historicos acima; sem PostgreSQL
+write, sem deck swap e sem promocao de regra battle.
+
+Evidencia oficial final:
+
+- Latest recorrente:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_040120/summary.json`.
+- `summary.json`: `run_scope=recurring_full`, `seeds_requested=16`,
+  `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `test_results_total=16` e
+  `test_results_status_counts={"pass":16}`.
+- `research_review.json`: `categories.mulligan.finding_codes={"forced_keep_after_bad_mulligan":6}`
+  e `categories.mulligan.finding_samples` com `6` entries:
+  `63210405/decision-000007`, `63210405/decision-000011`,
+  `63210407/decision-000006`, `63210410/decision-000010`,
+  `63210415/decision-000005` e `63210416/decision-000009`.
+- `research_review.md`: contem tabela `Seed | Decision | Code | Severity`
+  para os findings `forced_keep_after_bad_mulligan`.
+- `test_results.jsonl`: `test_battle_decision_research_review` passou com
+  `exit_code=0`.
+- Report persistente:
+  `docs/hermes-analysis/master_optimizer_reports/battle_latest_040120_research_review_bv084_closure_20260620_0101.md`.
+
+Resultado: `BV-084` fechado. As mencoes historicas anteriores de `BV-084`
+aberto foram superadas pelo run oficial `20260620_040120`; o quadro aberto
+atual nao contem mais linha `BV-084`.

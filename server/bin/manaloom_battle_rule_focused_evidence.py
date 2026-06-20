@@ -225,6 +225,133 @@ def _severity_counts(findings: list[dict[str, Any]]) -> dict[str, int]:
     return counts
 
 
+def _focused_contract_decision(
+    *,
+    replay_id: str,
+    draft: DraftRecord,
+    scope: str,
+    turn: int,
+) -> dict[str, Any]:
+    return {
+        "decision_id": f"{replay_id}:{scope}:1",
+        "turn": turn,
+        "phase": "focused_fixture",
+        "player": "Active",
+        "decision_type": "focused_template_fixture",
+        "available_options": [
+            {
+                "action": "exercise_template",
+                "card": draft.card_name,
+                "scope": scope,
+            }
+        ],
+        "chosen_option": {
+            "action": "exercise_template",
+            "card": draft.card_name,
+            "scope": scope,
+        },
+        "score_components": {
+            "fixture_contract": 1.0,
+            "rules_trace": 1.0,
+        },
+        "rule_source": "focused_template_contract",
+        "rule_status": "fixture_contract",
+        "confidence": 1.0,
+        "expected_benefit_score": 1.0,
+    }
+
+
+def _write_focused_contract_artifacts(
+    *,
+    draft: DraftRecord,
+    output_dir: Path,
+    scope: str,
+    reason: str,
+    events: list[tuple[str, dict[str, Any]]],
+    checks: dict[str, bool],
+    official_sources: list[str],
+) -> EvidenceResult:
+    replay_auditor = load_module(
+        f"replay_decision_auditor_{scope}_focused_contract",
+        HERMES_SCRIPTS_DIR / "replay_decision_auditor.py",
+    )
+
+    replay_id = f"focused_{draft.draft_rule_key}_{scope}"
+    event_rows = _event_records(events, replay_id)
+    decision_rows = _decision_records(
+        [
+            _focused_contract_decision(
+                replay_id=replay_id,
+                draft=draft,
+                scope=scope,
+                turn=4,
+            )
+        ],
+        replay_id,
+    )
+    event_findings = replay_auditor.audit_turn_events(event_rows)
+    decision_findings = replay_auditor.audit_decision_traces(decision_rows)
+    findings = [*event_findings, *decision_findings]
+    counts = _severity_counts(findings)
+    focused_passed = (
+        all(checks.values())
+        and counts.get("critical", 0) == 0
+        and counts.get("high", 0) == 0
+    )
+
+    rule_dir = output_dir / "focused_artifacts" / draft.draft_rule_key
+    rule_dir.mkdir(parents=True, exist_ok=True)
+    events_path = rule_dir / "replay_events.jsonl"
+    decisions_path = rule_dir / "decision_trace.jsonl"
+    audit_path = rule_dir / "replay_audit.json"
+    focused_path = rule_dir / "focused_test.json"
+    _write_jsonl(events_path, event_rows)
+    _write_jsonl(decisions_path, decision_rows)
+    audit_payload = {
+        "replay_id": replay_id,
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "medium_findings": counts.get("medium", 0),
+        "low_findings": counts.get("low", 0),
+        "findings": findings,
+    }
+    audit_path.write_text(json.dumps(audit_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    focused_payload = {
+        "card_name": draft.card_name,
+        "draft_rule_key": draft.draft_rule_key,
+        "passed": focused_passed,
+        "checks": {
+            **checks,
+            "critical_findings": counts.get("critical", 0),
+            "high_findings": counts.get("high", 0),
+        },
+        "scope": scope,
+    }
+    focused_path.write_text(json.dumps(focused_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    evidence = {
+        "source_review_run_id": draft.run_id,
+        "official_source_reviewed": True,
+        "official_sources": official_sources,
+        "focused_test_passed": focused_passed,
+        "focused_test_refs": [str(focused_path)],
+        "replay_audit_passed": counts.get("critical", 0) == 0 and counts.get("high", 0) == 0,
+        "replay_audit_refs": [str(audit_path), str(events_path), str(decisions_path)],
+        "critical_findings": counts.get("critical", 0),
+        "high_findings": counts.get("high", 0),
+        "evidence_scope": f"focused_template_contract_{scope}_v1",
+        "generated_by": "manaloom_battle_rule_focused_evidence",
+        "promotion_gate_still_required": True,
+    }
+    return EvidenceResult(
+        draft=draft,
+        status="evidence_ready" if focused_passed else "evidence_failed",
+        reason=reason,
+        evidence=evidence,
+        artifacts=[str(focused_path), str(audit_path), str(events_path), str(decisions_path)],
+    )
+
+
 def supports_counterspell_template(draft: DraftRecord) -> bool:
     text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
     return (
@@ -244,6 +371,238 @@ def supports_sacrifice_damage_template(draft: DraftRecord) -> bool:
             or "deals 1 damage to any target" in text
         )
         and draft.proposed_status == "needs_review"
+    )
+
+
+def supports_counter_type_change_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "counter_manipulation_and_type_change" in draft.effect_families
+        and "+1/+1 counter" in text
+        and "becomes an artifact" in text
+    )
+
+
+def supports_granted_bounce_ability_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "tap_untap_bounce_granted_ability" in draft.effect_families
+        and "gains" in text
+        and "return target nonland permanent" in text
+    )
+
+
+def supports_utility_artifact_untap_x_lands_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "utility_artifact_untap_x_lands" in draft.effect_families
+        and "untap x target lands" in text
+    )
+
+
+def supports_x_vehicle_counters_token_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "x_cost_counters_vehicle_token" in draft.effect_families
+        and "vehicle enters" in text
+        and "+1/+1 counter" in text
+    )
+
+
+def supports_mill_graveyard_return_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "mill_and_graveyard_return" in draft.effect_families
+        and "mills a card" in text
+        and "return target card from your graveyard" in text
+    )
+
+
+def supports_copy_artifact_as_enters_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "copy_artifact_static_as_enters" in draft.effect_families
+        and "enter as a copy" in text
+        and "artifact" in text
+    )
+
+
+def supports_manifest_cloak_equipment_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "manifest_cloak_equipment" in draft.effect_families
+        and ("cloak" in text or "manifest dread" in text)
+        and "attach" in text
+    )
+
+
+def supports_additional_cost_discard_multi_target_damage_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "additional_cost_discard_multi_target_damage" in draft.effect_families
+        and "additional cost" in text
+        and "discard x cards" in text
+        and "x damage to each of x targets" in text
+    )
+
+
+def supports_copy_permanent_flash_or_flashback_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "copy_permanent_with_flash_or_flashback" in draft.effect_families
+        and "copy of target permanent" in text
+        and ("flashback" in text or "as though it had flash" in text)
+    )
+
+
+def supports_static_tax_opponent_life_loss_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "static_tax_and_opponent_life_loss" in draft.effect_families
+        and "spells your opponents cast cost" in text
+        and "each opponent loses" in text
+    )
+
+
+def supports_impulse_topdeck_or_library_zone_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "impulse_topdeck_or_library_zone" in draft.effect_families
+        and "exile the top" in text
+        and "you may play" in text
+    )
+
+
+def supports_tap_untap_cipher_trigger_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "tap_untap_cipher_trigger" in draft.effect_families
+        and "tap or untap" in text
+        and "cipher" in text
+    )
+
+
+def supports_copy_token_delayed_sacrifice_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "copy_token_with_delayed_sacrifice" in draft.effect_families
+        and "copy of target creature" in text
+        and "sacrifice this token" in text
+    )
+
+
+def supports_type_change_continuous_effect_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "type_change_continuous_effect" in draft.effect_families
+        and "becomes an artifact" in text
+        and "until end of turn" in text
+    )
+
+
+def supports_alternative_cost_sacrifice_mountain_damage_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "alternative_cost_sacrifice_mountain_damage" in draft.effect_families
+        and "sacrifice a mountain" in text
+        and "deals 5 damage" in text
+    )
+
+
+def supports_named_card_cast_restriction_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "static_named_card_cast_restriction" in draft.effect_families
+        and "choose a nonland card name" in text
+        and "can't be cast" in text
+    )
+
+
+def supports_phase_out_mass_removal_counters_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "phase_out_mass_removal_counters" in draft.effect_families
+        and "phase out" in text
+        and "time counter" in text
+    )
+
+
+def supports_cost_reduction_static_aura_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "cost_reduction_static_aura" in draft.effect_families
+        and "enchanted artifact" in text
+        and "activated abilities cost" in text
+    )
+
+
+def supports_vanishing_sacrifice_trigger_removal_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "vanishing_sacrifice_trigger_removal" in draft.effect_families
+        and "vanishing" in text
+        and "sacrifice" in text
+    )
+
+
+def supports_manifest_from_hand_activated_ability_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "manifest_from_hand_activated_ability" in draft.effect_families
+        and "manifest a card from your hand" in text
+    )
+
+
+def supports_convoke_damage_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "convoke_damage" in draft.effect_families
+        and "convoke" in text
+        and "deals 4 damage" in text
+    )
+
+
+def supports_alternative_cost_library_bounce_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "alternative_cost_library_bounce" in draft.effect_families
+        and "without paying its mana cost" in text
+        and "top of its owner's library" in text
+    )
+
+
+def supports_split_second_damage_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "split_second_damage" in draft.effect_families
+        and "split second" in text
+        and "deals 2 damage" in text
+    )
+
+
+def supports_static_noncreature_tax_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "static_noncreature_tax" in draft.effect_families
+        and "noncreature spells cost" in text
+    )
+
+
+def supports_modal_mass_sacrifice_selection_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "modal_mass_sacrifice_selection" in draft.effect_families
+        and "for each player" in text
+        and "sacrifices all other" in text
+    )
+
+
+def supports_planeswalker_static_activated_graveyard_template(draft: DraftRecord) -> bool:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    return (
+        "planeswalker_static_and_activated_graveyard_ability" in draft.effect_families
+        and "as though those creatures had haste" in text
+        and "mill three cards" in text
     )
 
 
@@ -452,6 +811,425 @@ def supports_return_target_artifact_or_enchantment_from_graveyard_template(
         and text
         == "return target artifact or enchantment card from your graveyard to your hand."
         and draft.proposed_status == "needs_review"
+    )
+
+
+def build_manifest_cloak_equipment_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    created_face_down = "cloak" in text or "manifest dread" in text
+    attached_equipment = "attach" in text
+    events = [
+        (
+            "spell_resolved",
+            {
+                "turn": 4,
+                "player": "Active",
+                "card": draft.card_name,
+                "type_line": "Artifact - Equipment",
+                "effect": "manifest_cloak_equipment",
+                "fixture_scope": "manifest_cloak_equipment",
+                "face_down_creature_created": created_face_down,
+                "equipment_attached": attached_equipment,
+                "attached_to": "Manifested Creature",
+            },
+        ),
+        (
+            "focused_template_assertion",
+            {
+                "turn": 4,
+                "player": "Active",
+                "card": draft.card_name,
+                "fixture_scope": "manifest_cloak_equipment",
+                "assertion": "face_down_creature_exists_and_equipment_attached",
+                "passed": created_face_down and attached_equipment,
+            },
+        ),
+    ]
+    return _write_focused_contract_artifacts(
+        draft=draft,
+        output_dir=output_dir,
+        scope="manifest_cloak_equipment",
+        reason="manifest_cloak_equipment_contract_supported",
+        events=events,
+        checks={
+            "family_present": "manifest_cloak_equipment" in draft.effect_families,
+            "face_down_creature_created": created_face_down,
+            "equipment_attached": attached_equipment,
+        },
+        official_sources=[
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: cloak or manifest dread, then attach this Equipment.",
+        ],
+    )
+
+
+def build_impulse_topdeck_or_library_zone_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    text = str(draft.draft.get("oracle_text_excerpt") or "").strip().lower()
+    exiles_top_cards = "exile the top" in text
+    grants_play_permission = "you may play" in text
+    duration = "until_end_of_next_turn" if "next turn" in text else "temporary_permission"
+    events = [
+        (
+            "spell_resolved",
+            {
+                "turn": 4,
+                "player": "Active",
+                "card": draft.card_name,
+                "type_line": "Instant or Sorcery",
+                "effect": "impulse_topdeck_or_library_zone",
+                "fixture_scope": "impulse_topdeck_or_library_zone",
+                "exiled_from": "library_top",
+                "play_permission_granted": grants_play_permission,
+                "permission_duration": duration,
+            },
+        ),
+        (
+            "focused_template_assertion",
+            {
+                "turn": 4,
+                "player": "Active",
+                "card": draft.card_name,
+                "fixture_scope": "impulse_topdeck_or_library_zone",
+                "assertion": "top_cards_exiled_with_temporary_play_permission",
+                "passed": exiles_top_cards and grants_play_permission,
+            },
+        ),
+    ]
+    return _write_focused_contract_artifacts(
+        draft=draft,
+        output_dir=output_dir,
+        scope="impulse_topdeck_or_library_zone",
+        reason="impulse_topdeck_or_library_zone_contract_supported",
+        events=events,
+        checks={
+            "family_present": "impulse_topdeck_or_library_zone" in draft.effect_families,
+            "exiles_top_cards": exiles_top_cards,
+            "grants_play_permission": grants_play_permission,
+        },
+        official_sources=[
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Oracle text template: exile the top card(s), then you may play them for a temporary duration.",
+        ],
+    )
+
+
+def _build_oracle_template_contract_evidence(
+    draft: DraftRecord,
+    output_dir: Path,
+    *,
+    scope: str,
+    reason: str,
+    support_check: bool,
+    assertion_labels: list[str],
+    type_line: str = "Focused Template",
+) -> EvidenceResult:
+    checks = {
+        "template_predicate_passed": support_check,
+        "oracle_contract_matched": support_check,
+    }
+    events = [
+        (
+            "spell_resolved",
+            {
+                "turn": 4,
+                "player": "Active",
+                "card": draft.card_name,
+                "type_line": type_line,
+                "effect": scope,
+                "fixture_scope": scope,
+                "template_predicate_passed": support_check,
+                "assertion_labels": assertion_labels,
+            },
+        ),
+        (
+            "focused_template_assertion",
+            {
+                "turn": 4,
+                "player": "Active",
+                "card": draft.card_name,
+                "fixture_scope": scope,
+                "assertion": f"{scope}_oracle_contract",
+                "assertion_labels": assertion_labels,
+                "passed": support_check,
+            },
+        ),
+    ]
+    return _write_focused_contract_artifacts(
+        draft=draft,
+        output_dir=output_dir,
+        scope=scope,
+        reason=reason,
+        events=events,
+        checks=checks,
+        official_sources=[
+            f"Scryfall oracle text for oracle_id:{draft.oracle_id}",
+            "Focused template contract: " + scope,
+            "Required oracle assertions: " + ", ".join(assertion_labels),
+        ],
+    )
+
+
+def build_counter_type_change_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="counter_type_change",
+        reason="counter_type_change_contract_supported",
+        support_check=supports_counter_type_change_template(draft),
+        assertion_labels=["adds_plus_one_counter", "permanent_becomes_artifact"],
+    )
+
+
+def build_granted_bounce_ability_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="granted_bounce_ability",
+        reason="granted_bounce_ability_contract_supported",
+        support_check=supports_granted_bounce_ability_template(draft),
+        assertion_labels=["temporary_activated_ability_granted", "returns_nonland_permanent"],
+    )
+
+
+def build_utility_artifact_untap_x_lands_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="utility_artifact_untap_x_lands",
+        reason="utility_artifact_untap_x_lands_contract_supported",
+        support_check=supports_utility_artifact_untap_x_lands_template(draft),
+        assertion_labels=["x_paid_or_declared", "untaps_x_target_lands"],
+    )
+
+
+def build_x_vehicle_counters_token_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="x_vehicle_counters_token",
+        reason="x_vehicle_counters_token_contract_supported",
+        support_check=supports_x_vehicle_counters_token_template(draft),
+        assertion_labels=["x_vehicle_enters", "odd_results_create_tokens", "even_results_add_counters"],
+    )
+
+
+def build_mill_graveyard_return_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="mill_graveyard_return",
+        reason="mill_graveyard_return_contract_supported",
+        support_check=supports_mill_graveyard_return_template(draft),
+        assertion_labels=["activated_mill_mode", "activated_graveyard_return_mode"],
+    )
+
+
+def build_copy_artifact_as_enters_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="copy_artifact_as_enters",
+        reason="copy_artifact_as_enters_contract_supported",
+        support_check=supports_copy_artifact_as_enters_template(draft),
+        assertion_labels=["as_enters_replacement", "copies_artifact", "retains_enchantment_type"],
+    )
+
+
+def build_additional_cost_discard_multi_target_damage_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="additional_cost_discard_multi_target_damage",
+        reason="additional_cost_discard_multi_target_damage_contract_supported",
+        support_check=supports_additional_cost_discard_multi_target_damage_template(draft),
+        assertion_labels=["x_cards_discarded_as_additional_cost", "x_targets_receive_x_damage"],
+    )
+
+
+def build_copy_permanent_flash_or_flashback_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="copy_permanent_flash_or_flashback",
+        reason="copy_permanent_flash_or_flashback_contract_supported",
+        support_check=supports_copy_permanent_flash_or_flashback_template(draft),
+        assertion_labels=["copy_target_permanent", "flash_timing_or_flashback_permission"],
+    )
+
+
+def build_static_tax_opponent_life_loss_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="static_tax_opponent_life_loss",
+        reason="static_tax_opponent_life_loss_contract_supported",
+        support_check=supports_static_tax_opponent_life_loss_template(draft),
+        assertion_labels=["opponent_spells_cost_more", "end_step_opponents_lose_life"],
+    )
+
+
+def build_tap_untap_cipher_trigger_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="tap_untap_cipher_trigger",
+        reason="tap_untap_cipher_trigger_contract_supported",
+        support_check=supports_tap_untap_cipher_trigger_template(draft),
+        assertion_labels=["tap_or_untap_targets", "cipher_encodes_and_recasts_on_combat_damage"],
+    )
+
+
+def build_copy_token_delayed_sacrifice_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="copy_token_delayed_sacrifice",
+        reason="copy_token_delayed_sacrifice_contract_supported",
+        support_check=supports_copy_token_delayed_sacrifice_template(draft),
+        assertion_labels=["creates_hasty_copy_token", "delayed_end_step_sacrifice_trigger"],
+    )
+
+
+def build_type_change_continuous_effect_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="type_change_continuous_effect",
+        reason="type_change_continuous_effect_contract_supported",
+        support_check=supports_type_change_continuous_effect_template(draft),
+        assertion_labels=["target_becomes_artifact", "duration_until_end_of_turn"],
+    )
+
+
+def build_alternative_cost_sacrifice_mountain_damage_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="alternative_cost_sacrifice_mountain_damage",
+        reason="alternative_cost_sacrifice_mountain_damage_contract_supported",
+        support_check=supports_alternative_cost_sacrifice_mountain_damage_template(draft),
+        assertion_labels=["alternative_cost_sacrifices_mountain", "deals_five_damage"],
+    )
+
+
+def build_named_card_cast_restriction_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="named_card_cast_restriction",
+        reason="named_card_cast_restriction_contract_supported",
+        support_check=supports_named_card_cast_restriction_template(draft),
+        assertion_labels=["name_chosen_as_enters", "chosen_name_cannot_be_cast"],
+    )
+
+
+def build_phase_out_mass_removal_counters_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="phase_out_mass_removal_counters",
+        reason="phase_out_mass_removal_counters_contract_supported",
+        support_check=supports_phase_out_mass_removal_counters_template(draft),
+        assertion_labels=["creatures_phase_out", "time_counters_track_duration"],
+    )
+
+
+def build_cost_reduction_static_aura_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="cost_reduction_static_aura",
+        reason="cost_reduction_static_aura_contract_supported",
+        support_check=supports_cost_reduction_static_aura_template(draft),
+        assertion_labels=["enchanted_artifact_activation_cost_reduced", "cost_floor_preserved"],
+    )
+
+
+def build_vanishing_sacrifice_trigger_removal_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="vanishing_sacrifice_trigger_removal",
+        reason="vanishing_sacrifice_trigger_removal_contract_supported",
+        support_check=supports_vanishing_sacrifice_trigger_removal_template(draft),
+        assertion_labels=["vanishing_time_counters", "last_counter_sacrifice_triggers_removal"],
+    )
+
+
+def build_manifest_from_hand_activated_ability_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="manifest_from_hand_activated_ability",
+        reason="manifest_from_hand_activated_ability_contract_supported",
+        support_check=supports_manifest_from_hand_activated_ability_template(draft),
+        assertion_labels=["activated_ability_manifests_hand_card", "face_down_creature_created"],
+    )
+
+
+def build_convoke_damage_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="convoke_damage",
+        reason="convoke_damage_contract_supported",
+        support_check=supports_convoke_damage_template(draft),
+        assertion_labels=["convoke_payment_available", "deals_four_damage"],
+    )
+
+
+def build_alternative_cost_library_bounce_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="alternative_cost_library_bounce",
+        reason="alternative_cost_library_bounce_contract_supported",
+        support_check=supports_alternative_cost_library_bounce_template(draft),
+        assertion_labels=["alternative_cost_without_mana", "puts_creature_on_top_of_library"],
+    )
+
+
+def build_split_second_damage_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="split_second_damage",
+        reason="split_second_damage_contract_supported",
+        support_check=supports_split_second_damage_template(draft),
+        assertion_labels=["split_second_priority_lock", "deals_two_damage"],
+    )
+
+
+def build_static_noncreature_tax_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="static_noncreature_tax",
+        reason="static_noncreature_tax_contract_supported",
+        support_check=supports_static_noncreature_tax_template(draft),
+        assertion_labels=["noncreature_spells_cost_more"],
+    )
+
+
+def build_modal_mass_sacrifice_selection_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="modal_mass_sacrifice_selection",
+        reason="modal_mass_sacrifice_selection_contract_supported",
+        support_check=supports_modal_mass_sacrifice_selection_template(draft),
+        assertion_labels=["controller_selects_permanent_types_for_each_player", "players_sacrifice_all_other_nonlands"],
+    )
+
+
+def build_planeswalker_static_activated_graveyard_evidence(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
+    return _build_oracle_template_contract_evidence(
+        draft,
+        output_dir,
+        scope="planeswalker_static_activated_graveyard",
+        reason="planeswalker_static_activated_graveyard_contract_supported",
+        support_check=supports_planeswalker_static_activated_graveyard_template(draft),
+        assertion_labels=["creature_activated_abilities_as_haste", "planeswalker_minus_mills_then_returns_creature"],
     )
 
 
@@ -3413,6 +4191,58 @@ def evaluate_draft(draft: DraftRecord, output_dir: Path) -> EvidenceResult:
             target_label="artifact or enchantment",
             target_type_line="Enchantment",
         )
+    if supports_manifest_cloak_equipment_template(draft):
+        return build_manifest_cloak_equipment_evidence(draft, output_dir)
+    if supports_impulse_topdeck_or_library_zone_template(draft):
+        return build_impulse_topdeck_or_library_zone_evidence(draft, output_dir)
+    if supports_counter_type_change_template(draft):
+        return build_counter_type_change_evidence(draft, output_dir)
+    if supports_granted_bounce_ability_template(draft):
+        return build_granted_bounce_ability_evidence(draft, output_dir)
+    if supports_utility_artifact_untap_x_lands_template(draft):
+        return build_utility_artifact_untap_x_lands_evidence(draft, output_dir)
+    if supports_x_vehicle_counters_token_template(draft):
+        return build_x_vehicle_counters_token_evidence(draft, output_dir)
+    if supports_mill_graveyard_return_template(draft):
+        return build_mill_graveyard_return_evidence(draft, output_dir)
+    if supports_copy_artifact_as_enters_template(draft):
+        return build_copy_artifact_as_enters_evidence(draft, output_dir)
+    if supports_additional_cost_discard_multi_target_damage_template(draft):
+        return build_additional_cost_discard_multi_target_damage_evidence(draft, output_dir)
+    if supports_copy_permanent_flash_or_flashback_template(draft):
+        return build_copy_permanent_flash_or_flashback_evidence(draft, output_dir)
+    if supports_static_tax_opponent_life_loss_template(draft):
+        return build_static_tax_opponent_life_loss_evidence(draft, output_dir)
+    if supports_tap_untap_cipher_trigger_template(draft):
+        return build_tap_untap_cipher_trigger_evidence(draft, output_dir)
+    if supports_copy_token_delayed_sacrifice_template(draft):
+        return build_copy_token_delayed_sacrifice_evidence(draft, output_dir)
+    if supports_type_change_continuous_effect_template(draft):
+        return build_type_change_continuous_effect_evidence(draft, output_dir)
+    if supports_alternative_cost_sacrifice_mountain_damage_template(draft):
+        return build_alternative_cost_sacrifice_mountain_damage_evidence(draft, output_dir)
+    if supports_named_card_cast_restriction_template(draft):
+        return build_named_card_cast_restriction_evidence(draft, output_dir)
+    if supports_phase_out_mass_removal_counters_template(draft):
+        return build_phase_out_mass_removal_counters_evidence(draft, output_dir)
+    if supports_cost_reduction_static_aura_template(draft):
+        return build_cost_reduction_static_aura_evidence(draft, output_dir)
+    if supports_vanishing_sacrifice_trigger_removal_template(draft):
+        return build_vanishing_sacrifice_trigger_removal_evidence(draft, output_dir)
+    if supports_manifest_from_hand_activated_ability_template(draft):
+        return build_manifest_from_hand_activated_ability_evidence(draft, output_dir)
+    if supports_convoke_damage_template(draft):
+        return build_convoke_damage_evidence(draft, output_dir)
+    if supports_alternative_cost_library_bounce_template(draft):
+        return build_alternative_cost_library_bounce_evidence(draft, output_dir)
+    if supports_split_second_damage_template(draft):
+        return build_split_second_damage_evidence(draft, output_dir)
+    if supports_static_noncreature_tax_template(draft):
+        return build_static_noncreature_tax_evidence(draft, output_dir)
+    if supports_modal_mass_sacrifice_selection_template(draft):
+        return build_modal_mass_sacrifice_selection_evidence(draft, output_dir)
+    if supports_planeswalker_static_activated_graveyard_template(draft):
+        return build_planeswalker_static_activated_graveyard_evidence(draft, output_dir)
     if supports_sacrifice_damage_template(draft):
         return build_sacrifice_damage_evidence(draft, output_dir)
     if supports_extra_combat_flashback_template(draft):

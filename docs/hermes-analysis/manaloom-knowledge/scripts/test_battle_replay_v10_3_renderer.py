@@ -236,6 +236,25 @@ def test_renderer_explains_noncombat_damage_life_change():
     assert "life=40->39" in damage_line
 
 
+def test_renderer_uses_card_as_damage_cause_fallback():
+    damage_line = render(
+        "damage_resolved",
+        {
+            "player": "Etali, Primal Conqueror #105 (real)",
+            "card": "Lightning Bolt",
+            "target_player": "Kraum, Ludevic's Opus #83 (real)",
+            "target": "Memnite",
+            "amount": 3,
+            "result": "creature_destroyed",
+        },
+    )
+
+    assert "DAMAGE Etali, Primal Conqueror #105 (real): Lightning Bolt" in damage_line
+    assert "-> Kraum, Ludevic's Opus #83 (real)" in damage_line
+    assert "cause=Lightning Bolt" in damage_line
+    assert "cause=?" not in damage_line
+
+
 def test_deck_metrics_are_derived_from_resolved_cards():
     metrics = replay_renderer.deck_metrics(
         [
@@ -291,6 +310,7 @@ if __name__ == "__main__":
         test_renderer_uses_real_trigger_put_on_stack_fields,
         test_renderer_uses_trigger_fields_for_resolved_ability_kind,
         test_renderer_explains_noncombat_damage_life_change,
+        test_renderer_uses_card_as_damage_cause_fallback,
         test_deck_metrics_are_derived_from_resolved_cards,
         test_provenance_line_names_source_metrics_and_blocker_domain,
     ]

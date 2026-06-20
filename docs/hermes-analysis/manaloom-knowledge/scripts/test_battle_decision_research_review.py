@@ -28,11 +28,23 @@ def test_research_review_classifies_categories_from_replay_artifacts():
         seed_high.mkdir()
         (root / "summary.json").write_text("{}", encoding="utf-8")
         write_jsonl(seed / "replay.decision_trace.jsonl", [
-            {"decision_type": "mulligan_decision", "decision_id": "d1", "chosen_option": {"action": "keep"}},
+            {
+                "decision_type": "mulligan_decision",
+                "decision_id": "d1",
+                "chosen_option": {"action": "keep"},
+                "reason": "opening hand has two lands",
+                "risk_flags": [],
+            },
             {"decision_type": "cast_spell", "decision_id": "d2", "chosen_option": {"card": "Lotus Petal"}},
             {"decision_type": "combat_attack", "decision_id": "d3", "chosen_option": {"target": "B"}},
             {"decision_type": "tutor", "decision_id": "d4", "chosen_option": {"card": "Interaction"}},
-            {"decision_type": "board_wipe", "decision_id": "d5", "chosen_option": {"card": "Wrath"}},
+            {
+                "decision_type": "board_wipe",
+                "decision_id": "d5",
+                "chosen_option": {"card": "Wrath"},
+                "reason": "reset before lethal backswing",
+                "risk_flags": ["asymmetry_unclear"],
+            },
         ])
         (seed / "strategy_audit.json").write_text(json.dumps({
             "summary": {
@@ -42,7 +54,13 @@ def test_research_review_classifies_categories_from_replay_artifacts():
             },
             "findings": [
                 {"severity": "high", "code": "ramp_ritual_without_unlock_signal"},
-                {"severity": "medium", "code": "board_wipe_without_clear_asymmetry"},
+                {
+                    "severity": "medium",
+                    "code": "board_wipe_without_clear_asymmetry",
+                    "decision_id": "d5",
+                    "detail": "Board wipe lacked a clear asymmetry explanation.",
+                    "recommendation": "Record why the wipe improves the caster position.",
+                },
                 {
                     "severity": "high",
                     "code": "spending_last_land",
@@ -77,6 +95,27 @@ def test_research_review_classifies_categories_from_replay_artifacts():
     assert result["categories"]["sacrifice_land"]["status"] == "blocked_or_needs_review"
     assert result["categories"]["tutor"]["status"] == "coherent_in_sample"
     assert result["categories"]["board_wipe_wheel"]["status"] == "blocked_or_needs_review"
+    samples = result["categories"]["board_wipe_wheel"]["finding_samples"]
+    assert samples == [{
+        "seed": "1",
+        "decision_id": "d5",
+        "decision_type": "board_wipe",
+        "code": "board_wipe_without_clear_asymmetry",
+        "severity": "medium",
+        "detail": "Board wipe lacked a clear asymmetry explanation.",
+        "recommendation": "Record why the wipe improves the caster position.",
+        "chosen_option": {"card": "Wrath"},
+        "reason": "reset before lethal backswing",
+        "risk_flags": ["asymmetry_unclear"],
+        "player": None,
+        "turn": None,
+        "phase": None,
+        "actual_outcome": None,
+    }]
+    markdown = review.render_markdown(result)
+    assert "| Seed | Decision | Code | Severity | Chosen option | Reason | Risk flags | Detail |" in markdown
+    assert "d5" in markdown
+    assert "board_wipe_without_clear_asymmetry" in markdown
 
 
 def test_research_review_renders_sources():

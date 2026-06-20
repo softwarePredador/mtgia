@@ -51,16 +51,42 @@ EFFECT_FAMILY_KEY_PRIORITY = [
     "graveyard_recast_replacement",
     "graveyard_or_zone_recursion",
     "counterspell_stack_interaction",
+    "static_tax_and_opponent_life_loss",
+    "static_noncreature_tax",
+    "static_named_card_cast_restriction",
+    "alternative_cost_library_bounce",
+    "alternative_cost_sacrifice_mountain_damage",
+    "additional_cost_discard_multi_target_damage",
+    "convoke_damage",
+    "split_second_damage",
     "mass_removal_or_modal_wipe",
+    "modal_mass_sacrifice_selection",
     "targeted_interaction",
     "protection_or_prevention",
     "treasure_resource_generation",
     "mana_or_resource_acceleration",
     "library_search_or_selection",
     "triggered_or_static_engine",
+    "tap_untap_cipher_trigger",
+    "tap_untap_bounce_granted_ability",
+    "utility_artifact_untap_x_lands",
+    "manifest_cloak_equipment",
+    "manifest_from_hand_activated_ability",
+    "phase_out_mass_removal_counters",
+    "vanishing_sacrifice_trigger_removal",
     "copy_spell_or_permanent",
+    "copy_permanent_with_flash_or_flashback",
+    "copy_token_with_delayed_sacrifice",
+    "copy_artifact_static_as_enters",
     "card_advantage_or_selection",
+    "impulse_topdeck_or_library_zone",
     "counter_manipulation",
+    "counter_manipulation_and_type_change",
+    "type_change_continuous_effect",
+    "x_cost_counters_vehicle_token",
+    "mill_and_graveyard_return",
+    "cost_reduction_static_aura",
+    "planeswalker_static_and_activated_graveyard_ability",
     "token_or_board_presence",
     "synergy_enabler",
     "synergy_payoff",
@@ -119,6 +145,68 @@ def infer_effect_families_from_text(oracle_text: str) -> list[str]:
         families.add("counter_manipulation")
     if "copy" in text and ("spell" in text or "target" in text):
         families.add("copy_spell_or_permanent")
+    if "tap or untap" in text and "cipher" in text:
+        families.add("tap_untap_cipher_trigger")
+    if "gains" in text and "return target nonland permanent" in text:
+        families.add("tap_untap_bounce_granted_ability")
+    if "exile the top" in text and "you may play" in text:
+        families.add("impulse_topdeck_or_library_zone")
+    if "copy of target permanent" in text and "flashback" in text:
+        families.add("copy_permanent_with_flash_or_flashback")
+    if "copy of target creature" in text and "sacrifice this token" in text:
+        families.add("copy_token_with_delayed_sacrifice")
+    if "becomes an artifact" in text or "artifact in addition to its other types" in text:
+        families.add("type_change_continuous_effect")
+    if (
+        ("rather than pay" in text or "without paying its mana cost" in text)
+        and "owner's library" in text
+    ):
+        families.add("alternative_cost_library_bounce")
+    if "untap x target lands" in text:
+        families.add("utility_artifact_untap_x_lands")
+    if "x +1/+1 counters" in text and "vehicle" in text:
+        families.add("x_cost_counters_vehicle_token")
+    if "mills a card" in text and "return target card from your graveyard" in text:
+        families.add("mill_and_graveyard_return")
+    if "as a copy of any artifact" in text:
+        families.add("copy_artifact_static_as_enters")
+    if ("cloak" in text or "manifest" in text) and ("equipment" in text or "equip" in text):
+        families.add("manifest_cloak_equipment")
+    if "manifest a card from your hand" in text:
+        families.add("manifest_from_hand_activated_ability")
+    if "additional cost" in text and "discard x" in text and "x targets" in text:
+        families.add("additional_cost_discard_multi_target_damage")
+    if "spells your opponents cast cost" in text and "opponent loses" in text:
+        families.add("static_tax_and_opponent_life_loss")
+    if "sacrifice a mountain rather than pay" in text and "damage" in text:
+        families.add("alternative_cost_sacrifice_mountain_damage")
+    if "chosen name" in text and ("can't be cast" in text or "can't cast spells" in text):
+        families.add("static_named_card_cast_restriction")
+    if "phase out" in text and "time counter" in text:
+        families.add("phase_out_mass_removal_counters")
+    if (
+        "activated abilities of enchanted artifact cost" in text
+        or ("activated abilities cost" in text and "less to activate" in text)
+    ):
+        families.add("cost_reduction_static_aura")
+    if "vanishing" in text and "sacrifice" in text:
+        families.add("vanishing_sacrifice_trigger_removal")
+    if "convoke" in text and "deals 4 damage" in text:
+        families.add("convoke_damage")
+    if "split second" in text and "deals 2 damage" in text:
+        families.add("split_second_damage")
+    if "noncreature spells cost" in text:
+        families.add("static_noncreature_tax")
+    if "for each player" in text and (
+        "sacrifices the rest" in text or "sacrifices all other" in text
+    ):
+        families.add("modal_mass_sacrifice_selection")
+    if "activate abilities of creatures" in text and (
+        "graveyard" in text or "mill three cards" in text
+    ):
+        families.add("planeswalker_static_and_activated_graveyard_ability")
+    if "+1/+1 counter" in text and "artifact creature" in text:
+        families.add("counter_manipulation_and_type_change")
     return sorted(families)
 
 

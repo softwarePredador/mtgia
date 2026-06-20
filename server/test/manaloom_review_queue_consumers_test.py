@@ -610,6 +610,60 @@ def _write_enchantment_recursion_fixture(tmp: Path) -> Path:
 
 
 class ManaloomReviewQueueConsumersTest(unittest.TestCase):
+    def test_current_unknown_backlog_representatives_infer_effect_families(self) -> None:
+        battle_queue = _load_module(
+            "manaloom_battle_rule_review_queue_current_unknowns",
+            "bin/manaloom_battle_rule_review_queue.py",
+        )
+        cases = {
+            "Hidden Strings": (
+                "You may tap or untap target permanent, then you may tap or untap "
+                "another target permanent. Cipher",
+                "tap_untap_cipher_trigger",
+            ),
+            "Submerge": (
+                "If an opponent controls a Forest and you control an Island, you may "
+                "cast this spell without paying its mana cost. Put target creature on "
+                "top of its owner's library.",
+                "alternative_cost_library_bounce",
+            ),
+            "Stoke the Flames": (
+                "Convoke. Stoke the Flames deals 4 damage to any target.",
+                "convoke_damage",
+            ),
+            "Sudden Shock": (
+                "Split second. Sudden Shock deals 2 damage to any target.",
+                "split_second_damage",
+            ),
+            "Tragic Arrogance": (
+                "For each player, you choose from among the permanents that player "
+                "controls an artifact, a creature, an enchantment, and a planeswalker. "
+                "Then each player sacrifices the rest.",
+                "modal_mass_sacrifice_selection",
+            ),
+            "Cryptic Coat": (
+                "When Cryptic Coat enters the battlefield, cloak the top card of your "
+                "library, then attach Cryptic Coat to it. Equipped creature gets +1/+0 "
+                "and can't be blocked. Equip.",
+                "manifest_cloak_equipment",
+            ),
+            "God-Pharaoh's Statue": (
+                "Spells your opponents cast cost {2} more to cast. At the beginning "
+                "of your end step, each opponent loses 1 life.",
+                "static_tax_and_opponent_life_loss",
+            ),
+            "Nevermore": (
+                "As Nevermore enters the battlefield, choose a nonland card name. "
+                "Spells with the chosen name can't be cast.",
+                "static_named_card_cast_restriction",
+            ),
+        }
+
+        for card_name, (oracle_text, expected_family) in cases.items():
+            with self.subTest(card_name=card_name):
+                families = battle_queue.infer_effect_families_from_text(oracle_text)
+                self.assertIn(expected_family, families)
+
     def test_consumers_do_not_fail_before_candidate_review_runs(self) -> None:
         data_gap = _load_module(
             "manaloom_card_data_gap_review_empty",

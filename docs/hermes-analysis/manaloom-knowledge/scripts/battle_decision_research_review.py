@@ -200,6 +200,31 @@ def classify_status(
     return "not_observed"
 
 
+def finding_sample(
+    *,
+    seed: str,
+    item: dict[str, Any],
+    decision: dict[str, Any] | None,
+) -> dict[str, Any]:
+    decision = decision or {}
+    return {
+        "seed": seed,
+        "decision_id": item.get("decision_id"),
+        "decision_type": decision.get("decision_type"),
+        "code": str(item.get("code") or "unknown"),
+        "severity": str(item.get("severity") or "unknown"),
+        "detail": str(item.get("detail") or ""),
+        "recommendation": item.get("recommendation"),
+        "chosen_option": decision.get("chosen_option"),
+        "reason": decision.get("reason"),
+        "risk_flags": decision.get("risk_flags"),
+        "player": decision.get("player"),
+        "turn": decision.get("turn"),
+        "phase": decision.get("phase"),
+        "actual_outcome": decision.get("actual_outcome"),
+    }
+
+
 def aggregate(input_dir: Path) -> dict[str, Any]:
     decision_counts: Counter[str] = Counter()
     finding_counts: Counter[str] = Counter()
@@ -213,7 +238,13 @@ def aggregate(input_dir: Path) -> dict[str, Any]:
     seeds = seed_dirs(input_dir)
 
     for seed_dir in seeds:
-        for decision in load_jsonl(seed_dir / "replay.decision_trace.jsonl"):
+        decisions = load_jsonl(seed_dir / "replay.decision_trace.jsonl")
+        decisions_by_id = {
+            str(decision.get("decision_id")): decision
+            for decision in decisions
+            if decision.get("decision_id") is not None
+        }
+        for decision in decisions:
             decision_type = str(decision.get("decision_type") or "unknown")
             decision_counts[decision_type] += 1
             examples.setdefault(decision_type, {
@@ -240,13 +271,11 @@ def aggregate(input_dir: Path) -> dict[str, Any]:
         for item in strategy.get("findings", []):
             code = str(item.get("code") or "unknown")
             severity = str(item.get("severity") or "unknown")
+            decision_id = item.get("decision_id")
+            decision = decisions_by_id.get(str(decision_id)) if decision_id is not None else None
             finding_counts[code] += 1
             severity_by_code[code][severity] += 1
-            finding_items.append({
-                "code": code,
-                "severity": severity,
-                "detail": str(item.get("detail") or ""),
-            })
+            finding_items.append(finding_sample(seed=seed_name, item=item, decision=decision))
 
     categories = {}
     for category, metadata in SOURCE_MATRIX.items():
@@ -282,6 +311,7 @@ def aggregate(input_dir: Path) -> dict[str, Any]:
                 for code in sorted(codes)
                 if any(item["code"] == code for item in category_items)
             },
+            "finding_samples": category_items[:20],
             "official_sources": metadata["official_sources"],
             "strategy_sources": metadata["strategy_sources"],
             "expected_trace": metadata["expected_trace"],
@@ -351,6 +381,22 @@ def render_markdown(result: dict[str, Any]) -> str:
         lines.append("")
         if data["finding_codes"]:
             lines.append(f"Findings: `{json.dumps(data['finding_codes'], sort_keys=True)}`")
+            lines.append("")
+            lines.append("| Seed | Decision | Code | Severity | Chosen option | Reason | Risk flags | Detail |")
+            lines.append("|---|---|---|---|---|---|---|---|")
+            for sample in data.get("finding_samples", [])[:20]:
+                lines.append(
+                    "| {seed} | {decision_id} | {code} | {severity} | {chosen_option} | {reason} | {risk_flags} | {detail} |".format(
+                        seed=md(sample.get("seed")),
+                        decision_id=md(sample.get("decision_id")),
+                        code=md(sample.get("code")),
+                        severity=md(sample.get("severity")),
+                        chosen_option=md(json.dumps(sample.get("chosen_option"), sort_keys=True)),
+                        reason=md(sample.get("reason")),
+                        risk_flags=md(json.dumps(sample.get("risk_flags"), sort_keys=True)),
+                        detail=md(sample.get("detail")),
+                    )
+                )
             lines.append("")
     return "\n".join(lines)
 

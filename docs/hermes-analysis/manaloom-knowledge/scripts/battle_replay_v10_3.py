@@ -259,7 +259,14 @@ def write_replay_event(replay, event, data):
                     "target": data.get("target_player") or data.get("target") or "?",
                     "amount": data.get("amount", "?"),
                     "result": data.get("result", "?"),
-                    "cause": data.get("cause") or data.get("effect") or data.get("reason") or "?",
+                    "cause": (
+                        data.get("cause")
+                        or data.get("effect")
+                        or data.get("reason")
+                        or data.get("source")
+                        or data.get("card")
+                        or "?"
+                    ),
                     "life_note": f" {life_note}" if life_note else "",
                 }
             )
