@@ -4,12 +4,12 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-20 03:00 UTC
+> Data: 2026-06-20 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-18 11:00 UTC no checkout `88fa4a1e`: 0 imports/exports/parts locais quebrados em 1082 diretivas locais e os mesmos 2 SCCs. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
+O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-19 15:00 UTC no checkout `f80b2da2` encontrou delta amplo desde a rodada anterior deste foco (`cac5012b..HEAD`), mas nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` agora possuem leitura runtime nas proprias rotas, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count vivos e segue apenas sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-20 11:00 UTC no checkout `2e69bb4c`: 0 imports/exports/parts locais quebrados no runtime e no controle incluindo testes, 0 imports Python locais quebrados e somente 1 SCC app restante. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
 
 A revalidacao de coerencia app/server de 2026-06-18 23:00 UTC no checkout
 `523589bc` fechou os tres gaps estreitos da rodada anterior:
@@ -42,14 +42,16 @@ staples. Permanecem abertos fallbacks por nome, prompts runtime, payload/ranking
 inicial do optimize, rebuild guiado, candidate-quality foundation, check local de
 basic lands em analysis e corpus/analises auxiliares.
 
-A revalidacao de imports quebrados e dependencias circulares de 2026-06-19
-11:00 UTC no checkout `8ddc978a` confirmou `0` imports/exports/parts Dart
-locais quebrados em 1155 diretivas locais checadas (`app/lib`, `server/lib`,
-`server/routes`, `server/bin`) e `0` imports Python locais quebrados em
-`server/bin`. O ciclo backend antigo entre `optimize_runtime_support.dart` e
-`optimize_filler_loader_support.dart` ficou stale: o filler loader nao importa
-mais o runtime e passou a depender de modulos neutros. Permanece aberto somente
-o SCC app entre `life_counter_tabletop_engine.dart` e
+A revalidacao de imports quebrados e dependencias circulares de 2026-06-20
+11:00 UTC no checkout `2e69bb4c` confirmou `0` imports/exports/parts Dart
+runtime locais quebrados em 1155 diretivas locais checadas (`app/lib`,
+`server/lib`, `server/routes`, `server/bin`) e tambem `0` diretivas locais
+quebradas no controle incluindo `app/test`, `app/integration_test` e
+`server/test` (2595 diretivas locais). A checagem de Python em `server/bin`
+confirmou `0` imports locais quebrados e `0` SCCs. O ciclo backend antigo entre
+`optimize_runtime_support.dart` e `optimize_filler_loader_support.dart` continua
+stale: o filler loader nao importa mais o runtime e depende de modulos neutros.
+Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
 `life_counter_turn_tracker_engine.dart`.
 
 1. **P0 — Ferramenta de auditoria com falso-positivo em massa**: **RESOLVIDO na ferramenta**. Manter como lição operacional: evidência do auditor deve ser confrontada com analyzer quando apontar falhas estruturais.
@@ -157,15 +159,16 @@ o SCC app entre `life_counter_tabletop_engine.dart` e
     e `buildCandidateQualitySamplePoolSql` nao devem ser reabertas sem novo
     delta.
 13. **P1/P2 — Imports quebrados e dependencias circulares**: revalidado em
-    2026-06-19 11:00 UTC no checkout `8ddc978a`. O auditor base reportou
+    2026-06-20 11:00 UTC no checkout `2e69bb4c`. O auditor base reportou
     `Imports quebrados: 0`; o scanner ampliado encontrou `0` diretivas Dart
-    locais quebradas em 429 arquivos e `0` imports Python locais quebrados em
-    33 scripts de `server/bin`. As claims antigas contra `deck_analysis_tab.dart`,
+    runtime locais quebradas em 429 arquivos, `0` diretivas locais quebradas em
+    controle incluindo testes e `0` imports Python locais quebrados em 33
+    scripts de `server/bin`. As claims antigas contra `deck_analysis_tab.dart`,
     `life_counter_screen.dart`, `local_test_server.dart`,
     `commander-learning/index.dart` e o ciclo Community/Social seguem stale. O
     ciclo backend `optimize_runtime_support.dart` <->
-    `optimize_filler_loader_support.dart` tambem foi fechado: o filler loader
-    agora usa `optimize_filler_candidate_support.dart` e
+    `optimize_filler_loader_support.dart` tambem segue fechado: o filler loader
+    usa `optimize_filler_candidate_support.dart` e
     `optimize_functional_role_support.dart` sem importar o runtime. O unico SCC
     aberto nesta frente e o par
     `life_counter_tabletop_engine.dart` <->
@@ -549,15 +552,15 @@ Histórico do problema:
   - smoke Hermes pos-push para `4913a733bb6984bf9eb97d22d0c9598018aa05dc`
 
 ### P1 — Restaurar a analisabilidade do backend local
-- **Status 2026-06-19 11:00 UTC: RESOLVIDO/STALE no checkout local `8ddc978a`.**
+- **Status 2026-06-20 11:00 UTC: RESOLVIDO/STALE no checkout local `2e69bb4c`.**
   A resolucao historica segue refletida nesta branch de memoria.
 - **Evidência**:
   - `server/bin/local_test_server.dart:5`-`:13` checa
     `.dart_frog/server.dart` em runtime e retorna erro operacional claro quando
     o artefato nao existe.
   - Nao ha import estatico para `../.dart_frog/server.dart`.
-  - `cd server && dart analyze bin/local_test_server.dart` retornou
-    `No issues found`.
+  - `cd server && dart analyze ... bin/local_test_server.dart routes/ai/commander-learning/index.dart`
+    retornou `No issues found`.
 - **Impacto atual**: o bug estrutural de import estatico deixou de bloquear a
   analise focada do entrypoint local. O wrapper ainda depende do artefato gerado
   para executar servidor, mas isso agora e uma condicao operacional runtime, nao
@@ -574,7 +577,7 @@ Histórico do problema:
 
 ### P1 — Corrigir imports quebrados no app e no entrypoint local do backend
 
-**Status 2026-06-19 11:00 UTC: RESOLVIDO/STALE no checkout local `8ddc978a`.**
+**Status 2026-06-20 11:00 UTC: RESOLVIDO/STALE no checkout local `2e69bb4c`.**
 As resolucoes historicas para os imports app e o entrypoint local estao
 refletidas nesta branch de memoria; nao ha import local quebrado confirmado no
 recorte auditado.
@@ -589,10 +592,12 @@ recorte auditado.
   - A varredura focada de 429 arquivos Dart em `app/lib`, `server/lib`,
     `server/routes` e `server/bin` encontrou 0 imports/exports/parts locais
     quebrados em 1155 diretivas locais checadas.
+  - O controle incluindo `app/test`, `app/integration_test` e `server/test`
+    encontrou 0 diretivas locais quebradas em 2595 diretivas locais checadas.
   - A checagem estreita de 33 scripts Python em `server/bin` encontrou 0
-    imports locais quebrados.
-  - `cd server && dart analyze bin/local_test_server.dart` retornou
-    `No issues found`.
+    imports locais quebrados e 0 SCCs.
+  - `cd server && dart analyze ... bin/local_test_server.dart routes/ai/commander-learning/index.dart`
+    retornou `No issues found`.
   - O import historico de `server/routes/ai/commander-learning/index.dart:4`
     para `server/lib/ai/commander_learned_deck_support.dart` nao esta mais
     quebrado neste checkout; o arquivo alvo existe e
@@ -627,8 +632,8 @@ focado nao encontrou SCC com esses dois arquivos.
   - `app/lib/features/social/screens/user_profile_screen.dart:3` importa
     `package:go_router/go_router.dart` e nao importa
     `community_deck_detail_screen.dart`.
-  - A rodada focada de 409 arquivos Dart encontrou 2 SCCs, nenhum deles
-    contendo Community/Social.
+  - A rodada focada atual de 429 arquivos Dart runtime encontrou 1 SCC, que nao
+    contem Community/Social.
 - **Impacto atual**: a dependencia direta entre as duas telas nao e mais um
   achado aberto nesta branch.
 - **Ação recomendada**:
@@ -996,7 +1001,7 @@ Resolvido em `origin/master@32418bc6`: teste de contrato de rota para
 - Os achados antigos contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
   `local_test_server.dart`, `commander-learning/index.dart`, o ciclo
   Community/Social e o SCC backend de optimize nao estao abertos no checkout
-  `8ddc978a`; foram substituidos pelo SCC app atual entre os engines do life
+  `2e69bb4c`; foram substituidos pelo SCC app atual entre os engines do life
   counter.
 - A seção de "funções com nomes duplicados" mistura duplicação relevante com nomes esperados (`toString`, `print`, `add`), então precisa de triagem antes de virar tarefa de engenharia.
 - `battle_simulations` nao entrou como tabela nao usada nesta rodada: a rota

@@ -36,9 +36,164 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-20 07:00 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-20 11:00 UTC
+> Rotacao: `broken-imports-and-circular-dependencies`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Broken imports and circular dependencies - revalidacao 2026-06-20 11:00 UTC
+
+Escopo desta rodada: somente imports/exports/parts locais quebrados e ciclos de
+dependencia entre arquivos. Nao foi feita auditoria ampla de classes sem uso,
+funcoes sem chamador, tabelas PostgreSQL sem uso, duplicacao geral ou coerencia
+app/server fora do necessario para validar ou falsificar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `2e69bb4c`.
+- Delta desde a ultima rodada focada neste tema (`8ddc978a..HEAD`): somente
+  docs de Hermes (`STRUCTURE_AUDIT.md`, `PLANO_CORRECAO.md`,
+  `TECHNICAL_MAP.md`). Nao houve delta de produto em `app/lib`, `server/lib`,
+  `server/routes`, `server/bin`, `app/test`, `app/integration_test` ou
+  `server/test`.
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, trechos relevantes de
+`server/manual-de-instrucao.md` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+A skill local `manaloom-data-semantic-layer` tambem foi carregada; a regra
+relevante aqui e tratar Hermes como laboratorio/cache/auditor e validar achados
+contra codigo vivo.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib`, `server/bin`, testes nem scripts Python.
+- O script e textual/regex; ele nao compila o projeto nem constroi grafo de
+  ciclos.
+- A execucao voltou a inserir inventario gerado e duplicar historico manual sob
+  o marcador `## Historico gerado pelo auditor estrutural anterior`. Essa
+  mutacao mecanica foi revertida antes desta atualizacao, mantendo apenas os
+  numeros acima e a triagem focada abaixo.
+
+### Metodo manual focado
+
+- Scanner local dedicado percorreu 429 arquivos Dart runtime em `app/lib`,
+  `server/lib`, `server/routes` e `server/bin`.
+- Foram parseadas 2020 diretivas runtime `import`/`export`/`part`.
+- Foram resolvidas e checadas 1155 diretivas runtime locais, incluindo imports
+  relativos `./`, `../` e bare Dart (`import 'foo.dart'`), alem dos aliases
+  locais `package:server/...`, `package:manaloom/...` e o alias historico
+  `package:ai/...`.
+- Como controle adicional de import quebrado, a checagem incluindo
+  `app/test`, `app/integration_test` e `server/test` percorreu 795 arquivos
+  Dart, 4450 diretivas totais e 2595 diretivas locais.
+- O grafo Dart runtime foi analisado por componentes fortemente conectados
+  (SCCs), usando apenas arestas `import`/`export`.
+- A checagem de scripts Python em `server/bin` percorreu 33 arquivos, 316
+  imports totais, 7 imports locais e tambem analisou SCCs entre modulos locais.
+- Validacoes executadas:
+  - `cd app && flutter analyze --no-pub --no-fatal-infos lib/features/home/life_counter/life_counter_tabletop_engine.dart lib/features/home/life_counter/life_counter_turn_tracker_engine.dart`: `No issues found!`.
+  - `cd server && dart analyze lib/ai/optimize_runtime_support.dart lib/ai/optimize_filler_loader_support.dart lib/ai/optimize_filler_candidate_support.dart lib/ai/optimize_functional_role_support.dart bin/local_test_server.dart routes/ai/commander-learning/index.dart`: `No issues found!`.
+
+### Resultado do scanner focado
+
+- Imports/exports/parts Dart runtime locais quebrados: 0.
+- Imports/exports/parts Dart locais quebrados incluindo testes: 0.
+- SCCs Dart runtime com mais de um arquivo: 1.
+- Imports Python locais quebrados em `server/bin`: 0.
+- SCCs Python locais com mais de um modulo: 0.
+
+### Achados revalidados
+
+#### Sem achado aberto de import/export/part local quebrado
+
+- **Evidencia Dart runtime:** o auditor base reportou `Imports quebrados: 0` em
+  `server/lib`/`server/routes`; o scanner ampliado reportou
+  `DART_RUNTIME_BROKEN_LOCAL_DIRECTIVES 0` em `app/lib`, `server/lib`,
+  `server/routes` e `server/bin`.
+- **Evidencia Dart test-inclusive:** o controle incluindo `app/test`,
+  `app/integration_test` e `server/test` reportou
+  `DART_TEST_INCLUSIVE_BROKEN_LOCAL_DIRECTIVES 0`.
+- **Evidencia Python:** a checagem de `server/bin/**/*.py` reportou
+  `PY_SERVER_BIN_BROKEN_LOCAL_IMPORTS 0` em 33 scripts.
+- **Por que nao abrir achado:** nao ha diretiva local com alvo ausente neste
+  checkout. As claims antigas contra `deck_analysis_tab.dart`,
+  `life_counter_screen.dart`, `server/bin/local_test_server.dart` e
+  `server/routes/ai/commander-learning` permanecem stale para este foco.
+- **O que valida:** manter `broken_local_directives=0` no scanner ampliado e
+  analyzer verde para os recortes tocados.
+- **O que falsifica:** `dart analyze`/`flutter analyze` com
+  `uri_does_not_exist`, ou scanner ampliado apontando diretiva local com alvo
+  ausente e linha concreta.
+
+#### P1/P2 - Ciclo entre `life_counter_tabletop_engine.dart` e `life_counter_turn_tracker_engine.dart`
+
+- **Aresta 1:** `app/lib/features/home/life_counter/life_counter_tabletop_engine.dart:3`
+  importa `life_counter_turn_tracker_engine.dart`.
+- **Uso que fecha a aresta:** `life_counter_tabletop_engine.dart:429` chama
+  `LifeCounterTurnTrackerEngine.sanitizeTrackerPointersForActivePlayers(...)`.
+- **Aresta 2:** `app/lib/features/home/life_counter/life_counter_turn_tracker_engine.dart:2`
+  importa `life_counter_tabletop_engine.dart`.
+- **Usos que fecham a aresta:** `life_counter_turn_tracker_engine.dart:13`,
+  `:108` e `:165` chamam
+  `LifeCounterTabletopEngine.hasAnyActivePlayers(...)`.
+- **Estado de compilacao:** `flutter analyze --no-pub --no-fatal-infos` focado
+  nos dois arquivos retornou `No issues found!`; portanto o ciclo e estrutural,
+  nao um import quebrado atual.
+- **Por que importa:** os engines de mesa e turno dependem um do outro para
+  saneamento de jogadores ativos. Isso aumenta acoplamento em uma superficie
+  grande do life counter e dificulta extracao/teste isolado.
+- **O que valida:** mover o predicado/saneamento compartilhado para helper
+  neutro ou inverter uma dependencia, rerodar o scanner e obter 0 SCCs nesse par.
+- **O que falsifica:** prova de que o ciclo e intencional e coberto por contrato
+  arquitetural local, ou grafo local sem SCC entre estes arquivos.
+
+#### Status preservado - ciclo backend antigo de optimize segue resolvido
+
+- **Evidencia atual:** `server/lib/ai/optimize_runtime_support.dart:11` ainda
+  importa e `:12` reexporta `optimize_filler_loader_support.dart`, mas
+  `server/lib/ai/optimize_filler_loader_support.dart:5`-`:7` importa apenas
+  `commander_fallback_policy.dart`, `optimize_filler_candidate_support.dart` e
+  `optimize_functional_role_support.dart`.
+- **Por que a claim antiga fica stale:** nao existe import/export reverso de
+  `optimize_filler_loader_support.dart` para `optimize_runtime_support.dart`, e
+  o scanner atual nao encontrou SCC backend envolvendo esses arquivos.
+- **Estado de compilacao:** `dart analyze` focado nos arquivos de optimize e no
+  entrypoint local antigo retornou `No issues found!`.
+- **O que falsifica:** reintroduzir import/export reverso do filler loader para
+  o runtime, ou novo SCC backend apontado por scanner local com linhas concretas.
+
+### Resultado desta revalidacao
+
+No checkout `2e69bb4c`, nao ha evidencia atual de import/export/part Dart local
+quebrado nem import Python local quebrado no recorte auditado. A frente aberta
+desta rotacao continua restrita ao SCC app
+`life_counter_tabletop_engine.dart` <-> `life_counter_turn_tracker_engine.dart`.
+Como nao houve delta de produto desde a rodada de 2026-06-19 11:00 UTC, o status
+foi revalidado sem abrir novo achado.
 
 ## Rodada focada: Functions not called - revalidacao 2026-06-20 07:00 UTC
 

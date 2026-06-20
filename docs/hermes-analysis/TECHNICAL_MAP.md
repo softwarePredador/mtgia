@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-19 23:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 11:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -151,12 +151,14 @@ mtgia/
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
-  **REVALIDADO em 2026-06-19 11:00 UTC no checkout `8ddc978a`.** O auditor base
+  **REVALIDADO em 2026-06-20 11:00 UTC no checkout `2e69bb4c`.** O auditor base
   cobre apenas `server/lib` e `server/routes` e reportou `Imports quebrados: 0`.
   A triagem ampliada em 429 arquivos Dart de `app/lib`, `server/lib`,
   `server/routes` e `server/bin` resolveu 1155 diretivas locais e encontrou 0
-  imports/exports/parts locais quebrados. A checagem estreita de 33 scripts
-  Python em `server/bin` tambem encontrou 0 imports locais quebrados. Claims
+  imports/exports/parts locais quebrados; o controle incluindo
+  `app/test`, `app/integration_test` e `server/test` tambem encontrou 0
+  diretivas locais quebradas em 2595 checadas. A checagem estreita de 33 scripts
+  Python em `server/bin` encontrou 0 imports locais quebrados e 0 SCCs. Claims
   antigas contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
   `local_test_server.dart`, `commander-learning/index.dart` e o ciclo
   Community/Social estao stale. O ciclo backend antigo entre
