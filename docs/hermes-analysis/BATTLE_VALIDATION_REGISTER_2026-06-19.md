@@ -11082,5 +11082,12 @@ Conclusion:
 - The fix does not pretend the static search-limiter replacement layer is fully
   implemented; it records that ability as annotation-only until a library-search
   replacement executor exists.
-- A full 16-seed battle-strategy audit was already active at the end of this
-  checkpoint and had not yet replaced `latest/summary.json`.
+- The full 16-seed battle-strategy audit completed after this fix at
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_181004/summary.json`
+  with `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `test_results_status_counts={"pass":16}`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`, `decision_audit_turn_findings=0`, and
+  `action_findings=0`.
+- The latest quality gate with the clean audit is
+  `docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260620_181826.md`.
