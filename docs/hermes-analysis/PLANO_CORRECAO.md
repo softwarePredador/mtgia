@@ -72,6 +72,16 @@ staples. Permanecem abertos fallbacks por nome, prompts runtime, payload/ranking
 inicial do optimize, rebuild guiado, candidate-quality foundation, check local de
 basic lands em analysis e corpus/analises auxiliares.
 
+A revalidacao local de semantica de cartas de 2026-06-21 05:30 UTC no checkout
+`7a9255cd` confirmou que nao houve delta de produto em `server/lib` nem
+`server/routes` desde `708541a5`; o delta app ficou em providers/tela/flow de
+deck. As claims stale continuam fechadas: recommendations e weakness-analysis
+nao voltaram a usar listas fixas de staples, e quality gate/validator seguem
+preservando tags persistidas e roles multiplas no caminho principal. O achado app
+novo e estreito: `deck_provider_support_mutation.dart` mantem fallback local de
+basic lands no apply, aceitavel como excecao de regra mas sujeito a drift com a
+fonte server-side.
+
 A revalidacao de imports quebrados e dependencias circulares de 2026-06-20
 11:00 UTC no checkout `2e69bb4c` confirmou `0` imports/exports/parts Dart
 runtime locais quebrados em 1155 diretivas locais checadas (`app/lib`,
@@ -113,7 +123,7 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    de rodada própria os endpoints experimentais fora do caminho principal
    (`/ai/archetypes`, activation telemetry e rotas legacy/experimentais).
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-19 no checkout `708541a5`. `/ai/weakness-analysis` e
+   2026-06-21 no checkout `7a9255cd`. `/ai/weakness-analysis` e
    `/decks/:id/recommendations` continuam fora da claim antiga de listas fixas:
    ambas carregam `card_intelligence_snapshot` ou fallbacks agregados de
    `card_function_tags`/`card_semantic_tags_v2` e usam legalidade/identidade de
@@ -121,7 +131,8 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    `functional_card_tags.dart`, `optimization_functional_roles.dart`,
    `candidate_quality_data_support.dart`, `optimize_functional_role_support.dart`,
    `optimize_swap_candidate_support.dart` (pool inicial sem tags),
-   `rebuild_guided_service.dart`, no mock runtime de `/ai/optimize` quando
+   `rebuild_guided_service.dart`, em fallback local de basic lands no app,
+   no mock runtime de `/ai/optimize` quando
    `deckOptimizer == null`, em prompts runtime carregados por `otimizacao.dart` e
    em analises/corpus auxiliares. Exemplos de UI/import, comentarios de contrato,
    seeds de busca, docs/corpus/artifacts/test fixtures e seeds Commander
@@ -156,7 +167,7 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`; a varredura
    textual ampla nao foi usada para acusar DTOs/helpers locais sem evidencia
    adicional.
-9. **P1 — Drift entre deck analysis e optimize**: **PARCIAL em 2026-06-19**.
+9. **P1 — Drift entre deck analysis e optimize**: **PARCIAL em 2026-06-21**.
    O caminho principal carrega `functional_tags`/`semantic_tags_v2`; deck
    analysis, validator e quality gate preservam multi-tags com precedencia
    `functional_tags -> semantic_tags_v2 -> heuristica`. O risco restante nao esta
@@ -390,76 +401,55 @@ Histórico do problema:
     variaveis aceitas e defaults.
 
 ### P1 — Centralizar e reduzir politicas por nome restantes
-- **Status 2026-06-18 05:30 UTC: REVALIDADO/ABERTO no checkout `abfe1497`.**
-  Sem delta de produto desde `6d25e447`/`e458c074` no recorte `server/lib`,
-  `server/routes` e `app/lib`; os commits novos da branch sao documentais.
-  A branch atual ja tem excecoes aceitaveis e testadas:
-  `edh_bracket_policy.dart` como regra externa/Game Changer e
-  `commander_fallback_policy.dart` como policy versionada para fallbacks
-  Commander. O risco aberto sao nomes ainda espalhados em classificadores
-  heuristics, foundation de candidate quality, prompts runtime, replacement
-  ranking, endpoints advisory, rebuild guiado, advanced analysis e meta shell,
-  alem de um gap estreito no quality gate quando semantic v2 existe mas
-  `functional_tags` persistidos tem multi-tags adicionais.
+- **Status 2026-06-21 05:30 UTC: REVALIDADO/ABERTO no checkout `7a9255cd`.**
+  Sem delta de produto em `server/lib`/`server/routes` desde a revalidacao
+  semantica anterior; o delta app foi revisado e so adiciona o risco estreito de
+  copia local de basic lands em apply. `edh_bracket_policy.dart` continua excecao
+  intencional de regra externa/Game Changer, e `commander_fallback_policy.dart`
+  continua policy versionada para fallbacks Commander. O risco aberto sao nomes
+  ainda espalhados em fallback de classificadores, prompts runtime, payload/ranking
+  inicial do optimize, rebuild guiado, foundation de candidate quality, analises
+  auxiliares/corpus e copias locais de basic lands.
 - **Evidencia**:
-  - `server/lib/ai/functional_card_tags.dart:219`-`:226`, `:713`-`:730`,
-    `:767`-`:793`, `:836`-`:848`, `:863`-`:884` e `:900`-`:924` usa nomes como
-    `Sol Ring`, signets/talismans, `Teferi's Protection`, `Heroic Intervention`,
-    `Swiftfoot Boots`, `Lightning Greaves`, `Blood Artist`, `Ephemerate`,
-    `Jeska's Will`, `Thassa's Oracle`, `Isochron Scepter` e
-    `Dramatic Reversal` em fallbacks funcionais.
+  - `server/lib/ai/functional_card_tags.dart:226`-`:234`, `:720`-`:737`,
+    `:774`-`:804` e `:843`-`:882` usa nomes como `Sol Ring`,
+    signets/talismans, `Teferi's Protection`, `Heroic Intervention`, boots,
+    greaves, `Blood Artist`, `Zulaport Cutthroat`, `Ephemerate` e
+    `Jeska's Will` em fallbacks funcionais.
   - `server/lib/ai/optimization_functional_roles.dart:176`-`:179`,
-    `:228`-`:240`, `:387`-`:420` e `:447`-`:529` mantem nomes/sets conhecidos no
-    fallback do adapter de optimize.
-  - `server/bin/candidate_quality_data_foundation.dart:99`-`:126` gera
-    `card_function_tags`/`card_role_scores` chamando helpers heuristicos; estes
-    usam nomes em `server/lib/ai/candidate_quality_data_support.dart:376`-`:380`,
-    `:422`-`:448`, `:475`-`:481` e policy em `:586`-`:605`.
-  - `server/lib/ai/otimizacao.dart:854`-`:865` e `:1002`-`:1009` leem
-    `prompt.md`/`prompt_complete.md` como system prompt runtime. Os prompts tem
-    exemplos nomeados em `server/lib/ai/prompt.md:93`, `:121`-`:123` e
-    `server/lib/ai/prompt_complete.md:66`-`:80`.
-  - `server/lib/ai/optimize_runtime_support.dart:435`-`:463` e `:470`-`:500`
-    montam candidatos de replacement sem tags persistidas; `:520`-`:530` ranqueia
-    por texto/tipo, `preferredNames`, popularidade, rejeicao, CMC e tipo. Em modo
-    aggressive ha rerank com signals persistidos em
-    `server/lib/ai/optimize_candidate_quality_support.dart:203`-`:285`, mas o pool
-    inicial segue semantica-parcial.
-  - `server/routes/decks/[id]/recommendations/index.dart:48`-`:67` nao carrega
-    tags persistidas, recalcula buckets por `oracle_text` em `:122`-`:145`,
-    recomenda `Command Tower` diretamente em `:282`-`:289`, e `_findStaples` usa
-    raridade `rare/mythic` como proxy em `:478`-`:506`.
-  - `server/routes/ai/weakness-analysis/index.dart:50`-`:68` nao carrega
-    `card_function_tags`, `semantic_tags_v2` nem `card_role_scores`; chama
-    `resolveCardFunctionalRoles` sem essas fontes em `:115`-`:122` e retorna
-    listas fixas de recomendacao em `:193`-`:199`, `:212`-`:217`,
-    `:230`-`:235`, `:248`-`:253`, `:282`-`:287` e `:299`-`:304`.
-  - `server/lib/ai/rebuild_guided_service.dart:1226`-`:1231` classifica ramp por
-    `signet`/`sol ring`/`talisman`, e `:1331`-`:1338`, `:1404`-`:1411` aplicam
-    penalidade/prioridade a utility lands especificas por nome.
-  - `server/routes/decks/[id]/recommendations/index.dart:110`-`:130` calcula
-    buckets por `oracle_text` local; `:262`-`:268` recomenda `Command Tower`
-    diretamente quando `landCount < 34`; `_findStaples` em `:408`-`:438` trata
-    raridade `rare/mythic` como proxy de alto impacto sem role semantico.
-  - **Status 2026-06-12:** a parte de contagem em
-    `server/routes/ai/weakness-analysis/index.dart` foi parcialmente saneada:
-    a rota carrega `card_function_tags` e `card_semantic_tags_v2` quando as
-    tabelas existem e usa `resolveCardFunctionalRoles` antes do fallback
-    textual. Permanece pendente a troca das listas fixas de nomes retornadas
-    em recomendações por busca/policy versionada.
-  - `server/lib/ai/otimizacao.dart:856`-`:865` e `:1004`-`:1009` carregam
-    `server/lib/ai/prompt.md` e `prompt_complete.md`; os prompts incluem nomes
-    em `prompt.md:93`-`:123`/`:158`-`:172` e
-    `prompt_complete.md:63`-`:80`/`:112`-`:117`. Isso nao e branch
-    deterministico, mas e comportamento de produto quando a IA e chamada.
-  - `server/lib/edh_bracket_policy.dart:134`-`:142` usa listas por nome para
-    combos infinitos e Game Changers; este caso e excecao intencional de regra
-    externa, mas ainda precisa de fonte/versionamento/teste dedicado.
+    `:228`-`:264`, `:387`-`:487` e `:515`-`:561` mantem sets/branches de nomes
+    conhecidos no fallback e no `primaryRole` do adapter.
+  - `server/lib/ai/otimizacao.dart:854`-`:865` e `:1002`-`:1009` leem prompts
+    runtime; `server/lib/ai/prompt.md:93`, `:121`-`:123`, `:151`-`:172` e
+    `server/lib/ai/prompt_complete.md:66`-`:80`, `:108`-`:117` contem exemplos
+    nomeados de cartas que podem enviesar a IA.
+  - `server/routes/ai/optimize/index.dart:2158`-`:2185` monta
+    `removals_detailed` por `inferFunctionalRole` sem passar
+    `functional_tags`/`semantic_tags_v2`; `server/lib/ai/optimize_swap_candidate_support.dart:49`-`:84`,
+    `:101`-`:167` e `:183`-`:207` monta e ranqueia o pool inicial de replacement
+    sem tags/role scores.
+  - `server/lib/ai/candidate_quality_data_support.dart:516`-`:545`,
+    `:579`-`:584`, `:625`-`:633`, `:643`-`:652`, `:678`-`:685` e
+    `server/bin/candidate_quality_data_foundation.dart:107`-`:130` materializam
+    parte de `card_function_tags`/`card_role_scores` a partir de heuristicas que
+    ainda incluem nomes.
+  - `server/lib/ai/rebuild_guided_service.dart:1242`-`:1248`, `:1347`-`:1354`
+    e `:1416`-`:1428` decide ramp/utility-land por nomes fora do adapter.
+  - `server/routes/decks/[id]/analysis/index.dart:187`-`:210` e
+    `app/lib/features/decks/providers/deck_provider_support_mutation.dart:347`-`:371`
+    mantem copias locais de basic lands; basic land e excecao intencional, mas a
+    copia app nao lista `Snow-Covered Wastes`.
+  - `server/lib/ai/deck_advanced_analysis.dart:109`-`:132`, `:513`-`:524`,
+    `server/lib/meta/meta_deck_commander_shell_support.dart:160`-`:193` e
+    `server/lib/ai/commander_reference_deck_corpus_support.dart:989`-`:1120`
+    continuam com proxies por nome em analises auxiliares/corpus.
+  - **Nao reabrir sem novo delta:** recommendations e weakness-analysis carregam
+    snapshot/tags e buscam sugestoes por tags/semantic v2/legalidade/identidade;
+    a claim de listas fixas de staples ficou stale neste checkout.
 - **Impacto**: a maior parte do pipeline semantico ja converge, mas parte da
-  decisao de score/bracket/premium ainda depende de listas inline, dificultando
-  versao, auditoria e rollout controlado. No checkout local, a divergencia e
-  maior que o historico sugeria, porque a policy central citada nao esta
-  presente.
+  decisao de fallback, payload, score inicial, prompts e dados persistidos de
+  quality ainda pode nascer de lista inline por nome, dificultando versao,
+  auditoria e rollout controlado.
 - **Ação recomendada**:
   1. criar/restaurar modulo/config/tabela de policy versionada para excecoes de
      nome realmente intencionais;
@@ -480,70 +470,55 @@ Histórico do problema:
 
 ### P1/P2 — Manter adapter semantico compartilhado entre analysis, optimize e candidate quality
 
-- **Status 2026-06-07 05:30 UTC: REVALIDADO/ABERTO no checkout `84a97d75`.**
+- **Status 2026-06-21 05:30 UTC: REVALIDADO/PARCIAL no checkout `7a9255cd`.**
 - **Evidência**:
-  - `GET /decks/:id/analysis` seleciona `card_function_tags` e
-    `semantic_tags_v2` em `server/routes/decks/[id]/analysis/index.dart:80`-`:96`;
-    `POST /decks/:id/ai-analysis` faz o mesmo em
-    `server/routes/decks/[id]/ai-analysis/index.dart:119`-`:135`.
-  - `summarizeFunctionalTagsForDeck` prefere `functional_tags` persistidos e so
-    usa heuristica depois em `server/lib/ai/functional_card_tags.dart:432`-`:465`.
-  - `loadOptimizeDeckContext` carrega `semantic_tags_v2`, mas nao
-    `card_function_tags`, em `server/lib/ai/optimize_request_support.dart:86`-`:107`
-    e monta `allCardData` sem `functional_tags` em `:186`-`:198`.
-    O helper de select em `:323`-`:339` tambem agrega apenas
-    `card_semantic_tags_v2`.
-  - `classifyOptimizationFunctionalRole` usa `semantic_tags_v2` primeiro e
-    depois `type_line`/`oracle_text`, sem ler `functional_tags`, em
-    `server/lib/ai/optimization_functional_roles.dart:55`-`:124`.
-  - `OptimizationValidator` e o quality gate chamam esse classificador em
-    `server/lib/ai/optimization_validator.dart:266`-`:268` e
-    `server/lib/ai/optimization_quality_gate.dart:53`-`:54`.
-  - O checkout atual nao contem `optimizationFunctionalRolesForCard`; o caminho
-    vivo ainda e `classifyOptimizationFunctionalRole`, escalar. O mesmo arquivo
-    colapsa `semantic_tags_v2` para um unico role em
-    `server/lib/ai/optimization_functional_roles.dart:127`-`:180` e calcula
-    `role_delta` sobre esse role unico em `:292`-`:323`.
-    A precedencia tambem diverge no fallback textual: o comentario em `:111`-`:112`
-    diz que roles altos sao checados antes do fallback de tipo, mas o codigo
-    retorna wipe/protection/removal/ramp/draw/tutor antes de
-    `wincon`/`engine`/`combo_piece`/`payoff`/`enabler` em `:63`-`:117`.
-  - Candidate quality aplica outro mapa de normalizacao em
-    `server/lib/ai/candidate_quality_data_support.dart:290`-`:309`.
-  - `server/routes/ai/optimize/index.dart:2090`-`:2099` monta
-    `additionsData` com `semantic_tags_v2`, mas sem `functional_tags`; o helper
-    local de select v2 em `:3197`-`:3213` tambem nao agrega
-    `card_function_tags`.
-  - Nuance revalidada: candidate quality nao deve ser descrito como totalmente
-    sem `card_function_tags`, porque
-    `server/lib/ai/optimize_runtime_support.dart:2650`-`:2658` consulta
-    `card_function_tags` para sinais de candidatos. A lacuna ativa e o caminho de
-    contexto/validator/role preservation e o adapter unico.
-  - **Status 2026-06-12:** `server/routes/ai/weakness-analysis/index.dart`
-    passou a carregar `card_function_tags`/`card_semantic_tags_v2` opcionalmente
-    e a contar funções via `resolveCardFunctionalRoles`, com fallback textual.
-    Ainda recomenda nomes fixos em alguns blocos, o que segue como pendência de
-    policy/busca versionada.
-- **Impacto**: a aba de analise pode contar uma carta por `card_function_tags`
-  persistido, enquanto optimize/validator a tratam por heuristica ou role unico
-  de `semantic_tags_v2`. Swaps podem parecer seguros no gate por perderem roles
-  secundarios como `engine`, `payoff`, `enabler`, `drain` ou `exile_value`.
+  - `resolveCardFunctionalRoles` agora e o adapter principal e aplica precedencia
+    `functional_tags -> semantic_tags_v2 -> heuristica` em
+    `server/lib/ai/optimization_functional_roles.dart:37`-`:91`; os wrappers
+    `classifyOptimizationFunctionalRole` e `optimizationFunctionalRolesForCard`
+    vivem em `:301`-`:339`.
+  - `summarizeFunctionalTagsForDeck` preserva a mesma ordem em
+    `server/lib/ai/functional_card_tags.dart:442`-`:485`.
+  - `loadOptimizeDeckContext` carrega `semantic_tags_v2` e `functional_tags` por
+    snapshot ou fallback agregado em
+    `server/lib/ai/optimize_request_support.dart:97`-`:128`, `:203`-`:223` e
+    `:368`-`:402`.
+  - O quality gate nao deve ser reaberto pela claim antiga de semantic-only:
+    `_functionalRolesForGate` soma persisted functional tags, semantic-only roles
+    e fallback agregado em `server/lib/ai/optimization_quality_gate.dart:159`-`:203`.
+  - O validator tambem usa conjunto de roles: `server/lib/ai/optimization_validator.dart:266`-`:284`
+    calcula roles escalares para compatibilidade, mas compara intersecao de
+    `removedRoles`/`addedRoles`.
+  - `fetchOptimizeAdditionDataForQualityGate` inclui `semantic_tags_v2` e
+    `functional_tags` nas adicoes em
+    `server/lib/ai/optimize_route_addition_data_support.dart:95`-`:129`.
+  - Risco residual: `server/routes/ai/optimize/index.dart:2158`-`:2185` ainda
+    monta `removals_detailed` por role legado sem passar tags persistidas, e
+    `server/lib/ai/optimize_functional_role_support.dart:83`-`:111` ainda colapsa
+    multi-tags para um role legado.
+  - Risco residual: `server/lib/ai/optimize_swap_candidate_support.dart:49`-`:84`,
+    `:101`-`:167` e `:183`-`:207` infere need/ranking inicial sem
+    `functional_tags`, `semantic_tags_v2` ou role scores; o controle positivo e o
+    rerank aggressive com sinais persistidos em
+    `server/lib/ai/optimize_candidate_quality_support.dart:203`-`:285`.
+- **Impacto**: analysis, validator e quality gate estao alinhados no caminho
+  principal, mas o payload app-facing e o primeiro ranking de replacement ainda
+  podem perder roles secundarios como `draw + engine` ou
+  `combo_piece + enabler`.
 - **Ação recomendada**:
-  1. criar adapter unico `resolveCardFunctionalRoles` que receba
-     `functional_tags`, `semantic_tags_v2`, `oracle_text`, `type_line`,
-     `mana_cost` e `cmc`;
-  2. retornar conjunto de roles + `primary_role` compatível, nao apenas string;
-  3. usar o adapter em deck analysis, optimize context, validator, quality gate
-     e candidate quality;
-  4. carregar `card_function_tags` nas queries de optimize e additions;
-  5. cobrir com testes: persisted functional sem v2, v2 multi-tag, v2 abaixo de
+  1. passar `functional_tags`, `semantic_tags_v2`, `mana_cost` e `cmc` para o
+     payload `removals_detailed`;
+  2. trocar campos app-facing `role`/`function` por primary role compatível mais
+     lista de roles resolvidas quando o contrato permitir;
+  3. enriquecer as queries de replacement inicial com snapshot/tags/role scores;
+  4. manter testes de persisted functional sem v2, v2 multi-tag, v2 abaixo de
      confianca e fallback por oracle/tipo.
 - **Validação**:
   - uma carta com `functional_tags=[draw]` e sem `semantic_tags_v2` e `draw` em
     deck analysis, validator e quality gate;
   - uma carta com `semantic_tags_v2.tags=[draw, engine]` preserva ambos os
-    papeis no role delta;
-  - candidate quality e optimize usam a mesma normalizacao de roles.
+    papeis no role delta e no payload app-facing;
+  - replacement inicial e rerank aggressive usam a mesma normalizacao de roles.
 
 ### P2 — Threadar estado atual do deck nos fillers de optimize/complete
 

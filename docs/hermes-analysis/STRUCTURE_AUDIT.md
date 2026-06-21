@@ -27311,6 +27311,184 @@ optimize, e sinais de utilidade inferidos por nome em vez de
   check local de basic lands em analysis e corpus/analises auxiliares.
 - Nenhum achado novo foi baseado apenas em testes, docs, fixtures ou artifacts.
 
+### Revalidacao local — 2026-06-21 05:30 UTC
+
+> Checkout local: `7a9255cd`
+> Run timestamp UTC: `2026-06-21T05:30:05Z`
+
+- Working directory confirmado como repo root:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`, `git checkout codex/hermes-analysis-docs`,
+  `git pull --ff-only origin codex/hermes-analysis-docs` e
+  `git status --short` executados; branch estava atualizada e o status inicial
+  estava limpo.
+- Delta desde a revalidacao semantica anterior `708541a5`: no recorte
+  `server/lib` + `server/routes` nao houve mudanca de produto; no recorte
+  `app/lib` houve delta em provider/tela/flow de deck
+  (`deck_provider.dart`, `deck_provider_support_mutation.dart`,
+  `deck_details_screen.dart`, `deck_optimize_flow_support.dart`). Esta rodada
+  revalidou o backend por leitura direta e revisou o delta app para nomes
+  hardcoded/semantica de apply.
+
+#### Estado confirmado nesta revalidacao
+
+- A ordem do adapter principal continua correta:
+  `functional_tags -> semantic_tags_v2 -> heuristica` em
+  `server/lib/ai/optimization_functional_roles.dart:37`-`:91`, com
+  `classifyOptimizationFunctionalRole`/`optimizationFunctionalRolesForCard` em
+  `:301`-`:339`.
+- Deck analysis continua preferindo dados persistidos antes de fallback:
+  `summarizeFunctionalTagsForDeck` le `functional_tags` em
+  `server/lib/ai/functional_card_tags.dart:442`-`:446`, `semantic_tags_v2` em
+  `:447`-`:456` e so depois chama `inferFunctionalCardTags` em `:457`-`:466`;
+  a fonte efetiva e escolhida em `:473`-`:485`.
+- Optimize context e quality gate continuam threadando dados semanticos: o
+  contexto carrega snapshot ou fallbacks em
+  `server/lib/ai/optimize_request_support.dart:97`-`:128` e anexa
+  `semantic_tags_v2`/`functional_tags` em `:203`-`:223`; `_functionalRolesForGate`
+  soma persisted tags, semantic-only e fallback agregado em
+  `server/lib/ai/optimization_quality_gate.dart:159`-`:203`.
+- O validator nao e mais apenas escalar: alem de `removedRole`/`addedRole`, ele
+  calcula `removedRoles`/`addedRoles` e preserva troca quando ha intersecao de
+  roles em `server/lib/ai/optimization_validator.dart:266`-`:284`.
+- As claims antigas de listas fixas em `/ai/weakness-analysis` e
+  `/decks/:id/recommendations` seguem stale: as rotas carregam
+  snapshot/tags/agregados e buscam candidatos por tags, semantic v2, legalidade
+  e identidade de cor em
+  `server/routes/ai/weakness-analysis/index.dart:31`-`:84`, `:134`-`:166`,
+  `:737`-`:844` e
+  `server/routes/decks/[id]/recommendations/index.dart:48`-`:84`,
+  `:114`-`:185`, `:589`-`:680`.
+
+#### P1 — Fallbacks e prompts runtime ainda conhecem cartas especificas
+
+- **Classificacao:** Risk.
+- **Evidencia funcional:** `inferFunctionalCardTags` ainda usa nomes para ramp
+  (`signet`, `talisman`, `sol ring`, `arcane signet`) em
+  `server/lib/ai/functional_card_tags.dart:226`-`:234`, protecao por
+  `Teferi's Protection`/`Heroic Intervention`/boots/greaves em `:720`-`:737`,
+  aristocrats/drain por `Blood Artist`/`Zulaport Cutthroat` em `:774`-`:804`,
+  e blink/big spell/ritual por `Ephemerate`/`Jeska's Will` em `:843`-`:882`.
+- **Evidencia optimize:** `optimization_functional_roles.dart` adiciona roles
+  por `_knownWinconNames`, `_knownComboPieceNames`, `_knownEngineNames` e
+  `_knownProtectionNames` em `:176`-`:179`, prioriza esses nomes no
+  `primaryRole` em `:228`-`:264`, e ainda checa nomes como `Thassa's Oracle`,
+  `Isochron Scepter`, `Dramatic Reversal`, `Blood Artist`, `greaves` e `boots`
+  em `:387`-`:487`; as listas ficam em `:515`-`:561`.
+- **Evidencia prompts:** `otimizacao.dart` carrega `prompt.md` e
+  `prompt_complete.md` como prompt runtime em
+  `server/lib/ai/otimizacao.dart:854`-`:865` e `:1002`-`:1009`. Esses arquivos
+  contem exemplos nomeados como `Sol Ring`, `Mana Crypt`, `Arcane Signet`,
+  `Lightning Greaves`, `Thassa's Oracle`, `Force of Will`, `Command Tower`,
+  `Boseiju`, `Skullclamp` e `Doubling Season` em
+  `server/lib/ai/prompt.md:93`, `:121`-`:123`, `:151`-`:172` e
+  `server/lib/ai/prompt_complete.md:66`-`:80`, `:108`-`:117`.
+- **Por que importa:** mesmo quando o caminho principal usa tags persistidas, o
+  fallback ou a IA podem inferir utilidade por nome em vez de
+  `oracle_text`/`type_line`/`mana_cost`/`cmc` ou dados semanticos versionados.
+- **O que valida:** teste sentinela com cartas de texto equivalente e nomes
+  diferentes provando a mesma role, e prompts gerados a partir de policy/dados
+  versionados ou categorias genericas.
+- **Correcao estreita:** manter nome somente em policy versionada com fonte,
+  escopo, razao e teste; deixar fallback textual/oracle como a ultima camada
+  dos classificadores puros.
+
+#### P1/P2 — Optimize ainda perde semantica em payload e ranking inicial
+
+- **Classificacao:** Risk estreito; gate e validator estao mais coerentes, mas
+  caminhos app-facing e pre-rerank ainda sao parciais.
+- **Evidencia payload:** `removals_detailed` ainda chama `inferFunctionalRole`
+  somente com `name`, `typeLine` e `oracleText` em
+  `server/routes/ai/optimize/index.dart:2158`-`:2185`; o builder expõe esse
+  valor como `role`/`function` em
+  `server/lib/ai/optimize_payload_support.dart:429`-`:459`.
+- **Evidencia replacement ranking:** `findSynergyReplacements` consulta a carta
+  removida sem `functional_tags`/`semantic_tags_v2` em
+  `server/lib/ai/optimize_swap_candidate_support.dart:49`-`:84`, monta pool
+  inicial com campos crus + popularidade em `:101`-`:167` e ranqueia por
+  `scoreOptimizeReplacementCandidate` em `:183`-`:207`.
+- **Controle positivo:** o modo aggressive faz rerank posterior com
+  `card_role_scores`, `card_function_tags`, synergy e rejection penalties em
+  `server/lib/ai/optimize_candidate_quality_support.dart:203`-`:285`.
+- **O que valida:** teste de rota com card multi-tag persistido provando que
+  roles secundarios aparecem no payload e influenciam need/replacement score
+  antes do rerank aggressive.
+- **Correcao estreita:** passar `functional_tags`, `semantic_tags_v2`,
+  `mana_cost` e `cmc` de `originalCardByName` para o payload e enriquecer as
+  queries iniciais de replacement com snapshot/tags/role scores.
+
+#### P1/P2 — Rebuild guiado e basic-land fallback local ainda ficam fora da fonte compartilhada
+
+- **Classificacao:** Risk para rebuild; excecao intencional para basic lands,
+  mas com copias locais que podem divergir.
+- **Evidencia rebuild:** `server/lib/ai/rebuild_guided_service.dart:1242`-`:1248`
+  classifica ramp por `signet`/`sol ring`/`talisman`; `:1347`-`:1354` penaliza
+  `Temple of the False God` e `Terrain Generator`; `:1416`-`:1428` prioriza
+  utility lands por nomes fixos.
+- **Evidencia backend basic lands:** `server/routes/decks/[id]/analysis/index.dart:187`-`:210`
+  mantem lista local e usa `name.contains`, embora
+  `server/lib/basic_land_utils.dart:24`-`:50` ja centralize normalizacao por nome
+  e `type_line`.
+- **Evidencia app basic lands:** o delta app inclui fallback local em
+  `app/lib/features/decks/providers/deck_provider_support_mutation.dart:347`-`:371`;
+  ele respeita `is_basic_land` vindo do servidor e `type_line`, mas tambem mantem
+  set local sem `Snow-Covered Wastes`.
+- **O que valida:** rebuild consumir adapter/policy versionada para roles e
+  utility lands; analysis/app apply dependerem do campo server-side ou helper
+  compartilhado equivalente, sem lista local divergente.
+- **Correcao estreita:** mover excecoes de rebuild para policy versionada e
+  substituir listas locais de basic lands por helper/fonte server-side.
+
+#### P2 — Candidate quality e analises auxiliares ainda materializam proxies por nome
+
+- **Classificacao:** Risk quando o resultado vira sinal para optimize; permitido
+  como seed/corpus apenas com fonte/confidence.
+- **Evidencia candidate quality:** `inferCandidateFunctionTags` chama
+  `inferFunctionalCardTags` em
+  `server/lib/ai/candidate_quality_data_support.dart:516`-`:545` e ainda adiciona
+  ramp por `signet`/`talisman`/`sol ring` em `:579`-`:584`, protecao por
+  boots/greaves em `:625`-`:633`, combo por `Thassa`/`Oracle`,
+  `Dramatic Reversal` e `Isochron Scepter` em `:643`-`:652`, e aristocrats por
+  `Blood Artist`/`Zulaport Cutthroat` em `:678`-`:685`. A foundation persiste
+  esses sinais em `server/bin/candidate_quality_data_foundation.dart:107`-`:130`.
+- **Evidencia auxiliares:** `server/lib/ai/deck_advanced_analysis.dart:109`-`:132`
+  e `:513`-`:524` usa nomes para alt-win/drain/protecao; `server/lib/meta/meta_deck_commander_shell_support.dart:160`-`:193`
+  e `server/lib/ai/commander_reference_deck_corpus_support.dart:989`-`:1120`
+  contem listas/regex de corpus/meta por nome.
+- **O que valida:** sinais persistidos carregarem `source`, `confidence` e
+  `scope`, e consumidores app-facing preferirem tags/semantic v2/role scores
+  antes de qualquer seed por nome.
+- **Correcao estreita:** separar seed/policy por nome de inferencia semantica e
+  impedir que score final dependa so de nome quando texto/tipo/tags discordarem.
+
+#### Classificacao atual de ocorrencias permitidas ou intencionais
+
+- **Allowed — UI/import/contrato/teste/doc:** exemplos como `"1 Sol Ring"` em
+  import, dialog, comentarios de batch resolve, sugestoes do life counter,
+  fixtures, docs, artifacts e corpus nao foram tratados como bug de semantica.
+- **Allowed com guarda — mock dev de optimize:** `server/routes/ai/optimize/index.dart:1044`-`:1063`
+  retorna `Sol Ring`/`Arcane Signet` apenas quando `deckOptimizer == null` e marca
+  `is_mock=true`; producao/staging devem validar que esse fallback nao opera.
+- **Intentional exception — Commander fallback policy:** listas em
+  `server/lib/ai/commander_fallback_policy.dart:1`-`:190` sao policy versionada
+  para fallback/complete/filler e ficam aceitaveis enquanto tiverem fonte,
+  escopo e teste.
+- **Intentional exception — EDH bracket/Game Changer:** listas em
+  `server/lib/edh_bracket_policy.dart:111`-`:164`, `:312`-`:357` e
+  `:460`-`:561` representam regra externa/power-level, nao classificador
+  generico de utilidade.
+
+#### Resumo desta revalidacao
+
+- Nao ha evidencia nova para reabrir as claims antigas de staples fixas em
+  recommendations/weakness-analysis ou de mascaramento de `functional_tags` no
+  quality gate.
+- O risco atual permanece concentrado em fallbacks por nome, prompts runtime,
+  payload/ranking inicial do optimize, rebuild guiado, candidate-quality
+  foundation, copias locais de basic lands e analises/corpus auxiliares.
+- O delta app recente nao introduziu nome hardcoded de carta nao-basic em logica
+  semantica; o achado app novo e a copia local de basic lands no apply mutation.
+
 ## Rodada focada anterior: Duplicated or similar logic
 > Data: 2026-05-28 12:40 UTC
 > Rotacao local Codex: `duplicated-or-similar-logic`
