@@ -291,14 +291,17 @@ deve convergir para o server/helper compartilhado.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-20 07:00 UTC no checkout local `6244d33b`. Nao surgiu novo achado no
-  delta app recente. A claim ampla de `sync_cards_utils.dart` test-only segue
-  stale: o CLI operacional importa o utilitario e chama `parseSinceDays`,
-  `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`; restam P3 test-only
-  `extractCardRow`, `extractSetCardRow`, `extractOracleIds` e
-  `extractLegalities`. `swap_integrity` agora tem validacao app e bloqueio de
-  deck stale antes do apply por IDs; o achado vivo e mais estreito:
-  `server/lib/ai/optimize_swap_integrity.dart` ainda exporta
+  2026-06-21 07:14 UTC no checkout local `6410d456`. Desde a rodada focada
+  anterior (`6244d33b`), somente docs Hermes mudaram no recorte `app/lib`,
+  `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
+  `server/bin`, `server/test` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`;
+  nao surgiu novo achado confiavel. A claim ampla de `sync_cards_utils.dart`
+  test-only segue stale: o CLI operacional importa o utilitario e chama
+  `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`;
+  restam P3 test-only `extractCardRow`, `extractSetCardRow`,
+  `extractOracleIds` e `extractLegalities`. `swap_integrity` continua com
+  validacao app e bloqueio de deck stale antes do apply por IDs; o achado vivo
+  e mais estreito: `server/lib/ai/optimize_swap_integrity.dart` ainda exporta
   `verifySwapIntegrity` sem chamador backend. Permanecem sem chamador confirmado
   `buildOptimizeResponse`, o top-level `respondWithOptimizeTelemetry`,
   `getRequestTrace`, `ApiClient.loadTokenFromDisk`,
@@ -313,7 +316,8 @@ deve convergir para o server/helper compartilhado.
   `compute_loss_tags_from_replays`. Funcoes historicas
   `MLKnowledgeService.recordFeedback`, `hasSuspiciousNonLandCmc`,
   `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
-  e `buildCandidateQualitySamplePoolSql` nao devem ser reabertas sem novo delta.
+  e `buildCandidateQualitySamplePoolSql` nao foram reabertas; os tres ultimos
+  nem aparecem mais no checkout atual.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado em
   2026-06-20 15:00 UTC no checkout `956f630e`. Nao houve delta de produto desde
   a rodada focada `ced006f2`; so docs de Hermes mudaram. `deck_matchups` e

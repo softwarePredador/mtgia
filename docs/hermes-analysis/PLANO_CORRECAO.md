@@ -4,12 +4,25 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-21 03:00 UTC
+> Data: 2026-06-21 07:14 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-20 15:00 UTC no checkout `956f630e` confirmou que nao houve delta de produto desde a rodada focada `ced006f2`; so docs de Hermes mudaram. O auditor base continuou compatível (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados) e a triagem manual nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` seguem com leitura runtime nas proprias rotas e estao documentadas como historico/cache operacional, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count e policy documental de historico/retencao mas segue sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-20 11:00 UTC no checkout `2e69bb4c`: 0 imports/exports/parts locais quebrados no runtime e no controle incluindo testes, 0 imports Python locais quebrados e somente 1 SCC app restante. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
+
+A revalidacao de funcoes sem chamador de 2026-06-21 07:14 UTC no checkout
+`6410d456` confirmou que desde `6244d33b` somente docs Hermes mudaram no recorte
+`app/lib`, `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
+`server/bin`, `server/test` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. O
+auditor base continuou compativel (`221` arquivos backend, `205` classes, `116`
+tabelas textualmente referenciadas, `0` imports quebrados), mas segue textual e
+sem grafo de chamadas; a mutacao mecanica do bloco gerado foi revertida. Nao
+houve novo achado confiavel. Permanecem abertos os mesmos grupos:
+`verifySwapIntegrity` sem chamador backend, extracao parcial de
+`optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada,
+helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro
+helpers legados test-only de `sync_cards_utils.dart`.
 
 A revalidacao de classes de 2026-06-21 03:00 UTC no checkout `aeb667b2`
 confirmou que `6244d33b..HEAD` alterou somente docs de Hermes no recorte
@@ -183,15 +196,15 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-20 07:00 UTC no checkout `6244d33b`. O delta app recente nao gerou
-    novo achado; os helpers do fluxo de optimize agora possuem chamadas runtime
-    em `deck_details_screen.dart` ou no proprio fluxo. `sync_cards_utils.dart`
-    segue fora do achado P1 amplo porque `server/bin/sync_cards.dart` importa o
-    utilitario e chama `parseSinceDays`, `getNewSetCodesSinceFromData` e
+    2026-06-21 07:14 UTC no checkout `6410d456`. Desde a rodada focada anterior
+    (`6244d33b`), somente docs Hermes mudaram no recorte de produto/testes/API,
+    entao nao surgiu novo achado confiavel. `sync_cards_utils.dart` segue fora
+    do achado P1 amplo porque `server/bin/sync_cards.dart` importa o utilitario
+    e chama `parseSinceDays`, `getNewSetCodesSinceFromData` e
     `extractSetCardSyncRow`; restam apenas helpers legados/test-only no mesmo
     arquivo (`extractCardRow`, `extractSetCardRow`, `extractOracleIds`,
-    `extractLegalities`). `swap_integrity` agora tem validacao app e bloqueio de
-    deck stale antes do apply por IDs; o residual e o helper backend
+    `extractLegalities`). `swap_integrity` continua com validacao app e bloqueio
+    de deck stale antes do apply por IDs; o residual e o helper backend
     `verifySwapIntegrity` exportado sem chamador. Permanecem abertos
     `buildOptimizeResponse` e o top-level `respondWithOptimizeTelemetry`
     extraidos mas nao ligados ao fluxo, wrappers/conveniencias em request trace,
@@ -200,11 +213,11 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
     `buildLoreholdReferenceCardStatsFromProfile`,
     `summarizeAggressiveOptimizeUtilitySamples`, `normalize_commander` na copia
     Hermes docs e dois helpers script-level (`classify_loss_v2`,
-    `compute_loss_tags_from_replays`). Funcoes historicas
-    `MLKnowledgeService.recordFeedback`, `hasSuspiciousNonLandCmc`,
-    `normalizedCommanderReferenceCandidate`, `extractMtgTop8FormatCodeFromSourceUrl`
-    e `buildCandidateQualitySamplePoolSql` nao devem ser reabertas sem novo
-    delta.
+    `compute_loss_tags_from_replays`). `MLKnowledgeService.recordFeedback` e
+    `hasSuspiciousNonLandCmc` seguem com chamadores reais; os simbolos
+    historicos `normalizedCommanderReferenceCandidate`,
+    `extractMtgTop8FormatCodeFromSourceUrl` e
+    `buildCandidateQualitySamplePoolSql` nem aparecem mais no checkout atual.
 13. **P1/P2 — Imports quebrados e dependencias circulares**: revalidado em
     2026-06-20 11:00 UTC no checkout `2e69bb4c`. O auditor base reportou
     `Imports quebrados: 0`; o scanner ampliado encontrou `0` diretivas Dart
@@ -663,14 +676,16 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1/P2 — Remover ou reconectar funcoes publicas sem chamador runtime
 
-**Status 2026-06-20 07:00 UTC:** **PARCIAL.** O item de maior risco operacional
+**Status 2026-06-21 07:14 UTC:** **PARCIAL.** Desde a rodada focada anterior
+(`6244d33b`), somente docs Hermes mudaram no recorte de produto/testes/API; nao
+houve novo achado confiavel de funcao sem chamador. O item de maior risco operacional
 desta seção segue resolvido: `sync_cards_utils.dart` é importado por
 `server/bin/sync_cards.dart`, e o CLI usa os helpers compartilhados para
 parsing de `--since-days`, seleção incremental de sets e extração completa de
-cards de Set.json. A revalidacao atual tambem ajustou `verifySwapIntegrity`:
-o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas
-o helper backend exportado continua sem chamador. As anotações históricas de
-2026-06-07 continuam válidas apenas para os demais helpers abaixo.
+cards de Set.json. `verifySwapIntegrity` segue como residual estreito: o app
+valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper
+backend exportado continua sem chamador. As anotações históricas de 2026-06-07
+continuam válidas apenas para os demais helpers abaixo.
 
 - **Evidência**:
   - ✅ Resolvido 2026-06-11: `server/bin/sync_cards.dart` importa
@@ -681,7 +696,7 @@ o helper backend exportado continua sem chamador. As anotações históricas de
     `extractSetCardRow` foi preservado como projeção compatível de 12 colunas,
     enquanto `extractSetCardSyncRow` expõe a linha operacional de 15 colunas
     com `power`, `toughness` e `keywords`.
-  - Ajustado 2026-06-20: `server/lib/ai/optimize_swap_integrity.dart:112`
+  - Revalidado 2026-06-21: `server/lib/ai/optimize_swap_integrity.dart:112`
     define `verifySwapIntegrity`, mas `rg` em `server` e `app` encontra apenas
     a definicao. O app agora tem verificacao equivalente:
     `deck_optimize_flow_support.dart:486` define `validateOptimizeSwapIntegrity`,
@@ -722,6 +737,14 @@ o helper backend exportado continua sem chamador. As anotações históricas de
   - `server/lib/endpoint_cache.dart:32` define `EndpointCache.clearExpired`,
     sem chamada confirmada; `EndpointCache.instance.get/set` seguem vivos em
     rotas de cards, sets, archetypes e generate performance support.
+  - Controles positivos mantidos fora do achado vivo:
+    `server/lib/ai/optimize_feedback_support.dart:101` chama
+    `MLKnowledgeService.recordFeedback`, e
+    `server/lib/generated_deck_validation_service.dart:810` +
+    `server/lib/card_validation_service.dart:182` chamam
+    `hasSuspiciousNonLandCmc`. `normalizedCommanderReferenceCandidate`,
+    `extractMtgTop8FormatCodeFromSourceUrl`, `buildCandidateQualitySamplePoolSql`
+    e `tryGetRequestId` nao aparecem no checkout atual.
 - **Impacto**: cobertura pode estar validando caminhos mortos nos helpers
   restantes, mas o risco mais alto do sync de cartas foi fechado; os testes
   agora cobrem o mesmo extrator usado pelo CLI operacional.
