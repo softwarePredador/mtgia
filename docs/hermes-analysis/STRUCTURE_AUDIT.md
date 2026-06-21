@@ -36,9 +36,191 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-21 07:14 UTC
-> Rotacao: `functions-not-called`
+> Atualizacao local Codex: 2026-06-21 15:00 UTC
+> Rotacao: `postgresql-tables-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: PostgreSQL tables not used - revalidacao 2026-06-21 15:00 UTC
+
+Escopo desta rodada: somente tabelas PostgreSQL persistidas sem uso, write-only
+ou com consumo parcial/incoerente. Nao foi feita auditoria ampla de classes sem
+uso, funcoes sem chamada, imports/ciclos, duplicacao geral ou coerencia entre
+camadas fora do necessario para validar ou falsificar os candidatos de tabela.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `4f538e41`.
+- Delta desde a ultima rodada focada em tabelas PostgreSQL
+  (`956f630e..HEAD`) no recorte `app/lib`, `app/test`,
+  `app/integration_test`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test`, `server/database_setup.sql` e
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`: nenhum arquivo de produto mudou;
+  o delta ficou restrito aos docs Hermes (`STRUCTURE_AUDIT.md`,
+  `PLANO_CORRECAO.md`, `TECHNICAL_MAP.md`).
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar claims stale:
+`TECHNICAL_MAP.md`, `OPEN_RISKS.md`, `STRUCTURE_AUDIT.md`,
+`PLANO_CORRECAO.md`, `structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, trechos relevantes de
+`server/manual-de-instrucao.md` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+A skill local `manaloom-data-semantic-layer` tambem foi carregada; a regra
+relevante aqui e tratar PostgreSQL/backend como fonte de verdade do produto e
+Hermes como laboratorio/cache/auditor.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para esta rotacao:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao varre
+  `server/bin`, scripts Python, `database_setup.sql`, app Flutter nem docs de
+  contrato.
+- A deteccao de tabelas e textual/regex; ela conta `FROM`/`JOIN`/`CREATE TABLE`,
+  mas nao separa CTE, tabela temporaria, schema verifier, migration ou lineage
+  bruto.
+- A execucao voltou a inserir um inventario gerado grande em
+  `STRUCTURE_AUDIT.md`; essa mutacao mecanica foi revertida antes desta
+  atualizacao manual, mantendo apenas os numeros acima e a triagem focada.
+
+### Metodo manual focado
+
+- Comparei o delta de produto desde `956f630e`, baseline da ultima rodada de
+  tabelas PostgreSQL.
+- Reexecutei buscas exatas com `rg` para os candidatos vivos e os controles:
+  `deck_matchups`, `deck_weakness_reports`, `ml_prompt_feedback`,
+  `commander_reference_decks`, `commander_reference_deck_cards`,
+  `commander_reference_deck_analysis`, `deck_learning_events`,
+  `commander_card_usage`, `commander_card_synergy`,
+  `commander_learning_snapshot` e `commander_learned_decks`.
+- Separei `INSERT`, `UPDATE`, `DELETE`, `FROM` e `JOIN` em `server/lib`,
+  `server/routes`, `server/bin`, `server/test`, `server/database_setup.sql` e
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+- Nao rodei testes Dart/Flutter porque esta rodada nao alterou codigo de
+  produto; a validacao foi documental + busca/leitura direta.
+
+### Achados revalidados
+
+#### Status preservado - sem delta de produto desde a ultima rodada de tabelas
+
+- **Evidencia:** `git diff --name-status 956f630e..HEAD -- app/lib app/test app/integration_test server/lib server/routes server/bin server/test server/database_setup.sql server/doc/API_CONTRACTS_AND_DATA_MAP.md docs/hermes-analysis/STRUCTURE_AUDIT.md docs/hermes-analysis/PLANO_CORRECAO.md docs/hermes-analysis/TECHNICAL_MAP.md`
+  retornou somente os tres docs Hermes.
+- **Por que importa:** nao ha base nova para abrir achado de tabela PostgreSQL
+  em runtime sem evidencia adicional; a rodada preserva ou falsifica os
+  candidatos anteriores contra o codigo vivo.
+- **O que falsifica:** um proximo delta de produto no recorte acima, migracao
+  nova, tabela nova em `database_setup.sql`/`migrate.dart`, ou busca apontando
+  tabela persistida sem leitor/escritor real.
+
+#### Claims antigas de write-only continuam stale: `deck_matchups` e `deck_weakness_reports` tem leitura runtime
+
+- **`deck_matchups`:** `server/routes/ai/simulate-matchup/index.dart:392`
+  faz `INSERT INTO deck_matchups`; a mesma rota chama `_loadStoredMatchup` em
+  `:382` e le `SELECT win_rate, notes, updated_at FROM deck_matchups` em
+  `:458`-`:459`, retornando o valor em `stored_matchup.previous` no response
+  em `:430`-`:435`.
+- **`deck_weakness_reports`:**
+  `server/routes/ai/weakness-analysis/index.dart:602` faz
+  `INSERT INTO deck_weakness_reports`; a rota chama `_loadWeaknessHistory` em
+  `:624`, le agregados em `:692`-`:695` e itens recentes em `:708`-`:710`,
+  expondo `history` no response em `:677`.
+- **Status:** nao sao tabelas sem uso nem write-only no checkout atual. O risco
+  residual, se houver, e de maturidade/valor de produto do historico, nao de
+  ausencia de consumidor.
+- **O que valida:** manter testes de contrato para os campos de historico/cache
+  se essas rotas forem promovidas no app.
+- **O que falsifica:** remover esses `SELECT`/campos de response ou mover as
+  leituras para codigo morto sem rota/job consumidor.
+
+#### P2/P3 - `ml_prompt_feedback` coleta e conta, mas ainda nao alimenta selecao de prompt/modelo
+
+- **Tabela:** `ml_prompt_feedback`, declarada em
+  `server/database_setup.sql:550` e verificada por
+  `server/bin/verify_schema.dart:157`.
+- **Writer runtime confirmado:** `server/routes/ai/optimize/index.dart:761`
+  chama `optimize_feedback.recordOptimizeMlFeedback`; esse helper chama
+  `MLKnowledgeService(connection).recordFeedback` em
+  `server/lib/ai/optimize_feedback_support.dart:101`; o service executa
+  `INSERT INTO ml_prompt_feedback` em
+  `server/lib/ml_knowledge_service.dart:264`.
+- **Leitura confirmada:** `/ai/ml-status` exige/conta a tabela em
+  `server/routes/ai/ml-status/index.dart:83` e `:108`.
+- **Ausencia de consumidor de payload:** a busca por
+  `FROM/JOIN ml_prompt_feedback` encontrou apenas o contador de `/ai/ml-status`;
+  nao apareceu leitor que use `cards_accepted`, `cards_rejected`,
+  `effectiveness_score` ou `prompt_version` para score/selecao de prompt.
+- **Status:** a claim antiga de "sem chamador" esta falsa; o achado vivo e
+  consumo parcial do historico coletado.
+- **O que valida:** rota/job/service que leia o payload de `ml_prompt_feedback`
+  para selecao de prompt, scorecard, retencao ou treino operacional com teste.
+- **O que falsifica:** decisao documentada de manter a tabela apenas como log
+  operacional/retencao, ou consumo real do payload fora do contador.
+
+#### P3 - `commander_reference_decks` e `commander_reference_deck_cards` seguem raw corpus sem leitor direto
+
+- **Tabelas raw:** `commander_reference_decks` e
+  `commander_reference_deck_cards`.
+- **Escritas confirmadas:** `server/lib/ai/commander_reference_deck_corpus_support.dart:1234`
+  insere/upserta `commander_reference_decks`; `:1318` apaga cards antigos por
+  refresh; `:1334` insere `commander_reference_deck_cards`.
+- **Consumidor runtime confirmado usa agregado:** o produto le
+  `commander_reference_deck_analysis` em
+  `server/lib/ai/commander_reference_deck_corpus_support.dart:370`-`:379`; o
+  agregado e persistido em `:1383`.
+- **Ausencia de leitura direta confirmada:** busca focada por
+  `FROM/JOIN commander_reference_decks` e
+  `FROM/JOIN commander_reference_deck_cards` em `server/lib`, `server/routes`,
+  `server/bin` e `server/test` retornou somente writes/delete/DDL das raw
+  tables, sem `SELECT`/`JOIN` consumidor.
+- **Por que parece consumo parcial:** as raw tables podem ser lineage/audit do
+  corpus, mas o runtime confirmado le somente o resumo agregado.
+- **O que valida:** documentar retencao/reprocessamento das raw tables, criar
+  job que as releia para reconstruir o agregado, ou persistir apenas o agregado.
+- **O que falsifica:** `SELECT`/`JOIN` runtime real nas raw tables fora do fluxo
+  de apply/refresh.
+
+### Controles negativos
+
+- `deck_learning_events` possui writers em
+  `server/lib/ai/deck_learning_event_support.dart:226` e `:254`, leitura/update
+  operacional em `server/bin/pull_learning_events.py:76` e `:158`, e contagem
+  de backlog em `server/bin/manaloom_ops_daemon.py:167`.
+- `commander_card_usage` possui writer em
+  `server/lib/ai/deck_learning_event_support.dart:82`, leitura de hot cards em
+  `server/lib/ai/deck_learning_event_support.dart:14`, e consumo operacional em
+  `server/bin/manaloom_new_card_candidate_review.py:693`.
+- `commander_card_synergy` possui consumo em
+  `server/lib/ai/candidate_quality_data_support.dart:320` e
+  `server/lib/ai/optimize_candidate_quality_support.dart:240`, alem de jobs de
+  backfill/foundation em `server/bin`.
+- `commander_learning_snapshot` e view interna/diagnostica: ha construcao em
+  `server/lib/ai/commander_learning_snapshot_support.dart` e leitura em
+  `server/bin/commander_generate_provenance_audit.dart:530`; a rota
+  app-facing de learned decks evita usa-la diretamente por decisao de runtime.
+- `commander_learned_decks` tem leitura app-facing em
+  `server/routes/ai/commander-learning/index.dart:89` e `:127`, alem de
+  leitura/promocao em `server/lib/ai/commander_learned_deck_support.dart`.
+
+Nenhum novo candidato P1/P2 de tabela PostgreSQL sem consumidor claro foi aberto
+nesta rodada.
 
 ## Rodada focada: Functions not called - revalidacao 2026-06-21 07:14 UTC
 

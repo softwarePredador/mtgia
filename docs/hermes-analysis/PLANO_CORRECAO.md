@@ -4,10 +4,27 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-21 07:14 UTC
+> Data: 2026-06-21 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao de tabelas PostgreSQL de 2026-06-21 15:00 UTC no checkout
+`4f538e41` confirmou que desde a ultima rodada focada (`956f630e`) nao houve
+delta de produto em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
+`server/test`, `server/database_setup.sql` nem no API contract map; somente docs
+Hermes mudaram. O auditor base continuou compativel (`221` arquivos backend,
+`116` tabelas textualmente referenciadas, `0` imports quebrados), mas segue
+textual e sem prova de uso. A triagem manual nao abriu novo achado P1/P2:
+`deck_matchups` e `deck_weakness_reports` continuam com leitura runtime nas
+proprias rotas; `deck_learning_events`, `commander_card_usage`,
+`commander_card_synergy`, `commander_learning_snapshot` e
+`commander_learned_decks` possuem leitores/escritores ou consumidores
+operacionais confirmados. Permanecem residuais `ml_prompt_feedback` como
+historico coletado/contado ainda sem consumo de payload para selecao de prompt,
+e `commander_reference_decks`/`commander_reference_deck_cards` como raw corpus
+P3 sem leitor direto confirmado enquanto o produto le
+`commander_reference_deck_analysis`.
 
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-20 15:00 UTC no checkout `956f630e` confirmou que nao houve delta de produto desde a rodada focada `ced006f2`; so docs de Hermes mudaram. O auditor base continuou compatível (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados) e a triagem manual nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` seguem com leitura runtime nas proprias rotas e estao documentadas como historico/cache operacional, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count e policy documental de historico/retencao mas segue sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-20 11:00 UTC no checkout `2e69bb4c`: 0 imports/exports/parts locais quebrados no runtime e no controle incluindo testes, 0 imports Python locais quebrados e somente 1 SCC app restante. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
 
@@ -153,20 +170,21 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    e `edh_bracket_policy.dart` continuam excecoes intencionais por policy
    versionada/regra externa, desde que mantenham fonte, escopo e teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado em 2026-06-20 15:00 UTC no checkout `956f630e`.
-   Nao houve delta de produto desde a ultima rodada focada. `deck_matchups` e
-   `deck_weakness_reports` ja possuem leitura runtime nas proprias rotas e estao
-   documentadas como historico/cache operacional; o risco atual e baixa
-   retroalimentacao de produto, nao ausencia total de consumidor.
-   `ml_prompt_feedback` tem schema, writer runtime em `/ai/optimize`, contador
-   em `/ai/ml-status` e policy documental de historico/retencao; o risco restante
-   e usar esse payload para selecao/score de prompts. `commander_reference_decks`
-   e `commander_reference_deck_cards` seguem como raw corpus P3 sem
-   `SELECT/JOIN` direto confirmado, enquanto o produto le o agregado
+   revalidado novamente em 2026-06-21 15:00 UTC no checkout `4f538e41`.
+   Nao houve delta de produto desde a rodada focada anterior (`956f630e`).
+   `deck_matchups` e `deck_weakness_reports` ja possuem leitura runtime nas
+   proprias rotas; o risco atual e maturidade/valor do historico, nao ausencia
+   total de consumidor. `ml_prompt_feedback` tem schema, writer runtime em
+   `/ai/optimize`, contador em `/ai/ml-status` e policy documental de
+   historico/retencao; o risco restante e usar esse payload para selecao/score
+   de prompts. `commander_reference_decks` e
+   `commander_reference_deck_cards` seguem como raw corpus P3 sem `SELECT/JOIN`
+   direto confirmado, enquanto o produto le o agregado
    `commander_reference_deck_analysis`. `deck_learning_events`,
-   `commander_card_usage`, `commander_card_synergy` e
-   `commander_learning_snapshot` foram descartadas como achados por terem
-   leitores/escritores ou consumidores operacionais confirmados.
+   `commander_card_usage`, `commander_card_synergy`,
+   `commander_learning_snapshot` e `commander_learned_decks` foram descartadas
+   como achados por terem leitores/escritores ou consumidores operacionais
+   confirmados.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
    na rotacao local Codex de 2026-06-21 03:00 UTC no checkout `aeb667b2`.
    Desde a ultima rodada de classes (`6244d33b..HEAD`), somente docs Hermes
