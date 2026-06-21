@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-20 23:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-21 03:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-20)
+## Achados do audit de estrutura (atualizado 2026-06-21)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -233,17 +233,17 @@ mtgia/
   versionada com fonte, escopo e teste.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-20 03:00 UTC no checkout local `02b822c6`. O auditor textual executou
+  2026-06-21 03:00 UTC no checkout local `aeb667b2`. O auditor textual executou
   com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados),
   mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg`, leitura direta e triagem do delta. Houve delta desde a rodada anterior
-  de classes em `deck_provider.dart`, `deck_details_screen.dart`,
-  `deck_optimize_flow_support.dart`, testes focados e docs/Hermes, mas a triagem
-  das classes declaradas no Dart alterado nao gerou novo achado confiavel.
-  `LifeCounterScreen` continua legado/test-only enquanto a rota ativa usa
-  `LotusLifeCounterScreen`; `DeckCard` e `DeckProgressChip` continuam sem uso
-  runtime confirmado nas listagens; e `LotusPresentationMode` nao e
-  importado/chamado pelo Lotus.
+  de `rg` e leitura direta. Desde a ultima rodada de classes
+  (`6244d33b..HEAD`), nao houve delta em `app/lib`, `app/test`,
+  `app/integration_test`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test` nem `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; somente docs
+  Hermes mudaram. Nao surgiu novo achado confiavel. `LifeCounterScreen`
+  continua legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
+  `DeckCard` e `DeckProgressChip` continuam sem uso runtime confirmado nas
+  listagens; e `LotusPresentationMode` nao e importado/chamado pelo Lotus.
 
 ## Pipeline semantico de cartas
 

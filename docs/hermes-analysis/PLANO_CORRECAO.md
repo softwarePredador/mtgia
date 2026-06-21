@@ -4,12 +4,24 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-20 23:00 UTC
+> Data: 2026-06-21 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
 O auditor gerava muito ruído por inferir imports relativos a partir do root do repositório, então os **178 "imports quebrados" não podiam ser tratados como defeitos reais** sem revalidação por `dart analyze` ou por resolução relativa ao diretório do arquivo Dart. Esse P0 foi corrigido em `docs/hermes-analysis/scripts/structure_auditor.py`. Na rodada local de duplicacao de 2026-06-19 19:00 UTC no checkout `ced006f2`, o auditor base executou com sucesso (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados), mas voltou a inserir inventario gerado e duplicar historico manual sob o marcador do bloco gerado; essa mutacao mecanica foi revertida e os achados foram triados manualmente. A revalidacao manteve fechadas claims antigas: `basic_land_utils.dart` segue como fonte unica para basic/snow basics, `resolveOptimizeArchetype` segue centralizado em `optimize_archetype_support.dart`, e os wrappers da rota de optimize continuam delegando para helpers. Permanecem abertos os clusters de analise de estado rebuild/optimize, fallback/scoring funcional do optimize, trust social, request/log social, condition, CMC/tipo e runtime path de alguns crons/scripts Hermes. A revalidacao de tabelas PostgreSQL de 2026-06-20 15:00 UTC no checkout `956f630e` confirmou que nao houve delta de produto desde a rodada focada `ced006f2`; so docs de Hermes mudaram. O auditor base continuou compatível (`221` arquivos backend, `116` tabelas PostgreSQL textualmente referenciadas, `0` imports quebrados) e a triagem manual nao abriu novo achado P1/P2 app-facing: `deck_matchups` e `deck_weakness_reports` seguem com leitura runtime nas proprias rotas e estao documentadas como historico/cache operacional, `deck_learning_events`/`commander_card_usage`/`commander_card_synergy`/`commander_learning_snapshot` possuem leitores/escritores ou consumidores operacionais, `ml_prompt_feedback` tem DDL/writer/count e policy documental de historico/retencao mas segue sem consumidor de payload para selecao de prompt, e os raws `commander_reference_decks`/`commander_reference_deck_cards` permanecem P3 sem leitor direto. A frente aberta de aciclicidade foi revalidada em 2026-06-20 11:00 UTC no checkout `2e69bb4c`: 0 imports/exports/parts locais quebrados no runtime e no controle incluindo testes, 0 imports Python locais quebrados e somente 1 SCC app restante. A revalidacao de classes de 2026-06-20 03:00 UTC no checkout `02b822c6` executou o auditor base com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados), encontrou delta desde `ad2238a9` em provider/widgets de optimize, testes focados e docs/Hermes, mas nao abriu novo candidato confiavel alem dos quatro ja abertos. A auditoria local de semantica de cartas de 2026-06-17 05:30 UTC no checkout `6d25e447` nao encontrou delta de produto desde `e458c074`, mas atualizou a triagem de rebuild guiado e basic-land checks locais. A revalidacao de funcoes sem chamador de 2026-06-20 07:00 UTC no checkout `6244d33b` nao abriu novo achado no delta app recente; ajustou `verifySwapIntegrity` para risco mais estreito, porque o app agora valida `swap_integrity`/`deck_signature` antes do apply por IDs, mas o helper backend exportado continua sem chamador. Permanecem abertos a extracao parcial de `optimize_response_support.dart`, wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts operacionais sem consumidor confirmado e os quatro helpers legados test-only de `sync_cards_utils.dart`.
+
+A revalidacao de classes de 2026-06-21 03:00 UTC no checkout `aeb667b2`
+confirmou que `6244d33b..HEAD` alterou somente docs de Hermes no recorte
+`app/lib`, `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
+`server/bin`, `server/test` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+O auditor base continua compativel (`221` arquivos backend, `205` classes,
+`116` tabelas textualmente referenciadas, `0` imports quebrados), mas segue
+limitado a inventario textual de `server/lib`/`server/routes`; a mutacao
+mecanica do bloco gerado foi revertida. Nao houve novo candidato confiavel de
+classe sem uso. Permanecem abertos os mesmos quatro candidatos app:
+`LifeCounterScreen`, `DeckCard`, `DeckProgressChip` e
+`LotusPresentationMode`.
 
 A revalidacao de duplicacao de 2026-06-20 19:00 UTC no checkout `b372e3ce`
 confirmou que `19f589e7..HEAD` alterou somente docs de Hermes. O auditor base
@@ -132,16 +144,18 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    `commander_learning_snapshot` foram descartadas como achados por terem
    leitores/escritores ou consumidores operacionais confirmados.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-20 03:00 UTC no checkout `02b822c6`.
-   `LifeCounterScreen` segue
-   como caminho legado/test-only enquanto a rota viva usa `LotusLifeCounterScreen`;
-   `DeckCard` continua testado mas sem import/chamada na listagem real;
-   `DeckProgressChip` nao tem chamada de construtor; `LotusPresentationMode`
-   nao tem import nem chamada para `enter()`/`exit()`. Controles positivos desta
-   rodada descartaram `LotusLifeCounterScreen`, `DeckProgressIndicator`, as
-   classes privadas de `deck_details_screen.dart` e os DTOs/helpers de
-   `deck_optimize_flow_support.dart`; a varredura textual ampla nao foi usada
-   para acusar DTOs/helpers locais sem evidencia adicional.
+   na rotacao local Codex de 2026-06-21 03:00 UTC no checkout `aeb667b2`.
+   Desde a ultima rodada de classes (`6244d33b..HEAD`), somente docs Hermes
+   mudaram no recorte de produto/testes/contrato; nao houve novo candidato
+   confiavel. `LifeCounterScreen` segue como caminho legado/test-only enquanto
+   a rota viva usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
+   import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
+   construtor; `LotusPresentationMode` nao tem import nem chamada para
+   `enter()`/`exit()`. Controles positivos desta rodada preservaram
+   `LotusLifeCounterScreen`, `DeckProgressIndicator`, `_RecentDeckCard`,
+   `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`; a varredura
+   textual ampla nao foi usada para acusar DTOs/helpers locais sem evidencia
+   adicional.
 9. **P1 — Drift entre deck analysis e optimize**: **PARCIAL em 2026-06-19**.
    O caminho principal carrega `functional_tags`/`semantic_tags_v2`; deck
    analysis, validator e quality gate preservam multi-tags com precedencia
@@ -949,13 +963,15 @@ o helper backend exportado continua sem chamador. As anotações históricas de
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-20 03:00 UTC: REVALIDADO/ABERTO no checkout `02b822c6`.**
-  Desde a rodada anterior de classes (`ad2238a9..HEAD`), houve delta em
-  provider/widgets de optimize, testes focados e docs/Hermes, mas nenhum novo
-  candidato confiavel de classe sem uso foi confirmado. O auditor textual
-  executou com sucesso (`221` arquivos backend, `205` classes,
+- **Status 2026-06-21 03:00 UTC: REVALIDADO/ABERTO no checkout `aeb667b2`.**
+  Desde a ultima rodada de classes (`6244d33b..HEAD`), nao houve delta em
+  `app/lib`, `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
+  `server/bin`, `server/test` nem
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; somente docs Hermes mudaram. O
+  auditor textual executou com sucesso (`221` arquivos backend, `205` classes,
   `0` imports quebrados), mas continua limitado a inventario de
-  `server/lib`/`server/routes`.
+  `server/lib`/`server/routes`. Nenhum novo candidato confiavel de classe sem
+  uso foi confirmado.
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:284` usa
@@ -982,18 +998,11 @@ o helper backend exportado continua sem chamador. As anotações históricas de
   - `app/lib/features/home/lotus/lotus_presentation_mode.dart:4` define
     `LotusPresentationMode`, sem import nem chamada a `enter()`/`exit()` em
     `app/lib`, `app/test` ou `app/integration_test`.
-  - No delta atual, `deck_optimize_flow_support.dart` declara DTOs/helpers como
-    `OptimizePreviewData`, `OptimizeRequestOutcome`, `OptimizeApplyPlan`,
-    `OptimizePreviewSelection`, `OptimizeSwapIntegrityPayload`,
-    `GuidedRebuildRequest`, `GuidedRebuildOutcome`,
-    `AggressiveCandidateQualityDiagnostics` e `DeckAiFailurePresentation`; todos
-    possuem construcao/uso no proprio helper, nos dialogs, na sheet ou em testes
-    focados. `_DeckCardsSearchHeader` e `_OptimizationSheet` continuam chamadas
-    dentro de `deck_details_screen.dart`.
   - **Sem novo achado nesta revalidacao:** `LotusLifeCounterScreen` e
-    `DeckProgressIndicator` seguem ativos; a saida bruta do auditor para classes
-    backend e o inventario de classes em Dart alterado nao foram promovidos como
-    achado porque sao inventario textual, nao grafo de chamadas.
+    `DeckProgressIndicator` seguem ativos, assim como `_RecentDeckCard`,
+    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard` dentro das
+    suas telas/listagens. A saida bruta do auditor para classes backend nao foi
+    promovida como achado porque e inventario textual, nao grafo de chamadas.
 - **Impacto**: classes mortas ou legadas inflacionam a superficie de manutencao,
   mantem testes que podem nao proteger o runtime real e tornam ambigua a
   documentacao de gargalos ativos.
