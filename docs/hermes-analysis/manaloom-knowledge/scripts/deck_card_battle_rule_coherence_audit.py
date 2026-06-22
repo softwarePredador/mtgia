@@ -74,6 +74,7 @@ GENERIC_EFFECTS_THAT_REQUIRE_SCOPE = HIGH_RISK_GENERIC_EFFECTS | {
 }
 
 IGNORED_DISABLED_REVIEW_STATUSES = {"deprecated", "rejected"}
+LAND_ONLY_EFFECTS = {"land", "unknown"}
 
 SEVERITY_ORDER = {
     "critical": 0,
@@ -248,6 +249,16 @@ def rule_effect(rule: dict[str, Any]) -> str:
     return str((rule.get("effect_json") or {}).get("effect") or "")
 
 
+def rule_effects(rules: list[dict[str, Any]]) -> set[str]:
+    return {rule_effect(rule) or "unknown" for rule in rules}
+
+
+def is_land_only_rule_backlog(land_like: bool, rules: list[dict[str, Any]]) -> bool:
+    if not land_like or not rules:
+        return False
+    return rule_effects(rules).issubset(LAND_ONLY_EFFECTS)
+
+
 def rule_has_model_scope(rule: dict[str, Any]) -> bool:
     effect_json = rule.get("effect_json") or {}
     return bool(
@@ -259,6 +270,27 @@ def rule_has_model_scope(rule: dict[str, Any]) -> bool:
     )
 
 
+def impact_tier(land_like: bool, effects: set[str]) -> str:
+    if effects & HIGH_RISK_GENERIC_EFFECTS:
+        return "battle_critical"
+    if effects & GENERIC_EFFECTS_THAT_REQUIRE_SCOPE:
+        return "battle_support"
+    if land_like:
+        return "land_or_mana_base"
+    if "unknown" in effects:
+        return "unknown_effect"
+    return "support_or_passive"
+
+
+IMPACT_TIER_ORDER = {
+    "battle_critical": 0,
+    "battle_support": 1,
+    "support_or_passive": 2,
+    "unknown_effect": 3,
+    "land_or_mana_base": 4,
+}
+
+
 def classify_card(
     usage: DeckCardUsage,
     oracle: dict[str, Any] | None,
@@ -267,6 +299,7 @@ def classify_card(
     active = active_rules(rules)
     trusted = trusted_executable_rules(rules)
     land_like = is_land_like(usage, oracle)
+    land_only_backlog = is_land_only_rule_backlog(land_like, active)
     oracle_present = has_oracle_text(usage, oracle)
     findings: list[dict[str, str]] = []
 
@@ -298,9 +331,10 @@ def classify_card(
         )
 
     if active and not trusted:
+        severity = "medium" if land_only_backlog else "high"
         findings.append(
             {
-                "severity": "high",
+                "severity": severity,
                 "code": "no_trusted_executable_rule",
                 "detail": "Rules exist, but none are verified/active and executable.",
             }
@@ -313,9 +347,10 @@ def classify_card(
         or str(rule.get("execution_status") or "") in NON_EXECUTABLE_STATUSES
     ]
     if review_only:
+        severity = "medium" if land_only_backlog else "high"
         findings.append(
             {
-                "severity": "high",
+                "severity": severity,
                 "code": "review_only_or_needs_review_rule",
                 "detail": f"{len(review_only)} active rows are needs_review/review_only/disabled.",
             }
@@ -383,11 +418,15 @@ def classify_card(
         (finding["severity"] for finding in findings),
         key=lambda severity: SEVERITY_ORDER[severity],
     )
-    effects = sorted({rule_effect(rule) or "unknown" for rule in active})
+    effects_set = rule_effects(active)
+    effects = sorted(effects_set)
+    impact = impact_tier(land_like, effects_set)
     return {
         "card_name": usage.display_name,
         "normalized_name": usage.normalized_name,
         "severity": worst,
+        "impact_tier": impact,
+        "impact_rank": IMPACT_TIER_ORDER[impact],
         "priority_score": priority_score(worst, usage),
         "deck_count": usage.deck_count,
         "deck_ids": usage.deck_ids[:25],
@@ -430,6 +469,7 @@ def build_report(conn: sqlite3.Connection) -> dict[str, Any]:
     cards.sort(
         key=lambda card: (
             SEVERITY_ORDER[card["severity"]],
+            int(card["impact_rank"]),
             -int(card["priority_score"]),
             str(card["card_name"]).lower(),
         )
@@ -485,15 +525,15 @@ def markdown_report(report: dict[str, Any], limit: int) -> str:
             "",
             f"## Top {len(actionable)} Actionable Cards",
             "",
-            "| Severity | Priority | Card | Decks | Qty | Findings | Effects |",
-            "| --- | ---: | --- | ---: | ---: | --- | --- |",
+            "| Severity | Impact | Priority | Card | Decks | Qty | Findings | Effects |",
+            "| --- | --- | ---: | --- | ---: | ---: | --- | --- |",
         ]
     )
     for card in actionable:
         findings = ", ".join(f"`{item['code']}`" for item in card["findings"] if item["severity"] != "pass")
         effects = ", ".join(f"`{effect}`" for effect in card["effects"]) or "-"
         lines.append(
-            f"| `{card['severity']}` | {card['priority_score']} | `{card['card_name']}` | "
+            f"| `{card['severity']}` | `{card['impact_tier']}` | {card['priority_score']} | `{card['card_name']}` | "
             f"{card['deck_count']} | {card['total_quantity']} | {findings} | {effects} |"
         )
 

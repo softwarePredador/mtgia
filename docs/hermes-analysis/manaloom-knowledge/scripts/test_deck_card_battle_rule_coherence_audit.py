@@ -194,6 +194,36 @@ class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
             {finding["code"] for finding in card["findings"]},
         )
 
+    def test_land_only_review_backlog_is_medium(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                create_schema(conn)
+                insert_deck_card(
+                    conn,
+                    "Arid Mesa",
+                    oracle_text="{T}, Pay 1 life, Sacrifice Arid Mesa: Search your library...",
+                    type_line="Land",
+                )
+                insert_rule(
+                    conn,
+                    "Arid Mesa",
+                    {"effect": "land"},
+                    review_status="needs_review",
+                    execution_status="review_only",
+                    oracle_hash=None,
+                )
+                report = audit.build_report(conn)
+
+        card = report["cards"][0]
+        self.assertEqual(card["severity"], "medium")
+        self.assertEqual(card["impact_tier"], "land_or_mana_base")
+        self.assertIn(
+            "review_only_or_needs_review_rule",
+            {finding["code"] for finding in card["findings"]},
+        )
+
     def test_nonland_without_rule_is_high_but_basic_land_is_medium(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             db = Path(tmpdir) / "knowledge.db"

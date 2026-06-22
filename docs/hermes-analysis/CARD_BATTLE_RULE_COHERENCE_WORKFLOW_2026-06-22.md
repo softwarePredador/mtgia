@@ -32,15 +32,15 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_co
 Latest baseline report from this setup:
 
 - JSON:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_183944.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_184733.json`
 - Markdown:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_183944.md`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_184733.md`
 
 Initial result:
 
 - Distinct deck cards audited: `145`.
-- `high=134`.
-- `medium=3`.
+- `high=97`.
+- `medium=40`.
 - `pass=8`.
 
 Top finding families:
@@ -49,9 +49,15 @@ Top finding families:
 - `trusted_rule_without_oracle_hash`: `99`.
 - `generic_effect_without_model_scope`: `43`.
 
-This does not mean all 134 cards are broken at runtime. It means they are not
-yet clean enough to be considered One Ring-level trusted for deck generation and
-battle learning.
+This does not mean all actionable cards are broken at runtime. It means they
+are not yet clean enough to be considered One Ring-level trusted for deck
+generation and battle learning.
+
+The 18:47 UTC review adjusted the queue shape: land-only `needs_review` /
+`review_only` rows now remain actionable but move to `medium` and
+`impact_tier=land_or_mana_base`, so battle-critical effects such as wipe,
+protection, tutor, draw, copy, counter, silence, recursion, and wincon are
+worked first.
 
 ## Required Card Gate
 
@@ -80,12 +86,15 @@ A deck card is not coherent until all applicable checks are true:
 Process the queue in this order:
 
 1. `critical` cards first, if any.
-2. `high` cards that appear in multiple decks or are commanders.
+2. `high` cards with `impact_tier=battle_critical`, especially cards that
+   appear in multiple decks or are commanders.
 3. `high` cards with effects that directly change battle outcomes:
    protection, counter, silence, board wipe, copy spell, tutor, wheel, draw
    engine, extra turn, recursion, wincon, attack tax/limit, removal.
-4. Lands with only generic land modeling after higher-risk spells are clean.
+4. `high` cards with `impact_tier=battle_support`, especially mana acceleration
+   that changes turn timing.
 5. `medium` findings such as trusted rows missing oracle hash.
+6. Lands with only generic land modeling after higher-risk spells are clean.
 
 ## One Ring Standard
 
@@ -119,10 +128,10 @@ Leia obrigatoriamente:
 - docs/hermes-analysis/POSTGRES_DEPLOY_REGISTER_2026-06-20.md
 - docs/hermes-analysis/LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md
 
-Comece rodando:
+Comece validando a fonte de dados: confirme que o snapshot SQLite/Hermes usado pelo auditor foi sincronizado a partir do PostgreSQL mais recente, ou gere novo sync antes de concluir qualquer carta. Em caso de divergência, PostgreSQL vence. Depois rode:
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db --limit 200
 
-Use o relatório gerado como fila de trabalho. Para cada carta, em prioridade critical > high > medium:
+Use o relatório gerado como fila de trabalho. Para cada carta, em prioridade critical > high/battle_critical > high/battle_support > medium:
 1. Leia oracle/type/faces e regras já existentes em card_battle_rules/SQLite/Hermes.
 2. Compare a regra atual com a intenção real da carta; marque qualquer inferência como inferência.
 3. Se houver regra genérica, needs_review/review_only, shadow row ou ausência de battle_model_scope, corrija com regra específica e teste focado.

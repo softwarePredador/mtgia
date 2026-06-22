@@ -13905,3 +13905,61 @@ Current interpretation:
   inputs for battle learning and deck generation.
 - Future card promotion must close this queue with PostgreSQL package evidence,
   SQLite sync, tests, replay/events when battle-relevant, and living-doc updates.
+
+## Deck Card Battle Rule Coherence Gate Review - 2026-06-22 18:47 UTC
+
+Reviewed/adjusted gate logic:
+
+- The initial gate was safe but over-prioritized land-only
+  `needs_review`/`review_only` rows as `high`, putting generic land backlog in
+  the same queue tier as battle-changing effects such as `copy_spell`,
+  `board_wipe`, `draw_engine`, `counter`, `silence_opponents`, and `tutor`.
+- The auditor now keeps land-only backlog actionable as `medium` with
+  `impact_tier=land_or_mana_base`, while battle-changing effects sort first as
+  `impact_tier=battle_critical` or `battle_support`.
+- This is a queue/prioritization correction only. It did not promote a card,
+  did not change PostgreSQL, and did not mark any rule as trusted.
+
+Evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py` passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py` passed with `Ran 5 tests`.
+- New baseline command:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --limit 200
+```
+
+Generated reviewed baseline:
+
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_184733.json`.
+- Markdown:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_184733.md`.
+
+Reviewed baseline result:
+
+- Distinct deck cards audited: `145`.
+- `high=97`, `medium=40`, `pass=8`.
+- Top finding families remain:
+  - `review_only_or_needs_review_rule=133`.
+  - `trusted_rule_without_oracle_hash=99`.
+  - `generic_effect_without_model_scope=43`.
+- Top cards now start with battle-critical effects: `Austere Command`,
+  `Blasphemous Act`, `Boros Charm`, `Deflecting Swat`,
+  `Flawless Maneuver`, `Land Tax`, `Lightning Greaves`,
+  `Lorehold, the Historian`, `Past in Flames`, `Path to Exile`,
+  `Reverberate`, `Sensei's Divining Top`, `Swords to Plowshares`,
+  `Teferi's Protection`, `Valakut Awakening // Valakut Stoneforge`, and
+  `Wheel of Fortune`.
+
+Current interpretation:
+
+- The workflow is coherent as a conservative card-by-card gate, with the
+  corrected queue priority.
+- The remaining caveat is intentional: this auditor reads Hermes SQLite
+  `deck_cards`/`battle_card_rules` as the local queue surface. Any durable fix
+  still must be sourced from PostgreSQL, applied through precheck/apply/
+  postcheck/rollback evidence, then synced back into SQLite/Hermes.
