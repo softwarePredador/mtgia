@@ -147,7 +147,7 @@ mtgia/
 - Quality gate: `scripts/quality_gate.sh` (quick/full/resolution)
 - Testes de integracao: opt-in via `RUN_INTEGRATION_TESTS=1`
 
-## Achados do audit de estrutura (atualizado 2026-06-21)
+## Achados do audit de estrutura (atualizado 2026-06-22)
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
@@ -175,17 +175,19 @@ mtgia/
   os blocos de seleção de candidatos, fallback/recovery estrutural e
   orquestração remanescente da rota.
 - **P1/P2 — Coerencia app-facing de IA/deck revalidada no checkout local**:
-  status 2026-06-20 23:00 UTC no checkout `7857d7ef`. Nao houve delta de
+  status 2026-06-22 23:00 UTC no checkout `75662e64`. Nao houve delta de
   produto/contrato em `app/lib`, `server/lib`, `server/routes` ou
-  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` desde a ultima rodada deste foco.
+  `server/doc/API_CONTRACTS_AND_DATA_MAP.md` desde as ultimas rodadas deste foco.
   Ownership em `POST /ai/optimize`, `/ai/archetypes`, jobs async, activation
   telemetry e `/ai/commander-learning` permanecem saneados. O runtime de
   `swap_integrity` esta coerente entre backend e app: a rota de optimize emite o
   payload e o app valida hash/`deck_signature` antes de aplicar swaps por ID.
   Residual P2: `server/doc/API_CONTRACTS_AND_DATA_MAP.md` ainda nao documenta
   `swap_integrity`/`deck_signature` como campo opcional/aditivo de
-  `/ai/optimize`. Testes/analyze backend focados verdes; testes app focados
-  seguem bloqueados localmente sem `app/.dart_tool/package_config.json`.
+  `/ai/optimize`. Auditor base compativel (`221` arquivos backend,
+  `0` imports quebrados), analyze/testes backend focados verdes; testes app
+  focados seguem bloqueados localmente sem
+  `app/.dart_tool/package_config.json`.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em
   2026-06-22 19:00 UTC no checkout `4acd0a0c`. Nao houve delta de produto desde
   a ultima rodada focada de duplicacao; somente docs de Hermes mudaram.

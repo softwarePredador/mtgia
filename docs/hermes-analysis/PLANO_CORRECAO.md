@@ -4,10 +4,23 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-22 19:00 UTC
+> Data: 2026-06-22 23:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao de coerencia app/server de 2026-06-22 23:00 UTC no checkout
+`75662e64` confirmou que desde os baselines recentes deste foco (`7857d7ef`,
+`19f589e7` e `02b822c6`) nao houve delta de produto/API no recorte `app/lib`,
+`server/lib`, `server/routes` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. O
+auditor base continuou compativel (`221` arquivos backend, `205` classes,
+`116` tabelas textualmente referenciadas, `0` imports quebrados) e a mutacao
+mecanica de inventario foi revertida. Backend analyze e testes focados passaram.
+Ownership de `/ai/optimize`, activation telemetry e `/ai/commander-learning`
+continuam saneados. O residual P2 permanece estritamente documental:
+`swap_integrity`/`deck_signature` e emitido pela rota e consumido pelo app antes
+do apply por IDs, mas ainda nao aparece em
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
 
 A revalidacao de duplicacao de 2026-06-22 19:00 UTC no checkout `4acd0a0c`
 confirmou que desde o ultimo commit de duplicacao (`7857d7ef`) e desde o
@@ -107,6 +120,15 @@ achado vivo permanece o mesmo residual P2: `swap_integrity`/`deck_signature`
 segue emitido e consumido no fluxo app/backend, mas ainda nao esta listado no
 API contract map. Backend analyze/test focado passou; testes app continuam
 bloqueados pela ausencia de `app/.dart_tool/package_config.json`.
+
+A revalidacao de coerencia app/server de 2026-06-22 23:00 UTC no checkout
+`75662e64` preservou esse estado: os diffs focados desde `7857d7ef`,
+`19f589e7` e `02b822c6` ficaram vazios para `app/lib`, `server/lib`,
+`server/routes` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; o backend segue
+emitindo `swap_integrity`, o app segue validando hash/`deck_signature` e
+bloqueando apply stale, e o API map segue sem `swap_integrity`/`deck_signature`.
+Backend analyze/test focado passou; testes app continuam bloqueados pela
+ausencia de `app/.dart_tool/package_config.json`.
 
 A revalidacao local de semantica de cartas de 2026-06-19 05:30 UTC no checkout
 `708541a5` encontrou delta amplo de produto desde a rodada anterior, mas fechou
@@ -804,19 +826,21 @@ continuam válidas apenas para os demais helpers abaixo.
   - busca por simbolo encontra chamador runtime ou nenhum simbolo residual.
 
 ### P1/P2 — Alinhar contratos app-facing entre `app/lib`, rotas e helpers
-- **Status 2026-06-20 23:00 UTC:** PARCIAL no checkout local `7857d7ef`.
+- **Status 2026-06-22 23:00 UTC:** PARCIAL no checkout local `75662e64`.
   Os tres gaps estreitos revalidados em `523589bc` continuam resolvidos:
   ownership de optimize/archetypes/jobs async, activation telemetry,
   `/ai/commander-learning` documentado e auth-only de learned deck availability.
-  Nao houve delta de produto/contrato desde a ultima rodada deste foco; o
+  Nao houve delta de produto/contrato desde os baselines recentes deste foco
+  (`7857d7ef`, `19f589e7` e `02b822c6`); o
   residual P2 continua sendo o contrato documental de `swap_integrity`: o
   runtime app/backend esta alinhado, mas o API contract map nao lista esse campo
   app-facing agora consumido pelo app.
 - **Evidencia atualizada**:
   - O app envia `POST /ai/optimize` em
     `app/lib/features/decks/providers/deck_provider_support_ai.dart:56`. A rota
-    exige usuario autenticado em `server/routes/ai/optimize/index.dart:479`-`:480`
-    e passa `authenticatedUserId` para `loadOptimizeDeckContext` em `:560`-`:575`.
+    exige usuario autenticado em `server/routes/ai/optimize/index.dart:438`-`:441`,
+    verifica acesso async em `:453`-`:459` e passa `authenticatedUserId` para
+    `loadOptimizeDeckContext` em `:523`-`:527`.
     O helper consulta `decks` por `id + user_id` em
     `server/lib/ai/optimize_request_support.dart:64`-`:84`.
   - O contexto principal de optimize carrega `$semanticV2Select` e
@@ -829,7 +853,8 @@ continuam válidas apenas para os demais helpers abaixo.
     serializa `version`, `algo`, `hash`, `deck_signature`, `removal_count` e
     `addition_count`. O app parseia/valida o mesmo payload em
     `app/lib/features/decks/widgets/deck_optimize_flow_support.dart:341`-`:344`
-    e `:486`-`:517`, e bloqueia deck stale em
+    e `:486`-`:517`, propaga `expectedDeckSignature` em `:802`-`:838` e
+    bloqueia deck stale em
     `app/lib/features/decks/providers/deck_provider.dart:927`-`:935`.
     `server/doc/API_CONTRACTS_AND_DATA_MAP.md:165` documenta
     `POST /ai/optimize`, mas nao contem `swap_integrity` nem `deck_signature`.
@@ -876,15 +901,17 @@ continuam válidas apenas para os demais helpers abaixo.
     preserva `/ai/commander-learning` como rota explicita de learned decks.
   - Revalidacao 2026-06-20 23:00 UTC: `git diff --name-status 02b822c6..HEAD -- app/lib server/lib server/routes server/doc/API_CONTRACTS_AND_DATA_MAP.md`
     nao retornou arquivos; somente docs Hermes mudaram no recorte auditado.
+  - Revalidacao 2026-06-22 23:00 UTC: `git diff --name-status 7857d7ef..HEAD -- app/lib server/lib server/routes server/doc/API_CONTRACTS_AND_DATA_MAP.md`,
+    `git diff --name-status 19f589e7..HEAD -- app/lib server/lib server/routes server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+    e `git diff --name-status 02b822c6..HEAD -- app/lib server/lib server/routes server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+    nao retornaram arquivos.
   - `cd server && dart analyze lib/ai/optimization_functional_roles.dart lib/ai/optimization_quality_gate.dart lib/edh_bracket_policy.dart lib/ai/optimize_swap_integrity.dart routes/ai/optimize/index.dart`
-    retornou `No issues found!`. As suites focadas de optimize/quality/bracket,
-    `activation_events_contract_test.dart`, `ai_generate_learning_boundary_test.dart`,
-    `api_contracts_data_map_guard_test.dart` e
-    `commander_learned_deck_support_test.dart` passaram.
-  - Limite local: `cd app && flutter test --no-pub ...` nao executou testes
-    porque `app/.dart_tool/package_config.json` esta ausente; `app/pubspec.yaml`
-    declara `flutter_test`, mas sem package config o runner nao resolveu a
-    dependencia.
+    retornou `No issues found!`.
+  - `cd server && dart test test/activation_events_contract_test.dart test/ai_generate_learning_boundary_test.dart test/api_contracts_data_map_guard_test.dart test/commander_learned_deck_support_test.dart -r expanded`
+    retornou `All tests passed!`.
+  - Limite local: `app/.dart_tool/package_config.json` esta ausente; testes
+    Flutter `--no-pub` nao foram executados nesta rodada. O package config do
+    server existe.
 - **Impacto**: o risco de acesso cross-owner nos fluxos principais de optimize
   continua removido, e a protecao runtime de `swap_integrity` esta coerente. O
   risco atual e documental: consumidores e agentes podem nao saber que
