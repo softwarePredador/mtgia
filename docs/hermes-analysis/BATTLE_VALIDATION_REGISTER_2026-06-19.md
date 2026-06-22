@@ -13854,3 +13854,54 @@ Register reading:
 - The remaining result is strategic, not a battle gate blocker.
 - Variant 01 can be used as a clean rejected candidate in future deck-learning
   comparisons.
+
+## Deck Card Battle Rule Coherence Gate - 2026-06-22 18:39 UTC
+
+New gate:
+
+- Added a deck-card-wide battle-rule coherence auditor:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`.
+- Added focused tests:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`.
+- Added workflow/goal contract:
+  `docs/hermes-analysis/CARD_BATTLE_RULE_COHERENCE_WORKFLOW_2026-06-22.md`.
+
+Purpose:
+
+- Apply the PG025 `The One Ring` / `Orim's Chant` care level to every card that
+  appears in `deck_cards`.
+- Detect cards that look covered but still have broad/generic semantics,
+  lingering `needs_review` rows, missing oracle hash, missing active rules, or
+  non-executable review-only rules.
+
+Read-only baseline command:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py \
+  --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db \
+  --limit 120
+```
+
+Generated baseline:
+
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_183944.json`.
+- Markdown:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_183944.md`.
+
+Baseline result:
+
+- Distinct deck cards audited: `145`.
+- `high=134`, `medium=3`, `pass=8`.
+- Top finding families:
+  - `review_only_or_needs_review_rule=133`.
+  - `trusted_rule_without_oracle_hash=99`.
+  - `generic_effect_without_model_scope=43`.
+
+Current interpretation:
+
+- This does not prove all high cards are broken in current battle runtime.
+- It proves they are not clean enough to be treated as One Ring-level coherent
+  inputs for battle learning and deck generation.
+- Future card promotion must close this queue with PostgreSQL package evidence,
+  SQLite sync, tests, replay/events when battle-relevant, and living-doc updates.
