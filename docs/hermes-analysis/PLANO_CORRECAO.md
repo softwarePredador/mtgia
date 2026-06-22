@@ -4,13 +4,13 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-21 15:00 UTC
+> Data: 2026-06-22 15:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
 
-A revalidacao de tabelas PostgreSQL de 2026-06-21 15:00 UTC no checkout
-`4f538e41` confirmou que desde a ultima rodada focada (`956f630e`) nao houve
+A revalidacao de tabelas PostgreSQL de 2026-06-22 15:00 UTC no checkout
+`2c5c0ab2` confirmou que desde a ultima rodada focada (`4f538e41`) nao houve
 delta de produto em `app/lib`, `server/lib`, `server/routes`, `server/bin`,
 `server/test`, `server/database_setup.sql` nem no API contract map; somente docs
 Hermes mudaram. O auditor base continuou compativel (`221` arquivos backend,
@@ -170,8 +170,8 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    e `edh_bracket_policy.dart` continuam excecoes intencionais por policy
    versionada/regra externa, desde que mantenham fonte, escopo e teste dedicado.
 7. **P2/P3 — Tabelas PostgreSQL write-only ou parcialmente consumidas**:
-   revalidado novamente em 2026-06-21 15:00 UTC no checkout `4f538e41`.
-   Nao houve delta de produto desde a rodada focada anterior (`956f630e`).
+   revalidado novamente em 2026-06-22 15:00 UTC no checkout `2c5c0ab2`.
+   Nao houve delta de produto desde a rodada focada anterior (`4f538e41`).
    `deck_matchups` e `deck_weakness_reports` ja possuem leitura runtime nas
    proprias rotas; o risco atual e maturidade/valor do historico, nao ausencia
    total de consumidor. `ml_prompt_feedback` tem schema, writer runtime em
@@ -895,8 +895,8 @@ continuam válidas apenas para os demais helpers abaixo.
     `cd app && flutter test --no-pub test/features/decks/widgets/deck_optimize_flow_support_test.dart test/features/decks/providers/deck_provider_test.dart`.
 
 ### P2/P3 — Decidir destino de tabelas PostgreSQL persistidas sem consumidor claro
-- **Status 2026-06-20 15:00 UTC: REVALIDADO no checkout `956f630e`.**
-  Nao houve delta de produto desde a rodada focada `ced006f2`; o delta ate esta
+- **Status 2026-06-22 15:00 UTC: REVALIDADO no checkout `2c5c0ab2`.**
+  Nao houve delta de produto desde a rodada focada `4f538e41`; o delta ate esta
   rodada ficou restrito a docs de Hermes. A nova execucao local do auditor base
   foi compativel (`221` arquivos backend, `116` tabelas PostgreSQL textualmente
   referenciadas, `0` imports quebrados), mas ele segue textual e limitado a

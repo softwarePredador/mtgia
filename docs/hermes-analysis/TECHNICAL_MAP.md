@@ -319,8 +319,8 @@ deve convergir para o server/helper compartilhado.
   e `buildCandidateQualitySamplePoolSql` nao foram reabertas; os tres ultimos
   nem aparecem mais no checkout atual.
 - **P2/P3 — Tabelas PostgreSQL persistidas sem consumidor claro**: revalidado
-  novamente em 2026-06-21 15:00 UTC no checkout `4f538e41`. Desde a rodada
-  focada anterior (`956f630e`), nao houve delta de produto no recorte
+  novamente em 2026-06-22 15:00 UTC no checkout `2c5c0ab2`. Desde a rodada
+  focada anterior (`4f538e41`), nao houve delta de produto no recorte
   `app/lib`, `server/lib`, `server/routes`, `server/bin`, `server/test`,
   `server/database_setup.sql` ou `server/doc/API_CONTRACTS_AND_DATA_MAP.md`;
   somente docs Hermes mudaram. `deck_matchups` e `deck_weakness_reports` seguem
