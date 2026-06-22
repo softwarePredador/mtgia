@@ -187,7 +187,7 @@ mtgia/
   `/ai/optimize`. Testes/analyze backend focados verdes; testes app focados
   seguem bloqueados localmente sem `app/.dart_tool/package_config.json`.
 - **P1/P2 — Helpers duplicados com risco de drift**: revalidado novamente em
-  2026-06-20 19:00 UTC no checkout `b372e3ce`. Nao houve delta de produto desde
+  2026-06-22 19:00 UTC no checkout `4acd0a0c`. Nao houve delta de produto desde
   a ultima rodada focada de duplicacao; somente docs de Hermes mudaram.
   `resolveOptimizeArchetype` segue canonico em
   `optimize_archetype_support.dart`; roles estrategicos em

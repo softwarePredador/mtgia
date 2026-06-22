@@ -4,10 +4,25 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-22 15:00 UTC
+> Data: 2026-06-22 19:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao de duplicacao de 2026-06-22 19:00 UTC no checkout `4acd0a0c`
+confirmou que desde o ultimo commit de duplicacao (`7857d7ef`) e desde o
+baseline citado na rodada anterior (`b372e3ce`) nao houve delta de produto no
+recorte `app/lib`, `app/test`, `app/integration_test`, `server/lib`,
+`server/routes`, `server/bin`, `server/test`, `server/database_setup.sql` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`; somente docs Hermes mudaram. O
+auditor base continuou compativel (`221` arquivos backend, `205` classes,
+`116` tabelas textualmente referenciadas, `0` imports quebrados) e sua mutacao
+mecanica de inventario foi revertida. Nao foi aberto novo cluster: permanecem
+os mesmos pontos vivos de analise de estado rebuild/optimize, fallback/scoring
+funcional do optimize, trust social, request/log social, `condition`, CMC/tipo
+e runtime path em scripts Hermes/ops. Claims antigas de basic/snow basic lands,
+`resolveOptimizeArchetype`, `sync_cards_utils.dart` no caminho principal e
+exporter Hermes duplicado continuam stale/resolvidas.
 
 A revalidacao de tabelas PostgreSQL de 2026-06-22 15:00 UTC no checkout
 `2c5c0ab2` confirmou que desde a ultima rodada focada (`4f538e41`) nao houve
@@ -53,14 +68,15 @@ classe sem uso. Permanecem abertos os mesmos quatro candidatos app:
 `LifeCounterScreen`, `DeckCard`, `DeckProgressChip` e
 `LotusPresentationMode`.
 
-A revalidacao de duplicacao de 2026-06-20 19:00 UTC no checkout `b372e3ce`
-confirmou que `19f589e7..HEAD` alterou somente docs de Hermes. O auditor base
-continua compativel (`221` arquivos backend, `205` classes, `116` tabelas
-textualmente referenciadas, `0` imports quebrados), mas sua lista de problemas
-segue textual e foi revertida antes de registrar os achados manuais. Nao houve
-novo cluster de duplicacao; seguem abertos os mesmos pontos: analise de estado
-rebuild/optimize, fallback/scoring funcional do optimize, trust social,
-request/log social, condition, CMC/tipo e runtime path em scripts Hermes/ops.
+A revalidacao de duplicacao de 2026-06-22 19:00 UTC no checkout `4acd0a0c`
+confirmou novamente que nao houve delta de produto desde a ultima rodada deste
+foco. O auditor base continua compativel (`221` arquivos backend, `205`
+classes, `116` tabelas textualmente referenciadas, `0` imports quebrados), mas
+sua lista de problemas segue textual e a mutacao mecanica foi revertida antes
+de registrar os achados manuais. Nao houve novo cluster de duplicacao; seguem
+abertos os mesmos pontos: analise de estado rebuild/optimize, fallback/scoring
+funcional do optimize, trust social, request/log social, condition, CMC/tipo e
+runtime path em scripts Hermes/ops.
 
 A revalidacao de coerencia app/server de 2026-06-18 23:00 UTC no checkout
 `523589bc` fechou os tres gaps estreitos da rodada anterior:
@@ -130,7 +146,7 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    `server/routes/ai/optimize/index.dart` (~2498 linhas) reduziram, mas seguem
    como gargalos de manutenção.
 3. **P1 — Duplicação de helpers e lógica espalhada**: revalidada novamente em
-   2026-06-20 19:00 UTC no checkout `b372e3ce`. Nao houve delta de produto
+   2026-06-22 19:00 UTC no checkout `4acd0a0c`. Nao houve delta de produto
    desde a ultima rodada focada de duplicacao. `resolveOptimizeArchetype`,
    strategic roles em
    `functional_card_tags.dart`, o sync principal de cartas e o exporter Hermes
@@ -313,7 +329,7 @@ Histórico do problema:
   - diff estrutural mostrando redução de linhas na rota principal.
 
 ### P1 — Consolidar helpers duplicados que indicam drift funcional
-- **Status 2026-06-20 19:00 UTC: PARCIAL no checkout `b372e3ce`.**
+- **Status 2026-06-22 19:00 UTC: PARCIAL no checkout `4acd0a0c`.**
   Nao houve delta de produto desde a rodada focada anterior; a revalidacao
   confirmou os mesmos clusters abertos e manteve stale as claims antigas
   saneadas.
