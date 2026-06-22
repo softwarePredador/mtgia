@@ -31,9 +31,20 @@ battle_spec.loader.exec_module(battle)
 
 def test_supported_effects_cover_live_engine_handlers():
     assert "add_mana" in audit.SUPPORTED_EFFECTS
+    assert "aetherflux_lifegain" in audit.SUPPORTED_EFFECTS
+    assert "aetherflux_reservoir" in audit.SUPPORTED_EFFECTS
+    assert "attack_limit" in audit.SUPPORTED_EFFECTS
+    assert "attack_tax" in audit.SUPPORTED_EFFECTS
+    assert "brain_freeze" in audit.SUPPORTED_EFFECTS
+    assert "cannot_lose_turn" in audit.SUPPORTED_EFFECTS
     assert "composite_resolution" in audit.SUPPORTED_EFFECTS
+    assert "damage_player_and_creatures" in audit.SUPPORTED_EFFECTS
+    assert "damage_wipe_treasure" in audit.SUPPORTED_EFFECTS
     assert "hand_filter" in audit.SUPPORTED_EFFECTS
     assert "copy_creature_token" in audit.SUPPORTED_EFFECTS
+    assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
+    assert "redistribute_life_totals" in audit.SUPPORTED_EFFECTS
+    assert "thassa_oracle" in audit.SUPPORTED_EFFECTS
 
 
 def test_rise_of_the_eldrazi_uses_composite_oracle_runtime():
@@ -717,6 +728,54 @@ def test_forensic_reconciles_front_face_event_by_logical_rule_key():
     assert summary["semantic_hash_missing_unaccepted"] == 0
 
 
+def test_forensic_accepts_brainstone_first_draw_miracle_candidate():
+    events = [
+        {
+            "event": "miracle_cast",
+            "card": "Approach of the Second Sun",
+            "effect": "approach",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "rule_logical_key": "battle_rule_v1:approach-test",
+            "lorehold_on_board": True,
+            "cards_drawn_this_turn": 3,
+            "source": "brainstone_first_draw",
+            "first_draw_miracle_candidate": True,
+            "turn": 8,
+        }
+    ]
+
+    findings, summary = audit.audit_rule_provenance(events, {})
+
+    assert findings == []
+    assert summary["by_effect"]["approach"] == 1
+
+
+def test_forensic_blocks_non_first_draw_miracle_without_brainstone_marker():
+    events = [
+        {
+            "event": "miracle_cast",
+            "card": "Faithless Looting",
+            "effect": "draw_cards",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "rule_logical_key": "battle_rule_v1:looting-test",
+            "lorehold_on_board": True,
+            "cards_drawn_this_turn": 3,
+            "source": "lorehold_opponent_upkeep_rummage",
+            "turn": 8,
+        }
+    ]
+
+    findings, _summary = audit.audit_rule_provenance(events, {})
+
+    assert any(
+        finding.get("severity") == "critical"
+        and "first real draw" in finding.get("finding", "")
+        for finding in findings
+    )
+
+
 def test_forensic_keeps_unaccepted_lineage_missing_visible():
     events = [
         {
@@ -774,6 +833,8 @@ if __name__ == "__main__":
         test_oracle_normalized_creature_bounce_marks_effect_override,
         test_forensic_accepts_explicit_oracle_effect_normalization,
         test_forensic_reconciles_front_face_event_by_logical_rule_key,
+        test_forensic_accepts_brainstone_first_draw_miracle_candidate,
+        test_forensic_blocks_non_first_draw_miracle_without_brainstone_marker,
         test_forensic_keeps_unaccepted_lineage_missing_visible,
     ]
     for test in tests:

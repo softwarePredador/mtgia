@@ -1,0 +1,16 @@
+{
+  "apply": true,
+  "canonical_snapshot_rows_exported": 3201,
+  "curated_rows": 105,
+  "deleted_stale_manual_rows": 17,
+  "deleted_stale_reviewed_rows": 1,
+  "export_canonical_fallback_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "generated_rows": 0,
+  "input_rows": 122,
+  "inserted_or_updated": 122,
+  "manual_rows": 17,
+  "oracle_normalized_rows": 0,
+  "reviewed_rules_json": "docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json",
+  "skipped_lower_priority": 0,
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+}

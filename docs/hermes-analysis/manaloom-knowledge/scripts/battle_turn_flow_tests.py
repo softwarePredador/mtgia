@@ -444,6 +444,39 @@ def register_tests(battle, player, card):
         assert evaluation["reason"].startswith("early_card_flow:Faithless Looting")
         assert evaluation["off_color_early_count"] == 0
 
+    def test_mulligan_treats_fetch_land_as_opening_color_fixing():
+        hand = [
+            {"name": "Bloodstained Mire", "cmc": 0, "type_line": "Land"},
+            {"name": "Urza's Saga", "cmc": 0, "type_line": "Enchantment Land"},
+            {
+                "name": "Esper Sentinel",
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "type_line": "Artifact Creature",
+                "effect": "draw_engine",
+            },
+            {
+                "name": "Land Tax",
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "type_line": "Enchantment",
+                "effect": "passive",
+            },
+            {
+                "name": "Ghostly Prison",
+                "cmc": 3,
+                "mana_cost": "{2}{W}",
+                "type_line": "Enchantment",
+                "effect": "attack_tax",
+            },
+        ]
+
+        evaluation = battle.mulligan_evaluation(hand)
+
+        assert evaluation["keep"] is True
+        assert evaluation["reason"].startswith("early_card_flow:Esper Sentinel")
+        assert "off_color_early_hand" not in evaluation["risk_flags"]
+
     def test_mulligan_rejects_five_lands_with_only_reactive_spell():
         hand = [
             {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains"},
@@ -569,6 +602,7 @@ def register_tests(battle, player, card):
         test_mulligan_keeps_three_lands_with_card_flow_even_with_expensive_cluster,
         test_mulligan_rejects_off_color_early_hand_without_fixing,
         test_mulligan_keeps_off_color_early_hand_when_wildcard_fixing_exists,
+        test_mulligan_treats_fetch_land_as_opening_color_fixing,
         test_mulligan_rejects_five_lands_with_only_reactive_spell,
         test_mulligan_rejects_dead_mox_amber_hand_without_live_legend,
         test_mulligan_bottoms_expensive_cards_before_lands_and_early_play,

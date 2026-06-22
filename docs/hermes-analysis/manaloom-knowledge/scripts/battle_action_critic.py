@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter, defaultdict, deque
 from pathlib import Path
 from typing import Any
@@ -65,6 +66,16 @@ CARD_ACTION_EVENTS = {
 
 TARGETED_REMOVAL_EFFECTS = {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg"}
 
+NO_MAX_HAND_SIZE_PERMANENTS = {
+    "decanter of endless water",
+    "library of leng",
+    "reliquary tower",
+    "spellbook",
+    "thought vessel",
+    "venser's journal",
+    "wizard class",
+}
+
 DECISION_ACTION_EVENTS = {
     "commander_cast",
     "creature_cast",
@@ -96,9 +107,17 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "follow-up adventure creature cast represented in stack/cast context and human replay.",
     ),
+    "aetherflux_reservoir_resolved": (
+        "strategy_signal",
+        "Aetherflux Reservoir permanent resolution is engine context for later spell-cast lifegain.",
+    ),
     "attachment_sba": (
         "ignored_with_reason",
         "state-based attachment cleanup; legality is checked by the SBA helper.",
+    ),
+    "attack_prevented_by_orims_chant": (
+        "strategy_signal",
+        "kicked Orim's Chant prevented creatures from being declared as attackers.",
     ),
     "battle_back_face_cast": (
         "strategy_signal",
@@ -136,6 +155,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "renderer_only",
         "token creation is rendered as state evidence, not a decision/action verdict.",
     ),
+    "copy_spell_no_stack_target": (
+        "ignored_with_reason",
+        "copy-spell card had no legal stack target and intentionally resolved without creating a fake engine.",
+    ),
     "counters_cancelled": (
         "ignored_with_reason",
         "state-based counter cleanup; not a player decision action.",
@@ -147,6 +170,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "damage_resolved": (
         "renderer_only",
         "life-change explanation for human replay continuity.",
+    ),
+    "damage_wipe_treasure_resolved": (
+        "strategy_signal",
+        "variable damage wipe plus treasure creation result is consumed by replay and strategy checks.",
     ),
     "draw_cards_resolved": (
         "strategy_signal",
@@ -248,6 +275,18 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "life artifact resolution is effect evidence consumed by replay state checks.",
     ),
+    "life_totals_redistributed": (
+        "strategy_signal",
+        "life-total redistribution result is consumed by replay and strategy checks.",
+    ),
+    "one_ring_burden_life_loss": (
+        "strategy_signal",
+        "The One Ring burden life loss is upkeep state evidence consumed by replay state checks.",
+    ),
+    "mill_resolved": (
+        "strategy_signal",
+        "library mill resolution changes deck state and future draw-loss risk for replay/strategy checks.",
+    ),
     "loot_resolved": (
         "strategy_signal",
         "loot resolution is card-flow evidence consumed by replay/strategy context.",
@@ -300,6 +339,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "protection effect resolution is consumed by replay/forensic checks.",
     ),
+    "protection_from_everything_granted": (
+        "strategy_signal",
+        "temporary protection-from-everything grant is consumed by replay damage-prevention checks.",
+    ),
     "removal_countered_by_ward": (
         "strategy_signal",
         "ward counter result is stack/interaction context for replay checks.",
@@ -319,6 +362,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "station_activated": (
         "strategy_signal",
         "station activation is represented in replay state and decision context.",
+    ),
+    "thassa_oracle_resolved": (
+        "strategy_signal",
+        "Thassa's Oracle enter-the-battlefield check is terminal-combo context for outcome validation.",
     ),
     "token_ceased_to_exist": (
         "renderer_only",
@@ -525,6 +572,25 @@ def classify_event_contract(kind: str) -> tuple[str, str]:
         kind,
         ("unclassified", "event type has no explicit action contract classification."),
     )
+
+
+def normalize_permanent_name(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    text = text.replace("\u2018", "'").replace("\u2019", "'")
+    return re.sub(r"\s+", " ", text)
+
+
+def turn_end_has_no_max_hand_size(event: dict[str, Any]) -> bool:
+    if event.get("no_max_hand_size") is True:
+        return True
+    for permanent in event.get("board_snapshot") or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("no_max_hand_size") is True:
+            return True
+        if normalize_permanent_name(permanent.get("name")) in NO_MAX_HAND_SIZE_PERMANENTS:
+            return True
+    return False
 
 
 def summarize_event_contract(events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -907,7 +973,7 @@ def criticize_actions(
             evidence.append(f"hand={hand}")
             evidence.append(f"board={event.get('board', '-')}")
             evidence.append(f"grave={event.get('graveyard', '-')}")
-            if hand > 7:
+            if hand > 7 and not turn_end_has_no_max_hand_size(event):
                 findings.append(action_finding(
                     "critical",
                     "cleanup_hand_size",

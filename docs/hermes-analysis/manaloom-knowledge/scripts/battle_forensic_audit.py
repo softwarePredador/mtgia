@@ -30,21 +30,30 @@ REPORT_DIR = SCRIPT_DIR.parents[1] / "master_optimizer_reports"
 
 SUPPORTED_EFFECTS = {
     "add_mana",
+    "aetherflux_lifegain",
+    "aetherflux_reservoir",
     "approach",
+    "attack_limit",
+    "attack_tax",
     "board_wipe",
+    "brain_freeze",
     "combo",
     "composite_resolution",
     "commander",
+    "cannot_lose_turn",
     "copy_creature_token",
     "copy_spell",
     "counter",
     "creature",
     "damage_each_opponent",
+    "damage_player_and_creatures",
     "damage_wipe",
+    "damage_wipe_treasure",
     "deal_damage",
     "dragons_approach",
     "draw_cards",
     "draw_engine",
+    "equipment_static_attachment",
     "equipment_haste_shroud",
     "exile_value",
     "extra_turn",
@@ -71,6 +80,7 @@ SUPPORTED_EFFECTS = {
     "ramp_ritual",
     "recursion",
     "redirect_removal",
+    "redistribute_life_totals",
     "remove_artifact_or_3dmg",
     "remove_creature",
     "remove_permanent",
@@ -78,6 +88,7 @@ SUPPORTED_EFFECTS = {
     "silence_opponents",
     "silence_spell",
     "steal_all_creatures",
+    "thassa_oracle",
     "token_maker",
     "topdeck_manipulation",
     "treasure_maker",
@@ -97,12 +108,21 @@ CARD_EVENT_KINDS = {
 }
 
 GAME_IMPACT_EFFECTS = {
+    "aetherflux_lifegain",
+    "aetherflux_reservoir",
     "approach",
+    "attack_limit",
+    "attack_tax",
     "board_wipe",
+    "brain_freeze",
     "counter",
+    "cannot_lose_turn",
     "damage_each_opponent",
+    "damage_player_and_creatures",
     "damage_wipe",
+    "damage_wipe_treasure",
     "deal_damage",
+    "equipment_static_attachment",
     "equipment_haste_shroud",
     "extra_turn",
     "finisher",
@@ -120,12 +140,14 @@ GAME_IMPACT_EFFECTS = {
     "protect_creature",
     "pump_all",
     "recursion",
+    "redistribute_life_totals",
     "remove_artifact_or_3dmg",
     "remove_creature",
     "remove_permanent",
     "silence_opponents",
     "silence_spell",
     "steal_all_creatures",
+    "thassa_oracle",
     "token_maker",
     "treasure_maker",
     "tutor",
@@ -516,7 +538,11 @@ def audit_rule_provenance(
                     "Miracle cast without Lorehold marked as on-board.",
                     "Fix Lorehold miracle timing/state check.",
                 )
-            if int(event.get("cards_drawn_this_turn") or 0) != 1:
+            is_first_brainstone_draw = (
+                event.get("source") == "brainstone_first_draw"
+                and event.get("first_draw_miracle_candidate") is True
+            )
+            if int(event.get("cards_drawn_this_turn") or 0) != 1 and not is_first_brainstone_draw:
                 add_finding(
                     findings,
                     "critical",

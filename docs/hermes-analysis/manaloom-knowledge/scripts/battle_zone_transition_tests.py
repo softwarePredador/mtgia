@@ -110,6 +110,130 @@ def register_tests(battle, player, card):
         assert artifact in opponent.graveyard
         assert opponent.life == 39
 
+    def test_exile_removal_moves_commander_to_command_zone_and_off_battlefield():
+        caster = player("Caster")
+        opponent = player("Opponent")
+        commander = battle.enrich_card({
+            "name": "Kraum, Ludevic's Opus",
+            "effect": "draw_engine",
+            "type_line": "Legendary Creature — Zombie Horror",
+            "is_commander": True,
+            "power": 4,
+            "toughness": 4,
+        })
+        opponent.battlefield = [commander]
+
+        battle.apply_effect_immediate(
+            caster,
+            [opponent],
+            {"name": "Path to Exile", "cmc": 1, "type_line": "Instant"},
+            turn=7,
+            rng=random.Random(711),
+        )
+
+        assert commander not in opponent.battlefield
+        assert commander in opponent.command_zone
+        assert commander not in opponent.graveyard
+        assert commander not in opponent.exile
+
+    def test_zone_move_uses_real_battlefield_object_for_declared_target_copy():
+        opponent = player("Opponent")
+        commander = battle.enrich_card({
+            "name": "Kraum, Ludevic's Opus",
+            "effect": "draw_engine",
+            "type_line": "Legendary Creature — Zombie Horror",
+            "is_commander": True,
+            "power": 4,
+            "toughness": 4,
+        })
+        declared_target_copy = dict(commander)
+        declared_target_copy["_declared_target_snapshot"] = True
+        opponent.battlefield = [commander]
+
+        destination = battle.move_permanent_from_battlefield(
+            opponent,
+            declared_target_copy,
+            reason="removal",
+            source={"name": "Path to Exile"},
+        )
+
+        assert destination == "command_zone"
+        assert commander not in opponent.battlefield
+        assert commander in opponent.command_zone
+        assert declared_target_copy not in opponent.command_zone
+
+    def test_declared_removal_resolves_snapshot_target_to_live_permanent():
+        caster = player("Caster")
+        opponent = player("Opponent")
+        commander = battle.enrich_card({
+            "name": "Kraum, Ludevic's Opus",
+            "effect": "draw_engine",
+            "type_line": "Legendary Creature — Zombie Horror",
+            "is_commander": True,
+            "power": 4,
+            "toughness": 4,
+        })
+        declared_target_snapshot = dict(commander)
+        declared_target_snapshot["_declared_target_snapshot"] = True
+        opponent.battlefield = [commander]
+
+        resolved = battle.resolve_declared_single_removal(
+            caster,
+            [opponent],
+            {"name": "Path to Exile", "cmc": 1, "type_line": "Instant"},
+            {
+                "effect": "remove_creature",
+                "declared_targets": [
+                    {
+                        "target": declared_target_snapshot,
+                        "controller": opponent,
+                        "target_type": "creature",
+                    }
+                ],
+            },
+            turn=7,
+            rng=random.Random(712),
+        )
+
+        assert resolved is True
+        assert commander not in opponent.battlefield
+        assert commander in opponent.command_zone
+        assert declared_target_snapshot not in opponent.command_zone
+
+    def test_apply_effect_declared_target_survives_effect_data_deepcopy():
+        caster = player("Caster")
+        opponent = player("Opponent")
+        commander = battle.enrich_card({
+            "name": "Kraum, Ludevic's Opus",
+            "effect": "draw_engine",
+            "type_line": "Legendary Creature — Zombie Horror",
+            "is_commander": True,
+            "power": 4,
+            "toughness": 4,
+        })
+        opponent.battlefield = [commander]
+
+        battle.apply_effect_immediate(
+            caster,
+            [opponent],
+            {"name": "Path to Exile", "cmc": 1, "type_line": "Instant"},
+            turn=7,
+            rng=random.Random(713),
+            effect_data_override={
+                "effect": "remove_creature",
+                "declared_targets": [
+                    {
+                        "target": commander,
+                        "controller": opponent,
+                        "target_type": "creature",
+                    }
+                ],
+            },
+        )
+
+        assert commander not in opponent.battlefield
+        assert commander in opponent.command_zone
+
     def test_land_ramp_puts_library_land_tapped_and_spell_goes_to_graveyard():
         active = player("Active")
         forest = {"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}
@@ -335,6 +459,43 @@ def register_tests(battle, player, card):
         assert wheel_events
         assert wheel_events[0]["opponent_cards_drawn"] == 7
 
+    def test_draw_seven_non_wheel_override_draws_only_controller():
+        decisions = []
+        events = []
+        battle.DECISION_TRACE_HANDLER = lambda payload: decisions.append(payload)
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        active.hand = []
+        opponent.hand = []
+        active.library = [card(f"Draw {index}", cmc=1) for index in range(8)]
+        opponent.library = [card(f"Opponent Draw {index}", cmc=1) for index in range(8)]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Jin-Gitaxias, Core Augur",
+                "cmc": 10,
+                "type_line": "Legendary Creature - Phyrexian Praetor",
+                "effect": "draw_cards",
+                "count": 7,
+                "wheel_like": False,
+            },
+            turn=3,
+            rng=random.Random(81),
+        )
+        battle.DECISION_TRACE_HANDLER = None
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert len(active.hand) == 7
+        assert len(opponent.hand) == 0
+        assert not [decision for decision in decisions if decision["decision_type"] == "wheel"]
+        assert not [data for event, data in events if event == "wheel_resolved"]
+        draw_events = [data for event, data in events if event == "draw_cards_resolved"]
+        assert draw_events
+        assert draw_events[0]["cards_drawn"] == 7
+
     def test_wheel_uses_library_of_leng_replacement_for_effect_discard():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -433,6 +594,32 @@ def register_tests(battle, player, card):
             {"name": "Wheel of Fortune", "count": 7},
         ) is False
 
+    def test_wheel_cast_guard_blocks_self_decking_even_with_payoff():
+        active = player("Active")
+        opponent = player("Opponent")
+        active.hand = [{"name": "Wheel of Fortune", "cmc": 3, "type_line": "Sorcery"}]
+        active.library = [{"name": "Only Draw", "cmc": 1, "type_line": "Instant"}]
+        active.battlefield = [
+            {
+                "name": "Smothering Tithe",
+                "cmc": 4,
+                "effect": "ramp_engine",
+                "type_line": "Enchantment",
+            }
+        ]
+        opponent.hand = [{"name": "Opponent Card", "cmc": 1, "type_line": "Instant"}]
+
+        context = battle.wheel_decision_context(active, [opponent], 7)
+
+        assert context["payoff_expected"] is True
+        assert context["library_cards_before"] == 1
+        assert context["library_can_support_draw"] is False
+        assert battle.should_cast_wheel(
+            active,
+            [opponent],
+            {"name": "Wheel of Fortune", "count": 7},
+        ) is False
+
     def test_reforge_defaults_wheel_draw_count_to_seven():
         active = player("Active")
         opponent = player("Opponent")
@@ -476,6 +663,10 @@ def register_tests(battle, player, card):
         test_token_destroyed_by_board_wipe_does_not_remain_in_graveyard,
         test_token_sba_removes_tokens_from_non_battlefield_zones,
         test_artifact_removal_does_not_destroy_creature_target_by_mistake,
+        test_exile_removal_moves_commander_to_command_zone_and_off_battlefield,
+        test_zone_move_uses_real_battlefield_object_for_declared_target_copy,
+        test_declared_removal_resolves_snapshot_target_to_live_permanent,
+        test_apply_effect_declared_target_survives_effect_data_deepcopy,
         test_land_ramp_puts_library_land_tapped_and_spell_goes_to_graveyard,
         test_crop_rotation_can_find_untapped_high_value_land_with_context,
         test_crop_rotation_blocks_last_land_for_fetch_without_clear_payoff,
@@ -486,6 +677,7 @@ def register_tests(battle, player, card):
         test_tutor_trace_uses_contextual_target_scoring,
         test_board_wipe_trace_records_asymmetry_context,
         test_wheel_trace_uses_multiplayer_discard_draw_model,
+        test_draw_seven_non_wheel_override_draws_only_controller,
         test_wheel_uses_library_of_leng_replacement_for_effect_discard,
         test_effect_discard_replacement_prefers_keepable_spells_over_graveyard,
         test_wheel_cast_guard_blocks_opponent_refill_without_payoff,

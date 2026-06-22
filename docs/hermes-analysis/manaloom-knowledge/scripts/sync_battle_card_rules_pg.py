@@ -40,6 +40,7 @@ from sync_battle_card_rules import (
     build_rows,
     cleanup_obsolete_manual_rows,
     cleanup_stale_reviewed_rows,
+    load_active_snapshot_rows,
 )
 
 try:
@@ -627,6 +628,7 @@ def load_pg_rules(cur: Any, *, include_needs_review: bool) -> list[dict[str, Any
     statuses = ["verified", "active"]
     if include_needs_review:
         statuses.append("needs_review")
+        statuses.append("deprecated")
     cur.execute(
         """
         SELECT
@@ -730,6 +732,97 @@ def filter_rows_for_current_reviewed_curated(
     return filtered
 
 
+def runtime_rule_key(row: dict[str, Any]) -> tuple[str, str] | None:
+    card_name = str(row.get("normalized_name") or row.get("card_name") or "").strip()
+    effect_json = json_obj(row.get("effect_json"))
+    if not card_name or not effect_json:
+        return None
+    logical_rule_key = str(
+        row.get("logical_rule_key")
+        or battle_rule_registry.logical_rule_key(
+            {
+                "effect_json": effect_json,
+                "deck_role_json": row.get("deck_role_json"),
+            }
+        )
+    )
+    return normalize_card_name(card_name), logical_rule_key
+
+
+def merge_pg_rows_with_reviewed_runtime_rows(
+    rows: list[dict[str, Any]],
+    reviewed_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Overlay versioned reviewed runtime rows on top of the PG mirror.
+
+    PG remains the deploy source of truth, but the local battle runtime also has
+    a reviewed JSON layer. A PG sync with `apply_pg=false` must not erase that
+    reviewed layer and leave only broad `needs_review` generated rows in the
+    degraded canonical snapshot.
+    """
+    merged = [dict(row) for row in rows]
+    seen = {key for row in merged if (key := runtime_rule_key(row))}
+    for row in reviewed_rows:
+        source = str(row.get("source") or "")
+        if source not in {"curated", "manual"}:
+            continue
+        key = runtime_rule_key(row)
+        if key is None or key in seen:
+            continue
+        normalized_name, logical_rule_key = key
+        next_row = dict(row)
+        next_row["normalized_name"] = normalized_name
+        next_row["logical_rule_key"] = logical_rule_key
+        next_row.setdefault("execution_status", "auto")
+        next_row.setdefault("rule_version", 1)
+        next_row.setdefault("oracle_hash", None)
+        next_row.setdefault("notes", "")
+        merged.append(next_row)
+        seen.add(key)
+    return merged
+
+
+def cleanup_sqlite_rows_absent_from_runtime_rows(
+    conn: sqlite3.Connection,
+    rows: list[dict[str, Any]],
+) -> int:
+    """Drop stale local mirror rows for cards now governed by PG.
+
+    The PG-to-SQLite path treats PostgreSQL plus the current reviewed runtime
+    layer as the cache source. Local mirror rows for the same normalized card
+    must match an active runtime logical key or they can shadow the canonical
+    rule during runtime selection.
+    """
+    keys_by_name: dict[str, set[str]] = {}
+    for row in rows:
+        key = runtime_rule_key(row)
+        if key is None:
+            continue
+        normalized, logical_key = key
+        keys_by_name.setdefault(normalized, set()).add(logical_key)
+
+    changed = 0
+    mirror_sources = ("curated", "generated", "imported", "heuristic")
+    for normalized, logical_keys in keys_by_name.items():
+        key_placeholders = ",".join("?" for _ in logical_keys)
+        source_placeholders = ",".join("?" for _ in mirror_sources)
+        cursor = conn.execute(
+            f"""
+            DELETE FROM battle_card_rules
+            WHERE normalized_name = ?
+              AND source IN ({source_placeholders})
+              AND logical_rule_key NOT IN ({key_placeholders})
+            """,
+            (
+                normalized,
+                *mirror_sources,
+                *sorted(logical_keys),
+            ),
+        )
+        changed += max(0, cursor.rowcount)
+    return changed
+
+
 def mirror_pg_rules_to_sqlite(
     sqlite_db: str,
     rows: list[dict[str, Any]],
@@ -741,22 +834,32 @@ def mirror_pg_rules_to_sqlite(
         rows,
         reviewed_rows or [],
     )
+    runtime_rows = merge_pg_rows_with_reviewed_runtime_rows(
+        filtered_rows,
+        reviewed_rows or [],
+    )
     with closing(sqlite3.connect(sqlite_db)) as conn:
         battle_rule_registry.ensure_battle_card_rules(conn)
         cleanup_obsolete_manual_rows(conn)
         cleanup_stale_reviewed_rows(conn, reviewed_rows or [])
-        for row in filtered_rows:
+        changed += cleanup_sqlite_rows_absent_from_runtime_rows(conn, runtime_rows)
+        for row in runtime_rows:
+            effect_json = json_obj(row.get("effect_json"))
+            deck_role_json = row.get("deck_role_json")
+            if not isinstance(deck_role_json, dict):
+                deck_role_json = battle_rule_registry.deck_role_from_effect(effect_json)
             did_change = upsert_battle_card_rule(
                 conn,
                 row["card_name"],
-                row["effect_json"],
+                effect_json,
                 source=row["source"],
                 confidence=row["confidence"],
                 review_status=row["review_status"],
                 execution_status=str(row.get("execution_status") or "auto"),
-                deck_role_json=row["deck_role_json"],
-                notes=row["notes"],
-                oracle_hash=row["oracle_hash"],
+                deck_role_json=deck_role_json,
+                notes=row.get("notes") or "",
+                oracle_hash=row.get("oracle_hash"),
+                logical_rule_key_value=row.get("logical_rule_key"),
             )
             if did_change:
                 changed += 1
@@ -838,7 +941,7 @@ def main() -> int:
             reviewed_rows=seed_rows,
         )
         report["canonical_snapshot_rows_exported"] = export_canonical_snapshot(
-            rows,
+            load_active_snapshot_rows(args.sqlite_db),
             sqlite_db=args.sqlite_db,
             output_path=args.export_canonical_fallback_json,
         )

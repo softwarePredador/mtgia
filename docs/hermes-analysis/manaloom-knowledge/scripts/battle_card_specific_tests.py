@@ -86,34 +86,41 @@ def register_tests(battle, player):
     def test_lorehold_miracle_does_not_use_second_draw_of_turn():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-        active = player(
-            "Lorehold",
-            [
-                _card("Upkeep Draw"),
-                {
-                    "name": "Reforge the Soul",
-                    "cmc": 7,
-                    "type_line": "Sorcery",
-                },
-                _card("Filler"),
-            ],
-        )
+        active = player("Lorehold")
         active.is_human = True
+        active.cards_drawn_this_turn = 1
+        active._cards_drawn_turn_marker = 2
+        battle.CURRENT_REPLAY_TURN = 2
+        active.library = [
+            {
+                "name": "Reforge the Soul",
+                "cmc": 7,
+                "type_line": "Sorcery",
+            },
+            _card("Filler"),
+        ]
         active.battlefield = [
             {"name": "Lorehold, the Historian", "effect": "creature", "power": 3},
-            {"name": "The One Ring", "effect": "draw_engine", "burden": True},
+            {
+                "name": "The One Ring",
+                "effect": "draw_engine",
+                "burden": True,
+                "burden_counters": 0,
+                "activated_burden_draw": True,
+                "activation_requires_tap": True,
+            },
             "land",
             "land",
         ]
-        opponent = player("Opponent", [_card("Opp Filler")])
+        opponent = player("Opponent")
 
-        battle.play_turn_v8(
+        battle.activate_utility_artifacts(
             active,
             [opponent],
             [active, opponent],
             turn=2,
             rng=random.Random(19),
-            stack=battle.Stack(),
+            phase="postcombat_main",
         )
 
         assert not any(event == "miracle_cast" for event, _ in events)
@@ -189,6 +196,43 @@ def register_tests(battle, player):
 
         assert cast is False
         assert py in active.hand
+        assert stack.empty()
+        assert not any(event == "miracle_cast" for event, _ in events)
+
+    def test_lorehold_miracle_does_not_cast_redirect_without_stack_target():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            swat = {
+                "name": "Deflecting Swat",
+                "cmc": 3,
+                "type_line": "Instant",
+            }
+            active = player("Lorehold", [swat])
+            active.hand = [swat]
+            active.is_human = True
+            active.battlefield = [
+                {"name": "Lorehold, the Historian", "effect": "creature", "power": 3},
+            ]
+            active.mana_pool.add_generic(2)
+            stack = battle.Stack()
+
+            cast = battle.try_lorehold_miracle_cast(
+                active,
+                [swat],
+                turn=2,
+                phase="draw_step",
+                all_players=[active],
+                rng=random.Random(193),
+                stack=stack,
+                source="test_topdeck",
+                miracle_candidate=swat,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert cast is False
+        assert swat in active.hand
         assert stack.empty()
         assert not any(event == "miracle_cast" for event, _ in events)
 
@@ -733,13 +777,18 @@ def register_tests(battle, player):
             if isinstance(permanent, dict)
         )
         assert any(card.get("name") == "Savannah" for card in active.graveyard)
-        assert any(
-            event == "additional_cost_paid"
+        mox_cost_event = next(
+            data
+            for event, data in events
+            if event == "additional_cost_paid"
             and data.get("card") == "Mox Diamond"
             and data.get("cost") == "discard_land"
             and data.get("discarded") == "Savannah"
-            for event, data in events
         )
+        assert mox_cost_event["unlock_card"] == "Cheap Commander"
+        assert mox_cost_event["unlock_role"] == "commander"
+        assert mox_cost_event["unlock_reason"] == "same_turn_commander_cast"
+        assert mox_cost_event["unlocks_same_turn_action"] is True
         trace = next(
             trace
             for trace in decisions
@@ -1023,6 +1072,145 @@ def register_tests(battle, player):
         assert target.get("summoning_sick") is False
         assert target.get("indestructible") is not True
 
+    def test_static_equipment_applies_boost_and_keywords_to_best_creature():
+        active = player("Active")
+        target = {
+            "name": "Legendary Target",
+            "effect": "creature",
+            "type_line": "Legendary Creature",
+            "power": 3,
+            "toughness": 3,
+            "summoning_sick": True,
+        }
+        active.battlefield = [target]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Mithril Coat", "cmc": 3, "type_line": "Legendary Artifact — Equipment"},
+            4,
+            random.Random(1161),
+            effect_data_override={
+                "effect": "equipment_static_attachment",
+                "grants_indestructible": True,
+                "battle_model_scope": "test_static_equipment_attachment",
+            },
+        )
+
+        assert any(
+            permanent.get("name") == "Mithril Coat"
+            and permanent.get("effect") == "equipment_static_attachment"
+            and permanent.get("attached_to") == "Legendary Target"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert target.get("indestructible") is True
+
+    def test_artifact_etb_tutors_two_basic_plains_to_hand_and_stays_on_battlefield():
+        active = player("Active")
+        active.library = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Archaeomancer's Map", "cmc": 3, "type_line": "Artifact"},
+            3,
+            random.Random(1162),
+            effect_data_override={
+                "effect": "ramp_engine",
+                "trigger": "opponent_land_play",
+                "etb_tutor_target": "basic_plains",
+                "etb_tutor_count": 2,
+                "battle_model_scope": "test_basic_plains_etb_tutor",
+            },
+        )
+
+        assert [card.get("name") for card in active.hand].count("Plains") == 2
+        assert [card.get("name") for card in active.library] == ["Mountain"]
+        assert any(
+            permanent.get("name") == "Archaeomancer's Map"
+            and permanent.get("effect") == "ramp_engine"
+            and permanent.get("trigger") == "opponent_land_play"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+
+    def test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target():
+        active = player("Active")
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Increasing Vengeance", "cmc": 2, "type_line": "Instant"},
+            4,
+            random.Random(1163),
+            effect_data_override={
+                "effect": "copy_spell",
+                "instant": True,
+                "battle_model_scope": "test_copy_spell_requires_stack_target",
+            },
+        )
+
+        assert not any(
+            permanent.get("name") == "Increasing Vengeance"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert any(card.get("name") == "Increasing Vengeance" for card in active.graveyard)
+
+    def test_reckless_endeavor_damage_wipe_creates_treasures():
+        active = player("Active")
+        opponent = player("Opponent")
+        active.battlefield = [
+            {"name": "Own Small", "effect": "creature", "type_line": "Creature", "power": 1, "toughness": 1}
+        ]
+        opponent.battlefield = [
+            {"name": "Opp Small", "effect": "creature", "type_line": "Creature", "power": 2, "toughness": 2},
+            {"name": "Opp Big", "effect": "creature", "type_line": "Creature", "power": 8, "toughness": 8},
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Reckless Endeavor", "cmc": 7, "type_line": "Sorcery"},
+            7,
+            random.Random(1164),
+            effect_data_override={
+                "effect": "damage_wipe_treasure",
+                "damage": 6,
+                "treasure_count": 5,
+                "battle_model_scope": "test_damage_wipe_treasure",
+            },
+        )
+
+        assert active.treasures == 5
+        assert [card.get("name") for card in active.battlefield] == []
+        assert [card.get("name") for card in opponent.battlefield] == ["Opp Big"]
+
+    def test_reverse_the_sands_swaps_with_highest_life_opponent():
+        active = player("Active")
+        active.life = 8
+        opponent = player("Opponent")
+        opponent.life = 34
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Reverse the Sands", "cmc": 8, "type_line": "Sorcery"},
+            8,
+            random.Random(1165),
+            effect_data_override={
+                "effect": "redistribute_life_totals",
+                "battle_model_scope": "test_redistribute_life_totals",
+            },
+        )
+
+        assert active.life == 34
+        assert opponent.life == 8
+
     def test_birgi_adds_red_mana_when_controller_casts_spell():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -1132,6 +1320,37 @@ def register_tests(battle, player):
             and data.get("card") == "Valakut Awakening"
             and set(data.get("bottomed", [])) == {"Eight Drop A", "Nine Drop B"}
             and data.get("draw_count") == 3
+            for event, data in events
+        )
+
+    def test_valakut_awakening_preserves_approach_as_win_condition():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Lorehold")
+        approach = {
+            "name": "Approach of the Second Sun",
+            "cmc": 7,
+            "type_line": "Sorcery",
+        }
+        high_spell = {"name": "Nine Drop B", "cmc": 9, "type_line": "Sorcery", "effect": "draw_cards"}
+        card = {"name": "Valakut Awakening", "cmc": 3, "type_line": "Instant"}
+        active.hand = [card, approach, high_spell]
+        active.library = [
+            {"name": "Draw One", "cmc": 2, "type_line": "Sorcery"},
+            {"name": "Draw Two", "cmc": 2, "type_line": "Sorcery"},
+        ]
+
+        battle.apply_effect_immediate(active, [], card, 4, random.Random(49))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        hand_names = [entry.get("name") for entry in active.hand if isinstance(entry, dict)]
+        assert "Approach of the Second Sun" in hand_names
+        assert "Nine Drop B" not in hand_names
+        assert any(
+            event == "hand_filter_resolved"
+            and data.get("card") == "Valakut Awakening"
+            and "Approach of the Second Sun" not in set(data.get("bottomed", []))
+            and "Nine Drop B" in set(data.get("bottomed", []))
             for event, data in events
         )
 
@@ -1893,6 +2112,45 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_land_tutor_artifact_trace_scores_rejected_options():
+        decisions = []
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Lorehold")
+            active.battlefield = [
+                {
+                    "name": "Wayfarer's Bauble",
+                    "cmc": 1,
+                    "type_line": "Artifact",
+                    "effect": "land_ramp",
+                    "activated_self_sacrifice_land_tutor": True,
+                    "activation_cost_generic": 2,
+                },
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+            ]
+            active.library = [
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land - Plains"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land - Mountain"},
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land - Plains"},
+            ]
+            active.refresh_mana_sources(turn=2)
+
+            battle.activate_land_tutor_creatures(active, turn=2)
+        finally:
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        trace = next(
+            decision
+            for decision in decisions
+            if decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("action") == "activate_land_tutor_artifact"
+        )
+        assert trace["best_rejected_option_score"] is not None
+        assert trace["score_gap_vs_best_rejected"] is not None
+        assert trace["rejected_option_scores"]
+
     def test_angels_grace_prevents_lethal_damage_and_life_zero_loss_this_turn():
         active = player("Protected")
         active.life = 3
@@ -2294,6 +2552,339 @@ def register_tests(battle, player):
             and "sacrifice_artifact" in decision.get("risk_flags", [])
             for decision in decisions
         )
+
+    def test_lorehold_upkeep_rummage_preserves_approach_without_top_replacement():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            lorehold = player("Lorehold")
+            lorehold.is_human = True
+            lorehold.battlefield = [
+                {
+                    "name": "Lorehold, the Historian",
+                    "effect": "creature",
+                    "type_line": "Legendary Creature",
+                    "haste": True,
+                },
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                {"name": "Sacred Foundry", "effect": "land", "type_line": "Land"},
+            ]
+            lorehold.hand = [
+                {
+                    "name": "Approach of the Second Sun",
+                    "cmc": 7,
+                    "type_line": "Sorcery",
+                },
+                {"name": "Boros Charm", "cmc": 2, "type_line": "Instant", "effect": "protection"},
+            ]
+            lorehold.library = [{"name": "Filler Draw", "cmc": 2, "type_line": "Creature", "effect": "creature"}]
+            opponent = player("Opponent")
+            opponent.library = [_card("Opponent Draw", cmc=1)]
+            lorehold.refresh_mana_sources(turn=6)
+
+            triggered = battle.process_lorehold_opponent_upkeep_rummage(
+                opponent,
+                [lorehold, opponent],
+                6,
+                random.Random(126),
+                battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert triggered == 0
+        assert any(card.get("name") == "Approach of the Second Sun" for card in lorehold.hand)
+        assert not any(event == "lorehold_upkeep_rummage" for event, _ in events)
+        assert any(
+            event == "lorehold_upkeep_rummage_skipped"
+            and data.get("reason") == "no_strategic_discard_candidate"
+            for event, data in events
+        )
+        assert not any(decision.get("decision_type") == "lorehold_upkeep_rummage" for decision in decisions)
+
+    def test_low_life_casts_approach_before_proactive_attack_tax():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = player("Lorehold")
+            active.life = 10
+            active.is_human = True
+            active.hand = [
+                {
+                    "name": "Approach of the Second Sun",
+                    "cmc": 7,
+                    "type_line": "Sorcery",
+                },
+                {
+                    "name": "Windborn Muse",
+                    "cmc": 4,
+                    "type_line": "Creature — Spirit",
+                    "effect": "attack_tax",
+                },
+            ]
+            active.battlefield = [
+                {
+                    "name": "Plains",
+                    "effect": "land",
+                    "type_line": "Basic Land — Plains",
+                    "mana_produced": 1,
+                }
+                for _ in range(7)
+            ]
+            active.refresh_mana_sources(turn=8)
+            opponent = player("Opponent")
+
+            acted = battle.cast_spells_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                8,
+                "precombat_main",
+                battle.Stack(),
+                random.Random(127),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert acted is True
+        assert active.approach_count == 1
+        assert active.life == 17
+        assert not any(card.get("name") == "Approach of the Second Sun" for card in active.hand)
+        assert any(card.get("name") == "Windborn Muse" for card in active.hand)
+        assert any(
+            event == "spell_cast"
+            and data.get("card") == "Approach of the Second Sun"
+            and data.get("role") == "high_threat"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "cast_spell"
+            and decision.get("chosen_option", {}).get("card") == "Approach of the Second Sun"
+            and decision.get("actual_outcome") == "cast_to_stack"
+            for decision in decisions
+        )
+
+    def test_grand_abolisher_casts_as_setup_for_future_approach():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = player("Lorehold")
+            active.life = 23
+            active.is_human = True
+            active.hand = [
+                {
+                    "name": "Grand Abolisher",
+                    "cmc": 2,
+                    "type_line": "Creature — Human Cleric",
+                    "effect": "silence_opponents",
+                },
+                {
+                    "name": "Approach of the Second Sun",
+                    "cmc": 7,
+                    "type_line": "Sorcery",
+                },
+            ]
+            active.battlefield = [
+                {
+                    "name": "Plains",
+                    "effect": "land",
+                    "type_line": "Basic Land — Plains",
+                    "mana_produced": 1,
+                },
+                {
+                    "name": "Command Tower",
+                    "effect": "land",
+                    "type_line": "Land",
+                    "mana_produced": 1,
+                },
+            ]
+            active.refresh_mana_sources(turn=7)
+            opponent = player("Opponent")
+
+            acted = battle.cast_spells_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                7,
+                "precombat_main",
+                battle.Stack(),
+                random.Random(128),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert acted is True
+        assert any(card.get("name") == "Grand Abolisher" for card in active.battlefield)
+        assert any(card.get("name") == "Approach of the Second Sun" for card in active.hand)
+        assert any(
+            event == "spell_cast"
+            and data.get("card") == "Grand Abolisher"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "cast_spell"
+            and decision.get("chosen_option", {}).get("card") == "Grand Abolisher"
+            for decision in decisions
+        )
+
+    def test_orims_chant_held_without_castable_second_approach_payoff():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = player("Lorehold")
+            active.is_human = True
+            active.approach_count = 1
+            active.hand = [
+                {
+                    "name": "Orim's Chant",
+                    "cmc": 1,
+                    "type_line": "Instant",
+                    "effect": "silence_spell",
+                    "instant": True,
+                }
+            ]
+            active.battlefield = [
+                {
+                    "name": "Plains",
+                    "effect": "land",
+                    "type_line": "Basic Land — Plains",
+                    "mana_produced": 1,
+                },
+                {
+                    "name": "Command Tower",
+                    "effect": "land",
+                    "type_line": "Land",
+                    "mana_produced": 1,
+                },
+            ]
+            active.refresh_mana_sources(turn=10)
+            opponent = player("Opponent")
+
+            assert battle.has_immediate_silence_payoff(active, "precombat_main") is False
+            acted = battle.cast_spells_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                10,
+                "precombat_main",
+                battle.Stack(),
+                random.Random(129),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert acted is False
+        assert [card.get("name") for card in active.hand] == ["Orim's Chant"]
+        assert not any(
+            event == "spell_cast"
+            and data.get("card") == "Orim's Chant"
+            for event, data in events
+        )
+
+    def test_cleanup_discard_preserves_attack_tax_over_excess_cards():
+        active = player("Lorehold")
+        active.hand = [
+            {
+                "name": "Sphere of Safety",
+                "cmc": 5,
+                "type_line": "Enchantment",
+                "effect": "attack_tax",
+            },
+            {
+                "name": "Seven Mana Filler",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                "effect": "unknown",
+            },
+            {
+                "name": "Flawless Maneuver",
+                "cmc": 3,
+                "type_line": "Instant",
+                "effect": "indestructible",
+            },
+            {
+                "name": "Spectator Seating",
+                "cmc": 0,
+                "type_line": "Land",
+                "effect": "land",
+            },
+            {
+                "name": "War Room",
+                "cmc": 0,
+                "type_line": "Land",
+                "effect": "land",
+            },
+            {
+                "name": "Urza's Saga",
+                "cmc": 0,
+                "type_line": "Enchantment Land — Urza's Saga",
+                "effect": "land",
+            },
+            {
+                "name": "Pyroblast",
+                "cmc": 1,
+                "type_line": "Instant",
+                "effect": "counter",
+            },
+            {
+                "name": "Drannith Magistrate",
+                "cmc": 2,
+                "type_line": "Creature — Human Wizard",
+                "effect": "creature",
+            },
+            {
+                "name": "Get Lost",
+                "cmc": 2,
+                "type_line": "Instant",
+                "effect": "remove_permanent",
+            },
+            {
+                "name": "Giver of Runes",
+                "cmc": 1,
+                "type_line": "Creature — Kor Cleric",
+                "effect": "creature",
+            },
+        ]
+        active.battlefield = [
+            {"name": f"Land {index}", "cmc": 0, "type_line": "Land", "effect": "land"}
+            for index in range(4)
+        ]
+
+        discarded = []
+        while len(active.hand) > 7:
+            chosen = battle.choose_cleanup_discard(active)
+            discarded.append(chosen.get("name"))
+            active.hand.remove(chosen)
+
+        kept = [card.get("name") for card in active.hand]
+        assert "Sphere of Safety" in kept
+        assert "Seven Mana Filler" in discarded
+        assert sum(1 for name in discarded if name in {"Spectator Seating", "War Room", "Urza's Saga"}) == 2
 
     def test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor():
         events = []
@@ -2792,12 +3383,210 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def test_flame_wave_oracle_and_runtime_damage_target_player_creatures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            target = player("Target")
+            target.life = 9
+            small = {"name": "Small Creature", "effect": "creature", "type_line": "Creature", "power": 2, "toughness": 2}
+            medium = {"name": "Medium Creature", "effect": "creature", "type_line": "Creature", "power": 4, "toughness": 4}
+            large = {"name": "Large Creature", "effect": "creature", "type_line": "Creature", "power": 5, "toughness": 5}
+            protected = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 3,
+                "toughness": 3,
+                "indestructible": True,
+            }
+            target.battlefield = [small, medium, large, protected]
+            flame_wave = {
+                "name": "Flame Wave",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Flame Wave deals 4 damage to target player or planeswalker and "
+                    "each creature that player or that planeswalker's controller controls."
+                ),
+            }
+            effect = battle.normalize_effect_by_oracle(
+                flame_wave,
+                battle.with_rule_metadata(
+                    {"effect": "remove_creature", "instant": True},
+                    source="test_curated_rule",
+                    review_status="verified",
+                    confidence=1.0,
+                ),
+            )
+
+            assert effect["effect"] == "damage_player_and_creatures"
+            assert effect["amount"] == 4
+            assert effect["target"] == "player_or_planeswalker_controller"
+            assert "instant" not in effect
+
+            battle.apply_effect_immediate(
+                caster,
+                [target],
+                flame_wave,
+                turn=8,
+                rng=random.Random(112),
+                effect_data_override=effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert target.life == 5
+        assert small not in target.battlefield
+        assert medium not in target.battlefield
+        assert large in target.battlefield
+        assert protected in target.battlefield
+        assert any(card.get("name") == "Small Creature" for card in target.graveyard)
+        assert any(card.get("name") == "Medium Creature" for card in target.graveyard)
+        assert any(card.get("name") == "Flame Wave" for card in caster.graveyard)
+        assert any(
+            event == "damage_resolved"
+            and data.get("card") == "Flame Wave"
+            and data.get("effect") == "damage_player_and_creatures"
+            and data.get("target_player") == "Target"
+            and data.get("creatures_destroyed") == 2
+            and data.get("life_after") == 5
+            for event, data in events
+        )
+
+    def test_aetherflux_reservoir_gains_life_on_future_spell_casts_not_resolution_damage():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            reservoir = {"name": "Aetherflux Reservoir", "cmc": 4, "type_line": "Artifact"}
+            battle.apply_effect_immediate(
+                caster,
+                [],
+                reservoir,
+                turn=4,
+                rng=random.Random(113),
+                effect_data_override={"effect": "aetherflux_reservoir"},
+            )
+            caster.record_spell_cast(turn_marker=4)
+            battle.trigger_spell_cast_engines(
+                caster,
+                [caster],
+                {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant"},
+                turn=4,
+                phase="precombat_main",
+            )
+            caster.record_spell_cast(turn_marker=4)
+            battle.trigger_spell_cast_engines(
+                caster,
+                [caster],
+                {"name": "Faithless Looting", "cmc": 1, "type_line": "Sorcery"},
+                turn=4,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert caster.life == 43
+        assert any(card.get("name") == "Aetherflux Reservoir" for card in caster.battlefield)
+        assert not [
+            data for event, data in events
+            if event == "damage_resolved" and data.get("card") == "Aetherflux Reservoir"
+        ]
+        assert [
+            data.get("life_gained")
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Aetherflux Reservoir"
+        ] == [1, 2]
+
+    def test_brain_freeze_mills_library_instead_of_dealing_life_damage():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            target = player("Target")
+            target.library = [_card(f"Library {index}", cmc=1, effect="creature") for index in range(10)]
+            caster.spells_cast_this_turn = 4
+            battle.apply_effect_immediate(
+                caster,
+                [target],
+                {"name": "Brain Freeze", "cmc": 2, "type_line": "Instant"},
+                turn=5,
+                rng=random.Random(114),
+                effect_data_override={"effect": "brain_freeze", "mill_count": 3, "instant": True},
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert target.life == 40
+        assert len(target.library) == 0
+        assert len(target.graveyard) == 10
+        assert any(card.get("name") == "Brain Freeze" for card in caster.graveyard)
+        assert any(
+            event == "mill_resolved"
+            and data.get("card") == "Brain Freeze"
+            and data.get("target_player") == "Target"
+            and data.get("requested_mill") == 12
+            and data.get("cards_milled") == 10
+            for event, data in events
+        )
+        assert not [
+            data for event, data in events
+            if event == "damage_resolved" and data.get("card") == "Brain Freeze"
+        ]
+
+    def test_thassas_oracle_wins_only_when_library_is_within_blue_devotion():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            safe = player("Safe Oracle")
+            safe.library = [_card(f"Safe {index}", cmc=1, effect="creature") for index in range(5)]
+            battle.apply_effect_immediate(
+                safe,
+                [],
+                {"name": "Thassa's Oracle", "cmc": 2, "mana_cost": "{U}{U}", "type_line": "Creature"},
+                turn=6,
+                rng=random.Random(115),
+                effect_data_override={"effect": "thassa_oracle", "blue_devotion_pips": 2},
+            )
+
+            winning = player("Winning Oracle")
+            winning.library = [_card("Last Card", cmc=1, effect="creature")]
+            battle.apply_effect_immediate(
+                winning,
+                [],
+                {"name": "Thassa's Oracle", "cmc": 2, "mana_cost": "{U}{U}", "type_line": "Creature"},
+                turn=6,
+                rng=random.Random(116),
+                effect_data_override={"effect": "thassa_oracle", "blue_devotion_pips": 2},
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert safe.has_won() is False
+        assert winning.has_won() is True
+        assert winning.win_reason == "thassa_oracle"
+        assert any(
+            event == "thassa_oracle_resolved"
+            and data.get("player") == "Safe Oracle"
+            and data.get("result") == "no_win"
+            for event, data in events
+        )
+        assert any(
+            event == "game_won"
+            and data.get("player") == "Winning Oracle"
+            and data.get("reason") == "thassa_oracle"
+            for event, data in events
+        )
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
         test_lorehold_miracle_does_not_use_second_draw_of_turn,
         test_lorehold_miracle_skips_bad_wheel_refill,
         test_lorehold_miracle_does_not_cast_counter_without_stack_target,
+        test_lorehold_miracle_does_not_cast_redirect_without_stack_target,
         test_landfall_does_not_enqueue_without_real_landfall_source,
         test_landfall_enqueue_with_real_landfall_source,
         test_reforge_resolution_draws_seven_when_count_missing,
@@ -2822,9 +3611,15 @@ def register_tests(battle, player):
         test_everflowing_chalice_pays_multikicker_before_becoming_mana_source,
         test_everflowing_chalice_does_not_cast_as_zero_mana_ramp,
         test_lightning_greaves_grants_haste_and_shroud_without_indestructible,
+        test_static_equipment_applies_boost_and_keywords_to_best_creature,
+        test_artifact_etb_tutors_two_basic_plains_to_hand_and_stays_on_battlefield,
+        test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
+        test_reckless_endeavor_damage_wipe_creates_treasures,
+        test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_valakut_awakening_filters_hand_and_draws_plus_one,
+        test_valakut_awakening_preserves_approach_as_win_condition,
         test_mulligan_trace_scores_keep_vs_mulligan_for_heavy_dead_hand,
         test_special_lands_are_modelled_as_lands_not_spell_heuristics,
         test_war_room_activates_when_hand_is_low_and_life_is_safe,
@@ -2845,11 +3640,17 @@ def register_tests(battle, player):
         test_urzas_saga_enters_with_initial_chapter_state,
         test_urzas_saga_creates_construct_on_chapter_two,
         test_urzas_saga_tutors_safe_artifact_then_sacrifices,
+        test_land_tutor_artifact_trace_scores_rejected_options,
         test_angels_grace_prevents_lethal_damage_and_life_zero_loss_this_turn,
         test_angels_grace_blocks_opponent_approach_win_this_turn,
         test_senseis_top_sets_up_lorehold_approach_second_cast,
         test_scroll_rack_sets_up_lorehold_approach_second_cast_on_opponent_upkeep,
         test_brainstone_first_draw_approach_wins_before_rummage_resolution,
+        test_lorehold_upkeep_rummage_preserves_approach_without_top_replacement,
+        test_low_life_casts_approach_before_proactive_attack_tax,
+        test_grand_abolisher_casts_as_setup_for_future_approach,
+        test_orims_chant_held_without_castable_second_approach_payoff,
+        test_cleanup_discard_preserves_attack_tax_over_excess_cards,
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
@@ -2858,4 +3659,8 @@ def register_tests(battle, player):
         test_goblin_bombardment_review_only_snapshot_does_not_remove_on_cast,
         test_goblin_bombardment_skips_without_expendable_creature,
         test_iron_man_attack_trigger_sacrifices_treasure_for_artifact_tutor,
+        test_flame_wave_oracle_and_runtime_damage_target_player_creatures,
+        test_aetherflux_reservoir_gains_life_on_future_spell_casts_not_resolution_damage,
+        test_brain_freeze_mills_library_instead_of_dealing_life_damage,
+        test_thassas_oracle_wins_only_when_library_is_within_blue_devotion,
     ]

@@ -14,7 +14,38 @@ def render(event: str, data: dict) -> str:
     return handle.getvalue()
 
 
+class FakeBattleModule:
+    @staticmethod
+    def replay_card_snapshot(card):
+        return {"name": card.get("name", "?")}
+
+
+class FakePlayer:
+    def __init__(self, name, life, hand, alive=True):
+        self.name = name
+        self.life = life
+        self.hand = hand
+        self._alive = alive
+
+    def is_alive(self):
+        return self._alive
+
+
 def test_renderer_writes_land_cost_cast_illegal_and_board_details():
+    start_line = render(
+        "turn_start",
+        {
+            "player": "Lorehold",
+            "turn": 1,
+            "life": 40,
+            "hand": 2,
+            "board": 0,
+            "hand_snapshot": [
+                {"name": "Ghostly Prison"},
+                {"name": "Crawlspace"},
+            ],
+        },
+    )
     land_line = render(
         "land_played",
         {
@@ -58,7 +89,9 @@ def test_renderer_writes_land_cost_cast_illegal_and_board_details():
             "hand": 5,
             "board": 2,
             "graveyard": 0,
-            "discarded": 0,
+            "discarded": 1,
+            "discarded_cards": ["Spectator Seating"],
+            "hand_snapshot": [{"name": "Approach of the Second Sun"}],
             "board_snapshot": [
                 {"name": "Sunbillow Verge", "effect": "land"},
                 {"name": "Sensei's Divining Top", "effect": "topdeck_manipulation"},
@@ -66,10 +99,13 @@ def test_renderer_writes_land_cost_cast_illegal_and_board_details():
         },
     )
 
+    assert "HandCards=[Ghostly Prison, Crawlspace]" in start_line
     assert "PLAY LAND Lorehold: Sunbillow Verge" in land_line
     assert "PAY COST Lorehold: Sensei's Divining Top" in cost_line
     assert "mana 1->0" in cost_line
     assert "ILLEGAL CAST Opponent: Mental Misstep" in illegal_line
+    assert "DiscardedCards=[Spectator Seating]" in end_line
+    assert "HandCards=[Approach of the Second Sun]" in end_line
     assert "Permanents=[Sunbillow Verge, Sensei's Divining Top" in end_line
 
 
@@ -255,6 +291,24 @@ def test_renderer_uses_card_as_damage_cause_fallback():
     assert "cause=?" not in damage_line
 
 
+def test_renderer_explains_kicked_orims_chant_attack_prevention():
+    prevention_line = render(
+        "attack_prevented_by_orims_chant",
+        {
+            "player": "Lorehold",
+            "card": "Orim's Chant",
+            "prevented_attacker": "Dargo",
+            "prevented_attackers": 3,
+            "projected_combat_damage": 12,
+        },
+    )
+
+    assert prevention_line == (
+        "  PREVENT ATTACK Lorehold: Orim's Chant kicked against Dargo; "
+        "3 attackers stopped before declare attackers (projected_damage=12)\n"
+    )
+
+
 def test_deck_metrics_are_derived_from_resolved_cards():
     metrics = replay_renderer.deck_metrics(
         [
@@ -274,6 +328,23 @@ def test_deck_metrics_are_derived_from_resolved_cards():
     assert metrics["curve"]["4"] == 1
     assert metrics["curve"]["7+"] == 1
     assert metrics["curve"]["0"] == 0
+
+
+def test_target_deck_id_env_defaults_validates_and_overrides():
+    assert replay_renderer.target_deck_id_from_env({}) == 6
+    assert replay_renderer.target_deck_id_from_env(
+        {replay_renderer.TARGET_DECK_ID_ENV: "606"}
+    ) == 606
+
+    for raw in ("abc", "0", "-1"):
+        try:
+            replay_renderer.target_deck_id_from_env(
+                {replay_renderer.TARGET_DECK_ID_ENV: raw}
+            )
+        except ValueError as exc:
+            assert replay_renderer.TARGET_DECK_ID_ENV in str(exc)
+        else:
+            raise AssertionError(f"expected invalid deck id to fail: {raw}")
 
 
 def test_provenance_line_names_source_metrics_and_blocker_domain():
@@ -302,6 +373,23 @@ def test_provenance_line_names_source_metrics_and_blocker_domain():
     assert "blockers=deck_source" in line
 
 
+def test_final_player_summary_includes_hand_card_names():
+    handle = StringIO()
+    player = FakePlayer(
+        "Lorehold",
+        3,
+        [{"name": "Teferi's Protection"}, {"name": "Boros Charm"}],
+        alive=False,
+    )
+
+    replay_renderer.write_final_player_summary(handle, player, FakeBattleModule)
+
+    assert handle.getvalue() == (
+        "Lorehold: DEAD Life=3 Hand=2 "
+        "HandCards=[Teferi's Protection, Boros Charm]\n"
+    )
+
+
 if __name__ == "__main__":
     tests = [
         test_renderer_writes_land_cost_cast_illegal_and_board_details,
@@ -311,8 +399,11 @@ if __name__ == "__main__":
         test_renderer_uses_trigger_fields_for_resolved_ability_kind,
         test_renderer_explains_noncombat_damage_life_change,
         test_renderer_uses_card_as_damage_cause_fallback,
+        test_renderer_explains_kicked_orims_chant_attack_prevention,
         test_deck_metrics_are_derived_from_resolved_cards,
+        test_target_deck_id_env_defaults_validates_and_overrides,
         test_provenance_line_names_source_metrics_and_blocker_domain,
+        test_final_player_summary_includes_hand_card_names,
     ]
     for test in tests:
         test()

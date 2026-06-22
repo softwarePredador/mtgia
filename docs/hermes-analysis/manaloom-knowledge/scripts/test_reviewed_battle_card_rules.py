@@ -484,6 +484,13 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Mind Stone"]["effect_json"]["effect"], "ramp_permanent")
         self.assertEqual(by_name["Mind Stone"]["effect_json"]["mana_produced"], 1)
         self.assertTrue(by_name["Mind Stone"]["effect_json"]["activated_self_sacrifice_draw"])
+        self.assertEqual(by_name["Victory Chimes"]["source"], "curated")
+        self.assertEqual(by_name["Victory Chimes"]["review_status"], "verified")
+        self.assertEqual(by_name["Victory Chimes"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Victory Chimes"]["effect_json"]["mana_produced"], 1)
+        self.assertTrue(
+            by_name["Victory Chimes"]["effect_json"]["untaps_each_opponent_untap"]
+        )
         self.assertEqual(by_name["Nature's Claim"]["effect_json"]["target"], "artifact_or_enchantment")
         self.assertEqual(by_name["Natural Order"]["source"], "curated")
         self.assertEqual(by_name["Natural Order"]["review_status"], "verified")
@@ -787,6 +794,9 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         )
         self.assertEqual(by_name["Mox Diamond"]["source"], "curated")
         self.assertTrue(by_name["Mox Diamond"]["effect_json"]["requires_discard_land"])
+        self.assertEqual(by_name["Victory Chimes"]["source"], "curated")
+        self.assertEqual(by_name["Victory Chimes"]["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(by_name["Victory Chimes"]["effect_json"]["mana_produced"], 1)
         self.assertEqual(by_name["Natural Order"]["source"], "curated")
         self.assertEqual(by_name["Natural Order"]["effect_json"]["effect"], "tutor")
         self.assertEqual(

@@ -64,9 +64,12 @@ EFFECT_TO_DECK_CATEGORY = {
     "redirect_removal": "protection",
     "counter": "protection",
     "hate_artifact": "protection",
+    "attack_limit": "protection",
+    "attack_tax": "protection",
     "draw_cards": "draw",
     "cantrip_mana_filter_artifact": "draw",
     "draw_engine": "draw",
+    "equipment_static_attachment": "protection",
     "topdeck_manipulation": "draw",
     "loot": "draw",
     "tutor": "tutor",
@@ -80,12 +83,15 @@ EFFECT_TO_DECK_CATEGORY = {
     "worldfire_reset": "wincon",
     "board_wipe": "wipe",
     "damage_wipe": "wipe",
+    "damage_wipe_treasure": "wipe",
     "remove_creature": "removal",
     "remove_permanent": "removal",
     "remove_artifact_or_3dmg": "removal",
+    "damage_player_and_creatures": "removal",
     "deal_damage": "removal",
     "copy_spell": "engine",
     "recursion": "engine",
+    "redistribute_life_totals": "wincon",
     "land_recursion": "engine",
     "land_recursion_creature": "engine",
     "life_artifact": "protection",
@@ -562,12 +568,13 @@ def upsert_battle_card_rule(
     deck_role_json: dict[str, Any] | None = None,
     notes: str = "",
     oracle_hash: str | None = None,
+    logical_rule_key_value: str | None = None,
 ) -> bool:
     ensure_battle_card_rules(conn)
     normalized = normalize_card_name(card_name)
     now = utc_now()
     role = deck_role_json or deck_role_from_effect(effect_json)
-    rule_key = logical_rule_key(
+    rule_key = str(logical_rule_key_value or "") or logical_rule_key(
         {
             "effect_json": effect_json,
             "deck_role_json": role,

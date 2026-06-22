@@ -34,6 +34,15 @@ def _has_evaluation_pressure_metadata(event: dict[str, Any]) -> bool:
     )
 
 
+def _is_accepted_non_target_attack(event: dict[str, Any], table_intent_mode: bool) -> bool:
+    reason = str(event.get("target_reason") or "")
+    if table_intent_mode and reason.startswith("table_intent_"):
+        return True
+    if table_intent_mode and reason == "lethal":
+        return True
+    return False
+
+
 def audit_events(events: list[dict[str, Any]], target_player: str) -> dict[str, Any]:
     table_intent_mode = any(
         _event_kind(event) == "combat" and event.get("table_intent_enabled") is True
@@ -96,7 +105,7 @@ def audit_events(events: list[dict[str, Any]], target_player: str) -> dict[str, 
                     )
             else:
                 summary["opponent_combat_to_other"] += 1
-                if table_intent_mode and str(event.get("target_reason") or "").startswith("table_intent_"):
+                if _is_accepted_non_target_attack(event, table_intent_mode):
                     summary["opponent_combat_to_other_table_intent_accepted"] += 1
                     continue
                 summary["violations"].append(

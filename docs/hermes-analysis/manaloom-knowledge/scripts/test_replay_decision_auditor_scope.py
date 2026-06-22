@@ -122,12 +122,51 @@ def test_low_power_removal_with_better_target_score_is_still_flagged():
     assert findings[0]["finding"] == "Removal hit a low-power target while multiple targets were available."
 
 
+def test_cleanup_allows_no_maximum_hand_size_permanent():
+    findings = auditor.audit_turn_events([
+        {
+            "event": "turn_end",
+            "replay_id": "seed_hand",
+            "turn": 7,
+            "player": "Lorehold",
+            "hand": 8,
+            "discarded": 0,
+            "board_snapshot": [
+                {"name": "Library of Leng", "type_line": "Artifact"},
+            ],
+        }
+    ])
+
+    assert findings == []
+
+
+def test_cleanup_flags_large_hand_without_no_maximum_hand_size_permanent():
+    findings = auditor.audit_turn_events([
+        {
+            "event": "turn_end",
+            "replay_id": "seed_hand",
+            "turn": 7,
+            "player": "Lorehold",
+            "hand": 8,
+            "discarded": 0,
+            "board_snapshot": [
+                {"name": "Lorehold, the Historian", "type_line": "Legendary Creature"},
+            ],
+        }
+    ])
+
+    assert len(findings) == 1
+    assert findings[0]["finding"] == "Cleanup ended with hand size 8 > 7."
+
+
 if __name__ == "__main__":
     tests = [
         test_clean_status_names_turn_invariants_not_full_replay_trust,
         test_markdown_report_declares_not_evaluated_layers,
         test_low_power_removal_with_best_target_score_is_not_flagged,
         test_low_power_removal_with_better_target_score_is_still_flagged,
+        test_cleanup_allows_no_maximum_hand_size_permanent,
+        test_cleanup_flags_large_hand_without_no_maximum_hand_size_permanent,
     ]
     for test in tests:
         test()

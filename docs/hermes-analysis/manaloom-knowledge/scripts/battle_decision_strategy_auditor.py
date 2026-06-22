@@ -56,6 +56,12 @@ RESOURCE_BENEFIT_REASONS = {
     "untapped_net_mana_upgrade",
 }
 
+SAME_TURN_UNLOCK_REASONS = {
+    "same_turn_castable_spell",
+    "same_turn_commander_cast",
+    "same_turn_high_impact_spell",
+}
+
 BAD_FORCED_KEEP_RISK_FLAGS = {
     "expensive_dead_hand",
     "mana_screw",
@@ -351,7 +357,7 @@ def immediate_payoff_after_resource_spend(
     index: int,
     resource_event: dict[str, Any],
     *,
-    window: int = 8,
+    window: int = 12,
 ) -> dict[str, Any] | None:
     """Return the next meaningful same-turn payoff after spending a scarce resource."""
     player = resource_event.get("player")
@@ -390,6 +396,17 @@ def documented_resource_benefit(resource_event: dict[str, Any]) -> dict[str, Any
             "event": resource_event.get("event"),
             "card": resource_event.get("card"),
             "reason": reason,
+        }
+    unlock_reason = str(resource_event.get("unlock_reason") or "")
+    unlock_card = resource_event.get("unlock_card")
+    if unlock_card and (
+        unlock_reason in SAME_TURN_UNLOCK_REASONS
+        or resource_event.get("unlocks_same_turn_action")
+    ):
+        return {
+            "event": resource_event.get("event"),
+            "card": unlock_card,
+            "reason": unlock_reason or "documented_same_turn_unlock",
         }
     return None
 

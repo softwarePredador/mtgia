@@ -35,6 +35,7 @@ ADDITIONAL_CANONICAL_NAMES = {
     "Hullbreaker Horror",
     "Momentary Blink",
     "Mox Diamond",
+    "Mental Misstep",
     "Rise of the Eldrazi",
     "Roiling Regrowth",
     "Scour for Scrap",

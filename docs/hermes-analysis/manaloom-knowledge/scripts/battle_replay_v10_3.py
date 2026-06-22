@@ -22,6 +22,20 @@ DECK_PROVENANCE_OUT = os.environ.get(
     "REPLAY_DECK_PROVENANCE_OUT",
     str(Path(EVENTS_OUT).with_suffix(".deck_provenance.json")),
 )
+TARGET_DECK_ID_ENV = "MANALOOM_BATTLE_TARGET_DECK_ID"
+DEFAULT_TARGET_DECK_ID = 6
+
+
+def target_deck_id_from_env(environ=None):
+    environ = environ if environ is not None else os.environ
+    raw = str(environ.get(TARGET_DECK_ID_ENV, str(DEFAULT_TARGET_DECK_ID))).strip()
+    try:
+        deck_id = int(raw)
+    except ValueError as exc:
+        raise ValueError(f"{TARGET_DECK_ID_ENV} must be an integer, got {raw!r}") from exc
+    if deck_id <= 0:
+        raise ValueError(f"{TARGET_DECK_ID_ENV} must be positive, got {deck_id}")
+    return deck_id
 
 
 def is_land_like(card):
@@ -125,6 +139,31 @@ def format_board_snapshot(snapshot, limit=12):
     return ", ".join(names)
 
 
+def format_hand_snapshot(snapshot, limit=12):
+    if not snapshot:
+        return "-"
+    names = []
+    for item in snapshot[:limit]:
+        if isinstance(item, dict):
+            names.append(str(item.get("name") or "?"))
+        else:
+            names.append(str(item))
+    if len(snapshot) > limit:
+        names.append(f"+{len(snapshot) - limit} more")
+    return ", ".join(names)
+
+
+def write_final_player_summary(replay, player, battle_module):
+    hand_cards = format_hand_snapshot(
+        [battle_module.replay_card_snapshot(card) for card in player.hand]
+    )
+    replay.write(
+        f"{player.name}: {'ALIVE' if player.is_alive() else 'DEAD'} "
+        f"Life={player.life} Hand={len(player.hand)} "
+        f"HandCards=[{hand_cards}]\n"
+    )
+
+
 def format_life_note(data):
     parts = []
     if "life_before" in data or "life_after" in data:
@@ -139,8 +178,12 @@ def format_life_note(data):
 def write_replay_event(replay, event, data):
     if event == "turn_start":
         replay.write(
-            "\nTURN {turn} - {player} | Life={life} Hand={hand} Board={board}\n".format(
-                **data
+            "\nTURN {turn} - {player} | Life={life} Hand={hand} Board={board} "
+            "HandCards=[{hand_cards}]\n".format(
+                **{
+                    **data,
+                    "hand_cards": format_hand_snapshot(data.get("hand_snapshot") or []),
+                }
             )
         )
     elif event == "land_played":
@@ -342,6 +385,12 @@ def write_replay_event(replay, event, data):
             "{damage_to_player} player damage, target life {target_life_after}, "
             "target_dead={target_dead}\n".format(**data)
         )
+    elif event == "attack_prevented_by_orims_chant":
+        replay.write(
+            "  PREVENT ATTACK {player}: {card} kicked against {prevented_attacker}; "
+            "{prevented_attackers} attackers stopped before declare attackers "
+            "(projected_damage={projected_combat_damage})\n".format(**data)
+        )
     elif event == "removal_resolved":
         replay.write(
             "  REMOVAL {player}: {card} removed {target} from {target_player}\n".format(
@@ -355,12 +404,22 @@ def write_replay_event(replay, event, data):
             )
         )
     elif event == "turn_end":
+        discarded_cards = data.get("discarded_cards") or []
+        discarded_suffix = (
+            " DiscardedCards=[{}]".format(
+                format_hand_snapshot([{"name": name} for name in discarded_cards])
+            )
+            if discarded_cards
+            else ""
+        )
         replay.write(
             "  END {player}: Life={life} Hand={hand} Board={board} "
-            "Grave={graveyard} Discarded={discarded} "
-            "Permanents=[{permanents}]\n".format(
+            "Grave={graveyard} Discarded={discarded}{discarded_suffix} "
+            "HandCards=[{hand_cards}] Permanents=[{permanents}]\n".format(
                 **{
                     **data,
+                    "discarded_suffix": discarded_suffix,
+                    "hand_cards": format_hand_snapshot(data.get("hand_snapshot") or []),
                     "permanents": format_board_snapshot(data.get("board_snapshot") or []),
                 }
             )
@@ -436,10 +495,11 @@ def main():
 
         battle.REPLAY_EVENT_HANDLER = log
         battle.DECISION_TRACE_HANDLER = log_decision
+        target_deck_id = target_deck_id_from_env()
         if hasattr(battle, "load_deck_with_construction_report"):
-            commander, deck, construction_report = battle.load_deck_with_construction_report()
+            commander, deck, construction_report = battle.load_deck_with_construction_report(target_deck_id)
         else:
-            commander, deck = battle.load_deck()
+            commander, deck = battle.load_deck(target_deck_id)
             construction_report = {}
         learned = battle.load_learned_opponents()
         source = learned if learned and len(learned) >= 3 else battle.OPPONENT_ARCHETYPES
@@ -448,6 +508,7 @@ def main():
 
         replay.write("=" * 70 + "\n")
         replay.write("BATTLE v10.3 - STRUCTURED REPLAY\n")
+        replay.write(f"Target deck id: {target_deck_id}\n")
         replay.write(f"Commander: {commander['name']}\n")
         evaluation_target = (
             battle.evaluation_target_player_name()
@@ -481,7 +542,8 @@ def main():
             {
                 "name": "Lorehold",
                 "source_kind": "sqlite_deck_cards",
-                "source_ref": "deck_id:6",
+                "source_ref": f"deck_id:{target_deck_id}",
+                "target_deck_id": target_deck_id,
                 "metrics_basis": "runtime_derived_from_resolved_card_list",
                 "cached_metadata_used_for_metrics": False,
                 "metrics": deck_metrics(deck),
@@ -580,7 +642,8 @@ def main():
             lands = sum(1 for card in player.hand if battle.is_land(card))
             replay.write(
                 f"  {player.name}: {mulligans} mulligan(s), "
-                f"{len(player.hand)} cards, {lands} lands\n"
+                f"{len(player.hand)} cards, {lands} lands, "
+                f"HandCards=[{format_hand_snapshot([battle.replay_card_snapshot(card) for card in player.hand])}]\n"
             )
 
         turn = 0
@@ -635,10 +698,7 @@ def main():
             )
         replay.write(f"Winner: {winner.name if winner else 'none'} ({reason})\n")
         for player in all_players:
-            replay.write(
-                f"{player.name}: {'ALIVE' if player.is_alive() else 'DEAD'} "
-                f"Life={player.life} Hand={len(player.hand)}\n"
-            )
+            write_final_player_summary(replay, player, battle)
 
     print(f"Replay: {OUT}")
     print(f"Replay events: {EVENTS_OUT}")

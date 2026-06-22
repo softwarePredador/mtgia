@@ -13,6 +13,48 @@ def register_tests(battle, player, card):
         assert dead.eliminated is True
         assert battle.check_sbas([alive, dead]) is False
 
+    def test_eliminated_player_battlefield_leaves_game():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            dead = player("Dead")
+            dead.life = 0
+            dead.battlefield = [
+                {
+                    "name": "Dead Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Dead Land",
+                    "effect": "land",
+                    "type_line": "Land",
+                },
+            ]
+            dead.phased_out = [
+                {
+                    "name": "Phased Dead Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                }
+            ]
+
+            assert battle.check_sbas([dead]) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert dead.eliminated is True
+        assert dead.battlefield == []
+        assert dead.phased_out == []
+        event = next(data for event, data in events if event == "player_eliminated")
+        assert event["battlefield_removed_from_game"] == 2
+        assert event["phased_out_removed_from_game"] == 1
+
     def test_cleanup_runs_with_previously_eliminated_player():
         active = player("Active", [card("Draw") for _ in range(5)])
         active.hand = [card(f"Expensive {index}") for index in range(10)]
@@ -223,6 +265,7 @@ def register_tests(battle, player, card):
 
     return [
         test_sba_only_reports_new_elimination,
+        test_eliminated_player_battlefield_leaves_game,
         test_cleanup_runs_with_previously_eliminated_player,
         test_plus_minus_counters_cancel_as_sba,
         test_zero_or_negative_toughness_dies_even_if_indestructible,

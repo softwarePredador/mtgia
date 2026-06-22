@@ -1086,3 +1086,1004 @@ Conclusion:
   are not published because they are uncommitted.
 - Code publication is now an explicit remaining gap, separate from PostgreSQL
   deploy state.
+
+## Deck Worktree Classification - 2026-06-20 22:14 -0300
+
+Scope:
+
+- Classified current deck/auditor tracked modifications and untracked
+  `master_optimizer_reports` artifacts after PG-016, PG-017, and PG-018
+  appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap, PostgreSQL apply, or cache sync was performed.
+
+Current counts:
+
+- `git status --short --branch`: `master...origin/master`.
+- Tracked modified files: `23`.
+- Untracked files: `58`, all under
+  `docs/hermes-analysis/master_optimizer_reports/`.
+
+Source necessary:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_forensic_audit.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_target_pressure_audit.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/derive_functional_tags_from_battle_rules.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py`
+
+Test necessary:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_forensic_audit_supported_effects.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_target_pressure_audit.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py`
+
+Evidence necessary:
+
+- Updated registers:
+  `BATTLE_REPLAY_GATE_MATRIX.md`,
+  `BATTLE_VALIDATION_REGISTER_2026-06-19.md`,
+  `LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md`,
+  `MANALOOM_CENTRAL_AUDITOR_COMPLETION_AUDIT_2026-06-20.md`,
+  `MANALOOM_CENTRAL_AUDITOR_ORDERS.md`,
+  `MANALOOM_POST_LOOP_SMOKE_AND_NEXT_CYCLE_2026-06-20.md`, and
+  `POSTGRES_DEPLOY_REGISTER_2026-06-20.md`.
+- Runtime snapshot:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json`.
+- Untracked PG package and sync evidence under
+  `docs/hermes-analysis/master_optimizer_reports/`, including PG-011 through
+  PG-018 SQL packages, learned-deck coherence artifacts, Lorehold defense sync
+  artifacts, and battle-card-rules SQLite sync reports.
+
+Candidate future cleanup:
+
+- None of the 58 untracked `master_optimizer_reports` files should be deleted
+  during monitoring. They are currently evidence for PG/deck audit lineage.
+- Superseded package sets may be proposed for cleanup only after the central
+  registers stop referencing them and Rafael explicitly approves the exact file
+  list.
+
+## Deck Worktree Classification - 2026-06-20 22:44 -0300
+
+Scope:
+
+- Reclassified the worktree after the post-PG018 battle result and PG-019
+  artifacts appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap, PostgreSQL apply, or cache sync was performed.
+
+Current counts:
+
+- `git status --short --branch`: `master...origin/master`.
+- Tracked modified files: `24`.
+- Untracked files: `64`, all under
+  `docs/hermes-analysis/master_optimizer_reports/`.
+
+New since the prior classification:
+
+- Test necessary:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_tests.py`.
+- Evidence necessary:
+  `jin_gitaxias_non_wheel_pg019_apply_20260621_013900.sql`,
+  `jin_gitaxias_non_wheel_pg019_package_20260621_013900.md`,
+  `jin_gitaxias_non_wheel_pg019_postcheck_20260621_013900.sql`,
+  `jin_gitaxias_non_wheel_pg019_precheck_20260621_013900.sql`,
+  `jin_gitaxias_non_wheel_pg019_rollback_20260621_013900.sql`, and
+  `battle_card_rules_sqlite_from_pg_pg019_jin_non_wheel_20260621_014100.json`.
+
+Current classification delta:
+
+- PG-019 package/sync artifacts are evidence, not cleanup candidates, because
+  they explain the post-PG018 strategy-audit `wheel_opponent_refill_risk`
+  follow-up for `Jin-Gitaxias, Core Augur`.
+- `battle_zone_transition_tests.py` is a test file and should stay grouped with
+  the battle runtime/test source changes until the deck/auditor source slice is
+  reviewed as a whole.
+- No untracked `master_optimizer_reports` file should be deleted during
+  monitoring without explicit approval of the exact file list.
+
+## Deck Worktree Classification - 2026-06-20 23:14 -0300
+
+Scope:
+
+- Reclassified the worktree after the local Hermes master optimizer apply
+  artifacts appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or cache sync was performed.
+
+Current counts:
+
+- `git status --short --branch`: `master...origin/master`.
+- Tracked modified files: `24`.
+- Untracked files: `66`, all under
+  `docs/hermes-analysis/master_optimizer_reports/`.
+
+New evidence necessary:
+
+- `docs/hermes-analysis/master_optimizer_reports/master_optimizer_apply_20260621_020406.md`
+- `docs/hermes-analysis/master_optimizer_reports/master_optimizer_rollback_20260621T020406839706+0000.json`
+
+Classification:
+
+- These two files are evidence for a local Hermes SQLite optimizer apply:
+  `Windborn Muse` over `Guttersnipe` for runtime `deck_id=6`.
+- They are not cleanup candidates while the central register references them,
+  and the rollback JSON must stay available until Rafael explicitly decides how
+  to handle the local Hermes/runtime divergence.
+
+## Deck Worktree Classification - 2026-06-20 23:45 -0300
+
+Scope:
+
+- Reclassified the worktree after PG-020 package/sync/failure-analysis artifacts
+  and the fresh learned-deck coherence audit appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or cache sync was performed by this heartbeat.
+
+Current counts:
+
+- `git status --short --branch`: `master...origin/master`.
+- Tracked modified files: `24`.
+- Untracked files: `75`, all under
+  `docs/hermes-analysis/master_optimizer_reports/`.
+
+New evidence necessary:
+
+- `lorehold_windborn_deck_swap_pg020_precheck_20260621_022046.sql`
+- `lorehold_windborn_deck_swap_pg020_apply_20260621_022046.sql`
+- `lorehold_windborn_deck_swap_pg020_postcheck_20260621_022046.sql`
+- `lorehold_windborn_deck_swap_pg020_rollback_20260621_022046.sql`
+- `lorehold_windborn_deck_swap_pg020_package_20260621_022046.md`
+- `sync_pg_target_deck_to_hermes_pg020_windborn_20260621_022046.json`
+- `lorehold_deck6_pg020_failure_analysis_20260621_022700.md`
+- `learned_deck_coherence_audit_20260621_024551.json`
+- `learned_deck_coherence_audit_20260621_024551.md`
+
+Classification:
+
+- PG-020 files are evidence for an externally applied/postchecked PostgreSQL
+  deck correction and must stay with the deploy lineage.
+- The fresh learned-deck coherence artifacts are evidence for current
+  post-PG020 active learned-deck drift and must not be deleted during
+  monitoring.
+- No Ensnaring Bridge candidate package exists yet; any future package should
+  be classified separately before action.
+
+## Deck Worktree Classification - 2026-06-21 00:17 -0300
+
+Scope:
+
+- Reclassified the worktree after the read-only learned-deck coherence recheck
+  generated new artifacts for the Magus 64-seed checkpoint.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or cache sync was performed.
+
+New evidence necessary:
+
+- `learned_deck_coherence_audit_20260621_031653.json`
+- `learned_deck_coherence_audit_20260621_031653.md`
+
+Classification:
+
+- These two files are necessary evidence for the latest read-only learned-deck
+  coherence state after the Magus 64-seed battle checkpoint.
+- They supersede `learned_deck_coherence_audit_20260621_024551.*` for the
+  current Lorehold drift reading, but both artifact pairs should be preserved as
+  chronological evidence.
+- No untracked `master_optimizer_reports` file should be deleted during
+  monitoring without explicit approval of the exact file list.
+
+## Deck Worktree Classification - 2026-06-21 01:55 -0300
+
+Scope:
+
+- Reclassified the worktree after PG021/PG022 package, sync, and learned-deck
+  coherence artifacts appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+New evidence necessary:
+
+- `global_attack_rule_scope_pg021_precheck_20260621_043814.sql`
+- `global_attack_rule_scope_pg021_apply_20260621_043814.sql`
+- `global_attack_rule_scope_pg021_postcheck_20260621_043814.sql`
+- `global_attack_rule_scope_pg021_rollback_20260621_043814.sql`
+- `global_attack_rule_scope_pg021_package_20260621_043814.md`
+- `battle_card_rules_sqlite_from_pg_pg021_global_attack_scope_20260621_043814.json`
+- `lorehold_silent_arbiter_deck_swap_pg022_precheck_20260621_044155.sql`
+- `lorehold_silent_arbiter_deck_swap_pg022_apply_20260621_044155.sql`
+- `lorehold_silent_arbiter_deck_swap_pg022_postcheck_20260621_044155.sql`
+- `lorehold_silent_arbiter_deck_swap_pg022_rollback_20260621_044155.sql`
+- `lorehold_silent_arbiter_deck_swap_pg022_package_20260621_044155.md`
+- `sync_pg_target_deck_to_hermes_pg022_silent_arbiter_20260621_044155.json`
+- `learned_deck_coherence_audit_20260621_045522.json`
+- `learned_deck_coherence_audit_20260621_045522.md`
+
+Classification:
+
+- PG021 files are deploy lineage/evidence for global attack-rule scope
+  correction and must be preserved.
+- PG022 files are deploy lineage/evidence for the Silent Arbiter over
+  Monument to Endurance PostgreSQL deck correction and must be preserved.
+- The PG022 sync report is runtime-cache evidence and must be preserved.
+- `learned_deck_coherence_audit_20260621_045522.*` supersedes
+  `learned_deck_coherence_audit_20260621_031653.*` for current Lorehold
+  post-PG022 drift reading.
+- No untracked `master_optimizer_reports` file should be deleted during
+  monitoring without explicit approval of the exact file list.
+
+## Deck Worktree Classification - 2026-06-21 02:27 -0300
+
+Scope:
+
+- Reclassified the worktree after the PG022 validation report and post-PG022
+  candidate scans.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+New evidence necessary:
+
+- `lorehold_deck6_pg022_silent_arbiter_validation_20260621_044758.md`
+
+Classification:
+
+- The PG022 validation report is necessary evidence for the canonical
+  Silent Arbiter over Monument to Endurance result: `8/64`, clean gates,
+  synced PG/Hermes deck, and `100/100` card state.
+- Post-PG022 candidate scan outputs `20260621_051800`, `20260621_052117`, and
+  `20260621_052416` live outside the repo under
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/`
+  and should be referenced as external evidence, not copied into
+  `master_optimizer_reports` by this heartbeat.
+- No new untracked repo file was generated by this heartbeat.
+- No untracked `master_optimizer_reports` file should be deleted during
+  monitoring without explicit approval of the exact file list.
+
+## Deck Worktree Classification - 2026-06-21 03:06 -0300
+
+Scope:
+
+- Reclassified the worktree after the post-engine-fix candidate sequence and
+  latest `20260621_054803` battle artifact.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+New/changed evidence classification:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py`
+  is test necessary. The observed diff adds coverage that the player does not
+  cast `Teferi's Protection` against its own wheel payoff when a wheel plus
+  `Smothering Tithe` is on the stack.
+
+External evidence:
+
+- Post-fix battle outputs `20260621_053446`, `20260621_053937`,
+  `20260621_054357`, and `20260621_054803` live outside the repo under
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/`
+  and should be referenced as external evidence.
+- No new `master_optimizer_reports` file was generated by this heartbeat.
+- No untracked `master_optimizer_reports` file should be deleted during
+  monitoring without explicit approval of the exact file list.
+
+## Deck Worktree Classification - 2026-06-21 04:48 -0300
+
+Scope:
+
+- Reclassified after new external run directory `20260621_060733` appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_060733/`
+  is an aborted runner artifact: no `summary.json`, `py_compile=pass`, and
+  `test_battle_analyst_v10_3=failed` after a PostgreSQL connection closed
+  unexpectedly.
+- Read-only PG follow-up returned `pg_select_1=1`.
+- The artifact lives outside the repo and should be referenced as external
+  evidence only.
+
+Repo classification:
+
+- No new repo artifact was generated by this heartbeat.
+- Existing untracked `master_optimizer_reports` files remain evidence and must
+  not be deleted without explicit approval of the exact file list.
+
+## Deck Worktree Classification - 2026-06-21 15:32 -0300
+
+Scope:
+
+- Reclassified after the quantity-guard fix and three clean candidate runs.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, sync, or official deck swap was performed.
+
+Evidence necessary:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_deck6_quantity_guard_candidate_matrix_20260621_153200.md`
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_sphere_quantity_guard_20260621_150415.sqlite`
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_sphere_wrath_quantity_guard_20260621_151254.sqlite`
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_sphere_norns_quantity_guard_20260621_151842.sqlite`
+- External artifacts:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_180442/`,
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_181316/`,
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_181905/`.
+
+Classification:
+
+- These backup/report files are evidence for the deck candidate audit and must
+  not be removed as cleanup by default.
+- Current SQLite is restored to the official deck `6` shape: `100/100`, with
+  `Austere Command=1`, `Electroduplicate=1`, and `Victory Chimes=1`.
+- Candidate rows `Magus of the Moat`, `Sphere of Safety`, `Norn's Annex`, and
+  `Wrath of God` are not active official deck rows after restore.
+
+## Deck Worktree Classification - 2026-06-21 11:03 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_140346`
+  appeared and learned coherence artifact `20260621_133919` became canonical
+  for the corrected auditor.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync command was performed by
+  this heartbeat.
+
+Source necessary:
+
+- `server/bin/learned_deck_coherence_audit.py`: necessary source correction so
+  focused Lorehold strategy checks use `pg_saved_deck`/runtime truth instead
+  of stale active learned cards.
+- `server/test/learned_deck_coherence_audit_test.py`: necessary focused test
+  coverage for runtime-source precedence and `closing_conversion`.
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py`:
+  necessary runtime source touched by the focused zone-transition validation.
+
+Test necessary:
+
+- `python3 -m py_compile server/bin/learned_deck_coherence_audit.py server/test/learned_deck_coherence_audit_test.py`
+- `python3 -m unittest server/test/learned_deck_coherence_audit_test.py`
+  (`21` tests, `OK`).
+- External focused battle run `20260621_140346`: gate/test summary
+  `target_pressure=pass:1`, `table_intent=pass:1`, test results `pass:18`.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_133919.md`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_133919.json`
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_140346/summary.json`
+
+Candidate future cleanup:
+
+- None classified by this heartbeat. Existing untracked SQL/report artifacts
+  remain audit evidence and must not be deleted without explicit approval of
+  the exact file list.
+
+## Deck Worktree Classification - 2026-06-21 11:30 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_142400`
+  appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync command was performed by
+  this heartbeat.
+
+Evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_142400/summary.json`
+  is external battle evidence: `16/16`, trusted, clean gates, Lorehold `1/16`,
+  opponents `15/16`, target-pressure `pass=16`, table-intent `pass=16`, tests
+  `pass=18`.
+- Local SQLite check remains `100` rows / `100` quantity with the PG023 focused
+  card shape: `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, and `Windborn Muse=1`.
+
+Classification:
+
+- `20260621_142400` is evidence, not a source file and not a cleanup item.
+- Existing untracked `master_optimizer_reports` files remain audit evidence.
+- No candidate future cleanup is approved or implied.
+
+## Deck Worktree Classification - 2026-06-21 12:04 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_145948` and
+  newly visible untracked SQLite file
+  `docs/hermes-analysis/manaloom-knowledge/manaloom.sqlite`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync command was performed by
+  this heartbeat.
+
+Evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_145948/summary.json`
+  is external battle evidence: trusted, clean gates, tests `pass=18`, Lorehold
+  `2/16`, opponents `13/16`.
+- `20260621_144336` is external blocked evidence, not strategy truth:
+  `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- Local runtime SQLite check after runner: deck `6` is `100` rows / `100`
+  quantity with `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, and `Windborn Muse=1`.
+- `docs/hermes-analysis/manaloom-knowledge/manaloom.sqlite` is `0B` and
+  `file` reports `empty`.
+
+Classification:
+
+- External battle directories `140846`, `141620`, `144336`, `145423`, and
+  `145948` are evidence.
+- `docs/hermes-analysis/manaloom-knowledge/manaloom.sqlite` is candidate future
+  cleanup, not source and not test evidence, because it is empty. It was not
+  deleted.
+- Existing untracked SQL/report artifacts remain audit evidence.
+
+## Deck Worktree Classification - 2026-06-21 12:35 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_151645`
+  appeared while an external runner was still active.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, sync command, or runner
+  termination was performed by this heartbeat.
+
+Evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_151645/summary.json`
+  is external battle evidence: `review_required`, mandatory divergences
+  `forensic_audit`, `replay_decision_audit`, and `strategy_audit`, with
+  target-pressure/table-intent/tests still passing.
+- Active process at read time:
+  `manaloom-battle-strategy-audit.sh --seeds 16 --start-seed 63212310`.
+- Runtime SQLite read at that point: deck `6` is `100` rows / `100` quantity
+  with `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, and `Windborn Muse=1`.
+
+Classification:
+
+- `20260621_151645` is external review-required evidence, not source and not
+  cleanup.
+- No additional repo cleanup is approved or implied.
+
+## Deck Worktree Classification - 2026-06-21 12:37 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_152154`
+  appeared and no external runner remained active.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, sync command, or runner
+  termination was performed by this heartbeat.
+
+Evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_152154/summary.json`
+  is external trusted battle evidence: clean gates, tests `pass=18`, Lorehold
+  `1/16`, opponents `14/16`.
+- Runtime SQLite read: deck `6` is `100` rows / `100` quantity with
+  `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, and `Windborn Muse=1`.
+
+Classification:
+
+- `20260621_152154` is evidence, not a source file and not cleanup.
+- Existing untracked `docs/hermes-analysis/manaloom-knowledge/manaloom.sqlite`
+  remains candidate future cleanup because it is empty; it was not deleted.
+
+## Deck Worktree Classification - 2026-06-21 13:03 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_153944` and
+  new backup artifact
+  `knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_123935.sqlite`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync command was performed.
+
+Evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_153944/summary.json`
+  is external blocked battle evidence for Magus over Electroduplicate.
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_123935.sqlite`
+  is a `5.5M` SQLite backup artifact; it is not source code.
+- Current runtime SQLite deck `6` restored to `100/100` with
+  `Electroduplicate=1` and no focused `Magus of the Moat` row.
+
+Classification:
+
+- `20260621_153944` is evidence, not cleanup.
+- `knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_123935.sqlite`
+  is evidence for the temporary candidate run and candidate future cleanup once
+  explicitly approved; it was not deleted.
+
+## Deck Worktree Classification - 2026-06-21 13:19 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_160405` and new
+  backup artifact
+  `knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_160258.sqlite`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync command was performed.
+
+Evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_160405/summary.json`
+  is external trusted battle evidence for Magus over Electroduplicate after
+  mox trace fix.
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_160258.sqlite`
+  is a `5.5M` SQLite backup artifact; it is not source code.
+- Current runtime SQLite deck `6` restored to `100/100` with
+  `Electroduplicate=1` and no focused `Magus of the Moat` row.
+
+Classification:
+
+- `20260621_160405` is evidence, not cleanup.
+- `knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_160258.sqlite`
+  is evidence for the temporary candidate run and candidate future cleanup once
+  explicitly approved; it was not deleted.
+
+## Deck Worktree Classification - 2026-06-21 10:07 -0300
+
+Scope:
+
+- Reclassified after PG023 moved from prepared-only to external
+  applied/postchecked/synced/battle-validated evidence.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+Evidence necessary:
+
+- `lorehold_brainstone_deck_swap_pg023_precheck_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_apply_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_postcheck_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_rollback_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_package_20260621_114447.md`
+- `sync_pg_target_deck_to_hermes_pg023_brainstone_20260621_114447.json`
+- `battle_card_rules_sqlite_from_pg_pg023_brainstone_20260621_114447.json`
+- `learned_deck_coherence_audit_20260621_130957.json`
+- `learned_deck_coherence_audit_20260621_130957.md`
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_121648/`
+  is the PG023 post-sync 16-seed smoke artifact: `4/16`, trusted, clean gates.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_122732/`
+  is the PG023 post-sync 64-seed full artifact: `14/64`, trusted, clean gates.
+
+Classification:
+
+- PG023 SQL files remain necessary deploy-package evidence, including rollback.
+- PG023 sync JSON files are evidence of runtime cache synchronization and must
+  not be deleted during monitoring.
+- `learned_deck_coherence_audit_20260621_130957.*` is necessary fresh evidence
+  for the post-PG023 active learned-vs-runtime drift.
+- The active learned-deck drift is pending governance work, not a cleanup task.
+
+## Deck Worktree Classification - 2026-06-21 10:15 -0300
+
+Scope:
+
+- Reclassified after external temporary candidate runner `20260621_131126`
+  completed and restored local SQLite.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, or persistent deck swap was performed by this
+  heartbeat.
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131126/`
+  is a gate-clean temporary candidate artifact: `16/16`, trusted, clean gates,
+  Lorehold `1/16`.
+- The observed process command used a temporary SQLite mutation
+  (`Expedition Map` over `Electroduplicate`) with backup/restore trap.
+- Post-run SQLite check shows persistent deck `6` restored to PG023 state:
+  `Brainstone=1`, `Electroduplicate=1`, `Silent Arbiter=1`,
+  `Windborn Muse=1`, no `Expedition Map`, no `Generous Gift`.
+
+Classification:
+
+- `20260621_131126` is external candidate evidence only.
+- No new repo artifact was generated by this candidate runner.
+- Existing PG023 and learned-coherence artifacts remain necessary evidence and
+  should not be deleted during monitoring.
+
+## Deck Worktree Classification - 2026-06-21 10:20 -0300
+
+Scope:
+
+- Reclassified after current latest external run `20260621_131606` completed.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, or deck swap was performed by this heartbeat.
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131606/`
+  is current latest recurring smoke evidence: `16/16`, trusted, clean gates,
+  Lorehold `3/16`.
+- Persistent SQLite after the run remains PG023-shaped:
+  `Brainstone=1`, `Electroduplicate=1`, `Silent Arbiter=1`,
+  `Windborn Muse=1`, no `Generous Gift`, no `Expedition Map`.
+
+Classification:
+
+- `20260621_131606` is external battle evidence only.
+- No new repo artifact was generated by this run.
+- Existing repo artifacts remain evidence; no cleanup is authorized.
+
+## Deck Worktree Classification - 2026-06-21 10:25 -0300
+
+Scope:
+
+- Reclassified after current latest external temporary candidate run
+  `20260621_132027` completed and restored local SQLite.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, or persistent deck swap was performed by this
+  heartbeat.
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132027/`
+  is current latest temporary candidate evidence: `16/16`, trusted, clean
+  gates, Lorehold `2/16`.
+- Observed process command used `Thrill of Possibility` over `Boros Charm` with
+  local SQLite backup/restore.
+- Post-run SQLite check shows persistent deck restored:
+  `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, `Windborn Muse=1`, no `Thrill of Possibility`.
+
+Classification:
+
+- `20260621_132027` is external candidate evidence only.
+- No new repo artifact was generated by this run.
+- Existing repo artifacts remain evidence; no cleanup is authorized.
+
+## Deck Worktree Classification - 2026-06-21 10:26 -0300
+
+Scope:
+
+- Reclassified while external temporary candidate runner `20260621_132537` is
+  still active.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, or persistent deck swap was performed by this
+  heartbeat.
+
+External evidence:
+
+- Active run directory:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132537/`.
+- It is a temporary `Reprieve` over `Boros Charm` candidate with SQLite
+  backup/restore trap.
+- At final checkpoint, it had at least `9` seed directories and no summary had
+  been read.
+
+Classification:
+
+- `20260621_132537` is in-progress external candidate evidence.
+- Current SQLite should not be classified as persistent until the runner exits.
+- No repo artifact was generated by this active runner yet.
+
+## Deck Worktree Classification - 2026-06-21 10:30 -0300
+
+Scope:
+
+- Reclassified after external temporary candidate run `20260621_132537`
+  completed and restored local SQLite.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, or persistent deck swap was performed by this
+  heartbeat.
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132537/`
+  is current latest temporary candidate evidence: `16/16`, trusted, clean
+  gates, Lorehold `4/16`.
+- Candidate was `Reprieve` over `Boros Charm` with local SQLite
+  backup/restore.
+- Post-run SQLite check shows persistent deck restored:
+  `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, `Windborn Muse=1`, no `Reprieve`, no `Generous Gift`.
+
+Classification:
+
+- `20260621_132537` is external candidate evidence only.
+- No new repo artifact was generated by this run.
+- Existing repo artifacts remain evidence; no cleanup is authorized.
+
+## Deck Worktree Classification - 2026-06-21 10:30 Candidate Scan
+
+Scope:
+
+- Reclassified after new repo artifact
+  `lorehold_pg023_candidate_scan_20260621_132537.md` appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push,
+  PostgreSQL apply, rollback, or persistent deck swap was performed by this
+  heartbeat.
+
+Classification:
+
+- `lorehold_pg023_candidate_scan_20260621_132537.md` is necessary evidence.
+- It records `no_promotion` for the recent temporary candidate sweep and should
+  not be deleted during monitoring.
+- It corrects the interpretation of `131606`: candidate `Reforge the Soul` over
+  `Boros Charm`, not canonical PG023 smoke.
+
+## Deck Worktree Classification - 2026-06-21 10:06 -0300
+
+Scope:
+
+- Reclassified after PG023 PostgreSQL apply, PG -> Hermes sync, and post-sync
+  battle validation.
+- No deletion, stash, revert, stage, commit, or push was performed by this
+  update.
+
+New evidence necessary:
+
+- `lorehold_brainstone_deck_swap_pg023_precheck_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_apply_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_postcheck_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_rollback_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_package_20260621_114447.md`
+- `battle_card_rules_sqlite_from_pg_pg023_brainstone_20260621_114447.json`
+- `sync_pg_target_deck_to_hermes_pg023_brainstone_20260621_114447.json`
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_121648/`
+  is the post-sync 16-seed smoke.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_122732/`
+  is the post-sync 64-seed full validation and current `latest`.
+
+Classification:
+
+- PG023 files are no longer prepared-only; they are applied and validated deploy
+  evidence.
+- They must not be deleted during worktree cleanup.
+- Remaining dirty worktree should be split into coherent batches before commit:
+  battle engine/test fixes, PostgreSQL deploy artifacts, sync reports, and
+  audit-register updates.
+
+## Deck Worktree Classification - 2026-06-21 10:06 -0300 Candidate Scan
+
+Scope:
+
+- Reclassified after four temporary PG023 candidate smoke runs.
+- No deletion, stash, revert, stage, commit, push, PostgreSQL apply, or rollback
+  was performed for these candidate scans.
+
+New evidence necessary:
+
+- `lorehold_pg023_candidate_scan_20260621_132537.md`
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131126/`
+  is rejected `Expedition Map` over `Electroduplicate`.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131606/`
+  is rejected `Reforge the Soul` over `Boros Charm`.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132027/`
+  is rejected `Thrill of Possibility` over `Boros Charm`.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132537/`
+  is rejected `Reprieve` over `Boros Charm` and current `latest`.
+
+Classification:
+
+- Candidate scan report is necessary evidence and must not be deleted.
+- Candidate external artifacts are rejected strategy evidence, not canonical
+  runtime validation.
+- SQLite was restored after candidate scans; current repo dirty state is
+  documentation/evidence plus pre-existing battle/runtime modifications.
+
+Additional generated evidence:
+
+- `learned_deck_coherence_audit_20260621_130957.md`
+- `learned_deck_coherence_audit_20260621_130957.json`
+
+Classification:
+
+- These are read-only coherence evidence generated during the PG023 cycle.
+- They should be kept, not cleaned, because they document the remaining
+  Lorehold strategy-package mismatch after PG023.
+
+## Deck Worktree Classification - 2026-06-21 10:39 -0300
+
+Scope:
+
+- Corrected the learned-deck coherence auditor after discovering that the
+  focused Lorehold strategy check still used the stale active learned list
+  instead of the runtime PG deck.
+- No PostgreSQL write, SQLite deck swap, rollback, cleanup, deletion, stash,
+  stage, commit, or push was performed by this correction.
+
+Tracked code/test changes:
+
+- `server/bin/learned_deck_coherence_audit.py`
+- `server/test/learned_deck_coherence_audit_test.py`
+
+New evidence necessary:
+
+- `learned_deck_coherence_audit_20260621_133709.md`
+- `learned_deck_coherence_audit_20260621_133709.json`
+- `learned_deck_coherence_audit_20260621_133919.md`
+- `learned_deck_coherence_audit_20260621_133919.json`
+
+Classification:
+
+- `133709` is intermediate evidence showing the stale big-spell package was
+  recalibrated but before the strategy source fix.
+- `133919` is the current canonical learned-coherence artifact for this
+  correction. It shows `strategy_source=pg_saved_deck`, Lorehold strategy pass,
+  and no strategy issues.
+- The remaining name diff of `3` is active learned source lag versus runtime
+  PG/SQLite, not a deck quantity or PG/SQLite sync failure.
+
+## Deck Worktree Classification - 2026-06-21 13:52 -0300
+
+Scope:
+
+- Reclassified after Victory Chimes reviewed-rule changes, local SQLite sync
+  evidence, and latest battle artifacts `20260621_164101` and `20260621_164710`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed.
+
+Source necessary:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json`
+  adds verified curated `Victory Chimes` ramp modeling.
+
+Test necessary:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  adds assertions that `Victory Chimes` remains curated/verified
+  `ramp_permanent`.
+
+Evidence necessary:
+
+- `docs/hermes-analysis/master_optimizer_reports/victory_chimes_reviewed_rule_sqlite_sync_20260621_161900.json`
+  records the observed local SQLite sync.
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_victory_chimes_rule_fix_20260621_161900.sqlite`
+  preserves the stale pre-fix curated `draw_engine` row.
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_after_victory_fix_20260621_165000.sqlite`
+  preserves the pre-transient-candidate focused deck shape with
+  `Electroduplicate=1`.
+- External battle artifacts `20260621_164101` and `20260621_164710` are
+  required battle evidence.
+
+Candidate future cleanup:
+
+- The SQLite backup files remain cleanup candidates only after explicit
+  approval of the exact file list.
+- `docs/hermes-analysis/manaloom-knowledge/manaloom.sqlite` remains an
+  untracked candidate cleanup item from earlier classification; it was not
+  deleted.
+
+Current risk classification:
+
+- Focused Victory Chimes tests pass.
+- The broader reviewed-rule test file still has two Top/Scroll Rack failures,
+  so it remains a test-risk item, not cleanup.
+
+## Deck Worktree Classification - 2026-06-21 14:38 -0300
+
+Scope:
+
+- Reclassified after latest battle advanced to `20260621_173334`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed.
+
+New evidence necessary:
+
+- External artifact
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_173334/`
+  is current latest trusted candidate evidence.
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_after_victory_fix_same_seed_20260621_165700.sqlite`
+  is evidence preserving the pre-candidate focused shape with
+  `Electroduplicate=1`.
+
+Classification:
+
+- `173334` and the backup are evidence necessary, not cleanup by default.
+- The candidate still does not authorize PostgreSQL mutation or deck swap.
+- Existing Victory Chimes source/test classifications from the 13:52 entry
+  remain valid.
+
+## Deck Worktree Classification - 2026-06-21 14:42 -0300
+
+Scope:
+
+- Reclassified after new local runtime-cache backup
+  `knowledge_db_backup_candidate_magus_sphere_after_victory_fix_20260621_174200.sqlite`
+  appeared and `knowledge.db` changed at `14:39:31 -0300`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync was performed.
+
+Evidence necessary:
+
+- `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_sphere_after_victory_fix_20260621_174200.sqlite`
+  preserves the pre-change focused runtime shape with `Electroduplicate` and
+  `Victory Chimes`.
+
+Active drift:
+
+- Current local SQLite deck `6` now has `Magus of the Moat` and
+  `Sphere of Safety`, while latest completed battle remains `173334`.
+- Classify this as active runtime-cache drift/candidate state. It is not a
+  cleanup item and not authorization for mutation.
+
+## Deck Worktree Classification - 2026-06-21 14:46 -0300
+
+Scope:
+
+- Reclassified after the active drift runner completed as battle artifact
+  `20260621_174142`.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, rollback, or sync was performed.
+
+Evidence necessary:
+
+- External artifact
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_174142/`
+  is current latest review-required candidate evidence.
+- `knowledge_db_backup_candidate_magus_sphere_after_victory_fix_20260621_174200.sqlite`
+  remains evidence of the pre-candidate focused deck shape.
+
+Classification:
+
+- The temporary runtime-cache drift is no longer active after `174142`; final
+  SQLite focused state is back to `Electroduplicate` plus `Victory Chimes`.
+- `174142` is evidence necessary and not cleanup.
+- Magus+Sphere remains a rejected/review-required candidate, not a source file
+  or deploy package.
+
+## Deck Worktree Classification - 2026-06-21 05:18 -0300
+
+Scope:
+
+- Reclassified after PG023 Brainstone package artifacts appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+New evidence necessary:
+
+- `lorehold_brainstone_deck_swap_pg023_precheck_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_apply_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_postcheck_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_rollback_20260621_114447.sql`
+- `lorehold_brainstone_deck_swap_pg023_package_20260621_114447.md`
+
+Classification:
+
+- PG023 files are prepared deploy-package evidence for a proposed Brainstone
+  over Generous Gift Lorehold swap.
+- They are not applied artifacts yet and must not be deleted during monitoring.
+- They are not authorization to mutate PostgreSQL without explicit command
+  approval.
+
+## Deck Worktree Classification - 2026-06-21 05:17 -0300
+
+Scope:
+
+- Reclassified after latest external battle artifact `20260621_080706`
+  appeared.
+- No file deletion, move, cleanup, stash, revert, stage, commit, push, deck
+  swap command, PostgreSQL apply, or rollback was performed by this heartbeat.
+
+External evidence:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_080706/`
+  is the latest completed external battle artifact: `64/64`, trusted, clean
+  gates, Lorehold `14/64`.
+- The artifact lives outside the repo and should be referenced as external
+  evidence.
+
+Repo classification:
+
+- No new repo artifact was generated by this heartbeat.
+- Existing untracked `master_optimizer_reports` files remain evidence and must
+  not be deleted without explicit approval of the exact file list.

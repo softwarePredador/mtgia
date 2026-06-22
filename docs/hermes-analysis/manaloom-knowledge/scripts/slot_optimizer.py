@@ -51,6 +51,8 @@ EFFECT_TO_CATEGORY = {
     "indestructible": "protection",
     "phase_out": "protection",
     "counter": "protection",
+    "attack_limit": "protection",
+    "attack_tax": "protection",
     "draw_cards": "draw",
     "draw_engine": "draw",
     "topdeck_manipulation": "draw",

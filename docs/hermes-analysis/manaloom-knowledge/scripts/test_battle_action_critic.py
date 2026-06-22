@@ -534,6 +534,49 @@ def test_critic_flags_life_replacement_without_original_final_metadata():
     assert "replacement_without_zone_or_object_metadata" in codes
 
 
+def test_critic_accepts_large_hand_with_no_max_hand_size_permanent():
+    result = critic.criticize_actions([
+        {
+            "event": "turn_end",
+            "replay_id": "r-hand-ok",
+            "turn": 7,
+            "player": "Lorehold",
+            "hand": 8,
+            "board": 2,
+            "graveyard": 3,
+            "board_snapshot": [
+                {"name": "Library of Leng", "type_line": "Artifact"},
+                {"name": "Lorehold, the Historian", "type_line": "Legendary Creature"},
+            ],
+        },
+    ])
+
+    codes = {finding["code"] for finding in result["findings"]}
+
+    assert "cleanup_hand_size" not in codes
+
+
+def test_critic_flags_large_hand_without_no_max_hand_size_permanent():
+    result = critic.criticize_actions([
+        {
+            "event": "turn_end",
+            "replay_id": "r-hand-bad",
+            "turn": 7,
+            "player": "Lorehold",
+            "hand": 8,
+            "board": 1,
+            "graveyard": 3,
+            "board_snapshot": [
+                {"name": "Lorehold, the Historian", "type_line": "Legendary Creature"},
+            ],
+        },
+    ])
+
+    codes = {finding["code"] for finding in result["findings"]}
+
+    assert "cleanup_hand_size" in codes
+
+
 def test_critic_reports_event_contract_denominators():
     result = critic.criticize_actions([
         {"event": "priority_pass", "replay_id": "r-contract", "turn": 1, "player": "A"},
@@ -569,6 +612,8 @@ if __name__ == "__main__":
         test_critic_accepts_replacement_with_causal_metadata,
         test_critic_accepts_life_replacement_with_affected_player_metadata,
         test_critic_flags_life_replacement_without_original_final_metadata,
+        test_critic_accepts_large_hand_with_no_max_hand_size_permanent,
+        test_critic_flags_large_hand_without_no_max_hand_size_permanent,
         test_critic_does_not_consume_decision_trace_from_wrong_phase,
         test_critic_flags_spell_resolved_without_resolution_provenance,
         test_critic_accepts_spell_resolved_with_resolution_provenance,

@@ -204,6 +204,17 @@ def collect_requested_names(cur: sqlite3.Cursor) -> set[str]:
             if removed:
                 names.add(str(removed))
 
+    if table_exists(cur, "battle_card_rules"):
+        for (name,) in cur.execute(
+            """
+            SELECT DISTINCT card_name
+            FROM battle_card_rules
+            WHERE COALESCE(card_name,'')!=''
+            """
+        ):
+            if name:
+                names.add(str(name))
+
     known_cards, _canonical_names, _generated_only_names = load_layered_known_cards()
     names.update(str(name) for name in known_cards.keys() if name)
 

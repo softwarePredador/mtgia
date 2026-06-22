@@ -70,6 +70,44 @@ def get_lki(creature):
     }
 
 
+def _resolve_zone_object(zone, zone_object):
+    """Return the actual object stored in a zone before mutating LKI fields."""
+    if not isinstance(zone, list):
+        return zone_object
+    for candidate in zone:
+        if candidate is zone_object:
+            return candidate
+    for candidate in zone:
+        if candidate == zone_object:
+            return candidate
+    if isinstance(zone_object, dict):
+        target_name = zone_object.get("name") or zone_object.get("card_name")
+        if target_name:
+            name_matches = [
+                candidate
+                for candidate in zone
+                if isinstance(candidate, dict)
+                and (candidate.get("name") or candidate.get("card_name")) == target_name
+            ]
+            if len(name_matches) == 1:
+                return name_matches[0]
+    return zone_object
+
+
+def _remove_zone_object(zone, zone_object):
+    if not isinstance(zone, list):
+        return False
+    for index, candidate in enumerate(zone):
+        if candidate is zone_object:
+            del zone[index]
+            return True
+    try:
+        zone.remove(zone_object)
+        return True
+    except ValueError:
+        return False
+
+
 def move_permanent_from_battlefield(
     owner,
     permanent,
@@ -84,6 +122,7 @@ def move_permanent_from_battlefield(
     if not isinstance(permanent, dict):
         return "none"
 
+    permanent = _resolve_zone_object(owner.battlefield, permanent)
     permanent["_lki_snapshot"] = {
         "name": permanent.get("name", permanent.get("card_name", "")),
         "power": permanent.get("power", 0),
@@ -95,8 +134,7 @@ def move_permanent_from_battlefield(
     }
     permanent["_zone_id"] = permanent.get("_zone_id", 0) + 1
     permanent["_last_zone"] = "battlefield"
-    if permanent in owner.battlefield:
-        owner.battlefield.remove(permanent)
+    _remove_zone_object(owner.battlefield, permanent)
     if permanent.get("is_commander"):
         event = replacement_registry.process_event(
             replacement_event_cls(

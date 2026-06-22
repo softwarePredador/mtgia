@@ -248,6 +248,62 @@ def test_strategy_auditor_accepts_last_land_spend_with_commander_payoff():
     assert result["summary"]["findings"] == 0
 
 
+def test_strategy_auditor_accepts_documented_land_discard_unlock_context():
+    result = auditor.audit_strategy(
+        events=[
+            {
+                "event": "additional_cost_paid",
+                "player": "Tayam",
+                "turn": 4,
+                "card": "Mox Diamond",
+                "cost": "discard_land",
+                "discarded": "Overgrown Tomb",
+                "land_options": [{"name": "Overgrown Tomb"}],
+                "selection_reason": "prefer_redundant_tapped_basic_land_preserve_unique_colors",
+                "strategic_risk_flags": ["spending_last_land", "spending_unique_color_land"],
+                "resource_gate": "land_discard_ramp",
+                "unlock_card": "Tayam, Luminous Enigma",
+                "unlock_role": "commander",
+                "unlock_reason": "same_turn_commander_cast",
+                "unlocks_same_turn_action": True,
+            },
+        ],
+        decisions=[],
+    )
+
+    assert result["summary"]["findings"] == 0
+
+
+def test_strategy_auditor_accepts_land_discard_payoff_after_trigger_window():
+    result = auditor.audit_strategy(
+        events=[
+            {
+                "event": "additional_cost_paid",
+                "player": "Tayam",
+                "turn": 4,
+                "card": "Mox Diamond",
+                "cost": "discard_land",
+                "discarded": "Overgrown Tomb",
+                "land_options": [{"name": "Overgrown Tomb"}],
+                "selection_reason": "prefer_redundant_tapped_basic_land_preserve_unique_colors",
+                "strategic_risk_flags": ["spending_last_land", "spending_unique_color_land"],
+            },
+            {"event": "trigger_put_on_stack", "player": "Lorehold", "turn": 4, "card": "Esper Sentinel"},
+            {"event": "priority_pass", "player": "Tayam", "turn": 4},
+            {"event": "priority_pass", "player": "Lorehold", "turn": 4},
+            {"event": "priority_pass", "player": "Dargo", "turn": 4},
+            {"event": "priority_pass", "player": "Rograkh", "turn": 4},
+            {"event": "trigger_resolved", "player": "Lorehold", "turn": 4, "card": "Esper Sentinel"},
+            {"event": "cast_announced", "player": "Tayam", "turn": 4, "card": "Tayam, Luminous Enigma"},
+            {"event": "cost_paid", "player": "Tayam", "turn": 4, "card": "Tayam, Luminous Enigma"},
+            {"event": "commander_cast", "player": "Tayam", "turn": 4, "card": "Tayam, Luminous Enigma"},
+        ],
+        decisions=[],
+    )
+
+    assert result["summary"]["findings"] == 0
+
+
 def test_strategy_auditor_accepts_documented_land_sacrifice_benefit():
     result = auditor.audit_strategy(
         events=[
@@ -621,6 +677,8 @@ if __name__ == "__main__":
         test_strategy_auditor_flags_risky_land_ramp_without_payoff_reason,
         test_strategy_auditor_ignores_failed_land_cost_when_no_land_exists,
         test_strategy_auditor_accepts_last_land_spend_with_commander_payoff,
+        test_strategy_auditor_accepts_documented_land_discard_unlock_context,
+        test_strategy_auditor_accepts_land_discard_payoff_after_trigger_window,
         test_strategy_auditor_accepts_documented_land_sacrifice_benefit,
         test_strategy_auditor_still_blocks_last_land_spend_without_payoff,
         test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel,

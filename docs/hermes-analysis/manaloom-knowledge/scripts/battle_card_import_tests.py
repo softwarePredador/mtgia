@@ -431,6 +431,61 @@ def register_tests(battle, player, card, module_path):
             finally:
                 battle.DB = old_db
 
+    def test_load_deck_ignores_zero_quantity_rows():
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "deck.db"
+            conn = sqlite3.connect(db_path)
+            _create_deck_schema(conn)
+            _insert_oracle_card(
+                conn,
+                "Talrand, Sky Summoner",
+                color_identity=["U"],
+                type_line="Legendary Creature - Merfolk Wizard",
+                oracle_text="Whenever you cast an instant or sorcery spell, create a Drake token.",
+                power=2,
+                toughness=2,
+            )
+            _insert_oracle_card(
+                conn,
+                "Island",
+                color_identity=[],
+                type_line="Basic Land - Island",
+                oracle_text="",
+            )
+            _insert_oracle_card(
+                conn,
+                "Zero Quantity Spell",
+                color_identity=["U"],
+                type_line="Sorcery",
+                oracle_text="Draw a card.",
+            )
+            _insert_deck_card(conn, "Talrand, Sky Summoner", is_commander=1)
+            _insert_deck_card(conn, "Island", quantity=99, functional_tag="land")
+            _insert_deck_card(
+                conn,
+                "Zero Quantity Spell",
+                quantity=0,
+                functional_tag="draw",
+                type_line="Sorcery",
+                oracle_text="Draw a card.",
+            )
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.DB = str(db_path)
+                commander, deck, report = battle.load_deck_with_construction_report()
+                assert commander["name"] == "Talrand, Sky Summoner"
+                assert len(deck) == 99
+                assert all(item["name"] != "Zero Quantity Spell" for item in deck)
+                assert report["is_valid"] is True
+                assert report["main_quantity"] == 99
+                assert report["total_quantity"] == 100
+                assert report["issues"] == []
+            finally:
+                battle.DB = old_db
+
     def test_load_deck_construction_report_flags_singleton_violations():
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmp:
@@ -672,6 +727,7 @@ def register_tests(battle, player, card, module_path):
         test_battle_card_rules_table_overrides_fallbacks,
         test_load_deck_preserves_semantic_snapshot_identity_fields,
         test_load_deck_construction_report_accepts_valid_commander_shape,
+        test_load_deck_ignores_zero_quantity_rows,
         test_load_deck_construction_report_flags_singleton_violations,
         test_load_deck_construction_report_flags_off_color_cards,
         test_lands_are_not_instant_or_sorcery_even_with_generated_metadata,

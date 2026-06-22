@@ -50,6 +50,16 @@ KNOWN_LAND_NAMES = {
     "reliquary tower",
 }
 
+NO_MAX_HAND_SIZE_PERMANENTS = {
+    "decanter of endless water",
+    "library of leng",
+    "reliquary tower",
+    "spellbook",
+    "thought vessel",
+    "venser's journal",
+    "wizard class",
+}
+
 
 def writable_replay_dir(report: bool) -> Path:
     if not report:
@@ -204,6 +214,24 @@ def card_detail_is_creature(detail: dict[str, Any]) -> bool:
     return "creature" in str(detail.get("type_line") or "").lower()
 
 
+def normalize_permanent_name(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    return " ".join(text.replace("\u2018", "'").replace("\u2019", "'").split())
+
+
+def turn_end_has_no_max_hand_size(event: dict[str, Any]) -> bool:
+    if event.get("no_max_hand_size") is True:
+        return True
+    for permanent in event.get("board_snapshot") or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("no_max_hand_size") is True:
+            return True
+        if normalize_permanent_name(permanent.get("name")) in NO_MAX_HAND_SIZE_PERMANENTS:
+            return True
+    return False
+
+
 def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     latest_combat: dict[tuple[Any, Any, Any, Any], dict[str, Any]] = {}
@@ -227,7 +255,7 @@ def audit_turn_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if kind == "turn_end":
             hand = int(event.get("hand") or 0)
             discarded = int(event.get("discarded") or 0)
-            if hand > 7:
+            if hand > 7 and not turn_end_has_no_max_hand_size(event):
                 add_finding(findings, "critical", event, f"Cleanup ended with hand size {hand} > 7.")
             # Legitimate wheel/storm turns can discard double digits as long as
             # cleanup ends at seven. Keep this guard for runaway draw loops.

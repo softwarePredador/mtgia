@@ -16475,6 +16475,443 @@ Conclusion:
 - No Lorehold deck swap or PostgreSQL apply is justified without a separately
   approved package.
 
+### Auditor Central Latest 221652 Battle State - 2026-06-20 19:31 -03
+
+Scope:
+
+- Rechecked the latest full recurring battle after `212035` advanced.
+- Rechecked the latest learned-deck coherence artifact for Lorehold deck `6`.
+- No Lorehold deck swap, PostgreSQL write, SQLite cache sync, cleanup, stage,
+  commit, push, battle rerun, live app route call, or OpenAI call was performed
+  by this heartbeat.
+
+Evidence:
+
+- Latest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_181429.json`.
+- Lorehold `learned_deck:82` still has `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`,
+  `has_wheel_of_misfortune=true`, and `has_reforge_the_soul=false`.
+- Current full recurring battle audit:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_221652/summary.json`.
+- `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=63212216`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- `test_results_status_counts={"pass":18}`.
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`.
+- `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, `table_intent` passes `16/16`,
+  `target_pressure` passes `16/16`, and `event_contract_static` passes.
+- Target-pressure details:
+  `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=190`,
+  `target_pressure_opponent_combat_to_other=2`, and
+  `target_pressure_opponent_multi_defender_attack=0`.
+- Strategy findings are low-confidence only:
+  `strategy_findings=7`, `strategy_low_confidence_findings=7`,
+  `strategy_review_required_findings=0`.
+
+Local source/test evidence observed with this latest:
+
+- `battle_analyst_v9.py` contains attack-limit, attack-tax, defender attack
+  restriction, and Lorehold self-preservation attacker-reservation runtime
+  changes.
+- `battle_combat_tests.py` contains the matching combat regressions for
+  pressure reservation, vigilance reservation, `Crawlspace`, and
+  `Ghostly Prison`.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py`
+  exited `0`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  exited `0`.
+
+Conclusion:
+
+- Lorehold deck `6` remains coherent and unchanged.
+- Lorehold learned-deck coherence remains clean after the canonical Wheel apply.
+- At this checkpoint, target-pressure and battle mandatory gates passed in
+  `221652`.
+- `221652` superseded `212035` at 19:31, then `224455` superseded `221652`
+  after PG-011 external apply/sync reconciliation.
+- No Lorehold deck swap or PostgreSQL apply is justified without a separately
+  approved package.
+
+### PG-011 Defense Variant External Apply Reconciliation - 2026-06-20 19:48 -03
+
+Scope:
+
+- Detected new PG-011 package/sync artifacts for a Lorehold defense variant.
+- Confirmed by SELECT-only PostgreSQL checks that the variant had already been
+  applied externally.
+- Performed postcheck, learned-deck coherence audit, and fresh battle rerun for
+  evidence reconciliation. This heartbeat did not execute the PostgreSQL apply,
+  did not manually apply a deck swap by command, and did not stage, commit, or
+  push.
+
+Package/sync files:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_defense_variant_pg011_package_20260620_193420.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_defense_variant_pg011_precheck_20260620_193420.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_defense_variant_pg011_apply_20260620_193420.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_defense_variant_pg011_rollback_20260620_193420.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_defense_variant_pg011_postcheck_20260620_193420.sql`
+- `docs/hermes-analysis/master_optimizer_reports/sync_pg_target_deck_to_hermes_pg011_lorehold_defense_20260620_193849.json`
+- `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg011_lorehold_defense_20260620_193849.json`
+
+Applied deck delta observed by SELECT-only checks:
+
+- Remove: `Storm Herd`, `Worldfire`, `Rite of the Dragoncaller`,
+  `Fiery Emancipation`, `Mana Geyser`, and `Rise of the Eldrazi`.
+- Add: `Ghostly Prison`, `Crawlspace`, `Chaos Warp`, `Austere Command`,
+  `Get Lost`, and `Professional Face-Breaker`.
+- PG-011 postcheck result:
+  `out_qty_in_target_deck=0`, `in_qty_in_target_deck=6`,
+  `target_deck_qty=100`, `target_deck_rows=100`,
+  `active_learned_deck_ok=1`.
+
+Rule/cache evidence:
+
+- PostgreSQL now has curated/verified/auto rules:
+  `Crawlspace=attack_limit`, `Ghostly Prison=attack_tax`,
+  `Get Lost=remove_creature`.
+- Generated duplicate rows for those names are deprecated/disabled.
+- PostgreSQL now has curated `stax` function tags for `Crawlspace` and
+  `Ghostly Prison`.
+- Runtime sync artifact reports `apply=true`, deck id `6`,
+  `cards_written=100`, `quantity_written=100`, deck hash
+  `d6317fc612db65a3c5fa03bfa82287871d93b88cc907e3ea78b8e46ccf1287b0`.
+- Runtime cache artifact reports `apply_pg=false`,
+  `apply_sqlite_from_pg=true`, `pg_rows_loaded=5230`,
+  `sqlite_inserted_or_updated=5148`,
+  `canonical_snapshot_rows_exported=3187`.
+
+Variant-screen evidence retained:
+
+- Baseline artifact
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_221318/summary.json`
+  exists and is `trusted_for_strategy_learning` with
+  `mandatory_gate_divergences=[]`, target-pressure pass `16/16`, and tests
+  `18/18`.
+- Temp variant run
+  `/tmp/manaloom_lorehold_variant_b_mE2pHv/run_20260620_192657` exists.
+- Direct `Winner:` line count over variant replays shows `3` Lorehold wins
+  across the 16 seeds.
+- Direct JSONL count over variant events shows
+  `combat_with_restrictions=80`, `attackers_restricted=52`, and
+  `tax_paid=192`.
+- Direct JSONL count shows `Crawlspace` and `Ghostly Prison` each cast and
+  resolved `5` times.
+
+Post-apply validation:
+
+- Fresh learned-deck coherence artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_224441.json`.
+- Lorehold `learned_deck:82` remains `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `total_lands=33`; metadata records
+  `lorehold_defense_variant_b_20260620`.
+- Fresh full recurring battle:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_224455/summary.json`.
+- Battle result is `review_required`, not blocked:
+  `mandatory_gate_divergences=["forensic_audit=review_required"]`.
+- Target-pressure passes `16/16` with `target_pressure_findings=0`,
+  `target_pressure_opponent_combat_to_target=284`,
+  `target_pressure_opponent_combat_to_other=4`, and
+  `target_pressure_opponent_multi_defender_attack=2`.
+- Table-intent, action, replay-decision, event-contract, effect-coverage,
+  focused-template, unknown-template, and decision-trace gates pass; tests
+  `18/18`.
+- Forensic residual: six low `Flame Wave` findings on seeds `63212248`,
+  `63212253`, and `63212256`, all `passive` vs registry
+  `remove_creature`; `forensic_turn_findings=0`.
+
+Classification:
+
+- PG-011 is observed as externally applied and locally synced; do not reapply.
+- Current Lorehold coherence remains clean.
+- Current battle is not fully trusted because of low forensic review, but no
+  target-pressure/table-intent/action/replay blocker remains.
+
+### PG-012/PG-013/PG-014 Runtime Reconciliation - 2026-06-20 20:30 -03
+
+Scope:
+
+- Rechecked `git status --short --branch`, central registers, this Lorehold
+  register, the newest learned-deck coherence artifacts, the newest PG
+  battle-rule package artifacts, and
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`.
+- No deck swap, PostgreSQL apply command, cleanup, stage, commit, or push was
+  executed by this heartbeat.
+- PostgreSQL state changes for PG-012, PG-013, and PG-014 were observed as
+  external applied state and validated only through read-only postchecks.
+
+PostgreSQL evidence:
+
+- PG-012 `Flame Wave` postcheck SQL under read-only transaction settings:
+  `card_rows=1`, `curated_executable_rows=1`,
+  `stale_enabled_remove_rows=0`; curated rule
+  `damage_player_and_creatures`, source `curated`, confidence `1.000`,
+  `review_status=verified`, `execution_status=auto`.
+- PG-013 `Brainstone` postcheck SQL under read-only transaction settings:
+  `card_rows=1`, `curated_executable_rows=1`,
+  `stale_enabled_draw_rows=0`; curated rule `topdeck_manipulation`,
+  source `curated`, confidence `0.880`, `review_status=active`,
+  `execution_status=auto`.
+- PG-014 `Sphere of Safety` postcheck SQL under read-only transaction settings:
+  `card_rows=1`, `curated_executable_rows=1`,
+  `stale_enabled_draw_rows=0`, `protection_function_tag_rows=1`; curated rule
+  `attack_tax_per_enchantment`, source `curated`, confidence `1.000`,
+  `review_status=verified`, `execution_status=auto`.
+
+Runtime/cache evidence:
+
+- PG-012 sync artifacts:
+  `battle_card_rules_sqlite_from_pg_pg012_flame_wave_20260620_200035.json`
+  and
+  `battle_card_rules_sqlite_from_pg_pg012_flame_wave_postfix_20260620_231019.json`.
+  The postfix sync reports `apply_pg=false`,
+  `apply_sqlite_from_pg=true`, `pg_rows_loaded=5234`,
+  `sqlite_inserted_or_updated=5171`, and
+  `canonical_snapshot_rows_exported=3195`.
+- PG-013 sync artifact
+  `battle_card_rules_sqlite_from_pg_pg013_brainstone_20260620_201110.json`
+  reports `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5235`, `sqlite_inserted_or_updated=5171`, and
+  `canonical_snapshot_rows_exported=3195`.
+- PG-014 sync artifact
+  `battle_card_rules_sqlite_from_pg_pg014_sphere_20260620_202250.json`
+  reports `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5236`, `sqlite_inserted_or_updated=5172`, and
+  `canonical_snapshot_rows_exported=3195`.
+- Local SQLite `battle_card_rules` has `Sphere of Safety` curated/verified/auto
+  as `attack_tax`; the two generated `draw_engine` rows are disabled.
+- `known_cards_canonical_snapshot.json` exposes `Sphere of Safety` as
+  `attack_tax` with `attack_tax_per_enchantment=1` and
+  `minimum_attack_tax_per_creature=1`.
+
+Code/test evidence:
+
+- The strict PG mirror exposed a local Brainstone runtime regression: with only
+  PG generated `review_only` rows, a reviewed local runtime rule could be
+  removed from the canonical snapshot.
+- `sync_battle_card_rules_pg.py` now overlays current reviewed curated/manual
+  runtime rows on top of PG mirror rows when `apply_pg=false`, and exports the
+  canonical snapshot from active SQLite rows after mirror.
+- `test_sync_battle_card_rules_pg_selection.py` now covers the Brainstone
+  regression and the PG logical-key mirror cleanup path.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py`
+  passed (`7` tests).
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including `test_flame_wave_oracle_and_runtime_damage_target_player_creatures`,
+  `test_brainstone_first_draw_approach_wins_before_rummage_resolution`, and
+  `test_sphere_of_safety_scales_attack_tax_with_enchantments`.
+
+Learned-deck evidence:
+
+- Fresh read-only artifact:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_233027.json`.
+- Lorehold `learned_deck:82` remains `issues=[]`, `parsed_quantity=100`,
+  `resolved_quantity=100`, `unresolved=[]`, no premium Mox, and no PG/SQLite
+  name drift.
+- Commander identity remains `single_commander_identity` with combined color
+  identity `["R","W"]`.
+- Global learned-deck severity remains `{"medium":13}`. For Lorehold, the only
+  strategy-package issue is medium `lorehold_strategy_big_spell_finishers_gap`
+  because the approved defense variant removed several big-spell finishers.
+  This is not a decklist resolution, off-color, or PostgreSQL drift issue.
+
+Battle evidence:
+
+- Fresh full recurring battle:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_232534/summary.json`.
+- Result: `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`.
+- `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `action_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_audit_turn_findings=0`, target-pressure `pass=16`,
+  table-intent `pass=16`, and tests `18/18`.
+
+Current active pending classification:
+
+- No active Lorehold deck-list, quantity, off-color, premium Mox, PG/SQLite
+  name-match, `Flame Wave`, `Brainstone`, or `Sphere of Safety` battle-rule
+  pending remains in this checkpoint.
+- PG-012, PG-013, and PG-014 are closed as externally applied, postchecked,
+  runtime-synced, and battle-validated. Do not reapply them without new
+  SELECT/sync/battle drift evidence plus explicit approval of the exact command.
+- The medium `big_spell_finishers` strategy counter should be monitored as a
+  post-defense-variant strategy tradeoff, not treated as a database correction
+  or automatic swap request.
+
+### Latest Battle Drift - Arcane Epiphany Candidate - 2026-06-20 20:37 -03
+
+Scope:
+
+- A later external runner superseded the `232534` trusted battle with
+  `20260620_233350`.
+- No PostgreSQL apply, local cache hotfix, deck swap, cleanup, stage, commit,
+  or push was performed for this drift.
+
+Current latest battle:
+
+- Artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_233350/summary.json`.
+- `run_scope=recurring_full`,
+  `invocation_kind=codex_variant_sphere_for_guttersnipe`,
+  `seeds_requested=16`, `seeds_completed=16`, `start_seed=63212310`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- `forensic_rule_findings=2`, `forensic_turn_findings=0`,
+  `forensic_severity_counts={"high":1,"medium":1}`.
+- Target-pressure still passes `16/16`, table-intent passes `16/16`,
+  action findings are `0`, replay-decision findings are `0`, and tests are
+  `18/18`.
+
+Blocker evidence:
+
+- Both findings are `Arcane Epiphany` from
+  `The Emperor of Palamecia #42 (real)`, seed `63212310`, turn `10`,
+  phase `precombat_main`, effect `draw_cards`, source `functional_tags_json`.
+- `spell_cast` is medium and `spell_resolved` is high.
+- SELECT-only PostgreSQL evidence: `Arcane Epiphany` has one `cards` row
+  (`id=f5395e90-d0ef-4bf0-b042-f0cff60d31ae`, `{3}{U}{U}`, `Instant`,
+  oracle `This spell costs {1} less to cast if you control a Wizard. Draw
+  three cards.`, color identity `{U}`) and `battle_rule_rows=0`.
+- Local cache evidence: SQLite `battle_card_rules` has `0` rows for
+  `Arcane Epiphany`; the card is absent from canonical/generated/reviewed
+  battle-rule JSON.
+
+Classification:
+
+- Lorehold Deck 6 remains coherent in
+  `learned_deck_coherence_audit_20260620_233027.json`: `issues=[]`,
+  `parsed_quantity=100`, `resolved_quantity=100`, no premium Mox, no PG/SQLite
+  name drift.
+- PG-012/PG-013/PG-014 remain closed by the prior `232534` validation.
+- At `233350`, Arcane Epiphany candidate was the active battle-rule
+  blocker; later `234004` superseded it. If it reappears, future closure
+  requires row-level package, approved apply, rollback, postcheck, Hermes
+  runtime cache sync, and a fresh battle rerun.
+
+### Latest Battle Closure After Variant Reruns - 2026-06-20 20:40 -03
+
+- Current latest:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_234004/summary.json`.
+- `invocation_kind=codex_variant_sphere_for_victory_chimes`,
+  `seeds_completed=16`, `start_seed=63212310`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Forensic findings `0`, action findings `0`, replay-decision findings `0`,
+  target-pressure `pass=16`, table-intent `pass=16`, tests `18/18`.
+- Lorehold learned-deck artifact remains
+  `learned_deck_coherence_audit_20260620_233027.json` with
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`, no premium Mox,
+  and no PG/SQLite name drift.
+- `Arcane Epiphany` is now candidate-only from a superseded run, not an
+  active latest blocker.
+
+### Latest Battle Drift After Variant Sweep Continued - 2026-06-20 20:49 -03
+
+- Current latest at this checkpoint:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_234900/summary.json`.
+- `invocation_kind=codex_variant_spire_for_guttersnipe`,
+  `seeds_completed=16`, `start_seed=63212310`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- Forensic findings `2`, severity `{"high":1,"medium":1}`, both
+  `Arcane Epiphany`, effect `draw_cards`, source `functional_tags_json`, turn
+  `10`, player `The Emperor of Palamecia #42 (real)`.
+- Target-pressure `pass=16`, table-intent `pass=16`, action findings `0`,
+  replay-decision findings `0`, tests `18/18`.
+- Lorehold learned-deck artifact remains
+  `learned_deck_coherence_audit_20260620_233027.json` with
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`, no premium Mox,
+  and no PG/SQLite name drift.
+- PG-012/PG-013/PG-014 remain closed. Current pending at this checkpoint is
+  Arcane Epiphany candidate; a new external runner was already active
+  after this latest was read.
+
+### Latest Battle Closure After Variant Sweep Continued - 2026-06-20 20:52 -03
+
+- Current latest after the active runner completed:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_235219/summary.json`.
+- `invocation_kind=codex_real_deck_after_variants`, `seeds_completed=16`,
+  `start_seed=63212310`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Forensic findings `0`, action findings `0`, replay-decision findings `0`,
+  target-pressure `pass=16`, table-intent `pass=16`,
+  `test_results_status_counts={"pass":18}`.
+- Lorehold learned-deck artifact remains
+  `learned_deck_coherence_audit_20260620_233027.json` with `issues=[]`,
+  `parsed_quantity=100`, `resolved_quantity=100`, no premium Mox, and no
+  PG/SQLite name drift.
+- PG-012/PG-013/PG-014 remain closed. `Arcane Epiphany` returns to
+  candidate-only/historical status because it is not an active blocker in
+  current latest `235219`.
+- No Lorehold deck swap, PostgreSQL apply, cache hotfix, cleanup, stage,
+  commit, or push was performed.
+
+### Latest Battle Drift After PG-015/Wrath External Apply - 2026-06-20 20:59 -03
+
+- New PG-015/Wrath artifacts appeared externally:
+  `wrath_of_god_battle_rule_pg015_*_20260620_205619.*` plus
+  `battle_card_rules_sqlite_from_pg_pg015_wrath_20260620_205900.json`.
+- Read-only PG-015/Wrath postcheck shows `Wrath of God` as curated executable
+  `board_wipe`: `curated_executable_rows=1`, `stale_enabled_wipe_rows=0`,
+  reviewed by `codex_central_auditor_pg015`.
+- Local SQLite also has `Wrath of God` as `curated/verified/auto` `board_wipe`;
+  the generated duplicate is `deprecated/disabled`. Sync report:
+  `apply_pg=false`, `apply_sqlite_from_pg=true`, `pg_rows_loaded=5236`,
+  `sqlite_inserted_or_updated=5172`, `canonical_snapshot_rows_exported=3195`.
+- Current latest after the Wrath variant run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260620_235914/summary.json`.
+- `invocation_kind=codex_variant_wrath_for_guttersnipe`, `seeds_completed=16`,
+  `start_seed=63212310`.
+- `battle_replay_final_status=blocked`.
+- `mandatory_gate_divergences=["forensic_audit=blocked"]`.
+- Forensic findings `2`, severity `{"high":1,"medium":1}`, both
+  `Arcane Epiphany`, effect `draw_cards`, source `functional_tags_json`, seed
+  `63212310`, turn `10`.
+- Target-pressure `pass=16`, table-intent `pass=16`, action findings `0`,
+  replay-decision findings `0`, `test_results_status_counts={"pass":18}`.
+- Lorehold learned-deck artifact remains
+  `learned_deck_coherence_audit_20260620_233027.json` with `issues=[]`,
+  `parsed_quantity=100`, `resolved_quantity=100`, no premium Mox, and no
+  PG/SQLite name drift.
+- Classification: PG-015/Wrath is externally applied/postchecked/synced but the
+  active pending item is `Arcane Epiphany` battle-rule lineage. This is not a
+  Lorehold decklist coherence failure.
+- No Lorehold deck swap, PostgreSQL apply, cache hotfix, cleanup, stage,
+  commit, or push was performed by this heartbeat.
+
+### Latest Battle Closure After Wrath Variant Sweep - 2026-06-20 21:08 -03
+
+- Further external runners superseded `235914` and `000525`; current latest is
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_000827/summary.json`.
+- `invocation_kind=codex_real_deck_after_wrath_variants`,
+  `seeds_completed=16`, `start_seed=63212310`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Forensic findings `0`, action findings `0`, replay-decision findings `0`,
+  target-pressure `pass=16`, table-intent `pass=16`,
+  `test_results_status_counts={"pass":18}`.
+- Lorehold learned-deck artifact remains
+  `learned_deck_coherence_audit_20260620_233027.json` with `issues=[]`,
+  `parsed_quantity=100`, `resolved_quantity=100`, no premium Mox, and no
+  PG/SQLite name drift.
+- Classification: PG-015/Wrath is externally applied/postchecked/synced and
+  battle-validated by latest `000827`; `Arcane Epiphany` is candidate-only from
+  superseded `235914`, not active in the current latest.
+- No Lorehold deck swap, PostgreSQL apply, cache hotfix, cleanup, stage,
+  commit, or push was performed by this heartbeat.
+
 ### Auditor Central Latest 212035 Battle State - 2026-06-20 18:21 -03
 
 Scope:
@@ -16658,3 +17095,2550 @@ Conclusion:
 - Target-pressure is not an active blocker in the current latest run.
 - No Lorehold deck swap or PostgreSQL apply is justified without a separately
   approved package.
+
+### Auditor Central PG016-PG018 Battle Drift Check - 2026-06-20 22:14 -03
+
+Scope:
+
+- Rechecked the Lorehold Deck 6 register against the current learned-deck
+  coherence artifact, central PostgreSQL deploy register, and battle latest
+  symlink.
+- No Lorehold deck swap, PostgreSQL apply, cleanup, stash, revert, stage,
+  commit, push, app/backend code edit, live app route call, or OpenAI call was
+  performed by this heartbeat.
+
+Learned-deck coherence evidence:
+
+- Latest artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_233027.json`.
+- It is read-only and reports Lorehold `learned_deck:82` with
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`,
+  `unresolved=[]`, `off_color_candidates=[]`,
+  `partner_identity_candidates=[]`, and commander identity
+  `combined_color_identity=["R","W"]`.
+- The only Lorehold strategy check still reported by that artifact is
+  `lorehold_strategy_big_spell_finishers_gap` at medium severity after the
+  defense variant removed several big finishers. This is a strategy composition
+  review item, not a deck import or partner/background identity failure.
+
+Battle/PG evidence:
+
+- Latest battle summary before the post-PG018 rerun completed:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_010452/summary.json`.
+- It reports a 64-seed blocked run:
+  `invocation_kind=codex_pg017_full64_real_deck_baseline`,
+  `battle_replay_final_status=blocked`,
+  `mandatory_gate_divergences=["forensic_audit=blocked"]`,
+  `forensic_rule_findings=2`, target-pressure `pass=64`,
+  table-intent `pass=64`, action findings `0`, replay-decision findings `0`,
+  and tests `18/18`.
+- The active `010452` blocker was opponent card-rule lineage:
+  `Jin-Gitaxias, Core Augur`, seed `63212362`, turn `8`, effect
+  `draw_cards`, source `functional_tags_json`.
+- PG-016 anti-combat and PG-017 Arcane Epiphany artifacts appeared externally
+  and were verified by read-only postcheck plus runtime sync reports. They were
+  not applied by this heartbeat.
+- PG-018 opponent forensic artifacts also appeared externally for
+  `Jin-Gitaxias, Core Augur` and `Chandra, Flameshaper`. Read-only postcheck
+  returned `card_rows=2`, `curated_executable_rows=2`, and
+  `function_tag_rows=2`; local Hermes SQLite selects both PG-018 rows as
+  curated/verified/auto.
+- A new post-PG018 battle runner was active:
+  `manaloom-battle-strategy-audit.sh --seeds 64 --start-seed 63212310`.
+
+Conclusion:
+
+- Lorehold Deck 6 learned-deck coherence remains clean and unchanged.
+- The current battle drift is opponent card-rule governance, not a Lorehold
+  decklist coherence failure.
+- PG-016, PG-017, and PG-018 are closed for PostgreSQL/cache state unless
+  SELECT or sync evidence proves rollback/drift; PG-018 still needs the
+  in-progress battle rerun result for battle closure.
+- Active Lorehold-specific follow-up remains strategy composition review around
+  the medium big-spell finisher gap, not a PostgreSQL apply or swap request.
+
+### Auditor Central PG019 Strategy-Audit Drift Check - 2026-06-20 22:44 -03
+
+Scope:
+
+- Rechecked the post-PG018 battle result, PG-019 artifacts, and the current
+  learned-deck coherence artifact for Lorehold Deck 6.
+- No Lorehold deck swap, PostgreSQL apply, cleanup, stash, revert, stage,
+  commit, push, app/backend code edit, live app route call, or OpenAI call was
+  performed by this heartbeat.
+
+Learned-deck coherence evidence:
+
+- Newest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_233027.json`.
+- Lorehold `learned_deck:82` still has `issues=[]`,
+  `parsed_quantity=100`, `resolved_quantity=100`, `unresolved=[]`,
+  `off_color_candidates=[]`, `partner_identity_candidates=[]`, and commander
+  identity `combined_color_identity=["R","W"]`.
+
+Battle/PG evidence:
+
+- Latest completed battle summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_012833/summary.json`.
+- It reports `invocation_kind=codex_pg018_full64_real_deck_baseline`,
+  `seeds_requested=64`, `seeds_completed=64`,
+  `battle_replay_final_status=review_required`,
+  `mandatory_gate_divergences=["strategy_audit=review_required"]`,
+  forensic findings `0`, target-pressure `pass=64`, table-intent `pass=64`,
+  action findings `0`, replay-decision findings `0`, and tests `18/18`.
+- Strategy audit reports `strategy_findings=17`, including `16`
+  low-confidence mulligan findings and `1` review-required finding.
+- The review-required finding is opponent `Jin-Gitaxias, Core Augur` behavior:
+  seed `63212362`, `wheel_opponent_refill_risk`, decision `decision-000141`.
+- PG-019 artifacts appeared externally to correct that proxy:
+  `jin_gitaxias_non_wheel_pg019_*_20260621_013900.*` and
+  `battle_card_rules_sqlite_from_pg_pg019_jin_non_wheel_20260621_014100.json`.
+- Read-only PG-019 postcheck verifies `Jin-Gitaxias, Core Augur` as
+  curated/verified/auto with `draw_count=7` and `wheel_like=false`; local
+  Hermes SQLite selects the same row.
+- A post-PG019 64-seed battle runner was active at this checkpoint.
+
+Conclusion:
+
+- Lorehold Deck 6 learned-deck coherence remains clean and unchanged.
+- PG-018 battle-forensic drift is closed by the `012833` artifact.
+- PG-019 is a battle strategy-audit semantics correction for an opponent card,
+  not a Lorehold list mutation.
+- PG-019 is closed for PostgreSQL/cache state but remains pending battle
+  closure until the active post-PG019 rerun finishes.
+
+### Auditor Central Local Windborn Apply Check - 2026-06-20 23:14 -03
+
+Scope:
+
+- Rechecked the post-PG019 battle result, new master optimizer apply artifacts,
+  PostgreSQL materialized deck state, Hermes SQLite runtime deck state, and
+  learned-deck coherence artifact.
+- No Lorehold PostgreSQL deck swap, PostgreSQL apply, cleanup, stash, revert,
+  stage, commit, push, app/backend code edit, live app route call, or OpenAI
+  call was performed by this heartbeat.
+
+Learned-deck/PostgreSQL evidence:
+
+- Newest learned-deck coherence artifact remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260620_233027.json`.
+- The PostgreSQL materialized Lorehold deck
+  `528c877f-f829-4207-95e6-73981776c323` still has `Guttersnipe=1`, no
+  `Windborn Muse`, and `100/100` cards by read-only SELECT.
+- Therefore the Windborn change is not a PostgreSQL/learned-deck apply at this
+  checkpoint.
+
+Hermes local runtime evidence:
+
+- New local optimizer artifacts appeared:
+  `master_optimizer_apply_20260621_020406.md` and
+  `master_optimizer_rollback_20260621T020406839706+0000.json`.
+- The apply artifact records local Hermes `deck_id=6` swap:
+  `Windborn Muse` over `Guttersnipe`, `confirmation_wr=6.2%`,
+  `confirmation_delta=+3.1pp`, `deck_cards_after=100`, `lands_after=33`.
+- The artifact states: `No production database was mutated. This applies only
+  to the Hermes local SQLite knowledge deck.`
+- Local Hermes SQLite now has `Windborn Muse=1`, no `Guttersnipe`, and
+  `100/100` cards for `deck_id=6`.
+
+Battle evidence:
+
+- Latest completed battle summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_020427/summary.json`.
+- It reports `run_scope=recurring_full`,
+  `invocation_kind=codex_pg019_post_apply_windborn_16`,
+  `seeds_requested=16`, `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`,
+  target-pressure `pass=16`, table-intent `pass=16`, action findings `0`,
+  replay-decision findings `0`, tests `18/18`, and
+  `strategy_review_required_findings=0`.
+- A newer 64-seed run directory `20260621_020729` existed without `summary.json`
+  and the runner was still active.
+
+Conclusion:
+
+- PG-019 is battle-closed for the completed 16-seed `020427` run.
+- Lorehold has a real local Hermes runtime variant (`Windborn Muse` over
+  `Guttersnipe`) that is not yet reflected in PostgreSQL or learned-deck
+  coherence artifacts.
+- Do not promote the local Windborn swap to PostgreSQL or treat it as canonical
+  without explicit approval.
+
+Final 64-seed reconciliation:
+
+- `latest` advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_020729/summary.json`.
+- It reports `invocation_kind=codex_pg019_post_apply_windborn_64`,
+  `seeds_requested=64`, `seeds_completed=64`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, target-pressure
+  `pass=64`, table-intent `pass=64`, action findings `0`, replay-decision
+  findings `0`, tests `18/18`, and `strategy_review_required_findings=0`.
+- This closes battle validation for the local Hermes Windborn runtime variant,
+  while PostgreSQL/learned-deck canonical state remains unchanged until
+  explicitly approved.
+
+### PG-020 Canonical Windborn Apply And Current Failure Map - 2026-06-20 23:40 -03
+
+What changed:
+
+- `Windborn Muse` was promoted over `Guttersnipe` from local Hermes runtime
+  evidence into PostgreSQL deck
+  `528c877f-f829-4207-95e6-73981776c323` through PG-020.
+- PG-020 precheck/apply/postcheck/rollback package:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_windborn_deck_swap_pg020_package_20260621_022046.md`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/sync_pg_target_deck_to_hermes_pg020_windborn_20260621_022046.json`.
+
+Validated result:
+
+- Baseline before swap:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_015127/summary.json`,
+  `2/64 = 3.125%`.
+- Post-PG canonical run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_022700/summary.json`,
+  `4/64 = 6.25%`, `trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`.
+
+Current failure map from the 64-seed post-PG run:
+
+- Lorehold still loses `60/64`.
+- Opponent combat pressure is still concentrated on Lorehold:
+  `912` events toward Lorehold versus `12` toward other players.
+- Loss turn median remains around turn `8`.
+- Strategy audit still records `15` low-confidence
+  `forced_keep_after_bad_mulligan` findings.
+- Aggregated replay reading after the Windborn correction showed the deck does
+  cast defensive cards (`Crawlspace=18`, `Windborn Muse=12`,
+  `Ghostly Prison=10`, `Teferi's Protection=5` in 64 seeds), but those cards
+  are not enough to survive focused multiplayer pressure.
+
+Conclusion:
+
+- PG-020 is a valid first correction, not a final solution.
+- `Guttersnipe` was a weak payoff in the observed battle environment; replacing
+  it with an attack tax effect doubled the measured 64-seed win rate, but the
+  absolute result is still poor.
+- Next deck work must test additional early survivability, lower-risk keep
+  profiles, and stronger anti-focus tools before adding more wincon/payoff.
+
+### Post-PG020 Learned-Deck Coherence Recheck - 2026-06-20 23:45 -03
+
+Scope:
+
+- Reran the read-only learned-deck coherence audit after observing PG-020
+  applied and synced.
+- No Lorehold PostgreSQL deck swap, PostgreSQL apply, cleanup, stash, revert,
+  stage, commit, push, app/backend code edit, live app route call, or OpenAI
+  call was performed by this heartbeat.
+
+Fresh learned-deck evidence:
+
+- New artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_024551.json`
+  and `.md`.
+- Global learned-deck state remains high-clean:
+  `active_learned_decks=60`, `severity_counts={"medium":13}`.
+- Lorehold active learned row remains structurally clean:
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`,
+  `unresolved=[]`, no off-color candidates, no partner/background identity
+  finding, no premium Mox violations.
+- Materialized PG deck and Hermes runtime deck are 100/100 and contain
+  `Windborn Muse`, not `Guttersnipe`.
+
+Open name-drift evidence:
+
+- Active learned deck vs PostgreSQL:
+  active missing from PG: `Guttersnipe`; PG extra vs active:
+  `Windborn Muse`.
+- Active learned deck vs Hermes SQLite:
+  active missing from SQLite: `Guttersnipe`, `Monument to Endurance`;
+  SQLite extra vs active: `Silent Arbiter`, `Windborn Muse`.
+- Strategy package still has medium
+  `lorehold_strategy_big_spell_finishers_gap`: `2/4` big finishers.
+
+Latest battle evidence:
+
+- Latest completed summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_024220/summary.json`.
+- `invocation_kind=codex_pg020_candidate_ensnaring_bridge_for_monument_16`,
+  `seeds_requested=16`, `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, target-pressure
+  `pass=16`, table-intent `pass=16`, tests `18/18`, and
+  `strategy_review_required_findings=0`.
+- No PG package was found for this Ensnaring Bridge candidate.
+- A newer run directory `20260621_024527` was active without summary.
+
+Conclusion:
+
+- PG-020 remains valid and battle-trusted.
+- The active learned-deck row is now stale relative to the materialized
+  PostgreSQL/Hermes runtime deck. This is a real governance pending item, but
+  resolving it requires explicit mutation approval.
+- Ensnaring Bridge over Monument to Endurance is only candidate evidence until
+  an approved package exists.
+
+Final candidate reconciliation:
+
+- `latest` advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_024527/summary.json`.
+- It reports `invocation_kind=codex_pg020_candidate_silent_arbiter_for_monument_16`,
+  `seeds_requested=16`, `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, target-pressure
+  `pass=16`, table-intent `pass=16`, tests `18/18`, and
+  `strategy_review_required_findings=0`.
+- No PG package exists for Silent Arbiter over Monument to Endurance, and local
+  Hermes SQLite `deck_id=6` still shows the PG-020 Windborn runtime state.
+- A newer run directory `20260621_024906` existed and should be checked next.
+
+Final candidate reconciliation:
+
+- Checked
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_024906/summary.json`.
+- It reports `invocation_kind=codex_pg020_candidate_norns_annex_for_monument_16`,
+  `seeds_requested=16`, `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, target-pressure
+  `pass=16`, table-intent `pass=16`, tests `18/18`, and
+  `strategy_review_required_findings=0`.
+- No PG package or artifact exists for `Norn's Annex`/`PG021`/`024906` in
+  `docs/hermes-analysis/master_optimizer_reports`.
+- Classification: candidate-only battle evidence. The active learned-deck name
+  drift remains open and requires explicit mutation approval; this heartbeat did
+  not change PostgreSQL, apply swaps, stage, commit, push, stash, revert, or
+  clean files.
+
+Latest candidate blocker:
+
+- Latest then advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_025233/summary.json`.
+- It reports `invocation_kind=codex_pg020_candidate_magus_moat_for_monument_16`,
+  `seeds_requested=16`, `seeds_completed=16`, and
+  `battle_replay_final_status=review_required`.
+- Mandatory divergences:
+  `forensic_audit=review_required` and
+  `replay_decision_audit=review_required`.
+- Concrete finding: seed `63212318`, turn `12`, event `board_wipe_resolved`,
+  low severity, `Board wipe left more protected creatures (9) than destroyed
+  (7).`
+- Clean counters around the blocker: forensic rule findings `0`, replay
+  decision findings `0`, target-pressure `pass=16`, table-intent `pass=16`,
+  tests `18/18`, strategy review-required findings `0`.
+- No PG package exists for `Magus of the Moat`/`PG021`/`025233`; classification
+  is blocked candidate-only evidence.
+
+Latest 64-seed recheck:
+
+- Latest battle summary advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_030022/summary.json`.
+- It reports `invocation_kind=codex_pg020_candidate_magus_moat_for_monument_64`,
+  `run_scope=custom_multi_seed`, `seeds_requested=64`,
+  `seeds_completed=64`, and `battle_replay_final_status=review_required`.
+- Mandatory divergences remain
+  `forensic_audit=review_required` and
+  `replay_decision_audit=review_required`.
+- Concrete finding is still seed `63212318`, turn `12`,
+  `board_wipe_resolved`, low severity, `Board wipe left more protected
+  creatures (9) than destroyed (7).`
+- Clean counters: forensic rule findings `0`, replay decision findings `0`,
+  target-pressure `pass=64`, table-intent `pass=64`, tests `18/18`,
+  strategy review-required findings `0`.
+- Strategy signal: target wins `9`, opponent wins `54`,
+  opponent combat to target `883`, opponent combat to other `21`, and
+  `forced_keep_after_bad_mulligan=14`.
+- No PG package exists for `Magus of the Moat`/`PG021`/`030022`; this remains
+  blocked candidate-only evidence.
+
+Fresh learned-deck coherence recheck:
+
+- New read-only artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_031653.json`
+  and `.md`.
+- Global counters remain `active_learned_decks=60` and
+  `severity_counts={"medium":13}`.
+- Lorehold active learned row remains structurally clean:
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`,
+  `unresolved=[]`, no premium Mox, and no off-color plan entries.
+- Current name drift:
+  active vs PostgreSQL is missing `Guttersnipe` from PG and has PG extra
+  `Windborn Muse`; active vs Hermes SQLite is missing `Guttersnipe` and
+  `Monument to Endurance`, while SQLite has extra `Magus of the Moat` and
+  `Windborn Muse`.
+- Strategy package still has medium
+  `lorehold_strategy_big_spell_finishers_gap` (`2/4` big finishers).
+
+Corrected candidate follow-up:
+
+- Latest battle summary advanced again to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_031617/summary.json`.
+- It reports
+  `invocation_kind=codex_pg021_corrected_candidate_magus_moat_for_monument_16`,
+  `run_scope=recurring_full`, `seeds_requested=16`, `seeds_completed=16`,
+  and `battle_replay_final_status=trusted_for_strategy_learning`.
+- Mandatory gates are clean: `mandatory_gate_divergences=[]`, forensic rule
+  findings `0`, forensic turn findings `0`, replay decision findings `0`,
+  target-pressure `pass=16`, table-intent `pass=16`, tests `18/18`, strategy
+  review-required findings `0`.
+- Strategy signal: target wins `2`, opponent wins `12`,
+  opponent combat to target `215`, opponent combat to other `2`, and
+  `forced_keep_after_bad_mulligan=5`.
+- No PG package exists for `Magus of the Moat`/`PG021`/`031617`; classification
+  is clean candidate-only evidence, not promotion authorization.
+
+Corrected Silent Arbiter 64-seed follow-up:
+
+- Latest battle summary advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_032623/summary.json`.
+- It reports
+  `invocation_kind=codex_pg021_corrected_candidate_silent_arbiter_for_monument_64`,
+  `run_scope=custom_multi_seed`, `seeds_requested=64`, `seeds_completed=64`,
+  and `battle_replay_final_status=trusted_for_strategy_learning`.
+- Mandatory gates are clean: `mandatory_gate_divergences=[]`, forensic rule
+  findings `0`, forensic turn findings `0`, replay decision findings `0`,
+  target-pressure `pass=64`, table-intent `pass=64`, tests `18/18`, strategy
+  review-required findings `0`.
+- Strategy signal: target wins `8`, opponent wins `54`,
+  opponent combat to target `1103`, opponent combat to other `14`, and
+  `forced_keep_after_bad_mulligan=15`.
+- No PG package exists for `Silent Arbiter`/`PG021`/`032623`; classification is
+  clean candidate-only evidence, not promotion authorization.
+
+### PG021/PG022 External Apply And Post-Sync Recheck - 2026-06-21 01:55 -03
+
+Scope:
+
+- Observed new PG021 global attack-rule scope artifacts and PG022 Lorehold
+  Silent Arbiter deck swap artifacts.
+- This heartbeat did not execute PostgreSQL apply, deck swap, rollback, commit,
+  push, cleanup, stash, or revert.
+
+PostgreSQL/Hermes evidence:
+
+- PG021 read-only postcheck passed for `Silent Arbiter`, `Magus of the Moat`,
+  and `Ensnaring Bridge`: `rule_rows=3`, all three scope checks `true`,
+  `postcheck_passed=true`.
+- PG021 SQLite sync:
+  `battle_card_rules_sqlite_from_pg_pg021_global_attack_scope_20260621_043814.json`,
+  `apply_pg=false`, `apply_sqlite_from_pg=true`, `sqlite_inserted_or_updated=4`.
+- PG022 read-only postcheck passed:
+  `deck_rows=100`, `deck_quantity=100`, `Monument to Endurance=0`,
+  `Silent Arbiter=1`, `silent_is_commander=false`, `backup_rows=1`,
+  `postcheck_passed=true`.
+- PG022 PG -> Hermes sync:
+  `sync_pg_target_deck_to_hermes_pg022_silent_arbiter_20260621_044155.json`,
+  `apply=true`, `cards_written=100`, `quantity_written=100`,
+  `duplicate_rows_collapsed=0`.
+- Local Hermes SQLite `deck_id=6` focused check:
+  `Silent Arbiter=1`, `Windborn Muse=1`, no `Guttersnipe`, no
+  `Monument to Endurance`, `deck_rows=100`, `deck_quantity=100`.
+
+Battle evidence:
+
+- Latest post-sync smoke:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_044419/summary.json`.
+- `invocation_kind=codex_pg022_post_pg_sync_silent_arbiter_16`,
+  `run_scope=recurring_full`, `seeds_completed=16`,
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, replay decision
+  findings `0`, target-pressure `pass=16`, table-intent `pass=16`, tests
+  `18/18`.
+- Strategy signal: target wins `3`, opponent wins `13`,
+  opponent combat to target `274`, opponent combat to other `10`, and
+  `forced_keep_after_bad_mulligan=4`.
+
+Fresh learned-deck coherence:
+
+- New read-only artifacts:
+  `learned_deck_coherence_audit_20260621_045522.json` and `.md`.
+- Global counters remain `active_learned_decks=60` and
+  `severity_counts={"medium":13}`.
+- Lorehold active learned row remains structurally clean:
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`,
+  `unresolved=[]`, no premium Mox, no off-color plan entries.
+- Current name drift:
+  active vs PostgreSQL and SQLite are both missing `Guttersnipe` and
+  `Monument to Endurance`; PG/SQLite both have extra `Silent Arbiter` and
+  `Windborn Muse`.
+- Strategy package still has medium
+  `lorehold_strategy_big_spell_finishers_gap` (`2/4` big finishers).
+
+Conclusion:
+
+- PG021 and PG022 are now observed as externally applied/postchecked/synced and
+  smoke battle-trusted.
+- The remaining active Lorehold pending item is learned-deck governance drift,
+  not PG deck shape or runtime sync.
+
+## PG022 Full Post-Sync Deck State - 2026-06-21 01:58 -0300
+
+Canonical state:
+
+- PostgreSQL deck `528c877f-f829-4207-95e6-73981776c323` and Hermes SQLite
+  deck `6` now contain `Silent Arbiter=1` and `Windborn Muse=1`.
+- `Monument to Endurance=0` and `Guttersnipe=0`.
+- Deck size remains `100/100`.
+
+Battle proof:
+
+- Corrected baseline:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_041725/summary.json`,
+  `4/64`, trusted, clean gates.
+- PG022 full post-sync:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_044758/summary.json`,
+  `8/64`, trusted, clean gates.
+
+Conclusion:
+
+- Silent Arbiter is approved as the current canonical deck improvement because
+  it doubled 64-seed wins after PG021 corrected global attack-rule scope.
+- Lorehold is still weak overall: current validated winrate is `8/64 = 12.5%`.
+- Next active failure to investigate is consistency/mulligan:
+  `forced_keep_after_bad_mulligan=15` in the full post-sync run.
+
+## Post-PG022 Candidate Scan Update - 2026-06-21 02:27 -0300
+
+Scope:
+
+- Checked the latest battle-strategy audit artifact after the PG022 full
+  validation and the new candidate-scan sequence.
+- No PostgreSQL apply, deck swap, rollback, commit, push, cleanup, stash, or
+  revert was performed by this heartbeat.
+- Local SQLite focused check after the latest temporary candidate runner shows
+  the persisted Lorehold deck still has `Generous Gift=1`; `Reprieve`,
+  `Artist's Talent`, and `Brainstone` are not persisted in `deck_id=6`.
+
+New battle evidence:
+
+- PG022 validation report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_deck6_pg022_silent_arbiter_validation_20260621_044758.md`.
+  This report records PG022 as the current canonical improvement:
+  `4/64 = 6.25%` baseline to `8/64 = 12.5%` post-sync, clean gates,
+  `Silent Arbiter=1`, `Monument to Endurance=0`, `Windborn Muse=1`,
+  `Guttersnipe=0`, `100/100`.
+- Latest summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_052416/summary.json`.
+- Latest run profile:
+  `candidate_reprieve_for_generous_gift_16`, `invocation_kind=codex_candidate_scan`,
+  `seeds_completed=16/16`.
+- Latest status:
+  `battle_replay_final_status=review_required`,
+  `mandatory_gate_divergences=["strategy_audit=review_required"]`,
+  forensic findings `0`, replay decision findings `0`,
+  target-pressure `pass=16`, table-intent `pass=16`, tests `18/18`.
+- Strategy signal:
+  Lorehold wins `5/16`, opponents win `9/16`,
+  opponent combat to Lorehold `291`, opponent combat to other players `4`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":5,"wheel_opponent_refill_risk":1}`.
+
+Intermediate candidate sequence:
+
+- `20260621_051800`: Brainstone over Generous Gift after forensic fix,
+  `4/16`, trusted, clean gates.
+- `20260621_052117`: Artist's Talent over Generous Gift,
+  `3/16`, trusted, clean gates.
+- Both remain candidate-only evidence because no PostgreSQL package or approved
+  apply command exists for those swaps.
+
+Learned-deck coherence:
+
+- Latest learned audit remains
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_045522.json`.
+- It is read-only and unchanged at aggregate level:
+  `active_learned_decks=60`, `severity_counts={"medium":13}`.
+- Lorehold active learned row remains structurally clean:
+  `issues=[]`, `parsed_quantity=100`, `resolved_quantity=100`,
+  `unresolved=[]`, no premium Mox, no off-color plan entries.
+- Active-vs-runtime drift remains open:
+  active learned deck has `Guttersnipe` and `Monument to Endurance`; PG/SQLite
+  runtime has `Silent Arbiter` and `Windborn Muse`.
+
+Current active pending item:
+
+- Do not promote Reprieve, Brainstone, or Artist's Talent from these candidate
+  scans yet.
+- The only actionable Lorehold governance drift remains active learned-deck
+  mutation alignment, which still requires explicit approval before any write.
+
+## Post-Engine-Fix Candidate Scan Update - 2026-06-21 03:06 -0300
+
+Scope:
+
+- Checked the battle-strategy `latest` after a new engine-fix/candidate scan
+  sequence.
+- No PostgreSQL apply, deck swap, rollback, commit, push, cleanup, stash, or
+  revert was performed by this heartbeat.
+- No newer learned-deck coherence artifact appeared; latest remains
+  `learned_deck_coherence_audit_20260621_045522.json`.
+
+New battle evidence:
+
+- Latest summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_054803/summary.json`.
+- Latest run:
+  `run_profile=recurring_16_seed`, `invocation_kind=codex_candidate_combo_scan`,
+  `seeds_completed=16/16`.
+- Latest status:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, replay decision
+  findings `0`, target-pressure `pass=16`, table-intent `pass=16`, tests
+  `18/18`.
+- Strategy signal:
+  Lorehold wins `1/16`, opponents win `15/16`,
+  opponent combat to Lorehold `213`, opponent combat to others `5`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":7}`.
+- Learning signal:
+  `10` high-confidence learning seeds and `6` low-confidence seeds.
+
+Intermediate post-fix sequence:
+
+- `20260621_053446`: candidate scan, `4/16`, trusted, clean gates.
+- `20260621_053937`: baseline after engine fix, `3/16`, trusted, clean gates.
+- `20260621_054357`: candidate scan after engine fix, `4/16`, trusted, clean
+  gates, `forced_keep_after_bad_mulligan=2`.
+
+Interpretation:
+
+- The latest combo scan is gate-clean but strategically worse than PG022's
+  already weak full post-sync result.
+- This is not a promotion path: no PostgreSQL package or explicit approved
+  apply command exists for the sequence.
+- Active learned-deck drift remains unchanged: active learned deck still has
+  `Guttersnipe`/`Monument to Endurance`, while PG/SQLite runtime has
+  `Silent Arbiter`/`Windborn Muse`.
+
+## Aborted Runner Artifact - 2026-06-21 04:48 -0300
+
+Scope:
+
+- Checked for new battle output after `054803`.
+- A newer directory exists at
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_060733/`,
+  but it has no `summary.json`.
+- `latest` still points to `20260621_054803`.
+- No PostgreSQL apply, deck swap, rollback, commit, push, cleanup, stash, or
+  revert was performed by this heartbeat.
+
+Evidence:
+
+- `060733` ran `py_compile` successfully.
+- `test_battle_analyst_v10_3` failed after `963s` because
+  PostgreSQL closed the connection while `sync_pg.connect()` was opening in
+  `test_runtime_pg_rule_fallback_for_promoted_hotfixes.py`.
+- Read-only follow-up connectivity check succeeded:
+  `PGOPTIONS='-c default_transaction_read_only=on'` with `select 1` returned
+  `pg_select_1=1`.
+- Latest learned-deck coherence remains
+  `learned_deck_coherence_audit_20260621_045522.json`, with the same active
+  learned-vs-runtime drift and `medium=13` aggregate count.
+
+Conclusion:
+
+- `060733` is not a deck result and does not supersede `054803`.
+- It is runner/infrastructure evidence only; no active Lorehold deck pending
+  item changes from it.
+
+## Latest Manual 64-Seed Rerun - 2026-06-21 05:17 -0300
+
+Scope:
+
+- A newer completed battle artifact superseded `054803` as `latest`.
+- No PostgreSQL apply, deck swap, rollback, commit, push, cleanup, stash, or
+  revert was performed by this heartbeat.
+- No newer learned-deck coherence artifact appeared after
+  `learned_deck_coherence_audit_20260621_045522.json`.
+
+Battle evidence:
+
+- Latest summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_080706/summary.json`.
+- `run_profile=custom_64_seed`, `invocation_kind=manual_cli`,
+  `run_scope=custom_multi_seed`, `seeds_completed=64/64`.
+- Final status: `trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, forensic findings `0`, replay decision
+  findings `0`, target-pressure `pass=64`, table-intent `pass=64`, tests
+  `18/18`.
+- Strategy signal:
+  Lorehold wins `14/64`, opponents win `49/64`,
+  opponent combat to Lorehold `1050`, opponent combat to others `46`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":13}`.
+- Learning signal:
+  high-confidence learning seeds `54`, low-confidence seeds `10`.
+
+Deck-state evidence:
+
+- Local Hermes SQLite `deck_id=6` focused check: `Silent Arbiter=1`,
+  `Windborn Muse=1`, `Generous Gift=1`, `100/100`.
+- The same focused check returned no `Guttersnipe` or
+  `Monument to Endurance`, preserving the PG022 deck shape.
+
+Conclusion:
+
+- `080706` is the current latest battle artifact and improves the observed
+  64-seed signal from the prior PG022 validation (`8/64`) to `14/64`.
+- It does not close Lorehold: `forced_keep_after_bad_mulligan=13` remains.
+- It does not authorize PostgreSQL or learned-deck mutation without an explicit
+  approved package/command.
+
+## PG023 Brainstone Package Prepared - 2026-06-21 05:17 -0300
+
+Scope:
+
+- New package artifacts were found for a proposed Brainstone deck swap.
+- No PostgreSQL precheck, apply, postcheck, rollback, deck sync, battle-rule
+  sync, commit, push, cleanup, stash, or revert was executed by this heartbeat.
+
+Package evidence:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brainstone_deck_swap_pg023_package_20260621_114447.md`.
+- Proposed swap: `Brainstone` in, `Generous Gift` out.
+- Package status: `prepared`.
+- Package cites same 64-seed window as current latest:
+  PG022 baseline `8/64` versus Brainstone candidate `14/64`.
+- Seed delta claimed by package: net `+6` Lorehold wins over 64 seeds.
+- Post-apply requirements listed by package: sync target deck PG -> Hermes,
+  sync battle rules PG -> Hermes so Brainstone is verified/auto locally, rerun
+  16-seed smoke and 64-seed battle, record hashes/artifacts.
+
+Current runtime evidence:
+
+- Local Hermes SQLite `deck_id=6` focused check still returns
+  `Generous Gift=1` and no `Brainstone` row.
+
+Conclusion:
+
+- PG023 is a prepared package only. It is not applied and does not change the
+  active pending list until explicitly approved and postchecked.
+
+## PG023 External Apply Closure And Fresh Learned Audit - 2026-06-21 10:07 -0300
+
+Scope:
+
+- Rechecked the state after new PG023 artifacts and battle results appeared.
+- This heartbeat did not execute PG023 precheck, apply, rollback, deck swap,
+  commit, push, cleanup, stash, or revert.
+- The PostgreSQL verification performed here was read-only:
+  `PGOPTIONS='-c default_transaction_read_only=on'` with the PG023 postcheck
+  SQL.
+
+PostgreSQL / sync evidence:
+
+- PG023 package status is now
+  `applied_and_postchecked_and_battle_validated`, superseding the earlier
+  prepared-only reading.
+- Read-only PG023 postcheck returned `postcheck_passed=true` with
+  `deck_rows=100`, `deck_quantity=100`, `gift_rows=0`, `brainstone_rows=1`,
+  `brainstone_is_commander=false`, `deck_backup_rows=1`,
+  `rule_backup_rows=1`, and `brainstone_rule_verified=true`.
+- Deck sync artifact:
+  `docs/hermes-analysis/master_optimizer_reports/sync_pg_target_deck_to_hermes_pg023_brainstone_20260621_114447.json`
+  reports `apply=true`, `cards_written=100`, `quantity_written=100`,
+  `deck_hash=c160e490b9e887d7b1f15ca6557be97d59b5aaff60bdee926805fd36359a6cbf`,
+  `semantics_hash=0c9a7c65e28993112e340aebd35d873847af3b4dd7b6d13712ea6afc74ec068b`,
+  and `ruleset_hash=86a6271a29428335e47f1d74355c8d899f075c79898711f70c3f284dd85d6fcc`.
+- Battle-rule sync artifact:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg023_brainstone_20260621_114447.json`
+  reports `apply_pg=false`, `apply_sqlite_from_pg=true`,
+  `pg_rows_loaded=5244`, `sqlite_inserted_or_updated=5211`.
+- Current local SQLite focused check for `deck_id=6` returns
+  `Brainstone=1`, `Silent Arbiter=1`, `Windborn Muse=1`, and no
+  `Generous Gift` row.
+
+Battle evidence:
+
+- Post-sync 16-seed smoke:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_121648/summary.json`,
+  `4/16`, `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`.
+- Latest post-sync 64-seed validation:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_122732/summary.json`,
+  `custom_64_seed`, `manual_cli`, `64/64`,
+  `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`,
+  target-pressure `pass=64`, table-intent `pass=64`, tests `18/18`.
+- Strategy signal in `122732`: Lorehold wins `14/64`, opponents win `49/64`,
+  opponent combat to Lorehold `1050`, opponent combat to others `46`,
+  `forced_keep_after_bad_mulligan=13`, high-confidence learning seeds `54`,
+  low-confidence seeds `10`.
+
+Fresh learned-deck coherence:
+
+- Generated
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_130957.json`
+  and `.md`.
+- Aggregate remains unchanged: `active_learned_decks=60`,
+  `severity_counts={"medium":13}`.
+- Lorehold active learned row remains structurally clean:
+  `parsed_quantity=100`, `resolved_quantity=100`, `issues=[]`,
+  no premium Mox violations.
+- Lorehold active learned-vs-runtime drift increased to three cards:
+  active-only `Generous Gift`, `Guttersnipe`, `Monument to Endurance`; runtime
+  PG/SQLite-only `Brainstone`, `Silent Arbiter`, `Windborn Muse`.
+- Lorehold strategy package still has the medium
+  `lorehold_strategy_big_spell_finishers_gap` (`expected=4`, `actual=2`).
+
+Conclusion:
+
+- PG023 is no longer pending deploy work; it is externally applied,
+  postchecked, synced, and battle-validated.
+- The remaining active Lorehold pending item is governance drift of the active
+  learned deck versus materialized PG/SQLite runtime. Do not mutate it without
+  explicit approval.
+- The next technical improvement remains consistency/mulligan handling, because
+  `forced_keep_after_bad_mulligan=13` persists after PG023.
+
+## Temporary Expedition Map Candidate Latest - 2026-06-21 10:15 -0300
+
+Scope:
+
+- A new temporary candidate runner appeared after PG023 closure evidence.
+- Observed process command temporarily removed `Electroduplicate`, inserted
+  `Expedition Map`, ran 16 seeds, and restored `knowledge.db` from a backup
+  trap after exit.
+- This heartbeat did not execute or approve any deck swap, PostgreSQL apply,
+  rollback, commit, push, cleanup, stash, or revert for the candidate.
+
+Latest battle evidence:
+
+- Latest summary is now
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131126/summary.json`.
+- `run_profile=recurring_16_seed`, `invocation_kind=manual_cli`,
+  `seeds_completed=16/16`, `trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, target-pressure `pass=16`,
+  table-intent `pass=16`, tests `18/18`.
+- Strategy signal: Lorehold wins `1/16`, opponents win `14/16`,
+  opponent combat to Lorehold `260`, opponent combat to others `8`,
+  `forced_keep_after_bad_mulligan=3`, low-confidence seeds `2`.
+
+Runtime restoration evidence:
+
+- After the runner exited, local SQLite `deck_id=6` returned
+  `Brainstone=1`, `Electroduplicate=1`, `Silent Arbiter=1`, `Windborn Muse=1`,
+  no `Expedition Map`, no `Generous Gift`, and `100/100` total quantity.
+
+Conclusion:
+
+- `131126` supersedes `122732` as the latest symlink target, but it is a
+  temporary candidate run with poor outcome and no deploy package.
+- It does not reopen PG023 and does not change the active pending list.
+
+## Latest PG023 Recurring Smoke - 2026-06-21 10:20 -0300
+
+- Latest symlink now points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131606/summary.json`.
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `invocation_kind=manual_cli`, `seeds_completed=16/16`.
+- Final status is `trusted_for_strategy_learning`, with
+  `mandatory_gate_divergences=[]`, target-pressure `pass=16`,
+  table-intent `pass=16`, tests `18/18`.
+- Strategy signal: Lorehold wins `3/16`, opponents win `13/16`,
+  opponent combat to Lorehold `268`, opponent combat to others `3`,
+  `forced_keep_after_bad_mulligan=5`.
+- Persistent local SQLite after the run remains PG023-shaped:
+  `Brainstone=1`, `Electroduplicate=1`, `Silent Arbiter=1`,
+  `Windborn Muse=1`, no `Generous Gift`, no `Expedition Map`, `100/100`.
+- Conclusion: `131606` is current latest smoke evidence; it is gate-clean but
+  still weak strategy evidence and does not change the active pending list.
+
+## Temporary Thrill Candidate Latest - 2026-06-21 10:25 -0300
+
+- Latest symlink now points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132027/summary.json`.
+- Observed process command temporarily cut `Boros Charm` for
+  `Thrill of Possibility`, then restored `knowledge.db` from backup on exit.
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `invocation_kind=manual_cli`, `seeds_completed=16/16`.
+- Final status is `trusted_for_strategy_learning`, with
+  `mandatory_gate_divergences=[]`, target-pressure `pass=16`,
+  table-intent `pass=16`, tests `18/18`.
+- Strategy signal: Lorehold wins `2/16`, opponents win `13/16`,
+  `forced_keep_after_bad_mulligan=4`.
+- Persistent local SQLite after the run returned
+  `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, `Windborn Muse=1`, no `Thrill of Possibility`,
+  `100/100`.
+- Conclusion: current latest is gate-clean temporary candidate evidence only;
+  it does not change PG023 closure or the active pending list.
+
+## Active Temporary Reprieve Runner - 2026-06-21 10:26 -0300
+
+- A new external candidate runner is active after `132027`.
+- Observed command temporarily deletes `Boros Charm`, inserts `Reprieve`, runs
+  16 seeds, and should restore `knowledge.db` from backup on exit.
+- Active run directory:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132537/`.
+- Final checkpoint: at least `9` seed directories, no summary read yet.
+- Current SQLite is temporary while the runner is active:
+  `Reprieve=1`, no `Boros Charm`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, `Windborn Muse=1`, `100/100`.
+- Latest completed summary remains `20260621_132027` until `132537` publishes
+  a summary.
+
+## Temporary Reprieve Candidate Completed - 2026-06-21 10:30 -0300
+
+- Latest symlink now points to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132537/summary.json`.
+- The previously active temporary `Reprieve` over `Boros Charm` runner
+  completed and restored `knowledge.db`.
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `invocation_kind=manual_cli`, `seeds_completed=16/16`.
+- Final status is `trusted_for_strategy_learning`, with
+  `mandatory_gate_divergences=[]`, target-pressure `pass=16`,
+  table-intent `pass=16`, tests `18/18`.
+- Strategy signal: Lorehold wins `4/16`, opponents win `12/16`,
+  opponent combat to Lorehold `267`, opponent combat to others `4`,
+  `forced_keep_after_bad_mulligan=5`.
+- Persistent SQLite after the run returned
+  `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, `Windborn Muse=1`, no `Reprieve`, no `Generous Gift`,
+  `100/100`.
+- Fresh learned-deck coherence remains `20260621_130957`: aggregate
+  `medium=13`; Lorehold drift remains active-only
+  `Generous Gift`/`Guttersnipe`/`Monument to Endurance` versus runtime-only
+  `Brainstone`/`Silent Arbiter`/`Windborn Muse`.
+- Conclusion: `132537` is gate-clean temporary candidate evidence only. It
+  does not reopen PG023, does not create a deploy item, and does not change the
+  active pending list.
+
+## PG023 Candidate Scan Artifact - 2026-06-21 10:30 -0300
+
+- New artifact:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_pg023_candidate_scan_20260621_132537.md`.
+- Status: `no_promotion`.
+- The artifact classifies recent latest runs as temporary SQLite candidates,
+  not persistent swaps:
+  `Expedition Map` over `Electroduplicate` (`131126`, `1/16`),
+  `Reforge the Soul` over `Boros Charm` (`131606`, `3/16`),
+  `Thrill of Possibility` over `Boros Charm` (`132027`, `2/16`), and
+  `Reprieve` over `Boros Charm` (`132537`, `4/16`).
+- Correction: earlier `131606` notes that read like canonical PG023 smoke are
+  superseded by this artifact. `131606` is candidate evidence.
+- The artifact states no PostgreSQL apply was performed, no package was
+  generated, and SQLite restored to PG023 state after each run.
+- Canonical PG023 validation remains the full `20260621_122732` run:
+  `14/64`, trusted, clean gates.
+- Next search direction from the artifact: inspect losing seeds where Lorehold
+  keeps a high-scoring opener but fails to convert, especially `Birgi`,
+  `Lightning Greaves`, `Electroduplicate`, `Heat Shimmer`, and redundant
+  protection/copy packages.
+
+## PG023 Brainstone Applied And Validated - 2026-06-21 10:06 -0300
+
+Scope:
+
+- Applied the prepared PG023 package for Lorehold deck `528c877f-f829-4207-95e6-73981776c323`.
+- Swap: `Brainstone` in, `Generous Gift` out.
+- Also promoted the curated Brainstone battle rule from `active/auto` to
+  `verified/auto`.
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brainstone_deck_swap_pg023_precheck_20260621_114447.sql`
+  returned `ready_to_apply=t`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brainstone_deck_swap_pg023_apply_20260621_114447.sql`
+  reported `gift_rows=0`, `brainstone_rows=1`, `total_quantity=100`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brainstone_deck_swap_pg023_postcheck_20260621_114447.sql`
+  returned `postcheck_passed=t`, `deck_backup_rows=1`,
+  `rule_backup_rows=1`, and `brainstone_rule_verified=t`.
+- Rollback file exists:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brainstone_deck_swap_pg023_rollback_20260621_114447.sql`.
+
+Sync evidence:
+
+- Rule sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg023_brainstone_20260621_114447.json`,
+  `sqlite_inserted_or_updated=5211`, `pg_rows_loaded=5244`.
+- Deck sync:
+  `docs/hermes-analysis/master_optimizer_reports/sync_pg_target_deck_to_hermes_pg023_brainstone_20260621_114447.json`,
+  `cards_written=100`, `quantity_written=100`,
+  `deck_hash=c160e490b9e887d7b1f15ca6557be97d59b5aaff60bdee926805fd36359a6cbf`,
+  `semantics_hash=0c9a7c65e28993112e340aebd35d873847af3b4dd7b6d13712ea6afc74ec068b`,
+  `ruleset_hash=86a6271a29428335e47f1d74355c8d899f075c79898711f70c3f284dd85d6fcc`.
+- Local SQLite focused check after sync: `Brainstone=1`, no `Generous Gift`
+  row in `deck_id=6`, and Brainstone curated rule is `verified/auto`.
+
+Battle evidence:
+
+- Post-sync smoke:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_121648/summary.json`,
+  `4/16`, trusted, clean gates.
+- Post-sync full validation:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_122732/summary.json`,
+  `14/64`, trusted, clean gates.
+- Compared to PG022 full validation
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_044758/summary.json`,
+  Lorehold improved from `8/64` to `14/64`, net `+6` wins.
+- The 64-seed result is now `21.875%` Lorehold win rate in this fixed seed
+  window.
+
+Replay excerpt:
+
+- Seed `63212316`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_122732/seed_63212316/replay.txt`.
+- Turn 4: Lorehold casts Brainstone as `topdeck_manipulation`, rule
+  `curated/verified`.
+- Turn 10: Lorehold activates Brainstone with
+  `kind=brainstone_draw_three_put_two_back_for_miracle`.
+- Turn 11: Lorehold wins by elimination.
+- Seed gates: strategy `usable_for_strategy_learning`, table-intent `pass`,
+  target-pressure `pass`.
+
+Current open deck issue:
+
+- PG023 improved the deck but did not solve it. Lorehold still loses
+  `49/64` in the fixed window.
+- Remaining repeated strategy weakness is still consistency/mulligan pressure:
+  `forced_keep_after_bad_mulligan=13`.
+- Next deck work should target opening-hand quality, mana/curve density, and
+  cards that are dead before Lorehold establishes draw/topdeck engines.
+
+## PG023 Candidate Scan Rejections - 2026-06-21 10:06 -0300
+
+Scope:
+
+- Tested four temporary SQLite-only candidate swaps after PG023.
+- No PostgreSQL apply, rollback, package creation, commit, push, stash, delete,
+  or revert was performed for these candidates.
+- Local SQLite was restored after each run.
+
+Candidate evidence:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_pg023_candidate_scan_20260621_132537.md`.
+- PG023 smoke baseline:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_121648/summary.json`,
+  `4/16`, trusted, clean gates.
+- `Expedition Map` over `Electroduplicate`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131126/summary.json`,
+  `1/16`, trusted, clean gates; rejected.
+- `Reforge the Soul` over `Boros Charm`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131606/summary.json`,
+  `3/16`, trusted, clean gates; rejected.
+- `Thrill of Possibility` over `Boros Charm`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132027/summary.json`,
+  `2/16`, trusted, clean gates; rejected.
+- `Reprieve` over `Boros Charm`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_132537/summary.json`,
+  `4/16`, trusted, clean gates, but worse pressure and more low-confidence
+  mulligan noise than PG023 smoke; rejected.
+
+Important correction:
+
+- `forced_keep_after_bad_mulligan=13` in the PG023 full summary is global table
+  strategy signal, not Lorehold-only. Direct decision mapping shows only one of
+  those findings is attached to Lorehold (`63212346`); the others are attached
+  to opponents.
+- Therefore the next deck iteration should not blindly add lands or land tutors.
+  The failed `Expedition Map` candidate supports that correction.
+
+Current state:
+
+- Canonical runtime deck remains PG023: `Brainstone=1`, `Boros Charm=1`,
+  `Electroduplicate=1`.
+- The battle artifact symlink `latest` currently points to rejected candidate
+  `20260621_132537`; use PG023 full `20260621_122732` as canonical runtime
+  validation until a new applied/post-sync run supersedes it.
+
+## Learned Coherence Follow-Up - 2026-06-21 10:06 -0300
+
+New read-only artifact:
+
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_130957.md`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_130957.json`
+
+Evidence:
+
+- Active learned decks checked: `60`.
+- High issues: `0`.
+- Medium issues: `13`.
+- Lorehold PG saved deck rows/quantity: `100/100`, lands `33`.
+- Lorehold strategy package still reports `Big spell finishers` below minimum:
+  present `2`, expected `4`, missing historical finishers such as
+  `Rise of the Eldrazi`, `Storm Herd`, `Worldfire`, `Fiery Emancipation`, and
+  `Rite of the Dragoncaller`.
+
+Interpretation:
+
+- This is coherence/report evidence, not direct swap authorization.
+- Recent battle evidence rejects blindly adding a big spell wheel/finisher:
+  `Reforge the Soul` over `Boros Charm` fell to `3/16` in
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_131606/summary.json`.
+- The Lorehold strategy package needs recalibration against battle outcomes
+  before its missing-big-spell list is used as a deployment rule.
+
+## Learned Coherence Auditor Correction - 2026-06-21 10:39 -0300
+
+Scope:
+
+- Corrected `server/bin/learned_deck_coherence_audit.py` so the focused
+  Lorehold strategy check evaluates the runtime deck source when available:
+  `pg_saved_deck` first, then `sqlite_deck`, then the older active learned list.
+- Replaced the stale `big_spell_finishers` package with `closing_conversion`.
+  The package still checks for real closing lines, but it no longer forces the
+  old high-CMC finisher set that PG011 deliberately removed.
+- No PostgreSQL write, SQLite deck swap, rollback, cleanup, commit, push, stash,
+  or file deletion was performed.
+
+Code/test evidence:
+
+- `server/bin/learned_deck_coherence_audit.py`
+- `server/test/learned_deck_coherence_audit_test.py`
+- `python3 -m unittest server/test/learned_deck_coherence_audit_test.py`:
+  `21` tests, `OK`.
+- `python3 -m py_compile server/bin/learned_deck_coherence_audit.py server/test/learned_deck_coherence_audit_test.py`:
+  pass.
+
+New read-only artifact:
+
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_133919.md`
+- `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260621_133919.json`
+
+Artifact evidence:
+
+- `strategy_source=pg_saved_deck`.
+- Lorehold PG saved deck: `100` rows, `100` quantity, `33` lands.
+- Lorehold strategy package pass: `yes`; strategy issues: `[]`.
+- `closing_conversion`: present `7`, minimum `4`, pass. Present cards:
+  `Approach of the Second Sun`, `Mizzix's Mastery`, `Past in Flames`,
+  `Wheel of Fortune`, `Wheel of Misfortune`, `Blasphemous Act`, and
+  `Aetherflux Reservoir`.
+- Remaining name diff is not PG/SQLite drift. It is the known active learned
+  list lag: active still has `Generous Gift`, `Guttersnipe`, and
+  `Monument to Endurance`; runtime PG/SQLite has `Brainstone`,
+  `Silent Arbiter`, and `Windborn Muse`.
+
+Current deck interpretation:
+
+- The old `lorehold_strategy_big_spell_finishers_gap` is closed as an auditor
+  rule mismatch, not as a deck swap.
+- Do not use `Rise of the Eldrazi`, `Storm Herd`, `Worldfire`,
+  `Fiery Emancipation`, or `Rite of the Dragoncaller` as automatic add-backs
+  without fresh battle evidence.
+- The real next deck problem remains battle conversion under pressure:
+  PG023 is trusted at `14/64`, so the deck improved but still loses most games.
+
+## Focused Zone Transition Latest - 2026-06-21 11:03 -0300
+
+Scope:
+
+- Latest battle symlink advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_140346/summary.json`.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap, sync command, commit, push, cleanup, stash, revert, or file
+  deletion.
+- The run is focused zone-transition evidence, not a new full Lorehold deck
+  validation and not a deck promotion signal.
+
+Battle evidence:
+
+- `run_profile=focused_zone_transition_fix_v3`,
+  `run_scope=focused_seed`,
+  `invocation_kind=codex_focused_zone_transition_fix_63212310_v3`.
+- `seeds_completed=1/1`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- `target_pressure_statuses={"pass":1}` and
+  `table_intent_statuses={"pass":1}`.
+- `test_results_status_counts={"pass":18}`.
+- `strategy_review_required_findings=0`,
+  `strategy_code_counts={}`, and `strategy_severity_counts={}`.
+- Target-pressure sample: opponent combat to Lorehold `11`, to other players
+  `0`.
+- Table-intent sample: Lorehold target wins `0`, opponents `1`.
+
+Runtime deck check:
+
+- Local Hermes SQLite deck `6` remains `100` rows / `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`;
+  no `Reprieve` or `Generous Gift` rows in that focused query.
+
+Interpretation:
+
+- `latest` now points to focused runtime-support validation, so it supersedes
+  the older `132537` pointer only as a symlink state.
+- Canonical Lorehold deck validation remains PG023 full run
+  `20260621_122732` (`14/64`, trusted, clean gates).
+- The next real deck work remains consistency/conversion under pressure; no
+  active Lorehold pending item was removed from the deck backlog based on this
+  one-seed focused run.
+
+## PG023 Combat-Survival Rebaseline - 2026-06-21 11:30 -0300
+
+Scope:
+
+- Latest battle symlink advanced again to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_142400/summary.json`.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap, sync command, commit, push, cleanup, stash, revert, or file
+  deletion.
+- The run is a 16-seed PG023 rebaseline after combat-survival runtime response,
+  not a new deck package and not a rollback command.
+
+Battle evidence:
+
+- `run_profile=pg023_rebaseline_after_combat_survival_16_seed`.
+- `run_scope=recurring_full`.
+- `invocation_kind=codex_pg023_rebaseline_after_combat_survival_response`.
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Gate/test summary: target-pressure `pass=16`, table-intent `pass=16`,
+  test results `pass=18`.
+- Strategy findings: `strategy_review_required_findings=0`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":2}`,
+  `strategy_severity_counts={"medium":2}`.
+- Outcome sample: Lorehold target wins `1/16`, opponents `15/16`.
+- Pressure sample: opponent combat to Lorehold `246`, to other players `2`.
+
+Runtime deck check:
+
+- Local Hermes SQLite deck `6` remains `100` rows / `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`;
+  no `Reprieve` or `Generous Gift` rows in that focused query.
+
+Interpretation:
+
+- `142400` supersedes `140346` as latest symlink state and is broader than the
+  one-seed focused zone-transition run.
+- It is gate-clean but strategically poor: the 16-seed rebaseline is worse than
+  the PG023 post-sync smoke `20260621_121648` (`4/16`) and reinforces that
+  Lorehold still fails to convert/survive pressure.
+- It does not prove PostgreSQL drift or deck rollback need; runtime deck shape
+  still matches the PG023 Brainstone shape in SQLite.
+- Keep PG023 closed as a deploy item, and keep the active backlog on
+  consistency/combat-survival/conversion under pressure.
+
+## PG023 Priority-Fix And Angel's Grace Candidate Sweep - 2026-06-21 12:04 -0300
+
+Scope:
+
+- Latest battle symlink advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_145948/summary.json`.
+- This heartbeat waited for the active external runner to finish before reading
+  runtime state; no PostgreSQL apply, rollback, manual SQL write, deck swap,
+  sync command, commit, push, cleanup, stash, revert, or file deletion was
+  performed.
+- No new learned-deck coherence artifact appeared after
+  `learned_deck_coherence_audit_20260621_133919.json`.
+
+Recent battle artifacts:
+
+- `20260621_140846`: `pg023_rebaseline_after_zone_fix_16_seed`,
+  trusted, clean gates, tests `pass=18`, Lorehold `2/16`, opponents `14/16`,
+  `forced_keep_after_bad_mulligan=2`.
+- `20260621_141620`: `pg023_rebaseline_after_reactive_hold_16_seed`,
+  trusted, clean gates, tests `pass=18`, Lorehold `1/16`, opponents `15/16`,
+  `forced_keep_after_bad_mulligan=2`.
+- `20260621_144336`: `candidate_angels_grace_for_boros_16_seed`, blocked by
+  `mandatory_gate_divergences=["forensic_audit=blocked"]`; not valid strategy
+  evidence even though target-pressure/table-intent/tests passed.
+- `20260621_145423`:
+  `pg023_rebaseline_after_cannot_lose_priority_fix_16_seed`, trusted, clean
+  gates, tests `pass=18`, Lorehold `1/16`, opponents `15/16`,
+  `forced_keep_after_bad_mulligan=2`.
+- `20260621_145948`:
+  `candidate_angels_grace_for_boros_after_priority_fix_16_seed`, trusted,
+  clean gates, tests `pass=18`, Lorehold `2/16`, opponents `13/16`,
+  `forced_keep_after_bad_mulligan=3`, opponent combat to Lorehold `254`, to
+  other players `1`.
+
+Runtime deck check after runner exit:
+
+- Local Hermes SQLite deck `6` is restored to `100` rows / `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`.
+
+Interpretation:
+
+- The first Angel's Grace candidate (`144336`) is invalid because a mandatory
+  forensic gate blocked it.
+- The post-priority-fix Angel's Grace candidate (`145948`) is gate-clean but
+  not promotable: `2/16` is below the PG023 post-sync smoke `121648` at `4/16`
+  and does not beat the current deck's documented full validation.
+- PG023 remains closed as deployed runtime shape. The active work item remains
+  survival/conversion under pressure, not a Boros Charm -> Angel's Grace swap.
+
+## Latest Manual 16-Seed Review Checkpoint - 2026-06-21 12:35 -0300
+
+Scope:
+
+- Latest battle symlink advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_151645/summary.json`.
+- An external runner was still active at read time:
+  `manaloom-battle-strategy-audit.sh --seeds 16 --start-seed 63212310`.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap, sync command, commit, push, cleanup, stash, revert, file deletion,
+  or runner termination.
+- No new learned-deck coherence artifact appeared after
+  `learned_deck_coherence_audit_20260621_133919.json`.
+
+Battle evidence:
+
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `invocation_kind=manual_cli`.
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["forensic_audit=review_required","replay_decision_audit=review_required","strategy_audit=review_required"]`.
+- Gate/test summary: target-pressure `pass=16`, table-intent `pass=16`,
+  tests `pass=18`.
+- Strategy findings: `strategy_review_required_findings=4`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":4,"resource_cost_without_selection_context":1,"spending_unique_color_land":1,"tutor_no_target":2}`,
+  `strategy_severity_counts={"low":1,"medium":7}`.
+- Outcome sample: Lorehold target wins `1/16`, opponents `12/16`.
+- Pressure sample: opponent combat to Lorehold `310`, to other players `8`.
+
+Runtime deck check:
+
+- Current SQLite read after the latest pointer shows deck `6` at `100` rows /
+  `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`.
+
+Interpretation:
+
+- `151645` supersedes `145948` as latest symlink state, but it is not trusted
+  for strategy learning because three mandatory gates require review.
+- Because a runner was still active, this is a checkpoint, not a final
+  post-run restoration claim.
+- Do not open PostgreSQL apply/rollback from this artifact. The active item is
+  battle/auditor review plus the already-known Lorehold survival/conversion
+  weakness.
+
+## PG023 Oracle-Specific Finisher Contract Rebaseline - 2026-06-21 12:37 -0300
+
+Scope:
+
+- Latest battle symlink advanced again to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_152154/summary.json`.
+- The prior `151645` review checkpoint is superseded by this clean run.
+- No external runner was active at final read time.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap, sync command, commit, push, cleanup, stash, revert, file deletion,
+  or runner termination.
+
+Battle evidence:
+
+- `run_profile=pg023_rebaseline_after_oracle_specific_finisher_contract_fix_16_seed`.
+- `run_scope=recurring_full`.
+- `invocation_kind=codex_pg023_rebaseline_after_oracle_specific_finisher_contract_fix`.
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Gate/test summary: target-pressure `pass=16`, table-intent `pass=16`,
+  tests `pass=18`.
+- Strategy findings: `strategy_review_required_findings=0`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":2}`,
+  `strategy_severity_counts={"medium":2}`.
+- Outcome sample: Lorehold target wins `1/16`, opponents `14/16`.
+- Pressure sample: opponent combat to Lorehold `252`, to other players `2`.
+
+Runtime deck check:
+
+- Current SQLite read shows deck `6` at `100` rows / `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`.
+
+Interpretation:
+
+- The oracle-specific finisher contract fix clears the review gates seen in
+  `151645`.
+- The run is trusted, but the strategic result remains weak: Lorehold won only
+  `1/16`.
+- PG023 remains closed as deployed runtime shape. Do not open PostgreSQL apply
+  or rollback from this artifact; continue survival/conversion work.
+
+## Magus Candidate Over Electroduplicate Blocked - 2026-06-21 13:03 -0300
+
+Scope:
+
+- Latest battle symlink advanced to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_153944/summary.json`.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap, sync command, commit, push, cleanup, stash, revert, or file
+  deletion.
+- No new learned-deck coherence artifact appeared after
+  `learned_deck_coherence_audit_20260621_133919.json`.
+
+Related battle evidence:
+
+- `20260621_151200`:
+  `pg023_rebaseline_after_oracle_specific_finisher_rules_16_seed`, blocked by
+  `mandatory_gate_divergences=["event_contract_static=review_required","forensic_audit=blocked"]`.
+- `20260621_152154` superseded `151200` and cleared those review gates.
+- `20260621_153944`:
+  `candidate_magus_of_the_moat_for_electroduplicate_16_seed`, blocked by
+  `mandatory_gate_divergences=["strategy_audit=blocked"]`.
+
+Latest artifact details:
+
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=blocked`.
+- Gate/test side channels passed: target-pressure `pass=16`,
+  table-intent `pass=16`, tests `pass=18`.
+- Strategy findings: `strategy_review_required_findings=2`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":2,"spending_last_land":1,"spending_unique_color_land":1}`,
+  `strategy_severity_counts={"high":1,"medium":3}`.
+- Outcome sample: Lorehold target wins `3/16`, opponents `12/16`.
+- Pressure sample: opponent combat to Lorehold `256`, to other players `7`.
+
+Runtime deck check:
+
+- Current SQLite read shows deck `6` restored to `100` rows / `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`; no
+  `Magus of the Moat` row in that focused query.
+- New backup artifact observed:
+  `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_123935.sqlite`.
+  It is a `5.5M` SQLite backup and still contains the restored PG023 focused
+  card shape.
+
+Interpretation:
+
+- Magus of the Moat over Electroduplicate is not promotable: the candidate is
+  blocked by strategy audit despite `3/16` wins.
+- No PostgreSQL rollback/apply is opened. The backup is evidence/candidate
+  cleanup, not an authorization to mutate runtime state.
+
+## Magus Candidate After Mox Trace Fix - 2026-06-21 13:19 -0300
+
+Scope:
+
+- Latest battle symlink advanced again to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_160405/summary.json`.
+- This supersedes the blocked `153944` candidate reading.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap, sync command, commit, push, cleanup, stash, revert, or file
+  deletion.
+
+Battle evidence:
+
+- `run_profile=candidate_magus_of_the_moat_for_electroduplicate_after_mox_trace_fix_16_seed`.
+- `run_scope=recurring_full`.
+- `invocation_kind=codex_candidate_magus_of_the_moat_for_electroduplicate_after_mox_trace_fix_16_seed`.
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Gate/test summary: target-pressure `pass=16`, table-intent `pass=16`,
+  tests `pass=18`.
+- Strategy findings: `strategy_review_required_findings=0`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":2}`,
+  `strategy_severity_counts={"medium":2}`.
+- Outcome sample: Lorehold target wins `3/16`, opponents `12/16`.
+- Pressure sample: opponent combat to Lorehold `256`, to other players `7`.
+
+Runtime deck check:
+
+- Current SQLite read shows deck `6` restored to `100` rows / `100` quantity.
+- Focused card check: `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, and `Windborn Muse=1`; no
+  `Magus of the Moat` row in that focused query.
+- New backup artifact observed:
+  `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_over_electroduplicate_20260621_160258.sqlite`.
+  It is a `5.5M` SQLite backup and contains the restored PG023 focused card
+  shape.
+
+Interpretation:
+
+- The mox trace fix clears the `153944` strategy blocker, so `160405` is valid
+  strategy evidence.
+- The candidate is still not promotable: `3/16` is below the PG023 post-sync
+  smoke baseline `121648` at `4/16` and far below the full-run conversion
+  requirement.
+- Do not open PostgreSQL apply/rollback. Keep PG023 closed and continue
+  survival/conversion work.
+
+## Victory Chimes Rule Fix And Rebaseline - 2026-06-21 13:52 -0300
+
+Scope:
+
+- Rechecked `git status --short --branch`, central/Lorehold register tails,
+  latest learned-deck coherence artifact, latest battle `summary.json`, local
+  SQLite runtime state, and new untracked Victory Chimes artifacts.
+- This heartbeat did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap command, commit, push, cleanup, stash, revert, or file deletion.
+
+Victory Chimes evidence:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json`
+  now has `Victory Chimes` as `source=curated`, `review_status=verified`,
+  `effect=ramp_permanent`, `mana_produced=1`, `produces=C`, and
+  `untaps_each_opponent_untap=true`.
+- The stale local curated draw model is evidenced in
+  `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_victory_chimes_rule_fix_20260621_161900.sqlite`:
+  it contained a curated `draw_engine` row plus a generated ramp row.
+- The observed local SQLite sync report
+  `victory_chimes_reviewed_rule_sqlite_sync_20260621_161900.json` records
+  `apply=true`, `input_rows=122`, `curated_rows=105`, `manual_rows=17`,
+  `inserted_or_updated=122`, `deleted_stale_reviewed_rows=1`,
+  `deleted_stale_manual_rows=17`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Current SQLite `battle_card_rules` now has the generated needs-review ramp
+  row plus the curated verified ramp row for `Victory Chimes`; the stale
+  curated `draw_engine` row is no longer current.
+
+Tests:
+
+- Focused Victory Chimes regression:
+  `cd docs/hermes-analysis/manaloom-knowledge/scripts && python3 -m unittest test_reviewed_battle_card_rules.ReviewedBattleCardRulesTests.test_reviewed_rule_payload_contains_expected_cards test_reviewed_battle_card_rules.ReviewedBattleCardRulesTests.test_sync_build_rows_includes_reviewed_rules_without_generated_layer test_reviewed_battle_card_rules.ReviewedBattleCardRulesTests.test_runtime_prefers_reviewed_curated_rule_after_sync`
+  passed: `Ran 3 tests ... OK`.
+- Full `test_reviewed_battle_card_rules.py` is not green in the current
+  worktree: `Ran 25 tests`, `2` failures in
+  `test_lorehold_top_draw_mode_consumes_top_for_immediate_miracle` and
+  `test_lorehold_scroll_rack_sets_hand_spell_as_next_draw`. Those failures are
+  Top/Scroll Rack behavior and are not Victory Chimes-specific.
+
+Battle evidence:
+
+- Intermediate latest `20260621_164101`:
+  `run_profile=rebaseline_after_victory_chimes_rule_fix_16_seed`,
+  `seeds_completed=16/16`, `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, target-pressure `pass=16`,
+  table-intent `pass=16`, tests `pass=18`, Lorehold `1/16`, opponents `14/16`,
+  `forced_keep_after_bad_mulligan=2`.
+- A transient local candidate cache was observed after `164101`: SQLite deck
+  `6` showed `Magus of the Moat=1` and no focused `Electroduplicate` row.
+  The new backup
+  `knowledge_db_backup_candidate_magus_after_victory_fix_20260621_165000.sqlite`
+  preserves the prior focused shape with `Electroduplicate=1` and no Magus.
+- Final latest `20260621_164710`:
+  `run_profile=recurring_16_seed`, `invocation_kind=manual_cli`,
+  `seeds_completed=16/16`, `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, target-pressure `pass=16`,
+  table-intent `pass=16`, tests `pass=18`,
+  `strategy_review_required_findings=0`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":2}`,
+  Lorehold `2/16`, opponents `13/16`, opponent combat to Lorehold `246`,
+  to other players `1`.
+
+Final runtime deck check:
+
+- Current SQLite deck `6` is back to `100` rows / `100` quantity.
+- Focused card check returns `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, `Victory Chimes=1`, and
+  `Windborn Muse=1`; no focused `Magus of the Moat` row in the final query.
+- No active `battle_strategy_audit` or `battle_replay_v10_3.py` process
+  remained at final read time, and `latest` points to `20260621_164710`.
+
+Classification:
+
+- Source necessary:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json`.
+- Test necessary:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`.
+- Evidence necessary:
+  `victory_chimes_reviewed_rule_sqlite_sync_20260621_161900.json`,
+  `knowledge_db_backup_victory_chimes_rule_fix_20260621_161900.sqlite`,
+  `knowledge_db_backup_candidate_magus_after_victory_fix_20260621_165000.sqlite`,
+  and external battle artifacts `20260621_164101` and `20260621_164710`.
+- Candidate future cleanup only with explicit approval:
+  the SQLite backup artifacts above and the existing untracked report backlog.
+
+Current active list:
+
+- Victory Chimes draw-vs-ramp modeling is closed as a real local runtime
+  pending item.
+- PG023 remains closed. No PostgreSQL deploy item, rollback item, or deck swap
+  is opened by this evidence.
+- Active Lorehold work remains strategy outcome: consistency, mulligan/opening
+  hand quality, and the separate active learned-source lag. The latest trusted
+  result is still weak at `2/16`.
+
+## Magus Same-Seed Candidate After Victory Fix - 2026-06-21 14:38 -0300
+
+Scope:
+
+- Final recheck found that battle `latest` advanced again after the 13:52
+  register update.
+- This checkpoint did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap command, commit, push, cleanup, stash, revert, or file deletion.
+
+Latest battle evidence:
+
+- Current latest:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_173334/summary.json`.
+- `run_profile=candidate_magus_after_victory_chimes_fix_same_seed_16_seed`.
+- `run_scope=recurring_full`.
+- `invocation_kind=codex_candidate_magus_after_victory_chimes_fix_same_seed_16_seed`.
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `battle_replay_final_status_reason=all_mandatory_gates_pass`.
+- `mandatory_gate_divergences=[]`.
+- Gate/test summary: target-pressure `pass=16`, table-intent `pass=16`,
+  tests `pass=18`, strategy review findings `0`.
+- Strategy residual: `forced_keep_after_bad_mulligan=2`, medium severity `2`.
+- Outcome: Lorehold target wins `3/16`, opponents `12/16`; opponent combat to
+  Lorehold `256`, to other players `7`.
+
+Runtime and artifact evidence:
+
+- Final SQLite deck check after `173334`: deck `6` is `100` rows / `100`
+  quantity with `Boros Charm=1`, `Brainstone=1`, `Electroduplicate=1`,
+  `Silent Arbiter=1`, `Victory Chimes=1`, and `Windborn Muse=1`; no focused
+  `Magus of the Moat` row.
+- New backup artifact:
+  `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_after_victory_fix_same_seed_20260621_165700.sqlite`.
+  It is `5.5M` and preserves the pre-candidate focused shape with
+  `Electroduplicate=1`.
+- No active `battle_strategy_audit` or `battle_replay_v10_3.py` process
+  remained at final read time.
+
+Interpretation:
+
+- `173334` supersedes `164710` as the current latest battle artifact.
+- Victory Chimes remains closed as a local runtime rule-modeling pending item.
+- Magus after Victory Chimes fix is valid gate-clean evidence but still not a
+  promotion signal: `3/16` remains below the PG023 smoke baseline and does not
+  justify PostgreSQL apply, rollback, or deck swap.
+
+## Runtime Cache Drift After Latest Battle - 2026-06-21 14:42 -0300
+
+Scope:
+
+- A final post-update read found a new local SQLite backup and a local runtime
+  cache change after `173334`.
+- This checkpoint did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap command, commit, push, cleanup, stash, revert, sync, or file
+  deletion.
+
+Evidence:
+
+- Battle `latest` still points to `20260621_173334`; no newer completed battle
+  artifact exists and no active `battle_strategy_audit` or
+  `battle_replay_v10_3.py` process was found.
+- Current `knowledge.db` mtime:
+  `2026-06-21 14:39:31 -0300`.
+- New backup artifact:
+  `docs/hermes-analysis/master_optimizer_reports/knowledge_db_backup_candidate_magus_sphere_after_victory_fix_20260621_174200.sqlite`,
+  mtime `2026-06-21 14:39:14 -0300`, size `5.5M`.
+- Backup deck `6` focused state: `100/100`, `Electroduplicate`,
+  `Victory Chimes`; no focused `Magus of the Moat` or `Sphere of Safety`.
+- Current SQLite deck `6` focused state: `100/100`, `Magus of the Moat`,
+  `Sphere of Safety`; no focused `Electroduplicate` or `Victory Chimes`.
+
+Interpretation:
+
+- The latest completed battle evidence is still `173334`, which tested a Magus
+  candidate and ended trusted but below promotion threshold.
+- The current local runtime cache has moved again to an unvalidated
+  Magus+Sphere candidate state after that artifact.
+- This is now an active local runtime-cache drift item. It is not PostgreSQL
+  evidence, not a completed battle result, and not an authorization to apply or
+  restore anything without explicit command approval.
+
+## Magus+Sphere Candidate Review Required - 2026-06-21 14:46 -0300
+
+Scope:
+
+- The active runner created after the runtime-cache drift completed and moved
+  battle `latest` to `20260621_174142`.
+- This checkpoint did not execute PostgreSQL apply, rollback, manual SQL write,
+  deck swap command, commit, push, cleanup, stash, revert, sync, or file
+  deletion.
+
+Latest battle evidence:
+
+- Current latest:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_174142/summary.json`.
+- `run_profile=candidate_magus_sphere_after_victory_fix_same_seed_16_seed`.
+- `run_scope=recurring_full`.
+- `invocation_kind=codex_candidate_magus_sphere_after_victory_fix_same_seed_16_seed`.
+- `seeds_completed=16/16`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["forensic_audit=review_required","replay_decision_audit=review_required","strategy_audit=review_required"]`.
+- Gate/test side channels: target-pressure `pass=16`, table-intent `pass=16`,
+  tests `pass=18`.
+- Strategy findings: `strategy_review_required_findings=1`,
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":3,"tutor_no_target":1}`,
+  `strategy_severity_counts={"medium":4}`.
+- Outcome: Lorehold target wins `5/16`, opponents `11/16`; opponent combat to
+  Lorehold `248`, to other players `3`.
+
+Final runtime state:
+
+- Current SQLite deck `6` is restored to `100` rows / `100` quantity.
+- Focused card check returns `Boros Charm=1`, `Brainstone=1`,
+  `Electroduplicate=1`, `Silent Arbiter=1`, `Victory Chimes=1`, and
+  `Windborn Muse=1`; no focused `Magus of the Moat` or `Sphere of Safety`.
+- No active `battle_strategy_audit` or `battle_replay_v10_3.py` process
+  remained at final read time.
+
+Interpretation:
+
+- The 14:42 runtime-cache drift is superseded by completed battle artifact
+  `174142` and the runtime cache is back to the PG023/Victory shape.
+- Magus+Sphere is not promotable despite `5/16` because mandatory gates require
+  review.
+- Victory Chimes remains closed as a rule-modeling fix; Magus/Sphere remains a
+  rejected/review-required candidate. No PostgreSQL deploy, rollback, or deck
+  swap opens.
+
+## Quantity Guard And Clean Candidate Matrix - 2026-06-21 15:32 -0300
+
+Scope:
+
+- Re-audit the Magus/Sphere deck evidence after finding that temporary
+  `quantity=0` cuts were still loaded into the battle deck as one copy.
+- No PostgreSQL deploy, rollback, official deck swap, commit, push, stash,
+  revert, or cleanup was performed.
+
+Runtime correction:
+
+- `battle_analyst_v9.py` now treats `NULL` quantity as one legacy copy but
+  skips `quantity <= 0` in `load_deck_cards()`.
+- `battle_card_import_tests.py` adds
+  `test_load_deck_ignores_zero_quantity_rows`.
+- `test_battle_analyst_v10_3.py` passed after the loader fix.
+
+Candidate evidence:
+
+- `20260621_175408` is not valid promotion evidence despite green mandatory
+  gates because Lorehold deck provenance showed the candidate deck as
+  `101` main / `102` total. Root cause: zero-quantity cuts were loaded.
+- Clean Magus+Sphere rerun:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_180442/summary.json`.
+  It is `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`,
+  `deck_source_blocker_domains={"none":64}`, tests `pass=18`, target-pressure
+  `pass=16`, table-intent `pass=16`, Lorehold `5/16`, opponents `11/16`.
+- Magus+Sphere+Wrath rerun:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_181316/summary.json`.
+  It is gate-clean but worse: Lorehold `4/16`, opponents `12/16`.
+- Magus+Sphere+Norn's Annex rerun:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260621_181905/summary.json`.
+  It is gate-clean with Lorehold `5/16`, opponents `10/16`, and one stall.
+  It did not beat the simpler Magus+Sphere candidate and produced five
+  low-confidence mulligan findings.
+
+Battle interpretation:
+
+- The deck is still failing mainly to combat damage under real target pressure.
+- In clean candidate logs, Lorehold wins when early defensive pieces resolve
+  and the deck reaches its engine/Approach or elimination plan.
+- Losses often happen before a relevant prison effect appears, after it is
+  countered/removed, or before Lorehold closes.
+
+Decision:
+
+- No candidate is promoted to PostgreSQL yet.
+- No official deck swap is applied.
+- Magus+Sphere is the best clean signal so far, but `5/16` is not enough to
+  call the deck fixed.
+- Next deck iteration should improve early survivability and closing speed,
+  not just stack more expensive pillowfort cards.
+
+## Replay Hand Visibility And Survival Reserve Fix - 2026-06-22 12:10 -0300
+
+Scope:
+
+- Add player hand visibility to generated `replay.txt` so every mulligan,
+  turn start, and turn end can be audited against the cards actually available.
+- Fix a battle-pilot failure found in the official Lorehold window: Lorehold
+  could spend below the mana needed to keep `Teferi's Protection`/survival
+  response cards available while already at critical life.
+- No PostgreSQL deploy, rollback, official deck swap, commit, push, stash,
+  revert, or file deletion was performed in this checkpoint.
+
+Code evidence:
+
+- `battle_analyst_v9.py` now emits `hand_snapshot` for `turn_start` and
+  `turn_end` replay events.
+- `battle_replay_v10_3.py` renders `HandCards=[...]` in the mulligan block,
+  turn-start lines, and turn-end lines.
+- `battle_analyst_v9.py` now reserves survival response mana at low life for
+  `phase_out`/`cannot_lose_turn` effects unless the candidate spell is itself
+  a survival/removal/win-line exemption.
+- `battle_analyst_v9.py` also adds a stack ledger recovery guard so a spell
+  that reaches resolution with cast context cannot produce a resolution-only
+  replay without a cast ledger.
+
+Test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_replay_v10_3_renderer.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_replay_v10_3_renderer.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the new
+  `test_low_life_main_phase_preserves_survival_response_mana` and
+  `test_stack_resolution_recovers_missing_cast_ledger_event` cases.
+
+Battle evidence:
+
+- Baseline official hand-snapshot run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_114203/summary.json`.
+  It was `trusted_for_strategy_learning`, gate-clean, Lorehold `1/16`,
+  opponents `14/16`, opponent combat to Lorehold `298`, to others `11`.
+- Survival-reserve full rerun after action-ledger cleanup:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_121049/summary.json`.
+  It is `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`,
+  tests `pass=18`, target-pressure/table-intent `pass=16/16`, Lorehold
+  `2/16`, opponents `13/16`, one no-winner/stall result, opponent combat to
+  Lorehold `303`, to others `11`.
+- Seed proof:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_121049/seed_63231123/replay.txt`.
+  The replay shows `HandCards` from the mulligan block onward. On turn 8,
+  Lorehold is at critical life with `Teferi's Protection`, `Silence`,
+  `Aetherflux Reservoir`, `Seething Song`, and `Windborn Muse` in hand. On
+  turn 9, `Windborn Muse` is cast only with mana moving `8->4`, preserving a
+  survival response line, and Lorehold later ends alive while the three
+  opponents are dead.
+
+Current reading:
+
+- The previous battle-pilot failure is closed by code, focused tests, and a
+  gate-clean 16-seed replay window.
+- The deck itself is not fixed: the improvement is from `1/16` to `2/16` in
+  the same official seed window, while the table still sends extreme pressure
+  at Lorehold.
+- Remaining strategy residue is not rule execution: `forced_keep_after_bad_mulligan=7`
+  across seeds `63231111`, `63231114`, `63231116`, `63231121`, and `63231124`.
+- Next Lorehold work should target opening-hand quality, early mana/defense
+  density, and mulligan policy before another PostgreSQL deck-swap proposal.
+
+## Opening Fetch Fix And Mulligan Evidence Cleanup - 2026-06-22 12:25 -0300
+
+Scope:
+
+- Audit the five `forced_keep_after_bad_mulligan` seeds from the gate-clean
+  survival-reserve run.
+- Separate Lorehold-owned mulligan failures from opponent-owned mulligan
+  contamination.
+- Fix a battle-pilot opening-hand bug where fetchlands in the opening hand were
+  counted only as `generic` and therefore made castable early white/red cards
+  look off-color.
+- No PostgreSQL deploy, rollback, official deck swap, commit, push, stash,
+  revert, cleanup, or file deletion was performed in this checkpoint.
+
+Seed audit:
+
+- `63231111`: forced keep belongs to Kinnan, not Lorehold.
+- `63231114`: forced keep belongs to Lorehold and remains a real bad hand:
+  `Sacred Foundry`, `Lotus Petal`, `Swords to Plowshares`, `Inventors' Fair`,
+  `Get Lost`. The opener is interaction-heavy and still lacks a proactive
+  early plan.
+- `63231116`: forced keeps belong to Etali and Rograkh, not Lorehold.
+- `63231121`: forced keep belonged to Lorehold before the fix, but the final
+  hand contained `Bloodstained Mire`, `Urza's Saga`, `Esper Sentinel`,
+  `Land Tax`, and `Ghostly Prison`; this was a false off-color reading because
+  the fetchland should count as color fixing for opening-hand evaluation.
+- `63231124`: forced keep belongs to Sisay, not Lorehold.
+
+Code/test evidence:
+
+- `battle_analyst_v9.py` now uses `_opening_hand_land_source_colors()` for
+  mulligan/opening-hand evaluation. Fetchlands are treated as `wildcard`
+  fixing only inside the opening-hand evaluator; global `source_colors()` and
+  PostgreSQL data were not changed.
+- `battle_turn_flow_tests.py` adds
+  `test_mulligan_treats_fetch_land_as_opening_color_fixing`.
+- Direct evaluation after the patch:
+  - seed `63231121` Lorehold-style hand becomes `keep=True`,
+    `reason=early_card_flow:Esper Sentinel:1`, no `off_color_early_hand`.
+  - seed `63231114` Lorehold-style hand remains `keep=False`, still a real
+    bad opener.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+
+Battle evidence:
+
+- Focused seed:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_122423/summary.json`.
+  It is `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`,
+  tests `pass=18`, strategy findings `0`, Lorehold `1/1`.
+- Full same-seed window:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_122526/summary.json`.
+  It is `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`,
+  tests `pass=18`, target-pressure/table-intent `pass=16/16`, Lorehold
+  `2/16`, opponents `13/16`, opponent combat to Lorehold `296`, to others
+  `10`.
+- Strategy evidence improved: `forced_keep_after_bad_mulligan` dropped from
+  `7` findings across five seeds to `1` finding in only `63231124`, and that
+  remaining finding belongs to Sisay.
+
+Current reading:
+
+- The mulligan evidence is now materially cleaner; the current 16-seed result
+  has no Lorehold-owned low-confidence mulligan finding.
+- The deck is still not fixed: the official result remains `2/16`, and the
+  table still focuses Lorehold with overwhelming combat pressure.
+- The next active Lorehold failure analysis should use the current high-confidence
+  losses, not the superseded low-confidence mulligan set, and should prioritize
+  early survival/closing patterns over another blind deck swap.
+
+## Survival Defense And Counter-Legality Follow-Up - 2026-06-22 12:48 UTC
+
+Scope:
+
+- Continue from the gate-clean opening-fetch run and inspect high-confidence
+  Lorehold losses directly.
+- Confirm the replay hand requirement: current `replay.txt` artifacts expose
+  `HandCards=[...]` in mulligan, turn-start, and turn-end rows for each player.
+- Correct only battle-runtime defects with focused replay evidence. No
+  PostgreSQL write, deck swap, commit, push, stash, cleanup, rollback, or file
+  deletion was performed in this checkpoint.
+
+Runtime corrections:
+
+- Survival-response reserve now uses threshold `15` so Lorehold preserves mana
+  for `Teferi's Protection`/survival effects before the exact lethal window.
+- Low-life main-phase sequencing now prioritizes proactive combat defenses
+  (`attack_tax`, `attack_limit`) over commander/non-defense casts.
+- Counterspell target legality now respects mana-value restrictions. `Mental
+  Misstep` has a runtime waiver with `counter_target_cmc=1`, so it no longer
+  counters `Windborn Muse`.
+
+Evidence:
+
+- Full same-seed window:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_124815/summary.json`.
+- `124815` is `trusted_for_strategy_learning`, has
+  `mandatory_gate_divergences=[]`, `seeds_completed=16/16`, and
+  `test_results_status_counts={"pass":18}`.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py`
+  passed.
+
+Replay proof:
+
+- In
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_124815/seed_63231114/replay.txt`,
+  turn 6 shows Lorehold holding
+  `HandCards=[Lotus Petal, Windborn Muse, Land Tax, Teferi's Protection]`.
+- The replay then shows `CAST Lorehold: Teferi's Protection` during combat
+  damage and Rograkh damage reduced to `0`, leaving Lorehold at life `1`.
+- Turn 7 shows Lorehold holding
+  `HandCards=[Lotus Petal, Windborn Muse, Land Tax]`, casting and resolving
+  `Windborn Muse`, and Thrasios still holding `Mental Misstep` instead of
+  illegally countering the mana-value-four spell.
+- Thrasios and Sisay attacks are reduced to `0` damage by the new board state.
+  Lorehold still dies to Rograkh for `2` damage, so this seed is now a real
+  deck/board-state loss rather than a known runtime legality failure.
+
+Outcome:
+
+- Compared with `20260622_122526`, Lorehold remains `2/16` and opponents remain
+  `13/16`.
+- Opponent combat pressure to Lorehold increased from `296` to `316`; pressure
+  to other players increased from `10` to `13`.
+- Strategy residue remains `forced_keep_after_bad_mulligan=1`, still only seed
+  `63231124`.
+
+Current reading:
+
+- Replay observability and the three battle-pilot/runtime defects are closed
+  for the observed patterns.
+- Deck quality is still unresolved. The current evidence points to too much
+  focused table pressure reaching Lorehold before the deck can stabilize and
+  convert.
+- Next deck work should propose and test targeted changes for earlier
+  proactive combat taxation, life-buffer redundancy, and faster post-survival
+  conversion rather than treating this as another replay-gate problem.
+
+## PG024 Mental Misstep Durable Rule Closure - 2026-06-22 13:07 UTC
+
+Change:
+
+- Promoted `Mental Misstep` target legality into PostgreSQL
+  `card_battle_rules`.
+- Synced the rule into local SQLite/Hermes cache.
+- Removed `Mental Misstep` from the manual runtime waiver inventory so the
+  battle runtime now resolves it from the registry.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `exact_executable_rule_rows=1`, `broad_enabled_counter_rows=0`.
+- SQLite sync report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg024_mental_misstep_20260622_130535.json`,
+  with `pg_rows_loaded=3`, `sqlite_inserted_or_updated=3`.
+- Runtime check:
+  `Mental Misstep` resolves with
+  `_rule_logical_key=battle_rule_v1:da6a568dbdfeda5d4009574d953db55e` and
+  `counter_target_cmc=1`.
+- Full battle artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_130732/summary.json`.
+  It is `trusted_for_strategy_learning`, `mandatory_gate_divergences=[]`,
+  `seeds_completed=16/16`, and tests `pass=18`.
+
+Outcome:
+
+- Full result remains Lorehold `2/16`, opponents `13/16`.
+- Opponent combat pressure remains `316` to Lorehold and `13` to other players.
+- This confirms PG024 closes the invalid-counter data/runtime issue but does
+  not solve the deck's strategic failure under focused pressure.
+
+## Commander Damage Survival Fix And Current Magus+Sphere Candidate - 2026-06-22 13:54 -0300
+
+Scope:
+
+- Reconcile the current Lorehold Deck 6 state after PG024 and after the new
+  `replay.txt` final hand-card requirement.
+- Fix only battle-runtime defects proven by replay evidence.
+- Test local deck candidates without PostgreSQL deck deploy or permanent deck
+  swap.
+
+Replay renderer:
+
+- `replay.txt` now writes `HandCards=[...]` in the final `GAME OVER` player
+  rows.
+- Evidence:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/manual-replay-handcards-check/20260622_102100/replay.txt`
+  lines `416-419`.
+- Renderer report:
+  `docs/hermes-analysis/master_optimizer_reports/replay_final_handcards_renderer_20260622_102100.md`.
+
+Runtime fix:
+
+- `battle_analyst_v9.py` now treats projected lethal commander damage as a
+  combat survival-response trigger.
+- `battle_stack_casting_tests.py` adds
+  `test_combat_response_handles_commander_damage_lethal`.
+- Focus artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_134349/summary.json`.
+- The focused replay for seed `63231325` shows `Teferi's Protection` cast in
+  `combat_damage`, Kraum damage reduced to `0`, and decision trace
+  `decision-000164` with `commander_lethal=true`.
+- The seed still loses the next turn to Thrasios combat damage, so the
+  commander-damage runtime defect is closed and the remaining issue is deck /
+  board-state weakness.
+
+Official post-fix baseline:
+
+- Full artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_134502/summary.json`.
+- `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, tests `pass=18`, `seeds_completed=16`.
+- Lorehold `1/16`; opponents `14/16`.
+- Opponent combat pressure to Lorehold `328`; to other players `5`.
+- Strategy residue:
+  `strategy_code_counts={"forced_keep_after_bad_mulligan":2}` with
+  low-confidence seeds `63231318` and `63231327`.
+
+Candidate scan:
+
+- `Ensnaring Bridge` over `Electroduplicate`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_133008/summary.json`.
+  Trusted but rejected: Lorehold `1/16`, pressure to Lorehold `329`.
+- `Magus of the Moat` + `Sphere of Safety` over `Electroduplicate` +
+  `Victory Chimes`:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_135408/summary.json`.
+  Improved Lorehold to `2/16` and reduced pressure to Lorehold to `267`, but
+  the run is `review_required` because
+  `mandatory_gate_divergences=["strategy_audit=review_required"]`.
+- Candidate blocker:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_135408/seed_63231314/strategy_audit.md`
+  reports `board_wipe_without_timing_justification` on `decision-000299`.
+
+Current deck state:
+
+- Runtime SQLite was restored after candidate simulation:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`.
+- Confirmed official local runtime deck state:
+  `Electroduplicate=1`, `Victory Chimes=1`, deck rows `100`, deck quantity
+  `100`.
+- `Magus of the Moat`, `Sphere of Safety`, and `Ensnaring Bridge` are not in
+  the restored official runtime deck.
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`
+  currently points to the Magus+Sphere candidate `20260622_135408`; because it
+  is `review_required`, it is not the trusted official baseline.
+
+Decision:
+
+- No PostgreSQL deck deploy is justified now.
+- The strongest current deck direction is still early combat denial plus
+  post-survival conversion, but Magus+Sphere must first clear the strategy
+  review blocker.
+- Next step: inspect whether seed `63231314` `board_wipe_without_timing_justification`
+  is a real sequencing mistake or a false positive caused by miracle/upkeep
+  board-wipe context. Only after that should a new candidate or PostgreSQL
+  package be prepared.
+
+Full report:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_deck6_commander_damage_teferi_and_magus_sphere_current_20260622_135408.md`.
+
+## Eliminated Player Cleanup And Gate-Clean Magus+Sphere Candidate - 2026-06-22 14:26 -0300
+
+Scope:
+
+- Resolve the candidate blocker
+  `board_wipe_without_timing_justification` from seed `63231314`.
+- Ensure board-wipe strategy evidence is based on live opponents, not stale
+  permanents from eliminated players.
+- Revalidate the Magus+Sphere candidate without PostgreSQL deploy or permanent
+  deck swap.
+
+Runtime finding:
+
+- A first focused trace repair showed `opponent_creatures_destroyed=10` but
+  `live_opponent_creatures_destroyed=0`.
+- Those objects came from players already eliminated before the wipe.
+- Treating them as board-wipe benefit would have hidden a simulator state
+  contamination issue.
+
+Runtime changes:
+
+- `battle_sba_support.py` now removes battlefield and phased-out objects from a
+  player at elimination.
+- `player_eliminated` events now expose
+  `battlefield_removed_from_game` and `phased_out_removed_from_game`.
+- `battle_analyst_v9.py` board-wipe decision traces now expose actual
+  resolution metrics including live/stale opponent destruction.
+- Strategic board-wipe justification uses live opponent destruction; stale
+  eliminated-player objects are diagnostic only.
+
+Test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_zone_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+
+Official control:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_141844/summary.json`.
+- `run_profile=recurring_16_seed`, `invocation_kind=manual_cli`.
+- `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, tests `pass=18`.
+- Lorehold `1/16`; opponents `14/16`; pressure to Lorehold `301`; pressure to
+  others `12`.
+
+Candidate evidence:
+
+- Focus seed:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_142458/summary.json`.
+- Seed `63231314` is now trusted/gate-clean and Lorehold wins.
+- `decision-000299` has `live_opponent_creatures_destroyed=1`,
+  `stale_opponent_creatures_destroyed=0`, `actual_asymmetry=1`, and
+  `risk_flags=[]`.
+- Full candidate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_142625/summary.json`.
+- `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, tests `pass=18`, seeds `16/16`.
+- Lorehold `2/16`; opponents `14/16`; pressure to Lorehold `267`; pressure to
+  others `3`.
+- Remaining strategy residue is only
+  `forced_keep_after_bad_mulligan=1` in seed `63231318`.
+
+Current deck state:
+
+- Runtime SQLite restored after all candidate runs:
+  `Electroduplicate=1`, `Victory Chimes=1`, deck rows `100`, deck quantity
+  `100`.
+- `Magus of the Moat` and `Sphere of Safety` are not in the restored official
+  runtime deck.
+- The current `latest` artifact points to candidate `20260622_142625`; it is
+  gate-clean but still a candidate, not a PostgreSQL-promoted official deck.
+
+Decision:
+
+- The stale eliminated-player state bug is closed.
+- Magus+Sphere is now a valid gate-clean candidate signal, but `2/16` is still
+  too weak for PostgreSQL deck deploy.
+- Next step is loss-pattern analysis on `20260622_142625`, then a stronger
+  candidate around early combat denial plus faster post-stabilization
+  conversion.
+
+Full report:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_deck6_elimination_cleanup_magus_sphere_gate_clean_20260622_142625.md`.
+
+## PG025 One Ring / Orim Source Sync And Current Official Deck Reading - 2026-06-22 15:29 UTC
+
+Closed rule/data issues:
+
+- `The One Ring` is now durable in PostgreSQL/SQLite with
+  `battle_rule_v1:a71907ee296b5801e92e8d7f1940dba1`, modeling ETB/cast
+  protection, no ETB draw, burden upkeep life loss, and activated burden draw.
+- `Orim's Chant` is now durable in PostgreSQL/SQLite with
+  `battle_rule_v1:2332a82b6395a065b6516702d3e326c7`, modeling kicked attack
+  prevention.
+- Validation report:
+  `docs/hermes-analysis/master_optimizer_reports/one_ring_orims_pg025_deploy_validation_20260622_152901.md`.
+
+Current official controlled matrix:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_152901/summary.json`.
+- `run_profile=pg025_one_ring_orims_official_16_seed`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `mandatory_gate_divergences=[]`.
+- `test_results_status_counts={"pass":18}`.
+- Lorehold `0/16`; opponents `16/16`.
+- Opponent combat pressure to Lorehold `296`; pressure to other players `4`.
+- Low-confidence seeds remain `63231318` and `63231327`.
+
+Replay evidence:
+
+- `seed_63231322/replay.txt` shows Lorehold cast/resolves `The One Ring`,
+  activates burden draw, takes burden life loss next upkeep, and final summaries
+  include `HandCards=[...]`.
+- `seed_63231314/replay.txt` shows Lorehold using kicked `Orim's Chant` against
+  Dargo and Dargo using kicked `Orim's Chant` against Lorehold.
+
+Deck reading:
+
+- The corrected cards are functioning, including opponent-owned use of
+  `Orim's Chant`.
+- The current official deck still fails under real table focus. The failure is
+  no longer attributable to missing `The One Ring`, missing `Orim's Chant`, or
+  missing replay hand visibility.
+- The strongest prior candidate signal remains Magus+Sphere from
+  `20260622_142625`: gate-clean, Lorehold `2/16`, and lower pressure to
+  Lorehold (`267`) than the official controlled PG025 run (`296`), but still
+  not strong enough for permanent PostgreSQL deck deploy.
+- Next deck step: analyze official losses in `20260622_152901` against the
+  Magus+Sphere candidate `20260622_142625`, then test a stronger defensive
+  package before any deck swap is promoted.
+
+## PG026 Official Magus+Sphere Deck Reading - 2026-06-22 17:09 UTC
+
+Closed deployment step:
+
+- The Magus+Sphere candidate was promoted into PostgreSQL and synced into
+  Hermes SQLite.
+- Official deck change:
+  - Out: `Electroduplicate`.
+  - Out: `Victory Chimes`.
+  - In: `Magus of the Moat`.
+  - In: `Sphere of Safety`.
+- Deploy validation:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_magus_sphere_pg026_deploy_validation_20260622_170304.md`.
+
+Current official deck state:
+
+- PostgreSQL deck
+  `528c877f-f829-4207-95e6-73981776c323` postcheck: rows/quantity `100/100`,
+  `Magus of the Moat=1`, `Sphere of Safety=1`, `Electroduplicate=0`,
+  `Victory Chimes=0`.
+- Hermes SQLite deck `6` direct check: rows/quantity `100/100`,
+  `Magus of the Moat|1|0`, `Sphere of Safety|1|0`.
+- SQLite sync id: `20260622T170115Z`.
+
+Battle result:
+
+- Artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_170304/summary.json`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `mandatory_gate_divergences=[]`.
+- `test_results_status_counts={"pass":18}`.
+- `table_intent_statuses={"pass":16}` and
+  `target_pressure_statuses={"pass":16}`.
+- Lorehold won `6/16`; opponents won `10/16`.
+- Lorehold wins:
+  `63231314` approach turn `11`, `63231315` approach turn `14`,
+  `63231316` elimination turn `19`, `63231324` approach turn `11`,
+  `63231327` approach turn `9`, `63231328` approach turn `21`.
+
+Replay observability:
+
+- `replay.txt` now exposes `HandCards=[...]` for mulligan/opening hands,
+  turn-start states, turn-end states, cleanup discard context, and final player
+  summaries.
+- Example:
+  `seed_63231314/replay.txt` line `19` shows Lorehold's opening hand with
+  `Sphere of Safety`.
+- Example:
+  `seed_63231314/replay.txt` line `142` shows cleanup discards and the
+  retained hand, proving `Sphere of Safety` was preserved through cleanup.
+
+Strategic reading:
+
+- The PG026 deck is materially better than the PG025 official controlled matrix
+  (`0/16` to `6/16`), and the improvement is based on a durable PG/SQLite deck
+  state rather than a temporary swap.
+- The deck is still not final: `10/16` losses remain against real learned
+  opponents under table intent and target-pressure gates.
+- Active next task: read the ten losses from `20260622_170304`, classify each
+  loss by failure mode, and only then propose the next deck/PG change.
+
+## Lorehold Full-Variant Staging Prepared - 2026-06-22 17:21 UTC
+
+Prepared workflow:
+
+- New local staging tool:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_stager.py`.
+- New regression test:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_variant_stager.py`.
+- Workflow documentation:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_workflow_20260622_172156.md`.
+
+Purpose:
+
+- Accept full deck-by-deck Lorehold lists from Rafael.
+- Register each variant in local Hermes SQLite staging tables.
+- Validate every card before any battle run.
+- Materialize one valid variant at a time into a battle deck id for controlled
+  testing.
+- Keep this separate from PostgreSQL production deck deploy until a variant
+  wins a trusted battle gate and receives an explicit promotion package.
+
+Validation coverage:
+
+- Commander total: `100`.
+- Main deck: `99`.
+- Commander in list: `0` or `1`.
+- Oracle match in `card_oracle_cache`.
+- Canonical oracle-name normalization, including front-face aliases where the
+  cache already has them.
+- Lorehold color identity subset: `R/W`.
+- Commander singleton rule, with basic-land exception.
+- Battle rule count and verified/executable rule count.
+- Functional tag inference from battle rules/oracle metadata.
+
+Smoke evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_stager.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_variant_stager.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_variant_stager.py`
+  passed with `3` tests.
+- Current PG026 deck smoke passed:
+  `variants=1 valid=1 invalid=0`.
+- Smoke reports:
+  - `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_172156.json`
+  - `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_172156.md`
+
+Operational reading:
+
+- The project is now ready for a 30-variant Lorehold tournament workflow.
+- Validation does not choose the best deck; it only blocks unsafe/unclean
+  variants before battle.
+- Battle ranking should use trusted artifacts only: `battle_replay_final_status`,
+  mandatory gates, table intent, target pressure, tests, win rate, win condition,
+  and loss modes.
+
+## Lorehold Variant 01 Intake - 2026-06-22 17:27 UTC
+
+Input registered:
+
+- Input file:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_input_20260622_142629_deck01.txt`.
+- Source: `rafael-manual-paste`.
+- Variant name: `Lorehold Variant 01 - Rafael Paste 2026-06-22`.
+
+Validation/staging evidence:
+
+- Dry-run validation:
+  `variants=1 valid=1 invalid=0`.
+- Applied local Hermes staging:
+  `variants=1 valid=1 invalid=0`, `staging=applied`.
+- JSON report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_172727.json`.
+- Markdown report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_172727.md`.
+- Variant hash:
+  `cde4088aeef9659a963a0725a03c6589f0df1850d07b0f322c12165c88e02752`.
+
+Direct SQLite proof:
+
+- `lorehold_variant_decks` row:
+  `valid|100|99|1|0|21|cde4088aeef9659a`.
+- `lorehold_variant_deck_cards` oracle status:
+  `matched|81`.
+- Quantity check from staged cards:
+  total quantity `100`, commander quantity `1`, main quantity `99`, unique
+  staged rows `81`.
+
+Important reading:
+
+- The decklist is structurally valid for Commander under the local Lorehold
+  validator: no missing oracle, no off-color card, no singleton violation, and
+  exact `100/99/1` quantities.
+- It is not battle-ready as a fully trusted real simulation candidate yet.
+  There are `21` warning cards with registered battle rules that remain
+  `needs_review/review_only`, so the engine will not execute those effects as
+  verified behavior.
+- The 21 cards requiring battle-rule review before a trusted tournament run are:
+  `Archaeomancer's Map`, `Borrowed Knowledge`, `Chandra, Hope's Beacon`,
+  `Combustible Gearhulk`, `Commander's Plate`, `Farewell`,
+  `Hit the Mother Lode`, `Improvisation Capstone`, `Increasing Vengeance`,
+  `Mithril Coat`, `Olórin's Searing Light`,
+  `Ondu Inversion // Ondu Skyruins`, `Reckless Endeavor`,
+  `Restoration Seminar`, `Reverse the Sands`, `Soulfire Eruption`,
+  `Sunforger`, `Swiftfoot Boots`, `Thought Vessel`, `Tibalt's Trickery`,
+  and `Wear // Tear`.
+- Some pending rule categories look too generic or wrong for real battle
+  behavior, for example `Mithril Coat`/`Sunforger` as `ramp_permanent` and
+  `Ondu Inversion`/`Reverse the Sands` as `draw_cards`; these require rule
+  audit, not blind promotion.
+
+Next required gate for Variant 01:
+
+- Review and correct/promote the 21 `needs_review/review_only` rules with
+  oracle-backed behavior and tests before materializing this variant into a
+  battle deck id for trusted comparison.
+
+## Lorehold Variant 01 Rule Gate Closure - 2026-06-22 17:45 UTC
+
+Closed blocker:
+
+- The 21 Variant 01 battle-rule warnings from the intake pass were resolved via
+  PG027.
+- No deck swap was applied.
+- No production deck contents were changed.
+
+Implementation/code evidence:
+
+- Updated runtime:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`.
+- Updated rule categorization:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py`.
+- Updated card-specific tests:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`.
+- Updated reviewed rule source:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json`.
+
+Runtime improvements added:
+
+- `equipment_static_attachment` for `Mithril Coat`, `Commander's Plate`,
+  `Sunforger`, and `Swiftfoot Boots`.
+- Basic-Plains multi-tutor support and artifact ETB tutor handling for
+  `Archaeomancer's Map`.
+- `damage_wipe_treasure` for `Reckless Endeavor`.
+- `redistribute_life_totals` for `Reverse the Sands`.
+- Guard preventing instant/sorcery `copy_spell` cards such as
+  `Increasing Vengeance` from becoming fake permanent copy engines without a
+  stack target.
+- Lorehold miracle exception allowing `modal_boros_charm` to be cast through
+  legitimate topdeck/draw miracle sources while preserving normal response
+  holds elsewhere.
+
+PostgreSQL/SQLite evidence:
+
+- PG apply report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant01_rule_sync_pg027_apply_pg_20260622_144406.json`.
+- SQLite-from-PG report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant01_rule_sync_pg027_sqlite_from_pg_20260622_144406.json`.
+- PG direct postcheck on `143.198.230.247:5433/halder`:
+  `curated|active|auto|17`, `curated|verified|auto|5`,
+  `generated|needs_review|review_only|42`.
+- SQLite direct postcheck for the same selected cards:
+  `active|auto|curated|17`, `verified|auto|curated|5`,
+  `needs_review|review_only|generated|42`.
+
+Test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py`
+  passed.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  passed: `Ran 25 tests`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+
+Variant 01 post-sync validation:
+
+- JSON report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_174505.json`.
+- Markdown report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_174505.md`.
+- Result: `variants=1 valid=1 invalid=0`.
+- `issue_count=0`, `warning_count=0`.
+- Direct SQLite proof:
+  staged unique rows `81`, executable-rule rows `81`, oracle-matched rows `81`.
+- Sample rule coverage:
+  `Archaeomancer's Map|1`, `Mithril Coat|1`, `Reckless Endeavor|1`,
+  `Reverse the Sands|1`, `Swiftfoot Boots|1`, `Thought Vessel|1`.
+
+Current reading:
+
+- Variant 01 is now structurally valid and battle-rule-covered enough to enter
+  a controlled battle comparison.
+- Some high-complexity cards are still modeled as explicit approximations
+  rather than full Magic rules equivalence; those approximations are marked
+  `active` and documented in `reviewed_battle_card_rules.json`.
+- Next gate: materialize Variant 01 into an isolated battle deck id first,
+  verify the materialized deck hash/backup, then run a trusted battle matrix
+  before any consideration of replacing official deck `6` or promoting a deck
+  swap to PostgreSQL.
+
+## Lorehold Variant 01 Deck 606 Trusted Battle Matrix - 2026-06-22 18:17 UTC
+
+Scope:
+
+- The pasted Rafael Variant 01 list was materialized into isolated Hermes
+  battle deck id `606`.
+- No official deck `6` swap was applied.
+- No additional PostgreSQL deck deploy was applied in this matrix step.
+
+Materialization evidence:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant01_deck606_battle_matrix_20260622_181727.md`.
+- Final staging JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260622_175032.json`.
+- Deck hash:
+  `cde4088aeef9659a963a0725a03c6589f0df1850d07b0f322c12165c88e02752`.
+- Direct `knowledge.db` proof:
+  `deck_cards.deck_id=606` has `81` rows, `100` total quantity, `1`
+  commander, and `99` main.
+- Staging proof:
+  `valid|100|99|1|0|0|cde4088aeef9659a`, with `81/81`
+  oracle-matched and executable-rule rows.
+
+Battle evidence:
+
+- Artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_181727/summary.json`.
+- `run_profile=lorehold_variant01_deck606_16_seed_trusted_final`.
+- `battle_replay_final_status=trusted_for_strategy_learning`.
+- `mandatory_gate_divergences=[]`.
+- `seeds_completed=16/16`.
+- `target_pressure_statuses={"pass":16}`.
+- `table_intent_statuses={"pass":16}`.
+- `action_findings=0`.
+- `forensic_severity_counts={}`.
+- `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`.
+- `test_results_status_counts={"pass":18}`.
+- `lorehold_deck_source_ref=deck_id:606`.
+
+Result:
+
+- Lorehold Variant 01 won `1/16` (`6.25%`).
+- Opponents won `15/16` (`93.75%`).
+- The current official PG026 baseline remains better at `6/16`
+  (`37.5%`) in artifact
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_170304/summary.json`.
+
+Replay proof:
+
+- Winning seed replay:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_181727/seed_64270208/replay.txt`.
+- Deck provenance:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260622_181727/seed_64270208/deck_provenance.json`.
+- Provenance confirms `source_ref=deck_id:606`, `target_deck_id=606`,
+  `construction_report.is_valid=true`, `total_quantity=100`,
+  `main_quantity=99`, `commander_count=1`, no off-color cards, and no singleton
+  violations.
+
+Strategic reading:
+
+- Variant 01 should not be promoted to official deck `6`.
+- This is not being rejected because of a replay gate defect. The matrix was
+  trusted and the mandatory gates were clean.
+- The observed failure is deck/strategy quality under pressure: the candidate
+  can win when it survives to a wide-board combat finish, but it converts too
+  few games before faster opponent decks close.
+
+Next workflow:
+
+- Keep Variant 01 as a rejected learning candidate.
+- Use the new stager + isolated deck id flow for future submitted Lorehold
+  lists.
+- Do not consider a PostgreSQL deck swap until a candidate beats the PG026
+  baseline in a trusted matrix and the replay evidence explains the gain.

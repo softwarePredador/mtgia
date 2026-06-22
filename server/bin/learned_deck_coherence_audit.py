@@ -192,16 +192,22 @@ LOREHOLD_STRATEGY_PACKAGES = (
         "severity": "medium",
     },
     {
-        "key": "big_spell_finishers",
-        "label": "Big spell finishers",
+        "key": "closing_conversion",
+        "label": "Closing conversion",
         "minimum": 4,
         "required": (),
         "cards": (
+            "Approach of the Second Sun",
+            "Mizzix's Mastery",
+            "Past in Flames",
+            "Wheel of Fortune",
+            "Wheel of Misfortune",
+            "Blasphemous Act",
+            "Aetherflux Reservoir",
+            "Guttersnipe",
             "Rise of the Eldrazi",
             "Storm Herd",
             "Worldfire",
-            "Blasphemous Act",
-            "Approach of the Second Sun",
             "Fiery Emancipation",
             "Rite of the Dragoncaller",
         ),
@@ -1584,6 +1590,18 @@ def normalized_counter(names: Iterable[str]) -> Counter[str]:
     return Counter(normalize_name(front_face_name(name)) for name in names)
 
 
+def lorehold_strategy_source(
+    active_names: list[str],
+    sqlite_names: list[str],
+    pg_names: list[str],
+) -> tuple[str, list[str]]:
+    if pg_names:
+        return "pg_saved_deck", pg_names
+    if sqlite_names:
+        return "sqlite_deck", sqlite_names
+    return "active_learned_deck", active_names
+
+
 def lorehold_focused_audit(
     conn: psycopg2.extensions.connection,
     audits: list[LearnedDeckAudit],
@@ -1634,7 +1652,12 @@ def lorehold_focused_audit(
             in {normalize_name(card) for card in LOREHOLD_NO_PREMIUM_MOX}
         }
     )
-    strategy_checks = evaluate_lorehold_strategy(cardlist_names)
+    strategy_source, strategy_card_names = lorehold_strategy_source(
+        cardlist_names,
+        sqlite_names,
+        pg_names,
+    )
+    strategy_checks = evaluate_lorehold_strategy(strategy_card_names)
 
     return {
         "active_learned_deck": audit_to_json(active) if active else None,
@@ -1650,6 +1673,7 @@ def lorehold_focused_audit(
         },
         "name_match": name_match,
         "no_premium_mox_present": no_premium_mox_present,
+        "strategy_source": strategy_source,
         "strategy_checks": strategy_checks,
     }
 
@@ -2035,6 +2059,7 @@ def markdown_report(payload: dict[str, Any]) -> str:
             f"- PG saved missing Commander legalities: `{', '.join(pg_deck.get('missing_legalities') or []) or 'none'}`",
             f"- PG saved assumed Commander legalities: `{', '.join(item.get('name', '') for item in pg_deck.get('commander_legality_assumptions') or []) or 'none'}`",
             f"- No-premium-Mox violations: `{len(lorehold.get('no_premium_mox_present') or [])}`",
+            f"- Strategy source: `{lorehold.get('strategy_source') or 'unknown'}`",
             f"- Strategy package pass: `{'yes' if strategy.get('passed') else 'no'}`",
             f"- Name diff active -> SQLite: `{len(name_match.get('active_vs_sqlite_missing_from_sqlite') or [])}`",
             f"- Name diff active -> PG: `{len(name_match.get('active_vs_pg_missing_from_pg') or [])}`",

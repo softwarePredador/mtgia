@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import sqlite3
 import tempfile
 import unittest
 from unittest import mock
@@ -191,6 +192,137 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertIn("execution_status", str(captured["sql"]))
         self.assertIn("annotation_only", captured["values"][0])
         self.assertIn("%s, %s, 1", str(captured["template"]))
+
+    def test_pg_mirror_preserves_pg_logical_key_and_removes_shadow_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(sqlite_db) as conn:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Flame Wave",
+                    {"effect": "damage_player_and_creatures"},
+                    source="curated",
+                    confidence=1.0,
+                    review_status="verified",
+                    logical_rule_key_value="local-shadow-key",
+                )
+                sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Flame Wave",
+                    {"effect": "manual"},
+                    source="manual",
+                    confidence=1.0,
+                    review_status="verified",
+                    logical_rule_key_value="manual-key",
+                )
+                conn.commit()
+
+            changed = sync_pg.mirror_pg_rules_to_sqlite(
+                str(sqlite_db),
+                [
+                    {
+                        "normalized_name": "flame wave",
+                        "card_name": "Flame Wave",
+                        "logical_rule_key": "pg-key",
+                        "effect_json": {"effect": "damage_player_and_creatures"},
+                        "deck_role_json": {"category": "removal"},
+                        "source": "curated",
+                        "confidence": 1.0,
+                        "review_status": "verified",
+                        "execution_status": "auto",
+                        "notes": "test",
+                        "oracle_hash": "hash",
+                    }
+                ],
+            )
+
+            self.assertGreaterEqual(changed, 1)
+            with sqlite3.connect(sqlite_db) as conn:
+                rows = conn.execute(
+                    """
+                    SELECT logical_rule_key, source
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'flame wave'
+                    ORDER BY logical_rule_key
+                    """
+                ).fetchall()
+
+        self.assertIn(("pg-key", "curated"), rows)
+        self.assertNotIn(("local-shadow-key", "curated"), rows)
+
+    def test_pg_mirror_keeps_reviewed_runtime_row_over_pg_review_only_snapshot(self) -> None:
+        reviewed_rows = [
+            {
+                "card_name": "Brainstone",
+                "effect_json": {
+                    "effect": "topdeck_manipulation",
+                    "activation_cost_generic": 2,
+                    "requires_sacrifice_artifact": True,
+                    "draw_count": 3,
+                    "put_from_hand_on_top_count": 2,
+                    "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
+                },
+                "deck_role_json": {
+                    "category": "draw",
+                    "effect": "topdeck_manipulation",
+                },
+                "source": "curated",
+                "confidence": 0.88,
+                "review_status": "active",
+                "execution_status": "auto",
+                "notes": "reviewed runtime row",
+            }
+        ]
+        pg_rows = [
+            {
+                "normalized_name": "brainstone",
+                "card_name": "Brainstone",
+                "logical_rule_key": "pg-generated-review-only",
+                "effect_json": {"effect": "draw_cards", "count": 3},
+                "deck_role_json": {"category": "draw"},
+                "source": "generated",
+                "confidence": 0.55,
+                "review_status": "needs_review",
+                "execution_status": "review_only",
+                "notes": "broad generated approximation",
+                "oracle_hash": "hash",
+            }
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            snapshot_path = Path(tmpdir) / "known_cards_canonical_snapshot.json"
+
+            changed = sync_pg.mirror_pg_rules_to_sqlite(
+                str(sqlite_db),
+                pg_rows,
+                reviewed_rows=reviewed_rows,
+            )
+            exported = sync_pg.export_canonical_snapshot(
+                sync_pg.load_active_snapshot_rows(sqlite_db),
+                sqlite_db=str(sqlite_db),
+                output_path=snapshot_path,
+            )
+            payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+            with sqlite3.connect(sqlite_db) as conn:
+                rows = conn.execute(
+                    """
+                    SELECT source, review_status, execution_status, effect_json
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'brainstone'
+                    ORDER BY source, review_status, execution_status
+                    """
+                ).fetchall()
+
+        self.assertGreaterEqual(changed, 2)
+        self.assertEqual(exported, 1)
+        self.assertIn(("curated", "active", "auto", json.dumps(reviewed_rows[0]["effect_json"], sort_keys=True)), rows)
+        self.assertEqual(payload["Brainstone"]["effect"], "topdeck_manipulation")
+        self.assertEqual(payload["Brainstone"]["battle_rule_source"], "curated")
+        self.assertEqual(payload["Brainstone"]["battle_rule_review_status"], "active")
+        self.assertEqual(payload["Brainstone"]["battle_rule_execution_status"], "auto")
 
 
 if __name__ == "__main__":

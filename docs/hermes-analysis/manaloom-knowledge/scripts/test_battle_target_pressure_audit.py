@@ -131,6 +131,27 @@ def test_accepts_table_intent_political_attacks_to_other_players():
     assert result["findings"] == 0
 
 
+def test_accepts_table_intent_lethal_attack_to_other_player():
+    result = audit.audit_events(
+        [
+            {
+                "event": "combat",
+                "turn": 9,
+                "attacker": "Opponent A",
+                "target": "Opponent B",
+                "target_reason": "lethal",
+                "table_intent_enabled": True,
+            }
+        ],
+        "Lorehold",
+    )
+    assert result["status"] == "pass"
+    assert result["table_intent_mode_detected"] is True
+    assert result["opponent_combat_to_other"] == 1
+    assert result["opponent_combat_to_other_table_intent_accepted"] == 1
+    assert result["findings"] == 0
+
+
 def test_ignores_opponent_combat_after_lorehold_is_eliminated():
     result = audit.audit_events(
         [
@@ -180,5 +201,7 @@ if __name__ == "__main__":
     print("PASS test_blocks_when_opponent_combat_targets_non_lorehold_player")
     test_accepts_table_intent_political_attacks_to_other_players()
     print("PASS test_accepts_table_intent_political_attacks_to_other_players")
+    test_accepts_table_intent_lethal_attack_to_other_player()
+    print("PASS test_accepts_table_intent_lethal_attack_to_other_player")
     test_ignores_opponent_combat_after_lorehold_is_eliminated()
     print("PASS test_ignores_opponent_combat_after_lorehold_is_eliminated")

@@ -197,6 +197,74 @@ class LearnedDeckCoherenceAuditTest(unittest.TestCase):
             {issue["code"] for issue in failing["issues"]},
         )
 
+    def test_lorehold_strategy_accepts_defense_variant_closing_conversion(self) -> None:
+        cards = [
+            "Lorehold, the Historian",
+            "Dualcaster Mage",
+            "Twinflame",
+            "Heat Shimmer",
+            "Molten Duplication",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Land Tax",
+            "Faithless Looting",
+            "Mizzix's Mastery",
+            "Past in Flames",
+            "Wheel of Fortune",
+            "Wheel of Misfortune",
+            "Blasphemous Act",
+            "Approach of the Second Sun",
+            "Silence",
+            "Orim's Chant",
+            "Grand Abolisher",
+            "Ranger-Captain of Eos",
+            "Deflecting Swat",
+            "Teferi's Protection",
+            "Sol Ring",
+            "Mana Vault",
+            "Lotus Petal",
+            "Mox Amber",
+            "Arcane Signet",
+            "Boros Signet",
+            "Fellwar Stone",
+            "Talisman of Conviction",
+            "Ruby Medallion",
+            "Rite of Flame",
+        ]
+
+        result = audit.evaluate_lorehold_strategy(cards)
+        closing = {
+            package["key"]: package
+            for package in result["packages"]
+        }["closing_conversion"]
+
+        self.assertTrue(result["passed"])
+        self.assertTrue(closing["passed"])
+        self.assertEqual(closing["present_count"], 6)
+        self.assertNotIn(
+            "lorehold_strategy_closing_conversion_gap",
+            {issue["code"] for issue in result["issues"]},
+        )
+
+    def test_lorehold_strategy_source_prefers_pg_runtime_deck(self) -> None:
+        source, names = audit.lorehold_strategy_source(
+            ["Generous Gift", "Guttersnipe"],
+            ["Silent Arbiter", "Windborn Muse"],
+            ["Brainstone", "Silent Arbiter"],
+        )
+
+        self.assertEqual(source, "pg_saved_deck")
+        self.assertEqual(names, ["Brainstone", "Silent Arbiter"])
+
+        source, names = audit.lorehold_strategy_source(
+            ["Generous Gift"],
+            ["Silent Arbiter"],
+            [],
+        )
+
+        self.assertEqual(source, "sqlite_deck")
+        self.assertEqual(names, ["Silent Arbiter"])
+
     def test_derive_metadata_uses_commander_specific_color_identity(self) -> None:
         resolved = [
             audit.ResolvedCard(

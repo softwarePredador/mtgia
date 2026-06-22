@@ -2028,6 +2028,491 @@
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Sisay grows by colors among other legendary permanents and pays WUBRG to put a lower-mana-value legendary permanent onto the battlefield. Runtime models the creature baseline and keeps the activated tutor as an annotation."
   },
+  "Archaeomancer's Map": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "ramp_engine",
+      "trigger": "opponent_land_play",
+      "etb_tutor_target": "basic_plains",
+      "etb_tutor_count": 2,
+      "battle_model_scope": "basic_plains_etb_plus_opponent_land_catchup_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_engine",
+      "subtype": "plains_tutor_land_catchup_artifact"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: ETB searches up to two basic Plains to hand, and later may put lands from hand onto the battlefield when opponents get ahead on lands. Runtime now executes the basic-Plains hand tutor and reuses the reviewed opponent_land_play ramp-engine trigger."
+  },
+  "Borrowed Knowledge": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "draw_cards",
+      "sorcery": true,
+      "draw_equal_to_discarded_hand": true,
+      "modal_draw_equal_opponent_hand_or_discarded_hand": true,
+      "battle_model_scope": "modal_discard_hand_draw_equal_discarded_hand_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "subtype": "discard_hand_refill"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: runtime uses the legal mode that discards your hand and draws equal to cards discarded this way. The alternate target-opponent-hand mode remains annotated."
+  },
+  "Chandra, Hope's Beacon": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "copy_spell",
+      "planeswalker": true,
+      "spell_copy_once_each_turn": true,
+      "plus_two_adds_mana": 2,
+      "plus_one_impulse_top_cards": 5,
+      "minus_x_damage_targets": 2,
+      "battle_model_scope": "planeswalker_spell_copy_engine_plus_loyalty_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "copy_spell",
+      "subtype": "planeswalker_spell_copy_engine"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: planeswalker static copies the first instant/sorcery each turn and loyalty abilities add mana, impulse, or damage. Runtime executes the persistent copy-engine approximation and records loyalty details as metadata."
+  },
+  "Combustible Gearhulk": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 6,
+      "toughness": 6,
+      "first_strike": true,
+      "etb_draw_count": 3,
+      "opponent_may_choose_mill_damage_instead": true,
+      "battle_model_scope": "artifact_creature_etb_draw_three_default_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "creature",
+      "subtype": "etb_opponent_choice_draw_or_damage"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: first strike 6/6 artifact creature with ETB opponent choice between draw three and mill/damage. Runtime uses the safe draw-three mode while tracking the opponent-choice damage branch."
+  },
+  "Commander's Plate": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "equipment_static_attachment",
+      "power_boost": 3,
+      "toughness_boost": 3,
+      "protection_from_non_commander_identity_colors": true,
+      "equip_commander_cost": 3,
+      "equip_cost": 5,
+      "battle_model_scope": "equipment_commander_plate_auto_attach_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "equipment_static_attachment",
+      "subtype": "commander_identity_protection_equipment"
+    },
+    "source": "curated",
+    "confidence": 0.89,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: equipment gives +3/+3 and protection from colors outside commander's color identity. Runtime attaches to the best creature and applies the boost plus protection metadata."
+  },
+  "Farewell": {
+    "effect_json": {
+      "cmc": 6.0,
+      "effect": "board_wipe",
+      "sorcery": true,
+      "exile_modes": [
+        "artifacts",
+        "creatures",
+        "enchantments",
+        "graveyards"
+      ],
+      "battle_model_scope": "modal_exile_wipe_creature_runtime_baseline_v1"
+    },
+    "deck_role_json": {
+      "category": "wipe",
+      "effect": "board_wipe",
+      "subtype": "modal_exile_reset"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: choose one or more exile modes for artifacts, creatures, enchantments, and graveyards. Runtime executes the creature-wipe baseline and records the broader exile modes for audit."
+  },
+  "Hit the Mother Lode": {
+    "rules": [
+      {
+        "effect_json": {
+          "cmc": 7.0,
+          "effect": "draw_cards",
+          "sorcery": true,
+          "count": 1,
+          "discover_value": 10,
+          "compose_on_resolution": true,
+          "battle_model_scope": "discover_10_as_one_card_value_component_v1"
+        },
+        "deck_role_json": {
+          "category": "draw",
+          "effect": "draw_cards",
+          "subtype": "discover_value"
+        }
+      },
+      {
+        "effect_json": {
+          "cmc": 7.0,
+          "effect": "treasure_maker",
+          "treasure_count": 3,
+          "discover_treasure_difference": true,
+          "compose_on_resolution": true,
+          "battle_model_scope": "discover_10_treasure_difference_average_v1"
+        },
+        "deck_role_json": {
+          "category": "ramp",
+          "effect": "treasure_maker",
+          "subtype": "discover_treasure_rebate"
+        }
+      }
+    ],
+    "source": "curated",
+    "confidence": 0.84,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: Discover 10 and create tapped Treasures for the difference if the discovered card costs less than 10. Runtime composes a one-card value component plus conservative Treasure output."
+  },
+  "Improvisation Capstone": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "exile_value",
+      "sorcery": true,
+      "exile_until_total_mana_value_at_least": 4,
+      "may_cast_exiled_spells_without_paying": true,
+      "paradigm": true,
+      "battle_model_scope": "exile_value_free_casts_paradigm_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "exile_value",
+      "subtype": "free_cast_impulse_value"
+    },
+    "source": "curated",
+    "confidence": 0.84,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: exile cards until total mana value 4 or greater and cast any number for free; Paradigm repeats later. Runtime uses the supported exile-value approximation and tracks Paradigm as metadata."
+  },
+  "Increasing Vengeance": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "copy_spell",
+      "instant": true,
+      "target": "own_instant_or_sorcery_on_stack",
+      "flashback_cost": "{3}{R}{R}",
+      "copies_if_cast_from_graveyard": 2,
+      "battle_model_scope": "instant_copy_spell_requires_stack_target_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "copy_spell",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: copies target instant or sorcery you control, twice if cast from graveyard. Runtime now prevents instant/sorcery copy spells from becoming permanent engines without a stack target."
+  },
+  "Mithril Coat": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "equipment_static_attachment",
+      "flash": true,
+      "equipment_indestructible": true,
+      "grants_indestructible": true,
+      "auto_attach_legendary_creature": true,
+      "equip_cost": 3,
+      "battle_model_scope": "flash_equipment_indestructible_auto_attach_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "equipment_static_attachment",
+      "subtype": "indestructible_equipment"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: flash indestructible equipment that attaches to a legendary creature and grants indestructible. Runtime attaches to the best creature and applies persistent indestructible."
+  },
+  "Olórin's Searing Light": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "remove_creature",
+      "instant": true,
+      "target": "each_opponent_greatest_power_creature",
+      "spell_mastery_damage_each_opponent": true,
+      "battle_model_scope": "each_opponent_greatest_power_edict_single_target_baseline_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_creature",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: each opponent exiles their greatest-power creature and spell mastery can damage them. Runtime uses the supported creature-removal baseline while recording the multiplayer edict and damage details."
+  },
+  "Ondu Inversion // Ondu Skyruins": {
+    "effect_json": {
+      "cmc": 8.0,
+      "effect": "board_wipe",
+      "sorcery": true,
+      "target": "nonland_permanent",
+      "mdfc_land_face": {
+        "effect": "land",
+        "produces": "W",
+        "mana_produced": 1,
+        "enters_tapped": true
+      },
+      "battle_model_scope": "nonland_permanent_wipe_with_mdfc_land_face_v1"
+    },
+    "deck_role_json": {
+      "category": "wipe",
+      "effect": "board_wipe",
+      "subtype": "nonland_permanent_reset"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: front face destroys all nonland permanents and back face is a tapped white land. Runtime executes the creature-wipe baseline and preserves MDFC land metadata."
+  },
+  "Reckless Endeavor": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "damage_wipe_treasure",
+      "sorcery": true,
+      "average_damage": 6,
+      "average_treasure_count": 6,
+      "random_d12_pair": true,
+      "battle_model_scope": "d12_damage_wipe_treasure_average_v1"
+    },
+    "deck_role_json": {
+      "category": "wipe",
+      "effect": "damage_wipe_treasure",
+      "subtype": "damage_wipe_treasure_rebuild"
+    },
+    "source": "curated",
+    "confidence": 0.88,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: roll two d12, one result damages each creature and the other creates Treasures. Runtime executes an average damage wipe plus average Treasure creation."
+  },
+  "Restoration Seminar": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "recursion",
+      "sorcery": true,
+      "count": 1,
+      "target": "nonland",
+      "destination": "battlefield",
+      "paradigm": true,
+      "battle_model_scope": "nonland_permanent_graveyard_to_battlefield_paradigm_v1"
+    },
+    "deck_role_json": {
+      "category": "recursion",
+      "effect": "recursion",
+      "subtype": "nonland_permanent_reanimate"
+    },
+    "source": "curated",
+    "confidence": 0.93,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: returns target nonland permanent card from graveyard to battlefield, then Paradigm repeats later. Runtime supports nonland recursion to battlefield and records Paradigm."
+  },
+  "Reverse the Sands": {
+    "effect_json": {
+      "cmc": 8.0,
+      "effect": "redistribute_life_totals",
+      "sorcery": true,
+      "battle_model_scope": "redistribute_life_totals_swap_highest_opponent_v1"
+    },
+    "deck_role_json": {
+      "category": "wincon",
+      "effect": "redistribute_life_totals",
+      "subtype": "life_total_swing"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: redistribute any number of players' life totals. Runtime uses the strategic baseline of swapping Lorehold with the highest-life opponent when beneficial."
+  },
+  "Soulfire Eruption": {
+    "effect_json": {
+      "cmc": 9.0,
+      "effect": "deal_damage",
+      "sorcery": true,
+      "amount": 5,
+      "target": "any_number_creatures_planeswalkers_players",
+      "exile_top_card_per_target_damage_equal_mana_value": true,
+      "play_exiled_until_next_turn": true,
+      "battle_model_scope": "multi_target_exile_damage_average_single_target_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "deal_damage",
+      "subtype": "multi_target_exile_damage"
+    },
+    "source": "curated",
+    "confidence": 0.84,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: can target many creatures, planeswalkers, and/or players, exiling a card per target for damage and temporary play access. Runtime uses a conservative average single-target damage model."
+  },
+  "Sunforger": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "equipment_static_attachment",
+      "power_boost": 4,
+      "activated_tutor_target": "red_or_white_instant_mv_lte_4",
+      "activation_cost": "{R}{W}, unattach",
+      "equip_cost": 3,
+      "battle_model_scope": "power_equipment_with_instant_tutor_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "tutor",
+      "effect": "equipment_static_attachment",
+      "subtype": "instant_tutor_equipment"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: equipped creature gets +4/+0 and Sunforger can unattach for RW to cast a red or white instant with mana value 4 or less. Runtime executes the equipment boost and keeps the activated tutor as metadata."
+  },
+  "Swiftfoot Boots": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "equipment_static_attachment",
+      "grants_haste": true,
+      "grants_hexproof": true,
+      "equip_cost": 1,
+      "battle_model_scope": "equipment_auto_attach_haste_hexproof_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "equipment_static_attachment",
+      "subtype": "haste_hexproof_equipment"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: equipped creature has hexproof and haste. Runtime auto-attaches to the best creature and applies persistent haste and hexproof."
+  },
+  "Thought Vessel": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "C",
+      "no_maximum_hand_size": true,
+      "battle_model_scope": "colorless_mana_rock_no_max_hand_size_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "colorless_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.97,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: artifact grants no maximum hand size and taps for colorless mana. Runtime executes the colorless mana-rock baseline and records the hand-size static ability."
+  },
+  "Tibalt's Trickery": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "counter",
+      "instant": true,
+      "target": "spell",
+      "random_mill_then_free_replacement_spell": true,
+      "battle_model_scope": "counterspell_with_random_replacement_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "counter",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.86,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: counters target spell, then gives that controller a random replacement-cast line. Runtime executes the counter baseline and records the replacement drawback."
+  },
+  "Wear // Tear": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "remove_permanent",
+      "instant": true,
+      "target": "artifact_or_enchantment",
+      "split_card": true,
+      "fuse": true,
+      "battle_model_scope": "split_artifact_or_enchantment_removal_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_permanent",
+      "target": "artifact_or_enchantment",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: Wear destroys target artifact, Tear destroys target enchantment, and Fuse can cast both. Runtime models the combined artifact-or-enchantment instant removal target."
+  },
+  "Victory Chimes": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "ramp_permanent",
+      "mana_produced": 1,
+      "produces": "C",
+      "untaps_each_opponent_untap": true,
+      "battle_model_scope": "political_colorless_mana_rock_multiplayer_untap_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "ramp_permanent",
+      "subtype": "political_colorless_mana_rock"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "verified",
+    "notes": "Oracle-reviewed on 2026-06-21 against local PostgreSQL/Scryfall cache: Victory Chimes is a colorless mana artifact that untaps during each other player's untap step. It must not be modeled as draw_engine or draw a card on resolution."
+  },
   "Woodland Bellower": {
     "effect_json": {
       "cmc": 6.0,

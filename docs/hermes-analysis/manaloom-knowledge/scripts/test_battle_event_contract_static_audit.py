@@ -40,6 +40,9 @@ def test_known_static_and_observed_events_are_classified():
                 "adventure_cast",
                 "draw_equal_to_discarded_hand_resolved",
                 "etb_tutor_resolved",
+                "copy_spell_no_stack_target",
+                "damage_wipe_treasure_resolved",
+                "life_totals_redistributed",
                 "worldfire_resolved",
             ],
         )
@@ -50,6 +53,9 @@ def test_known_static_and_observed_events_are_classified():
                 {"event": "adventure_cast", "turn": 2, "player": "A"},
                 {"event": "draw_equal_to_discarded_hand_resolved", "turn": 3, "player": "A"},
                 {"event": "etb_tutor_resolved", "turn": 3, "player": "A"},
+                {"event": "copy_spell_no_stack_target", "turn": 3, "player": "A"},
+                {"event": "damage_wipe_treasure_resolved", "turn": 3, "player": "A"},
+                {"event": "life_totals_redistributed", "turn": 3, "player": "A"},
                 {"event": "worldfire_resolved", "turn": 3, "player": "A"},
             ],
         )

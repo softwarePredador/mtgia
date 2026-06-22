@@ -131,24 +131,45 @@ DECISION_TRACE_COUNTER = 0
 CURRENT_REPLAY_TURN = None
 DECISION_TRACE_SCHEMA_VERSION = "decision_trace_v1"
 DECISION_STRATEGY_VERSION = "battle_decision_strategy_v1_2026_06_15"
+COMMANDER_DAMAGE_LETHAL = 21
 EVALUATION_TARGET_ENV = "MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER"
 EVALUATION_MODE_ENV = "MANALOOM_BATTLE_EVALUATION_MODE"
 TABLE_INTENT_ENV = "MANALOOM_BATTLE_TABLE_INTENT"
 HIGH_IMPACT_PAYOFF_EFFECTS = {
+    "aetherflux_reservoir",
+    "attack_limit",
+    "attack_tax",
     "approach",
     "board_wipe",
+    "brain_freeze",
     "copy_creature_token",
     "copy_spell",
+    "damage_player_and_creatures",
+    "damage_wipe_treasure",
     "draw_engine",
+    "equipment_static_attachment",
     "finisher",
     "overload_recursion",
     "protection",
     "remove_creature",
     "remove_permanent",
+    "redistribute_life_totals",
     "silence_opponents",
     "steal_all_creatures",
+    "thassa_oracle",
     "token_maker",
     "wincon",
+}
+RESPONSE_WINDOW_ONLY_EFFECTS = {
+    "cannot_lose_turn",
+    "indestructible",
+    "modal_boros_charm",
+    "phase_out",
+    "redirect_removal",
+}
+SILENCE_WINDOW_EFFECTS = {
+    "silence_opponents",
+    "silence_spell",
 }
 
 
@@ -652,6 +673,45 @@ def store_cast_context_fields(effect_data, fields):
     if isinstance(effect_data, dict):
         effect_data["_cast_context"] = copy.deepcopy(fields)
     return effect_data
+
+
+def mark_cast_ledger_emitted(effect_data):
+    if isinstance(effect_data, dict):
+        effect_data["_cast_ledger_emitted"] = True
+    return effect_data
+
+
+def ensure_stack_cast_ledger_event(stack_item, turn, phase):
+    if not stack_item or getattr(stack_item, "was_cast", True) is False:
+        return False
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    if effect_data.get("effect") == "triggered_ability":
+        return False
+    if effect_data.get("_cast_ledger_emitted"):
+        return False
+    cast_context = copy.deepcopy(effect_data.get("_cast_context") or {})
+    if not cast_context:
+        return False
+    card = getattr(stack_item, "card", None) or {}
+    controller = getattr(stack_item, "controller", None)
+    recovered_phase = phase or cast_context.get("phase")
+    cast_context.pop("phase", None)
+    emit_replay_event(
+        "spell_cast",
+        player=getattr(controller, "name", "?"),
+        card=card.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        type_line=card.get("type_line", ""),
+        cmc=card.get("cmc", 0),
+        turn=turn,
+        phase=recovered_phase,
+        cast_ledger_recovered=True,
+        recovery_reason="stack_item_missing_cast_ledger",
+        **cast_context,
+        **replay_rule_fields(effect_data),
+    )
+    mark_cast_ledger_emitted(effect_data)
+    return True
 
 
 def resolved_spell_destination(card, effect_data, effect):
@@ -1251,6 +1311,7 @@ def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, tu
         **ctx.to_replay_fields(),
         **replay_rule_fields(effect_data),
     )
+    mark_cast_ledger_emitted(effect_data)
     trigger_spell_cast_engines(
         player, all_players, flashback_copy, turn, phase, stack=stack, active_player=player
     )
@@ -1856,7 +1917,9 @@ def load_deck_cards(deck_id=6):
     commanders = []
     deck = []
     for row in rows:
-        qty = row["quantity"] or 1
+        qty = 1 if row["quantity"] is None else int(row["quantity"])
+        if qty <= 0:
+            continue
         functional_tags = functional_tags_from_values(
             row["functional_tags_json"],
             row["functional_tag"],
@@ -2374,6 +2437,21 @@ def normalize_effect_by_oracle(card, effect_data):
         normalized["uncounterable"] = True
         normalized["exiles_self"] = True
         normalized["_composite_rule_components"] = components
+        return normalized
+
+    if (
+        re.search(r"\bdeals?\s+\d+\s+damage\s+to\s+target\s+player\s+or\s+planeswalker\b", text)
+        and "each creature that player" in text
+        and "controller controls" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        amount_match = re.search(r"\bdeals?\s+(\d+)\s+damage\b", text)
+        amount = int(amount_match.group(1)) if amount_match else int(normalized.get("amount") or 4)
+        normalized["effect"] = "damage_player_and_creatures"
+        normalized["amount"] = amount
+        normalized["target"] = "player_or_planeswalker_controller"
+        normalized["battle_model_scope"] = "target_player_and_controller_creatures"
+        normalized.pop("instant", None)
         return normalized
 
     if "counter target" in text:
@@ -3264,6 +3342,62 @@ def learned_opponent_commander_card(profile):
 # PLAYER STATE
 # ═══════════════════════════════════════════
 
+def card_mana_value(card):
+    try:
+        return int(float(card.get("cmc") or card.get("mana_value") or 0))
+    except Exception:
+        return 0
+
+
+def first_present_value(mapping, keys):
+    for key in keys:
+        if key in mapping and mapping.get(key) is not None:
+            return mapping.get(key)
+    return None
+
+
+def counter_can_target(counter_card, counter_effect, target_card, stack_item=None):
+    if not isinstance(target_card, dict):
+        return True
+    target_value = card_mana_value(target_card)
+    exact_value = first_present_value(
+        counter_effect,
+        (
+            "counter_target_cmc",
+            "counter_target_mana_value",
+            "target_cmc",
+            "target_mana_value",
+        ),
+    )
+    if exact_value is not None:
+        try:
+            if target_value != int(float(exact_value)):
+                return False
+        except Exception:
+            return False
+    max_value = first_present_value(
+        counter_effect,
+        ("counter_target_cmc_max", "counter_target_mana_value_max"),
+    )
+    if max_value is not None:
+        try:
+            if target_value > int(float(max_value)):
+                return False
+        except Exception:
+            return False
+    min_value = first_present_value(
+        counter_effect,
+        ("counter_target_cmc_min", "counter_target_mana_value_min"),
+    )
+    if min_value is not None:
+        try:
+            if target_value < int(float(min_value)):
+                return False
+        except Exception:
+            return False
+    return True
+
+
 class ManaPool:
     def __init__(self): self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = self.wildcard = 0
     def total(self): return self.generic + self.white + self.blue + self.black + self.red + self.green + self.colorless + self.wildcard
@@ -3666,7 +3800,7 @@ class Player:
         """Return whether a real counterspell in hand can currently be paid for."""
         return bool(self.counterspell_cards(castable_only=True))
 
-    def counterspell_cards(self, castable_only=False):
+    def counterspell_cards(self, castable_only=False, target_card=None, stack_item=None):
         counters = [
             card
             for card in self.hand
@@ -3679,6 +3813,16 @@ class Player:
                 card for card in counters
                 if self.can_pay_card(card)
             ]
+        if target_card is not None:
+            counters = [
+                card for card in counters
+                if counter_can_target(
+                    card,
+                    get_card_effect(card),
+                    target_card,
+                    stack_item=stack_item,
+                )
+            ]
         return counters
 
     def use_counterspell(
@@ -3690,7 +3834,11 @@ class Player:
         phase=None,
         priority_window=None,
     ):
-        counters = self.counterspell_cards(castable_only=True)
+        counters = self.counterspell_cards(
+            castable_only=True,
+            target_card=target_card,
+            stack_item=stack_item,
+        )
         if not counters:
             self.counters_available = len(self.counterspell_cards())
             return None
@@ -3974,7 +4122,7 @@ def _opening_hand_colors(hand):
     for card in hand:
         if not is_effective_land(card):
             continue
-        for color in source_colors(card):
+        for color in _opening_hand_land_source_colors(card):
             if color not in colors:
                 colors.append(color)
     return sorted(colors)
@@ -4001,10 +4149,19 @@ def _opening_hand_land_options(hand):
     ]
 
 
+def _opening_hand_land_source_colors(land):
+    colors = source_colors(land)
+    if colors and colors != ["generic"]:
+        return colors
+    if isinstance(land, dict) and normalize_card_name(land.get("name", "")) in FETCH_LAND_NAMES:
+        return ["wildcard"]
+    return colors
+
+
 def _opening_hand_virtual_mana_pool(lands):
     pool = ManaPool()
     for land in lands:
-        colors = source_colors(land)
+        colors = _opening_hand_land_source_colors(land)
         color = colors[0] if len(colors) == 1 else "wildcard"
         pool.add(color, 1)
     return pool
@@ -4684,9 +4841,42 @@ def missing_required_declared_removal_target(effect_data, declared_targets):
     return (effect_data or {}).get("effect") in TARGETED_REMOVAL_EFFECTS and not declared_targets
 
 
+def battlefield_object_for_target(player, target):
+    battlefield = getattr(player, "battlefield", [])
+    if not isinstance(battlefield, list) or not isinstance(target, dict):
+        return None
+    for permanent in battlefield:
+        if permanent is target:
+            return permanent
+    for permanent in battlefield:
+        if permanent == target:
+            return permanent
+    target_name = target.get("name") or target.get("card_name")
+    if target_name:
+        name_matches = [
+            permanent
+            for permanent in battlefield
+            if isinstance(permanent, dict)
+            and (permanent.get("name") or permanent.get("card_name")) == target_name
+        ]
+        if len(name_matches) == 1:
+            return name_matches[0]
+    return None
+
+
 def controller_for_target(players, target):
     for candidate in players:
-        if target in getattr(candidate, "battlefield", []):
+        if battlefield_object_for_target(candidate, target) is not None:
+            return candidate
+    return None
+
+
+def declared_target_controller(players, target, entry_controller=None):
+    live_controller = controller_for_target(players, target)
+    if live_controller is not None:
+        return live_controller
+    for candidate in players:
+        if candidate is entry_controller:
             return candidate
     return None
 
@@ -4706,9 +4896,19 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
     players = [player] + list(opponents)
     for entry in declared_targets:
         target = entry.get("target") if isinstance(entry, dict) else entry
-        target_controller = (
-            entry.get("controller") if isinstance(entry, dict) else None
-        ) or controller_for_target(players, target)
+        entry_controller = entry.get("controller") if isinstance(entry, dict) else None
+        target_controller = declared_target_controller(
+            players,
+            target,
+            entry_controller=entry_controller,
+        )
+        live_target = (
+            battlefield_object_for_target(target_controller, target)
+            if target_controller is not None
+            else None
+        )
+        if live_target is not None:
+            target = live_target
         decision = targeting_decision(
             card,
             target,
@@ -4716,10 +4916,7 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             target_controller=target_controller,
             target_type=target_type,
         )
-        target_still_present = (
-            target_controller is not None
-            and target in getattr(target_controller, "battlefield", [])
-        )
+        target_still_present = target_controller is not None and live_target is not None
         if not decision["target_legal"] or not target_still_present:
             illegal.append(decision["target_name"])
             continue
@@ -4756,9 +4953,19 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
     entry = declared_targets[0]
     target = entry.get("target") if isinstance(entry, dict) else entry
     players = [player] + list(opponents)
-    target_controller = (
-        entry.get("controller") if isinstance(entry, dict) else None
-    ) or controller_for_target(players, target)
+    entry_controller = entry.get("controller") if isinstance(entry, dict) else None
+    target_controller = declared_target_controller(
+        players,
+        target,
+        entry_controller=entry_controller,
+    )
+    live_target = (
+        battlefield_object_for_target(target_controller, target)
+        if target_controller is not None
+        else None
+    )
+    if live_target is not None:
+        target = live_target
     target_type = (
         entry.get("target_type") if isinstance(entry, dict) else None
     ) or removal_target_type(effect_data)
@@ -4770,10 +4977,7 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         target_type=target_type,
     )
     target_name = decision.get("target_name") or "?"
-    target_still_present = (
-        target_controller is not None
-        and target in getattr(target_controller, "battlefield", [])
-    )
+    target_still_present = target_controller is not None and live_target is not None
     if not decision["target_legal"] or not target_still_present:
         emit_replay_event(
             "removal_resolved",
@@ -4884,9 +5088,12 @@ def redirectable_stack_context(redirector, all_players, stack_item):
 
     entry = declared_targets[0]
     old_target = entry.get("target") if isinstance(entry, dict) else entry
-    old_controller = (
-        entry.get("controller") if isinstance(entry, dict) else None
-    ) or controller_for_target(all_players, old_target)
+    entry_controller = entry.get("controller") if isinstance(entry, dict) else None
+    old_controller = declared_target_controller(
+        all_players,
+        old_target,
+        entry_controller=entry_controller,
+    )
     target_type = (
         entry.get("target_type") if isinstance(entry, dict) else None
     ) or removal_target_type(effect_data)
@@ -5024,6 +5231,303 @@ def game_winner(all_players):
 
 
 MAIN_PHASES = {"precombat_main", "postcombat_main"}
+
+
+def has_immediate_silence_payoff(player, phase):
+    if phase not in MAIN_PHASES:
+        return False
+    payoff_effects = {
+        "approach",
+        "extra_turn",
+        "finisher",
+        "overload_recursion",
+        "wincon",
+        "worldfire_reset",
+    }
+    for candidate in getattr(player, "hand", []) or []:
+        if not isinstance(candidate, dict) or is_effective_land(candidate):
+            continue
+        effect = str(get_card_effect(candidate).get("effect") or "").lower()
+        if effect in payoff_effects and player.can_pay_card(candidate):
+            return True
+    return False
+
+
+def should_hold_for_response_window(player, card, effect_data, phase):
+    effect = str((effect_data or {}).get("effect") or card.get("effect") or "").lower()
+    if effect == "copy_spell" and is_instant_or_sorcery_spell(card):
+        return True
+    if effect in RESPONSE_WINDOW_ONLY_EFFECTS:
+        return True
+    if effect == "silence_opponents" and not is_instant(card):
+        return False
+    if effect in SILENCE_WINDOW_EFFECTS and not has_immediate_silence_payoff(player, phase):
+        return True
+    return False
+
+
+SURVIVAL_RESPONSE_RESERVE_LIFE_TOTAL = 15
+SURVIVAL_RESPONSE_EFFECTS = {"phase_out", "cannot_lose_turn"}
+PROACTIVE_COMBAT_DEFENSE_EFFECTS = {"attack_limit", "attack_tax", "equipment_static_attachment"}
+SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
+    "phase_out",
+    "cannot_lose_turn",
+    "board_wipe",
+    "damage_player_and_creatures",
+    "remove_creature",
+    "remove_permanent",
+    "approach",
+    "finisher",
+    "worldfire_reset",
+}
+
+
+def is_the_one_ring(card_or_name):
+    if isinstance(card_or_name, dict):
+        name = card_or_name.get("name", "")
+    else:
+        name = card_or_name
+    return normalize_card_name(name) == "the one ring"
+
+
+def grants_protection_from_everything_on_enter(card, effect_data=None):
+    effect_data = effect_data or {}
+    return bool(
+        effect_data.get("protection_from_everything_on_enter")
+        or effect_data.get("one_ring_protection_on_enter")
+        or is_the_one_ring(card)
+    )
+
+
+def is_orims_chant(card_or_name):
+    if isinstance(card_or_name, dict):
+        name = card_or_name.get("name", "")
+    else:
+        name = card_or_name
+    return normalize_card_name(name) == "orim's chant"
+
+
+def orims_chant_kicker_costs():
+    return ["{W}"]
+
+
+def grants_kicked_attack_prevention(card, effect_data=None):
+    effect_data = effect_data or {}
+    return bool(
+        effect_data.get("kicker_prevent_attacks")
+        or effect_data.get("kicked_prevent_attacks")
+        or effect_data.get("prevent_attacks_if_kicked")
+        or is_orims_chant(card)
+    )
+
+
+def can_pay_orims_chant_kicked(player, card):
+    return player.can_pay(card_mana_cost(card, additional_costs=orims_chant_kicker_costs()))
+
+
+def proactive_combat_defense_cards_in_hand(player, phase):
+    if phase not in ("precombat_main", "postcombat_main"):
+        return []
+    defense_cards = []
+    for candidate in getattr(player, "hand", []) or []:
+        if not isinstance(candidate, dict) or is_effective_land(candidate):
+            continue
+        candidate_effect = get_card_effect(candidate)
+        effect = str(candidate_effect.get("effect") or candidate.get("effect") or "").lower()
+        if (
+            effect not in PROACTIVE_COMBAT_DEFENSE_EFFECTS
+            and not grants_protection_from_everything_on_enter(candidate, candidate_effect)
+        ):
+            continue
+        if not can_cast_in_phase(candidate, candidate_effect, phase):
+            continue
+        if not player.can_pay_card(candidate):
+            continue
+        defense_cards.append((candidate, candidate_effect))
+    return defense_cards
+
+
+def should_prioritize_proactive_combat_defense(player, card, effect_data=None, phase=None):
+    if phase not in ("precombat_main", "postcombat_main"):
+        return False
+    if getattr(player, "life", 0) > SURVIVAL_RESPONSE_RESERVE_LIFE_TOTAL:
+        return False
+    effect = str((effect_data or {}).get("effect") or card.get("effect") or "").lower()
+    if effect in {"approach", "wincon"}:
+        return False
+    if effect in PROACTIVE_COMBAT_DEFENSE_EFFECTS or grants_protection_from_everything_on_enter(card, effect_data):
+        return False
+    return bool(proactive_combat_defense_cards_in_hand(player, phase))
+
+
+def survival_response_cards_in_hand(player, *, exclude_card=None):
+    response_cards = []
+    for candidate in getattr(player, "hand", []) or []:
+        if candidate is exclude_card or not isinstance(candidate, dict):
+            continue
+        if not is_instant(candidate):
+            continue
+        candidate_effect = get_card_effect(candidate)
+        effect = str(candidate_effect.get("effect") or "").lower()
+        if effect in SURVIVAL_RESPONSE_EFFECTS:
+            response_cards.append((candidate, candidate_effect))
+    return response_cards
+
+
+def _can_pay_any_survival_response_from_state(
+    player,
+    response_cards,
+    pool_snapshot,
+    treasures,
+    restricted_mana,
+    life,
+):
+    original_pool = player.mana_pool.snapshot()
+    original_treasures = player.treasures
+    original_restricted = copy.deepcopy(player.restricted_mana)
+    original_life = player.life
+    try:
+        for color, amount in pool_snapshot.items():
+            setattr(player.mana_pool, color, amount)
+        player.treasures = treasures
+        player.restricted_mana = copy.deepcopy(restricted_mana)
+        player.life = life
+        return any(player.can_pay_card(card) for card, _effect in response_cards)
+    finally:
+        for color, amount in original_pool.items():
+            setattr(player.mana_pool, color, amount)
+        player.treasures = original_treasures
+        player.restricted_mana = original_restricted
+        player.life = original_life
+
+
+def survival_response_reservation_context(player, card, effect_data=None, additional_generic=0):
+    """Prevent low-life pilots from spending mana reserved for instant survival."""
+    if getattr(player, "life", 0) > SURVIVAL_RESPONSE_RESERVE_LIFE_TOTAL:
+        return None
+    effect = str((effect_data or {}).get("effect") or card.get("effect") or "").lower()
+    if grants_protection_from_everything_on_enter(card, effect_data):
+        return None
+    if effect in SURVIVAL_RESERVATION_EXEMPT_EFFECTS:
+        return None
+    response_cards = survival_response_cards_in_hand(player, exclude_card=card)
+    if not response_cards:
+        return None
+    currently_payable = [
+        (response_card, response_effect)
+        for response_card, response_effect in response_cards
+        if player.can_pay_card(response_card)
+    ]
+    if not currently_payable:
+        return None
+    payment_plan = player._payment_plan(card_mana_cost(card, additional_generic))
+    if payment_plan is None:
+        return None
+    pool_after, treasures_after, life_payment, restricted_after = payment_plan
+    life_after = player.life - life_payment
+    if _can_pay_any_survival_response_from_state(
+        player,
+        currently_payable,
+        pool_after,
+        treasures_after,
+        restricted_after,
+        life_after,
+    ):
+        return None
+    return {
+        "reserved_response_cards": [response_card.get("name", "?") for response_card, _ in currently_payable],
+        "reserved_response_effects": [response_effect.get("effect", "unknown") for _, response_effect in currently_payable],
+        "life_before": player.life,
+        "candidate": card.get("name", "?"),
+        "candidate_effect": effect,
+        "reason": "preserve_survival_response_mana_at_low_life",
+    }
+
+
+def should_reserve_survival_response_mana(player, card, effect_data=None, phase=None, additional_generic=0):
+    if phase not in ("precombat_main", "postcombat_main"):
+        return False
+    return survival_response_reservation_context(
+        player,
+        card,
+        effect_data,
+        additional_generic=additional_generic,
+    ) is not None
+
+
+def _numeric_effect_amount(value, default=0):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def cannot_lose_turn_stack_response_context(player, top_item):
+    if not top_item or top_item.controller is player:
+        return None
+    effect_data = top_item.effect_data or {}
+    top_effect = str(effect_data.get("effect") or "").lower()
+    if top_effect == "approach" and getattr(top_item.controller, "approach_count", 0) >= 1:
+        return {
+            "immediate_loss_source": "approach_second_cast",
+            "reason": "prevent_opponent_immediate_win",
+        }
+    if top_effect == "damage_player_and_creatures":
+        amount = _numeric_effect_amount(effect_data.get("amount"), 4)
+        if player.life <= amount:
+            return {
+                "immediate_loss_source": "lethal_damage_spell",
+                "projected_damage": amount,
+                "life_before": player.life,
+                "reason": "prevent_lethal_damage_spell",
+            }
+    if top_effect == "deal_damage":
+        amount = _numeric_effect_amount(effect_data.get("amount"), 0)
+        target = str(effect_data.get("target") or "").lower()
+        if amount > 0 and target in {"any", "player", "opponent", "player_or_planeswalker"} and player.life <= amount:
+            return {
+                "immediate_loss_source": "lethal_direct_damage",
+                "projected_damage": amount,
+                "life_before": player.life,
+                "reason": "prevent_lethal_damage_spell",
+            }
+    return None
+
+
+def blue_devotion(player):
+    devotion = 0
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        mana_cost = str(permanent.get("mana_cost") or "")
+        devotion += mana_cost.count("{U}")
+        devotion += mana_cost.count("{U/P}")
+        for hybrid in ("{W/U}", "{U/B}", "{G/U}", "{U/R}", "{2/U}"):
+            devotion += mana_cost.count(hybrid)
+    return devotion
+
+
+def brain_freeze_copy_count(player):
+    return max(1, int(getattr(player, "spells_cast_this_turn", 0) or 0))
+
+
+def brain_freeze_total_mill(player, effect_data):
+    per_copy = int((effect_data or {}).get("mill_count") or 3)
+    return max(0, per_copy) * brain_freeze_copy_count(player)
+
+
+def choose_mill_target(player, opponents, total_mill):
+    alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
+    if not alive_opponents:
+        return player
+    lethal_targets = [
+        opponent
+        for opponent in alive_opponents
+        if len(getattr(opponent, "library", []) or []) <= total_mill
+    ]
+    if lethal_targets:
+        return min(lethal_targets, key=lambda opponent: (len(opponent.library), opponent.life, opponent.name))
+    return min(alive_opponents, key=lambda opponent: (len(opponent.library), opponent.life, opponent.name))
 
 
 def priority_order_from(active_player, all_players):
@@ -5269,6 +5773,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             (top_item.effect_data.get("_cast_context") or {}).get("phase")
             or (top_item.effect_data.get("_resolution_context") or {}).get("phase")
         )
+    ensure_stack_cast_ledger_event(top_item, turn, phase)
     if top_item.countered:
         stack.resolve_top()
         return False
@@ -5355,13 +5860,37 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 return True
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
-            if score >= 40:
+            top_effect = top_item.effect_data.get("effect", "")
+            own_stack_protection_targets = {
+                "board_wipe",
+                "damage_player_and_creatures",
+                "worldfire_reset",
+            }
+            should_consider_protection = score >= 40 and (
+                player != top_item.controller
+                or top_effect in own_stack_protection_targets
+            )
+            if should_consider_protection:
                 instants = [c for c in player.hand if is_instant(c) and player.can_pay_card(c)]
                 for c in instants:
                     eff = get_card_effect(c)
-                    if eff.get("effect") in ("phase_out", "indestructible", "modal_boros_charm", "cannot_lose_turn"):
+                    protection_effect = eff.get("effect")
+                    cannot_lose_context = None
+                    if protection_effect == "cannot_lose_turn":
+                        cannot_lose_context = cannot_lose_turn_stack_response_context(player, top_item)
+                        if cannot_lose_context is None:
+                            continue
+                    elif protection_effect not in ("phase_out", "indestructible", "modal_boros_charm"):
+                        continue
+                    if protection_effect in ("phase_out", "indestructible", "modal_boros_charm", "cannot_lose_turn"):
                         if player.can_pay_card(c):
                             fields = replay_rule_fields(eff)
+                            score_components = {
+                                "stack_threat_score": score,
+                                "available_instants": len(instants),
+                            }
+                            if cannot_lose_context:
+                                score_components.update(cannot_lose_context)
                             emit_decision_trace(
                                 decision_type="response",
                                 player=player,
@@ -5385,16 +5914,20 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                     for option_card in instants
                                     if option_card is not c
                                 ][:8],
-                                score_components={
-                                    "stack_threat_score": score,
-                                    "available_instants": len(instants),
-                                },
+                                score_components=score_components,
                                 rule_source=fields.get("rule_source", "battle_heuristic"),
                                 rule_status=fields.get("rule_review_status", "heuristic"),
                                 confidence="medium",
                                 expected_benefit_score=score,
-                                actual_outcome="protective_response_cast",
-                                reason="high_threat_stack_response",
+                                actual_outcome=(
+                                    "cannot_lose_response_cast"
+                                    if protection_effect == "cannot_lose_turn"
+                                    else "protective_response_cast"
+                                ),
+                                reason=(
+                                    (cannot_lose_context or {}).get("reason")
+                                    or "high_threat_stack_response"
+                                ),
                             )
                             player.hand.remove(c)
                             player.spend_card_mana(c)
@@ -5431,7 +5964,11 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
         else:
             # v8.2: Smart counter decision based on threat score
             if player != top_item.controller and counter_worth(score, player, rng):
-                counters = player.counterspell_cards(castable_only=True)
+                counters = player.counterspell_cards(
+                    castable_only=True,
+                    target_card=top_item.card,
+                    stack_item=top_item,
+                )
                 counter = player.use_counterspell(
                     turn,
                     top_item.card,
@@ -5566,6 +6103,25 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
     if effect_name == "worldfire_reset":
         return 92
 
+    if effect_name == "thassa_oracle":
+        if len(getattr(controller, "library", []) or []) <= max(2, blue_devotion(controller)):
+            return 100
+        return 25
+
+    if effect_name == "brain_freeze":
+        total_mill = brain_freeze_total_mill(controller, {"mill_count": 3})
+        for opponent in all_players:
+            if opponent != controller and opponent.is_alive() and len(getattr(opponent, "library", []) or []) <= total_mill:
+                return 80
+        if total_mill >= 15:
+            return 45
+        return 25
+
+    if effect_name == "aetherflux_reservoir":
+        if getattr(controller, "spells_cast_this_turn", 0) >= 3:
+            return 55
+        return 35
+
     # ── MASSIVE BOARD IMPACT ──
     if effect_name == "board_wipe":
         # Higher threat if caster has protection (asymmetric wipe)
@@ -5577,6 +6133,25 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         if opp_creatures > caster_creatures * 2:
             return 75  # devastating for opponents
         return 45  # symmetric, fair
+
+    if effect_name == "damage_player_and_creatures":
+        alive_opponents = [
+            player
+            for player in all_players
+            if player != controller and player.is_alive()
+        ]
+        if not alive_opponents:
+            return 10
+        amount = 4
+        best_score = max(
+            _player_and_creatures_damage_target_score(opponent, amount)[0]
+            for opponent in alive_opponents
+        )
+        if best_score >= 90:
+            return 70
+        if best_score >= 45:
+            return 52
+        return 32
 
     if effect_name == "steal_all_creatures":
         total_stolen = sum(len([c for c in o.battlefield if is_battlefield_creature(c)])
@@ -5612,6 +6187,32 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         if spells_in_grave > 5:
             return 50
         return 30
+
+    if effect_name in ("attack_limit", "attack_tax"):
+        opposing_power = sum(
+            table_visible_board_power(player)
+            for player in all_players
+            if player != controller and player.is_alive()
+        )
+        if player_is_evaluation_target(controller) and opposing_power >= max(1, controller.life):
+            return 68
+        if opposing_power >= max(8, controller.life // 2):
+            return 55
+        return 35
+
+    if is_the_one_ring(card_name):
+        opposing_power = sum(
+            table_visible_board_power(player)
+            for player in all_players
+            if player != controller and player.is_alive()
+        )
+        if player_is_evaluation_target(controller) and (
+            controller.life <= 20 or opposing_power >= max(1, controller.life)
+        ):
+            return 82
+        if controller.life <= 12:
+            return 72
+        return 35
 
     # ── REMOVAL ──
     if effect_name in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
@@ -5719,6 +6320,8 @@ def clear_until_eot(player):
             card.pop("_landfall_triggers_this_turn", None)
     player.indestructible = False
     player.silenced_opponents_until_eot = False
+    player.creatures_cant_attack_this_turn = False
+    player.creatures_cant_attack_source = None
     player.cannot_lose_this_turn = False
     player.damage_life_floor = None
     player.damage_prevention_shields = []
@@ -5774,6 +6377,7 @@ def is_artifact_permanent(card):
         return False
     type_line = str(card.get("type_line") or "").lower()
     return "artifact" in type_line or card.get("effect") in (
+        "equipment_static_attachment",
         "equipment_haste_shroud",
         "hate_artifact",
         "life_artifact",
@@ -6155,7 +6759,7 @@ def additional_card_costs_are_payable(player, card, effect_data):
     return True
 
 
-def pay_additional_card_costs(player, card, effect_data, *, turn=None):
+def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_context=None):
     """Pay non-mana costs that materially affect battlefield validity."""
     if (
         not effect_data.get("requires_discard_card")
@@ -6194,11 +6798,17 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             turn=turn,
         )
     if effect_data.get("requires_discard_land"):
+        cost_context = dict(cost_context or {})
         hand_lands = [
             candidate
             for candidate in player.hand
             if isinstance(candidate, dict) and is_land(candidate)
         ]
+        battlefield_land_count = sum(
+            1
+            for candidate in player.battlefield
+            if isinstance(candidate, dict) and is_effective_land(candidate)
+        )
         discard, land_options, strategic_risk_flags, selection_reason = choose_land_for_resource_cost(
             hand_lands,
             zone="hand",
@@ -6226,6 +6836,16 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None):
             land_options=land_options,
             selection_reason=selection_reason,
             strategic_risk_flags=strategic_risk_flags,
+            resource_gate=cost_context.get("resource_gate"),
+            strategic_benefit_reason=cost_context.get("strategic_benefit_reason"),
+            unlock_card=cost_context.get("unlock_card"),
+            unlock_role=cost_context.get("unlock_role"),
+            unlock_reason=cost_context.get("unlock_reason"),
+            unlocks_same_turn_action=bool(cost_context.get("unlocks_same_turn_action")),
+            battlefield_land_count=battlefield_land_count,
+            hand_land_count_before=len(hand_lands),
+            hand_land_count_after=max(0, len(hand_lands) - 1),
+            total_land_count_after=battlefield_land_count + max(0, len(hand_lands) - 1),
         )
     required_color = "G" if effect_data.get("requires_sacrifice_green_creature") else None
     if effect_data.get("requires_sacrifice_creature") or required_color:
@@ -6508,6 +7128,8 @@ def board_wipe_decision_context(player, opponents):
 
 def wheel_decision_context(player, opponents, draw_count):
     hand_size = len(player.hand)
+    library_cards_before = len(getattr(player, "library", []) or [])
+    library_can_support_draw = library_cards_before >= draw_count
     opponent_hands = [len(opp.hand) for opp in opponents if opp.is_alive()]
     opponent_refill_risk = sum(1 for size in opponent_hands if size < draw_count)
     net_cards_for_player = draw_count - hand_size
@@ -6523,7 +7145,7 @@ def wheel_decision_context(player, opponents, draw_count):
         and permanent.get("name") in {"Smothering Tithe", "Notion Thief", "Narset, Parter of Veils"}
     }
     payoff_expected = bool(payoff_names)
-    timing_justified = (
+    timing_justified = library_can_support_draw and (
         payoff_expected
         or (net_cards_for_player >= 4 and opponent_refill_risk == 0)
         or (net_cards_for_player >= 5 and total_opponent_net_cards <= net_cards_for_player)
@@ -6531,6 +7153,8 @@ def wheel_decision_context(player, opponents, draw_count):
     return {
         "hand_size_before": hand_size,
         "draw_count": draw_count,
+        "library_cards_before": library_cards_before,
+        "library_can_support_draw": library_can_support_draw,
         "net_cards_for_player": net_cards_for_player,
         "opponent_hand_sizes": opponent_hands,
         "opponent_net_cards": opponent_net_cards,
@@ -6702,7 +7326,7 @@ def graveyard_enchantment_recovery_score(card, player, turn):
     cmc = int(float(card.get("cmc") or 0))
     expected_next_turn_mana = max(controlled_land_count(player), 1) if player is not None else 1
     reason = "highest_contextual_enchantment_recovery_value"
-    if effect in ("ramp_engine", "draw_engine", "topdeck_manipulation"):
+    if effect in ("ramp_engine", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax"):
         score = max(score, 70)
         if cmc <= expected_next_turn_mana + 1:
             score += 8
@@ -6835,6 +7459,11 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng):
 
 
 def is_wheel_like_card(card, effect_data):
+    if isinstance(effect_data, dict) and "wheel_like" in effect_data:
+        value = effect_data.get("wheel_like")
+        if isinstance(value, str):
+            return value.strip().lower() in {"1", "true", "yes", "y"}
+        return bool(value)
     name = normalize_card_name(card.get("name", "")) if isinstance(card, dict) else ""
     count = wheel_like_draw_count(card, effect_data)
     return count >= 7 or any(
@@ -6916,8 +7545,36 @@ def move_zone_object_to_exile(owner, zone_name, card, *, reason=None, source=Non
         return "exile"
 
     zone = getattr(owner, zone_name, None)
-    if isinstance(zone, list) and card in zone:
-        zone.remove(card)
+    if isinstance(zone, list):
+        for zone_object in zone:
+            if zone_object is card:
+                card = zone_object
+                break
+        else:
+            for zone_object in zone:
+                if zone_object == card:
+                    card = zone_object
+                    break
+            else:
+                target_name = card.get("name") or card.get("card_name")
+                if target_name:
+                    name_matches = [
+                        zone_object
+                        for zone_object in zone
+                        if isinstance(zone_object, dict)
+                        and (zone_object.get("name") or zone_object.get("card_name")) == target_name
+                    ]
+                    if len(name_matches) == 1:
+                        card = name_matches[0]
+        for index, zone_object in enumerate(zone):
+            if zone_object is card:
+                del zone[index]
+                break
+        else:
+            try:
+                zone.remove(card)
+            except ValueError:
+                pass
 
     if zone_name == "battlefield":
         card["_lki_snapshot"] = {
@@ -7047,10 +7704,10 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
             score += 22
             reason = "unlock_interaction"
-        elif effect in ("creature", "draw_engine", "topdeck_manipulation"):
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 18 if cmc <= 4 else 10
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "worldfire_reset"):
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
             score += 24
             reason = "unlock_high_impact_spell"
         else:
@@ -7151,10 +7808,10 @@ def sacrifice_mana_unlock_candidates(
         elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
             score += 20
             reason = "unlock_interaction"
-        elif effect in ("creature", "draw_engine", "topdeck_manipulation"):
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 16 if cmc <= 4 else 8
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "worldfire_reset"):
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
             score += 26
             reason = "unlock_high_impact_spell"
         else:
@@ -7343,6 +8000,45 @@ def _utility_artifact_skip_event(player, permanent, turn, reason, *, phase, risk
         phase=phase,
         turn=turn,
     )
+
+
+def _attack_limit_against_player(player, opponents):
+    limit = None
+    all_battlefields = [player.battlefield]
+    all_battlefields.extend(opponent.battlefield for opponent in opponents if opponent.is_alive())
+    for battlefield in all_battlefields:
+        for permanent in battlefield:
+            if not isinstance(permanent, dict):
+                continue
+            normalized = normalize_card_name(permanent.get("name", ""))
+            if normalized == "silent arbiter":
+                limit = 1 if limit is None else min(limit, 1)
+            elif normalized == "crawlspace" and permanent in player.battlefield:
+                limit = 2 if limit is None else min(limit, 2)
+    return limit
+
+
+def _estimated_burden_cycle_combat_pressure(player, opponents):
+    if not opponents or player.life_cant_change:
+        return 0
+    attack_limit = _attack_limit_against_player(player, opponents)
+    projected_pressure = 0
+    for opponent in opponents:
+        if not opponent.is_alive():
+            continue
+        attacker_powers = sorted(
+            (
+                max(0, combat_stat(creature, "power", 2))
+                for creature in opponent.battlefield
+                if is_battlefield_creature(creature)
+                and not creature.get("defender")
+            ),
+            reverse=True,
+        )
+        if attack_limit is not None:
+            attacker_powers = attacker_powers[:attack_limit]
+        projected_pressure += sum(attacker_powers)
+    return projected_pressure
 
 
 def _sacrifice_damage_skip_event(player, permanent, turn, reason, *, phase, risk_flags=None):
@@ -8408,6 +9104,146 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             )
             return 1
 
+    burden_draw_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") == "draw_engine"
+        and (permanent.get("activated_burden_draw") or is_the_one_ring(permanent))
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase == "postcombat_main":
+        for permanent in burden_draw_artifacts:
+            if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "artifact_already_tapped_for_burden_draw",
+                    phase=phase,
+                )
+                continue
+            if not player.library:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_library_for_burden_draw_artifact",
+                    phase=phase,
+                )
+                continue
+            if hand_size > 3 and player.life > 15:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_burden_draw_artifact",
+                    phase=phase,
+                )
+                continue
+            current_counters = int(permanent.get("burden_counters") or 0)
+            if player.life <= current_counters and not player.life_cant_change:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "burden_life_loss_risk_too_high",
+                    phase=phase,
+                )
+                continue
+            next_burden_counters = current_counters + 1
+            if (
+                not player.life_cant_change
+                and player.life - next_burden_counters <= 1
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "next_upkeep_burden_life_loss_risk_too_high",
+                    phase=phase,
+                    risk_flags=["next_upkeep_self_lethal_or_near_lethal"],
+                )
+                continue
+            projected_cycle_pressure = _estimated_burden_cycle_combat_pressure(player, opponents)
+            if (
+                projected_cycle_pressure > 0
+                and not player.life_cant_change
+                and player.life - projected_cycle_pressure - next_burden_counters <= 2
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "burden_cycle_combat_pressure_risk_too_high",
+                    phase=phase,
+                    risk_flags=[
+                        "projected_combat_pressure",
+                        "future_burden_clock",
+                    ],
+                )
+                continue
+            permanent["utility_artifact_used_this_turn"] = True
+            permanent["tapped"] = True
+            permanent["burden_counters"] = next_burden_counters
+            draw_count = permanent["burden_counters"]
+            drawn = player.draw(draw_count, rng)
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="activate_burden_draw",
+                        effect=permanent.get("effect", "draw_engine"),
+                        score=28 + draw_count * 4,
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="activate_burden_draw",
+                    effect=permanent.get("effect", "draw_engine"),
+                    score=28 + draw_count * 4,
+                ),
+                score_components={
+                    "activation_cost": "tap_add_burden_counter",
+                    "activation_cost_generic": 1,
+                    "burden_counters_before": current_counters,
+                    "burden_counters_after": permanent["burden_counters"],
+                    "cards_drawn": len(drawn),
+                    "hand_before": hand_size,
+                    "hand_after": len(player.hand),
+                },
+                rule_source="utility_artifact_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=28 + draw_count * 4,
+                reason="activate_burden_artifact_for_card_flow",
+                strategic_principle="convert_protected_draw_engine_into_cards_when_hand_is_low_or_life_is_critical",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "cards": len(drawn),
+                    "burden_counters": 1,
+                },
+                risk_flags=["future_burden_life_loss"],
+                rejected_reason="no_better_burden_draw_artifact",
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="burden_draw",
+                burden_counters=permanent["burden_counters"],
+                cards_drawn=len(drawn),
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                phase=phase,
+                turn=turn,
+            )
+            return 1
+
     self_sacrifice_draw_artifacts = [
         permanent
         for permanent in player.battlefield
@@ -8572,9 +9408,12 @@ def discard_replacement_priority(card, player):
         "counter",
         "remove_creature",
         "remove_permanent",
+        "damage_wipe_treasure",
+        "redistribute_life_totals",
         "board_wipe",
         "protection",
         "phase_out",
+        "equipment_static_attachment",
         "tutor",
     }:
         return 140 + min(cmc, 6) * 3
@@ -8688,6 +9527,15 @@ def lorehold_draw_priority(card, player):
     if is_effective_land(card):
         return 18 if controlled_land_count(player) < 4 else 4
     return 20 + min(cmc, 6)
+
+
+def is_lorehold_protected_win_condition(card):
+    if not isinstance(card, dict):
+        return False
+    effect_data = get_card_effect(card)
+    effect = str(effect_data.get("effect") or card.get("effect") or "unknown")
+    normalized_name = normalize_card_name(card.get("name", ""))
+    return normalized_name == "approach of the second sun" or effect in {"approach", "wincon"}
 
 
 def activate_lorehold_topdeck_artifacts(
@@ -9291,6 +10139,7 @@ def choose_lorehold_rummage_discard(player):
         effect = get_card_effect(card).get("effect", card.get("effect", "unknown"))
         is_land_card = is_effective_land(card)
         instant_or_sorcery = is_instant_or_sorcery_spell(card)
+        protected_win_condition = is_lorehold_protected_win_condition(card)
         score = 0
         reason = "keep_card"
         use_top_replacement = False
@@ -9302,6 +10151,8 @@ def choose_lorehold_rummage_discard(player):
         elif is_land_card and lands_in_hand >= 2 and battlefield_lands >= 4:
             score = 88
             reason = "discard_excess_land_for_new_draw"
+        elif protected_win_condition:
+            risk_flags.append("critical_win_condition_preserved")
         elif not is_land_card and cmc >= 7:
             score = 72
             reason = "pitch_dead_high_cmc_spell"
@@ -9344,6 +10195,68 @@ def choose_lorehold_rummage_discard(player):
     )
 
 
+def cleanup_discard_priority(player, card):
+    """Higher score means the card is safer to discard during max-hand cleanup."""
+    if not isinstance(card, dict):
+        return 0
+    cmc = int(_opening_hand_card_cmc(card) or 0)
+    effect_data = get_card_effect(card)
+    effect = str(effect_data.get("effect") or card.get("effect") or "").lower()
+    if is_lorehold_protected_win_condition(card):
+        return -500 + cmc
+    if (
+        effect in PROACTIVE_COMBAT_DEFENSE_EFFECTS
+        or grants_protection_from_everything_on_enter(card, effect_data)
+    ):
+        return -250 + cmc
+    if effect in SURVIVAL_RESPONSE_EFFECTS or effect in SILENCE_WINDOW_EFFECTS:
+        return -160 + cmc
+    if effect in {
+        "counter",
+        "modal_boros_charm",
+        "protect_creature",
+        "redirect_removal",
+        "remove_creature",
+        "remove_permanent",
+    }:
+        return -80 + cmc
+    if is_effective_land(card):
+        battlefield_lands = controlled_land_count(player)
+        lands_in_hand = sum(
+            1 for candidate in getattr(player, "hand", []) or []
+            if isinstance(candidate, dict) and is_effective_land(candidate)
+        )
+        if battlefield_lands >= 4 and lands_in_hand >= 2:
+            return 110
+        if battlefield_lands >= 5:
+            return 70
+        return 10
+    if cmc >= 7:
+        return 95 + cmc
+    if cmc >= 5:
+        return 75 + cmc
+    if effect in {"unknown", "passive"}:
+        return 35 + cmc
+    return cmc
+
+
+def choose_cleanup_discard(player):
+    candidates = [
+        card for card in getattr(player, "hand", []) or []
+        if isinstance(card, dict)
+    ]
+    if not candidates:
+        return None
+    return max(
+        candidates,
+        key=lambda card: (
+            cleanup_discard_priority(player, card),
+            int(_opening_hand_card_cmc(card) or 0),
+            normalize_card_name(card.get("name", "")),
+        ),
+    )
+
+
 def try_lorehold_miracle_cast(
     player,
     drawn_for_turn,
@@ -9372,6 +10285,19 @@ def try_lorehold_miracle_cast(
         return False
     eff = get_card_effect(last_drawn)
     if eff.get("effect") == "counter":
+        return False
+    miracle_can_use_modal_boros_charm = (
+        eff.get("effect") == "modal_boros_charm"
+        and source
+        in {
+            "brainstone_first_draw",
+            "draw_step",
+            "lorehold_opponent_upkeep_rummage",
+            "lorehold_topdeck_artifact",
+            "senseis_top_draw",
+        }
+    )
+    if should_hold_for_response_window(player, last_drawn, eff, phase) and not miracle_can_use_modal_boros_charm:
         return False
     if last_drawn not in player.hand:
         return False
@@ -9421,12 +10347,14 @@ def try_lorehold_miracle_cast(
         miracle_cost=miracle_cost,
         lorehold_on_board=True,
         cards_drawn_this_turn=player.cards_drawn_this_turn,
+        first_draw_miracle_candidate=miracle_candidate is not None,
         phase=phase,
         source=source,
         turn=turn,
         **declared_target_fields,
         **replay_rule_fields(eff),
     )
+    mark_cast_ledger_emitted(eff)
     stack.push(last_drawn, player, eff)
     while not stack.empty():
         priority_round(player, all_players, stack, turn, rng)
@@ -10220,7 +11148,62 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
     return activations
 
 
+def library_tutor_candidates(player, target_type):
+    target_type = str(target_type or "any").lower()
+    candidates = []
+    for candidate in getattr(player, "library", []) or []:
+        if not isinstance(candidate, dict):
+            continue
+        if target_type == "any":
+            candidates.append(candidate)
+        elif target_type == "artifact_or_enchantment":
+            type_line = str(candidate.get("type_line") or "").lower()
+            if (
+                ("artifact" in type_line or "enchantment" in type_line)
+                and candidate.get("name") != "Approach of the Second Sun"
+            ):
+                candidates.append(candidate)
+        elif target_type == "land":
+            if is_effective_land(candidate):
+                candidates.append(candidate)
+        elif target_type == "basic_land":
+            type_line = str(candidate.get("type_line") or "").lower()
+            if is_effective_land(candidate) and "basic" in type_line:
+                candidates.append(candidate)
+        elif target_type == "basic_plains":
+            type_line = str(candidate.get("type_line") or "").lower()
+            if (
+                is_effective_land(candidate)
+                and "basic" in type_line
+                and (
+                    normalize_card_name(candidate.get("name", "")) == "plains"
+                    or "plains" in type_line
+                )
+            ):
+                candidates.append(candidate)
+        elif target_type in ("graveyard", "graveyard_nonlegendary"):
+            if target_type == "graveyard" or "legendary" not in str(candidate.get("type_line") or "").lower():
+                candidates.append(candidate)
+        elif target_type in ("creature", "creature_to_battlefield"):
+            if is_creature_card(candidate):
+                candidates.append(candidate)
+        elif target_type == "instant_or_sorcery":
+            if is_instant_or_sorcery_spell(candidate):
+                candidates.append(candidate)
+        elif target_type in ("green_creature", "green_creature_to_battlefield"):
+            if is_creature_card(candidate) and card_has_color(candidate, "G"):
+                candidates.append(candidate)
+    return candidates
+
+
+def spell_has_required_library_target(player, effect_data):
+    if str((effect_data or {}).get("effect") or "") != "tutor":
+        return True
+    return bool(library_tutor_candidates(player, (effect_data or {}).get("target", "any")))
+
+
 def tutor_destination_for_target_type(target_type):
+    target_type = str(target_type or "any").lower()
     if target_type in ("graveyard", "graveyard_nonlegendary"):
         return "graveyard"
     if str(target_type).endswith("_to_battlefield"):
@@ -10249,7 +11232,7 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     elif effect in ("remove_creature", "remove_permanent", "board_wipe") and opponent_creatures >= 3:
         score += 55
         reason = "find_interaction_for_board_pressure"
-    elif effect in ("draw_engine", "topdeck_manipulation") and turn <= 5:
+    elif effect in ("draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax") and turn <= 5:
         score += 50
         reason = "establish_value_engine"
     elif effect in ("wincon", "approach", "finisher", "overload_recursion", "worldfire_reset") and turn >= 5:
@@ -10726,6 +11709,18 @@ def activate_land_tutor_creatures(player, turn):
             found_land = enrich_card({**land_to_find, "effect": "land", "tapped": True})
             player.battlefield.append(found_land)
             trigger_landfall(player, found_land, turn, "land_tutor_activated")
+            ranked_target_options = sorted(
+                target_options,
+                key=lambda item: item["selection_rank"],
+            )
+            chosen_option_score = next(
+                (
+                    option["score"]
+                    for option in ranked_target_options
+                    if option["name"] == land_to_find.get("name", "?")
+                ),
+                0,
+            )
             emit_decision_trace(
                 decision_type="utility_artifact_activation",
                 player=player,
@@ -10738,17 +11733,23 @@ def activate_land_tutor_creatures(player, turn):
                         action="activate_land_tutor_artifact",
                         effect="land_tutor",
                     )
-                    for option in sorted(target_options, key=lambda item: item["selection_rank"])[:8]
+                    for option in ranked_target_options[:8]
                 ],
                 chosen_option=decision_card_option(
                     land_to_find,
-                    score=next(
-                        (option["score"] for option in target_options if option["name"] == land_to_find.get("name", "?")),
-                        0,
-                    ),
+                    score=chosen_option_score,
                     action="activate_land_tutor_artifact",
                     effect="land_tutor",
                 ),
+                rejected_options=[
+                    decision_card_option(
+                        {"name": option["name"]},
+                        score=option["score"],
+                        action="defer_land_tutor_artifact",
+                        effect="land_tutor",
+                    )
+                    for option in ranked_target_options[1:8]
+                ],
                 score_components={
                     "activation_cost_generic": activation_cost,
                     "found_land": land_to_find.get("name", "?"),
@@ -10757,10 +11758,7 @@ def activate_land_tutor_creatures(player, turn):
                 rule_source="utility_artifact_activation_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
                 confidence="medium",
-                expected_benefit_score=next(
-                    (option["score"] for option in target_options if option["name"] == land_to_find.get("name", "?")),
-                    0,
-                ),
+                expected_benefit_score=chosen_option_score,
                 actual_outcome="artifact_converted_into_tapped_land",
                 reason="convert_low_impact_artifact_into_structural_land_development",
                 strategic_principle="cash_in_land_tutor_artifact_when_it_improves_real_mana_development",
@@ -10925,6 +11923,93 @@ def apply_equipment_haste_shroud(player, card, effect_data, turn):
     )
 
 
+def apply_equipment_static_attachment(player, card, effect_data, turn):
+    equipment = enrich_card({**card, **effect_data})
+    equipment["effect"] = "equipment_static_attachment"
+    player.battlefield.append(equipment)
+    creatures = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent)
+    ]
+    if not creatures:
+        emit_replay_event(
+            "equipment_unattached",
+            player=player.name,
+            card=card.get("name", "?"),
+            effect="equipment_static_attachment",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return
+
+    target = choose_best_creature_target(creatures)
+    grants = []
+    power_boost = int(effect_data.get("power_boost") or 0)
+    toughness_boost = int(effect_data.get("toughness_boost") or 0)
+    if power_boost:
+        target["power"] = int(target.get("power") or 0) + power_boost
+    if toughness_boost:
+        target["toughness"] = int(target.get("toughness") or 0) + toughness_boost
+    for keyword in ("haste", "hexproof", "shroud", "indestructible"):
+        if effect_data.get(f"grants_{keyword}"):
+            target[keyword] = True
+            grants.append(keyword)
+    if effect_data.get("grants_haste"):
+        target["summoning_sick"] = False
+    if effect_data.get("protection_from_non_commander_identity_colors"):
+        target["protection_from_non_commander_identity_colors"] = True
+        grants.append("protection_from_non_commander_identity_colors")
+    equipment["attached_to"] = target.get("name", "?")
+    emit_replay_event(
+        "equipment_attached",
+        player=player.name,
+        card=card.get("name", "?"),
+        effect="equipment_static_attachment",
+        target=target.get("name", "?"),
+        power_boost=power_boost,
+        toughness_boost=toughness_boost,
+        grants=grants,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+
+def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn):
+    target_type = effect_data.get("etb_tutor_target") or effect_data.get("target") or "any"
+    count = max(1, int(effect_data.get("etb_tutor_count") or effect_data.get("count") or 1))
+    candidates = library_tutor_candidates(player, target_type)
+    scored_candidates = [
+        (
+            candidate,
+            *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+        )
+        for candidate in candidates
+    ]
+    scored_candidates.sort(key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", "")))
+    selected = scored_candidates[:count]
+    moved = []
+    for selected_card, _score, _reason in selected:
+        if selected_card not in player.library:
+            continue
+        player.library.remove(selected_card)
+        player.hand.append(selected_card)
+        moved.append(selected_card)
+    emit_replay_event(
+        "tutor_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_type=target_type,
+        found=moved[0].get("name", "?") if moved else None,
+        found_cards=[item.get("name", "?") for item in moved],
+        destination="hand" if moved else None,
+        trigger="enters_battlefield",
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return moved
+
+
 def resolve_hand_filter(player, card, effect_data, turn, rng):
     """Resolve Valakut Awakening-style bottom-then-draw filtering."""
     max_bottom = int(effect_data.get("max_bottom") or 3)
@@ -10954,7 +12039,11 @@ def resolve_hand_filter(player, card, effect_data, turn, rng):
         should_bottom = False
         urgency = 99
         reason = "keep"
-        if effect in keep_effects:
+        if is_lorehold_protected_win_condition(candidate):
+            should_bottom = False
+            urgency = 99
+            reason = "keep_critical_win_condition"
+        elif effect in keep_effects:
             should_bottom = False
             urgency = 99
             reason = "keep_interaction_or_setup"
@@ -11142,6 +12231,178 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     player.graveyard.append(card)
 
 
+def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
+    amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
+    treasure_count = int(effect_data.get("treasure_count") or effect_data.get("average_treasure_count") or amount)
+    destroyed = []
+    protected = []
+    creatures_seen = 0
+    for participant in [player] + list(opponents):
+        for permanent in list(participant.battlefield):
+            if not is_battlefield_creature(permanent):
+                continue
+            creatures_seen += 1
+            if permanent.get("indestructible"):
+                protected.append(permanent.get("name", "?"))
+                continue
+            if _damage_sweep_creature_toughness(permanent) > amount:
+                continue
+            destination = move_creature_from_battlefield(
+                participant,
+                permanent,
+                reason="damage_wipe_treasure",
+                source=card,
+            )
+            destroyed.append(
+                {
+                    "controller": participant.name,
+                    "name": permanent.get("name", "?"),
+                    "destination": destination,
+                }
+            )
+    player.treasures += max(0, treasure_count)
+    emit_replay_event(
+        "damage_wipe_treasure_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        damage=amount,
+        treasures_created=max(0, treasure_count),
+        creatures_seen=creatures_seen,
+        creatures_destroyed=len(destroyed),
+        destroyed=destroyed[:20],
+        protected=protected[:20],
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def apply_redistribute_life_totals(player, opponents, card, effect_data, turn):
+    participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
+    if not participants:
+        finish_resolved_spell(player, card, turn=turn)
+        return
+    before = {participant.name: participant.life for participant in participants}
+    highest = max(participants, key=lambda participant: participant.life)
+    swapped_with = None
+    if highest is not player and highest.life > player.life:
+        player_life_before = player.life
+        highest_life_before = highest.life
+        change_life(player, highest_life_before - player.life)
+        change_life(highest, player_life_before - highest.life)
+        swapped_with = highest.name
+    after = {participant.name: participant.life for participant in participants}
+    emit_replay_event(
+        "life_totals_redistributed",
+        player=player.name,
+        card=card.get("name", "?"),
+        swapped_with=swapped_with,
+        life_before=before,
+        life_after=after,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def _damage_sweep_creature_toughness(creature):
+    try:
+        return int(creature.get("toughness") or creature.get("power") or 2)
+    except (TypeError, ValueError):
+        return 2
+
+
+def _player_and_creatures_damage_target_score(target, amount):
+    killable = []
+    protected = 0
+    total_creatures = 0
+    for permanent in getattr(target, "battlefield", []):
+        if not is_battlefield_creature(permanent):
+            continue
+        total_creatures += 1
+        if permanent.get("indestructible"):
+            protected += 1
+            continue
+        if _damage_sweep_creature_toughness(permanent) <= amount:
+            killable.append(permanent)
+    killable_priority = sum(
+        1
+        + priority[0] * 30
+        + priority[1] * 6
+        + priority[2]
+        + priority[3]
+        for priority in (target_priority(creature) for creature in killable)
+    )
+    lethal_bonus = 80 if getattr(target, "life", 0) <= amount else 0
+    pressure_bonus = min(30, table_visible_board_power(target))
+    return (
+        lethal_bonus + killable_priority + len(killable) * 12 + pressure_bonus,
+        len(killable),
+        total_creatures - protected,
+        -getattr(target, "life", 0),
+    )
+
+
+def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng):
+    raw_amount = effect_data.get("amount") or effect_data.get("damage") or 4
+    amount = int(raw_amount)
+    alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
+    if not alive_opponents:
+        finish_resolved_spell(player, card, turn=turn)
+        return
+
+    target = max(
+        alive_opponents,
+        key=lambda opponent: _player_and_creatures_damage_target_score(opponent, amount),
+    )
+    life_before = target.life
+    dealt = deal_damage(target, amount)
+    destroyed = []
+    protected = []
+    creatures_seen = 0
+    for permanent in list(target.battlefield):
+        if not is_battlefield_creature(permanent):
+            continue
+        creatures_seen += 1
+        if permanent.get("indestructible"):
+            protected.append(permanent.get("name", "?"))
+            continue
+        if _damage_sweep_creature_toughness(permanent) > amount:
+            continue
+        destination = move_creature_from_battlefield(
+            target,
+            permanent,
+            reason="damage_player_and_creatures",
+            source=card,
+        )
+        destroyed.append(
+            {
+                "name": permanent.get("name", "?"),
+                "destination": destination,
+            }
+        )
+
+    emit_replay_event(
+        "damage_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        effect=effect_data.get("effect", "damage_player_and_creatures"),
+        amount=amount,
+        target_player=target.name,
+        result="player_and_creatures_damage" if dealt else "creature_damage_only_or_prevented",
+        cause="target_player_and_controller_creatures",
+        life_before=life_before,
+        life_after=target.life,
+        creatures_seen=creatures_seen,
+        creatures_destroyed=len(destroyed),
+        destroyed=destroyed,
+        protected=protected,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
 def trigger_spell_cast_engines(
     player,
     all_players,
@@ -11154,6 +12415,41 @@ def trigger_spell_cast_engines(
 ):
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") == "aetherflux_reservoir" or permanent.get("aetherflux_lifegain"):
+            life_gain = max(1, int(getattr(player, "spells_cast_this_turn", 0) or 1))
+
+            def resolve_aetherflux_lifegain(
+                permanent=permanent,
+                life_gain=life_gain,
+            ):
+                life_before = player.life
+                gain_life(player, life_gain, cap=999)
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="spell_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    effect="aetherflux_lifegain",
+                    life_gained=life_gain,
+                    spells_cast_this_turn=getattr(player, "spells_cast_this_turn", 0),
+                    life_before=life_before,
+                    life_after=player.life,
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "spell_cast",
+                resolve_aetherflux_lifegain,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
             continue
         trigger_kind = permanent.get("trigger")
         if trigger_kind not in {"spell_cast", "noncreature_spell_cast"}:
@@ -11391,7 +12687,7 @@ def check_ward(target, spell, controller, rng):
     ward_cost = target.get("ward_cost") or target.get("ward", 0)
     if ward_cost <= 0:
         return False  # No ward
-    
+
     # Ward triggers: AI opponent pays 50% of the time if affordable
     can_pay = controller.available_mana() >= ward_cost
     if not can_pay:
@@ -11399,7 +12695,7 @@ def check_ward(target, spell, controller, rng):
         emit_replay_event("ward_countered", target=target.get("name"),
                          spell=spell.get("name"), ward_cost=ward_cost)
         return True  # Spell is countered
-    
+
     # Decision: pay or let it be countered
     if controller.is_human or rng.random() < 0.5:
         # Pay ward cost
@@ -11452,6 +12748,7 @@ def cast_adventure_spell_from_hand(player, card, opponents, all_players, turn, p
         **cast_ctx.to_replay_fields(),
         **replay_rule_fields(effect_data),
     )
+    mark_cast_ledger_emitted(effect_data)
     trigger_spell_cast_engines(
         player, all_players, adventure, turn, phase, stack=stack, active_player=player
     )
@@ -11517,6 +12814,18 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             and player.can_pay_card(candidate)
             and can_cast_in_phase(candidate, get_card_effect(candidate), phase)
             and get_card_effect(candidate).get("effect") not in ("counter", "unknown")
+            and not should_hold_for_response_window(
+                player,
+                candidate,
+                get_card_effect(candidate),
+                phase,
+            )
+            and not should_reserve_survival_response_mana(
+                player,
+                candidate,
+                get_card_effect(candidate),
+                phase,
+            )
             for candidate in player.hand
         )
         if not has_free_castable:
@@ -11613,6 +12922,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             candidate_effect = get_card_effect(candidate)
             effect_name = str(candidate_effect.get("effect") or "unknown")
             if effect_name in ("counter", "unknown", "ramp_ritual", "ramp_permanent", "ramp_engine", "land_ramp", "land_recursion"):
+                continue
+            if should_hold_for_response_window(player, candidate, candidate_effect, phase):
+                continue
+            if should_reserve_survival_response_mana(player, candidate, candidate_effect, phase):
                 continue
             if effect_name not in HIGH_IMPACT_PAYOFF_EFFECTS:
                 continue
@@ -11852,17 +13165,33 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         and player.can_pay_card(cmd, additional_generic=player.commander_tax)
     ):
         cmd_eff = get_card_effect(cmd)
-        cast_ctx = begin_cast_context(
+        if should_reserve_survival_response_mana(
             player,
             cmd,
+            cmd_eff,
             phase,
             additional_generic=player.commander_tax,
-            effect_data=cmd_eff,
-            role="commander",
-            source_zone="command_zone",
-        )
-        cost = cmd["cmc"] + player.commander_tax
-        if commit_cast_payment(cast_ctx):
+        ) or should_prioritize_proactive_combat_defense(
+            player,
+            cmd,
+            cmd_eff,
+            phase,
+        ):
+            cmd = None
+        else:
+            cast_ctx = begin_cast_context(
+                player,
+                cmd,
+                phase,
+                additional_generic=player.commander_tax,
+                effect_data=cmd_eff,
+                role="commander",
+                source_zone="command_zone",
+            )
+            cost = cmd["cmc"] + player.commander_tax
+        if cmd is None:
+            pass
+        elif commit_cast_payment(cast_ctx):
             player.command_zone.pop(0)
             cmd_copy = enrich_card(cmd)
             haste = has_haste(cmd_copy)
@@ -12005,6 +13334,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 continue
             strategy_context = ramp_resource_strategy_context(candidate, effect)
             if strategy_context is None:
+                continue
+            if should_reserve_survival_response_mana(player, candidate, effect, phase):
+                continue
+            if should_prioritize_proactive_combat_defense(player, candidate, effect, phase):
                 continue
             ramp_contexts[id(candidate)] = strategy_context
         ramp_cards = [c for c in player.hand if id(c) in ramp_contexts]
@@ -12165,7 +13498,13 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
-                if not pay_additional_card_costs(player, c, eff, turn=turn):
+                if not pay_additional_card_costs(
+                    player,
+                    c,
+                    eff,
+                    turn=turn,
+                    cost_context=strategy_context,
+                ):
                     player.graveyard.append(c)
                     return False
                 trigger_spell_cast_engines(
@@ -12232,6 +13571,25 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             "land_ramp",
             "land_recursion",
         )
+        and not should_hold_for_response_window(
+            player,
+            c,
+            get_card_effect(c),
+            phase,
+        )
+        and not should_reserve_survival_response_mana(
+            player,
+            c,
+            get_card_effect(c),
+            phase,
+        )
+        and not should_prioritize_proactive_combat_defense(
+            player,
+            c,
+            get_card_effect(c),
+            phase,
+        )
+        and spell_has_required_library_target(player, get_card_effect(c))
     ]
     # v8: Miracle check for Lorehold
     if player.is_human:
@@ -12248,7 +13606,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         # Sort by threat score (highest first — resolve big plays before small ones)
         scored = [(c, threat_score(get_card_effect(c).get("effect", ""), c.get("name", ""), player, all_players, turn)) for c in castable]
         scored.sort(key=lambda x: -x[1])
-        
+
         wincons = [c for c, s in scored if s >= 50]
         if wincons:
             c = wincons[0]
@@ -12341,6 +13699,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
+                mark_cast_ledger_emitted(eff)
                 if not pay_additional_card_costs(player, c, eff, turn=turn):
                     player.graveyard.append(c)
                     return False
@@ -12622,6 +13981,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **cast_ctx.to_replay_fields(),
                     **replay_rule_fields(eff),
                 )
+                mark_cast_ledger_emitted(eff)
                 if not pay_additional_card_costs(player, c, eff, turn=turn):
                     player.graveyard.append(c)
                     continue
@@ -12861,6 +14221,10 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
+    elif effect in ("attack_limit", "attack_tax"):
+        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = effect
+        player.battlefield.append(permanent)
     elif effect == "ramp_permanent":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
@@ -12879,12 +14243,34 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         player.battlefield.append(permanent)
         treasure_count = int(effect_data.get("enters_treasure") or 0)
         player.treasures += treasure_count
+        if effect_data.get("etb_tutor_target"):
+            resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn)
     elif effect == "draw_engine":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "draw_engine"
+        if is_the_one_ring(card):
+            permanent["burden"] = True
+            permanent["burden_counters"] = int(permanent.get("burden_counters") or 0)
+            permanent["activated_burden_draw"] = True
+            permanent["activation_requires_tap"] = True
         player.battlefield.append(permanent)
         player.draw_engines += 1
-        if effect_data.get("draw_on_enter", True):
+        if grants_protection_from_everything_on_enter(card, effect_data):
+            player.protection_from_everything = True
+            player.protection_from_everything_source = permanent
+            emit_replay_event(
+                "protection_from_everything_granted",
+                player=player.name,
+                card=card.get("name", "?"),
+                duration="until_next_turn",
+                life_cant_change=False,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+        draw_on_enter = effect_data.get("draw_on_enter")
+        if draw_on_enter is None:
+            draw_on_enter = not is_the_one_ring(card)
+        if draw_on_enter:
             player.draw(1, rng)
     elif effect == "cantrip_mana_filter_artifact":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
@@ -13168,18 +14554,109 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "deal_damage":
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "damage_player_and_creatures":
+        apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "damage_wipe_treasure":
+        apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":
         apply_equipment_haste_shroud(player, card, effect_data, turn)
+    elif effect == "equipment_static_attachment":
+        apply_equipment_static_attachment(player, card, effect_data, turn)
     elif effect == "board_wipe":
         context = board_wipe_decision_context(player, opponents)
+        destroyed = 0
+        protected = 0
+        creatures_seen = 0
+        unprotected_seen = 0
+        own_creatures_destroyed = 0
+        opponent_creatures_destroyed = 0
+        live_opponent_creatures_destroyed = 0
+        own_creatures_seen = 0
+        opponent_creatures_seen = 0
+        live_opponent_creatures_seen = 0
+        for p in [player] + list(opponents):
+            is_self = p is player
+            is_live_opponent = (not is_self) and p.is_alive()
+            survivors = []
+            destroyed_cards = []
+            for c in list(p.battlefield):
+                if is_battlefield_creature(c):
+                    creatures_seen += 1
+                    if is_self:
+                        own_creatures_seen += 1
+                    else:
+                        opponent_creatures_seen += 1
+                        if is_live_opponent:
+                            live_opponent_creatures_seen += 1
+                    # v8: indestructible per-creature
+                    if c.get("indestructible"):
+                        survivors.append(c)
+                        protected += 1
+                        continue
+                    unprotected_seen += 1
+                    destroyed_cards.append(c)
+                    destroyed += 1
+                    if is_self:
+                        own_creatures_destroyed += 1
+                    else:
+                        opponent_creatures_destroyed += 1
+                        if is_live_opponent:
+                            live_opponent_creatures_destroyed += 1
+                else:
+                    survivors.append(c)
+            p.battlefield = survivors
+            for c in destroyed_cards:
+                move_creature_from_battlefield(
+                    p,
+                    c,
+                    reason="board_wipe",
+                    source=card,
+                )
+        effective_opponent_destroyed = live_opponent_creatures_destroyed
+        actual_asymmetry = effective_opponent_destroyed - own_creatures_destroyed
+        self_protected_from_wipe = bool(
+            getattr(player, "protection_from_everything", False)
+            or getattr(player, "phased_out", [])
+        )
+        resolution_timing_justified = bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or (effective_opponent_destroyed > 0 and own_creatures_destroyed == 0)
+            or (self_protected_from_wipe and effective_opponent_destroyed > 0)
+        )
+        resolution_context = {
+            **context,
+            "pre_resolution_timing_justified": context["timing_justified"],
+            "timing_justified": resolution_timing_justified,
+            "creatures_seen": creatures_seen,
+            "unprotected_seen": unprotected_seen,
+            "actual_destroyed": destroyed,
+            "protected": protected,
+            "own_creatures_seen": own_creatures_seen,
+            "opponent_creatures_seen": opponent_creatures_seen,
+            "live_opponent_creatures_seen": live_opponent_creatures_seen,
+            "own_creatures_destroyed": own_creatures_destroyed,
+            "opponent_creatures_destroyed": opponent_creatures_destroyed,
+            "live_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+            "stale_opponent_creatures_destroyed": (
+                opponent_creatures_destroyed - live_opponent_creatures_destroyed
+            ),
+            "effective_opponent_creatures_destroyed": effective_opponent_destroyed,
+            "actual_asymmetry": actual_asymmetry,
+            "self_protected_from_wipe": self_protected_from_wipe,
+        }
         risk_flags = []
-        if not context["timing_justified"]:
+        if not resolution_context["timing_justified"]:
             risk_flags.append("wipe_without_timing_justification")
         elif (
-            context["asymmetry"] <= 0
-            and not context["lethal_pressure"]
-            and not context["rebuild_plan"]
-            and not context["behind_on_board"]
+            resolution_context["actual_asymmetry"] <= 0
+            and not resolution_context["lethal_pressure"]
+            and not resolution_context["rebuild_plan"]
+            and not resolution_context["behind_on_board"]
+            and not (
+                resolution_context["self_protected_from_wipe"]
+                and resolution_context["effective_opponent_creatures_destroyed"] > 0
+            )
         ):
             risk_flags.append("wipe_without_clear_asymmetry")
         fields = replay_rule_fields(effect_data)
@@ -13194,52 +14671,30 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             ],
             chosen_option=decision_card_option(card, effect_data, action="resolve_board_wipe"),
             rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
-            score_components=context,
+            score_components=resolution_context,
             rule_source=fields.get("rule_source", "battle_heuristic"),
             rule_status=fields.get("rule_review_status", "heuristic"),
             confidence="medium",
             expected_benefit_score=(
-                max(0, context["asymmetry"] * 10)
+                max(0, max(context["asymmetry"], actual_asymmetry) * 10)
                 + (40 if context["lethal_pressure"] else 0)
                 + (20 if context["behind_on_board"] else 0)
                 + (15 if context["rebuild_plan"] else 0)
+                + min(max(0, effective_opponent_destroyed) * 5, 30)
+                + (
+                    10
+                    if self_protected_from_wipe and effective_opponent_destroyed > 0
+                    else 0
+                )
             ),
             actual_outcome="board_wipe_resolved",
             reason="reset_board_state",
             strategic_principle="wipe_when_behind_under_lethal_pressure_or_asymmetric",
             heuristic_version=DECISION_STRATEGY_VERSION,
-            resource_delta=context,
+            resource_delta=resolution_context,
             risk_flags=risk_flags,
             rejected_reason="spell_already_resolving",
         )
-        destroyed = 0
-        protected = 0
-        creatures_seen = 0
-        unprotected_seen = 0
-        for p in [player] + list(opponents):
-            survivors = []
-            destroyed_cards = []
-            for c in list(p.battlefield):
-                if is_battlefield_creature(c):
-                    creatures_seen += 1
-                    # v8: indestructible per-creature
-                    if c.get("indestructible"):
-                        survivors.append(c)
-                        protected += 1
-                        continue
-                    unprotected_seen += 1
-                    destroyed_cards.append(c)
-                    destroyed += 1
-                else:
-                    survivors.append(c)
-            p.battlefield = survivors
-            for c in destroyed_cards:
-                move_creature_from_battlefield(
-                    p,
-                    c,
-                    reason="board_wipe",
-                    source=card,
-                )
         emit_replay_event(
             "board_wipe_resolved",
             player=player.name,
@@ -13248,6 +14703,11 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             protected=protected,
             creatures_seen=creatures_seen,
             unprotected_seen=unprotected_seen,
+            own_creatures_destroyed=own_creatures_destroyed,
+            opponent_creatures_destroyed=opponent_creatures_destroyed,
+            live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+            actual_asymmetry=actual_asymmetry,
+            self_protected_from_wipe=self_protected_from_wipe,
             turn=turn,
         )
         finish_resolved_spell(player, card, turn=turn)
@@ -13475,6 +14935,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             dmg_each = total_power // len(alive_opps)
             for opp in alive_opps:
                 deal_damage(opp, dmg_each)
+    elif effect == "redistribute_life_totals":
+        apply_redistribute_life_totals(player, opponents, card, effect_data, turn)
     elif effect == "token_maker":
         token_count = effect_data.get("token_count", 5)
         if isinstance(token_count, str):
@@ -13557,6 +15019,16 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             player.indestructible = True
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "copy_spell":
+        if is_instant_or_sorcery_spell(card):
+            emit_replay_event(
+                "copy_spell_no_stack_target",
+                player=player.name,
+                card=card.get("name", "?"),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            finish_resolved_spell(player, card, turn=turn)
+            return
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "copy_spell"
         player.battlefield.append(permanent)
@@ -13564,30 +15036,9 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
     elif effect == "tutor":
         target_type = effect_data.get("target", "any")
         found = None
-        candidates = []
-        for c in player.library:
-            if target_type == "any":
-                candidates.append(c)
-            elif target_type == "artifact_or_enchantment":
-                # v8.3: Enlightened Tutor — finds Artifact or Enchantment by type_line
-                tl = c.get("type_line", "")
-                if ("Artifact" in tl or "Enchantment" in tl) and c.get("name") != "Approach of the Second Sun":
-                    candidates.append(c)
-            elif target_type == "land":
-                if is_effective_land(c):
-                    candidates.append(c)
-            elif target_type in ("graveyard", "graveyard_nonlegendary"):
-                if target_type == "graveyard" or "legendary" not in str(c.get("type_line") or "").lower():
-                    candidates.append(c)
-            elif target_type in ("creature", "creature_to_battlefield"):
-                if is_creature_card(c):
-                    candidates.append(c)
-            elif target_type == "instant_or_sorcery":
-                if is_instant_or_sorcery_spell(c):
-                    candidates.append(c)
-            elif target_type in ("green_creature", "green_creature_to_battlefield"):
-                if is_creature_card(c) and card_has_color(c, "G"):
-                    candidates.append(c)
+        candidates = library_tutor_candidates(player, target_type)
+        selected_candidates = []
+        selection_count = max(1, int(effect_data.get("count") or effect_data.get("max_count") or 1))
         if candidates:
             scored_candidates = [
                 (
@@ -13597,7 +15048,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                 for candidate in candidates
             ]
             scored_candidates.sort(key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", "")))
-            found, found_score, found_reason = scored_candidates[0]
+            selected_candidates = scored_candidates[:selection_count]
+            found, found_score, found_reason = selected_candidates[0]
         else:
             scored_candidates = []
             found_score = 0
@@ -13640,11 +15092,12 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                     destination=tutor_destination_for_target_type(target_type),
                     reason=reason,
                 )
-                for candidate, score, reason in scored_candidates[1:10]
+                for candidate, score, reason in scored_candidates[len(selected_candidates):10]
             ],
             score_components={
                 "target_type": target_type,
                 "candidate_count": len(candidates),
+                "selection_count": selection_count,
                 "selected_reason": found_reason,
                 "lands": controlled_land_count(player),
                 "opponent_creatures": sum(
@@ -13665,28 +15118,38 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                 "target_type": target_type,
                 "destination": destination_preview,
                 "selected": found.get("name", "?") if found else None,
+                "selected_cards": [
+                    selected_card.get("name", "?")
+                    for selected_card, _score, _reason in selected_candidates
+                ],
             },
             risk_flags=[] if found else ["no_tutor_target"],
             rejected_reason="lower_contextual_tutor_score",
         )
+        moved_cards = []
         if found:
-            player.library.remove(found)
-            if target_type in ("graveyard", "graveyard_nonlegendary"):
-                player.graveyard.append(found)
-                destination = "graveyard"
-            elif str(target_type).endswith("_to_battlefield"):
-                permanent_effect = get_card_effect(found)
-                permanent = enrich_card({**found, **permanent_effect})
-                if is_creature_card(found):
-                    permanent["effect"] = "creature"
-                    permanent["haste"] = has_haste(permanent)
-                    permanent["summoning_sick"] = not permanent["haste"]
-                    permanent["tapped"] = False
-                player.battlefield.append(permanent)
-                destination = "battlefield"
-            else:
-                player.hand.append(found)
-                destination = "hand"
+            for selected_card, _score, _reason in selected_candidates:
+                if selected_card not in player.library:
+                    continue
+                player.library.remove(selected_card)
+                moved_cards.append(selected_card)
+                if target_type in ("graveyard", "graveyard_nonlegendary"):
+                    player.graveyard.append(selected_card)
+                    destination = "graveyard"
+                elif str(target_type).endswith("_to_battlefield"):
+                    permanent_effect = get_card_effect(selected_card)
+                    permanent = enrich_card({**selected_card, **permanent_effect})
+                    if is_creature_card(selected_card):
+                        permanent["effect"] = "creature"
+                        permanent["haste"] = has_haste(permanent)
+                        permanent["summoning_sick"] = not permanent["haste"]
+                        permanent["tapped"] = False
+                    player.battlefield.append(permanent)
+                    destination = "battlefield"
+                else:
+                    player.hand.append(selected_card)
+                    destination = "hand"
+            found = moved_cards[0] if moved_cards else found
         else:
             destination = None
         emit_replay_event(
@@ -13695,6 +15158,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             card=card.get("name", "?"),
             target_type=target_type,
             found=found.get("name", "?") if found else None,
+            found_cards=[item.get("name", "?") for item in moved_cards],
             destination=destination,
             turn=turn,
         )
@@ -13707,6 +15171,19 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         permanent["effect"] = "topdeck_manipulation"
         player.battlefield.append(permanent)
         player.draw(1, rng)
+    elif effect == "aetherflux_reservoir":
+        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "aetherflux_reservoir"
+        permanent["aetherflux_lifegain"] = True
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "aetherflux_reservoir_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            trigger="spell_cast",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     elif effect == "life_artifact":
         permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "life_artifact"
@@ -13751,6 +15228,87 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+    elif effect == "brain_freeze":
+        copies = brain_freeze_copy_count(player)
+        per_copy = int(effect_data.get("mill_count") or 3)
+        total_mill = max(0, per_copy) * copies
+        target = choose_mill_target(player, opponents, total_mill)
+        library_before = len(target.library)
+        milled = []
+        for _ in range(min(total_mill, len(target.library))):
+            milled_card = target.library.pop(0)
+            target.graveyard.append(milled_card)
+            milled.append(milled_card)
+        emit_replay_event(
+            "mill_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=target.name,
+            copies=copies,
+            storm_copies=max(0, copies - 1),
+            mill_per_copy=per_copy,
+            requested_mill=total_mill,
+            cards_milled=len(milled),
+            milled=[milled_card.get("name", "?") for milled_card in milled if isinstance(milled_card, dict)][:12],
+            target_library_before=library_before,
+            target_library_after=len(target.library),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+    elif effect == "thassa_oracle":
+        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "creature"
+        player.battlefield.append(permanent)
+        devotion = max(blue_devotion(player), int(effect_data.get("blue_devotion_pips") or 0))
+        library_remaining = len(player.library)
+        emit_replay_event(
+            "creature_to_battlefield",
+            player=player.name,
+            card=card.get("name", "?"),
+            is_mana_source=False,
+            mana_produced=None,
+            summoning_sick=permanent.get("summoning_sick"),
+            turn=turn,
+        )
+        if library_remaining <= devotion:
+            blocked_by_grace = any(
+                opp.is_alive() and getattr(opp, "cannot_lose_this_turn", False)
+                for opp in opponents
+            )
+            if not blocked_by_grace:
+                player.win_reason = "thassa_oracle"
+                emit_replay_event(
+                    "game_won",
+                    player=player.name,
+                    reason="thassa_oracle",
+                    devotion_to_blue=devotion,
+                    library_remaining=library_remaining,
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
+            else:
+                emit_replay_event(
+                    "game_win_prevented",
+                    player=player.name,
+                    reason="opponents_cannot_win_this_turn",
+                    card=card.get("name", "?"),
+                    devotion_to_blue=devotion,
+                    library_remaining=library_remaining,
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
+        else:
+            emit_replay_event(
+                "thassa_oracle_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                devotion_to_blue=devotion,
+                library_remaining=library_remaining,
+                result="no_win",
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
     elif effect == "finisher":
         creatures = [c for c in player.battlefield if is_battlefield_creature(c)]
         total_power = sum(c.get("power", 2) for c in creatures)
@@ -13829,7 +15387,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         for opp in opponents:
             if opp.is_alive():
                 deal_damage(opp, total_damage)
-        
+
         # Ripple: after casting, reveal top 4 and cast matching spells for free
         has_ripple = any(isinstance(c, dict) and c.get("effect") == "ripple_engine" for c in player.battlefield)
         if has_ripple and player.library:
@@ -13848,7 +15406,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                     player.library.pop(i)
             if extra_casts > 0:
                 print(f"  [RIPPLE] Cast {extra_casts} extra Dragon's Approach!")
-        
+
         finish_resolved_spell(player, card, turn=turn)
 
     elif effect == "combo" and card.get("name") == "Dualcaster Mage":
@@ -13878,7 +15436,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                     for opp in alive_opps:
                         deal_damage(opp, dmg_each)
                 print(f"  [COMBO] Dualcaster+Twinflame = {tokens_needed} hasty 2/2s! {total_power} total damage")
-        
+
         permanent = enrich_card(dict(card))
         permanent["effect"] = "creature"
         permanent["haste"] = True
@@ -13925,6 +15483,147 @@ def apply_basic_attack_requirements(candidates):
     if len(candidates) == 1 and cant_attack_alone(candidates[0]):
         return []
     return candidates
+
+
+def combat_attack_prevention_response_window(
+    attacker,
+    target,
+    attackers,
+    all_players,
+    turn,
+    target_reason,
+):
+    """Cast kicked Orim's Chant before attackers are declared when combat is lethal."""
+    if not target or not attackers or getattr(attacker, "creatures_cant_attack_this_turn", False):
+        return False
+    projected_power = sum(combat_stat(card, "power", 0) for card in attackers)
+    if projected_power <= 0:
+        return False
+    lethal_projection = projected_power >= max(1, int(getattr(target, "life", 0) or 0))
+    near_lethal_projection = (
+        getattr(target, "life", 0) <= 20
+        and projected_power >= max(6, int(getattr(target, "life", 0) or 0) // 2)
+    )
+    if not lethal_projection and not near_lethal_projection:
+        return False
+
+    response_options = []
+    for candidate in list(getattr(target, "hand", []) or []):
+        if not isinstance(candidate, dict) or not is_instant(candidate):
+            continue
+        effect_data = get_card_effect(candidate)
+        if not grants_kicked_attack_prevention(candidate, effect_data):
+            continue
+        if not can_pay_orims_chant_kicked(target, candidate):
+            continue
+        response_options.append((candidate, effect_data))
+    if not response_options:
+        return False
+
+    card, effect_data = response_options[0]
+    cast_ctx = begin_cast_context(
+        target,
+        card,
+        "beginning_of_combat",
+        effect_data=effect_data,
+        role="response",
+        modes=["kicker:{W}"],
+        additional_costs=orims_chant_kicker_costs(),
+        targets=[
+            {
+                "target": attacker.name,
+                "target_controller": attacker.name,
+                "target_type": "player",
+                "target_legal": True,
+            }
+        ],
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="response",
+        player=target,
+        turn=turn,
+        phase="beginning_of_combat",
+        available_options=[
+            decision_card_option(option_card, option_effect, action="kick_prevent_attacks")
+            for option_card, option_effect in response_options[:8]
+        ],
+        chosen_option=decision_card_option(card, effect_data, action="kick_prevent_attacks"),
+        rejected_options=[
+            decision_card_option(option_card, option_effect, action="reject_response")
+            for option_card, option_effect in response_options[1:8]
+        ],
+        score_components={
+            "projected_combat_damage": projected_power,
+            "life_before_damage": target.life,
+            "attackers": len(attackers),
+            "available_responses": len(response_options),
+            "kicker_paid": 1,
+            "targeted_attacker": attacker.name,
+        },
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(70, projected_power),
+        actual_outcome="combat_attack_prevention_response_cast",
+        reason="prevent_projected_lethal_or_near_lethal_attack",
+        strategic_principle="use_kicked_attack_prevention_before_attackers_are_declared",
+    )
+    target.hand.remove(card)
+    emit_replay_event(
+        "spell_cast",
+        player=target.name,
+        card=card.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        type_line=card.get("type_line", ""),
+        cmc=card.get("cmc", 0),
+        turn=turn,
+        phase="beginning_of_combat",
+        response_to="declare_attackers",
+        projected_combat_damage=projected_power,
+        **cast_ctx.to_replay_fields(),
+        **fields,
+    )
+    mark_cast_ledger_emitted(effect_data)
+    attach_direct_resolution_context(
+        effect_data,
+        card,
+        "beginning_of_combat",
+        priority_window="attack_prevention_response",
+        locked_cost=cast_ctx.locked_cost,
+        targets=cast_ctx.targets,
+    )
+    emit_replay_event(
+        "spell_resolved",
+        player=target.name,
+        card=card.get("name", "?"),
+        cmc=card.get("cmc", 0),
+        type_line=card.get("type_line", ""),
+        effect=effect_data.get("effect", "unknown"),
+        turn=turn,
+        **spell_resolution_context_fields(card, effect_data, effect_data.get("effect", "unknown")),
+        **replay_fields_for_declared_targets(effect_data),
+        **fields,
+    )
+    target.graveyard.append(card)
+    attacker.creatures_cant_attack_this_turn = True
+    attacker.creatures_cant_attack_source = card.get("name", "?")
+    emit_replay_event(
+        "attack_prevented_by_orims_chant",
+        player=target.name,
+        card=card.get("name", "?"),
+        prevented_attacker=attacker.name,
+        target_player=attacker.name,
+        projected_combat_damage=projected_power,
+        prevented_attackers=len(attackers),
+        target_reason=target_reason,
+        turn=turn,
+        **fields,
+    )
+    return True
 
 
 def table_visible_board_power(player):
@@ -14045,7 +15744,333 @@ def choose_table_intent_target(attacker, defenders, total_power):
     return chosen["target"], chosen["reason"], options
 
 
-def declare_attackers_step(attacker, opponents, turn):
+def reserve_attackers_for_self_preservation(attacker, attackers, defenders):
+    if (
+        not attackers
+        or not defenders
+        or not table_intent_enabled()
+        or not player_is_evaluation_target(attacker)
+    ):
+        return attackers, []
+
+    total_power = sum(combat_stat(card, "power", 2) for card in attackers)
+    if any(defender.life <= total_power for defender in defenders if defender.is_alive()):
+        return attackers, []
+
+    incoming_visible_power = sum(
+        table_visible_board_power(defender)
+        for defender in defenders
+        if defender.is_alive()
+    )
+    if incoming_visible_power < max(1, int(attacker.life or 0)):
+        return attackers, []
+
+    reserved = [
+        card
+        for card in attackers
+        if not has_vigilance(card) and not must_attack_if_able(card)
+    ]
+    if not reserved:
+        return attackers, []
+
+    reserved_ids = {id(card) for card in reserved}
+    remaining = [
+        card
+        for card in attackers
+        if id(card) not in reserved_ids
+    ]
+    remaining = apply_basic_attack_requirements(remaining)
+    if not remaining:
+        return [], list(attackers)
+    return remaining, reserved
+
+
+def defender_attack_limit(defender):
+    limits = []
+    for permanent in getattr(defender, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") == "attack_limit":
+            raw_limit = permanent.get("max_attackers_against_you")
+            try:
+                limits.append(max(0, int(raw_limit)))
+            except (TypeError, ValueError):
+                continue
+    return min(limits) if limits else None
+
+
+def table_attack_limit(all_players):
+    limits = []
+    for controller in all_players or []:
+        for permanent in getattr(controller, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            if permanent.get("effect") != "attack_limit":
+                continue
+            raw_limit = permanent.get("max_attackers")
+            try:
+                limits.append(max(0, int(raw_limit)))
+            except (TypeError, ValueError):
+                continue
+    return min(limits) if limits else None
+
+
+def table_attack_filter_restrictions(all_players):
+    max_power = None
+    required_keywords = set()
+    for controller in all_players or []:
+        for permanent in getattr(controller, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            if permanent.get("effect") != "attack_limit":
+                continue
+            if (
+                permanent.get("max_attacker_power_by_controller_hand_size")
+                or permanent.get("max_attacker_power_by_defender_hand_size")
+            ):
+                hand_size = len(getattr(controller, "hand", []) or [])
+                max_power = hand_size if max_power is None else min(max_power, hand_size)
+            raw_power = permanent.get("max_attacker_power")
+            if raw_power is not None:
+                try:
+                    power_limit = max(0, int(raw_power))
+                    max_power = power_limit if max_power is None else min(max_power, power_limit)
+                except (TypeError, ValueError):
+                    pass
+            keyword = str(permanent.get("attack_requires_keyword") or "").strip().lower()
+            if keyword:
+                required_keywords.add(keyword)
+    return max_power, sorted(required_keywords)
+
+
+def defender_attack_filter_restrictions(defender):
+    max_power = None
+    required_keywords = set()
+    for permanent in getattr(defender, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "attack_limit":
+            continue
+        raw_power = permanent.get("max_attacker_power_against_you")
+        if raw_power is not None:
+            try:
+                power_limit = max(0, int(raw_power))
+                max_power = power_limit if max_power is None else min(max_power, power_limit)
+            except (TypeError, ValueError):
+                pass
+        keyword = str(permanent.get("attack_requires_keyword_against_you") or "").strip().lower()
+        if keyword:
+            required_keywords.add(keyword)
+    return max_power, sorted(required_keywords)
+
+
+def defender_attack_tax_per_creature(defender):
+    tax = 0
+    enchantment_count = sum(
+        1
+        for permanent in getattr(defender, "battlefield", []) or []
+        if isinstance(permanent, dict)
+        and "Enchantment" in str(permanent.get("type_line") or "")
+    )
+    for permanent in getattr(defender, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "attack_tax":
+            continue
+        try:
+            tax += max(0, int(permanent.get("attack_tax_per_creature", 0) or 0))
+        except (TypeError, ValueError):
+            continue
+        try:
+            tax += max(0, int(permanent.get("attack_tax_per_enchantment", 0) or 0)) * enchantment_count
+        except (TypeError, ValueError):
+            continue
+    return tax
+
+
+def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
+    if not group_attackers:
+        return [], {}
+
+    max_power, required_keywords = defender_attack_filter_restrictions(defender)
+    filtered_attackers = []
+    filtered_out = []
+    for card in group_attackers:
+        if max_power is not None and combat_stat(card, "power", 2) > max_power:
+            filtered_out.append(card)
+            continue
+        card_keywords = {
+            str(keyword).lower()
+            for keyword in (card.get("keywords") or [])
+            if str(keyword).strip()
+        }
+        if required_keywords and not any(keyword in card_keywords for keyword in required_keywords):
+            filtered_out.append(card)
+            continue
+        filtered_attackers.append(card)
+    group_attackers = filtered_attackers
+
+    allowed_count = len(group_attackers)
+    limit = defender_attack_limit(defender)
+    if limit is not None:
+        allowed_count = min(allowed_count, limit)
+
+    tax_per_creature = defender_attack_tax_per_creature(defender)
+    tax_paid = 0
+    if tax_per_creature > 0:
+        affordable = int(attacker.available_mana() or 0) // tax_per_creature
+        allowed_count = min(allowed_count, affordable)
+        tax_paid = allowed_count * tax_per_creature
+
+    ordered_attackers = sorted(
+        group_attackers,
+        key=lambda card: (
+            combat_stat(card, "power", 2),
+            combat_stat(card, "toughness", combat_stat(card, "power", 2)),
+            str(card.get("name", "")),
+        ),
+        reverse=True,
+    )
+    kept = ordered_attackers[:allowed_count]
+    if tax_paid > 0:
+        attacker.spend_mana(tax_paid)
+
+    removed_count = len(group_attackers) - len(kept) + len(filtered_out)
+    details = {}
+    if (
+        limit is not None
+        or tax_per_creature > 0
+        or max_power is not None
+        or required_keywords
+        or removed_count
+    ):
+        details = {
+            "target": defender.name,
+            "attack_limit": limit,
+            "attack_tax_per_creature": tax_per_creature,
+            "attack_max_power": max_power,
+            "attack_requires_keywords": required_keywords,
+            "tax_paid": tax_paid,
+            "attackers_before": len(group_attackers) + len(filtered_out),
+            "attackers_after": len(kept),
+            "attackers_restricted": removed_count,
+        }
+    return kept, details
+
+
+def apply_global_attack_restrictions(attack_groups, all_players):
+    if not attack_groups:
+        return [], []
+
+    limit = table_attack_limit(all_players)
+    max_power, required_keywords = table_attack_filter_restrictions(all_players)
+    if limit is None and max_power is None and not required_keywords:
+        return attack_groups, []
+
+    original_count = sum(len(group_attackers) for _, group_attackers in attack_groups)
+    filtered_groups = []
+    globally_filtered_out = []
+    for defender, group_attackers in attack_groups:
+        kept_group = []
+        for card in group_attackers:
+            if max_power is not None and combat_stat(card, "power", 2) > max_power:
+                globally_filtered_out.append(card)
+                continue
+            card_keywords = {
+                str(keyword).lower()
+                for keyword in (card.get("keywords") or [])
+                if str(keyword).strip()
+            }
+            if required_keywords and not any(keyword in card_keywords for keyword in required_keywords):
+                globally_filtered_out.append(card)
+                continue
+            kept_group.append(card)
+        if kept_group:
+            filtered_groups.append((defender, kept_group))
+
+    if limit is not None:
+        ordered_attackers = sorted(
+            [
+                card
+                for _, group_attackers in filtered_groups
+                for card in group_attackers
+            ],
+            key=lambda card: (
+                combat_stat(card, "power", 2),
+                combat_stat(card, "toughness", combat_stat(card, "power", 2)),
+                str(card.get("name", "")),
+            ),
+            reverse=True,
+        )
+        kept_ids = {id(card) for card in ordered_attackers[:limit]}
+        limited_groups = []
+        for defender, group_attackers in filtered_groups:
+            kept_group = [card for card in group_attackers if id(card) in kept_ids]
+            if kept_group:
+                limited_groups.append((defender, kept_group))
+        filtered_groups = limited_groups
+
+    kept_count = sum(len(group_attackers) for _, group_attackers in filtered_groups)
+    restricted_count = max(0, original_count - kept_count)
+    if not restricted_count:
+        return filtered_groups, []
+
+    return filtered_groups, [
+        {
+            "target": "all_defenders",
+            "attack_limit": limit,
+            "attack_tax_per_creature": 0,
+            "attack_max_power": max_power,
+            "attack_requires_keywords": required_keywords,
+            "tax_paid": 0,
+            "attackers_before": original_count,
+            "attackers_after": kept_count,
+            "attackers_restricted": restricted_count,
+        }
+    ]
+
+
+def apply_attack_restrictions(attacker, attack_groups, all_players):
+    attack_groups, global_details = apply_global_attack_restrictions(
+        attack_groups,
+        all_players,
+    )
+    restricted_groups = []
+    details = list(global_details)
+    for defender, group_attackers in attack_groups:
+        kept, restriction_details = apply_attack_restrictions_to_group(
+            attacker,
+            defender,
+            list(group_attackers),
+        )
+        if restriction_details:
+            details.append(restriction_details)
+        if kept:
+            restricted_groups.append((defender, kept))
+    return restricted_groups, details
+
+
+def declare_attackers_step(attacker, opponents, all_players, turn):
+    if getattr(attacker, "creatures_cant_attack_this_turn", False):
+        emit_replay_event(
+            "combat_step",
+            step="declare_attackers",
+            attacker=attacker.name,
+            target=None,
+            target_reason="creatures_cant_attack_this_turn",
+            attackers=0,
+            attackers_detail=[],
+            attack_restrictions=[
+                {
+                    "scope": "global",
+                    "restriction": "creatures_cant_attack_this_turn",
+                    "source": getattr(attacker, "creatures_cant_attack_source", None),
+                }
+            ],
+            turn=turn,
+        )
+        return None
+
     creatures = attacker.untapped_creatures()
     if not creatures:
         return None
@@ -14056,12 +16081,16 @@ def declare_attackers_step(attacker, opponents, turn):
     if not attackers:
         return None
 
-    for creature in attackers:
-        if not has_vigilance(creature):
-            creature["tapped"] = True
-
     alive_defenders = [o for o in opponents if o.is_alive()]
     if not alive_defenders:
+        return None
+
+    attackers, reserved_attackers = reserve_attackers_for_self_preservation(
+        attacker,
+        attackers,
+        alive_defenders,
+    )
+    if not attackers:
         return None
 
     total_power = sum(a.get("power", 2) for a in attackers)
@@ -14123,6 +16152,45 @@ def declare_attackers_step(attacker, opponents, turn):
         )
         target_reason = "default_low_life"
 
+    attack_groups = assign_attackers_to_defenders(
+        attacker,
+        attackers,
+        alive_defenders,
+        target,
+        target_reason,
+    )
+    attack_groups, attack_restriction_details = apply_attack_restrictions(
+        attacker,
+        attack_groups,
+        all_players,
+    )
+    if not attack_groups:
+        return None
+
+    final_attackers = [
+        card
+        for _, group_attackers in attack_groups
+        for card in group_attackers
+    ]
+    if target not in [group_target for group_target, _ in attack_groups]:
+        target = attack_groups[0][0]
+    attackers = final_attackers
+    total_power = sum(a.get("power", 2) for a in attackers)
+
+    if combat_attack_prevention_response_window(
+        attacker,
+        target,
+        attackers,
+        all_players,
+        turn,
+        target_reason,
+    ):
+        return None
+
+    for creature in attackers:
+        if not has_vigilance(creature):
+            creature["tapped"] = True
+
     emit_decision_trace(
         decision_type="combat_attack",
         player=attacker,
@@ -14165,6 +16233,8 @@ def declare_attackers_step(attacker, opponents, turn):
             "evaluation_target_player": evaluation_target_player_name() or None,
             "evaluation_target_active": int(target is evaluation_target),
             "table_intent_enabled": table_intent_enabled(),
+            "reserved_attackers_for_self_preservation": len(reserved_attackers),
+            "attack_restrictions": attack_restriction_details,
             "table_intent_options": [
                 {
                     "target": row["target"].name,
@@ -14209,14 +16279,12 @@ def declare_attackers_step(attacker, opponents, turn):
         ],
         attackers=len(attackers),
         attackers_detail=[replay_card_snapshot(card) for card in attackers],
+        reserved_attackers_for_self_preservation=len(reserved_attackers),
+        reserved_attackers_detail=[
+            replay_card_snapshot(card) for card in reserved_attackers
+        ],
+        attack_restrictions=attack_restriction_details,
         turn=turn,
-    )
-    attack_groups = assign_attackers_to_defenders(
-        attacker,
-        attackers,
-        alive_defenders,
-        target,
-        target_reason,
     )
     if len(attack_groups) > 1:
         emit_replay_event(
@@ -14382,6 +16450,156 @@ def declare_blockers_step(target, attackers, turn, rng):
         turn=turn,
     )
     return block_assignments
+
+
+def projected_player_combat_damage_details(attacker, target, attackers, block_assignments):
+    details = {
+        "player_damage": 0,
+        "commander_lethal": False,
+        "commander_lethal_sources": [],
+    }
+    for attacking_creature, declared_blockers in block_assignments:
+        if attacking_creature not in attackers:
+            continue
+        projected_damage = 0
+        power = combat_stat(attacking_creature, "power", 2)
+        if not declared_blockers:
+            projected_damage = power
+        elif attacking_creature.get("trample"):
+            lethal_blocker_damage = sum(
+                combat_lethal_damage_required(attacking_creature, blocker)
+                for blocker in declared_blockers
+            )
+            projected_damage = max(0, power - lethal_blocker_damage)
+        details["player_damage"] += projected_damage
+        if (
+            projected_damage > 0
+            and attacker is not None
+            and target is not None
+            and attacking_creature.get("is_commander")
+            and attacking_creature.get("owner") == attacker.name
+        ):
+            source_key = commander_damage_key(target.name, attacking_creature, attacker.name)
+            existing_damage = getattr(attacker, "commander_damage_by_source", {}).get(source_key, 0)
+            projected_total = existing_damage + projected_damage
+            if projected_total >= COMMANDER_DAMAGE_LETHAL:
+                details["commander_lethal"] = True
+                details["commander_lethal_sources"].append(
+                    {
+                        "source": source_key,
+                        "existing_damage": existing_damage,
+                        "projected_damage": projected_damage,
+                        "projected_total": projected_total,
+                    }
+                )
+    return details
+
+
+def projected_player_combat_damage(attackers, block_assignments):
+    return projected_player_combat_damage_details(
+        None,
+        None,
+        attackers,
+        block_assignments,
+    )["player_damage"]
+
+
+def combat_defensive_response_window(attacker, target, attackers, block_assignments, all_players, turn, rng):
+    projection = projected_player_combat_damage_details(
+        attacker,
+        target,
+        attackers,
+        block_assignments,
+    )
+    projected_damage = projection["player_damage"]
+    commander_lethal = projection["commander_lethal"]
+    if projected_damage <= 0 or (
+        projected_damage < max(1, target.life) and not commander_lethal
+    ):
+        return False
+    response_options = []
+    for candidate in list(getattr(target, "hand", []) or []):
+        if not isinstance(candidate, dict) or not is_instant(candidate):
+            continue
+        effect_data = get_card_effect(candidate)
+        effect = str(effect_data.get("effect") or "").lower()
+        if effect not in ("phase_out", "cannot_lose_turn"):
+            continue
+        if not target.can_pay_card(candidate):
+            continue
+        response_options.append((candidate, effect_data))
+    if not response_options:
+        return False
+
+    response_options.sort(
+        key=lambda item: 0 if item[1].get("effect") == "phase_out" else 1
+    )
+    card, effect_data = response_options[0]
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="response",
+        player=target,
+        turn=turn,
+        phase="combat_damage",
+        available_options=[
+            decision_card_option(option_card, option_effect, action="respond")
+            for option_card, option_effect in response_options[:8]
+        ],
+        chosen_option=decision_card_option(card, effect_data, action="prevent_combat_lethal"),
+        rejected_options=[
+            decision_card_option(option_card, option_effect, action="reject_response")
+            for option_card, option_effect in response_options[1:8]
+        ],
+        score_components={
+            "projected_combat_damage": projected_damage,
+            "life_before_damage": target.life,
+            "attackers": len(attackers),
+            "available_responses": len(response_options),
+            "commander_lethal": commander_lethal,
+            "commander_lethal_sources": projection["commander_lethal_sources"],
+        },
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(80, projected_damage),
+        actual_outcome="combat_survival_response_cast",
+        reason="prevent_lethal_combat_damage",
+        strategic_principle="hold_survival_protection_for_lethal_combat_window",
+    )
+    if not target.spend_card_mana(card):
+        return False
+    target.hand.remove(card)
+    locked_cost = replay_cost_snapshot(card_mana_cost(card))
+    attach_direct_resolution_context(
+        effect_data,
+        card,
+        "combat_damage",
+        priority_window="combat_damage_prevention",
+        locked_cost=locked_cost,
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=target.name,
+        card=card.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        type_line=card.get("type_line", ""),
+        cmc=card.get("cmc", 0),
+        turn=turn,
+        phase="combat_damage",
+        role="response",
+        response_to="combat_damage",
+        projected_combat_damage=projected_damage,
+        **fields,
+    )
+    apply_effect_immediate(
+        target,
+        [player for player in all_players if player is not target],
+        card,
+        turn,
+        rng,
+        effect_data_override=effect_data,
+    )
+    return True
 
 
 def combat_stat(card, key, fallback):
@@ -14637,7 +16855,7 @@ def end_of_combat_step(attacker, all_players, turn, rng, stack):
 
 def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     beginning_of_combat_step(attacker, opponents, all_players, turn, rng, stack)
-    declared = declare_attackers_step(attacker, opponents, turn)
+    declared = declare_attackers_step(attacker, opponents, all_players, turn)
     if not declared:
         return
     attackers, alive_defenders, target, target_reason, attack_groups = declared
@@ -14764,6 +16982,15 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     )
 
     for group_target, group_attackers, group_block_assignments in grouped_block_assignments:
+        combat_defensive_response_window(
+            attacker,
+            group_target,
+            group_attackers,
+            group_block_assignments,
+            all_players,
+            turn,
+            rng,
+        )
         combat_damage_steps(
             attacker,
             opponents,
@@ -14786,6 +17013,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         turn=turn,
         life=player.life,
         hand=len(player.hand),
+        hand_snapshot=[replay_card_snapshot(card) for card in player.hand],
         board=len(player.battlefield),
     )
     decay_table_intent_memory(player)
@@ -14812,11 +17040,25 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.refresh_mana_sources(turn)
     process_upkeep_utility_lands(player, turn)
 
-    # ── UPKEEP (v8.3: The One Ring burden = draw 1 per turn if on board) ──
+    # The One Ring loses life on upkeep; drawing happens through its tap
+    # activation, not automatically when the upkeep starts.
     for c in player.battlefield:
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and c.get("burden"):
-            for _ in range(sum(1 for _ in player.battlefield if isinstance(_, dict) and _.get("effect") == "draw_engine")):
-                player.draw(1, rng)
+            burden_counters = int(c.get("burden_counters") or 0)
+            if burden_counters > 0:
+                life_before = player.life
+                if not player.life_cant_change:
+                    player.life -= burden_counters
+                emit_replay_event(
+                    "one_ring_burden_life_loss",
+                    player=player.name,
+                    card=c.get("name", "?"),
+                    burden_counters=burden_counters,
+                    life_before=life_before,
+                    life_after=player.life,
+                    prevented=bool(player.life_cant_change),
+                    turn=turn,
+                )
     process_lorehold_opponent_upkeep_rummage(player, all_players, turn, rng, stack)
     activate_lorehold_topdeck_artifacts(
         player,
@@ -14987,7 +17229,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             player.draw(1, rng)
     process_warp_end_step(player, turn)
     process_end_step_token_sacrifices(player, turn)
-    
+
     # ── OPPONENT END STEP INTERACTION (NEW) ──
     # All opponents can cast instants on this player's end step
     if not (player.silenced_opponents or player.silenced_opponents_until_eot):
@@ -15000,6 +17242,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                 and is_modeled_battle_card(c)
                 and opp.can_pay_card(c)
                 and get_card_effect(c).get("effect") != "counter"
+                and not should_hold_for_response_window(
+                    opp,
+                    c,
+                    get_card_effect(c),
+                    "end_step",
+                )
+                and spell_has_required_library_target(opp, get_card_effect(c))
             ]
             for c in instants_in_hand[:1]:  # 1 instant per opponent per end step
                 if opp.can_pay_card(c):
@@ -15057,10 +17306,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── CLEANUP ──
     discarded = 0
+    discarded_cards = []
     while len(player.hand) > 7 and not player_has_no_maximum_hand_size(player):
-        worst = max(player.hand, key=lambda c: c.get("cmc", 0))
+        worst = choose_cleanup_discard(player)
+        if worst is None:
+            break
         player.hand.remove(worst)
         player.graveyard.append(worst)
+        discarded_cards.append(worst.get("name", "?"))
         discarded += 1
 
     emit_replay_event(
@@ -15069,10 +17322,12 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         turn=turn,
         life=player.life,
         hand=len(player.hand),
+        hand_snapshot=[replay_card_snapshot(card) for card in player.hand],
         board=len(player.battlefield),
         board_snapshot=[replay_card_snapshot(card) for card in player.battlefield],
         graveyard=len(player.graveyard),
         discarded=discarded,
+        discarded_cards=discarded_cards,
     )
 
     for participant in all_players:
@@ -15179,12 +17434,12 @@ def classify_loss(player, opponents, turn, result, reason):
     tags = []
     if result != "loss":
         return tags
-    
+
     current_mana = player.available_mana() if hasattr(player, "available_mana") else 0
     lands_played = getattr(player, "lands_played_this_turn", 0)
     nonland_count = sum(1 for c in (player.graveyard + player.hand) if not is_land(c))
     mulligans = getattr(player, "_mulligan_count", 0)
-    
+
     if turn >= 4 and current_mana < 3 and lands_played < 3:
         tags.append("screw")
     elif lands_played >= 7 and nonland_count <= 2:
@@ -15195,7 +17450,7 @@ def classify_loss(player, opponents, turn, result, reason):
         tags.append("commander-removed")
     if turn >= 10 and "screw" not in tags and "flood" not in tags:
         tags.append("out-valued")
-    
+
     # v9: Canonical loss taxonomy
     if getattr(player, "poison", 0) >= 10:
         tags.insert(0, "poison")
@@ -15203,7 +17458,7 @@ def classify_loss(player, opponents, turn, result, reason):
         tags.insert(0, "effect_says_lose")
     if getattr(player, "conceded", False):
         tags.insert(0, "concede")
-    
+
     if not tags:
         tags.append("combat-damage")
     return tags

@@ -260,19 +260,40 @@ def check_sbas(
     emit_replay_event,
 ):
     """State-based actions after each spell resolution."""
+    def remove_eliminated_player_objects(player_obj):
+        battlefield_removed = len(getattr(player_obj, "battlefield", []) or [])
+        phased_out_removed = len(getattr(player_obj, "phased_out", []) or [])
+        player_obj.battlefield = []
+        if hasattr(player_obj, "phased_out"):
+            player_obj.phased_out = []
+        return {
+            "battlefield_removed_from_game": battlefield_removed,
+            "phased_out_removed_from_game": phased_out_removed,
+        }
+
     for player_obj in all_players:
         if getattr(player_obj, "failed_draw_from_empty_library", False) and not player_obj.eliminated:
             if getattr(player_obj, "cannot_lose_this_turn", False):
                 continue
             player_obj.life = 0
             player_obj.eliminated = True
-            emit_replay_event("player_eliminated", player=player_obj.name, reason="draw_from_empty_library")
+            emit_replay_event(
+                "player_eliminated",
+                player=player_obj.name,
+                reason="draw_from_empty_library",
+                **remove_eliminated_player_objects(player_obj),
+            )
             return True
         if player_obj.life <= 0 and not player_obj.eliminated:
             if getattr(player_obj, "cannot_lose_this_turn", False):
                 continue
             player_obj.eliminated = True
-            emit_replay_event("player_eliminated", player=player_obj.name, reason="life_zero")
+            emit_replay_event(
+                "player_eliminated",
+                player=player_obj.name,
+                reason="life_zero",
+                **remove_eliminated_player_objects(player_obj),
+            )
             return True
         if player_obj.eliminated:
             continue
@@ -289,6 +310,7 @@ def check_sbas(
                         reason="commander_damage",
                         commander_damage_key=source_key,
                         commander_damage=dmg,
+                        **remove_eliminated_player_objects(opponent),
                     )
                     return True
 
@@ -298,7 +320,12 @@ def check_sbas(
                 continue
             player_obj.life = 0
             player_obj.eliminated = True
-            emit_replay_event("player_eliminated", player=player_obj.name, reason="poison")
+            emit_replay_event(
+                "player_eliminated",
+                player=player_obj.name,
+                reason="poison",
+                **remove_eliminated_player_objects(player_obj),
+            )
             return True
 
     if cancel_plus_minus_counters_func(all_players):

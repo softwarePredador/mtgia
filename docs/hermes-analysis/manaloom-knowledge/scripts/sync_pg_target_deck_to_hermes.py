@@ -273,7 +273,7 @@ def infer_tag(row: dict[str, Any]) -> str:
         if tag != "unknown":
             return tag
     effect = str(row.get("battle_effect") or "").lower()
-    if effect in {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg"}:
+    if effect in {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg", "damage_player_and_creatures"}:
         return "removal"
     if effect in {"board_wipe", "damage_wipe"}:
         return "board_wipe"
@@ -281,7 +281,7 @@ def infer_tag(row: dict[str, Any]) -> str:
         return "ramp"
     if effect in {"draw_cards", "draw_engine", "loot", "topdeck_manipulation"}:
         return "draw"
-    if effect in {"phase_out", "indestructible", "modal_boros_charm", "silence_opponents"}:
+    if effect in {"phase_out", "indestructible", "modal_boros_charm", "silence_opponents", "attack_limit", "attack_tax"}:
         return "protection"
     if effect in {"approach", "finisher", "token_maker", "steal_all_creatures"}:
         return "wincon"
