@@ -215,10 +215,93 @@ def register_tests(battle, player):
         assert commander_events[0]["source_zone"] == "command_zone"
         assert not [data for event, data in events if event == "cast_illegal"]
 
+    def test_dargo_commander_cast_uses_variable_self_reduction_and_sacrifices_artifacts():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_get_card_effect = battle.get_card_effect
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        pilot = player("Pilot")
+        dargo = battle.enrich_card({
+            "name": "Dargo, the Shipwrecker",
+            "cmc": 7,
+            "mana_cost": "{6}{R}",
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "static_variable_self_spell_cost_reduction_variant_v1",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_amount_source": "sacrificed_artifact_or_creature_count_this_turn",
+            "cost_reduction_counts_additional_sacrifices_paid_while_casting": True,
+            "type_line": "Legendary Creature - Giant Pirate",
+            "power": 7,
+            "toughness": 5,
+            "is_commander": True,
+            "owner": pilot.name,
+        })
+        pilot.commander = dargo
+        pilot.command_zone = [dargo]
+        pilot.battlefield = [
+            {
+                "name": "Spent Relic",
+                "type_line": "Artifact",
+                "cmc": 0,
+                "tapped": True,
+            },
+            {
+                "name": "Treasure Token",
+                "type_line": "Artifact Token - Treasure",
+                "cmc": 0,
+                "tag": "token",
+            },
+        ]
+        pilot.mana_pool.add("red", 1)
+        pilot.mana_pool.add_generic(2)
+
+        try:
+            def patched_get_card_effect(card):
+                if isinstance(card, dict) and card.get("name") == "Dargo, the Shipwrecker":
+                    return {
+                        "effect": "static_cost_reduction",
+                        "battle_model_scope": "static_variable_self_spell_cost_reduction_variant_v1",
+                        "cost_reduction_applies_to": "this_spell",
+                        "cost_reduction_amount_source": "sacrificed_artifact_or_creature_count_this_turn",
+                        "cost_reduction_counts_additional_sacrifices_paid_while_casting": True,
+                        "_rule_source": "curated",
+                        "_rule_review_status": "verified",
+                    }
+                return previous_get_card_effect(card)
+
+            battle.get_card_effect = patched_get_card_effect
+            result = battle.cast_spells_v8(
+                pilot,
+                [],
+                [pilot],
+                turn=1,
+                phase="precombat_main",
+                stack=battle.Stack(),
+                rng=random.Random(72),
+            )
+        finally:
+            battle.get_card_effect = previous_get_card_effect
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert result is True
+        assert dargo not in pilot.command_zone
+        assert any(card.get("name") == "Dargo, the Shipwrecker" for card in pilot.battlefield)
+        assert {card.get("name") for card in pilot.graveyard} == {"Spent Relic"}
+        commander_events = [data for event, data in events if event == "commander_cast"]
+        assert len(commander_events) == 1
+        assert commander_events[0]["source_zone"] == "command_zone"
+        additional_cost_events = [data for event, data in events if event == "additional_cost_paid"]
+        assert any(
+            data.get("cost") == "sacrifice_artifact_or_creature_any_number"
+            and data.get("sacrificed_count") == 2
+            for data in additional_cost_events
+        )
+
     return [
         test_conformance_commander_damage_ledger_persists_across_zone_change,
         test_commander_damage_is_tracked_per_commander_origin,
         test_commander_destroyed_in_combat_returns_to_command_zone,
         test_unaffordable_commander_is_held_without_illegal_cast_event,
         test_affordable_commander_cast_uses_command_zone_source,
+        test_dargo_commander_cast_uses_variable_self_reduction_and_sacrifices_artifacts,
     ]

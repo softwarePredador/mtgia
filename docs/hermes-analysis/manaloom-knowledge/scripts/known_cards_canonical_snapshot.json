@@ -6388,6 +6388,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:bae0bddaa64a2f72a2565a04a8680035"
   },
+  "Dargo, the Shipwrecker": {
+    "ability_kind": "static",
+    "applies_to_controller": "source_controller",
+    "battle_model_scope": "static_variable_self_spell_cost_reduction_variant_v1",
+    "cost_reduction_amount_source": "sacrificed_artifact_or_creature_count_this_turn",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_counts_additional_sacrifices_paid_while_casting": true,
+    "effect": "static_cost_reduction",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:947eca66a843591ccbbaa6080e2ec17a",
+    "battle_rule_oracle_hash": "8683fc84ed2dfe9f92c9c6c6c5546a53"
+  },
   "Darigaaz's Caldera": {
     "effect": "land",
     "battle_rule_source": "curated",

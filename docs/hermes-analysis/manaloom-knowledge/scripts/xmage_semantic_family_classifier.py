@@ -153,6 +153,8 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
     effect_json = primary_effect(card)
     scope = str(effect_json.get("battle_model_scope") or "")
     applies_to = str(effect_json.get("cost_reduction_applies_to") or "")
+    cost_classes = xmage_cost_classes(card)
+    types = xmage_types(card)
     if scope == "static_activated_ability_cost_reduction_variant_v1":
         return (
             applies_to in {
@@ -163,6 +165,15 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("cost_reduction_generic") or 0) > 0
             and int(effect_json.get("cost_reduction_minimum_total_mana") or 0) == 1
             and "cost_reduction_condition" not in effect_json
+        )
+    if scope == "static_variable_self_spell_cost_reduction_variant_v1":
+        return (
+            applies_to == "this_spell"
+            and types == {"CREATURE"}
+            and "SacrificeXTargetCost" in cost_classes
+            and effect_json.get("cost_reduction_amount_source")
+            == "sacrificed_artifact_or_creature_count_this_turn"
+            and bool(effect_json.get("cost_reduction_counts_additional_sacrifices_paid_while_casting"))
         )
     if scope not in {
         "static_cost_reduction_for_matching_spells_v1",

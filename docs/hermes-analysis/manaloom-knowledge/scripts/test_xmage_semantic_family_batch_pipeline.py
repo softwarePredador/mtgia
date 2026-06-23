@@ -156,7 +156,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
-    def test_classifier_keeps_variable_self_spell_cost_reducer_out_of_batch_lane(self) -> None:
+    def test_classifier_marks_variable_self_spell_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
                 "cards": [
@@ -171,11 +171,14 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                         "xmage": {
                             "class_name": "DargoTheShipwrecker",
                             "path": "/xmage/DargoTheShipwrecker.java",
+                            "types": ["CREATURE"],
+                            "cost_classes": ["SacrificeXTargetCost"],
                             "primary_effect": {
                                 "effect": "static_cost_reduction",
                                 "battle_model_scope": "static_variable_self_spell_cost_reduction_variant_v1",
                                 "cost_reduction_applies_to": "this_spell",
                                 "cost_reduction_amount_source": "sacrificed_artifact_or_creature_count_this_turn",
+                                "cost_reduction_counts_additional_sacrifices_paid_while_casting": True,
                             },
                         },
                     }
@@ -184,7 +187,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
 
         card = report["cards"][0]
-        self.assertEqual(card["promotion_lane"], "split_family_scope_review_required")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
     def test_package_builder_writes_review_only_sql_package_for_safe_proposals(self) -> None:
         proposal_report = generator.build_generator_report(

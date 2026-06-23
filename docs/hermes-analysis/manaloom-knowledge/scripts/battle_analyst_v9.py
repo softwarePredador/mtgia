@@ -1347,6 +1347,127 @@ def adjusted_activated_ability_generic_cost(
     return remaining_generic
 
 
+def _player_sacrificed_artifact_or_creature_count_this_turn(player):
+    turn_marker = CURRENT_REPLAY_TURN
+    if turn_marker is not None and getattr(player, "_sacrificed_permanents_turn_marker", None) != turn_marker:
+        player.sacrificed_permanents_this_turn = []
+        player._sacrificed_permanents_turn_marker = turn_marker
+    count = 0
+    for permanent in getattr(player, "sacrificed_permanents_this_turn", []) or []:
+        type_line = str((permanent or {}).get("type_line") or "").lower()
+        if "artifact" in type_line or "creature" in type_line:
+            count += 1
+    return count
+
+
+def _self_variable_spell_cost_reduction_supported(effect_data):
+    if str(effect_data.get("effect") or "") != "static_cost_reduction":
+        return False
+    if str(effect_data.get("battle_model_scope") or "") != "static_variable_self_spell_cost_reduction_variant_v1":
+        return False
+    if str(effect_data.get("cost_reduction_applies_to") or "") != "this_spell":
+        return False
+    return bool(effect_data.get("cost_reduction_counts_additional_sacrifices_paid_while_casting"))
+
+
+def _cost_reduction_candidate_rank(permanent):
+    type_line = str(permanent.get("type_line") or "").lower()
+    effect = str(permanent.get("effect") or "")
+    score = 0
+    if permanent.get("is_commander"):
+        score += 1000
+    if permanent.get("tag") == "token" or "token" in type_line:
+        score -= 40
+    if "artifact" in type_line and "creature" not in type_line:
+        score -= 12
+    if permanent.get("tapped"):
+        score -= 4
+    if permanent.get("is_mana_source") or effect in {"ramp_permanent", "land", "creature"}:
+        score += 10
+    score += int(float(permanent.get("cmc") or 0))
+    score += int(float(permanent.get("power") or 0))
+    return score
+
+
+def _artifact_or_creature_cost_reduction_candidates(player, card):
+    normalized_name = normalize_card_name(card.get("name", ""))
+    candidates = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("is_commander"):
+            continue
+        if normalize_card_name(permanent.get("name", "")) == normalized_name:
+            continue
+        type_line = str(permanent.get("type_line") or "").lower()
+        if "artifact" not in type_line and "creature" not in type_line:
+            continue
+        candidates.append(permanent)
+    candidates.sort(
+        key=lambda permanent: (
+            _cost_reduction_candidate_rank(permanent),
+            permanent.get("name", ""),
+        )
+    )
+    return candidates
+
+
+def build_variable_self_spell_cost_reduction_cast_plan(
+    player,
+    card,
+    effect_data,
+    *,
+    additional_generic=0,
+):
+    if not _self_variable_spell_cost_reduction_supported(effect_data):
+        return None
+    base_cost = card_cost_for_player_state(player, card, additional_generic)
+    base_generic = max(0, int(base_cost.get("generic", 0) or 0))
+    previous_count = _player_sacrificed_artifact_or_creature_count_this_turn(player)
+    candidates = _artifact_or_creature_cost_reduction_candidates(player, card)
+    for sacrifice_count in range(0, len(candidates) + 1):
+        reduction_amount = 2 * (previous_count + sacrifice_count)
+        locked_cost = copy.deepcopy(base_cost)
+        locked_cost["generic"] = max(0, base_generic - reduction_amount)
+        if player.can_pay(locked_cost):
+            return {
+                "locked_cost": locked_cost,
+                "cost_context": {
+                    "sacrifice_artifact_or_creature": candidates[:sacrifice_count],
+                    "previous_sacrificed_artifact_or_creature_count": previous_count,
+                    "additional_sacrifice_count": sacrifice_count,
+                },
+            }
+    return None
+
+
+def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=0):
+    variable_plan = build_variable_self_spell_cost_reduction_cast_plan(
+        player,
+        card,
+        effect_data,
+        additional_generic=additional_generic,
+    )
+    if variable_plan is not None:
+        return variable_plan
+    locked_cost = card_cost_for_player_state(player, card, additional_generic)
+    if not player.can_pay(locked_cost):
+        return None
+    return {
+        "locked_cost": locked_cost,
+        "cost_context": {},
+    }
+
+
+def card_is_runtime_castable(player, card, effect_data, *, additional_generic=0):
+    return runtime_cast_plan_for_card(
+        player,
+        card,
+        effect_data,
+        additional_generic=additional_generic,
+    ) is not None
+
+
 def card_cost_for_player_state(
     player,
     card,
@@ -1396,6 +1517,7 @@ def begin_cast_context(
     additional_costs=None,
     source_zone="hand",
     alternative_cost_kind=None,
+    locked_cost_override=None,
 ):
     """Announce and lock cost for a simplified CR 601.2 cast."""
     ctx = CastingContext(
@@ -1414,13 +1536,17 @@ def begin_cast_context(
     )
     ctx.effect_data = effect_data or get_card_effect(card)
     ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase)
-    ctx.locked_cost = card_cost_for_player_state(
-        player,
-        card,
-        additional_generic,
-        alternative_cost=alternative_cost,
-        x_value=ctx.x_value,
-        additional_costs=ctx.additional_costs,
+    ctx.locked_cost = (
+        copy.deepcopy(locked_cost_override)
+        if locked_cost_override is not None
+        else card_cost_for_player_state(
+            player,
+            card,
+            additional_generic,
+            alternative_cost=alternative_cost,
+            x_value=ctx.x_value,
+            additional_costs=ctx.additional_costs,
+        )
     )
     store_cast_context_fields(
         ctx.effect_data,
@@ -4547,6 +4673,19 @@ class ManaPool:
 
 class Player:
     def shuffle(self, rng): rng.shuffle(self.library)
+
+    def record_permanent_sacrificed(self, permanent, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_sacrificed_permanents_turn_marker", None) != turn_marker:
+            self.sacrificed_permanents_this_turn = []
+            self._sacrificed_permanents_turn_marker = turn_marker
+        if not hasattr(self, "sacrificed_permanents_this_turn"):
+            self.sacrificed_permanents_this_turn = []
+        entry = {
+            "name": permanent.get("name", permanent.get("card_name", "")),
+            "type_line": permanent.get("type_line", ""),
+        }
+        self.sacrificed_permanents_this_turn.append(entry)
+        return len(self.sacrificed_permanents_this_turn)
 
     def record_spell_cast(self, turn_marker=None, card=None, mana_value=None):
         if turn_marker is not None and getattr(self, "_spells_cast_turn_marker", None) != turn_marker:
@@ -8413,7 +8552,7 @@ def grant_graveyard_flashback_until_eot(player, source_card, effect_data, turn):
 
 
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
-    return _move_creature_from_battlefield(
+    destination = _move_creature_from_battlefield(
         owner,
         creature,
         reason=reason,
@@ -8422,10 +8561,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
+    if "sacrifice" in str(reason or "").lower():
+        owner.record_permanent_sacrificed(creature, CURRENT_REPLAY_TURN)
+    return destination
 
 
 def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, all_players=None):
-    return _move_permanent_from_battlefield(
+    destination = _move_permanent_from_battlefield(
         owner,
         permanent,
         reason=reason,
@@ -8434,6 +8576,9 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
+    if "sacrifice" in str(reason or "").lower():
+        owner.record_permanent_sacrificed(permanent, CURRENT_REPLAY_TURN)
+    return destination
 
 
 def is_artifact_permanent(card):
@@ -8806,7 +8951,10 @@ def choose_creature_for_resource_cost(player, *, required_color=None):
     return ranked[0], option_rows, selection_reason
 
 
-def additional_card_costs_are_payable(player, card, effect_data):
+def additional_card_costs_are_payable(player, card, effect_data, cost_context=None):
+    planned_sacrifices = list((cost_context or {}).get("sacrifice_artifact_or_creature") or [])
+    if planned_sacrifices:
+        return True
     if effect_data.get("requires_discard_card"):
         discardable = [
             candidate
@@ -8843,11 +8991,14 @@ def additional_card_costs_are_payable(player, card, effect_data):
 
 def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_context=None):
     """Pay non-mana costs that materially affect battlefield validity."""
+    cost_context = dict(cost_context or {})
+    planned_sacrifices = list(cost_context.get("sacrifice_artifact_or_creature") or [])
     if (
         not effect_data.get("requires_discard_card")
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
+        and not planned_sacrifices
     ):
         return True
     if effect_data.get("requires_discard_card"):
@@ -8888,7 +9039,6 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             turn=turn,
         )
     if effect_data.get("requires_discard_land"):
-        cost_context = dict(cost_context or {})
         hand_lands = [
             candidate
             for candidate in player.hand
@@ -8981,6 +9131,35 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             creature_options=creature_options,
             selection_reason=selection_reason,
             required_color=required_color,
+            turn=turn,
+        )
+    if planned_sacrifices:
+        sacrificed = []
+        for permanent in planned_sacrifices:
+            destination = move_permanent_from_battlefield(
+                player,
+                permanent,
+                reason="sacrifice_artifact_or_creature_additional_cost",
+                source=card,
+            )
+            sacrificed.append(
+                {
+                    "name": permanent.get("name", "?"),
+                    "destination": destination,
+                    "type_line": permanent.get("type_line", ""),
+                }
+            )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="sacrifice_artifact_or_creature_any_number",
+            sacrificed=[entry["name"] for entry in sacrificed],
+            sacrificed_count=len(sacrificed),
+            previous_sacrificed_artifact_or_creature_count=cost_context.get(
+                "previous_sacrificed_artifact_or_creature_count",
+                0,
+            ),
             turn=turn,
         )
     return True
@@ -18835,9 +19014,22 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         is_main_phase
         and player.command_zone
         and cmd is not None
-        and player.can_pay_card(cmd, additional_generic=player.commander_tax)
     ):
         cmd_eff = get_card_effect(cmd)
+        cmd_cast_plan = runtime_cast_plan_for_card(
+            player,
+            cmd,
+            cmd_eff,
+            additional_generic=player.commander_tax,
+        )
+        if cmd_cast_plan is None:
+            cmd = None
+    if (
+        is_main_phase
+        and player.command_zone
+        and cmd is not None
+        and cmd_cast_plan is not None
+    ):
         if should_reserve_survival_response_mana(
             player,
             cmd,
@@ -18860,11 +19052,20 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 effect_data=cmd_eff,
                 role="commander",
                 source_zone="command_zone",
+                locked_cost_override=cmd_cast_plan.get("locked_cost"),
             )
             cost = cmd["cmc"] + player.commander_tax
         if cmd is None:
             pass
         elif commit_cast_payment(cast_ctx):
+            if not pay_additional_card_costs(
+                player,
+                cmd,
+                cmd_eff,
+                turn=turn,
+                cost_context=cmd_cast_plan.get("cost_context"),
+            ):
+                return False
             player.command_zone.pop(0)
             cmd_copy = enrich_card(cmd)
             haste = has_haste(cmd_copy)
@@ -19262,7 +19463,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     castable = [
         c for c in player.hand
         if not is_effective_land(c)
-        and player.can_pay_card(c)
+        and card_is_runtime_castable(player, c, get_card_effect(c))
         and get_card_effect(c).get("effect") not in (
             "counter",
             "unknown",
@@ -19311,9 +19512,14 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         wincons = [c for c, s in scored if s >= 50]
         if wincons:
             c = wincons[0]
-            if c in player.hand and player.can_pay_card(c):
+            if c in player.hand:
                 eff = get_card_effect(c)
-                if eff.get("effect") in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
+                cast_plan = runtime_cast_plan_for_card(player, c, eff)
+                if cast_plan is None:
+                    wincons = []
+                    c = None
+                    eff = None
+                elif eff.get("effect") in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
                     wincons = []
                 elif eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                     wincons = []
@@ -19323,12 +19529,17 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     and not should_cast_wheel(player, opponents, {**eff, "name": c.get("name")})
                 ):
                     wincons = []
-                elif not additional_card_costs_are_payable(player, c, eff):
+                elif not additional_card_costs_are_payable(
+                    player,
+                    c,
+                    eff,
+                    cast_plan.get("cost_context"),
+                ):
                     wincons = []
                 if not wincons:
                     c = None
                     eff = None
-            if c is not None and c in player.hand and player.can_pay_card(c):
+            if c is not None and c in player.hand:
                 eff, declared_targets = prepare_declared_removal_targets(
                     player,
                     opponents,
@@ -19344,6 +19555,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     effect_data=eff,
                     role="high_threat",
                     targets=declared_targets,
+                    locked_cost_override=cast_plan.get("locked_cost"),
                 )
                 if not commit_cast_payment(cast_ctx):
                     return False
@@ -19401,7 +19613,13 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **replay_rule_fields(eff),
                 )
                 mark_cast_ledger_emitted(eff)
-                if not pay_additional_card_costs(player, c, eff, turn=turn):
+                if not pay_additional_card_costs(
+                    player,
+                    c,
+                    eff,
+                    turn=turn,
+                    cost_context=cast_plan.get("cost_context"),
+                ):
                     player.graveyard.append(c)
                     return False
                 trigger_spell_cast_engines(
@@ -19430,11 +19648,17 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 return True
 
     # Other spells: 2 per phase max
-    remaining = sorted([c for c in castable if player.can_pay_card(c)], key=lambda c: c["cmc"])
+    remaining = sorted(
+        [
+            c for c in castable
+            if runtime_cast_plan_for_card(player, c, get_card_effect(c)) is not None
+        ],
+        key=lambda c: c["cmc"],
+    )
     played = 0
     for c in remaining:
         if played >= 2: break
-        if c in player.hand and player.can_pay_card(c):
+        if c in player.hand:
             eff = get_card_effect(c)
             if eff.get("effect") in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
                 continue
@@ -19446,9 +19670,19 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 and not should_cast_wheel(player, opponents, {**eff, "name": c.get("name")})
             ):
                 continue
+            cast_plan = runtime_cast_plan_for_card(player, c, eff)
+            if cast_plan is None:
+                continue
             if eff.get("effect") == "creature":
                 if not is_main_phase: continue  # creatures only in main phase
-                cast_ctx = begin_cast_context(player, c, phase, effect_data=eff, role="creature")
+                cast_ctx = begin_cast_context(
+                    player,
+                    c,
+                    phase,
+                    effect_data=eff,
+                    role="creature",
+                    locked_cost_override=cast_plan.get("locked_cost"),
+                )
                 if not commit_cast_payment(cast_ctx):
                     continue
                 creature_score = threat_score(
@@ -19569,7 +19803,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if note_action():
                     return True
             else:
-                if not additional_card_costs_are_payable(player, c, eff):
+                if not additional_card_costs_are_payable(
+                    player,
+                    c,
+                    eff,
+                    cast_plan.get("cost_context"),
+                ):
                     continue
                 eff, declared_targets = prepare_declared_removal_targets(
                     player,
@@ -19586,6 +19825,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     effect_data=eff,
                     role="normal",
                     targets=declared_targets,
+                    locked_cost_override=cast_plan.get("locked_cost"),
                 )
                 if not commit_cast_payment(cast_ctx):
                     continue
@@ -19655,7 +19895,13 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     **replay_rule_fields(eff),
                 )
                 mark_cast_ledger_emitted(eff)
-                if not pay_additional_card_costs(player, c, eff, turn=turn):
+                if not pay_additional_card_costs(
+                    player,
+                    c,
+                    eff,
+                    turn=turn,
+                    cost_context=cast_plan.get("cost_context"),
+                ):
                     player.graveyard.append(c)
                     continue
                 trigger_spell_cast_engines(
