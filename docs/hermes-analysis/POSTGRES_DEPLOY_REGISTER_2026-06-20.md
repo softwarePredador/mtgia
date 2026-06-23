@@ -3,9 +3,10 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule package in this thread is
-PG094, applied, postchecked, synced from PostgreSQL to Hermes SQLite/canonical
-snapshot, tested, and documented on 2026-06-23 10:33 UTC. PG094 was a
-hash/scope/cache provenance restore for already-approved rules; it was not a
+PG095, applied, postchecked, synced from PostgreSQL to Hermes SQLite/canonical
+snapshot, tested, and documented on 2026-06-23 11:02 UTC. PG095 promoted
+`Winds of Abandon` to an Oracle-specific executable single-target exile rule
+with basic-land search and overload explicitly annotation-only; it was not a
 deck swap, learned-deck promotion, or battle rebaseline.
 
 ## Purpose
@@ -8556,3 +8557,86 @@ Tests:
 Next deploy number:
 
 - PG095 is next for any future PostgreSQL package.
+
+## PG095 Winds of Abandon Card Rule - Applied 2026-06-23 11:02 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Promoted `Winds of Abandon` from generated `needs_review/review_only`
+  generic removal rows to one curated `active/auto` card-specific battle rule.
+- Runtime executable subset: single-target Sorcery exile of a creature the
+  controller does not control.
+- Explicit annotations: target controller basic-land search/tapped placement
+  and overload `target` -> `each` rewrite remain `annotation_only` until a
+  search/shuffle and overload executor exists.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_rollback_20260623_105512.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg095_winds_of_abandon_battle_rule_20260623_105512`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.out`
+  reported `card_rows=1`, `distinct_oracle_ids=1`,
+  `expected_oracle_hash_rows=1`, `exact_executable_rule_rows=0`,
+  `legacy_enabled_removal_rows=2`, and
+  `trusted_executable_without_oracle_hash_rows=0`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.out`
+  reported backup `SELECT 2`, `INSERT 0 1`, `UPDATE 2`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.out`
+  reported `exact_executable_rule_rows=1`,
+  `legacy_enabled_removal_rows=0`, and
+  `trusted_executable_without_oracle_hash_rows=0`.
+
+Rule key:
+
+- `Winds of Abandon`:
+  `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`, raw Oracle hash
+  `05e38c4458b7b803d038978b46f11f72`, scope
+  `winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1`.
+
+Sync/audit/runtime evidence:
+
+- PG095 start sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_start_sync_report_20260623_104742.json`.
+- Final PG -> SQLite/canonical runtime sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`
+  reported `pg_rows_loaded=1830`, `sqlite_inserted_or_updated=2507`,
+  `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`
+  shows runtime selection of the PG095 rule, `spell_resolved`, and
+  `removal_resolved` with `destination=exile`, target `Siege Rhino`, and
+  target-controller basic-land compensation marked `annotation_only`.
+- Comparable post-PG095 audits:
+  deck `6` `pass=100`; deck `606` `pass=81`; deck `607` moved from
+  `high=17`, `medium=4`, `pass=73` to `high=16`, `medium=4`, `pass=74`;
+  deck `608` remained `high=14`, `medium=3`, `pass=51`; global moved from
+  `high=31`, `medium=4`, `pass=170` to `high=30`, `medium=4`, `pass=171`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+- Saved outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_py_compile_runtime_post_20260623_110204.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_deck_card_battle_rule_coherence_audit_runtime_post_20260623_110204.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`.
+
+Next deploy number:
+
+- PG096 is next for any future PostgreSQL package.

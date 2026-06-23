@@ -21372,3 +21372,84 @@ Next recommended queue:
 
 - PG095 should return to deck `607` battle-critical high cards first.
 - Treat user notes as audit hints to verify, not as durable rule sources.
+
+## PG095 Deck 607 Winds of Abandon Rule Gate - 2026-06-23 11:03 UTC
+
+Status: `applied_validated`.
+
+Lote:
+
+- Lane: deck `607` battle-critical high card with an existing removal executor
+  and stale SQLite/auditor state.
+- Card closed: `Winds of Abandon`.
+- Cards deliberately left open:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Promise of Loyalty`, and `Starfall Invocation`.
+
+Oracle/runtime split:
+
+- Oracle text: exile target creature you do not control; each controller of a
+  creature exiled this way searches for a tapped basic land; overload changes
+  target to each.
+- Current runtime model:
+  single-target opponent creature exile through the existing
+  `remove_creature` executor.
+- Runtime limitations:
+  tapped basic-land search/shuffle and overload mass-exile rewrite are
+  explicit `annotation_only` fields.
+
+PostgreSQL package:
+
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_rollback_20260623_105512.sql`
+
+Evidence:
+
+- Precheck reported one card row, one Oracle identity, one expected hash row,
+  zero exact executable rule rows, and two legacy enabled removal rows.
+- Apply inserted one curated active/auto rule and disabled two generated shadow
+  rows.
+- Postcheck reported one exact executable rule row, zero legacy enabled removal
+  rows, and zero trusted executable rows without Oracle hash.
+- Final PG -> SQLite/canonical runtime sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`
+  with `include_needs_review=false`, `pg_rows_loaded=1830`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`
+  prove logical rule key `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`,
+  target `Siege Rhino`, `target_player=Opponent`, and
+  `destination=exile`.
+
+Runtime/test coverage:
+
+- Added/validated
+  `test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance`.
+- `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`,
+  focused PG095 test, and `test_battle_analyst_v10_3.py` passed.
+- Full wrapper output:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`
+  with 389 PASS lines.
+
+Post-PG095 auditor result:
+
+- Deck `6` remains `pass=100`; no Lorehold deck `6` card list or strategy
+  swap occurred.
+- Deck `607` moved to `high=16`, `medium=4`, `pass=74`.
+- `Winds of Abandon` is `pass` in deck `607`.
+- Global: `high=30`, `medium=4`, `pass=171`.
+
+Remaining deck `607` battle-critical high queue:
+
+- `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Promise of Loyalty`, and `Starfall Invocation`.
+
+Next queue:
+
+- PG096 should continue deck `607` battle-critical high cards.
+- Do not treat observations about any card as law; use them as prompts to
+  verify Oracle, PostgreSQL rule state, runtime behavior, and replay evidence.

@@ -4168,3 +4168,75 @@ Remaining queue:
   support/passive rows.
 - User observations remain validation hints only; the durable rule source is
   PostgreSQL plus Oracle-backed review.
+
+## PG095 Winds of Abandon Card Rule - 2026-06-23 11:02 UTC
+
+Status: `applied_validated`.
+
+What changed:
+
+- PG095 closed the deck `607` high finding for `Winds of Abandon`.
+- The old cache/PG state had two generated `needs_review/review_only` generic
+  `remove_creature` rows and no trusted executable Oracle-specific rule.
+- The new trusted rule is:
+  `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`.
+- Raw Oracle hash:
+  `05e38c4458b7b803d038978b46f11f72`.
+- Battle model scope:
+  `winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1`.
+- Runtime executes only the single-target Sorcery exile subset. Basic-land
+  search/tapped placement and overload rewrite are annotation-only.
+
+PostgreSQL package:
+
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.sql`
+- `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_rollback_20260623_105512.sql`
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.out`
+  reported 1 card row, 1 oracle id, 1 expected raw Oracle hash row, 0 existing
+  exact executable rows, and 2 legacy enabled removal rows.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.out`
+  reported backup `SELECT 2`, `INSERT 0 1`, `UPDATE 2`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.out`
+  reported 1 exact executable rule, 0 legacy enabled removal rows, and 0
+  trusted executable rows without hash.
+- Final PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`
+  reported `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=2507`, and `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`.
+
+Runtime/test coverage:
+
+- Added
+  `test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance`.
+- `py_compile`, `test_deck_card_battle_rule_coherence_audit.py`, and
+  `test_battle_analyst_v10_3.py` passed.
+- Saved outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_py_compile_runtime_post_20260623_110204.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_deck_card_battle_rule_coherence_audit_runtime_post_20260623_110204.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`.
+
+Post-PG095 auditor result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=16`, `medium=4`, `pass=74`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=30`, `medium=4`, `pass=171`.
+
+Remaining queue:
+
+- PG096 should continue deck `607` battle-critical high cards before
+  support/passive rows.
+- `Avatar's Wrath`, `Call Forth the Tempest`, and `High Noon` are likely
+  executor/model work, not hash-only cleanup.

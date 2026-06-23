@@ -1101,7 +1101,19 @@ Next package number is PG086. Next queue should prioritize remaining deck
   Current post-PG094 state: deck `6` `pass=100`, deck `606` `pass=81`,
   deck `607` `high=17`, `medium=4`, `pass=73`, deck `608` `high=14`,
   `medium=3`, `pass=51`, and global `high=31`, `medium=4`, `pass=170`.
-  PG095 is next.
+  PG095 then closed `Winds of Abandon` as an Oracle-specific Sorcery
+  single-target exile rule. Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`.
+  The rule key is `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`,
+  raw Oracle hash `05e38c4458b7b803d038978b46f11f72`, and scope
+  `winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1`.
+  Basic-land search/tapped placement and overload rewrite remain
+  `annotation_only`. Final runtime sync used `include_needs_review=false`;
+  deck `607` moved to `high=16`, `medium=4`, `pass=74`, and global moved to
+  `high=30`, `medium=4`, `pass=171`. PG096 is next.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

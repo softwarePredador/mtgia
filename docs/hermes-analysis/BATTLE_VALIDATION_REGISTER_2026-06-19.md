@@ -17605,3 +17605,90 @@ Validation:
   deck `607` `high=17`, `medium=4`, `pass=73`, deck `608` `high=14`,
   `medium=3`, `pass=51`, and global `high=31`, `medium=4`, `pass=170`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+## PG095 Winds of Abandon Card Rule Gate - 2026-06-23 11:02 UTC
+
+Status: `applied_validated`.
+
+Replay relevance:
+
+- This is a focused PostgreSQL/card-rule/cache gate, not a new 16-seed battle
+  replay baseline and not strategy-learning evidence.
+- The latest recurring battle artifact remains
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  with `timestamp_utc=2026-06-23T09:47:49Z`,
+  `battle_replay_final_status=review_required`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- PG095 does not override that latest recurring status.
+
+What changed:
+
+- `Winds of Abandon` moved from two generated `needs_review/review_only`
+  generic removal rows to one curated `active/auto` Oracle-specific rule.
+- Runtime executes the single-target Sorcery exile subset only.
+- Controller basic-land search/tapped placement and overload mass-exile rewrite
+  are explicitly `annotation_only`.
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.out`
+  showed 1 card row, 1 oracle id, 1 raw Oracle hash match, 0 existing exact
+  executable rows, 2 legacy enabled removal rows, and 0 trusted executable rows
+  without hash.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.out`
+  created backup `SELECT 2`, inserted 1 curated rule, disabled 2 generated
+  rows, and committed.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.out`
+  confirmed 1 exact executable rule, 0 legacy enabled removal rows, and 0
+  trusted executable rows without hash.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_rollback_20260623_105512.sql`.
+
+Rule/source facts:
+
+- Logical key:
+  `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`.
+- Raw Oracle hash:
+  `05e38c4458b7b803d038978b46f11f72`.
+- Battle model scope:
+  `winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1`.
+
+SQLite/runtime evidence:
+
+- Final runtime sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`
+  reported `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=2507`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`
+  show selected source `curated`, status `active/auto`, rule key/hash PG095,
+  `spell_resolved`, `removal_resolved`, `destination=exile`, target
+  `Siege Rhino`, and the basic-land compensation annotation. Final state keeps
+  `Self Guard` on Lorehold's battlefield, moves `Siege Rhino` to opponent
+  exile, and leaves `Plains` in opponent library.
+
+Validation:
+
+- Added focused regression:
+  `test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance`.
+- `py_compile`, `test_deck_card_battle_rule_coherence_audit.py`, and
+  `test_battle_analyst_v10_3.py` passed after the final runtime sync.
+- Saved outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_py_compile_runtime_post_20260623_110204.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_deck_card_battle_rule_coherence_audit_runtime_post_20260623_110204.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`.
+
+Post-PG095 card-rule queue:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=16`, `medium=4`, `pass=74`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=30`, `medium=4`, `pass=171`.
+- `Winds of Abandon` specifically moved from `high` to `pass`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.

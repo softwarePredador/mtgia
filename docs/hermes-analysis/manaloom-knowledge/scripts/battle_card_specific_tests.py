@@ -612,6 +612,99 @@ def register_tests(battle, player):
         assert removal_event["life_gain_requested"] == 4
         assert removal_event["life_gained"] == 4
 
+    def test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            winds = {
+                "name": "Winds of Abandon",
+                "cmc": 2,
+                "mana_cost": "{1}{W}",
+                "type_line": "Sorcery",
+            }
+            winds_effect = battle.get_card_effect(winds)
+            assert winds_effect["effect"] == "remove_creature"
+            assert winds_effect["target"] == "creature"
+            assert winds_effect["target_restriction"] == "you_dont_control"
+            assert winds_effect["target_controller"] == "opponent"
+            assert winds_effect["sorcery"] is True
+            assert winds_effect.get("instant") is None
+            assert winds_effect["destination"] == "exile"
+            assert winds_effect["exile_target"] is True
+            assert winds_effect["target_controller_basic_land_tapped"] is True
+            assert winds_effect["basic_land_compensation_status"] == "annotation_only"
+            assert winds_effect["overload_cost"] == "{4}{W}{W}"
+            assert winds_effect["overload_status"] == "annotation_only"
+            assert winds_effect["overload_target_rewrite"] == "target_to_each"
+            assert winds_effect["battle_model_scope"] == (
+                "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1"
+            )
+            assert winds_effect["_rule_logical_key"] == (
+                "battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c"
+            )
+            assert winds_effect["_rule_oracle_hash"] == "05e38c4458b7b803d038978b46f11f72"
+
+            active = player("Lorehold")
+            own_creature = {
+                "name": "Self Guard",
+                "cmc": 2,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            active.battlefield = [own_creature]
+            opponent = player("Opponent")
+            target = {
+                "name": "Siege Rhino",
+                "cmc": 4,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 5,
+            }
+            basic_land = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            opponent.battlefield = [target]
+            opponent.library = [basic_land]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                winds,
+                turn=7,
+                rng=random.Random(205),
+                effect_data_override=winds_effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert own_creature in active.battlefield
+        assert target not in opponent.battlefield
+        assert target in opponent.exile
+        assert target not in opponent.graveyard
+        assert basic_land in opponent.library
+        assert basic_land not in opponent.battlefield
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Winds of Abandon"
+        )
+        assert removal_event["target_player"] == "Opponent"
+        assert removal_event["target"] == "Siege Rhino"
+        assert removal_event["destination"] == "exile"
+        assert removal_event["rule_logical_key"] == (
+            "battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c"
+        )
+        assert removal_event["rule_oracle_hash"] == "05e38c4458b7b803d038978b46f11f72"
+        assert removal_event["target_controller_basic_land_tapped"] is True
+        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+
     def test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -8303,6 +8396,7 @@ def register_tests(battle, player):
         test_flashback_targeted_removal_declares_target_before_resolution,
         test_path_to_exile_exiles_creature_with_pg037_rule_provenance,
         test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance,
+        test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance,
         test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,

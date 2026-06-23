@@ -4131,3 +4131,55 @@ Decision:
 - Next replay/battle work should continue from the live `event_contract_static`
   review state or from a deliberate fresh multi-seed run after the next card
   rule batch, not from PG094 alone.
+
+## PG095 Winds of Abandon Gate Reading - 2026-06-23 11:02 UTC
+
+Scope:
+
+- PG095 is a PostgreSQL card-rule/cache gate, not a replay gate promotion and
+  not a deck deploy.
+- It promoted `Winds of Abandon` to an Oracle-specific runtime rule for the
+  executable single-target exile subset.
+- Basic-land search/tapped placement and overload mass-exile rewrite remain
+  `annotation_only`.
+
+Evidence:
+
+- PG095 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.out`
+  reports 1 exact executable rule, 0 enabled legacy removal rows, and 0 trusted
+  executable rows without hash.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`
+  reports `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=2507`, and `canonical_snapshot_rows_exported=3201`.
+- Runtime wrapper output:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`
+  records `removal_resolved` with destination `exile`, rule key
+  `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`, and raw Oracle hash
+  `05e38c4458b7b803d038978b46f11f72`.
+
+Latest recurring battle remains separate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+- `timestamp_utc=2026-06-23T09:47:49Z`.
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`.
+- `seeds_requested=16`, `seeds_completed=16`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- `strategy_learning_confidence_counts={"high_confidence_replay":14,"low_confidence_replay":2}`.
+- `test_results_status_counts={"pass":18}` and `test_result_failures=[]`.
+
+Decision:
+
+- PG095 is accepted as a card-rule/source-of-truth correction.
+- It reduces the deck `607` card-rule queue to `high=16`, `medium=4`,
+  `pass=74` and global to `high=30`, `medium=4`, `pass=171`.
+- It does not change the latest recurring battle status.
+- It does not authorize a deck swap or learned-deck promotion.
+- Next replay/battle work should continue from the live `event_contract_static`
+  review state or from a deliberate fresh multi-seed run after the next card
+  rule batch, not from PG095 alone.

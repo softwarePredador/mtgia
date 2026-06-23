@@ -3861,6 +3861,60 @@ Scope guard:
 - No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
   swap, code edit, battle-engine edit, commit, or push was performed.
 
+## PG095 Winds of Abandon Reading - 2026-06-23 11:02 UTC
+
+What changed:
+
+- PG095 closed `Winds of Abandon` for deck `607`.
+- The previous state had two generated `needs_review/review_only` generic
+  `remove_creature` rows that incorrectly modeled the card as `instant`.
+- The new durable source is one PostgreSQL `curated active/auto` rule:
+  `battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c`.
+- Raw Oracle hash:
+  `05e38c4458b7b803d038978b46f11f72`.
+- Runtime executable subset:
+  single-target Sorcery exile for a creature the controller does not control.
+- Annotation-only subset:
+  basic-land search/tapped placement for the target controller and overload
+  `target` to `each` rewrite.
+
+Evidence:
+
+- PostgreSQL precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_precheck_20260623_105512.out`,
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_apply_20260623_105512.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_postcheck_20260623_105512.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_battle_rule_pg095_rollback_20260623_105512.sql`.
+- Final PG -> SQLite/canonical runtime sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_winds_of_abandon_runtime_sync_report_20260623_105512.json`
+  with `include_needs_review=false`, `pg_rows_loaded=1830`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/winds_of_abandon_pg095_focused_events_20260623_105512.jsonl`.
+- Full wrapper output:
+  `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`.
+
+Current candidate status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=16`, `medium=4`, `pass=74`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global card-rule queue: `high=30`, `medium=4`, `pass=171`.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  new multi-seed battle baseline.
+
+Next recommended queue:
+
+- Continue deck `607` battle-critical high cards before support/passive rows.
+- Highest-risk next choices are not simple metadata fixes:
+  `Avatar's Wrath` needs airbend/non-hand-cast-lock modeling,
+  `Call Forth the Tempest` needs opponent-only dynamic damage from spells cast
+  this turn, and `High Noon` needs a static one-spell-per-turn model rather than
+  the current generic removal shape.
+
 ## Role Summary Runtime Recheck
 
 Timestamp: 2026-06-20 06:10 -03.
