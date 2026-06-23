@@ -17742,7 +17742,7 @@ Post-PG095 card-rule queue:
 - `Winds of Abandon` specifically moved from `high` to `pass`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
 
-## PG097 Start Sync/Audit + Fresh 16-Seed Gate - 2026-06-23 11:40 UTC
+## PG097 Valakut Sync/Audit + Fresh 16-Seed Gate - 2026-06-23 11:48 UTC
 
 Status: `validated_gate_refresh_review_required`.
 
@@ -17750,39 +17750,56 @@ Scope:
 
 - PostgreSQL remained the source of truth.
 - Hermes SQLite/canonical data was refreshed from PostgreSQL.
-- No PostgreSQL apply package was executed and no rollback artifact was needed
-  in this cycle.
+- PG097 restored the simple-name `Valakut Awakening` row's Oracle hash/status
+  provenance and added a sync guard so missing incoming hashes do not erase
+  reviewed/existing `oracle_hash` metadata.
 - No deck swap, no `deck_cards` mutation, and no learned-deck promotion
   occurred.
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_precheck_20260623_113918.out`
+  reported 1 target rule row, 1 Oracle hash match row, 1 row needing hash
+  restore, 1 row needing status restore, and no existing backup table.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_apply_20260623_113918.out`
+  reported backup `SELECT 1`, `updated_rows=1`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`
+  reported 1 restored hash row, 1 active status row, 1 auto execution row, and
+  1 backup row.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_rollback_20260623_113918.sql`.
 
 Sync/audit evidence:
 
 - PG -> SQLite/canonical sync:
-  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`
   reports `include_needs_review=false`, `pg_rows_loaded=1830`,
   `sqlite_inserted_or_updated=1808`, and
   `canonical_snapshot_rows_exported=3201`.
 - Deck `6` audit:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_valakut_post_20260623_114030.json`
   reports `pass=100`.
 - Deck `606` audit:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_valakut_post_20260623_114030.json`
   reports `pass=81`.
 - Deck `607` audit:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_valakut_post_20260623_114030.json`
   reports `high=15`, `medium=4`, `pass=75`.
 - Global audit:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_valakut_post_20260623_114030.json`
   reports `high=29`, `medium=4`, `pass=172`.
 
 Fresh 16-seed evidence:
 
 - Run directory:
-  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711`.
-- `summary.json` reports `timestamp_utc=2026-06-23T11:37:11Z`,
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_114452`.
+- `summary.json` reports `timestamp_utc=2026-06-23T11:44:52Z`,
   `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
-  `seeds_requested=16`, `start_seed=63241137`, `seeds_completed=16`,
-  `events=13752`, and `decisions=2198`.
+  `seeds_requested=16`, `start_seed=63241144`, `seeds_completed=16`,
+  `events=13305`, and `decisions=2219`.
 - Test gate: `test_results_status_counts={"pass":18}` with
   `test_result_failures=[]`.
 - Runtime/effect gates:
