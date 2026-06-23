@@ -4372,6 +4372,249 @@ def register_tests(battle, player):
         assert "Seven Mana Filler" in discarded
         assert sum(1 for name in discarded if name in {"Spectator Seating", "War Room", "Urza's Saga"}) == 2
 
+    def test_enlightened_tutor_puts_artifact_or_enchantment_on_library_top():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            spell = {"name": "Enlightened Tutor", "cmc": 1, "type_line": "Instant"}
+            active.hand = [spell]
+            active.library = [
+                {"name": "Filler Spell", "cmc": 2, "type_line": "Sorcery"},
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=2,
+                rng=random.Random(6081),
+                effect_data_override={
+                    "effect": "tutor",
+                    "target": "artifact_or_enchantment_to_top",
+                    "instant": True,
+                    "battle_model_scope": "test_artifact_enchantment_to_library_top",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.library[0]["name"] == "Sol Ring"
+        assert all(card.get("name") != "Sol Ring" for card in active.hand)
+        assert any(
+            event == "tutor_resolved"
+            and data.get("card") == "Enlightened Tutor"
+            and data.get("found") == "Sol Ring"
+            and data.get("destination") == "library_top"
+            for event, data in events
+        )
+
+    def test_idyllic_tutor_finds_enchantment_to_hand_only():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            spell = {"name": "Idyllic Tutor", "cmc": 3, "type_line": "Sorcery"}
+            active.hand = [spell]
+            active.library = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=3,
+                rng=random.Random(6082),
+                effect_data_override={
+                    "effect": "tutor",
+                    "target": "enchantment",
+                    "sorcery": True,
+                    "battle_model_scope": "test_enchantment_to_hand",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Smothering Tithe" for card in active.hand)
+        assert any(card.get("name") == "Sol Ring" for card in active.library)
+        assert any(
+            event == "tutor_resolved"
+            and data.get("card") == "Idyllic Tutor"
+            and data.get("found") == "Smothering Tithe"
+            and data.get("destination") == "hand"
+            for event, data in events
+        )
+
+    def test_goblin_engineer_etb_tutors_artifact_to_graveyard():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.library = [
+                {"name": "Filler Spell", "cmc": 2, "type_line": "Sorcery"},
+                {"name": "The One Ring", "cmc": 4, "type_line": "Legendary Artifact", "effect": "draw_engine"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Goblin Engineer",
+                    "cmc": 2,
+                    "type_line": "Creature - Goblin Artificer",
+                    "power": 1,
+                    "toughness": 2,
+                },
+                turn=3,
+                rng=random.Random(6083),
+                effect_data_override={
+                    "effect": "creature",
+                    "is_creature_permanent": True,
+                    "power": 1,
+                    "toughness": 2,
+                    "etb_tutor_target": "artifact_to_graveyard",
+                    "battle_model_scope": "test_artifact_to_graveyard_etb",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Goblin Engineer" for card in active.battlefield)
+        assert any(card.get("name") == "The One Ring" for card in active.graveyard)
+        assert all(card.get("name") != "The One Ring" for card in active.hand)
+        assert any(
+            event == "tutor_resolved"
+            and data.get("card") == "Goblin Engineer"
+            and data.get("found") == "The One Ring"
+            and data.get("destination") == "graveyard"
+            and data.get("trigger") == "enters_battlefield"
+            for event, data in events
+        )
+
+    def test_imperial_recruiter_etb_tutors_power_two_creature_to_hand():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.library = [
+                {
+                    "name": "Craterhoof Behemoth",
+                    "cmc": 8,
+                    "type_line": "Creature - Beast",
+                    "power": 5,
+                    "toughness": 5,
+                },
+                {
+                    "name": "Esper Sentinel",
+                    "cmc": 1,
+                    "type_line": "Artifact Creature - Human Soldier",
+                    "power": 1,
+                    "toughness": 1,
+                },
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Imperial Recruiter",
+                    "cmc": 3,
+                    "type_line": "Creature - Human Advisor",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                turn=3,
+                rng=random.Random(6084),
+                effect_data_override={
+                    "effect": "creature",
+                    "is_creature_permanent": True,
+                    "power": 1,
+                    "toughness": 1,
+                    "etb_tutor_target": "creature_power_lte_2",
+                    "battle_model_scope": "test_power_lte_2_creature_to_hand_etb",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Imperial Recruiter" for card in active.battlefield)
+        assert any(card.get("name") == "Esper Sentinel" for card in active.hand)
+        assert any(card.get("name") == "Craterhoof Behemoth" for card in active.library)
+        assert any(
+            event == "tutor_resolved"
+            and data.get("card") == "Imperial Recruiter"
+            and data.get("found") == "Esper Sentinel"
+            and data.get("destination") == "hand"
+            and data.get("trigger") == "enters_battlefield"
+            for event, data in events
+        )
+
+    def test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.library = [
+                {
+                    "name": "Craterhoof Behemoth",
+                    "cmc": 8,
+                    "type_line": "Creature - Beast",
+                    "power": 5,
+                    "toughness": 5,
+                },
+                {
+                    "name": "Esper Sentinel",
+                    "cmc": 1,
+                    "type_line": "Artifact Creature - Human Soldier",
+                    "power": 1,
+                    "toughness": 1,
+                },
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Recruiter of the Guard",
+                    "cmc": 3,
+                    "type_line": "Creature - Human Soldier",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                turn=3,
+                rng=random.Random(6085),
+                effect_data_override={
+                    "effect": "creature",
+                    "is_creature_permanent": True,
+                    "power": 1,
+                    "toughness": 1,
+                    "etb_tutor_target": "creature_toughness_lte_2",
+                    "battle_model_scope": "test_toughness_lte_2_creature_to_hand_etb",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Recruiter of the Guard" for card in active.battlefield)
+        assert any(card.get("name") == "Esper Sentinel" for card in active.hand)
+        assert any(card.get("name") == "Craterhoof Behemoth" for card in active.library)
+        assert any(
+            event == "tutor_resolved"
+            and data.get("card") == "Recruiter of the Guard"
+            and data.get("found") == "Esper Sentinel"
+            and data.get("destination") == "hand"
+            and data.get("trigger") == "enters_battlefield"
+            for event, data in events
+        )
+
     def test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -5256,6 +5499,11 @@ def register_tests(battle, player):
         test_grand_abolisher_casts_as_setup_for_future_approach,
         test_orims_chant_held_without_castable_second_approach_payoff,
         test_cleanup_discard_preserves_attack_tax_over_excess_cards,
+        test_enlightened_tutor_puts_artifact_or_enchantment_on_library_top,
+        test_idyllic_tutor_finds_enchantment_to_hand_only,
+        test_goblin_engineer_etb_tutors_artifact_to_graveyard,
+        test_imperial_recruiter_etb_tutors_power_two_creature_to_hand,
+        test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand,
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,

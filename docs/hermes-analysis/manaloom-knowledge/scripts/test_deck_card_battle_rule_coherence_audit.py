@@ -117,6 +117,7 @@ def insert_rule(
     execution_status: str = "auto",
     source: str = "curated",
     oracle_hash: str = "hash",
+    logical_rule_key: str | None = None,
 ) -> None:
     conn.execute(
         """
@@ -128,7 +129,8 @@ def insert_rule(
         """,
         (
             audit.normalize_name(name),
-            "battle_rule_v1:" + audit.normalize_name(name).replace(" ", "_"),
+            logical_rule_key
+            or "battle_rule_v1:" + audit.normalize_name(name).replace(" ", "_"),
             name,
             json.dumps(effect_json, sort_keys=True),
             source,
@@ -229,6 +231,46 @@ class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
             "review_only_or_needs_review_rule",
             {finding["code"] for finding in card["findings"]},
         )
+
+    def test_disabled_land_shadow_with_trusted_rule_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                create_schema(conn)
+                insert_deck_card(
+                    conn,
+                    "Arid Mesa",
+                    oracle_text="{T}, Pay 1 life, Sacrifice Arid Mesa: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.",
+                    type_line="Land",
+                )
+                insert_rule(
+                    conn,
+                    "Arid Mesa",
+                    {
+                        "effect": "land",
+                        "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
+                        "fetch_activation_status": "annotation_only",
+                    },
+                    oracle_hash="fetch-oracle-hash",
+                    logical_rule_key="battle_rule_v1:trusted_fetchland",
+                )
+                insert_rule(
+                    conn,
+                    "Arid Mesa",
+                    {"effect": "land"},
+                    review_status="deprecated",
+                    execution_status="disabled",
+                    source="generated",
+                    oracle_hash=None,
+                    logical_rule_key="battle_rule_v1:generated_shadow",
+                )
+                report = audit.build_report(conn)
+
+        card = report["cards"][0]
+        self.assertEqual(card["severity"], "pass")
+        self.assertEqual(card["trusted_executable_rule_count"], 1)
+        self.assertEqual(card["review_only_rule_count"], 0)
 
     def test_nonland_without_rule_is_high_but_basic_land_is_medium(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

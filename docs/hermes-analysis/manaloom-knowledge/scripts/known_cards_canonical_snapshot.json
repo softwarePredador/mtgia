@@ -1340,13 +1340,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Arid Mesa": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "mountain_or_plains",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "ebfe02c9ed9ba9317ab2ed6bb2bd0529"
   },
   "Arixmethes, Slumbering Isle": {
     "cmc": 4.0,
@@ -2855,13 +2874,32 @@
     "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
   },
   "Bloodstained Mire": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "swamp_or_mountain",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "c2b1d722530ed12d78dbc0993c3392fe"
   },
   "Bloodthirsty Blade": {
     "cmc": 2.0,
@@ -8654,15 +8692,22 @@
     "battle_rule_logical_key": "battle_rule_v1:8ef50c368534ec91af1e28c7e3079c2e"
   },
   "Enlightened Tutor": {
+    "battle_model_scope": "artifact_enchantment_tutor_to_library_top_v1",
+    "cmc": 1.0,
     "effect": "tutor",
     "instant": true,
-    "target": "artifact_or_enchantment",
+    "oracle_runtime_scope": "instant_artifact_or_enchantment_reveal_shuffle_to_top_runtime",
+    "pg063_tutor_family": "deck608_tutor_search_package",
+    "reveals_tutored_card": true,
+    "target": "artifact_or_enchantment_to_top",
+    "tutor_destination": "library_top",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3264bc2ec518549c022b24afe73b6081"
+    "battle_rule_logical_key": "battle_rule_v1:ed0d4316c416061742e6eea0e4bade8a",
+    "battle_rule_oracle_hash": "82899cda80d16c0c70ee5861f7e693d5"
   },
   "Ensnared by the Mara": {
     "cmc": 4.0,
@@ -10150,13 +10195,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Flooded Strand": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "plains_or_island",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "bdaaea9fa512cffa0852a6f4f28d5fc7"
   },
   "Floodfarm Verge": {
     "effect": "land",
@@ -11558,16 +11622,27 @@
     "battle_rule_logical_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985"
   },
   "Goblin Engineer": {
+    "activated_artifact_reanimation_cost": "R_tap_sacrifice_artifact",
+    "activated_artifact_reanimation_status": "annotation_only",
+    "activated_artifact_reanimation_target": "artifact_mv_lte_3_from_graveyard",
+    "battle_model_scope": "goblin_engineer_etb_artifact_to_graveyard_v1",
+    "cmc": 2.0,
     "effect": "creature",
+    "etb_tutor_destination": "graveyard",
+    "etb_tutor_target": "artifact_to_graveyard",
     "is_creature_permanent": true,
+    "oracle_runtime_scope": "creature_etb_artifact_library_to_graveyard_runtime_activated_reanimation_annotation",
+    "pg063_tutor_family": "deck608_tutor_search_package",
     "power": 1,
+    "reveals_tutored_card": false,
     "toughness": 2,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c2736795c0d2c41d771b8a87319618bc"
+    "battle_rule_logical_key": "battle_rule_v1:bbff8bfe05ccbe03f94fcbadd749be18",
+    "battle_rule_oracle_hash": "64c401c2fd35257e988374fdfc22d86b"
   },
   "Goblin Game": {
     "cmc": 7.0,
@@ -13588,15 +13663,22 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Idyllic Tutor": {
+    "battle_model_scope": "enchantment_tutor_to_hand_v1",
     "cmc": 3.0,
     "effect": "tutor",
-    "target": "artifact_or_enchantment",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "oracle_runtime_scope": "sorcery_enchantment_reveal_shuffle_to_hand_runtime",
+    "pg063_tutor_family": "deck608_tutor_search_package",
+    "reveals_tutored_card": true,
+    "sorcery": true,
+    "target": "enchantment",
+    "tutor_destination": "hand",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "active",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ea6ed022a770b0a46be715353e501927"
+    "battle_rule_logical_key": "battle_rule_v1:b516a3f8059b43f049f156445eeeaf21",
+    "battle_rule_oracle_hash": "c47e51a791e68f5ecb96f7187d68a20f"
   },
   "Ifnir Deadlands": {
     "effect": "land",
@@ -13748,17 +13830,24 @@
     "battle_rule_logical_key": "battle_rule_v1:c04ea8861f209f15b99aa140a7ae2a4a"
   },
   "Imperial Recruiter": {
+    "battle_model_scope": "imperial_recruiter_etb_power2_creature_to_hand_v1",
+    "cmc": 3.0,
     "effect": "creature",
-    "etb_tutor_target": "small_creature",
+    "etb_tutor_destination": "hand",
+    "etb_tutor_target": "creature_power_lte_2",
     "is_creature_permanent": true,
+    "oracle_runtime_scope": "creature_etb_power_lte_2_creature_reveal_shuffle_to_hand_runtime",
+    "pg063_tutor_family": "deck608_tutor_search_package",
     "power": 1,
+    "reveals_tutored_card": true,
     "toughness": 1,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6a79bda93d80009785f4d04a359d3068"
+    "battle_rule_logical_key": "battle_rule_v1:3323c3883679f1a92af90fbb39918840",
+    "battle_rule_oracle_hash": "8ed92583adcde1d5b9d01b21a2415fb0"
   },
   "Imperial Seal": {
     "effect": "tutor",
@@ -17109,13 +17198,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Marsh Flats": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "plains_or_swamp",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "1e88f8d7987276fdac2c3311b238eaab"
   },
   "Martial Coup": {
     "cmc": 2.0,
@@ -20983,13 +21091,32 @@
     "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
   },
   "Prismatic Vista": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "basic_land",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "61126da5d1bfc96a6f0dbaf6bde70c46"
   },
   "Prisoner's Dilemma": {
     "cmc": 5.0,
@@ -21997,17 +22124,24 @@
     "battle_rule_logical_key": "battle_rule_v1:bae0bddaa64a2f72a2565a04a8680035"
   },
   "Recruiter of the Guard": {
+    "battle_model_scope": "recruiter_guard_etb_toughness2_creature_to_hand_v1",
+    "cmc": 3.0,
     "effect": "creature",
-    "etb_tutor_target": "small_creature",
+    "etb_tutor_destination": "hand",
+    "etb_tutor_target": "creature_toughness_lte_2",
     "is_creature_permanent": true,
+    "oracle_runtime_scope": "creature_etb_toughness_lte_2_creature_reveal_shuffle_to_hand_runtime",
+    "pg064_tutor_family": "deck6_recruiter_guard_toughness_tutor",
     "power": 1,
+    "reveals_tutored_card": true,
     "toughness": 1,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6a79bda93d80009785f4d04a359d3068"
+    "battle_rule_logical_key": "battle_rule_v1:423a8aa67b5cf450f4c4fb47ca50ae46",
+    "battle_rule_oracle_hash": "aaa06784ff51d908d553ccc81d6854cd"
   },
   "Red Elemental Blast": {
     "effect": "counter",
@@ -23735,13 +23869,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Scalding Tarn": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "island_or_mountain",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "2f8da37c0e286b9d2ab7b9caed62a8c2"
   },
   "Scalelord Reckoner": {
     "cmc": 5.0,
@@ -32857,13 +33010,32 @@
     "battle_rule_logical_key": "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
   },
   "Windswept Heath": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "forest_or_plains",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "f2d4d8a8f608a11052e219ad1aa3c4e4"
   },
   "Windurst, Federation Center": {
     "effect": "land",
@@ -33023,13 +33195,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Wooded Foothills": {
+    "annotation_only_functions": [
+      "pay_1_life",
+      "sacrifice_self",
+      "search_library_for_allowed_land",
+      "put_land_onto_battlefield",
+      "shuffle_library"
+    ],
+    "battle_model_scope": "fetchland_land_play_with_activation_annotation_v1",
     "effect": "land",
+    "fetch_activation_status": "annotation_only",
+    "fetch_target_scope": "mountain_or_forest",
+    "library_search_shuffle_status": "annotation_only",
+    "life_payment_status": "annotation_only",
+    "modeled_functions": [
+      "land_play"
+    ],
+    "opening_hand_fixing_status": "runtime_name_based_fetchland_color_fixing",
+    "oracle_runtime_scope": "land_play_runtime_fetch_activation_annotation_only",
+    "pg062_l1_fetchland_family": "deck6_fetchlands",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "788c9b5400ed42d116b7b1dd4aeaa403"
   },
   "Wooded Ridgeline": {
     "effect": "land",

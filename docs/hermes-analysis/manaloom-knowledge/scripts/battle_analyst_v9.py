@@ -12020,10 +12020,20 @@ def library_tutor_candidates(player, target_type):
     for candidate in getattr(player, "library", []) or []:
         if not isinstance(candidate, dict):
             continue
+        type_line = str(candidate.get("type_line") or "").lower()
         if target_type == "any":
             candidates.append(candidate)
-        elif target_type == "artifact_or_enchantment":
-            type_line = str(candidate.get("type_line") or "").lower()
+        elif target_type in ("artifact", "artifact_to_graveyard"):
+            if "artifact" in type_line:
+                candidates.append(candidate)
+        elif target_type in ("enchantment", "enchantment_to_hand"):
+            if "enchantment" in type_line:
+                candidates.append(candidate)
+        elif target_type in (
+            "artifact_or_enchantment",
+            "artifact_or_enchantment_to_hand",
+            "artifact_or_enchantment_to_top",
+        ):
             if (
                 ("artifact" in type_line or "enchantment" in type_line)
                 and candidate.get("name") != "Approach of the Second Sun"
@@ -12053,6 +12063,24 @@ def library_tutor_candidates(player, target_type):
         elif target_type in ("creature", "creature_to_battlefield"):
             if is_creature_card(candidate):
                 candidates.append(candidate)
+        elif target_type == "creature_power_lte_2":
+            try:
+                candidate_power = int(float(candidate.get("power")))
+            except (TypeError, ValueError):
+                candidate_power = None
+            if is_creature_card(candidate) and candidate_power is not None and candidate_power <= 2:
+                candidates.append(candidate)
+        elif target_type == "creature_toughness_lte_2":
+            try:
+                candidate_toughness = int(float(candidate.get("toughness")))
+            except (TypeError, ValueError):
+                candidate_toughness = None
+            if (
+                is_creature_card(candidate)
+                and candidate_toughness is not None
+                and candidate_toughness <= 2
+            ):
+                candidates.append(candidate)
         elif target_type == "instant_or_sorcery":
             if is_instant_or_sorcery_spell(candidate):
                 candidates.append(candidate)
@@ -12070,11 +12098,43 @@ def spell_has_required_library_target(player, effect_data):
 
 def tutor_destination_for_target_type(target_type):
     target_type = str(target_type or "any").lower()
+    if str(target_type).endswith("_to_top"):
+        return "library_top"
+    if str(target_type).endswith("_to_graveyard"):
+        return "graveyard"
     if target_type in ("graveyard", "graveyard_nonlegendary"):
         return "graveyard"
     if str(target_type).endswith("_to_battlefield"):
         return "battlefield"
     return "hand"
+
+
+def move_library_tutor_selection(player, selected_cards, target_type):
+    destination = tutor_destination_for_target_type(target_type)
+    moved_cards = []
+    library_top_insert_index = 0
+    for selected_card in selected_cards:
+        if selected_card not in player.library:
+            continue
+        player.library.remove(selected_card)
+        moved_cards.append(selected_card)
+        if destination == "graveyard":
+            player.graveyard.append(selected_card)
+        elif destination == "library_top":
+            player.library.insert(library_top_insert_index, selected_card)
+            library_top_insert_index += 1
+        elif destination == "battlefield":
+            permanent_effect = get_card_effect(selected_card)
+            permanent = enrich_card({**selected_card, **permanent_effect})
+            if is_creature_card(selected_card):
+                permanent["effect"] = "creature"
+                permanent["haste"] = has_haste(permanent)
+                permanent["summoning_sick"] = not permanent["haste"]
+                permanent["tapped"] = False
+            player.battlefield.append(permanent)
+        else:
+            player.hand.append(selected_card)
+    return moved_cards, destination if moved_cards else None
 
 
 def tutor_candidate_score(candidate, target_type, player, opponents, turn):
@@ -12948,13 +13008,11 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
     ]
     scored_candidates.sort(key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", "")))
     selected = scored_candidates[:count]
-    moved = []
-    for selected_card, _score, _reason in selected:
-        if selected_card not in player.library:
-            continue
-        player.library.remove(selected_card)
-        player.hand.append(selected_card)
-        moved.append(selected_card)
+    moved, destination = move_library_tutor_selection(
+        player,
+        [selected_card for selected_card, _score, _reason in selected],
+        target_type,
+    )
     emit_replay_event(
         "tutor_resolved",
         player=player.name,
@@ -12962,7 +13020,7 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
         target_type=target_type,
         found=moved[0].get("name", "?") if moved else None,
         found_cards=[item.get("name", "?") for item in moved],
-        destination="hand" if moved else None,
+        destination=destination,
         trigger="enters_battlefield",
         turn=turn,
         **replay_rule_fields(effect_data),
@@ -15249,6 +15307,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         if effect_data.get("etb_draw_count"):
             player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
         resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
+        if effect_data.get("etb_tutor_target"):
+            resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
         emit_replay_event(
             "creature_to_battlefield",
             player=player.name,
@@ -16281,27 +16341,11 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         )
         moved_cards = []
         if found:
-            for selected_card, _score, _reason in selected_candidates:
-                if selected_card not in player.library:
-                    continue
-                player.library.remove(selected_card)
-                moved_cards.append(selected_card)
-                if target_type in ("graveyard", "graveyard_nonlegendary"):
-                    player.graveyard.append(selected_card)
-                    destination = "graveyard"
-                elif str(target_type).endswith("_to_battlefield"):
-                    permanent_effect = get_card_effect(selected_card)
-                    permanent = enrich_card({**selected_card, **permanent_effect})
-                    if is_creature_card(selected_card):
-                        permanent["effect"] = "creature"
-                        permanent["haste"] = has_haste(permanent)
-                        permanent["summoning_sick"] = not permanent["haste"]
-                        permanent["tapped"] = False
-                    player.battlefield.append(permanent)
-                    destination = "battlefield"
-                else:
-                    player.hand.append(selected_card)
-                    destination = "hand"
+            moved_cards, destination = move_library_tutor_selection(
+                player,
+                [selected_card for selected_card, _score, _reason in selected_candidates],
+                target_type,
+            )
             found = moved_cards[0] if moved_cards else found
         else:
             destination = None

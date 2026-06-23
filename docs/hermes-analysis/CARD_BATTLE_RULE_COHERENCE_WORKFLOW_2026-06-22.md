@@ -2421,3 +2421,143 @@ Next queue:
   only after the battle-critical/support cards already closed in this cycle are
   left stable; otherwise continue with the next battle-critical high-impact
   family from the auditor.
+
+## PG062 Deck 6 L1 Fetchland Cleanup - Closed 2026-06-23 02:46 UTC
+
+Status:
+
+- Closed the remaining deck `6` L1 land/mana-base medium queue for:
+  `Arid Mesa`, `Bloodstained Mire`, `Flooded Strand`, `Marsh Flats`,
+  `Prismatic Vista`, `Scalding Tarn`, `Windswept Heath`, and
+  `Wooded Foothills`.
+- PostgreSQL remained the source of truth; Hermes SQLite was resynced from PG
+  after postcheck passed.
+- No deck swap and no `deck_cards` mutation was executed.
+- No dynamic fetchland activation executor was promoted. The trusted runtime
+  model remains `effect=land`; pay-life/sacrifice/search/shuffle is recorded
+  as `annotation_only`.
+
+Applied PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_precheck_20260623_024200.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_apply_20260623_024200.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_postcheck_20260623_024200.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_rollback_20260623_024200.sql`.
+
+Validation:
+
+- PG precheck:
+  `deck_target_cards=8`, `target_rule_rows=16`,
+  `trusted_runtime_rows=8`, `trusted_missing_hash_rows=8`,
+  `trusted_without_scope_rows=8`, `trusted_bad_effect_rows=0`,
+  `generated_review_only_rows=8`, `target_bad_type_rows=0`,
+  `target_faces_json_rows=0`, `target_missing_fetch_oracle_rows=0`, and
+  `backup_table_exists=0`.
+- PG apply created backup table
+  `manaloom_deploy_audit.pg062_deck6_l1_fetchlands_20260623_024200`
+  with `16` rows, updated `8` trusted curated runtime rows, and disabled `8`
+  generated review-only shadows.
+- PG postcheck:
+  `target_cards=8`, `target_rule_rows=16`, `trusted_runtime_rows=8`,
+  `trusted_missing_hash_rows=0`, `trusted_hash_mismatch_rows=0`,
+  `trusted_missing_scope_rows=0`, `trusted_bad_effect_rows=0`,
+  `active_review_only_or_needs_review_rows=0`,
+  `disabled_generated_shadow_rows=8`, `target_bad_type_rows=0`,
+  `target_faces_json_rows=0`, and `backup_rows=16`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg062_deck6_l1_fetchlands_20260623_024200.json`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_focused_events_20260623_024200.jsonl`.
+- Tests passed:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Auditor result:
+
+- Deck `6` moved from `high=30`, `medium=8`, `pass=62` to
+  `high=30`, `pass=70`.
+- Deck `606` moved from `high=38`, `medium=8`, `pass=35` to
+  `high=38`, `medium=7`, `pass=36`; shared `Arid Mesa` was also removed from
+  that medium queue.
+- Global deck-card audit moved from `high=116`, `medium=23`, `pass=66` to
+  `high=116`, `medium=15`, `pass=74`.
+
+Next queue:
+
+- Deck `6` has no remaining medium findings in the current auditor cut.
+- The next efficient deck-6 batch should move to high-impact shared executor
+  families: L3 remaining ramp/cost engines, then L4 draw/wheel/card-flow, L5
+  copy-spell/token-copy, and L6 interaction/protection/removal/counter/silence.
+
+## Deck 608 Tutor/Search Package Closure - PG063 2026-06-23
+
+Closed package:
+
+- `Enlightened Tutor`: use an explicit library-top target, not a generic hand
+  tutor. Runtime target: `artifact_or_enchantment_to_top`; destination:
+  `library_top`.
+- `Idyllic Tutor`: use enchantment-only selection. Runtime target:
+  `enchantment`; destination: `hand`.
+- `Goblin Engineer`: model as creature plus ETB artifact-to-graveyard tutor.
+  Activated artifact reanimation remains `annotation_only`.
+- `Imperial Recruiter`: model as creature plus ETB
+  `creature_power_lte_2` tutor to hand.
+
+Required validation pattern for future tutor/search cards:
+
+- Confirm oracle destination first: hand, graveyard, battlefield, library top,
+  exile, or command-zone-specific behavior.
+- Add/extend runtime target type only when the current selector cannot express
+  the oracle target set.
+- Add a focused regression proving both target filter and zone movement.
+- Promote exactly one curated executable rule per active runtime semantics and
+  disable generated/broad shadows only after PG postcheck passes.
+- Rerun `test_battle_analyst_v10_3.py` after PG -> SQLite/snapshot sync, not
+  only before it.
+
+Evidence:
+
+- PG063 package:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_package_20260623_024856.md`.
+- PG063 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.out`.
+- Deck `608` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_025416.json`.
+
+## Deck 6 Recruiter of the Guard Closure - PG064 2026-06-23
+
+Closed package:
+
+- `Recruiter of the Guard`: model as a creature with ETB tutor for a creature
+  card with toughness 2 or less, revealed and put into hand.
+- Runtime target: `creature_toughness_lte_2`; destination: `hand`.
+- This is intentionally distinct from `Imperial Recruiter`, which uses
+  `creature_power_lte_2`.
+
+Validation note:
+
+- Central precheck passed before apply with
+  `new_rule_key_rows_already_present=0` and `backup_table_exists=0`.
+- Apply output reports `SELECT 2`, `INSERT 0 1`, `UPDATE 2`, and `COMMIT`;
+  postcheck, PG -> SQLite sync, canonical snapshot, auditor, replay event, and
+  battle tests then passed.
+
+Evidence:
+
+- PG064 package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_package_20260623_025848.md`.
+- PG064 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`.
+- PG064 focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_focused_events_20260623_025848.jsonl`.
+- Deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_030307.json`.

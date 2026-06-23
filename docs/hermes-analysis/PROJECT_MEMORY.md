@@ -190,3 +190,46 @@ Atualizado em 2026-05-26:
   `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_postcheck_20260623_022328.out`
   fechou `target_missing_hash_rows=0`, `target_hash_mismatch_rows=0` e
   `target_missing_effect_patch_rows=0`.
+
+## ManaLoom deck 6 fetchland gate - 2026-06-23
+
+- PG062 fechou o lote L1 de fetchlands do deck oficial `6` sem promover
+  executor dinamico de fetch.
+- `Arid Mesa`, `Bloodstained Mire`, `Flooded Strand`, `Marsh Flats`,
+  `Prismatic Vista`, `Scalding Tarn`, `Windswept Heath` e `Wooded Foothills`
+  continuam como `effect=land`; pagar vida, sacrificar, buscar e embaralhar
+  estao marcados como `annotation_only`.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_postcheck_20260623_024200.out`
+  fechou `active_review_only_or_needs_review_rows=0` e `backup_rows=16`; o
+  auditor deck `6` passou para `high=30`, `pass=70`.
+
+## ManaLoom deck 608 tutor/search gate - 2026-06-23
+
+- PG063 fechou o pacote tutor/search do deck `608` para `Enlightened Tutor`,
+  `Idyllic Tutor`, `Goblin Engineer` e `Imperial Recruiter`.
+- Runtime novo: `library_tutor_candidates` diferencia alvo e destino
+  (`artifact_or_enchantment_to_top`, `enchantment`,
+  `artifact_to_graveyard`, `creature_power_lte_2`), e criaturas com
+  `etb_tutor_target` usam o resolvedor generico de tutor ETB.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.out`
+  fechou `target_runtime_rows=4`, `old_active_shadow_rows=0` e
+  `backup_rows=8`; o auditor deck `608` passou para
+  `high=34`, `medium=6`, `pass=28` e os quatro alvos ficaram
+  `pass/coherent_for_current_gate`.
+
+## ManaLoom deck 6 Recruiter of the Guard gate - 2026-06-23
+
+- PG064 fechou `Recruiter of the Guard` como criatura com ETB tutor de
+  criatura com toughness 2 ou menos para a mao.
+- Diferenciar dos recruits por poder: `Imperial Recruiter` usa
+  `creature_power_lte_2`; `Recruiter of the Guard` usa
+  `creature_toughness_lte_2`.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`
+  fechou `target_runtime_rows=1`, `old_active_shadow_rows=0` e
+  `backup_rows=2`; o focused event
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_focused_events_20260623_025848.jsonl`
+  prova `rule_logical_key=battle_rule_v1:423a8aa67b5cf450f4c4fb47ca50ae46`;
+  o auditor deck `6` passou para `high=27`, `pass=73`.

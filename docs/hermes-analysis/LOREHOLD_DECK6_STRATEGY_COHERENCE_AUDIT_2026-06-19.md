@@ -19946,3 +19946,130 @@ Next queue reading:
   the auditor queue. Land/mana-base medium cleanup can be handled after the
   battle-deciding high-impact cards unless the next cycle is explicitly scoped
   to the L1 land package.
+
+## PG062 Deck 6 L1 Fetchland Cleanup - 2026-06-23 02:46 UTC
+
+What changed:
+
+- Applied and validated the L1 fetchland cleanup package for `Arid Mesa`,
+  `Bloodstained Mire`, `Flooded Strand`, `Marsh Flats`, `Prismatic Vista`,
+  `Scalding Tarn`, `Windswept Heath`, and `Wooded Foothills`.
+- The package removed the remaining deck `6` medium land/mana-base queue by
+  adding live oracle hashes and fetchland annotation metadata to the trusted
+  curated land rows, then disabling generated `needs_review`/`review_only`
+  shadows.
+- No deck swap, no `deck_cards` mutation, and no dynamic fetch activation
+  executor was promoted.
+
+Evidence:
+
+- PG062 precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_precheck_20260623_024200.out`.
+- PG062 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_postcheck_20260623_024200.out`
+  reports zero hash/scope/effect defects, zero active review-only rows, and
+  `backup_rows=16`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg062_deck6_l1_fetchlands_20260623_024200.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_focused_events_20260623_024200.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_024200.json`
+  reports `high=30`, `pass=70`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_024200.json`
+  reports `high=38`, `medium=7`, `pass=36`.
+
+Current reading:
+
+- Official deck `6` has no remaining medium findings in the current auditor
+  cut. The remaining work is entirely high-severity battle/card-model work.
+- Next practical lane should be a high-impact family, not more land cleanup:
+  L3 remaining ramp/cost engines, L4 draw/wheel/card-flow, L5 copy/token-copy,
+  or L6 interaction/protection/removal/counter/silence.
+
+## PG063 Deck 608 Tutor/Search Runtime Package - 2026-06-23 02:54 UTC
+
+What changed:
+
+- Applied and validated the deck `608` tutor/search package for:
+  `Enlightened Tutor`, `Idyllic Tutor`, `Goblin Engineer`, and
+  `Imperial Recruiter`.
+- Runtime now distinguishes tutor destination semantics that were previously
+  too broad:
+  artifact/enchantment to library top, enchantment to hand, artifact to
+  graveyard, and creature power <= 2 to hand.
+- PostgreSQL rules were promoted to one trusted active runtime row per target
+  card and the superseded generated/broad shadow rows were disabled.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Collision note:
+
+- A tutor/search package was initially prepared under PG062, but PG062 was
+  already occupied by the deck `6` fetchland cleanup. The temporary tutor
+  PG062 change was rolled back, its backup table was dropped, and the same
+  package was reapplied cleanly as PG063.
+
+Evidence:
+
+- Runtime tests added in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`.
+- Full battle harness passed after the PG sync:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- PG063 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.out`
+  reports `target_runtime_rows=4`, zero hash/effect/target/destination/scope
+  defects, `old_active_shadow_rows=0`, and `backup_rows=8`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg063_deck608_tutor_search_20260623_024856.json`.
+- Deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_025416.json`
+  reports `high=34`, `medium=6`, `pass=28`; all four target cards report
+  `pass/coherent_for_current_gate`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_025416.json`
+  reports `high=112`, `medium=15`, `pass=78`.
+
+Current reading:
+
+- The previous shared tutor/search queue is closed for these four cards.
+- Deck `608` is still not battle-ready because `34` high-severity findings and
+  `6` medium findings remain.
+- The next efficient deck `608` work should continue by shared high-impact
+  executor family, with priority on remaining interaction/protection/removal,
+  draw/wheel/card-flow, and combo/payoff cards that can distort battle
+  outcomes if modeled generically.
+
+## PG064 Deck 6 Recruiter of the Guard Runtime Package - 2026-06-23 03:03 UTC
+
+What changed:
+
+- Applied and validated the PostgreSQL package for `Recruiter of the Guard`.
+- Runtime now supports `creature_toughness_lte_2` as an ETB tutor target,
+  separate from the `creature_power_lte_2` model used by `Imperial Recruiter`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG064 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`
+  reports zero hash/effect/target/destination/scope defects,
+  `old_active_shadow_rows=0`, and `backup_rows=2`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg064_deck6_recruiter_guard_20260623_025848.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_focused_events_20260623_025848.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_030307.json`
+  reports `high=27`, `pass=73`; `Recruiter of the Guard` reports
+  `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG064 sync.
+
+Current reading:
+
+- Deck `6` improved from `high=28`, `pass=72` after PG063 to
+  `high=27`, `pass=73`.
+- The next deck `6` work should stay on high-severity card-model gaps; the
+  medium land queue remains closed.

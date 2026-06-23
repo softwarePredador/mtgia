@@ -5619,3 +5619,249 @@ Rollback:
 - `deck6_l3b_simple_red_rituals_metadata_pg061_rollback_20260623_022418.sql`
   restores the 5 current-state backup rows from
   `manaloom_deploy_audit.pg061_deck6_l3b_simple_red_rituals_metadata_20260623_022418`.
+
+## PG062 Deck 6 L1 Fetchland Cleanup - Applied 2026-06-23 02:46 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable L1 land/mana-base cleanup for official Lorehold deck `6`.
+- PostgreSQL is the source of truth; Hermes SQLite was synced from PostgreSQL
+  after postcheck passed.
+- No deck list, deck swap, or `deck_cards` mutation was executed.
+- No dynamic fetchland activation executor was promoted; fetch activation
+  clauses remain `annotation_only`.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_precheck_20260623_024200.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_apply_20260623_024200.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_postcheck_20260623_024200.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_rollback_20260623_024200.sql`.
+
+Target cards:
+
+- `Arid Mesa`.
+- `Bloodstained Mire`.
+- `Flooded Strand`.
+- `Marsh Flats`.
+- `Prismatic Vista`.
+- `Scalding Tarn`.
+- `Windswept Heath`.
+- `Wooded Foothills`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg062_deck6_l1_fetchlands_20260623_024200`.
+- Backup row count: `16`.
+- Updated trusted curated runtime rows: `8`.
+- Disabled generated `needs_review`/`review_only` shadow rows: `8`.
+
+Postcheck evidence:
+
+- `target_cards=8`.
+- `target_rule_rows=16`.
+- `trusted_runtime_rows=8`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `trusted_missing_scope_rows=0`.
+- `trusted_bad_effect_rows=0`.
+- `active_review_only_or_needs_review_rows=0`.
+- `disabled_generated_shadow_rows=8`.
+- `target_bad_type_rows=0`.
+- `target_faces_json_rows=0`.
+- `backup_rows=16`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg062_deck6_l1_fetchlands_20260623_024200.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_focused_events_20260623_024200.jsonl`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_024200.json`
+  reports `high=30`, `pass=70`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_024200.json`
+  reports `high=38`, `medium=7`, `pass=36`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_024200.json`
+  reports `high=116`, `medium=15`, `pass=74`.
+
+Rollback:
+
+- `deck6_l1_fetchlands_pg062_rollback_20260623_024200.sql` deletes the
+  current target rows and restores the 16 pre-PG062 rows from
+  `manaloom_deploy_audit.pg062_deck6_l1_fetchlands_20260623_024200`.
+
+## PG063 Deck 608 Tutor/Search Runtime Package - Applied 2026-06-23 02:54 UTC
+
+Status:
+
+- `applied_validated`.
+- Runtime and PostgreSQL repair for the deck 608 tutor/search package:
+  `Enlightened Tutor`, `Idyllic Tutor`, `Goblin Engineer`, and
+  `Imperial Recruiter`.
+- PostgreSQL is the source of truth; Hermes SQLite and the canonical fallback
+  snapshot were synced from PostgreSQL after postcheck passed.
+- No deck list, deck swap, or `deck_cards` mutation was executed.
+
+Collision handling:
+
+- A first prepared tutor/search package used PG062 numbering before the
+  worktree revealed an already-applied `PG062 Deck 6 L1 Fetchland Cleanup`.
+- The temporary tutor/search PG062 change was rolled back, its backup table
+  `manaloom_deploy_audit.pg062_deck608_tutor_search_20260623_024856` was
+  dropped, and the package was reapplied as PG063.
+- Verified current backup table:
+  `manaloom_deploy_audit.pg063_deck608_tutor_search_20260623_024856`.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_precheck_20260623_024856.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_apply_20260623_024856.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_rollback_20260623_024856.sql`.
+
+Target cards:
+
+- `Enlightened Tutor`: artifact/enchantment tutor to library top.
+- `Idyllic Tutor`: enchantment tutor to hand.
+- `Goblin Engineer`: creature ETB artifact tutor to graveyard; activated
+  artifact reanimation clause remains annotation-only.
+- `Imperial Recruiter`: creature ETB power-2-or-less tutor to hand.
+
+Precheck evidence before apply:
+
+- `target_cards=4`.
+- `target_rule_rows=8`.
+- `current_curated_runtime_rows=3`.
+- `current_generated_review_only_rows=5`.
+- `current_trusted_missing_hash_rows=3`.
+- `new_rule_key_rows_already_present=0`.
+- `target_names_missing_cards=0`.
+
+Apply evidence:
+
+- Backup row count: `8`.
+- Inserted curated runtime rules: `4`.
+- Disabled superseded broad/shadow rows: `8`.
+
+Postcheck evidence:
+
+- `target_runtime_rows=4`.
+- `target_hash_mismatch_rows=0`.
+- `target_bad_effect_rows=0`.
+- `target_bad_target_rows=0`.
+- `target_bad_destination_rows=0`.
+- `target_bad_scope_rows=0`.
+- `target_bad_runtime_scope_rows=0`.
+- `old_active_shadow_rows=0`.
+- `backup_rows=8`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg063_deck608_tutor_search_20260623_024856.json`.
+- Deck 608 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_025416.json`
+  reports `high=34`, `medium=6`, `pass=28`; all four target cards report
+  `pass/coherent_for_current_gate`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_025416.json`
+  reports `high=28`, `pass=72`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_025416.json`
+  reports `high=38`, `medium=7`, `pass=36`.
+- Deck 607 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_025416.json`
+  reports `high=50`, `medium=8`, `pass=36`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_025416.json`
+  reports `high=112`, `medium=15`, `pass=78`.
+
+Rollback:
+
+- `deck608_tutor_search_pg063_rollback_20260623_024856.sql` deletes the
+  current target rows and restores the 8 pre-PG063 rows from
+  `manaloom_deploy_audit.pg063_deck608_tutor_search_20260623_024856`.
+
+## PG064 Deck 6 Recruiter of the Guard Runtime Package - Applied 2026-06-23 03:04 UTC
+
+Status:
+
+- `applied_validated`.
+- Runtime and PostgreSQL repair for `Recruiter of the Guard`.
+- PostgreSQL is the source of truth; Hermes SQLite and the canonical fallback
+  snapshot were synced from PostgreSQL after postcheck passed.
+- No deck list, deck swap, or `deck_cards` mutation was executed.
+
+Apply note:
+
+- The central precheck passed before apply with `new_rule_key_rows_already_present=0`
+  and `backup_table_exists=0`.
+- Apply output is present at
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_apply_20260623_025848.out`
+  and reports `SELECT 2`, `INSERT 0 1`, `UPDATE 2`, and `COMMIT`.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_precheck_20260623_025848.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_apply_20260623_025848.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_rollback_20260623_025848.sql`.
+
+Target card:
+
+- `Recruiter of the Guard`: creature ETB tutor for a creature card with
+  toughness 2 or less, revealed and put into hand.
+
+Postcheck evidence:
+
+- `target_rule_rows=3`.
+- `target_runtime_rows=1`.
+- `target_hash_mismatch_rows=0`.
+- `target_bad_effect_rows=0`.
+- `target_bad_target_rows=0`.
+- `target_bad_destination_rows=0`.
+- `target_bad_scope_rows=0`.
+- `old_active_shadow_rows=0`.
+- `backup_rows=2`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg064_deck6_recruiter_guard_20260623_025848.json`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_030307.json`
+  reports `high=27`, `pass=73`; `Recruiter of the Guard` reports
+  `pass/coherent_for_current_gate`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_030307.json`
+  reports `high=38`, `medium=7`, `pass=36`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_030307.json`
+  reports `high=111`, `medium=15`, `pass=79`.
+
+Rollback:
+
+- `deck6_recruiter_guard_pg064_rollback_20260623_025848.sql` restores the 2
+  pre-PG064 rows from
+  `manaloom_deploy_audit.pg064_deck6_recruiter_guard_20260623_025848`.

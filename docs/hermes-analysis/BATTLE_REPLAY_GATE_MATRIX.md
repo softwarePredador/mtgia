@@ -2881,3 +2881,144 @@ Final audit after PG061:
 - No new replay artifact was generated for PG061 because it did not change
   executor behavior; the applicable runtime proof remains the PG058 simple-red
   ritual focused event gate.
+
+## PG062 Deck 6 L1 Fetchland Focused Event Gate - 2026-06-23 02:46 UTC
+
+Artifacts:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_postcheck_20260623_024200.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg062_deck6_l1_fetchlands_20260623_024200.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_focused_events_20260623_024200.jsonl`.
+- Current deck audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_024200.json`.
+
+Gate:
+
+- The rule-resolution event proves `8` trusted curated fetchland rows with
+  `battle_model_scope=fetchland_land_play_with_activation_annotation_v1`,
+  live `oracle_hash`, and `8` generated shadows disabled.
+- The runtime sample proves current name-based opening-hand fetchland color
+  fixing using `Bloodstained Mire`; the hand is kept with
+  `off_color_early_count=0`.
+- Dynamic pay-life/sacrifice/search/shuffle activation remains
+  `annotation_only`, not a newly promoted executor.
+
+Status:
+
+- `Arid Mesa`, `Bloodstained Mire`, `Flooded Strand`, `Marsh Flats`,
+  `Prismatic Vista`, `Scalding Tarn`, `Windswept Heath`, and
+  `Wooded Foothills` are closed for the current deck `6` L1 fetchland
+  coherence gate.
+- Deck `6` now reports `high=30`, `pass=70`; the medium land/mana-base queue
+  is empty in the current auditor cut.
+- Deck `606` also benefits for shared `Arid Mesa`, moving to `high=38`,
+  `medium=7`, `pass=36`.
+
+Caveat:
+
+- This gate does not claim full Magic-equivalent fetchland activation
+  sequencing. It only proves the runtime-safe land model and current
+  opening-hand fixing behavior.
+
+## PG063 Deck 608 Tutor/Search Runtime Gate - 2026-06-23 02:54 UTC
+
+Artifacts:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg063_deck608_tutor_search_20260623_024856.json`.
+- Current deck 608 audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_025416.json`.
+
+Gate:
+
+- `test_enlightened_tutor_puts_artifact_or_enchantment_on_library_top` proves
+  library-top movement for artifact/enchantment tutors.
+- `test_idyllic_tutor_finds_enchantment_to_hand_only` proves enchantment-only
+  filtering to hand.
+- `test_goblin_engineer_etb_tutors_artifact_to_graveyard` proves creature ETB
+  artifact-to-graveyard tutor movement.
+- `test_imperial_recruiter_etb_tutors_power_two_creature_to_hand` proves
+  creature ETB power <= 2 filtering to hand.
+
+Status:
+
+- `Enlightened Tutor`, `Idyllic Tutor`, `Goblin Engineer`, and
+  `Imperial Recruiter` are closed for the current deck `608` tutor/search
+  coherence gate.
+- Deck `608` now reports `high=34`, `medium=6`, `pass=28`; all four target
+  cards report `pass/coherent_for_current_gate`.
+
+Caveat:
+
+- Goblin Engineer's activated artifact reanimation ability remains
+  `annotation_only`; PG063 only promotes the ETB artifact-to-graveyard tutor
+  executor.
+
+## PG064 Deck 6 Recruiter of the Guard Focused Event Gate - 2026-06-23 03:04 UTC
+
+Artifacts:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg064_deck6_recruiter_guard_20260623_025848.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_focused_events_20260623_025848.jsonl`.
+- Current deck 6 audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_030307.json`.
+
+Gate:
+
+- `test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand`
+  proves the new `creature_toughness_lte_2` selector.
+- The focused runtime event proves `Recruiter of the Guard` resolves from the
+  synced rule and emits `tutor_resolved` with
+  `rule_logical_key=battle_rule_v1:423a8aa67b5cf450f4c4fb47ca50ae46`.
+- The sample moves `Esper Sentinel` to hand and leaves `Craterhoof Behemoth`
+  in library, proving toughness-filtered selection.
+
+Status:
+
+- `Recruiter of the Guard` is closed for the current deck `6` tutor/ETB gate.
+- Deck `6` now reports `high=27`, `pass=73`.
+
+Caveat:
+
+- This gate models the ETB search/reveal/put-into-hand behavior. It does not
+  claim a full shuffle-order simulator beyond the current tutor abstraction.
+
+## PG064 Deck 6 Recruiter of the Guard Runtime Gate - 2026-06-23 03:03 UTC
+
+Artifacts:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg064_deck6_recruiter_guard_20260623_025848.json`.
+- Current deck 6 audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_030307.json`.
+
+Gate:
+
+- `test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand`
+  proves creature ETB toughness <= 2 filtering to hand.
+- The gate is intentionally separate from `Imperial Recruiter`, which filters
+  by power <= 2.
+
+Status:
+
+- `Recruiter of the Guard` is closed for the current deck `6` tutor/search
+  coherence gate.
+- Deck `6` now reports `high=27`, `pass=73`; `Recruiter of the Guard` reports
+  `pass/coherent_for_current_gate`.
+
+Caveat:
+
+- PG064 was accepted by central live-state validation because apply output was
+  not present in the worktree; postcheck, backup table, sync, audit, and battle
+  tests are the accepted evidence.

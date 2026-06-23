@@ -15668,3 +15668,191 @@ Gate note:
 - PG061 is a metadata/provenance confirmation package only. No new focused
   event file was generated because no executor behavior changed after PG058;
   runtime evidence remains the PG058 focused ritual event gate.
+
+## PG062 Deck 6 L1 Fetchland Cleanup - Closed 2026-06-23 02:46 UTC
+
+Status:
+
+- Closed the deck `6` L1 fetchland land/mana-base queue for:
+  `Arid Mesa`, `Bloodstained Mire`, `Flooded Strand`, `Marsh Flats`,
+  `Prismatic Vista`, `Scalding Tarn`, `Windswept Heath`, and
+  `Wooded Foothills`.
+- This is a conservative cleanup/provenance package: trusted runtime remains
+  `effect=land`; fetch activation clauses are `annotation_only`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_precheck_20260623_024200.out`
+  reports `deck_target_cards=8`, `target_rule_rows=16`,
+  `trusted_runtime_rows=8`, `trusted_missing_hash_rows=8`,
+  `trusted_without_scope_rows=8`, `generated_review_only_rows=8`,
+  `target_bad_type_rows=0`, `target_faces_json_rows=0`,
+  `target_missing_fetch_oracle_rows=0`, and `backup_table_exists=0`.
+- PG apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_apply_20260623_024200.out`
+  reports `SELECT 16`, `UPDATE 8`, `UPDATE 8`, and `COMMIT`.
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_postcheck_20260623_024200.out`
+  reports `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_missing_scope_rows=0`,
+  `active_review_only_or_needs_review_rows=0`,
+  `disabled_generated_shadow_rows=8`, and `backup_rows=16`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg062_deck6_l1_fetchlands_20260623_024200.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1_fetchlands_pg062_focused_events_20260623_024200.jsonl`.
+
+Gate result:
+
+- The focused event proves `8` trusted fetchland rows with
+  `battle_model_scope=fetchland_land_play_with_activation_annotation_v1` and
+  `8` disabled generated shadows.
+- The runtime sample proves `Bloodstained Mire` participates in current
+  name-based opening-hand fetchland color fixing; dynamic fetch activation
+  remains `annotation_only`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_024200.json`
+  reports `high=30`, `pass=70`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_024200.json`
+  reports `high=38`, `medium=7`, `pass=36`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_024200.json`
+  reports `high=116`, `medium=15`, `pass=74`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed `7` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed `8` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+
+Caveat:
+
+- This gate does not claim Magic-equivalent fetchland activation sequencing.
+  It records the current runtime-safe land play model plus opening-hand
+  name-based fixing and keeps sacrifice/search/shuffle as annotations.
+
+## PG063 Deck 608 Tutor/Search Runtime Gate - Closed 2026-06-23 02:54 UTC
+
+Status:
+
+- Closed the deck `608` tutor/search runtime gate for `Enlightened Tutor`,
+  `Idyllic Tutor`, `Goblin Engineer`, and `Imperial Recruiter`.
+- This is a runtime plus PostgreSQL package: code now supports tutor
+  destination-specific movement for hand, graveyard, battlefield, and library
+  top, and creature ETB rules can invoke the generic library tutor path.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Runtime validation:
+
+- `test_enlightened_tutor_puts_artifact_or_enchantment_on_library_top`
+  proves `Enlightened Tutor` puts the selected artifact/enchantment on top of
+  the library, not into hand.
+- `test_idyllic_tutor_finds_enchantment_to_hand_only` proves `Idyllic Tutor`
+  filters enchantments only and moves the selected card to hand.
+- `test_goblin_engineer_etb_tutors_artifact_to_graveyard` proves
+  `Goblin Engineer` resolves as a creature and its ETB moves an artifact from
+  library to graveyard.
+- `test_imperial_recruiter_etb_tutors_power_two_creature_to_hand` proves
+  `Imperial Recruiter` resolves as a creature and its ETB selects a creature
+  with power 2 or less into hand.
+
+PostgreSQL validation:
+
+- PG063 apply created backup table
+  `manaloom_deploy_audit.pg063_deck608_tutor_search_20260623_024856` with
+  `8` rows, inserted `4` curated runtime rules, and disabled `8` superseded
+  broad/shadow rows.
+- PG063 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_tutor_search_pg063_postcheck_20260623_024856.out`
+  reports `target_runtime_rows=4`, zero hash/effect/target/destination/scope
+  defects, `old_active_shadow_rows=0`, and `backup_rows=8`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed `7` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed `8` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after the PG -> SQLite/snapshot sync.
+
+Auditor result:
+
+- Deck `608` moved from `high=38`, `medium=11`, `pass=19` to
+  `high=34`, `medium=6`, `pass=28`.
+- The four target cards all report `pass/coherent_for_current_gate`, one
+  trusted executable rule, and zero review-only rows in
+  `deck_card_battle_rule_coherence_audit_deck608_20260623_025416.json`.
+- Global deck-card audit moved from `high=116`, `medium=15`, `pass=74` after
+  PG062 fetchlands to `high=112`, `medium=15`, `pass=78`.
+
+Next queue:
+
+- Deck `608` still has `34` high findings and `6` medium findings.
+- Continue with high-impact shared executor families before running battle
+  evaluation on deck `608`: interaction/protection/removal, draw/wheel/card
+  flow, combo/payoff, and remaining cost/ramp engines.
+
+## PG064 Deck 6 Recruiter of the Guard Runtime Gate - Closed 2026-06-23 03:03 UTC
+
+Status:
+
+- Closed the deck `6` runtime gate for `Recruiter of the Guard`.
+- Runtime supports `creature_toughness_lte_2` as an ETB library tutor target
+  to hand.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Apply note:
+
+- The central precheck passed before apply with `new_rule_key_rows_already_present=0`
+  and `backup_table_exists=0`.
+- Apply output is present and reports `SELECT 2`, `INSERT 0 1`, `UPDATE 2`,
+  and `COMMIT`.
+
+Runtime validation:
+
+- `test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand`
+  proves the card resolves as a creature and its ETB selects a creature with
+  toughness 2 or less into hand.
+
+PostgreSQL validation:
+
+- PG064 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_postcheck_20260623_025848.out`
+  reports `target_runtime_rows=1`, zero hash/effect/target/destination/scope
+  defects, `old_active_shadow_rows=0`, and `backup_rows=2`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed `7` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed `8` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including
+  `test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand`.
+
+Auditor result:
+
+- Deck `6` moved from `high=28`, `pass=72` after PG063 to
+  `high=27`, `pass=73`.
+- Global deck-card audit moved from `high=112`, `medium=15`, `pass=78` after
+  PG063 to `high=111`, `medium=15`, `pass=79`.
+
+Next queue:
+
+- Deck `6` still has `27` high findings. Continue with high-impact shared
+  executor families before battle evaluation: interaction/protection/removal,
+  draw/wheel/card-flow, copy/token-copy, and remaining cost/ramp engines.
