@@ -2642,6 +2642,72 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(any(card.get("name") == "Mind Stone" for card in player.graveyard if isinstance(card, dict)))
         self.assertTrue(any(card.get("name") == "Refill Card" for card in player.hand))
 
+    def test_hedron_archive_cash_in_draws_two_cards(self) -> None:
+        old_db = battle.DB
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            with closing(sqlite3.connect(db_path)) as conn:
+                battle_rule_registry.ensure_battle_card_rules(conn)
+                battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Hedron Archive",
+                    {
+                        "effect": "ramp_permanent",
+                        "cmc": 4.0,
+                        "produces": "C",
+                        "mana_produced": 2,
+                        "activation_cost_generic": 2,
+                        "activation_requires_tap": True,
+                        "activated_self_sacrifice_draw": True,
+                        "draw_on_self_sacrifice": 2,
+                        "battle_model_scope": "two_mana_rock_self_sacrifice_draw_two_v1",
+                    },
+                    source="curated",
+                    confidence=0.94,
+                    review_status="verified",
+                    notes="runtime support for draw-two self-sacrifice mana rock",
+                )
+                conn.commit()
+
+            try:
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Tester", None, [])
+                opponent = battle.Player("Opponent", None, [])
+                player.library = [
+                    {"name": "Refill Card A", "type_line": "Sorcery", "cmc": 2},
+                    {"name": "Refill Card B", "type_line": "Instant", "cmc": 3},
+                ]
+                player.battlefield = [
+                    {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+                    {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                    {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                    {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                    {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                ]
+                spell = {"name": "Hedron Archive", "type_line": "Artifact", "cmc": 4}
+                battle.apply_effect_immediate(player, [], spell, turn=4, rng=__import__("random").Random(7))
+                self.assertTrue(
+                    any(card.get("name") == "Hedron Archive" for card in player.battlefield if isinstance(card, dict))
+                )
+                player.refresh_mana_sources(turn=5)
+                activated = battle.activate_utility_artifacts(
+                    player,
+                    [opponent],
+                    [player, opponent],
+                    turn=5,
+                    rng=__import__("random").Random(8),
+                    phase="postcombat_main",
+                )
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        self.assertEqual(activated, 1)
+        self.assertTrue(any(card.get("name") == "Hedron Archive" for card in player.graveyard if isinstance(card, dict)))
+        self.assertTrue(any(card.get("name") == "Refill Card A" for card in player.hand))
+        self.assertTrue(any(card.get("name") == "Refill Card B" for card in player.hand))
+
     def test_wayfarers_bauble_waits_on_battlefield_then_fetches_basic_tapped(self) -> None:
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -76,6 +76,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             primary["cost_reduction_applies_to"],
             "activated_abilities_of_creatures_you_control",
         )
+        self.assertEqual(primary["cost_reduction_minimum_total_mana"], 1)
 
     def test_dargo_is_scoped_as_variable_self_spell_cost_reduction(self) -> None:
         result = hints.build_effect_hints(
@@ -98,6 +99,26 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(
             primary["cost_reduction_amount_source"],
             "sacrificed_artifact_or_creature_count_this_turn",
+        )
+
+    def test_dargo_full_oracle_keeps_variable_self_spell_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "custom_inner_classes": [
+                    {"class_name": "DargoCostReductionEffect", "extends": "CostModificationEffectImpl"}
+                ],
+            },
+            "As an additional cost to cast this spell, you may sacrifice any number of artifacts and/or creatures. This spell costs {2} less to cast for each permanent sacrificed this way and {2} less to cast for each other artifact or creature you've sacrificed this turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "static_variable_self_spell_cost_reduction_variant_v1",
+        )
+        self.assertTrue(
+            primary["cost_reduction_counts_additional_sacrifices_paid_while_casting"]
         )
 
     def test_oracle_text_can_trigger_gift_destroy_all_hint(self) -> None:
@@ -155,6 +176,42 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
 
         self.assertEqual(primary["effect"], "other_turn_untapping_target_player_colorless_mana_rock")
         self.assertEqual(primary["target_constraints"]["mana_pool_owner"], "chosen_player")
+
+    def test_modal_mana_rock_extracts_runtime_fields_from_xmage_structure(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DrawCardSourceControllerEffect"],
+                "ability_classes": ["SimpleManaAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(2), new TapSourceCost())); Ability ability = new SimpleActivatedAbility(new DrawCardSourceControllerEffect(2), new GenericManaCost(2)); ability.addCost(new TapSourceCost()); ability.addCost(new SacrificeSourceCost());",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "mana_rock_with_sacrifice_draw")
+        self.assertEqual(primary["battle_model_scope"], "two_mana_rock_self_sacrifice_draw_two_v1")
+        self.assertEqual(primary["mana_produced"], 2)
+        self.assertEqual(primary["activation_cost_generic"], 2)
+        self.assertEqual(primary["draw_on_self_sacrifice"], 2)
+        self.assertTrue(primary["activated_self_sacrifice_draw"])
+
+    def test_disciple_of_freyalise_is_not_false_positive_modal_mana_rock(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DiscipleOfFreyaliseEffect", "DrawCardSourceControllerEffect", "GainLifeEffect", "TapSourceUnlessPaysEffect"],
+                "ability_classes": ["AsEntersBattlefieldAbility", "EntersBattlefieldTriggeredAbility", "GreenManaAbility"],
+                "cost_classes": ["PayLifeCost", "SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["CREATURE", "LAND"]},
+                "raw_excerpt": "this.getRightHalfCard().addAbility(new GreenManaAbility()); SacrificeTargetCost cost = new SacrificeTargetCost(StaticFilters.FILTER_ANOTHER_CREATURE); new GainLifeEffect(xValue).apply(game, source); new DrawCardSourceControllerEffect(xValue).apply(game, source);",
+            }
+        )
+
+        self.assertNotEqual(
+            result["primary_candidate"]["effect_json"]["effect"],
+            "mana_rock_with_sacrifice_draw",
+        )
 
     def test_monument_to_endurance_modal_discard_hint_precedes_generic_token(self) -> None:
         result = hints.build_effect_hints(

@@ -2446,6 +2446,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
+  "Biomancer's Familiar": {
+    "ability_kind": "static",
+    "applies_to_controller": "source_controller",
+    "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
+    "cost_reduction_applies_to": "activated_abilities_of_creatures_you_control",
+    "cost_reduction_generic": 2,
+    "cost_reduction_minimum_total_mana": 1,
+    "effect": "static_cost_reduction",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c85c546552beeb0bd02a75cede7d3773",
+    "battle_rule_oracle_hash": "d46c913f1a4b75d8c3310602ed48ba5c"
+  },
   "Biosynthic Burst": {
     "effect": "protect_creature",
     "instant": true,
@@ -13173,15 +13189,21 @@
     "battle_rule_logical_key": "battle_rule_v1:f76564d35e8cbcd2be2bb75b3381d499"
   },
   "Hedron Archive": {
+    "activated_self_sacrifice_draw": true,
+    "activation_cost_generic": 2,
+    "activation_requires_tap": true,
+    "battle_model_scope": "two_mana_rock_self_sacrifice_draw_two_v1",
+    "draw_on_self_sacrifice": 2,
     "effect": "ramp_permanent",
     "mana_produced": 2,
     "produces": "C",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:14b8ed249a1623b5d6c081f2b4ce0455"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:699a8966e4ddb5d8b8a54f57e243bf7f",
+    "battle_rule_oracle_hash": "0b901e920cec79011b3c835d55d3c859"
   },
   "Heliod's Intervention": {
     "cmc": 2.0,
@@ -17975,16 +17997,16 @@
     "activation_cost_generic": 1,
     "activation_requires_tap": true,
     "battle_model_scope": "mana_rock_self_sacrifice_draw_v1",
-    "cmc": 2.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "C",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:53afed56bbee9885bfb6201f8587db07"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3818b990dbad7de33216aee39fbb14c8",
+    "battle_rule_oracle_hash": "8d1c9b62d7e5642df44a61a63de5e240"
   },
   "Mindblaze": {
     "cmc": 6.0,
@@ -27427,16 +27449,15 @@
     "activation_cost_generic": 2,
     "activation_requires_tap": true,
     "battle_model_scope": "two_mana_rock_graveyard_hate_cantrip_v1",
-    "cmc": 4.0,
     "effect": "ramp_permanent",
     "mana_produced": 2,
     "produces": "C",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.92,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:38361118faf164900a80cacbfce1411b",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3b749c5de073394f1c912fa43d8e7c02",
     "battle_rule_oracle_hash": "28a979e8676f38d3fa18b199d3f7802b"
   },
   "Storm Herd": {
@@ -30866,13 +30887,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Training Grounds": {
-    "effect": "ramp_engine",
+    "ability_kind": "static",
+    "applies_to_controller": "source_controller",
+    "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
+    "cost_reduction_applies_to": "activated_abilities_of_creatures_you_control",
+    "cost_reduction_generic": 2,
+    "cost_reduction_minimum_total_mana": 1,
+    "effect": "static_cost_reduction",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c85c546552beeb0bd02a75cede7d3773",
+    "battle_rule_oracle_hash": "abdaacd48d9c93d70dd49ee28fcc8ffc"
   },
   "Tramway Station": {
     "effect": "land",

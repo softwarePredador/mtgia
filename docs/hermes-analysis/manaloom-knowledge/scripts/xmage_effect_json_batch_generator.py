@@ -104,6 +104,32 @@ def merged_effect_json(card: dict[str, Any], external_card: dict[str, Any] | Non
     return effect_json
 
 
+def runtime_effect_json(card: dict[str, Any], effect_json: dict[str, Any]) -> dict[str, Any]:
+    family_id = str(card.get("family_id") or "")
+    if family_id != "modal_mana_rock":
+        return effect_json
+    if str(effect_json.get("effect") or "") != "mana_rock_with_sacrifice_draw":
+        return effect_json
+
+    runtime_json: dict[str, Any] = {
+        "effect": "ramp_permanent",
+        "produces": str(effect_json.get("produces") or "C"),
+        "mana_produced": int(effect_json.get("mana_produced") or 1),
+        "activation_requires_tap": bool(effect_json.get("activation_requires_tap", True)),
+        "activated_self_sacrifice_draw": True,
+        "battle_model_scope": effect_json.get("battle_model_scope"),
+    }
+    if "cmc" in effect_json:
+        runtime_json["cmc"] = effect_json["cmc"]
+    if effect_json.get("activation_cost_generic") is not None:
+        runtime_json["activation_cost_generic"] = int(effect_json["activation_cost_generic"])
+    if int(effect_json.get("draw_on_self_sacrifice") or 1) > 1:
+        runtime_json["draw_on_self_sacrifice"] = int(effect_json["draw_on_self_sacrifice"])
+    if effect_json.get("activated_exile_target_player_graveyards"):
+        runtime_json["activated_exile_target_player_graveyards"] = True
+    return runtime_json
+
+
 def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     role = dict(DECK_ROLE_BY_FAMILY.get(str(card.get("family_id") or ""), DECK_ROLE_BY_FAMILY["manual_model"]))
     effect = card.get("effect")
@@ -129,7 +155,7 @@ def proposal_status(card: dict[str, Any], oracle_hash: str | None) -> str:
 
 
 def build_proposal(card: dict[str, Any], external_card: dict[str, Any] | None) -> dict[str, Any]:
-    effect_json = merged_effect_json(card, external_card)
+    effect_json = runtime_effect_json(card, merged_effect_json(card, external_card))
     deck_role_json = deck_role_for(card)
     oracle_hash, oracle_hash_source = oracle_hash_for(card, external_card)
     rule = {"effect_json": effect_json, "deck_role_json": deck_role_json}

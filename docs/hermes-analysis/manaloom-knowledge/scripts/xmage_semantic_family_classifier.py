@@ -137,6 +137,10 @@ def xmage_effect_classes(card: dict[str, Any]) -> set[str]:
     return {str(value or "") for value in ((card.get("xmage") or {}).get("effect_classes") or []) if value}
 
 
+def xmage_cost_classes(card: dict[str, Any]) -> set[str]:
+    return {str(value or "") for value in ((card.get("xmage") or {}).get("cost_classes") or []) if value}
+
+
 def family_for_effect(effect: str | None) -> str:
     effect = str(effect or "external_reference_required_manual_model")
     for family_id, definition in FAMILY_DEFINITIONS.items():
@@ -149,6 +153,17 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
     effect_json = primary_effect(card)
     scope = str(effect_json.get("battle_model_scope") or "")
     applies_to = str(effect_json.get("cost_reduction_applies_to") or "")
+    if scope == "static_activated_ability_cost_reduction_variant_v1":
+        return (
+            applies_to in {
+                "activated_abilities_of_creatures_you_control",
+                "activated_abilities_of_artifacts_you_control",
+                "activated_abilities_you_activate",
+            }
+            and int(effect_json.get("cost_reduction_generic") or 0) > 0
+            and int(effect_json.get("cost_reduction_minimum_total_mana") or 0) == 1
+            and "cost_reduction_condition" not in effect_json
+        )
     if scope not in {
         "static_cost_reduction_for_matching_spells_v1",
         "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
@@ -171,7 +186,7 @@ GENERIC_BATCH_SAFE_SCOPES = {
 }
 MANA_ROCK_BATCH_SAFE_SCOPE = (
     "mana_rock_with_sacrifice_draw",
-    "artifact_tap_colorless_mana_or_pay_tap_sac_draw_one_v1",
+    "mana_rock_self_sacrifice_draw_v1",
 )
 GENERIC_BATCH_SAFE_EFFECT_CLASSES = {
     "counter_spell": {"CounterTargetEffect"},
@@ -220,12 +235,49 @@ def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
     return True
 
 
+def modal_mana_rock_batch_safe(card: dict[str, Any]) -> bool:
+    effect_json = primary_effect(card)
+    effect = str(effect_json.get("effect") or "")
+    scope = str(effect_json.get("battle_model_scope") or "")
+    types = xmage_types(card)
+    ability_classes = xmage_ability_classes(card)
+    effect_classes = xmage_effect_classes(card)
+    cost_classes = xmage_cost_classes(card)
+    if effect != "mana_rock_with_sacrifice_draw":
+        return False
+    if scope not in {
+        "mana_rock_self_sacrifice_draw_v1",
+        "two_mana_rock_graveyard_hate_cantrip_v1",
+        "two_mana_rock_self_sacrifice_draw_two_v1",
+    }:
+        return False
+    if types != {"ARTIFACT"}:
+        return False
+    if "DrawCardSourceControllerEffect" not in effect_classes:
+        return False
+    if not any("Mana" in cls for cls in ability_classes):
+        return False
+    if not {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes):
+        return False
+    if not effect_json.get("activated_self_sacrifice_draw"):
+        return False
+    if effect_json.get("produces") != "C":
+        return False
+    if int(effect_json.get("mana_produced") or 0) < 1:
+        return False
+    if scope == "two_mana_rock_self_sacrifice_draw_two_v1":
+        return int(effect_json.get("draw_on_self_sacrifice") or 1) == 2
+    return True
+
+
 def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     if card.get("status") == "blocked_missing_xmage_class":
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
     if generic_runtime_batch_safe(card):
+        return "batch_metadata_candidate_requires_pg_precheck"
+    if modal_mana_rock_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
     support_status = str(family.get("support_status") or "")
     if family.get("effects") == {"static_cost_reduction"} and not static_cost_reducer_batch_safe(card):

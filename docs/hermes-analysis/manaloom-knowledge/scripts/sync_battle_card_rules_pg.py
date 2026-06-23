@@ -800,6 +800,17 @@ def merge_pg_rows_with_reviewed_runtime_rows(
     degraded canonical snapshot.
     """
     reviewed_by_key: dict[tuple[str, str], dict[str, Any]] = {}
+    active_pg_curated_names: set[str] = set()
+    for row in rows:
+        if str(row.get("source") or "") != "curated":
+            continue
+        if str(row.get("review_status") or "") not in {"verified", "active"}:
+            continue
+        if str(row.get("execution_status") or "") == "disabled":
+            continue
+        normalized = normalize_card_name(str(row.get("card_name") or row.get("normalized_name") or ""))
+        if normalized:
+            active_pg_curated_names.add(normalized)
     for row in reviewed_rows:
         source = str(row.get("source") or "")
         if source not in {"curated", "manual"}:
@@ -837,6 +848,8 @@ def merge_pg_rows_with_reviewed_runtime_rows(
         if key is None or key in seen:
             continue
         normalized_name, logical_rule_key = key
+        if source == "curated" and normalized_name in active_pg_curated_names:
+            continue
         next_row = dict(row)
         next_row["normalized_name"] = normalized_name
         next_row["logical_rule_key"] = logical_rule_key

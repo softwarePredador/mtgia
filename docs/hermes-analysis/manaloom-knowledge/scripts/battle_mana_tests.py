@@ -153,6 +153,53 @@ def register_tests(battle, player):
         assert active.available_mana() == 8
         assert active.mana_pool.wildcard == 3
 
+    def test_training_grounds_reduces_generic_creature_activation_cost_to_floor_one():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Training Grounds",
+                "type_line": "Enchantment",
+                "effect": "static_cost_reduction",
+                "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
+                "cost_reduction_applies_to": "activated_abilities_of_creatures_you_control",
+                "cost_reduction_generic": 2,
+                "cost_reduction_minimum_total_mana": 1,
+            }
+        ]
+        creature = {
+            "name": "Utility Creature",
+            "type_line": "Creature - Advisor",
+        }
+
+        assert battle.adjusted_activated_ability_generic_cost(active, creature, 3) == 1
+        assert battle.adjusted_activated_ability_generic_cost(active, creature, 1) == 1
+        assert battle.adjusted_activated_ability_generic_cost(
+            active,
+            creature,
+            1,
+            activation_colors=["U"],
+        ) == 0
+
+    def test_training_grounds_does_not_reduce_artifact_activation_cost():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Training Grounds",
+                "type_line": "Enchantment",
+                "effect": "static_cost_reduction",
+                "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
+                "cost_reduction_applies_to": "activated_abilities_of_creatures_you_control",
+                "cost_reduction_generic": 2,
+                "cost_reduction_minimum_total_mana": 1,
+            }
+        ]
+        artifact = {
+            "name": "Mind Stone",
+            "type_line": "Artifact",
+        }
+
+        assert battle.adjusted_activated_ability_generic_cost(active, artifact, 2) == 2
+
     def test_hybrid_and_phyrexian_mana_use_legal_payment_options():
         white_payer = player("White")
         white_payer.mana_pool.add("white", 1)
@@ -299,6 +346,8 @@ def register_tests(battle, player):
         test_basic_lands_refresh_as_colored_sources,
         test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources,
         test_l3a_artifact_mana_rocks_refresh_with_oracle_scopes,
+        test_training_grounds_reduces_generic_creature_activation_cost_to_floor_one,
+        test_training_grounds_does_not_reduce_artifact_activation_cost,
         test_hybrid_and_phyrexian_mana_use_legal_payment_options,
         test_monocolored_hybrid_and_hybrid_phyrexian_mana_use_legal_payment_options,
         test_restricted_mana_only_pays_matching_spell_categories,

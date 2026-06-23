@@ -125,7 +125,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_name["Promise of Loyalty"]["proposal_status"], "runtime_family_implementation_required")
         self.assertFalse(by_name["Molecule Man"]["safe_for_batch_pg_package"])
 
-    def test_classifier_demotes_custom_static_cost_scope_from_batch_safe_lane(self) -> None:
+    def test_classifier_marks_activated_ability_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
                 "cards": [
@@ -144,6 +144,38 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "effect": "static_cost_reduction",
                                 "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
                                 "cost_reduction_applies_to": "activated_abilities_of_creatures_you_control",
+                                "cost_reduction_generic": 2,
+                                "cost_reduction_minimum_total_mana": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_keeps_variable_self_spell_cost_reducer_out_of_batch_lane(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Dargo, the Shipwrecker",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "DargoTheShipwrecker",
+                            "path": "/xmage/DargoTheShipwrecker.java",
+                            "primary_effect": {
+                                "effect": "static_cost_reduction",
+                                "battle_model_scope": "static_variable_self_spell_cost_reduction_variant_v1",
+                                "cost_reduction_applies_to": "this_spell",
+                                "cost_reduction_amount_source": "sacrificed_artifact_or_creature_count_this_turn",
                             },
                         },
                     }
@@ -289,6 +321,92 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         proposal = report["proposals"][0]
         self.assertEqual(proposal["oracle_hash"], "localhash123")
         self.assertTrue(proposal["safe_for_batch_pg_package"])
+
+    def test_classifier_marks_supported_modal_mana_rock_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Hedron Archive",
+                        "severity": "high",
+                        "oracle_hash": "hedronhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "HedronArchive",
+                            "path": "/xmage/HedronArchive.java",
+                            "types": ["ARTIFACT"],
+                            "ability_classes": ["SimpleManaAbility", "SimpleActivatedAbility"],
+                            "effect_classes": ["DrawCardSourceControllerEffect"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "mana_rock_with_sacrifice_draw",
+                                "battle_model_scope": "two_mana_rock_self_sacrifice_draw_two_v1",
+                                "ability_kind": "activated",
+                                "produces": "C",
+                                "mana_produced": 2,
+                                "activation_cost_generic": 2,
+                                "activation_requires_tap": True,
+                                "activated_self_sacrifice_draw": True,
+                                "draw_on_self_sacrifice": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_generator_normalizes_modal_mana_rock_to_runtime_ramp_effect(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Hedron Archive",
+                        "normalized_name": "hedron archive",
+                        "severity": "high",
+                        "oracle_hash": "hedronhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "HedronArchive",
+                            "path": "/xmage/HedronArchive.java",
+                            "types": ["ARTIFACT"],
+                            "ability_classes": ["SimpleManaAbility", "SimpleActivatedAbility"],
+                            "effect_classes": ["DrawCardSourceControllerEffect"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "mana_rock_with_sacrifice_draw",
+                                "battle_model_scope": "two_mana_rock_self_sacrifice_draw_two_v1",
+                                "ability_kind": "activated",
+                                "produces": "C",
+                                "mana_produced": 2,
+                                "activation_cost_generic": 2,
+                                "activation_requires_tap": True,
+                                "activated_self_sacrifice_draw": True,
+                                "draw_on_self_sacrifice": 2,
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest=None,
+        )
+
+        proposal = report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["effect_json"]["effect"], "ramp_permanent")
+        self.assertEqual(proposal["effect_json"]["battle_model_scope"], "two_mana_rock_self_sacrifice_draw_two_v1")
+        self.assertEqual(proposal["effect_json"]["mana_produced"], 2)
+        self.assertEqual(proposal["effect_json"]["draw_on_self_sacrifice"], 2)
 
 
 if __name__ == "__main__":

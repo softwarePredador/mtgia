@@ -1268,6 +1268,85 @@ def apply_static_cost_reductions_to_cost(cost, reductions):
     return adjusted
 
 
+def _activated_ability_reduction_minimum_generic(effect_data, activation_colors):
+    minimum_total = max(0, int(effect_data.get("cost_reduction_minimum_total_mana") or 0))
+    colored_symbols = len([color for color in (activation_colors or []) if color])
+    return max(0, minimum_total - colored_symbols)
+
+
+def activated_ability_cost_reductions_for_permanent(
+    player,
+    permanent,
+    base_generic_cost,
+    *,
+    activation_colors=None,
+):
+    if base_generic_cost <= 0 or not isinstance(permanent, dict):
+        return []
+    type_line = str(permanent.get("type_line") or "").lower()
+    reductions = []
+    for source in getattr(player, "battlefield", []) or []:
+        if not isinstance(source, dict):
+            continue
+        effect_data = _source_static_cost_reduction_effect(source)
+        if not effect_data:
+            continue
+        if _static_cost_reduction_scope(effect_data) != "static_activated_ability_cost_reduction_variant_v1":
+            continue
+        applies_to = str(effect_data.get("cost_reduction_applies_to") or "")
+        if applies_to == "activated_abilities_of_creatures_you_control":
+            if "creature" not in type_line:
+                continue
+        elif applies_to == "activated_abilities_of_artifacts_you_control":
+            if "artifact" not in type_line:
+                continue
+        elif applies_to != "activated_abilities_you_activate":
+            continue
+        amount = _static_cost_reduction_amount(source, effect_data)
+        if amount <= 0:
+            continue
+        reductions.append(
+            {
+                "source": source.get("name", "unknown"),
+                "amount": amount,
+                "scope": "static_activated_ability_cost_reduction_variant_v1",
+                "cost_reduction_applies_to": applies_to,
+                "minimum_generic_after_reduction": _activated_ability_reduction_minimum_generic(
+                    effect_data,
+                    activation_colors,
+                ),
+            }
+        )
+    return reductions
+
+
+def adjusted_activated_ability_generic_cost(
+    player,
+    permanent,
+    base_generic_cost,
+    *,
+    activation_colors=None,
+):
+    try:
+        remaining_generic = max(0, int(base_generic_cost or 0))
+    except (TypeError, ValueError):
+        return 0
+    reductions = activated_ability_cost_reductions_for_permanent(
+        player,
+        permanent,
+        remaining_generic,
+        activation_colors=activation_colors,
+    )
+    for reduction in reductions:
+        amount = max(0, int(reduction.get("amount", 0) or 0))
+        floor_generic = max(0, int(reduction.get("minimum_generic_after_reduction", 0) or 0))
+        reducible_generic = max(0, remaining_generic - floor_generic)
+        if reducible_generic <= 0:
+            continue
+        remaining_generic -= min(amount, reducible_generic)
+    return remaining_generic
+
+
 def card_cost_for_player_state(
     player,
     card,
@@ -12847,8 +12926,13 @@ def activate_sacrifice_mana_artifacts(
 def cantrip_mana_filter_unlock_options(player, permanent, turn, *, phase="precombat_main"):
     if phase != "precombat_main":
         return []
-    activation_cost = int(permanent.get("activation_cost_generic") or 1)
     activation_colors = list(permanent.get("activation_add_colors") or [])
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(permanent.get("activation_cost_generic") or 1),
+        activation_colors=activation_colors,
+    )
     if activation_cost <= 0 or not activation_colors:
         return []
     activation_cost_text = "{%d}" % activation_cost
@@ -12958,7 +13042,11 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         permanent = permanents_by_name.get(normalized_name)
         if permanent is None:
             continue
-        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        activation_cost = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(permanent.get("activation_cost_generic") or 1),
+        )
         activation_cost_text = "{%d}" % activation_cost
         draw_count = int(permanent.get("draw_on_self_sacrifice") or 1)
 
@@ -13313,7 +13401,11 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         return 0
 
     for permanent in self_sacrifice_draw_artifacts:
-        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        activation_cost = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(permanent.get("activation_cost_generic") or 1),
+        )
         if permanent.get("activation_requires_tap") and permanent.get("tapped"):
             _utility_artifact_skip_event(
                 player,
@@ -13365,7 +13457,12 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         if permanent in player.battlefield:
             player.battlefield.remove(permanent)
         player.graveyard.append(permanent)
-        drawn = player.draw(1, rng)
+        draw_count = int(
+            permanent.get("draw_on_self_sacrifice")
+            or permanent.get("draw_count")
+            or 1
+        )
+        drawn = player.draw(draw_count, rng)
         emit_decision_trace(
             decision_type="utility_artifact_activation",
             player=player,
@@ -13749,7 +13846,11 @@ def activate_lorehold_topdeck_artifacts(
     ]
     if phase in {"upkeep", "opponent_upkeep"} and exchange_artifacts and player.library:
         for permanent in exchange_artifacts:
-            activation_cost = int(permanent.get("activation_cost_generic") or 1)
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 1),
+            )
             if player.available_mana() < activation_cost:
                 _utility_artifact_skip_event(
                     player,
@@ -13902,7 +14003,11 @@ def activate_lorehold_topdeck_artifacts(
     ]
     if phase in {"upkeep", "opponent_upkeep"} and brainstone_artifacts and player.library:
         for permanent in brainstone_artifacts:
-            activation_cost = int(permanent.get("activation_cost_generic") or 2)
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 2),
+            )
             draw_count = int(permanent.get("draw_count") or 3)
             putback_count = int(permanent.get("put_from_hand_on_top_count") or 2)
             miracle_cost = lorehold_miracle_cost(player)
@@ -14100,7 +14205,11 @@ def activate_lorehold_topdeck_artifacts(
         return 0
 
     for permanent in utility_artifacts:
-        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        activation_cost = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(permanent.get("activation_cost_generic") or 1),
+        )
         if player.available_mana() < activation_cost:
             _utility_artifact_skip_event(
                 player,
@@ -16414,7 +16523,11 @@ def activate_land_tutor_creatures(player, turn):
             continue
         if land_tutor_creature and permanent.get("summoning_sick"):
             continue
-        activation_cost = int(permanent.get("activation_cost_generic") or 2)
+        activation_cost = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(permanent.get("activation_cost_generic") or 2),
+        )
         if player.available_mana() < activation_cost:
             continue
 

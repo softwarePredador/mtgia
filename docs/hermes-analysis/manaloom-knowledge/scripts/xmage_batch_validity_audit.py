@@ -204,6 +204,7 @@ def classify_card(
             "types": xmage_types,
             "ability_classes": xmage_card.get("ability_classes") or [],
             "effect_classes": xmage_card.get("effect_classes") or [],
+            "cost_classes": xmage_card.get("cost_classes") or [],
             "subtypes": metadata.get("subtypes") or [],
             "signals": xmage_card.get("signals") or [],
             "primary_effect": effect_json,

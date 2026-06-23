@@ -203,6 +203,47 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             ["new-pg"],
         )
 
+    def test_merge_pg_rows_does_not_reappend_stale_reviewed_curated_row_when_pg_has_active_curated_card(self) -> None:
+        rows = [
+            {
+                "card_name": "Mind Stone",
+                "normalized_name": "mind stone",
+                "logical_rule_key": "pg-new",
+                "effect_json": {
+                    "effect": "ramp_permanent",
+                    "mana_produced": 1,
+                    "produces": "C",
+                    "activated_self_sacrifice_draw": True,
+                    "battle_model_scope": "mana_rock_self_sacrifice_draw_v1",
+                },
+                "deck_role_json": {"category": "ramp", "effect": "ramp_permanent"},
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+                "oracle_hash": "abc123",
+            }
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Mind Stone",
+                "logical_rule_key": "reviewed-old",
+                "effect_json": {
+                    "effect": "ramp_permanent",
+                    "mana_produced": 1,
+                    "produces": "C",
+                    "activated_self_sacrifice_draw": True,
+                    "battle_model_scope": "mana_rock_self_sacrifice_draw_v1",
+                },
+                "deck_role_json": {"category": "ramp", "effect": "ramp_permanent"},
+                "source": "curated",
+            }
+        ]
+
+        merged = sync_pg.merge_pg_rows_with_reviewed_runtime_rows(rows, reviewed_rows)
+
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0]["logical_rule_key"], "pg-new")
+
     def test_upsert_pg_rules_preserves_execution_status_in_batch_values(self) -> None:
         captured: dict[str, object] = {}
 

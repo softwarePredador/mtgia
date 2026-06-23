@@ -24,6 +24,11 @@ def _oracle_has(oracle_text: str, *needles: str) -> bool:
     return all(needle.lower() in text for needle in needles)
 
 
+def _first_int(pattern: str, text: str) -> int | None:
+    match = re.search(pattern, str(text or ""))
+    return int(match.group(1)) if match else None
+
+
 def _slug(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
 
@@ -86,15 +91,22 @@ def static_cost_reduction_fields_from_oracle(oracle_text: str) -> dict[str, Any]
     if "where x is" in text and "power" in text:
         fields.pop("cost_reduction_generic", None)
         fields["cost_reduction_amount_source"] = "source_power"
-    if "for each artifact or creature you've sacrificed this turn" in text:
+    if (
+        "for each artifact or creature you've sacrificed this turn" in text
+        or "for each other artifact or creature you've sacrificed this turn" in text
+    ):
         fields.pop("cost_reduction_generic", None)
         fields["cost_reduction_amount_source"] = "sacrificed_artifact_or_creature_count_this_turn"
+    if "for each permanent sacrificed this way" in text:
+        fields["cost_reduction_counts_additional_sacrifices_paid_while_casting"] = True
     if "instant and sorcery" in text or "instant or sorcery" in text:
         fields["applies_to_card_types"] = ["instant", "sorcery"]
         fields["cost_reduction_applies_to"] = "instant_sorcery_spells_you_cast"
     mana_value_match = re.search(r"mana\s+value\s+(\d+)\s+or\s+greater", text)
     if mana_value_match:
         fields["minimum_mana_value"] = int(mana_value_match.group(1))
+    if "can't reduce the mana in that cost to less than one mana" in text:
+        fields["cost_reduction_minimum_total_mana"] = 1
     if "if you control a wizard" in text:
         fields["cost_reduction_condition"] = "control_wizard"
     color_map = {
@@ -119,7 +131,10 @@ def static_cost_reduction_scope_from_fields(fields: dict[str, Any]) -> str:
     if applies_to.startswith("activated_abilities_"):
         return "static_activated_ability_cost_reduction_variant_v1"
     if applies_to == "this_spell":
-        if fields.get("cost_reduction_amount_source") == "sacrificed_artifact_or_creature_count_this_turn":
+        if (
+            fields.get("cost_reduction_amount_source") == "sacrificed_artifact_or_creature_count_this_turn"
+            or fields.get("cost_reduction_counts_additional_sacrifices_paid_while_casting")
+        ):
             return "static_variable_self_spell_cost_reduction_variant_v1"
         if fields.get("cost_reduction_condition"):
             return "static_conditional_self_spell_cost_reduction_variant_v1"
@@ -225,6 +240,72 @@ def _inner_extends(index_entry: dict[str, Any]) -> set[str]:
     }
 
 
+def _constructor_card_types(index_entry: dict[str, Any]) -> set[str]:
+    metadata = index_entry.get("constructor_metadata")
+    if not isinstance(metadata, dict):
+        return set()
+    return {
+        str(value or "").upper()
+        for value in (metadata.get("card_types") or [])
+        if value
+    }
+
+
+def _build_modal_mana_rock_fields(
+    *,
+    index_entry: dict[str, Any],
+    rules_text: str,
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if "ARTIFACT" not in card_types:
+        return None
+    if "DrawCardSourceControllerEffect" not in effect_classes:
+        return None
+    if not any("Mana" in cls for cls in ability_classes):
+        return None
+    if "TapSourceCost" not in cost_classes or "SacrificeSourceCost" not in cost_classes:
+        return None
+
+    mana_produced = _first_int(r"ColorlessMana\((\d+)\)", rules_text)
+    if mana_produced is None and "ColorlessManaAbility" in ability_classes:
+        mana_produced = 1
+    if mana_produced is None:
+        return None
+
+    activation_cost_generic = _first_int(r"GenericManaCost\((\d+)\)", rules_text)
+    draw_on_self_sacrifice = _first_int(r"DrawCardSourceControllerEffect\((\d+)\)", rules_text) or 1
+    exile_target_player_graveyards = "ExileGraveyardAllTargetPlayerEffect" in effect_classes
+
+    if exile_target_player_graveyards and mana_produced == 2 and draw_on_self_sacrifice == 1:
+        scope = "two_mana_rock_graveyard_hate_cantrip_v1"
+    elif mana_produced == 2 and draw_on_self_sacrifice == 2:
+        scope = "two_mana_rock_self_sacrifice_draw_two_v1"
+    elif mana_produced == 1 and draw_on_self_sacrifice == 1:
+        scope = "mana_rock_self_sacrifice_draw_v1"
+    else:
+        scope = "artifact_colorless_mana_self_sacrifice_draw_variant_v1"
+
+    fields: dict[str, Any] = {
+        "mana_produced": mana_produced,
+        "produces": "C",
+        "activation_requires_tap": True,
+        "activated_self_sacrifice_draw": True,
+    }
+    if activation_cost_generic is not None:
+        fields["activation_cost_generic"] = activation_cost_generic
+    if draw_on_self_sacrifice > 1:
+        fields["draw_on_self_sacrifice"] = draw_on_self_sacrifice
+    if exile_target_player_graveyards:
+        fields["activated_exile_target_player_graveyards"] = True
+    return {
+        "scope": scope,
+        "fields": fields,
+    }
+
+
 def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> dict[str, Any]:
     """Return conservative ManaLoom hints for one parsed XMage card entry."""
 
@@ -235,6 +316,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     filter_classes = _as_set(index_entry.get("filter_classes"))
     condition_classes = _as_set(index_entry.get("condition_classes"))
     counter_types = _as_set(index_entry.get("counter_types"))
+    cost_classes = _as_set(index_entry.get("cost_classes"))
     inner_extends = _inner_extends(index_entry)
     ability_kind = _ability_kind(ability_classes)
     target_constraints = _target_constraints(target_classes, filter_classes)
@@ -298,16 +380,22 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
-    if _oracle_has(rules_text, "add {c}", "draw a card") or (
-        "DrawCardSourceControllerEffect" in effect_classes and any("Mana" in cls for cls in ability_classes)
-    ):
+    mana_rock_fields = _build_modal_mana_rock_fields(
+        index_entry=index_entry,
+        rules_text=rules_text,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+    )
+    if mana_rock_fields is not None:
         candidates.append(
             _candidate(
                 effect="mana_rock_with_sacrifice_draw",
-                scope="artifact_tap_colorless_mana_or_pay_tap_sac_draw_one_v1",
-                reason="XMage/oracle text indicates a colorless mana artifact with sacrifice-to-draw activated ability.",
+                scope=str(mana_rock_fields["scope"]),
+                reason="XMage structure indicates an artifact that taps for colorless mana and has a tap-plus-sacrifice card-draw mode.",
                 ability_kind="activated",
                 requires_runtime_executor=True,
+                extra_effect_fields=dict(mana_rock_fields["fields"]),
                 matched_signals=["mana", "draw", "sacrifice_cost"],
             )
         )

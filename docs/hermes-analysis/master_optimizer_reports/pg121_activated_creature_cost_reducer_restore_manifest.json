@@ -1,0 +1,25 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg121_activated_creature_cost_reducer_restore_20260623_2",
+  "deploy_id": "PG121",
+  "family_counts": {
+    "static_cost_reducer": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg121_activated_creature_cost_reducer_restore_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg121_activated_creature_cost_reducer_restore_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg121_activated_creature_cost_reducer_restore_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg121_activated_creature_cost_reducer_restore_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg121_activated_creature_cost_reducer_restore_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg121_activated_creature_cost_reducer_restore_rollback.sql"
+  },
+  "generated_at": "2026-06-23T22:59:53+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Training Grounds",
+    "Biomancer's Familiar"
+  ],
+  "selected_count": 2,
+  "slug": "activated_creature_cost_reducer_restore",
+  "status": "prepared_read_only_pending_apply_approval"
+}
