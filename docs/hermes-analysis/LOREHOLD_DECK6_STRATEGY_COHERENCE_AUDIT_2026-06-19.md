@@ -20241,6 +20241,8 @@ Evidence:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`.
 - SQLite-from-PG sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg069_specific_runtime_cleanup_focused_events_20260623_011015.jsonl`.
 - Deck `6` auditor:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
   reports `high=7`, `medium=10`, `pass=83`; `The One Ring` and
@@ -20253,7 +20255,7 @@ Current reading:
 
 - Deck `6` improved from `high=7`, `medium=11`, `pass=82` after PG068 to
   `high=7`, `medium=10`, `pass=83`.
-- Remaining high queue is unchanged and still battle-critical:
+- Remaining high queue:
   `Chaos Warp`, `Esper Sentinel`, `Faithless Looting`, `Gamble`, `Get Lost`,
   `Pyroblast`, and `Wheel of Misfortune`.
 - The next PG package must be PG070.

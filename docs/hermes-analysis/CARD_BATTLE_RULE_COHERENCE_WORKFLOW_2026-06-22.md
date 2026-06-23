@@ -2747,6 +2747,11 @@ Evidence:
 - Deck `6` auditor:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
   reports `high=7`, `medium=10`, `pass=83`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg069_20260623_040215.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg069_specific_runtime_cleanup_focused_events_20260623_011015.jsonl`.
 - Global auditor:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg069_20260623_040215.json`
   reports `high=57`, `medium=44`, `pass=104`.

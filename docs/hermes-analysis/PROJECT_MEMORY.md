@@ -338,8 +338,17 @@ Atualizado em 2026-05-26:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`
   fechou `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
   `runtime_missing_hash_rows=0` e `backup_rows=6`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg069_specific_runtime_cleanup_focused_events_20260623_011015.jsonl`
+  prova `The One Ring` e `Unexpected Windfall` com rule key/hash nos eventos
+  de replay.
+- Sync final PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`
+  usou `include_needs_review=false`, carregou `pg_rows_loaded=1825` e escreveu
+  `sqlite_inserted_or_updated=2493`.
 - Auditor deck `6` em
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
-  passou para `high=7`, `medium=10`, `pass=83`; global passou para
-  `high=57`, `medium=44`, `pass=104`.
+  passou para `high=7`, `medium=10`, `pass=83`; deck `606` esta em
+  `high=7`, `medium=30`, `pass=44`; global esta em `high=57`,
+  `medium=44`, `pass=104`.
 - Proximo deploy deve usar PG070.

@@ -16169,6 +16169,8 @@ Runtime gate:
   `oracle_runtime_scope=additional_cost_discard_draw_two_create_two_treasures_v1`.
 - Runtime replay now emits `rule_logical_key` and `rule_oracle_hash` on the
   `treasure_created` event for this card.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg069_specific_runtime_cleanup_focused_events_20260623_011015.jsonl`.
 
 Tests:
 
@@ -16186,14 +16188,21 @@ Auditor result:
 
 - SQLite-from-PG sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`
-  loaded `pg_rows_loaded=1825`, wrote `sqlite_inserted_or_updated=2493`, and
-  exported `canonical_snapshot_rows_exported=3201`.
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=2493`, and exported
+  `canonical_snapshot_rows_exported=3201`.
 - Deck `6` auditor:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
   reports `high=7`, `medium=10`, `pass=83`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg069_20260623_040215.json`
+  reports `high=7`, `medium=30`, `pass=44`.
 - Deck `607` auditor:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg069_20260623_040215.json`
   reports `high=30`, `medium=17`, `pass=47`.
+- Deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg069_20260623_040215.json`
+  reports `high=21`, `medium=9`, `pass=38`.
 - Global deck-card audit:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg069_20260623_040215.json`
   reports `high=57`, `medium=44`, `pass=104`.
