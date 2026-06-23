@@ -1,0 +1,9 @@
+               normalized_name               |                expected_rule_key                | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | active_shadow_rows | backup_rows
+---------------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+--------------------+-------------
+ emeria's call // emeria, shattered skyclave | battle_rule_v1:ae4a933d873bec332ec2a46106b79277 |                  1 |                           1 |                         1 |                  0 |           0
+(1 row)
+
+               normalized_name               |                logical_rule_key                 | review_status | execution_status |           oracle_hash            |                                   battle_model_scope                                   |   effect    | token_count |     token_name      | grants_non_angel_indestructible
+---------------------------------------------+-------------------------------------------------+---------------+------------------+----------------------------------+----------------------------------------------------------------------------------------+-------------+-------------+---------------------+---------------------------------
+ emeria's call // emeria, shattered skyclave | battle_rule_v1:ae4a933d873bec332ec2a46106b79277 | verified      | auto             | 2fab1a2b9eb87041bc9e93f3b8d52831 | create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1 | token_maker | 2           | Angel Warrior Token | true
+(1 row)

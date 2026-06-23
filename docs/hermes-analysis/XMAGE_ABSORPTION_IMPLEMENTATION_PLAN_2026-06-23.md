@@ -713,3 +713,42 @@ Operational conclusion:
 - For `board_wipe_choice`, ManaLoom should generate new focused tests from
   Oracle/XMage class structure because the local XMage test corpus has no exact
   tests for those three cards.
+
+## Phase J - Token-Maker Family Runtime Apply - PG114
+
+Status: `implemented_pg_applied_validated`.
+
+Closed family/card:
+
+- Family: `token_maker`.
+- Card: `Emeria's Call // Emeria, Shattered Skyclave`.
+- XMage class: `EmeriasCall`.
+- ManaLoom rule:
+  `battle_rule_v1:ae4a933d873bec332ec2a46106b79277`.
+
+What was absorbed:
+
+- `CreateTokenEffect(new AngelWarriorToken(), 2)` became two 4/4 white Angel
+  Warrior flying tokens.
+- `GainAbilityAllEffect(IndestructibleAbility, Duration.UntilYourNextTurn,
+  FilterControlledCreaturePermanent("Non-Angel creatures you control"))`
+  became explicit non-Angel creature protection until the controller's next
+  turn.
+
+Validation:
+
+- PostgreSQL precheck/apply/postcheck package:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_package_20260623_200501.md`.
+- PG -> Hermes targeted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_sync_report_20260623_200501.json`.
+- Focused and full battle tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_focused_tests_20260623_200501.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_battle_analyst_v10_3_20260623_200501.out`.
+- Local replay/audit:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_pg114_emerias_call_20260623_200501/summary_20260623_201031.json`.
+
+Queue impact:
+
+- Deck `607`: `high=7`, `medium=8`, `pass=79`.
+- Global: `high=21`, `medium=15`, `pass=169`.

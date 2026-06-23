@@ -1,0 +1,8 @@
+               normalized_name               |          expected_hash           | card_rows | existing_rule_rows | target_active_rows | shadow_rows
+---------------------------------------------+----------------------------------+-----------+--------------------+--------------------+-------------
+ emeria's call // emeria, shattered skyclave | 2fab1a2b9eb87041bc9e93f3b8d52831 |         1 |                  0 |                  0 |           0
+(1 row)
+
+ normalized_name | logical_rule_key | review_status | execution_status | rule_version | oracle_hash | effect_json | deck_role_json
+-----------------+------------------+---------------+------------------+--------------+-------------+-------------+----------------
+(0 rows)

@@ -4455,3 +4455,31 @@ Decision:
 - It reduces deck `607` card-rule queue to `high=10`, `medium=4`, `pass=80`.
 - Continue deck `607` high `battle_critical` cards before using battle
   win-rate as deck-quality evidence.
+
+## PG114 Local Replay Gate - Emeria's Call Token-Maker
+
+Fresh local replay/audit:
+
+- `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_pg114_emerias_call_20260623_200501/summary_20260623_201031.json`.
+- Runner:
+  `server/bin/run_local_battle_replay_audit.sh --include-needs-review`.
+- Full PG -> Hermes sync before replay:
+  `pg_rows_loaded=5318`, `sqlite_inserted_or_updated=5273`,
+  `canonical_snapshot_rows_exported=3204`.
+
+Gate interpretation:
+
+- Local replay runner completed with `local_battle_replay_audit=ok`.
+- Forensic audit: `status=turn_invariants_clean`, `turn_findings=0`,
+  `decision_findings=0`, no critical/high/medium/low forensic findings.
+- Strategy audit: `verdict=low_confidence_replay`, `highest_severity=medium`,
+  `code_counts={"forced_keep_after_bad_mulligan":1}`,
+  `review_required_findings=0`.
+- This is not a recurring 16-seed gate and does not supersede the latest
+  recurring artifact under `~/.manaloom-agents`.
+
+Decision:
+
+- PG114 is accepted at the local replay/audit layer.
+- The residual medium finding is replay-confidence/mulligan evidence, not an
+  observed Emeria runtime failure.

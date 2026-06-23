@@ -1741,6 +1741,43 @@ def clear_expired_non_hand_cast_locks(active_player, all_players, turn):
         participant.non_hand_cast_locks = kept
 
 
+def remember_until_next_turn(card, key, *, source_player, turn):
+    originals = card.setdefault("_until_next_turn_originals", {})
+    if key not in originals:
+        originals[key] = card.get(key, None)
+    card["_until_next_turn_source_player"] = source_player
+    card["_until_next_turn_granted_turn"] = int(turn)
+
+
+def set_until_next_turn(card, key, value, *, source_player, turn):
+    remember_until_next_turn(card, key, source_player=source_player, turn=turn)
+    card[key] = value
+
+
+def clear_until_next_turn_effects(active_player, turn):
+    source_name = getattr(active_player, "name", None)
+    for zone in (active_player.battlefield, active_player.phased_out, active_player.graveyard):
+        for card in zone:
+            if not isinstance(card, dict):
+                continue
+            if card.get("_until_next_turn_source_player") != source_name:
+                continue
+            try:
+                granted_turn = int(card.get("_until_next_turn_granted_turn") or 0)
+            except (TypeError, ValueError):
+                granted_turn = 0
+            if int(turn) <= granted_turn:
+                continue
+            originals = card.pop("_until_next_turn_originals", {})
+            for key, original in originals.items():
+                if original is None:
+                    card.pop(key, None)
+                else:
+                    card[key] = original
+            card.pop("_until_next_turn_source_player", None)
+            card.pop("_until_next_turn_granted_turn", None)
+
+
 def cast_warp_card_from_exile(player, card, turn, phase):
     """Recast a card previously exiled by warp using its normal cost."""
     if phase not in MAIN_PHASES or not isinstance(card, dict):
@@ -7885,6 +7922,43 @@ def grant_permanents_until_eot(player, *, keywords=()):
         for keyword in keywords:
             set_until_eot(permanent, keyword, True)
     return permanents
+
+
+def _is_angel_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    type_line = str(permanent.get("type_line") or "").lower()
+    subtype = str(permanent.get("subtype") or permanent.get("token_subtype") or "").lower()
+    return "angel" in type_line or subtype == "angel"
+
+
+def grant_non_angel_creatures_indestructible_until_next_turn(player, *, source_card, effect_data, turn):
+    protected = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent) and not _is_angel_permanent(permanent)
+    ]
+    for permanent in protected:
+        set_until_next_turn(
+            permanent,
+            "indestructible",
+            True,
+            source_player=player.name,
+            turn=turn,
+        )
+    emit_replay_event(
+        "protection_resolved",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        grants=["indestructible"],
+        target_scope="non_angel_creatures_you_control",
+        duration="until_your_next_turn",
+        affected=[permanent.get("name", "?") for permanent in protected[:20]],
+        affected_count=len(protected),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return protected
 
 
 def grant_graveyard_flashback_until_eot(player, source_card, effect_data, turn):
@@ -19975,6 +20049,14 @@ def apply_effect_immediate(
             player.battlefield.append(permanent)
         else:
             requested_tokens = create_creature_tokens_from_effect(player, effect_data, opponents=opponents)
+            protected_until_next_turn = []
+            if effect_data.get("grant_non_angel_creatures_indestructible_until_next_turn"):
+                protected_until_next_turn = grant_non_angel_creatures_indestructible_until_next_turn(
+                    player,
+                    source_card=card,
+                    effect_data=effect_data,
+                    turn=turn,
+                )
             emit_replay_event(
                 "tokens_created",
                 player=player.name,
@@ -19991,6 +20073,10 @@ def apply_effect_immediate(
                 token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
                 token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),
                 token_cap_applied=requested_tokens > 20,
+                protected_non_angel_creatures_until_next_turn=[
+                    permanent.get("name", "?") for permanent in protected_until_next_turn[:20]
+                ],
+                protected_non_angel_creature_count=len(protected_until_next_turn),
                 turn=turn,
                 **replay_rule_fields(effect_data),
             )
@@ -22239,6 +22325,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.lands_played_this_turn = 0
     player.cards_drawn_this_turn = 0
     clear_until_eot(player)
+    clear_until_next_turn_effects(player, turn)
     player.indestructible = False
 
     # ── UNTAP ──

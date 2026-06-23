@@ -4456,3 +4456,54 @@ Current deck `607` high queue after PG098:
   Thunder`, and `Tragic Arrogance`.
 - `medium`: `Bender's Waterskin`, `Victory Chimes`,
   `Monument to Endurance`, and `Surge to Victory`.
+
+## PG114 Emeria's Call Token-Maker - 2026-06-23 20:10 UTC
+
+Status: `applied_validated`.
+
+- Family: `token_maker`.
+- Card closed from deck `607` high/support queue:
+  `Emeria's Call // Emeria, Shattered Skyclave`.
+- XMage reference: local class `EmeriasCall` creates two
+  `AngelWarriorToken` tokens and grants `IndestructibleAbility` until the next
+  turn to non-Angel controlled creatures.
+- Runtime support added generic until-next-turn restoration plus a
+  token-maker side effect for non-Angel indestructible.
+- PostgreSQL promoted:
+  `battle_rule_v1:ae4a933d873bec332ec2a46106b79277`,
+  `oracle_hash=2fab1a2b9eb87041bc9e93f3b8d52831`,
+  `battle_model_scope=create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1`.
+
+Evidence:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_package_20260623_200501.md`.
+- Precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_precheck_20260623_200501.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_apply_20260623_200501.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_postcheck_20260623_200501.out`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_sync_report_20260623_200501.json`.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_focused_tests_20260623_200501.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_battle_analyst_v10_3_20260623_200501.out`.
+- Local replay/audit:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_pg114_emerias_call_20260623_200501/summary_20260623_201031.json`.
+
+Post-PG114 audits:
+
+- Deck `607`: `high=7`, `medium=8`, `pass=79`.
+- Global: `high=21`, `medium=15`, `pass=169`.
+- The remaining deck `607` high queue is
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Molecule Man`, `The Mind Stone`, and
+  `Thor, God of Thunder`.
+
+Next recommended family:
+
+- `modal_mana_rock` for `The Mind Stone`, because it has exact XMage source and
+  remains a one-card runtime family.
+- Keep `Molecule Man` and `Thor, God of Thunder` in manual-review lane until
+  a reliable local/reference implementation is available.

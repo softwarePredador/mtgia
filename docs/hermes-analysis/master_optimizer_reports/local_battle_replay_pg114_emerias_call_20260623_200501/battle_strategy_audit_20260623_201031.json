@@ -1,0 +1,45 @@
+{
+  "findings": [
+    {
+      "code": "forced_keep_after_bad_mulligan",
+      "decision_id": "decision-000010",
+      "detail": "Mulligan cap forced a risky keep: mana_screw, negative_keep_score, too_few_lands.",
+      "event_index": null,
+      "recommendation": "Track this replay separately; do not treat resulting WR as high-confidence deck quality.",
+      "severity": "medium"
+    }
+  ],
+  "summary": {
+    "code_counts": {
+      "forced_keep_after_bad_mulligan": 1
+    },
+    "decision_types": {
+      "cast_spell": 39,
+      "combat_attack": 20,
+      "lorehold_upkeep_rummage": 3,
+      "mulligan_decision": 10,
+      "pass_no_action": 73,
+      "response": 3,
+      "tutor": 2,
+      "utility_artifact_activation": 8,
+      "utility_land_activation": 1
+    },
+    "decisions": 159,
+    "events": 971,
+    "findings": 1,
+    "high_confidence_learning_eligible": false,
+    "high_confidence_learning_weight": 0.0,
+    "highest_severity": "medium",
+    "learning_confidence": "low_confidence_replay",
+    "learning_confidence_reason": "forced_keep_after_bad_mulligan",
+    "low_confidence_learning_codes": [
+      "forced_keep_after_bad_mulligan"
+    ],
+    "low_confidence_learning_findings": 1,
+    "review_required_findings": 0,
+    "severity_counts": {
+      "medium": 1
+    },
+    "verdict": "low_confidence_replay"
+  }
+}

@@ -9282,6 +9282,104 @@ def register_tests(battle, player):
             "tempting_offer_base_create_1_1_white_rabbit_component_v1",
         }
 
+    def test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            non_angel = {
+                "name": "Seasoned Pyromancer",
+                "cmc": 3,
+                "effect": "creature",
+                "type_line": "Creature — Human Shaman",
+                "power": 2,
+                "toughness": 2,
+            }
+            angel = {
+                "name": "Serra Angel",
+                "cmc": 5,
+                "effect": "creature",
+                "type_line": "Creature — Angel",
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+            }
+            active.battlefield = [non_angel, angel]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Emeria's Call // Emeria, Shattered Skyclave", "type_line": "Sorcery", "cmc": 7},
+                turn=7,
+                rng=random.Random(114),
+                effect_data_override={
+                    "effect": "token_maker",
+                    "token_count": 2,
+                    "token_name": "Angel Warrior Token",
+                    "token_subtype": "Angel Warrior",
+                    "token_colors": ["W"],
+                    "token_power": 4,
+                    "token_toughness": 4,
+                    "token_flying": True,
+                    "grant_non_angel_creatures_indestructible_until_next_turn": True,
+                    "battle_model_scope": "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1",
+                    "_rule_logical_key": "battle_rule_v1:ae4a933d873bec332ec2a46106b79277",
+                    "_rule_oracle_hash": "2fab1a2b9eb87041bc9e93f3b8d52831",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        tokens = [
+            permanent
+            for permanent in active.battlefield
+            if permanent.get("name") == "Angel Warrior Token"
+        ]
+        assert len(tokens) == 2
+        assert all(token["power"] == 4 and token["toughness"] == 4 for token in tokens)
+        assert all(token.get("flying") is True for token in tokens)
+        assert all(token.get("indestructible") is not True for token in tokens)
+        assert non_angel.get("indestructible") is True
+        assert angel.get("indestructible") is not True
+        assert any(
+            event == "tokens_created"
+            and data.get("card") == "Emeria's Call // Emeria, Shattered Skyclave"
+            and data.get("tokens_created") == 2
+            and data.get("protected_non_angel_creature_count") == 1
+            for event, data in events
+        )
+        assert any(
+            event == "protection_resolved"
+            and data.get("card") == "Emeria's Call // Emeria, Shattered Skyclave"
+            and data.get("target_scope") == "non_angel_creatures_you_control"
+            and data.get("duration") == "until_your_next_turn"
+            and data.get("affected") == ["Seasoned Pyromancer"]
+            for event, data in events
+        )
+        battle.clear_until_next_turn_effects(active, 7)
+        assert non_angel.get("indestructible") is True
+        battle.clear_until_next_turn_effects(active, 8)
+        assert non_angel.get("indestructible") is not True
+
+    def test_pg114_emerias_call_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect(
+            {"name": "Emeria's Call // Emeria, Shattered Skyclave", "type_line": "Sorcery", "cmc": 7}
+        )
+        assert effect_data["_rule_logical_key"] == "battle_rule_v1:ae4a933d873bec332ec2a46106b79277"
+        assert effect_data["_rule_oracle_hash"] == "2fab1a2b9eb87041bc9e93f3b8d52831"
+        assert effect_data["effect"] == "token_maker"
+        assert effect_data["token_count"] == 2
+        assert effect_data["token_name"] == "Angel Warrior Token"
+        assert effect_data["token_power"] == 4
+        assert effect_data["token_toughness"] == 4
+        assert effect_data["token_flying"] is True
+        assert effect_data["grant_non_angel_creatures_indestructible_until_next_turn"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1"
+        )
+
     def test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache():
         return_effect = battle.get_card_effect(
             {"name": "Return the Favor", "type_line": "Instant", "cmc": 2}
@@ -9735,6 +9833,8 @@ def register_tests(battle, player):
         test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache,
         test_pg091_token_maker_family_runtime_support,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
+        test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn,
+        test_pg114_emerias_call_rule_resolves_from_sqlite_cache,
         test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache,
         test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance,
         test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance,

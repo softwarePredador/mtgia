@@ -3,11 +3,12 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG107, applied, postchecked, synced from PostgreSQL to Hermes
-SQLite/canonical snapshot, tested, and documented on 2026-06-23 14:38 UTC.
-PG107 promoted `Fated Clash` to an Oracle-backed protect-then-destroy rule and
-deprecated two stale generated plain board-wipe shadows. This was not a deck
-swap, learned-deck promotion, or battle rebaseline.
+this thread is PG114, applied, postchecked, synced from PostgreSQL to Hermes
+SQLite/canonical snapshot, tested, locally replay-audited, and documented on
+2026-06-23 20:10 UTC. PG114 promoted
+`Emeria's Call // Emeria, Shattered Skyclave` to an Oracle/XMage-backed
+token-maker rule. This was not a deck swap, learned-deck promotion, or battle
+rebaseline.
 
 ## Purpose
 
@@ -10126,3 +10127,86 @@ Register decision:
 - PG112 and PG113 are closed as applied, postchecked, synced, and audited.
 - Do not reuse PG112 or PG113.
 - Next package number is PG114.
+
+## PG114 Emeria's Call Token-Maker - Applied 2026-06-23
+
+Authorization and scope:
+
+- Continuation of the approved mass XMage -> ManaLoom adaptation goal with
+  PostgreSQL write permission for scoped, validated card-rule packages.
+- Promotes one deck `607` high/support card:
+  `Emeria's Call // Emeria, Shattered Skyclave`.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Emeria's Call // Emeria, Shattered Skyclave`:
+  `battle_rule_v1:ae4a933d873bec332ec2a46106b79277`,
+  `oracle_hash=2fab1a2b9eb87041bc9e93f3b8d52831`,
+  `effect=token_maker`,
+  `battle_model_scope=create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1`.
+
+Runtime/test changes:
+
+- Added generic until-next-turn keyword restoration support.
+- Added token-maker side effect for
+  `grant_non_angel_creatures_indestructible_until_next_turn`.
+- Focused tests cover two 4/4 white Angel Warrior flying tokens, non-Angel
+  creature protection, Angel exclusion, and next-turn cleanup.
+- SQLite cache test confirms `get_card_effect(...)` resolves the PG114 rule
+  after PostgreSQL -> Hermes sync.
+
+Package files:
+
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_precheck_20260623_200501.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_apply_20260623_200501.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_postcheck_20260623_200501.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_rollback_20260623_200501.sql`.
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_precheck_20260623_200501.out`;
+  `card_rows=1`, `existing_rule_rows=0`, `target_active_rows=0`,
+  `shadow_rows=0`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_apply_20260623_200501.out`;
+  backup rows `0`, `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_postcheck_20260623_200501.out`;
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `active_shadow_rows=0`, `backup_rows=0`.
+- Targeted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_sync_report_20260623_200501.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`, `sqlite_inserted_or_updated=1`,
+  `canonical_snapshot_rows_exported=3196`.
+- Full local battle-audit sync:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_pg114_emerias_call_20260623_200501/battle_card_rules_cache_sync_20260623_201031.json`;
+  `pg_rows_loaded=5318`, `sqlite_inserted_or_updated=5273`,
+  `canonical_snapshot_rows_exported=3204`.
+- Focused/runtime tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_focused_tests_20260623_200501.out`.
+- Full battle analyst suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_battle_analyst_v10_3_20260623_200501.out`;
+  PG114 focused and SQLite-cache tests pass.
+- Local replay/audit:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_pg114_emerias_call_20260623_200501/summary_20260623_201031.json`;
+  forensic `turn_findings=0`, `decision_findings=0`, strategy audit has one
+  medium low-confidence replay finding
+  `forced_keep_after_bad_mulligan`, with `review_required_findings=0`.
+
+Post-sync deck-card audits:
+
+- Deck `607`: `high=7`, `medium=8`, `pass=79`.
+- Global: `high=21`, `medium=15`, `pass=169`.
+
+Register decision:
+
+- PG114 is closed as applied, postchecked, synced, tested, and locally
+  replay-audited.
+- Do not reuse PG114.
+- Next package number is PG115.

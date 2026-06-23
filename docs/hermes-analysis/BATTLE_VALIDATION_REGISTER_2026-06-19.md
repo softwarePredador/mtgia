@@ -18120,3 +18120,56 @@ Battle gate interpretation:
 - Final status remains `review_required` only from
   `event_contract_static=review_required`; this is the same static fixture
   backlog category, not an observed PG106 runtime failure.
+
+## PG114 Battle Validation - Emeria's Call Token-Maker
+
+Status: `validated_runtime_pg_sync_and_local_replay_audit`.
+
+Runtime changes validated:
+
+- Added until-next-turn keyword restoration support for card-level temporary
+  protection that must survive normal EOT cleanup.
+- Added `token_maker` support for
+  `grant_non_angel_creatures_indestructible_until_next_turn`.
+- PG114 focused tests prove two 4/4 flying Angel Warrior tokens, non-Angel
+  creature protection, Angel exclusion, and next-turn expiry.
+
+PostgreSQL/source-of-truth changes:
+
+- PG114 promoted `Emeria's Call // Emeria, Shattered Skyclave`:
+  `battle_rule_v1:ae4a933d873bec332ec2a46106b79277`,
+  `oracle_hash=2fab1a2b9eb87041bc9e93f3b8d52831`,
+  `effect=token_maker`,
+  `review_status=verified`, `execution_status=auto`.
+- No prior active/shadow rule existed for this normalized card.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_postcheck_20260623_200501.out`.
+- Targeted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_sync_report_20260623_200501.json`.
+- Focused tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_focused_tests_20260623_200501.out`.
+- Full battle analyst suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg114_emerias_call_token_maker_battle_analyst_v10_3_20260623_200501.out`.
+- Local replay/audit:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_pg114_emerias_call_20260623_200501/summary_20260623_201031.json`.
+
+Local replay interpretation:
+
+- Full local PG -> Hermes sync before replay:
+  `pg_rows_loaded=5318`, `sqlite_inserted_or_updated=5273`,
+  `canonical_snapshot_rows_exported=3204`.
+- Forensic audit clean: `turn_findings=0`, `decision_findings=0`.
+- Strategy audit has one medium low-confidence replay finding:
+  `forced_keep_after_bad_mulligan`; `review_required_findings=0`.
+- This does not indicate an Emeria runtime failure and does not supersede the
+  recurring 16-seed gate history.
+
+Decision:
+
+- PG114 is accepted as a card-rule/source-of-truth and local runtime validation
+  package.
+- It reduces deck `607` card-rule queue to `high=7`, `medium=8`, `pass=79`
+  and global queue to `high=21`, `medium=15`, `pass=169`.
