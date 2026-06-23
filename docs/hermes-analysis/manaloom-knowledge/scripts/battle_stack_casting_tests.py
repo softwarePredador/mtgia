@@ -560,6 +560,53 @@ def register_tests(battle, player):
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
+    def test_direct_spell_resolution_fills_minimum_resolution_context():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.library = [{"name": "Drawn", "cmc": 1, "type_line": "Sorcery"}]
+            active.mana_pool.add_generic(1)
+            spell = {
+                "name": "Direct Audited Draw",
+                "cmc": 1,
+                "mana_cost": "{1}",
+                "type_line": "Sorcery",
+            }
+            effect = {"effect": "draw_cards", "count": 1}
+            ctx = battle.begin_cast_context(
+                active,
+                spell,
+                "precombat_main",
+                effect_data=effect,
+                role="normal",
+            )
+            assert battle.commit_cast_payment(ctx) is True
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                spell,
+                2,
+                random.Random(113),
+                effect_data_override=effect,
+                phase="precombat_main",
+            )
+
+            resolved = next(data for event, data in events if event == "spell_resolved")
+            assert resolved["phase"] == "precombat_main"
+            assert resolved["priority_window"] == "direct_resolution"
+            assert resolved["stack_depth"] == 0
+            assert resolved["source_zone"] == "hand"
+            assert resolved["from_zone"] == "hand"
+            assert resolved["to_zone"] == "graveyard"
+            assert resolved["cast_pipeline"] == "601.2_minimal"
+            assert resolved["resolved_from_stack"] is False
+            assert resolved["locked_cost"]["generic"] == 1
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
     def test_casting_context_locks_cost_before_payment():
         active = player("Active")
         spell = {
@@ -1638,6 +1685,7 @@ def register_tests(battle, player):
         test_main_phase_pass_trace_explains_mana_constrained_hand,
         test_stack_resolution_emits_apnap_pass_sequence_before_resolve,
         test_spell_resolved_includes_stack_and_zone_provenance,
+        test_direct_spell_resolution_fills_minimum_resolution_context,
         test_casting_context_locks_cost_before_payment,
         test_casting_context_emits_cost_paid_event,
         test_casting_context_locks_x_alternative_and_additional_costs,

@@ -77,6 +77,11 @@ GLOBAL_LEARNING_ELIGIBILITY_POLICY = (
     "requires_high_confidence_strategy_seed_and_all_mandatory_gates_pass"
 )
 
+WHEEL_SCOPES_WITH_MODELED_OPPONENT_DELTAS = {
+    "multiplayer_discard_draw_v1",
+    "wheel_of_misfortune_secret_number_compact_v1",
+}
+
 
 def load_jsonl(path: Path | None) -> list[dict[str, Any]]:
     if path is None or not path.exists():
@@ -332,7 +337,10 @@ def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
         model_scope = str(score.get("model_scope") or "")
         timing_justified = bool(score.get("timing_justified"))
         wheel_payoffs = score.get("wheel_payoffs") or []
-        if "wheel_model_simplified" in risk_flags and model_scope != "multiplayer_discard_draw_v1":
+        if (
+            "wheel_model_simplified" in risk_flags
+            and model_scope not in WHEEL_SCOPES_WITH_MODELED_OPPONENT_DELTAS
+        ):
             findings.append(finding(
                 "medium",
                 "wheel_model_simplified",

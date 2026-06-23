@@ -75,6 +75,19 @@ def test_known_field_contract_waivers_are_not_generic_only_gaps():
                     {"discard_destination": "graveyard", "drawn_card": "Lightning Bolt"},
                 ),
                 base_decision(
+                    "land_tax_upkeep_tutor",
+                    {
+                        "player_land_count": 1,
+                        "opponent_land_counts": [{"player": "Opponent", "lands": 2}],
+                        "max_opponent_land_count": 2,
+                        "candidate_count": 1,
+                        "selected_count": 1,
+                        "max_count": 3,
+                        "reveals": True,
+                        "shuffle_after": True,
+                    },
+                ),
+                base_decision(
                     "saga_chapter_resolution",
                     {"chapter": 3, "candidate_count": 2, "selected_reason": "best_target"},
                 ),

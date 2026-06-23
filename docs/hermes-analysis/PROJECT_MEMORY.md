@@ -736,3 +736,26 @@ Atualizado em 2026-05-26:
   `battle_runtime_surface_manifest.py --fail-on-unclassified`.
 - Next action remains: commit this harness fix, rerun deck `6`
   `deck6_pg078_rebaseline_16_seed` with `start_seed=64270200`.
+
+## ManaLoom PG078 deck 6 rebaseline checkpoint - 2026-06-23 07:32 UTC
+
+- Accepted run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/summary.json`.
+- Scope: harness/replay checkpoint only. No PostgreSQL apply, no deck swap, no
+  `deck_cards` mutation.
+- Runtime/harness fixes validated: flashback targeted removal target
+  declaration, Land Tax decision-trace comparison option, spell-copy resolution
+  provenance, and action-critic handling for same-name spell copies.
+- Gate result: `action_critic=pass`, `forensic_audit=pass`,
+  `replay_decision_audit=pass`, `event_contract_static=pass`,
+  `decision_trace_taxonomy=pass`, `table_intent=pass`, and
+  `target_pressure=pass` across 16 seeds from `64270200`.
+- Card-coherence auditor rerun at `20260623_073004`: deck `6` `pass=100`,
+  deck `606` `high=7`, `medium=7`, `pass=67`, and global `high=50`,
+  `medium=12`, `pass=143`.
+- Final aggregate is `trusted_for_strategy_learning`. `strategy_audit` still
+  records two medium low-confidence findings (`forced_keep_after_bad_mulligan`
+  on seeds `64270204` and `64270207`), but
+  `strategy_review_required_findings=0`.
+- Next work: keep PG079 for the next real PostgreSQL card-rule package and
+  continue deck `606` high battle-critical queue.

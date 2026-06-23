@@ -90,6 +90,28 @@ CONTRACTS: dict[str, dict[str, Any]] = {
         "specific_status": "specific_via_research",
         "fixture_gate": "test_battle_decision_research_review.py",
     },
+    "land_tax_upkeep_tutor": {
+        "owner": "land-tax-upkeep-tutor-field-contract",
+        "strategy_auditor": "generic_strategy_fields_only",
+        "research_category": None,
+        "specific_status": "accepted_field_contract_waiver",
+        "waiver_reason": (
+            "Land Tax upkeep tutor is deterministic card-advantage bookkeeping; "
+            "the trace must expose land-count condition, candidate count, "
+            "selected count, max count, reveal policy, and shuffle policy."
+        ),
+        "required_score_keys": {
+            "player_land_count",
+            "opponent_land_counts",
+            "max_opponent_land_count",
+            "candidate_count",
+            "selected_count",
+            "max_count",
+            "reveals",
+            "shuffle_after",
+        },
+        "fixture_gate": "field_contract_required_before_observed_learning",
+    },
     "lorehold_upkeep_rummage": {
         "owner": "lorehold-upkeep-rummage-field-contract",
         "strategy_auditor": "generic_strategy_fields_only",

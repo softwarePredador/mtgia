@@ -20733,3 +20733,48 @@ Current reading:
   `Witch Enchanter // Witch-Blessed Meadow`.
 - Next step after committing this batch is a fresh battle rebaseline for deck
   `6`; do not mix the battle rebaseline with the next card-rule PG package.
+
+## PG078 Deck 6 Rebaseline Reading - 2026-06-23 07:32 UTC
+
+Accepted run:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/summary.json`
+  (`deck_id=6`, `start_seed=64270200`, `seeds_completed=16`).
+
+What this proves:
+
+- The post-PG078 deck `6` replay surface is no longer blocked by action,
+  forensic, replay-decision, event-contract, decision-taxonomy, table-intent,
+  or target-pressure gates.
+- `action_critic` has `findings=0`; `forensic_audit` has `rule_findings=0`;
+  `replay_decision_audit` has `decision_findings=0`.
+- `event_contract_static` is ready with no observed/static unclassified events
+  and no missing required fields.
+- `decision_trace_taxonomy` is ready with zero contract findings and zero
+  missing required fields.
+- Final aggregate status is `trusted_for_strategy_learning`, with
+  `battle_replay_final_status_reason=all_mandatory_gates_pass` and
+  `mandatory_gate_divergences=[]`.
+- `strategy_audit` has `review_required_findings=0`; the previous
+  `wheel_model_simplified` review item was superseded by the
+  `wheel_of_misfortune_secret_number_compact_v1` scope fix.
+- The post-run card-coherence auditor still reports deck `6` `pass=100` in
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_rebaseline_checkpoint_20260623_073004.json`.
+
+Learning caveat:
+
+- Final aggregate status is `trusted_for_strategy_learning`, but the learning
+  policy remains seed-scoped.
+- `strategy_audit` records two medium low-confidence findings,
+  `forced_keep_after_bad_mulligan=2`; seeds `64270204` and `64270207` should
+  not be treated as high-confidence learning samples.
+- This is not evidence that a card rule is wrong in PostgreSQL or that deck
+  composition should be swapped.
+
+Current reading:
+
+- Deck `6` card/replay technical blockers are closed for this checkpoint, and
+  the latest accepted aggregate is `trusted_for_strategy_learning`.
+- Continue card-rule validation on deck `606` high battle-critical queue.
+- Treat the two remaining `forced_keep_after_bad_mulligan` records as
+  seed-level low-confidence exclusions, not as deck `6` review blockers.

@@ -44,6 +44,10 @@ def test_known_static_and_observed_events_are_classified():
                 "damage_wipe_treasure_resolved",
                 "life_totals_redistributed",
                 "worldfire_resolved",
+                "land_tax_trigger_resolved",
+                "graveyard_flashback_granted",
+                "mizzix_mastery_resolved",
+                "spell_copy_ceased_to_exist",
             ],
         )
         write_events(
@@ -57,6 +61,10 @@ def test_known_static_and_observed_events_are_classified():
                 {"event": "damage_wipe_treasure_resolved", "turn": 3, "player": "A"},
                 {"event": "life_totals_redistributed", "turn": 3, "player": "A"},
                 {"event": "worldfire_resolved", "turn": 3, "player": "A"},
+                {"event": "land_tax_trigger_resolved", "turn": 4, "player": "A"},
+                {"event": "graveyard_flashback_granted", "turn": 4, "player": "A"},
+                {"event": "mizzix_mastery_resolved", "turn": 4, "player": "A"},
+                {"event": "spell_copy_ceased_to_exist", "turn": 4, "player": "A"},
             ],
         )
 

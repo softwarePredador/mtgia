@@ -486,6 +486,36 @@ def test_strategy_auditor_accepts_multiplayer_wheel_with_payoff():
     assert result["summary"]["findings"] == 0
 
 
+def test_strategy_auditor_accepts_wheel_of_misfortune_compact_scope():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "d-wheel-misfortune",
+                "decision_type": "wheel",
+                "chosen_option": {"card": "Wheel of Misfortune", "effect": "wheel"},
+                "score_components": {
+                    "opponent_refill_risk": 0,
+                    "model_scope": "wheel_of_misfortune_secret_number_compact_v1",
+                    "timing_justified": True,
+                    "wheel_payoffs": [],
+                    "opponent_net_cards": [0, 0, 0],
+                    "total_opponent_net_cards": 0,
+                },
+                "strategic_principle": "wheel_only_when_refill_or_payoff_outweighs_opponent_refill",
+                "heuristic_version": "test",
+                "resource_delta": {"draw_count": 7, "opponent_net_cards": [0, 0, 0]},
+                "risk_flags": ["wheel_model_simplified"],
+                "alternatives_considered": [{"card": "Wheel of Misfortune"}],
+            },
+        ],
+    )
+
+    codes = {finding["code"] for finding in result["findings"]}
+    assert "wheel_model_simplified" not in codes
+    assert result["summary"]["review_required_findings"] == 0
+
+
 def test_strategy_auditor_flags_worldfire_without_known_follow_up():
     result = auditor.audit_strategy(
         events=[],
@@ -684,6 +714,7 @@ if __name__ == "__main__":
         test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel,
         test_strategy_auditor_accepts_contextual_pass_no_action,
         test_strategy_auditor_accepts_multiplayer_wheel_with_payoff,
+        test_strategy_auditor_accepts_wheel_of_misfortune_compact_scope,
         test_strategy_auditor_flags_worldfire_without_known_follow_up,
         test_global_learning_eligibility_blocks_high_strategy_seed_when_other_gates_review_required,
         test_global_learning_eligibility_allows_clean_high_seed_and_excludes_low_confidence_seed,

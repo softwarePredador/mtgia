@@ -16954,3 +16954,66 @@ Status: `fixed_validated_preflight`.
   exited cleanly.
 - This is a harness/preflight fix only; no battle replay result was produced
   by the failed `065035` run.
+
+## PG078 Deck 6 Battle Rebaseline - 2026-06-23 07:32 UTC
+
+Status: `trusted_for_strategy_learning`.
+
+Scope:
+
+- Reran deck `6` battle rebaseline after the PG078 card-rule/cache work and
+  preflight manifest fix.
+- No PostgreSQL apply, no deck swap, and no `deck_cards` mutation occurred in
+  this rebaseline checkpoint.
+
+Runtime/harness fixes validated in this cycle:
+
+- Flashback targeted removal now declares and persists target metadata before
+  resolution.
+- Land Tax upkeep tutor now exposes an explicit rejected/declined option so
+  decision trace comparison fields are present.
+- Spell-copy resolutions no longer consume the original spell cast in
+  `battle_action_critic.py`.
+- Copy/direct spell resolution provenance now carries required contract fields.
+
+Evidence:
+
+- Accepted run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/summary.json`.
+- Command profile:
+  `MANALOOM_BATTLE_TARGET_DECK_ID=6`,
+  `run_profile=deck6_pg078_learning_gate_fix_16_seed`,
+  `start_seed=64270200`, `seeds_completed=16`.
+- Test harness inside the run: `test_results_status_counts.pass=18`.
+- Gate results:
+  `action_critic=pass` with `findings=0`,
+  `forensic_audit=pass` with `rule_findings=0`,
+  `replay_decision_audit=pass` with `decision_findings=0`,
+  `event_contract_static=pass`,
+  `decision_trace_taxonomy=pass`,
+  `table_intent=pass`, and `target_pressure=pass`.
+- Card-coherence auditor rerun after the rebaseline:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_rebaseline_checkpoint_20260623_073004.json`
+  reports deck `6` `pass=100`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg078_rebaseline_checkpoint_20260623_073004.json`
+  reports deck `606` `high=7`, `medium=7`, `pass=67`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg078_rebaseline_checkpoint_20260623_073004.json`
+  reports global `high=50`, `medium=12`, `pass=143`.
+- Final aggregate status:
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  reason `all_mandatory_gates_pass`.
+
+Learning caveat:
+
+- `strategy_audit=pass`; it still records two medium low-confidence findings,
+  both `forced_keep_after_bad_mulligan`.
+- Seeds `64270204` and `64270207` are low-confidence; the other 14 seeds are
+  high-confidence strategy-learning candidates.
+- This is not a card-rule/Oracle/PostgreSQL mismatch.
+
+Status:
+
+- Card/replay blockers for deck `6` are closed for this checkpoint.
+- Use seed-level learning confidence when consuming the run: 14 eligible
+  high-confidence seeds, 2 low-confidence seeds retained as evidence but not
+  high-confidence learning samples.

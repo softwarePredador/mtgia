@@ -26,6 +26,7 @@ ACTION_EVENTS = {
     "creature_cast",
     "cost_paid",
     "end_step_instant",
+    "flashback_cast",
     "game_won",
     "land_played",
     "miracle_cast",
@@ -56,6 +57,7 @@ CARD_ACTION_EVENTS = {
     "commander_cast",
     "creature_cast",
     "end_step_instant",
+    "flashback_cast",
     "land_played",
     "miracle_cast",
     "spell_cast",
@@ -107,9 +109,21 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "follow-up adventure creature cast represented in stack/cast context and human replay.",
     ),
+    "adventure_exiled": (
+        "technical",
+        "adventure spell exile ledger after the spell half resolves.",
+    ),
     "aetherflux_reservoir_resolved": (
         "strategy_signal",
         "Aetherflux Reservoir permanent resolution is engine context for later spell-cast lifegain.",
+    ),
+    "approach_cast_tracked": (
+        "strategy_signal",
+        "Approach cast count is tracked for first/second-resolution outcome context.",
+    ),
+    "approach_first_resolution": (
+        "strategy_signal",
+        "first Approach resolution changes library placement and future win-condition context.",
     ),
     "attachment_sba": (
         "ignored_with_reason",
@@ -139,6 +153,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "cantrip/filter resolution is represented by card-flow and decision context.",
     ),
+    "chaos_warp_reveal_resolved": (
+        "strategy_signal",
+        "Chaos Warp reveal/placement outcome is card-specific resolution evidence.",
+    ),
     "composite_rule_component_resolved": (
         "strategy_signal",
         "component of a composite rule; consumed with the parent composite resolution.",
@@ -146,6 +164,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "composite_rule_resolved": (
         "strategy_signal",
         "composite rule resolution signal consumed by replay/forensic checks.",
+    ),
+    "compensation_tokens_created": (
+        "renderer_only",
+        "compensation token creation is replay state evidence for resolved removal.",
     ),
     "copy_creature_token_failed": (
         "ignored_with_reason",
@@ -171,9 +193,21 @@ EVENT_CONTRACT_OVERRIDES = {
         "renderer_only",
         "life-change explanation for human replay continuity.",
     ),
+    "damage_wipe_resolved": (
+        "strategy_signal",
+        "damage wipe resolution is consumed by replay and strategy checks.",
+    ),
     "damage_wipe_treasure_resolved": (
         "strategy_signal",
         "variable damage wipe plus treasure creation result is consumed by replay and strategy checks.",
+    ),
+    "dragons_approach_dragon_tutored": (
+        "strategy_signal",
+        "Dragon's Approach tutor result is combo/finisher context for replay checks.",
+    ),
+    "dragons_approach_resolved": (
+        "strategy_signal",
+        "Dragon's Approach resolution is card-specific damage/tutor context.",
     ),
     "draw_cards_resolved": (
         "strategy_signal",
@@ -186,6 +220,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "end_step_token_sacrificed": (
         "renderer_only",
         "scheduled token cleanup state evidence.",
+    ),
+    "end_step_token_exiled": (
+        "renderer_only",
+        "scheduled token exile cleanup state evidence.",
     ),
     "etb_tutor_resolved": (
         "strategy_signal",
@@ -227,6 +265,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "alternate graveyard cast mode represented in stack/cast context and human replay.",
     ),
+    "flashback_exiled": (
+        "technical",
+        "flashback replacement-zone ledger after a tracked graveyard cast resolves.",
+    ),
     "game_lost": (
         "strategy_signal",
         "game loss terminal state consumed by replay outcome checks.",
@@ -234,6 +276,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "game_win_prevented": (
         "strategy_signal",
         "win-prevention signal consumed by game-outcome and replay checks.",
+    ),
+    "graveyard_flashback_granted": (
+        "strategy_signal",
+        "Past in Flames style permission grant is card-flow evidence for later flashback casts.",
     ),
     "hand_filter_resolved": (
         "strategy_signal",
@@ -267,6 +313,14 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "land recursion resolution is resource-development evidence.",
     ),
+    "land_tax_trigger_skipped": (
+        "ignored_with_reason",
+        "Land Tax upkeep trigger was considered but skipped because its condition or targets were unavailable.",
+    ),
+    "land_tax_trigger_resolved": (
+        "strategy_signal",
+        "Land Tax upkeep tutor resolution is card-flow/resource evidence.",
+    ),
     "lander_token_created": (
         "renderer_only",
         "token creation is rendered as state evidence, not a standalone action verdict.",
@@ -286,6 +340,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "mill_resolved": (
         "strategy_signal",
         "library mill resolution changes deck state and future draw-loss risk for replay/strategy checks.",
+    ),
+    "jeskas_will_resolved": (
+        "strategy_signal",
+        "Jeska's Will mode result changes mana/card-flow context for strategy review.",
     ),
     "loot_resolved": (
         "strategy_signal",
@@ -307,6 +365,18 @@ EVENT_CONTRACT_OVERRIDES = {
         "forensic_card_event",
         "multi-target spell resolution is effect evidence consumed by forensic/replay checks.",
     ),
+    "mizzix_mastery_copy_cast": (
+        "strategy_signal",
+        "Mizzix's Mastery copy-cast event is recursion/copy-spell resolution context.",
+    ),
+    "mizzix_mastery_resolved": (
+        "strategy_signal",
+        "Mizzix's Mastery aggregate resolution is recursion/copy-spell outcome context.",
+    ),
+    "modal_boros_charm_resolved": (
+        "strategy_signal",
+        "Boros Charm modal resolution is protection/damage context for replay checks.",
+    ),
     "multikicker_paid": (
         "technical",
         "kicker payment ledger detail; primary cast remains the audited action.",
@@ -322,6 +392,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "phase_creatures_resolved": (
         "strategy_signal",
         "phase effect resolution is board-state evidence for replay/forensic checks.",
+    ),
+    "phase_out_resolved": (
+        "strategy_signal",
+        "phase-out resolution is protection/combat-prevention context.",
     ),
     "planeswalker_damage": (
         "renderer_only",
@@ -343,9 +417,21 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "temporary protection-from-everything grant is consumed by replay damage-prevention checks.",
     ),
+    "random_discard_after_tutor": (
+        "strategy_signal",
+        "Gamble-style random discard after tutor changes card-flow/resource context.",
+    ),
     "removal_countered_by_ward": (
         "strategy_signal",
         "ward counter result is stack/interaction context for replay checks.",
+    ),
+    "ripple_trigger_resolved": (
+        "strategy_signal",
+        "ripple resolution changes cast/card-flow context for replay checks.",
+    ),
+    "ritual_mana_added": (
+        "strategy_signal",
+        "ritual mana addition is resource-development evidence.",
     ),
     "saga_chapter_progressed": (
         "strategy_signal",
@@ -358,6 +444,22 @@ EVENT_CONTRACT_OVERRIDES = {
     "saga_sacrificed_by_sba": (
         "ignored_with_reason",
         "state-based action cleanup after final saga chapter.",
+    ),
+    "self_exiled_on_resolution": (
+        "technical",
+        "self-exile replacement zone movement after resolution.",
+    ),
+    "spell_copied": (
+        "strategy_signal",
+        "copy-spell stack event changes future resolution context.",
+    ),
+    "spell_copy_ceased_to_exist": (
+        "technical",
+        "copied spell cleanup after stack resolution.",
+    ),
+    "static_enter_tapped_applied": (
+        "technical",
+        "static tapped-entry replacement was applied during zone movement.",
     ),
     "station_activated": (
         "strategy_signal",
@@ -378,6 +480,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "treasure_created": (
         "renderer_only",
         "token/resource state evidence, not a standalone action verdict.",
+    ),
+    "trigger_skipped": (
+        "ignored_with_reason",
+        "trigger path was checked and skipped with reason metadata.",
     ),
     "utility_artifact_activated": (
         "strategy_signal",
@@ -505,6 +611,18 @@ def has_declared_target(event: dict[str, Any]) -> bool:
         return True
     targets = event.get("targets")
     return isinstance(targets, list) and len(targets) > 0
+
+
+def is_spell_copy_resolution(event: dict[str, Any]) -> bool:
+    return (
+        event.get("event") == "spell_resolved"
+        and (
+            event.get("role") == "copy"
+            or event.get("source_zone") == "stack_copy"
+            or event.get("destination") == "ceased_to_exist"
+            or event.get("cast_pipeline") in {"spell_copy", "spell_copy_resolution"}
+        )
+    )
 
 
 def action_finding(
@@ -913,7 +1031,7 @@ def criticize_actions(
                     "Only allow this with an explicit extra-land effect in the event metadata.",
                 ))
 
-        if kind in {"spell_cast", "creature_cast", "commander_cast", "miracle_cast", "end_step_instant"}:
+        if kind in {"spell_cast", "creature_cast", "commander_cast", "miracle_cast", "end_step_instant", "flashback_cast"}:
             if is_land_event(event):
                 findings.append(action_finding(
                     "critical",
@@ -926,7 +1044,9 @@ def criticize_actions(
 
         if kind == "spell_resolved":
             key = (replay_id, player, str(event.get("card") or ""))
-            if cast_stack.get(key):
+            if is_spell_copy_resolution(event):
+                evidence.append("copy_resolution=true")
+            elif cast_stack.get(key):
                 cast_stack[key].pop()
             else:
                 findings.append(action_finding(

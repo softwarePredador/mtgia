@@ -265,6 +265,119 @@ def test_critic_accepts_targeted_removal_with_declared_target():
     assert result["summary"]["findings"] == 0
 
 
+def test_critic_tracks_flashback_cast_before_resolution():
+    result = critic.criticize_actions([
+        {
+            "event": "flashback_cast",
+            "replay_id": "r-flashback-ok",
+            "turn": 6,
+            "phase": "precombat_main",
+            "player": "Lorehold",
+            "card": "Swords to Plowshares",
+            "effect": "remove_creature",
+            "type_line": "Instant",
+            "target": "Threat Creature",
+            "targets": [{"target": "Threat Creature"}],
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+        },
+        {
+            "event": "spell_resolved",
+            "replay_id": "r-flashback-ok",
+            "turn": 6,
+            "phase": "precombat_main",
+            "player": "Lorehold",
+            "card": "Swords to Plowshares",
+            "effect": "remove_creature",
+            "type_line": "Instant",
+            "resolved_from_stack": True,
+            "stack_depth": 1,
+            "source_zone": "graveyard",
+            "from_zone": "graveyard",
+            "to_zone": "exile",
+            "target": "Threat Creature",
+            "targets": [{"target": "Threat Creature"}],
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+        },
+    ])
+
+    codes = {finding["code"] for finding in result["findings"]}
+
+    assert "resolve_without_cast" not in codes
+    assert "targeted_removal_without_declared_target" not in codes
+
+
+def test_critic_does_not_consume_original_cast_for_spell_copy_resolution():
+    result = critic.criticize_actions([
+        {
+            "event": "spell_cast",
+            "replay_id": "r-copy-ok",
+            "turn": 8,
+            "phase": "precombat_main",
+            "player": "Lorehold",
+            "card": "Fateful Showdown",
+            "effect": "draw_cards",
+            "type_line": "Instant",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "cast_pipeline": "601.2_minimal",
+        },
+        {
+            "event": "spell_resolved",
+            "replay_id": "r-copy-ok",
+            "turn": 8,
+            "phase": "precombat_main",
+            "player": "Lorehold",
+            "card": "Fateful Showdown",
+            "effect": "draw_cards",
+            "type_line": "Instant",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "role": "copy",
+            "source_zone": "stack_copy",
+            "from_zone": "stack",
+            "to_zone": "ceased_to_exist",
+            "destination": "ceased_to_exist",
+            "zone_after": "ceased_to_exist",
+            "result": "resolved",
+            "resolved_from_stack": True,
+            "stack_depth": 2,
+            "priority_window": "stack_resolution",
+            "cast_pipeline": "spell_copy",
+            "locked_cost": {"copied_spell": True},
+        },
+        {
+            "event": "spell_resolved",
+            "replay_id": "r-copy-ok",
+            "turn": 8,
+            "phase": "precombat_main",
+            "player": "Lorehold",
+            "card": "Fateful Showdown",
+            "effect": "draw_cards",
+            "type_line": "Instant",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "role": "normal",
+            "source_zone": "hand",
+            "from_zone": "hand",
+            "to_zone": "graveyard",
+            "destination": "graveyard",
+            "zone_after": "graveyard",
+            "result": "resolved",
+            "resolved_from_stack": True,
+            "stack_depth": 1,
+            "priority_window": "stack_resolution",
+            "cast_pipeline": "601.2_minimal",
+            "locked_cost": {"generic": 2, "colored": {"red": 2}},
+        },
+    ])
+
+    codes = {finding["code"] for finding in result["findings"]}
+
+    assert "resolve_without_cast" not in codes
+
+
 def test_critic_does_not_consume_decision_trace_from_wrong_phase():
     result = critic.criticize_actions(
         [
@@ -597,6 +710,23 @@ def test_critic_reports_event_contract_denominators():
     assert contract["event_types_unclassified"] == ["future_new_event"]
 
 
+def test_critic_classifies_flashback_and_land_tax_auxiliary_events():
+    result = critic.criticize_actions([
+        {"event": "adventure_exiled", "replay_id": "r-contract", "turn": 1, "player": "A", "card": "Adventure Spell"},
+        {"event": "flashback_exiled", "replay_id": "r-contract", "turn": 1, "player": "A", "card": "Past in Flames"},
+        {"event": "graveyard_flashback_granted", "replay_id": "r-contract", "turn": 1, "player": "A", "card": "Past in Flames"},
+        {"event": "land_tax_trigger_skipped", "replay_id": "r-contract", "turn": 1, "player": "A", "card": "Land Tax"},
+    ])
+
+    contract = result["summary"]["event_contract"]
+
+    assert contract["events_unclassified"] == 0
+    assert contract["event_types_unclassified"] == []
+    assert contract["event_class_counts"]["technical"] == 2
+    assert contract["event_class_counts"]["strategy_signal"] == 1
+    assert contract["event_class_counts"]["ignored_with_reason"] == 1
+
+
 if __name__ == "__main__":
     tests = [
         test_critic_flags_action_level_findings,
@@ -614,10 +744,13 @@ if __name__ == "__main__":
         test_critic_flags_life_replacement_without_original_final_metadata,
         test_critic_accepts_large_hand_with_no_max_hand_size_permanent,
         test_critic_flags_large_hand_without_no_max_hand_size_permanent,
+        test_critic_tracks_flashback_cast_before_resolution,
+        test_critic_does_not_consume_original_cast_for_spell_copy_resolution,
         test_critic_does_not_consume_decision_trace_from_wrong_phase,
         test_critic_flags_spell_resolved_without_resolution_provenance,
         test_critic_accepts_spell_resolved_with_resolution_provenance,
         test_critic_reports_event_contract_denominators,
+        test_critic_classifies_flashback_and_land_tax_auxiliary_events,
     ]
     for test in tests:
         test()

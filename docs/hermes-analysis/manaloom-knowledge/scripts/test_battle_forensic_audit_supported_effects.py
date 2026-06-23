@@ -40,8 +40,11 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "composite_resolution" in audit.SUPPORTED_EFFECTS
     assert "damage_player_and_creatures" in audit.SUPPORTED_EFFECTS
     assert "damage_wipe_treasure" in audit.SUPPORTED_EFFECTS
+    assert "graveyard_flashback_grant" in audit.SUPPORTED_EFFECTS
     assert "hand_filter" in audit.SUPPORTED_EFFECTS
     assert "copy_creature_token" in audit.SUPPORTED_EFFECTS
+    assert "create_treasure" in audit.SUPPORTED_EFFECTS
+    assert "land_tax" in audit.SUPPORTED_EFFECTS
     assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
     assert "redistribute_life_totals" in audit.SUPPORTED_EFFECTS
     assert "thassa_oracle" in audit.SUPPORTED_EFFECTS

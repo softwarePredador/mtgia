@@ -1,0 +1,4001 @@
+{
+  "field_findings": [
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "priority_window",
+        "resolved_from_stack",
+        "stack_depth"
+      ],
+      "severity": "medium",
+      "source_line": 142,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270200/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 534,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270204/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "priority_window",
+        "resolved_from_stack",
+        "source_zone",
+        "stack_depth"
+      ],
+      "severity": "medium",
+      "source_line": 769,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270205/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 1033,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270205/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 1157,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270205/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 719,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270206/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 2409,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270206/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 1039,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270207/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 663,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270211/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "priority_window",
+        "resolved_from_stack",
+        "source_zone",
+        "stack_depth"
+      ],
+      "severity": "medium",
+      "source_line": 740,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270212/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 1565,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270213/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "source_zone"
+      ],
+      "severity": "medium",
+      "source_line": 2109,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270213/replay.events.jsonl"
+    },
+    {
+      "code": "observed_event_missing_minimum_fields",
+      "event": "spell_resolved",
+      "missing": [
+        "cast_pipeline",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "priority_window",
+        "resolved_from_stack",
+        "source_zone",
+        "stack_depth"
+      ],
+      "severity": "medium",
+      "source_line": 1381,
+      "source_path": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270215/replay.events.jsonl"
+    }
+  ],
+  "items": [
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "resolved activated ability; renderer/decision trace carry the action-specific context.",
+      "emit_lines": [
+        9643,
+        13540,
+        13488
+      ],
+      "emitters": [
+        {
+          "line": 9643,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13540,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13488,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "activated_ability",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 10,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "activation was considered but skipped; no action legality verdict expected.",
+      "emit_lines": [
+        9412,
+        9425,
+        9477,
+        13517,
+        13393,
+        13406
+      ],
+      "emitters": [
+        {
+          "line": 9412,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 9425,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 9477,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13517,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13393,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13406,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "activated_ability_skipped",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 311,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        7553,
+        7588,
+        7629,
+        13123,
+        13142
+      ],
+      "emitters": [
+        {
+          "line": 7553,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 7588,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 7629,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13123,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13142,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "additional_cost_failed",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 2,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "additional cost ledger detail; primary payment is audited through cost_paid.",
+      "emit_lines": [
+        13157,
+        7563,
+        7600,
+        7647
+      ],
+      "emitters": [
+        {
+          "line": 13157,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 7563,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 7600,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 7647,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "additional_cost_paid",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 44,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "alternate cast mode represented in stack/cast context and human replay.",
+      "emit_lines": [
+        14703
+      ],
+      "emitters": [
+        {
+          "line": 14703,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "adventure_cast",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "follow-up adventure creature cast represented in stack/cast context and human replay.",
+      "emit_lines": [
+        14759
+      ],
+      "emitters": [
+        {
+          "line": 14759,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "adventure_creature_cast_from_exile",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "adventure spell exile ledger after the spell half resolves.",
+      "emit_lines": [
+        71
+      ],
+      "emitters": [
+        {
+          "line": 71,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py"
+        }
+      ],
+      "event": "adventure_exiled",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_technical_ledger_event_no_forced_replay_required",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Aetherflux Reservoir permanent resolution is engine context for later spell-cast lifegain.",
+      "emit_lines": [
+        17385
+      ],
+      "emitters": [
+        {
+          "line": 17385,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "aetherflux_reservoir_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Approach cast count is tracked for first/second-resolution outcome context.",
+      "emit_lines": [
+        1636
+      ],
+      "emitters": [
+        {
+          "line": 1636,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "approach_cast_tracked",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 11,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "first Approach resolution changes library placement and future win-condition context.",
+      "emit_lines": [
+        17037
+      ],
+      "emitters": [
+        {
+          "line": 17037,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "approach_first_resolution",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 6,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "state-based attachment cleanup; legality is checked by the SBA helper.",
+      "emit_lines": [
+        167,
+        158
+      ],
+      "emitters": [
+        {
+          "line": 167,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        },
+        {
+          "line": 158,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        }
+      ],
+      "event": "attachment_sba",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "kicked Orim's Chant prevented creatures from being declared as attackers.",
+      "emit_lines": [
+        17892
+      ],
+      "emitters": [
+        {
+          "line": 17892,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "attack_prevented_by_orims_chant",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "battle transformation/cast signal consumed by replay and future strategy checks.",
+      "emit_lines": [
+        1272
+      ],
+      "emitters": [
+        {
+          "line": 1272,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "battle_back_face_cast",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "battle damage state evidence for replay continuity.",
+      "emit_lines": [
+        1248
+      ],
+      "emitters": [
+        {
+          "line": 1248,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "battle_damage",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "board wipe resolution is consumed by decision strategy and replay state checks.",
+      "emit_lines": [
+        8218,
+        16738
+      ],
+      "emitters": [
+        {
+          "line": 8218,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16738,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "board_wipe_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 2,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "cannot-lose effect is game-state strategy context, not a standalone action verdict.",
+      "emit_lines": [
+        16913
+      ],
+      "emitters": [
+        {
+          "line": 16913,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "cannot_lose_turn_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "cantrip/filter resolution is represented by card-flow and decision context.",
+      "emit_lines": [
+        16306
+      ],
+      "emitters": [
+        {
+          "line": 16306,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "cantrip_mana_filter_artifact_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "technical ledger event; included only in ledger mode.",
+      "emit_lines": [
+        1019
+      ],
+      "emitters": [
+        {
+          "line": 1019,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "cast_announced",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 935,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "technical ledger event; included only in ledger mode.",
+      "emit_lines": [
+        1034,
+        1044
+      ],
+      "emitters": [
+        {
+          "line": 1034,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 1044,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "cast_illegal",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 21,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Chaos Warp reveal/placement outcome is card-specific resolution evidence.",
+      "emit_lines": [
+        5264
+      ],
+      "emitters": [
+        {
+          "line": 5264,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "chaos_warp_reveal_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        19201
+      ],
+      "emitters": [
+        {
+          "line": 19201,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "combat",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 357,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        19053
+      ],
+      "emitters": [
+        {
+          "line": 19053,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "combat_result",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 390,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        17726,
+        18537,
+        18721,
+        19038,
+        19123,
+        18333,
+        19030
+      ],
+      "emitters": [
+        {
+          "line": 17726,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 18537,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 18721,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 19038,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 19123,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 18333,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 19030,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "combat_step",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 2199,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        15207
+      ],
+      "emitters": [
+        {
+          "line": 15207,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "commander_cast",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 113,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "compensation token creation is replay state evidence for resolved removal.",
+      "emit_lines": [
+        5183
+      ],
+      "emitters": [
+        {
+          "line": 5183,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "compensation_tokens_created",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "component of a composite rule; consumed with the parent composite resolution.",
+      "emit_lines": [
+        16118
+      ],
+      "emitters": [
+        {
+          "line": 16118,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "composite_rule_component_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "composite rule resolution signal consumed by replay/forensic checks.",
+      "emit_lines": [
+        16192
+      ],
+      "emitters": [
+        {
+          "line": 16192,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "composite_rule_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "token creation is rendered as state evidence, not a decision/action verdict.",
+      "emit_lines": [
+        13911
+      ],
+      "emitters": [
+        {
+          "line": 13911,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "copy_creature_token_created",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 9,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "copy-token path was considered but skipped or failed with reason metadata.",
+      "emit_lines": [
+        13880
+      ],
+      "emitters": [
+        {
+          "line": 13880,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "copy_creature_token_failed",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 2,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "copy-spell card had no legal stack target and intentionally resolved without creating a fake engine.",
+      "emit_lines": [
+        17212,
+        17173
+      ],
+      "emitters": [
+        {
+          "line": 17212,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17173,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "copy_spell_no_stack_target",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 4,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        1062
+      ],
+      "emitters": [
+        {
+          "line": 1062,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "cost_paid",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 914,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "state-based counter cleanup; not a player decision action.",
+      "emit_lines": [
+        55
+      ],
+      "emitters": [
+        {
+          "line": 55,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        }
+      ],
+      "event": "counters_cancelled",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        15798
+      ],
+      "emitters": [
+        {
+          "line": 15798,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "creature_cast",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 274,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "battlefield placement state evidence for human replay continuity.",
+      "emit_lines": [
+        16217,
+        17158,
+        17472
+      ],
+      "emitters": [
+        {
+          "line": 16217,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17158,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17472,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "creature_to_battlefield",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "life-change explanation for human replay continuity.",
+      "emit_lines": [
+        14241,
+        14000,
+        13982,
+        17528
+      ],
+      "emitters": [
+        {
+          "line": 14241,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14000,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13982,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17528,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "damage_resolved",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 7,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "damage wipe resolution is consumed by replay and strategy checks.",
+      "emit_lines": [
+        14116
+      ],
+      "emitters": [
+        {
+          "line": 14116,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "damage_wipe_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "variable damage wipe plus treasure creation result is consumed by replay and strategy checks.",
+      "emit_lines": [
+        14045
+      ],
+      "emitters": [
+        {
+          "line": 14045,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "damage_wipe_treasure_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Dragon's Approach tutor result is combo/finisher context for replay checks.",
+      "emit_lines": [
+        17632
+      ],
+      "emitters": [
+        {
+          "line": 17632,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "dragons_approach_dragon_tutored",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Dragon's Approach resolution is card-specific damage/tutor context.",
+      "emit_lines": [
+        17643
+      ],
+      "emitters": [
+        {
+          "line": 17643,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "dragons_approach_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "draw resolution is card-flow evidence consumed by replay/strategy context.",
+      "emit_lines": [
+        16410
+      ],
+      "emitters": [
+        {
+          "line": 16410,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "draw_cards_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 19,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "discard-hand-then-draw resolution is card-flow evidence consumed by replay/strategy context.",
+      "emit_lines": [
+        16393
+      ],
+      "emitters": [
+        {
+          "line": 16393,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "draw_equal_to_discarded_hand_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        19560
+      ],
+      "emitters": [
+        {
+          "line": 19560,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "end_step_instant",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 22,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "scheduled token exile cleanup state evidence.",
+      "emit_lines": [
+        13953
+      ],
+      "emitters": [
+        {
+          "line": 13953,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "end_step_token_exiled",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "scheduled token cleanup state evidence.",
+      "emit_lines": [
+        13946
+      ],
+      "emitters": [
+        {
+          "line": 13946,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "end_step_token_sacrificed",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 4,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "attachment state evidence, not a standalone strategy action.",
+      "emit_lines": [
+        13632,
+        13681
+      ],
+      "emitters": [
+        {
+          "line": 13632,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13681,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "equipment_attached",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "attachment state evidence, not a standalone strategy action.",
+      "emit_lines": [
+        13620,
+        13653
+      ],
+      "emitters": [
+        {
+          "line": 13620,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13653,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "equipment_unattached",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "enter-the-battlefield tutor resolution is card-flow evidence consumed by replay/strategy context.",
+      "emit_lines": [
+        8944
+      ],
+      "emitters": [
+        {
+          "line": 8944,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "etb_tutor_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "extra combat was blocked by cap and should carry cap reason metadata.",
+      "emit_lines": [
+        19480
+      ],
+      "emitters": [
+        {
+          "line": 19480,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "extra_combat_cap_reached",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "future-combat scheduling signal for strategy/replay context.",
+      "emit_lines": [
+        17563
+      ],
+      "emitters": [
+        {
+          "line": 17563,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "extra_combat_scheduled",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "extra-combat consumption signal for strategy/replay context.",
+      "emit_lines": [
+        19468
+      ],
+      "emitters": [
+        {
+          "line": 19468,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "extra_combat_taken",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "extra turn was blocked by cap and should carry cap reason metadata.",
+      "emit_lines": [
+        19652
+      ],
+      "emitters": [
+        {
+          "line": 19652,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "extra_turn_cap_reached",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "future-turn scheduling signal for strategy/replay context.",
+      "emit_lines": [
+        17547
+      ],
+      "emitters": [
+        {
+          "line": 17547,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "extra_turn_scheduled",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "extra-turn consumption signal for strategy/replay context.",
+      "emit_lines": [
+        19631
+      ],
+      "emitters": [
+        {
+          "line": 19631,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "extra_turn_taken",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        1442
+      ],
+      "emitters": [
+        {
+          "line": 1442,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "flashback_cast",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 4,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "flashback replacement-zone ledger after a tracked graveyard cast resolves.",
+      "emit_lines": [
+        59
+      ],
+      "emitters": [
+        {
+          "line": 59,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py"
+        }
+      ],
+      "event": "flashback_exiled",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "game loss terminal state consumed by replay outcome checks.",
+      "emit_lines": [
+        19642
+      ],
+      "emitters": [
+        {
+          "line": 19642,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "game_lost",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "win-prevention signal consumed by game-outcome and replay checks.",
+      "emit_lines": [
+        17026,
+        17498
+      ],
+      "emitters": [
+        {
+          "line": 17026,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17498,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "game_win_prevented",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        17019,
+        17488
+      ],
+      "emitters": [
+        {
+          "line": 17019,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17488,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "game_won",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 15,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Past in Flames style permission grant is card-flow evidence for later flashback casts.",
+      "emit_lines": [
+        7106
+      ],
+      "emitters": [
+        {
+          "line": 7106,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "graveyard_flashback_granted",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 6,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "hand filtering resolution is card-flow evidence consumed by replay/strategy context.",
+      "emit_lines": [
+        13813
+      ],
+      "emitters": [
+        {
+          "line": 13813,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "hand_filter_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "hate artifact resolution is effect evidence consumed by replay/forensic checks.",
+      "emit_lines": [
+        17408
+      ],
+      "emitters": [
+        {
+          "line": 17408,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "hate_artifact_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "imprint path was considered but skipped or failed with reason metadata.",
+      "emit_lines": [
+        7755
+      ],
+      "emitters": [
+        {
+          "line": 7755,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "imprint_failed",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "imprint resolution is resource-context evidence for later cast decisions.",
+      "emit_lines": [
+        7783
+      ],
+      "emitters": [
+        {
+          "line": 7783,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "imprint_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 1,
+      "static": true
+    },
+    {
+      "classification": "forensic_card_event",
+      "classification_reason": "instant removal is a card-event kind checked by forensic lineage.",
+      "emit_lines": [
+        18655
+      ],
+      "emitters": [
+        {
+          "line": 18655,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "instant_removal",
+      "expected_consumer": "battle_forensic_audit.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 1,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Jeska's Will mode result changes mana/card-flow context for strategy review.",
+      "emit_lines": [
+        7895
+      ],
+      "emitters": [
+        {
+          "line": 7895,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "jeskas_will_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        19410
+      ],
+      "emitters": [
+        {
+          "line": 19410,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "land_played",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 454,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "land ramp resolution is resource-development evidence for replay/strategy context.",
+      "emit_lines": [
+        13199
+      ],
+      "emitters": [
+        {
+          "line": 13199,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "land_ramp_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 6,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "land recursion creature resolution is resource-development evidence.",
+      "emit_lines": [
+        13597
+      ],
+      "emitters": [
+        {
+          "line": 13597,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "land_recursion_creature_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "land recursion resolution is resource-development evidence.",
+      "emit_lines": [
+        13221
+      ],
+      "emitters": [
+        {
+          "line": 13221,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "land_recursion_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Land Tax upkeep tutor resolution is card-flow/resource evidence.",
+      "emit_lines": [
+        8456
+      ],
+      "emitters": [
+        {
+          "line": 8456,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "land_tax_trigger_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 22,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "Land Tax upkeep trigger was considered but skipped because its condition or targets were unavailable.",
+      "emit_lines": [
+        8341
+      ],
+      "emitters": [
+        {
+          "line": 8341,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "land_tax_trigger_skipped",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 13,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "token creation is rendered as state evidence, not a standalone action verdict.",
+      "emit_lines": [
+        16457
+      ],
+      "emitters": [
+        {
+          "line": 16457,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "lander_token_created",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "life artifact resolution is effect evidence consumed by replay state checks.",
+      "emit_lines": [
+        17397
+      ],
+      "emitters": [
+        {
+          "line": 17397,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "life_artifact_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "life-total redistribution result is consumed by replay and strategy checks.",
+      "emit_lines": [
+        14151
+      ],
+      "emitters": [
+        {
+          "line": 14151,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "life_totals_redistributed",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "loot resolution is card-flow evidence consumed by replay/strategy context.",
+      "emit_lines": [
+        17424
+      ],
+      "emitters": [
+        {
+          "line": 17424,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "loot_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 7,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "decision-trace backed upkeep rummage signal.",
+      "emit_lines": [
+        11928
+      ],
+      "emitters": [
+        {
+          "line": 11928,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "lorehold_upkeep_rummage",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 51,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "upkeep rummage was considered and skipped.",
+      "emit_lines": [
+        11831
+      ],
+      "emitters": [
+        {
+          "line": 11831,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "lorehold_upkeep_rummage_skipped",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 285,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "planeswalker loyalty activation is represented in replay state and decision context.",
+      "emit_lines": [
+        1210
+      ],
+      "emitters": [
+        {
+          "line": 1210,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "loyalty_ability_activated",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "technical ledger event; included only in ledger mode.",
+      "emit_lines": [
+        3778
+      ],
+      "emitters": [
+        {
+          "line": 3778,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "mana_refreshed",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 747,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "library mill resolution changes deck state and future draw-loss risk for replay/strategy checks.",
+      "emit_lines": [
+        17449
+      ],
+      "emitters": [
+        {
+          "line": 17449,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "mill_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        11786
+      ],
+      "emitters": [
+        {
+          "line": 11786,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "miracle_cast",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 20,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Mizzix's Mastery copy-cast event is recursion/copy-spell resolution context.",
+      "emit_lines": [
+        12831
+      ],
+      "emitters": [
+        {
+          "line": 12831,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "mizzix_mastery_copy_cast",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Mizzix's Mastery aggregate resolution is recursion/copy-spell outcome context.",
+      "emit_lines": [
+        12854
+      ],
+      "emitters": [
+        {
+          "line": 12854,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "mizzix_mastery_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Boros Charm modal resolution is protection/damage context for replay checks.",
+      "emit_lines": [
+        16991
+      ],
+      "emitters": [
+        {
+          "line": 16991,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "modal_boros_charm_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 2,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        18568
+      ],
+      "emitters": [
+        {
+          "line": 18568,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "multi_defender_attack",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 29,
+      "static": true
+    },
+    {
+      "classification": "forensic_card_event",
+      "classification_reason": "multi-target spell resolution is effect evidence consumed by forensic/replay checks.",
+      "emit_lines": [
+        5489
+      ],
+      "emitters": [
+        {
+          "line": 5489,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "multi_target_resolution",
+      "expected_consumer": "battle_forensic_audit.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_forensic_card_event_static_contract_until_observed",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "kicker payment ledger detail; primary cast remains the audited action.",
+      "emit_lines": [
+        15514
+      ],
+      "emitters": [
+        {
+          "line": 15514,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "multikicker_paid",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 1,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "The One Ring burden life loss is upkeep state evidence consumed by replay state checks.",
+      "emit_lines": [
+        19330
+      ],
+      "emitters": [
+        {
+          "line": 19330,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "one_ring_burden_life_loss",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 1,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "library/exile state transition for Paradigm Shift-style effects.",
+      "emit_lines": [
+        1557
+      ],
+      "emitters": [
+        {
+          "line": 1557,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "paradigm_exiled",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "state-based permanent movement; not a player decision action.",
+      "emit_lines": [
+        361,
+        375
+      ],
+      "emitters": [
+        {
+          "line": 361,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        },
+        {
+          "line": 375,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        }
+      ],
+      "event": "permanent_moved_by_sba",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "phase effect resolution is board-state evidence for replay/forensic checks.",
+      "emit_lines": [
+        16902
+      ],
+      "emitters": [
+        {
+          "line": 16902,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "phase_creatures_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "phase-out resolution is protection/combat-prevention context.",
+      "emit_lines": [
+        16878
+      ],
+      "emitters": [
+        {
+          "line": 16878,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "phase_out_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "planeswalker damage state evidence for replay continuity.",
+      "emit_lines": [
+        1225
+      ],
+      "emitters": [
+        {
+          "line": 1225,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "planeswalker_damage",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        280,
+        291,
+        323,
+        307
+      ],
+      "emitters": [
+        {
+          "line": 280,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        },
+        {
+          "line": 291,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        },
+        {
+          "line": 323,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        },
+        {
+          "line": 307,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        }
+      ],
+      "event": "player_eliminated",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 13,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "scheduled copy cleanup ledger detail.",
+      "emit_lines": [
+        1541
+      ],
+      "emitters": [
+        {
+          "line": 1541,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "prepared_copies_removed",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_technical_ledger_event_no_forced_replay_required",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "copy setup state evidence for later replay resolution.",
+      "emit_lines": [
+        1521
+      ],
+      "emitters": [
+        {
+          "line": 1521,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "prepared_copy_created",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "technical ledger event; included only in ledger mode.",
+      "emit_lines": [
+        6114
+      ],
+      "emitters": [
+        {
+          "line": 6114,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "priority_pass",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 8431,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "temporary protection-from-everything grant is consumed by replay damage-prevention checks.",
+      "emit_lines": [
+        16288
+      ],
+      "emitters": [
+        {
+          "line": 16288,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "protection_from_everything_granted",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "protection effect resolution is consumed by replay/forensic checks.",
+      "emit_lines": [
+        16938,
+        16961
+      ],
+      "emitters": [
+        {
+          "line": 16938,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16961,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "protection_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Gamble-style random discard after tutor changes card-flow/resource context.",
+      "emit_lines": [
+        17353
+      ],
+      "emitters": [
+        {
+          "line": 17353,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "random_discard_after_tutor",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 7,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        17120
+      ],
+      "emitters": [
+        {
+          "line": 17120,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "recursion_resolved",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 18,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        5761,
+        5712,
+        5735
+      ],
+      "emitters": [
+        {
+          "line": 5761,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 5712,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 5735,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "redirect_removal_resolved",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "ward counter result is stack/interaction context for replay checks.",
+      "emit_lines": [
+        5551,
+        16076,
+        16505
+      ],
+      "emitters": [
+        {
+          "line": 5551,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16076,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16505,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "removal_countered_by_ward",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        5601,
+        5537,
+        5581,
+        16093,
+        16554,
+        16534
+      ],
+      "emitters": [
+        {
+          "line": 5601,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 5537,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 5581,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16093,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16554,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 16534,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "removal_resolved",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 46,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        176
+      ],
+      "emitters": [
+        {
+          "line": 176,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_support.py"
+        }
+      ],
+      "event": "replacement_applied",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 113,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "ripple resolution changes cast/card-flow context for replay checks.",
+      "emit_lines": [
+        17668
+      ],
+      "emitters": [
+        {
+          "line": 17668,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "ripple_trigger_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "ritual mana addition is resource-development evidence.",
+      "emit_lines": [
+        16256
+      ],
+      "emitters": [
+        {
+          "line": 16256,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "ritual_mana_added",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 7,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "saga progression signal consumed through decision/replay context.",
+      "emit_lines": [
+        8512
+      ],
+      "emitters": [
+        {
+          "line": 8512,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "saga_chapter_progressed",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 8,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "saga resolution signal consumed through decision/replay context.",
+      "emit_lines": [
+        8619
+      ],
+      "emitters": [
+        {
+          "line": 8619,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "saga_chapter_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 4,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "state-based action cleanup after final saga chapter.",
+      "emit_lines": [
+        216
+      ],
+      "emitters": [
+        {
+          "line": 216,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        }
+      ],
+      "event": "saga_sacrificed_by_sba",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 4,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "self-exile replacement zone movement after resolution.",
+      "emit_lines": [
+        81
+      ],
+      "emitters": [
+        {
+          "line": 81,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py"
+        }
+      ],
+      "event": "self_exiled_on_resolution",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 5,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        716,
+        17854,
+        18858,
+        6484,
+        6408,
+        15453,
+        15664,
+        15947,
+        6647
+      ],
+      "emitters": [
+        {
+          "line": 716,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17854,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 18858,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 6484,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 6408,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 15453,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 15664,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 15947,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 6647,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "spell_cast",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 545,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "copy-spell stack event changes future resolution context.",
+      "emit_lines": [
+        6528,
+        17192
+      ],
+      "emitters": [
+        {
+          "line": 6528,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17192,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "spell_copied",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 10,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "copied spell cleanup after stack resolution.",
+      "emit_lines": [
+        48
+      ],
+      "emitters": [
+        {
+          "line": 48,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py"
+        }
+      ],
+      "event": "spell_copy_ceased_to_exist",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 11,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        4116
+      ],
+      "emitters": [
+        {
+          "line": 4116,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "spell_countered",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 29,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        16163,
+        17877,
+        6554
+      ],
+      "emitters": [
+        {
+          "line": 16163,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17877,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 6554,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "spell_resolved",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "cast_pipeline",
+        "destination",
+        "event",
+        "from_zone",
+        "locked_cost",
+        "phase",
+        "priority_window",
+        "resolved_from_stack",
+        "result",
+        "source_zone",
+        "stack_depth",
+        "stack_object",
+        "to_zone",
+        "turn",
+        "zone_after"
+      ],
+      "observed_count": 408,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "static tapped-entry replacement was applied during zone movement.",
+      "emit_lines": [
+        12960
+      ],
+      "emitters": [
+        {
+          "line": 12960,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "static_enter_tapped_applied",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_technical_ledger_event_no_forced_replay_required",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "station activation is represented in replay state and decision context.",
+      "emit_lines": [
+        1498
+      ],
+      "emitters": [
+        {
+          "line": 1498,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "station_activated",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Thassa's Oracle enter-the-battlefield check is terminal-combo context for outcome validation.",
+      "emit_lines": [
+        17509
+      ],
+      "emitters": [
+        {
+          "line": 17509,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "thassa_oracle_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "token zone cleanup state evidence.",
+      "emit_lines": [
+        9591,
+        9874,
+        236
+      ],
+      "emitters": [
+        {
+          "line": 9591,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 9874,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 236,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py"
+        }
+      ],
+      "event": "token_ceased_to_exist",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_renderer_only_event_no_guardrail_consumer",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "topdeck manipulation is represented in decision trace score components.",
+      "emit_lines": [
+        11557,
+        11131,
+        11319,
+        11461
+      ],
+      "emitters": [
+        {
+          "line": 11557,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 11131,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 11319,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 11461,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "topdeck_manipulation_activated",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 45,
+      "static": true
+    },
+    {
+      "classification": "renderer_only",
+      "classification_reason": "token/resource state evidence, not a standalone action verdict.",
+      "emit_lines": [
+        16436
+      ],
+      "emitters": [
+        {
+          "line": 16436,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "treasure_created",
+      "expected_consumer": "battle_replay_v10_3.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 6,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        4199
+      ],
+      "emitters": [
+        {
+          "line": 4199,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "trigger_put_on_stack",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 359,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        9942,
+        9845,
+        13042,
+        13076,
+        13334,
+        14404,
+        14446,
+        14284,
+        14330,
+        14368,
+        14535,
+        14611,
+        19095
+      ],
+      "emitters": [
+        {
+          "line": 9942,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 9845,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13042,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13076,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13334,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14404,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14446,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14284,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14330,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14368,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14535,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14611,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 19095,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "trigger_resolved",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 359,
+      "static": true
+    },
+    {
+      "classification": "ignored_with_reason",
+      "classification_reason": "trigger path was checked and skipped with reason metadata.",
+      "emit_lines": [
+        13289,
+        13316
+      ],
+      "emitters": [
+        {
+          "line": 13289,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 13316,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "trigger_skipped",
+      "expected_consumer": "skip_guardrail_or_state_cleanup",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_explicitly_ignored_event_contract",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        19598
+      ],
+      "emitters": [
+        {
+          "line": 19598,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "turn_end",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 726,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        19288
+      ],
+      "emitters": [
+        {
+          "line": 19288,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "turn_start",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 747,
+      "static": true
+    },
+    {
+      "classification": "action_audited",
+      "classification_reason": "included in ACTION_EVENTS and receives action critic checks.",
+      "emit_lines": [
+        13713,
+        17328
+      ],
+      "emitters": [
+        {
+          "line": 13713,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 17328,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "tutor_resolved",
+      "expected_consumer": "battle_action_critic.py",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 82,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "utility artifact activation is represented in decision trace score components.",
+      "emit_lines": [
+        10200,
+        10787,
+        10436,
+        10525,
+        10665
+      ],
+      "emitters": [
+        {
+          "line": 10200,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 10787,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 10436,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 10525,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 10665,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "utility_artifact_activated",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 7,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "utility land activation is represented in decision trace score components.",
+      "emit_lines": [
+        9393,
+        12077,
+        12179,
+        12283,
+        12440,
+        12581
+      ],
+      "emitters": [
+        {
+          "line": 9393,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 12077,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 12179,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 12283,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 12440,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 12581,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "utility_land_activated",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 22,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "utility land trigger is replay state context.",
+      "emit_lines": [
+        8632
+      ],
+      "emitters": [
+        {
+          "line": 8632,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "utility_land_triggered",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 8,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "ward counter result is stack/interaction context for replay checks.",
+      "emit_lines": [
+        14659,
+        14671
+      ],
+      "emitters": [
+        {
+          "line": 14659,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 14671,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "ward_countered",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "ward payment ledger detail; primary interaction remains the audited action.",
+      "emit_lines": [
+        14667
+      ],
+      "emitters": [
+        {
+          "line": 14667,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "ward_paid",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_technical_ledger_event_no_forced_replay_required",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "alternate warp cast mode represented in stack/cast context and human replay.",
+      "emit_lines": [
+        1338
+      ],
+      "emitters": [
+        {
+          "line": 1338,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "warp_cast",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "technical",
+      "classification_reason": "warp delayed exile ledger detail.",
+      "emit_lines": [
+        1365
+      ],
+      "emitters": [
+        {
+          "line": 1365,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "warp_exiled_end_step",
+      "expected_consumer": "structured_replay_ledger",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_technical_ledger_event_no_forced_replay_required",
+      "minimum_fields": [
+        "event"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "warp recast is represented in stack/cast context and human replay.",
+      "emit_lines": [
+        1396
+      ],
+      "emitters": [
+        {
+          "line": 1396,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "warp_recast_from_exile",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "wheel decision/effect signal consumed by strategy review.",
+      "emit_lines": [
+        8803,
+        8879
+      ],
+      "emitters": [
+        {
+          "line": 8803,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        },
+        {
+          "line": 8879,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "wheel_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "observed_in_latest",
+      "fixture_waiver_reason": "",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 3,
+      "static": true
+    },
+    {
+      "classification": "strategy_signal",
+      "classification_reason": "Worldfire-style reset resolution is consumed by strategy and replay outcome checks.",
+      "emit_lines": [
+        16848
+      ],
+      "emitters": [
+        {
+          "line": 16848,
+          "path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+        }
+      ],
+      "event": "worldfire_resolved",
+      "expected_consumer": "decision_strategy_or_replay_context",
+      "fixture_or_waiver": "static_contract_accepted_waiver",
+      "fixture_waiver_reason": "accepted_strategy_context_signal_static_contract",
+      "minimum_fields": [
+        "event",
+        "turn"
+      ],
+      "observed_count": 0,
+      "static": true
+    }
+  ],
+  "summary": {
+    "all_event_types_total": 138,
+    "engine_source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "event_paths": [
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270200/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270201/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270202/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270203/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270204/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270205/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270206/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270207/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270208/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270209/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270210/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270211/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270212/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270213/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270214/replay.events.jsonl",
+      "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316/seed_64270215/replay.events.jsonl"
+    ],
+    "events_observed_total": 19415,
+    "fixture_or_waiver_counts": {
+      "observed_in_latest": 86,
+      "static_contract_accepted_waiver": 52
+    },
+    "generated_at_utc": "2026-06-23T07:18:19Z",
+    "input_dir": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065316",
+    "observed_counts": {
+      "activated_ability": 10,
+      "activated_ability_skipped": 311,
+      "additional_cost_failed": 2,
+      "additional_cost_paid": 44,
+      "aetherflux_reservoir_resolved": 5,
+      "approach_cast_tracked": 11,
+      "approach_first_resolution": 6,
+      "attack_prevented_by_orims_chant": 3,
+      "board_wipe_resolved": 2,
+      "cast_announced": 935,
+      "cast_illegal": 21,
+      "chaos_warp_reveal_resolved": 5,
+      "combat": 357,
+      "combat_result": 390,
+      "combat_step": 2199,
+      "commander_cast": 113,
+      "compensation_tokens_created": 3,
+      "copy_creature_token_created": 9,
+      "copy_creature_token_failed": 2,
+      "copy_spell_no_stack_target": 4,
+      "cost_paid": 914,
+      "creature_cast": 274,
+      "creature_to_battlefield": 5,
+      "damage_resolved": 7,
+      "draw_cards_resolved": 19,
+      "draw_equal_to_discarded_hand_resolved": 5,
+      "end_step_instant": 22,
+      "end_step_token_exiled": 5,
+      "end_step_token_sacrificed": 4,
+      "equipment_attached": 3,
+      "extra_turn_scheduled": 3,
+      "flashback_cast": 4,
+      "flashback_exiled": 3,
+      "game_won": 15,
+      "graveyard_flashback_granted": 6,
+      "hand_filter_resolved": 5,
+      "hate_artifact_resolved": 3,
+      "imprint_resolved": 1,
+      "instant_removal": 1,
+      "jeskas_will_resolved": 3,
+      "land_played": 454,
+      "land_ramp_resolved": 6,
+      "land_tax_trigger_resolved": 22,
+      "land_tax_trigger_skipped": 13,
+      "loot_resolved": 7,
+      "lorehold_upkeep_rummage": 51,
+      "lorehold_upkeep_rummage_skipped": 285,
+      "mana_refreshed": 747,
+      "miracle_cast": 20,
+      "mizzix_mastery_copy_cast": 3,
+      "mizzix_mastery_resolved": 3,
+      "modal_boros_charm_resolved": 2,
+      "multi_defender_attack": 29,
+      "multikicker_paid": 1,
+      "one_ring_burden_life_loss": 1,
+      "phase_out_resolved": 3,
+      "player_eliminated": 13,
+      "priority_pass": 8431,
+      "protection_from_everything_granted": 3,
+      "protection_resolved": 3,
+      "random_discard_after_tutor": 7,
+      "recursion_resolved": 18,
+      "redirect_removal_resolved": 5,
+      "removal_resolved": 46,
+      "replacement_applied": 113,
+      "ritual_mana_added": 7,
+      "saga_chapter_progressed": 8,
+      "saga_chapter_resolved": 4,
+      "saga_sacrificed_by_sba": 4,
+      "self_exiled_on_resolution": 5,
+      "spell_cast": 545,
+      "spell_copied": 10,
+      "spell_copy_ceased_to_exist": 11,
+      "spell_countered": 29,
+      "spell_resolved": 408,
+      "topdeck_manipulation_activated": 45,
+      "treasure_created": 6,
+      "trigger_put_on_stack": 359,
+      "trigger_resolved": 359,
+      "turn_end": 726,
+      "turn_start": 747,
+      "tutor_resolved": 82,
+      "utility_artifact_activated": 7,
+      "utility_land_activated": 22,
+      "utility_land_triggered": 8,
+      "wheel_resolved": 3
+    },
+    "observed_event_class_counts": {
+      "action_audited": 8243,
+      "forensic_card_event": 1,
+      "ignored_with_reason": 619,
+      "renderer_only": 42,
+      "strategy_signal": 312,
+      "technical": 10198
+    },
+    "observed_event_types_total": 86,
+    "observed_missing_required_fields": 13,
+    "observed_not_static_literal": [],
+    "observed_type_class_counts": {
+      "action_audited": 26,
+      "forensic_card_event": 1,
+      "ignored_with_reason": 6,
+      "renderer_only": 8,
+      "strategy_signal": 36,
+      "technical": 9
+    },
+    "observed_unclassified_total": 0,
+    "observed_unclassified_types": [],
+    "static_class_counts": {
+      "action_audited": 26,
+      "forensic_card_event": 2,
+      "ignored_with_reason": 13,
+      "renderer_only": 15,
+      "strategy_signal": 68,
+      "technical": 14
+    },
+    "static_contract_waiver_until_forced_fixture": 0,
+    "static_engine_sources": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_support.py",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py"
+    ],
+    "static_event_types_total": 138,
+    "static_fixture_accepted_waiver_reasons": {
+      "accepted_explicitly_ignored_event_contract": 7,
+      "accepted_forensic_card_event_static_contract_until_observed": 1,
+      "accepted_renderer_only_event_no_guardrail_consumer": 7,
+      "accepted_strategy_context_signal_static_contract": 32,
+      "accepted_technical_ledger_event_no_forced_replay_required": 5
+    },
+    "static_fixture_accepted_waiver_total": 52,
+    "static_fixture_unaccepted_types": [],
+    "static_not_observed": [
+      "adventure_cast",
+      "adventure_creature_cast_from_exile",
+      "adventure_exiled",
+      "attachment_sba",
+      "battle_back_face_cast",
+      "battle_damage",
+      "cannot_lose_turn_resolved",
+      "cantrip_mana_filter_artifact_resolved",
+      "composite_rule_component_resolved",
+      "composite_rule_resolved",
+      "counters_cancelled",
+      "damage_wipe_resolved",
+      "damage_wipe_treasure_resolved",
+      "dragons_approach_dragon_tutored",
+      "dragons_approach_resolved",
+      "equipment_unattached",
+      "etb_tutor_resolved",
+      "extra_combat_cap_reached",
+      "extra_combat_scheduled",
+      "extra_combat_taken",
+      "extra_turn_cap_reached",
+      "extra_turn_taken",
+      "game_lost",
+      "game_win_prevented",
+      "imprint_failed",
+      "land_recursion_creature_resolved",
+      "land_recursion_resolved",
+      "lander_token_created",
+      "life_artifact_resolved",
+      "life_totals_redistributed",
+      "loyalty_ability_activated",
+      "mill_resolved",
+      "multi_target_resolution",
+      "paradigm_exiled",
+      "permanent_moved_by_sba",
+      "phase_creatures_resolved",
+      "planeswalker_damage",
+      "prepared_copies_removed",
+      "prepared_copy_created",
+      "removal_countered_by_ward",
+      "ripple_trigger_resolved",
+      "static_enter_tapped_applied",
+      "station_activated",
+      "thassa_oracle_resolved",
+      "token_ceased_to_exist",
+      "trigger_skipped",
+      "ward_countered",
+      "ward_paid",
+      "warp_cast",
+      "warp_exiled_end_step",
+      "warp_recast_from_exile",
+      "worldfire_resolved"
+    ],
+    "static_unclassified_total": 0,
+    "static_unclassified_types": [],
+    "status": "review_required"
+  },
+  "version": 1
+}

@@ -19,6 +19,7 @@ DEFAULT_ENGINE_SOURCES = [
     DEFAULT_ENGINE_SOURCE,
     SCRIPT_DIR / "battle_sba_support.py",
     SCRIPT_DIR / "battle_replacement_support.py",
+    SCRIPT_DIR / "battle_zone_transition_support.py",
 ]
 DEFAULT_LATEST_RUN = Path(
     "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/"

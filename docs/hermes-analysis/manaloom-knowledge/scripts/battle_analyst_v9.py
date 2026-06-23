@@ -674,6 +674,18 @@ def replay_primary_target_fields(targets):
     return {"target": str(first)}
 
 
+def zero_mana_cost_snapshot(*spend_tags):
+    return {
+        "generic": 0,
+        "colored": {},
+        "hybrid": [],
+        "monocolored_hybrid": [],
+        "phyrexian": [],
+        "phyrexian_hybrid": [],
+        "spend_tags": list(spend_tags),
+    }
+
+
 def store_cast_context_fields(effect_data, fields):
     if isinstance(effect_data, dict):
         effect_data["_cast_context"] = copy.deepcopy(fields)
@@ -752,17 +764,43 @@ def spell_resolution_context_fields(card, effect_data, effect, player=None):
     if isinstance(effect_data, dict):
         fields.update(copy.deepcopy(effect_data.get("_cast_context") or {}))
         fields.update(copy.deepcopy(effect_data.get("_resolution_context") or {}))
+    if fields.get("cast_pipeline") and not fields.get("priority_window"):
+        fields.setdefault("priority_window", "direct_resolution")
+        fields.setdefault("stack_depth", 0)
+        fields.setdefault("resolved_from_stack", False)
     destination = resolved_spell_destination(card, effect_data, effect, player=player)
     source_zone = fields.get("source_zone") or effect_data.get("source_zone")
+    if (
+        not source_zone
+        and isinstance(card, dict)
+        and (card.get("is_copy") or (isinstance(effect_data, dict) and effect_data.get("_copied_from_spell")))
+    ):
+        source_zone = "stack_copy"
+        fields.setdefault("cast_pipeline", "spell_copy")
+        fields.setdefault("locked_cost", {"copied_spell": True})
     fields.setdefault("stack_object", card.get("name", "?"))
     fields.setdefault("result", "resolved")
     if source_zone:
         fields["source_zone"] = source_zone
-        fields.setdefault("from_zone", source_zone)
+        fields.setdefault("from_zone", "stack" if source_zone == "stack_copy" else source_zone)
     if destination:
         fields.setdefault("destination", destination)
         fields.setdefault("zone_after", destination)
         fields.setdefault("to_zone", destination)
+    if isinstance(card, dict) and card.get("is_copy"):
+        fields.setdefault("source_zone", "stack_copy")
+        if not fields.get("from_zone") or fields.get("from_zone") == fields.get("source_zone") == "stack_copy":
+            fields["from_zone"] = "stack"
+        if not fields.get("cast_pipeline") or fields.get("cast_pipeline") == "direct_resolution":
+            fields["cast_pipeline"] = "spell_copy_resolution"
+        fields.setdefault("locked_cost", zero_mana_cost_snapshot("copied_spell_no_mana_payment"))
+        fields.setdefault("priority_window", "copy_resolution")
+        fields.setdefault("stack_depth", 0)
+        fields.setdefault("resolved_from_stack", False)
+    elif fields.get("cast_pipeline"):
+        fields.setdefault("priority_window", "direct_spell_resolution")
+        fields.setdefault("stack_depth", 0)
+        fields.setdefault("resolved_from_stack", False)
     allowed = {
         "phase",
         "priority_window",
@@ -800,6 +838,18 @@ def spell_resolution_context_fields(card, effect_data, effect, player=None):
 
 def attach_stack_resolution_context(effect_data, stack_item, phase, stack_depth):
     fields = copy.deepcopy(effect_data.get("_cast_context") or {})
+    fields.update(copy.deepcopy(effect_data.get("_resolution_context") or {}))
+    if (
+        isinstance(getattr(stack_item, "card", None), dict)
+        and (
+            stack_item.card.get("is_copy")
+            or (isinstance(effect_data, dict) and effect_data.get("_copied_from_spell"))
+        )
+    ):
+        fields.setdefault("source_zone", "stack_copy")
+        fields.setdefault("from_zone", "stack")
+        fields.setdefault("cast_pipeline", "spell_copy")
+        fields.setdefault("locked_cost", {"copied_spell": True})
     fields.update(
         {
             "phase": phase or fields.get("phase"),
@@ -1365,6 +1415,14 @@ def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, tu
     if not is_instant(card) and not (is_sorcery(card) and phase in MAIN_PHASES):
         return False
     effect_data = get_card_effect(card)
+    effect_data, declared_targets = prepare_declared_removal_targets(
+        player,
+        opponents,
+        card,
+        effect_data,
+    )
+    if missing_required_declared_removal_target(effect_data, declared_targets):
+        return False
     ctx = begin_cast_context(
         player,
         card,
@@ -1372,6 +1430,7 @@ def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, tu
         effect_data=effect_data,
         role="flashback",
         alternative_cost=flashback_cost,
+        targets=declared_targets,
         source_zone="graveyard",
         alternative_cost_kind="flashback",
     )
@@ -4198,6 +4257,18 @@ def copy_spell_on_stack(
     if isinstance(source_effect_data, dict):
         copied_effect["_copy_source_rule_logical_key"] = source_effect_data.get("_rule_logical_key")
         copied_effect["_copy_source_rule_oracle_hash"] = source_effect_data.get("_rule_oracle_hash")
+    original_context = {}
+    if isinstance(original_effect_data, dict):
+        original_context.update(copy.deepcopy(original_effect_data.get("_cast_context") or {}))
+        original_context.update(copy.deepcopy(original_effect_data.get("_resolution_context") or {}))
+    copied_effect["_resolution_context"] = {
+        "phase": original_context.get("phase"),
+        "source_zone": "stack_copy",
+        "from_zone": "stack",
+        "cast_pipeline": "spell_copy",
+        "locked_cost": {"copied_spell": True},
+        "role": "copy",
+    }
     item = StackItem(copied_card, controller, copied_effect)
     item.was_cast = False
     stack.push(item)
@@ -8317,6 +8388,26 @@ def resolve_land_tax_upkeep_trigger(player, permanent, turn, all_players=None):
         "found_cards": selected_names,
         "target_type": target_type,
     }
+    rejected_land_options = [
+        decision_card_option(
+            candidate,
+            get_card_effect(candidate),
+            score=score,
+            action="reject_tutor_target",
+            reason=reason,
+            target_type=target_type,
+        )
+        for candidate, score, reason in scored_candidates[max_count:10]
+    ]
+    if moved and not rejected_land_options:
+        rejected_land_options.append(
+            {
+                "action": "decline_optional_tutor",
+                "target_type": target_type,
+                "score": 0,
+                "reason": "optional_trigger_but_card_advantage_selected",
+            }
+        )
     emit_decision_trace(
         decision_type="land_tax_upkeep_tutor",
         player=player,
@@ -8334,17 +8425,7 @@ def resolve_land_tax_upkeep_trigger(player, permanent, turn, all_players=None):
             for candidate, score, reason in scored_candidates[:10]
         ] or [{"action": "resolve_without_target", "target_type": target_type}],
         chosen_option=chosen_option,
-        rejected_options=[
-            decision_card_option(
-                candidate,
-                get_card_effect(candidate),
-                score=score,
-                action="reject_tutor_target",
-                reason=reason,
-                target_type=target_type,
-            )
-            for candidate, score, reason in scored_candidates[max_count:10]
-        ],
+        rejected_options=rejected_land_options,
         score_components={
             "player_land_count": player_land_count,
             "opponent_land_counts": opponent_land_counts,
@@ -12737,6 +12818,16 @@ def resolve_mizzix_mastery(player, opponents, card, effect_data, turn, rng, *, s
         copy_effect = copy.deepcopy(get_card_effect(original))
         copy_effect["_copied_from_spell"] = original.get("name", "?")
         copy_effect["_copied_by"] = card.get("name", "?")
+        attach_direct_resolution_context(
+            copy_effect,
+            copy_card,
+            phase,
+            priority_window="mizzix_mastery_copy_resolution",
+            source_zone="stack_copy",
+            locked_cost=zero_mana_cost_snapshot("cast_without_paying_mana_cost"),
+            alternative_cost="{0}",
+            alternative_cost_kind="cast_without_paying_mana",
+        )
         emit_replay_event(
             "mizzix_mastery_copy_cast",
             player=player.name,
@@ -16051,6 +16142,19 @@ def apply_effect_immediate(
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect = effect_data.get("effect", "unknown")
+    if (
+        isinstance(card, dict)
+        and (card.get("is_copy") or effect_data.get("_copied_from_spell"))
+        and not effect_data.get("_resolution_context")
+    ):
+        attach_direct_resolution_context(
+            effect_data,
+            card,
+            phase or "copy_resolution",
+            priority_window="copy_direct_resolution",
+            source_zone="stack_copy",
+            locked_cost={"copied_spell": True},
+        )
     spell_resolved_fields = {
         **spell_resolution_context_fields(card, effect_data, effect, player=player),
         **replay_fields_for_declared_targets(effect_data),

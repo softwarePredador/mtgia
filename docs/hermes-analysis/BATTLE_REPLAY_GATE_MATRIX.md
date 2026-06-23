@@ -1,10 +1,17 @@
 # Battle Replay Gate Matrix
 
-Status: current as of `2026-06-21T00:08Z`.
+Status: current as of `2026-06-23T07:32Z`.
 
 This matrix defines the mandatory gates that must run before a battle replay is
 interpreted as final evidence. A green result in one auditor is not a global
 pass unless the aggregate final status also says so.
+
+Latest accepted run:
+`/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/summary.json`.
+It ran deck `6`, `start_seed=64270200`, `seeds_requested=16`,
+`seeds_completed=16`, with
+`run_profile=deck6_pg078_learning_gate_fix_16_seed`.
+Final status is `trusted_for_strategy_learning`; all mandatory gates passed.
 
 ## Mandatory Gates
 
@@ -3590,3 +3597,37 @@ Status:
 - `battle_runtime_surface_manifest.py --fail-on-unclassified` now exits cleanly.
 - The 16-seed deck `6` battle rebaseline still needs to be rerun after this
   harness fix is committed.
+
+## PG078 Deck 6 Battle Rebaseline - 2026-06-23 07:32 UTC
+
+Artifacts:
+
+- Accepted run summary:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/summary.json`.
+- Event contract:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/event_contract_static.json`.
+- Decision taxonomy:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/decision_trace_taxonomy.json`.
+
+Gate:
+
+- `action_critic`: pass, `findings=0`, `action_verdict_counts.ok=8229`.
+- `forensic_audit`: pass, `rule_findings=0`, `turn_findings=0`.
+- `replay_decision_audit`: pass, `decision_findings=0`, `turn_findings=0`.
+- `event_contract_static`: pass,
+  `observed_unclassified_total=0`, `observed_missing_required_fields=0`,
+  `static_unclassified_total=0`.
+- `decision_trace_taxonomy`: pass,
+  `decision_trace_contract_findings=0`, `missing_required_fields=0`,
+  `observed_without_contract=0`.
+- `table_intent` and `target_pressure`: pass for all 16 seeds.
+- `strategy_audit`: pass, `findings=2`, both medium low-confidence:
+  `forced_keep_after_bad_mulligan=2`; `review_required_findings=0`.
+
+Status:
+
+- Final aggregate status: `trusted_for_strategy_learning` with reason
+  `all_mandatory_gates_pass`.
+- There are no high/critical action, forensic, or replay-decision blockers.
+- Strategy learning eligibility is seed-scoped: 14 seeds are high-confidence
+  eligible, while seeds `64270204` and `64270207` remain low-confidence.

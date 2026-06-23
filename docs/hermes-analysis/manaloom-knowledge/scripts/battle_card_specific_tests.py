@@ -404,6 +404,79 @@ def register_tests(battle, player):
         battle.clear_until_eot(active)
         assert "flashback_cost" not in sorcery
 
+    def test_flashback_targeted_removal_declares_target_before_resolution():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            target = {
+                "name": "Kraum, Ludevic's Opus",
+                "cmc": 5,
+                "type_line": "Legendary Creature",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            opponent.battlefield = [target]
+            swords = {
+                "name": "Swords to Plowshares",
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "type_line": "Instant",
+                "flashback_cost": "{W}",
+                "_flashback_granted_by": "Past in Flames",
+                "_flashback_granted_rule_key": "battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be",
+            }
+            active.graveyard = [swords]
+            active.mana_pool.add("white", 1)
+            stack = battle.Stack()
+
+            assert battle.cast_flashback_spell_from_graveyard(
+                active,
+                swords,
+                [opponent],
+                [active, opponent],
+                6,
+                "precombat_main",
+                stack,
+                random.Random(64270201),
+            ) is True
+            while not stack.empty():
+                battle.priority_round(active, [active, opponent], stack, 6, random.Random(64270202), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target not in opponent.battlefield
+        assert target in opponent.exile
+        announced = next(
+            data
+            for event, data in events
+            if event == "cast_announced" and data.get("card") == "Swords to Plowshares"
+        )
+        flashback_cast = next(
+            data
+            for event, data in events
+            if event == "flashback_cast" and data.get("card") == "Swords to Plowshares"
+        )
+        resolved = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Swords to Plowshares"
+        )
+
+        assert announced["role"] == "flashback"
+        assert announced["source_zone"] == "graveyard"
+        assert announced["target"] == "Kraum, Ludevic's Opus"
+        assert announced["targets"][0]["target"] == "Kraum, Ludevic's Opus"
+        assert flashback_cast["target"] == "Kraum, Ludevic's Opus"
+        assert flashback_cast["targets"][0]["target_controller"] == "Opponent"
+        assert resolved["role"] == "flashback"
+        assert resolved["from_zone"] == "graveyard"
+        assert resolved["target"] == "Kraum, Ludevic's Opus"
+        assert resolved["targets"][0]["target_legal"] is True
+
     def test_path_to_exile_exiles_creature_with_pg037_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -719,6 +792,21 @@ def register_tests(battle, player):
                 and data.get("card") == "Targeted Insight"
                 for event, data in events
             )
+            copy_resolved = next(
+                data
+                for event, data in events
+                if event == "spell_resolved"
+                and data.get("card") == "Targeted Insight"
+                and data.get("destination") == "ceased_to_exist"
+            )
+            assert copy_resolved["phase"] == "precombat_main"
+            assert copy_resolved["priority_window"] == "stack_resolution"
+            assert copy_resolved["resolved_from_stack"] is True
+            assert copy_resolved["source_zone"] == "stack_copy"
+            assert copy_resolved["from_zone"] == "stack"
+            assert copy_resolved["to_zone"] == "ceased_to_exist"
+            assert copy_resolved["cast_pipeline"] == "spell_copy"
+            assert copy_resolved["locked_cost"]["copied_spell"] is True
             assert battle.priority_round(
                 active,
                 [active, responder],
@@ -2650,11 +2738,15 @@ def register_tests(battle, player):
         assert resolved[-1]["destination"] == "hand"
         assert resolved[-1]["rule_logical_key"] == "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef"
         assert resolved[-1]["rule_oracle_hash"] == "83b074e38da3e6c4eb6ec3e7568c914b"
-        assert any(
-            decision.get("decision_type") == "land_tax_upkeep_tutor"
-            and decision.get("chosen_option", {}).get("found_cards") == ["Island", "Mountain", "Plains"]
+        trace = next(
+            decision
             for decision in decisions
+            if decision.get("decision_type") == "land_tax_upkeep_tutor"
+            and decision.get("chosen_option", {}).get("found_cards") == ["Island", "Mountain", "Plains"]
         )
+        assert trace["best_rejected_option_score"] is not None
+        assert trace["score_gap_vs_best_rejected"] is not None
+        assert trace["rejected_options"][-1]["action"] == "decline_optional_tutor"
 
     def test_land_tax_skips_when_no_opponent_controls_more_lands():
         events = []
@@ -3295,11 +3387,20 @@ def register_tests(battle, player):
             for event, data in events
             if event == "mizzix_mastery_copy_cast"
         )
+        copy_resolution = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Refill Spell"
+        )
         assert mastery_event["exiled_targets"] == ["Refill Spell"]
         assert mastery_event["copied_spells"] == ["Refill Spell"]
         assert mastery_event["rule_logical_key"] == "battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f"
         assert copy_event["copied_spell"] == "Refill Spell"
         assert copy_event["cast_without_paying_mana_cost"] is True
+        assert copy_resolution["source_zone"] == "stack_copy"
+        assert copy_resolution["from_zone"] == "stack"
+        assert copy_resolution["cast_pipeline"] == "spell_copy_resolution"
+        assert copy_resolution["locked_cost"]["spend_tags"] == ["cast_without_paying_mana_cost"]
         assert [card.get("name") for card in active.hand] == ["Drawn One", "Drawn Two"]
         assert [card.get("name") for card in active.exile] == ["Refill Spell", "Mizzix's Mastery"]
         assert active.graveyard == []
@@ -6606,6 +6707,7 @@ def register_tests(battle, player):
         test_lorehold_miracle_does_not_cast_redirect_without_stack_target,
         test_lorehold_upkeep_rummage_emits_pg035_rule_provenance,
         test_past_in_flames_grants_flashback_with_pg036_rule_provenance,
+        test_flashback_targeted_removal_declares_target_before_resolution,
         test_path_to_exile_exiles_creature_with_pg037_rule_provenance,
         test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance,
         test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,

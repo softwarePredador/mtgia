@@ -3202,3 +3202,60 @@ Workflow note:
   high battle-critical cards are `Flare of Duplication`, `Powerbalance`,
   `Reforge the Soul`, `Rise of the Eldrazi`, `Rite of the Dragoncaller`,
   `Storm Herd`, and `Witch Enchanter // Witch-Blessed Meadow`.
+
+## PG078 Deck 6 Battle Rebaseline/Harness Checkpoint - 2026-06-23 07:32 UTC
+
+Scope:
+
+- Rebaseline only; no PostgreSQL package was applied in this checkpoint.
+- PostgreSQL remains the card-rule source of truth. SQLite/Hermes remained the
+  runtime/cache source used by the replay wrapper after the earlier PG078 sync.
+- User observations are hints only; no card was reopened without an Oracle/PG
+  or replay mismatch.
+
+Accepted run:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_072754/summary.json`
+  with `seeds_requested=16`, `seeds_completed=16`,
+  `start_seed=64270200`,
+  `run_profile=deck6_pg078_learning_gate_fix_16_seed`.
+
+What was fixed in runtime/harness:
+
+- `Swords to Plowshares` flashback cast path now declares target metadata
+  before resolution, closing the high action-critic target finding from seed
+  `64270201`.
+- `Land Tax` decision traces now include a rejected/declined option for
+  comparison when all basic land targets are selected.
+- `Mizzix's Mastery`/spell-copy resolution provenance now exposes copy
+  resolution context without spending a real cast.
+- `battle_action_critic.py` no longer consumes the original spell cast when a
+  same-name spell copy resolves first.
+
+Gate result:
+
+- `action_critic=pass`, `findings=0`.
+- `forensic_audit=pass`, `rule_findings=0`, `turn_findings=0`.
+- `replay_decision_audit=pass`, `decision_findings=0`, `turn_findings=0`.
+- `event_contract_static=pass` with no observed/static unclassified events and
+  no missing required fields.
+- `decision_trace_taxonomy=pass` with no contract findings and no missing
+  required fields.
+- `table_intent=pass`, `target_pressure=pass`, and all 18 wrapper tests passed.
+- Final aggregate status is `trusted_for_strategy_learning`; all mandatory
+  gates pass.
+- `strategy_audit` still records two medium low-confidence findings,
+  `forced_keep_after_bad_mulligan=2`, but `review_required_findings=0`; seeds
+  `64270204` and `64270207` are low-confidence while the other 14 seeds are
+  high-confidence learning candidates.
+- Card-coherence auditor rerun after the rebaseline:
+  deck `6` `pass=100`, deck `606` `high=7`, `medium=7`, `pass=67`,
+  and global `high=50`, `medium=12`, `pass=143`, written to
+  `deck_card_battle_rule_coherence_audit_*_pg078_rebaseline_checkpoint_20260623_073004`.
+
+Next workflow:
+
+- Do not create a PG deploy entry for this checkpoint; no SQL was applied.
+- Keep PG079 for the next real PostgreSQL card-rule package.
+- Continue deck `606` high battle-critical queue before lower-priority global
+  medium cards.
