@@ -9800,3 +9800,109 @@ Next deploy number:
 
 - PG108, PG109, and PG110 are pending packages. Do not reuse any of these
   deploy numbers.
+
+## PG108/PG109/PG110 Battle Card Rules - Applied 2026-06-23
+
+Status: `applied_postchecked_synced_revalidated`.
+
+Authorization:
+
+- Rafael authorized PostgreSQL synchronization/validation in the active Codex
+  thread after the PG108/PG109/PG110 packages had been prepared and prechecked.
+
+Applied packages:
+
+- PG108 `Pearl Medallion`:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353.sql`.
+- PG109 `Bender's Waterskin` and `Victory Chimes`:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938.sql`.
+- PG110 `The Scarlet Witch`:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_apply_20260623_150416.sql`.
+
+Precheck/apply/postcheck evidence:
+
+- PG108 rerun precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353_rerun_20260623_sync.out`.
+- PG108 apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353_executed_20260623_sync.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=1`.
+- PG108 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_postcheck_20260623_170353_rerun_20260623_sync.out`;
+  `promoted_rule_rows=1`, `verified_auto=1`, `active_shadow_rows=0`.
+- PG109 rerun precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938_rerun_20260623_sync.out`.
+- PG109 apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938_executed_20260623_sync.out`;
+  `deprecated_shadow_rows=4`, `upserted_rows=2`.
+- PG109 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_postcheck_20260623_171938_rerun_20260623_sync.out`;
+  both cards have `promoted_rule_rows=1`, `verified_auto=1`,
+  `active_shadow_rows=0`, `trusted_missing_oracle_hash_rows=0`, and
+  `active_draw_engine_rows=0`.
+- PG110 rerun precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416_rerun_20260623_sync.out`.
+- PG110 apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_apply_20260623_150416_executed_20260623_sync.out`;
+  `deprecated_shadow_rows=0`, `upserted_rows=1`.
+- PG110 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_postcheck_20260623_150416_rerun_20260623_sync.out`;
+  `promoted_rule_rows=1`, `verified_auto=1`, `oracle_hash_rows=1`,
+  `active_shadow_rows=0`.
+
+Runtime cache sync:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg108_pg109_pg110_battle_card_rules_sync_report_20260623.json`.
+- Result: `pg_rows_loaded=5314`, `sqlite_inserted_or_updated=5269`,
+  `canonical_snapshot_rows_exported=3202`.
+- Updated runtime snapshot:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json`.
+
+Post-sync audit evidence:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"pass":100}`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"medium":7,"pass":74}`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"high":11,"medium":8,"pass":75}`.
+- Deck `608`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"high":16,"medium":6,"pass":46}`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"high":26,"medium":15,"pass":164}`.
+- Applied cards verified as pass after sync:
+  `Pearl Medallion`, `Bender's Waterskin`, `Victory Chimes`, and
+  `The Scarlet Witch`.
+
+Additional validation:
+
+- Learned-deck coherence:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260623_185723.json`
+  and `.md`; `60` active learned decks, `0` high issues, `13` medium issues,
+  Lorehold Deck `6` strategy package pass `yes`.
+- Local Deck `6` battle replay:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_deck6_pg108_pg109_pg110_post_sync_20260623/summary_20260623_185610.json`;
+  forensic status `turn_invariants_clean`, strategy verdict
+  `low_confidence_replay` due one medium `forced_keep_after_bad_mulligan`.
+
+Tests:
+
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`:
+  `Ran 8 tests OK`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py -v`:
+  `Ran 8 tests OK`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_validity_audit.py -v`:
+  `Ran 6 tests OK`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`:
+  `Ran 10 tests OK` with sqlite `ResourceWarning` warnings only.
+
+Register decision:
+
+- PG108, PG109, and PG110 are closed as applied and validated.
+- Do not reuse these package numbers.
+- Any future change to the same cards requires a new PG package and fresh
+  precheck/apply/postcheck/sync/audit evidence.

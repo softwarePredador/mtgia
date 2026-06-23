@@ -22880,3 +22880,149 @@ Conclusion:
   implementation -> PG package/precheck/apply only when approved.
 - `board_wipe_choice` should proceed with generated ManaLoom tests rather than
   waiting for existing XMage tests.
+
+## PG108/PG109/PG110 Applied, Synced, And Revalidated - 2026-06-23
+
+Status: `applied_synced_revalidated`.
+
+Scope closed in this checkpoint:
+
+- PG108 `Pearl Medallion` static white-spell cost reducer.
+- PG109 `Bender's Waterskin` and `Victory Chimes` mana-rock source/runtime
+  corrections.
+- PG110 `The Scarlet Witch` source-power static cost reducer for instant or
+  sorcery spells with mana value `4+`.
+
+PostgreSQL apply evidence:
+
+- PG108 rerun precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353_rerun_20260623_sync.out`.
+- PG108 apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353_executed_20260623_sync.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=1`.
+- PG108 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_postcheck_20260623_170353_rerun_20260623_sync.out`;
+  `promoted_rule_rows=1`, `verified_auto=1`, `active_shadow_rows=0`.
+- PG109 rerun precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938_rerun_20260623_sync.out`.
+- PG109 apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938_executed_20260623_sync.out`;
+  `deprecated_shadow_rows=4`, `upserted_rows=2`.
+- PG109 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_postcheck_20260623_171938_rerun_20260623_sync.out`;
+  both cards have `promoted_rule_rows=1`, `verified_auto=1`,
+  `active_shadow_rows=0`, `trusted_missing_oracle_hash_rows=0`, and
+  `active_draw_engine_rows=0`.
+- PG110 rerun precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416_rerun_20260623_sync.out`.
+- PG110 apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_apply_20260623_150416_executed_20260623_sync.out`;
+  `deprecated_shadow_rows=0`, `upserted_rows=1`.
+- PG110 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_postcheck_20260623_150416_rerun_20260623_sync.out`;
+  `promoted_rule_rows=1`, `verified_auto=1`, `oracle_hash_rows=1`,
+  `active_shadow_rows=0`.
+
+Hermes sync evidence:
+
+- PG -> SQLite runtime sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pg109_pg110_battle_card_rules_sync_report_20260623.json`.
+- Sync loaded `5314` PostgreSQL rows, wrote `5269` SQLite rows, and exported
+  `3202` canonical snapshot rows.
+- Source mix after sync: `curated_rows=132`, `generated_rows=1961`,
+  `input_rows=2110`, `manual_rows=17`, `oracle_normalized_rows=267`.
+- Canonical snapshot updated:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json`.
+
+Deck-card coherence evidence:
+
+- Official Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg108_pg109_pg110_post_sync_20260623.json`;
+  `total_cards=100`, `severity_counts={"pass":100}`.
+- Backup Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg108_pg109_pg110_post_sync_20260623.json`;
+  `total_cards=81`, `severity_counts={"medium":7,"pass":74}`.
+- Work queue Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pg109_pg110_post_sync_20260623.json`;
+  `total_cards=94`, `severity_counts={"high":11,"medium":8,"pass":75}`.
+- Backup Deck `608`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg108_pg109_pg110_post_sync_20260623.json`;
+  `total_cards=68`, `severity_counts={"high":16,"medium":6,"pass":46}`.
+- Global deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg108_pg109_pg110_post_sync_20260623.json`;
+  `total_cards=205`, `severity_counts={"high":26,"medium":15,"pass":164}`.
+
+Important interpretation:
+
+- `Pearl Medallion`, `Bender's Waterskin`, `Victory Chimes`, and
+  `The Scarlet Witch` all report `severity=pass` with
+  `coherent_for_current_gate` after PG apply and Hermes sync.
+- Deck `607` count changed from pre-apply `high=9`, `medium=4`, `pass=81`
+  to post-sync `high=11`, `medium=8`, `pass=75` because the complete sync
+  exposed active `needs_review`/review-only rows that were not previously
+  visible in SQLite. This is metric drift from cache visibility, not a
+  regression in the four applied cards.
+
+Battle and learned-deck validation:
+
+- Local Deck `6` battle replay audit with the current synced cache:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_deck6_pg108_pg109_pg110_post_sync_20260623/summary_20260623_185610.json`.
+- Battle forensic summary: `status=turn_invariants_clean`,
+  `turn_findings=0`, `decision_findings=0`.
+- Battle strategy summary: `verdict=low_confidence_replay`,
+  `severity_counts={"medium":1}`, `learning_confidence_reason=forced_keep_after_bad_mulligan`.
+  This is a replay-confidence finding, not a card-rule closure failure.
+- Learned-deck coherence audit:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260623_185723.json`
+  and `.md`.
+- Learned-deck result: `60` active learned decks checked, `0` high issues,
+  `13` medium issues. Lorehold Deck `6` strategy package pass remains `yes`,
+  with `PG saved deck rows=100`, `PG saved deck lands=33`,
+  `Active metadata lands=33`, and `Derived learned lands=33`.
+
+Focused test evidence:
+
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`:
+  `Ran 8 tests OK`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py -v`:
+  `Ran 8 tests OK`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_validity_audit.py -v`:
+  `Ran 6 tests OK`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`:
+  `Ran 10 tests OK` with only sqlite `ResourceWarning` messages from the test
+  harness.
+
+Active pending list after this checkpoint:
+
+- Remove from active PG pending: PG108, PG109, and PG110.
+- Remove from active Deck `607` card-rule pending:
+  `Pearl Medallion`, `Bender's Waterskin`, `Victory Chimes`, and
+  `The Scarlet Witch`.
+- Keep active runtime/data pending for Deck `607`: `Promise of Loyalty`,
+  `Starfall Invocation`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, `Thor, God of Thunder`,
+  `Tragic Arrogance`, `Big Score`, `Tempt with Bunnies`,
+  `Monument to Endurance`, `Surge to Victory`, plus review-only land rows
+  now surfaced by the full sync.
+
+Operational timing estimate with the current XMage-assisted flow:
+
+- Same already-supported semantic family and PG-only metadata/source package:
+  about `3-7` minutes per additional card after the package scaffold exists.
+- Exact XMage class found, mapper already exists, focused scenario generated:
+  about `10-20` minutes per card.
+- New runtime family, first card in family: about `45-90` minutes because it
+  still needs runtime support, focused tests, audit rerun, PG package, sync,
+  and evidence.
+- Additional cards in that same new runtime family: about `10-25` minutes each.
+- Missing exact XMage source or new-set gap, such as current `Molecule Man` and
+  `Thor, God of Thunder`: about `60-120+` minutes per card unless another
+  authoritative source or local class appears.
+
+Conclusion:
+
+- The workflow is no longer viable as bespoke one-card analysis for thousands
+  of cards; the correct scaling unit is semantic family plus batch PG package.
+- For the current Deck `607` queue, the fastest next slice remains
+  `board_wipe_choice`: `Promise of Loyalty`, `Starfall Invocation`, and
+  `Tragic Arrogance` as one runtime-family implementation.

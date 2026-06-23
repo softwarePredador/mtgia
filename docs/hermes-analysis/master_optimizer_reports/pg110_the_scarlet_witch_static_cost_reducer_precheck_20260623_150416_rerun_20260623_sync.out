@@ -1,0 +1,9 @@
+ target_card_rows | card_oracle_hash_match_rows | existing_rule_rows | expected_rule_rows_before | trusted_rule_rows_before | active_static_cost_reduction_rows_before | would_deprecate_shadow_rows | rows_missing_oracle_hash_before 
+------------------+-----------------------------+--------------------+---------------------------+--------------------------+------------------------------------------+-----------------------------+---------------------------------
+                1 |                           1 |                  0 |                         0 |                        0 |                                        0 |                           0 |                               0
+(1 row)
+
+ normalized_name | card_name | logical_rule_key | source | review_status | execution_status | confidence | rule_version | oracle_hash | effect_json | deck_role_json | notes 
+-----------------+-----------+------------------+--------+---------------+------------------+------------+--------------+-------------+-------------+----------------+-------
+(0 rows)
+

@@ -3634,3 +3634,85 @@ Current order:
   Oracle/XMage class structure; there are no exact XMage tests to convert.
 - Continue using exact XMage class evidence, but require ManaLoom runtime tests
   before PostgreSQL promotion.
+
+## PG108/PG109/PG110 Applied And Synced - 2026-06-23
+
+Central order update:
+
+- Rafael authorized synchronization/validation with PostgreSQL. PG108, PG109,
+  and PG110 were executed, postchecked, synced back into Hermes SQLite, and
+  re-audited.
+- PG108 `Pearl Medallion`, PG109 `Bender's Waterskin`/`Victory Chimes`, and
+  PG110 `The Scarlet Witch` are no longer pending apply packages.
+- Do not reapply these packages unless a future postcheck proves rollback or
+  drift.
+
+PostgreSQL evidence:
+
+- PG108 apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353_executed_20260623_sync.out`;
+  result `deprecated_shadow_rows=2`, `upserted_rows=1`.
+- PG108 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_postcheck_20260623_170353_rerun_20260623_sync.out`;
+  `promoted_rule_rows=1`, `verified_auto=1`, `active_shadow_rows=0`.
+- PG109 apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938_executed_20260623_sync.out`;
+  result `deprecated_shadow_rows=4`, `upserted_rows=2`.
+- PG109 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_postcheck_20260623_171938_rerun_20260623_sync.out`;
+  both target cards have `promoted_rule_rows=1`, `verified_auto=1`,
+  `active_shadow_rows=0`, `trusted_missing_oracle_hash_rows=0`, and
+  `active_draw_engine_rows=0`.
+- PG110 apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_apply_20260623_150416_executed_20260623_sync.out`;
+  result `deprecated_shadow_rows=0`, `upserted_rows=1`.
+- PG110 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_postcheck_20260623_150416_rerun_20260623_sync.out`;
+  `promoted_rule_rows=1`, `verified_auto=1`, `oracle_hash_rows=1`,
+  `active_shadow_rows=0`.
+
+Sync and validation evidence:
+
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pg109_pg110_battle_card_rules_sync_report_20260623.json`;
+  `pg_rows_loaded=5314`, `sqlite_inserted_or_updated=5269`,
+  `canonical_snapshot_rows_exported=3202`.
+- Official Deck `6` deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"pass":100}`.
+- Work Deck `607` deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pg109_pg110_post_sync_20260623.json`;
+  `severity_counts={"high":11,"medium":8,"pass":75}`.
+- Deck `607` interpretation: `Pearl Medallion`, `Bender's Waterskin`,
+  `Victory Chimes`, and `The Scarlet Witch` are all `pass`; the higher
+  high/medium count comes from previously hidden `needs_review`/review-only
+  rows now mirrored into SQLite.
+- Learned-deck coherence:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260623_185723.json`;
+  `60` active learned decks, `0` high issues, `13` medium issues, Lorehold
+  strategy package pass remains `yes`.
+- Local Deck `6` battle validation:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_deck6_pg108_pg109_pg110_post_sync_20260623/summary_20260623_185610.json`;
+  forensic status `turn_invariants_clean`, strategy verdict
+  `low_confidence_replay` due one medium `forced_keep_after_bad_mulligan`.
+
+Tests:
+
+- `test_deck_card_battle_rule_coherence_audit.py -v`: `Ran 8 tests OK`.
+- `test_xmage_to_manaloom_effect_hints.py -v`: `Ran 8 tests OK`.
+- `test_xmage_batch_validity_audit.py -v`: `Ran 6 tests OK`.
+- `test_sync_battle_card_rules_pg_selection.py -v`: `Ran 10 tests OK`;
+  sqlite `ResourceWarning` only.
+
+Current order:
+
+- Keep Deck `6` as clean control: latest deck-card gate is `pass=100`.
+- Next implementation slice should be a semantic-family batch, not isolated
+  card work. Preferred family remains `board_wipe_choice` for
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- Current per-card timing expectation after XMage absorption:
+  `3-7` minutes for additional cards in an existing PG-only family,
+  `10-20` minutes for exact-XMage/known-mapper cards,
+  `45-90` minutes for the first card in a new runtime family,
+  `10-25` minutes for additional cards in that runtime family, and
+  `60-120+` minutes when exact XMage source is missing.
