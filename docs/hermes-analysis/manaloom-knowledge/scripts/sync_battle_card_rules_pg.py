@@ -698,6 +698,7 @@ def filter_rows_for_current_reviewed_curated(
     reviewed set.
     """
     allowed_by_name: dict[str, set[str]] = {}
+    active_pg_curated_by_name: dict[str, set[str]] = {}
     for row in reviewed_rows:
         if str(row.get("source") or "") != "curated":
             continue
@@ -717,12 +718,40 @@ def filter_rows_for_current_reviewed_curated(
                 )
             )
         )
+    for row in rows:
+        if str(row.get("source") or "") != "curated":
+            continue
+        if (
+            str(row.get("review_status") or "") not in {"verified", "active"}
+            or str(row.get("execution_status") or "") == "disabled"
+        ):
+            continue
+        normalized = normalize_card_name(str(row.get("card_name") or ""))
+        active_pg_curated_by_name.setdefault(normalized, set()).add(
+            str(
+                row.get("logical_rule_key")
+                or battle_rule_registry.logical_rule_key(
+                    {
+                        "effect_json": json_obj(row.get("effect_json")),
+                        "deck_role_json": row.get("deck_role_json"),
+                    }
+                )
+            )
+        )
 
     filtered: list[dict[str, Any]] = []
     for row in rows:
         normalized = normalize_card_name(str(row.get("card_name") or ""))
         if str(row.get("source") or "") != "curated":
             filtered.append(row)
+            continue
+        if (
+            str(row.get("review_status") or "") in {"verified", "active"}
+            and str(row.get("execution_status") or "") != "disabled"
+        ):
+            filtered.append(row)
+            continue
+        if active_pg_curated_by_name.get(normalized):
             continue
         allowed_keys = allowed_by_name.get(normalized)
         if not allowed_keys:

@@ -21,6 +21,7 @@ def sample_batch_audit() -> dict:
             {
                 "card_name": "Pearl Medallion",
                 "severity": "high",
+                "oracle_hash": "77f7f449ee56143d6b63814fecd37176",
                 "status": "ready_for_structured_xmage_pull_review_required",
                 "ready_for_structured_pull": True,
                 "valid_xmage_source": True,
@@ -29,6 +30,7 @@ def sample_batch_audit() -> dict:
                 "xmage": {
                     "class_name": "PearlMedallion",
                     "path": "/xmage/PearlMedallion.java",
+                    "types": ["ARTIFACT"],
                     "primary_effect": {
                         "effect": "static_cost_reduction",
                         "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
@@ -42,6 +44,7 @@ def sample_batch_audit() -> dict:
             {
                 "card_name": "Promise of Loyalty",
                 "severity": "high",
+                "oracle_hash": "11f7f449ee56143d6b63814fecd37176",
                 "status": "ready_for_structured_xmage_pull_review_required",
                 "ready_for_structured_pull": True,
                 "valid_xmage_source": True,
@@ -50,6 +53,7 @@ def sample_batch_audit() -> dict:
                 "xmage": {
                     "class_name": "PromiseOfLoyalty",
                     "path": "/xmage/PromiseOfLoyalty.java",
+                    "types": ["SORCERY"],
                     "primary_effect": {
                         "effect": "vow_counter_each_player_sacrifice_rest",
                         "battle_model_scope": "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1",
@@ -60,6 +64,7 @@ def sample_batch_audit() -> dict:
             {
                 "card_name": "Molecule Man",
                 "severity": "high",
+                "oracle_hash": None,
                 "status": "blocked_missing_xmage_class",
                 "ready_for_structured_pull": False,
                 "valid_xmage_source": False,
@@ -175,6 +180,115 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             self.assertIn("BEGIN;", apply_sql)
             self.assertIn("Pearl Medallion", apply_sql)
             self.assertIn("RAISE EXCEPTION", apply_sql)
+            self.assertIn("target_card_rows < 1", apply_sql)
+            self.assertIn("canonical_target_cards", apply_sql)
+
+    def test_package_builder_reuses_existing_backup_table_from_manifest(self) -> None:
+        proposal_report = generator.build_generator_report(
+            batch_audit=sample_batch_audit(),
+            external_harvest=sample_external_harvest(),
+        )
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            output_prefix = Path(tmp_dir) / "pg999_static_cost_reducer_batch"
+            manifest_path = Path(f"{output_prefix}_manifest.json")
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "backup_table": "manaloom_deploy_audit.pg999_existing_backup_table",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            manifest = package_builder.build_package(
+                proposal_report,
+                deploy_id="PG999",
+                slug="static_cost_reducer_batch",
+                output_prefix=output_prefix,
+                include_family={"static_cost_reducer"},
+                include_card=set(),
+                exclude_card=set(),
+                max_cards=None,
+            )
+
+            self.assertEqual(
+                manifest["backup_table"],
+                "manaloom_deploy_audit.pg999_existing_backup_table",
+            )
+            rollback_sql = Path(manifest["files"]["rollback"]).read_text(encoding="utf-8")
+            postcheck_sql = Path(manifest["files"]["postcheck"]).read_text(encoding="utf-8")
+            self.assertIn("pg999_existing_backup_table", rollback_sql)
+            self.assertIn("pg999_existing_backup_table", postcheck_sql)
+
+    def test_classifier_marks_spell_scope_runtime_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Counterspell",
+                        "severity": "high",
+                        "oracle_hash": "abc",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Counterspell",
+                            "path": "/xmage/Counterspell.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect"],
+                            "ability_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_target_stack_object_variant_v1",
+                                "ability_kind": "one_shot",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_generator_uses_local_oracle_hash_when_external_harvest_is_missing(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Counterspell",
+                        "normalized_name": "counterspell",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "oracle_hash": "localhash123",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Counterspell",
+                            "path": "/xmage/Counterspell.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect"],
+                            "ability_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_target_stack_object_variant_v1",
+                                "ability_kind": "one_shot",
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest=None,
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(proposal["oracle_hash"], "localhash123")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
 
 
 if __name__ == "__main__":

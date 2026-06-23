@@ -153,6 +153,56 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             ["generated"],
         )
 
+    def test_filter_rows_for_current_reviewed_curated_keeps_active_pg_curated_row_even_if_reviewed_json_is_older(self) -> None:
+        rows = [
+            {
+                "card_name": "Laughing Mad",
+                "logical_rule_key": "old-reviewed",
+                "effect_json": {
+                    "effect": "draw_cards",
+                    "count": 2,
+                    "battle_model_scope": "discard_draw_two_flashback_v1",
+                },
+                "deck_role_json": {"category": "interaction", "effect": "targeted_interaction"},
+                "source": "curated",
+                "review_status": "deprecated",
+                "execution_status": "disabled",
+            },
+            {
+                "card_name": "Laughing Mad",
+                "logical_rule_key": "new-pg",
+                "effect_json": {
+                    "effect": "draw_cards",
+                    "ability_kind": "one_shot",
+                    "battle_model_scope": "source_controller_draw_variant_v1",
+                },
+                "deck_role_json": {"category": "interaction", "effect": "targeted_interaction"},
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+            },
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Laughing Mad",
+                "logical_rule_key": "old-reviewed",
+                "effect_json": {
+                    "effect": "draw_cards",
+                    "count": 2,
+                    "battle_model_scope": "discard_draw_two_flashback_v1",
+                },
+                "deck_role_json": {"category": "interaction", "effect": "targeted_interaction"},
+                "source": "curated",
+            }
+        ]
+
+        filtered = sync_pg.filter_rows_for_current_reviewed_curated(rows, reviewed_rows)
+
+        self.assertEqual(
+            [row["logical_rule_key"] for row in filtered if row["source"] == "curated"],
+            ["new-pg"],
+        )
+
     def test_upsert_pg_rules_preserves_execution_status_in_batch_values(self) -> None:
         captured: dict[str, object] = {}
 

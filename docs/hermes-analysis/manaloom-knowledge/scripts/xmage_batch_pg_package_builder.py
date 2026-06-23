@@ -101,13 +101,28 @@ def proposed_cte(proposals: list[dict[str, Any]]) -> str:
 
 def build_precheck_sql(proposals: list[dict[str, Any]]) -> str:
     return f"""WITH {proposed_cte(proposals)},
-target_cards AS (
-  SELECT p.normalized_name, count(c.id) AS target_card_rows
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
   FROM proposed p
   LEFT JOIN public.cards c
     ON lower(c.name) = p.normalized_name
    AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
-  GROUP BY p.normalized_name
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
 ),
 rule_rows AS (
   SELECT p.normalized_name, count(r.*) AS existing_rule_rows
@@ -140,11 +155,12 @@ SELECT
   p.oracle_hash,
   p.logical_rule_key,
   tc.target_card_rows,
+  tc.canonical_card_id,
   rr.existing_rule_rows,
   er.expected_rule_rows_before,
   sr.would_deprecate_shadow_rows
 FROM proposed p
-JOIN target_cards tc USING (normalized_name)
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
 JOIN rule_rows rr USING (normalized_name)
 JOIN expected_rows er USING (normalized_name)
 JOIN shadow_rows sr USING (normalized_name)
@@ -169,7 +185,12 @@ DECLARE
 BEGIN
   WITH {proposed_cte(proposals)},
   counts AS (
-    SELECT p.card_name, p.normalized_name, p.oracle_hash, count(c.id) AS target_card_rows
+    SELECT
+      p.card_name,
+      p.normalized_name,
+      p.oracle_hash,
+      count(c.id) AS target_card_rows,
+      min(c.id::text)::uuid AS canonical_card_id
     FROM proposed p
     LEFT JOIN public.cards c
       ON lower(c.name) = p.normalized_name
@@ -179,10 +200,10 @@ BEGIN
   SELECT jsonb_agg(counts ORDER BY card_name)
     INTO v_missing
   FROM counts
-  WHERE target_card_rows <> 1;
+  WHERE target_card_rows < 1;
 
   IF v_missing IS NOT NULL THEN
-    RAISE EXCEPTION 'XMage batch package abort: expected exactly one Oracle-hash-matched card row for every proposed card: %', v_missing;
+    RAISE EXCEPTION 'XMage batch package abort: expected at least one Oracle-hash-matched card row for every proposed card: %', v_missing;
   END IF;
 END $$;
 
@@ -202,12 +223,38 @@ deprecated AS (
 SELECT count(*) AS deprecated_shadow_rows FROM deprecated;
 
 WITH {proposed_cte(proposals)},
-target_cards AS (
-  SELECT p.*, c.id AS card_id, c.name AS db_card_name
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
   FROM proposed p
   JOIN public.cards c
     ON lower(c.name) = p.normalized_name
    AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+canonical_target_cards AS (
+  SELECT
+    p.*,
+    min(m.card_id::text)::uuid AS card_id,
+    min(m.db_card_name) AS db_card_name
+  FROM proposed p
+  JOIN matched_cards m
+    USING (normalized_name, card_name, oracle_hash)
+  GROUP BY
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    p.logical_rule_key,
+    p.effect_json,
+    p.deck_role_json,
+    p.source,
+    p.confidence,
+    p.review_status,
+    p.execution_status,
+    p.notes
 ),
 upserted AS (
   INSERT INTO public.card_battle_rules (
@@ -249,7 +296,7 @@ upserted AS (
     now(),
     logical_rule_key,
     execution_status
-  FROM target_cards
+  FROM canonical_target_cards
   ON CONFLICT (normalized_name, logical_rule_key) DO UPDATE
   SET
     card_id = EXCLUDED.card_id,
@@ -293,7 +340,12 @@ COMMIT;
 def build_postcheck_sql(proposals: list[dict[str, Any]], backup_table: str) -> str:
     return f"""WITH {proposed_cte(proposals)},
 rule_rows AS (
-  SELECT p.normalized_name, p.card_name, p.logical_rule_key, p.oracle_hash, r.*
+  SELECT
+    r.normalized_name,
+    r.logical_rule_key,
+    r.oracle_hash,
+    r.review_status,
+    r.execution_status
   FROM proposed p
   LEFT JOIN public.card_battle_rules r
     ON r.normalized_name = p.normalized_name
@@ -308,7 +360,10 @@ SELECT
   count(r.*) FILTER (WHERE r.oracle_hash = p.oracle_hash) AS promoted_oracle_hash_rows,
   (SELECT count(*) FROM manaloom_deploy_audit.{backup_table}) AS backup_rows
 FROM proposed p
-LEFT JOIN rule_rows r USING (normalized_name, card_name, logical_rule_key, oracle_hash)
+LEFT JOIN rule_rows r
+  ON r.normalized_name = p.normalized_name
+ AND r.logical_rule_key = p.logical_rule_key
+ AND r.oracle_hash = p.oracle_hash
 GROUP BY p.card_name, p.normalized_name, p.logical_rule_key, p.oracle_hash
 ORDER BY p.card_name;
 """
@@ -343,6 +398,21 @@ def markdown_package(manifest: dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def existing_backup_table_from_manifest(manifest_path: Path) -> str | None:
+    if not manifest_path.exists():
+        return None
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    value = str(payload.get("backup_table") or "").strip()
+    if not value:
+        return None
+    if "." in value:
+        return value.split(".", 1)[1]
+    return value
+
+
 def build_package(
     proposal_report: dict[str, Any],
     *,
@@ -364,7 +434,6 @@ def build_package(
     if not selected:
         raise ValueError("No safe proposals selected for package generation.")
 
-    backup_table = safe_ident(f"{deploy_id}_{slug}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}")
     files = {
         "precheck": f"{output_prefix}_precheck.sql",
         "apply": f"{output_prefix}_apply.sql",
@@ -373,6 +442,9 @@ def build_package(
         "manifest": f"{output_prefix}_manifest.json",
         "package": f"{output_prefix}_package.md",
     }
+    backup_table = existing_backup_table_from_manifest(Path(files["manifest"])) or safe_ident(
+        f"{deploy_id}_{slug}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+    )
     Path(files["precheck"]).write_text(build_precheck_sql(selected), encoding="utf-8")
     Path(files["apply"]).write_text(build_apply_sql(selected, backup_table), encoding="utf-8")
     Path(files["rollback"]).write_text(build_rollback_sql(selected, backup_table), encoding="utf-8")

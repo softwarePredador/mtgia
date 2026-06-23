@@ -1,0 +1,39 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg119_current_replay_simple_runtime_batch_20260623_22251",
+  "deploy_id": "PG119",
+  "family_counts": {
+    "board_wipe_choice": 1,
+    "targeted_interaction": 14
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg119_current_replay_simple_runtime_batch_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg119_current_replay_simple_runtime_batch_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg119_current_replay_simple_runtime_batch_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg119_current_replay_simple_runtime_batch_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg119_current_replay_simple_runtime_batch_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg119_current_replay_simple_runtime_batch_rollback.sql"
+  },
+  "generated_at": "2026-06-23T22:29:42+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Fierce Guardianship",
+    "Force of Will",
+    "Mindbreak Trap",
+    "Sevinne's Reclamation",
+    "Abrupt Decay",
+    "Counterspell",
+    "Deadly Rollick",
+    "Force of Vigor",
+    "Laughing Mad",
+    "Lightning Bolt",
+    "Negate",
+    "Snapback",
+    "Thrill of Possibility",
+    "Calamity of Cinders",
+    "Gut Shot"
+  ],
+  "selected_count": 15,
+  "slug": "current_replay_simple_runtime_batch",
+  "status": "prepared_read_only_pending_apply_approval"
+}

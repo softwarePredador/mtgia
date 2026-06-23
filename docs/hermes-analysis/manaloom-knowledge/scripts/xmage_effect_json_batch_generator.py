@@ -49,8 +49,11 @@ def external_by_name(external_harvest: dict[str, Any] | None) -> dict[str, dict[
     }
 
 
-def oracle_hash_for(card_name: str, external_card: dict[str, Any] | None) -> tuple[str | None, str]:
+def oracle_hash_for(card: dict[str, Any], external_card: dict[str, Any] | None) -> tuple[str | None, str]:
     if not external_card:
+        local_hash = str(card.get("oracle_hash") or "").strip()
+        if local_hash:
+            return local_hash, "combined_coherence.oracle_hash"
         return None, "missing_external_harvest"
     candidate = external_card.get("candidate_rule") or {}
     if candidate.get("oracle_hash"):
@@ -128,7 +131,7 @@ def proposal_status(card: dict[str, Any], oracle_hash: str | None) -> str:
 def build_proposal(card: dict[str, Any], external_card: dict[str, Any] | None) -> dict[str, Any]:
     effect_json = merged_effect_json(card, external_card)
     deck_role_json = deck_role_for(card)
-    oracle_hash, oracle_hash_source = oracle_hash_for(str(card.get("card_name") or ""), external_card)
+    oracle_hash, oracle_hash_source = oracle_hash_for(card, external_card)
     rule = {"effect_json": effect_json, "deck_role_json": deck_role_json}
     logical_key = logical_rule_key(rule)
     status = proposal_status(card, oracle_hash)
@@ -148,7 +151,7 @@ def build_proposal(card: dict[str, Any], external_card: dict[str, Any] | None) -
         "deck_role_json": deck_role_json,
         "review_status": "verified" if status == "batch_pg_candidate_after_precheck" else "needs_review",
         "execution_status": "auto" if status == "batch_pg_candidate_after_precheck" else "review_only",
-        "source": "curated_xmage_batch_candidate" if status == "batch_pg_candidate_after_precheck" else "xmage_batch_review_candidate",
+        "source": "curated" if status == "batch_pg_candidate_after_precheck" else "generated",
         "confidence": 0.94 if status == "batch_pg_candidate_after_precheck" else 0.70,
         "notes": notes_for(card),
         "xmage_class": card.get("xmage_class"),

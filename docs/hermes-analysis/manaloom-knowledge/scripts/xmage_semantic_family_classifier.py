@@ -125,6 +125,18 @@ def primary_effect(card: dict[str, Any]) -> dict[str, Any]:
     return (card.get("xmage") or {}).get("primary_effect") or {}
 
 
+def xmage_types(card: dict[str, Any]) -> set[str]:
+    return {str(value or "").upper() for value in ((card.get("xmage") or {}).get("types") or []) if value}
+
+
+def xmage_ability_classes(card: dict[str, Any]) -> set[str]:
+    return {str(value or "") for value in ((card.get("xmage") or {}).get("ability_classes") or []) if value}
+
+
+def xmage_effect_classes(card: dict[str, Any]) -> set[str]:
+    return {str(value or "") for value in ((card.get("xmage") or {}).get("effect_classes") or []) if value}
+
+
 def family_for_effect(effect: str | None) -> str:
     effect = str(effect or "external_reference_required_manual_model")
     for family_id, definition in FAMILY_DEFINITIONS.items():
@@ -147,11 +159,74 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
     return "cost_reduction_condition" not in effect_json
 
 
+GENERIC_BATCH_SAFE_SCOPES = {
+    ("counter_spell", "counter_target_stack_object_variant_v1"),
+    ("draw_cards", "source_controller_draw_variant_v1"),
+    ("bounce", "targeted_return_to_hand_variant_v1"),
+    ("removal_exile", "targeted_exile_variant_v1"),
+    ("removal_destroy", "targeted_destroy_variant_v1"),
+    ("direct_damage", "targeted_damage_variant_v1"),
+    ("recursion", "graveyard_to_battlefield_variant_v1"),
+    ("sweeper_damage", "damage_all_variant_v1"),
+}
+MANA_ROCK_BATCH_SAFE_SCOPE = (
+    "mana_rock_with_sacrifice_draw",
+    "artifact_tap_colorless_mana_or_pay_tap_sac_draw_one_v1",
+)
+GENERIC_BATCH_SAFE_EFFECT_CLASSES = {
+    "counter_spell": {"CounterTargetEffect"},
+    "draw_cards": {"DrawCardSourceControllerEffect"},
+    "bounce": {"ReturnToHandTargetEffect"},
+    "removal_exile": {"ExileTargetEffect"},
+    "removal_destroy": {"DestroyTargetEffect"},
+    "direct_damage": {"DamageTargetEffect"},
+    "sweeper_damage": {"DamageAllEffect"},
+}
+GENERIC_BATCH_SAFE_ABILITY_CLASSES = {
+    "counter_spell": {"AlternativeCostSourceAbility"},
+    "draw_cards": {"FlashbackAbility"},
+    "bounce": {"AlternativeCostSourceAbility"},
+    "removal_exile": {"AlternativeCostSourceAbility"},
+    "removal_destroy": {"AlternativeCostSourceAbility", "CantBeCounteredSourceAbility"},
+    "direct_damage": set(),
+    "sweeper_damage": {"ConvokeAbility"},
+    "recursion": {"FlashbackAbility"},
+}
+
+
+def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
+    effect_json = primary_effect(card)
+    effect = str(effect_json.get("effect") or "")
+    scope = str(effect_json.get("battle_model_scope") or "")
+    types = xmage_types(card)
+    ability_classes = xmage_ability_classes(card)
+    effect_classes = xmage_effect_classes(card)
+    if (effect, scope) == MANA_ROCK_BATCH_SAFE_SCOPE:
+        return False
+    if (effect, scope) not in GENERIC_BATCH_SAFE_SCOPES:
+        return False
+    if not types or not types.issubset({"INSTANT", "SORCERY"}):
+        return False
+    if effect == "recursion":
+        if "ReturnFromGraveyardToBattlefieldTargetEffect" not in effect_classes:
+            return False
+    else:
+        allowed_effects = GENERIC_BATCH_SAFE_EFFECT_CLASSES.get(effect)
+        if allowed_effects is None or not effect_classes.issubset(allowed_effects):
+            return False
+    allowed_abilities = GENERIC_BATCH_SAFE_ABILITY_CLASSES.get(effect, set())
+    if not ability_classes.issubset(allowed_abilities):
+        return False
+    return True
+
+
 def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     if card.get("status") == "blocked_missing_xmage_class":
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
+    if generic_runtime_batch_safe(card):
+        return "batch_metadata_candidate_requires_pg_precheck"
     support_status = str(family.get("support_status") or "")
     if family.get("effects") == {"static_cost_reduction"} and not static_cost_reducer_batch_safe(card):
         return "split_family_scope_review_required"
@@ -175,6 +250,7 @@ def classify_card(card: dict[str, Any]) -> dict[str, Any]:
         "severity": card.get("severity"),
         "status": card.get("status"),
         "coherence_findings": card.get("coherence_findings") or [],
+        "oracle_hash": card.get("oracle_hash"),
         "family_id": family_id,
         "effect": effect_json.get("effect"),
         "battle_model_scope": effect_json.get("battle_model_scope"),
@@ -186,6 +262,9 @@ def classify_card(card: dict[str, Any]) -> dict[str, Any]:
         "valid_xmage_source": bool(card.get("valid_xmage_source")),
         "xmage_class": (card.get("xmage") or {}).get("class_name"),
         "xmage_path": (card.get("xmage") or {}).get("path"),
+        "xmage_types": sorted(xmage_types(card)),
+        "xmage_ability_classes": sorted(xmage_ability_classes(card)),
+        "xmage_effect_classes": sorted(xmage_effect_classes(card)),
         "focused_test_scenario_count": (card.get("checks") or {}).get("focused_test_scenario_count") or 0,
         "effect_json": effect_json,
     }

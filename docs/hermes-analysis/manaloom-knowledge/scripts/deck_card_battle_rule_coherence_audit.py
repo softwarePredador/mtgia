@@ -10,6 +10,7 @@ for card-by-card review.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sqlite3
@@ -241,6 +242,13 @@ def has_oracle_text(usage: DeckCardUsage, oracle: dict[str, Any] | None) -> bool
     return any(text.strip() for text in usage.oracle_texts)
 
 
+def oracle_hash_md5(oracle_text: str | None) -> str | None:
+    text = str(oracle_text or "").strip()
+    if not text:
+        return None
+    return hashlib.md5(text.encode("utf-8")).hexdigest()
+
+
 def active_rules(rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         rule
@@ -450,6 +458,7 @@ def classify_card(
         "land_like": land_like,
         "oracle_cache_present": bool(oracle),
         "oracle_text_present": oracle_present,
+        "oracle_hash": oracle_hash_md5((oracle or {}).get("oracle_text")),
         "type_line": str((oracle or {}).get("type_line") or (usage.type_lines[0] if usage.type_lines else "")),
         "active_rule_count": len(active),
         "trusted_executable_rule_count": len(trusted),

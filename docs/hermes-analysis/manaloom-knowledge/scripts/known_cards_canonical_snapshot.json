@@ -144,15 +144,22 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Abrupt Decay": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_destroy_variant_v1",
     "effect": "remove_permanent",
-    "instant": true,
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ]
+    },
     "target": "nonland_permanent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:24839f966a77da6656c462aa885ccaa4",
+    "battle_rule_oracle_hash": "04ce5e5a3b4a8e9243a592cae2f67af8"
   },
   "Abstergo Entertainment": {
     "effect": "land",
@@ -3903,6 +3910,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9a861b4584060dd00c80918ddc8c78b8"
   },
+  "Calamity of Cinders": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "damage_all_variant_v1",
+    "effect": "sweeper_damage",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:83c697bb6d5579334bef054f2204b3a9",
+    "battle_rule_oracle_hash": "860e306393dd42863f84cbe930499be9"
+  },
   "Calciform Pools": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -5679,14 +5703,20 @@
     "battle_rule_logical_key": "battle_rule_v1:cf02bd166a0ffd1d5e60e5ffd1201c07"
   },
   "Counterspell": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_target_stack_object_variant_v1",
     "effect": "counter",
+    "target_constraints": {
+      "zone": "stack"
+    },
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab59b16c0affe83efd99245a87b0b785",
+    "battle_rule_oracle_hash": "d748ee6dd8f8a81c2f3f28ac38dd895a"
   },
   "Country Roads": {
     "effect": "land",
@@ -6592,15 +6622,22 @@
     "battle_rule_logical_key": "battle_rule_v1:a845d70ca59d599e7edd7aa15d170519"
   },
   "Deadly Rollick": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_exile_variant_v1",
     "effect": "remove_creature",
-    "instant": true,
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
     "target": "creature",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d0548bf7d63a72a613d0d7559c0bead5",
+    "battle_rule_oracle_hash": "e437e191b057a33d4d4bec121c1cd435"
   },
   "Deadpool, Trading Card": {
     "effect": "creature",
@@ -9940,14 +9977,20 @@
     "battle_rule_logical_key": "battle_rule_v1:6afe98bc6ead389c7e5e760bf3c575ac"
   },
   "Fierce Guardianship": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_target_stack_object_variant_v1",
     "effect": "counter",
+    "target_constraints": {
+      "zone": "stack"
+    },
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab59b16c0affe83efd99245a87b0b785",
+    "battle_rule_oracle_hash": "bc4b4203a40c025f864fb72b5e028507"
   },
   "Fiery Confluence": {
     "cmc": 4.0,
@@ -10512,24 +10555,37 @@
     "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
   },
   "Force of Vigor": {
-    "effect": "remove_permanent",
-    "instant": true,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_destroy_variant_v1",
+    "effect": "removal_destroy",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0b547d7209a38ac2d23a1cca07917680"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c4882150a4b01688aa847f3a2b6b917e",
+    "battle_rule_oracle_hash": "0a5b0d5ec18fe010214e5074967e0f58"
   },
   "Force of Will": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_target_stack_object_variant_v1",
     "effect": "counter",
+    "target_constraints": {
+      "zone": "stack"
+    },
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab59b16c0affe83efd99245a87b0b785",
+    "battle_rule_oracle_hash": "47f60c69ad0e8584a19c553ead1b804e"
   },
   "Foreboding Landscape": {
     "effect": "land",
@@ -12678,6 +12734,21 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Gut Shot": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_damage_variant_v1",
+    "effect": "direct_damage",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a939ce51bf83fe086fc16a40d344752d",
+    "battle_rule_oracle_hash": "11231a3dc6228cf87243630826f882a7"
   },
   "Guttersnipe": {
     "damage": 2,
@@ -15959,20 +16030,15 @@
     "battle_rule_logical_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d"
   },
   "Laughing Mad": {
-    "battle_model_scope": "discard_draw_two_flashback_v1",
-    "cmc": 3.0,
-    "count": 2,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "source_controller_draw_variant_v1",
     "effect": "draw_cards",
-    "flashback": true,
-    "flashback_cost": "{3}{R}",
-    "instant": true,
-    "requires_discard_card": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.93,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:034c28dd36fc871cb93eb48ad66ef74e",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3af05007acd54aabd195ff390b8f082f",
     "battle_rule_oracle_hash": "77323f8288f108b027cf698e38e08341"
   },
   "Lava Tubes": {
@@ -16269,17 +16335,19 @@
     "battle_rule_logical_key": "battle_rule_v1:2f76bad97175d8bd361b3fd37840ffee"
   },
   "Lightning Bolt": {
-    "amount": 3,
-    "cmc": 1.0,
-    "effect": "deal_damage",
-    "instant": true,
-    "target": "any",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_damage_variant_v1",
+    "effect": "direct_damage",
+    "target_constraints": {
+      "scope": "any_target"
+    },
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.98,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:391a4c412232533c791194c4aea9ea28"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a939ce51bf83fe086fc16a40d344752d",
+    "battle_rule_oracle_hash": "d6688e11f8fab7ac055bb72239825ab3"
   },
   "Lightning Greaves": {
     "attach_model": "auto_attach_best_creature_on_resolution",
@@ -17930,14 +17998,19 @@
     "battle_rule_logical_key": "battle_rule_v1:9ebdd456c04ec50d9efbc010ee85c689"
   },
   "Mindbreak Trap": {
-    "effect": "counter",
-    "instant": true,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_exile_variant_v1",
+    "effect": "removal_exile",
+    "target_constraints": {
+      "zone": "stack"
+    },
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ac8ef4daa0b2bccca232c55650faaac7",
+    "battle_rule_oracle_hash": "59ac3fb4c9b6e1e17fa82e6f0c9a703f"
   },
   "Mindcrank": {
     "cmc": 2.0,
@@ -19182,14 +19255,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Negate": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_target_stack_object_variant_v1",
     "effect": "counter",
+    "target_constraints": {
+      "zone": "stack"
+    },
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab59b16c0affe83efd99245a87b0b785",
+    "battle_rule_oracle_hash": "25854a654e42a97cc4802ee504f71c51"
   },
   "Neglected Manor": {
     "effect": "land",
@@ -25045,14 +25124,22 @@
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
   "Sevinne's Reclamation": {
-    "count": 1,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "graveyard_to_battlefield_variant_v1",
     "effect": "recursion",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "zone": "graveyard"
+    },
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fac6bf2a168be222f29dff8b54459d88"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:13150949864474c123d5a02a7a007722",
+    "battle_rule_oracle_hash": "ef26bb3a88ec6e282792b3a5faad8f8f"
   },
   "Sewer-veillance Cam": {
     "effect": "passive",
@@ -26244,15 +26331,24 @@
     "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4"
   },
   "Snapback": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_return_to_hand_variant_v1",
     "effect": "remove_creature",
-    "instant": true,
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "_rule_oracle_normalized_effect_from": "bounce",
+    "_rule_oracle_normalized_effect_to": "remove_creature",
     "target": "creature",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ecb72fd4217be7d7c883b645bf4da384",
+    "battle_rule_oracle_hash": "5bf90c640dc5f6814c35b1acc8021782"
   },
   "Snapcaster Mage": {
     "cmc": 2.0,
@@ -30167,16 +30263,16 @@
     "battle_rule_logical_key": "battle_rule_v1:ec9c870dd58d78bc15537f68438a0f47"
   },
   "Thrill of Possibility": {
-    "count": 2,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "source_controller_draw_variant_v1",
     "effect": "draw_cards",
-    "instant": true,
-    "requires_discard_card": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:57faef0d5ed88fa41112b8b1a6c41d4e"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3af05007acd54aabd195ff390b8f082f",
+    "battle_rule_oracle_hash": "82c625909b3e6d29d4fa95e933cfc80e"
   },
   "Thrilling Discovery": {
     "cmc": 2.0,
