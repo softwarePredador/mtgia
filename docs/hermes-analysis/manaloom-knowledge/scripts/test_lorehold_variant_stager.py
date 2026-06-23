@@ -36,6 +36,7 @@ def seed_db(path: Path) -> None:
             ("plains", "Plains // Plains", "", '["W"]', '["W"]', "Basic Land — Plains", "", 0.0),
             ("sol ring", "Sol Ring", "{1}", "[]", "[]", "Artifact", "{T}: Add {C}{C}.", 1.0),
             ("approach of the second sun", "Approach of the Second Sun", "{6}{W}", '["W"]', '["W"]', "Sorcery", "If this spell was cast from your hand and you've cast another spell named Approach of the Second Sun this game, you win the game.", 7.0),
+            ("dragon's approach", "Dragon's Approach", "{2}{R}", '["R"]', '["R"]', "Sorcery", "Dragon's Approach deals 3 damage to each opponent. You may exile Dragon's Approach and four cards named Dragon's Approach from your graveyard. If you do, search your library for a Dragon creature card, put it onto the battlefield, then shuffle. A deck can have any number of cards named Dragon's Approach.", 3.0),
             ("counterspell", "Counterspell", "{U}{U}", '["U"]', '["U"]', "Instant", "Counter target spell.", 2.0),
         ]
         conn.executemany(
@@ -184,6 +185,29 @@ Commander
                 joined = "\n".join(report["issues"])
                 self.assertIn("off_color_identity:U", joined)
                 self.assertIn("oracle_missing", joined)
+
+    def test_validate_allows_dragon_approach_copy_limit_exception(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "knowledge.db"
+            seed_db(db)
+            deck = stager.parse_deck_blocks(
+                "\n".join(
+                    [
+                        "1 Lorehold, the Historian",
+                        "20 Dragon's Approach",
+                        "1 Sol Ring",
+                        "78 Plains",
+                    ]
+                )
+            )[0]
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                stager.ensure_tables(conn)
+                report = stager.validate_deck(conn, deck, "input-sha")
+                self.assertEqual(report["validation_status"], "valid")
+                self.assertNotIn("singleton_violation", "\n".join(report["issues"]))
+                self.assertEqual(report["total_quantity"], 100)
+                self.assertEqual(report["main_quantity"], 99)
 
 
 if __name__ == "__main__":

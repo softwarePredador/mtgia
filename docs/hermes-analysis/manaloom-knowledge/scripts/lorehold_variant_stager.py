@@ -25,6 +25,7 @@ DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledg
 DEFAULT_REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 COMMANDER = "Lorehold, the Historian"
 COMMANDER_COLORS = {"R", "W"}
+COPY_LIMIT_EXCEPTION_NAMES = {"dragon's approach"}
 
 SECTION_HEADERS = {
     "artifact",
@@ -471,6 +472,14 @@ def is_basic_land(oracle: sqlite3.Row | None) -> bool:
     return "Basic" in type_line and "Land" in type_line
 
 
+def allows_multiple_copies(name: str, oracle: sqlite3.Row | None) -> bool:
+    normalized = normalize_name(name)
+    if normalized in COPY_LIMIT_EXCEPTION_NAMES:
+        return True
+    oracle_text = str(oracle["oracle_text"] or "").lower() if oracle else ""
+    return "a deck can have any number of cards named" in oracle_text
+
+
 def validate_deck(conn: sqlite3.Connection, deck: DeckBlock, raw_input_sha256: str) -> dict[str, Any]:
     commander_key = normalize_name(COMMANDER)
     deck_key = deck_hash(deck)
@@ -493,12 +502,13 @@ def validate_deck(conn: sqlite3.Connection, deck: DeckBlock, raw_input_sha256: s
         card_warnings: list[str] = []
         is_commander = normalized_oracle == commander_key or normalize_name(parsed.name) == commander_key
         basic_land = is_basic_land(oracle)
+        copy_limit_exception = allows_multiple_copies(oracle_name, oracle)
 
         if not oracle:
             card_issues.append("oracle_missing")
-        if not is_commander and not basic_land and parsed.quantity > 1:
+        if not is_commander and not basic_land and not copy_limit_exception and parsed.quantity > 1:
             card_issues.append("singleton_violation")
-        if normalized_oracle in singleton_seen and not basic_land:
+        if normalized_oracle in singleton_seen and not basic_land and not copy_limit_exception:
             card_issues.append("duplicate_name_after_oracle_normalization")
         singleton_seen[normalized_oracle] = parsed.name
 

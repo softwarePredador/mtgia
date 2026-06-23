@@ -1,0 +1,23 @@
+PG052 Lorehold Variant 02 card oracle metadata precheck
+     check_name      | value
+---------------------+-------
+ current_target_rows |     3
+(1 row)
+
+    expected_name     |                  id                  |     current_name     |             scryfall_id              |              oracle_id               | mana_cost | current_cmc | expected_cmc |                type_line                 | oracle_len
+----------------------+--------------------------------------+----------------------+--------------------------------------+--------------------------------------+-----------+-------------+--------------+------------------------------------------+------------
+ Molecule Man         |                                      |                      |                                      |                                      |           |             |            6 |                                          |          0
+ The Mind Stone       | 952222c4-374d-42ed-b654-db4cc8751339 | The Mind Stone       | b175e826-09e8-4fae-9f2e-b902f95b282d | b175e826-09e8-4fae-9f2e-b902f95b282d | {1}{W}    |         0.0 |            2 | Legendary Artifact — Infinity Stone      |        275
+ The Scarlet Witch    | 40994661-32d0-4450-b09f-e908e329a3c3 | The Scarlet Witch    | d8ae8c38-501e-44ea-9faf-cf9d11ba6616 | d8ae8c38-501e-44ea-9faf-cf9d11ba6616 | {2}{R}    |         0.0 |            3 | Legendary Creature — Mutant Warlock Hero |        125
+ Thor, God of Thunder | ceddc419-1225-4090-ba30-b14999c5d04c | Thor, God of Thunder | 2842217a-173e-4879-8b25-fefe2fc1123f | 2842217a-173e-4879-8b25-fefe2fc1123f | {3}{R}{R} |         0.0 |            5 | Legendary Creature — God Warrior Hero    |        256
+(4 rows)
+
+       check_name        | value
+-------------------------+-------
+ bad_or_missing_cmc_rows |     3
+(1 row)
+
+       check_name        | value
+-------------------------+-------
+ oracle_id_conflict_rows |     0
+(1 row)

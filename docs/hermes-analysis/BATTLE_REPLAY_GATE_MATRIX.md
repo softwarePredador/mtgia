@@ -2603,3 +2603,101 @@ Caveat:
 - `Blasphemous Act` cost reduction `{1}` per creature remains
   `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
   dynamic cost-reduction executor.
+
+## PG051 Deck 6 L1B Non-Fetch Land Mana Focused Event Gate - 2026-06-23 01:25 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_focused_events_20260623_012230.jsonl`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_apply_20260623_011438.sql`.
+
+Gate:
+
+- `11` `rule_resolution` rows prove the included non-fetch lands resolve to
+  trusted curated rules with `rule_logical_key` and `rule_oracle_hash`.
+- `3` runtime `land_played` samples prove the battle runtime emits the active
+  PostgreSQL-backed rule provenance for:
+  `City of Brass`, `Battlefield Forge`, and `Sacred Foundry`.
+- All runtime samples used
+  `rule_logical_key=battle_rule_v1:603c776839827f2f21cef8b62e22a1be`.
+- Sample oracle hashes:
+  `City of Brass=969b41c45b968319b44f77454c6ac55b`,
+  `Battlefield Forge=39d45b03e1a8226fd02925e44ee7692c`, and
+  `Sacred Foundry=33b9a82ff9bf4322c280434b47fb3436`.
+
+Status:
+
+- The included `11` non-fetch lands are closed for the current
+  battle-rule coherence gate.
+- Final auditor after PG052:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_012130.json`
+  reports deck `6` at `high=41`, `medium=8`, `pass=51`.
+
+Caveats:
+
+- This gate proves mana-source runtime provenance. Life-loss, conditional ETB,
+  surveil, filter, and related clauses remain annotation-only or abstracted as
+  stated in each `battle_model_scope`.
+- Fetchlands were excluded and remain open for a separate waiver/model package.
+
+## PG052 Valakut Awakening Hash-Only Gate - 2026-06-23 01:25 UTC
+
+Artifacts:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg052_hash_only_apply_20260623_012000.sql`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg052_valakut_hash_only_20260623_012000.json`.
+
+Gate:
+
+- PG052 did not add a new executor and did not require a new replay.
+- It restored the active PG042 rule oracle hash:
+  `rule_logical_key=battle_rule_v1:6e1f3b876822abafe1de47610f46858d`,
+  `rule_oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`.
+- Full battle regression suite passed after the PG-to-SQLite sync:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Status:
+
+- `Valakut Awakening // Valakut Stoneforge` is closed for the hash-only
+  provenance gate.
+
+## PG054 Deck 6 L6 Silence-Lock Focused Event Gate - 2026-06-23 01:36 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_focused_events_20260623_013520.jsonl`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_apply_20260623_013119.sql`.
+
+Gate:
+
+- `Silence` rule resolution includes:
+  `rule_logical_key=battle_rule_v1:74b210b77b004a677906e0216d44e445` and
+  `rule_oracle_hash=a0ca3c09a7db091c435ab31adb9c1780`.
+- The focused `Silence` runtime check emits `spell_resolved` for Silence with
+  that same key/hash and then proves the responder keeps `Real Counter` while
+  `silenced_opponents_until_eot=true`.
+- `Grand Abolisher` rule resolution includes:
+  `rule_logical_key=battle_rule_v1:4df98360e4467568504b19219c8ba5d0` and
+  `rule_oracle_hash=57c98b7e49853c5e0afff526da052e3c`.
+- The focused Grand Abolisher runtime check emits `cast_announced`,
+  `cost_paid`, `spell_cast`, and `spell_resolved` with that same key/hash, and
+  verifies `silenced_opponents=true`.
+
+Status:
+
+- `Silence` and `Grand Abolisher` are closed for the current battle-rule
+  coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_013430.json`
+  reports deck `6` at `high=39`, `medium=8`, `pass=53`.
+
+Caveat:
+
+- Grand Abolisher's activated-ability lock remains `annotation_only`; this
+  gate proves the current opponent spell-cast lock runtime path.

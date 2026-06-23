@@ -4729,3 +4729,445 @@ Rollback:
 - `deck6_l2_hash_only_batch_pg049_rollback_20260623_004614.sql`
   deletes the current target rows and restores the nine pre-PG049 rows from
   `manaloom_deploy_audit.pg049_deck6_l2_hash_only_batch_20260623_004614`.
+
+## PG050 Deck 6 L1A Land Model Cleanup Deploy - 2026-06-23 01:05 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable metadata/provenance cleanup for official Lorehold deck `6` L1A
+  land/mana-base rules. PostgreSQL is the source of truth; Hermes SQLite was
+  resynced only after the PG postcheck passed.
+- No deck swap, commit, push, `effect_json` change, or runtime behavior change
+  was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_precheck_20260623_010026.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_apply_20260623_010026.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_postcheck_20260623_010026.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_rollback_20260623_010026.sql`.
+
+Target cards:
+
+- `Ancient Den`.
+- `Ancient Tomb`.
+- `Command Tower`.
+- `Gemstone Caverns`.
+- `Great Furnace`.
+- `Hall of Heliod's Generosity`.
+- `Inventors' Fair`.
+- `Plateau`.
+- `Sunbaked Canyon`.
+- `Urza's Saga`.
+- `War Room`.
+
+Precheck evidence:
+
+- `deck_target_cards=11`.
+- `target_rule_rows=31`.
+- `generated_review_only_rows=11`.
+- `trusted_missing_hash_rows=20`.
+- `card_id_mismatch_same_oracle_rows=5`.
+- `card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `target_names_missing_rules=0`.
+
+Apply evidence:
+
+- First apply attempt aborted before `COMMIT` because the SQL referenced the
+  update target alias inside a `FROM` join; PostgreSQL rolled back the open
+  transaction and no backup table remained.
+- Corrected apply created backup table:
+  `manaloom_deploy_audit.pg050_deck6_l1a_land_model_cleanup_20260623_010026`.
+- Backup row count: `31`.
+- Updated curated trusted rows: `20`.
+- Disabled generated review-only shadows: `11`.
+
+Postcheck evidence:
+
+- `generated_review_only_rows=0`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `generated_disabled_or_deprecated_rows=11`.
+- `backup_rows=31`.
+- `disabled_card_id_mismatch_same_oracle_rows=2`; these are disabled generated
+  shadows for `Ancient Tomb` and `Command Tower`, not active runtime rows.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg050_deck6_l1a_land_model_cleanup_20260623_010026.json`.
+- Deck 6 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_010510.json`.
+- Deck 6 final counts: `high=41`, `medium=19`, `pass=40`.
+- Deck 606 separate auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_010510.json`.
+
+Rollback:
+
+- `deck6_l1a_land_model_cleanup_pg050_rollback_20260623_010026.sql`
+  deletes the current target rows and restores the 31 pre-PG050 rows from
+  `manaloom_deploy_audit.pg050_deck6_l1a_land_model_cleanup_20260623_010026`.
+
+## PG053 Lorehold Variant 02 Card Oracle Metadata Deploy - 2026-06-23 01:23 UTC
+
+Status:
+
+- `applied_validated`.
+- PostgreSQL `cards` metadata deploy required by Lorehold Variant 02 intake.
+- No deck swap, no PostgreSQL `deck_cards` mutation, and no battle-rule
+  mutation was executed.
+- Canonical register id is `PG053`. The physical SQL/output filenames and PG
+  audit table retain the `pg052_lorehold_variant02...` prefix because this
+  package was executed before detecting the concurrent `PG052 Valakut Awakening
+  Hash-Only Repair` package.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant02_card_oracle_metadata_pg052_precheck_20260623_011834.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant02_card_oracle_metadata_pg052_apply_20260623_011834.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant02_card_oracle_metadata_pg052_postcheck_20260623_011834.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant02_card_oracle_metadata_pg052_rollback_20260623_011834.sql`.
+
+Precheck evidence:
+
+- `current_target_rows=3`.
+- `Molecule Man` was absent.
+- `The Mind Stone`, `The Scarlet Witch`, and `Thor, God of Thunder` existed
+  with oracle text but stale `cmc=0`.
+- `bad_or_missing_cmc_rows=3`.
+- `oracle_id_conflict_rows=0`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg052_lorehold_variant02_card_oracle_metadata_20260623_011834`.
+- Backup row count: `3`.
+- Updated rows: `3`.
+- Inserted rows: `1`.
+
+Postcheck evidence:
+
+- `target_rows=4`.
+- `bad_cmc_rows=0`.
+- `missing_oracle_rows=0`.
+- `off_lorehold_color_identity_rows=0`.
+- `backup_rows=3`.
+
+Post-apply sync/audit:
+
+- Hermes cache sync:
+  `docs/hermes-analysis/master_optimizer_reports/card_oracle_cache_from_pg_pg052_lorehold_variant02_20260623_011834.json`.
+- Lorehold Variant 02 intake/materialization:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant02_deck607_intake_20260623_012330.md`.
+
+Rollback:
+
+- `lorehold_variant02_card_oracle_metadata_pg052_rollback_20260623_011834.sql`
+  deletes the four PG052 target rows and restores the three pre-PG052 backup
+  rows from
+  `manaloom_deploy_audit.pg052_lorehold_variant02_card_oracle_metadata_20260623_011834`.
+
+## PG051 Deck 6 L1B Non-Fetch Land Mana Batch - Applied 2026-06-23 01:15 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable runtime/provenance update for `11` official Lorehold deck `6`
+  non-fetch lands. PostgreSQL is the source of truth; Hermes SQLite was
+  resynced after PG postcheck passed.
+- No deck swap, commit, or push was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_precheck_20260623_011438.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_apply_20260623_011438.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_postcheck_20260623_011438.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_rollback_20260623_011438.sql`.
+
+Target cards:
+
+- `Battlefield Forge`.
+- `City of Brass`.
+- `Clifftop Retreat`.
+- `Elegant Parlor`.
+- `Inspiring Vantage`.
+- `Mana Confluence`.
+- `Rugged Prairie`.
+- `Sacred Foundry`.
+- `Spectator Seating`.
+- `Sunbillow Verge`.
+- `Sundown Pass`.
+
+Precheck evidence:
+
+- `deck_target_cards=11`.
+- `fetchland_names_in_target=0`.
+- `target_rule_rows=22`.
+- `generated_review_only_rows=11`.
+- `trusted_missing_hash_rows=11`.
+- `trusted_without_scope_rows=11`.
+- `trusted_without_produces_rows=11`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `target_names_missing_rules=0`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg051_deck6_l1b_nonfetch_land_mana_20260623_011438`.
+- Backup row count: `22`.
+- Updated curated trusted rows: `11`.
+- Disabled generated review-only shadows: `11`.
+
+Postcheck evidence:
+
+- `generated_review_only_rows=0`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `trusted_without_scope_rows=0`.
+- `trusted_without_produces_rows=0`.
+- `curated_l1b_family_rows=11`.
+- `generated_disabled_or_deprecated_rows=11`.
+- `backup_rows=22`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg051_deck6_l1b_nonfetch_land_mana_20260623_011438.json`.
+- Deck 6 after PG051:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_011800.json`
+  reports `high=41`, `medium=9`, `pass=50`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_focused_events_20260623_012230.jsonl`.
+
+Rollback:
+
+- `deck6_l1b_nonfetch_land_mana_pg051_rollback_20260623_011438.sql`
+  deletes the current target rows and restores the 22 pre-PG051 rows from
+  `manaloom_deploy_audit.pg051_deck6_l1b_nonfetch_land_mana_20260623_011438`.
+
+## PG052 Valakut Awakening Hash-Only Repair - Applied 2026-06-23 01:20 UTC
+
+Status:
+
+- `applied_validated`.
+- Hash-only provenance repair for the verified active
+  `Valakut Awakening // Valakut Stoneforge` rule.
+- No `effect_json`, runtime behavior, deck swap, commit, or push was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg052_hash_only_precheck_20260623_012000.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg052_hash_only_apply_20260623_012000.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg052_hash_only_postcheck_20260623_012000.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg052_hash_only_rollback_20260623_012000.sql`.
+
+Precheck evidence:
+
+- First precheck attempt failed on a CTE scope mistake after emitting metrics;
+  no apply ran before the SQL was corrected.
+- Corrected precheck:
+  `deck_target_cards=1`, `target_rule_rows=3`, `active_curated_rows=1`,
+  `trusted_missing_hash_rows=1`, and no active card-id mismatches.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg052_valakut_awakening_hash_only_20260623_012000`.
+- Backup row count: `3`.
+- Updated active curated trusted rows: `1`.
+
+Postcheck evidence:
+
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `backup_rows=3`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg052_valakut_hash_only_20260623_012000.json`.
+- Deck 6 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_012130.json`
+  reports `high=41`, `medium=8`, `pass=51`.
+- Deck 606 separate auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_012130.json`
+  reports `high=43`, `medium=8`, `pass=30`.
+
+Rollback:
+
+- `valakut_awakening_pg052_hash_only_rollback_20260623_012000.sql`
+  deletes the current target rows and restores the 3 pre-PG052 rows from
+  `manaloom_deploy_audit.pg052_valakut_awakening_hash_only_20260623_012000`.
+
+## PG054 Deck 6 L6 Silence-Lock Batch - Applied 2026-06-23 01:34 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable runtime/provenance update for `Silence` and `Grand Abolisher` in
+  official Lorehold deck `6`.
+- PostgreSQL is the source of truth; Hermes SQLite was resynced after PG
+  postcheck passed.
+- No deck swap, commit, or push was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_precheck_20260623_013119.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_apply_20260623_013119.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_postcheck_20260623_013119.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_rollback_20260623_013119.sql`.
+
+Target cards:
+
+- `Grand Abolisher`.
+- `Silence`.
+
+Precheck evidence:
+
+- `deck_target_cards=2`.
+- `target_rule_rows=5`.
+- `active_curated_rows=3`.
+- `trusted_missing_hash_rows=3`.
+- `generated_review_only_rows=2`.
+- `silence_legacy_active_rows=1`.
+- `target_active_runtime_rows=2`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `target_names_missing_rules=0`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg054_deck6_l6_silence_lock_20260623_013119`.
+- Backup row count: `5`.
+- Updated curated trusted rows: `2`.
+- Disabled legacy/shadow rows: `3`.
+
+Postcheck evidence:
+
+- `active_curated_rows=2`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `trusted_without_scope_rows=0`.
+- `generated_review_only_rows=0`.
+- `silence_legacy_active_rows=0`.
+- `target_active_runtime_rows=2`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `disabled_or_deprecated_rows=3`.
+- `backup_rows=5`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg054_deck6_l6_silence_lock_20260623_013119.json`.
+- Deck 6 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_013430.json`
+  reports `high=39`, `medium=8`, `pass=53`.
+- Deck 606 separate auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_013600.json`
+  reports `high=43`, `medium=8`, `pass=30`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_focused_events_20260623_013520.jsonl`.
+
+Rollback:
+
+- `deck6_l6_silence_lock_pg054_rollback_20260623_013119.sql`
+  deletes the current target rows and restores the 5 pre-PG054 rows from
+  `manaloom_deploy_audit.pg054_deck6_l6_silence_lock_20260623_013119`.
+
+## PG055 Lorehold Variant 03 Card Metadata - Applied 2026-06-23 01:31 UTC
+
+Status:
+
+- `applied_validated`.
+- Logical deploy id: `PG055`.
+- Important numbering note: the physical SQL/output artifacts and backup table
+  were generated with a `pg054_lorehold_variant03...` prefix before the
+  concurrent `PG054 Deck 6 L6 Silence-Lock Batch` register entry was reconciled.
+  The deploy is tracked here as `PG055` to avoid a second logical `PG054`.
+- PostgreSQL `cards` metadata only; no `deck_cards`, deck swap, or battle-rule
+  mutation was executed.
+
+Target cards:
+
+- `Naktamun Lorespinner // Wheel of Fortune`.
+- `Tablet of Discovery`.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant03_card_metadata_pg054_precheck_20260623_013138.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant03_card_metadata_pg054_apply_20260623_013138.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant03_card_metadata_pg054_postcheck_20260623_013138.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant03_card_metadata_pg054_rollback_20260623_013138.sql`.
+
+Precheck evidence:
+
+- `target_rows=2`.
+- `bad_cmc_rows=2`.
+- `naktamun_missing_faces_rows=1`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg054_lorehold_variant03_card_metadata_20260623_013138`.
+- Backup row count: `2`.
+- Updated `Naktamun Lorespinner // Wheel of Fortune`: `cmc=3`,
+  `rarity=rare`, `collector_number=33`, `layout=prepare`, and
+  `card_faces_json` populated with the prepared `Wheel of Fortune` face.
+- Updated `Tablet of Discovery`: `cmc=3`, `rarity=uncommon`,
+  `collector_number=132`, and `layout=normal`.
+
+Postcheck evidence:
+
+- `target_rows=2`.
+- `bad_cmc_rows=0`.
+- `naktamun_missing_faces_rows=0`.
+- `backup_rows=2`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant03_card_metadata_pg054_postcheck_20260623_013138.out`.
+
+Post-apply sync/audit:
+
+- Hermes oracle-cache sync:
+  `docs/hermes-analysis/master_optimizer_reports/card_oracle_cache_from_pg_pg054_lorehold_variant03_20260623_013138.json`.
+- Lorehold Variant 03 final staging:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260623_013409.json`.
+- Materialized isolated battle deck: `deck_id=608`.
+- Deck 608 coherence auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_014500.json`
+  reports `high=43`, `medium=11`, `pass=14`.
+
+Rollback:
+
+- `lorehold_variant03_card_metadata_pg054_rollback_20260623_013138.sql`
+  restores the two pre-apply `cards` rows from
+  `manaloom_deploy_audit.pg054_lorehold_variant03_card_metadata_20260623_013138`.

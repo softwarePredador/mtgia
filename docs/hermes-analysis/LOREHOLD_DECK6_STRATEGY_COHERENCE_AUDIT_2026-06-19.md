@@ -19642,3 +19642,142 @@ Next workflow:
   lists.
 - Do not consider a PostgreSQL deck swap until a candidate beats the PG026
   baseline in a trusted matrix and the replay evidence explains the gain.
+
+## Lorehold Variant 02 Intake / Deck 607 Sandbox - 2026-06-23 01:23 UTC
+
+Input registered:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_input_20260623_011430_deck02.txt`.
+- Variant name: `Lorehold Variant 02 - Rafael Paste 2026-06-23`.
+
+PostgreSQL card metadata dependency:
+
+- PG053 was applied and validated before final staging because the first
+  dry-run found five oracle-cache blockers:
+  `Emeria's Call`, `Molecule Man`, `The Mind Stone`, `The Scarlet Witch`, and
+  `Thor, God of Thunder`.
+- The physical SQL/output artifacts retain the `pg052_lorehold_variant02...`
+  prefix because the package was executed before detecting a concurrent
+  `PG052 Valakut Awakening Hash-Only Repair`.
+- PG053 inserted `Molecule Man` into PostgreSQL `cards` and corrected stale CMC
+  values for `The Mind Stone`, `The Scarlet Witch`, and
+  `Thor, God of Thunder`.
+- Postcheck: `target_rows=4`, `bad_cmc_rows=0`, `missing_oracle_rows=0`,
+  `off_lorehold_color_identity_rows=0`.
+- Hermes cache sync:
+  `docs/hermes-analysis/master_optimizer_reports/card_oracle_cache_from_pg_pg052_lorehold_variant02_20260623_011834.json`.
+
+Validation/materialization evidence:
+
+- Final staging report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260623_012310.json`.
+- Result: `variants=1 valid=1 invalid=0`.
+- Variant hash:
+  `a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306`.
+- Direct `knowledge.db` proof:
+  `deck_cards.deck_id=607` has `94` rows, `100` total quantity, `99` main,
+  and `1` commander.
+- Prior Variant 01 `deck_id=606` and official deck `6` were not overwritten.
+
+Battle-rule readiness:
+
+- Deck 607 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_012330.md`.
+- Counts: `high=55`, `medium=16`, `pass=23`.
+- Stager warnings remain `19` cards with no verified executable battle rule,
+  including `Molecule Man`, `The Mind Stone`, `The Scarlet Witch`,
+  `Thor, God of Thunder`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Tragic Arrogance`, `Avatar's Wrath`, and `Winds of Abandon`.
+
+Current reading:
+
+- Variant 02 is structurally valid and registered as isolated deck `607`.
+- It is not battle-ready as a trusted comparison candidate yet.
+- Next gate: run card-by-card battle-rule validation against `deck_id=607`
+  until the high-priority queue is resolved or explicitly waived with evidence.
+
+## Lorehold Variant 03 Intake / Deck 608 Sandbox - 2026-06-23 01:45 UTC
+
+Input registered:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_input_20260623_012923_deck03.txt`.
+- Variant name: `Lorehold Variant 03 - Rafael Paste 2026-06-23`.
+- Structural note: `Dragon's Approach` is allowed above singleton limit through
+  the explicit oracle/copy-limit exception in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_stager.py`.
+
+PostgreSQL card metadata dependency:
+
+- Logical deploy: `PG055 Lorehold Variant 03 Card Metadata`.
+- Physical SQL/output prefix: `pg054_lorehold_variant03...` because the package
+  was generated before the concurrent `PG054 Deck 6 L6 Silence-Lock Batch`
+  register entry was reconciled.
+- First dry-run blocker:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260623_013022.json`
+  reported `Naktamun Lorespinner:oracle_missing`.
+- PG055 corrected stale PostgreSQL metadata for
+  `Naktamun Lorespinner // Wheel of Fortune` and `Tablet of Discovery`.
+- Postcheck:
+  `target_rows=2`, `bad_cmc_rows=0`, `naktamun_missing_faces_rows=0`,
+  `backup_rows=2`.
+- Hermes cache sync:
+  `docs/hermes-analysis/master_optimizer_reports/card_oracle_cache_from_pg_pg054_lorehold_variant03_20260623_013138.json`.
+
+Validation/materialization evidence:
+
+- Final dry-run report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260623_013402.json`.
+- Applied staging report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_staging_20260623_013409.json`.
+- Result: `variants=1 valid=1 invalid=0`.
+- Variant hash:
+  `4b733dfd11e6b0f892b1242458b4fa6522fb3fb13699ff1c612b1e1d6b0bddc0`.
+- Direct `knowledge.db` proof:
+  `deck_cards.deck_id=608` has `68` rows, `100` total quantity, `99` main,
+  and `1` commander.
+- Prior Variant 01 `deck_id=606`, Variant 02 `deck_id=607`, and official deck
+  `6` were not overwritten.
+
+Battle-rule readiness:
+
+- Deck 608 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_014500.md`.
+- Counts: `high=43`, `medium=11`, `pass=14`.
+- Highest-priority queue starts with `Dragon's Approach`, `Angel's Grace`,
+  `Artist's Talent`, `Cool but Rude`, `Enlightened Tutor`, `Goblin Engineer`,
+  `Idyllic Tutor`, `Imperial Recruiter`, `Magmakin Artillerist`,
+  `Pyromancer Ascension`, `Razorgrass Ambush // Razorgrass Field`, and
+  `Naktamun Lorespinner // Wheel of Fortune`.
+
+Deck 607 refreshed readiness:
+
+- Refreshed auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_014500.md`.
+- Counts: `high=55`, `medium=16`, `pass=23`.
+
+Latest battle opponent inclusion:
+
+- Exact latest artifact inventory:
+  `docs/hermes-analysis/master_optimizer_reports/latest_battle_opponent_learned_decks_inventory_20260623_013710.md`.
+- Source artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`.
+- The latest trusted battle profile still points to
+  `run_profile=lorehold_variant01_deck606_16_seed_trusted_final`.
+- Opponent recut found `12` unique learned decks across `16` seeds:
+  learned decks `25`, `31`, `42`, `54`, `58`, `62`, `74`, `83`, `84`, `104`,
+  `105`, and `116`.
+- Identity audit across those opponents covered `1200` card instances:
+  `resolved_instances=1151`, `oracle_resolved_instances=49`,
+  `unresolved_instances=0`, `ambiguous_instances=0`, and
+  `semantic_identity_coverage=1.0`.
+- No opponent PostgreSQL mutation was applied in this inclusion step because no
+  unresolved or ambiguous card identity blocker was found.
+
+Current reading:
+
+- Variant 03 is structurally valid and registered as isolated deck `608`.
+- It is not yet a trusted battle comparison candidate because the battle-rule
+  queue still has `43` high-severity card-model findings.
+- The opponent pool used by the current battle artifacts is now inventoried and
+  identity-resolved, but their per-card executable battle-rule quality still
+  needs the same card-by-card gate before claiming full battle fidelity.

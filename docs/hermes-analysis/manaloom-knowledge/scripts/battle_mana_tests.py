@@ -58,6 +58,33 @@ def register_tests(battle, player):
         assert active.mana_pool.blue == 1
         assert active.can_pay_card({"name": "Azorius", "cmc": 2, "mana_cost": "{W}{U}"})
 
+    def test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "City of Brass",
+                "effect": "land",
+                "produces": "WUBRG",
+                "mana_produced": 1,
+                "battle_model_scope": "five_color_tap_damage_land_annotation_v1",
+                "tap_damage_status": "annotation_only",
+            },
+            {
+                "name": "Battlefield Forge",
+                "effect": "land",
+                "produces": "CWR",
+                "mana_produced": 1,
+                "battle_model_scope": "pain_land_flexible_mana_life_loss_annotation_v1",
+                "life_loss_on_colored_mana_status": "annotation_only",
+            },
+        ]
+        active.refresh_mana_sources(turn=1)
+
+        assert active.mana_pool.wildcard == 2
+        assert active.can_pay_card({"name": "Boros Spell", "cmc": 2, "mana_cost": "{W}{R}"})
+        assert active.spend_card_mana({"name": "Boros Spell", "cmc": 2, "mana_cost": "{W}{R}"})
+        assert active.available_mana() == 0
+
     def test_hybrid_and_phyrexian_mana_use_legal_payment_options():
         white_payer = player("White")
         white_payer.mana_pool.add("white", 1)
@@ -202,6 +229,7 @@ def register_tests(battle, player):
         test_colored_mana_requires_the_correct_color,
         test_treasure_and_flexible_sources_pay_colored_costs,
         test_basic_lands_refresh_as_colored_sources,
+        test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources,
         test_hybrid_and_phyrexian_mana_use_legal_payment_options,
         test_monocolored_hybrid_and_hybrid_phyrexian_mana_use_legal_payment_options,
         test_restricted_mana_only_pays_matching_spell_categories,

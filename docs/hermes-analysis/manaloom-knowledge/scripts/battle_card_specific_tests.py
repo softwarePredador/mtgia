@@ -1517,6 +1517,36 @@ def register_tests(battle, player):
         battle.clear_until_eot(active)
         assert active.silenced_opponents_until_eot is False
 
+    def test_pg054_silence_lock_family_rule_provenance():
+        cases = [
+            (
+                {"name": "Silence", "cmc": 1, "type_line": "Instant"},
+                "silence_spell",
+                "silence_until_eot_v1",
+                "battle_rule_v1:74b210b77b004a677906e0216d44e445",
+                "a0ca3c09a7db091c435ab31adb9c1780",
+            ),
+            (
+                {
+                    "name": "Grand Abolisher",
+                    "cmc": 2,
+                    "type_line": "Creature — Human Cleric",
+                },
+                "silence_opponents",
+                "static_opponent_spell_lock_activated_ability_lock_annotation_v1",
+                "battle_rule_v1:4df98360e4467568504b19219c8ba5d0",
+                "57c98b7e49853c5e0afff526da052e3c",
+            ),
+        ]
+
+        for card, effect, scope, logical_key, oracle_hash in cases:
+            rule = battle.get_card_effect(card)
+            assert rule["effect"] == effect
+            assert rule["battle_model_scope"] == scope
+            assert rule["_rule_logical_key"] == logical_key
+            assert rule["_rule_oracle_hash"] == oracle_hash
+            assert rule["_rule_execution_status"] == "auto"
+
     def test_samis_curiosity_creates_lander_token_not_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -4936,6 +4966,7 @@ def register_tests(battle, player):
         test_lorehold_miracle_ignores_lands_and_creatures,
         test_lorehold_miracle_rejects_flash_creatures,
         test_silence_spell_blocks_responses_until_cleanup_only,
+        test_pg054_silence_lock_family_rule_provenance,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
         test_snapback_return_target_creature_stays_creature_removal,

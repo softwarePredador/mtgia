@@ -1,0 +1,17 @@
+PG052 Lorehold Variant 02 card oracle metadata postcheck
+    expected_name     |                  id                  |         name         | mana_cost | cmc | expected_cmc |                type_line                 | colors | color_identity | power | toughness | keywords | set_code | rarity | collector_number | layout | oracle_len
+----------------------+--------------------------------------+----------------------+-----------+-----+--------------+------------------------------------------+--------+----------------+-------+-----------+----------+----------+--------+------------------+--------+------------
+ Molecule Man         | ee64d0dd-e3d8-4abc-b9d6-b19c505fbfa1 | Molecule Man         | {6}       | 6.0 |            6 | Legendary Creature — Human Villain       | {}     | {}             | 5     | 5         | {}       | msc      | rare   | 9                | normal |        147
+ The Mind Stone       | 952222c4-374d-42ed-b654-db4cc8751339 | The Mind Stone       | {1}{W}    | 2.0 |            2 | Legendary Artifact — Infinity Stone      | {W}    | {W}            |       |           | {}       | msh      | mythic | 21               | normal |        275
+ The Scarlet Witch    | 40994661-32d0-4450-b09f-e908e329a3c3 | The Scarlet Witch    | {2}{R}    | 3.0 |            3 | Legendary Creature — Mutant Warlock Hero | {R}    | {R}            | 2     | 3         | {}       | msh      | rare   | 151              | normal |        125
+ Thor, God of Thunder | ceddc419-1225-4090-ba30-b14999c5d04c | Thor, God of Thunder | {3}{R}{R} | 5.0 |            5 | Legendary Creature — God Warrior Hero    | {R}    | {R}            | 5     | 5         | {Flying} | msh      | mythic | 156              | normal |        256
+(4 rows)
+
+            check_name            | value
+----------------------------------+-------
+ target_rows                      |     4
+ bad_cmc_rows                     |     0
+ missing_oracle_rows              |     0
+ off_lorehold_color_identity_rows |     0
+ backup_rows                      |     3
+(5 rows)

@@ -891,6 +891,120 @@ Auditor result:
 
 Carry-forward caveat:
 
+- The note about `Blasphemous Act` cost reduction `{1}` per creature is an
+  audit cue, not a closing premise. When that card returns to the queue, validate
+  oracle, PostgreSQL, and runtime state again; do not infer dynamic cost
+  execution unless the executor exists.
+
+## PG050 Deck 6 L1A Land Model Cleanup Batch - 2026-06-23 01:05 UTC
+
+Closed lane:
+
+- Lane: `L1A` land/mana-base cleanup for official Lorehold deck `6`.
+- This batch covered land rules that already had a curated runtime model or a
+  direct land-source model. It did not treat fetchlands or unmodeled
+  ETB/life-loss/surveil lands as simple.
+- No deck swap, commit, push, `effect_json` change, or runtime executor change
+  was executed.
+
+Cards included:
+
+- `Ancient Den`.
+- `Ancient Tomb`.
+- `Command Tower`.
+- `Gemstone Caverns`.
+- `Great Furnace`.
+- `Hall of Heliod's Generosity`.
+- `Inventors' Fair`.
+- `Plateau`.
+- `Sunbaked Canyon`.
+- `Urza's Saga`.
+- `War Room`.
+
+Rule changes:
+
+- Added PostgreSQL `oracle_hash` to `20` curated trusted/auto rows.
+- Aligned `5` active trusted rows whose `card_id` pointed at a different
+  printing with the same `oracle_id` to the actual deck `6` printing.
+- Disabled `11` generated `needs_review` / `review_only` land shadow rows.
+- Preserved all existing `effect_json` payloads and multiple land utility
+  profiles. The batch is metadata/provenance cleanup, not a new behavior
+  model.
+
+Applied SQL:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_precheck_20260623_010026.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_apply_20260623_010026.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_postcheck_20260623_010026.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1a_land_model_cleanup_pg050_rollback_20260623_010026.sql`.
+
+Evidence:
+
+- PostgreSQL precheck:
+  `deck_target_cards=11`, `target_rule_rows=31`,
+  `generated_review_only_rows=11`, `trusted_missing_hash_rows=20`,
+  `card_id_mismatch_same_oracle_rows=5`, and
+  `card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- PG apply created backup table
+  `manaloom_deploy_audit.pg050_deck6_l1a_land_model_cleanup_20260623_010026`
+  with `31` rows, updated `20` curated rules, and disabled `11` generated
+  shadows.
+- PostgreSQL postcheck:
+  `generated_review_only_rows=0`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`,
+  `active_card_id_mismatch_same_oracle_rows=0`,
+  `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`,
+  `generated_disabled_or_deprecated_rows=11`, and `backup_rows=31`.
+- Two remaining `card_id` mismatches are disabled generated shadows for
+  `Ancient Tomb` and `Command Tower`; they are not active runtime rows.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg050_deck6_l1a_land_model_cleanup_20260623_010026.json`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`.
+
+Auditor result:
+
+- Deck 6 pre-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_005513.json`
+  reported `high=41`, `medium=30`, `pass=29`.
+- Deck 6 post-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_010510.json`
+  reports `high=41`, `medium=19`, `pass=40`.
+- Deck 606 separate post-sync report:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_010510.json`
+  reports `high=43`, `medium=13`, `pass=25`.
+- The 11 included cards now report `pass` with `coherent_for_current_gate`.
+
+Replay:
+
+- Not generated. PG050 did not change runtime behavior, `effect_json`, or
+  executor dispatch. Existing focused unit coverage for utility lands was run
+  through `battle_card_specific_tests.py`.
+
+Remaining L1 backlog:
+
+- `19` deck 6 land/mana-base cards remain medium:
+  `Arid Mesa`, `Battlefield Forge`, `Bloodstained Mire`, `City of Brass`,
+  `Clifftop Retreat`, `Elegant Parlor`, `Flooded Strand`,
+  `Inspiring Vantage`, `Mana Confluence`, `Marsh Flats`, `Prismatic Vista`,
+  `Rugged Prairie`, `Sacred Foundry`, `Scalding Tarn`,
+  `Spectator Seating`, `Sunbillow Verge`, `Sundown Pass`,
+  `Windswept Heath`, and `Wooded Foothills`.
+
+Next recommended lane:
+
+- Finish L1B by splitting fetchlands from pain/check/shock/surveil lands.
+  Fetchlands should not be closed as simple mana lands unless the missing
+  search/shuffle behavior is explicitly waived or modeled.
+
+Carry-forward caveat:
+
 - `Blasphemous Act` cost reduction `{1}` per creature remains
   `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
   dynamic cost-reduction executor.
@@ -1892,3 +2006,153 @@ Carry-forward caveat:
 - `Blasphemous Act` cost reduction `{1}` per creature remains
   `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
   dynamic cost-reduction executor.
+
+## PG051 Deck 6 L1B Non-Fetch Land Mana Batch - Closed 2026-06-23 01:25 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate for `11` official
+  Lorehold deck `6` non-fetch land/mana-base cards.
+- Cards:
+  `Battlefield Forge`, `City of Brass`, `Clifftop Retreat`, `Elegant Parlor`,
+  `Inspiring Vantage`, `Mana Confluence`, `Rugged Prairie`,
+  `Sacred Foundry`, `Spectator Seating`, `Sunbillow Verge`, and
+  `Sundown Pass`.
+- Explicitly excluded:
+  `Arid Mesa`, `Bloodstained Mire`, `Flooded Strand`, `Marsh Flats`,
+  `Prismatic Vista`, `Scalding Tarn`, `Windswept Heath`, and
+  `Wooded Foothills`.
+
+Validation:
+
+- PostgreSQL oracle/type checked for every included card before apply.
+- Fetchlands stayed open because sacrifice/search/shuffle is real behavior and
+  current runtime only has fetch-aware opening-hand scoring, not a full land
+  self-activation executor.
+- PG051 added `oracle_hash`, `battle_model_scope`, `produces`,
+  `mana_produced=1`, and annotation-only status fields to the trusted curated
+  land model.
+- Life-loss, conditional ETB, surveil, filter, and similar clauses are not
+  claimed as full executors in this package. Runtime scope is
+  `mana_source_runtime_with_annotation_only_clauses`.
+- PG postcheck:
+  `generated_review_only_rows=0`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
+  `trusted_without_produces_rows=0`, `curated_l1b_family_rows=11`,
+  `generated_disabled_or_deprecated_rows=11`, and `backup_rows=22`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg051_deck6_l1b_nonfetch_land_mana_20260623_011438.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l1b_nonfetch_land_mana_pg051_focused_events_20260623_012230.jsonl`.
+- Tests passed:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Auditor result:
+
+- Deck 6 pre-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_010907.json`
+  reported `high=41`, `medium=19`, `pass=40`.
+- Deck 6 after PG051:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_011800.json`
+  reported `high=41`, `medium=9`, `pass=50`.
+
+## PG052 Valakut Awakening Hash-Only Repair - Closed 2026-06-23 01:25 UTC
+
+Status:
+
+- Closed `Valakut Awakening // Valakut Stoneforge` for the hash-only
+  provenance gate after the full battle test suite exposed missing
+  `_rule_oracle_hash` on the active PG042 rule.
+- No `effect_json` or executor behavior changed.
+
+Validation:
+
+- PostgreSQL oracle hash for the deck card is
+  `22b42fcc181b7aed71f78b2e1e51e887`, matching the PG042 regression test.
+- Active runtime rule:
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d`,
+  `battle_model_scope=bottom_then_draw_plus_one_mdfc_land_v1`.
+- Corrected precheck confirmed `deck_target_cards=1`, `target_rule_rows=3`,
+  `active_curated_rows=1`, and `trusted_missing_hash_rows=1`.
+- PG postcheck:
+  `trusted_missing_hash_rows=0`, `trusted_hash_mismatch_rows=0`, and
+  `backup_rows=3`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg052_valakut_hash_only_20260623_012000.json`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Final auditor result:
+
+- Deck 6:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_012130.json`
+  reports `high=41`, `medium=8`, `pass=51`.
+- Deck 606:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_012130.json`
+  reports `high=43`, `medium=8`, `pass=30`.
+
+Next recommended lane:
+
+- Continue deck `6` with L3/L4/L6 battle-critical families, while keeping the
+  eight fetchlands as a separate L1 waiver/model package.
+
+## PG054 Deck 6 L6 Silence-Lock Batch - Closed 2026-06-23 01:36 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate for `2` official
+  Lorehold deck `6` battle-critical silence-lock cards:
+  `Silence` and `Grand Abolisher`.
+- Explicitly excluded:
+  `Drannith Magistrate` and `Ranger-Captain of Eos`.
+
+Validation:
+
+- PostgreSQL oracle/type checked for both included cards before apply.
+- `Silence` is modeled as `silence_spell` with
+  `battle_model_scope=silence_until_eot_v1`.
+- `Grand Abolisher` is modeled as `silence_opponents` with
+  `battle_model_scope=static_opponent_spell_lock_activated_ability_lock_annotation_v1`.
+- Grand Abolisher's oracle text also blocks activated abilities of artifacts,
+  creatures, and enchantments; PG054 records that clause as
+  `activated_ability_lock_status=annotation_only` and does not claim a full
+  activated-ability-lock executor.
+- PG054 disabled the generated review-only shadows for both cards and the
+  legacy active no-hash Silence row.
+- PG postcheck:
+  `active_curated_rows=2`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
+  `generated_review_only_rows=0`, `silence_legacy_active_rows=0`,
+  `target_active_runtime_rows=2`, `disabled_or_deprecated_rows=3`, and
+  `backup_rows=5`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg054_deck6_l6_silence_lock_20260623_013119.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_silence_lock_pg054_focused_events_20260623_013520.jsonl`.
+- Tests passed:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+
+Auditor result:
+
+- Deck 6 pre-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_013000.json`
+  reported `high=41`, `medium=8`, `pass=51`.
+- Deck 6 post-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_013430.json`
+  reported `high=39`, `medium=8`, `pass=53`.
+- Deck 606 separate post-sync report:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_013600.json`
+  reports `high=43`, `medium=8`, `pass=30`.
+
+Remaining risk:
+
+- `Drannith Magistrate` still needs a separate model/waiver for the "cast from
+  outside hand" lock.
+- `Ranger-Captain of Eos` still needs a separate model/waiver for its sacrifice
+  silence ability.
