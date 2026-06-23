@@ -844,7 +844,7 @@
   },
   "Angel's Grace": {
     "battle_model_scope": "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1",
-    "cmc": 1.0,
+    "cmc": 1,
     "effect": "cannot_lose_turn",
     "instant": true,
     "life_floor_on_damage": 1,
@@ -9709,7 +9709,7 @@
   },
   "Fellwar Stone": {
     "battle_model_scope": "conditional_opponent_color_mana_rock_v1",
-    "cmc": 2.0,
+    "cmc": 2,
     "conditionally_produces_opponent_land_colors": true,
     "effect": "ramp_permanent",
     "mana_produced": 1,
@@ -16159,7 +16159,7 @@
   },
   "Library of Leng": {
     "battle_model_scope": "discard_replacement_to_top_v1",
-    "cmc": 1.0,
+    "cmc": 1,
     "discard_effect_to_top_replacement": true,
     "effect": "passive",
     "no_max_hand_size": true,
@@ -17185,7 +17185,7 @@
   },
   "Mana Vault": {
     "battle_model_scope": "fast_mana_artifact_partial_v1",
-    "cmc": 1.0,
+    "cmc": 1,
     "does_not_untap_normally": true,
     "effect": "ramp_permanent",
     "mana_produced": 3,
@@ -18595,7 +18595,7 @@
   },
   "Mox Amber": {
     "battle_model_scope": "legend_gated_fast_mana_v1",
-    "cmc": 0.0,
+    "cmc": 0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "WUBRGC",
@@ -24444,7 +24444,7 @@
   "Scroll Rack": {
     "activation_cost_generic": 1,
     "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
-    "cmc": 2.0,
+    "cmc": 2,
     "effect": "topdeck_manipulation",
     "hand_to_top_exchange": true,
     "battle_rule_source": "curated",
@@ -24832,7 +24832,7 @@
   },
   "Seething Song": {
     "battle_model_scope": "single_shot_red_ritual_v1",
-    "cmc": 3.0,
+    "cmc": 3,
     "effect": "ramp_ritual",
     "instant": true,
     "mana_color_status": "abstracted_to_generic_pool_runtime",
@@ -25601,7 +25601,7 @@
   },
   "Silence": {
     "battle_model_scope": "silence_until_eot_v1",
-    "cmc": 1.0,
+    "cmc": 1,
     "effect": "silence_spell",
     "instant": true,
     "oracle_runtime_scope": "opponent_spell_cast_lock_until_eot_runtime",
@@ -28401,7 +28401,7 @@
   },
   "Talisman of Conviction": {
     "battle_model_scope": "pain_talisman_color_pair_partial_v1",
-    "cmc": 2.0,
+    "cmc": 2,
     "effect": "ramp_permanent",
     "life_for_colored_mana": 1,
     "mana_produced": 1,
@@ -31553,7 +31553,7 @@
   },
   "Unexpected Windfall": {
     "battle_model_scope": "discard_draw_create_treasures_v1",
-    "cmc": 4.0,
+    "cmc": 4,
     "draw_count": 2,
     "effect": "treasure_maker",
     "instant": true,
@@ -32034,11 +32034,12 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a"
+    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a",
+    "battle_rule_oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887"
   },
   "Valakut Awakening // Valakut Stoneforge": {
     "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1",
-    "cmc": 3.0,
+    "cmc": 3,
     "draw_extra": 1,
     "effect": "hand_filter",
     "instant": true,
@@ -33063,7 +33064,7 @@
     "activation_requires_tap": true,
     "basic_only": true,
     "battle_model_scope": "self_sacrifice_basic_land_tutor_artifact_v1",
-    "cmc": 1.0,
+    "cmc": 1,
     "effect": "ramp_permanent",
     "land_count": 1,
     "land_enters_tapped": true,

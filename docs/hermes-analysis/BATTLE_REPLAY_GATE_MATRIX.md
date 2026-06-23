@@ -4085,3 +4085,49 @@ Status:
 - Deck `608`: `high=14`, `medium=3`, `pass=51`.
 - Global queue after PG093: `high=31`, `medium=4`, `pass=170`.
 - No deck swap, no `deck_cards` mutation, and no new battle rebaseline.
+
+## PG094 Hash/Scope Restore Gate Reading - 2026-06-23 10:33 UTC
+
+Scope:
+
+- PG094 is a PostgreSQL card-rule/cache provenance restore, not a replay gate
+  promotion and not a deck deploy.
+- It restored 12 already-approved `card_battle_rules` rows, synced Hermes
+  SQLite/canonical snapshot from PostgreSQL, and reran card-rule/runtime tests.
+
+Evidence:
+
+- PG094 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.out`
+  reports `target_rule_rows=12`, `hash_restored_rows=12`,
+  `effect_json_restored_rows=12`, `status_restored_rows=12`, and
+  `backup_rows=12`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_sync_report_20260623_102141.json`
+  reports `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Runtime wrapper output:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_battle_analyst_v10_3_20260623_102141.out`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_focused_events_20260623_102141.jsonl`.
+
+Latest recurring battle remains separate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+- `timestamp_utc=2026-06-23T09:47:49Z`.
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`.
+- `seeds_requested=16`, `seeds_completed=16`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- `strategy_learning_confidence_counts={"high_confidence_replay":14,"low_confidence_replay":2}`.
+- `test_results_status_counts={"pass":18}` and `test_result_failures=[]`.
+
+Decision:
+
+- PG094 is accepted as a card-rule/source-of-truth restore.
+- It does not change the latest recurring battle status.
+- It does not authorize a deck swap or learned-deck promotion.
+- Next replay/battle work should continue from the live `event_contract_static`
+  review state or from a deliberate fresh multi-seed run after the next card
+  rule batch, not from PG094 alone.

@@ -2,15 +2,11 @@
 
 Owner: Auditor Central / single operator
 Controller: Auditor Central
-Status: active register, PG-001, PG-002, PG-006, PG-007, PG-008, PG-009, and
-Lorehold canonical Wheel apply applied and validated; PG-006, PG-007, PG-008,
-and Lorehold canonical Wheel runtime cache sync completed; PG-003 remains not
-ready; PG-005 remains no-apply-needed; PG-011, PG-012, PG-013, and PG-014 are
-externally applied, postchecked, runtime-synced, and validated by
-`20260620_232534`; PG-015/Wrath is externally applied, postchecked, and
-runtime-synced, and later latest official full battle `20260621_000827` is
-trusted for strategy learning; Arcane Epiphany remains candidate-only from
-superseded blockers; no PostgreSQL apply was executed by this heartbeat
+Status: active register. Latest current card-rule package in this thread is
+PG094, applied, postchecked, synced from PostgreSQL to Hermes SQLite/canonical
+snapshot, tested, and documented on 2026-06-23 10:33 UTC. PG094 was a
+hash/scope/cache provenance restore for already-approved rules; it was not a
+deck swap, learned-deck promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -8479,3 +8475,84 @@ Tests:
 Next deploy number:
 
 - PG094 is next for any future PostgreSQL package.
+
+## PG094 Hash/Scope Restore For Canonical Card Rules - Applied 2026-06-23 10:33 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored PostgreSQL `card_battle_rules` provenance/effect/status metadata
+  from the versioned canonical snapshot for 12 already-approved card rules
+  whose hash/scope/effect/status fields drifted after a PG -> SQLite/canonical
+  refresh.
+- Target cards:
+  `Angel's Grace`, `Fellwar Stone`, `Library of Leng`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- No new card behavior was invented in this package. No deck swap, no
+  `deck_cards` mutation, no learned-deck promotion, and no battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_precheck_20260623_102141.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_apply_20260623_102141.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_rollback_20260623_102141.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg094_hash_scope_restore_20260623_102141`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_precheck_20260623_102141.out`
+  reported `expected_target_rows=12`, `resolved_rule_rows=12`,
+  `raw_hash_match_rows=12`, `rows_needing_hash_restore=1`,
+  `rows_needing_effect_restore=3`, `rows_needing_status_restore=1`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_apply_20260623_102141.out`
+  reported backup creation with `SELECT 12`, `updated_rows=12`,
+  `restored_rows=12`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.out`
+  reported `target_rule_rows=12`, `hash_restored_rows=12`,
+  `effect_json_restored_rows=12`, `status_restored_rows=12`, and
+  `backup_rows=12`.
+
+Sync/audit/runtime evidence:
+
+- PG094 start sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_start_sync_report_20260623_102141.json`.
+- Post-apply PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_sync_report_20260623_102141.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`,
+  `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_focused_events_20260623_102141.jsonl`
+  has 24 rows proving 12 SQLite rows and 12 runtime-selected logical keys,
+  including `Seething Song` with the red-ritual metadata.
+- Start audits before the restore showed:
+  deck `6` `medium=9`, `pass=91`; deck `606` `medium=5`, `pass=76`;
+  deck `607` `high=17`, `medium=9`, `pass=68`; deck `608` `high=15`,
+  `medium=7`, `pass=46`; and global `high=32`, `medium=15`, `pass=158`.
+- Post-PG094 audits show:
+  deck `6` `pass=100`; deck `606` `pass=81`; deck `607` `high=17`,
+  `medium=4`, `pass=73`; deck `608` `high=14`, `medium=3`, `pass=51`;
+  global `high=31`, `medium=4`, `pass=170`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+- Saved outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_py_compile_20260623_102141.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_deck_card_battle_rule_coherence_audit_20260623_102141.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_battle_analyst_v10_3_20260623_102141.out`.
+
+Next deploy number:
+
+- PG095 is next for any future PostgreSQL package.

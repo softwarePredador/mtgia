@@ -17552,3 +17552,56 @@ Status: `applied_validated`.
   `pass=73`, deck `608` `high=14`, `medium=3`, `pass=51`, and global
   `high=31`, `medium=4`, `pass=170`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+## PG094 Hash/Scope Restore Focused Card-Rule Gate - 2026-06-23 10:33 UTC
+
+Status: `applied_validated`.
+
+Replay relevance:
+
+- This is a focused PostgreSQL/card-rule/cache gate, not a new 16-seed battle
+  replay baseline and not strategy-learning evidence.
+- The latest recurring battle artifact remains
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  with `timestamp_utc=2026-06-23T09:47:49Z`,
+  `battle_replay_final_status=review_required`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- PG094 does not override that latest recurring status.
+
+Artifacts:
+
+- PG094 PostgreSQL precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_precheck_20260623_102141.out`.
+- PG094 PostgreSQL apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_apply_20260623_102141.out`.
+- PG094 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.out`.
+- PG094 rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_rollback_20260623_102141.sql`.
+- PG094 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_sync_report_20260623_102141.json`.
+- PG094 focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_focused_events_20260623_102141.jsonl`
+  proves 12 SQLite rows and 12 runtime-selected logical keys from the final
+  cache.
+
+Gate:
+
+- PG094 restored raw hash/effect/status provenance for 12 already-approved
+  rules from PostgreSQL source data and re-exported the canonical snapshot.
+- New focused regression confirms SQLite cache resolution for:
+  `Fellwar Stone`, `Library of Leng`, `Mana Vault`, `Mox Amber`,
+  `Scroll Rack`, `Seething Song`, `Silence`, `Talisman of Conviction`,
+  `Unexpected Windfall`, `Valakut Awakening // Valakut Stoneforge`, and
+  `Wayfarer's Bauble`.
+
+Validation:
+
+- Full runtime wrapper passed after PG094:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_battle_analyst_v10_3_20260623_102141.out`.
+- Deck-card audit tests passed:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_deck_card_battle_rule_coherence_audit_20260623_102141.out`.
+- Post-PG094 card-rule queue: deck `6` `pass=100`, deck `606` `pass=81`,
+  deck `607` `high=17`, `medium=4`, `pass=73`, deck `608` `high=14`,
+  `medium=3`, `pass=51`, and global `high=31`, `medium=4`, `pass=170`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.

@@ -2067,6 +2067,95 @@ def register_tests(battle, player):
             assert rule["_rule_oracle_hash"] == oracle_hash
             assert rule["_rule_execution_status"] == "auto"
 
+    def test_pg094_deck6_606_l2_hash_restore_rules_resolve_from_sqlite_cache():
+        cases = [
+            (
+                {"name": "Fellwar Stone", "cmc": 2, "type_line": "Artifact"},
+                "ramp_permanent",
+                "conditional_opponent_color_mana_rock_v1",
+                "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+                "d63befc8ac40d9a38732f9b5c1a7414a",
+            ),
+            (
+                {"name": "Library of Leng", "cmc": 1, "type_line": "Artifact"},
+                "passive",
+                "discard_replacement_to_top_v1",
+                "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+                "575aef3cc2523831e440ea7dcd55fa6e",
+            ),
+            (
+                {"name": "Mana Vault", "cmc": 1, "type_line": "Artifact"},
+                "ramp_permanent",
+                "fast_mana_artifact_partial_v1",
+                "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+                "35e3fd94c8453c0e326033af49ae18c8",
+            ),
+            (
+                {"name": "Mox Amber", "cmc": 0, "type_line": "Legendary Artifact"},
+                "ramp_permanent",
+                "legend_gated_fast_mana_v1",
+                "battle_rule_v1:972703914ee50acd7a4e6f529fea1adf",
+                "e47b40cf2afc4c9ceac6bf91815da706",
+            ),
+            (
+                {"name": "Scroll Rack", "cmc": 2, "type_line": "Artifact"},
+                "topdeck_manipulation",
+                "scroll_rack_upkeep_single_exchange_v1",
+                "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
+                "8133928f03d5a5a77f2beecfcbd09e30",
+            ),
+            (
+                {"name": "Seething Song", "cmc": 3, "type_line": "Instant"},
+                "ramp_ritual",
+                "single_shot_red_ritual_v1",
+                "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
+                "ccd492289c6f1c14c8fb7a248d7bbf32",
+            ),
+            (
+                {"name": "Silence", "cmc": 1, "type_line": "Instant"},
+                "silence_spell",
+                "silence_until_eot_v1",
+                "battle_rule_v1:74b210b77b004a677906e0216d44e445",
+                "a0ca3c09a7db091c435ab31adb9c1780",
+            ),
+            (
+                {"name": "Talisman of Conviction", "cmc": 2, "type_line": "Artifact"},
+                "ramp_permanent",
+                "pain_talisman_color_pair_partial_v1",
+                "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+                "d49ceec937367a344a9f0948eea4f8f2",
+            ),
+            (
+                {"name": "Unexpected Windfall", "cmc": 4, "type_line": "Instant"},
+                "treasure_maker",
+                "discard_draw_create_treasures_v1",
+                "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4",
+                "9c4fbe06104051a2e8b1d295d307b26a",
+            ),
+            (
+                {"name": "Valakut Awakening // Valakut Stoneforge", "cmc": 3, "type_line": "Instant"},
+                "hand_filter",
+                "bottom_then_draw_plus_one_mdfc_land_v1",
+                "battle_rule_v1:6e1f3b876822abafe1de47610f46858d",
+                "22b42fcc181b7aed71f78b2e1e51e887",
+            ),
+            (
+                {"name": "Wayfarer's Bauble", "cmc": 1, "type_line": "Artifact"},
+                "ramp_permanent",
+                "self_sacrifice_basic_land_tutor_artifact_v1",
+                "battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab",
+                "f11935fa793ae03d95ae75d62cdfa516",
+            ),
+        ]
+
+        for card, effect, scope, logical_key, oracle_hash in cases:
+            rule = battle.get_card_effect(card)
+            assert rule["effect"] == effect
+            assert rule["battle_model_scope"] == scope
+            assert rule["_rule_logical_key"] == logical_key
+            assert rule["_rule_oracle_hash"] == oracle_hash
+            assert rule["_rule_execution_status"] == "auto"
+
     def test_samis_curiosity_creates_lander_token_not_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -8243,6 +8332,7 @@ def register_tests(battle, player):
         test_pg080_mox_opal_requires_metalcraft_for_mana,
         test_pg080_simian_spirit_guide_exiles_from_hand_for_one_mana,
         test_pg082_deck6_606_hash_only_rules_resolve_from_sqlite_cache,
+        test_pg094_deck6_606_l2_hash_restore_rules_resolve_from_sqlite_cache,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
         test_snapback_return_target_creature_stays_creature_removal,

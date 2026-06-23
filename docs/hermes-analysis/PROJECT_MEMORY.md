@@ -1084,6 +1084,24 @@ Next package number is PG086. Next queue should prioritize remaining deck
   state: deck `6` `pass=100`, deck `606` `pass=81`, deck `607` `high=17`,
   `medium=4`, `pass=73`, deck `608` `high=14`, `medium=3`, `pass=51`, and
   global `high=31`, `medium=4`, `pass=170`. PG094 is next.
+- PG094 restored 12 already-approved card-rule rows whose canonical
+  hash/scope/effect/status metadata drifted after the PG -> SQLite/canonical
+  sync path. Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.out`
+  reports `target_rule_rows=12`, `hash_restored_rows=12`,
+  `effect_json_restored_rows=12`, `status_restored_rows=12`, and
+  `backup_rows=12`.
+  PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_sync_report_20260623_102141.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`. Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_focused_events_20260623_102141.jsonl`.
+  Full wrapper output:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_battle_analyst_v10_3_20260623_102141.out`.
+  Current post-PG094 state: deck `6` `pass=100`, deck `606` `pass=81`,
+  deck `607` `high=17`, `medium=4`, `pass=73`, deck `608` `high=14`,
+  `medium=3`, `pass=51`, and global `high=31`, `medium=4`, `pass=170`.
+  PG095 is next.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

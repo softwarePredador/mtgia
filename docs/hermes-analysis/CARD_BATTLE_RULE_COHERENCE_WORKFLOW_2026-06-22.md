@@ -4096,3 +4096,75 @@ Next queue:
 
 - PG094 should continue deck `607` battle-critical high cards before
   support/passive rows.
+
+## PG094 Hash/Scope Restore For Canonical Rules - 2026-06-23 10:33 UTC
+
+Status: `applied_validated`.
+
+What changed:
+
+- PG094 did not advance to a new high battle-critical card. The start sync
+  exposed hash/scope/effect drift in canonical card-rule metadata, so the
+  correct next action was a restore package.
+- Restored cards:
+  `Angel's Grace`, `Fellwar Stone`, `Library of Leng`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- This was a PostgreSQL source-of-truth correction plus PG -> SQLite/canonical
+  sync, not a decklist change and not a new replay baseline.
+
+PostgreSQL package:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_precheck_20260623_102141.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_apply_20260623_102141.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_rollback_20260623_102141.sql`
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_precheck_20260623_102141.out`
+  reported 12 expected/resolved target rows, 12 raw hash matches, 1 row needing
+  hash restore, 3 rows needing effect restore, and 1 row needing status restore.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_apply_20260623_102141.out`
+  reported `updated_rows=12`, `restored_rows=12`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_postcheck_20260623_102141.out`
+  reported 12/12 hash, effect, and status restored rows plus 12 backup rows.
+- Final PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_sync_report_20260623_102141.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_hash_scope_restore_focused_events_20260623_102141.jsonl`
+  prove 12 SQLite rows and 12 runtime-selected logical keys after the final
+  sync.
+
+Runtime/test coverage:
+
+- Added
+  `test_pg094_deck6_606_l2_hash_restore_rules_resolve_from_sqlite_cache`.
+- `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed.
+- Saved outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg094_py_compile_20260623_102141.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_deck_card_battle_rule_coherence_audit_20260623_102141.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg094_test_battle_analyst_v10_3_20260623_102141.out`.
+
+Post-PG094 auditor result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=17`, `medium=4`, `pass=73`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=31`, `medium=4`, `pass=170`.
+
+Remaining queue:
+
+- PG095 should return to deck `607` battle-critical high cards before
+  support/passive rows.
+- User observations remain validation hints only; the durable rule source is
+  PostgreSQL plus Oracle-backed review.
