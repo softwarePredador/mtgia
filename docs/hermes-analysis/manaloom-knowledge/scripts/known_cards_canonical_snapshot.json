@@ -3261,7 +3261,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ab8c8e79988c1b44ccf6f4cd8324aa78"
+    "battle_rule_logical_key": "battle_rule_v1:ab8c8e79988c1b44ccf6f4cd8324aa78",
+    "battle_rule_oracle_hash": "8027b5b33d6dda44ff12265baabb8407"
   },
   "Boseiju, Who Endures": {
     "effect": "land",
@@ -4455,7 +4456,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.86,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:207d63694c9c3f9c9ee4bf5eb22689f1"
+    "battle_rule_logical_key": "battle_rule_v1:207d63694c9c3f9c9ee4bf5eb22689f1",
+    "battle_rule_oracle_hash": "c1ff6aa18ae8c03f7ecccfd33a45b589"
   },
   "Chandra, Torch of Defiance": {
     "cmc": 4.0,
@@ -5193,7 +5195,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6a93d9061542e1b4b2c92baa569c56e9"
+    "battle_rule_logical_key": "battle_rule_v1:6a93d9061542e1b4b2c92baa569c56e9",
+    "battle_rule_oracle_hash": "e7d8cac3ecb3f29206d6b36d975b8bfa"
   },
   "Comet Storm": {
     "cmc": 2.0,
@@ -5285,7 +5288,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.89,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:abc69abda697439c441b557d2ddf27ad"
+    "battle_rule_logical_key": "battle_rule_v1:abc69abda697439c441b557d2ddf27ad",
+    "battle_rule_oracle_hash": "3a9c2345e54e6ccaa6cc1a1f6aa35801"
   },
   "Commander's Sphere": {
     "effect": "ramp_permanent",
@@ -9479,7 +9483,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c5aef30c5a5904e02c4cfe40957080d3"
+    "battle_rule_logical_key": "battle_rule_v1:c5aef30c5a5904e02c4cfe40957080d3",
+    "battle_rule_oracle_hash": "4f0536b65096d1326139fe7f7f9435db"
   },
   "Farhaven Elf": {
     "cmc": 3.0,
@@ -13388,7 +13393,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.84,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:96918f32221fe2908cf49d33a457af2f"
+    "battle_rule_logical_key": "battle_rule_v1:96918f32221fe2908cf49d33a457af2f",
+    "battle_rule_oracle_hash": "971773d66dc1e38d5cbb8465858998bd"
   },
   "Hive of the Eye Tyrant": {
     "effect": "land",
@@ -13981,7 +13987,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.84,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4a001137f9a15f1a45b994a4d63f1689"
+    "battle_rule_logical_key": "battle_rule_v1:4a001137f9a15f1a45b994a4d63f1689",
+    "battle_rule_oracle_hash": "211282705b9124c8f737b1eb351e13f0"
   },
   "Impulsive Pilferer": {
     "effect": "creature",
@@ -14055,7 +14062,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.88,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:30ea39d59aa1ffc3158a49675b767c30"
+    "battle_rule_logical_key": "battle_rule_v1:30ea39d59aa1ffc3158a49675b767c30",
+    "battle_rule_oracle_hash": "112a3720da30692b859f8a9bedc90a2f"
   },
   "Incubation Druid": {
     "battle_model_scope": "mana_dork_without_adapt_v1",
@@ -16060,7 +16068,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3"
+    "battle_rule_logical_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+    "battle_rule_oracle_hash": "575aef3cc2523831e440ea7dcd55fa6e"
   },
   "Lich-Knights' Conquest": {
     "cmc": 5.0,
@@ -18053,7 +18062,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:af0db3c4541fbb0e337359c8420a613c"
+    "battle_rule_logical_key": "battle_rule_v1:af0db3c4541fbb0e337359c8420a613c",
+    "battle_rule_oracle_hash": "62dd63935c78d3962d388d37bb2a498b"
   },
   "Mizzix's Mastery": {
     "battle_model_scope": "target_or_overload_graveyard_instant_sorcery_copy_cast_runtime_v1",
@@ -19632,7 +19642,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.86,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ff60d5ae64eccde0c80bc7fb7b463ff4"
+    "battle_rule_logical_key": "battle_rule_v1:ff60d5ae64eccde0c80bc7fb7b463ff4",
+    "battle_rule_oracle_hash": "519ac16db041b51d9562300859c589b9"
   },
   "Omashu City": {
     "effect": "land",
@@ -19724,7 +19735,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:89baba2dcd27be9d4b7d0fcbdb82bb8f"
+    "battle_rule_logical_key": "battle_rule_v1:89baba2dcd27be9d4b7d0fcbdb82bb8f",
+    "battle_rule_oracle_hash": "b60f294f3269b1ca28cfb83c7708cf14"
   },
   "Ondu Spiritdancer": {
     "cmc": 5.0,
@@ -22192,7 +22204,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.88,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:58cf44e1552692ff62aeaf4ae3c7eaee"
+    "battle_rule_logical_key": "battle_rule_v1:58cf44e1552692ff62aeaf4ae3c7eaee",
+    "battle_rule_oracle_hash": "a9360407a1ca872b72f52acfed795194"
   },
   "Reckless Handling": {
     "effect": "tutor",
@@ -22702,7 +22715,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e354df66477b8437134c5fb0bbb3e371"
+    "battle_rule_logical_key": "battle_rule_v1:e354df66477b8437134c5fb0bbb3e371",
+    "battle_rule_oracle_hash": "23ccef3f0d08d7be5c4285e10c682356"
   },
   "Resupply": {
     "cmc": 6.0,
@@ -22843,7 +22857,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.86,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:70d3cbd28ace705feb076fb737205e90"
+    "battle_rule_logical_key": "battle_rule_v1:70d3cbd28ace705feb076fb737205e90",
+    "battle_rule_oracle_hash": "cf45f8dd47bcf4f77694df304a5a432a"
   },
   "Revitalizing Repast // Old-Growth Grove": {
     "cmc": 1.0,
@@ -26374,7 +26389,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.84,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:57f8434c0cd32364c89eaf074940d0ec"
+    "battle_rule_logical_key": "battle_rule_v1:57f8434c0cd32364c89eaf074940d0ec",
+    "battle_rule_oracle_hash": "31b7f03353f2d3fefa35e790ef709644"
   },
   "Soulscour": {
     "cmc": 10.0,
@@ -27580,7 +27596,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.86,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6e364810e102d8ab6c2ce482573d2f66"
+    "battle_rule_logical_key": "battle_rule_v1:6e364810e102d8ab6c2ce482573d2f66",
+    "battle_rule_oracle_hash": "3e4cf1c2a53dedcc2a49f0ab82aa803d"
   },
   "Sungrass Prairie": {
     "effect": "land",
@@ -27838,7 +27855,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.96,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:86b568648669ceb1eef6d7f6b95d4f1c"
+    "battle_rule_logical_key": "battle_rule_v1:86b568648669ceb1eef6d7f6b95d4f1c",
+    "battle_rule_oracle_hash": "5f4fa8fe20c8a6c55a2aee48c34c6b25"
   },
   "Swiftwater Cliffs": {
     "effect": "land",
@@ -29725,7 +29743,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:93ac5946d2f83cec409a2892520f26d0"
+    "battle_rule_logical_key": "battle_rule_v1:93ac5946d2f83cec409a2892520f26d0",
+    "battle_rule_oracle_hash": "ff80b35ee08bb1b68ec7c0be24d6eaaa"
   },
   "Thoughtcast": {
     "cmc": 5.0,
@@ -30024,7 +30043,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.86,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c3821ae5e8f44d1820ba5c1ed48c3366"
+    "battle_rule_logical_key": "battle_rule_v1:c3821ae5e8f44d1820ba5c1ed48c3366",
+    "battle_rule_oracle_hash": "4817af87412f9b1d481222c3da52ced5"
   },
   "Timber Gorge": {
     "effect": "land",
@@ -32780,7 +32800,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.92,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab"
+    "battle_rule_logical_key": "battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab",
+    "battle_rule_oracle_hash": "f11935fa793ae03d95ae75d62cdfa516"
   },
   "Wear // Tear": {
     "battle_model_scope": "split_artifact_or_enchantment_removal_v1",
@@ -32795,7 +32816,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a89224366575c83b24415529fe686a0e"
+    "battle_rule_logical_key": "battle_rule_v1:a89224366575c83b24415529fe686a0e",
+    "battle_rule_oracle_hash": "bccbbc9c0ebfc638e73f0ee82a7d72d3"
   },
   "Weathered Wayfarer": {
     "effect": "creature",

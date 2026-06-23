@@ -3535,3 +3535,31 @@ Status:
 - It records scenario summaries plus `spell_resolved`,
   `jeskas_will_resolved`, `mizzix_mastery_copy_cast`, and
   `mizzix_mastery_resolved` events with rule key/hash provenance.
+
+## PG078 Card-Rule Provenance Gate - 2026-06-23 06:42 UTC
+
+Artifacts:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`.
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`.
+- Deck `6` card-gate audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`.
+- Deck `606` card-gate audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg078_l2_hash_scope_restore_20260623_063535.json`.
+
+Gate:
+
+- PG078 is a provenance/hash gate only. It restored PostgreSQL `oracle_hash`
+  values for 23 already scoped trusted rules and disabled 44 superseded shadow
+  rows.
+- It does not add new battle replay evidence, does not alter target-pressure or
+  table-intent behavior, and does not change deck composition.
+
+Status:
+
+- Card gate is closed for deck `6` at `high=0`, `medium=0`, `pass=100`.
+- Deck `606` remains open at `high=7`, `medium=7`, `pass=67`.
+- A fresh 16-seed deck `6` battle rebaseline is still required before drawing
+  strategic conclusions from the post-PG078 state.

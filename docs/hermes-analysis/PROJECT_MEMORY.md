@@ -689,3 +689,29 @@ Atualizado em 2026-05-26:
   `medium=29`, `pass=45`, deck `607` `high=29`, `medium=12`, `pass=53`,
   deck `608` `high=21`, `medium=4`, `pass=43`, and global `high=50`,
   `medium=34`, `pass=121`.
+
+## ManaLoom PG078 deck 606 hash/scope restore - 2026-06-23 06:42 UTC
+
+- PG078 was applied and validated as a provenance/cache coherence batch for
+  deck `606` L2 rules. It restored `oracle_hash` on 23 trusted scoped
+  PostgreSQL `card_battle_rules` rows and disabled 44 superseded generated or
+  shadow rows.
+- SQL evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_precheck_20260623_063535.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_apply_20260623_063535.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`.
+- Postcheck facts: `target_rule_rows=23`, `target_hash_match_rows=23`,
+  `target_missing_hash_rows=0`, `trusted_auto_rows=23`,
+  `active_shadow_rows=0`, `disabled_shadow_rows=44`, and
+  `total_backup_rows=67`.
+- SQLite/canonical snapshot sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
+  `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`
+  because this step was sync-from-PG after the SQL apply.
+- Current accepted card-gate cuts: deck `6` `high=0`, `medium=0`,
+  `pass=100`; deck `606` `high=7`, `medium=7`, `pass=67`; global
+  `high=50`, `medium=12`, `pass=143`.
+- Work remains: commit this batch, then run a fresh deck `6` 16-seed battle
+  rebaseline. Do not treat PG078 as battle-strategy evidence by itself.

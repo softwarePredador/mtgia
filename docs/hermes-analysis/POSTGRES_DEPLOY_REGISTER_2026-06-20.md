@@ -7433,3 +7433,57 @@ High-water sync/audit:
 Next deploy number:
 
 - PG078 remains next.
+
+## PG078 Deck 606 L2 Hash/Scope Restore - Applied 2026-06-23 06:35-06:42 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restore `oracle_hash` provenance for 23 already curated/scoped executable
+  rules in the deck `606` L2 queue.
+- Disable superseded generated/shadow rows for the same target names.
+- Preserve `effect_json`, `deck_role_json`, deck composition, and learned-deck
+  state.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_precheck_20260623_063535.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_apply_20260623_063535.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_rollback_20260623_063535.sql`
+
+Backup table:
+
+- `manaloom_deploy_audit.pg078_deck606_l2_hash_scope_restore_20260623_063535`
+  with 67 backed-up rows.
+
+Postcheck evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`
+  reported `target_rule_rows=23`, `target_hash_match_rows=23`,
+  `target_missing_hash_rows=0`, `trusted_auto_rows=23`,
+  `scoped_target_rows=23`, `target_backup_rows=23`,
+  `effect_json_unchanged_rows=23`, `deck_role_json_unchanged_rows=23`,
+  `active_shadow_rows=0`, `disabled_shadow_rows=44`, and
+  `total_backup_rows=67`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
+  refreshed SQLite from PostgreSQL with `pg_rows_loaded=1824`,
+  `sqlite_inserted_or_updated=1802`, `canonical_snapshot_rows_exported=3201`,
+  and `include_needs_review=false`.
+- Deck `6` accepted audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`
+  (`high=0`, `medium=0`, `pass=100`).
+- Deck `606` accepted audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg078_l2_hash_scope_restore_20260623_063535.json`
+  (`high=7`, `medium=7`, `pass=67`).
+- Global accepted audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg078_l2_hash_scope_restore_20260623_063535.json`
+  (`high=50`, `medium=12`, `pass=143`).
+
+Next deploy number:
+
+- PG079 is next for any future PostgreSQL package.

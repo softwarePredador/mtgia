@@ -16878,3 +16878,47 @@ Status: `applied_validated`.
   `medium=4`, `pass=43`, and global `high=50`, `medium=34`, `pass=121`.
 - Focused L4 runtime evidence:
   `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`.
+
+## PG078 Deck 606 Hash/Scope Restore - 2026-06-23 06:42 UTC
+
+Status: `applied_validated`.
+
+PostgreSQL package:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_precheck_20260623_063535.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_apply_20260623_063535.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_rollback_20260623_063535.sql`
+
+PostgreSQL evidence:
+
+- Precheck expected and found 23 trusted target rules with oracle text, all
+  missing `oracle_hash` and all carrying `battle_model_scope`.
+- Apply committed after restoring those 23 hashes and disabling 44 superseded
+  generated/shadow rows; `effect_json` and `deck_role_json` were intentionally
+  unchanged.
+- Postcheck reported `target_hash_match_rows=23`,
+  `target_missing_hash_rows=0`, `active_shadow_rows=0`,
+  `disabled_shadow_rows=44`, and `total_backup_rows=67`.
+
+Sync/auditor evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
+  refreshed SQLite from PostgreSQL with `pg_rows_loaded=1824`,
+  `sqlite_inserted_or_updated=1802`, and `canonical_snapshot_rows_exported=3201`.
+- Deck `6` remained closed:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`
+  reports `high=0`, `medium=0`, `pass=100`.
+- Deck `606` improved to:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg078_l2_hash_scope_restore_20260623_063535.json`
+  with `high=7`, `medium=7`, `pass=67`.
+- Global queue after sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg078_l2_hash_scope_restore_20260623_063535.json`
+  with `high=50`, `medium=12`, `pass=143`.
+
+Battle status:
+
+- This PG078 batch is card-rule provenance/cache work. It is not a battle
+  rebaseline and does not prove the current Lorehold deck strategic win rate.
+- Next battle action is to rerun the 16-seed strategy audit explicitly against
+  deck `6` after this batch is committed.

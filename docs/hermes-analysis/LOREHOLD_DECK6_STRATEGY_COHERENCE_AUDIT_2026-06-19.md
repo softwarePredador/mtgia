@@ -20666,3 +20666,65 @@ Current reading:
 - Final state remains deck `6` `high=0`, `medium=0`, `pass=100`.
 - Strategy status is unchanged: this is a card/rule gate closure, not proof
   that Lorehold is the best strategic deck after battles.
+
+## PG078 Deck 606 L2 Hash/Scope Restore - 2026-06-23 06:42 UTC
+
+Status: `applied_validated`.
+
+What changed:
+
+- PG078 restored `oracle_hash` provenance for 23 already curated/scoped
+  executable rules used by the deck `606` queue.
+- The apply disabled 44 superseded generated/shadow rows for the same target
+  names.
+- No deck swap, no `deck_cards` mutation, and no `effect_json` or
+  `deck_role_json` semantic change was performed.
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_precheck_20260623_063535.out`
+  reported `expected_target_rules=23`, `target_rule_rows=23`,
+  `target_missing_hash_rows=23`, `scoped_target_rows=23`,
+  `trusted_auto_rows=23`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_apply_20260623_063535.out`
+  committed the transaction and recorded `UPDATE 44` for shadow-row disablement;
+  the guarded `DO` block required exactly 23 hash updates before commit.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`
+  reported `target_rule_rows=23`, `target_hash_match_rows=23`,
+  `target_missing_hash_rows=0`, `trusted_auto_rows=23`,
+  `scoped_target_rows=23`, `active_shadow_rows=0`,
+  `disabled_shadow_rows=44`, and `total_backup_rows=67`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_rollback_20260623_063535.sql`.
+
+Sync and auditor evidence:
+
+- PG -> SQLite/canonical snapshot sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
+  `canonical_snapshot_rows_exported=3201`, and `include_needs_review=false`.
+- Canonical fallback snapshot updated 22 card entries with
+  `battle_rule_oracle_hash`; this is runtime cache evidence, not a new
+  PostgreSQL semantic mutation.
+- Deck `6` post-PG078 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`
+  remains `high=0`, `medium=0`, `pass=100`.
+- Deck `606` post-PG078 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg078_l2_hash_scope_restore_20260623_063535.json`
+  improved to `high=7`, `medium=7`, `pass=67`.
+- Global post-PG078 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg078_l2_hash_scope_restore_20260623_063535.json`
+  reports `high=50`, `medium=12`, `pass=143`.
+
+Current reading:
+
+- Deck `6` remains closed for the current card battle-rule coherence gate.
+- Deck `606` still has seven high battle-critical cards to validate:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- Next step after committing this batch is a fresh battle rebaseline for deck
+  `6`; do not mix the battle rebaseline with the next card-rule PG package.

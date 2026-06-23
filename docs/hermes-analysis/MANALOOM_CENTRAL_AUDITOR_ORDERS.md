@@ -3160,3 +3160,26 @@ Current order:
 - Deck `6` card gate is closed. Continue either with deck `606` high cards or
   with a fresh battle rebaseline from current deck `6`; do not mix those two
   steps in one unreviewed package.
+
+### PG078 Applied Order - 2026-06-23 06:42 UTC
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`
+  validated 23 restored oracle hashes, zero missing target hashes, zero active
+  shadow rows, 44 disabled shadow rows, and 67 backup rows.
+- `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
+  synced PostgreSQL into Hermes SQLite/canonical snapshot with
+  `sqlite_inserted_or_updated=1802` and `canonical_snapshot_rows_exported=3201`.
+- `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`
+  keeps deck `6` at `high=0`, `medium=0`, `pass=100`.
+- `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg078_l2_hash_scope_restore_20260623_063535.json`
+  leaves deck `606` at `high=7`, `medium=7`, `pass=67`.
+
+Current order:
+
+- Commit and push the PG078 evidence batch before starting the next long run.
+- Run the fresh 16-seed battle rebaseline for deck `6` after the worktree is
+  clean.
+- Keep the next card-rule package separate from battle rebaseline evidence;
+  the likely next card queue remains deck `606` high battle-critical cards.
