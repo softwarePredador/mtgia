@@ -3021,17 +3021,6 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
         }
     ),
-    "Aura of Silence": handcrafted_runtime_rule(
-        {
-            "effect": "remove_permanent",
-            "target": "artifact_or_enchantment",
-            "taxes_opponent_artifact_enchantment_spells": 2,
-            "activation_cost": "sacrifice_self",
-            "card_id": "e7faf8eb-e829-4109-8dfe-42865a23ba86",
-            "semantic_hash": "e6276e51fdd5341a5632356f36fb5333eb2ac061679dd0605a557b903affb060",
-            "battle_model_scope": "aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
-        }
-    ),
 }
 HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 
@@ -3057,7 +3046,6 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Vivi Ornitier",
     "Faeburrow Elder",
     "Neoform",
-    "Aura of Silence",
 }
 
 
@@ -3158,11 +3146,6 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
         ["20260619_202217", "20260619_202628"],
         "2026-06-19T20:26:28Z",
-    ),
-    "Aura of Silence": manual_runtime_waiver_metadata(
-        "Replace functional-tag removal blocker with artifact/enchantment tax plus sacrifice-removal semantics and stable local card identity.",
-        ["20260620_002832"],
-        "2026-06-19T21:32:00Z",
     ),
 }
 

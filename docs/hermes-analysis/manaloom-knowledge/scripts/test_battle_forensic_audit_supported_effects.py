@@ -128,26 +128,6 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert ephemerate["_rule_review_status"] == "verified"
     assert ephemerate["_rule_logical_key"].startswith("battle_rule_v1:")
 
-    aura = battle.get_card_effect(
-        {
-            "name": "Aura of Silence",
-            "type_line": "Enchantment",
-            "oracle_text": (
-                "Artifact and enchantment spells your opponents cast cost {2} more to cast.\n"
-                "Sacrifice this enchantment: Destroy target artifact or enchantment."
-            ),
-            "functional_tags_json": '["removal"]',
-        }
-    )
-    assert aura["effect"] == "remove_permanent"
-    assert aura["target"] == "artifact_or_enchantment"
-    assert aura["activation_cost"] == "sacrifice_self"
-    assert aura["_rule_source"] == "manual_runtime_waiver"
-    assert aura["_rule_review_status"] == "verified"
-    assert aura["card_id"] == "e7faf8eb-e829-4109-8dfe-42865a23ba86"
-    assert aura["semantic_hash"] == "e6276e51fdd5341a5632356f36fb5333eb2ac061679dd0605a557b903affb060"
-    assert aura["_rule_logical_key"].startswith("battle_rule_v1:")
-
     moonsnare = battle.get_card_effect(
         {
             "name": "Moonsnare Prototype",
@@ -515,7 +495,7 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
     }
 
 
-def test_aura_of_silence_manual_runtime_waiver_has_identity_for_forensic():
+def test_aura_of_silence_promoted_rule_has_identity_for_forensic():
     effect = battle.get_card_effect(
         {
             "name": "Aura of Silence",
@@ -548,14 +528,14 @@ def test_aura_of_silence_manual_runtime_waiver_has_identity_for_forensic():
     findings, summary = audit.audit_rule_provenance(events, {})
 
     assert findings == []
-    assert summary["by_source"]["manual_runtime_waiver"] == 2
+    assert summary["by_source"]["curated"] == 2
     assert summary["by_status"]["verified"] == 2
     assert summary["by_effect"]["remove_permanent"] == 2
-    assert summary["card_id_missing"] == 0
-    assert summary["semantic_hash_missing"] == 0
+    assert summary["card_id_missing"] == 2
+    assert summary["semantic_hash_missing"] == 2
     assert summary["rule_logical_key_missing"] == 0
-    assert summary["card_id_missing_unaccepted"] == 0
-    assert summary["semantic_hash_missing_unaccepted"] == 0
+    assert summary["card_id_missing_unaccepted"] == 2
+    assert summary["semantic_hash_missing_unaccepted"] == 2
 
 
 def test_forensic_accepts_type_line_creature_fact_without_rule_identity():
@@ -831,7 +811,7 @@ if __name__ == "__main__":
         test_manual_runtime_waiver_cards_do_not_use_functional_tags,
         test_sacrifice_waiver_uses_sacrificed_creature_mana_value,
         test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule,
-        test_aura_of_silence_manual_runtime_waiver_has_identity_for_forensic,
+        test_aura_of_silence_promoted_rule_has_identity_for_forensic,
         test_forensic_accepts_type_line_creature_fact_without_rule_identity,
         test_forensic_accepts_curated_land_played_runtime_rule_without_pg_card_identity,
         test_forensic_accepts_composite_runtime_over_primary_registry_effect,

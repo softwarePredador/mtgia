@@ -1615,16 +1615,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Aura of Silence": {
-    "cmc": 3.0,
+    "ability_kind": "activated",
+    "activation_cost": "sacrifice_self",
+    "battle_model_scope": "aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
     "effect": "remove_permanent",
-    "instant": true,
     "target": "artifact_or_enchantment",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9d5afecce0b2500c1dff74bcd97e6eb4"
+    "taxes_opponent_artifact_enchantment_spells": 2,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1e7e893925d6140639fc794bf2510773",
+    "battle_rule_oracle_hash": "6e4cfd52a9afd82047d39f8b76416eb4"
   },
   "Aura Shards": {
     "cmc": 3.0,
@@ -19171,8 +19174,8 @@
     "battle_rule_logical_key": "battle_rule_v1:8b297552724d5caee8f0cac7f8e26426"
   },
   "Nature's Claim": {
+    "ability_kind": "one_shot",
     "battle_model_scope": "artifact_or_enchantment_removal_lifegain_v1",
-    "cmc": 1.0,
     "effect": "remove_permanent",
     "instant": true,
     "target": "artifact_or_enchantment",
@@ -19180,9 +19183,10 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.98,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b68a368de3add71ee716cda718b9bcb9"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ac8416f2210ff0a8466bfb61e3b4b4e",
+    "battle_rule_oracle_hash": "c88d03f66daf06b46fd567dca8e34c50"
   },
   "Nature's Lore": {
     "cmc": 2.0,
@@ -24667,13 +24671,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Seal of Primordium": {
-    "effect": "passive",
+    "ability_kind": "activated",
+    "activation_cost": "sacrifice_self",
+    "battle_model_scope": "activated_sacrifice_self_destroy_artifact_or_enchantment_v1",
+    "effect": "remove_permanent",
+    "target": "artifact_or_enchantment",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bb89a03f7bba301581f6b3e65a46df96",
+    "battle_rule_oracle_hash": "487c743fec96f43d2e18d90cd1432f22"
   },
   "Search for Tomorrow": {
     "basic_only": true,

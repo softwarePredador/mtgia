@@ -73,6 +73,15 @@ def _target_constraints(target_classes: set[str], filter_classes: set[str]) -> d
     return constraints
 
 
+def _artifact_or_enchantment_source_text(rules_text: str) -> bool:
+    text = _normalized_rules_text(rules_text)
+    return (
+        "artifact or enchantment" in text
+        or "artifact and enchantment" in text
+        or "filter_permanent_artifact_or_enchantment" in text
+    )
+
+
 def static_cost_reduction_fields_from_oracle(oracle_text: str) -> dict[str, Any]:
     text = _normalized_rules_text(oracle_text)
     fields: dict[str, Any] = {
@@ -320,6 +329,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     inner_extends = _inner_extends(index_entry)
     ability_kind = _ability_kind(ability_classes)
     target_constraints = _target_constraints(target_classes, filter_classes)
+    card_types = _constructor_card_types(index_entry)
     candidates: list[dict[str, Any]] = []
 
     if _oracle_has(rules_text, "vow counter", "sacrifices the rest") or (
@@ -497,6 +507,73 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 matched_signals=["token"],
             )
         )
+
+    if "DestroyTargetEffect" in effect_classes and _artifact_or_enchantment_source_text(rules_text):
+        if "GainLifeTargetControllerEffect" in effect_classes and (
+            "gainlifetargetcontrollereffect(4)" in _normalized_rules_text(rules_text)
+            or _oracle_has(rules_text, "controller gains 4 life")
+        ):
+            candidates.append(
+                _candidate(
+                    effect="remove_permanent",
+                    scope="artifact_or_enchantment_removal_lifegain_v1",
+                    reason="XMage structure shows destroy target artifact or enchantment plus gain-4-to-target-controller rider.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "target": "artifact_or_enchantment",
+                        "target_controller_gains_life": 4,
+                        "instant": "INSTANT" in card_types,
+                    },
+                    matched_signals=["DestroyTargetEffect", "GainLifeTargetControllerEffect", "artifact_or_enchantment"],
+                )
+            )
+        elif (
+            "SpellsCostIncreasingAllEffect" in effect_classes
+            and "SacrificeSourceCost" in cost_classes
+            and (
+                _oracle_has(
+                    rules_text,
+                    "artifact and enchantment spells your opponents cast cost {2} more to cast",
+                )
+                or "spellscostincreasingalleffect(2" in _normalized_rules_text(rules_text)
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="remove_permanent",
+                    scope="aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
+                    reason="XMage structure matches Aura of Silence tax static ability plus sacrifice-self artifact/enchantment removal activation.",
+                    ability_kind="activated",
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "target": "artifact_or_enchantment",
+                        "activation_cost": "sacrifice_self",
+                        "taxes_opponent_artifact_enchantment_spells": 2,
+                    },
+                    matched_signals=[
+                        "DestroyTargetEffect",
+                        "SpellsCostIncreasingAllEffect",
+                        "SacrificeSourceCost",
+                        "artifact_or_enchantment",
+                    ],
+                )
+            )
+        elif "SacrificeSourceCost" in cost_classes:
+            candidates.append(
+                _candidate(
+                    effect="remove_permanent",
+                    scope="activated_sacrifice_self_destroy_artifact_or_enchantment_v1",
+                    reason="XMage structure shows a sacrifice-self activated ability that destroys target artifact or enchantment.",
+                    ability_kind="activated",
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "target": "artifact_or_enchantment",
+                        "activation_cost": "sacrifice_self",
+                    },
+                    matched_signals=["DestroyTargetEffect", "SacrificeSourceCost", "artifact_or_enchantment"],
+                )
+            )
 
     class_to_effect = [
         ("DestroyAllEffect", "board_wipe", "destroy_all_permanents_or_creatures_variant_v1", True),

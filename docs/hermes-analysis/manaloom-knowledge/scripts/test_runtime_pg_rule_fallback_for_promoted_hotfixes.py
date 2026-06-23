@@ -27,6 +27,7 @@ sync_pg = load_module(SYNC_PG_PATH, "sync_pg_for_pg_fallback_test")
 
 ADDITIONAL_CANONICAL_NAMES = {
     "Aether Spellbomb",
+    "Aura of Silence",
     "Crop Rotation",
     "Eldrazi Confluence",
     "Emerald Charm",
@@ -36,9 +37,11 @@ ADDITIONAL_CANONICAL_NAMES = {
     "Momentary Blink",
     "Mox Diamond",
     "Mental Misstep",
+    "Nature's Claim",
     "Rise of the Eldrazi",
     "Roiling Regrowth",
     "Scour for Scrap",
+    "Seal of Primordium",
     "Sink into Stupor",
     "Snap",
     "Snapback",

@@ -241,6 +241,112 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "exile_instant_sorcery_boost_combat_damage_copy_cast")
         self.assertEqual(primary["target_constraints"]["zone"], "graveyard")
 
+    def test_natures_claim_maps_to_artifact_or_enchantment_lifegain_removal(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DestroyTargetEffect", "GainLifeTargetControllerEffect"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect()); "
+                    "this.getSpellAbility().addEffect(new GainLifeTargetControllerEffect(4)); "
+                    "this.getSpellAbility().addTarget(new TargetPermanent("
+                    "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(primary["battle_model_scope"], "artifact_or_enchantment_removal_lifegain_v1")
+        self.assertEqual(primary["target"], "artifact_or_enchantment")
+        self.assertEqual(primary["target_controller_gains_life"], 4)
+        self.assertTrue(primary["instant"])
+
+    def test_seal_of_primordium_maps_to_sacrifice_self_artifact_or_enchantment_removal(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DestroyTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["SacrificeSourceCost"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "Ability ability = new SimpleActivatedAbility(new DestroyTargetEffect(), "
+                    "new SacrificeSourceCost()); ability.addTarget(new TargetPermanent("
+                    "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_sacrifice_self_destroy_artifact_or_enchantment_v1",
+        )
+        self.assertEqual(primary["target"], "artifact_or_enchantment")
+        self.assertEqual(primary["activation_cost"], "sacrifice_self")
+
+    def test_aura_of_silence_maps_to_tax_plus_sacrifice_removal(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DestroyTargetEffect", "SpellsCostIncreasingAllEffect"],
+                "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                "cost_classes": ["SacrificeSourceCost"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SimpleStaticAbility(new SpellsCostIncreasingAllEffect("
+                    "2, filter, TargetController.OPPONENT))); "
+                    "Ability ability = new SimpleActivatedAbility(new DestroyTargetEffect(), "
+                    "new SacrificeSourceCost()); ability.addTarget(new TargetPermanent("
+                    "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                ),
+            },
+            "Artifact and enchantment spells your opponents cast cost {2} more to cast. "
+            "Sacrifice Aura of Silence: Destroy target artifact or enchantment.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
+        )
+        self.assertEqual(primary["target"], "artifact_or_enchantment")
+        self.assertEqual(primary["activation_cost"], "sacrifice_self")
+        self.assertEqual(primary["taxes_opponent_artifact_enchantment_spells"], 2)
+
+    def test_aura_of_silence_source_text_without_oracle_still_maps_to_tax_plus_sacrifice_removal(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DestroyTargetEffect", "SpellsCostIncreasingAllEffect"],
+                "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                "cost_classes": ["SacrificeSourceCost"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SimpleStaticAbility(new SpellsCostIncreasingAllEffect("
+                    "2, filter, TargetController.OPPONENT))); "
+                    "Ability ability = new SimpleActivatedAbility(new DestroyTargetEffect(), "
+                    "new SacrificeSourceCost()); ability.addTarget(new TargetPermanent("
+                    "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
+        )
+        self.assertEqual(primary["taxes_opponent_artifact_enchantment_spells"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

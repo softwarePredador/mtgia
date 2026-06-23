@@ -365,6 +365,113 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_natures_claim_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Nature's Claim",
+                        "severity": "high",
+                        "oracle_hash": "naturesclaimhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "NaturesClaim",
+                            "path": "/xmage/NaturesClaim.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["DestroyTargetEffect", "GainLifeTargetControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "artifact_or_enchantment_removal_lifegain_v1",
+                                "target": "artifact_or_enchantment",
+                                "target_controller_gains_life": 4,
+                                "instant": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_seal_of_primordium_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Seal of Primordium",
+                        "severity": "high",
+                        "oracle_hash": "sealhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SealOfPrimordium",
+                            "path": "/xmage/SealOfPrimordium.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DestroyTargetEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "activated_sacrifice_self_destroy_artifact_or_enchantment_v1",
+                                "target": "artifact_or_enchantment",
+                                "activation_cost": "sacrifice_self",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_aura_of_silence_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Aura of Silence",
+                        "severity": "high",
+                        "oracle_hash": "aurahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AuraOfSilence",
+                            "path": "/xmage/AuraOfSilence.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DestroyTargetEffect", "SpellsCostIncreasingAllEffect"],
+                            "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                            "cost_classes": ["SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "aura_of_silence_tax_and_sacrifice_removal_waiver_v1",
+                                "target": "artifact_or_enchantment",
+                                "activation_cost": "sacrifice_self",
+                                "taxes_opponent_artifact_enchantment_spells": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_normalizes_modal_mana_rock_to_runtime_ramp_effect(self) -> None:
         report = generator.build_generator_report(
             batch_audit={

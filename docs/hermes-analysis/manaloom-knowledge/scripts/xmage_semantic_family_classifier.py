@@ -87,6 +87,7 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "effects": {
             "removal_destroy",
             "removal_exile",
+            "remove_permanent",
             "bounce",
             "direct_damage",
             "counter_spell",
@@ -220,6 +221,44 @@ GENERIC_BATCH_SAFE_ABILITY_CLASSES = {
 }
 
 
+def specialized_targeted_interaction_batch_safe(card: dict[str, Any]) -> bool:
+    effect_json = primary_effect(card)
+    effect = str(effect_json.get("effect") or "")
+    scope = str(effect_json.get("battle_model_scope") or "")
+    target = str(effect_json.get("target") or "")
+    types = xmage_types(card)
+    ability_classes = xmage_ability_classes(card)
+    effect_classes = xmage_effect_classes(card)
+    cost_classes = xmage_cost_classes(card)
+    if effect != "remove_permanent" or target != "artifact_or_enchantment":
+        return False
+    if scope == "artifact_or_enchantment_removal_lifegain_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"DestroyTargetEffect", "GainLifeTargetControllerEffect"}
+            and not ability_classes
+            and int(effect_json.get("target_controller_gains_life") or 0) == 4
+        )
+    if scope == "activated_sacrifice_self_destroy_artifact_or_enchantment_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DestroyTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "SacrificeSourceCost" in cost_classes
+            and effect_json.get("activation_cost") == "sacrifice_self"
+        )
+    if scope == "aura_of_silence_tax_and_sacrifice_removal_waiver_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DestroyTargetEffect", "SpellsCostIncreasingAllEffect"}
+            and ability_classes == {"SimpleActivatedAbility", "SimpleStaticAbility"}
+            and "SacrificeSourceCost" in cost_classes
+            and effect_json.get("activation_cost") == "sacrifice_self"
+            and int(effect_json.get("taxes_opponent_artifact_enchantment_spells") or 0) == 2
+        )
+    return False
+
+
 def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
     effect_json = primary_effect(card)
     effect = str(effect_json.get("effect") or "")
@@ -287,6 +326,8 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
     if generic_runtime_batch_safe(card):
+        return "batch_metadata_candidate_requires_pg_precheck"
+    if specialized_targeted_interaction_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
     if modal_mana_rock_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
