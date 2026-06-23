@@ -7890,19 +7890,28 @@
     "battle_rule_logical_key": "battle_rule_v1:fac6bf2a168be222f29dff8b54459d88"
   },
   "Dualcaster Mage": {
+    "battle_model_scope": "creature_etb_copy_stack_instant_or_sorcery_v1",
+    "choose_new_targets_status": "annotation_only",
+    "cmc": 3.0,
+    "copy_is_not_cast": true,
     "effect": "copy_spell",
+    "etb_copy_spell": true,
+    "instant": true,
     "is_creature_permanent": true,
     "keywords": [
       "flash"
     ],
+    "may_choose_new_targets": true,
     "power": 2,
+    "target": "instant_or_sorcery_on_stack",
     "toughness": 2,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.92,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:41cfcafdca0d9f19437fac325b524be6"
+    "battle_rule_logical_key": "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55",
+    "battle_rule_oracle_hash": "e26f613394b72e9724d299512983218a"
   },
   "Duelist's Heritage": {
     "cmc": 3.0,
@@ -12864,16 +12873,22 @@
     "battle_rule_logical_key": "battle_rule_v1:f416db25cdcf943a2e0c2f43874aedc8"
   },
   "Heat Shimmer": {
-    "effect": "token_maker",
-    "token_count": 1,
+    "battle_model_scope": "target_creature_copy_haste_exile_eot_v1",
+    "cmc": 3.0,
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "exile_token_at_end_step": true,
+    "target_controller": "any",
     "token_haste": true,
-    "token_power": 2,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:95aa5073467196e34333aba1235487ba"
+    "battle_rule_logical_key": "battle_rule_v1:644897bfa688d33b1a718723360e2480",
+    "battle_rule_oracle_hash": "9c4cfbeb99bfea90a8a5d4c3c7894793"
   },
   "Hedge Maze": {
     "effect": "land",
@@ -18026,16 +18041,24 @@
     "battle_rule_logical_key": "battle_rule_v1:49c775bf9accb1a7e247cdeb66db02de"
   },
   "Molten Duplication": {
-    "effect": "token_maker",
-    "token_count": 1,
+    "artifact_in_addition": true,
+    "battle_model_scope": "own_artifact_or_creature_copy_artifact_haste_sacrifice_eot_v1",
+    "cmc": 2.0,
+    "copy_target_types": [
+      "artifact",
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "sacrifice_token_at_end_step": true,
+    "target_controller": "own",
     "token_haste": true,
-    "token_power": 2,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:95aa5073467196e34333aba1235487ba"
+    "battle_rule_logical_key": "battle_rule_v1:e154b34c0deaa861094d5870f4c0ad69",
+    "battle_rule_oracle_hash": "7c24d56660499c0af4db967925de1573"
   },
   "Molten Echoes": {
     "cmc": 4.0,
@@ -22231,14 +22254,22 @@
     "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
   },
   "Reiterate": {
+    "battle_model_scope": "copy_stack_instant_or_sorcery_buyback_annotation_v1",
+    "buyback_status": "annotation_only",
+    "choose_new_targets_status": "annotation_only",
+    "cmc": 3.0,
+    "copy_is_not_cast": true,
     "effect": "copy_spell",
     "instant": true,
+    "may_choose_new_targets": true,
+    "target": "instant_or_sorcery_on_stack",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b82bbb548dab138fa0700cb4cf905617"
+    "battle_rule_logical_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405",
+    "battle_rule_oracle_hash": "996fb5f02f16605ff7f1c899f2c50f60"
   },
   "Rejuvenating Springs": {
     "effect": "land",
@@ -30711,16 +30742,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Twinflame": {
-    "effect": "token_maker",
-    "token_count": 1,
+    "battle_model_scope": "own_creature_single_copy_haste_exile_eot_v1",
+    "cmc": 2.0,
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "exile_token_at_end_step": true,
+    "strive_multi_target_status": "annotation_only_single_best_own_creature",
+    "target_controller": "own",
     "token_haste": true,
-    "token_power": 2,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:95aa5073467196e34333aba1235487ba"
+    "battle_rule_logical_key": "battle_rule_v1:97ab0167213936bfa544f19731284e56",
+    "battle_rule_oracle_hash": "d9c51f63ac78f713113c52feadfba6db"
   },
   "Twinflame Tyrant": {
     "cmc": 5.0,

@@ -733,6 +733,142 @@ def register_tests(battle, player):
         assert any(card.get("name") == "Active Draw" for card in active.hand)
         assert any(card.get("name") == "Targeted Insight" for card in active.graveyard)
 
+    def test_reiterate_copies_stack_spell_with_pg068_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            reiterate = {
+                "name": "Reiterate",
+                "cmc": 3,
+                "mana_cost": "{1}{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [reiterate]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(1)
+            target_spell = {
+                "name": "Targeted Insight",
+                "cmc": 3,
+                "mana_cost": "{2}{U}",
+                "type_line": "Sorcery",
+            }
+            target_effect = {"effect": "draw_cards", "count": 1}
+            reiterate_effect = battle.get_card_effect(reiterate)
+            assert reiterate_effect["effect"] == "copy_spell"
+            assert reiterate_effect["target"] == "instant_or_sorcery_on_stack"
+            assert reiterate_effect["copy_is_not_cast"] is True
+            assert reiterate_effect["buyback_status"] == "annotation_only"
+            assert reiterate_effect["battle_model_scope"] == (
+                "copy_stack_instant_or_sorcery_buyback_annotation_v1"
+            )
+            assert reiterate_effect["_rule_logical_key"] == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+            assert reiterate_effect["_rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
+
+            stack = battle.Stack()
+            stack.push(target_spell, active, target_effect)
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(202),
+                phase="precombat_main",
+            ) is True
+            assert stack.items[-1].card.get("is_copy") is True
+            assert stack.items[-1].controller is responder
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert reiterate not in responder.hand
+        assert reiterate in responder.graveyard
+        copied_event = next(
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Reiterate"
+        )
+        assert copied_event["copied_spell"] == "Targeted Insight"
+        assert copied_event["copy_is_cast"] is False
+        assert copied_event["rule_logical_key"] == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+        assert copied_event["rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
+        assert copied_event["choose_new_targets_status"] == "annotation_only"
+
+    def test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            dualcaster = {
+                "name": "Dualcaster Mage",
+                "cmc": 3,
+                "mana_cost": "{1}{R}{R}",
+                "type_line": "Creature — Human Wizard",
+                "keywords": ["Flash"],
+            }
+            responder.hand = [dualcaster]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(1)
+            target_spell = {
+                "name": "Targeted Insight",
+                "cmc": 3,
+                "mana_cost": "{2}{U}",
+                "type_line": "Sorcery",
+            }
+            target_effect = {"effect": "draw_cards", "count": 1}
+            dualcaster_effect = battle.get_card_effect(dualcaster)
+            assert dualcaster_effect["effect"] == "copy_spell"
+            assert dualcaster_effect["etb_copy_spell"] is True
+            assert dualcaster_effect["is_creature_permanent"] is True
+            assert dualcaster_effect["target"] == "instant_or_sorcery_on_stack"
+            assert dualcaster_effect["copy_is_not_cast"] is True
+            assert dualcaster_effect["battle_model_scope"] == (
+                "creature_etb_copy_stack_instant_or_sorcery_v1"
+            )
+            assert dualcaster_effect["_rule_logical_key"] == "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
+            assert dualcaster_effect["_rule_oracle_hash"] == "e26f613394b72e9724d299512983218a"
+
+            stack = battle.Stack()
+            stack.push(target_spell, active, target_effect)
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(203),
+                phase="precombat_main",
+            ) is True
+            assert stack.items[-1].card.get("name") == "Dualcaster Mage"
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(204),
+                phase="precombat_main",
+            ) is False
+            assert stack.items[-1].card.get("is_copy") is True
+            assert stack.items[-1].controller is responder
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert dualcaster not in responder.hand
+        assert any(card.get("name") == "Dualcaster Mage" for card in responder.battlefield)
+        assert not any(card.get("name") == "Dualcaster Mage" for card in responder.graveyard)
+        copied_event = next(
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Dualcaster Mage"
+        )
+        assert copied_event["copied_spell"] == "Targeted Insight"
+        assert copied_event["copy_is_cast"] is False
+        assert copied_event["trigger"] == "enters_battlefield"
+        assert copied_event["rule_logical_key"] == "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
+        assert copied_event["rule_oracle_hash"] == "e26f613394b72e9724d299512983218a"
+
     def test_deflecting_swat_redirects_targeted_removal_for_free_with_commander():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -2589,6 +2725,64 @@ def register_tests(battle, player):
         )
         assert any(card.get("name") == "Increasing Vengeance" for card in active.graveyard)
 
+    def test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.hand = [
+                {"name": "Unexpected Windfall", "cmc": 4, "mana_cost": "{2}{R}{R}", "type_line": "Instant"},
+                {"name": "Discard Me", "cmc": 7, "type_line": "Sorcery", "effect": "draw_cards"},
+            ]
+            active.library = [
+                {"name": "Drawn One", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Drawn Two", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            windfall = active.hand[0]
+            effect_data = battle.get_card_effect(windfall)
+
+            assert effect_data["effect"] == "treasure_maker"
+            assert effect_data["draw_count"] == 2
+            assert effect_data["treasure_count"] == 2
+            assert effect_data["requires_discard_card"] is True
+            assert effect_data["battle_model_scope"] == "discard_draw_create_treasures_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4"
+            assert effect_data["_rule_oracle_hash"] == "9c4fbe06104051a2e8b1d295d307b26a"
+
+            active.hand.remove(windfall)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                windfall,
+                5,
+                random.Random(1166),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.treasures == 2
+        assert [card.get("name") for card in active.hand] == ["Drawn One", "Drawn Two"]
+        assert any(card.get("name") == "Discard Me" for card in active.graveyard)
+        assert any(card.get("name") == "Unexpected Windfall" for card in active.graveyard)
+        assert any(
+            event == "additional_cost_paid"
+            and data.get("card") == "Unexpected Windfall"
+            and data.get("cost") == "discard_card"
+            and data.get("discarded") == "Discard Me"
+            for event, data in events
+        )
+        treasure_event = next(
+            data
+            for event, data in events
+            if event == "treasure_created" and data.get("card") == "Unexpected Windfall"
+        )
+        assert treasure_event["treasures_created"] == 2
+        assert treasure_event["cards_drawn"] == 2
+        assert treasure_event["rule_logical_key"] == "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4"
+        assert treasure_event["rule_oracle_hash"] == "9c4fbe06104051a2e8b1d295d307b26a"
+
     def test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -2768,6 +2962,152 @@ def register_tests(battle, player):
             and data.get("target") == "Value Creature"
             for event, data in events
         )
+        assert any(event == "end_step_token_sacrificed" for event, _ in events)
+
+    def test_heat_shimmer_copies_any_creature_and_exiles_token_at_end_step():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {"name": "Small Utility", "effect": "creature", "type_line": "Creature", "power": 1, "toughness": 1}
+            ]
+            opponent.battlefield = [
+                {"name": "Large Threat", "effect": "creature", "type_line": "Creature", "power": 7, "toughness": 7}
+            ]
+            card = {"name": "Heat Shimmer", "cmc": 3, "type_line": "Sorcery"}
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                5,
+                random.Random(681),
+                effect_data_override={
+                    "effect": "copy_creature_token",
+                    "target_controller": "any",
+                    "copy_target_types": ["creature"],
+                    "token_haste": True,
+                    "exile_token_at_end_step": True,
+                    "battle_model_scope": "target_creature_copy_haste_exile_eot_v1",
+                    "_rule_logical_key": "battle_rule_v1:644897bfa688d33b1a718723360e2480",
+                    "_rule_oracle_hash": "9c4cfbeb99bfea90a8a5d4c3c7894793",
+                },
+            )
+            token = next(
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict) and permanent.get("copy_of") == "Large Threat"
+            )
+            battle.process_end_step_token_sacrifices(active, 5)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert token not in active.battlefield
+        assert token in active.exile
+        created = next(data for event, data in events if event == "copy_creature_token_created")
+        assert created["card"] == "Heat Shimmer"
+        assert created["target"] == "Large Threat"
+        assert created["target_controller"] == "Opponent"
+        assert created["haste"] is True
+        assert created["exile_at_end_step"] is True
+        assert created["rule_logical_key"] == "battle_rule_v1:644897bfa688d33b1a718723360e2480"
+        assert created["rule_oracle_hash"] == "9c4cfbeb99bfea90a8a5d4c3c7894793"
+        assert any(event == "end_step_token_exiled" for event, _ in events)
+
+    def test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step():
+        active = player("Active")
+        opponent = player("Opponent")
+        active.battlefield = [
+            {"name": "Own Combo Creature", "effect": "creature", "type_line": "Creature", "power": 2, "toughness": 2}
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Bomb", "effect": "creature", "type_line": "Creature", "power": 9, "toughness": 9}
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Twinflame", "cmc": 2, "type_line": "Sorcery"},
+            5,
+            random.Random(682),
+            effect_data_override={
+                "effect": "copy_creature_token",
+                "target_controller": "own",
+                "copy_target_types": ["creature"],
+                "token_haste": True,
+                "exile_token_at_end_step": True,
+                "strive_multi_target_status": "annotation_only_single_best_own_creature",
+                "battle_model_scope": "own_creature_single_copy_haste_exile_eot_v1",
+                "_rule_logical_key": "battle_rule_v1:97ab0167213936bfa544f19731284e56",
+                "_rule_oracle_hash": "d9c51f63ac78f713113c52feadfba6db",
+            },
+        )
+
+        tokens = [
+            permanent for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("token")
+        ]
+        assert len(tokens) == 1
+        assert tokens[0]["copy_of"] == "Own Combo Creature"
+        assert tokens[0]["haste"] is True
+        assert tokens[0]["exile_at_end_step"] is True
+
+    def test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.battlefield = [
+                {
+                    "name": "Sol Ring",
+                    "effect": "ramp_permanent",
+                    "type_line": "Artifact",
+                    "mana_produced": 2,
+                }
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Molten Duplication", "cmc": 2, "type_line": "Sorcery"},
+                5,
+                random.Random(683),
+                effect_data_override={
+                    "effect": "copy_creature_token",
+                    "target_controller": "own",
+                    "copy_target_types": ["artifact", "creature"],
+                    "artifact_in_addition": True,
+                    "token_haste": True,
+                    "sacrifice_token_at_end_step": True,
+                    "battle_model_scope": "own_artifact_or_creature_copy_artifact_haste_sacrifice_eot_v1",
+                    "_rule_logical_key": "battle_rule_v1:e154b34c0deaa861094d5870f4c0ad69",
+                    "_rule_oracle_hash": "7c24d56660499c0af4db967925de1573",
+                },
+            )
+            token = next(
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict) and permanent.get("copy_of") == "Sol Ring"
+            )
+            battle.process_end_step_token_sacrifices(active, 5)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert token["artifact_token"] is True
+        assert "artifact" in token["type_line"].lower()
+        assert token not in active.battlefield
+        assert token in active.graveyard
+        created = next(data for event, data in events if event == "copy_creature_token_created")
+        assert created["card"] == "Molten Duplication"
+        assert created["target"] == "Sol Ring"
+        assert created["artifact_in_addition"] is True
+        assert created["sacrifice_at_end_step"] is True
+        assert created["rule_logical_key"] == "battle_rule_v1:e154b34c0deaa861094d5870f4c0ad69"
+        assert created["rule_oracle_hash"] == "7c24d56660499c0af4db967925de1573"
         assert any(event == "end_step_token_sacrificed" for event, _ in events)
 
     def test_valakut_awakening_filters_hand_and_draws_plus_one():
@@ -5471,6 +5811,8 @@ def register_tests(battle, player):
         test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance,
         test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
+        test_reiterate_copies_stack_spell_with_pg068_rule_provenance,
+        test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance,
         test_deflecting_swat_redirects_targeted_removal_for_free_with_commander,
         test_flawless_maneuver_protects_creatures_for_free_with_commander,
         test_landfall_does_not_enqueue_without_real_landfall_source,
@@ -5518,6 +5860,9 @@ def register_tests(battle, player):
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
+        test_heat_shimmer_copies_any_creature_and_exiles_token_at_end_step,
+        test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step,
+        test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token,
         test_valakut_awakening_filters_hand_and_draws_plus_one,
         test_valakut_awakening_preserves_approach_as_win_condition,
         test_valakut_awakening_split_name_emits_pg042_rule_provenance,

@@ -20138,3 +20138,82 @@ Evidence:
   reproduced deck `6` as `high=24`, `pass=76`; deck `606` in
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_033223.json`
   remained `high=37`, `medium=7`, `pass=37`.
+
+## PG068 Deck 6 Copy Spell Stack Package - 2026-06-23 03:45 UTC
+
+What changed:
+
+- Closed `Reiterate` and `Dualcaster Mage` in deck `6`.
+- `Reiterate` is now an oracle-hashed instant stack-copy rule with buyback as
+  `annotation_only`.
+- `Dualcaster Mage` is now an oracle-hashed flash creature ETB stack-copy rule,
+  not a generic permanent copy engine.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG068 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_precheck_20260623_004158.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_apply_20260623_004158.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_copy_spell_stack_20260623_004158.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg068_copy_spell_stack_focused_events_20260623_004158.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg068_20260623_004158.json`
+  reports `high=22`, `pass=78`; `Reiterate` and `Dualcaster Mage` report
+  `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG068 sync.
+
+Current reading:
+
+- Deck `6` improved from `high=24`, `pass=76` after PG067 smoke to
+  `high=22`, `pass=78`.
+- Continue by executor family. The next efficient family is likely
+  copy-creature-token for `Heat Shimmer`, `Molten Duplication`, and
+  `Twinflame`; do not reuse generic `token_maker` unless oracle/runtime
+  evidence supports it.
+
+## PG068 Deck 6 Copy Token Package - 2026-06-23 03:50 UTC
+
+What changed:
+
+- Closed `Heat Shimmer`, `Twinflame`, and `Molten Duplication` in deck `6`.
+- The copy-token executor now supports legal target-controller selection,
+  creature/artifact target types, artifact-in-addition marking,
+  exile-at-end-step cleanup, and sacrifice-at-end-step cleanup.
+- The package also revalidated the already-applied `Reiterate` and
+  `Dualcaster Mage` PG068 copy-spell rows in the same current audit cut.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG068 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_precheck_20260623_034443.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_apply_20260623_034443.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_deck6_copy_token_stack_rules_20260623_034443.json`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_035001.json`
+  reports `high=7`, `medium=11`, `pass=82`; `Reiterate`,
+  `Dualcaster Mage`, `Heat Shimmer`, `Molten Duplication`, and `Twinflame`
+  all report `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG068 sync and runtime changes.
+
+Current reading:
+
+- Deck `6` improved from `high=22`, `pass=78` after the first PG068
+  copy-spell cut to `high=7`, `medium=11`, `pass=82`.
+- Remaining deck `6` high queue: `Chaos Warp`, `Esper Sentinel`,
+  `Faithless Looting`, `Gamble`, `Get Lost`, `Pyroblast`, and
+  `Wheel of Misfortune`.
+- The next PG package must be PG069 because PG068 now has two valid backup
+  tables for related copy-family packages.

@@ -3065,3 +3065,76 @@ Caveat:
   and boast text remain `annotation_only`.
 - `Blasphemous Act` was only rechecked as a pass card in this cycle; its cost
   reduction remains the prior `annotation_only` caveat.
+
+## PG068 Deck 6 Copy Spell Stack Gate - 2026-06-23 03:45 UTC
+
+Artifacts:
+
+- PG068 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_copy_spell_stack_20260623_004158.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg068_copy_spell_stack_focused_events_20260623_004158.jsonl`.
+- Current deck `6` audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg068_20260623_004158.json`.
+
+Gate:
+
+- `Reiterate` casts in response to a target instant/sorcery stack object and
+  emits `spell_copied` with
+  `rule_logical_key=battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405`.
+- `Dualcaster Mage` casts as a flash creature in response, resolves to the
+  battlefield, then its ETB emits `spell_copied` with
+  `trigger=enters_battlefield` and
+  `rule_logical_key=battle_rule_v1:e176019b87d68d22e2388e08a4efbf55`.
+
+Status:
+
+- `Reiterate` and `Dualcaster Mage` are closed for the current deck `6`
+  copy-spell stack gate.
+- Deck `6` now reports `high=22`, `pass=78`.
+
+Caveat:
+
+- The "you may choose new targets" text remains `annotation_only`; the runtime
+  proves stack-copy creation and provenance, not dynamic target reassignment.
+
+## PG068 Deck 6 Copy Token Gate - 2026-06-23 03:50 UTC
+
+Artifacts:
+
+- PG068 copy-token postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_deck6_copy_token_stack_rules_20260623_034443.json`.
+- Current deck `6` audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_035001.json`.
+
+Gate:
+
+- `Heat Shimmer` emits `copy_creature_token_created` for the best legal
+  creature target from any controller and marks the token with
+  `exile_at_end_step=true`.
+- `Twinflame` emits `copy_creature_token_created` for a controller-owned
+  creature and marks the token with `exile_at_end_step=true`.
+- `Molten Duplication` emits `copy_creature_token_created` for a
+  controller-owned artifact or creature, marks `artifact_in_addition=true`, and
+  marks the token with `sacrifice_at_end_step=true`.
+
+Status:
+
+- `Heat Shimmer`, `Twinflame`, and `Molten Duplication` are closed for the
+  current copy-token gate.
+- The previously proven `Reiterate` and `Dualcaster Mage` PG068 copy-spell
+  gates remain closed.
+- Deck `6` now reports `high=7`, `medium=11`, `pass=82`.
+
+Caveat:
+
+- `Twinflame` strive is modeled as
+  `annotation_only_single_best_own_creature`; the runtime proves the single
+  best legal target path, not multi-target strive expansion.
+- `Molten Duplication` proves temporary artifact-copy creation and end-step
+  sacrifice, not downstream activated abilities of copied artifacts beyond the
+  copied permanent metadata.

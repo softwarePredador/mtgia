@@ -6257,3 +6257,167 @@ Rollback:
 - `seething_song_runtime_metadata_pg067_rollback_20260623_032307.sql`
   restores the pre-PG067 row from
   `manaloom_deploy_audit.pg067_seething_song_runtime_metadata_20260623_032307`.
+
+## PG068 Deck 6 Copy Spell Stack Rules - Applied 2026-06-23 03:45 UTC
+
+Status:
+
+- `applied_validated`.
+- Scope: `Reiterate` and `Dualcaster Mage` in `card_battle_rules`.
+- Purpose: replace generic trusted/review-only copy-spell rows with
+  oracle-hashed, scoped stack-copy runtime rows.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_precheck_20260623_004158.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_precheck_20260623_004158.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_apply_20260623_004158.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_apply_20260623_004158.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_rollback_20260623_004158.sql`.
+
+Postcheck evidence:
+
+- `target_rule_rows=6`.
+- `expected_runtime_rows=2`.
+- `old_active_shadow_rows=0`.
+- `backup_rows=4`.
+
+Rules created:
+
+- `Reiterate`:
+  `battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405`,
+  `oracle_hash=996fb5f02f16605ff7f1c899f2c50f60`,
+  `battle_model_scope=copy_stack_instant_or_sorcery_buyback_annotation_v1`.
+- `Dualcaster Mage`:
+  `battle_rule_v1:e176019b87d68d22e2388e08a4efbf55`,
+  `oracle_hash=e26f613394b72e9724d299512983218a`,
+  `battle_model_scope=creature_etb_copy_stack_instant_or_sorcery_v1`.
+
+Rollback:
+
+- `deck6_l5a_copy_spell_stack_pg068_rollback_20260623_004158.sql`
+  deletes the two PG068 rows and restores the four pre-PG068 rows from
+  `manaloom_deploy_audit.pg068_deck6_l5a_copy_spell_stack_20260623_004158`.
+
+## PG068 Deck 6 Copy Token Stack Rules - Applied 2026-06-23 03:44 UTC
+
+Status:
+
+- `applied_validated`.
+- Scope: `Dualcaster Mage`, `Reiterate`, `Heat Shimmer`,
+  `Molten Duplication`, and `Twinflame` in `card_battle_rules`.
+- Purpose: extend the PG068 copy-spell package by replacing generic
+  `token_maker` copy rows with oracle-hashed, scoped temporary-copy runtime
+  rows. The package also normalized the already-applied Reiterate/Dualcaster
+  rows into the same five-card validation set.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_precheck_20260623_034443.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_precheck_20260623_034443.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_apply_20260623_034443.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_apply_20260623_034443.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_rollback_20260623_034443.sql`.
+
+Postcheck evidence:
+
+- `expected_rows=5`.
+- `exact_runtime_rows=5`.
+- `hash_mismatch_rows=0`.
+- `effect_mismatch_rows=0`.
+- `scope_mismatch_rows=0`.
+- `old_active_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- `backup_rows=12`.
+
+Rules created or confirmed:
+
+- `Reiterate`:
+  `battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405`,
+  `oracle_hash=996fb5f02f16605ff7f1c899f2c50f60`,
+  `battle_model_scope=copy_stack_instant_or_sorcery_buyback_annotation_v1`.
+- `Dualcaster Mage`:
+  `battle_rule_v1:e176019b87d68d22e2388e08a4efbf55`,
+  `oracle_hash=e26f613394b72e9724d299512983218a`,
+  `battle_model_scope=creature_etb_copy_stack_instant_or_sorcery_v1`.
+- `Heat Shimmer`:
+  `battle_rule_v1:644897bfa688d33b1a718723360e2480`,
+  `oracle_hash=9c4cfbeb99bfea90a8a5d4c3c7894793`,
+  `battle_model_scope=target_creature_copy_haste_exile_eot_v1`.
+- `Twinflame`:
+  `battle_rule_v1:97ab0167213936bfa544f19731284e56`,
+  `oracle_hash=d9c51f63ac78f713113c52feadfba6db`,
+  `battle_model_scope=own_creature_single_copy_haste_exile_eot_v1`.
+- `Molten Duplication`:
+  `battle_rule_v1:e154b34c0deaa861094d5870f4c0ad69`,
+  `oracle_hash=7c24d56660499c0af4db967925de1573`,
+  `battle_model_scope=own_artifact_or_creature_copy_artifact_haste_sacrifice_eot_v1`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_deck6_copy_token_stack_rules_20260623_034443.json`
+  exported `canonical_snapshot_rows_exported=3201`, loaded
+  `pg_rows_loaded=1826`, and wrote `sqlite_inserted_or_updated=2493`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_035001.json`
+  reports `high=7`, `medium=11`, `pass=82`; all five target cards report
+  `pass/coherent_for_current_gate`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_035001.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_035001.json`
+  reports `high=30`, `medium=18`, `pass=46`.
+- Deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_035001.json`
+  reports `high=21`, `medium=9`, `pass=38`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_035001.json`
+  reports `high=57`, `medium=45`, `pass=103`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including Reiterate, Dualcaster Mage, Heat Shimmer, Twinflame, and
+  Molten Duplication PG068 behavior tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Rollback:
+
+- `deck6_copy_token_stack_rules_pg068_rollback_20260623_034443.sql`
+  restores the 12 backed-up rows from
+  `manaloom_deploy_audit.pg068_deck6_copy_token_stack_rules_20260623_034443`.
+
+Numbering note:
+
+- PG068 now has two validated backup tables:
+  `manaloom_deploy_audit.pg068_deck6_l5a_copy_spell_stack_20260623_004158`
+  and
+  `manaloom_deploy_audit.pg068_deck6_copy_token_stack_rules_20260623_034443`.
+- The next PostgreSQL package must use PG069.

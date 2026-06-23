@@ -2633,3 +2633,86 @@ Evidence:
 - Latest deck `6` audit:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_032427.json`
   reports `high=24`, `pass=76`.
+
+## PG068 Copy Spell Stack Family - 2026-06-23 03:45 UTC
+
+Closed:
+
+- `Reiterate`: instant spell-copy runtime,
+  `battle_model_scope=copy_stack_instant_or_sorcery_buyback_annotation_v1`.
+- `Dualcaster Mage`: flash creature ETB spell-copy runtime,
+  `battle_model_scope=creature_etb_copy_stack_instant_or_sorcery_v1`.
+
+Why this was a family batch:
+
+- Both cards copy target instant/sorcery spells on the stack.
+- `Reiterate` can use the existing instant copy-spell response path.
+- `Dualcaster Mage` needed a small executor split: cast the flash creature onto
+  the stack, resolve it to battlefield, then copy the legal stack object from
+  the ETB. It is no longer represented as a generic permanent copy engine.
+
+Evidence:
+
+- PG068 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.out`
+  reports `expected_runtime_rows=2`, `old_active_shadow_rows=0`, and
+  `backup_rows=4`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg068_copy_spell_stack_focused_events_20260623_004158.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg068_20260623_004158.json`
+  reports `high=22`, `pass=78`, with `Reiterate` and `Dualcaster Mage` as
+  `pass/coherent_for_current_gate`.
+
+Next lane recommendation:
+
+- Continue deck `6` battle-critical cards by executor family. The nearest
+  efficient copy/token-copy lane is `Heat Shimmer`, `Molten Duplication`, and
+  `Twinflame`, but those should use the existing copy-creature-token executor
+  rather than generic `token_maker`.
+
+## PG068 Copy Token Family - 2026-06-23 03:50 UTC
+
+Closed:
+
+- `Heat Shimmer`: copies a target creature controlled by any player, gives the
+  token haste, and exiles it at end step.
+- `Twinflame`: copies a controller-owned creature, gives the token haste, and
+  exiles it at end step. Strive remains an annotation-only single-best-target
+  approximation.
+- `Molten Duplication`: copies a controller-owned artifact or creature as an
+  artifact in addition, gives the token haste, and sacrifices it at end step.
+
+Why this was a family batch:
+
+- All three cards were previously represented as generic `token_maker` rows.
+- Their oracle text is not generic token production; it is temporary copy-token
+  creation with controller/target-type and end-step cleanup differences.
+- The runtime already had a temporary copy-token executor, but it needed
+  target-controller support, artifact target support, artifact-in-addition
+  marking, and exile-at-end-step cleanup.
+
+Evidence:
+
+- PG068 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.out`
+  reports `exact_runtime_rows=5`, `hash_mismatch_rows=0`,
+  `effect_mismatch_rows=0`, `scope_mismatch_rows=0`,
+  `old_active_shadow_rows=0`, and `backup_rows=12`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_035001.json`
+  reports `high=7`, `medium=11`, `pass=82`, with all five PG068 copy-family
+  cards as `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG068 sync and runtime changes.
+
+Next lane recommendation:
+
+- Use PG069 for the next PostgreSQL package.
+- For deck `6`, the remaining high queue is now `Chaos Warp`,
+  `Esper Sentinel`, `Faithless Looting`, `Gamble`, `Get Lost`, `Pyroblast`,
+  and `Wheel of Misfortune`.
+- Prioritize by battle impact and reusable executor family: interaction
+  (`Chaos Warp`, `Get Lost`, `Pyroblast`), then card-flow/search
+  (`Esper Sentinel`, `Faithless Looting`, `Gamble`, `Wheel of Misfortune`).

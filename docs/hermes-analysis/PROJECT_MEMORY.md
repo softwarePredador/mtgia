@@ -270,3 +270,53 @@ Atualizado em 2026-05-26:
   auditores de deck `6`/`606` sem nova escrita PostgreSQL; as contagens
   permaneceram deck `6` `high=24`, `pass=76` e deck `606` `high=37`,
   `medium=7`, `pass=37`.
+
+## ManaLoom deck 6 copy-spell stack gate - 2026-06-23
+
+- PG068 fechou `Reiterate` e `Dualcaster Mage` como familia de copia de
+  magica no stack.
+- `Reiterate` usa o executor existente de instant `copy_spell`; buyback e
+  escolha de novos alvos permanecem `annotation_only`.
+- `Dualcaster Mage` agora tem trilha explicita `etb_copy_spell`: a criatura
+  com flash entra no stack, resolve para battlefield e so entao copia o
+  instant/sorcery alvo ainda no stack.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.out`
+  fechou `expected_runtime_rows=2`, `old_active_shadow_rows=0` e
+  `backup_rows=4`; o focused event
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg068_copy_spell_stack_focused_events_20260623_004158.jsonl`
+  prova `battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405` para `Reiterate`
+  e `battle_rule_v1:e176019b87d68d22e2388e08a4efbf55` para `Dualcaster Mage`.
+- Auditor deck `6` passou para `high=22`, `pass=78`; deck `606` permaneceu
+  `high=37`, `medium=7`, `pass=37`.
+- Nota de metodo: observacoes sobre `Blasphemous Act` sao caveats para checar
+  quando a lane dele voltar, nao regras normativas nem bloqueadores de outros
+  lotes.
+
+## ManaLoom deck 6 copy-token gate - 2026-06-23
+
+- O segundo pacote PG068 fechou `Heat Shimmer`, `Twinflame` e
+  `Molten Duplication` como familia de copia temporaria de criatura/artefato,
+  e revalidou `Reiterate`/`Dualcaster Mage` no mesmo corte.
+- `Heat Shimmer` copia criatura de qualquer controlador e exila o token no fim
+  do turno; `Twinflame` copia criatura propria e exila o token; `Molten
+  Duplication` copia artefato ou criatura propria como artefato em adicao e
+  sacrifica o token no fim do turno.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.out`
+  fechou `exact_runtime_rows=5`, `hash_mismatch_rows=0`,
+  `effect_mismatch_rows=0`, `scope_mismatch_rows=0`,
+  `old_active_shadow_rows=0` e `backup_rows=12`.
+- Auditor deck `6` em
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_035001.json`
+  passou para `high=7`, `medium=11`, `pass=82`; deck `606` passou para
+  `high=7`, `medium=30`, `pass=44`; deck `607` esta em `high=30`,
+  `medium=18`, `pass=46`; deck `608` esta em `high=21`, `medium=9`,
+  `pass=38`; global esta em `high=57`, `medium=45`, `pass=103`.
+- `test_battle_analyst_v10_3.py`, `test_sync_battle_card_rules_pg_selection.py
+  -v`, `test_deck_card_battle_rule_coherence_audit.py -v` e `py_compile`
+  passaram no corte atual.
+- PG068 agora tem duas backup tables validas:
+  `pg068_deck6_l5a_copy_spell_stack_20260623_004158` e
+  `pg068_deck6_copy_token_stack_rules_20260623_034443`. Proximo deploy deve
+  usar PG069.

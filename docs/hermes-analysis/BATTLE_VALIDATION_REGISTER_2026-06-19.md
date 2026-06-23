@@ -15984,3 +15984,151 @@ Auditor result:
   `deck_card_battle_rule_coherence_audit_deck606_20260623_033223.json`
   reproduced the same deck `6` and deck `606` counts without a new PostgreSQL
   apply.
+
+## PG068 Deck 6 Copy Spell Stack Gate - Applied 2026-06-23 03:45 UTC
+
+Status:
+
+- `applied_validated`.
+- Closed `Reiterate` and `Dualcaster Mage` for deck `6` copy-spell stack
+  coherence.
+- No deck swap and no `deck_cards` mutation was executed.
+- The Blasphemous Act cost-reduction note remains only a future caveat to
+  check in its own lane; it did not drive this package.
+
+PostgreSQL validation:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_precheck_20260623_004158.out`
+  reported `target_cards_with_expected_oracle_hash=2`,
+  `existing_rule_rows=4`, `new_rule_key_rows_already_present=0`,
+  `current_active_or_review_rows=4`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_apply_20260623_004158.out`
+  reported `SELECT 4`, `UPDATE 4`, `INSERT 0 2`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l5a_copy_spell_stack_pg068_postcheck_20260623_004158.out`
+  reported `target_rule_rows=6`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, and `backup_rows=4`.
+
+Runtime gate:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg068_copy_spell_stack_focused_events_20260623_004158.jsonl`.
+- `Reiterate` emits `spell_copied` with
+  `rule_logical_key=battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405` and
+  `rule_oracle_hash=996fb5f02f16605ff7f1c899f2c50f60`.
+- `Dualcaster Mage` resolves as a flash creature, enters the battlefield, then
+  emits ETB `spell_copied` with
+  `rule_logical_key=battle_rule_v1:e176019b87d68d22e2388e08a4efbf55` and
+  `rule_oracle_hash=e26f613394b72e9724d299512983218a`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the new Reiterate and Dualcaster PG068 tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Auditor result:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_copy_spell_stack_20260623_004158.json`
+  reloaded `pg_rows_loaded=5296` and `sqlite_inserted_or_updated=5252`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg068_20260623_004158.json`
+  reports `high=22`, `pass=78`; `Reiterate` and `Dualcaster Mage` both
+  report `pass/coherent_for_current_gate`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg068_20260623_004158.json`
+  remains `high=37`, `medium=7`, `pass=37`.
+- Global deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg068_20260623_004158.json`
+  reports `high=106`, `medium=15`, `pass=84`.
+
+## PG068 Deck 6 Copy Token Stack Gate - Applied 2026-06-23 03:50 UTC
+
+Status:
+
+- `applied_validated`.
+- Closed `Heat Shimmer`, `Twinflame`, and `Molten Duplication` for the current
+  copy-token gate, while preserving the Reiterate/Dualcaster copy-spell rows
+  already proven earlier in PG068.
+- No deck swap and no `deck_cards` mutation was executed.
+
+PostgreSQL validation:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_precheck_20260623_034443.out`
+  reported `expected_rows=5`, `target_card_rows=5`,
+  `oracle_hash_match_rows=5`, `deck6_rows=5`,
+  `new_rule_key_rows_already_present=2`, and `backup_table_exists=0`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_apply_20260623_034443.out`
+  reported `SELECT 12`, `INSERT 0 5`, `UPDATE 6`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_copy_token_stack_rules_pg068_postcheck_20260623_034443.out`
+  reported `exact_runtime_rows=5`, `hash_mismatch_rows=0`,
+  `effect_mismatch_rows=0`, `scope_mismatch_rows=0`,
+  `old_active_shadow_rows=0`,
+  `trusted_executable_without_oracle_hash_rows=0`, and `backup_rows=12`.
+
+Runtime gate:
+
+- `Heat Shimmer` copies the best target creature from any controller, gives the
+  token haste, and exiles it at the end step.
+- `Twinflame` copies a controller-owned creature, gives the token haste, and
+  exiles it at the end step; strive multi-target expansion remains
+  `annotation_only_single_best_own_creature`.
+- `Molten Duplication` copies a controller-owned artifact or creature as an
+  artifact in addition, gives the token haste, and sacrifices it at the end
+  step.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the PG068 copy-spell and copy-token tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Auditor result:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg068_deck6_copy_token_stack_rules_20260623_034443.json`
+  loaded `pg_rows_loaded=1826`, wrote `sqlite_inserted_or_updated=2493`, and
+  exported `canonical_snapshot_rows_exported=3201`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_035001.json`
+  reports `high=7`, `medium=11`, `pass=82`; `Reiterate`,
+  `Dualcaster Mage`, `Heat Shimmer`, `Molten Duplication`, and `Twinflame`
+  all report `pass/coherent_for_current_gate`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_035001.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_035001.json`
+  reports `high=30`, `medium=18`, `pass=46`.
+- Deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_035001.json`
+  reports `high=21`, `medium=9`, `pass=38`.
+- Global deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_035001.json`
+  reports `high=57`, `medium=45`, `pass=103`.
+
+Remaining deck `6` high queue:
+
+- `Chaos Warp`, `Esper Sentinel`, `Faithless Looting`, `Gamble`, `Get Lost`,
+  `Pyroblast`, and `Wheel of Misfortune`.
+
+Numbering note:
+
+- PG068 was used for two related copy-family packages with distinct backup
+  tables. The next PostgreSQL package must use PG069.

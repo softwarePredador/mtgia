@@ -6176,6 +6176,24 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 **fields,
             )
             mark_cast_ledger_emitted(eff)
+            if eff.get("etb_copy_spell"):
+                store_cast_context_fields(
+                    eff,
+                    {
+                        "phase": phase,
+                        "priority_window": "copy_spell_response_cast",
+                        "stack_object": c.get("name", "?"),
+                        "source_zone": "hand",
+                        "cast_pipeline": "response_stack_cast_minimal",
+                        "locked_cost": replay_cost_snapshot(locked_cost),
+                        "alternative_cost": alternative_cost,
+                        "alternative_cost_kind": alternative_cost_kind,
+                        "targets": [copy_target],
+                        "role": "response",
+                    },
+                )
+                stack.push(c, player, eff)
+                return True
             copied_item = copy_spell_on_stack(
                 top_item.card,
                 player,
@@ -6429,6 +6447,8 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             turn,
             rng,
             effect_data_override=item.effect_data,
+            stack=stack,
+            phase=phase,
         )
         if game_winner(all_players):
             return True
@@ -13133,44 +13153,96 @@ def resolve_hand_filter(player, card, effect_data, turn, rng):
     finish_resolved_spell(player, card, turn=turn)
 
 
-def resolve_copy_creature_token(player, card, effect_data, turn):
-    """Create a temporary token copy of one of the controller's creatures."""
-    targets = [
-        permanent
-        for permanent in player.battlefield
-        if is_battlefield_creature(permanent)
+def _copy_token_target_types(effect_data):
+    raw_types = (
+        effect_data.get("copy_target_types")
+        or effect_data.get("target_types")
+        or effect_data.get("copy_target_type")
+        or "creature"
+    )
+    if isinstance(raw_types, str):
+        return {
+            part.strip().lower()
+            for part in re.split(r"[,/|]", raw_types)
+            if part.strip()
+        }
+    if isinstance(raw_types, (list, tuple, set)):
+        return {str(part).strip().lower() for part in raw_types if str(part).strip()}
+    return {"creature"}
+
+
+def _matches_copy_token_target(permanent, target_types):
+    if not isinstance(permanent, dict):
+        return False
+    if "creature" in target_types and is_battlefield_creature(permanent):
+        return True
+    if "artifact" in target_types and is_artifact_permanent(permanent):
+        return True
+    return False
+
+
+def copy_token_target_candidates(player, opponents, effect_data):
+    target_types = _copy_token_target_types(effect_data)
+    target_controller = str(effect_data.get("target_controller") or "own").lower()
+    controllers = [(player, permanent) for permanent in player.battlefield]
+    if target_controller in {"any", "any_controller", "any_creature"}:
+        for opponent in opponents or []:
+            controllers.extend((opponent, permanent) for permanent in opponent.battlefield)
+    candidates = [
+        (controller, permanent)
+        for controller, permanent in controllers
+        if _matches_copy_token_target(permanent, target_types)
     ]
-    if not targets:
+    return candidates
+
+
+def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None):
+    """Create a temporary token copy of a legal creature/artifact target."""
+    candidates = copy_token_target_candidates(player, opponents or [], effect_data)
+    if not candidates:
         emit_replay_event(
             "copy_creature_token_failed",
             player=player.name,
             card=card.get("name", "?"),
-            reason="no_creature_target",
+            reason="no_copyable_target",
+            copy_target_types=sorted(_copy_token_target_types(effect_data)),
             turn=turn,
             **replay_rule_fields(effect_data),
         )
         finish_resolved_spell(player, card, turn=turn)
         return None
-    target = choose_best_creature_target(targets)
+    target_controller, target = max(candidates, key=lambda item: target_priority(item[1]))
     token = copy.deepcopy(target)
     token["name"] = f"{target.get('name', 'Creature')} token"
     token["token"] = True
     token["copy_of"] = target.get("name", "?")
     token["is_commander"] = False
+    if effect_data.get("artifact_in_addition"):
+        token["artifact_token"] = True
+        type_line = str(token.get("type_line") or "")
+        if "artifact" not in type_line.lower():
+            token["type_line"] = f"Artifact {type_line}".strip()
+    token_is_creature = is_battlefield_creature(token)
     token["haste"] = bool(effect_data.get("token_haste", True))
-    token["summoning_sick"] = not token["haste"]
+    token["summoning_sick"] = token_is_creature and not token["haste"]
     token["tapped"] = False
     if effect_data.get("sacrifice_token_at_end_step"):
         token["sacrifice_at_end_step"] = True
+    if effect_data.get("exile_token_at_end_step"):
+        token["exile_at_end_step"] = True
     player.battlefield.append(token)
     emit_replay_event(
         "copy_creature_token_created",
         player=player.name,
         card=card.get("name", "?"),
         target=target.get("name", "?"),
+        target_controller=target_controller.name,
         token=token.get("name", "?"),
+        copy_target_types=sorted(_copy_token_target_types(effect_data)),
         haste=token.get("haste"),
+        artifact_in_addition=bool(effect_data.get("artifact_in_addition")),
         sacrifice_at_end_step=bool(token.get("sacrifice_at_end_step")),
+        exile_at_end_step=bool(token.get("exile_at_end_step")),
         turn=turn,
         **replay_rule_fields(effect_data),
     )
@@ -13180,12 +13252,19 @@ def resolve_copy_creature_token(player, card, effect_data, turn):
 
 def process_end_step_token_sacrifices(player, turn):
     sacrificed = []
+    exiled = []
     for permanent in list(player.battlefield):
-        if not isinstance(permanent, dict) or not permanent.get("sacrifice_at_end_step"):
+        if not isinstance(permanent, dict):
+            continue
+        if not (permanent.get("sacrifice_at_end_step") or permanent.get("exile_at_end_step")):
             continue
         player.battlefield.remove(permanent)
-        player.graveyard.append(permanent)
-        sacrificed.append(permanent)
+        if permanent.get("exile_at_end_step"):
+            player.exile.append(permanent)
+            exiled.append(permanent)
+        else:
+            player.graveyard.append(permanent)
+            sacrificed.append(permanent)
     if sacrificed:
         emit_replay_event(
             "end_step_token_sacrificed",
@@ -13193,7 +13272,14 @@ def process_end_step_token_sacrifices(player, turn):
             tokens=[token.get("name", "?") for token in sacrificed],
             turn=turn,
         )
-    return sacrificed
+    if exiled:
+        emit_replay_event(
+            "end_step_token_exiled",
+            player=player.name,
+            tokens=[token.get("name", "?") for token in exiled],
+            turn=turn,
+        )
+    return sacrificed + exiled
 
 
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
@@ -15319,7 +15405,17 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
     return {"applied": applied, "skipped": skipped}
 
 
-def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_override=None):
+def apply_effect_immediate(
+    player,
+    opponents,
+    card,
+    turn,
+    rng,
+    effect_data_override=None,
+    *,
+    stack=None,
+    phase=None,
+):
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect = effect_data.get("effect", "unknown")
@@ -16241,7 +16337,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "copy_creature_token":
-        resolve_copy_creature_token(player, card, effect_data, turn)
+        resolve_copy_creature_token(player, card, effect_data, turn, opponents=opponents)
     elif effect == "overload_recursion":
         spells = [c for c in player.graveyard if isinstance(c, dict) and c.get("cmc", 0) > 0]
         if player.copy_engines > 0: spells = spells * 2
@@ -16305,6 +16401,66 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             player.indestructible = True
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "copy_spell":
+        if effect_data.get("etb_copy_spell"):
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "creature"
+            permanent["haste"] = has_haste(permanent)
+            permanent["summoning_sick"] = not permanent["haste"]
+            permanent["tapped"] = False
+            player.battlefield.append(permanent)
+            emit_replay_event(
+                "creature_to_battlefield",
+                player=player.name,
+                card=card.get("name", "?"),
+                is_mana_source=bool(permanent.get("is_mana_source")),
+                mana_produced=permanent.get("mana_produced"),
+                summoning_sick=permanent.get("summoning_sick"),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+
+            target_item = stack.items[-1] if stack is not None and getattr(stack, "items", None) else None
+            copy_target = copy_spell_stack_target_context(player, target_item, effect_data)
+            if not copy_target:
+                emit_replay_event(
+                    "copy_spell_no_stack_target",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    trigger="enters_battlefield",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(effect_data),
+                )
+                return
+
+            copied_item = copy_spell_on_stack(
+                target_item.card,
+                player,
+                stack,
+                original_effect_data=target_item.effect_data,
+                source_card=card,
+                source_effect_data=effect_data,
+            )
+            emit_replay_event(
+                "spell_copied",
+                player=player.name,
+                card=card.get("name", "?"),
+                copied_spell=target_item.card.get("name", "?"),
+                copied_spell_controller=getattr(target_item.controller, "name", None),
+                copied_stack_object=getattr(copied_item, "card", {}).get("name", "?") if copied_item else None,
+                copy_controller=player.name,
+                copy_is_cast=False,
+                copy_stack_depth=len(stack.items) if stack is not None else 0,
+                may_choose_new_targets=bool(effect_data.get("may_choose_new_targets")),
+                choose_new_targets_status=effect_data.get("choose_new_targets_status"),
+                trigger="enters_battlefield",
+                turn=turn,
+                phase=phase,
+                **copy_target,
+                **replay_rule_fields(effect_data),
+            )
+            return
         if is_instant_or_sorcery_spell(card):
             emit_replay_event(
                 "copy_spell_no_stack_target",
