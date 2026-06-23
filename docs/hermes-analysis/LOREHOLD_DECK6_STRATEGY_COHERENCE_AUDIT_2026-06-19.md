@@ -21292,6 +21292,7 @@ Evidence:
 - Full runtime wrapper:
   `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_100709.out`.
 - Current rerun pack:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_rerun_current_20260623_101800.out`,
   `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_rerun_current_20260623_101800.json`,
   `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`,
   `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`,

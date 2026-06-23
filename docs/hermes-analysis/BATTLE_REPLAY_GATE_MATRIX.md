@@ -4035,6 +4035,8 @@ Artifacts:
 
 - PG093 PostgreSQL postcheck:
   `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`.
+- PG093 current PostgreSQL postcheck rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_rerun_current_20260623_101800.out`.
 - PG093 PG -> SQLite/canonical sync:
   `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`.
 - PG093 current PG -> SQLite/canonical sync:
