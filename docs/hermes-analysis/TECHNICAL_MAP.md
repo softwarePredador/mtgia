@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-21 03:00 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-23 05:30 UTC.
 
 ## Estrutura do repositorio
 
@@ -207,7 +207,9 @@ mtgia/
   regex para custo reduzido; testes cobrem `Impact Tremors` como payoff e
   `The One Ring` como draw/protection sem payoff.
 - **P1/P2 — Pipeline semantico de cartas parcialmente saneado**: revalidado em
-  2026-06-21 no checkout `7a9255cd`. Deck analysis, optimize context,
+  2026-06-23 05:30 UTC no checkout `cfe6b266`. Nao houve delta de produto em
+  `server/lib`, `server/routes` ou `app/lib` desde a rodada semantica anterior.
+  Deck analysis, optimize context,
   additionsData, validator e quality gate carregam/preservam
   `functional_tags` + `semantic_tags_v2` com precedencia
   `functional_tags` persistidos -> `semantic_tags_v2` -> heuristica. A claim de
@@ -219,7 +221,7 @@ mtgia/
   legado ou pool inicial sem tags: `removals_detailed`, need/replacement ranking
   inicial, rebuild guiado, prompts runtime, candidate-quality foundation, copias
   locais de basic lands em analysis/app apply e analises/corpus auxiliares.
-- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-21
+- **P1 — Listas de nomes em runtime de cartas**: a auditoria de 2026-06-23
   manteve como permitidos exemplos de UI/import, comentarios de contrato, aliases
   localizados, docs/corpus/artifacts/test fixtures, sugestoes de busca do life
   counter e o mock dev de `/ai/optimize` marcado como `is_mock=true`. Como
@@ -263,22 +265,23 @@ Fluxo desejado para qualquer decisao de utilidade no core de decks:
    declarado, nunca como lista inline espalhada por classificadores, gates e
    rotas.
 
-Estado atual revalidado em 2026-06-21 05:30 UTC no checkout `7a9255cd`: deck
-analysis, optimize context, additionsData, validator, role delta e quality gate
-threadam `functional_tags` e `semantic_tags_v2` no caminho principal. Weakness
-analysis e recommendations continuam fora de um service unico, mas carregam
-snapshot/tags semanticas e usam `resolveCardFunctionalRoles` para contadores
-internos; seus fallbacks buscam candidatos por tags/semantica/legalidade/
-identidade em vez de listas fixas de staples. Candidate quality tem uso parcial
-de `card_function_tags`, mas parte da propria foundation ainda nasce de
-heuristicas por nome e de listas de escopo high-power/premium. O mock de
-`/ai/optimize` sem `deckOptimizer` ainda retorna staples por nome, mas marcado
-como `is_mock=true`. Os prompts runtime carregados por `otimizacao.dart` ainda
-contem exemplos fixos de cartas; idealmente esses exemplos devem ser gerados por
-policy/dados versionados, nao mantidos como texto solto. O delta app revisado em
-2026-06-21 nao reabriu nome hardcoded nao-basic, mas mostrou fallback local de
-basic lands em apply mutation; basic land e excecao intencional, porem a fonte
-deve convergir para o server/helper compartilhado.
+Estado atual revalidado em 2026-06-23 05:30 UTC no checkout `cfe6b266`: nao
+houve delta de produto em `server/lib`, `server/routes` ou `app/lib` desde a
+rodada semantica anterior. Deck analysis, optimize context, additionsData,
+validator, role delta e quality gate threadam `functional_tags` e
+`semantic_tags_v2` no caminho principal. Weakness analysis e recommendations
+continuam fora de um service unico, mas carregam snapshot/tags semanticas e usam
+`resolveCardFunctionalRoles` para contadores internos; seus fallbacks buscam
+candidatos por tags/semantica/legalidade/identidade em vez de listas fixas de
+staples. Candidate quality tem uso parcial de `card_function_tags`, mas parte da
+propria foundation ainda nasce de heuristicas por nome e de listas de escopo
+high-power/premium. O mock de `/ai/optimize` sem `deckOptimizer` ainda retorna
+staples por nome, mas marcado como `is_mock=true`. Os prompts runtime carregados
+por `otimizacao.dart` ainda contem exemplos fixos de cartas; idealmente esses
+exemplos devem ser gerados por policy/dados versionados, nao mantidos como texto
+solto. O fallback local de basic lands em apply mutation permanece uma excecao
+intencional sujeita a drift; basic land deve convergir para o server/helper
+compartilhado.
 - **P2 — Fallback de semantic v2 baixa confianca**: revalidado e coberto em
   `origin/master@c3531df7`. Tags semantic v2 abaixo de 0.65 sao ignoradas e a
   classificacao cai para heuristica por `oracle_text`/`type_line`.

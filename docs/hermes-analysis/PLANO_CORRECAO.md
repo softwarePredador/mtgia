@@ -4,10 +4,21 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-23 03:00 UTC
+> Data: 2026-06-23 05:30 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao local de semantica de cartas de 2026-06-23 05:30 UTC no checkout
+`cfe6b266` confirmou que, desde a ultima rodada semantica (`7a9255cd`), nao
+houve delta de produto em `server/lib`, `server/routes` nem `app/lib`. As claims
+stale continuam fechadas: `/ai/weakness-analysis` e
+`/decks/:id/recommendations` seguem fora do problema antigo de staples fixas, e
+quality gate/validator continuam preservando `functional_tags`,
+`semantic_tags_v2` e roles multiplas no caminho principal. Permanecem abertos
+os mesmos riscos estreitos: fallbacks/prompts por nome, payload/ranking inicial
+do optimize, rebuild guiado, candidate-quality foundation, copias locais de
+basic lands e analises/corpus auxiliares.
 
 A revalidacao de classes sem uso de 2026-06-23 03:00 UTC no checkout
 `d89c9f8c` confirmou que desde a ultima rodada de classes (`aeb667b2`) e desde
@@ -203,7 +214,9 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    de rodada própria os endpoints experimentais fora do caminho principal
    (`/ai/archetypes`, activation telemetry e rotas legacy/experimentais).
 6. **P1 — Politicas por nome / semantica de cartas**: revalidado novamente em
-   2026-06-21 no checkout `7a9255cd`. `/ai/weakness-analysis` e
+   2026-06-23 05:30 UTC no checkout `cfe6b266`. Nao houve delta de produto em
+   `server/lib`, `server/routes` ou `app/lib` desde a rodada semantica anterior.
+   `/ai/weakness-analysis` e
    `/decks/:id/recommendations` continuam fora da claim antiga de listas fixas:
    ambas carregam `card_intelligence_snapshot` ou fallbacks agregados de
    `card_function_tags`/`card_semantic_tags_v2` e usam legalidade/identidade de
@@ -249,7 +262,7 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    `_CommunityDeckCard`, `_FollowingDeckCard` e `_EmptyDeckCard`; a varredura
    textual ampla nao foi usada para acusar DTOs/helpers locais sem evidencia
    adicional.
-9. **P1 — Drift entre deck analysis e optimize**: **PARCIAL em 2026-06-21**.
+9. **P1 — Drift entre deck analysis e optimize**: **PARCIAL em 2026-06-23**.
    O caminho principal carrega `functional_tags`/`semantic_tags_v2`; deck
    analysis, validator e quality gate preservam multi-tags com precedencia
    `functional_tags -> semantic_tags_v2 -> heuristica`. O risco restante nao esta
