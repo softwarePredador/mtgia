@@ -297,11 +297,14 @@ compartilhado.
   `optimize_diagnostics.bracket_policy` com contagem/lista sanitizada e mantém
   `warnings.blocked_by_bracket` por compatibilidade.
 - **P1/P2 — Funcoes publicas sem chamador runtime confirmado**: revalidado em
-  2026-06-21 07:14 UTC no checkout local `6410d456`. Desde a rodada focada
-  anterior (`6244d33b`), somente docs Hermes mudaram no recorte `app/lib`,
+  2026-06-23 07:00 UTC no checkout local `5c678845`. Desde a rodada focada
+  anterior (`6410d456`), somente docs Hermes mudaram no recorte `app/lib`,
   `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
   `server/bin`, `server/test` e `server/doc/API_CONTRACTS_AND_DATA_MAP.md`;
-  nao surgiu novo achado confiavel. A claim ampla de `sync_cards_utils.dart`
+  nao surgiu novo achado confiavel. O auditor base seguiu compativel
+  (`221` arquivos backend, `205` classes, `116` tabelas textualmente
+  referenciadas, `0` imports quebrados), mas continua textual e sem grafo de
+  chamadas. A claim ampla de `sync_cards_utils.dart`
   test-only segue stale: o CLI operacional importa o utilitario e chama
   `parseSinceDays`, `getNewSetCodesSinceFromData` e `extractSetCardSyncRow`;
   restam P3 test-only `extractCardRow`, `extractSetCardRow`,

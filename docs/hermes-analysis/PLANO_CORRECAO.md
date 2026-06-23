@@ -4,10 +4,24 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-23 05:30 UTC
+> Data: 2026-06-23 07:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao de funcoes sem chamador de 2026-06-23 07:00 UTC no checkout
+`5c678845` confirmou que desde a ultima rodada focada (`6410d456`) somente docs
+Hermes mudaram no recorte `app/lib`, `app/test`, `app/integration_test`,
+`server/lib`, `server/routes`, `server/bin`, `server/test` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. O auditor base continuou
+compativel (`221` arquivos backend, `205` classes, `116` tabelas textualmente
+referenciadas, `0` imports quebrados), mas segue textual e sem grafo de
+chamadas; a mutacao mecanica de inventario foi descartada. Nao houve novo
+achado confiavel. Permanecem abertos os mesmos grupos: `verifySwapIntegrity`
+sem chamador backend, extracao parcial de `optimize_response_support.dart`,
+wrappers/conveniencias app/backend sem chamada, helpers P2/P3 de IA/scripts
+operacionais sem consumidor confirmado e os quatro helpers legados test-only de
+`sync_cards_utils.dart`.
 
 A revalidacao local de semantica de cartas de 2026-06-23 05:30 UTC no checkout
 `cfe6b266` confirmou que, desde a ultima rodada semantica (`7a9255cd`), nao
@@ -278,9 +292,12 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
     por bracket podem expor `optimize_diagnostics.bracket_policy`, mantendo
     `warnings.blocked_by_bracket` para compatibilidade.
 12. **P1/P2 — Funcoes publicas sem chamador runtime**: revalidado em
-    2026-06-21 07:14 UTC no checkout `6410d456`. Desde a rodada focada anterior
-    (`6244d33b`), somente docs Hermes mudaram no recorte de produto/testes/API,
-    entao nao surgiu novo achado confiavel. `sync_cards_utils.dart` segue fora
+    2026-06-23 07:00 UTC no checkout `5c678845`. Desde a rodada focada anterior
+    (`6410d456`), somente docs Hermes mudaram no recorte de produto/testes/API,
+    entao nao surgiu novo achado confiavel. O auditor base seguiu compativel
+    (`221` arquivos backend, `205` classes, `116` tabelas textualmente
+    referenciadas, `0` imports quebrados), mas continua textual e sem grafo de
+    chamadas. `sync_cards_utils.dart` segue fora
     do achado P1 amplo porque `server/bin/sync_cards.dart` importa o utilitario
     e chama `parseSinceDays`, `getNewSetCodesSinceFromData` e
     `extractSetCardSyncRow`; restam apenas helpers legados/test-only no mesmo
@@ -758,8 +775,8 @@ focado nao encontrou SCC com esses dois arquivos.
 
 ### P1/P2 — Remover ou reconectar funcoes publicas sem chamador runtime
 
-**Status 2026-06-21 07:14 UTC:** **PARCIAL.** Desde a rodada focada anterior
-(`6244d33b`), somente docs Hermes mudaram no recorte de produto/testes/API; nao
+**Status 2026-06-23 07:00 UTC:** **PARCIAL.** Desde a rodada focada anterior
+(`6410d456`), somente docs Hermes mudaram no recorte de produto/testes/API; nao
 houve novo achado confiavel de funcao sem chamador. O item de maior risco operacional
 desta seção segue resolvido: `sync_cards_utils.dart` é importado por
 `server/bin/sync_cards.dart`, e o CLI usa os helpers compartilhados para
@@ -778,14 +795,14 @@ continuam válidas apenas para os demais helpers abaixo.
     `extractSetCardRow` foi preservado como projeção compatível de 12 colunas,
     enquanto `extractSetCardSyncRow` expõe a linha operacional de 15 colunas
     com `power`, `toughness` e `keywords`.
-  - Revalidado 2026-06-21: `server/lib/ai/optimize_swap_integrity.dart:112`
+  - Revalidado 2026-06-23: `server/lib/ai/optimize_swap_integrity.dart:112`
     define `verifySwapIntegrity`, mas `rg` em `server` e `app` encontra apenas
     a definicao. O app agora tem verificacao equivalente:
     `deck_optimize_flow_support.dart:486` define `validateOptimizeSwapIntegrity`,
     `:645` a chama antes do preview e `deck_provider.dart:918`-`:931` rejeita
     `expectedDeckSignature` stale antes do apply por IDs.
-  - `server/lib/request_trace.dart:48` e `:51` definem
-    `getRequestTrace`/`tryGetRequestId`; os consumidores reais usam
+  - `server/lib/request_trace.dart:48` define `getRequestTrace`; `tryGetRequestId`
+    nao aparece no checkout atual. Os consumidores reais usam
     `context.read<RequestTrace>()` diretamente, por exemplo
     `server/lib/auth_middleware.dart:57`, `server/lib/observability.dart:225`,
     `server/routes/trades/index.dart:332` e
