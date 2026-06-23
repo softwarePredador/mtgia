@@ -3631,3 +3631,37 @@ Status:
 - There are no high/critical action, forensic, or replay-decision blockers.
 - Strategy learning eligibility is seed-scoped: 14 seeds are high-confidence
   eligible, while seeds `64270204` and `64270207` remain low-confidence.
+
+## PG079 Deck 606 Focused Card-Rule Gate - 2026-06-23 08:01 UTC
+
+Artifacts:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_deck606_high_battle_critical_sync_report_20260623_075404.json`.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`.
+- Post-test deck `606` card-gate audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg079_post_tests_20260623_080107.json`.
+
+Gate:
+
+- The focused event artifact has 19 rows and proves runtime propagation of all
+  seven PG079 `rule_logical_key` values.
+- Covered cards: `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- This is card-rule execution/provenance evidence only. It is not a 16-seed
+  battle rebaseline and is not strategy-learning evidence.
+- The runtime wrapper passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Status:
+
+- Deck `606` high battle-critical queue is closed for this PG079 batch:
+  post-test audit reports `high=0`, `medium=7`, `pass=74`.
+- Deck `6` remains closed at `pass=100`.
+- Global queue after PG079 is `high=43`, `medium=11`, `pass=151`.
+- Next card-rule gate should start with deck `606` `medium/battle_support`:
+  `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.

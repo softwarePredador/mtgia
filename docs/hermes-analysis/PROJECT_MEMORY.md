@@ -759,3 +759,85 @@ Atualizado em 2026-05-26:
   `strategy_review_required_findings=0`.
 - Next work: keep PG079 for the next real PostgreSQL card-rule package and
   continue deck `606` high battle-critical queue.
+
+## ManaLoom PG079 deck 606 high battle-critical card gate - 2026-06-23 08:01 UTC
+
+- PG079 was applied and validated for the seven deck `606` high
+  battle-critical rules: `Flare of Duplication`, `Powerbalance`,
+  `Reforge the Soul`, `Rise of the Eldrazi`, `Rite of the Dragoncaller`,
+  `Storm Herd`, and `Witch Enchanter // Witch-Blessed Meadow`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_precheck_20260623_074912.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`,
+  and rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`.
+- Postcheck facts: seven target rows matched expected `oracle_hash` and
+  `battle_model_scope`; zero target rows were missing hashes; seven generated
+  shadow rows were disabled; backup table
+  `manaloom_deploy_audit.pg079_deck606_high_battle_critical_20260623_074912`
+  has 14 rows.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_deck606_high_battle_critical_sync_report_20260623_075404.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  contains 19 rows proving all seven PG079 logical rule keys.
+- Tests passed:
+  `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py`.
+- Post-test audits: deck `6` `pass=100`; deck `606` `high=0`, `medium=7`,
+  `pass=74`; global `high=43`, `medium=11`, `pass=151`.
+- Method reminder: user observations, including `Blasphemous Act`, are
+  validation hints only. Do not promote or reopen a card without
+  Oracle/PostgreSQL/runtime evidence.
+- Next package number is PG080. Next queue: deck `606`
+  `medium/battle_support` cards `Monologue Tax`, `Mox Opal`, and
+  `Simian Spirit Guide`.
+
+## ManaLoom PG079 deck 606 high battle-critical closeout - 2026-06-23 08:00 UTC
+
+- PG079 closed the seven deck `606` high battle-critical rows:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- The semantic apply package was already present in PostgreSQL before the
+  central-auditor hash restore step ran. Treat
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`
+  as the primary semantic apply evidence for those seven cards.
+- Central-auditor follow-up PG079 restored remaining scoped trusted
+  `oracle_hash` provenance without overwriting the richer target metadata:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_apply_20260623_044955.out`
+  committed `111` backed-up rows and postcheck reported
+  `target_hash_match_rows=7`, `target_required_semantic_fields_rows=7`,
+  `scoped_trusted_auto_missing_hash_rows=0`, and `backup_rows=111`.
+- `Seething Song` required a PG079 addendum after the sync exposed a PG058
+  runtime metadata drift. Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_seething_song_metadata_restore_postcheck_20260623_045814.out`.
+- PG -> SQLite/canonical snapshot syncs:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_runtime_semantics_sync_report_20260623_044955.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg079_runtime_semantics_sync_report_after_seething_20260623_045814.json`,
+  both with `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_focused_events_20260623_045814.jsonl`.
+- Tests passed: `py_compile`,
+  `test_sync_battle_card_rules_pg_selection.py -v`,
+  `test_deck_card_battle_rule_coherence_audit.py -v`, and the full
+  `test_battle_analyst_v10_3.py`, including
+  `test_pg079_deck606_high_rules_resolve_from_sqlite_cache` and all focused
+  `test_pg079_*` regressions.
+- Accepted post-PG079 card-gate cuts: deck `6` `pass=100`; deck `606`
+  `high=0`, `medium=7`, `pass=74`; deck `607` `high=26`, `medium=5`,
+  `pass=63`; deck `608` `high=20`, `medium=3`, `pass=45`; global
+  `high=43`, `medium=11`, `pass=151`.
+- Next PostgreSQL package number: PG080. Next card-rule queue should start
+  with shared deck `607`/`608` high cards (`Artist's Talent`,
+  `Pinnacle Monk // Mystic Peak`, and `Redirect Lightning`) before single-deck
+  lower-impact rows.

@@ -3259,3 +3259,141 @@ Next workflow:
 - Keep PG079 for the next real PostgreSQL card-rule package.
 - Continue deck `606` high battle-critical queue before lower-priority global
   medium cards.
+
+## PG079 Deck 606 High Battle-Critical Rules - 2026-06-23 08:01 UTC
+
+Closed cards:
+
+- `Flare of Duplication`
+- `Powerbalance`
+- `Reforge the Soul`
+- `Rise of the Eldrazi`
+- `Rite of the Dragoncaller`
+- `Storm Herd`
+- `Witch Enchanter // Witch-Blessed Meadow`
+
+What changed:
+
+- PostgreSQL `card_battle_rules` received oracle-hash and battle-model-scope
+  provenance for the seven trusted executable rows.
+- Seven superseded generated/review-only shadow rows were disabled.
+- Runtime support was added or tightened for the PG079 model scopes:
+  life-total token counts, token attributes, spell-cast Dragon payoff,
+  Powerbalance same-mana-value topdeck free-cast trigger, and focused
+  provenance checks for the copied spell, wheel, composite, token, and ETB
+  removal paths.
+- No deck swap, no `deck_cards` mutation, and no learned-deck mutation.
+
+PostgreSQL package:
+
+- Precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_precheck_20260623_074912.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`.
+- Postcheck facts: `target_rule_rows=7`, `target_hash_match_rows=7`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=7`,
+  `trusted_auto_rows=7`, `rule_version_at_least_2_rows=7`,
+  `non_disabled_shadow_rows=0`, `disabled_shadow_rows=7`, and
+  `backup_rows=14`.
+
+Sync and focused evidence:
+
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_deck606_high_battle_critical_sync_report_20260623_075404.json`
+  with `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  has 19 rows and proves all seven PG079 `rule_logical_key` values.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+
+All passed after the PG079 focused tests were added.
+
+Auditor result after tests:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg079_post_tests_20260623_080107.json`
+  reports `pass=100`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg079_post_tests_20260623_080107.json`
+  reports `high=0`, `medium=7`, `pass=74`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg079_post_tests_20260623_080054.json`
+  reports `high=43`, `medium=11`, `pass=151`.
+
+Method note:
+
+- User observations are hypotheses for validation only. The `Blasphemous Act`
+  cost-reduction note remains a caveat, not an instruction to reopen the card
+  or to promote a dynamic cost executor without Oracle/PostgreSQL/runtime
+  evidence.
+
+Next workflow:
+
+- Use PG080 for the next PostgreSQL package.
+- Continue deck `606` medium battle-support cards before passive/support rows:
+  `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.
+
+## PG079 Deck 606 High Battle-Critical Runtime Semantics - 2026-06-23 08:00 UTC
+
+Closed:
+
+- Deck `606` no longer has high card-rule coherence findings after PG079.
+- The seven high battle-critical cards now have scoped trusted executable
+  rules with matching Oracle hashes:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- No deck swap and no `deck_cards` mutation was performed.
+
+Evidence:
+
+- Primary semantic PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_precheck_20260623_074912.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`.
+- Central-auditor hash/sync package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_precheck_20260623_044955.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_apply_20260623_044955.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_postcheck_20260623_044955.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_rollback_20260623_044955.sql`.
+- `Seething Song` PG058 metadata addendum:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_seething_song_metadata_restore_postcheck_20260623_045814.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_runtime_semantics_sync_report_after_seething_20260623_045814.json`.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_focused_events_20260623_045814.jsonl`.
+
+Validation:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 -m unittest docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 -m unittest docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+
+Accepted audits:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `high=0`, `medium=7`, `pass=74`.
+- Deck `607`: `high=26`, `medium=5`, `pass=63`.
+- Deck `608`: `high=20`, `medium=3`, `pass=45`.
+- Global: `high=43`, `medium=11`, `pass=151`.
+
+Next workflow:
+
+- PG080 is next.
+- Continue high-card validation on deck `607`/`608`, prioritizing cards shared
+  across both variants before single-deck-only cards.

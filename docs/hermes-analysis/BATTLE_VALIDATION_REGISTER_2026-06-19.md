@@ -17017,3 +17017,76 @@ Status:
 - Use seed-level learning confidence when consuming the run: 14 eligible
   high-confidence seeds, 2 low-confidence seeds retained as evidence but not
   high-confidence learning samples.
+
+## PG079 Deck 606 High Battle-Critical Card Gate - 2026-06-23 08:01 UTC
+
+Status: `card_gate_closed_for_pg079_batch`.
+
+Scope:
+
+- Closed the deck `606` high battle-critical card-rule queue for:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- PostgreSQL remained the source of truth. SQLite/Hermes and the canonical
+  snapshot were refreshed only after the validated PostgreSQL package.
+- No deck swap, no `deck_cards` mutation, and no strategy-learning claim.
+
+PostgreSQL evidence:
+
+- SQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_precheck_20260623_074912.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`
+  reports seven target rows with expected hashes/scopes, zero missing hashes,
+  zero non-disabled shadow rows, seven disabled shadow rows, and 14 backed-up
+  rows.
+
+Runtime/cache evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg079_deck606_high_battle_critical_sync_report_20260623_075404.json`
+  reports `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  contains focused events for all seven PG079 logical rule keys, including
+  stack-copy guard/provenance, Powerbalance same-mana-value free cast,
+  Reforge wheel draw-seven, Rise composite resolution, Storm Herd
+  life-total Pegasus tokens, Rite Dragon spell-cast payoff, and Witch
+  Enchanter ETB artifact/enchantment removal.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the PG079 focused tests.
+
+Auditor status after tests:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg079_post_tests_20260623_080107.json`
+  reports `pass=100`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg079_post_tests_20260623_080107.json`
+  reports `high=0`, `medium=7`, `pass=74`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg079_post_tests_20260623_080054.json`
+  reports `high=43`, `medium=11`, `pass=151`.
+
+Method note:
+
+- User observations, including the `Blasphemous Act` cost-reduction caveat,
+  remain validation hints only. Do not treat them as authoritative rules and
+  do not reopen a closed card unless Oracle/PostgreSQL/runtime evidence shows
+  a real mismatch.
+
+Next queue:
+
+- Continue deck `606` `medium/battle_support` before passive/support rows:
+  `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.

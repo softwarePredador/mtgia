@@ -6894,7 +6894,7 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         return 45 if creatures else 10
 
     if effect_name == "token_maker":
-        # How many tokens? If Storm Herd (life_total/2), it's a lot
+        # How many tokens? If Storm Herd (life_total), it's a lot.
         if controller.life > 30:
             return 60  # Storm Herd = 15+ tokens
         return 35
@@ -12919,6 +12919,37 @@ def create_creature_token(
     return token
 
 
+def token_count_for_effect(player, effect_data, default=5):
+    token_count = (effect_data or {}).get("token_count", default)
+    if isinstance(token_count, str):
+        if token_count == "life_total":
+            token_count = player.life
+        elif token_count == "lands":
+            token_count = controlled_land_count(player)
+    return int(token_count)
+
+
+def create_creature_tokens_from_effect(player, effect_data, *, count=None):
+    token_count = token_count_for_effect(player, effect_data) if count is None else int(count)
+    token_name = (effect_data or {}).get("token_name") or "Token"
+    token_power = (effect_data or {}).get("token_power", 2)
+    token_toughness = (effect_data or {}).get("token_toughness", token_power)
+    token_haste = bool((effect_data or {}).get("token_haste") or (effect_data or {}).get("haste"))
+    token_flying = bool((effect_data or {}).get("token_flying") or (effect_data or {}).get("flying"))
+    artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
+    for _ in range(min(max(0, token_count), 20)):
+        create_creature_token(
+            player,
+            name=token_name,
+            power=token_power,
+            toughness=token_toughness,
+            haste=token_haste,
+            flying=token_flying,
+            artifact=artifact_tokens,
+        )
+    return token_count
+
+
 def permanent_is_opponent_enter_tapped_subject(permanent):
     if not isinstance(permanent, dict):
         return False
@@ -13725,6 +13756,57 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
     return moved
 
 
+def resolve_etb_removal(player, opponents, card, effect_data, turn, rng):
+    target_type = (
+        effect_data.get("etb_remove_target")
+        or effect_data.get("etb_removal_target")
+        or effect_data.get("target")
+        or "artifact_or_enchantment"
+    )
+    removal_effect = {
+        **effect_data,
+        "effect": effect_data.get("etb_remove_effect") or "remove_permanent",
+        "target": target_type,
+    }
+    removal_effect, declared_targets = prepare_declared_removal_targets(
+        player,
+        opponents,
+        card,
+        removal_effect,
+    )
+    if not declared_targets:
+        emit_replay_event(
+            "etb_removal_skipped",
+            player=player.name,
+            card=card.get("name", "?"),
+            trigger="enters_battlefield",
+            target_type=target_type,
+            reason="no_legal_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return False
+    if resolve_declared_single_removal(
+        player,
+        opponents,
+        card,
+        removal_effect,
+        turn,
+        rng,
+    ):
+        emit_replay_event(
+            "etb_removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            trigger="enters_battlefield",
+            turn=turn,
+            **replay_fields_for_declared_targets(removal_effect),
+            **replay_rule_fields(effect_data),
+        )
+        return True
+    return False
+
+
 def resolve_hand_filter(player, card, effect_data, turn, rng):
     """Resolve Valakut Awakening-style bottom-then-draw filtering."""
     max_bottom = int(effect_data.get("max_bottom") or 3)
@@ -14433,6 +14515,45 @@ def trigger_spell_cast_engines(
             continue
         if permanent.get("trigger") != "instant_sorcery_cast":
             continue
+        if permanent.get("trigger_effect") == "token_maker":
+            token_count = max(1, int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1))
+
+            def resolve_spell_cast_token_maker_trigger(
+                permanent=permanent,
+                token_count=token_count,
+            ):
+                created = create_creature_tokens_from_effect(
+                    player,
+                    permanent,
+                    count=token_count,
+                )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    effect="token_maker",
+                    tokens_created=created,
+                    token_name=permanent.get("token_name") or permanent.get("spell_cast_token_name") or "Token",
+                    token_power=permanent.get("token_power"),
+                    token_toughness=permanent.get("token_toughness") or permanent.get("token_power"),
+                    token_flying=bool(permanent.get("token_flying") or permanent.get("spell_cast_token_flying")),
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_spell_cast_token_maker_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         if permanent.get("trigger_effect") != "damage_each_opponent":
             continue
         amount = int(permanent.get("damage") or 2)
@@ -14502,6 +14623,69 @@ def trigger_opponent_spell_draw_engines(
             if trigger not in ("opponent_spell", "opponent_noncreature_spell"):
                 continue
             if trigger == "opponent_noncreature_spell" and not is_noncreature_spell:
+                continue
+            if permanent.get("powerbalance_topdeck_free_cast_same_mana_value"):
+                def resolve_powerbalance_trigger(
+                    opponent=opponent,
+                    permanent=permanent,
+                    spell=spell,
+                ):
+                    revealed = opponent.library[0] if opponent.library else None
+                    spell_mana_value = int(float(spell.get("cmc") or 0))
+                    revealed_mana_value = (
+                        int(float(revealed.get("cmc") or 0))
+                        if isinstance(revealed, dict)
+                        else None
+                    )
+                    can_cast_revealed = (
+                        isinstance(revealed, dict)
+                        and not is_effective_land(revealed)
+                        and revealed_mana_value == spell_mana_value
+                    )
+                    if can_cast_revealed:
+                        cast_card = opponent.library.pop(0)
+                        opponent.graveyard.append(cast_card)
+                        emit_replay_event(
+                            "powerbalance_trigger_resolved",
+                            player=opponent.name,
+                            card=permanent.get("name", "?"),
+                            trigger="opponent_spell",
+                            trigger_spell=spell.get("name", "?"),
+                            revealed_card=cast_card.get("name", "?"),
+                            revealed_mana_value=revealed_mana_value,
+                            trigger_spell_mana_value=spell_mana_value,
+                            result="cast_without_paying_mana",
+                            cast_without_paying_mana_cost=True,
+                            turn=turn,
+                            phase=phase,
+                            **replay_rule_fields(permanent),
+                        )
+                    else:
+                        emit_replay_event(
+                            "powerbalance_trigger_resolved",
+                            player=opponent.name,
+                            card=permanent.get("name", "?"),
+                            trigger="opponent_spell",
+                            trigger_spell=spell.get("name", "?"),
+                            revealed_card=revealed.get("name", "?") if isinstance(revealed, dict) else None,
+                            revealed_mana_value=revealed_mana_value,
+                            trigger_spell_mana_value=spell_mana_value,
+                            result="no_cast",
+                            cast_without_paying_mana_cost=False,
+                            turn=turn,
+                            phase=phase,
+                            **replay_rule_fields(permanent),
+                        )
+
+                resolve_or_enqueue_trigger(
+                    opponent,
+                    permanent,
+                    "opponent_spell",
+                    resolve_powerbalance_trigger,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players or [caster, opponent],
+                )
                 continue
             if (
                 permanent.get("opponent_first_noncreature_spell_each_turn")
@@ -15826,6 +16010,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if eff.get("etb_draw_count"):
                     player.draw(int(eff.get("etb_draw_count") or 1), rng)
                 resolve_etb_library_creature_tutor(player, c_copy, eff, turn)
+                if eff.get("etb_remove_target") or eff.get("etb_removal_target"):
+                    resolve_etb_removal(player, opponents, c_copy, eff, turn, rng)
                 if eff.get("etb_token_count"):
                     for _ in range(min(int(eff.get("etb_token_count") or 1), 20)):
                         create_creature_token(
@@ -16023,17 +16209,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 "cards_drawn": draw_count,
             })
         elif component_effect == "token_maker":
-            token_count = int(component.get("token_count") or 1)
-            token_haste = bool(component.get("token_haste") or component.get("haste"))
-            artifact_tokens = bool(component.get("artifact_tokens"))
-            for _ in range(min(max(0, token_count), 20)):
-                create_creature_token(
-                    player,
-                    power=component.get("token_power", 2),
-                    toughness=component.get("token_toughness", component.get("token_power", 2)),
-                    haste=token_haste,
-                    artifact=artifact_tokens,
-                )
+            token_count = create_creature_tokens_from_effect(player, component)
             outcome = "tokens_created"
             applied.append({"effect": component_effect, "tokens_created": token_count})
         elif component_effect == "extra_turn":
@@ -16214,6 +16390,8 @@ def apply_effect_immediate(
         resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
         if effect_data.get("etb_tutor_target"):
             resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
+        if effect_data.get("etb_remove_target") or effect_data.get("etb_removal_target"):
+            resolve_etb_removal(player, opponents, permanent, effect_data, turn, rng)
         emit_replay_event(
             "creature_to_battlefield",
             player=player.name,
@@ -17064,22 +17242,33 @@ def apply_effect_immediate(
     elif effect == "redistribute_life_totals":
         apply_redistribute_life_totals(player, opponents, card, effect_data, turn)
     elif effect == "token_maker":
-        token_count = effect_data.get("token_count", 5)
-        if isinstance(token_count, str):
-            if token_count == "life_total": token_count = player.life // 2
-            elif token_count == "lands": token_count = controlled_land_count(player)
-        token_count = int(token_count)
-        token_haste = bool(effect_data.get("token_haste") or effect_data.get("haste"))
-        artifact_tokens = bool(effect_data.get("artifact_tokens"))
-        for _ in range(min(token_count, 20)):
-            create_creature_token(
-                player,
-                power=effect_data.get("token_power", 2),
-                toughness=effect_data.get("token_toughness", effect_data.get("token_power", 2)),
-                haste=token_haste,
-                artifact=artifact_tokens,
+        if (
+            effect_data.get("trigger") == "instant_sorcery_cast"
+            and not is_instant(card)
+            and not is_sorcery(card)
+        ):
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "token_maker"
+            player.battlefield.append(permanent)
+        else:
+            requested_tokens = create_creature_tokens_from_effect(player, effect_data)
+            emit_replay_event(
+                "tokens_created",
+                player=player.name,
+                card=card.get("name", "?"),
+                effect="token_maker",
+                tokens_requested=requested_tokens,
+                tokens_created=min(max(0, requested_tokens), 20),
+                token_name=effect_data.get("token_name") or "Token",
+                token_power=effect_data.get("token_power", 2),
+                token_toughness=effect_data.get("token_toughness", effect_data.get("token_power", 2)),
+                token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
+                token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),
+                token_cap_applied=requested_tokens > 20,
+                turn=turn,
+                **replay_rule_fields(effect_data),
             )
-        finish_resolved_spell(player, card, turn=turn)
+            finish_resolved_spell(player, card, turn=turn)
     elif effect == "copy_creature_token":
         resolve_copy_creature_token(player, card, effect_data, turn, opponents=opponents)
     elif effect == "overload_recursion":

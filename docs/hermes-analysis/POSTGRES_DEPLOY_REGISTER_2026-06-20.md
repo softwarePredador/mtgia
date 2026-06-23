@@ -7495,3 +7495,143 @@ Sync/audit evidence:
 Next deploy number:
 
 - PG079 is next for any future PostgreSQL package.
+
+## PG079 Deck 606 High Battle-Critical Runtime Semantics - Applied 2026-06-23 07:49-08:00 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Apply scoped Oracle-specific runtime metadata for the seven remaining deck
+  `606` high battle-critical rows.
+- Restore missing `oracle_hash` provenance on scoped trusted executable rows.
+- Restore `Seething Song` PG058 simple-red-ritual metadata after the
+  post-sync runtime test exposed drift.
+- No `deck_cards` mutation, no deck swap, and no learned-deck composition
+  change.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_precheck_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_apply_20260623_044955.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg079_seething_song_metadata_restore_apply_20260623_045814.sql`
+
+Backup tables:
+
+- `manaloom_deploy_audit.pg079_deck606_high_battle_critical_20260623_074912`
+  with 14 backed-up rows.
+- `manaloom_deploy_audit.pg079_deck606_runtime_semantics_20260623_044955`
+  with 111 backed-up rows.
+- `manaloom_deploy_audit.pg079_seething_song_metadata_restore_20260623_045814`
+  with 1 backed-up row.
+
+Postcheck evidence:
+
+- `deck606_high_battle_critical_pg079_postcheck_20260623_074912.out` reported
+  `target_rule_rows=7`, `target_hash_match_rows=7`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=7`,
+  `trusted_auto_rows=7`, `non_disabled_shadow_rows=0`,
+  `disabled_shadow_rows=7`, and `backup_rows=14`.
+- `deck606_pg079_runtime_semantics_postcheck_20260623_044955.out` reported
+  `target_hash_match_rows=7`, `target_required_semantic_fields_rows=7`,
+  `target_verified_auto_rows=7`, `scoped_trusted_auto_missing_hash_rows=0`,
+  and `backup_rows=111`.
+- `pg079_seething_song_metadata_restore_postcheck_20260623_045814.out`
+  confirmed `mana_color_status=abstracted_to_generic_pool_runtime`,
+  `oracle_runtime_scope=single_shot_red_ritual_runtime_generic_pool_color_annotation`,
+  and `pg058_l3b_simple_red_ritual_family=deck6_simple_red_rituals`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg079_runtime_semantics_sync_report_after_seething_20260623_045814.json`
+  refreshed SQLite/canonical snapshot from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Deck `606` final audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg079_final_20260623_045814.json`
+  (`high=0`, `medium=7`, `pass=74`).
+- Global final audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg079_post_tests_20260623_080054.json`
+  (`high=43`, `medium=11`, `pass=151`).
+
+Test evidence:
+
+- `py_compile` passed for the touched runtime/audit scripts.
+- `test_sync_battle_card_rules_pg_selection.py -v` passed.
+- `test_deck_card_battle_rule_coherence_audit.py -v` passed.
+- Full `test_battle_analyst_v10_3.py` passed, including all PG079 focused
+  tests.
+
+Next deploy number:
+
+- PG080 is next.
+
+## PG079 Deck 606 High Battle-Critical Rules - Applied 2026-06-23 07:49-07:54 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Validated and promoted the seven deck `606` high battle-critical rules:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- Added `oracle_hash`, oracle-specific `battle_model_scope`, stable runtime
+  metadata, and version `2` provenance to the trusted PostgreSQL rows.
+- Disabled seven superseded generated/review-only shadow rows.
+- No deck swap, no `deck_cards` mutation, and no learned-deck state mutation.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_precheck_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_apply_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`
+
+Backup table:
+
+- `manaloom_deploy_audit.pg079_deck606_high_battle_critical_20260623_074912`
+  with 14 backed-up rows.
+
+Postcheck evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`
+  reported `target_rule_rows=7`, `target_hash_match_rows=7`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=7`,
+  `trusted_auto_rows=7`, `rule_version_at_least_2_rows=7`,
+  `non_disabled_shadow_rows=0`, `disabled_shadow_rows=7`, and
+  `backup_rows=14`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg079_deck606_high_battle_critical_sync_report_20260623_075404.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
+  `canonical_snapshot_rows_exported=3201`, and
+  `include_needs_review=false`.
+- Deck `606` post-test audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg079_post_tests_20260623_080107.json`
+  reports `high=0`, `medium=7`, `pass=74`.
+- Deck `6` post-test audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg079_post_tests_20260623_080107.json`
+  reports `pass=100`.
+- Global post-test audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg079_post_tests_20260623_080054.json`
+  reports `high=43`, `medium=11`, `pass=151`.
+
+Test and replay evidence:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after focused PG079 tests were added.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+- `python3 -m py_compile` passed for the touched runtime/auditor files.
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  contains 19 focused event rows proving the seven PG079 logical rule keys.
+
+Next deploy number:
+
+- PG080 is next for any future PostgreSQL package.

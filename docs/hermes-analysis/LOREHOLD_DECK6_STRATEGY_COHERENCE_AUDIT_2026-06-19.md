@@ -20778,3 +20778,96 @@ Current reading:
 - Continue card-rule validation on deck `606` high battle-critical queue.
 - Treat the two remaining `forced_keep_after_bad_mulligan` records as
   seed-level low-confidence exclusions, not as deck `6` review blockers.
+
+## PG079 Deck 606 High Battle-Critical Card Gate - 2026-06-23 08:01 UTC
+
+Scope:
+
+- Closed the seven deck `606` high battle-critical card-rule findings:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+- This was a PostgreSQL card-rule package plus focused runtime proof, not a
+  strategy rebaseline and not a deck swap.
+
+PostgreSQL and cache evidence:
+
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`
+  reports `target_rule_rows=7`, `target_hash_match_rows=7`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=7`,
+  `non_disabled_shadow_rows=0`, and `disabled_shadow_rows=7`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_rollback_20260623_074912.sql`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_deck606_high_battle_critical_sync_report_20260623_075404.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+
+Runtime evidence:
+
+- Focused event artifact:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_high_battle_critical_focused_events_20260623_075434.jsonl`
+  has 19 rows proving all seven PG079 logical rule keys.
+- `test_battle_analyst_v10_3.py` passed after adding the PG079 focused tests.
+
+Current reading:
+
+- Deck `6` remains closed for card-rule coherence:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg079_post_tests_20260623_080107.json`
+  reports `pass=100`.
+- Deck `606` high battle-critical queue is closed:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg079_post_tests_20260623_080107.json`
+  reports `high=0`, `medium=7`, `pass=74`.
+- Global card-rule queue is now `high=43`, `medium=11`, `pass=151`.
+- Next deck `606` lane should be `medium/battle_support`:
+  `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.
+
+Method note:
+
+- User observations about individual cards are validation hints only. Do not
+  reopen `Blasphemous Act` or any other card unless Oracle/PostgreSQL/runtime
+  evidence shows a real mismatch.
+
+## PG079 Deck 606 Card-Rule Closeout Reading - 2026-06-23 08:00 UTC
+
+What changed:
+
+- Deck `606` high battle-critical queue was closed with PG079 runtime semantics
+  and PG -> SQLite/canonical snapshot sync.
+- The corrected cards are `Flare of Duplication`, `Powerbalance`,
+  `Reforge the Soul`, `Rise of the Eldrazi`, `Rite of the Dragoncaller`,
+  `Storm Herd`, and `Witch Enchanter // Witch-Blessed Meadow`.
+- Runtime code now has focused support for Powerbalance topdeck same-MV
+  free-cast, instant/sorcery token triggers, life-total token makers, and
+  creature ETB artifact/enchantment removal.
+
+Evidence:
+
+- PostgreSQL semantic package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_high_battle_critical_pg079_postcheck_20260623_074912.out`.
+- Central hash/sync package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_postcheck_20260623_044955.out`.
+- Seething Song metadata addendum:
+  `docs/hermes-analysis/master_optimizer_reports/pg079_seething_song_metadata_restore_postcheck_20260623_045814.out`.
+- Focused event log:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg079_runtime_semantics_focused_events_20260623_045814.jsonl`.
+- Full runtime regression:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG -> SQLite sync.
+
+Current card-gate status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `high=0`, `medium=7`, `pass=74`.
+- Deck `607`: `high=26`, `medium=5`, `pass=63`.
+- Deck `608`: `high=20`, `medium=3`, `pass=45`.
+- Global: `high=43`, `medium=11`, `pass=151`.
+
+Current reading:
+
+- This closes the deck `606` high battle-critical card-rule gate. It does not
+  by itself prove a better Lorehold deck composition or authorize a deck swap.
+- Next validation should move to deck `607`/`608` high shared cards before the
+  next battle-learning/deck-selection cycle.

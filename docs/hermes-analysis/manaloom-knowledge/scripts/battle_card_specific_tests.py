@@ -6698,6 +6698,375 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg079_storm_herd_creates_life_total_flying_pegasus_tokens():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.life = 12
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Storm Herd", "type_line": "Sorcery", "cmc": 10},
+                turn=8,
+                rng=random.Random(610),
+                effect_data_override={
+                    "effect": "token_maker",
+                    "token_count": "life_total",
+                    "token_name": "Pegasus Token",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_flying": True,
+                    "battle_model_scope": "life_total_flying_pegasus_token_maker_v1",
+                    "_rule_logical_key": "battle_rule_v1:b041641dc875caa7987253389dc52839",
+                    "_rule_oracle_hash": "storm-herd-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        pegasus_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Pegasus Token"
+        ]
+        assert len(pegasus_tokens) == 12
+        assert all(token.get("power") == 1 and token.get("toughness") == 1 for token in pegasus_tokens)
+        assert all(token.get("flying") is True for token in pegasus_tokens)
+        token_event = next(
+            data
+            for event, data in events
+            if event == "tokens_created" and data.get("card") == "Storm Herd"
+        )
+        assert token_event["tokens_requested"] == 12
+        assert token_event["tokens_created"] == 12
+        assert token_event["token_flying"] is True
+
+    def test_pg079_rite_of_the_dragoncaller_creates_flying_dragon_on_instant_sorcery_cast():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Rite of the Dragoncaller",
+                    "cmc": 6,
+                    "type_line": "Enchantment",
+                    "effect": "token_maker",
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "token_maker",
+                    "token_count": 1,
+                    "token_name": "Dragon Token",
+                    "token_power": 5,
+                    "token_toughness": 5,
+                    "token_flying": True,
+                    "battle_model_scope": "instant_sorcery_cast_create_5_5_flying_dragon_v1",
+                    "_rule_logical_key": "battle_rule_v1:b23bca3229a81d65750cf9c453c7943d",
+                    "_rule_oracle_hash": "rite-dragoncaller-test-hash",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                {"name": "Lightning Helix", "type_line": "Instant", "cmc": 2},
+                turn=5,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        dragon_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Dragon Token"
+        ]
+        assert len(dragon_tokens) == 1
+        assert dragon_tokens[0]["power"] == 5
+        assert dragon_tokens[0]["toughness"] == 5
+        assert dragon_tokens[0].get("flying") is True
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Rite of the Dragoncaller"
+            and data.get("trigger") == "instant_sorcery_cast"
+            and data.get("trigger_spell") == "Lightning Helix"
+            and data.get("effect") == "token_maker"
+            and data.get("tokens_created") == 1
+            and data.get("token_power") == 5
+            and data.get("token_flying") is True
+            for event, data in events
+        )
+
+    def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            sol_ring = {"name": "Sol Ring", "type_line": "Artifact", "cmc": 1}
+            opponent.battlefield = [
+                sol_ring,
+                {"name": "Runeclaw Bear", "type_line": "Creature", "effect": "creature", "power": 2, "toughness": 2},
+            ]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Witch Enchanter // Witch-Blessed Meadow",
+                    "type_line": "Creature — Human Warlock",
+                    "cmc": 4,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                turn=6,
+                rng=random.Random(611),
+                effect_data_override={
+                    "effect": "creature",
+                    "etb_remove_target": "artifact_or_enchantment",
+                    "battle_model_scope": "creature_etb_destroy_opponent_artifact_or_enchantment_v1",
+                    "_rule_logical_key": "battle_rule_v1:5768b971f1ab4f2d4d9b8bd6a768c132",
+                    "_rule_oracle_hash": "witch-enchanter-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(
+            permanent.get("name") == "Witch Enchanter // Witch-Blessed Meadow"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert sol_ring not in opponent.battlefield
+        assert sol_ring in opponent.graveyard
+        assert any(
+            event == "etb_removal_resolved"
+            and data.get("card") == "Witch Enchanter // Witch-Blessed Meadow"
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("target_type") == "artifact_or_enchantment"
+            and data.get("target") == "Sol Ring"
+            for event, data in events
+        )
+
+    def test_pg079_powerbalance_casts_same_mana_value_top_card_without_paying():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Opponent")
+            controller = player("Lorehold")
+            controller.library = [
+                {"name": "Free Bolt", "type_line": "Instant", "cmc": 2, "effect": "draw_cards", "count": 1},
+                {"name": "Library Filler", "type_line": "Sorcery", "cmc": 5},
+            ]
+            controller.battlefield = [
+                {
+                    "name": "Powerbalance",
+                    "type_line": "Enchantment",
+                    "effect": "draw_engine",
+                    "trigger": "opponent_spell",
+                    "draw_on_enter": False,
+                    "powerbalance_topdeck_free_cast_same_mana_value": True,
+                    "battle_model_scope": "opponent_spell_reveal_top_same_mana_value_free_cast_v1",
+                    "_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b",
+                    "_rule_oracle_hash": "powerbalance-test-hash",
+                }
+            ]
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                {"name": "Opponent Two Drop", "type_line": "Creature", "cmc": 2, "effect": "creature"},
+                turn=4,
+                phase="main",
+                rng=random.Random(612),
+                all_players=[caster, controller],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in controller.library] == ["Library Filler"]
+        assert any(card.get("name") == "Free Bolt" for card in controller.graveyard)
+        assert any(
+            event == "powerbalance_trigger_resolved"
+            and data.get("card") == "Powerbalance"
+            and data.get("revealed_card") == "Free Bolt"
+            and data.get("trigger_spell_mana_value") == 2
+            and data.get("result") == "cast_without_paying_mana"
+            and data.get("cast_without_paying_mana_cost") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
+            for event, data in events
+        )
+
+    def test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Flare of Duplication", "type_line": "Instant", "cmc": 3},
+                turn=4,
+                rng=random.Random(613),
+                effect_data_override={
+                    "effect": "copy_spell",
+                    "instant": True,
+                    "target": "instant_or_sorcery_on_stack",
+                    "may_choose_new_targets": True,
+                    "alternative_cost_status": "sacrifice_nontoken_red_creature_annotation_only",
+                    "battle_model_scope": "copy_target_instant_or_sorcery_stack_spell_alt_cost_annotation_v1",
+                    "_rule_logical_key": "battle_rule_v1:b82bbb548dab138fa0700cb4cf905617",
+                    "_rule_oracle_hash": "flare-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert not any(
+            permanent.get("name") == "Flare of Duplication"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert any(card.get("name") == "Flare of Duplication" for card in active.graveyard)
+        assert any(
+            event == "copy_spell_no_stack_target"
+            and data.get("card") == "Flare of Duplication"
+            and data.get("rule_logical_key") == "battle_rule_v1:b82bbb548dab138fa0700cb4cf905617"
+            for event, data in events
+        )
+
+    def test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.hand = [
+                {"name": "Old Card", "cmc": 2, "type_line": "Instant"},
+                {"name": "Another Old Card", "cmc": 3, "type_line": "Sorcery"},
+            ]
+            opponent.hand = [{"name": "Opponent Old Card", "cmc": 1, "type_line": "Instant"}]
+            active.library = [{"name": f"Draw {index}", "cmc": 1, "type_line": "Sorcery"} for index in range(8)]
+            opponent.library = [
+                {"name": f"Opponent Draw {index}", "cmc": 1, "type_line": "Sorcery"}
+                for index in range(8)
+            ]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Reforge the Soul", "type_line": "Sorcery", "cmc": 5},
+                turn=5,
+                rng=random.Random(614),
+                effect_data_override={
+                    "effect": "draw_cards",
+                    "count": 7,
+                    "wheel": True,
+                    "miracle": "1R",
+                    "battle_model_scope": "each_player_discard_hand_draw_seven_miracle_annotation_v1",
+                    "_rule_logical_key": "battle_rule_v1:90b82cfc81ff726ac0fc96a1b220f263",
+                    "_rule_oracle_hash": "reforge-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert len(active.hand) == 7
+        assert len(opponent.hand) == 7
+        assert any(card.get("name") == "Old Card" for card in active.graveyard)
+        assert any(
+            event == "spell_resolved"
+            and data.get("card") == "Reforge the Soul"
+            and data.get("rule_logical_key") == "battle_rule_v1:90b82cfc81ff726ac0fc96a1b220f263"
+            for event, data in events
+        )
+
+    def test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            target = {"name": "Threat Permanent", "type_line": "Artifact", "cmc": 4, "effect": "ramp_engine"}
+            opponent.battlefield = [target]
+            active.library = [{"name": f"Draw {index}", "cmc": 1, "type_line": "Sorcery"} for index in range(5)]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Rise of the Eldrazi", "type_line": "Sorcery", "cmc": 12},
+                turn=9,
+                rng=random.Random(615),
+                effect_data_override={
+                    "effect": "composite_resolution",
+                    "uncounterable": True,
+                    "exiles_self": True,
+                    "_composite_rule_components": [
+                        {"effect": "remove_permanent", "target": "nonland_permanent"},
+                        {"effect": "draw_cards", "count": 4},
+                        {"effect": "extra_turn", "turns": 1},
+                    ],
+                    "battle_model_scope": "uncounterable_destroy_target_permanent_target_player_draw_four_extra_turn_exile_v1",
+                    "_rule_logical_key": "battle_rule_v1:57d155e410ca3cc6a96e14ed50f524d4",
+                    "_rule_oracle_hash": "rise-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert target not in opponent.battlefield
+        assert target in opponent.graveyard
+        assert len(active.hand) == 4
+        assert active.extra_turns == 1
+        assert any(card.get("name") == "Rise of the Eldrazi" for card in active.exile)
+        assert any(
+            event == "composite_rule_resolved"
+            and data.get("card") == "Rise of the Eldrazi"
+            and data.get("components_applied") == 3
+            and data.get("rule_logical_key") == "battle_rule_v1:57d155e410ca3cc6a96e14ed50f524d4"
+            for event, data in events
+        )
+
+    def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
+        expected = {
+            "Flare of Duplication": (
+                "battle_rule_v1:b82bbb548dab138fa0700cb4cf905617",
+                "3b1f1bcd5e69cb1f5f306e83345b2a1f",
+                "copy_target_instant_or_sorcery_stack_spell_alt_cost_annotation_v1",
+            ),
+            "Powerbalance": (
+                "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b",
+                "8cbde54a4e2e1464a5deb5171928e203",
+                "opponent_spell_reveal_top_same_mana_value_free_cast_v1",
+            ),
+            "Reforge the Soul": (
+                "battle_rule_v1:90b82cfc81ff726ac0fc96a1b220f263",
+                "041645992d04029f74855292bb1459f4",
+                "each_player_discard_hand_draw_seven_miracle_annotation_v1",
+            ),
+            "Rise of the Eldrazi": (
+                "battle_rule_v1:57d155e410ca3cc6a96e14ed50f524d4",
+                "6cad51822d2ad0e019c29770033c7d21",
+                "uncounterable_destroy_target_permanent_target_player_draw_four_extra_turn_exile_v1",
+            ),
+            "Rite of the Dragoncaller": (
+                "battle_rule_v1:b23bca3229a81d65750cf9c453c7943d",
+                "9308f0eadf924f7ea0c8ea2463224c9a",
+                "instant_sorcery_cast_create_5_5_flying_dragon_v1",
+            ),
+            "Storm Herd": (
+                "battle_rule_v1:b041641dc875caa7987253389dc52839",
+                "25e798eec6b64f1ae52d3af1ca8597dd",
+                "life_total_flying_pegasus_token_maker_v1",
+            ),
+            "Witch Enchanter // Witch-Blessed Meadow": (
+                "battle_rule_v1:5768b971f1ab4f2d4d9b8bd6a768c132",
+                "cd5355a1a3cd44df9237726d9e3006c5",
+                "creature_etb_destroy_opponent_artifact_or_enchantment_v1",
+            ),
+        }
+        for name, (logical_key, oracle_hash, scope) in expected.items():
+            effect_data = battle.get_card_effect({"name": name, "type_line": "Instant", "cmc": 1})
+            assert effect_data["_rule_logical_key"] == logical_key
+            assert effect_data["_rule_oracle_hash"] == oracle_hash
+            assert effect_data["battle_model_scope"] == scope
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -6830,4 +7199,12 @@ def register_tests(battle, player):
         test_thassas_oracle_wins_only_when_library_is_within_blue_devotion,
         test_dragons_approach_deals_fixed_damage_and_tutors_dragon_from_graveyard_cost,
         test_thrumming_stone_ripples_dragons_approach_without_bonus_damage,
+        test_pg079_powerbalance_casts_same_mana_value_top_card_without_paying,
+        test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,
+        test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope,
+        test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile,
+        test_pg079_deck606_high_rules_resolve_from_sqlite_cache,
+        test_pg079_storm_herd_creates_life_total_flying_pegasus_tokens,
+        test_pg079_rite_of_the_dragoncaller_creates_flying_dragon_on_instant_sorcery_cast,
+        test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
     ]
