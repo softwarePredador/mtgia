@@ -3,12 +3,11 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG106, applied, postchecked, synced from PostgreSQL to Hermes
-SQLite/canonical snapshot, tested, battle-gated, and documented on
-2026-06-23 14:20 UTC. PG106 promoted `Everything Comes to Dust` to an
-Oracle-backed convoke-aware exile wipe rule and closed a replay target metadata
-gap for copied targeted removal. This was not a deck swap, learned-deck
-promotion, or battle rebaseline.
+this thread is PG107, applied, postchecked, synced from PostgreSQL to Hermes
+SQLite/canonical snapshot, tested, and documented on 2026-06-23 14:38 UTC.
+PG107 promoted `Fated Clash` to an Oracle-backed protect-then-destroy rule and
+deprecated two stale generated plain board-wipe shadows. This was not a deck
+swap, learned-deck promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -9064,7 +9063,120 @@ Post-PG106 deck audit counts:
 
 Next deploy number:
 
-- PG107 is next for any future PostgreSQL package.
+- PG107 was consumed by the Fated Clash package below. PG108 is next for any
+  future PostgreSQL package.
+
+## PG107 Fated Clash Protect-Then-Destroy Rule - Applied 2026-06-23 14:38 UTC
+
+Status: `applied_validated_synced_no_new_battle_rebaseline`.
+
+Scope:
+
+- PG107 promoted `Fated Clash` from two generated `needs_review`/`review_only`
+  plain board-wipe shadows to one curated verified executable rule.
+- Runtime models the Oracle scope as one target creature you control and one
+  target creature an opponent controls gaining indestructible until end of
+  turn, then all other creatures are destroyed. The opponent target is selected
+  as the lowest-value legal opponent creature because it survives the wipe.
+- No `deck_cards` mutation, no learned-deck promotion, and no deck swap.
+
+Promoted PG107 rule:
+
+- `logical_rule_key=battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326`
+- `oracle_hash=14445ec4dd93171e67d19058efe24d9c`
+- `effect=fated_clash_protect_then_destroy`
+- `battle_model_scope=own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1`
+- `review_status=verified`
+- `execution_status=auto`
+- `source=curated`
+
+PostgreSQL evidence:
+
+- PG107 apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_apply_20260623_143808.out`
+  reported backup `SELECT 2`, `deprecated_shadow_rows=2`,
+  `upserted_rows=1`, and `COMMIT`.
+- PG107 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_postcheck_20260623_143808.out`
+  reported `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `promoted_expected_effect_rows=1`,
+  `active_shadow_rows=0`,
+  `active_rows_still_claiming_plain_board_wipe=0`,
+  `trusted_missing_oracle_hash_rows=0`, and `backup_rows=2`.
+- Final live read-only PostgreSQL SELECT before commit:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_live_readonly_select_20260623_commit_ready.json`
+  reported the same expected PG107 counters and
+  `all_checks_passed=true` with `mutations_performed=[]`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_rollback_20260623_143808.sql`.
+
+Runtime/sync evidence:
+
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_sync_report_20260623_143808.json`
+  reported `apply_pg=false`, `pg_rows_loaded=1835`,
+  `sqlite_inserted_or_updated=1815`,
+  `canonical_snapshot_rows_exported=3201`, and `curated_rows=132`.
+- SQLite verification:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_sqlite_verify_20260623_143808.json`
+  shows the synced `Fated Clash` row with the PG107 logical key, hash,
+  `review_status=verified`, and `execution_status=auto`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_focused_replay_20260623_143808.json`
+  has `all_checks_passed=true`; the wipe event destroyed two creatures,
+  protected two targets, emitted two spell targets, and left only `Own Best`
+  plus `Opponent Small` on battlefield as expected.
+
+Tests and post-PG107 audit:
+
+- PG107 focused tests passed:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_battle_analyst_v10_3_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_deck_card_coherence_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_event_contract_static_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_forensic_supported_effects_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_reviewed_rules_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_sync_pg_selection_test_20260623_143808.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_py_compile_20260623_143808.out`.
+- Commit-ready revalidation after the runtime cache/snapshot enrichment:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_py_compile_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_battle_analyst_v10_3_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_external_harvester_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_forensic_supported_effects_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_deck_card_coherence_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_sync_pg_selection_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_reviewed_rules_test_20260623.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_event_contract_static_test_20260623.out`.
+- Commit-ready results: `py_compile OK`; battle analyst v10.3 passed;
+  harvester `Ran 5 tests OK`; forensic supported effects passed; deck-card
+  coherence `Ran 8 tests OK`; sync PG selection `Ran 10 tests OK` with known
+  sqlite ResourceWarnings; reviewed battle rules `Ran 28 tests OK`; event
+  contract static audit `7 tests passed`.
+- No additional PostgreSQL write was required for commit-ready closure. The
+  live read-only SELECT artifact
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_live_readonly_select_20260623_commit_ready.json`
+  remained `all_checks_passed=true` with `mutations_performed=[]`.
+- Post-PG107 deck-card audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg107_post_20260623_143808.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg107_post_20260623_143808.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg107_post_20260623_143808.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg107_post_20260623_143808.json`.
+
+Post-PG107 deck audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=9`, `medium=4`, `pass=81`.
+- Deck `608`: `high=15`, `medium=3`, `pass=50`.
+- Global: `high=24`, `medium=4`, `pass=177`.
+- `Fated Clash` is now `pass` for deck `607` with one trusted executable
+  rule.
+
+Next deploy number:
+
+- PG108 is next for any future PostgreSQL package.
 
 ## PG099 Avatar's Wrath Airbend Runtime Rule - Applied 2026-06-23 12:37 UTC
 

@@ -1,0 +1,196 @@
+{
+  "all_checks_passed": true,
+  "artifact": "pg107_fated_clash_focused_replay",
+  "board_wipe_events": [
+    {
+      "data": {
+        "actual_asymmetry": 0,
+        "card": "Fated Clash",
+        "conditional_flash_if_attacking_and_blocking": true,
+        "creatures_seen": 4,
+        "destroyed": 2,
+        "destroyed_cards": [
+          {
+            "controller": "Lorehold",
+            "name": "Own Small",
+            "type_line": "Creature"
+          },
+          {
+            "controller": "Opponent",
+            "name": "Opponent Bomb",
+            "type_line": "Creature"
+          }
+        ],
+        "illegal_targets": [],
+        "live_opponent_creatures_destroyed": 1,
+        "opponent_creatures_destroyed": 1,
+        "own_creatures_destroyed": 1,
+        "player": "Lorehold",
+        "protected": 2,
+        "protected_targets": [
+          {
+            "target": "Own Best",
+            "target_controller": "Lorehold",
+            "target_role": "creature_you_control",
+            "target_score": [
+              0,
+              1,
+              5,
+              5,
+              5
+            ]
+          },
+          {
+            "target": "Opponent Small",
+            "target_controller": "Opponent",
+            "target_role": "creature_opponent_controls",
+            "target_score": [
+              0,
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "risk_flags": [],
+        "rule_alternative_count": 1,
+        "rule_confidence": 0.97,
+        "rule_execution_status": "auto",
+        "rule_logical_key": "battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326",
+        "rule_oracle_hash": "14445ec4dd93171e67d19058efe24d9c",
+        "rule_review_status": "verified",
+        "rule_runtime_selection_mode": "single_selected",
+        "rule_source": "curated",
+        "rule_version": 2,
+        "turn": 8,
+        "unprotected_seen": 2
+      },
+      "event": "board_wipe_resolved"
+    }
+  ],
+  "card": {
+    "cmc": 5,
+    "name": "Fated Clash",
+    "type_line": "Sorcery"
+  },
+  "checks": {
+    "active_battlefield_only_own_best": true,
+    "active_graveyard_has_own_small_and_spell": true,
+    "effect_is_fated_clash": true,
+    "opponent_battlefield_only_opponent_small": true,
+    "opponent_graveyard_has_opponent_bomb": true,
+    "rule_key_is_pg107": true,
+    "spell_event_targets_two_creatures": true,
+    "wipe_event_destroyed_two_protected_two": true
+  },
+  "effect_data": {
+    "_rule_alternatives": [
+      {
+        "category": "wipe",
+        "confidence": 0.97,
+        "effect": "fated_clash_protect_then_destroy",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326",
+        "review_status": "verified",
+        "source": "curated"
+      }
+    ],
+    "_rule_confidence": 0.97,
+    "_rule_execution_status": "auto",
+    "_rule_logical_key": "battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326",
+    "_rule_oracle_hash": "14445ec4dd93171e67d19058efe24d9c",
+    "_rule_review_status": "verified",
+    "_rule_runtime_selection": {
+      "rule_count": 1,
+      "selected_effect": "fated_clash_protect_then_destroy",
+      "selected_logical_rule_key": "battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326",
+      "selection_mode": "single_selected"
+    },
+    "_rule_source": "curated",
+    "_rule_version": 2,
+    "battle_model_scope": "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1",
+    "conditional_flash_if_attacking_and_blocking": true,
+    "effect": "fated_clash_protect_then_destroy",
+    "grants_targets_indestructible_until_eot": true,
+    "sorcery": true,
+    "target_scope": "own_creature_and_opponent_creature",
+    "then_destroy_all_creatures": true
+  },
+  "final_state": {
+    "active_battlefield": [
+      "Own Best"
+    ],
+    "active_graveyard": [
+      "Own Small",
+      "Fated Clash"
+    ],
+    "opponent_battlefield": [
+      "Opponent Small"
+    ],
+    "opponent_graveyard": [
+      "Opponent Bomb"
+    ],
+    "opponent_small_indestructible_until_cleanup": true,
+    "own_best_indestructible_until_cleanup": true
+  },
+  "generated_at": "2026-06-23T14:38:08-03:00",
+  "initial_state": {
+    "active_battlefield": [
+      "Own Best",
+      "Own Small"
+    ],
+    "opponent_battlefield": [
+      "Opponent Small",
+      "Opponent Bomb"
+    ]
+  },
+  "source_of_truth": "PostgreSQL battle_card_rules synced into Hermes SQLite knowledge.db",
+  "spell_events": [
+    {
+      "data": {
+        "card": "Fated Clash",
+        "cmc": 5,
+        "destination": "graveyard",
+        "effect": "fated_clash_protect_then_destroy",
+        "player": "Lorehold",
+        "result": "resolved",
+        "rule_alternative_count": 1,
+        "rule_confidence": 0.97,
+        "rule_execution_status": "auto",
+        "rule_logical_key": "battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326",
+        "rule_oracle_hash": "14445ec4dd93171e67d19058efe24d9c",
+        "rule_review_status": "verified",
+        "rule_runtime_selection_mode": "single_selected",
+        "rule_source": "curated",
+        "rule_version": 2,
+        "stack_object": "Fated Clash",
+        "target": "Own Best",
+        "target_controller": "Lorehold",
+        "target_legal": true,
+        "target_type": "creature",
+        "targets": [
+          {
+            "target": "Own Best",
+            "target_controller": "Lorehold",
+            "target_legal": true,
+            "target_type": "creature",
+            "targeting_pipeline": "targeting_formal_minimal"
+          },
+          {
+            "target": "Opponent Small",
+            "target_controller": "Opponent",
+            "target_legal": true,
+            "target_type": "creature",
+            "targeting_pipeline": "targeting_formal_minimal"
+          }
+        ],
+        "to_zone": "graveyard",
+        "turn": 8,
+        "type_line": "Sorcery",
+        "zone_after": "graveyard"
+      },
+      "event": "spell_resolved"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+json_report=docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg107_post_20260623_143808.json
+md_report=docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg107_post_20260623_143808.md
+deck_id=607
+total_cards=94
+severity_counts={"high": 9, "medium": 4, "pass": 81}

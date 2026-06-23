@@ -42,6 +42,7 @@ HIGH_RISK_GENERIC_EFFECTS = {
     "draw_engine",
     "extra_turn",
     "exile_artifact_enchantment_creature_convoke_wipe",
+    "fated_clash_protect_then_destroy",
     "finisher",
     "gift_hexproof_indestructible",
     "graveyard_flashback_grant",

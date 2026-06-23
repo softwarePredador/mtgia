@@ -3248,3 +3248,89 @@ Current order:
   `latest` policy.
 - This order performed no PostgreSQL write, rollback, deck swap, commit, push,
   stash, revert, script deletion, plist deletion, or artifact deletion.
+
+### PG107 + External Rule Reference Harvester Order - 2026-06-23 14:58 UTC
+
+Evidence:
+
+- PG107/Fated Clash is closed for the current deck `607` card-rule gate:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_postcheck_20260623_143808.out`
+  validated one promoted verified/auto rule, zero active shadows, zero plain
+  board-wipe leftovers, zero trusted rows missing oracle hash, and two backup
+  rows.
+- Final live read-only PostgreSQL SELECT:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_live_readonly_select_20260623_commit_ready.json`
+  confirmed the same expected PG107 counters with `all_checks_passed=true` and
+  `mutations_performed=[]`.
+- PG107 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_sync_report_20260623_143808.json`
+  reported `apply_pg=false`, `pg_rows_loaded=1835`,
+  `sqlite_inserted_or_updated=1815`, and
+  `canonical_snapshot_rows_exported=3201`.
+- PG107 focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_focused_replay_20260623_143808.json`
+  has `all_checks_passed=true`, logical key
+  `battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326`, and expected
+  protect-two/destroy-two final state.
+- Post-PG107 deck audits:
+  deck `6` `pass=100`; deck `607` `high=9`, `medium=4`, `pass=81`;
+  deck `608` `high=15`, `medium=3`, `pass=50`; global `high=24`,
+  `medium=4`, `pass=177`.
+- Read-only harvester implemented:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py`
+  plus focused unit tests in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_rule_reference_harvester.py`.
+- Accepted harvester evidence:
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg107_top5_20260623_145446.json`
+  and `.md`; it harvested the current deck `607` top five residual high cards
+  after PG107 and found external references for `Promise of Loyalty`,
+  `Starfall Invocation`, `Pearl Medallion`, `Emeria's Call // Emeria,
+  Shattered Skyclave`, and `Molecule Man`.
+- Superseded harvester evidence:
+  `external_card_rule_reference_harvest_deck607_pg107_top5_20260623_145331.*`
+  remains retained but should not be used as accepted evidence because the
+  later `145446` run corrected XMage CamelCase/first-face candidate handling
+  and the `Emeria's Call` candidate effect.
+- Commit-ready closure evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_py_compile_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_battle_analyst_v10_3_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_external_harvester_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_forensic_supported_effects_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_deck_card_coherence_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_sync_pg_selection_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_reviewed_rules_test_20260623.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_event_contract_static_test_20260623.out`.
+- Runtime cache/snapshot closure:
+  `battle_analyst_v9.py` now fills missing non-executable runtime
+  annotations from `known_cards_canonical_snapshot.json` for trusted
+  SQLite-selected rules when the logical key and oracle hash match. This keeps
+  PG-restored metadata visible for `Seething Song`, `Silence`, and
+  `Angel's Grace` without replacing active rule behavior.
+- Commit-ready test result: `py_compile OK`; harvester `Ran 5 tests OK`;
+  battle analyst v10.3 passed; forensic supported effects passed; deck-card
+  coherence `Ran 8 tests OK`; sync PG selection `Ran 10 tests OK` with known
+  sqlite ResourceWarnings; reviewed battle rules `Ran 28 tests OK`; event
+  contract static audit `7 tests passed`.
+
+Current order:
+
+- Keep PG107 closed unless a later PostgreSQL SELECT, sync report, focused
+  replay, or card-gate artifact proves rollback/drift.
+- Use the external harvester as a read-only acceleration tool for the next
+  card-rule package; it generates review packets and candidate logical keys,
+  but does not authorize PostgreSQL writes or runtime promotion by itself.
+- Use XMage only as a rule-reference source inside the harvester/review packet
+  flow: card class existence, target filters, resolution order, zone movement,
+  delayed cleanup, static reducer shape, and test-oracle cues. Oracle/Scryfall
+  remains the text authority, and ManaLoom runtime/tests/PG package remain the
+  promotion gate.
+- Next practical card-rule targets are `Promise of Loyalty` and
+  `Starfall Invocation` first, with `Pearl Medallion` as a smaller
+  battle-support package if the operator wants a lower-risk slice.
+- Keep local ManaLoom LaunchAgents disabled while manual card-rule validation
+  remains active. Run battle/card-rule/learned-deck checks explicitly with
+  named artifacts.
+- This order performed no new PostgreSQL write, rollback, deck swap, commit,
+  push, stash, revert, LaunchAgent reenable, script deletion, plist deletion,
+  or artifact deletion.

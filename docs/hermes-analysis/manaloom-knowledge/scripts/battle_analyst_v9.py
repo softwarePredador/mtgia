@@ -152,6 +152,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "equipment_static_attachment",
     "exile_artifact_enchantment_creature_convoke_wipe",
     "exile_top_nonland_free_cast",
+    "fated_clash_protect_then_destroy",
     "finisher",
     "gift_hexproof_indestructible",
     "graveyard_flashback_grant",
@@ -2824,6 +2825,27 @@ def normalize_effect_by_oracle(card, effect_data):
         return normalized
 
     if (
+        "target creature you control and target creature an opponent controls each gain indestructible until end of turn" in text
+        and "then destroy all creatures" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "fated_clash_protect_then_destroy"
+        normalized["sorcery"] = True
+        normalized["conditional_flash_if_attacking_and_blocking"] = (
+            "as though it had flash" in text
+            and "a creature is attacking and a creature is blocking" in text
+        )
+        normalized["target_scope"] = "own_creature_and_opponent_creature"
+        normalized["grants_targets_indestructible_until_eot"] = True
+        normalized["then_destroy_all_creatures"] = True
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1"
+        )
+        normalized.pop("instant", None)
+        return normalized
+
+    if (
         normalized_name == "ephemerate"
         and "exile target creature you control" in text
         and "return it to the battlefield" in text
@@ -3066,6 +3088,20 @@ def replay_rule_fields(effect_data):
 CANONICAL_FALLBACK_KNOWN_CARDS = set()
 
 
+CANONICAL_RUNTIME_ENRICHMENT_KEYS = {
+    "battle_model_scope",
+    "oracle_runtime_scope",
+    "mana_color_status",
+    "pg058_l3b_simple_red_ritual_family",
+    "opponents_cant_win_this_turn",
+    "split_second",
+    "life_floor_on_damage",
+    "damage_prevention_scope",
+    "singleton_commander_baseline",
+    "graveyard_named_copy_scaling_status",
+}
+
+
 COMPOSABLE_RESOLUTION_EFFECTS = {
     "draw_cards",
     "remove_creature",
@@ -3275,6 +3311,49 @@ def _annotated_battle_rule_effect(rule):
     )
 
 
+def _canonical_runtime_annotations_for_lookup(lookup_name, effect):
+    """Fill missing runtime annotations from the canonical snapshot only."""
+    if lookup_name not in CANONICAL_FALLBACK_KNOWN_CARDS:
+        return {}
+    try:
+        snapshot_effect, metadata = extract_snapshot_effect_and_metadata(KNOWN_CARDS[lookup_name])
+    except Exception:
+        return {}
+    if not (
+        _runtime_safe_execution_status(metadata.get("battle_rule_execution_status"))
+        and _runtime_safe_review_status(metadata.get("battle_rule_review_status"))
+    ):
+        return {}
+    snapshot_key = str(metadata.get("battle_rule_logical_key") or "")
+    effect_key = str(effect.get("_rule_logical_key") or "")
+    if snapshot_key and effect_key and snapshot_key != effect_key:
+        return {}
+    snapshot_hash = str(metadata.get("battle_rule_oracle_hash") or "")
+    effect_hash = str(effect.get("_rule_oracle_hash") or "")
+    if snapshot_hash and effect_hash and snapshot_hash != effect_hash:
+        return {}
+    annotations = {}
+    for key in CANONICAL_RUNTIME_ENRICHMENT_KEYS:
+        if effect.get(key) not in (None, "", [], {}):
+            continue
+        value = snapshot_effect.get(key)
+        if value not in (None, "", [], {}):
+            annotations[key] = value
+    return annotations
+
+
+def _enrich_effect_from_canonical_snapshot(lookup_name, effect):
+    annotations = _canonical_runtime_annotations_for_lookup(lookup_name, effect)
+    if not annotations:
+        return effect
+    enriched = dict(effect)
+    enriched.update(annotations)
+    enrichment = dict(enriched.get("_rule_runtime_selection") or {})
+    enrichment["canonical_snapshot_enrichment"] = sorted(annotations.keys())
+    enriched["_rule_runtime_selection"] = enrichment
+    return enriched
+
+
 def _extract_runtime_safe_secondary_annotations(primary_effect, rule):
     """Allow secondary rules to contribute only non-executable cost metadata."""
     effect = rule.get("effect_json") or {}
@@ -3478,10 +3557,10 @@ def get_card_effect(card):
             if any(rule and rule.get("effect_json") for rule in rules):
                 composite_effect = _build_composite_battle_rule_effect(card, rules)
                 if composite_effect is not None:
-                    return composite_effect
+                    return _enrich_effect_from_canonical_snapshot(lookup_name, composite_effect)
                 enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
                 if enriched_effect is not None:
-                    return enriched_effect
+                    return _enrich_effect_from_canonical_snapshot(lookup_name, enriched_effect)
                 rule = _select_primary_runtime_rule(rules)
                 if rule is not None:
                     effect = _annotate_runtime_rule_selection(
@@ -3489,6 +3568,7 @@ def get_card_effect(card):
                         rules,
                         selection_mode="single_selected",
                     )
+                    effect = _enrich_effect_from_canonical_snapshot(lookup_name, effect)
                     return normalize_effect_by_oracle(card, effect)
     for lookup_name in lookup_names:
         if lookup_name in HANDCRAFTED_KNOWN_CARDS:
@@ -6167,6 +6247,7 @@ SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "board_wipe",
     "damage_wipe",
     "exile_artifact_enchantment_creature_convoke_wipe",
+    "fated_clash_protect_then_destroy",
     "damage_player_and_creatures",
     "remove_creature",
     "remove_permanent",
@@ -8904,6 +8985,290 @@ def resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
         opponent_creatures_destroyed=opponent_creatures_destroyed,
         live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
         actual_asymmetry=actual_asymmetry,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def creature_candidates_for_player(player, *, controller, source, effect_data):
+    return [
+        permanent
+        for permanent in removal_target_candidates(
+            player,
+            {**(effect_data or {}), "target": "creature"},
+            controller=controller,
+            source=source,
+        )
+        if is_battlefield_creature(permanent)
+    ]
+
+
+def choose_lowest_value_creature_target(creatures):
+    return min(creatures, key=target_priority)
+
+
+def prepare_fated_clash_targets(player, opponents, card, effect_data):
+    if (effect_data or {}).get("effect") != "fated_clash_protect_then_destroy":
+        return effect_data, []
+    if (effect_data or {}).get("declared_targets"):
+        replay = replay_fields_for_declared_targets(effect_data).get("targets", [])
+        return effect_data, replay
+
+    own_candidates = creature_candidates_for_player(
+        player,
+        controller=player,
+        source=card,
+        effect_data=effect_data,
+    )
+    own_target = choose_best_creature_target(own_candidates) if own_candidates else None
+    opponent_target = None
+    opponent_controller = None
+    opponent_candidates = []
+    for opponent in prioritize_evaluation_target_opponents(player, opponents):
+        candidates = creature_candidates_for_player(
+            opponent,
+            controller=player,
+            source=card,
+            effect_data=effect_data,
+        )
+        if not candidates:
+            continue
+        selected = choose_lowest_value_creature_target(candidates)
+        if opponent_target is None or target_priority(selected) < target_priority(opponent_target):
+            opponent_target = selected
+            opponent_controller = opponent
+            opponent_candidates = candidates
+
+    declared_targets = []
+    if own_target is not None:
+        declared_targets.append(
+            {
+                "target": own_target,
+                "controller": player,
+                "target_type": "creature",
+                "target_role": "creature_you_control",
+                "declared_by": player,
+            }
+        )
+    if opponent_target is not None:
+        declared_targets.append(
+            {
+                "target": opponent_target,
+                "controller": opponent_controller,
+                "target_type": "creature",
+                "target_role": "creature_opponent_controls",
+                "declared_by": player,
+            }
+        )
+    next_effect = {**effect_data, "declared_targets": declared_targets}
+    next_effect["own_target_options"] = [
+        target_option_replay_entry(candidate) for candidate in own_candidates[:8]
+    ]
+    next_effect["opponent_target_options"] = [
+        target_option_replay_entry(candidate) for candidate in opponent_candidates[:8]
+    ]
+    replay = replay_fields_for_declared_targets(next_effect).get("targets", [])
+    return next_effect, replay
+
+
+def resolve_fated_clash(player, opponents, card, effect_data, turn):
+    effect_data, declared_targets = prepare_fated_clash_targets(
+        player,
+        opponents,
+        card,
+        effect_data,
+    )
+    players = [player] + list(opponents or [])
+    protected_targets = []
+    illegal_targets = []
+    for entry in effect_data.get("declared_targets") or []:
+        target = entry.get("target") if isinstance(entry, dict) else entry
+        entry_controller = entry.get("controller") if isinstance(entry, dict) else None
+        target_controller = declared_target_controller(
+            players,
+            target,
+            entry_controller=entry_controller,
+        )
+        live_target = (
+            battlefield_object_for_target(target_controller, target)
+            if target_controller is not None
+            else None
+        )
+        if live_target is None:
+            illegal_targets.append(
+                target.get("name", "?") if isinstance(target, dict) else str(target)
+            )
+            continue
+        decision = targeting_decision(
+            card,
+            live_target,
+            player,
+            target_controller=target_controller,
+            target_type="creature",
+        )
+        if not decision.get("target_legal"):
+            illegal_targets.append(decision.get("target_name") or "?")
+            continue
+        set_until_eot(live_target, "indestructible", True)
+        protected_targets.append(
+            {
+                "target": decision.get("target_name"),
+                "target_controller": decision.get("target_controller"),
+                "target_role": entry.get("target_role") if isinstance(entry, dict) else None,
+                "target_score": list(target_priority(live_target)),
+            }
+        )
+
+    if len(protected_targets) == 0:
+        fields = replay_rule_fields(effect_data)
+        emit_replay_event(
+            "board_wipe_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            destroyed=0,
+            protected=0,
+            result="no_legal_targets",
+            illegal_targets=illegal_targets,
+            target_requirement="own_creature_and_opponent_creature",
+            turn=turn,
+            **fields,
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return
+
+    context = board_wipe_decision_context(player, opponents)
+    destroyed = 0
+    protected = 0
+    creatures_seen = 0
+    unprotected_seen = 0
+    own_creatures_destroyed = 0
+    opponent_creatures_destroyed = 0
+    live_opponent_creatures_destroyed = 0
+    destroyed_cards = []
+    for controller in players:
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        survivors = []
+        controller_destroyed = []
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not is_battlefield_creature(permanent):
+                survivors.append(permanent)
+                continue
+            creatures_seen += 1
+            if permanent.get("indestructible"):
+                survivors.append(permanent)
+                protected += 1
+                continue
+            unprotected_seen += 1
+            controller_destroyed.append(permanent)
+            destroyed += 1
+            if is_self:
+                own_creatures_destroyed += 1
+            else:
+                opponent_creatures_destroyed += 1
+                if is_live_opponent:
+                    live_opponent_creatures_destroyed += 1
+        controller.battlefield = survivors
+        for permanent in controller_destroyed:
+            destroyed_cards.append(
+                {
+                    "controller": controller.name,
+                    "name": permanent.get("name", "?"),
+                    "type_line": permanent.get("type_line", ""),
+                }
+            )
+            move_creature_from_battlefield(
+                controller,
+                permanent,
+                reason="fated_clash",
+                source=card,
+            )
+
+    actual_asymmetry = live_opponent_creatures_destroyed - own_creatures_destroyed
+    resolution_context = {
+        **context,
+        "pre_resolution_timing_justified": context["timing_justified"],
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_creatures_destroyed > own_creatures_destroyed
+        ),
+        "creatures_seen": creatures_seen,
+        "unprotected_seen": unprotected_seen,
+        "actual_destroyed": destroyed,
+        "protected": protected,
+        "protected_target_count": len(protected_targets),
+        "own_creatures_destroyed": own_creatures_destroyed,
+        "opponent_creatures_destroyed": opponent_creatures_destroyed,
+        "live_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+        "actual_asymmetry": actual_asymmetry,
+        "conditional_flash_if_attacking_and_blocking": bool(
+            effect_data.get("conditional_flash_if_attacking_and_blocking")
+        ),
+    }
+    risk_flags = []
+    if len(protected_targets) < 2:
+        risk_flags.append("partial_target_resolution")
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif (
+        actual_asymmetry <= 0
+        and not context["lethal_pressure"]
+        and not context["behind_on_board"]
+    ):
+        risk_flags.append("wipe_without_clear_asymmetry")
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_fated_clash"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            action="resolve_fated_clash",
+        ),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_creatures_destroyed * 5, 30),
+        actual_outcome="board_wipe_resolved",
+        reason="protect_selected_creatures_then_destroy_all_creatures",
+        strategic_principle="protect_best_own_creature_and_weakest_opponent_creature_before_wipe",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        destroyed=destroyed,
+        protected=protected,
+        creatures_seen=creatures_seen,
+        unprotected_seen=unprotected_seen,
+        protected_targets=protected_targets,
+        illegal_targets=illegal_targets,
+        destroyed_cards=destroyed_cards[:20],
+        own_creatures_destroyed=own_creatures_destroyed,
+        opponent_creatures_destroyed=opponent_creatures_destroyed,
+        live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        actual_asymmetry=actual_asymmetry,
+        conditional_flash_if_attacking_and_blocking=bool(
+            effect_data.get("conditional_flash_if_attacking_and_blocking")
+        ),
+        risk_flags=risk_flags,
         turn=turn,
         **fields,
     )
@@ -17698,6 +18063,13 @@ def apply_effect_immediate(
             card,
             effect_data,
         )
+    if effect == "fated_clash_protect_then_destroy" and not effect_data.get("declared_targets"):
+        effect_data, _ = prepare_fated_clash_targets(
+            player,
+            opponents,
+            card,
+            effect_data,
+        )
     spell_resolved_fields = {
         **spell_resolution_context_fields(card, effect_data, effect, player=player),
         **replay_fields_for_declared_targets(effect_data),
@@ -18156,6 +18528,8 @@ def apply_effect_immediate(
         apply_airbend_other_creatures(player, opponents, card, effect_data, turn)
     elif effect == "exile_artifact_enchantment_creature_convoke_wipe":
         resolve_everything_comes_to_dust(player, opponents, card, effect_data, turn)
+    elif effect == "fated_clash_protect_then_destroy":
+        resolve_fated_clash(player, opponents, card, effect_data, turn)
     elif effect == "damage_wipe_treasure":
         apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":

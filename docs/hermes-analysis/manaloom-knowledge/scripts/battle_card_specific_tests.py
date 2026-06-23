@@ -1756,6 +1756,134 @@ def register_tests(battle, player):
             "Opponent Human",
         }
 
+    def test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Fated Clash",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "You may cast this spell as though it had flash if a creature "
+                    "is attacking and a creature is blocking.\n"
+                    "Target creature you control and target creature an opponent "
+                    "controls each gain indestructible until end of turn. Then "
+                    "destroy all creatures."
+                ),
+            },
+            {"effect": "board_wipe", "cmc": 5.0},
+        )
+
+        assert effect_data["effect"] == "fated_clash_protect_then_destroy"
+        assert effect_data["sorcery"] is True
+        assert effect_data["conditional_flash_if_attacking_and_blocking"] is True
+        assert effect_data["target_scope"] == "own_creature_and_opponent_creature"
+        assert effect_data["grants_targets_indestructible_until_eot"] is True
+        assert effect_data["then_destroy_all_creatures"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1"
+        )
+
+    def test_fated_clash_protects_best_own_and_weakest_opponent_creature_then_wipes():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            own_best = {
+                "name": "Own Best",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 5,
+                "power": 5,
+                "toughness": 5,
+            }
+            own_small = {
+                "name": "Own Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent_small = {
+                "name": "Opponent Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent_bomb = {
+                "name": "Opponent Bomb",
+                "effect": "finisher",
+                "type_line": "Creature",
+                "cmc": 8,
+                "power": 8,
+                "toughness": 8,
+            }
+            active.battlefield = [own_best, own_small]
+            opponent.battlefield = [opponent_small, opponent_bomb]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Fated Clash",
+                    "cmc": 5,
+                    "type_line": "Sorcery",
+                },
+                turn=8,
+                rng=random.Random(10701),
+                effect_data_override={
+                    "effect": "fated_clash_protect_then_destroy",
+                    "conditional_flash_if_attacking_and_blocking": True,
+                    "battle_model_scope": (
+                        "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:fated-clash-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert [card.get("name") for card in active.battlefield] == ["Own Best"]
+        assert [card.get("name") for card in opponent.battlefield] == ["Opponent Small"]
+        assert {card.get("name") for card in active.graveyard} == {"Own Small", "Fated Clash"}
+        assert [card.get("name") for card in opponent.graveyard] == ["Opponent Bomb"]
+        assert own_best["indestructible"] is True
+        assert opponent_small["indestructible"] is True
+
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Fated Clash"
+        )
+        assert {target["target"] for target in spell_event["targets"]} == {
+            "Own Best",
+            "Opponent Small",
+        }
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert wipe_event["card"] == "Fated Clash"
+        assert wipe_event["rule_logical_key"] == "battle_rule_v1:fated-clash-test"
+        assert wipe_event["destroyed"] == 2
+        assert wipe_event["protected"] == 2
+        assert wipe_event["conditional_flash_if_attacking_and_blocking"] is True
+        assert {entry["target"] for entry in wipe_event["protected_targets"]} == {
+            "Own Best",
+            "Opponent Small",
+        }
+        assert {entry["name"] for entry in wipe_event["destroyed_cards"]} == {
+            "Own Small",
+            "Opponent Bomb",
+        }
+        battle.clear_until_eot(active)
+        battle.clear_until_eot(opponent)
+        assert "indestructible" not in own_best
+        assert "indestructible" not in opponent_small
+
     def test_austere_command_resolves_two_destroy_modes():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -9186,6 +9314,8 @@ def register_tests(battle, player):
         test_pg102_creative_technique_demonstrates_top_nonland_free_casts,
         test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe,
         test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
+        test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe,
+        test_fated_clash_protects_best_own_and_weakest_opponent_creature_then_wipes,
         test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,
         test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope,
         test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile,

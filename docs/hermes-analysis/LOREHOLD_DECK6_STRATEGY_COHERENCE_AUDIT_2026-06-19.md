@@ -22041,3 +22041,164 @@ Scope guard:
   with named run profiles for battle and learned-deck evidence. Do not reenable
   unattended LaunchAgents unless the schedule writes to a non-conflicting
   evidence path or has retention and dirty-worktree guards.
+
+## PG107 Fated Clash Validation - 2026-06-23 14:38 UTC
+
+Status: `deck607_queue_reduced_no_new_battle_rebaseline`.
+
+What changed:
+
+- `Fated Clash` was validated against current Oracle text and promoted from
+  generated plain board-wipe shadows to:
+  `battle_rule_v1:15d0a672ca7e8d3cb7dff9fbd6ee2326`,
+  `oracle_hash=14445ec4dd93171e67d19058efe24d9c`,
+  `effect=fated_clash_protect_then_destroy`, and
+  `battle_model_scope=own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1`.
+- Runtime now models the spell as target one creature you control and one
+  target creature an opponent controls, grant both indestructible until end of
+  turn, then destroy the other creatures.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  fresh 16-seed battle rebaseline were performed in this PG107 checkpoint.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_postcheck_20260623_143808.out`.
+- Final live read-only PostgreSQL SELECT:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_live_readonly_select_20260623_commit_ready.json`
+  with `all_checks_passed=true` and `mutations_performed=[]`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_protect_then_destroy_sync_report_20260623_143808.json`.
+- SQLite selected-rule verification:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_sqlite_verify_20260623_143808.json`.
+- Focused Fated Clash replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_focused_replay_20260623_143808.json`,
+  with `all_checks_passed=true`, two protected targets, two destroyed
+  creatures, and expected final battlefield/graveyard state.
+- Focused suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_battle_analyst_v10_3_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_deck_card_coherence_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_event_contract_static_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_forensic_supported_effects_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_reviewed_rules_test_20260623_143808.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_sync_pg_selection_test_20260623_143808.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg107_fated_clash_py_compile_20260623_143808.out`.
+
+Current audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=9`, `medium=4`, `pass=81`.
+- Deck `608`: `high=15`, `medium=3`, `pass=50`.
+- Global: `high=24`, `medium=4`, `pass=177`.
+- `Fated Clash` is closed for the current deck `607` gate.
+
+Current deck `607` high queue:
+
+- `Promise of Loyalty`
+- `Starfall Invocation`
+- `Pearl Medallion`
+- `Emeria's Call // Emeria, Shattered Skyclave`
+- `Molecule Man`
+- `The Mind Stone`
+- `The Scarlet Witch`
+- `Thor, God of Thunder`
+- `Tragic Arrogance`
+
+## External Card Rule Reference Harvester - 2026-06-23 14:58 UTC
+
+Status: `implemented_read_only_ready_for_manual_card_package_review`.
+
+What changed:
+
+- Added
+  `docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py`.
+- Added focused tests in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_rule_reference_harvester.py`.
+- The helper reads an existing `deck_card_battle_rule_coherence_audit` report
+  or builds one from Hermes SQLite, fetches Scryfall/XMage/Forge references,
+  computes raw Oracle MD5, builds candidate review packets, and writes JSON/MD
+  evidence.
+- It is explicitly read-only: it does not mutate PostgreSQL, SQLite, deck
+  lists, runtime code, or reviewed rule files.
+
+Evidence:
+
+- Accepted live harvester run:
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg107_top5_20260623_145446.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg107_top5_20260623_145446.md`.
+- The run reports `mutations_performed=[]`, source deck `607` counts
+  `high=9`, `medium=4`, `pass=81`, and packets for:
+  `Promise of Loyalty`, `Starfall Invocation`, `Pearl Medallion`,
+  `Emeria's Call // Emeria, Shattered Skyclave`, and `Molecule Man`.
+- External references found:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Pearl Medallion` all have
+  Scryfall, XMage, and Forge hits. `Emeria's Call` has Scryfall/XMage hits.
+  `Molecule Man` has Scryfall/Forge hits.
+- Candidate effects:
+  `Promise of Loyalty` -> `vow_counter_each_player_sacrifice_rest`;
+  `Starfall Invocation` ->
+  `gift_destroy_all_creatures_return_own_destroyed_creature`;
+  `Pearl Medallion` -> `ramp_permanent`;
+  `Emeria's Call // Emeria, Shattered Skyclave` -> `token_maker`;
+  `Molecule Man` -> `passive` pending manual model review.
+- Superseded first run:
+  `external_card_rule_reference_harvest_deck607_pg107_top5_20260623_145331.*`
+  is retained only as historical evidence; use `145446` as accepted evidence.
+
+Validation:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_rule_reference_harvester.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_rule_reference_harvester.py`
+- Result: `py_compile` exited `0`; unit test output was `Ran 5 tests` and
+  `OK`.
+
+Commit-ready closure - 2026-06-23:
+
+- Runtime cache/snapshot guard added in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`:
+  trusted SQLite-selected rules may fill missing non-executable runtime
+  annotations from `known_cards_canonical_snapshot.json` when logical key and
+  oracle hash match. It does not overwrite executable behavior from the active
+  rule.
+- This fixed the commit-blocking drift where `Seething Song`, `Silence`, and
+  `Angel's Grace` resolved from SQLite without PG-restored metadata.
+- Commit-ready validation artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_py_compile_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_battle_analyst_v10_3_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_external_harvester_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_forensic_supported_effects_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_deck_card_coherence_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_sync_pg_selection_test_20260623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_reviewed_rules_test_20260623.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg107_commit_ready_event_contract_static_test_20260623.out`.
+- Results: `py_compile OK`; external harvester `Ran 5 tests OK`;
+  battle analyst v10.3 passed including `test_fated_clash_*`,
+  `test_pg058_*`, and `test_pg086_*`; forensic supported effects passed;
+  deck-card coherence audit `Ran 8 tests OK`; sync PG selection
+  `Ran 10 tests OK` with existing sqlite ResourceWarnings; reviewed battle
+  rules `Ran 28 tests OK`; event contract static audit `7 tests passed`.
+
+XMage usage decision:
+
+- XMage is an external rule-reference source for review packets, not a
+  ManaLoom runtime dependency and not a replacement for Oracle/Scryfall text.
+- The harvester uses XMage hits to accelerate card-by-card work by locating a
+  modeled card class and extracting review cues: target shape, controller
+  restrictions, resolution ordering, zone transitions, delayed cleanup, static
+  cost reducers, and test-oracle ideas.
+- The next package still requires ManaLoom-native implementation, focused
+  tests/replay, dry-run/precheck/rollback SQL, explicit PostgreSQL apply when
+  needed, postcheck, sync, and re-audit. XMage evidence alone does not promote
+  a rule.
+
+Next validation focus:
+
+- Use the harvester output to start the next manually reviewed package with
+  `Promise of Loyalty` or `Starfall Invocation`; both are still pending until
+  Oracle/reference comparison, focused tests/replay, dry-run SQL package, and
+  post-audit evidence exist.
+- `Pearl Medallion` is the lower-risk battle-support slice if a smaller next
+  package is preferred.

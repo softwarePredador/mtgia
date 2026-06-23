@@ -88,6 +88,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "damage_wipe_treasure": "wipe",
     "exile_artifact_enchantment_creature_convoke_wipe": "wipe",
     "remove_creature": "removal",
+    "fated_clash_protect_then_destroy": "wipe",
     "remove_permanent": "removal",
     "remove_artifact_or_3dmg": "removal",
     "damage_player_and_creatures": "removal",
