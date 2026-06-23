@@ -5329,11 +5329,10 @@ Status:
 - `applied_validated`.
 - Durable runtime/provenance update for `Rite of Flame` and `Seething Song` in
   official Lorehold deck `6`.
-- The PG058 apply output exists and shows `UPDATE 2`, `UPDATE 3`, and
-  `COMMIT`; when the central auditor reconciled the package, PostgreSQL already
-  matched the post-apply state.
-- PostgreSQL is the source of truth; Hermes SQLite was full-refreshed after
-  scoped sync evidence was captured.
+- PostgreSQL package was applied in this cycle after precheck matched the
+  expected target row counts.
+- PostgreSQL is the source of truth; Hermes SQLite was synced from PostgreSQL
+  after postcheck passed.
 - No deck swap and no `deck_cards` mutation was executed.
 
 Applied package:
@@ -5354,7 +5353,7 @@ Target cards:
 
 Apply evidence:
 
-- Current-state precheck output captured after apply:
+- Precheck output:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_precheck_20260623_020031.out`.
 - Created backup table:
   `manaloom_deploy_audit.pg058_deck6_l3b_simple_red_rituals_20260623_020031`.
@@ -5382,10 +5381,8 @@ Postcheck evidence:
 
 Post-apply sync/audit:
 
-- Scoped SQLite-from-PG sync:
+- SQLite-from-PG sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
-- Full SQLite-from-PG refresh:
-  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
 - Focused events:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
 - Deck 6 final auditor:

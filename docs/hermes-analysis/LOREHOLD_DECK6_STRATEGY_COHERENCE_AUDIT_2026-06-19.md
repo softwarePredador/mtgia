@@ -19830,26 +19830,21 @@ Next deck 608 queue:
 
 What changed:
 
-- Reconciled and validated `PG058 Deck 6 L3B Simple Red Ritual Package` for
+- Applied and validated `PG058 Deck 6 L3B Simple Red Ritual Package` for
   `Rite of Flame` and `Seething Song`.
-- The PG058 apply output exists and shows `UPDATE 2`, `UPDATE 3`, and
-  `COMMIT`; when the central auditor reconciled the package, PostgreSQL already
-  matched the post-apply state.
 - Added focused runtime/provenance coverage for the two ritual rules.
 - No deck swap and no `deck_cards` mutation was executed.
 
 Evidence:
 
-- Current-state PG precheck captured after apply:
+- PG precheck:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_precheck_20260623_020031.out`.
 - PG postcheck:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_postcheck_20260623_020031.out`.
 - Apply output:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
-- Scoped SQLite-from-PG sync:
+- SQLite-from-PG sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
-- Full SQLite-from-PG refresh:
-  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
 - Focused events:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
 - Deck 6 auditor:
