@@ -5116,6 +5116,126 @@ def create_removal_compensation_tokens(effect_data, target_controller, source_ca
     return created
 
 
+def is_permanent_card(card):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    permanent_types = (
+        "artifact",
+        "battle",
+        "creature",
+        "enchantment",
+        "land",
+        "planeswalker",
+    )
+    return any(card_type in type_line for card_type in permanent_types)
+
+
+def is_token_permanent(card):
+    if not isinstance(card, dict):
+        return False
+    return bool(card.get("token")) or "token" in str(card.get("type_line") or "").lower()
+
+
+def move_permanent_to_library_then_reveal(
+    target_controller,
+    target,
+    source_card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    all_players=None,
+):
+    if target_controller is None or not isinstance(target, dict):
+        return "library"
+    battlefield = getattr(target_controller, "battlefield", [])
+    live_target = battlefield_object_for_target(target_controller, target)
+    if live_target is not None:
+        target = live_target
+    if target in battlefield:
+        battlefield.remove(target)
+    elif live_target is not None and live_target in battlefield:
+        battlefield.remove(live_target)
+
+    library_before = len(getattr(target_controller, "library", []) or [])
+    target_vanished = is_token_permanent(target)
+    if not target_vanished:
+        target_controller.library.append(target)
+    target_controller.shuffle(rng)
+
+    revealed = target_controller.library[0] if target_controller.library else None
+    revealed_is_permanent = is_permanent_card(revealed)
+    put_onto_battlefield = False
+    if revealed_is_permanent and revealed in target_controller.library:
+        target_controller.library.remove(revealed)
+        permanent = prepare_entering_permanent(
+            revealed,
+            controller=target_controller,
+            all_players=all_players or [target_controller],
+            turn=turn,
+        )
+        target_controller.battlefield.append(permanent)
+        put_onto_battlefield = True
+
+    emit_replay_event(
+        "chaos_warp_reveal_resolved",
+        player=getattr(target_controller, "name", None),
+        source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        target=target.get("name", "?"),
+        target_vanished=target_vanished,
+        library_before=library_before,
+        library_after=len(getattr(target_controller, "library", []) or []),
+        revealed_card=revealed.get("name", "?") if isinstance(revealed, dict) else None,
+        revealed_type_line=revealed.get("type_line", "") if isinstance(revealed, dict) else "",
+        revealed_is_permanent=revealed_is_permanent,
+        put_onto_battlefield=put_onto_battlefield,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return "library"
+
+
+def move_removed_permanent_to_destination(
+    target_controller,
+    target,
+    source_card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    all_players=None,
+):
+    destination = removal_destination(effect_data)
+    if destination == "exile":
+        move_zone_object_to_exile(
+            target_controller,
+            "battlefield",
+            target,
+            reason="removal",
+            source=source_card,
+            turn=turn,
+        )
+    elif destination == "library":
+        move_permanent_to_library_then_reveal(
+            target_controller,
+            target,
+            source_card,
+            effect_data,
+            turn,
+            rng,
+            all_players=all_players,
+        )
+    else:
+        move_permanent_from_battlefield(
+            target_controller,
+            target,
+            reason="removal",
+            source=source_card,
+        )
+    return destination
+
+
 def declared_target_replay_entry(decision):
     return {
         "target": decision.get("target_name"),
@@ -5271,11 +5391,14 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
         if check_ward(target, card, player, rng):
             ward_countered.append(decision["target_name"])
             continue
-        move_permanent_from_battlefield(
+        move_removed_permanent_to_destination(
             target_controller,
             target,
-            reason="multi_target_removal",
-            source=card,
+            card,
+            effect_data,
+            turn,
+            rng,
+            all_players=players,
         )
         create_removal_compensation_tokens(effect_data, target_controller, card, turn)
         resolved.append(decision["target_name"])
@@ -5415,23 +5538,15 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         ),
         **replay_rule_fields(effect_data),
     )
-    destination = removal_destination(effect_data)
-    if destination == "exile":
-        move_zone_object_to_exile(
-            target_controller,
-            "battlefield",
-            target,
-            reason="removal",
-            source=card,
-            turn=turn,
-        )
-    else:
-        move_permanent_from_battlefield(
-            target_controller,
-            target,
-            reason="removal",
-            source=card,
-        )
+    move_removed_permanent_to_destination(
+        target_controller,
+        target,
+        card,
+        effect_data,
+        turn,
+        rng,
+        all_players=players,
+    )
     create_removal_compensation_tokens(effect_data, target_controller, card, turn)
     return True
 
@@ -12332,6 +12447,17 @@ def library_tutor_candidates(player, target_type):
         elif target_type in ("creature", "creature_to_battlefield"):
             if is_creature_card(candidate):
                 candidates.append(candidate)
+        elif target_type in (
+            "small_creature",
+            "creature_mana_value_1_or_less",
+            "creature_mana_value_lte_1",
+        ):
+            try:
+                candidate_cmc = int(float(candidate.get("cmc") or candidate.get("mana_value")))
+            except (TypeError, ValueError):
+                candidate_cmc = None
+            if is_creature_card(candidate) and candidate_cmc is not None and candidate_cmc <= 1:
+                candidates.append(candidate)
         elif target_type == "creature_power_lte_2":
             try:
                 candidate_power = int(float(candidate.get("power")))
@@ -16109,23 +16235,15 @@ def apply_effect_immediate(
                         ),
                         **replay_rule_fields(effect_data),
                     )
-                destination = removal_destination(effect_data)
-                if destination == "exile":
-                    move_zone_object_to_exile(
-                        opp,
-                        "battlefield",
-                        t,
-                        reason="removal",
-                        source=card,
-                        turn=turn,
-                    )
-                else:
-                    move_permanent_from_battlefield(
-                        opp,
-                        t,
-                        reason="removal",
-                        source=card,
-                    )
+                move_removed_permanent_to_destination(
+                    opp,
+                    t,
+                    card,
+                    effect_data,
+                    turn,
+                    rng,
+                    all_players=all_players_for_entry,
+                )
                 create_removal_compensation_tokens(effect_data, opp, card, turn)
                 break
         finish_resolved_spell(player, card, turn=turn)

@@ -20535,3 +20535,66 @@ Current reading:
   mismatch appears. The cost-reduction note is only a caveat/pista.
 - The next PG package must be PG076, preferably `Chaos Warp` as an L8 unique
   shuffle/reveal/top permanent executor before the medium queue.
+
+## PG076 Deck 6 Support/Passive + Chaos Warp Closure - 2026-06-23 05:55 UTC
+
+What changed:
+
+- Support/passive rows for `Drannith Magistrate`, `Giver of Runes`,
+  `Mother of Runes`, `Professional Face-Breaker`, `Ranger-Captain of Eos`,
+  and `Storm-Kiln Artist` were reconciled with current oracle hashes and
+  scoped annotation metadata. Ranger-Captain's ETB small-creature tutor is
+  runtime executable; its sacrifice noncreature silence remains annotation-only.
+- `Chaos Warp` now models target permanent -> owner library shuffle -> reveal
+  top card -> put revealed permanent onto battlefield.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- Support/passive postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_annotation_pg076_postcheck_20260623_054358.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_ranger_tutor_pg076_postcheck_20260623_054358.out`.
+- Chaos Warp postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_postcheck_20260623_055230.out`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_chaos_warp_focused_events_20260623_055230.jsonl`.
+- Final deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_chaos_warp_20260623_055230.json`
+  reports `high=0`, `medium=2`, `pass=98`.
+- Final deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg076_chaos_warp_20260623_055230.json`
+  reports `high=29`, `medium=14`, `pass=51`.
+- Final deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg076_chaos_warp_20260623_055230.json`
+  reports `high=21`, `medium=6`, `pass=41`.
+
+Current reading:
+
+- Deck `6` has no high-severity card left in the current card battle-rule
+  coherence gate.
+- Remaining deck `6` medium queue: `Jeska's Will` and `Mizzix's Mastery`.
+- The next PostgreSQL package must use PG077.
+
+## PG076 Final Deck 6 Reading - 2026-06-23 06:01 UTC
+
+Additional evidence:
+
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_final_sync_report_20260623_060105.json`.
+- Support/passive focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_final_20260623_060105.json`
+  reports `high=0`, `medium=2`, `pass=98`.
+- Final deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg076_final_20260623_060105.json`
+  remains `high=7`, `medium=30`, `pass=44`.
+
+Current reading:
+
+- Deck `6` has no high card left in this coherence gate.
+- `Blasphemous Act` remains closed/pass; the cost-reduction note is a
+  validation hint only, not an instruction to alter the card.
+- Next deck `6` candidates are `Jeska's Will` and `Mizzix's Mastery`; after
+  that, continue deck `606` high queue.

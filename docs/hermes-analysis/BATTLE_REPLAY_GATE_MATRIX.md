@@ -3399,3 +3399,73 @@ Caveat:
   runtime, not a full strategic hidden-choice solver.
 - `Blasphemous Act` was not a PG073-PG075 target. Its cost-reduction note is
   a caveat/pista only and does not reopen the card without proven mismatch.
+
+## PG076 Deck 6 Chaos Warp Runtime Gate - 2026-06-23 05:55 UTC
+
+Artifacts:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_postcheck_20260623_055230.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_chaos_warp_runtime_sync_report_20260623_055230.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_chaos_warp_focused_events_20260623_055230.jsonl`.
+- Final deck `6` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_chaos_warp_20260623_055230.json`.
+
+Gate:
+
+- `Chaos Warp` emits `removal_resolved` with
+  `rule_logical_key=battle_rule_v1:0b547d7209a38ac2d23a1cca07917680`,
+  `rule_oracle_hash=7db2bc44526b855fd22302e9569746b5`,
+  `target_type=permanent`, and `destination=library`.
+- It then emits `chaos_warp_reveal_resolved`; the focused event proves a token
+  target vanishes after the zone-change replacement and a revealed permanent
+  is put onto the battlefield.
+
+Status:
+
+- `Chaos Warp` is closed for the current L8 unique shuffle/reveal gate.
+- Deck `6` now reports `high=0`, `medium=2`, `pass=98`; remaining deck `6`
+  medium cards are `Jeska's Will` and `Mizzix's Mastery`.
+- Deck `607` now reports `high=29`, `medium=14`, `pass=51`; deck `608`
+  reports `high=21`, `medium=6`, `pass=41`.
+
+Caveat:
+
+- Commander replacement for a commander targeted by `Chaos Warp` remains
+  covered by the general replacement suite, not by this focused token-target
+  event.
+
+## PG076 Deck 6 Support/Passive Annotation Gate - 2026-06-23 06:01 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`.
+- Final deck `6` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_final_20260623_060105.json`.
+
+Gate:
+
+- `Drannith Magistrate`, `Giver of Runes`, `Mother of Runes`,
+  `Professional Face-Breaker`, `Ranger-Captain of Eos`, and
+  `Storm-Kiln Artist` each emit `spell_resolved` with curated rule key/hash
+  provenance.
+- `Ranger-Captain of Eos` additionally emits `tutor_resolved` with
+  `rule_logical_key=battle_rule_v1:b05b64c0734daafd9c6f24ea02b39495`,
+  `target_type=creature_mana_value_1_or_less`, `found=Esper Sentinel`, and
+  `destination=hand`.
+
+Status:
+
+- The former deck `6` medium support/passive queue is closed for the current
+  coherence gate.
+- The only deck `6` remaining cards in queue are `Jeska's Will` and
+  `Mizzix's Mastery`.
+
+Caveat:
+
+- The protection, treasure/impulse, magecraft, static nonhand-cast
+  restriction, sacrifice silence, and shuffle text captured in these rows
+  remain annotation/provenance unless explicitly named as runtime above.

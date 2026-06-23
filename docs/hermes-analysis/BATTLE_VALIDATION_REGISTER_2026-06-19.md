@@ -16654,3 +16654,86 @@ Next lane recommendation:
 - Use PG076 for the next PostgreSQL package.
 - Take `Chaos Warp` first as L8 unique shuffle/reveal/top permanent executor,
   then the `Jeska's Will`/`Mizzix's Mastery` battle-support pair.
+
+## PG076 Deck 6 Support/Passive + Chaos Warp Validation - 2026-06-23
+
+Status: `applied_validated`.
+
+PostgreSQL:
+
+- Support/passive backups:
+  `manaloom_deploy_audit.pg076_deck6_support_passive_annotation_20260623_054358`
+  and
+  `manaloom_deploy_audit.pg076_deck6_support_passive_ranger_tutor_20260623_054358`.
+- Chaos Warp backup:
+  `manaloom_deploy_audit.pg076_deck6_chaos_warp_runtime_20260623_055230`.
+- Chaos Warp postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_postcheck_20260623_055230.out`
+  reported `target_rule_rows=2`, `expected_runtime_rows=1`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=2`.
+
+Runtime evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_chaos_warp_focused_events_20260623_055230.jsonl`.
+- The event log proves `Chaos Warp` resolves as target permanent removal to
+  owner library, then reveals top card and puts a revealed permanent onto the
+  battlefield with rule key/hash provenance.
+
+Auditor result:
+
+- Deck `6`: `high=0`, `medium=2`, `pass=98`.
+- Deck `606`: `high=7`, `medium=30`, `pass=44`.
+- Deck `607`: `high=29`, `medium=14`, `pass=51`.
+- Deck `608`: `high=21`, `medium=6`, `pass=41`.
+- Global: `high=50`, `medium=36`, `pass=119`.
+
+Tests:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed and includes `test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Next:
+
+- Use PG077 next.
+- Deck `6` has no high card left in the current battle-rule coherence gate.
+  Continue with `Jeska's Will` and `Mizzix's Mastery`.
+
+## PG076 Final Sync/Audit Addendum - 2026-06-23 06:01 UTC
+
+Status: `applied_validated`.
+
+Additional runtime evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`
+  contains 6 `spell_resolved` events for the support/passive cards and 1
+  `tutor_resolved` event for `Ranger-Captain of Eos` selecting
+  `Esper Sentinel` with
+  `rule_logical_key=battle_rule_v1:b05b64c0734daafd9c6f24ea02b39495`.
+
+Final sync/auditors:
+
+- Final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_final_sync_report_20260623_060105.json`
+  confirmed PostgreSQL remained the source of truth and SQLite was refreshed
+  with `include_needs_review=false`.
+- Exact requested global audit command was rerun with `--limit 200` and wrote
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg076_final_20260623_060105.json`;
+  result: `high=50`, `medium=36`, `pass=119`.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_final_20260623_060105.json`;
+  result: `high=0`, `medium=2`, `pass=98`.
+- Final deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg076_final_20260623_060105.json`;
+  result: `high=7`, `medium=30`, `pass=44`.
+
+Current queue:
+
+- Deck `6`: `Jeska's Will`, then `Mizzix's Mastery`.
+- Deck `606` high queue remains: `Flare of Duplication`, `Powerbalance`,
+  `Reforge the Soul`, `Rise of the Eldrazi`, `Rite of the Dragoncaller`,
+  `Storm Herd`, and `Witch Enchanter // Witch-Blessed Meadow`.

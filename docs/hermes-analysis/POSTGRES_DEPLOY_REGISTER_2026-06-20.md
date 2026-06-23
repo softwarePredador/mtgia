@@ -7131,3 +7131,136 @@ Rollback:
 Numbering note:
 
 - The next PostgreSQL package must use PG072.
+
+## PG076 Deck 6 Support/Passive + Chaos Warp Runtime - Applied 2026-06-23 05:55 UTC
+
+Status:
+
+- `applied_validated`.
+- This is a reconciled combined PG076 package with three PostgreSQL backup
+  tables:
+  `manaloom_deploy_audit.pg076_deck6_support_passive_annotation_20260623_054358`,
+  `manaloom_deploy_audit.pg076_deck6_support_passive_ranger_tutor_20260623_054358`,
+  and
+  `manaloom_deploy_audit.pg076_deck6_chaos_warp_runtime_20260623_055230`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Scope:
+
+- Support/passive annotation and provenance for `Drannith Magistrate`,
+  `Giver of Runes`, `Mother of Runes`, `Professional Face-Breaker`,
+  `Ranger-Captain of Eos`, and `Storm-Kiln Artist`.
+- `Ranger-Captain of Eos` addendum: ETB tutor for creature mana value 1 or
+  less is runtime executable; sacrifice noncreature silence and library shuffle
+  remain annotation-only.
+- `Chaos Warp` runtime:
+  `target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1`.
+
+Artifacts:
+
+- Support/passive precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_annotation_pg076_precheck_20260623_054358.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_annotation_pg076_apply_20260623_054358.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_annotation_pg076_postcheck_20260623_054358.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_annotation_pg076_rollback_20260623_054358.sql`.
+- Ranger addendum precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_ranger_tutor_pg076_precheck_20260623_054358.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_ranger_tutor_pg076_apply_20260623_054358.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_ranger_tutor_pg076_postcheck_20260623_054358.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_support_passive_ranger_tutor_pg076_rollback_20260623_054358.sql`.
+- Chaos Warp precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_precheck_20260623_055230.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_apply_20260623_055230.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_postcheck_20260623_055230.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_chaos_warp_runtime_pg076_rollback_20260623_055230.sql`.
+
+Postcheck evidence:
+
+- Support/passive postcheck reported `target_rule_rows=12`,
+  `expected_curated_annotation_rows=6`, `active_review_shadow_rows=0`, and
+  `backup_rows=12`.
+- Ranger addendum postcheck reported `ranger_rule_rows=1`,
+  `expected_ranger_tutor_runtime_rows=1`, and `backup_rows=1`.
+- Chaos Warp postcheck reported `target_rule_rows=2`,
+  `expected_runtime_rows=1`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0`, and `backup_rows=2`.
+
+Rules confirmed:
+
+- `Chaos Warp`:
+  `battle_rule_v1:0b547d7209a38ac2d23a1cca07917680`,
+  `oracle_hash=7db2bc44526b855fd22302e9569746b5`,
+  `effect=remove_permanent`, `target=permanent`, `destination=library`,
+  and
+  `battle_model_scope=target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1`.
+- The superseded generated `Chaos Warp` draw row
+  `battle_rule_v1:1bd5dce7cffed8d0af007d20b15e8549` is
+  `deprecated/disabled`.
+
+Accepted sync/audit:
+
+- Final SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_chaos_warp_runtime_sync_report_20260623_055230.json`
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and exported
+  `canonical_snapshot_rows_exported=3201`.
+- Final deck `6` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_chaos_warp_20260623_055230.json`
+  reported `high=0`, `medium=2`, `pass=98`.
+- Deck `606`: `high=7`, `medium=30`, `pass=44`.
+- Deck `607`: `high=29`, `medium=14`, `pass=51`.
+- Deck `608`: `high=21`, `medium=6`, `pass=41`.
+- Global: `high=50`, `medium=36`, `pass=119`.
+
+Runtime evidence:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_chaos_warp_focused_events_20260623_055230.jsonl`.
+- The focused event proves `removal_resolved` with `destination=library` and
+  `chaos_warp_reveal_resolved` with a revealed permanent entering the
+  battlefield.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including
+  `test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Register ordering note:
+
+- Some immediately preceding PG070-PG075 entries are physically out of
+  chronological order because they were reconciled from parallel artifacts.
+  This PG076 entry is the current applied high-water mark.
+
+Numbering note:
+
+- The next PostgreSQL package must use PG077.
+
+## PG076 Final Sync/Audit Addendum - Validated 2026-06-23 06:01 UTC
+
+- No additional PostgreSQL apply was performed in this addendum.
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_final_sync_report_20260623_060105.json`.
+  It reported `pg_inserted_or_updated=0`, `pg_rows_loaded=1825`,
+  `sqlite_inserted_or_updated=1802`, `canonical_snapshot_rows_exported=3201`,
+  and `include_needs_review=false`.
+- Final accepted audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_final_20260623_060105.json`
+  (`high=0`, `medium=2`, `pass=98`),
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg076_final_20260623_060105.json`
+  (`high=7`, `medium=30`, `pass=44`), and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg076_final_20260623_060105.json`
+  (`high=50`, `medium=36`, `pass=119`).
+- Runtime evidence added for support/passive package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`.
+- Rollbacks remain the original PG076 rollback files listed above; PG077 is
+  still the next deploy number.

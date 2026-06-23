@@ -555,3 +555,68 @@ Atualizado em 2026-05-26:
 - Proximo deploy deve usar PG076. Unico high restante no deck `6`:
   `Chaos Warp`; depois priorizar mediums battle-support `Jeska's Will` e
   `Mizzix's Mastery` antes da fila support/passive.
+
+## ManaLoom deck 6 PG076 support/passive + Chaos Warp closure - 2026-06-23
+
+- PG076 foi reconciliado como pacote combinado. Subpacote support/passive
+  aplicou hashes/scope oracle-specific para `Drannith Magistrate`,
+  `Giver of Runes`, `Mother of Runes`, `Professional Face-Breaker`,
+  `Ranger-Captain of Eos` e `Storm-Kiln Artist`; o addendum de
+  `Ranger-Captain of Eos` tornou o ETB tutor de criatura mana value 1 ou
+  menos executavel, mantendo shuffle e sacrifice-silence como annotation-only.
+- Subpacote `Chaos Warp` aplicou a regra runtime:
+  `target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1`.
+  A regra curada `battle_rule_v1:0b547d7209a38ac2d23a1cca07917680` ficou
+  `verified/auto`, `rule_version=2`, `oracle_hash=7db2bc44526b855fd22302e9569746b5`;
+  a shadow row gerada `draw_cards` ficou `deprecated/disabled`.
+- PostgreSQL backups PG076 existentes:
+  `manaloom_deploy_audit.pg076_deck6_support_passive_annotation_20260623_054358`,
+  `manaloom_deploy_audit.pg076_deck6_support_passive_ranger_tutor_20260623_054358`
+  e `manaloom_deploy_audit.pg076_deck6_chaos_warp_runtime_20260623_055230`.
+- Sync final aceito PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_chaos_warp_runtime_sync_report_20260623_055230.json`
+  usou `include_needs_review=false`, carregou `pg_rows_loaded=1825`,
+  escreveu `sqlite_inserted_or_updated=1802` e exportou
+  `canonical_snapshot_rows_exported=3201`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_chaos_warp_focused_events_20260623_055230.jsonl`
+  prova `removal_resolved` com destino `library` e
+  `chaos_warp_reveal_resolved` colocando a carta permanente revelada no
+  battlefield com rule key/hash.
+- Auditor final aceito PG076: deck `6` esta em `high=0`, `medium=2`,
+  `pass=98`; deck `606` esta em `high=7`, `medium=30`, `pass=44`;
+  deck `607` esta em `high=29`, `medium=14`, `pass=51`; deck `608` esta em
+  `high=21`, `medium=6`, `pass=41`; global esta em `high=50`,
+  `medium=36`, `pass=119`.
+- Testes passaram: `py_compile`, `test_battle_analyst_v10_3.py`
+  incluindo `test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent`,
+  `test_sync_battle_card_rules_pg_selection.py -v` e
+  `test_deck_card_battle_rule_coherence_audit.py -v`.
+- Proximo deploy deve usar PG077. Deck `6` nao tem high restante; proxima fila
+  do deck `6` e `Jeska's Will` e `Mizzix's Mastery`.
+
+## ManaLoom deck 6 PG076 final reconciliation - 2026-06-23 06:01 UTC
+
+- Revalidacao final PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_final_sync_report_20260623_060105.json`
+  confirmou `include_needs_review=false`, `pg_inserted_or_updated=0`,
+  `pg_rows_loaded=1825`, `sqlite_inserted_or_updated=1802` e
+  `canonical_snapshot_rows_exported=3201`.
+- Evento focado support/passive:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`
+  prova seis `spell_resolved` com rule key/hash e um `tutor_resolved` para
+  `Ranger-Captain of Eos` buscando `Esper Sentinel` via
+  `creature_mana_value_1_or_less`.
+- Auditor final deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_final_20260623_060105.json`
+  reportou `high=0`, `medium=2`, `pass=98`; os mediums restantes sao
+  `Jeska's Will` e `Mizzix's Mastery`.
+- Auditor final deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg076_final_20260623_060105.json`
+  permaneceu `high=7`, `medium=30`, `pass=44`.
+- Auditor global final limitado:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg076_final_20260623_060105.json`
+  reportou `high=50`, `medium=36`, `pass=119`.
+- `Blasphemous Act` aparece `pass/coherent_for_current_gate` no corte deck `6`;
+  a nota de reducao de custo continua apenas caveat de checagem futura e nao
+  reabre a carta sem mismatch real de oracle/runtime/PostgreSQL.

@@ -4507,14 +4507,23 @@
     "battle_rule_logical_key": "battle_rule_v1:f1b00dfd80398fba57611334b547c89d"
   },
   "Chaos Warp": {
+    "battle_model_scope": "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1",
+    "destination": "library",
     "effect": "remove_permanent",
     "instant": true,
+    "nonpermanent_reveal_status": "revealed_card_remains_on_top_of_library",
+    "oracle_runtime_scope": "owner_shuffle_target_permanent_into_library_then_reveal_top_permanent_to_battlefield_v1",
+    "permanent_reveal_to_battlefield": true,
+    "target": "permanent",
+    "token_target_status": "token_vanishes_after_shuffle_replacement",
+    "top_reveal_after_shuffle": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0b547d7209a38ac2d23a1cca07917680"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0b547d7209a38ac2d23a1cca07917680",
+    "battle_rule_oracle_hash": "7db2bc44526b855fd22302e9569746b5"
   },
   "Charcoal Diamond": {
     "cmc": 2.0,
@@ -7684,16 +7693,22 @@
     "battle_rule_logical_key": "battle_rule_v1:adfbbd4cb3a121483d8bd0b3b0fbb4f3"
   },
   "Drannith Magistrate": {
+    "battle_model_scope": "static_nonhand_cast_restriction_annotation_creature_body_v1",
     "effect": "passive",
     "is_creature_permanent": true,
+    "opponents_cant_cast_from_nonhand_zones": true,
+    "oracle_runtime_scope": "creature_body_runtime_static_nonhand_cast_lock_annotation",
     "power": 1,
+    "runtime_modeled_effect": "creature_body_only",
+    "static_ability_status": "annotation_only",
     "toughness": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:673c58ea36aeaf798d78aaaa10892e3e"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:673c58ea36aeaf798d78aaaa10892e3e",
+    "battle_rule_oracle_hash": "2335f446bb72dcb00f41aed8faf2167a"
   },
   "Drannith Ruins": {
     "effect": "land",
@@ -11394,16 +11409,28 @@
     "battle_rule_logical_key": "battle_rule_v1:021c1007409d808aeb5ade04d6976acb"
   },
   "Giver of Runes": {
+    "activated_protection_status": "annotation_only",
+    "battle_model_scope": "creature_body_protection_activation_annotation_v1",
+    "duration": "until_end_of_turn",
     "effect": "creature",
     "is_creature_permanent": true,
+    "oracle_runtime_scope": "creature_body_runtime_protection_activation_annotation",
     "power": 1,
+    "protection_choices": [
+      "colorless",
+      "chosen_color"
+    ],
+    "protection_target": "another_creature_you_control",
+    "runtime_modeled_effect": "creature_body_only",
+    "tap_activation": true,
     "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c2736795c0d2c41d771b8a87319618bc"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c2736795c0d2c41d771b8a87319618bc",
+    "battle_rule_oracle_hash": "ae6856021d2bee0a8ba4d7e70ce56637"
   },
   "Gix, Yawgmoth Praetor": {
     "cmc": 3.0,
@@ -18351,16 +18378,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Mother of Runes": {
+    "activated_protection_status": "annotation_only",
+    "battle_model_scope": "creature_body_protection_activation_annotation_v1",
+    "duration": "until_end_of_turn",
     "effect": "creature",
     "is_creature_permanent": true,
+    "oracle_runtime_scope": "creature_body_runtime_protection_activation_annotation",
     "power": 1,
+    "protection_choices": [
+      "chosen_color"
+    ],
+    "protection_target": "target_creature_you_control",
+    "runtime_modeled_effect": "creature_body_only",
+    "tap_activation": true,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948",
+    "battle_rule_oracle_hash": "022c4e9496d2b5b6f0785bc63f8e9d11"
   },
   "Mount Doom": {
     "effect": "land",
@@ -21222,19 +21260,25 @@
     "battle_rule_logical_key": "battle_rule_v1:0f097858e7300dc218d3d077cdcfc2d7"
   },
   "Professional Face-Breaker": {
+    "battle_model_scope": "creature_body_menace_combat_damage_treasure_impulse_annotation_v1",
+    "combat_damage_treasure_trigger_status": "annotation_only",
     "effect": "creature",
     "is_creature_permanent": true,
     "keywords": [
       "menace"
     ],
+    "oracle_runtime_scope": "creature_body_runtime_menace_treasure_impulse_annotation",
     "power": 2,
+    "runtime_modeled_effect": "creature_body_only",
     "toughness": 3,
+    "treasure_impulse_draw_status": "annotation_only",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3d154b436fcb6b4f290cdd0246d5def4"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3d154b436fcb6b4f290cdd0246d5def4",
+    "battle_rule_oracle_hash": "606b21e85871f60d1804eaabcd59ac5b"
   },
   "Profound Journey": {
     "cmc": 7.0,
@@ -21834,17 +21878,25 @@
     "battle_rule_logical_key": "battle_rule_v1:e9a2f41b86aad0a56d142873b1267daf"
   },
   "Ranger-Captain of Eos": {
+    "battle_model_scope": "creature_body_etb_small_creature_tutor_sacrifice_noncreature_silence_annotation_v1",
     "effect": "creature",
-    "etb_tutor_target": "small_creature",
+    "etb_tutor_runtime_scope": "creature_mana_value_1_or_less_to_hand",
+    "etb_tutor_status": "runtime_library_to_hand",
+    "etb_tutor_target": "creature_mana_value_1_or_less",
     "is_creature_permanent": true,
+    "library_shuffle_status": "annotation_only",
+    "oracle_runtime_scope": "creature_body_runtime_etb_tutor_sacrifice_silence_annotation",
     "power": 3,
+    "runtime_modeled_effect": "creature_body_only",
+    "sacrifice_noncreature_silence_status": "annotation_only",
     "toughness": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b05b64c0734daafd9c6f24ea02b39495"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b05b64c0734daafd9c6f24ea02b39495",
+    "battle_rule_oracle_hash": "43c8ec0dd0df9cecea5986a5ffb1d16d"
   },
   "Raphael's Technique": {
     "cmc": 6.0,
@@ -27088,16 +27140,23 @@
     "battle_rule_logical_key": "battle_rule_v1:6f6965867e137adb2ab9ae3ff368c80c"
   },
   "Storm-Kiln Artist": {
+    "artifact_power_bonus_status": "annotation_only",
+    "battle_model_scope": "creature_body_artifact_power_magecraft_treasure_annotation_v1",
     "effect": "creature",
     "is_creature_permanent": true,
+    "magecraft_treasure_status": "annotation_only",
+    "magecraft_trigger": "cast_or_copy_instant_or_sorcery",
+    "oracle_runtime_scope": "creature_body_runtime_artifact_power_magecraft_treasure_annotation",
     "power": 2,
+    "runtime_modeled_effect": "creature_body_only",
     "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985",
+    "battle_rule_oracle_hash": "cb2cf161073de3983ac24385743ab78a"
   },
   "Stormcarved Coast": {
     "effect": "land",

@@ -3118,6 +3118,78 @@ def register_tests(battle, player):
         assert any(card.get("name") == "Sol Ring" for card in opponent.battlefield)
         assert any(card.get("name") == "Opponent Enchantment" for card in opponent.graveyard)
 
+    def test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            chaos_warp = {"name": "Chaos Warp", "cmc": 3, "type_line": "Instant"}
+            target = {
+                "name": "Beast Token",
+                "cmc": 0,
+                "type_line": "Creature Token",
+                "effect": "creature",
+                "token": True,
+                "power": 3,
+                "toughness": 3,
+            }
+            revealed_permanent = {
+                "name": "Replacement Rock",
+                "cmc": 2,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+            }
+            opponent.battlefield = [target]
+            opponent.library = [revealed_permanent]
+            active.hand = [chaos_warp]
+            effect_data = battle.get_card_effect(chaos_warp)
+
+            assert effect_data["effect"] == "remove_permanent"
+            assert effect_data["target"] == "permanent"
+            assert effect_data["destination"] == "library"
+            assert effect_data["top_reveal_after_shuffle"] is True
+            assert effect_data["battle_model_scope"] == "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:0b547d7209a38ac2d23a1cca07917680"
+            assert effect_data["_rule_oracle_hash"] == "7db2bc44526b855fd22302e9569746b5"
+            assert battle.target_matches_type(target, effect_data["target"])
+
+            active.hand.remove(chaos_warp)
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                chaos_warp,
+                4,
+                random.Random(76076),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Chaos Warp"
+        )
+        reveal_event = next(
+            data
+            for event, data in events
+            if event == "chaos_warp_reveal_resolved"
+        )
+        assert removal_event["target"] == "Beast Token"
+        assert removal_event["destination"] == "library"
+        assert removal_event["target_type"] == "permanent"
+        assert removal_event["rule_logical_key"] == "battle_rule_v1:0b547d7209a38ac2d23a1cca07917680"
+        assert removal_event["rule_oracle_hash"] == "7db2bc44526b855fd22302e9569746b5"
+        assert reveal_event["target_vanished"] is True
+        assert reveal_event["revealed_card"] == "Replacement Rock"
+        assert reveal_event["revealed_is_permanent"] is True
+        assert reveal_event["put_onto_battlefield"] is True
+        assert any(card.get("name") == "Replacement Rock" for card in opponent.battlefield)
+        assert not any(card.get("name") == "Beast Token" for card in opponent.battlefield)
+        assert opponent.library == []
+
     def test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -3287,6 +3359,114 @@ def register_tests(battle, player):
         assert wheel_event["secret_number_choice_model"] == "compact_controller_draw_count_opponents_zero_v1"
         assert wheel_event["rule_logical_key"] == "battle_rule_v1:402155f35799993b812ca441586017cd"
         assert wheel_event["rule_oracle_hash"] == "fa744c33b4bc56c05977ec9c378e5b7d"
+
+    def test_pg076_support_passive_annotations_and_ranger_small_creature_tutor():
+        expected = {
+            "Drannith Magistrate": (
+                "battle_rule_v1:673c58ea36aeaf798d78aaaa10892e3e",
+                "2335f446bb72dcb00f41aed8faf2167a",
+                "static_nonhand_cast_restriction_annotation_creature_body_v1",
+            ),
+            "Giver of Runes": (
+                "battle_rule_v1:c2736795c0d2c41d771b8a87319618bc",
+                "ae6856021d2bee0a8ba4d7e70ce56637",
+                "creature_body_protection_activation_annotation_v1",
+            ),
+            "Mother of Runes": (
+                "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948",
+                "022c4e9496d2b5b6f0785bc63f8e9d11",
+                "creature_body_protection_activation_annotation_v1",
+            ),
+            "Professional Face-Breaker": (
+                "battle_rule_v1:3d154b436fcb6b4f290cdd0246d5def4",
+                "606b21e85871f60d1804eaabcd59ac5b",
+                "creature_body_menace_combat_damage_treasure_impulse_annotation_v1",
+            ),
+            "Ranger-Captain of Eos": (
+                "battle_rule_v1:b05b64c0734daafd9c6f24ea02b39495",
+                "43c8ec0dd0df9cecea5986a5ffb1d16d",
+                "creature_body_etb_small_creature_tutor_sacrifice_noncreature_silence_annotation_v1",
+            ),
+            "Storm-Kiln Artist": (
+                "battle_rule_v1:128e222b4de1e6308d98743711b54985",
+                "cb2cf161073de3983ac24385743ab78a",
+                "creature_body_artifact_power_magecraft_treasure_annotation_v1",
+            ),
+        }
+        cards = [
+            {"name": "Drannith Magistrate", "cmc": 2, "type_line": "Creature — Human Wizard"},
+            {"name": "Giver of Runes", "cmc": 1, "type_line": "Creature — Kor Cleric"},
+            {"name": "Mother of Runes", "cmc": 1, "type_line": "Creature — Human Cleric"},
+            {"name": "Professional Face-Breaker", "cmc": 3, "type_line": "Creature — Human Warrior"},
+            {"name": "Ranger-Captain of Eos", "cmc": 3, "type_line": "Creature — Human Soldier Ranger"},
+            {"name": "Storm-Kiln Artist", "cmc": 4, "type_line": "Creature — Dwarf Shaman"},
+        ]
+        active = player("Active")
+        active.library = [
+            {
+                "name": "Esper Sentinel",
+                "cmc": 1,
+                "type_line": "Artifact Creature — Human Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            },
+            {
+                "name": "Grand Abolisher",
+                "cmc": 2,
+                "type_line": "Creature — Human Cleric",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            },
+        ]
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            for card in cards:
+                effect_data = battle.get_card_effect(card)
+                logical_key, oracle_hash, scope = expected[card["name"]]
+                assert effect_data["_rule_logical_key"] == logical_key
+                assert effect_data["_rule_oracle_hash"] == oracle_hash
+                assert effect_data["battle_model_scope"] == scope
+                if card["name"] == "Ranger-Captain of Eos":
+                    assert effect_data["etb_tutor_target"] == "creature_mana_value_1_or_less"
+                    assert effect_data["etb_tutor_status"] == "runtime_library_to_hand"
+                    assert effect_data["sacrifice_noncreature_silence_status"] == "annotation_only"
+                elif card["name"] != "Drannith Magistrate":
+                    assert effect_data["runtime_modeled_effect"] == "creature_body_only"
+                battle.apply_effect_immediate(
+                    active,
+                    [],
+                    card,
+                    6,
+                    random.Random(760),
+                    effect_data_override=effect_data,
+                )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        spell_events = {
+            data["card"]: data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") in expected
+        }
+        assert set(spell_events) == set(expected)
+        for name, (logical_key, oracle_hash, _scope) in expected.items():
+            assert spell_events[name]["rule_logical_key"] == logical_key
+            assert spell_events[name]["rule_oracle_hash"] == oracle_hash
+
+        tutor_event = next(
+            data
+            for event, data in events
+            if event == "tutor_resolved" and data.get("card") == "Ranger-Captain of Eos"
+        )
+        assert tutor_event["target_type"] == "creature_mana_value_1_or_less"
+        assert tutor_event["found"] == "Esper Sentinel"
+        assert tutor_event["rule_logical_key"] == expected["Ranger-Captain of Eos"][0]
+        assert tutor_event["rule_oracle_hash"] == expected["Ranger-Captain of Eos"][1]
+        assert [card.get("name") for card in active.hand] == ["Esper Sentinel"]
 
     def test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance():
         events = []
@@ -6367,8 +6547,10 @@ def register_tests(battle, player):
         test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source,
         test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
         test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens,
+        test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent,
         test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax,
         test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
+        test_pg076_support_passive_annotations_and_ranger_small_creature_tutor,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,

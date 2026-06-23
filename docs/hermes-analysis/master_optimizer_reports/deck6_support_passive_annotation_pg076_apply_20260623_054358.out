@@ -1,0 +1,16 @@
+BEGIN
+CREATE SCHEMA
+DO
+SELECT 6
+SELECT 12
+ curated_rows_patched
+----------------------
+                    6
+(1 row)
+
+ generated_shadow_rows_disabled
+--------------------------------
+                              6
+(1 row)
+
+COMMIT

@@ -3061,3 +3061,35 @@ Workflow note:
 - Use PG076 for the next PostgreSQL package. Remaining deck `6` high queue is
   `Chaos Warp`; next battle-support mediums are `Jeska's Will` and
   `Mizzix's Mastery`.
+
+## PG076 Closure Reading - 2026-06-23
+
+- PG076 is the combined support/passive + Chaos Warp package.
+- Support/passive annotations closed the former medium support/passive queue
+  for `Drannith Magistrate`, `Giver of Runes`, `Mother of Runes`,
+  `Professional Face-Breaker`, `Ranger-Captain of Eos`, and
+  `Storm-Kiln Artist`; Ranger-Captain ETB small-creature tutor is now runtime,
+  while sacrifice noncreature silence remains annotation-only.
+- `Chaos Warp` is closed with
+  `battle_model_scope=target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1`.
+- Final PG076 deck `6` gate is `high=0`, `medium=2`, `pass=98`.
+- Remaining deck `6` coherence queue is only `Jeska's Will` and
+  `Mizzix's Mastery`.
+- Use PG077 for the next PostgreSQL package.
+
+## PG076 Final Reconciliation - 2026-06-23 06:01 UTC
+
+- PostgreSQL remains source of truth; final sync artifact:
+  `docs/hermes-analysis/master_optimizer_reports/pg076_final_sync_report_20260623_060105.json`.
+- The exact global auditor shape requested for the cycle was rerun with
+  `--limit 200`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg076_final_20260623_060105.json`
+  (`high=50`, `medium=36`, `pass=119`).
+- Deck `6` accepted final cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg076_final_20260623_060105.json`
+  (`high=0`, `medium=2`, `pass=98`).
+- Support/passive focused event artifact:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`.
+- Method note: user observations, including `Blasphemous Act` cost reduction,
+  are validation hints only. They do not override Oracle/PostgreSQL evidence
+  and do not reopen a card without a real mismatch.
