@@ -1061,7 +1061,29 @@ Next package number is PG086. Next queue should prioritize remaining deck
   destroy target artifact; redirect and can't-block modes remain annotations.
   Post-PG092 applied state: deck `6` `pass=100`, deck `606` `pass=81`,
   deck `608` `high=14`, `medium=3`, `pass=51`, and global `high=32`,
-  `medium=4`, `pass=169`. PG093 is next.
+  `medium=4`, `pass=169`.
+- PG093 closed deck `607` `Insurrection` as a scoped compact runtime rule.
+  Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`.
+  Current rerun evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_rerun_current_20260623_101800.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_rerun_current_20260623_101800.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`
+  with 387 PASS lines.
+  The rule now carries raw Oracle hash
+  `a756d0c90be63a18b7eaf97582e75b8e`, scope
+  `steal_all_creatures_until_eot_haste_attack_projection_v1`, and runtime
+  model `compact_damage_projection`. The limitation is explicit: the engine
+  projects stolen-creature combat damage and does not yet transfer objects onto
+  Lorehold's battlefield for a full EOT control lifecycle. Post-PG093 current
+  state: deck `6` `pass=100`, deck `606` `pass=81`, deck `607` `high=17`,
+  `medium=4`, `pass=73`, deck `608` `high=14`, `medium=3`, `pass=51`, and
+  global `high=31`, `medium=4`, `pass=170`. PG094 is next.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

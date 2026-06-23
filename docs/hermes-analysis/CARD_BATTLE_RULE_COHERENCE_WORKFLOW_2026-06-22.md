@@ -3985,5 +3985,114 @@ Status: `read_only_start_snapshot`.
 - Current-state validation after this PG092 start refresh:
   `docs/hermes-analysis/master_optimizer_reports/pg092_start_test_battle_analyst_v10_3_20260623_101200.out`
   passed the full battle analyst wrapper.
-- The next write package remains PG092 and should target remaining deck `607`
-  high battle-critical cards before support/passive rows.
+- This PG092 start snapshot was superseded by the PG092 and PG093 closeouts
+  recorded below.
+
+## PG093 Deck 607 Insurrection Runtime Scope Cleanup - 2026-06-23 10:10 UTC
+
+Status: `applied_validated`.
+
+Lote:
+
+- Lane: deck `607` battle-critical high card with an existing compact executor
+  that needed real Oracle hash, scoped metadata, replay evidence, and explicit
+  runtime limitations.
+- Card included: `Insurrection`.
+- Cards deliberately excluded:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Promise of Loyalty`, `Starfall Invocation`, and `Winds of Abandon`.
+
+Oracle/runtime split:
+
+- Oracle text: untap all creatures, gain control of them until end of turn, and
+  give them haste until end of turn.
+- Current runtime model:
+  `compact_damage_projection`.
+- Runtime limitation:
+  the engine does not transfer objects onto Lorehold's battlefield for a full
+  control-duration lifecycle. It records stolen creatures, removes opponent
+  creatures from their battlefields, preserves noncreatures, and projects
+  combat damage across live opponents.
+
+PostgreSQL package:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_precheck_20260623_100709.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_apply_20260623_100709.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_rollback_20260623_100709.sql`
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_precheck_20260623_100709.out`
+  reported one card/hash match, two current rows, one target key row, one
+  trusted executable row, one row to disable, and no existing backup table.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_apply_20260623_100709.out`
+  reported backup creation with two rows, one upsert, one disabled shadow, and
+  `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`
+  reported one target row, one hash match, one expected scope row, one compact
+  runtime row, one EOT/haste row, zero active shadows, one disabled shadow, and
+  two backup rows.
+- Current rerun postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_rerun_current_20260623_101800.out`
+  confirmed the same PostgreSQL state after this continuation cycle.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Current PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_rerun_current_20260623_101800.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`
+  prove the selected logical rule key from SQLite, three stolen creatures,
+  total power `9`, and projected `4` damage to each live opponent.
+- Current focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`
+  prove the same logical rule key/hash and compact projection after the fresh
+  sync.
+- Current rerun at `20260623_101800` repeated PG -> SQLite sync, focused
+  events, deck `6`/`606`/`607`/`608`/global audits, and the runtime wrapper
+  with the same post-PG093 counts.
+
+Runtime/test coverage:
+
+- Added
+  `test_pg093_insurrection_uses_compact_steal_attack_runtime` and
+  `test_pg093_insurrection_rule_resolves_from_sqlite_cache`.
+- `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed.
+- Current saved outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_py_compile_current_20260623_101800.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_deck_card_battle_rule_coherence_audit_current_20260623_101800.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`.
+
+Post-PG093 auditor result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=17`, `medium=4`, `pass=73`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=31`, `medium=4`, `pass=170`.
+
+Remaining deck `607` high queue:
+
+- Battle-critical:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Promise of Loyalty`, `Starfall Invocation`, and `Winds of Abandon`.
+- Support/passive/no active rule:
+  `Pearl Medallion`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, `The Scarlet Witch`,
+  `Thor, God of Thunder`, and `Tragic Arrogance`.
+
+Next queue:
+
+- PG094 should continue deck `607` battle-critical high cards before
+  support/passive rows.

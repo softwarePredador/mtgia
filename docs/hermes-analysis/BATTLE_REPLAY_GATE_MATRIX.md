@@ -4022,3 +4022,50 @@ Status:
 - Deck `608`: `high=14`, `medium=3`, `pass=51`.
 - Global queue after PG092: `high=32`, `medium=4`, `pass=169`.
 - No deck swap, no `deck_cards` mutation, and no new battle rebaseline.
+
+## PG093 Deck 607 Insurrection Focused Card-Rule Gate - 2026-06-23 10:10 UTC
+
+Replay relevance:
+
+- This is a focused card-rule/runtime gate, not a new 16-seed battle replay
+  baseline and not strategy-learning evidence.
+- The latest recurring battle artifact remains separate from this checkpoint.
+
+Artifacts:
+
+- PG093 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`.
+- PG093 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`.
+- PG093 focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`.
+- PG093 current focused event rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`.
+- Post-test card-rule audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg093_after_insurrection_20260623_100709.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg093_after_insurrection_20260623_100709.json`.
+
+Gate:
+
+- `Insurrection` proves logical rule key
+  `battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954` from SQLite cache after
+  PostgreSQL sync.
+- Focused event `steal_all_creatures_resolved` records three stolen creatures,
+  total stolen power `9`, two damaged opponents, `4` damage to each opponent,
+  `control_duration=until_end_of_turn`, and
+  `runtime_model=compact_damage_projection`.
+- The rule payload explicitly records that the engine does not yet transfer
+  objects onto Lorehold's battlefield for a full EOT control lifecycle.
+
+Validation:
+
+- Full runtime wrapper passed after PG093:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- The deck-card coherence auditor was rerun after PostgreSQL -> SQLite sync.
+
+Status:
+
+- Deck `607`: `high=17`, `medium=4`, `pass=73`.
+- Global queue after PG093: `high=31`, `medium=4`, `pass=170`.
+- No deck swap, no `deck_cards` mutation, and no new battle rebaseline.

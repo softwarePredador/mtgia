@@ -8396,3 +8396,86 @@ Tests:
 Next deploy number:
 
 - PG093 is next for any future PostgreSQL package.
+
+## PG093 Deck 607 Insurrection Runtime Scope Cleanup - Applied 2026-06-23 10:10 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Promoted the deck `607` `Insurrection` row from a generic trusted rule to a
+  card-specific verified rule with raw Oracle hash, battle model scope, compact
+  runtime scope, and explicit limitations.
+- The implemented runtime is a compact damage projection of the Oracle effect:
+  it removes opponent creatures from their battlefields, records the stolen
+  creatures, gives them the modeled until-end-of-turn/haste provenance, and
+  projects combat damage evenly across live opponents.
+- This does not yet model full object control transfer onto the controller's
+  battlefield. That limitation is recorded in the rule payload.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_precheck_20260623_100709.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_apply_20260623_100709.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_rollback_20260623_100709.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg093_deck607_insurrection_20260623_100709`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_precheck_20260623_100709.out`
+  reported `expected_target_rules=1`, `cards_resolved_rows=1`,
+  `raw_oracle_hash_match_rows=1`, `current_rule_rows=2`,
+  `current_expected_key_rows=1`, `current_trusted_executable_rows=1`,
+  `rows_to_disable=1`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_apply_20260623_100709.out`
+  reported backup creation with two rows, one upsert, one disabled shadow, and
+  `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`
+  reported `target_rule_rows=1`, `target_hash_match_rows=1`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=1`,
+  `compact_runtime_rows=1`, `eot_haste_rows=1`, `trusted_auto_rows=1`,
+  `rule_version_at_least_2_rows=1`, `non_disabled_shadow_rows=0`,
+  `disabled_shadow_rows=1`, and `backup_rows=2`.
+
+Rule key:
+
+- `Insurrection`: `battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954`,
+  raw Oracle hash `a756d0c90be63a18b7eaf97582e75b8e`, scope
+  `steal_all_creatures_until_eot_haste_attack_projection_v1`.
+
+Sync/audit/runtime evidence:
+
+- PG093 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`,
+  `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`.
+- Post-PG093 audits:
+  deck `607` `high=17`, `medium=4`, `pass=73`; global `high=31`,
+  `medium=4`, `pass=170`.
+- Current rerun evidence at `20260623_101800` confirmed the same post-PG093
+  state across deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
+  `high=17`, `medium=4`, `pass=73`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, and global `high=31`, `medium=4`, `pass=170`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+- Current rerun artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_py_compile_current_20260623_101800.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_deck_card_battle_rule_coherence_audit_current_20260623_101800.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`.
+
+Next deploy number:
+
+- PG094 is next for any future PostgreSQL package.

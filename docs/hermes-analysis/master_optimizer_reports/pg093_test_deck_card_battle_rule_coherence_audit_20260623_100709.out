@@ -1,0 +1,12 @@
+test_build_report_filters_by_deck_id (__main__.DeckCardBattleRuleCoherenceAuditTest.test_build_report_filters_by_deck_id) ... ok
+test_disabled_land_shadow_with_trusted_rule_passes (__main__.DeckCardBattleRuleCoherenceAuditTest.test_disabled_land_shadow_with_trusted_rule_passes) ... ok
+test_exact_scoped_rule_passes (__main__.DeckCardBattleRuleCoherenceAuditTest.test_exact_scoped_rule_passes) ... ok
+test_generic_trusted_rule_without_scope_is_high (__main__.DeckCardBattleRuleCoherenceAuditTest.test_generic_trusted_rule_without_scope_is_high) ... ok
+test_land_only_review_backlog_is_medium (__main__.DeckCardBattleRuleCoherenceAuditTest.test_land_only_review_backlog_is_medium) ... ok
+test_needs_review_rule_is_high (__main__.DeckCardBattleRuleCoherenceAuditTest.test_needs_review_rule_is_high) ... ok
+test_nonland_without_rule_is_high_but_basic_land_is_medium (__main__.DeckCardBattleRuleCoherenceAuditTest.test_nonland_without_rule_is_high_but_basic_land_is_medium) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.049s
+
+OK

@@ -14396,13 +14396,25 @@
     "battle_rule_logical_key": "battle_rule_v1:802683f320c420eff2f09721ebefad4d"
   },
   "Insurrection": {
+    "battle_model_scope": "steal_all_creatures_until_eot_haste_attack_projection_v1",
+    "cmc": 8.0,
+    "control_duration": "until_end_of_turn",
     "effect": "steal_all_creatures",
+    "oracle_runtime_scope": "untap_gain_control_all_creatures_haste_until_eot_compact_attack_projection_v1",
+    "runtime_limitations": [
+      "does_not_transfer_objects_to_controller_battlefield",
+      "projects_combat_damage_evenly_across_live_opponents"
+    ],
+    "runtime_model": "compact_damage_projection",
+    "stolen_creatures_gain_haste": true,
+    "untap_stolen_creatures": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954",
+    "battle_rule_oracle_hash": "a756d0c90be63a18b7eaf97582e75b8e"
   },
   "Intangible Virtue": {
     "cmc": 2.0,

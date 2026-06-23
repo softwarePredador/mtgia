@@ -17608,17 +17608,39 @@ def apply_effect_immediate(
             player.library.append(card)
     elif effect == "steal_all_creatures":
         total_power = 0
+        stolen = []
         for opp in opponents:
             creatures = [c for c in opp.battlefield if is_battlefield_creature(c)]
             for c in creatures:
                 total_power += c.get("power", 2)
+                stolen.append({
+                    "controller": opp.name,
+                    "name": c.get("name", "?"),
+                    "power": c.get("power", 2),
+                })
             opp.battlefield = [c for c in opp.battlefield if not is_battlefield_creature(c)]
-        finish_resolved_spell(player, card, turn=turn)
         alive_opps = [o for o in opponents if o.is_alive()]
+        dmg_each = 0
         if alive_opps and total_power > 0:
             dmg_each = total_power // len(alive_opps)
             for opp in alive_opps:
                 deal_damage(opp, dmg_each)
+        emit_replay_event(
+            "steal_all_creatures_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            stolen_count=len(stolen),
+            stolen=stolen[:20],
+            total_power=total_power,
+            damaged_opponents=[opp.name for opp in alive_opps],
+            damage_each_opponent=dmg_each,
+            control_duration=effect_data.get("control_duration", "until_end_of_turn"),
+            stolen_creatures_gain_haste=bool(effect_data.get("stolen_creatures_gain_haste", True)),
+            runtime_model=effect_data.get("runtime_model", "compact_damage_projection"),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "redistribute_life_totals":
         apply_redistribute_life_totals(player, opponents, card, effect_data, turn)
     elif effect == "token_maker":

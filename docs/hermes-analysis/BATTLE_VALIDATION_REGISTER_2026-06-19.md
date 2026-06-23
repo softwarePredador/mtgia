@@ -17490,3 +17490,65 @@ Status: `applied_validated`.
   deck `608` `high=14`, `medium=3`, `pass=51`; global `high=32`,
   `medium=4`, `pass=169`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+## PG093 Deck 607 Insurrection Runtime Scope Cleanup - 2026-06-23 10:10 UTC
+
+Status: `applied_validated`.
+
+- Closed one deck `607` high battle-critical finding: `Insurrection`.
+- `Insurrection` now has raw Oracle hash, scoped battle model, and explicit
+  compact runtime limitations. The engine models the effect as a compact
+  damage projection: opponent creatures are removed from their battlefields,
+  stolen creature names/power are recorded, noncreatures remain, and projected
+  combat damage is split across live opponents.
+- The full Oracle control-transfer lifecycle remains a documented limitation:
+  objects are not transferred onto Lorehold's battlefield for EOT cleanup.
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`
+  reports one promoted target row, one hash match, one scope match, one compact
+  runtime row, one EOT/haste row, zero active shadows, one disabled shadow, and
+  two backed-up pre-apply rows.
+- Current PostgreSQL postcheck rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_rerun_current_20260623_101800.out`
+  confirms the same one target row, hash/scope/runtime match, zero active
+  shadows, one disabled shadow, and two backup rows.
+- PostgreSQL rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_rollback_20260623_100709.sql`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Current PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_rerun_current_20260623_101800.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`
+  show SQLite rule key
+  `battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954`, hash
+  `a756d0c90be63a18b7eaf97582e75b8e`, three stolen creatures, total power
+  `9`, and `4` projected damage to each of two live opponents.
+- Current focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`
+  show the same rule key/hash and `steal_all_creatures_resolved` event after
+  the fresh sync.
+- Focused tests added:
+  `test_pg093_insurrection_uses_compact_steal_attack_runtime` and
+  `test_pg093_insurrection_rule_resolves_from_sqlite_cache`.
+- Validation:
+  `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed after PG093 sync.
+- Current validation outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_py_compile_current_20260623_101800.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_deck_card_battle_rule_coherence_audit_current_20260623_101800.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`
+  with 387 PASS lines in the full wrapper.
+- Post-PG093 card-rule queue: deck `6` `pass=100`, deck `606` `pass=81`,
+  deck `607` `high=17`, `medium=4`, `pass=73`, deck `608` `high=14`,
+  `medium=3`, `pass=51`, and global `high=31`, `medium=4`, `pass=170`.
+- Current rerun evidence at `20260623_101800` also confirms deck `6`
+  `pass=100`, deck `606` `pass=81`, deck `607` `high=17`, `medium=4`,
+  `pass=73`, deck `608` `high=14`, `medium=3`, `pass=51`, and global
+  `high=31`, `medium=4`, `pass=170`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.

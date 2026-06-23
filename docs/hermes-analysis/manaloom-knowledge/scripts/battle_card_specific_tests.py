@@ -8042,6 +8042,122 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg093_insurrection_uses_compact_steal_attack_runtime():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            active_creature = {
+                "name": "Lorehold Bodyguard",
+                "type_line": "Creature - Human Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "cmc": 2,
+            }
+            opponent_a_creature = {
+                "name": "Rival Giant",
+                "type_line": "Creature - Giant",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "cmc": 4,
+            }
+            opponent_b_creature_1 = {
+                "name": "Rival Dragon",
+                "type_line": "Creature - Dragon",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "cmc": 5,
+            }
+            opponent_b_creature_2 = {
+                "name": "Rival Soldier",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "cmc": 2,
+            }
+            opponent_artifact = {
+                "name": "Mana Rock",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "cmc": 2,
+            }
+            active.battlefield = [active_creature]
+            opponent_a.battlefield = [opponent_a_creature, opponent_artifact]
+            opponent_b.battlefield = [opponent_b_creature_1, opponent_b_creature_2]
+            card = {"name": "Insurrection", "type_line": "Sorcery", "cmc": 8}
+            effect_data = {
+                "effect": "steal_all_creatures",
+                "battle_model_scope": "steal_all_creatures_until_eot_haste_attack_projection_v1",
+                "oracle_runtime_scope": (
+                    "untap_gain_control_all_creatures_haste_until_eot_"
+                    "compact_damage_projection_v1"
+                ),
+                "control_duration": "until_end_of_turn",
+                "untap_stolen_creatures": True,
+                "stolen_creatures_gain_haste": True,
+                "runtime_model": "compact_damage_projection",
+                "_rule_logical_key": "battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954",
+                "_rule_oracle_hash": "a756d0c90be63a18b7eaf97582e75b8e",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent_a, opponent_b],
+                card,
+                6,
+                random.Random(9301),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active_creature in active.battlefield
+        assert opponent_artifact in opponent_a.battlefield
+        assert not any(battle.is_battlefield_creature(card) for card in opponent_a.battlefield)
+        assert not any(battle.is_battlefield_creature(card) for card in opponent_b.battlefield)
+        assert opponent_a.life == 36
+        assert opponent_b.life == 36
+        assert any(card.get("name") == "Insurrection" for card in active.graveyard)
+        assert any(
+            event == "steal_all_creatures_resolved"
+            and data.get("card") == "Insurrection"
+            and data.get("stolen_count") == 3
+            and data.get("total_power") == 9
+            and data.get("damage_each_opponent") == 4
+            and data.get("damaged_opponents") == ["Opponent A", "Opponent B"]
+            and data.get("control_duration") == "until_end_of_turn"
+            and data.get("stolen_creatures_gain_haste") is True
+            and data.get("runtime_model") == "compact_damage_projection"
+            and data.get("rule_logical_key") == "battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954"
+            and data.get("rule_oracle_hash") == "a756d0c90be63a18b7eaf97582e75b8e"
+            for event, data in events
+        )
+
+    def test_pg093_insurrection_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect({"name": "Insurrection", "type_line": "Sorcery", "cmc": 8})
+        assert effect_data["effect"] == "steal_all_creatures"
+        assert effect_data["_rule_logical_key"] == "battle_rule_v1:e6b0d9f25aff060aa1f813e43154c954"
+        assert effect_data["_rule_oracle_hash"] == "a756d0c90be63a18b7eaf97582e75b8e"
+        assert (
+            effect_data["battle_model_scope"]
+            == "steal_all_creatures_until_eot_haste_attack_projection_v1"
+        )
+        assert (
+            effect_data["oracle_runtime_scope"]
+            == "untap_gain_control_all_creatures_haste_until_eot_compact_attack_projection_v1"
+        )
+        assert effect_data["control_duration"] == "until_end_of_turn"
+        assert effect_data["untap_stolen_creatures"] is True
+        assert effect_data["stolen_creatures_gain_haste"] is True
+        assert effect_data["runtime_model"] == "compact_damage_projection"
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -8247,4 +8363,6 @@ def register_tests(battle, player):
         test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache,
         test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance,
         test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance,
+        test_pg093_insurrection_uses_compact_steal_attack_runtime,
+        test_pg093_insurrection_rule_resolves_from_sqlite_cache,
     ]

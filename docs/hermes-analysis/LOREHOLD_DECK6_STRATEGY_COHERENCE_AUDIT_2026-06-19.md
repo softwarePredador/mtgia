@@ -21263,3 +21263,58 @@ Next recommended queue:
   executable runtime and annotations.
 - Avoid treating `High Noon`, `Call Forth the Tempest`, or `Insurrection` as
   metadata-only cleanup until their real Oracle/runtime scope is reviewed.
+
+## PG093 Deck 607 Insurrection Reading - 2026-06-23 10:10 UTC
+
+What changed:
+
+- PG093 closed `Insurrection` for deck `607`.
+- The card is now verified from the raw Oracle text:
+  "Untap all creatures and gain control of them until end of turn. They gain
+  haste until end of turn."
+- The active battle model is intentionally compact:
+  `steal_all_creatures_until_eot_haste_attack_projection_v1`.
+- Runtime limitation remains explicit:
+  the engine does not transfer stolen objects onto Lorehold's battlefield for a
+  complete EOT control lifecycle; it records stolen creatures and projects
+  combat damage.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_rollback_20260623_100709.sql`.
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`.
+- Full runtime wrapper:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_100709.out`.
+- Current rerun pack:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`
+  and the `deck*_pg093_after_insurrection_20260623_101800` audit artifacts.
+
+Current candidate status:
+
+- Deck `607`: `high=17`, `medium=4`, `pass=73`.
+- Global card-rule queue: `high=31`, `medium=4`, `pass=170`.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  new multi-seed battle baseline.
+
+Remaining deck `607` high queue:
+
+- Battle-critical:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Promise of Loyalty`, `Starfall Invocation`, and `Winds of Abandon`.
+- Support/passive/no active rule:
+  `Pearl Medallion`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, `The Scarlet Witch`,
+  `Thor, God of Thunder`, and `Tragic Arrogance`.
+
+Next recommended queue:
+
+- PG094 should continue deck `607` battle-critical high cards first.
+- `Call Forth the Tempest`, `High Noon`, and board-wipe modal cards need
+  card-specific Oracle/runtime review, not metadata-only promotion.
