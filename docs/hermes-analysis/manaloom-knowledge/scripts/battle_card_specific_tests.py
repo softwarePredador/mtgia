@@ -1884,6 +1884,401 @@ def register_tests(battle, player):
         assert "indestructible" not in own_best
         assert "indestructible" not in opponent_small
 
+    def test_promise_of_loyalty_oracle_normalizes_to_vow_sacrifice_wipe():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Promise of Loyalty",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Each player puts a vow counter on a creature they control "
+                    "and sacrifices the rest. Each of those creatures can't attack "
+                    "you or planeswalkers you control for as long as it has a vow "
+                    "counter on it."
+                ),
+            },
+            {"effect": "draw_cards", "cmc": 5.0},
+        )
+
+        assert effect_data["effect"] == "vow_counter_each_player_sacrifice_rest"
+        assert effect_data["counter_type"] == "vow"
+        assert effect_data["choice_scope"] == "each_player_one_creature_they_control"
+        assert effect_data["sacrifice_scope"] == "other_creatures"
+        assert (
+            effect_data["battle_model_scope"]
+            == "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1"
+        )
+
+    def test_promise_of_loyalty_vows_one_creature_each_player_and_blocks_attack_back():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            own_best = {
+                "name": "Own Best",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 5,
+                "power": 5,
+                "toughness": 5,
+            }
+            own_small = {
+                "name": "Own Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent_best = {
+                "name": "Opponent Best",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 4,
+                "power": 4,
+                "toughness": 4,
+            }
+            opponent_small = {
+                "name": "Opponent Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            active.battlefield = [own_best, own_small]
+            opponent.battlefield = [opponent_best, opponent_small]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Promise of Loyalty",
+                    "cmc": 5,
+                    "type_line": "Sorcery",
+                },
+                turn=8,
+                rng=random.Random(11101),
+                effect_data_override={
+                    "effect": "vow_counter_each_player_sacrifice_rest",
+                    "battle_model_scope": (
+                        "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:promise-loyalty-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+
+            declared_attack = battle.declare_attackers_step(
+                opponent,
+                [active],
+                [active, opponent],
+                turn=9,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert [card.get("name") for card in active.battlefield] == ["Own Best"]
+        assert [card.get("name") for card in opponent.battlefield] == ["Opponent Best"]
+        assert {card.get("name") for card in active.graveyard} == {"Own Small", "Promise of Loyalty"}
+        assert [card.get("name") for card in opponent.graveyard] == ["Opponent Small"]
+        assert own_best["vow_counters"] == 1
+        assert opponent_best["vow_counters"] == 1
+        assert "Lorehold" in opponent_best["vow_cannot_attack_players"]
+        assert declared_attack is None
+        assert opponent_best.get("tapped") is not True
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert wipe_event["card"] == "Promise of Loyalty"
+        assert wipe_event["rule_logical_key"] == "battle_rule_v1:promise-loyalty-test"
+        assert wipe_event["destroyed"] == 2
+        assert wipe_event["sacrificed"] == 2
+        assert wipe_event["vows_placed"] == 2
+        assert {entry["name"] for entry in wipe_event["vow_countered_creatures"]} == {
+            "Own Best",
+            "Opponent Best",
+        }
+
+    def test_starfall_invocation_oracle_normalizes_to_gift_destroy_return_wipe():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Starfall Invocation",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Gift a card (You may promise an opponent a gift as you cast "
+                    "this spell. If you do, they draw a card before its other "
+                    "effects.)\nDestroy all creatures. If the gift was promised, "
+                    "return a creature card put into your graveyard this way to "
+                    "the battlefield under your control."
+                ),
+            },
+            {"effect": "board_wipe", "cmc": 5.0},
+        )
+
+        assert effect_data["effect"] == "gift_destroy_all_creatures_return_own_destroyed_creature"
+        assert effect_data["gift_default_promised"] is True
+        assert effect_data["gift_card_draw"] is True
+        assert effect_data["destroy_scope"] == "all_creatures"
+        assert effect_data["return_scope"] == "own_creature_destroyed_this_way"
+        assert (
+            effect_data["battle_model_scope"]
+            == "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1"
+        )
+
+    def test_starfall_invocation_destroys_all_creatures_gifts_and_returns_best_own():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            own_best = {
+                "name": "Own Best",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 6,
+                "power": 6,
+                "toughness": 6,
+            }
+            own_small = {
+                "name": "Own Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent_creature = {
+                "name": "Opponent Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 4,
+                "power": 4,
+                "toughness": 4,
+            }
+            active.battlefield = [own_best, own_small]
+            opponent.battlefield = [opponent_creature]
+            opponent.library = [{"name": "Gift Draw", "cmc": 2, "type_line": "Instant"}]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Starfall Invocation",
+                    "cmc": 5,
+                    "type_line": "Sorcery",
+                },
+                turn=8,
+                rng=random.Random(11102),
+                effect_data_override={
+                    "effect": "gift_destroy_all_creatures_return_own_destroyed_creature",
+                    "gift_default_promised": True,
+                    "gift_card_draw": True,
+                    "battle_model_scope": (
+                        "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:starfall-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert [card.get("name") for card in active.battlefield] == ["Own Best"]
+        assert active.battlefield[0]["summoning_sick"] is True
+        assert {card.get("name") for card in active.graveyard} == {"Own Small", "Starfall Invocation"}
+        assert [card.get("name") for card in opponent.graveyard] == ["Opponent Creature"]
+        assert [card.get("name") for card in opponent.hand] == ["Gift Draw"]
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert wipe_event["card"] == "Starfall Invocation"
+        assert wipe_event["rule_logical_key"] == "battle_rule_v1:starfall-test"
+        assert wipe_event["destroyed"] == 3
+        assert wipe_event["gift_promised"] is True
+        assert wipe_event["gift_recipient"] == "Opponent"
+        assert wipe_event["gift_cards_drawn"] == 1
+        assert wipe_event["returned_own_creature"] == "Own Best"
+
+    def test_tragic_arrogance_oracle_normalizes_to_selective_nonland_sacrifice():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Tragic Arrogance",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "For each player, you choose from among the permanents that "
+                    "player controls an artifact, a creature, an enchantment, and "
+                    "a planeswalker. Then each player sacrifices all other nonland "
+                    "permanents they control."
+                ),
+            },
+            {"effect": "board_wipe", "cmc": 5.0},
+        )
+
+        assert effect_data["effect"] == "selective_nonland_sacrifice"
+        assert effect_data["controller_chooses_for_each_player"] is True
+        assert effect_data["choice_types"] == ["artifact", "creature", "enchantment", "planeswalker"]
+        assert effect_data["sacrifice_scope"] == "other_nonland_permanents"
+        assert (
+            effect_data["battle_model_scope"]
+            == "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1"
+        )
+
+    def test_tragic_arrogance_keeps_best_per_type_and_sacrifices_other_nonlands():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            own_artifact_creature = {
+                "name": "Own Artifact Creature",
+                "effect": "finisher",
+                "type_line": "Artifact Creature",
+                "cmc": 6,
+                "power": 6,
+                "toughness": 6,
+            }
+            own_small = {
+                "name": "Own Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            own_rock = {
+                "name": "Own Rock",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "cmc": 2,
+            }
+            own_enchantment = {
+                "name": "Own Enchantment",
+                "effect": "draw_engine",
+                "type_line": "Enchantment",
+                "cmc": 4,
+            }
+            own_walker = {
+                "name": "Own Walker",
+                "effect": "passive",
+                "type_line": "Planeswalker",
+                "cmc": 4,
+            }
+            own_land = {
+                "name": "Own Plains",
+                "effect": "land",
+                "type_line": "Basic Land - Plains",
+                "cmc": 0,
+            }
+            opponent_artifact_creature = {
+                "name": "Opponent Artifact Creature",
+                "effect": "finisher",
+                "type_line": "Artifact Creature",
+                "cmc": 7,
+                "power": 7,
+                "toughness": 7,
+            }
+            opponent_small = {
+                "name": "Opponent Small",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 1,
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent_rock = {
+                "name": "Opponent Rock",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "cmc": 2,
+            }
+            opponent_enchantment = {
+                "name": "Opponent Enchantment",
+                "effect": "draw_engine",
+                "type_line": "Enchantment",
+                "cmc": 3,
+            }
+            opponent_walker = {
+                "name": "Opponent Walker",
+                "effect": "passive",
+                "type_line": "Planeswalker",
+                "cmc": 4,
+            }
+            active.battlefield = [
+                own_artifact_creature,
+                own_small,
+                own_rock,
+                own_enchantment,
+                own_walker,
+                own_land,
+            ]
+            opponent.battlefield = [
+                opponent_artifact_creature,
+                opponent_small,
+                opponent_rock,
+                opponent_enchantment,
+                opponent_walker,
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Tragic Arrogance",
+                    "cmc": 5,
+                    "type_line": "Sorcery",
+                },
+                turn=8,
+                rng=random.Random(11103),
+                effect_data_override={
+                    "effect": "selective_nonland_sacrifice",
+                    "choice_types": ["artifact", "creature", "enchantment", "planeswalker"],
+                    "battle_model_scope": (
+                        "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:tragic-arrogance-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert {card.get("name") for card in active.battlefield} == {
+            "Own Artifact Creature",
+            "Own Enchantment",
+            "Own Walker",
+            "Own Plains",
+        }
+        assert {card.get("name") for card in opponent.battlefield} == {
+            "Opponent Artifact Creature",
+            "Opponent Enchantment",
+            "Opponent Walker",
+        }
+        assert {card.get("name") for card in active.graveyard} == {
+            "Own Small",
+            "Own Rock",
+            "Tragic Arrogance",
+        }
+        assert {card.get("name") for card in opponent.graveyard} == {
+            "Opponent Small",
+            "Opponent Rock",
+        }
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert wipe_event["card"] == "Tragic Arrogance"
+        assert wipe_event["rule_logical_key"] == "battle_rule_v1:tragic-arrogance-test"
+        assert wipe_event["destroyed"] == 4
+        assert wipe_event["sacrificed"] == 4
+        assert wipe_event["nonland_permanents_seen"] == 10
+        assert wipe_event["protected"] == 6
+        assert {entry["name"] for entry in wipe_event["sacrificed_cards"]} == {
+            "Own Small",
+            "Own Rock",
+            "Opponent Small",
+            "Opponent Rock",
+        }
+
     def test_austere_command_resolves_two_destroy_modes():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -9316,6 +9711,12 @@ def register_tests(battle, player):
         test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
         test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe,
         test_fated_clash_protects_best_own_and_weakest_opponent_creature_then_wipes,
+        test_promise_of_loyalty_oracle_normalizes_to_vow_sacrifice_wipe,
+        test_promise_of_loyalty_vows_one_creature_each_player_and_blocks_attack_back,
+        test_starfall_invocation_oracle_normalizes_to_gift_destroy_return_wipe,
+        test_starfall_invocation_destroys_all_creatures_gifts_and_returns_best_own,
+        test_tragic_arrogance_oracle_normalizes_to_selective_nonland_sacrifice,
+        test_tragic_arrogance_keeps_best_per_type_and_sacrifices_other_nonlands,
         test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,
         test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope,
         test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile,

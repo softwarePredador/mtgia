@@ -1,0 +1,14 @@
+   normalized_name   |          expected_hash           | card_rows | existing_rule_rows | target_active_rows | shadow_rows
+---------------------+----------------------------------+-----------+--------------------+--------------------+-------------
+ promise of loyalty  | 21dd715160fde6e50b8edc015ce83b0f |         1 |                  2 |                  0 |           2
+ starfall invocation | 3429884949eac8ffe09d86dc85bee1ae |         1 |                  2 |                  0 |           2
+ tragic arrogance    | efdf5d051aaa7f94b12c4dccbbfd7d3d |         1 |                  0 |                  0 |           0
+(3 rows)
+
+   normalized_name   |                logical_rule_key                 | review_status | execution_status | rule_version | oracle_hash |                   effect_json                    |                deck_role_json
+---------------------+-------------------------------------------------+---------------+------------------+--------------+-------------+--------------------------------------------------+----------------------------------------------
+ promise of loyalty  | battle_rule_v1:45c2a4f6d6d4930fb4cb54b8fa886bc2 | needs_review  | review_only      |            1 |             | {"cmc": 5.0, "count": 1, "effect": "draw_cards"} | {"effect": "draw_cards", "category": "draw"}
+ promise of loyalty  | battle_rule_v1:b0ccc811be3022e88f1338ff5dbeb676 | needs_review  | review_only      |            1 |             | {"cmc": 5.0, "count": 1, "effect": "draw_cards"} | {"effect": "draw_cards", "category": "draw"}
+ starfall invocation | battle_rule_v1:84dca9d12c0abf5610fa673e6d82eab8 | needs_review  | review_only      |            1 |             | {"cmc": 5.0, "effect": "board_wipe"}             | {"effect": "board_wipe", "category": "wipe"}
+ starfall invocation | battle_rule_v1:8d54214335142fbda9e139f79184cd30 | needs_review  | review_only      |            1 |             | {"cmc": 5.0, "effect": "board_wipe"}             | {"effect": "board_wipe", "category": "wipe"}
+(4 rows)

@@ -1,0 +1,159 @@
+{
+  "blocker_domain_policy": "deck_source_or_legality_findings_are_reported_separately_from_battle_engine_findings",
+  "cached_metadata_used_for_replay_metrics": false,
+  "decks": [
+    {
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 2.561,
+        "card_count": 99,
+        "curve": {
+          "0": 2,
+          "1": 17,
+          "2": 14,
+          "3": 19,
+          "4": 10,
+          "5": 1,
+          "6": 1,
+          "7+": 2
+        },
+        "lands": 33,
+        "nonlands": 66
+      },
+      "metrics_basis": "runtime_derived_from_resolved_card_list",
+      "name": "Lorehold",
+      "source_kind": "sqlite_deck_cards",
+      "source_ref": "deck_id:6",
+      "target_deck_id": 6
+    },
+    {
+      "battle_card_count": 99,
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "commander": {
+        "cmc": 5.0,
+        "mana_cost": "{W}{U}{B}{R}{G}",
+        "metadata_source": "oracle_cache",
+        "name": "Scion of the Ur-Dragon",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Legendary Creature \u2014 Dragon Avatar"
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 2.194,
+        "card_count": 99,
+        "curve": {
+          "0": 6,
+          "1": 24,
+          "2": 19,
+          "3": 11,
+          "4": 5,
+          "5": 3,
+          "6": 2,
+          "7+": 2
+        },
+        "lands": 27,
+        "nonlands": 72
+      },
+      "metrics_basis": "runtime_derived_from_resolved_built_deck",
+      "name": "Scion of the Ur-Dragon #36 (real)",
+      "source_card_count": 100,
+      "source_kind": "learned_decks",
+      "source_ref": "learned_deck:36",
+      "source_system": "pg_meta_decks"
+    },
+    {
+      "battle_card_count": 99,
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "commander": {
+        "cmc": 5.0,
+        "mana_cost": "{2}{B}{R}{G}",
+        "metadata_source": "oracle_cache",
+        "name": "Korvold, Fae-Cursed King",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Legendary Creature \u2014 Dragon Noble"
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 2.77,
+        "card_count": 99,
+        "curve": {
+          "0": 0,
+          "1": 12,
+          "2": 17,
+          "3": 18,
+          "4": 5,
+          "5": 6,
+          "6": 2,
+          "7+": 1
+        },
+        "lands": 38,
+        "nonlands": 61
+      },
+      "metrics_basis": "runtime_derived_from_resolved_built_deck",
+      "name": "Korvold, Fae-Cursed King #41 (real)",
+      "source_card_count": 100,
+      "source_kind": "learned_decks",
+      "source_ref": "learned_deck:41",
+      "source_system": "pg_meta_decks"
+    },
+    {
+      "battle_card_count": 99,
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "commander": {
+        "cmc": 2.0,
+        "mana_cost": "{U}{R}",
+        "metadata_source": "oracle_cache",
+        "name": "The Emperor of Palamecia // The Lord Master of Hell",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Legendary Creature \u2014 Human Noble Wizard"
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 4.222,
+        "card_count": 99,
+        "curve": {
+          "0": 1,
+          "1": 1,
+          "2": 11,
+          "3": 9,
+          "4": 21,
+          "5": 7,
+          "6": 2,
+          "7+": 11
+        },
+        "lands": 36,
+        "nonlands": 63
+      },
+      "metrics_basis": "runtime_derived_from_resolved_built_deck",
+      "name": "The Emperor of Palamecia #42 (real)",
+      "source_card_count": 100,
+      "source_kind": "learned_decks",
+      "source_ref": "learned_deck:42",
+      "source_system": "pg_meta_decks"
+    }
+  ],
+  "metrics_policy": "runtime_derived_from_resolved_card_lists",
+  "replay_id": "seed_42"
+}

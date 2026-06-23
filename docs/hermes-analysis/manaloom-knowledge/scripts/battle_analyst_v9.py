@@ -154,6 +154,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "exile_top_nonland_free_cast",
     "fated_clash_protect_then_destroy",
     "finisher",
+    "gift_destroy_all_creatures_return_own_destroyed_creature",
     "gift_hexproof_indestructible",
     "graveyard_flashback_grant",
     "land_tax",
@@ -166,7 +167,19 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "steal_all_creatures",
     "thassa_oracle",
     "token_maker",
+    "selective_nonland_sacrifice",
+    "vow_counter_each_player_sacrifice_rest",
     "wincon",
+}
+BOARD_WIPE_LIKE_EFFECTS = {
+    "airbend_other_creatures",
+    "board_wipe",
+    "damage_wipe",
+    "exile_artifact_enchantment_creature_convoke_wipe",
+    "fated_clash_protect_then_destroy",
+    "gift_destroy_all_creatures_return_own_destroyed_creature",
+    "selective_nonland_sacrifice",
+    "vow_counter_each_player_sacrifice_rest",
 }
 RESPONSE_WINDOW_ONLY_EFFECTS = {
     "cannot_lose_turn",
@@ -3132,6 +3145,49 @@ def normalize_effect_by_oracle(card, effect_data):
         return normalized
 
     if (
+        "vow counter" in text
+        and "sacrifices the rest" in text
+        and "can't attack you or planeswalkers you control" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "vow_counter_each_player_sacrifice_rest"
+        normalized["sorcery"] = True
+        normalized["counter_type"] = "vow"
+        normalized["choice_scope"] = "each_player_one_creature_they_control"
+        normalized["sacrifice_scope"] = "other_creatures"
+        normalized["attack_restriction"] = (
+            "cant_attack_source_controller_or_planeswalkers_while_vow_counter"
+        )
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1"
+        )
+        normalized.pop("instant", None)
+        return normalized
+
+    if (
+        "gift a card" in text
+        and "destroy all creatures" in text
+        and "return a creature card put into your graveyard this way to the battlefield under your control" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "gift_destroy_all_creatures_return_own_destroyed_creature"
+        normalized["sorcery"] = True
+        normalized["gift"] = "card"
+        normalized["gift_default_promised"] = True
+        normalized["gift_card_draw"] = True
+        normalized["gift_choice_model"] = "lowest_visible_threat_opponent"
+        normalized["destroy_scope"] = "all_creatures"
+        normalized["return_scope"] = "own_creature_destroyed_this_way"
+        normalized["return_destination"] = "battlefield_under_your_control"
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1"
+        )
+        normalized.pop("instant", None)
+        return normalized
+
+    if (
         "target creature you control and target creature an opponent controls each gain indestructible until end of turn" in text
         and "then destroy all creatures" in text
         and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
@@ -3148,6 +3204,23 @@ def normalize_effect_by_oracle(card, effect_data):
         normalized["battle_model_scope"] = (
             normalized.get("battle_model_scope")
             or "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1"
+        )
+        normalized.pop("instant", None)
+        return normalized
+
+    if (
+        "for each player, you choose from among the permanents that player controls an artifact, a creature, an enchantment, and a planeswalker" in text
+        and "each player sacrifices all other nonland permanents they control" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "selective_nonland_sacrifice"
+        normalized["sorcery"] = True
+        normalized["controller_chooses_for_each_player"] = True
+        normalized["choice_types"] = ["artifact", "creature", "enchantment", "planeswalker"]
+        normalized["sacrifice_scope"] = "other_nonland_permanents"
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1"
         )
         normalized.pop("instant", None)
         return normalized
@@ -4967,9 +5040,11 @@ class Stack:
         """Is the top spell threatening enough for opponents to counter?"""
         if not self.items: return False
         effect = self.items[-1].effect_data.get("effect", "")
-        threats = {"airbend_other_creatures", "board_wipe", "damage_wipe", "finisher", "approach", "steal_all_creatures",
-                   "overload_recursion", "pump_all", "token_maker", "copy_creature_token",
-                   "worldfire_reset"}
+        threats = BOARD_WIPE_LIKE_EFFECTS | {
+            "finisher", "approach", "steal_all_creatures",
+            "overload_recursion", "pump_all", "token_maker", "copy_creature_token",
+            "worldfire_reset",
+        }
         return effect in threats
     def empty(self): return len(self.items) == 0
 
@@ -6555,6 +6630,9 @@ SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "damage_wipe",
     "exile_artifact_enchantment_creature_convoke_wipe",
     "fated_clash_protect_then_destroy",
+    "gift_destroy_all_creatures_return_own_destroyed_creature",
+    "selective_nonland_sacrifice",
+    "vow_counter_each_player_sacrifice_rest",
     "damage_player_and_creatures",
     "remove_creature",
     "remove_permanent",
@@ -7570,7 +7648,7 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         return 35
 
     # ── MASSIVE BOARD IMPACT ──
-    if effect_name in ("airbend_other_creatures", "board_wipe", "damage_wipe"):
+    if effect_name in BOARD_WIPE_LIKE_EFFECTS:
         # Higher threat if caster has protection (asymmetric wipe)
         if controller.indestructible or controller.protection_from_everything:
             return 85
@@ -9582,6 +9660,489 @@ def resolve_fated_clash(player, opponents, card, effect_data, turn):
     finish_resolved_spell(player, card, turn=turn)
 
 
+def resolve_promise_of_loyalty(player, opponents, card, effect_data, turn):
+    players = [player] + list(opponents or [])
+    context = board_wipe_decision_context(player, opponents)
+    vow_choices = []
+    sacrificed_cards = []
+    creatures_seen = 0
+    own_creatures_sacrificed = 0
+    opponent_creatures_sacrificed = 0
+    live_opponent_creatures_sacrificed = 0
+
+    for controller in players:
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        creatures = [
+            permanent
+            for permanent in list(getattr(controller, "battlefield", []) or [])
+            if is_battlefield_creature(permanent)
+        ]
+        creatures_seen += len(creatures)
+        if not creatures:
+            continue
+
+        chosen = choose_best_creature_target(creatures)
+        chosen["vow_counters"] = int(chosen.get("vow_counters") or 0) + 1
+        chosen["vow_counter"] = True
+        restricted_players = chosen.setdefault("vow_cannot_attack_players", [])
+        if isinstance(restricted_players, str):
+            restricted_players = [restricted_players]
+            chosen["vow_cannot_attack_players"] = restricted_players
+        if player.name not in restricted_players:
+            restricted_players.append(player.name)
+        chosen["vow_counter_source"] = card.get("name", "?")
+        chosen["vow_counter_source_controller"] = player.name
+        vow_choices.append(
+            {
+                "controller": controller.name,
+                "name": chosen.get("name", "?"),
+                "target_score": list(target_priority(chosen)),
+                "cannot_attack_players": list(restricted_players),
+            }
+        )
+
+        chosen_id = id(chosen)
+        for creature in creatures:
+            if id(creature) == chosen_id:
+                continue
+            destination = move_creature_from_battlefield(
+                controller,
+                creature,
+                reason="promise_of_loyalty",
+                source=card,
+            )
+            sacrificed_cards.append(
+                {
+                    "controller": controller.name,
+                    "name": creature.get("name", "?"),
+                    "type_line": creature.get("type_line", ""),
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_creatures_sacrificed += 1
+            else:
+                opponent_creatures_sacrificed += 1
+                if is_live_opponent:
+                    live_opponent_creatures_sacrificed += 1
+
+    actual_asymmetry = live_opponent_creatures_sacrificed - own_creatures_sacrificed
+    resolution_context = {
+        **context,
+        "creatures_seen": creatures_seen,
+        "vows_placed": len(vow_choices),
+        "actual_sacrificed": len(sacrificed_cards),
+        "own_creatures_sacrificed": own_creatures_sacrificed,
+        "opponent_creatures_sacrificed": opponent_creatures_sacrificed,
+        "live_opponent_creatures_sacrificed": live_opponent_creatures_sacrificed,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_sacrificed,
+        "actual_asymmetry": actual_asymmetry,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_creatures_sacrificed > own_creatures_sacrificed
+        ),
+    }
+    risk_flags = []
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif (
+        actual_asymmetry <= 0
+        and not context["lethal_pressure"]
+        and not context["behind_on_board"]
+    ):
+        risk_flags.append("wipe_without_clear_asymmetry")
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_vow_sacrifice_wipe"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            action="resolve_vow_sacrifice_wipe",
+        ),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_creatures_sacrificed * 5, 35),
+        actual_outcome="board_wipe_resolved",
+        reason="each_player_keeps_best_vow_creature_and_sacrifices_rest",
+        strategic_principle="preserve_one_creature_each_player_while_reducing_wide_boards",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        destroyed=len(sacrificed_cards),
+        sacrificed=len(sacrificed_cards),
+        protected=len(vow_choices),
+        creatures_seen=creatures_seen,
+        vows_placed=len(vow_choices),
+        vow_countered_creatures=vow_choices[:20],
+        sacrificed_cards=sacrificed_cards[:20],
+        own_creatures_sacrificed=own_creatures_sacrificed,
+        opponent_creatures_sacrificed=opponent_creatures_sacrificed,
+        live_opponent_creatures_sacrificed=live_opponent_creatures_sacrificed,
+        actual_asymmetry=actual_asymmetry,
+        risk_flags=risk_flags,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def resolve_starfall_invocation(player, opponents, card, effect_data, turn, rng):
+    players = [player] + list(opponents or [])
+    context = board_wipe_decision_context(player, opponents)
+    gift_recipient = (
+        choose_gift_opponent(player, opponents)
+        if effect_data.get("gift_default_promised", True)
+        else None
+    )
+    gift_promised = gift_recipient is not None
+    gifted_cards = gift_recipient.draw(1, rng) if gift_promised else []
+    destroyed_cards = []
+    protected_cards = []
+    own_destroyed_candidates = []
+    creatures_seen = 0
+    own_creatures_destroyed = 0
+    opponent_creatures_destroyed = 0
+    live_opponent_creatures_destroyed = 0
+
+    for controller in players:
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        for creature in list(getattr(controller, "battlefield", []) or []):
+            if not is_battlefield_creature(creature):
+                continue
+            creatures_seen += 1
+            if creature.get("indestructible"):
+                protected_cards.append(
+                    {
+                        "controller": controller.name,
+                        "name": creature.get("name", "?"),
+                    }
+                )
+                continue
+            destination = move_creature_from_battlefield(
+                controller,
+                creature,
+                reason="starfall_invocation",
+                source=card,
+            )
+            destroyed_cards.append(
+                {
+                    "controller": controller.name,
+                    "name": creature.get("name", "?"),
+                    "type_line": creature.get("type_line", ""),
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_creatures_destroyed += 1
+                if destination == "graveyard" and creature in player.graveyard:
+                    own_destroyed_candidates.append(creature)
+            else:
+                opponent_creatures_destroyed += 1
+                if is_live_opponent:
+                    live_opponent_creatures_destroyed += 1
+
+    returned = None
+    if gift_promised and own_destroyed_candidates:
+        returned = choose_best_creature_target(own_destroyed_candidates)
+        if returned in player.graveyard:
+            player.graveyard.remove(returned)
+        returned["controller"] = player.name
+        returned = prepare_entering_permanent(
+            returned,
+            controller=player,
+            all_players=players,
+            turn=turn,
+        )
+        player.battlefield.append(returned)
+
+    actual_asymmetry = live_opponent_creatures_destroyed - own_creatures_destroyed
+    resolution_context = {
+        **context,
+        "gift_promised": gift_promised,
+        "gift_cards_drawn": len(gifted_cards),
+        "creatures_seen": creatures_seen,
+        "actual_destroyed": len(destroyed_cards),
+        "protected": len(protected_cards),
+        "returned_own_creature": returned.get("name", "?") if returned else None,
+        "own_creatures_destroyed": own_creatures_destroyed,
+        "opponent_creatures_destroyed": opponent_creatures_destroyed,
+        "live_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+        "actual_asymmetry": actual_asymmetry,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or returned is not None
+        ),
+    }
+    risk_flags = []
+    if gift_promised and returned is None:
+        risk_flags.append("gift_promised_no_own_destroyed_creature_to_return")
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif (
+        actual_asymmetry <= 0
+        and returned is None
+        and not context["lethal_pressure"]
+        and not context["behind_on_board"]
+    ):
+        risk_flags.append("wipe_without_clear_asymmetry")
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_gift_destroy_return_wipe"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            action="resolve_gift_destroy_return_wipe",
+        ),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_creatures_destroyed * 5, 35)
+        + (18 if returned is not None else 0),
+        actual_outcome="board_wipe_resolved",
+        reason="destroy_all_creatures_and_return_own_destroyed_creature_if_gifted",
+        strategic_principle="convert_symmetric_wipe_into_rebuild_advantage_when_gifted",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        destroyed=len(destroyed_cards),
+        protected=len(protected_cards),
+        creatures_seen=creatures_seen,
+        gift_promised=gift_promised,
+        gift_recipient=getattr(gift_recipient, "name", None),
+        gift_cards_drawn=len(gifted_cards),
+        gift_drawn_cards=[
+            gifted.get("name", "?")
+            for gifted in gifted_cards
+            if isinstance(gifted, dict)
+        ],
+        returned_own_creature=returned.get("name", "?") if returned else None,
+        destroyed_cards=destroyed_cards[:20],
+        protected_cards=protected_cards[:20],
+        own_creatures_destroyed=own_creatures_destroyed,
+        opponent_creatures_destroyed=opponent_creatures_destroyed,
+        live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        actual_asymmetry=actual_asymmetry,
+        risk_flags=risk_flags,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def permanent_matches_tragic_arrogance_choice(permanent, choice_type):
+    if choice_type == "artifact":
+        return is_artifact_permanent(permanent)
+    if choice_type == "creature":
+        return is_battlefield_creature(permanent)
+    if choice_type == "enchantment":
+        return is_enchantment_permanent(permanent)
+    if choice_type == "planeswalker":
+        return is_planeswalker_permanent(permanent)
+    return False
+
+
+def resolve_tragic_arrogance(player, opponents, card, effect_data, turn):
+    players = [player] + list(opponents or [])
+    context = board_wipe_decision_context(player, opponents)
+    choice_types = list(
+        effect_data.get("choice_types")
+        or ["artifact", "creature", "enchantment", "planeswalker"]
+    )
+    choices = []
+    sacrificed_cards = []
+    nonland_seen = 0
+    own_permanents_sacrificed = 0
+    opponent_permanents_sacrificed = 0
+    live_opponent_permanents_sacrificed = 0
+    own_creatures_sacrificed = 0
+    opponent_creatures_sacrificed = 0
+    live_opponent_creatures_sacrificed = 0
+
+    for controller in players:
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        nonland_permanents = [
+            permanent
+            for permanent in list(getattr(controller, "battlefield", []) or [])
+            if isinstance(permanent, dict) and not is_effective_land(permanent)
+        ]
+        nonland_seen += len(nonland_permanents)
+        chosen_ids = set()
+        for choice_type in choice_types:
+            candidates = [
+                permanent
+                for permanent in nonland_permanents
+                if permanent_matches_tragic_arrogance_choice(permanent, choice_type)
+            ]
+            if not candidates:
+                continue
+            chosen = max(candidates, key=target_priority)
+            chosen_ids.add(id(chosen))
+            choices.append(
+                {
+                    "controller": controller.name,
+                    "choice_type": choice_type,
+                    "name": chosen.get("name", "?"),
+                    "type_line": chosen.get("type_line", ""),
+                    "target_score": list(target_priority(chosen)),
+                }
+            )
+
+        for permanent in nonland_permanents:
+            if id(permanent) in chosen_ids:
+                continue
+            was_creature = is_battlefield_creature(permanent)
+            destination = move_permanent_from_battlefield(
+                controller,
+                permanent,
+                reason="tragic_arrogance",
+                source=card,
+            )
+            sacrificed_cards.append(
+                {
+                    "controller": controller.name,
+                    "name": permanent.get("name", "?"),
+                    "type_line": permanent.get("type_line", ""),
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_permanents_sacrificed += 1
+                if was_creature:
+                    own_creatures_sacrificed += 1
+            else:
+                opponent_permanents_sacrificed += 1
+                if is_live_opponent:
+                    live_opponent_permanents_sacrificed += 1
+                if was_creature:
+                    opponent_creatures_sacrificed += 1
+                    if is_live_opponent:
+                        live_opponent_creatures_sacrificed += 1
+
+    actual_asymmetry = live_opponent_permanents_sacrificed - own_permanents_sacrificed
+    resolution_context = {
+        **context,
+        "nonland_permanents_seen": nonland_seen,
+        "choices_made": len(choices),
+        "actual_sacrificed": len(sacrificed_cards),
+        "own_permanents_sacrificed": own_permanents_sacrificed,
+        "opponent_permanents_sacrificed": opponent_permanents_sacrificed,
+        "live_opponent_permanents_sacrificed": live_opponent_permanents_sacrificed,
+        "own_creatures_sacrificed": own_creatures_sacrificed,
+        "opponent_creatures_sacrificed": opponent_creatures_sacrificed,
+        "live_opponent_creatures_sacrificed": live_opponent_creatures_sacrificed,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_sacrificed,
+        "actual_asymmetry": actual_asymmetry,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_permanents_sacrificed > own_permanents_sacrificed
+        ),
+    }
+    risk_flags = []
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif (
+        actual_asymmetry <= 0
+        and not context["lethal_pressure"]
+        and not context["behind_on_board"]
+    ):
+        risk_flags.append("wipe_without_clear_asymmetry")
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_selective_nonland_sacrifice"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            action="resolve_selective_nonland_sacrifice",
+        ),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_permanents_sacrificed * 5, 35),
+        actual_outcome="board_wipe_resolved",
+        reason="controller_chooses_each_player_kept_permanents_then_sacrifices_other_nonlands",
+        strategic_principle="keep_best_per_type_while_collapsing_excess_nonland_boards",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        destroyed=len(sacrificed_cards),
+        sacrificed=len(sacrificed_cards),
+        protected=len({(entry["controller"], entry["name"]) for entry in choices}),
+        nonland_permanents_seen=nonland_seen,
+        choices=choices[:24],
+        sacrificed_cards=sacrificed_cards[:24],
+        own_permanents_sacrificed=own_permanents_sacrificed,
+        opponent_permanents_sacrificed=opponent_permanents_sacrificed,
+        live_opponent_permanents_sacrificed=live_opponent_permanents_sacrificed,
+        own_creatures_sacrificed=own_creatures_sacrificed,
+        opponent_creatures_sacrificed=opponent_creatures_sacrificed,
+        live_opponent_creatures_sacrificed=live_opponent_creatures_sacrificed,
+        actual_asymmetry=actual_asymmetry,
+        risk_flags=risk_flags,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
 CREATURE_TYPE_STOPWORDS = {
     "artifact",
     "battle",
@@ -10732,7 +11293,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
             continue
         if not _can_pay_card_with_bonus_mana(player, card):
             continue
-        if effect in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+        if effect in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
             if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
@@ -10750,7 +11311,17 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 18 if cmc <= 4 else 10
             reason = "unlock_board_or_engine_development"
-        elif effect in ("airbend_other_creatures", "finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
+        elif effect in (
+            BOARD_WIPE_LIKE_EFFECTS
+            | {
+                "finisher",
+                "approach",
+                "token_maker",
+                "damage_wipe_treasure",
+                "redistribute_life_totals",
+                "worldfire_reset",
+            }
+        ):
             score += 24
             reason = "unlock_high_impact_spell"
         else:
@@ -10836,7 +11407,7 @@ def sacrifice_mana_unlock_candidates(
             bonus_color=bonus_color,
         ):
             continue
-        if effect in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+        if effect in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
             if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
@@ -10854,7 +11425,17 @@ def sacrifice_mana_unlock_candidates(
         elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 16 if cmc <= 4 else 8
             reason = "unlock_board_or_engine_development"
-        elif effect in ("airbend_other_creatures", "finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
+        elif effect in (
+            BOARD_WIPE_LIKE_EFFECTS
+            | {
+                "finisher",
+                "approach",
+                "token_maker",
+                "damage_wipe_treasure",
+                "redistribute_life_totals",
+                "worldfire_reset",
+            }
+        ):
             score += 26
             reason = "unlock_high_impact_spell"
         else:
@@ -13358,7 +13939,7 @@ def try_lorehold_miracle_cast(
     if last_drawn not in player.hand:
         return False
     opponents = [candidate for candidate in all_players if candidate is not player]
-    if eff.get("effect") in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+    if eff.get("effect") in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
         return False
     if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
         return False
@@ -17823,7 +18404,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             c = wincons[0]
             if c in player.hand and player.can_pay_card(c):
                 eff = get_card_effect(c)
-                if eff.get("effect") in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+                if eff.get("effect") in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
                     wincons = []
                 elif eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                     wincons = []
@@ -17946,7 +18527,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         if played >= 2: break
         if c in player.hand and player.can_pay_card(c):
             eff = get_card_effect(c)
-            if eff.get("effect") in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+            if eff.get("effect") in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
                 continue
             if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                 continue
@@ -18843,6 +19424,12 @@ def apply_effect_immediate(
         apply_equipment_haste_shroud(player, card, effect_data, turn)
     elif effect == "equipment_static_attachment":
         apply_equipment_static_attachment(player, card, effect_data, turn)
+    elif effect == "vow_counter_each_player_sacrifice_rest":
+        resolve_promise_of_loyalty(player, opponents, card, effect_data, turn)
+    elif effect == "gift_destroy_all_creatures_return_own_destroyed_creature":
+        resolve_starfall_invocation(player, opponents, card, effect_data, turn, rng)
+    elif effect == "selective_nonland_sacrifice":
+        resolve_tragic_arrogance(player, opponents, card, effect_data, turn)
     elif effect == "board_wipe":
         if effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes"):
             resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
@@ -20494,6 +21081,20 @@ def defender_attack_tax_per_creature(defender):
     return tax
 
 
+def vow_attack_restricted_for_defender(card, defender):
+    if not isinstance(card, dict) or defender is None:
+        return False
+    restricted_players = card.get("vow_cannot_attack_players") or []
+    if isinstance(restricted_players, str):
+        restricted_players = [restricted_players]
+    restricted_names = {
+        str(name)
+        for name in restricted_players
+        if str(name).strip()
+    }
+    return getattr(defender, "name", None) in restricted_names
+
+
 def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
     if not group_attackers:
         return [], {}
@@ -20501,7 +21102,12 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
     max_power, required_keywords = defender_attack_filter_restrictions(defender)
     filtered_attackers = []
     filtered_out = []
+    vow_filtered_out = []
     for card in group_attackers:
+        if vow_attack_restricted_for_defender(card, defender):
+            vow_filtered_out.append(card)
+            filtered_out.append(card)
+            continue
         if max_power is not None and combat_stat(card, "power", 2) > max_power:
             filtered_out.append(card)
             continue
@@ -20548,6 +21154,7 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
         or tax_per_creature > 0
         or max_power is not None
         or required_keywords
+        or vow_filtered_out
         or removed_count
     ):
         details = {
@@ -20560,6 +21167,11 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
             "attackers_before": len(group_attackers) + len(filtered_out),
             "attackers_after": len(kept),
             "attackers_restricted": removed_count,
+            "vow_restricted_attackers": [
+                card.get("name", "?")
+                for card in vow_filtered_out
+                if isinstance(card, dict)
+            ],
         }
     return kept, details
 

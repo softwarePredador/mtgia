@@ -9906,3 +9906,103 @@ Register decision:
 - Do not reuse these package numbers.
 - Any future change to the same cards requires a new PG package and fresh
   precheck/apply/postcheck/sync/audit evidence.
+
+## PG111 Deck 607 Board-Wipe-Choice Rules - Applied 2026-06-23
+
+Authorization and scope:
+
+- Rafael authorized the mass XMage -> ManaLoom adaptation goal with PostgreSQL
+  write permission in the active Codex thread.
+- PG111 applies verified executable battle-card rules for:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- No deck swaps were applied.
+
+Rule keys:
+
+- `Promise of Loyalty`:
+  `battle_rule_v1:78fff8e218103b0710bc5ee9cf174ee9`,
+  `oracle_hash=21dd715160fde6e50b8edc015ce83b0f`,
+  `effect=vow_counter_each_player_sacrifice_rest`.
+- `Starfall Invocation`:
+  `battle_rule_v1:58cfb4628b4a4a879f6f9c5e0ab3ee5f`,
+  `oracle_hash=3429884949eac8ffe09d86dc85bee1ae`,
+  `effect=gift_destroy_all_creatures_return_own_destroyed_creature`.
+- `Tragic Arrogance`:
+  `battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a`,
+  `oracle_hash=efdf5d051aaa7f94b12c4dccbbfd7d3d`,
+  `effect=selective_nonland_sacrifice`.
+
+Package files:
+
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_precheck_20260623_192502.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_apply_20260623_192502.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_postcheck_20260623_192502.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_rollback_20260623_192502.sql`.
+
+Precheck:
+
+- Output:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_precheck_20260623_192502.out`.
+- `Promise of Loyalty`: `card_rows=1`, `existing_rule_rows=2`,
+  `target_active_rows=0`, `shadow_rows=2`.
+- `Starfall Invocation`: `card_rows=1`, `existing_rule_rows=2`,
+  `target_active_rows=0`, `shadow_rows=2`.
+- `Tragic Arrogance`: `card_rows=1`, `existing_rule_rows=0`,
+  `target_active_rows=0`, `shadow_rows=0`.
+
+Apply:
+
+- Output:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_apply_20260623_192502.out`.
+- Result: backup rows `SELECT 4`, `deprecated_shadow_rows=4`,
+  `upserted_rows=3`, `COMMIT`.
+
+Postcheck:
+
+- Output:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_postcheck_20260623_192502.out`.
+- All three target cards returned `matching_target_rows=1`, `review_ok=t`,
+  `execution_ok=t`, `hash_ok=t`, `effect_ok=t`, and `scope_ok=t`.
+- Shadow rows after apply: `Promise of Loyalty` `2/2` disabled,
+  `Starfall Invocation` `2/2` disabled, `Tragic Arrogance` `0`.
+
+Runtime cache sync:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_sync_report_20260623_192502.json`.
+- Result: `selected_card_count=3`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=7`, `canonical_snapshot_rows_exported=3195`,
+  `oracle_normalized_rows=2`, `generated_rows=2`.
+
+Post-sync audit evidence:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"pass":100}`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":8,"medium":8,"pass":78}`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":23,"medium":15,"pass":167}`.
+
+Tests:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_py_compile_20260623_192502.out`:
+  pass.
+- `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_focused_tests_20260623_192502.out`:
+  six focused tests passed.
+- Full-suite attempt:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_full_suite_attempt_20260623_192502.out`;
+  blocked at pre-existing PG058 `KeyError: 'mana_color_status'` before PG111
+  tests, `exit_status=1`.
+
+Register decision:
+
+- PG111 is closed as applied, postchecked, synced, and audited.
+- Do not reuse PG111.
+- Any future change to these three cards requires a new package and fresh
+  precheck/apply/postcheck/sync/audit evidence.

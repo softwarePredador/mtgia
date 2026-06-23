@@ -23026,3 +23026,143 @@ Conclusion:
 - For the current Deck `607` queue, the fastest next slice remains
   `board_wipe_choice`: `Promise of Loyalty`, `Starfall Invocation`, and
   `Tragic Arrogance` as one runtime-family implementation.
+
+## PG111 Board-Wipe-Choice Applied, Synced, And Revalidated - 2026-06-23
+
+Scope closed:
+
+- Runtime family: `board_wipe_choice`.
+- Cards closed from the active Deck `607` pending list:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- PostgreSQL package: PG111.
+- Source-of-truth write was authorized in-chat for this mass XMage -> ManaLoom
+  adaptation goal.
+
+Runtime implementation:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`
+  now models:
+  `vow_counter_each_player_sacrifice_rest`,
+  `gift_destroy_all_creatures_return_own_destroyed_creature`, and
+  `selective_nonland_sacrifice`.
+- `Promise of Loyalty` now keeps one best creature per player, puts vow
+  counters on those creatures, sacrifices the rest, and prevents vow creatures
+  from attacking the source controller while the vow counter remains.
+- `Starfall Invocation` now models gift-a-card, destroys all creatures, and
+  returns the best own creature destroyed this way to the battlefield.
+- `Tragic Arrogance` now keeps the best artifact, creature, enchantment, and
+  planeswalker per player and sacrifices other nonland permanents.
+- These effects are included in the board-wipe-like threat/counter/unlock
+  family instead of being treated as generic draw or generic wipe rows.
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_precheck_20260623_192502.out`.
+  Results: `Promise of Loyalty` card_rows `1`, existing_rule_rows `2`,
+  target_active_rows `0`, shadow_rows `2`; `Starfall Invocation` card_rows
+  `1`, existing_rule_rows `2`, target_active_rows `0`, shadow_rows `2`;
+  `Tragic Arrogance` card_rows `1`, existing_rule_rows `0`,
+  target_active_rows `0`, shadow_rows `0`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_apply_20260623_192502.out`.
+  Results: backup `SELECT 4`, `deprecated_shadow_rows=4`,
+  `upserted_rows=3`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_postcheck_20260623_192502.out`.
+  All three cards have `matching_target_rows=1`, `review_ok=t`,
+  `execution_ok=t`, `hash_ok=t`, `effect_ok=t`, and `scope_ok=t`.
+  The four stale review-only shadow rows for `Promise of Loyalty` and
+  `Starfall Invocation` are disabled/deprecated.
+- Rollback package prepared but not needed:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_rollback_20260623_192502.sql`.
+
+Hermes/runtime sync:
+
+- PG -> SQLite sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_sync_report_20260623_192502.json`.
+- Result: `selected_card_count=3`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=7`, `canonical_snapshot_rows_exported=3195`,
+  `oracle_normalized_rows=2`, `generated_rows=2`,
+  `apply_sqlite_from_pg=true`.
+- Runtime snapshot updated:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json`.
+
+Deck-card audit evidence:
+
+- Official Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"pass":100}`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"medium":7,"pass":74}`.
+- Work Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":8,"medium":8,"pass":78}`.
+- Deck `608`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":16,"medium":6,"pass":46}`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":23,"medium":15,"pass":167}`.
+- Target-card closure in Deck `607`:
+  `Promise of Loyalty` is `pass`, effect
+  `vow_counter_each_player_sacrifice_rest`, key
+  `battle_rule_v1:78fff8e218103b0710bc5ee9cf174ee9`;
+  `Starfall Invocation` is `pass`, effect
+  `gift_destroy_all_creatures_return_own_destroyed_creature`, key
+  `battle_rule_v1:58cfb4628b4a4a879f6f9c5e0ab3ee5f`;
+  `Tragic Arrogance` is `pass`, effect `selective_nonland_sacrifice`, key
+  `battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a`.
+
+Learned-deck and battle validation:
+
+- Learned-deck coherence:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260623_192924.json`
+  and `.md`.
+- Learned-deck aggregate did not change versus the previous checkpoint:
+  `60` active learned decks, `severity_counts={"medium":13}`,
+  `land_count_high_review=1`, `land_count_low_review=7`,
+  `some_core_metadata_zero=5`.
+- Lorehold Deck `6` strategy package remains `passed=true` with PG saved deck
+  rows `100`, land quantity `33`, and no off-color candidates.
+- Local Deck `6` battle replay:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_deck6_pg111_board_wipe_choice_20260623_192502/`.
+- Replay decision audit:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_deck6_pg111_board_wipe_choice_20260623_192502/replay_decision_audit_20260623_192502.json`;
+  `status=turn_invariants_clean`, `structured_trace_usable=true`,
+  `structured_events=1129`, `decision_traces=188`, `turn_findings=0`,
+  `decision_findings=0`, severity counts all `0`.
+- This random Deck `6` replay did not exercise the three new board-wipe-choice
+  effects directly; the semantic proof for those cards is the focused test set
+  plus the PG postcheck and deck-card audit closure.
+
+Test evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_py_compile_20260623_192502.out`:
+  `PASS py_compile battle_analyst_v9.py battle_card_specific_tests.py`.
+- `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_focused_tests_20260623_192502.out`:
+  six focused PG111 tests passed for Oracle normalization and runtime behavior.
+- Full `test_battle_analyst_v10_3.py` attempt evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_full_suite_attempt_20260623_192502.out`.
+  It stops before the new PG111 tests on the pre-existing PG058
+  `KeyError: 'mana_color_status'` with `exit_status=1`. Treat PG058 as a
+  separate drift item, not a PG111 closure blocker.
+
+Active pending list after PG111:
+
+- Remove from active Deck `607` card-rule pending:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- Keep active Deck `607` high pending:
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.
+- Keep active Deck `607` medium land/review rows:
+  `Command Beacon`, `Eiganjo, Seat of the Empire`, `Exotic Orchard`,
+  `Glittering Massif`, `Plaza of Heroes`, `Radiant Summit`,
+  `Reliquary Tower`, and `Turbulent Steppe`.
+- PG111 is closed as applied, postchecked, synced, and audited. Do not reuse
+  this package number.
+- Next recommended mass slice: choose the next semantic family from the eight
+  remaining high rows; do not return to one-card-only processing unless a card
+  is isolated by missing source data.

@@ -1361,3 +1361,41 @@ Next package number is PG086. Next queue should prioritize remaining deck
   Next deck `607` battle-critical cards are `Fated Clash`,
   `Promise of Loyalty`, and `Starfall Invocation`; `Pearl Medallion` remains
   the next high battle-support card.
+
+## ManaLoom PG111 Board-Wipe-Choice Family - 2026-06-23 19:25 UTC
+
+- PG111 closed the `board_wipe_choice` runtime family for Deck `607`:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- Runtime now has explicit effects for vow-sacrifice wipe, gift-destroy-return
+  wipe, and selective nonland sacrifice. The cards are no longer modeled as
+  stale draw/generic wipe rows.
+- PostgreSQL evidence:
+  `pg111_deck607_board_wipe_choice_precheck_20260623_192502.out`,
+  `pg111_deck607_board_wipe_choice_apply_20260623_192502.out`, and
+  `pg111_deck607_board_wipe_choice_postcheck_20260623_192502.out`.
+  Apply result was `deprecated_shadow_rows=4`, `upserted_rows=3`; postcheck
+  returned all target rows with `review_ok=t`, `execution_ok=t`, `hash_ok=t`,
+  `effect_ok=t`, and `scope_ok=t`.
+- Hermes sync evidence:
+  `pg111_deck607_board_wipe_choice_sync_report_20260623_192502.json`;
+  `selected_card_count=3`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=7`, `canonical_snapshot_rows_exported=3195`.
+- Tests/evidence:
+  `pg111_board_wipe_choice_py_compile_20260623_192502.out` and
+  `pg111_board_wipe_choice_focused_tests_20260623_192502.out`; six focused
+  PG111 tests passed.
+- Full-suite attempt evidence:
+  `pg111_board_wipe_choice_full_suite_attempt_20260623_192502.out`; it stops
+  at pre-existing PG058 `KeyError: 'mana_color_status'` before PG111 tests.
+- Audit state after PG111: deck `6` `pass=100`, deck `607` `high=8`,
+  `medium=8`, `pass=78`, deck `606` `medium=7`, `pass=74`, deck `608`
+  `high=16`, `medium=6`, `pass=46`, global `high=23`, `medium=15`,
+  `pass=167`.
+- Learned-deck coherence remained unchanged at `60` active learned decks and
+  `severity_counts={"medium":13}`; Lorehold strategy package remains passed.
+- Deck `6` local replay decision audit after PG111 was
+  `turn_invariants_clean`, `turn_findings=0`, `decision_findings=0`.
+- Current Deck `607` high queue after PG111:
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.

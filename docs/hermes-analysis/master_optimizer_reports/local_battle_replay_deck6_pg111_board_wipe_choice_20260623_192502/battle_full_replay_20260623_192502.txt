@@ -1,0 +1,514 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Target deck id: 6
+Commander: Lorehold, the Historian
+Evaluation mode: target-deck-under-pressure
+Evaluation target player: Lorehold
+Opponents available: 12
+Opponents picked: Scion of the Ur-Dragon #36 (real), Korvold, Fae-Cursed King #41 (real), The Emperor of Palamecia #42 (real)
+======================================================================
+
+DECK SOURCE PROVENANCE
+  Metrics are derived from the resolved runtime card lists; cached learned-deck metadata is not used for replay lands/CMC/curve.
+  Deck-source blockers are reported separately from battle-engine action/strategy/forensic blockers.
+  Lorehold: source=sqlite_deck_cards metrics=runtime_derived_from_resolved_card_list cards=99 lands=33 avg_nonland_cmc=2.56 curve={"0": 2, "1": 17, "2": 14, "3": 19, "4": 10, "5": 1, "6": 1, "7+": 2} blockers=none
+  Scion of the Ur-Dragon #36 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=27 avg_nonland_cmc=2.19 curve={"0": 6, "1": 24, "2": 19, "3": 11, "4": 5, "5": 3, "6": 2, "7+": 2} blockers=none
+  Korvold, Fae-Cursed King #41 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=38 avg_nonland_cmc=2.77 curve={"0": 0, "1": 12, "2": 17, "3": 18, "4": 5, "5": 6, "6": 2, "7+": 1} blockers=none
+  The Emperor of Palamecia #42 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=36 avg_nonland_cmc=4.22 curve={"0": 1, "1": 1, "2": 11, "3": 9, "4": 21, "5": 7, "6": 2, "7+": 11} blockers=none
+
+MULLIGANS
+  Lorehold: 0 mulligan(s), 7 cards, 2 lands, HandCards=[Jeska's Will, Sol Ring, Sunbaked Canyon, Blasphemous Act, Rite of Flame, Mana Vault, Ancient Den]
+  Scion of the Ur-Dragon #36 (real): 3 mulligan(s), 5 cards, 1 lands, HandCards=[Swan Song, Swords to Plowshares, Taiga, Grand Abolisher, Into the Flood Maw]
+  Korvold, Fae-Cursed King #41 (real): 0 mulligan(s), 7 cards, 3 lands, HandCards=[Swamp, Biosynthic Burst, Seal of Primordium, Forest, Immersturm Predator, Mountain, Obsessive Pursuit]
+  The Emperor of Palamecia #42 (real): 3 mulligan(s), 5 cards, 0 lands, HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute]
+
+TURN 1 - Lorehold | Life=40 Hand=7 Board=0 HandCards=[Jeska's Will, Sol Ring, Sunbaked Canyon, Blasphemous Act, Rite of Flame, Mana Vault, Ancient Den]
+  MANA Lorehold: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Lorehold: Sunbaked Canyon mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/active
+  ANNOUNCE Lorehold: Sol Ring role=ramp phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Lorehold: Sol Ring cost={generic=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Lorehold: Sol Ring (CMC=1.0) [ramp_permanent] phase=precombat_main cost={generic=1} rule=curated/verified
+  ANNOUNCE Lorehold: Mana Vault role=ramp phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Lorehold: Mana Vault cost={generic=1} mana 2->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Lorehold: Mana Vault (CMC=1.0) [ramp_permanent] phase=precombat_main cost={generic=1} rule=curated/active
+  ANNOUNCE Lorehold: Scroll Rack role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Lorehold: Scroll Rack cost={generic=2} mana 4->2 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 2, 'wildcard': 0}
+  CAST Lorehold: Scroll Rack (CMC=2.0) [topdeck_manipulation] phase=precombat_main cost={generic=2} rule=curated/active
+  RESOLVE SPELL Lorehold: Scroll Rack (CMC=2.0) [topdeck_manipulation] rule=curated/active
+  END Lorehold: Life=40 Hand=5 Board=4 Grave=0 Discarded=0 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, Ancient Den, City of Brass] Permanents=[Sunbaked Canyon, Sol Ring, Mana Vault, Scroll Rack]
+
+TURN 1 - Scion of the Ur-Dragon #36 (real) | Life=40 Hand=5 Board=0 HandCards=[Swan Song, Swords to Plowshares, Taiga, Grand Abolisher, Into the Flood Maw]
+  MANA Scion of the Ur-Dragon #36 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Scion of the Ur-Dragon #36 (real): Taiga mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1} rule=curated/verified
+  END Scion of the Ur-Dragon #36 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0 HandCards=[Swan Song, Swords to Plowshares, Grand Abolisher, Into the Flood Maw, Lion's Eye Diamond] Permanents=[Taiga]
+
+TURN 1 - Korvold, Fae-Cursed King #41 (real) | Life=40 Hand=7 Board=0 HandCards=[Swamp, Biosynthic Burst, Seal of Primordium, Forest, Immersturm Predator, Mountain, Obsessive Pursuit]
+  MANA Korvold, Fae-Cursed King #41 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Swamp mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Korvold, Fae-Cursed King #41 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Biosynthic Burst, Seal of Primordium, Forest, Immersturm Predator, Mountain, Obsessive Pursuit, Mazirek, Kraul Death Priest] Permanents=[Swamp]
+
+TURN 1 - The Emperor of Palamecia #42 (real) | Life=40 Hand=5 Board=0 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute]
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=6 Board=0 Grave=0 Discarded=0 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse] Permanents=[-]
+
+TURN 2 - Lorehold | Life=40 Hand=5 Board=4 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, Ancient Den, City of Brass]
+  MANA Lorehold: 6 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  PLAY LAND Lorehold: Ancient Den mana+=1 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=3, red=1, white=1} targets=-
+  PAY COST Lorehold: Lorehold, the Historian cost={generic=3, red=1, white=1} mana 7->2 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 2, 'wildcard': 0}
+  CAST COMMANDER Lorehold: Lorehold, the Historian (CMC=5.0) [passive] phase=precombat_main cost={generic=3, red=1, white=1} rule=curated/active
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=40)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 35, target_dead=False
+  CAST INSTANT Scion of the Ur-Dragon #36 (real): Swords to Plowshares (CMC=1.0) [remove_creature] phase=end_step cost={white=1} rule=curated/active
+  RESOLVE SPELL Scion of the Ur-Dragon #36 (real): Swords to Plowshares (CMC=1.0) [remove_creature] rule=curated/active
+  REMOVAL Scion of the Ur-Dragon #36 (real): Swords to Plowshares removed Lorehold, the Historian from Lorehold
+  END Lorehold: Life=40 Hand=5 Board=5 Grave=0 Discarded=0 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, City of Brass, Sphere of Safety] Permanents=[Sunbaked Canyon, Sol Ring, Mana Vault, Scroll Rack, Ancient Den]
+
+TURN 2 - Scion of the Ur-Dragon #36 (real) | Life=35 Hand=4 Board=1 HandCards=[Swan Song, Grand Abolisher, Into the Flood Maw, Lion's Eye Diamond]
+  MANA Scion of the Ur-Dragon #36 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  END Scion of the Ur-Dragon #36 (real): Life=35 Hand=5 Board=1 Grave=1 Discarded=0 HandCards=[Swan Song, Grand Abolisher, Into the Flood Maw, Lion's Eye Diamond, Korvold, Fae-Cursed King] Permanents=[Taiga]
+
+TURN 2 - Korvold, Fae-Cursed King #41 (real) | Life=40 Hand=7 Board=1 HandCards=[Biosynthic Burst, Seal of Primordium, Forest, Immersturm Predator, Mountain, Obsessive Pursuit, Mazirek, Kraul Death Priest]
+  MANA Korvold, Fae-Cursed King #41 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Forest mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Biosynthic Burst role=normal phase=precombat_main locked_cost={generic=1, green=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Biosynthic Burst cost={generic=1, green=1} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Biosynthic Burst (CMC=2.0) [protect_creature] phase=precombat_main cost={generic=1, green=1} rule=curated/verified
+  RESOLVE SPELL Korvold, Fae-Cursed King #41 (real): Biosynthic Burst (CMC=2.0) [protect_creature] rule=curated/verified
+  END Korvold, Fae-Cursed King #41 (real): Life=40 Hand=6 Board=2 Grave=1 Discarded=0 HandCards=[Seal of Primordium, Immersturm Predator, Mountain, Obsessive Pursuit, Mazirek, Kraul Death Priest, Path of Ancestry] Permanents=[Swamp, Forest]
+
+TURN 2 - The Emperor of Palamecia #42 (real) | Life=40 Hand=6 Board=0 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse]
+  MANA The Emperor of Palamecia #42 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Spinerock Knoll mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse] Permanents=[Spinerock Knoll]
+
+TURN 3 - Lorehold | Life=40 Hand=5 Board=5 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, City of Brass, Sphere of Safety]
+  MANA Lorehold: 7 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  PLAY LAND Lorehold: City of Brass mana+=1 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 2} rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=5, red=1, white=1} targets=-
+  PAY COST Lorehold: Lorehold, the Historian cost={generic=5, red=1, white=1} mana 8->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1}
+  CAST COMMANDER Lorehold: Lorehold, the Historian (CMC=5.0) [passive] phase=precombat_main cost={generic=5, red=1, white=1} rule=curated/active
+  CAST INSTANT Scion of the Ur-Dragon #36 (real): Into the Flood Maw (CMC=1.0) [remove_creature] phase=end_step cost={blue=1} rule=curated/verified
+  RESOLVE SPELL Scion of the Ur-Dragon #36 (real): Into the Flood Maw (CMC=1.0) [remove_creature] rule=curated/verified
+  REMOVAL Scion of the Ur-Dragon #36 (real): Into the Flood Maw removed Lorehold, the Historian from Lorehold
+  END Lorehold: Life=40 Hand=5 Board=6 Grave=0 Discarded=0 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, Sphere of Safety, Plains // Plains] Permanents=[Sunbaked Canyon, Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass]
+
+TURN 3 - Scion of the Ur-Dragon #36 (real) | Life=35 Hand=4 Board=1 HandCards=[Swan Song, Grand Abolisher, Lion's Eye Diamond, Korvold, Fae-Cursed King]
+  MANA Scion of the Ur-Dragon #36 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1})
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Noble Hierarch role=creature phase=precombat_main locked_cost={green=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Noble Hierarch cost={green=1} mana 1->0 life 35->35 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Scion of the Ur-Dragon #36 (real): Noble Hierarch (CMC=1.0) [creature] phase=precombat_main cost={green=1} rule=curated/verified
+  END Scion of the Ur-Dragon #36 (real): Life=35 Hand=4 Board=2 Grave=2 Discarded=0 HandCards=[Swan Song, Grand Abolisher, Lion's Eye Diamond, Korvold, Fae-Cursed King] Permanents=[Taiga, Noble Hierarch]
+
+TURN 3 - Korvold, Fae-Cursed King #41 (real) | Life=40 Hand=6 Board=2 HandCards=[Seal of Primordium, Immersturm Predator, Mountain, Obsessive Pursuit, Mazirek, Kraul Death Priest, Path of Ancestry]
+  MANA Korvold, Fae-Cursed King #41 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Seal of Primordium role=normal phase=precombat_main locked_cost={generic=1, green=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Seal of Primordium cost={generic=1, green=1} mana 3->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Seal of Primordium (CMC=2.0) [passive] phase=precombat_main cost={generic=1, green=1} rule=curated/verified
+  RESOLVE SPELL Korvold, Fae-Cursed King #41 (real): Seal of Primordium (CMC=2.0) [passive] rule=curated/verified
+  END Korvold, Fae-Cursed King #41 (real): Life=40 Hand=5 Board=4 Grave=1 Discarded=0 HandCards=[Immersturm Predator, Obsessive Pursuit, Mazirek, Kraul Death Priest, Path of Ancestry, Decadent Dragon] Permanents=[Swamp, Forest, Mountain, Seal of Primordium]
+
+TURN 3 - The Emperor of Palamecia #42 (real) | Life=40 Hand=6 Board=1 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse]
+  MANA The Emperor of Palamecia #42 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse, Tellah, Great Sage] Permanents=[Spinerock Knoll]
+
+TURN 4 - Lorehold | Life=40 Hand=5 Board=6 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, Sphere of Safety, Plains // Plains]
+  MANA Lorehold: 8 available (5 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 2})
+  PLAY LAND Lorehold: Plains // Plains mana+=1 pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 2} rule=curated/verified
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=precombat_main locked_cost={generic=7, red=1, white=1} targets=-
+  PAY COST Lorehold: Lorehold, the Historian cost={generic=7, red=1, white=1} mana 9->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Lorehold: Lorehold, the Historian (CMC=5.0) [passive] phase=precombat_main cost={generic=7, red=1, white=1} rule=curated/active
+  END Lorehold: Life=40 Hand=5 Board=8 Grave=0 Discarded=0 HandCards=[Jeska's Will, Blasphemous Act, Rite of Flame, Sphere of Safety, Bloodstained Mire] Permanents=[Sunbaked Canyon, Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped)]
+
+TURN 4 - Scion of the Ur-Dragon #36 (real) | Life=35 Hand=4 Board=2 HandCards=[Swan Song, Grand Abolisher, Lion's Eye Diamond, Korvold, Fae-Cursed King]
+  MANA Scion of the Ur-Dragon #36 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Grand Abolisher role=high_threat phase=precombat_main locked_cost={white=2} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Grand Abolisher cost={white=2} mana 2->0 life 35->35 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Scion of the Ur-Dragon #36 (real): Grand Abolisher (CMC=2.0) [silence_opponents] phase=precombat_main cost={white=2} rule=curated/verified
+  RESOLVE SPELL Scion of the Ur-Dragon #36 (real): Grand Abolisher (CMC=2.0) [silence_opponents] rule=curated/verified
+  END Scion of the Ur-Dragon #36 (real): Life=35 Hand=4 Board=3 Grave=2 Discarded=0 HandCards=[Swan Song, Lion's Eye Diamond, Korvold, Fae-Cursed King, Hoarding Broodlord] Permanents=[Taiga, Noble Hierarch, Grand Abolisher]
+
+TURN 4 - Korvold, Fae-Cursed King #41 (real) | Life=40 Hand=5 Board=4 HandCards=[Immersturm Predator, Obsessive Pursuit, Mazirek, Kraul Death Priest, Path of Ancestry, Decadent Dragon]
+  MANA Korvold, Fae-Cursed King #41 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Path of Ancestry mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Search for Tomorrow role=ramp phase=precombat_main locked_cost={generic=2, green=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Search for Tomorrow cost={generic=2, green=1} mana 4->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Search for Tomorrow (CMC=3.0) [land_ramp] phase=precombat_main cost={generic=2, green=1} rule=curated/verified
+  END Korvold, Fae-Cursed King #41 (real): Life=40 Hand=4 Board=6 Grave=2 Discarded=0 HandCards=[Immersturm Predator, Obsessive Pursuit, Mazirek, Kraul Death Priest, Decadent Dragon] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest (tapped)]
+
+TURN 4 - The Emperor of Palamecia #42 (real) | Life=40 Hand=7 Board=1 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse, Tellah, Great Sage]
+  MANA The Emperor of Palamecia #42 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): The Emperor of Palamecia role=commander phase=precombat_main locked_cost={blue=1, red=1} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): The Emperor of Palamecia cost={blue=1, red=1} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER The Emperor of Palamecia #42 (real): The Emperor of Palamecia (CMC=2.0) [creature] phase=precombat_main cost={blue=1, red=1} rule=curated/active
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=7 Board=3 Grave=0 Discarded=0 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse, Tellah, Great Sage] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia]
+
+TURN 5 - Lorehold | Life=40 Hand=5 Board=8 HandCards=[Jeska's Will, Rite of Flame, Bloodstained Mire, Magus of the Moat, Giver of Runes]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 2})
+  CAST Lorehold: Past in Flames (CMC=4.0) [graveyard_flashback_grant] phase=draw_step cost={} rule=curated/active
+  RESOLVE SPELL Lorehold: Past in Flames (CMC=4.0) [graveyard_flashback_grant] rule=curated/active
+  PLAY LAND Lorehold: Bloodstained Mire mana+=1 pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2} rule=curated/verified
+  ANNOUNCE Lorehold: Blasphemous Act role=flashback phase=precombat_main locked_cost={generic=8, red=1} targets=-
+  ILLEGAL CAST Lorehold: Blasphemous Act reason=cannot_pay_locked_cost locked_cost={generic=8, red=1} phase=precombat_main
+  ANNOUNCE Lorehold: Giver of Runes role=creature phase=precombat_main locked_cost={white=1} targets=-
+  PAY COST Lorehold: Giver of Runes cost={white=1} mana 8->7 life 40->40 life_paid=0 pool={'generic': 1, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 2}
+  CAST CREATURE Lorehold: Giver of Runes (CMC=1.0) [creature] phase=precombat_main cost={white=1} rule=curated/verified
+  ANNOUNCE Lorehold: Blasphemous Act role=flashback phase=precombat_main locked_cost={generic=8, red=1} targets=-
+  ILLEGAL CAST Lorehold: Blasphemous Act reason=cannot_pay_locked_cost locked_cost={generic=8, red=1} phase=precombat_main
+  ANNOUNCE Lorehold: Magus of the Moat role=normal phase=precombat_main locked_cost={generic=2, white=2} targets=-
+  PAY COST Lorehold: Magus of the Moat cost={generic=2, white=2} mana 7->3 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 2, 'wildcard': 1}
+  CAST Lorehold: Magus of the Moat (CMC=4.0) [attack_limit] phase=precombat_main cost={generic=2, white=2} rule=curated/verified
+  RESOLVE SPELL Lorehold: Magus of the Moat (CMC=4.0) [attack_limit] rule=curated/verified
+  ANNOUNCE Lorehold: Blasphemous Act role=flashback phase=precombat_main locked_cost={generic=8, red=1} targets=-
+  ILLEGAL CAST Lorehold: Blasphemous Act reason=cannot_pay_locked_cost locked_cost={generic=8, red=1} phase=precombat_main
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 1 attackers, 0 blockers, 0 gang blocks, 5 power (reason=default_low_life, target_life=35)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 30, target_dead=False
+  ANNOUNCE Lorehold: Blasphemous Act role=flashback phase=postcombat_main locked_cost={generic=8, red=1} targets=-
+  ILLEGAL CAST Lorehold: Blasphemous Act reason=cannot_pay_locked_cost locked_cost={generic=8, red=1} phase=postcombat_main
+  ACTIVATE Lorehold: Sunbaked Canyon kind=sacrifice_draw mana_paid=1
+  END Lorehold: Life=40 Hand=3 Board=10 Grave=4 Discarded=0 HandCards=[Jeska's Will, Rite of Flame, Heat Shimmer] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped), Bloodstained Mire, Giver of Runes, Magus of the Moat]
+
+TURN 5 - Scion of the Ur-Dragon #36 (real) | Life=30 Hand=4 Board=3 HandCards=[Swan Song, Lion's Eye Diamond, Korvold, Fae-Cursed King, Hoarding Broodlord]
+  MANA Scion of the Ur-Dragon #36 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Bloom Tender role=creature phase=precombat_main locked_cost={generic=1, green=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Bloom Tender cost={generic=1, green=1} mana 2->0 life 30->30 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Scion of the Ur-Dragon #36 (real): Bloom Tender (CMC=2.0) [creature] phase=precombat_main cost={generic=1, green=1} rule=curated/verified
+  END Scion of the Ur-Dragon #36 (real): Life=30 Hand=4 Board=4 Grave=2 Discarded=0 HandCards=[Swan Song, Lion's Eye Diamond, Korvold, Fae-Cursed King, Hoarding Broodlord] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Bloom Tender]
+
+TURN 5 - Korvold, Fae-Cursed King #41 (real) | Life=40 Hand=4 Board=6 HandCards=[Immersturm Predator, Obsessive Pursuit, Mazirek, Kraul Death Priest, Decadent Dragon]
+  MANA Korvold, Fae-Cursed King #41 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King role=commander phase=precombat_main locked_cost={generic=2, black=1, green=1, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King cost={generic=2, black=1, green=1, red=1} mana 5->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] phase=precombat_main cost={generic=2, black=1, green=1, red=1} rule=known_cards_canonical_snapshot/review_only
+  END Korvold, Fae-Cursed King #41 (real): Life=40 Hand=5 Board=7 Grave=2 Discarded=0 HandCards=[Immersturm Predator, Obsessive Pursuit, Mazirek, Kraul Death Priest, Decadent Dragon, Sol Ring] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Korvold, Fae-Cursed King]
+
+TURN 5 - The Emperor of Palamecia #42 (real) | Life=40 Hand=7 Board=3 HandCards=[Wizard's Retort, Bond of Insight, Laughing Mad, Negate, Refute, One with the Multiverse, Tellah, Great Sage]
+  MANA The Emperor of Palamecia #42 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE The Emperor of Palamecia #42 (real): Abandon Attachments role=normal phase=precombat_main locked_cost={generic=1, hybrid=[['blue', 'red']]} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): Abandon Attachments cost={generic=1, hybrid=[['blue', 'red']]} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST The Emperor of Palamecia #42 (real): Abandon Attachments (CMC=2.0) [draw_cards] phase=precombat_main cost={generic=1, hybrid=[['blue', 'red']]} rule=curated/verified
+  RESOLVE SPELL The Emperor of Palamecia #42 (real): Abandon Attachments (CMC=2.0) [draw_cards] rule=curated/verified
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=7 Board=3 Grave=3 Discarded=0 HandCards=[Laughing Mad, Negate, Refute, One with the Multiverse, Tellah, Great Sage, Flame Wave, Sisay's Ring] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia]
+
+TURN 6 - Lorehold | Life=40 Hand=3 Board=10 HandCards=[Jeska's Will, Rite of Flame, Molten Duplication]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  CAST Lorehold: Heat Shimmer (CMC=3.0) [copy_creature_token] phase=draw_step cost={} rule=curated/active
+  RESOLVE SPELL Lorehold: Heat Shimmer (CMC=3.0) [copy_creature_token] rule=curated/active
+  ANNOUNCE Lorehold: Molten Duplication role=normal phase=precombat_main locked_cost={generic=1, red=1} targets=-
+  PAY COST Lorehold: Molten Duplication cost={generic=1, red=1} mana 7->5 life 40->40 life_paid=0 pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0}
+  CAST Lorehold: Molten Duplication (CMC=2.0) [copy_creature_token] phase=precombat_main cost={generic=1, red=1} rule=curated/active
+  RESOLVE SPELL Lorehold: Molten Duplication (CMC=2.0) [copy_creature_token] rule=curated/active
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 3 attackers, 0 blockers, 0 gang blocks, 11 power (reason=default_low_life, target_life=30)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 25, target_dead=False
+  DAMAGE Lorehold -> Korvold, Fae-Cursed King #41 (real): 6 player damage, target life 34, target_dead=False
+  END Lorehold: Life=40 Hand=2 Board=10 Grave=7 Discarded=0 HandCards=[Jeska's Will, Rite of Flame] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped), Bloodstained Mire, Giver of Runes, Magus of the Moat (tapped)]
+
+TURN 6 - Scion of the Ur-Dragon #36 (real) | Life=25 Hand=4 Board=4 HandCards=[Swan Song, Lion's Eye Diamond, Korvold, Fae-Cursed King, Hoarding Broodlord]
+  MANA Scion of the Ur-Dragon #36 (real): 4 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Lion's Eye Diamond role=ramp phase=precombat_main locked_cost={} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Lion's Eye Diamond cost={} mana 4->4 life 25->25 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4}
+  CAST Scion of the Ur-Dragon #36 (real): Lion's Eye Diamond (CMC=0.0) [ramp_ritual] phase=precombat_main cost={} rule=curated/verified
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Channel the Suns role=ramp phase=precombat_main locked_cost={generic=3, green=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Channel the Suns cost={generic=3, green=1} mana 7->3 life 25->25 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3}
+  CAST Scion of the Ur-Dragon #36 (real): Channel the Suns (CMC=4.0) [ramp_permanent] phase=precombat_main cost={generic=3, green=1} rule=functional_tags_json/heuristic
+  END Scion of the Ur-Dragon #36 (real): Life=25 Hand=3 Board=5 Grave=3 Discarded=0 HandCards=[Swan Song, Korvold, Fae-Cursed King, Hoarding Broodlord] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Bloom Tender, Channel the Suns]
+
+TURN 6 - Korvold, Fae-Cursed King #41 (real) | Life=34 Hand=5 Board=7 HandCards=[Immersturm Predator, Obsessive Pursuit, Mazirek, Kraul Death Priest, Decadent Dragon, Sol Ring]
+  MANA Korvold, Fae-Cursed King #41 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Evolving Wilds mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Sol Ring role=ramp phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Sol Ring cost={generic=1} mana 6->5 life 34->34 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 2, 'colorless': 0, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Sol Ring (CMC=1.0) [ramp_permanent] phase=precombat_main cost={generic=1} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Obsessive Pursuit role=normal phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Obsessive Pursuit cost={generic=1, black=1} mana 7->5 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 2, 'colorless': 2, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Obsessive Pursuit (CMC=2.0) [draw_cards] phase=precombat_main cost={generic=1, black=1} rule=functional_tags_json/heuristic
+  RESOLVE SPELL Korvold, Fae-Cursed King #41 (real): Obsessive Pursuit (CMC=2.0) [draw_cards] rule=functional_tags_json/heuristic
+  COMBAT Korvold, Fae-Cursed King #41 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=evaluation_target_pressure, target_life=40)
+  DAMAGE Korvold, Fae-Cursed King #41 (real) -> Lorehold: 4 player damage, target life 36, target_dead=False
+  END Korvold, Fae-Cursed King #41 (real): Life=34 Hand=5 Board=9 Grave=3 Discarded=0 HandCards=[Immersturm Predator, Mazirek, Kraul Death Priest, Decadent Dragon, Mountain, Thriving Bluff] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Korvold, Fae-Cursed King (tapped), Evolving Wilds, Sol Ring]
+
+TURN 6 - The Emperor of Palamecia #42 (real) | Life=40 Hand=7 Board=3 HandCards=[Laughing Mad, Negate, Refute, One with the Multiverse, Tellah, Great Sage, Flame Wave, Sisay's Ring]
+  MANA The Emperor of Palamecia #42 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END The Emperor of Palamecia #42 (real): Life=40 Hand=7 Board=3 Grave=4 Discarded=1 DiscardedCards=[One with the Multiverse] HandCards=[Laughing Mad, Negate, Refute, Tellah, Great Sage, Flame Wave, Sisay's Ring, Stonespeaker Crystal] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia]
+
+TURN 7 - Lorehold | Life=36 Hand=2 Board=10 HandCards=[Rite of Flame, Ghostly Prison]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  CAST Lorehold: Jeska's Will (CMC=3.0) [ramp_ritual] phase=draw_step cost={} rule=curated/verified
+  RESOLVE SPELL Lorehold: Jeska's Will (CMC=3.0) [ramp_ritual] rule=curated/verified
+  ANNOUNCE Lorehold: Ghostly Prison role=normal phase=precombat_main locked_cost={generic=2, white=1} targets=-
+  PAY COST Lorehold: Ghostly Prison cost={generic=2, white=1} mana 14->11 life 36->36 life_paid=0 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 7, 'green': 0, 'colorless': 2, 'wildcard': 1}
+  CAST Lorehold: Ghostly Prison (CMC=3.0) [attack_tax] phase=precombat_main cost={generic=2, white=1} rule=curated/verified
+  RESOLVE SPELL Lorehold: Ghostly Prison (CMC=3.0) [attack_tax] rule=curated/verified
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=25)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 20, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 1 player damage, target life 39, target_dead=False
+  END Lorehold: Life=36 Hand=1 Board=11 Grave=8 Discarded=0 HandCards=[Rite of Flame] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped), Bloodstained Mire, Giver of Runes, Magus of the Moat (tapped), Ghostly Prison]
+
+TURN 7 - Scion of the Ur-Dragon #36 (real) | Life=20 Hand=3 Board=5 HandCards=[Swan Song, Korvold, Fae-Cursed King, Hoarding Broodlord]
+  MANA Scion of the Ur-Dragon #36 (real): 5 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 5})
+  PLAY LAND Scion of the Ur-Dragon #36 (real): Badlands mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6} rule=curated/verified
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Scion of the Ur-Dragon role=commander phase=precombat_main locked_cost={black=1, blue=1, green=1, red=1, white=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Scion of the Ur-Dragon cost={black=1, blue=1, green=1, red=1, white=1} mana 6->1 life 20->20 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1}
+  CAST COMMANDER Scion of the Ur-Dragon #36 (real): Scion of the Ur-Dragon (CMC=5.0) [tutor] phase=precombat_main cost={black=1, blue=1, green=1, red=1, white=1} rule=functional_tags_json/heuristic
+  END Scion of the Ur-Dragon #36 (real): Life=20 Hand=3 Board=7 Grave=3 Discarded=0 HandCards=[Swan Song, Korvold, Fae-Cursed King, Hoarding Broodlord] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Bloom Tender, Channel the Suns, Badlands, Scion of the Ur-Dragon]
+
+TURN 7 - Korvold, Fae-Cursed King #41 (real) | Life=34 Hand=5 Board=9 HandCards=[Immersturm Predator, Mazirek, Kraul Death Priest, Decadent Dragon, Mountain, Thriving Bluff]
+  MANA Korvold, Fae-Cursed King #41 (real): 8 available (7 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 1, 'green': 2, 'colorless': 2, 'wildcard': 0})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Mountain mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 1, 'red': 2, 'green': 2, 'colorless': 2, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Decadent Dragon role=ramp phase=precombat_main locked_cost={generic=2, red=2} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Decadent Dragon cost={generic=2, red=2} mana 9->5 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 2, 'colorless': 2, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Decadent Dragon (CMC=4.0) [ramp_permanent] phase=precombat_main cost={generic=2, red=2} rule=functional_tags_json/heuristic
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Dire Fleet Hoarder role=ramp phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Dire Fleet Hoarder cost={generic=1, black=1} mana 6->4 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 2, 'colorless': 1, 'wildcard': 1}
+  CAST Korvold, Fae-Cursed King #41 (real): Dire Fleet Hoarder (CMC=2.0) [ramp_permanent] phase=precombat_main cost={generic=1, black=1} rule=functional_tags_json/heuristic
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Mazirek, Kraul Death Priest role=creature phase=precombat_main locked_cost={generic=3, black=1, green=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Mazirek, Kraul Death Priest cost={generic=3, black=1, green=1} mana 5->0 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Korvold, Fae-Cursed King #41 (real): Mazirek, Kraul Death Priest (CMC=5.0) [creature] phase=precombat_main cost={generic=3, black=1, green=1} rule=type_line_creature/fact
+  END Korvold, Fae-Cursed King #41 (real): Life=34 Hand=2 Board=13 Grave=3 Discarded=0 HandCards=[Immersturm Predator, Thriving Bluff] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Korvold, Fae-Cursed King, Evolving Wilds, Sol Ring, Mountain, Decadent Dragon, Dire Fleet Hoarder, +1 more]
+
+TURN 7 - The Emperor of Palamecia #42 (real) | Life=39 Hand=7 Board=3 HandCards=[Laughing Mad, Negate, Refute, Tellah, Great Sage, Flame Wave, Sisay's Ring, Stonespeaker Crystal]
+  MANA The Emperor of Palamecia #42 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE The Emperor of Palamecia #42 (real): Sazacap's Brew role=normal phase=precombat_main locked_cost={generic=1, red=1} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): Sazacap's Brew cost={generic=1, red=1} mana 2->0 life 39->39 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST The Emperor of Palamecia #42 (real): Sazacap's Brew (CMC=2.0) [draw_cards] phase=precombat_main cost={generic=1, red=1} rule=curated/active
+  RESOLVE SPELL The Emperor of Palamecia #42 (real): Sazacap's Brew (CMC=2.0) [draw_cards] rule=curated/active
+  END The Emperor of Palamecia #42 (real): Life=39 Hand=7 Board=3 Grave=7 Discarded=0 HandCards=[Refute, Tellah, Great Sage, Flame Wave, Sisay's Ring, Stonespeaker Crystal, Island, Island] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia]
+
+TURN 8 - Lorehold | Life=36 Hand=1 Board=11 HandCards=[Rite of Flame]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=20)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 15, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 1 player damage, target life 38, target_dead=False
+  END Lorehold: Life=36 Hand=2 Board=11 Grave=8 Discarded=0 HandCards=[Rite of Flame, Reiterate] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped), Bloodstained Mire, Giver of Runes, Magus of the Moat (tapped), Ghostly Prison]
+
+TURN 8 - Scion of the Ur-Dragon #36 (real) | Life=15 Hand=3 Board=7 HandCards=[Swan Song, Korvold, Fae-Cursed King, Hoarding Broodlord]
+  MANA Scion of the Ur-Dragon #36 (real): 6 available (5 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Korvold, Fae-Cursed King role=normal phase=precombat_main locked_cost={generic=2, black=1, green=1, red=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Korvold, Fae-Cursed King cost={generic=2, black=1, green=1, red=1} mana 6->1 life 15->15 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 1}
+  CAST Scion of the Ur-Dragon #36 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] phase=precombat_main cost={generic=2, black=1, green=1, red=1} rule=known_cards_canonical_snapshot/review_only
+  RESOLVE SPELL Scion of the Ur-Dragon #36 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] rule=known_cards_canonical_snapshot/review_only
+  END Scion of the Ur-Dragon #36 (real): Life=15 Hand=3 Board=8 Grave=3 Discarded=0 HandCards=[Swan Song, Hoarding Broodlord, Force of Will] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Bloom Tender, Channel the Suns, Badlands, Scion of the Ur-Dragon, Korvold, Fae-Cursed King]
+
+TURN 8 - Korvold, Fae-Cursed King #41 (real) | Life=34 Hand=2 Board=12 HandCards=[Immersturm Predator, Thriving Bluff]
+  MANA Korvold, Fae-Cursed King #41 (real): 11 available (10 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 2, 'red': 2, 'green': 2, 'colorless': 2, 'wildcard': 1})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Thriving Bluff mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 2, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King role=commander phase=precombat_main locked_cost={generic=4, black=1, green=1, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King cost={generic=4, black=1, green=1, red=1} mana 12->5 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 2, 'green': 1, 'colorless': 0, 'wildcard': 1}
+  CAST COMMANDER Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] phase=precombat_main cost={generic=4, black=1, green=1, red=1} rule=known_cards_canonical_snapshot/review_only
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Gleaming Barrier role=ramp phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Gleaming Barrier cost={generic=2} mana 5->3 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 1, 'colorless': 0, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Gleaming Barrier (CMC=2.0) [ramp_permanent] phase=precombat_main cost={generic=2} rule=functional_tags_json/heuristic
+  COMBAT Korvold, Fae-Cursed King #41 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=evaluation_target_pressure, target_life=36)
+  DAMAGE Korvold, Fae-Cursed King #41 (real) -> Lorehold: 6 player damage, target life 30, target_dead=False
+  END Korvold, Fae-Cursed King #41 (real): Life=34 Hand=1 Board=14 Grave=3 Discarded=0 HandCards=[Immersturm Predator] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Evolving Wilds, Sol Ring, Mountain, Decadent Dragon (tapped), Dire Fleet Hoarder, Mazirek, Kraul Death Priest (tapped), +2 more]
+
+TURN 8 - The Emperor of Palamecia #42 (real) | Life=38 Hand=7 Board=3 HandCards=[Refute, Tellah, Great Sage, Flame Wave, Sisay's Ring, Stonespeaker Crystal, Island, Island]
+  MANA The Emperor of Palamecia #42 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 2, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END The Emperor of Palamecia #42 (real): Life=38 Hand=7 Board=4 Grave=7 Discarded=0 HandCards=[Refute, Tellah, Great Sage, Flame Wave, Sisay's Ring, Stonespeaker Crystal, Island, Mountain] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia, Island]
+
+TURN 9 - Lorehold | Life=30 Hand=2 Board=11 HandCards=[Rite of Flame, Birgi, God of Storytelling // Harnfel, Horn of Bounty]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  ANNOUNCE Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty role=creature phase=precombat_main locked_cost={generic=2, red=1} targets=-
+  PAY COST Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty cost={generic=2, red=1} mana 9->6 life 30->30 life_paid=0 pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 4, 'wildcard': 0}
+  CAST CREATURE Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty (CMC=3.0) [creature] phase=precombat_main cost={generic=2, red=1} rule=curated/active
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=default_low_life, target_life=15)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 10, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 1 player damage, target life 37, target_dead=False
+  END Lorehold: Life=30 Hand=2 Board=12 Grave=8 Discarded=0 HandCards=[Rite of Flame, Reiterate] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped), Bloodstained Mire, Giver of Runes, Magus of the Moat (tapped), Ghostly Prison, Birgi, God of Storytelling // Harnfel, Horn of Bounty]
+
+TURN 9 - Scion of the Ur-Dragon #36 (real) | Life=10 Hand=3 Board=8 HandCards=[Swan Song, Hoarding Broodlord, Force of Will]
+  MANA Scion of the Ur-Dragon #36 (real): 6 available (5 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  PLAY LAND Scion of the Ur-Dragon #36 (real): Arid Mesa mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 6} rule=curated/verified
+  COMBAT Scion of the Ur-Dragon #36 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 8 power (reason=evaluation_target_pressure, target_life=30)
+  DAMAGE Scion of the Ur-Dragon #36 (real) -> Lorehold: 8 player damage, target life 22, target_dead=False
+  END Scion of the Ur-Dragon #36 (real): Life=10 Hand=3 Board=9 Grave=3 Discarded=0 HandCards=[Swan Song, Hoarding Broodlord, Force of Will] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Bloom Tender, Channel the Suns, Badlands, Scion of the Ur-Dragon (tapped), Korvold, Fae-Cursed King (tapped), Arid Mesa]
+
+TURN 9 - Korvold, Fae-Cursed King #41 (real) | Life=34 Hand=1 Board=14 HandCards=[Immersturm Predator]
+  MANA Korvold, Fae-Cursed King #41 (real): 13 available (12 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 2, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 1})
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King role=commander phase=precombat_main locked_cost={generic=6, black=1, green=1, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King cost={generic=6, black=1, green=1, red=1} mana 13->4 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 2, 'green': 1, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] phase=precombat_main cost={generic=6, black=1, green=1, red=1} rule=known_cards_canonical_snapshot/review_only
+  COMBAT Korvold, Fae-Cursed King #41 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 6 power (reason=evaluation_target_pressure, target_life=22)
+  DAMAGE Korvold, Fae-Cursed King #41 (real) -> Lorehold: 6 player damage, target life 16, target_dead=False
+  END Korvold, Fae-Cursed King #41 (real): Life=34 Hand=2 Board=14 Grave=3 Discarded=0 HandCards=[Immersturm Predator, Roxanne, Starfall Savant] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Evolving Wilds, Sol Ring, Mountain, Decadent Dragon (tapped), Dire Fleet Hoarder, Mazirek, Kraul Death Priest (tapped), +2 more]
+
+TURN 9 - The Emperor of Palamecia #42 (real) | Life=37 Hand=7 Board=4 HandCards=[Refute, Tellah, Great Sage, Flame Wave, Sisay's Ring, Stonespeaker Crystal, Island, Mountain]
+  MANA The Emperor of Palamecia #42 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 2, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): Sisay's Ring role=ramp phase=precombat_main locked_cost={generic=4} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): Sisay's Ring cost={generic=4} mana 4->0 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST The Emperor of Palamecia #42 (real): Sisay's Ring (CMC=4.0) [ramp_permanent] phase=precombat_main cost={generic=4} rule=curated/verified
+  END The Emperor of Palamecia #42 (real): Life=37 Hand=6 Board=6 Grave=7 Discarded=0 HandCards=[Refute, Tellah, Great Sage, Flame Wave, Stonespeaker Crystal, Mountain, Mountain] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia, Island, Island, Sisay's Ring]
+
+TURN 10 - Lorehold | Life=16 Hand=2 Board=12 HandCards=[Rite of Flame, Dualcaster Mage]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 2 attackers, 2 blockers, 1 gang blocks, 6 power (reason=lethal, target_life=10)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life 5, target_dead=False
+  END Lorehold: Life=16 Hand=3 Board=11 Grave=9 Discarded=0 HandCards=[Rite of Flame, Dualcaster Mage, Reiterate] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Lorehold, the Historian (tapped), Bloodstained Mire, Giver of Runes, Ghostly Prison, Birgi, God of Storytelling // Harnfel, Horn of Bounty]
+
+TURN 10 - Scion of the Ur-Dragon #36 (real) | Life=5 Hand=3 Board=8 HandCards=[Swan Song, Hoarding Broodlord, Force of Will]
+  MANA Scion of the Ur-Dragon #36 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Lorehold: Orim's Chant role=response phase=beginning_of_combat locked_cost={white=2} targets={'target': 'Scion of the Ur-Dragon #36 (real)', 'target_controller': 'Scion of the Ur-Dragon #36 (real)', 'target_type': 'player', 'target_legal': True}
+  PAY COST Lorehold: Orim's Chant cost={white=2} mana 8->6 life 16->16 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1}
+  CAST Lorehold: Orim's Chant (CMC=1.0) [silence_spell] phase=beginning_of_combat cost={white=2} rule=curated/verified
+  RESOLVE SPELL Lorehold: Orim's Chant (CMC=1.0) [silence_spell] rule=curated/verified
+  PREVENT ATTACK Lorehold: Orim's Chant kicked against Scion of the Ur-Dragon #36 (real); 2 attackers stopped before declare attackers (projected_damage=8)
+  END Scion of the Ur-Dragon #36 (real): Life=5 Hand=4 Board=8 Grave=4 Discarded=0 HandCards=[Swan Song, Hoarding Broodlord, Force of Will, Misdirection] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Channel the Suns, Badlands, Scion of the Ur-Dragon, Korvold, Fae-Cursed King, Arid Mesa]
+
+TURN 10 - Korvold, Fae-Cursed King #41 (real) | Life=34 Hand=2 Board=14 HandCards=[Immersturm Predator, Roxanne, Starfall Savant]
+  MANA Korvold, Fae-Cursed King #41 (real): 13 available (12 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 2, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 1})
+  PLAY LAND Korvold, Fae-Cursed King #41 (real): Thriving Moor mana+=1 pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 3, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 1} rule=curated/verified
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King role=commander phase=precombat_main locked_cost={generic=8, black=1, green=1, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King cost={generic=8, black=1, green=1, red=1} mana 14->3 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 1, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] phase=precombat_main cost={generic=8, black=1, green=1, red=1} rule=known_cards_canonical_snapshot/review_only
+  COMBAT Korvold, Fae-Cursed King #41 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=evaluation_target_pressure, target_life=16)
+  DAMAGE Korvold, Fae-Cursed King #41 (real) -> Lorehold: 4 player damage, target life 12, target_dead=False
+  END Korvold, Fae-Cursed King #41 (real): Life=34 Hand=2 Board=15 Grave=3 Discarded=0 HandCards=[Immersturm Predator, Roxanne, Starfall Savant] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Evolving Wilds, Sol Ring, Mountain, Decadent Dragon (tapped), Dire Fleet Hoarder, Mazirek, Kraul Death Priest, +3 more]
+
+TURN 10 - The Emperor of Palamecia #42 (real) | Life=37 Hand=6 Board=6 HandCards=[Refute, Tellah, Great Sage, Flame Wave, Stonespeaker Crystal, Mountain, Mountain]
+  MANA The Emperor of Palamecia #42 (real): 6 available (5 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 1, 'green': 0, 'colorless': 2, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 2, 'green': 0, 'colorless': 2, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): Stonespeaker Crystal role=ramp phase=precombat_main locked_cost={generic=4} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): Stonespeaker Crystal cost={generic=4} mana 7->3 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 2, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST The Emperor of Palamecia #42 (real): Stonespeaker Crystal (CMC=4.0) [ramp_permanent] phase=precombat_main cost={generic=4} rule=curated/active
+  ANNOUNCE The Emperor of Palamecia #42 (real): Tellah, Great Sage role=creature phase=precombat_main locked_cost={generic=3, blue=1, red=1} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): Tellah, Great Sage cost={generic=3, blue=1, red=1} mana 5->0 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE The Emperor of Palamecia #42 (real): Tellah, Great Sage (CMC=5.0) [creature] phase=precombat_main cost={generic=3, blue=1, red=1} rule=curated/active
+  END The Emperor of Palamecia #42 (real): Life=37 Hand=4 Board=9 Grave=7 Discarded=0 HandCards=[Refute, Flame Wave, Mountain, Subjugate the Hobbits] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia, Island, Island, Sisay's Ring, Mountain, Stonespeaker Crystal, Tellah, Great Sage]
+
+TURN 11 - Lorehold | Life=12 Hand=2 Board=11 HandCards=[Rite of Flame, Dualcaster Mage]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 3 attackers, 3 blockers, 1 gang blocks, 9 power (reason=lethal, target_life=5)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 3 player damage, target life 2, target_dead=False
+  ANNOUNCE Lorehold: Rite of Flame role=ramp phase=postcombat_main locked_cost={red=1} targets=-
+  PAY COST Lorehold: Rite of Flame cost={red=1} mana 9->8 life 12->12 life_paid=0 pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 0}
+  CAST Lorehold: Rite of Flame (CMC=1.0) [ramp_ritual] phase=postcombat_main cost={red=1} rule=curated/verified
+  TRIGGER Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty event=spell_cast stack=0
+  RESOLVE ABILITY Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty kind=spell_cast trigger_spell=Rite of Flame
+  ANNOUNCE Lorehold: Lorehold, the Historian role=commander phase=postcombat_main locked_cost={generic=9, red=1, white=1} targets=-
+  PAY COST Lorehold: Lorehold, the Historian cost={generic=9, red=1, white=1} mana 11->0 life 12->12 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Lorehold: Lorehold, the Historian (CMC=5.0) [passive] phase=postcombat_main cost={generic=9, red=1, white=1} rule=curated/active
+  TRIGGER Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty event=spell_cast stack=1
+  RESOLVE ABILITY Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty kind=spell_cast trigger_spell=Lorehold, the Historian
+  END Lorehold: Life=12 Hand=2 Board=10 Grave=12 Discarded=0 HandCards=[Dualcaster Mage, Reiterate] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Bloodstained Mire, Ghostly Prison, Birgi, God of Storytelling // Harnfel, Horn of Bounty (tapped), Lorehold, the Historian (tapped)]
+
+TURN 11 - Scion of the Ur-Dragon #36 (real) | Life=2 Hand=4 Board=7 HandCards=[Swan Song, Hoarding Broodlord, Force of Will, Misdirection]
+  MANA Scion of the Ur-Dragon #36 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 4})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Vampiric Tutor role=normal phase=precombat_main locked_cost={black=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Vampiric Tutor cost={black=1} mana 5->4 life 2->2 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3}
+  CAST Scion of the Ur-Dragon #36 (real): Vampiric Tutor (CMC=1.0) [tutor] phase=precombat_main cost={black=1} rule=curated/verified
+  RESOLVE SPELL Scion of the Ur-Dragon #36 (real): Vampiric Tutor (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Scion of the Ur-Dragon #36 (real): Vampiric Tutor found Brain Freeze (any)
+  ANNOUNCE Scion of the Ur-Dragon #36 (real): Brain Freeze role=high_threat phase=precombat_main locked_cost={generic=1, blue=1} targets=-
+  PAY COST Scion of the Ur-Dragon #36 (real): Brain Freeze cost={generic=1, blue=1} mana 4->2 life 2->2 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2}
+  CAST Scion of the Ur-Dragon #36 (real): Brain Freeze (CMC=2.0) [finisher] phase=precombat_main cost={generic=1, blue=1} rule=curated/verified
+  RESOLVE SPELL Scion of the Ur-Dragon #36 (real): Brain Freeze (CMC=2.0) [finisher] rule=curated/verified
+  DAMAGE Scion of the Ur-Dragon #36 (real): Brain Freeze -> Korvold, Fae-Cursed King #41 (real) amount=6 result=player_damage cause=finisher_total_power life=34->28
+  COMBAT Scion of the Ur-Dragon #36 (real) -> Lorehold: 1 attackers, 0 blockers, 0 gang blocks, 4 power (reason=evaluation_target_pressure, target_life=12)
+  DAMAGE Scion of the Ur-Dragon #36 (real) -> Lorehold: 4 player damage, target life 8, target_dead=False
+  END Scion of the Ur-Dragon #36 (real): Life=2 Hand=4 Board=7 Grave=7 Discarded=0 HandCards=[Swan Song, Hoarding Broodlord, Force of Will, Misdirection] Permanents=[Taiga, Noble Hierarch, Grand Abolisher, Channel the Suns, Badlands, Scion of the Ur-Dragon (tapped), Arid Mesa]
+
+TURN 11 - Korvold, Fae-Cursed King #41 (real) | Life=28 Hand=2 Board=15 HandCards=[Immersturm Predator, Roxanne, Starfall Savant]
+  MANA Korvold, Fae-Cursed King #41 (real): 14 available (13 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 3, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 1})
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King role=commander phase=precombat_main locked_cost={generic=10, black=1, green=1, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King cost={generic=10, black=1, green=1, red=1} mana 14->1 life 28->28 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Korvold, Fae-Cursed King #41 (real): Korvold, Fae-Cursed King (CMC=5.0) [passive] phase=precombat_main cost={generic=10, black=1, green=1, red=1} rule=known_cards_canonical_snapshot/review_only
+  END Korvold, Fae-Cursed King #41 (real): Life=28 Hand=3 Board=16 Grave=3 Discarded=0 HandCards=[Immersturm Predator, Roxanne, Starfall Savant, Blossoming Defense] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Evolving Wilds, Sol Ring, Mountain, Decadent Dragon, Dire Fleet Hoarder, Mazirek, Kraul Death Priest, +4 more]
+
+TURN 11 - The Emperor of Palamecia #42 (real) | Life=37 Hand=4 Board=9 HandCards=[Refute, Flame Wave, Mountain, Subjugate the Hobbits]
+  MANA The Emperor of Palamecia #42 (real): 9 available (7 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 2, 'green': 0, 'colorless': 4, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 3, 'green': 0, 'colorless': 4, 'wildcard': 0} rule=curated/verified
+  COMBAT The Emperor of Palamecia #42 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=evaluation_target_pressure, target_life=8)
+  DAMAGE The Emperor of Palamecia #42 (real) -> Lorehold: 5 player damage, target life 3, target_dead=False
+  END The Emperor of Palamecia #42 (real): Life=37 Hand=4 Board=10 Grave=7 Discarded=0 HandCards=[Refute, Flame Wave, Subjugate the Hobbits, Epic Experiment] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia (tapped), Island, Island, Sisay's Ring, Mountain, Stonespeaker Crystal, Tellah, Great Sage (tapped), Mountain]
+
+TURN 12 - Lorehold | Life=3 Hand=2 Board=10 HandCards=[Dualcaster Mage, Windborn Muse]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  ANNOUNCE Lorehold: Windborn Muse role=high_threat phase=precombat_main locked_cost={generic=3, white=1} targets=-
+  PAY COST Lorehold: Windborn Muse cost={generic=3, white=1} mana 9->5 life 3->3 life_paid=0 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 1}
+  CAST Lorehold: Windborn Muse (CMC=4.0) [attack_tax] phase=precombat_main cost={generic=3, white=1} rule=curated/verified
+  TRIGGER Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty event=spell_cast stack=2
+  RESOLVE ABILITY Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty kind=spell_cast trigger_spell=Windborn Muse
+  RESOLVE SPELL Lorehold: Windborn Muse (CMC=4.0) [attack_tax] rule=curated/verified
+  ANNOUNCE Lorehold: Dualcaster Mage role=normal phase=precombat_main locked_cost={generic=1, red=2} targets=-
+  PAY COST Lorehold: Dualcaster Mage cost={generic=1, red=2} mana 6->3 life 3->3 life_paid=0 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 2, 'wildcard': 0}
+  CAST Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] phase=precombat_main cost={generic=1, red=2} rule=curated/active
+  TRIGGER Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty event=spell_cast stack=3
+  RESOLVE ABILITY Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty kind=spell_cast trigger_spell=Dualcaster Mage
+  RESOLVE SPELL Lorehold: Dualcaster Mage (CMC=3.0) [copy_spell] rule=curated/active
+  COMBAT Lorehold -> Scion of the Ur-Dragon #36 (real): 2 attackers, 1 blockers, 0 gang blocks, 8 power (reason=lethal, target_life=2)
+  DAMAGE Lorehold -> Scion of the Ur-Dragon #36 (real): 5 player damage, target life -3, target_dead=True
+  >>> DIED: Scion of the Ur-Dragon #36 (real) (life_zero) <<<
+
+TURN 12 - Korvold, Fae-Cursed King #41 (real) | Life=28 Hand=3 Board=16 HandCards=[Immersturm Predator, Roxanne, Starfall Savant, Blossoming Defense]
+  MANA Korvold, Fae-Cursed King #41 (real): 14 available (13 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 3, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 1})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Roxanne, Starfall Savant role=ramp phase=precombat_main locked_cost={generic=3, green=1, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Roxanne, Starfall Savant cost={generic=3, green=1, red=1} mana 14->9 life 28->28 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 3, 'red': 2, 'green': 1, 'colorless': 2, 'wildcard': 1}
+  CAST Korvold, Fae-Cursed King #41 (real): Roxanne, Starfall Savant (CMC=5.0) [ramp_permanent] phase=precombat_main cost={generic=3, green=1, red=1} rule=functional_tags_json/heuristic
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Gadrak, the Crown-Scourge role=normal phase=precombat_main locked_cost={generic=2, red=1} targets=-
+  PAY COST Korvold, Fae-Cursed King #41 (real): Gadrak, the Crown-Scourge cost={generic=2, red=1} mana 10->7 life 28->28 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 3, 'red': 1, 'green': 1, 'colorless': 0, 'wildcard': 2}
+  CAST Korvold, Fae-Cursed King #41 (real): Gadrak, the Crown-Scourge (CMC=3.0) [passive] phase=precombat_main cost={generic=2, red=1} rule=known_cards_canonical_snapshot/review_only
+  RESOLVE SPELL Korvold, Fae-Cursed King #41 (real): Gadrak, the Crown-Scourge (CMC=3.0) [passive] rule=known_cards_canonical_snapshot/review_only
+  COMBAT Korvold, Fae-Cursed King #41 (real) -> Lorehold: 1 attackers, 1 blockers, 0 gang blocks, 4 power (reason=lethal, target_life=3)
+  DAMAGE Korvold, Fae-Cursed King #41 (real) -> Lorehold: 0 player damage, target life 3, target_dead=False
+  END Korvold, Fae-Cursed King #41 (real): Life=28 Hand=2 Board=18 Grave=3 Discarded=0 HandCards=[Immersturm Predator, Blossoming Defense] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Evolving Wilds, Sol Ring, Mountain, Decadent Dragon, Dire Fleet Hoarder, Mazirek, Kraul Death Priest, +6 more]
+
+TURN 12 - The Emperor of Palamecia #42 (real) | Life=37 Hand=4 Board=10 HandCards=[Refute, Flame Wave, Subjugate the Hobbits, Epic Experiment]
+  MANA The Emperor of Palamecia #42 (real): 10 available (8 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 3, 'green': 0, 'colorless': 4, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 4, 'green': 0, 'colorless': 4, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE The Emperor of Palamecia #42 (real): Flame Wave role=high_threat phase=precombat_main locked_cost={generic=3, red=4} targets=-
+  PAY COST The Emperor of Palamecia #42 (real): Flame Wave cost={generic=3, red=4} mana 11->4 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST The Emperor of Palamecia #42 (real): Flame Wave (CMC=7.0) [damage_player_and_creatures] phase=precombat_main cost={generic=3, red=4} rule=curated/verified
+  RESOLVE SPELL The Emperor of Palamecia #42 (real): Flame Wave (CMC=7.0) [damage_player_and_creatures] rule=curated/verified
+  DAMAGE The Emperor of Palamecia #42 (real): Flame Wave -> Korvold, Fae-Cursed King #41 (real) amount=4 result=player_and_creatures_damage cause=target_player_and_controller_creatures life=28->24
+  COMBAT The Emperor of Palamecia #42 (real) -> Lorehold: 2 attackers, 1 blockers, 0 gang blocks, 5 power (reason=lethal, target_life=3)
+  DAMAGE The Emperor of Palamecia #42 (real) -> Lorehold: 2 player damage, target life 1, target_dead=False
+  END The Emperor of Palamecia #42 (real): Life=37 Hand=3 Board=11 Grave=8 Discarded=0 HandCards=[Refute, Subjugate the Hobbits, Epic Experiment] Permanents=[Spinerock Knoll, Island, The Emperor of Palamecia (tapped), Island, Island, Sisay's Ring, Mountain, Stonespeaker Crystal, Tellah, Great Sage (tapped), Mountain, Mountain]
+
+TURN 13 - Lorehold | Life=1 Hand=1 Board=10 HandCards=[Twinflame]
+  MANA Lorehold: 9 available (6 sources, 0 treasures, pool={'generic': 1, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 1})
+  ANNOUNCE Lorehold: Twinflame role=normal phase=precombat_main locked_cost={generic=1, red=1} targets=-
+  PAY COST Lorehold: Twinflame cost={generic=1, red=1} mana 9->7 life 1->1 life_paid=0 pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 5, 'wildcard': 0}
+  CAST Lorehold: Twinflame (CMC=2.0) [copy_creature_token] phase=precombat_main cost={generic=1, red=1} rule=curated/active
+  TRIGGER Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty event=spell_cast stack=4
+  RESOLVE ABILITY Lorehold: Birgi, God of Storytelling // Harnfel, Horn of Bounty kind=spell_cast trigger_spell=Twinflame
+  RESOLVE SPELL Lorehold: Twinflame (CMC=2.0) [copy_creature_token] rule=curated/active
+  COMBAT Lorehold -> Korvold, Fae-Cursed King #41 (real): 3 attackers, 0 blockers, 0 gang blocks, 13 power (reason=default_low_life, target_life=24)
+  DAMAGE Lorehold -> Korvold, Fae-Cursed King #41 (real): 8 player damage, target life 16, target_dead=False
+  DAMAGE Lorehold -> The Emperor of Palamecia #42 (real): 5 player damage, target life 32, target_dead=False
+  END Lorehold: Life=1 Hand=1 Board=10 Grave=15 Discarded=0 HandCards=[Reiterate] Permanents=[Sol Ring, Mana Vault, Scroll Rack, Ancient Den, City of Brass, Plains // Plains, Bloodstained Mire, Ghostly Prison, Birgi, God of Storytelling // Harnfel, Horn of Bounty (tapped), Lorehold, the Historian (tapped)]
+
+TURN 13 - Korvold, Fae-Cursed King #41 (real) | Life=16 Hand=2 Board=11 HandCards=[Immersturm Predator, Blossoming Defense]
+  MANA Korvold, Fae-Cursed King #41 (real): 11 available (10 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 2, 'red': 3, 'green': 2, 'colorless': 2, 'wildcard': 0})
+  ACTIVATE Lorehold: Scroll Rack kind=scroll_rack_single_exchange_for_lorehold mana_paid=-
+  ANNOUNCE Korvold, Fae-Cursed King #41 (real): Seedship Impact role=normal phase=precombat_main locked_cost={generic=1, green=1} targets={'target': 'Ghostly Prison', 'target_controller': 'Lorehold', 'target_type': 'artifact_or_enchantment', 'target_legal': True, 'targeting_pipeline': 'targeting_formal_minimal'}
+  PAY COST Korvold, Fae-Cursed King #41 (real): Seedship Impact cost={generic=1, green=1} mana 11->9 life 16->16 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 2, 'red': 3, 'green': 1, 'colorless': 2, 'wildcard': 0}
+  CAST Korvold, Fae-Cursed King #41 (real): Seedship Impact (CMC=2.0) [remove_permanent] phase=precombat_main cost={generic=1, green=1} rule=curated/verified
+  RESOLVE SPELL Korvold, Fae-Cursed King #41 (real): Seedship Impact (CMC=2.0) [remove_permanent] rule=curated/verified
+  REMOVAL Korvold, Fae-Cursed King #41 (real): Seedship Impact removed Ghostly Prison from Lorehold
+  END Korvold, Fae-Cursed King #41 (real): Life=16 Hand=2 Board=11 Grave=10 Discarded=0 HandCards=[Immersturm Predator, Blossoming Defense] Permanents=[Swamp, Forest, Mountain, Seal of Primordium, Path of Ancestry, Forest, Evolving Wilds, Sol Ring, Mountain, Thriving Bluff, Thriving Moor]
+
+TURN 13 - The Emperor of Palamecia #42 (real) | Life=32 Hand=3 Board=11 HandCards=[Refute, Subjugate the Hobbits, Epic Experiment]
+  MANA The Emperor of Palamecia #42 (real): 11 available (9 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 3, 'black': 0, 'red': 4, 'green': 0, 'colorless': 4, 'wildcard': 0})
+  PLAY LAND The Emperor of Palamecia #42 (real): Terramorphic Expanse mana+=1 pool={'generic': 1, 'white': 0, 'blue': 3, 'black': 0, 'red': 4, 'green': 0, 'colorless': 4, 'wildcard': 0} rule=curated/verified
+  COMBAT The Emperor of Palamecia #42 (real) -> Lorehold: 2 attackers, 0 blockers, 0 gang blocks, 5 power (reason=lethal, target_life=1)
+  DAMAGE The Emperor of Palamecia #42 (real) -> Lorehold: 5 player damage, target life -4, target_dead=True
+  >>> DIED: Lorehold (life_zero) <<<
+
+GAME OVER - Turn 13
+  >>> WIN: Korvold, Fae-Cursed King #41 (real) (elimination) turn 13 <<<
+Winner: Korvold, Fae-Cursed King #41 (real) (elimination)
+Lorehold: DEAD Life=-4 Hand=1 HandCards=[Land Tax]
+Scion of the Ur-Dragon #36 (real): DEAD Life=-3 Hand=4 HandCards=[Swan Song, Hoarding Broodlord, Force of Will, Misdirection]
+Korvold, Fae-Cursed King #41 (real): ALIVE Life=16 Hand=2 HandCards=[Immersturm Predator, Blossoming Defense]
+The Emperor of Palamecia #42 (real): ALIVE Life=32 Hand=3 HandCards=[Refute, Subjugate the Hobbits, Epic Experiment]

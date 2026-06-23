@@ -3716,3 +3716,79 @@ Current order:
   `45-90` minutes for the first card in a new runtime family,
   `10-25` minutes for additional cards in that runtime family, and
   `60-120+` minutes when exact XMage source is missing.
+
+## PG111 Board-Wipe-Choice Applied And Closed - 2026-06-23
+
+Central order update:
+
+- Rafael authorized the mass XMage -> ManaLoom adaptation goal with PostgreSQL
+  write and commit/push permission.
+- PG111 was executed for the `board_wipe_choice` runtime family:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- These three cards are no longer active Deck `607` card-rule pending items.
+- Do not reapply PG111 unless a future PostgreSQL postcheck proves rollback or
+  drift.
+
+Runtime and tests:
+
+- Runtime file:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`.
+- Test file:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`.
+- `py_compile` evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_py_compile_20260623_192502.out`;
+  pass.
+- Focused semantic tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_focused_tests_20260623_192502.out`;
+  six focused tests passed.
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_precheck_20260623_192502.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_apply_20260623_192502.out`;
+  `deprecated_shadow_rows=4`, `upserted_rows=3`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_postcheck_20260623_192502.out`;
+  all three target rows have `matching_target_rows=1`, `review_ok=t`,
+  `execution_ok=t`, `hash_ok=t`, `effect_ok=t`, and `scope_ok=t`.
+- Rollback package exists for emergency-only use:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_rollback_20260623_192502.sql`.
+
+Sync and validation evidence:
+
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_deck607_board_wipe_choice_sync_report_20260623_192502.json`;
+  `selected_card_count=3`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=7`, `canonical_snapshot_rows_exported=3195`.
+- Deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"pass":100}`.
+- Deck `607` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":8,"medium":8,"pass":78}`.
+- Global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg111_board_wipe_choice_20260623_192502.json`;
+  `severity_counts={"high":23,"medium":15,"pass":167}`.
+- Learned-deck coherence:
+  `docs/hermes-analysis/master_optimizer_reports/learned_deck_coherence_audit_20260623_192924.json`;
+  aggregate remains `severity_counts={"medium":13}` and Lorehold strategy
+  package remains passed.
+- Deck `6` local replay decision audit:
+  `docs/hermes-analysis/master_optimizer_reports/local_battle_replay_deck6_pg111_board_wipe_choice_20260623_192502/replay_decision_audit_20260623_192502.json`;
+  `status=turn_invariants_clean`, `turn_findings=0`, `decision_findings=0`.
+
+Current order:
+
+- Keep Deck `6` as the clean control: latest deck-card gate remains
+  `pass=100`.
+- PG111 is closed and must not be reused.
+- Continue mass work by semantic family. Remaining Deck `607` high queue:
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.
+- PG058 `mana_color_status` drift blocked the full suite before PG111 tests;
+  evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_full_suite_attempt_20260623_192502.out`.
+  Handle it as a separate runtime/metadata drift item.
