@@ -3866,6 +3866,101 @@ Remaining queue:
   Oracle text, PostgreSQL state, or runtime evidence.
 - PG092 is the next PostgreSQL package number.
 
+## PG092 Deck 608 L7 Modal Interaction Cleanup - 2026-06-23 10:00 UTC
+
+Status: `applied_validated`.
+
+Start gate:
+
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_start_sync_report_20260623_101000.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Start audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg092_start_20260623_095405.json`
+  reports deck `6` `pass=100`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg092_start_20260623_095405.json`
+  reports deck `606` `pass=81`; and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg092_start_20260623_095405.json`
+  reports deck `608` `high=16`, `medium=3`, `pass=49`.
+- Because deck `6` and deck `606` remained closed after the PostgreSQL-source
+  sync, this cycle continued into backlog deck `608`.
+
+Lote:
+
+- Lane: L7 shadow/hash/scope cleanup where a card-specific compact model
+  already existed.
+- Cards included:
+  `Return the Favor` and `Untimely Malfunction`.
+- Cards deliberately excluded from this L7 batch:
+  `High Noon`, because the current trusted row is not the card's Oracle
+  behavior; `Call Forth the Tempest`, because the damage wipe is dynamic and
+  cascade remains unmodeled; and `Insurrection`, because the current compact
+  executor is not the real gain-control/haste Oracle model.
+
+Oracle/runtime split:
+
+- `Return the Favor`: executable subset is copy target instant/sorcery spell
+  on the stack with new-target permission metadata. Spree additional costs,
+  activated/triggered ability copying, and target-change mode are
+  `annotation_only`.
+- `Untimely Malfunction`: executable subset is destroy target artifact.
+  Redirect and can't-block modes are `annotation_only`.
+
+PostgreSQL package:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_precheck_20260623_095405.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_apply_20260623_095405.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_rollback_20260623_095405.sql`
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_precheck_20260623_095405.out`
+  reported two card/hash matches, four current rows, four rows to disable, no
+  key conflicts, and no existing backup table.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_apply_20260623_095405.out`
+  reported backup creation with four rows, two upserts, four disabled rows, and
+  `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.out`
+  reported two target rows, two hash matches, two scope matches, zero active
+  shadows, four disabled shadows, and four backup rows.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_deck608_l7_modal_interaction_sync_report_20260623_095405.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1809`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_pg092_l7_modal_interaction_focused_events_20260623_095405.jsonl`.
+
+Runtime/test coverage:
+
+- Added
+  `test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache`,
+  `test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance`,
+  and
+  `test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance`.
+- `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed.
+
+Post-PG092 auditor result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=32`, `medium=4`, `pass=169`.
+
+Next queue:
+
+- Continue backlog high battle-critical cards before support/passive rows.
+- Recommended next safe lane: deck `608`/global L5 copy-spell or L6 removal
+  only after separating cards with real executor coverage from annotation-only
+  gaps. `High Noon`, `Call Forth the Tempest`, and `Insurrection` should remain
+  out of metadata-only batches until their real runtime scope is reviewed.
+- PG093 is the next PostgreSQL package number.
+
 ## PG092 Start Queue Snapshot - 2026-06-23 09:54 UTC
 
 Status: `read_only_start_snapshot`.

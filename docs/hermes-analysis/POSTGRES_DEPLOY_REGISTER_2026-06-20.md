@@ -8317,3 +8317,82 @@ Tests:
 Next deploy number:
 
 - PG092 is next for any future PostgreSQL package.
+
+## PG092 Deck 608 L7 Modal Interaction Cleanup - Applied 2026-06-23 10:00 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Promoted deck `608` high battle-critical L7 cleanup rows for
+  `Return the Favor` and `Untimely Malfunction`.
+- This was not a full new executor package. Both cards already had trusted
+  executable rows, but lacked raw Oracle hash, card-specific scope, and shadow
+  cleanup.
+- Unsupported modal branches remain explicit annotations:
+  `Return the Favor` only executes the instant/sorcery stack-copy subset;
+  copying activated/triggered abilities, spree additional-cost accounting, and
+  target-change mode are `annotation_only`. `Untimely Malfunction` executes
+  artifact destruction; target-change and can't-block modes are
+  `annotation_only`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_precheck_20260623_095405.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_apply_20260623_095405.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_rollback_20260623_095405.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg092_deck608_l7_modal_interaction_20260623_095405`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_precheck_20260623_095405.out`
+  reported `expected_target_rules=2`, `cards_resolved_rows=2`,
+  `raw_oracle_hash_match_rows=2`, `current_rule_rows=4`,
+  `current_trusted_executable_rows=2`, `rows_to_disable=4`,
+  `new_key_conflict_rows=0`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_apply_20260623_095405.out`
+  reported `SELECT 4`, `INSERT 0 2`, `UPDATE 4`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.out`
+  reported `target_rule_rows=2`, `target_hash_match_rows=2`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=2`,
+  `trusted_auto_rows=2`, `rule_version_at_least_2_rows=2`,
+  `return_annotation_rows=1`, `untimely_annotation_rows=1`,
+  `non_disabled_shadow_rows=0`, `disabled_shadow_rows=4`, and
+  `backup_rows=4`.
+
+Rule keys:
+
+- `Return the Favor`: `battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2`,
+  raw Oracle hash `a24911b7ea2027ebba59bb6792eee776`, scope
+  `spree_copy_instant_or_sorcery_stack_spell_change_target_annotation_v1`.
+- `Untimely Malfunction`: `battle_rule_v1:667ba8e5e69696402f9cd213886e57a8`,
+  raw Oracle hash `877f2d75c90c7886ca9536135829bb90`, scope
+  `modal_destroy_artifact_redirect_or_cant_block_annotation_v1`.
+
+Sync/audit/runtime evidence:
+
+- PG092 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_deck608_l7_modal_interaction_sync_report_20260623_095405.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1809`,
+  `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_pg092_l7_modal_interaction_focused_events_20260623_095405.jsonl`.
+- Post-PG092 audits:
+  deck `6` `pass=100`; deck `606` `pass=81`; deck `608` `high=14`,
+  `medium=3`, `pass=51`; global `high=32`, `medium=4`, `pass=169`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+
+Next deploy number:
+
+- PG093 is next for any future PostgreSQL package.

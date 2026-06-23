@@ -22923,15 +22923,29 @@
     "battle_rule_logical_key": "battle_rule_v1:c00113b80fabb02be02604cb4e498bb1"
   },
   "Return the Favor": {
+    "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_annotation_v1",
+    "change_target_mode_status": "annotation_only",
+    "choose_new_targets_status": "may_choose_new_targets",
     "cmc": 2.0,
+    "copy_activated_triggered_ability_status": "annotation_only",
     "effect": "copy_spell",
     "instant": true,
+    "may_choose_new_targets": true,
+    "modes": [
+      "copy_instant_or_sorcery_spell",
+      "change_single_target"
+    ],
+    "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_spree_change_target_annotation_v1",
+    "spree": true,
+    "spree_additional_cost_status": "annotation_only",
+    "target": "instant_or_sorcery_on_stack",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a2d3576649203ce5874ce076d7a8a0a0"
+    "battle_rule_confidence": 0.92,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
+    "battle_rule_oracle_hash": "a24911b7ea2027ebba59bb6792eee776"
   },
   "Return to Dust": {
     "cmc": 4.0,
@@ -31669,7 +31683,10 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Untimely Malfunction": {
+    "battle_model_scope": "modal_destroy_artifact_redirect_or_cant_block_annotation_v1",
+    "cant_block_mode_status": "annotation_only",
     "cmc": 2.0,
+    "destroy_artifact_mode": true,
     "effect": "remove_permanent",
     "instant": true,
     "modes": [
@@ -31677,13 +31694,16 @@
       "redirect_target",
       "cant_block"
     ],
+    "oracle_runtime_scope": "destroy_target_artifact_redirect_cant_block_annotation_v1",
+    "redirect_target_mode_status": "annotation_only",
     "target": "artifact",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.88,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0f108cd7e592ec9c848447b13e97d6cf"
+    "battle_rule_confidence": 0.92,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+    "battle_rule_oracle_hash": "877f2d75c90c7886ca9536135829bb90"
   },
   "Unwind": {
     "cmc": 3.0,

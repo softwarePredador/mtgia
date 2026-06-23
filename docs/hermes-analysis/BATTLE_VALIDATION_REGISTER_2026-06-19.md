@@ -17451,3 +17451,42 @@ Status: `applied_validated`.
   deck `608` `high=16`, `medium=3`, `pass=49`; global `high=34`,
   `medium=4`, `pass=167`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+## PG092 Deck 608 L7 Modal Interaction Cleanup - 2026-06-23 10:00 UTC
+
+Status: `applied_validated`.
+
+- Closed two deck `608` high battle-critical L7 findings:
+  `Return the Favor` and `Untimely Malfunction`.
+- `Return the Favor` now has raw Oracle hash, model scope, and explicit
+  annotations for spree accounting, activated/triggered ability copying, and
+  target-change mode. The current executor covers the instant/sorcery
+  stack-copy subset only.
+- `Untimely Malfunction` now has raw Oracle hash, model scope, and explicit
+  annotations for target-change and can't-block modes. The current executor
+  covers the destroy-target-artifact mode only.
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.out`
+  reports two promoted target rows, two hash matches, two scope matches, zero
+  active shadows, four disabled shadows, one annotation row for each card, and
+  four backed-up pre-apply rows.
+- PostgreSQL rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_rollback_20260623_095405.sql`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_deck608_l7_modal_interaction_sync_report_20260623_095405.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1809`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_pg092_l7_modal_interaction_focused_events_20260623_095405.jsonl`.
+- Focused tests added:
+  `test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache`,
+  `test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance`,
+  and
+  `test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance`.
+- Validation:
+  `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed after PG092 sync.
+- Post-PG092 card-rule queue: deck `6` `pass=100`; deck `606` `pass=81`;
+  deck `608` `high=14`, `medium=3`, `pass=51`; global `high=32`,
+  `medium=4`, `pass=169`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.

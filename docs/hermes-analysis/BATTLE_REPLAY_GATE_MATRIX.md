@@ -3971,3 +3971,54 @@ Status:
 - Deck `608`: `high=16`, `medium=3`, `pass=49`.
 - Global queue after PG091: `high=34`, `medium=4`, `pass=167`.
 - No deck swap, no `deck_cards` mutation, and no new battle rebaseline.
+
+## PG092 Deck 608 L7 Modal Interaction Focused Card-Rule Gate - 2026-06-23 10:00 UTC
+
+Replay relevance:
+
+- This is a focused card-rule/runtime gate, not a new 16-seed battle replay
+  baseline and not strategy-learning evidence.
+- The latest recurring battle artifact remains separate from this card-rule
+  checkpoint.
+
+Artifacts:
+
+- PG092 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.out`.
+- PG092 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_deck608_l7_modal_interaction_sync_report_20260623_095405.json`.
+- PG092 focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_pg092_l7_modal_interaction_focused_events_20260623_095405.jsonl`.
+- Post-test card-rule audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg092_after_l7_modal_20260623_095405.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg092_after_l7_modal_20260623_095405.json`.
+
+Gate:
+
+- `Return the Favor` proves logical rule key
+  `battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2` from SQLite cache after
+  PostgreSQL sync and emits `copy_spell_no_stack_target` when no legal
+  instant/sorcery stack spell exists. This proves the compact executor remains
+  stack-targeted and does not become a permanent engine. Copying
+  activated/triggered abilities, target-change mode, and spree accounting
+  remain explicit annotations.
+- `Untimely Malfunction` proves logical rule key
+  `battle_rule_v1:667ba8e5e69696402f9cd213886e57a8` from SQLite cache after
+  PostgreSQL sync and removes an artifact while leaving a creature target
+  illegal for that executable mode. Redirect and can't-block modes remain
+  explicit annotations.
+
+Validation:
+
+- Full runtime wrapper passed after PG092:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- The deck-card coherence auditor was rerun after PostgreSQL -> SQLite sync.
+
+Status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global queue after PG092: `high=32`, `medium=4`, `pass=169`.
+- No deck swap, no `deck_cards` mutation, and no new battle rebaseline.

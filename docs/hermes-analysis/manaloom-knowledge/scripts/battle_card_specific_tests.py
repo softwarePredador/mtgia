@@ -7926,6 +7926,122 @@ def register_tests(battle, player):
             "tempting_offer_base_create_1_1_white_rabbit_component_v1",
         }
 
+    def test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache():
+        return_effect = battle.get_card_effect(
+            {"name": "Return the Favor", "type_line": "Instant", "cmc": 2}
+        )
+        assert return_effect["effect"] == "copy_spell"
+        assert return_effect["_rule_logical_key"] == "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2"
+        assert return_effect["_rule_oracle_hash"] == "a24911b7ea2027ebba59bb6792eee776"
+        assert (
+            return_effect["battle_model_scope"]
+            == "spree_copy_instant_or_sorcery_stack_spell_change_target_annotation_v1"
+        )
+        assert return_effect["target"] == "instant_or_sorcery_on_stack"
+        assert return_effect["may_choose_new_targets"] is True
+        assert return_effect["spree_additional_cost_status"] == "annotation_only"
+        assert return_effect["copy_activated_triggered_ability_status"] == "annotation_only"
+        assert return_effect["change_target_mode_status"] == "annotation_only"
+
+        untimely_effect = battle.get_card_effect(
+            {"name": "Untimely Malfunction", "type_line": "Instant", "cmc": 2}
+        )
+        assert untimely_effect["effect"] == "remove_permanent"
+        assert untimely_effect["_rule_logical_key"] == "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+        assert untimely_effect["_rule_oracle_hash"] == "877f2d75c90c7886ca9536135829bb90"
+        assert (
+            untimely_effect["battle_model_scope"]
+            == "modal_destroy_artifact_redirect_or_cant_block_annotation_v1"
+        )
+        assert untimely_effect["target"] == "artifact"
+        assert untimely_effect["destroy_artifact_mode"] is True
+        assert untimely_effect["redirect_target_mode_status"] == "annotation_only"
+        assert untimely_effect["cant_block_mode_status"] == "annotation_only"
+
+    def test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            artifact = {
+                "name": "Mana Rock",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "cmc": 2,
+            }
+            creature = {
+                "name": "Opponent Creature",
+                "type_line": "Creature — Human",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "cmc": 2,
+            }
+            opponent.battlefield = [artifact, creature]
+            card = {"name": "Untimely Malfunction", "type_line": "Instant", "cmc": 2}
+            effect_data = battle.get_card_effect(card)
+
+            assert battle.target_matches_type(artifact, effect_data["target"])
+            assert not battle.target_matches_type(creature, effect_data["target"])
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                5,
+                random.Random(9202),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert artifact not in opponent.battlefield
+        assert creature in opponent.battlefield
+        assert any(card.get("name") == "Mana Rock" for card in opponent.graveyard)
+        assert any(
+            event == "removal_resolved"
+            and data.get("card") == "Untimely Malfunction"
+            and data.get("target") == "Mana Rock"
+            and data.get("target_type") == "artifact"
+            and data.get("rule_logical_key") == "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+            for event, data in events
+        )
+
+    def test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            card = {"name": "Return the Favor", "type_line": "Instant", "cmc": 2}
+            effect_data = battle.get_card_effect(card)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                card,
+                5,
+                random.Random(9203),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert any(card.get("name") == "Return the Favor" for card in active.graveyard)
+        assert not any(
+            permanent.get("name") == "Return the Favor"
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert any(
+            event == "copy_spell_no_stack_target"
+            and data.get("card") == "Return the Favor"
+            and data.get("rule_logical_key") == "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2"
+            and data.get("rule_oracle_hash") == "a24911b7ea2027ebba59bb6792eee776"
+            for event, data in events
+        )
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -8128,4 +8244,7 @@ def register_tests(battle, player):
         test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache,
         test_pg091_token_maker_family_runtime_support,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
+        test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache,
+        test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance,
+        test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance,
     ]
