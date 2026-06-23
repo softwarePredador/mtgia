@@ -3496,6 +3496,20 @@ def card_mana_value(card):
         return 0
 
 
+def card_power_value(card, default=1):
+    if not isinstance(card, dict):
+        return default
+    for key in ("power", "base_power"):
+        value = card.get(key)
+        if value is None:
+            continue
+        try:
+            return max(0, int(float(value)))
+        except Exception:
+            continue
+    return default
+
+
 def first_present_value(mapping, keys):
     for key in keys:
         if key in mapping and mapping.get(key) is not None:
@@ -3589,6 +3603,13 @@ class Player:
         self.spells_cast_this_turn += 1
         return self.spells_cast_this_turn
 
+    def record_noncreature_spell_cast(self, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_noncreature_spells_cast_turn_marker", None) != turn_marker:
+            self.noncreature_spells_cast_this_turn = 0
+            self._noncreature_spells_cast_turn_marker = turn_marker
+        self.noncreature_spells_cast_this_turn += 1
+        return self.noncreature_spells_cast_this_turn
+
     def draw(self, n=1, rng=None):
         drawn = []
         turn_marker = CURRENT_REPLAY_TURN
@@ -3654,6 +3675,8 @@ class Player:
         self._cards_drawn_turn_marker = None
         self.spells_cast_this_turn = 0
         self._spells_cast_turn_marker = None
+        self.noncreature_spells_cast_this_turn = 0
+        self._noncreature_spells_cast_turn_marker = None
         self.failed_draw_from_empty_library = False
 
     def refresh_mana_sources(self, turn=None):
@@ -7911,17 +7934,30 @@ def resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
     finish_resolved_spell(player, card, turn=turn)
 
 
-def wheel_decision_context(player, opponents, draw_count):
+def is_wheel_of_misfortune_model(card, effect_data):
+    if not isinstance(effect_data, dict):
+        effect_data = {}
+    name = normalize_card_name(card.get("name", "")) if isinstance(card, dict) else ""
+    return bool(effect_data.get("misfortune_secret_number_model")) or name == "wheel of misfortune"
+
+
+def wheel_decision_context(player, opponents, draw_count, effect_data=None):
+    effect_data = effect_data if isinstance(effect_data, dict) else {}
+    misfortune_model = is_wheel_of_misfortune_model(effect_data, effect_data)
     hand_size = len(player.hand)
     library_cards_before = len(getattr(player, "library", []) or [])
     library_can_support_draw = library_cards_before >= draw_count
     opponent_hands = [len(opp.hand) for opp in opponents if opp.is_alive()]
-    opponent_refill_risk = sum(1 for size in opponent_hands if size < draw_count)
     net_cards_for_player = draw_count - hand_size
-    opponent_net_cards = [
-        draw_count - size
-        for size in opponent_hands
-    ]
+    if misfortune_model:
+        opponent_refill_risk = 0
+        opponent_net_cards = [0 for _size in opponent_hands]
+    else:
+        opponent_refill_risk = sum(1 for size in opponent_hands if size < draw_count)
+        opponent_net_cards = [
+            draw_count - size
+            for size in opponent_hands
+        ]
     total_opponent_net_cards = sum(max(0, value) for value in opponent_net_cards)
     payoff_names = {
         permanent.get("name")
@@ -7948,7 +7984,11 @@ def wheel_decision_context(player, opponents, draw_count):
         "wheel_payoffs": sorted(payoff_names),
         "payoff_expected": payoff_expected,
         "timing_justified": timing_justified,
-        "model_scope": "multiplayer_discard_draw_v1",
+        "model_scope": (
+            "wheel_of_misfortune_secret_number_compact_v1"
+            if misfortune_model
+            else "multiplayer_discard_draw_v1"
+        ),
     }
 
 
@@ -8377,11 +8417,118 @@ def should_cast_wheel(player, opponents, effect_data):
         player,
         opponents,
         draw_count,
+        effect_data,
     )["timing_justified"]
+
+
+def resolve_wheel_of_misfortune(player, opponents, card, draw_count, turn, rng, effect_data):
+    fields = replay_rule_fields(effect_data if isinstance(effect_data, dict) else {})
+    participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
+    controller_choice = int(effect_data.get("controller_secret_number") or draw_count or 7)
+    opponent_choice = int(effect_data.get("opponent_secret_number") or 0)
+    choices = []
+    for participant in participants:
+        choice = controller_choice if participant is player else opponent_choice
+        choices.append({"player": participant.name, "number": max(0, choice)})
+    highest_number = max((entry["number"] for entry in choices), default=0)
+    lowest_number = min((entry["number"] for entry in choices), default=0)
+    highest_players = {entry["player"] for entry in choices if entry["number"] == highest_number}
+    lowest_players = {entry["player"] for entry in choices if entry["number"] == lowest_number}
+
+    damaged = []
+    for participant in participants:
+        if participant.name not in highest_players or highest_number <= 0:
+            continue
+        life_before = participant.life
+        if deal_damage(participant, highest_number):
+            damaged.append(
+                {
+                    "player": participant.name,
+                    "damage": highest_number,
+                    "life_before": life_before,
+                    "life_after": participant.life,
+                }
+            )
+
+    results = []
+    total_opponent_drawn = 0
+    for participant in participants:
+        if participant.name in lowest_players:
+            results.append({
+                "player": participant.name,
+                "number": next(entry["number"] for entry in choices if entry["player"] == participant.name),
+                "lowest_number": True,
+                "discarded": 0,
+                "drawn": 0,
+                "hand_after": len(participant.hand),
+            })
+            continue
+        discarded_cards = list(participant.hand)
+        participant.hand = []
+        discard_resolution = resolve_effect_discard_cards(
+            participant,
+            discarded_cards,
+            top_limit=draw_count,
+        )
+        drawn = participant.draw(draw_count, rng)
+        if participant is not player:
+            total_opponent_drawn += len(drawn)
+        results.append({
+            "player": participant.name,
+            "number": next(entry["number"] for entry in choices if entry["player"] == participant.name),
+            "lowest_number": False,
+            "discarded": len(discarded_cards),
+            "discarded_to_top": [entry.get("name", "?") for entry in discard_resolution["to_top"]],
+            "discarded_to_graveyard": [
+                entry.get("name", "?") for entry in discard_resolution["to_graveyard"]
+            ],
+            "drawn": len(drawn),
+            "hand_after": len(participant.hand),
+        })
+
+    emit_replay_event(
+        "wheel_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        draw_count=draw_count,
+        participants=results,
+        number_choices=choices,
+        highest_number=highest_number,
+        lowest_number=lowest_number,
+        damaged=damaged,
+        lowest_number_players=sorted(lowest_players),
+        opponent_cards_drawn=total_opponent_drawn,
+        secret_number_choice_model=effect_data.get(
+            "secret_number_choice_model",
+            "compact_controller_draw_count_opponents_zero_v1",
+        ),
+        damage_model_status=effect_data.get(
+            "damage_model_status",
+            "runtime_highest_number_damage",
+        ),
+        discard_draw_model=effect_data.get(
+            "discard_draw_model",
+            "runtime_non_lowest_discard_draw_seven",
+        ),
+        turn=turn,
+        **fields,
+    )
+    return results
 
 
 def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng, effect_data=None):
     fields = replay_rule_fields(effect_data if isinstance(effect_data, dict) else {})
+    effect_data = effect_data if isinstance(effect_data, dict) else {}
+    if is_wheel_of_misfortune_model(card, effect_data):
+        return resolve_wheel_of_misfortune(
+            player,
+            opponents,
+            card,
+            draw_count,
+            turn,
+            rng,
+            effect_data,
+        )
     participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
     results = []
     total_opponent_drawn = 0
@@ -13906,7 +14053,17 @@ def trigger_opponent_spell_draw_engines(
     all_players=None,
 ):
     spell_effect = get_card_effect(spell).get("effect")
-    is_noncreature_spell = spell_effect != "creature"
+    spell_is_creature = (
+        spell_effect == "creature"
+        or is_creature_card(spell)
+        or "creature" in str(spell.get("type_line") or "").lower()
+    )
+    is_noncreature_spell = not spell_is_creature
+    noncreature_spell_number = (
+        caster.record_noncreature_spell_cast(turn)
+        if is_noncreature_spell
+        else 0
+    )
     for opponent in opponents:
         for permanent in list(opponent.battlefield):
             if not isinstance(permanent, dict):
@@ -13918,9 +14075,20 @@ def trigger_opponent_spell_draw_engines(
                 continue
             if trigger == "opponent_noncreature_spell" and not is_noncreature_spell:
                 continue
+            if (
+                permanent.get("opponent_first_noncreature_spell_each_turn")
+                and noncreature_spell_number != 1
+            ):
+                continue
             if permanent.get("opponent_second_spell_each_turn") and getattr(caster, "spells_cast_this_turn", 0) != 2:
                 continue
-            tax = int(permanent.get("tax") if permanent.get("tax") is not None else 1)
+            if permanent.get("tax_amount_equals_source_power"):
+                tax = card_power_value(
+                    permanent,
+                    default=int(permanent.get("tax") if permanent.get("tax") is not None else 1),
+                )
+            else:
+                tax = int(permanent.get("tax") if permanent.get("tax") is not None else 1)
             def resolve_opponent_draw_trigger(
                 opponent=opponent,
                 permanent=permanent,
@@ -13944,6 +14112,20 @@ def trigger_opponent_spell_draw_engines(
                     trigger_spell=spell.get("name", "?"),
                     effect="draw_cards",
                     result=result,
+                    tax_amount=tax,
+                    tax_paid=pays_tax,
+                    noncreature_spell_number=noncreature_spell_number,
+                    opponent_first_noncreature_spell_each_turn=bool(
+                        permanent.get("opponent_first_noncreature_spell_each_turn")
+                    ),
+                    tax_amount_equals_source_power=bool(
+                        permanent.get("tax_amount_equals_source_power")
+                    ),
+                    tax_payment_model=permanent.get("tax_payment_model"),
+                    tax_payment_status=permanent.get(
+                        "tax_payment_status",
+                        "runtime_random_pay_if_available",
+                    ),
                     turn=turn,
                     phase=phase,
                     **replay_rule_fields(permanent),
@@ -15678,7 +15860,7 @@ def apply_effect_immediate(
                 player=player,
                 opponents=opponents,
             )
-            context = wheel_decision_context(player, opponents, wheel_draw_count)
+            context = wheel_decision_context(player, opponents, wheel_draw_count, effect_data)
             risk_flags = []
             if (
                 context["opponent_refill_risk"] > 0

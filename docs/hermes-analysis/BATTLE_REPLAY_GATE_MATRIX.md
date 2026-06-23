@@ -3351,3 +3351,51 @@ Caveat:
   proved executor path is countering blue spells on the stack.
 - `Get Lost` Map-token activation/explore is annotation-only; the proved
   executor path is target destruction plus token creation.
+
+## PG073 Deck 6 L4 Card-Flow Gate - 2026-06-23 05:24 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_card_flow_focused_events_20260623_051141.jsonl`.
+- Reconciled focused events after preserving PG `rule_version` in SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_l6_card_flow_focused_events_20260623_052954.jsonl`.
+- PG073 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_postcheck_20260623_051141.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg073_l4_card_flow_sync_report_20260623_051141.json`.
+- Final accepted deck `6` cut after PG075:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg075_final_20260623_053046.json`.
+
+Gate:
+
+- `Esper Sentinel` emits `trigger_resolved` with
+  `rule_logical_key=battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d`,
+  `rule_oracle_hash=d8e8e60e34140942af13aa1be250a961`,
+  `trigger=opponent_noncreature_spell`, `noncreature_spell_number=1`,
+  `tax_amount=1`, `tax_amount_equals_source_power=true`, and
+  `tax_paid=false`; the reconciled event also carries `rule_version=2`.
+- `Wheel of Misfortune` emits `spell_resolved` and `wheel_resolved` with
+  `rule_logical_key=battle_rule_v1:402155f35799993b812ca441586017cd`,
+  `rule_oracle_hash=fa744c33b4bc56c05977ec9c378e5b7d`,
+  `secret_number_choice_model=compact_controller_draw_count_opponents_zero_v1`,
+  active number `7`, opponent number `0`, active damage `7`, and
+  non-lowest discard/draw seven.
+
+Status:
+
+- `Esper Sentinel` and `Wheel of Misfortune` are closed for the current L4
+  card-flow gate.
+- PG074 and PG075 were provenance/metadata restore gates, not separate runtime
+  replay gates.
+- Deck `6` final accepted cut reports `high=1`, `medium=8`, `pass=91`;
+  remaining high is `Chaos Warp`.
+- Deck `607` accepted cut reports `high=29`, `medium=16`, `pass=49`;
+  deck `608` accepted cut reports `high=21`, `medium=7`, `pass=40`.
+
+Caveat:
+
+- `Wheel of Misfortune` hidden-number equilibrium is compact deterministic
+  runtime, not a full strategic hidden-choice solver.
+- `Blasphemous Act` was not a PG073-PG075 target. Its cost-reduction note is
+  a caveat/pista only and does not reopen the card without proven mismatch.

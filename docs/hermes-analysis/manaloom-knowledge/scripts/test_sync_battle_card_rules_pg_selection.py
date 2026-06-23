@@ -281,6 +281,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
                         "confidence": 1.0,
                         "review_status": "verified",
                         "execution_status": "auto",
+                        "rule_version": 4,
                         "notes": "test",
                         "oracle_hash": "hash",
                     }
@@ -291,15 +292,15 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             with sqlite3.connect(sqlite_db) as conn:
                 rows = conn.execute(
                     """
-                    SELECT logical_rule_key, source
+                    SELECT logical_rule_key, source, rule_version
                     FROM battle_card_rules
                     WHERE normalized_name = 'flame wave'
                     ORDER BY logical_rule_key
                     """
                 ).fetchall()
 
-        self.assertIn(("pg-key", "curated"), rows)
-        self.assertNotIn(("local-shadow-key", "curated"), rows)
+        self.assertIn(("pg-key", "curated", 4), rows)
+        self.assertNotIn(("local-shadow-key", "curated", 1), rows)
 
     def test_pg_mirror_keeps_reviewed_runtime_row_over_pg_review_only_snapshot(self) -> None:
         reviewed_rows = [

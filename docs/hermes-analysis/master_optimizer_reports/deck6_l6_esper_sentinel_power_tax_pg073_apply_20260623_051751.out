@@ -1,0 +1,9 @@
+BEGIN
+psql:docs/hermes-analysis/master_optimizer_reports/deck6_l6_esper_sentinel_power_tax_pg073_apply_20260623_051751.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+DO
+SELECT 2
+DO
+UPDATE 1
+UPDATE 1
+COMMIT

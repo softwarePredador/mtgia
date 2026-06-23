@@ -870,6 +870,7 @@ def mirror_pg_rules_to_sqlite(
                 notes=row.get("notes") or "",
                 oracle_hash=row.get("oracle_hash"),
                 logical_rule_key_value=row.get("logical_rule_key"),
+                rule_version=int(row.get("rule_version") or 1),
             )
             if did_change:
                 changed += 1

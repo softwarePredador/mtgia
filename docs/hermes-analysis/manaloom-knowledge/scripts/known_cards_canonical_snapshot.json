@@ -8878,14 +8878,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Esper Sentinel": {
+    "battle_model_scope": "first_opponent_noncreature_spell_power_tax_draw_v1",
     "effect": "draw_engine",
-    "trigger": "opponent_spell",
+    "opponent_first_noncreature_spell_each_turn": true,
+    "oracle_runtime_scope": "opponent_first_noncreature_spell_each_turn_draw_unless_power_tax_v1",
+    "tax_amount_equals_source_power": true,
+    "tax_payment_model": "runtime_random_pay_if_available",
+    "tax_payment_status": "runtime_random_pay_if_available",
+    "trigger": "opponent_noncreature_spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d",
+    "battle_rule_oracle_hash": "d8e8e60e34140942af13aa1be250a961"
   },
   "Essence Flux": {
     "cmc": 1.0,
@@ -9384,7 +9391,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa",
     "battle_rule_oracle_hash": "2e734d8bae3f331866abf1b030c92781"
   },
@@ -9661,7 +9668,7 @@
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
     "battle_rule_oracle_hash": "d63befc8ac40d9a38732f9b5c1a7414a"
   },
@@ -10902,7 +10909,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2861739f22e978549e28d2339288df2a",
     "battle_rule_oracle_hash": "9b3fc8ab7f664f6c084e0bda0ccf9a7c"
   },
@@ -11190,7 +11197,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea",
     "battle_rule_oracle_hash": "6b6517e1b5b60db5cf6bbcd991dbc1ec"
   },
@@ -16573,7 +16580,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d",
     "battle_rule_oracle_hash": "a5b9069217908acfd75c5704b414b035"
   },
@@ -17040,7 +17047,7 @@
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.91,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
     "battle_rule_oracle_hash": "35e3fd94c8453c0e326033af49ae18c8"
   },
@@ -18420,7 +18427,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:972703914ee50acd7a4e6f529fea1adf",
     "battle_rule_oracle_hash": "e47b40cf2afc4c9ceac6bf91815da706"
   },
@@ -21452,7 +21459,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c",
     "battle_rule_oracle_hash": "ecf9ad1f393a664f16867aab8a6edf77"
   },
@@ -23365,7 +23372,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a",
     "battle_rule_oracle_hash": "52bc55846d69bacf3afba1ffa734b81e"
   },
@@ -24155,7 +24162,7 @@
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.8,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
     "battle_rule_oracle_hash": "8133928f03d5a5a77f2beecfcbd09e30"
   },
@@ -24548,7 +24555,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
     "battle_rule_oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32"
   },
@@ -25310,7 +25317,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:74b210b77b004a677906e0216d44e445",
     "battle_rule_oracle_hash": "a0ca3c09a7db091c435ab31adb9c1780"
   },
@@ -25888,7 +25895,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6",
     "battle_rule_oracle_hash": "bb7d29c1a84a53604c017da1b5f0620c"
   },
@@ -28059,7 +28066,7 @@
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
     "battle_rule_oracle_hash": "d49ceec937367a344a9f0948eea4f8f2"
   },
@@ -29301,7 +29308,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:a71907ee296b5801e92e8d7f1940dba1",
     "battle_rule_oracle_hash": "644d5305e6be932586a6d3b7325cadf7"
   },
@@ -31190,7 +31197,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4",
     "battle_rule_oracle_hash": "9c4fbe06104051a2e8b1d295d307b26a"
   },
@@ -31653,7 +31660,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a"
   },
   "Valakut Awakening // Valakut Stoneforge": {
@@ -31673,7 +31680,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:6e1f3b876822abafe1de47610f46858d",
     "battle_rule_oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887"
   },
@@ -32810,14 +32817,25 @@
     "battle_rule_oracle_hash": "c37cd579d8132efac0c2118608f6f001"
   },
   "Wheel of Misfortune": {
+    "battle_model_scope": "wheel_of_misfortune_secret_number_damage_discard_draw_compact_v1",
+    "controller_secret_number": 7,
     "count": 7,
+    "damage_model_status": "runtime_highest_number_damage",
+    "discard_draw_model": "runtime_non_lowest_discard_draw_seven",
     "effect": "draw_cards",
+    "hidden_choice_status": "compact_deterministic_not_full_secret_choice_equilibrium",
+    "misfortune_secret_number_model": true,
+    "opponent_secret_number": 0,
+    "oracle_runtime_scope": "secret_number_highest_damage_non_lowest_discard_draw_seven_compact_v1",
+    "secret_number_choice_model": "compact_controller_draw_count_opponents_zero_v1",
+    "wheel_like": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:402155f35799993b812ca441586017cd"
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:402155f35799993b812ca441586017cd",
+    "battle_rule_oracle_hash": "fa744c33b4bc56c05977ec9c378e5b7d"
   },
   "Whelming Wave": {
     "cmc": 4.0,

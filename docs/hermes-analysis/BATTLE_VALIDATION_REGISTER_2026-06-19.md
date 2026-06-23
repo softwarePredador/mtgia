@@ -16538,3 +16538,119 @@ Next lane recommendation:
 - Prefer `Esper Sentinel` + the Runes/Magistrate medium support family only if
   modeling static/triggered protection/silence together; otherwise take
   `Wheel of Misfortune` as L4 card-flow and keep `Chaos Warp` as L8 unique.
+
+## PG073-PG075 Deck 6 L4 Card-Flow And Provenance Closure - 2026-06-23 05:33 UTC
+
+Status:
+
+- `applied_validated`.
+- Closed `Esper Sentinel` and `Wheel of Misfortune` from the deck `6` high
+  queue.
+- Restored current hash provenance for eight trusted support/runtime rows in
+  PG074, and restored `Seething Song` red ritual metadata in PG075.
+- No deck swap and no `deck_cards` mutation was executed.
+- `Blasphemous Act` was not part of this cycle. Its cost-reduction note is a
+  caveat/pista only and must not be treated as a rule source or blocker.
+
+PostgreSQL validation:
+
+- PG073 precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_precheck_20260623_051141.out`
+  reported `target_cards_with_expected_oracle_hash=2`,
+  `existing_rule_rows=4`, `target_specific_rule_rows=2`,
+  `old_active_shadow_rows=1`, `target_specific_defect_rows=1`, and
+  `backup_table_already_exists=f`.
+- PG073 apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_apply_20260623_051141.out`
+  completed `SELECT 4`, `UPDATE 1`, `UPDATE 1`, and `COMMIT`.
+- PG073 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_postcheck_20260623_051141.out`
+  reported `target_rule_rows=4`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=4`.
+- PG074 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_postcheck_20260623_052703.out`
+  reported `target_rule_rows=8`, `current_hash_rows=8`,
+  `missing_oracle_hash_rows=0`, `hash_mismatch_rows=0`,
+  `missing_scope_rows=0`, and `backup_rows=8`.
+- PG075 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_postcheck_20260623_053046.out`
+  reported `target_rule_rows=1`, `expected_metadata_rows=1`, and
+  `backup_rows=1`.
+
+Runtime gates:
+
+- `Esper Sentinel` emits `trigger_resolved` with
+  `rule_logical_key=battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d`,
+  `rule_oracle_hash=d8e8e60e34140942af13aa1be250a961`,
+  `noncreature_spell_number=1`, `tax_amount=1`,
+  `tax_amount_equals_source_power=true`, and `tax_paid=false`.
+- `Wheel of Misfortune` emits `wheel_resolved` with
+  `rule_logical_key=battle_rule_v1:402155f35799993b812ca441586017cd`,
+  `rule_oracle_hash=fa744c33b4bc56c05977ec9c378e5b7d`,
+  `secret_number_choice_model=compact_controller_draw_count_opponents_zero_v1`,
+  `highest_number=7`, `lowest_number=0`, active player damage `7`, and
+  non-lowest discard/draw seven.
+- Focused event artifact:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_card_flow_focused_events_20260623_051141.jsonl`.
+- Reconciled focused event artifact after preserving PG `rule_version` in
+  SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_l6_card_flow_focused_events_20260623_052954.jsonl`.
+
+SQLite/Hermes sync:
+
+- PG073:
+  `docs/hermes-analysis/master_optimizer_reports/pg073_l4_card_flow_sync_report_20260623_051141.json`.
+- PG074:
+  `docs/hermes-analysis/master_optimizer_reports/pg074_hash_provenance_restore_sync_report_20260623_052703.json`.
+- PG075:
+  `docs/hermes-analysis/master_optimizer_reports/pg075_seething_song_metadata_sync_report_20260623_053046.json`.
+- Each accepted sync used `include_needs_review=false`, loaded
+  `pg_rows_loaded=1825`, wrote `sqlite_inserted_or_updated=1802`, and
+  exported `canonical_snapshot_rows_exported=3201`.
+
+Auditor result:
+
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg075_final_20260623_053046.json`
+  reports `high=1`, `medium=8`, `pass=91`.
+- Final deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg075_final_20260623_053046.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Final global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg075_final_20260623_053046.json`
+  reports `high=51`, `medium=42`, `pass=112`.
+- Reconciled deck `607` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg073_l4_l6_card_flow_accepted_20260623_052954.json`
+  reports `high=29`, `medium=16`, `pass=49`.
+- Reconciled deck `608` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg073_l4_l6_card_flow_accepted_20260623_052954.json`
+  reports `high=21`, `medium=7`, `pass=40`.
+- The non-final PG073/PG074 audit cuts generated while sync was running are
+  rejected for closure decisions.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG075 sync, including PG073 `Esper Sentinel` and
+  `Wheel of Misfortune` focused tests.
+
+Remaining deck `6` queue:
+
+- High: `Chaos Warp`.
+- Medium battle-support: `Jeska's Will`, `Mizzix's Mastery`.
+- Medium support/passive: `Drannith Magistrate`, `Giver of Runes`,
+  `Mother of Runes`, `Professional Face-Breaker`,
+  `Ranger-Captain of Eos`, and `Storm-Kiln Artist`.
+
+Next lane recommendation:
+
+- Use PG076 for the next PostgreSQL package.
+- Take `Chaos Warp` first as L8 unique shuffle/reveal/top permanent executor,
+  then the `Jeska's Will`/`Mizzix's Mastery` battle-support pair.

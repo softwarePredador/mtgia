@@ -3118,6 +3118,176 @@ def register_tests(battle, player):
         assert any(card.get("name") == "Sol Ring" for card in opponent.battlefield)
         assert any(card.get("name") == "Opponent Enchantment" for card in opponent.graveyard)
 
+    def test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            sentinel_controller = player("Sentinel Controller")
+            sentinel_controller.library = [
+                _card("Sentinel Draw One", cmc=1, effect="draw_cards"),
+                _card("Sentinel Draw Two", cmc=1, effect="draw_cards"),
+            ]
+            sentinel = {
+                "name": "Esper Sentinel",
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "type_line": "Artifact Creature - Human Soldier",
+                "power": 1,
+                "toughness": 1,
+            }
+            effect_data = battle.get_card_effect(sentinel)
+
+            assert effect_data["effect"] == "draw_engine"
+            assert effect_data["trigger"] == "opponent_noncreature_spell"
+            assert effect_data["opponent_first_noncreature_spell_each_turn"] is True
+            assert effect_data["tax_amount_equals_source_power"] is True
+            assert effect_data["battle_model_scope"] == (
+                "first_opponent_noncreature_spell_power_tax_draw_v1"
+            )
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d"
+            assert effect_data["_rule_oracle_hash"] == "d8e8e60e34140942af13aa1be250a961"
+
+            permanent = battle.prepare_entering_permanent(
+                {**sentinel, **effect_data, "effect": "draw_engine"},
+                controller=sentinel_controller,
+                all_players=[caster, sentinel_controller],
+                turn=4,
+            )
+            sentinel_controller.battlefield = [permanent]
+
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [sentinel_controller],
+                {"name": "Creature Spell", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+                turn=4,
+                phase="main",
+                rng=random.Random(7075),
+            )
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [sentinel_controller],
+                {"name": "First Noncreature", "cmc": 2, "type_line": "Sorcery"},
+                turn=4,
+                phase="main",
+                rng=random.Random(7075),
+            )
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [sentinel_controller],
+                {"name": "Second Noncreature", "cmc": 2, "type_line": "Instant"},
+                turn=4,
+                phase="main",
+                rng=random.Random(7075),
+            )
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [sentinel_controller],
+                {"name": "Next Turn Noncreature", "cmc": 2, "type_line": "Sorcery"},
+                turn=5,
+                phase="main",
+                rng=random.Random(7075),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Esper Sentinel"
+        ]
+        assert [event["trigger_spell"] for event in trigger_events] == [
+            "First Noncreature",
+            "Next Turn Noncreature",
+        ]
+        assert [card.get("name") for card in sentinel_controller.hand] == [
+            "Sentinel Draw One",
+            "Sentinel Draw Two",
+        ]
+        first_event = trigger_events[0]
+        assert first_event["trigger"] == "opponent_noncreature_spell"
+        assert first_event["result"] == "card_drawn"
+        assert first_event["tax_amount"] == 1
+        assert first_event["tax_paid"] is False
+        assert first_event["noncreature_spell_number"] == 1
+        assert first_event["opponent_first_noncreature_spell_each_turn"] is True
+        assert first_event["tax_amount_equals_source_power"] is True
+        assert first_event["rule_logical_key"] == "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d"
+        assert first_event["rule_oracle_hash"] == "d8e8e60e34140942af13aa1be250a961"
+
+    def test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            wheel = {"name": "Wheel of Misfortune", "cmc": 3, "type_line": "Sorcery"}
+            active.hand = [
+                wheel,
+                {"name": "Active Discard A", "cmc": 2, "type_line": "Instant"},
+                {"name": "Active Discard B", "cmc": 2, "type_line": "Instant"},
+            ]
+            active.library = [
+                {"name": f"Active Draw {index}", "cmc": 1, "type_line": "Sorcery"}
+                for index in range(1, 8)
+            ]
+            opponent.hand = [
+                {"name": "Opponent Keeps A", "cmc": 2, "type_line": "Instant"},
+                {"name": "Opponent Keeps B", "cmc": 2, "type_line": "Instant"},
+            ]
+            opponent.library = [
+                {"name": f"Opponent Draw {index}", "cmc": 1, "type_line": "Sorcery"}
+                for index in range(1, 8)
+            ]
+            effect_data = battle.get_card_effect(wheel)
+
+            assert effect_data["effect"] == "draw_cards"
+            assert effect_data["count"] == 7
+            assert effect_data["wheel_like"] is True
+            assert effect_data["misfortune_secret_number_model"] is True
+            assert effect_data["battle_model_scope"] == (
+                "wheel_of_misfortune_secret_number_damage_discard_draw_compact_v1"
+            )
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:402155f35799993b812ca441586017cd"
+            assert effect_data["_rule_oracle_hash"] == "fa744c33b4bc56c05977ec9c378e5b7d"
+
+            active.hand.remove(wheel)
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                wheel,
+                4,
+                random.Random(7076),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        wheel_event = next(
+            data
+            for event, data in events
+            if event == "wheel_resolved" and data.get("card") == "Wheel of Misfortune"
+        )
+        assert wheel_event["highest_number"] == 7
+        assert wheel_event["lowest_number"] == 0
+        assert wheel_event["lowest_number_players"] == ["Opponent"]
+        assert wheel_event["damaged"][0]["player"] == "Active"
+        assert wheel_event["damaged"][0]["damage"] == 7
+        assert active.life == 33
+        active_result = next(entry for entry in wheel_event["participants"] if entry["player"] == "Active")
+        opponent_result = next(entry for entry in wheel_event["participants"] if entry["player"] == "Opponent")
+        assert active_result["discarded"] == 2
+        assert active_result["drawn"] == 7
+        assert opponent_result["lowest_number"] is True
+        assert opponent_result["discarded"] == 0
+        assert opponent_result["drawn"] == 0
+        assert [card.get("name") for card in opponent.hand] == ["Opponent Keeps A", "Opponent Keeps B"]
+        assert wheel_event["secret_number_choice_model"] == "compact_controller_draw_count_opponents_zero_v1"
+        assert wheel_event["rule_logical_key"] == "battle_rule_v1:402155f35799993b812ca441586017cd"
+        assert wheel_event["rule_oracle_hash"] == "fa744c33b4bc56c05977ec9c378e5b7d"
+
     def test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -6197,6 +6367,8 @@ def register_tests(battle, player):
         test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source,
         test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
         test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens,
+        test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax,
+        test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,

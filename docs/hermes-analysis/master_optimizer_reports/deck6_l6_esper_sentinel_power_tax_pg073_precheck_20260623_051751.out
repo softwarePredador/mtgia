@@ -1,0 +1,18 @@
+Pager usage is off.
+SELECT 1
+SELECT 2
+ target_cards_with_expected_oracle_hash | existing_rule_rows | target_specific_rule_rows | old_active_shadow_rows | target_specific_defect_rows | backup_table_already_exists
+----------------------------------------+--------------------+---------------------------+------------------------+-----------------------------+-----------------------------
+                                      1 |                  2 |                         1 |                      1 |                           1 | f
+(1 row)
+
+      name      |             type_line             | mana_cost | cmc |           oracle_hash            |                                                                  oracle_text
+----------------+-----------------------------------+-----------+-----+----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------
+ Esper Sentinel | Artifact Creature — Human Soldier | {W}       | 1.0 | d8e8e60e34140942af13aa1be250a961 | Whenever an opponent casts their first noncreature spell each turn, draw a card unless that player pays {X}, where X is this creature's power.
+(1 row)
+
+      name      | normalized_name |                logical_rule_key                 |  source   | review_status | execution_status | confidence | rule_version | oracle_hash |                      effect_json                       |                deck_role_json
+----------------+-----------------+-------------------------------------------------+-----------+---------------+------------------+------------+--------------+-------------+--------------------------------------------------------+-----------------------------------------------
+ Esper Sentinel | esper sentinel  | battle_rule_v1:e9a2f41b86aad0a56d142873b1267daf | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 1.0, "effect": "draw_engine"}                  | {"effect": "draw_engine", "category": "draw"}
+ Esper Sentinel | esper sentinel  | battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d | curated   | verified      | auto             |      1.000 |            1 |             | {"effect": "draw_engine", "trigger": "opponent_spell"} | {"effect": "draw_engine", "category": "draw"}
+(2 rows)

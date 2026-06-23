@@ -570,11 +570,13 @@ def upsert_battle_card_rule(
     notes: str = "",
     oracle_hash: str | None = None,
     logical_rule_key_value: str | None = None,
+    rule_version: int = 1,
 ) -> bool:
     ensure_battle_card_rules(conn)
     normalized = normalize_card_name(card_name)
     now = utc_now()
     role = deck_role_json or deck_role_from_effect(effect_json)
+    normalized_rule_version = max(1, int(rule_version or 1))
     rule_key = str(logical_rule_key_value or "") or logical_rule_key(
         {
             "effect_json": effect_json,
@@ -610,7 +612,7 @@ def upsert_battle_card_rule(
             deck_role_json, source, confidence, review_status, execution_status, rule_version,
             oracle_hash, notes,
             created_at, updated_at, last_seen_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(normalized_name, logical_rule_key) DO UPDATE SET
             card_name=excluded.card_name,
             effect_json=excluded.effect_json,
@@ -619,6 +621,7 @@ def upsert_battle_card_rule(
             confidence=excluded.confidence,
             review_status=excluded.review_status,
             execution_status=excluded.execution_status,
+            rule_version=excluded.rule_version,
             oracle_hash=excluded.oracle_hash,
             notes=excluded.notes,
             updated_at=excluded.updated_at,
@@ -634,6 +637,7 @@ def upsert_battle_card_rule(
             confidence,
             review_status,
             execution_status,
+            normalized_rule_version,
             oracle_hash,
             notes,
             now,

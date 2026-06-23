@@ -6625,6 +6625,233 @@ Numbering note:
 
 - The next PostgreSQL package must use PG072.
 
+## PG073 Deck 6 L4/L6 Card Flow/Trigger Gate - Applied 2026-06-23 05:35 UTC
+
+Scope:
+
+- Target cards: `Wheel of Misfortune` and `Esper Sentinel`.
+- Metadata restore addenda required by broad PG sync gates: `Silence`,
+  `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Talisman of Conviction`, and
+  `Seething Song`.
+- Runtime sync fix: preserve PG `rule_version` when mirroring
+  `card_battle_rules` into SQLite.
+- No deck swap and no `deck_cards` mutation was executed.
+
+PostgreSQL artifacts:
+
+- L4 card-flow precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_precheck_20260623_051141.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_apply_20260623_051141.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_postcheck_20260623_051141.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_rollback_20260623_051141.sql`.
+- L6 Esper Sentinel precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_esper_sentinel_power_tax_pg073_precheck_20260623_051751.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_esper_sentinel_power_tax_pg073_apply_20260623_051751.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_esper_sentinel_power_tax_pg073_postcheck_20260623_051751.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_esper_sentinel_power_tax_pg073_rollback_20260623_051751.sql`.
+- Metadata restore addenda:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg073_postcheck_20260623_052154.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg055_mana_rocks_hash_restore_pg073_postcheck_20260623_052713.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg058_seething_song_metadata_restore_pg073_postcheck_20260623_052954.out`.
+
+Postcheck evidence:
+
+- L4 card-flow postcheck reported `target_rule_rows=4`,
+  `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0`, and `backup_rows=4`.
+- L6 Esper Sentinel postcheck reported `target_rule_rows=2`,
+  `expected_runtime_rows=1`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0`, and `backup_rows=2`.
+- Silence addendum postcheck reported `silence_rule_rows=3`,
+  `expected_runtime_rows=1`, `target_missing_hash_rows=0`, and
+  `backup_rows=3`.
+- PG055 mana rock hash addendum postcheck reported `target_rule_rows=4`,
+  `expected_runtime_rows=4`, `target_missing_hash_rows=0`, and
+  `backup_rows=4`.
+- Seething Song metadata addendum postcheck reported `target_rule_rows=1`,
+  `expected_runtime_rows=1`, `target_missing_runtime_metadata_rows=0`, and
+  `backup_rows=1`.
+
+Rules confirmed:
+
+- `Wheel of Misfortune`:
+  `battle_rule_v1:402155f35799993b812ca441586017cd`,
+  `oracle_hash=fa744c33b4bc56c05977ec9c378e5b7d`,
+  `battle_model_scope=wheel_of_misfortune_secret_number_damage_discard_draw_compact_v1`.
+  Compact runtime chooses controller number `7` and opponent number `0` by
+  default; highest number takes damage and non-lowest players discard/draw
+  seven. Hidden-choice equilibrium remains compact-mode only.
+- `Esper Sentinel`:
+  `battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d`,
+  `oracle_hash=d8e8e60e34140942af13aa1be250a961`,
+  `battle_model_scope=first_opponent_noncreature_spell_power_tax_draw_v1`.
+  Runtime triggers on the first opponent noncreature spell each turn and uses
+  source power as the tax amount.
+
+Accepted sync/audit:
+
+- Final trusted SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg073_l4_l6_card_flow_metadata_restores_sync_report_20260623_053210.json`
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and exported
+  `canonical_snapshot_rows_exported=3201`.
+- Accepted auditors:
+  deck `6` `high=1`, `medium=8`, `pass=91`; deck `606` `high=7`,
+  `medium=30`, `pass=44`; deck `607` `high=29`, `medium=16`,
+  `pass=49`; deck `608` `high=21`, `medium=7`, `pass=40`; global
+  `high=51`, `medium=42`, `pass=112`.
+
+Runtime evidence:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_l6_card_flow_focused_events_20260623_052954.jsonl`.
+- `Esper Sentinel` emits two `trigger_resolved` events only for
+  `First Noncreature` on turn 4 and `Next Turn Noncreature` on turn 5, with
+  `tax_amount=1`, `tax_paid=false`, rule key/hash, and `rule_version=2`.
+- `Wheel of Misfortune` emits `wheel_resolved` with `highest_number=7`,
+  `lowest_number=0`, `damaged=[Active: 7]`, active player discard/draw seven,
+  opponent draws zero, rule key/hash, and `rule_version=2`.
+
+Tests:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG073 sync and metadata restores.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed and now covers preserving PG `rule_version` in SQLite mirror.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Rollback:
+
+- Use the PG073 rollback SQL files listed above for L4/L6 targets.
+- Metadata addenda have separate rollback files:
+  `deck6_silence_hash_restore_pg073_rollback_20260623_052154.sql`,
+  `deck6_pg055_mana_rocks_hash_restore_pg073_rollback_20260623_052713.sql`,
+  and
+  `deck6_pg058_seething_song_metadata_restore_pg073_rollback_20260623_052954.sql`.
+
+Numbering note:
+
+- The next PostgreSQL package must use PG074.
+
+## PG074 Deck 6 Hash Provenance Restore - Applied 2026-06-23 05:30 UTC
+
+Scope:
+
+- Target cards: `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Scroll Rack`,
+  `Seething Song`, `Talisman of Conviction`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- Hash-only provenance restore. No `effect_json`, `deck_role_json`, executor,
+  or deck-list semantic change.
+- Backup table:
+  `manaloom_deploy_audit.pg074_deck6_hash_provenance_restore_20260623_052703`.
+
+Artifacts:
+
+- Precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_precheck_20260623_052703.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_apply_20260623_052703.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_postcheck_20260623_052703.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_rollback_20260623_052703.sql`.
+- Outputs:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_precheck_20260623_052703.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_apply_20260623_052703.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_postcheck_20260623_052703.out`.
+
+Postcheck evidence:
+
+- Precheck reported `expected_target_rows=8`, `target_rule_rows=8`,
+  `missing_oracle_hash_rows=4`, `hash_mismatch_rows=0`,
+  `missing_scope_rows=0`, and `backup_table_already_exists=f`.
+- Apply output completed `INSERT 0 8`, `SELECT 8`, `UPDATE 8`, and
+  `COMMIT`.
+- Postcheck reported `target_rule_rows=8`, `current_hash_rows=8`,
+  `missing_oracle_hash_rows=0`, `hash_mismatch_rows=0`,
+  `missing_scope_rows=0`, and `backup_rows=8`.
+
+Accepted sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg074_hash_provenance_restore_sync_report_20260623_052703.json`
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and exported
+  `canonical_snapshot_rows_exported=3201`.
+- Trusted deck `6` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg074_hash_provenance_restore_trusted_20260623_052703.json`
+  reported `high=1`, `medium=8`, `pass=91`.
+
+Rollback:
+
+- `deck6_hash_provenance_restore_pg074_rollback_20260623_052703.sql`
+  restores the eight backed-up rows from
+  `manaloom_deploy_audit.pg074_deck6_hash_provenance_restore_20260623_052703`.
+
+## PG075 Deck 6 Seething Song Metadata Restore - Applied 2026-06-23 05:33 UTC
+
+Scope:
+
+- Target card: `Seething Song`.
+- Restored red ritual metadata required by the provenance harness:
+  `produces=R`, `mana_color_status=abstracted_to_generic_pool_runtime`, and
+  `oracle_runtime_scope=single_shot_red_ritual_runtime_generic_pool_color_annotation`.
+- No executor semantic change and no deck-list change.
+- Backup table:
+  `manaloom_deploy_audit.pg075_deck6_seething_song_metadata_20260623_053046`.
+
+Artifacts:
+
+- Precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_precheck_20260623_053046.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_apply_20260623_053046.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_postcheck_20260623_053046.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_rollback_20260623_053046.sql`.
+- Outputs:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_precheck_20260623_053046.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_apply_20260623_053046.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_postcheck_20260623_053046.out`.
+
+Postcheck evidence:
+
+- Apply output completed `SELECT 1`, `UPDATE 1`, and `COMMIT`.
+- Postcheck reported `target_rule_rows=1`, `expected_metadata_rows=1`, and
+  `backup_rows=1`.
+
+Accepted sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg075_seething_song_metadata_sync_report_20260623_053046.json`
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and exported
+  `canonical_snapshot_rows_exported=3201`.
+- Final deck `6` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg075_final_20260623_053046.json`
+  reported `high=1`, `medium=8`, `pass=91`.
+- Final deck `606` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg075_final_20260623_053046.json`
+  reported `high=7`, `medium=30`, `pass=44`.
+- Final global cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg075_final_20260623_053046.json`
+  reported `high=51`, `medium=42`, `pass=112`.
+
+Rollback:
+
+- `deck6_seething_song_metadata_pg075_rollback_20260623_053046.sql`
+  restores the backed-up row from
+  `manaloom_deploy_audit.pg075_deck6_seething_song_metadata_20260623_053046`.
+
+Numbering note:
+
+- Non-final PG073/PG074 auditor cuts generated during sync are rejected as
+  race/intermediate artifacts.
+- The next PostgreSQL package must use PG076.
+
 ## PG072 Deck 6 L6 Interaction/Removal/Counter - Applied 2026-06-23 05:04 UTC
 
 Scope:

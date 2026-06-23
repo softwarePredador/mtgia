@@ -498,3 +498,60 @@ Atualizado em 2026-05-26:
   `pass=89`; deck `606` permanece `high=7`, `medium=30`, `pass=44`;
   global esta em `high=53`, `medium=42`, `pass=110`.
 - Proximo deploy deve usar PG073.
+
+## ManaLoom deck 6 PG073-PG075 L4 card-flow/provenance checkpoint - 2026-06-23
+
+- Nota de metodo: observacoes do operador, incluindo a ressalva de
+  `Blasphemous Act`, sao pistas para checagem, nao fonte de regra. A carta so
+  deve ser reaberta se oracle, PostgreSQL ou executor mostrarem falha real.
+- PG073 fechou `Esper Sentinel` e `Wheel of Misfortune` para a fila high do
+  deck `6`. `Esper Sentinel` ja estava semanticamente corrigido no PostgreSQL
+  com `battle_model_scope=first_opponent_noncreature_spell_power_tax_draw_v1`;
+  o ciclo adicionou executor/teste focado e desabilitou a shadow row gerada.
+  `Wheel of Misfortune` saiu de draw-seven generico para o modelo compacto de
+  escolha secreta, dano ao maior numero e descarte/compra para nao-menores.
+- Evidencia PG073:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_precheck_20260623_051141.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_apply_20260623_051141.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_postcheck_20260623_051141.out`
+  e rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_rollback_20260623_051141.sql`.
+  O postcheck fechou `target_rule_rows=4`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0` e
+  `backup_rows=4`.
+- Focused events PG073:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_card_flow_focused_events_20260623_051141.jsonl`
+  prova `trigger_resolved` de `Esper Sentinel` com tax de poder e
+  `wheel_resolved` de `Wheel of Misfortune` com rule key/hash.
+- Focused events reconciliados:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_l6_card_flow_focused_events_20260623_052954.jsonl`
+  preservam `rule_version=2` no replay local depois da correcao do sync
+  PG -> SQLite.
+- PG074 restaurou somente proveniencia de hash para oito regras confiaveis:
+  `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Scroll Rack`,
+  `Seething Song`, `Talisman of Conviction`, `Unexpected Windfall` e
+  `Valakut Awakening // Valakut Stoneforge`. Nao houve mudanca semantica de
+  `effect_json`, `deck_role_json` ou executor.
+- PG075 restaurou metadados de `Seething Song`
+  (`produces=R`, `mana_color_status=abstracted_to_generic_pool_runtime` e
+  escopo de ritual vermelho) exigidos pelo harness de proveniencia. Tambem
+  nao houve mudanca de executor ou deck.
+- Syncs aceitos PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/pg073_l4_card_flow_sync_report_20260623_051141.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg074_hash_provenance_restore_sync_report_20260623_052703.json`
+  e
+  `docs/hermes-analysis/master_optimizer_reports/pg075_seething_song_metadata_sync_report_20260623_053046.json`;
+  todos usaram `include_needs_review=false`, carregaram `pg_rows_loaded=1825`,
+  escreveram `sqlite_inserted_or_updated=1802` e exportaram
+  `canonical_snapshot_rows_exported=3201`.
+- Auditor final aceito PG075/reconciliado: deck `6` esta em `high=1`,
+  `medium=8`, `pass=91`; deck `606` esta em `high=7`, `medium=30`,
+  `pass=44`; deck `607` esta em `high=29`, `medium=16`, `pass=49`;
+  deck `608` esta em `high=21`, `medium=7`, `pass=40`; global esta em
+  `high=51`, `medium=42`, `pass=112`.
+- Os cortes PG073/PG074 gerados em paralelo com sync sem sufixo final/trusted
+  sao rejeitados como artefatos racy/intermediarios para gate. Usar somente os
+  cortes `trusted`, `accepted` ou `pg075_final` quando decidir fechamento.
+- Proximo deploy deve usar PG076. Unico high restante no deck `6`:
+  `Chaos Warp`; depois priorizar mediums battle-support `Jeska's Will` e
+  `Mizzix's Mastery` antes da fila support/passive.

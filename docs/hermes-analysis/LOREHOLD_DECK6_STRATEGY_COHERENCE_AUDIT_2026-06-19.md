@@ -20474,3 +20474,64 @@ Current reading:
 - Remaining high queue:
   `Chaos Warp`, `Esper Sentinel`, and `Wheel of Misfortune`.
 - The next PG package must be PG073.
+
+## PG073-PG075 Deck 6 L4 Card-Flow/Provenance Reading - 2026-06-23 05:33 UTC
+
+What changed:
+
+- `Esper Sentinel` is now closed for the current battle-rule gate with
+  first-opponent-noncreature-spell trigger, source-power tax, and focused
+  `trigger_resolved` provenance.
+- `Wheel of Misfortune` is now closed for the current battle-rule gate with
+  compact secret-number runtime: controller default `7`, opponent default `0`,
+  highest-number damage, and non-lowest discard/draw seven.
+- PG074 restored hash-only provenance for trusted support/runtime cards:
+  `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Scroll Rack`,
+  `Seething Song`, `Talisman of Conviction`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- PG075 restored `Seething Song` red ritual metadata required by the
+  provenance harness.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG073 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_postcheck_20260623_051141.out`.
+- PG074 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_postcheck_20260623_052703.out`.
+- PG075 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_postcheck_20260623_053046.out`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_card_flow_focused_events_20260623_051141.jsonl`.
+- Reconciled focused events after preserving PG `rule_version` in SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_l6_card_flow_focused_events_20260623_052954.jsonl`.
+- Final deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg075_final_20260623_053046.json`
+  reports `high=1`, `medium=8`, `pass=91`.
+- Final deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg075_final_20260623_053046.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Final global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg075_final_20260623_053046.json`
+  reports `high=51`, `medium=42`, `pass=112`.
+- Reconciled deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg073_l4_l6_card_flow_accepted_20260623_052954.json`
+  reports `high=29`, `medium=16`, `pass=49`.
+- Reconciled deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg073_l4_l6_card_flow_accepted_20260623_052954.json`
+  reports `high=21`, `medium=7`, `pass=40`.
+
+Current reading:
+
+- Deck `6` has one remaining high card: `Chaos Warp`.
+- Remaining medium battle-support cards are `Jeska's Will` and
+  `Mizzix's Mastery`.
+- Remaining medium support/passive cards are `Drannith Magistrate`,
+  `Giver of Runes`, `Mother of Runes`, `Professional Face-Breaker`,
+  `Ranger-Captain of Eos`, and `Storm-Kiln Artist`.
+- Non-final PG073/PG074 audit cuts generated in parallel with sync are
+  rejected as gate sources.
+- `Blasphemous Act` remains closed unless a real oracle/runtime/PostgreSQL
+  mismatch appears. The cost-reduction note is only a caveat/pista.
+- The next PG package must be PG076, preferably `Chaos Warp` as an L8 unique
+  shuffle/reveal/top permanent executor before the medium queue.

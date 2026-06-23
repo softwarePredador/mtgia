@@ -1,0 +1,8 @@
+BEGIN
+psql:docs/hermes-analysis/master_optimizer_reports/deck6_pg055_mana_rocks_hash_restore_pg073_apply_20260623_052713.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+DO
+SELECT 4
+DO
+UPDATE 4
+COMMIT

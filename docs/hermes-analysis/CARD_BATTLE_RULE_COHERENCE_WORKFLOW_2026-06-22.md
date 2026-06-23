@@ -2959,3 +2959,105 @@ Workflow note:
 - Use PG073 for the next PostgreSQL package.
 - Remaining trusted deck `6` high queue is `Chaos Warp`, `Esper Sentinel`, and
   `Wheel of Misfortune`.
+
+## PG073 L4 Card-Flow Runtime - 2026-06-23 05:24 UTC
+
+Closed:
+
+- `Esper Sentinel`: verified as first opponent noncreature spell each turn,
+  draw unless that opponent pays source power. PostgreSQL already held the
+  semantic trusted row; this cycle added executor/test coverage and disabled
+  the superseded generated shadow row.
+- `Wheel of Misfortune`: replaced generic draw-seven behavior with compact
+  secret-number runtime: controller chooses 7, opponents choose 0 by default,
+  highest number takes damage, and non-lowest players discard/draw seven.
+
+PostgreSQL evidence:
+
+- Precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_precheck_20260623_051141.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_apply_20260623_051141.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_postcheck_20260623_051141.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_card_flow_pg073_rollback_20260623_051141.sql`.
+- Postcheck reports `target_rule_rows=4`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=4`.
+
+Runtime and sync evidence:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_card_flow_focused_events_20260623_051141.jsonl`.
+- Reconciled focused events after preserving PG `rule_version` in SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg073_l4_l6_card_flow_focused_events_20260623_052954.jsonl`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg073_l4_card_flow_sync_report_20260623_051141.json`.
+- Trusted deck `6` cut after sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg073_l4_card_flow_trusted_20260623_051141.json`
+  reported `high=1`, `medium=17`, `pass=82`; the medium spike was real
+  provenance drift, not a Wheel/Esper semantic failure.
+
+## PG074 Hash Provenance Restore - 2026-06-23 05:30 UTC
+
+Closed:
+
+- Hash-only provenance restored for `Fellwar Stone`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`,
+  `Talisman of Conviction`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- No `effect_json`, `deck_role_json`, executor, or deck-list semantic change.
+
+Evidence:
+
+- Precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_precheck_20260623_052703.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_apply_20260623_052703.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_postcheck_20260623_052703.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg074_rollback_20260623_052703.sql`.
+- Postcheck reports `target_rule_rows=8`, `current_hash_rows=8`,
+  `missing_oracle_hash_rows=0`, `hash_mismatch_rows=0`,
+  `missing_scope_rows=0`, and `backup_rows=8`.
+- Trusted deck `6` cut after sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg074_hash_provenance_restore_trusted_20260623_052703.json`
+  reported `high=1`, `medium=8`, `pass=91`.
+
+## PG075 Seething Song Metadata Restore - 2026-06-23 05:33 UTC
+
+Closed:
+
+- `Seething Song` ritual metadata was restored for provenance harness
+  coherence: `produces=R`,
+  `mana_color_status=abstracted_to_generic_pool_runtime`,
+  and `battle_model_scope=single_shot_red_ritual_v1`.
+- No executor semantic change and no deck mutation.
+
+Evidence:
+
+- Precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_precheck_20260623_053046.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_apply_20260623_053046.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_postcheck_20260623_053046.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_seething_song_metadata_pg075_rollback_20260623_053046.sql`.
+- Postcheck reports `target_rule_rows=1`, `expected_metadata_rows=1`, and
+  `backup_rows=1`.
+- Final accepted cuts: deck `6` `high=1`, `medium=8`, `pass=91`;
+  deck `606` `high=7`, `medium=30`, `pass=44`; global `high=51`,
+  `medium=42`, `pass=112`.
+- Reconciled accepted cuts also track deck `607` `high=29`, `medium=16`,
+  `pass=49` and deck `608` `high=21`, `medium=7`, `pass=40`.
+
+Workflow note:
+
+- Non-final PG073/PG074 audit cuts generated while sync was running are
+  rejected as race/intermediate artifacts. Use `trusted`, `accepted`, or
+  `pg075_final` cuts for closure decisions.
+- The `Blasphemous Act` cost-reduction note is only a caveat/pista. It does
+  not reopen the card without a proven oracle/runtime/PostgreSQL mismatch.
+- Use PG076 for the next PostgreSQL package. Remaining deck `6` high queue is
+  `Chaos Warp`; next battle-support mediums are `Jeska's Will` and
+  `Mizzix's Mastery`.
