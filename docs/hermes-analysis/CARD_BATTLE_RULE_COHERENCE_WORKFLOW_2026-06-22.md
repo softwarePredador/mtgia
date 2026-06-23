@@ -2285,23 +2285,27 @@ Remaining risk:
   `Idyllic Tutor`, `Imperial Recruiter`, `Magmakin Artillerist`,
   `Pyromancer Ascension`, and `Naktamun Lorespinner // Wheel of Fortune`.
 
-## PG058 Deck 6 L3B Simple Red Ritual Batch - Closed 2026-06-23 02:08 UTC
+## PG058 Deck 6 L3B Simple Red Ritual Batch - Closed 2026-06-23 02:11 UTC
 
 Status:
 
 - Closed `Rite of Flame` and `Seething Song` for the official deck `6`
   battle-rule coherence gate.
-- PostgreSQL already matched the PG058 post-apply state when the central
-  auditor found the untracked SQL artifacts after commit `955f4d25`; the apply
-  SQL was not re-run by the central auditor.
+- Applied the validated PostgreSQL package in this cycle after precheck matched
+  the expected target row counts.
 - No deck swap and no `deck_cards` mutation was executed.
 
 Validation:
 
-- Current-state precheck showed `deck_target_cards=2`, `target_rule_rows=5`,
-  `target_runtime_rows=2`, `generated_review_only_rows=0`,
-  `curated_shadow_rows_to_disable=0`, `trusted_missing_hash_rows=0`,
-  `trusted_without_scope_rows=0`, and no active card-id mismatches.
+- PG precheck showed `deck_target_cards=2`, `target_rule_rows=5`,
+  `target_runtime_rows=2`, `generated_review_only_rows=2`,
+  `curated_shadow_rows_to_disable=1`, `trusted_missing_hash_rows=3`,
+  `trusted_without_scope_rows=2`,
+  `target_runtime_rows_without_produces=1`, and no active card-id mismatches.
+- PG apply created backup table
+  `manaloom_deploy_audit.pg058_deck6_l3b_simple_red_rituals_20260623_020031`
+  with `5` rows, updated `2` trusted runtime rows, and disabled `3`
+  generated/legacy shadows.
 - PG postcheck:
   `target_runtime_rows=2`, `trusted_missing_hash_rows=0`,
   `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
@@ -2310,16 +2314,15 @@ Validation:
   `target_runtime_rows_bad_scope=0`, `generated_review_only_rows=0`,
   `active_curated_shadow_rows=0`, `disabled_or_deprecated_rows=3`, and
   `backup_rows=5`.
-- Apply output captured before central-auditor reconciliation:
+- Apply output:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
 - Scoped SQLite-from-PG sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
-- Full SQLite-from-PG refresh after scoped sync:
-  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
 - Focused events:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
-- Test added:
-  `test_pg058_simple_red_ritual_family_rule_provenance`.
+- Tests added/strengthened:
+  `test_pg058_simple_red_ritual_family_rule_provenance` and
+  `test_pg058_simple_red_ritual_family_runtime_adds_one_shot_mana`.
 
 Auditor result:
 

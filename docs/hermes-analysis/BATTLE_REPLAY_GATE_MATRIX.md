@@ -2780,7 +2780,7 @@ Caveats:
   Approach package. It does not claim full Magic-equivalent stack, search,
   replacement, or shuffle behavior.
 
-## PG058 Deck 6 L3B Simple Red Ritual Focused Event Gate - 2026-06-23 02:08 UTC
+## PG058 Deck 6 L3B Simple Red Ritual Focused Event Gate - 2026-06-23 02:11 UTC
 
 Artifacts:
 
@@ -2788,6 +2788,8 @@ Artifacts:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_postcheck_20260623_020031.out`.
 - Apply output:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
+- Scoped SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
 - Full SQLite sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
 - Focused events:

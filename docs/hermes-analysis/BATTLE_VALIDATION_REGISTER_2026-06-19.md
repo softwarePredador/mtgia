@@ -15469,19 +15469,19 @@ Caveats:
   the current simulator abstraction. Search/shuffle and all replacement effects
   remain outside this focused gate.
 
-## PG058 Deck 6 L3B Simple Red Ritual Batch - Closed 2026-06-23 02:08 UTC
+## PG058 Deck 6 L3B Simple Red Ritual Batch - Closed 2026-06-23 02:11 UTC
 
 Status:
 
 - Closed `Rite of Flame` and `Seething Song` for deck `6`.
-- PostgreSQL already matched the PG058 post-apply state when the central
-  auditor found the SQL artifacts after commit `955f4d25`; apply was not re-run
-  in this reconciliation step.
+- The PG058 apply output exists and shows `UPDATE 2`, `UPDATE 3`, and
+  `COMMIT`; when the central auditor reconciled the package, PostgreSQL already
+  matched the post-apply state.
 - No deck swap and no `deck_cards` mutation was executed.
 
 Evidence:
 
-- Current-state precheck output:
+- Current-state precheck output captured after apply:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_precheck_20260623_020031.out`.
 - PG postcheck:
   `target_runtime_rows=2`, `trusted_missing_hash_rows=0`,
@@ -15491,7 +15491,7 @@ Evidence:
   `target_runtime_rows_bad_scope=0`, `generated_review_only_rows=0`,
   `active_curated_shadow_rows=0`, `disabled_or_deprecated_rows=3`, and
   `backup_rows=5`.
-- Apply output captured before central-auditor reconciliation:
+- Apply output:
   `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
 - Scoped SQLite-from-PG sync:
   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
@@ -15502,6 +15502,9 @@ Evidence:
 - Deck 6 auditor:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_021017.json`
   reports `high=30`, `medium=8`, `pass=62`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_021017.json`
+  reports `high=38`, `medium=8`, `pass=35`.
 
 Gate result:
 
