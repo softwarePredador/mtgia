@@ -5865,3 +5865,395 @@ Rollback:
 - `deck6_recruiter_guard_pg064_rollback_20260623_025848.sql` restores the 2
   pre-PG064 rows from
   `manaloom_deploy_audit.pg064_deck6_recruiter_guard_20260623_025848`.
+
+## PG065-PG067 Transition Summary - Superseded by Detailed Entries Below
+
+Note: this block is a transition summary captured while reconciling concurrent
+PG065/PG066/PG067 work. The canonical artifact-by-artifact entries start at
+`PG065 Shared Engine Rules - Applied 2026-06-23 03:15 UTC` below.
+
+Status:
+
+- `applied_validated`.
+- Runtime/PostgreSQL repair for `Smothering Tithe` and `Scroll Rack`.
+- PostgreSQL remains the source of truth; Hermes SQLite and the canonical
+  fallback snapshot were synced from PostgreSQL after postcheck passed.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_precheck_20260623_031553.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_apply_20260623_031553.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_rollback_20260623_031553.sql`.
+
+Postcheck evidence:
+
+- `target_rule_rows=2`.
+- `target_runtime_rows=2`.
+- `target_hash_mismatch_rows=0`.
+- `target_bad_effect_rows=0`.
+- `target_bad_scope_rows=0`.
+- `old_active_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- `backup_rows=5`.
+
+Runtime evidence:
+
+- `Smothering Tithe` now has oracle-hashed `opponent_draw_tax_treasure_v1`
+  metadata and focused replay evidence in
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_focused_events_20260623_031553.jsonl`.
+- `Scroll Rack` now keeps only the oracle-hashed
+  `scroll_rack_upkeep_single_exchange_v1` executable slice; the focused replay
+  shows it putting `Approach of the Second Sun` on top for the Lorehold
+  opponent-upkeep draw.
+- Battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after the final PG067 sync.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg065_shared_engine_rules_20260623_031553.json`.
+- Final post-cycle sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg067_seething_song_runtime_metadata_20260623_032307.json`.
+- Final deck audits after PG065/PG066/PG067:
+  - Deck `6`: `high=24`, `pass=76`.
+  - Deck `606`: `high=37`, `medium=7`, `pass=37`.
+  - Deck `607`: `high=48`, `medium=8`, `pass=38`.
+  - Deck `608`: `high=31`, `medium=6`, `pass=31`.
+  - Global: `high=108`, `medium=15`, `pass=82`.
+
+Rollback:
+
+- `shared_engine_rules_pg065_rollback_20260623_031553.sql` restores the 5
+  pre-PG065 rows from
+  `manaloom_deploy_audit.pg065_shared_engine_rules_20260623_031553`.
+
+### PG066 Runtime Hash Backfill / PG066 Birgi Collision Note - Applied 2026-06-23 03:20-03:22 UTC
+
+Status:
+
+- `applied_validated`, with a numbering collision detected and preserved in
+  the record.
+- Two separate PG066 slugs now exist in PostgreSQL audit schema:
+  - `pg066_runtime_hash_backfill_20260623_032021`: central-auditor hash
+    backfill for trusted runtime rows exposed by PG->SQLite sync.
+  - `pg066_deck6_birgi_spellcast_resource_engine_20260623_032200`: Birgi
+    runtime package applied by a concurrent executor flow and detected during
+    worktree audit.
+- No deck swap and no `deck_cards` mutation was executed by either package.
+- Next new package number should skip to PG068+ unless this register is
+  explicitly renumbered in a controlled maintenance pass.
+
+Runtime hash backfill target rows:
+
+- `Silence`.
+- `Fellwar Stone`.
+- `Mana Vault`.
+- `Mox Amber`.
+- `Seething Song`.
+- `Talisman of Conviction`.
+- `Valakut Awakening`.
+- `Valakut Awakening // Valakut Stoneforge`.
+
+Hash backfill evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_precheck_20260623_032021.out`
+  reported `expected_rows=8`, `target_card_rows=8`,
+  `expected_oracle_hash_rows=8`, `trusted_runtime_rows=8`,
+  `rows_missing_oracle_hash=8`, and `hash_mismatch_rows=0`.
+- Apply:
+  `runtime_hash_backfill_pg066_apply_20260623_032021.out` reported
+  `SELECT 8`, `UPDATE 8`, and `COMMIT`.
+- Postcheck:
+  `runtime_hash_backfill_pg066_postcheck_20260623_032021.out` reported
+  `expected_rows=8`, `trusted_runtime_rows=8`, `expected_hash_rows=8`,
+  `hash_mismatch_rows=0`, and `backup_rows=8`.
+
+Birgi PG066 evidence:
+
+- SQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_apply_20260623_032200.sql`.
+- Postcheck output captured by central auditor after detecting the applied DB
+  state:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`.
+- Postcheck reports `target_runtime_rows=1`, zero hash/effect/trigger/mana/scope
+  defects, `old_active_shadow_rows=0`, and `backup_rows=2`.
+- Focused replay evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg066_birgi_smothering_focused_events_20260623_032200.jsonl`.
+
+Rollback:
+
+- Hash backfill rollback:
+  `runtime_hash_backfill_pg066_rollback_20260623_032021.sql` restores the 8
+  backed-up rows from
+  `manaloom_deploy_audit.pg066_runtime_hash_backfill_20260623_032021`.
+- Birgi rollback:
+  `deck6_birgi_spellcast_resource_engine_pg066_rollback_20260623_032200.sql`
+  restores Birgi rows from
+  `manaloom_deploy_audit.pg066_deck6_birgi_spellcast_resource_engine_20260623_032200`.
+
+### PG067 Seething Song Runtime Metadata - Applied 2026-06-23 03:23 UTC
+
+Status:
+
+- `applied_validated`.
+- Adds the missing `mana_color_status=abstracted_to_generic_pool_runtime`
+  metadata to the already oracle-hashed `Seething Song` runtime row.
+- This was required because the full battle harness failed after the PG066 sync
+  when the SQLite mirror reflected the PostgreSQL row exactly.
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_precheck_20260623_032307.out`.
+- Apply:
+  `seething_song_runtime_metadata_pg067_apply_20260623_032307.out` reported
+  `SELECT 1`, `UPDATE 1`, and `COMMIT`.
+- Postcheck:
+  `seething_song_runtime_metadata_pg067_postcheck_20260623_032307.out`
+  reported `target_rows=1`, `expected_runtime_rows=1`, and `backup_rows=1`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg067_seething_song_runtime_metadata_20260623_032307.json`.
+- Full battle harness passed after the final sync:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Rollback:
+
+- `seething_song_runtime_metadata_pg067_rollback_20260623_032307.sql` restores
+  the pre-PG067 row from
+  `manaloom_deploy_audit.pg067_seething_song_runtime_metadata_20260623_032307`.
+
+## PG065 Shared Engine Rules - Applied 2026-06-23 03:15 UTC
+
+Status:
+
+- `applied_validated`.
+- Runtime PostgreSQL repair for `Scroll Rack` and `Smothering Tithe`.
+- PostgreSQL is the source of truth; Hermes SQLite and the canonical fallback
+  snapshot were synced from PostgreSQL after the package.
+- No deck list, deck swap, or `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_precheck_20260623_031553.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_precheck_20260623_031553.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_apply_20260623_031553.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_apply_20260623_031553.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_rollback_20260623_031553.sql`.
+
+Target cards:
+
+- `Scroll Rack`: oracle-hashed topdeck manipulation runtime slice
+  `scroll_rack_upkeep_single_exchange_v1`; full arbitrary exchange remains
+  `annotation_only`.
+- `Smothering Tithe`: oracle-hashed opponent-draw Treasure-tax runtime model
+  `opponent_draw_tax_treasure_v1`; optional tax payment remains compact
+  `compact_assume_unpaid_v1`.
+
+Postcheck evidence:
+
+- `target_runtime_rows=2`.
+- `target_hash_mismatch_rows=0`.
+- `target_bad_effect_rows=0`.
+- `target_bad_scope_rows=0`.
+- `old_active_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- `backup_rows=5`.
+
+Rollback:
+
+- `shared_engine_rules_pg065_rollback_20260623_031553.sql` restores the 5
+  pre-PG065 rows from
+  `manaloom_deploy_audit.pg065_shared_engine_rules_20260623_031553`.
+
+## PG066 Deck 6 Birgi Spell-Cast Resource Engine - Applied 2026-06-23 03:22 UTC
+
+Status:
+
+- `applied_validated`.
+- PostgreSQL repair for `Birgi, God of Storytelling // Harnfel, Horn of
+  Bounty`.
+- PostgreSQL is the source of truth; Hermes SQLite and the canonical fallback
+  snapshot were synced from PostgreSQL after postcheck passed.
+- No deck list, deck swap, or `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_precheck_20260623_032200.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_precheck_20260623_032200.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_apply_20260623_032200.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_apply_20260623_032200.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_rollback_20260623_032200.sql`.
+
+Target card:
+
+- `Birgi, God of Storytelling // Harnfel, Horn of Bounty`: front-face creature
+  permanent with `spell_cast` trigger adding `{R}`. Back face `Harnfel` and
+  boast text remain `annotation_only`.
+
+Postcheck evidence:
+
+- `target_rule_rows=3`.
+- `target_runtime_rows=1`.
+- `target_hash_mismatch_rows=0`.
+- `target_bad_effect_rows=0`.
+- `target_bad_trigger_rows=0`.
+- `target_bad_mana_rows=0`.
+- `target_bad_scope_rows=0`.
+- `old_active_shadow_rows=0`.
+- `backup_rows=2`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg066_birgi_20260623_032200.json`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg066_20260623_032200.json`
+  reports `high=24`, `pass=76`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg066_20260623_032200.json`
+  reports `high=37`, `medium=7`, `pass=37`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg066_20260623_032200.json`
+  reports `high=108`, `medium=15`, `pass=82`.
+
+Rollback:
+
+- `deck6_birgi_spellcast_resource_engine_pg066_rollback_20260623_032200.sql`
+  restores the 2 pre-PG066 rows from
+  `manaloom_deploy_audit.pg066_deck6_birgi_spellcast_resource_engine_20260623_032200`.
+
+## PG066 Runtime Hash Backfill - Applied 2026-06-23 03:20 UTC
+
+Status:
+
+- `applied_validated`.
+- Metadata-only backfill for trusted runtime rows that already had executable
+  semantics but were missing persisted `oracle_hash`.
+- This PG066 package collides numerically with the later deck `6` Birgi PG066
+  package. Backup tables are distinct; do not reuse PG066. Next package id
+  should be PG068.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_precheck_20260623_032021.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_precheck_20260623_032021.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_apply_20260623_032021.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_apply_20260623_032021.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_postcheck_20260623_032021.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_postcheck_20260623_032021.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_rollback_20260623_032021.sql`.
+
+Target rows:
+
+- `Silence`, `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Seething Song`,
+  `Talisman of Conviction`, `Valakut Awakening`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+
+Postcheck evidence:
+
+- `expected_rows=8`.
+- `trusted_runtime_rows=8`.
+- `expected_hash_rows=8`.
+- `hash_mismatch_rows=0`.
+- `backup_rows=8`.
+
+Rollback:
+
+- `runtime_hash_backfill_pg066_rollback_20260623_032021.sql` restores the 8
+  backed-up rows from
+  `manaloom_deploy_audit.pg066_runtime_hash_backfill_20260623_032021`.
+
+## PG067 Seething Song Runtime Metadata - Applied 2026-06-23 03:23 UTC
+
+Status:
+
+- `applied_validated`.
+- Metadata-only update for `Seething Song`; it records that runtime currently
+  abstracts red ritual mana into the generic one-shot pool while preserving
+  oracle `produces=R`.
+- No deck list, deck swap, or `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_precheck_20260623_032307.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_precheck_20260623_032307.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_apply_20260623_032307.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_apply_20260623_032307.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_postcheck_20260623_032307.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_postcheck_20260623_032307.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_rollback_20260623_032307.sql`.
+
+Postcheck evidence:
+
+- `target_rows=1`.
+- `expected_runtime_rows=1`.
+- `backup_rows=1`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg067_seething_song_runtime_metadata_20260623_032307.json`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_032427.json`
+  reports `high=24`, `pass=76`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_032427.json`
+  reports `high=37`, `medium=7`, `pass=37`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_032427.json`
+  reports `high=108`, `medium=15`, `pass=82`.
+- Repeat no-change Deck 6/606 smoke:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_cycle_deck6_20260623_033223.json`
+  reloaded `pg_rows_loaded=5294` / `sqlite_inserted_or_updated=5250`, and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_033223.json`
+  plus
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_033223.json`
+  reproduced the same deck `6` (`high=24`, `pass=76`) and deck `606`
+  (`high=37`, `medium=7`, `pass=37`) counts. No new PostgreSQL apply was run
+  for this repeat smoke.
+
+Rollback:
+
+- `seething_song_runtime_metadata_pg067_rollback_20260623_032307.sql`
+  restores the pre-PG067 row from
+  `manaloom_deploy_audit.pg067_seething_song_runtime_metadata_20260623_032307`.

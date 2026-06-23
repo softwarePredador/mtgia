@@ -3019,6 +3019,49 @@ Status:
 
 Caveat:
 
-- PG064 was accepted by central live-state validation because apply output was
-  not present in the worktree; postcheck, backup table, sync, audit, and battle
-  tests are the accepted evidence.
+- Historical note: this duplicate runtime-gate entry is superseded by the
+  focused event gate above. PG064 apply output is now present in the worktree;
+  postcheck, backup table, sync, audit, and battle tests remain the accepted
+  evidence.
+
+## PG065/PG066 Deck 6 Resource Engine Focused Event Gate - 2026-06-23 03:24 UTC
+
+Artifacts:
+
+- PG065 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.out`.
+- PG066 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg066_birgi_20260623_032200.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg066_birgi_smothering_focused_events_20260623_032200.jsonl`.
+- Current deck 6 audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg066_20260623_032200.json`.
+
+Gate:
+
+- `Smothering Tithe` emits `trigger_resolved` for `opponent_draw` with
+  `effect=create_treasure`, `treasures_created=2`, and
+  `rule_logical_key=battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6`.
+- `Birgi, God of Storytelling // Harnfel, Horn of Bounty` emits
+  `trigger_resolved` for `spell_cast` with `effect=add_mana`,
+  `mana_color=red`, and
+  `rule_logical_key=battle_rule_v1:05576012d8fca56910da7ea072abe15e`.
+- `Scroll Rack` is covered by PG065 as a topdeck runtime slice and by the
+  existing `test_scroll_rack_sets_up_lorehold_approach_second_cast_on_opponent_upkeep`.
+
+Status:
+
+- `Scroll Rack`, `Smothering Tithe`, and `Birgi` are closed for the current
+  deck `6` resource/topdeck engine gate.
+- Deck `6` now reports `high=24`, `pass=76`.
+
+Caveat:
+
+- `Smothering Tithe` tax payment is still modeled as
+  `compact_assume_unpaid_v1`, not dynamic opponent payment.
+- `Birgi` PG066 models the front face spell-cast mana trigger only; `Harnfel`
+  and boast text remain `annotation_only`.
+- `Blasphemous Act` was only rechecked as a pass card in this cycle; its cost
+  reduction remains the prior `annotation_only` caveat.

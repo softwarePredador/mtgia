@@ -13772,6 +13772,79 @@ def trigger_opponent_spell_draw_engines(
             )
 
 
+def trigger_opponent_draw_resource_engines(
+    drawing_player,
+    opponents,
+    drawn_count,
+    turn,
+    phase,
+    *,
+    stack=None,
+    all_players=None,
+):
+    if drawn_count <= 0:
+        return
+    for opponent in opponents:
+        if not opponent.is_alive():
+            continue
+        for permanent in list(opponent.battlefield):
+            if not isinstance(permanent, dict):
+                continue
+            if permanent.get("effect") != "ramp_engine":
+                continue
+            if permanent.get("trigger") != "opponent_draw":
+                continue
+            treasure_per_card = int(
+                permanent.get("treasure_count_per_card_drawn")
+                or permanent.get("treasure_count")
+                or 1
+            )
+            treasure_count = max(0, drawn_count * treasure_per_card)
+
+            def resolve_opponent_draw_resource_trigger(
+                opponent=opponent,
+                permanent=permanent,
+                treasure_count=treasure_count,
+            ):
+                treasures_before = opponent.treasures
+                permanent["counter"] = permanent.get("counter", 0) + drawn_count
+                # Compact model: the drawing player does not pay the optional {2}.
+                opponent.treasures += treasure_count
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=opponent.name,
+                    card=permanent.get("name", "?"),
+                    trigger="opponent_draw",
+                    drawing_player=drawing_player.name,
+                    drawn_player=drawing_player.name,
+                    effect="create_treasure",
+                    cards_drawn=drawn_count,
+                    tax_amount=int(permanent.get("tax_amount") or 2),
+                    tax_paid=False,
+                    tax_payment_model=permanent.get("tax_payment_model"),
+                    tax_payment_status=permanent.get(
+                        "tax_payment_status",
+                        "annotation_only_assume_unpaid",
+                    ),
+                    treasures_created=treasure_count,
+                    treasures_before=treasures_before,
+                    treasures_after=opponent.treasures,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                opponent,
+                permanent,
+                "opponent_draw",
+                resolve_opponent_draw_resource_trigger,
+                stack=stack,
+                active_player=drawing_player,
+                all_players=all_players or [drawing_player, *opponents],
+            )
+
+
 
 
 def check_ward(target, spell, controller, rng):
@@ -18352,6 +18425,17 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         stack,
         source="draw_step",
     )
+    trigger_opponent_draw_resource_engines(
+        player,
+        opponents,
+        len(drawn_for_turn),
+        turn,
+        "draw_step",
+        stack=stack,
+        all_players=all_players,
+    )
+    while not stack.empty() or _pending_triggers:
+        priority_round(player, all_players, stack, turn, rng, phase="draw_step")
 
     # ── PRECOMBAT MAIN ──
     total_mana = player.available_mana()
@@ -18428,16 +18512,6 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     if game_winner(all_players):
         return
     if check_sbas(all_players): return
-
-    # ── TRIGGER: Smothering Tithe on opponent draws (during draw step above) ──
-    for opp in opponents:
-        if opp.is_alive():
-            for c in opp.battlefield:
-                if isinstance(c, dict) and c.get("effect") == "ramp_engine" and c.get("trigger") == "opponent_draw":
-                    c["counter"] = c.get("counter", 0) + 1
-                    # Creates a Treasure token (simplified as +1 treasure)
-                    opp.treasures += 1
-
 
     # ── COMBAT ──
     if turn > 1:

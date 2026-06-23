@@ -2561,3 +2561,75 @@ Evidence:
   `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_focused_events_20260623_025848.jsonl`.
 - Deck `6` audit:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_030307.json`.
+
+## Deck 6 Resource/Topdeck Engine Closure - PG065/PG066 2026-06-23
+
+Closed package:
+
+- `Scroll Rack`: oracle-hashed topdeck manipulation runtime slice
+  `scroll_rack_upkeep_single_exchange_v1`; full arbitrary hand/top exchange is
+  still `annotation_only`.
+- `Smothering Tithe`: oracle-hashed opponent-draw Treasure-tax model
+  `opponent_draw_tax_treasure_v1`; optional `{2}` payment stays compact
+  `compact_assume_unpaid_v1`.
+- `Birgi, God of Storytelling // Harnfel, Horn of Bounty`: front-face creature
+  with `spell_cast` trigger adding `{R}`; back face and boast text remain
+  `annotation_only`.
+
+Validation note:
+
+- PG065 for `Scroll Rack`/`Smothering Tithe` was already applied in the
+  worktree state discovered during this cycle; live PostgreSQL won over the
+  stale queue assumption.
+- PG066 was created and applied only for `Birgi`, because PostgreSQL still had
+  one trusted row without `oracle_hash`/`battle_model_scope` and one generated
+  `review_only` shadow.
+- The `Blasphemous Act` cost-reduction note is only a caveat. It did not drive
+  this package and did not block progress because the card remains
+  `pass/coherent_for_current_gate`.
+
+Evidence:
+
+- PG065 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.out`.
+- PG066 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_precheck_20260623_032200.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_apply_20260623_032200.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg066_birgi_smothering_focused_events_20260623_032200.jsonl`.
+- Deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg066_20260623_032200.json`
+  reports `high=24`, `pass=76`.
+- Global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg066_20260623_032200.json`
+  reports `high=108`, `medium=15`, `pass=82`.
+
+Next queue:
+
+- Continue deck `6` high-impact battle-critical cards first: interaction,
+  protection/removal/counter/silence, draw/wheel/card-flow, and copy/token-copy.
+
+## Runtime Hash Backfill and Seething Song Metadata - PG066/PG067 2026-06-23
+
+Validation note:
+
+- `runtime_hash_backfill_pg066_20260623_032021` backfilled `oracle_hash` for
+  8 already-trusted runtime rows after sync/audit exposed missing persisted
+  hashes.
+- `seething_song_runtime_metadata_pg067_20260623_032307` records that
+  `Seething Song` still uses the one-shot ritual runtime while abstracting red
+  mana into the generic pool. This is metadata, not a new executor.
+- PG066 is duplicated in this checkpoint (`runtime_hash_backfill` and `Birgi`)
+  with separate backup tables. Future packages should start at PG068.
+
+Evidence:
+
+- Runtime hash backfill postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_postcheck_20260623_032021.out`.
+- Seething Song postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_postcheck_20260623_032307.out`.
+- Latest deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_032427.json`
+  reports `high=24`, `pass=76`.

@@ -1,0 +1,4 @@
+ target_cards | target_in_deck6 | target_rule_rows | current_curated_runtime_rows | current_generated_review_only_rows | current_trusted_missing_hash_rows | new_rule_key_rows_already_present | live_oracle_hash_matches | active_review_only_rows | backup_table_exists
+--------------+-----------------+------------------+------------------------------+------------------------------------+-----------------------------------+-----------------------------------+--------------------------+-------------------------+---------------------
+            1 |               1 |                2 |                            1 |                                  1 |                                 1 |                                 0 |                        1 |                       1 |                   0
+(1 row)

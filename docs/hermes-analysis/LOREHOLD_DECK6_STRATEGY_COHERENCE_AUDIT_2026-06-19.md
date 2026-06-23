@@ -20073,3 +20073,68 @@ Current reading:
   `high=27`, `pass=73`.
 - The next deck `6` work should stay on high-severity card-model gaps; the
   medium land queue remains closed.
+
+## PG065/PG066 Deck 6 Resource/Topdeck Engine Package - 2026-06-23 03:24 UTC
+
+What changed:
+
+- Registered the already-applied PG065 package for `Scroll Rack` and
+  `Smothering Tithe`.
+- Applied and validated PG066 for `Birgi, God of Storytelling // Harnfel, Horn
+  of Bounty`.
+- Runtime now emits replay provenance for `Smothering Tithe` opponent-draw
+  Treasure triggers and keeps `Birgi` on the front-face spell-cast red mana
+  executor.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG065 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.out`.
+- PG066 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg066_birgi_20260623_032200.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg066_birgi_smothering_focused_events_20260623_032200.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg066_20260623_032200.json`
+  reports `high=24`, `pass=76`; `Scroll Rack`, `Smothering Tithe`, `Birgi`,
+  and `Blasphemous Act` report `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG066 sync.
+
+Current reading:
+
+- Deck `6` improved from `high=27`, `pass=73` after PG064 to `high=24`,
+  `pass=76`.
+- The next efficient deck `6` batch should target high-impact battle-critical
+  interaction/protection/removal/counter/silence or copy/token-copy cards.
+  Do not reopen `Blasphemous Act` unless a real oracle/runtime mismatch
+  appears; its cost reduction remains an `annotation_only` caveat.
+
+## PG066/PG067 Runtime Metadata Backfill - 2026-06-23 03:27 UTC
+
+What changed:
+
+- Verified the already-applied PG066 runtime hash backfill for 8 trusted rows.
+- Verified PG067 `Seething Song` metadata marking red ritual mana as currently
+  abstracted to the generic one-shot runtime pool.
+- PG066 is duplicated in naming with the Birgi package; both are valid live
+  backup tables, and the next deploy id should be PG068.
+
+Evidence:
+
+- Runtime hash backfill postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_postcheck_20260623_032021.out`.
+- Seething Song postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_postcheck_20260623_032307.out`.
+- Latest deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_032427.json`
+  reports `high=24`, `pass=76`.
+- Repeat no-change smoke after the same PG067 sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_033223.json`
+  reproduced deck `6` as `high=24`, `pass=76`; deck `606` in
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_033223.json`
+  remained `high=37`, `medium=7`, `pass=37`.

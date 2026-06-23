@@ -15856,3 +15856,131 @@ Next queue:
 - Deck `6` still has `27` high findings. Continue with high-impact shared
   executor families before battle evaluation: interaction/protection/removal,
   draw/wheel/card-flow, copy/token-copy, and remaining cost/ramp engines.
+
+## PG065/PG066 Deck 6 Shared Resource Engine Gate - Closed 2026-06-23 03:24 UTC
+
+Status:
+
+- Closed the current deck `6` resource/topdeck engine gate for `Scroll Rack`,
+  `Smothering Tithe`, and `Birgi, God of Storytelling // Harnfel, Horn of
+  Bounty`.
+- PG065 was already applied for `Scroll Rack` and `Smothering Tithe` before
+  this checkpoint was registered; live PostgreSQL confirmed the backup table
+  `manaloom_deploy_audit.pg065_shared_engine_rules_20260623_031553`.
+- PG066 was applied only for `Birgi` after precheck showed the real remaining
+  failure: trusted runtime row without `oracle_hash`/`battle_model_scope` plus
+  one generated `review_only` shadow.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Runtime validation:
+
+- `test_scroll_rack_sets_up_lorehold_approach_second_cast_on_opponent_upkeep`
+  remains the focused Scroll Rack runtime proof; PG065 keeps full arbitrary
+  exchange as `annotation_only`.
+- `test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance`
+  proves the opponent-draw Treasure trigger emits rule provenance from the
+  synced PG065 row.
+- `test_birgi_adds_red_mana_when_controller_casts_spell` proves the PG066
+  front-face spell-cast red mana trigger.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg066_birgi_smothering_focused_events_20260623_032200.jsonl`
+  contains `Birgi` with
+  `rule_logical_key=battle_rule_v1:05576012d8fca56910da7ea072abe15e` and
+  `Smothering Tithe` with
+  `rule_logical_key=battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6`.
+
+PostgreSQL validation:
+
+- PG065 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.out`
+  reports `target_runtime_rows=2`, zero hash/effect/scope defects,
+  `old_active_shadow_rows=0`, `trusted_executable_without_oracle_hash_rows=0`,
+  and `backup_rows=5`.
+- PG066 precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_precheck_20260623_032200.out`
+  reports `target_rule_rows=2`, `current_trusted_missing_hash_rows=1`,
+  `new_rule_key_rows_already_present=0`, and `backup_table_exists=0`.
+- PG066 apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_apply_20260623_032200.out`
+  reports `SELECT 2`, `INSERT 0 1`, `UPDATE 2`, and `COMMIT`.
+- PG066 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`
+  reports `target_runtime_rows=1`, zero hash/effect/trigger/mana/scope
+  defects, `old_active_shadow_rows=0`, and `backup_rows=2`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the new `Smothering Tithe` event-provenance test and the
+  existing `Birgi` trigger test.
+
+Auditor result:
+
+- After PG065 sync, deck `6` reported `high=25`, `medium=7`, `pass=68`.
+- After PG066 sync, deck `6` reports `high=24`, `pass=76`; `Scroll Rack`,
+  `Smothering Tithe`, `Birgi`, and `Blasphemous Act` all report
+  `pass/coherent_for_current_gate`.
+- Deck `606` now reports `high=37`, `medium=7`, `pass=37`.
+- Global deck-card audit now reports `high=108`, `medium=15`, `pass=82`.
+
+Caveat:
+
+- `Blasphemous Act` was not changed in this cycle. Its cost reduction remains
+  a known `annotation_only` caveat, not a blocker and not an inferred runtime
+  rule.
+- `Smothering Tithe` models the optional `{2}` payment as
+  `compact_assume_unpaid_v1`; the payment decision remains a compact
+  assumption rather than a dynamic tax executor.
+
+Next queue:
+
+- Deck `6` still has `24` high findings: `Chaos Warp`, `Drannith Magistrate`,
+  `Dualcaster Mage`, `Esper Sentinel`, `Faithless Looting`, `Gamble`,
+  `Get Lost`, `Giver of Runes`, `Heat Shimmer`, `Molten Duplication`,
+  `Mother of Runes`, `Pyroblast`, `Ranger-Captain of Eos`, `Reiterate`,
+  `The One Ring`, `Twinflame`, `Wheel of Misfortune`, `Jeska's Will`,
+  `Lotus Petal`, `Mizzix's Mastery`, `Professional Face-Breaker`,
+  `Ruby Medallion`, `Storm-Kiln Artist`, and `Unexpected Windfall`.
+
+## PG066 Runtime Hash Backfill and PG067 Seething Song Metadata - Verified 2026-06-23 03:27 UTC
+
+Status:
+
+- Live PostgreSQL and worktree artifacts show two additional already-applied
+  packages in this cycle:
+  `runtime_hash_backfill_pg066_20260623_032021` and
+  `seething_song_runtime_metadata_pg067_20260623_032307`.
+- PG066 numbering is therefore duplicated with the `Birgi` package above, but
+  the backup tables are distinct:
+  `manaloom_deploy_audit.pg066_runtime_hash_backfill_20260623_032021` and
+  `manaloom_deploy_audit.pg066_deck6_birgi_spellcast_resource_engine_20260623_032200`.
+- Next deploy package id should start at PG068.
+
+PostgreSQL validation:
+
+- Runtime hash backfill PG066 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_backfill_pg066_postcheck_20260623_032021.out`
+  reports `expected_rows=8`, `trusted_runtime_rows=8`,
+  `expected_hash_rows=8`, `hash_mismatch_rows=0`, and `backup_rows=8`.
+- PG067 `Seething Song` postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg067_postcheck_20260623_032307.out`
+  reports `target_rows=1`, `expected_runtime_rows=1`, and `backup_rows=1`.
+
+Auditor result:
+
+- Latest available cut after PG067:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_032427.json`
+  reports `high=24`, `pass=76`.
+- `Seething Song`, `Rite of Flame`, `Birgi`, `Scroll Rack`, and
+  `Smothering Tithe` all report `pass/coherent_for_current_gate` in that cut.
+- Deck `606` remains `high=37`, `medium=7`, `pass=37`; global remains
+  `high=108`, `medium=15`, `pass=82`.
+- Repeat no-change Deck 6/606 smoke:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_cycle_deck6_20260623_033223.json`
+  reloaded the PG source into SQLite, and
+  `deck_card_battle_rule_coherence_audit_deck6_20260623_033223.json` plus
+  `deck_card_battle_rule_coherence_audit_deck606_20260623_033223.json`
+  reproduced the same deck `6` and deck `606` counts without a new PostgreSQL
+  apply.

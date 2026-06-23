@@ -2589,6 +2589,58 @@ def register_tests(battle, player):
         )
         assert any(card.get("name") == "Increasing Vengeance" for card in active.graveyard)
 
+    def test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.library = [_card("Drawn Card", cmc=1, effect="draw_cards")]
+            tithe_controller = player("Tithe Controller")
+            tithe_controller.battlefield = [
+                {
+                    "name": "Smothering Tithe",
+                    "cmc": 4,
+                    "type_line": "Enchantment",
+                    "effect": "ramp_engine",
+                    "trigger": "opponent_draw",
+                    "treasure_count": 1,
+                    "tax_amount": 2,
+                    "tax_payment_model": "compact_assume_unpaid_v1",
+                    "battle_model_scope": "opponent_draw_tax_treasure_v1",
+                    "_rule_logical_key": "battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6",
+                    "_rule_oracle_hash": "bb7d29c1a84a53604c017da1b5f0620c",
+                }
+            ]
+
+            battle.play_turn_v8(
+                active,
+                [tithe_controller],
+                [active, tithe_controller],
+                turn=4,
+                rng=random.Random(1201),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert tithe_controller.treasures == 1
+        assert any(
+            event == "trigger_resolved"
+            and data.get("player") == "Tithe Controller"
+            and data.get("card") == "Smothering Tithe"
+            and data.get("trigger") == "opponent_draw"
+            and data.get("drawing_player") == "Active"
+            and data.get("effect") == "create_treasure"
+            and data.get("tax_paid") is False
+            and data.get("treasures_created") == 1
+            and data.get("tax_payment_model") == "compact_assume_unpaid_v1"
+            and data.get("tax_payment_status") == "annotation_only_assume_unpaid"
+            and data.get("rule_logical_key") == "battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6"
+            and data.get("rule_oracle_hash") == "bb7d29c1a84a53604c017da1b5f0620c"
+            for event, data in events
+        )
+
     def test_reckless_endeavor_damage_wipe_creates_treasures():
         active = player("Active")
         opponent = player("Opponent")
@@ -5461,6 +5513,7 @@ def register_tests(battle, player):
         test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands,
         test_land_tax_skips_when_no_opponent_controls_more_lands,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
+        test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,

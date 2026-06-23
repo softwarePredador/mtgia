@@ -1,0 +1,4 @@
+ target_rule_rows | target_runtime_rows | target_hash_mismatch_rows | target_bad_effect_rows | target_bad_trigger_rows | target_bad_mana_rows | target_bad_scope_rows | old_active_shadow_rows | backup_rows
+------------------+---------------------+---------------------------+------------------------+-------------------------+----------------------+-----------------------+------------------------+-------------
+                3 |                   1 |                         0 |                      0 |                       0 |                    0 |                     0 |                      0 |           2
+(1 row)

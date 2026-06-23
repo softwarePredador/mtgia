@@ -233,3 +233,40 @@ Atualizado em 2026-05-26:
   `docs/hermes-analysis/master_optimizer_reports/deck6_recruiter_guard_pg064_focused_events_20260623_025848.jsonl`
   prova `rule_logical_key=battle_rule_v1:423a8aa67b5cf450f4c4fb47ca50ae46`;
   o auditor deck `6` passou para `high=27`, `pass=73`.
+
+## ManaLoom deck 6 resource/topdeck engine gate - 2026-06-23
+
+- PG065 fechou `Scroll Rack` e `Smothering Tithe`; PG066 fechou `Birgi, God
+  of Storytelling // Harnfel, Horn of Bounty`.
+- PostgreSQL venceu a suposicao inicial da fila: `Smothering Tithe` ja tinha
+  `oracle_hash`, `battle_model_scope` e shadow gerada desativada via PG065;
+  por isso PG066 aplicou somente `Birgi`.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/shared_engine_rules_pg065_postcheck_20260623_031553.out`
+  fechou `target_runtime_rows=2`, `old_active_shadow_rows=0` e
+  `backup_rows=5`; `docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_postcheck_20260623_032200.out`
+  fechou `target_runtime_rows=1`, `old_active_shadow_rows=0` e
+  `backup_rows=2`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg066_birgi_smothering_focused_events_20260623_032200.jsonl`
+  prova `Birgi` com
+  `battle_rule_v1:05576012d8fca56910da7ea072abe15e` e `Smothering Tithe`
+  com `battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6`.
+- Auditor deck `6` passou para `high=24`, `pass=76`; `Blasphemous Act`
+  permaneceu `pass` e sua reducao de custo segue apenas como caveat
+  `annotation_only`.
+
+## ManaLoom PG066/PG067 runtime metadata note - 2026-06-23
+
+- `runtime_hash_backfill_pg066_20260623_032021` aplicou backfill de
+  `oracle_hash` em 8 regras runtime ja confiaveis; `hash_mismatch_rows=0` e
+  `backup_rows=8`.
+- `seething_song_runtime_metadata_pg067_20260623_032307` anotou que
+  `Seething Song` preserva `produces=R`, mas o runtime atual abstrai a mana
+  para pool generico one-shot; `backup_rows=1`.
+- Houve colisao de numeracao PG066 entre o backfill e o pacote `Birgi`; as
+  backup tables sao distintas. Proximo deploy deve usar PG068.
+- O smoke `20260623_033223` re-sincronizou PG -> SQLite e reexecutou os
+  auditores de deck `6`/`606` sem nova escrita PostgreSQL; as contagens
+  permaneceram deck `6` `high=24`, `pass=76` e deck `606` `high=37`,
+  `medium=7`, `pass=37`.
