@@ -17387,3 +17387,27 @@ Next queue:
 - Continue with the remaining candidate deck high queues, prioritizing deck
   `608`/`607` high battle-critical cards before any deck-selection or
   strategy-learning claim.
+
+## PG089 Runtime Prework - Removal Compensation Creature Tokens - 2026-06-23 09:16 UTC
+
+Status: `applied_validated_after_pg090_restore`.
+
+- Added battle runtime support for removal effects that give the target
+  controller creature compensation tokens, preserving `compensation_tokens_created`
+  replay evidence and rule provenance.
+- Focused test added:
+  `test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller`.
+- PG089 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.out`
+  reports `target_rule_rows=2`, `target_hash_match_rows=2`, no missing hashes,
+  no active shadows, and `backup_rows=4`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg089_l6_removal_compensation_focused_events_20260623_062000.jsonl`.
+- PG090 restored older hash/scope drift exposed by PG089 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.out`
+  reports 12/12 hash and patch matches.
+- Validation: full battle wrapper passed with `380` PASS lines after PG090.
+- Final card-rule queue after PG090: deck `607` `high=21`, `medium=4`,
+  `pass=69`; deck `608` `high=16`, `medium=3`, `pass=49`; global
+  `high=37`, `medium=4`, `pass=164`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.

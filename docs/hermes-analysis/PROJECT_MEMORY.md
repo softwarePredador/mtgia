@@ -990,8 +990,8 @@ Next package number is PG086. Next queue should prioritize remaining deck
   deck `608` `high=16`, `medium=3`, `pass=49`; global `high=39`,
   `medium=4`, `pass=162`.
 - PG086 was already occupied by deck `608` `Angel's Grace` artifacts during
-  this cycle, and PG088 subsequently corrected the PG087 hash convention; use
-  PG089 for the next package.
+  this cycle, and PG088 subsequently corrected the PG087 hash convention. At
+  that checkpoint, PG089 was the next package.
 - A read-only PG089 start snapshot was generated after the PG088 sync:
   `docs/hermes-analysis/master_optimizer_reports/pg089_start_sync_report_20260623_061026.json`,
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg089_start_20260623_061026.json`,
@@ -1000,6 +1000,35 @@ Next package number is PG086. Next queue should prioritize remaining deck
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg089_start_20260623_061026.json`.
   It is not a deploy; it confirms deck `6` `pass=100`, deck `606` `pass=81`,
   and global `high=39`, `medium=4`, `pass=162` before the next PG089 write.
+- PG089 runtime prework added creature compensation-token execution for targeted
+  removal effects and focused test
+  `test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller`.
+  The initial runtime-only wrapper passed with `379` PASS lines before the
+  PostgreSQL closeout; the accepted final state is the PG090-restored wrapper
+  result below.
+- PG089 then closed `Generous Gift` and `Stroke of Midnight` with PostgreSQL
+  postcheck evidence at
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.out`
+  and focused events at
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg089_l6_removal_compensation_focused_events_20260623_062000.jsonl`.
+- PG089 sync exposed older hash/scope drift in PostgreSQL; PG090 restored 12
+  already-approved rules. Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_sync_report_20260623_062000.json`.
+- Final post-PG090 state: deck `607` `high=21`, `medium=4`, `pass=69`;
+  deck `608` `high=16`, `medium=3`, `pass=49`; global `high=37`,
+  `medium=4`, `pass=164`; full wrapper passed with `380` PASS lines.
+- A read-only PG091 start snapshot was generated after the PG090 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_start_sync_report_20260623_manual.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg091_start_20260623_093259.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg091_start_20260623_093259.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg091_start_20260623_093259.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg091_start_20260623_093259.json`.
+  It is not a deploy; it confirms deck `6` `pass=100`, deck `606`
+  `pass=81`, deck `607` `high=21`, `medium=4`, `pass=69`, and deck `608`
+  `high=16`, `medium=3`, `pass=49` as the next cycle baseline.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

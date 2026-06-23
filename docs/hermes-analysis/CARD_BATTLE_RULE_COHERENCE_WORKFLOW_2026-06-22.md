@@ -3728,8 +3728,8 @@ Auditor result after tests:
 
 Next workflow:
 
-- PG088 was consumed by the deck `606` PG087 hash-convention correction; use
-  PG089 for the next PostgreSQL package.
+- PG088 was consumed by the deck `606` PG087 hash-convention correction. At
+  that checkpoint, PG089 was the next PostgreSQL package.
 - Continue with remaining candidate deck high queues (`607`/`608`) before any
   battle-ranking or deck-promotion claim.
 
@@ -3750,5 +3750,59 @@ Status: `read_only_start_snapshot`.
   reports deck `606` `pass=81`; and
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg089_start_20260623_061026.json`
   reports global `high=39`, `medium=4`, `pass=162`.
-- The next write package is still PG089 and should target the remaining
-  candidate deck high queues, primarily deck `607`/`608` high cards.
+- At this snapshot, the next write package was PG089 and should target the
+  remaining candidate deck high queues, primarily deck `607`/`608` high cards.
+
+## PG089 Runtime Prework: Removal Compensation Creature Tokens - 2026-06-23 09:16 UTC
+
+Status: `applied_as_pg089_then_validated_after_pg090_restore`.
+
+- Added runtime support for targeted removal effects that create creature
+  compensation tokens for the target controller, using fields such as
+  `target_controller_creature_tokens`, `target_controller_token_name`,
+  `target_controller_token_power`, and `target_controller_token_toughness`.
+- The existing `compensation_tokens_created` replay event now covers both Map
+  tokens and creature compensation tokens, with rule provenance preserved.
+- Added focused test
+  `test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller`.
+- Initial validation:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed with `379` PASS lines after this runtime-only prework. Final
+  acceptance is the post-PG090 `380` PASS wrapper result.
+- PG089 promoted `Generous Gift` and `Stroke of Midnight` with
+  precheck/postcheck/rollback artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_precheck_20260623_061026.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_rollback_20260623_061026.sql`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg089_l6_removal_compensation_focused_events_20260623_062000.jsonl`.
+- PG089 sync exposed older PostgreSQL hash/scope drift. PG090 restored 12
+  already-approved rows:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.out`
+  reports 12/12 hash and patch matches.
+- Final post-PG090 audits: deck `607` `high=21`, `medium=4`, `pass=69`;
+  deck `608` `high=16`, `medium=3`, `pass=49`; global `high=37`,
+  `medium=4`, `pass=164`.
+
+## PG091 Start Queue Snapshot - 2026-06-23 09:33 UTC
+
+Status: `read_only_start_snapshot`.
+
+- This is not a PostgreSQL deploy, not a deck swap, and not a battle
+  rebaseline.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_start_sync_report_20260623_manual.json`
+  reports `pg_rows_loaded=1825`, `sqlite_inserted_or_updated=1803`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Start audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg091_start_20260623_093259.json`
+  reports deck `6` `pass=100`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg091_start_20260623_093259.json`
+  reports deck `606` `pass=81`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg091_start_20260623_093259.json`
+  reports deck `607` `high=21`, `medium=4`, `pass=69`; and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg091_start_20260623_093259.json`
+  reports deck `608` `high=16`, `medium=3`, `pass=49`.
+- The next write package is PG091 and should keep prioritizing battle-critical
+  high-card queues in deck `607`/`608`.

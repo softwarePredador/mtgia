@@ -1,6 +1,6 @@
 # Battle Replay Gate Matrix
 
-Status: current as of `2026-06-23T07:32Z`.
+Status: current as of `2026-06-23T09:24Z`.
 
 This matrix defines the mandatory gates that must run before a battle replay is
 interpreted as final evidence. A green result in one auditor is not a global
@@ -3851,4 +3851,60 @@ Status:
 - Deck `6`: `pass=100`.
 - Deck `606`: `pass=81`; card-rule gate closed for this deck.
 - Global queue after PG088: `high=39`, `medium=4`, `pass=162`.
+- No deck swap, no `deck_cards` mutation, and no new battle rebaseline.
+
+## PG089/PG090 Deck 607 Removal Compensation Card-Rule Gate - 2026-06-23 09:24 UTC
+
+Replay relevance:
+
+- This is a focused card-rule/runtime gate, not a new 16-seed battle replay
+  baseline and not strategy-learning evidence.
+- The latest accepted deck `6` multi-seed replay baseline remains the PG078
+  `trusted_for_strategy_learning` artifact until a fresh multi-seed run is
+  intentionally generated.
+
+Artifacts:
+
+- PG089 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.out`.
+- PG089 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg089_l6_removal_compensation_sync_report_20260623_061026.json`.
+- PG089 focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg089_l6_removal_compensation_focused_events_20260623_062000.jsonl`.
+- PG090 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.out`.
+- PG090 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_sync_report_20260623_062000.json`.
+- Final card-rule audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg090_final_20260623_061026.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg090_final_20260623_061026.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg090_final_20260623_061026.json`.
+
+Gate:
+
+- PG089 closed `Generous Gift` and `Stroke of Midnight` by promoting
+  card-specific removal rules with raw Oracle hashes, target scopes, and
+  executable creature compensation token metadata.
+- The focused event artifact proves the two logical rules load from SQLite
+  cache after PostgreSQL sync and emit `compensation_tokens_created` for the
+  target controller: a 3/3 green Elephant for `Generous Gift` and a 1/1 white
+  Human for `Stroke of Midnight`.
+- PG090 restored 12 already-approved rule hash/scope payloads that the PG089
+  sync exposed as stale in PostgreSQL. This is provenance/cache repair, not new
+  card behavior.
+
+Validation:
+
+- Full runtime wrapper passed after PG090:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- The deck-card coherence auditor was rerun after PostgreSQL -> SQLite sync.
+
+Status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=21`, `medium=4`, `pass=69`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- Global queue after PG090: `high=37`, `medium=4`, `pass=164`.
 - No deck swap, no `deck_cards` mutation, and no new battle rebaseline.

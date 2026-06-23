@@ -11167,14 +11167,28 @@
     "battle_rule_logical_key": "battle_rule_v1:c55ef23c6aa9b267341ad09e7efa160d"
   },
   "Generous Gift": {
+    "battle_model_scope": "destroy_target_permanent_create_3_3_green_elephant_for_controller_v1",
+    "cmc": 3.0,
+    "compensation_token_status": "dynamic_creature_token_executor",
     "effect": "remove_permanent",
     "instant": true,
+    "oracle_runtime_scope": "destroy_target_permanent_runtime_create_3_3_green_elephant_for_controller_v1",
+    "target": "permanent",
+    "target_controller_creature_tokens": 1,
+    "target_controller_token_colors": [
+      "G"
+    ],
+    "target_controller_token_name": "Elephant",
+    "target_controller_token_power": 3,
+    "target_controller_token_subtype": "Elephant",
+    "target_controller_token_toughness": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0b547d7209a38ac2d23a1cca07917680"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:70fa2e668d7c5e40f055c04c01d25a6c",
+    "battle_rule_oracle_hash": "9363edd299df8476da36798bd527cde1"
   },
   "Generous Plunderer": {
     "cmc": 2.0,
@@ -27453,16 +27467,28 @@
     "battle_rule_logical_key": "battle_rule_v1:d47cbde8d1dc5678060e25ea1b620a82"
   },
   "Stroke of Midnight": {
+    "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
     "cmc": 3.0,
+    "compensation_token_status": "dynamic_creature_token_executor",
     "effect": "remove_permanent",
     "instant": true,
+    "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
     "target": "nonland_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9d5afecce0b2500c1dff74bcd97e6eb4"
+    "target_controller_creature_tokens": 1,
+    "target_controller_token_colors": [
+      "W"
+    ],
+    "target_controller_token_name": "Human",
+    "target_controller_token_power": 1,
+    "target_controller_token_subtype": "Human",
+    "target_controller_token_toughness": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9b50d2f897b561c8c390c9e0e04da417",
+    "battle_rule_oracle_hash": "a885e8190e19cf23b1f4c82563ca111b"
   },
   "Stubborn Denial": {
     "cmc": 1.0,

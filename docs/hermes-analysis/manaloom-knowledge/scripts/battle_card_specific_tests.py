@@ -7630,6 +7630,114 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller():
+        expected = {
+            "Generous Gift": (
+                "battle_rule_v1:70fa2e668d7c5e40f055c04c01d25a6c",
+                "9363edd299df8476da36798bd527cde1",
+                "destroy_target_permanent_create_3_3_green_elephant_for_controller_v1",
+                "permanent",
+                "Elephant",
+                3,
+            ),
+            "Stroke of Midnight": (
+                "battle_rule_v1:9b50d2f897b561c8c390c9e0e04da417",
+                "a885e8190e19cf23b1f4c82563ca111b",
+                "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+                "nonland_permanent",
+                "Human",
+                1,
+            ),
+        }
+        for name, (logical_key, oracle_hash, scope, target_type, token_name, token_power) in expected.items():
+            effect_data = battle.get_card_effect({"name": name, "type_line": "Instant", "cmc": 3})
+            assert effect_data["_rule_logical_key"] == logical_key
+            assert effect_data["_rule_oracle_hash"] == oracle_hash
+            assert effect_data["battle_model_scope"] == scope
+            assert effect_data["target"] == target_type
+            assert effect_data["target_controller_creature_tokens"] == 1
+            assert effect_data["target_controller_token_name"] == token_name
+            assert effect_data["target_controller_token_power"] == token_power
+
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            target = {
+                "name": "Threat Engine",
+                "cmc": 3,
+                "type_line": "Artifact",
+                "effect": "ramp_engine",
+            }
+            opponent.battlefield = [target]
+            spell = {"name": "Generous Gift", "type_line": "Instant", "cmc": 3}
+            generous_effect = battle.get_card_effect(spell)
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=5,
+                rng=random.Random(989),
+                effect_data_override=generous_effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target not in opponent.battlefield
+        token = next(card for card in opponent.battlefield if card.get("name") == "Elephant")
+        assert token["power"] == 3
+        assert token["toughness"] == 3
+        assert token["type_line"] == "Creature Token — Elephant"
+        assert token["colors"] == ["G"]
+        assert any(
+            event == "compensation_tokens_created"
+            and data.get("token") == "Elephant"
+            and data.get("target_controller_creature_tokens") == 1
+            and data.get("compensation_token_status") == "dynamic_creature_token_executor"
+            and data.get("rule_logical_key") == "battle_rule_v1:70fa2e668d7c5e40f055c04c01d25a6c"
+            and data.get("rule_oracle_hash") == "9363edd299df8476da36798bd527cde1"
+            for event, data in events
+        )
+
+    def test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache():
+        expected = {
+            "Generous Gift": (
+                "battle_rule_v1:70fa2e668d7c5e40f055c04c01d25a6c",
+                "9363edd299df8476da36798bd527cde1",
+                "destroy_target_permanent_create_3_3_green_elephant_for_controller_v1",
+                "permanent",
+                "Elephant",
+                3,
+                3,
+                ["G"],
+            ),
+            "Stroke of Midnight": (
+                "battle_rule_v1:9b50d2f897b561c8c390c9e0e04da417",
+                "a885e8190e19cf23b1f4c82563ca111b",
+                "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+                "nonland_permanent",
+                "Human",
+                1,
+                1,
+                ["W"],
+            ),
+        }
+        for name, (logical_key, oracle_hash, scope, target, token_name, power, toughness, colors) in expected.items():
+            effect_data = battle.get_card_effect({"name": name, "type_line": "Instant", "cmc": 3})
+            assert effect_data["_rule_logical_key"] == logical_key
+            assert effect_data["_rule_oracle_hash"] == oracle_hash
+            assert effect_data["battle_model_scope"] == scope
+            assert effect_data["target"] == target
+            assert effect_data["target_controller_creature_tokens"] == 1
+            assert effect_data["target_controller_token_name"] == token_name
+            assert effect_data["target_controller_token_power"] == power
+            assert effect_data["target_controller_token_toughness"] == toughness
+            assert effect_data["target_controller_token_colors"] == colors
+            assert effect_data["compensation_token_status"] == "dynamic_creature_token_executor"
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -7828,4 +7936,6 @@ def register_tests(battle, player):
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,
         test_pg087_skyclave_apparition_exiles_only_nontoken_mv_lte_four_with_rule_provenance,
+        test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller,
+        test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache,
     ]

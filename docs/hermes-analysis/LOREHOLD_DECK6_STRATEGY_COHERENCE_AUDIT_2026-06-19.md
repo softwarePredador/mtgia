@@ -21088,3 +21088,59 @@ Auditor decision:
   still not a deck-promotion or strategy-learning claim.
 - Continue closing candidate deck high queues and run a fresh multi-seed battle
   artifact before comparing or promoting variants.
+
+## PG089/PG090 Lorehold Candidate Card-Rule Reading - 2026-06-23 09:24 UTC
+
+What changed:
+
+- PG089 closed two deck `607` high removal-compensation findings:
+  `Generous Gift` and `Stroke of Midnight`.
+- Both cards now have PostgreSQL-source card-specific battle rules with raw
+  Oracle hashes, model scopes, target scopes, and executable compensation
+  token metadata.
+- Runtime support now creates creature compensation tokens for target
+  controller removal rules and preserves `compensation_tokens_created` replay
+  evidence with logical rule provenance.
+- PG090 restored 12 older hash/scope payloads exposed by the PG089
+  PostgreSQL-source sync. This was cache/provenance repair for already-approved
+  rules, not a deck or strategy change.
+
+Evidence:
+
+- PG089 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.out`.
+- PG089 rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_rollback_20260623_061026.sql`.
+- PG089 focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg089_l6_removal_compensation_focused_events_20260623_062000.jsonl`.
+- PG090 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.out`.
+- PG090 rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_rollback.sql`.
+- Final global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg090_final_20260623_061026.json`
+  reports `high=37`, `medium=4`, `pass=164`.
+
+Current candidate status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=21`, `medium=4`, `pass=69`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  new multi-seed battle baseline.
+- PG091 read-only start snapshot:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_start_sync_report_20260623_manual.json`
+  plus deck `6`/`606`/`607`/`608` PG091 start audits confirm the same counts
+  after the final PG090 sync and are the current next-cycle baseline.
+
+Next recommended card-rule queue:
+
+- Continue deck `607` high battle-critical cards before support/passive rows:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
+  `Furygale Flocking`, `High Noon`, `Insurrection`, `Prismari Pianist`,
+  `Promise of Loyalty`, `Starfall Invocation`, `Tempt with Bunnies`, and
+  `Winds of Abandon`.
+- Treat user card comments as audit hints only; Oracle text, PostgreSQL state,
+  and runtime evidence remain the decision sources.

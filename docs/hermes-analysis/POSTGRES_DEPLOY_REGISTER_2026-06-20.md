@@ -8113,6 +8113,124 @@ Test evidence:
 - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
   passed after PG088 sync.
 
+Next deploy number at that checkpoint:
+
+- At that checkpoint, PG089 was the next future PostgreSQL package.
+
+## PG089 Deck 607 L6 Removal Compensation Rules - Applied/Validated 2026-06-23 09:18-09:24 UTC
+
+Status: `applied_validated_with_duplicate_apply_attempt_recorded`.
+
+Scope:
+
+- Closed the deck `607` high L6 removal-compensation findings for
+  `Generous Gift` and `Stroke of Midnight`.
+- Added card-specific raw `oracle_hash`, target scope, and executable creature
+  token compensation metadata.
+- Added runtime support for removal compensation creature tokens and focused
+  regression tests.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_precheck_20260623_061026.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_apply_20260623_061026.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_rollback_20260623_061026.sql`
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_precheck_20260623_061026.out`
+  reported two expected target rules, two cards resolved, two raw Oracle hash
+  matches, two promotable rows, two shadows to disable, no key conflicts, and
+  no pre-existing backup table.
+- A duplicate apply attempt was made after the package had already been applied
+  by the active workspace process; it correctly stopped on the existing backup
+  guard. The evidence is retained at
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_duplicate_apply_attempt_20260623_061026.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_l6_removal_compensation_pg089_postcheck_20260623_061026.out`
+  reported `target_rule_rows=2`, `target_hash_match_rows=2`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=2`,
+  `target_expected_target_rows=2`,
+  `target_expected_compensation_rows=2`, `trusted_auto_rows=2`,
+  `rule_version_at_least_2_rows=2`, `non_disabled_shadow_rows=0`,
+  `disabled_shadow_rows=2`, and `backup_rows=4`.
+
+Sync/audit/runtime evidence:
+
+- PG089 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg089_l6_removal_compensation_sync_report_20260623_061026.json`
+  reported `pg_rows_loaded=1825`, `sqlite_inserted_or_updated=1803`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg089_l6_removal_compensation_focused_events_20260623_062000.jsonl`
+  proves both rules load from runtime metadata and create the expected Elephant
+  or Human token after removing the target.
+- Post-PG090 final audits after the drift restoration below:
+  deck `607` `high=21`, `medium=4`, `pass=69`; deck `608` `high=16`,
+  `medium=3`, `pass=49`; global `high=37`, `medium=4`, `pass=164`.
+
+Important follow-up:
+
+- PG089 sync exposed missing `oracle_hash` / effect-scope drift on older rules
+  still present in PostgreSQL. PG090 below restored those before the final
+  wrapper and canonical snapshot were accepted.
+
+## PG090 Rule Hash/Scope Restore After PG089 Sync - Applied 2026-06-23 09:24 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored PostgreSQL metadata for 12 already-approved rules whose missing
+  `oracle_hash` or effect-scope fields were exposed by the PG089 sync.
+- This package did not create new card behavior and did not change deck rows.
+
+Implementation note:
+
+- PG090 first ran a 9-row deck `6`/shared L2 hash restore phase, retained as
+  intermediate evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_restore_pg090_precheck_20260623_061026.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_restore_pg090_apply_20260623_061026.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_restore_pg090_postcheck_20260623_061026.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg090_deck6_l2_hash_restore_sync_report_20260623_061026.json`.
+- The final accepted PG090 restore is the 12-row package below. It supersedes
+  the narrower 9-row phase for current state and final audit counts.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_rollback.sql`
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_precheck.out`
+  reported `expected_target_rules=12`, `target_rule_rows=12`,
+  `raw_oracle_hash_match_rows=12`, `rows_needing_restore=5`,
+  `key_conflict_rows=0`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_apply.out`
+  reported backup creation with 12 rows, `UPDATE 12`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_postcheck.out`
+  reported `target_rule_rows=12`, `target_hash_match_rows=12`,
+  `target_missing_hash_rows=0`, `target_effect_patch_match_rows=12`,
+  `target_confidence_match_rows=12`, `rule_version_at_least_2_rows=12`, and
+  `backup_rows=12`.
+- PG090 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_sync_report_20260623_062000.json`
+  reported `pg_rows_loaded=1825`, `sqlite_inserted_or_updated=1803`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Full wrapper:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed with 380 PASS lines after PG090.
+
 Next deploy number:
 
-- PG089 is next for any future PostgreSQL package.
+- PG091 is next for any future PostgreSQL package.

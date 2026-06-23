@@ -5150,6 +5150,32 @@ def removal_annotation_replay_fields(effect_data):
             "map_token_activation_status",
             "annotation_only_explore_activation_not_autorun",
         )
+    creature_tokens = (
+        effect_data.get("target_controller_creature_tokens")
+        if effect_data.get("target_controller_creature_tokens") is not None
+        else effect_data.get("compensation_creature_tokens")
+    )
+    if creature_tokens is not None:
+        fields["target_controller_creature_tokens"] = numeric_stat(creature_tokens) or 0
+        fields["compensation_token_name"] = (
+            effect_data.get("target_controller_token_name")
+            or effect_data.get("compensation_token_name")
+            or "Token"
+        )
+        fields["compensation_token_power"] = numeric_stat(
+            effect_data.get("target_controller_token_power")
+            or effect_data.get("compensation_token_power")
+            or 1
+        ) or 1
+        fields["compensation_token_toughness"] = numeric_stat(
+            effect_data.get("target_controller_token_toughness")
+            or effect_data.get("compensation_token_toughness")
+            or fields["compensation_token_power"]
+        ) or fields["compensation_token_power"]
+        fields["compensation_token_status"] = effect_data.get(
+            "compensation_token_status",
+            "dynamic_creature_token_executor",
+        )
     return fields
 
 
@@ -5226,6 +5252,62 @@ def create_removal_compensation_tokens(effect_data, target_controller, source_ca
                 "map_token_status",
                 "annotation_only_explore_activation_not_autorun",
             ),
+            turn=turn,
+            **removal_annotation_replay_fields(effect_data),
+            **replay_rule_fields(effect_data),
+        )
+    creature_count = numeric_stat(
+        effect_data.get("target_controller_creature_tokens")
+        or effect_data.get("compensation_creature_tokens")
+        or 0
+    ) or 0
+    creature_created = []
+    if creature_count > 0:
+        token_name = (
+            effect_data.get("target_controller_token_name")
+            or effect_data.get("compensation_token_name")
+            or "Token"
+        )
+        token_subtype = (
+            effect_data.get("target_controller_token_subtype")
+            or effect_data.get("compensation_token_subtype")
+            or token_name
+        )
+        token_power = numeric_stat(
+            effect_data.get("target_controller_token_power")
+            or effect_data.get("compensation_token_power")
+            or 1
+        ) or 1
+        token_toughness = numeric_stat(
+            effect_data.get("target_controller_token_toughness")
+            or effect_data.get("compensation_token_toughness")
+            or token_power
+        ) or token_power
+        for _ in range(max(0, min(creature_count, 10))):
+            token = create_creature_token(
+                target_controller,
+                name=token_name,
+                power=token_power,
+                toughness=token_toughness,
+            )
+            if token_subtype:
+                token["type_line"] = f"Creature Token — {token_subtype}"
+                token["subtype"] = token_subtype
+            token_colors = (
+                effect_data.get("target_controller_token_colors")
+                or effect_data.get("compensation_token_colors")
+            )
+            if token_colors:
+                token["colors"] = token_colors
+            creature_created.append(token)
+            created.append(token)
+    if creature_created:
+        emit_replay_event(
+            "compensation_tokens_created",
+            player=getattr(target_controller, "name", None),
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+            token=creature_created[0].get("name", "Token"),
+            tokens_created=len(creature_created),
             turn=turn,
             **removal_annotation_replay_fields(effect_data),
             **replay_rule_fields(effect_data),
