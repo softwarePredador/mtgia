@@ -6625,6 +6625,81 @@ Numbering note:
 
 - The next PostgreSQL package must use PG072.
 
+## PG072 Deck 6 L6 Interaction/Removal/Counter - Applied 2026-06-23 05:04 UTC
+
+Scope:
+
+- Target cards: `Get Lost` and `Pyroblast`.
+- No deck swap and no `deck_cards` mutation was executed.
+- Backup table:
+  `manaloom_deploy_audit.pg072_deck6_l6_interaction_removal_counter_20260623_045642`.
+
+Artifacts:
+
+- Precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_precheck_20260623_045642.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_apply_20260623_045642.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_rollback_20260623_045642.sql`.
+- Outputs:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_precheck_20260623_045642.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_apply_20260623_045642.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.out`.
+
+Postcheck evidence:
+
+- Postcheck reported `target_rule_rows=4`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=4`.
+
+Rules confirmed:
+
+- `Get Lost`:
+  `battle_rule_v1:8e7da3df51386d58c857a596433f73ea`,
+  `oracle_hash=6b6517e1b5b60db5cf6bbcd991dbc1ec`,
+  `effect=remove_permanent`,
+  `battle_model_scope=destroy_creature_enchantment_planeswalker_create_two_map_tokens_v1`.
+- `Pyroblast`:
+  `battle_rule_v1:141ff57f44bc4c229393f05f7daf667c`,
+  `oracle_hash=ecf9ad1f393a664f16867aab8a6edf77`,
+  `effect=counter`,
+  `battle_model_scope=blue_spell_counter_runtime_destroy_blue_permanent_annotation_v1`.
+
+Accepted sync/audit:
+
+- Trusted SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_sync_report_20260623_045642.json`
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and exported
+  `canonical_snapshot_rows_exported=3201`.
+- Final snapshot resync after the oracle-normalizer fix:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_resync_report_20260623_050816.json`
+  exported `canonical_snapshot_rows_exported=3201` and kept `Get Lost` as
+  `effect=remove_permanent`, `target=creature_enchantment_or_planeswalker`.
+- Accepted auditors:
+  deck `6` `high=3`, `medium=8`, `pass=89`; deck `606` `high=7`,
+  `medium=30`, `pass=44`; global `high=53`, `medium=42`, `pass=110`.
+
+Runtime evidence:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg072_l6_interaction_removal_counter_focused_events_20260623_045642.jsonl`.
+- `Pyroblast` counters a blue stack spell and rejects a red stack spell target.
+- `Get Lost` removes an enchantment target and creates two Map tokens for the
+  target controller.
+
+Rollback:
+
+- `deck6_l6_interaction_removal_counter_pg072_rollback_20260623_045642.sql`
+  restores the four backed-up rows from
+  `manaloom_deploy_audit.pg072_deck6_l6_interaction_removal_counter_20260623_045642`.
+
+Numbering note:
+
+- The next PostgreSQL package must use PG073.
+
 ## PG070 Deck 6 L2 Hash Cleanup + Red Discard Runtime - Applied 2026-06-23 04:30 UTC
 
 Status:

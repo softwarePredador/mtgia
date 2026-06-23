@@ -11178,16 +11178,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Get Lost": {
+    "battle_model_scope": "destroy_creature_enchantment_planeswalker_create_two_map_tokens_v1",
     "cmc": 2.0,
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": true,
-    "target": "creature",
+    "map_token_activation_status": "annotation_only_explore_activation_not_autorun",
+    "map_tokens_created": 2,
+    "oracle_runtime_scope": "destroy_target_creature_enchantment_or_planeswalker_then_controller_creates_two_map_tokens_v1",
+    "target": "creature_enchantment_or_planeswalker",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
+    "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea",
+    "battle_rule_oracle_hash": "6b6517e1b5b60db5cf6bbcd991dbc1ec"
   },
   "Ghalta and Mavren": {
     "cmc": 7.0,
@@ -21432,15 +21437,24 @@
     "battle_rule_logical_key": "battle_rule_v1:071d9c92eecbefcd8762c29fdadf79cb"
   },
   "Pyroblast": {
+    "available_modes": [
+      "counter_target_blue_spell_runtime",
+      "destroy_target_blue_permanent_annotation_only"
+    ],
+    "battle_model_scope": "blue_spell_counter_runtime_destroy_blue_permanent_annotation_v1",
+    "destroy_blue_permanent_status": "annotation_only_no_proactive_blue_permanent_mode_executor",
     "effect": "counter",
     "instant": true,
-    "target": "blue_spell_or_permanent",
+    "oracle_runtime_scope": "choose_counter_blue_spell_runtime_destroy_blue_permanent_annotation_v1",
+    "requires_blue_target": true,
+    "target": "blue_spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
+    "battle_rule_logical_key": "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c",
+    "battle_rule_oracle_hash": "ecf9ad1f393a664f16867aab8a6edf77"
   },
   "Pyrokinesis": {
     "cmc": 6.0,

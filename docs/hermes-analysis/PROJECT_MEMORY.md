@@ -458,3 +458,43 @@ Atualizado em 2026-05-26:
   `medium=42`, `pass=108`.
 - O sync amplo gerado com regras em revisao foi descartado como gate aceito.
 - Proximo deploy deve usar PG072.
+
+## ManaLoom deck 6 PG072 L6 interaction/removal/counter - 2026-06-23
+
+- PG072 fechou `Get Lost` e `Pyroblast` como lote L6
+  interaction/removal/counter; `Chaos Warp` ficou fora por exigir shuffle,
+  reveal e top permanent como revisao unique.
+- `Get Lost` saiu de `remove_creature` para
+  `effect=remove_permanent`, `target=creature_enchantment_or_planeswalker`,
+  `oracle_hash=6b6517e1b5b60db5cf6bbcd991dbc1ec` e
+  `battle_model_scope=destroy_creature_enchantment_planeswalker_create_two_map_tokens_v1`.
+  A ativacao/explore dos Map tokens segue `annotation_only`.
+- `Pyroblast` passou a exigir alvo azul no runtime de counter:
+  `oracle_hash=ecf9ad1f393a664f16867aab8a6edf77` e
+  `battle_model_scope=blue_spell_counter_runtime_destroy_blue_permanent_annotation_v1`.
+  O modo de destruir permanente azul segue anotado ate existir selecao
+  proativa desse modo.
+- Evidencia PG:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_precheck_20260623_045642.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_apply_20260623_045642.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.out`
+  e rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_rollback_20260623_045642.sql`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg072_l6_interaction_removal_counter_focused_events_20260623_045642.jsonl`
+  prova `Pyroblast` counterando spell azul e rejeitando spell vermelha, e
+  `Get Lost` removendo enchantment e criando dois Map tokens com rule
+  key/hash.
+- Sync aceito PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_sync_report_20260623_045642.json`
+  usou `include_needs_review=false`, carregou `pg_rows_loaded=1825` e
+  escreveu `sqlite_inserted_or_updated=1802`.
+- Resync final apos corrigir a normalizacao oracle de `target creature,
+  enchantment, or planeswalker`:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_resync_report_20260623_050816.json`;
+  o snapshot canonico passou a manter `Get Lost` como
+  `effect=remove_permanent` e `target=creature_enchantment_or_planeswalker`.
+- Auditor aceito pos-PG072: deck `6` esta em `high=3`, `medium=8`,
+  `pass=89`; deck `606` permanece `high=7`, `medium=30`, `pass=44`;
+  global esta em `high=53`, `medium=42`, `pass=110`.
+- Proximo deploy deve usar PG073.

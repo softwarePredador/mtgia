@@ -3311,3 +3311,43 @@ Caveat:
 - `Ruby Medallion` cost reduction is annotation-only until a dynamic cost
   reducer executor exists; the current runtime proof is that it no longer
   behaves as a mana source.
+
+## PG072 Deck 6 L6 Interaction/Removal/Counter Gate - 2026-06-23 05:04 UTC
+
+Artifacts:
+
+- PG072 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.out`.
+- Trusted SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_sync_report_20260623_045642.json`.
+- Final snapshot resync after the oracle-normalizer fix:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_resync_report_20260623_050816.json`.
+- Current deck `6` audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg072_l6_interaction_removal_counter_20260623_045642.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg072_l6_interaction_removal_counter_focused_events_20260623_045642.jsonl`.
+
+Gate:
+
+- `Pyroblast` emits `spell_countered` with
+  `rule_logical_key=battle_rule_v1:141ff57f44bc4c229393f05f7daf667c`,
+  `rule_oracle_hash=ecf9ad1f393a664f16867aab8a6edf77`, allows a blue stack
+  spell target, and rejects a red stack spell target.
+- `Get Lost` emits `removal_resolved` with
+  `rule_logical_key=battle_rule_v1:8e7da3df51386d58c857a596433f73ea`,
+  `rule_oracle_hash=6b6517e1b5b60db5cf6bbcd991dbc1ec`,
+  `target_type=creature_enchantment_or_planeswalker`, then emits
+  `compensation_tokens_created` for two Map tokens.
+
+Status:
+
+- `Get Lost` and `Pyroblast` are closed for the current L6 interaction gate.
+- Deck `6` accepted cut reports `high=3`, `medium=8`, `pass=89`; global
+  accepted cut reports `high=53`, `medium=42`, `pass=110`.
+
+Caveat:
+
+- `Pyroblast` destroy-blue-permanent mode is annotation-only in PG072; the
+  proved executor path is countering blue spells on the stack.
+- `Get Lost` Map-token activation/explore is annotation-only; the proved
+  executor path is target destruction plus token creation.

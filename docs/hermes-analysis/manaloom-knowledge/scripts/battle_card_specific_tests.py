@@ -2981,6 +2981,143 @@ def register_tests(battle, player):
         assert not battle.is_mana_source_permanent(ruby_permanent)
         assert active.available_mana() == 0
 
+    def test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance():
+        active = player("Active")
+        blue_spell = {
+            "name": "Blue Threat",
+            "cmc": 4,
+            "type_line": "Sorcery",
+            "colors": ["U"],
+        }
+        red_spell = {
+            "name": "Red Threat",
+            "cmc": 4,
+            "type_line": "Sorcery",
+            "colors": ["R"],
+        }
+        pyroblast = {"name": "Pyroblast", "cmc": 1, "type_line": "Instant"}
+        active.hand = [pyroblast]
+        active.mana_pool.add("red", 1)
+        effect_data = battle.get_card_effect(pyroblast)
+
+        assert effect_data["effect"] == "counter"
+        assert effect_data["requires_blue_target"] is True
+        assert effect_data["battle_model_scope"] == "blue_spell_counter_runtime_destroy_blue_permanent_annotation_v1"
+        assert effect_data["_rule_logical_key"] == "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
+        assert effect_data["_rule_oracle_hash"] == "ecf9ad1f393a664f16867aab8a6edf77"
+        assert battle.counter_can_target(pyroblast, effect_data, blue_spell)
+        assert not battle.counter_can_target(pyroblast, effect_data, red_spell)
+
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            stack_item = battle.StackItem(
+                blue_spell,
+                active,
+                {"effect": "draw_cards"},
+            )
+            counter = active.use_counterspell(
+                turn=3,
+                target_card=blue_spell,
+                stack_item=stack_item,
+                stack_depth=1,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert counter and counter["name"] == "Pyroblast"
+        counter_event = next(data for event, data in events if event == "spell_countered")
+        assert counter_event["counter"] == "Pyroblast"
+        assert counter_event["target"] == "Blue Threat"
+        assert counter_event["rule_logical_key"] == "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
+        assert counter_event["rule_oracle_hash"] == "ecf9ad1f393a664f16867aab8a6edf77"
+
+    def test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            get_lost = {"name": "Get Lost", "cmc": 2, "type_line": "Instant"}
+            target = {
+                "name": "Opponent Enchantment",
+                "cmc": 3,
+                "type_line": "Enchantment",
+                "effect": "draw_engine",
+            }
+            artifact = {
+                "name": "Sol Ring",
+                "cmc": 1,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+            }
+            creature = {
+                "name": "Siege Rhino",
+                "cmc": 4,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 5,
+            }
+            planeswalker = {
+                "name": "Jace, the Mind Sculptor",
+                "cmc": 4,
+                "type_line": "Legendary Planeswalker - Jace",
+                "effect": "planeswalker",
+            }
+            opponent.battlefield = [artifact, target]
+            active.hand = [get_lost]
+            effect_data = battle.get_card_effect(get_lost)
+
+            assert effect_data["effect"] == "remove_permanent"
+            assert effect_data["target"] == "creature_enchantment_or_planeswalker"
+            assert effect_data["map_tokens_created"] == 2
+            assert effect_data["battle_model_scope"] == "destroy_creature_enchantment_planeswalker_create_two_map_tokens_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
+            assert effect_data["_rule_oracle_hash"] == "6b6517e1b5b60db5cf6bbcd991dbc1ec"
+            target_type = effect_data["target"]
+            assert battle.target_matches_type(creature, target_type)
+            assert battle.target_matches_type(target, target_type)
+            assert battle.target_matches_type(planeswalker, target_type)
+            assert not battle.target_matches_type(artifact, target_type)
+
+            active.hand.remove(get_lost)
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                get_lost,
+                3,
+                random.Random(7074),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Get Lost"
+        )
+        token_event = next(
+            data
+            for event, data in events
+            if event == "compensation_tokens_created" and data.get("source") == "Get Lost"
+        )
+        assert removal_event["target"] == "Opponent Enchantment"
+        assert removal_event["target_type"] == "creature_enchantment_or_planeswalker"
+        assert removal_event["target_controller_map_tokens"] == 2
+        assert removal_event["rule_logical_key"] == "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
+        assert removal_event["rule_oracle_hash"] == "6b6517e1b5b60db5cf6bbcd991dbc1ec"
+        assert token_event["tokens_created"] == 2
+        assert token_event["player"] == "Opponent"
+        assert token_event["target_controller_map_tokens"] == 2
+        assert token_event["rule_logical_key"] == "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
+        assert sum(1 for card in opponent.battlefield if card.get("map_token")) == 2
+        assert any(card.get("name") == "Sol Ring" for card in opponent.battlefield)
+        assert any(card.get("name") == "Opponent Enchantment" for card in opponent.graveyard)
+
     def test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -6058,6 +6195,8 @@ def register_tests(battle, player):
         test_pg070_gamble_tutors_then_randomly_discards_with_rule_provenance,
         test_pg071_lotus_petal_is_one_shot_fast_mana_with_rule_provenance,
         test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source,
+        test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
+        test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,

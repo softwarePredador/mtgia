@@ -2918,3 +2918,44 @@ Workflow note:
 - Use PG072 for the next PostgreSQL package.
 - Remaining trusted deck `6` high queue is `Chaos Warp`, `Esper Sentinel`,
   `Get Lost`, `Pyroblast`, and `Wheel of Misfortune`.
+
+## PG072 L6 Interaction/Removal/Counter - 2026-06-23 05:04 UTC
+
+Closed:
+
+- `Get Lost`: scoped as destroy target creature, enchantment, or planeswalker;
+  target controller creates two Map tokens. Map activation/explore remains
+  annotation-only.
+- `Pyroblast`: scoped counter runtime to blue spells only. Destroy-blue-
+  permanent mode remains annotation-only until proactive mode selection exists.
+
+Why this was a family batch:
+
+- Both cards are deck `6` L6 interaction cards with existing trusted rows that
+  were too broad and lacked current oracle hashes/model scopes.
+- `Chaos Warp` was not included because it requires a unique shuffle/reveal/top
+  permanent executor, not the shared removal/counter path.
+
+Evidence:
+
+- PG072 precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_precheck_20260623_045642.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_apply_20260623_045642.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_rollback_20260623_045642.sql`.
+- Trusted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_sync_report_20260623_045642.json`.
+- Final snapshot resync after the oracle-normalizer fix:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_resync_report_20260623_050816.json`.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg072_l6_interaction_removal_counter_focused_events_20260623_045642.jsonl`.
+- Accepted auditors:
+  deck `6` `high=3`, `medium=8`, `pass=89`; deck `606` `high=7`,
+  `medium=30`, `pass=44`; global `high=53`, `medium=42`, `pass=110`.
+
+Workflow note:
+
+- Use PG073 for the next PostgreSQL package.
+- Remaining trusted deck `6` high queue is `Chaos Warp`, `Esper Sentinel`, and
+  `Wheel of Misfortune`.

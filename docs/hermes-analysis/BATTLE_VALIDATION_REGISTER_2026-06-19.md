@@ -16459,3 +16459,82 @@ Next lane recommendation:
 - Use PG072 for the next PostgreSQL package.
 - Prefer the battle-critical lane first: `Chaos Warp`, `Get Lost`,
   `Pyroblast`, `Esper Sentinel`, and `Wheel of Misfortune`.
+
+## PG072 Deck 6 L6 Interaction/Removal/Counter - Applied 2026-06-23 05:04 UTC
+
+Status:
+
+- `applied_validated`.
+- Closed `Get Lost` and `Pyroblast` from the deck `6` high queue.
+- No deck swap and no `deck_cards` mutation was executed.
+
+PostgreSQL validation:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_precheck_20260623_045642.out`
+  reported `target_cards_with_expected_oracle_hash=2`,
+  `existing_rule_rows=4`, `target_specific_rule_rows=2`,
+  `old_active_shadow_rows=1`, `target_specific_defect_rows=2`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_apply_20260623_045642.out`
+  completed `SELECT 4`, `UPDATE 1`, `UPDATE 1`, `UPDATE 1`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.out`
+  reported `target_rule_rows=4`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=4`.
+
+Runtime gate:
+
+- `Get Lost` now resolves as `remove_permanent` for
+  `creature_enchantment_or_planeswalker` and creates two Map artifact tokens
+  for the target controller; Map activation/explore is annotation-only.
+- `Pyroblast` now requires a blue stack spell for the counter runtime; the
+  destroy-blue-permanent mode is annotation-only.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg072_l6_interaction_removal_counter_focused_events_20260623_045642.jsonl`.
+
+Auditor result:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_sync_report_20260623_045642.json`
+  used `include_needs_review=false`, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and exported
+  `canonical_snapshot_rows_exported=3201`.
+- Final resync after fixing the oracle-normalizer branch for `target creature,
+  enchantment, or planeswalker`:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_resync_report_20260623_050816.json`;
+  `known_cards_canonical_snapshot.json` now keeps `Get Lost` as
+  `remove_permanent` with `target=creature_enchantment_or_planeswalker`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg072_l6_interaction_removal_counter_20260623_045642.json`
+  reports `high=3`, `medium=8`, `pass=89`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg072_l6_interaction_removal_counter_20260623_045642.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg072_l6_interaction_removal_counter_20260623_045642.json`
+  reports `high=53`, `medium=42`, `pass=110`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the PG072 Pyroblast/Get Lost tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Remaining deck `6` high queue:
+
+- `Chaos Warp`, `Esper Sentinel`, and `Wheel of Misfortune`.
+
+Next lane recommendation:
+
+- Use PG073 for the next PostgreSQL package.
+- Prefer `Esper Sentinel` + the Runes/Magistrate medium support family only if
+  modeling static/triggered protection/silence together; otherwise take
+  `Wheel of Misfortune` as L4 card-flow and keep `Chaos Warp` as L8 unique.

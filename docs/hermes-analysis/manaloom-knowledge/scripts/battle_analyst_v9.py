@@ -1505,6 +1505,21 @@ def create_lander_token(player, name="Lander Token"):
     return token
 
 
+def create_map_token(player, name="Map Token"):
+    token = {
+        "name": name,
+        "cmc": 0,
+        "tag": "token",
+        "effect": "artifact_token",
+        "type_line": "Artifact Token — Map",
+        "artifact": True,
+        "map_token": True,
+        "tapped": False,
+    }
+    player.battlefield.append(token)
+    return token
+
+
 def finish_countered_spell(player, card):
     return _finish_countered_spell(player, card, move_to_exile_func=move_to_exile)
 
@@ -2644,6 +2659,13 @@ def normalize_effect_by_oracle(card, effect_data):
             normalized["effect"] = "remove_permanent"
             normalized["target"] = "nonland_permanent"
             return normalized
+        if re.search(
+            r"\b(destroy|exile)\s+target\s+creature,\s+enchantment,\s+or\s+planeswalker\b",
+            text,
+        ):
+            normalized["effect"] = "remove_permanent"
+            normalized["target"] = "creature_enchantment_or_planeswalker"
+            return normalized
         if "target creature" in text:
             normalized["effect"] = "remove_creature"
             normalized["target"] = "creature"
@@ -3484,6 +3506,12 @@ def first_present_value(mapping, keys):
 def counter_can_target(counter_card, counter_effect, target_card, stack_item=None):
     if not isinstance(target_card, dict):
         return True
+    if counter_effect.get("requires_blue_target") or str(counter_effect.get("target") or "").lower() in (
+        "blue_spell",
+        "blue_spell_or_permanent",
+    ):
+        if not card_is_blue(target_card):
+            return False
     target_value = card_mana_value(target_card)
     exact_value = first_present_value(
         counter_effect,
@@ -4848,6 +4876,17 @@ def target_matches_type(target, target_type):
         return is_artifact_permanent(target) or is_battlefield_creature(target)
     if target_type == "creature_or_enchantment":
         return is_battlefield_creature(target) or is_enchantment_permanent(target)
+    if target_type in ("planeswalker", "planeswalker_permanent"):
+        return "planeswalker" in str(target.get("type_line") or "").lower()
+    if target_type in (
+        "creature_enchantment_or_planeswalker",
+        "creature_or_enchantment_or_planeswalker",
+    ):
+        return (
+            is_battlefield_creature(target)
+            or is_enchantment_permanent(target)
+            or "planeswalker" in str(target.get("type_line") or "").lower()
+        )
     if target_type == "colored_permanent":
         return is_colored_permanent(target)
     if target_type in ("nonland", "nonland_permanent"):
@@ -4855,6 +4894,17 @@ def target_matches_type(target, target_type):
     if target_type in ("permanent", "any"):
         return True
     return True
+
+
+def card_is_blue(card):
+    colors = card.get("colors") or card.get("color_identity") or []
+    if isinstance(colors, str):
+        colors = read_json_list(colors) or [colors]
+    normalized = {_normalize_color_symbol(color) for color in colors}
+    if "blue" in normalized or "u" in normalized:
+        return True
+    mana_cost = str(card.get("mana_cost") or "").upper()
+    return "{U}" in mana_cost or "{U/" in mana_cost or "/U}" in mana_cost
 
 
 def is_legal_target(spell, target, controller, all_players=None, target_type=None, target_controller=None):
@@ -4947,6 +4997,19 @@ def removal_annotation_replay_fields(effect_data):
         fields["basic_land_compensation_status"] = effect_data.get(
             "basic_land_compensation_status"
         )
+    map_tokens = (
+        effect_data.get("target_controller_map_tokens")
+        if effect_data.get("target_controller_map_tokens") is not None
+        else effect_data.get("map_tokens_created")
+    )
+    if map_tokens is not None:
+        fields["target_controller_map_tokens"] = int(map_tokens or 0)
+        fields["map_token_status"] = effect_data.get(
+            "map_token_status"
+        ) or effect_data.get(
+            "map_token_activation_status",
+            "annotation_only_explore_activation_not_autorun",
+        )
     return fields
 
 
@@ -4994,6 +5057,40 @@ def removal_life_gain_replay_fields(effect_data, requested, gained):
         fields["life_gain_requested"] = int(requested or 0)
         fields["life_gained"] = int(gained or 0)
     return fields
+
+
+def create_removal_compensation_tokens(effect_data, target_controller, source_card, turn):
+    if not isinstance(effect_data, dict) or target_controller is None:
+        return []
+    try:
+        map_count = int(
+            effect_data.get("map_tokens_created")
+            or effect_data.get("target_controller_map_tokens")
+            or 0
+        )
+    except Exception:
+        map_count = 0
+    created = []
+    for _ in range(max(0, min(map_count, 10))):
+        created.append(create_map_token(target_controller))
+    if created:
+        emit_replay_event(
+            "compensation_tokens_created",
+            player=getattr(target_controller, "name", None),
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+            token="Map",
+            tokens_created=len(created),
+            map_token_activation_status=effect_data.get(
+                "map_token_activation_status"
+            ) or effect_data.get(
+                "map_token_status",
+                "annotation_only_explore_activation_not_autorun",
+            ),
+            turn=turn,
+            **removal_annotation_replay_fields(effect_data),
+            **replay_rule_fields(effect_data),
+        )
+    return created
 
 
 def declared_target_replay_entry(decision):
@@ -5157,6 +5254,7 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             reason="multi_target_removal",
             source=card,
         )
+        create_removal_compensation_tokens(effect_data, target_controller, card, turn)
         resolved.append(decision["target_name"])
 
     emit_replay_event(
@@ -5311,6 +5409,7 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
             reason="removal",
             source=card,
         )
+    create_removal_compensation_tokens(effect_data, target_controller, card, turn)
     return True
 
 
@@ -15845,6 +15944,7 @@ def apply_effect_immediate(
                         reason="removal",
                         source=card,
                     )
+                create_removal_compensation_tokens(effect_data, opp, card, turn)
                 break
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "deal_damage":

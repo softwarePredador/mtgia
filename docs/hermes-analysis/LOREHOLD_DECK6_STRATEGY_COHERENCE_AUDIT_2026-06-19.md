@@ -20429,3 +20429,48 @@ Current reading:
   `Chaos Warp`, `Esper Sentinel`, `Get Lost`, `Pyroblast`, and
   `Wheel of Misfortune`.
 - The next PG package must be PG072.
+
+## PG072 Deck 6 L6 Interaction/Removal/Counter - 2026-06-23 05:04 UTC
+
+What changed:
+
+- `Get Lost` now targets creature, enchantment, or planeswalker and creates
+  two Map tokens for the target controller:
+  `battle_rule_v1:8e7da3df51386d58c857a596433f73ea`,
+  `oracle_hash=6b6517e1b5b60db5cf6bbcd991dbc1ec`, and
+  `battle_model_scope=destroy_creature_enchantment_planeswalker_create_two_map_tokens_v1`.
+- `Pyroblast` now requires a blue stack spell for the counter runtime:
+  `battle_rule_v1:141ff57f44bc4c229393f05f7daf667c`,
+  `oracle_hash=ecf9ad1f393a664f16867aab8a6edf77`, and
+  `battle_model_scope=blue_spell_counter_runtime_destroy_blue_permanent_annotation_v1`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG072 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_precheck_20260623_045642.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_apply_20260623_045642.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l6_interaction_removal_counter_pg072_postcheck_20260623_045642.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_sync_report_20260623_045642.json`.
+- Final snapshot resync after the oracle-normalizer fix:
+  `docs/hermes-analysis/master_optimizer_reports/pg072_l6_interaction_removal_counter_resync_report_20260623_050816.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg072_l6_interaction_removal_counter_focused_events_20260623_045642.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg072_l6_interaction_removal_counter_20260623_045642.json`
+  reports `high=3`, `medium=8`, `pass=89`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg072_l6_interaction_removal_counter_20260623_045642.json`
+  reports `high=53`, `medium=42`, `pass=110`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG072 sync and runtime changes.
+
+Current reading:
+
+- `Get Lost` and `Pyroblast` are closed for this gate.
+- Remaining high queue:
+  `Chaos Warp`, `Esper Sentinel`, and `Wheel of Misfortune`.
+- The next PG package must be PG073.

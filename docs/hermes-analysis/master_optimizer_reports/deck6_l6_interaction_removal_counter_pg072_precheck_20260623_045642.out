@@ -1,0 +1,23 @@
+Pager usage is off.
+SELECT 2
+SELECT 4
+ target_cards_with_expected_oracle_hash | existing_rule_rows | target_specific_rule_rows | old_active_shadow_rows | target_specific_defect_rows | backup_table_already_exists
+----------------------------------------+--------------------+---------------------------+------------------------+-----------------------------+-----------------------------
+                                      2 |                  4 |                         2 |                      1 |                           2 | f
+(1 row)
+
+   name    | type_line | mana_cost | cmc |           oracle_hash            |                                                                                                        oracle_text
+-----------+-----------+-----------+-----+----------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Get Lost  | Instant   | {1}{W}    | 2.0 | 6b6517e1b5b60db5cf6bbcd991dbc1ec | Destroy target creature, enchantment, or planeswalker. Its controller creates two Map tokens. (They're artifacts with "{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.")
+ Pyroblast | Instant   | {R}       | 1.0 | ecf9ad1f393a664f16867aab8a6edf77 | Choose one —                                                                                                                                                                                                              +
+           |           |           |     |                                  | • Counter target spell if it's blue.                                                                                                                                                                                      +
+           |           |           |     |                                  | • Destroy target permanent if it's blue.
+(2 rows)
+
+   name    | normalized_name |                logical_rule_key                 |  source   | review_status | execution_status | confidence | rule_version | oracle_hash |                                 effect_json                                 |                                              deck_role_json
+-----------+-----------------+-------------------------------------------------+-----------+---------------+------------------+------------+--------------+-------------+-----------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------
+ Get Lost  | get lost        | battle_rule_v1:159798b7dc7618ba252a0476874a13bb | generated | deprecated    | disabled         |      0.550 |            1 |             | {"cmc": 2.0, "effect": "remove_creature", "instant": true}                  | {"effect": "remove_creature", "timing": "instant", "category": "removal"}
+ Get Lost  | get lost        | battle_rule_v1:8e7da3df51386d58c857a596433f73ea | curated   | verified      | auto             |      0.900 |            1 |             | {"cmc": 2.0, "effect": "remove_creature", "instant": true}                  | {"effect": "remove_creature", "timing": "instant", "category": "removal"}
+ Pyroblast | pyroblast       | battle_rule_v1:d47cbde8d1dc5678060e25ea1b620a82 | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 1.0, "effect": "counter", "instant": true}                          | {"effect": "counter", "timing": "instant", "category": "protection"}
+ Pyroblast | pyroblast       | battle_rule_v1:141ff57f44bc4c229393f05f7daf667c | curated   | verified      | auto             |      1.000 |            1 |             | {"effect": "counter", "target": "blue_spell_or_permanent", "instant": true} | {"effect": "counter", "target": "blue_spell_or_permanent", "timing": "instant", "category": "protection"}
+(4 rows)
