@@ -3,11 +3,12 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule package in this thread is
-PG095, applied, postchecked, synced from PostgreSQL to Hermes SQLite/canonical
-snapshot, tested, and documented on 2026-06-23 11:02 UTC. PG095 promoted
-`Winds of Abandon` to an Oracle-specific executable single-target exile rule
-with basic-land search and overload explicitly annotation-only; it was not a
-deck swap, learned-deck promotion, or battle rebaseline.
+PG096A/PG096B, applied, postchecked, synced from PostgreSQL to Hermes
+SQLite/canonical snapshot, tested, and documented on 2026-06-23 11:26 UTC.
+PG096A promoted `High Noon` from false removal to an Oracle-specific passive
+rule, and PG096B restored hash/effect/status provenance for 12 already-approved
+deck 6/606 rules. These were not deck swaps, learned-deck promotions, or battle
+rebaselines.
 
 ## Purpose
 
@@ -8639,4 +8640,138 @@ Tests:
 
 Next deploy number:
 
-- PG096 is next for any future PostgreSQL package.
+- PG097 is next for any future PostgreSQL package.
+
+## PG096A Deck 607 High Noon Rule - Applied 2026-06-23 11:18 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Promoted `High Noon` from false `remove_creature` behavior to one
+  Oracle-specific `passive` rule.
+- The one-spell-per-turn static ability and `{4}{R}, Sacrifice High Noon: It
+  deals 5 damage to any target` activated ability are recorded as
+  `annotation_only` until static spell-limit and activation executors exist.
+- Two false removal rows were deprecated/disabled.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_precheck_20260623_111818.sql`
+- `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_apply_20260623_111818.sql`
+- `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_postcheck_20260623_111818.sql`
+- `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_rollback_20260623_111818.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg096_high_noon_battle_rule_20260623_111818`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_precheck_20260623_111818.out`
+  reported `card_rows=2`, `expected_oracle_hash_rows=2`,
+  `exact_pg096_rule_rows=0`, `trusted_executable_false_removal_rows=1`,
+  `all_false_removal_rows=2`, and
+  `trusted_executable_without_oracle_hash_rows=1`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_apply_20260623_111818.out`
+  reported backup `SELECT 2`, `INSERT 0 1`, `UPDATE 2`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_postcheck_20260623_111818.out`
+  reported `exact_pg096_rule_rows=1`,
+  `trusted_executable_false_removal_rows=0`,
+  `trusted_executable_without_oracle_hash_rows=0`, and
+  `deprecated_false_removal_rows=2`.
+
+Rule key:
+
+- `High Noon`: `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1`,
+  raw Oracle hash `dfec584c3cfdf4eb34b8a1e1d4f7da3a`, scope
+  `high_noon_one_spell_per_turn_static_activated_five_damage_annotation_v1`.
+
+## PG096B Deck 6/606 Hash/Scope Restore - Applied 2026-06-23 11:19 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored PostgreSQL hash/effect/status provenance for 12 already-approved
+  rules after a fresh PG -> SQLite audit exposed drift in deck `6` and deck
+  `606`.
+- Target cards:
+  `Angel's Grace`, `Fellwar Stone`, `Library of Leng`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- No new behavior was invented; this restored the versioned PG094
+  Oracle-matched canonical metadata.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_precheck_20260623_111958.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_apply_20260623_111958.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_postcheck_20260623_111958.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_rollback_20260623_111958.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg096_hash_scope_restore_deck6_606_20260623_111958`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_precheck_20260623_111958.out`
+  reported `expected_target_rows=12`, `resolved_rule_rows=12`,
+  `raw_hash_match_rows=12`, `rows_needing_hash_restore=12`,
+  `rows_needing_effect_restore=3`,
+  `rows_needing_status_restore=1`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_apply_20260623_111958.out`
+  reported backup `SELECT 12`, `updated_rows=12`, `restored_rows=12`, and
+  `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_postcheck_20260623_111958.out`
+  reported `target_rule_rows=12`, `hash_restored_rows=12`,
+  `effect_json_restored_rows=12`, `status_restored_rows=12`, and
+  `backup_rows=12`.
+
+Sync/audit/runtime evidence:
+
+- Final PG -> SQLite/canonical sync after both PG096A and PG096B:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_runtime_sync_report_20260623_112650.json`
+  reported `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_pg096_focused_events_20260623_112650.jsonl`
+  prove SQLite/runtime selection for `High Noon`, including `spell_resolved`
+  to battlefield with zero
+  `removal_resolved` events.
+  `docs/hermes-analysis/master_optimizer_reports/pg096_combined_focused_events_20260623_112546.jsonl`
+  also proves SQLite/runtime-selected logical keys and hashes for the 12
+  restored deck `6`/`606` rules.
+- Post-PG096 combined audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg096_high_noon_runtime_post_20260623_112650.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg096_high_noon_runtime_post_20260623_112650.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg096_high_noon_runtime_post_20260623_112650.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg096_high_noon_runtime_post_20260623_112650.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg096_high_noon_runtime_post_20260623_112650.json`.
+  Results: deck `6` `pass=100`; deck `606` `pass=81`; deck `607`
+  `high=15`, `medium=4`, `pass=75`; deck `608` `high=14`, `medium=3`,
+  `pass=51`; global `high=29`, `medium=4`, `pass=172`.
+
+Tests:
+
+- `python3 -m py_compile ...`:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_py_compile_20260623_112650.out`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_deck_card_battle_rule_coherence_audit_20260623_112650.out`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_battle_analyst_v10_3_20260623_112650.out`.
+
+Next deploy number:
+
+- PG097 is next for any future PostgreSQL package.

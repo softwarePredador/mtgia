@@ -3861,6 +3861,22 @@ Scope guard:
 - No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
   swap, code edit, battle-engine edit, commit, or push was performed.
 
+## 2026-06-23 11:26 UTC - PG096A/PG096B Card-Rule Gate Reading
+
+- PG096A corrected `High Noon` for deck `607`: false `remove_creature` behavior
+  was replaced by `effect=passive` with rule
+  `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1` and Oracle hash
+  `dfec584c3cfdf4eb34b8a1e1d4f7da3a`.
+- PG096B restored hash/effect/status provenance for 12 already-approved deck
+  `6`/`606` rules after stricter audit exposed PostgreSQL metadata drift.
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_runtime_sync_report_20260623_112650.json`.
+- Final card-rule audits: deck `6` `pass=100`, deck `606` `pass=81`, deck
+  `607` `high=15`, `medium=4`, `pass=75`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, global `high=29`, `medium=4`, `pass=172`.
+- No deck mutation, learned-deck promotion, battle rebaseline, or deck swap was
+  performed.
+
 ## PG095 Winds of Abandon Reading - 2026-06-23 11:02 UTC
 
 What changed:

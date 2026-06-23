@@ -1113,7 +1113,21 @@ Next package number is PG086. Next queue should prioritize remaining deck
   Basic-land search/tapped placement and overload rewrite remain
   `annotation_only`. Final runtime sync used `include_needs_review=false`;
   deck `607` moved to `high=16`, `medium=4`, `pass=74`, and global moved to
-  `high=30`, `medium=4`, `pass=171`. PG096 is next.
+  `high=30`, `medium=4`, `pass=171`.
+- PG096A corrected `High Noon` in deck `607`: the previous trusted runtime row
+  falsely modeled it as `remove_creature`. The new curated rule is
+  `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1`, raw Oracle hash
+  `dfec584c3cfdf4eb34b8a1e1d4f7da3a`, `effect=passive`, and scope
+  `high_noon_one_spell_per_turn_static_activated_five_damage_annotation_v1`.
+  Static one-spell-per-turn and activated five-damage modes are
+  `annotation_only`; runtime proof
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_pg096_focused_events_20260623_112650.jsonl`
+  show `High Noon` resolving to battlefield with zero removal events.
+  PG096B restored hash/effect/status metadata for 12 already-approved deck
+  `6`/`606` rules. Final PG -> SQLite sync used `include_needs_review=false`;
+  post-PG096 state: deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
+  `high=15`, `medium=4`, `pass=75`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, and global `high=29`, `medium=4`, `pass=172`. PG097 is next.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

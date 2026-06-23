@@ -705,6 +705,71 @@ def register_tests(battle, player):
         assert removal_event["target_controller_basic_land_tapped"] is True
         assert removal_event["basic_land_compensation_status"] == "annotation_only"
 
+    def test_pg096_high_noon_is_passive_static_rule_not_creature_removal():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            high_noon = {
+                "name": "High Noon",
+                "cmc": 2,
+                "mana_cost": "{1}{W}",
+                "type_line": "Enchantment",
+            }
+            high_noon_effect = battle.get_card_effect(high_noon)
+            assert high_noon_effect["effect"] == "passive"
+            assert high_noon_effect["ability_kind"] == "static"
+            assert high_noon_effect["static_spell_limit_per_turn"] == 1
+            assert high_noon_effect["spell_limit_scope"] == "each_player"
+            assert high_noon_effect["spell_limit_status"] == (
+                "annotation_only_no_static_spell_limit_executor"
+            )
+            assert high_noon_effect["activated_damage_amount"] == 5
+            assert high_noon_effect["activated_damage_target"] == "any"
+            assert high_noon_effect["activated_damage_status"] == (
+                "annotation_only_no_activation_executor"
+            )
+            assert high_noon_effect["sacrifice_self_activation_status"] == "annotation_only"
+            assert high_noon_effect["battle_model_scope"] == (
+                "high_noon_one_spell_per_turn_static_activated_five_damage_annotation_v1"
+            )
+            assert high_noon_effect["_rule_logical_key"] == (
+                "battle_rule_v1:fca6c4be65cae378901514ff6c8417d1"
+            )
+            assert high_noon_effect["_rule_oracle_hash"] == "dfec584c3cfdf4eb34b8a1e1d4f7da3a"
+
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            opposing_creature = {
+                "name": "Adversary",
+                "cmc": 3,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+            }
+            opponent.battlefield = [opposing_creature]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                high_noon,
+                turn=4,
+                rng=random.Random(960),
+                effect_data_override=high_noon_effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opposing_creature in opponent.battlefield
+        assert opposing_creature not in opponent.graveyard
+        assert opposing_creature not in opponent.exile
+        assert any(card.get("name") == "High Noon" for card in active.battlefield)
+        assert not any(
+            event == "removal_resolved" and data.get("card") == "High Noon"
+            for event, data in events
+        )
+
     def test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -8397,6 +8462,7 @@ def register_tests(battle, player):
         test_path_to_exile_exiles_creature_with_pg037_rule_provenance,
         test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance,
         test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance,
+        test_pg096_high_noon_is_passive_static_rule_not_creature_removal,
         test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,

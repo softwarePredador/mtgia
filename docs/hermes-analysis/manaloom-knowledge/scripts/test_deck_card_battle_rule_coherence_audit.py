@@ -286,6 +286,56 @@ class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
         self.assertEqual(by_name["Missing Rule Spell"]["severity"], "high")
         self.assertEqual(by_name["Plains"]["severity"], "medium")
 
+    def test_scoped_trusted_rules_require_oracle_hash(self) -> None:
+        cases = [
+            (
+                None,
+                {"medium": 2},
+                {
+                    "Silence": "trusted_rule_without_oracle_hash",
+                    "Mana Vault": "trusted_rule_without_oracle_hash",
+                },
+            ),
+            ("oracle-hash", {"pass": 2}, {}),
+        ]
+        for oracle_hash, expected_counts, expected_findings in cases:
+            with self.subTest(oracle_hash=oracle_hash):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    db = Path(tmpdir) / "knowledge.db"
+                    with sqlite3.connect(db) as conn:
+                        conn.row_factory = sqlite3.Row
+                        create_schema(conn)
+                        insert_deck_card(conn, "Silence")
+                        insert_rule(
+                            conn,
+                            "Silence",
+                            {
+                                "effect": "silence_spell",
+                                "battle_model_scope": "silence_until_eot_v1",
+                            },
+                            oracle_hash=oracle_hash,
+                        )
+                        insert_deck_card(conn, "Mana Vault", type_line="Artifact")
+                        insert_rule(
+                            conn,
+                            "Mana Vault",
+                            {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "fast_mana_artifact_partial_v1",
+                                "mana_produced": 3,
+                            },
+                            oracle_hash=oracle_hash,
+                        )
+                        report = audit.build_report(conn)
+
+                self.assertEqual(report["severity_counts"], expected_counts)
+                by_name = {card["card_name"]: card for card in report["cards"]}
+                for card_name, expected_code in expected_findings.items():
+                    self.assertIn(
+                        expected_code,
+                        {finding["code"] for finding in by_name[card_name]["findings"]},
+                    )
+
     def test_build_report_filters_by_deck_id(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             db = Path(tmpdir) / "knowledge.db"

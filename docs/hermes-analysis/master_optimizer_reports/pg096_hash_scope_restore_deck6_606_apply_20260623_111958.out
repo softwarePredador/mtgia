@@ -1,0 +1,16 @@
+BEGIN
+psql:docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_apply_20260623_111958.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+DO
+SELECT 12
+ updated_rows
+--------------
+           12
+(1 row)
+
+ restored_rows
+---------------
+            12
+(1 row)
+
+COMMIT

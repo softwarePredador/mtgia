@@ -17412,6 +17412,55 @@ Status: `applied_validated_after_pg090_restore`.
   `high=37`, `medium=4`, `pass=164`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
 
+## PG096 Combined High Noon + Deck 6/606 Hash/Scope Restore - 2026-06-23 11:25 UTC
+
+Status: `applied_validated`.
+
+- This checkpoint combines two PostgreSQL card-rule/cache gates that were
+  synchronized and validated together after the final PG -> SQLite refresh.
+- PG096A `High Noon` closed one deck `607` battle-critical high finding by
+  replacing false `remove_creature` behavior with a passive Oracle-specific
+  rule. Static one-spell-per-turn and activated five-damage modes remain
+  `annotation_only`.
+- PG096B restored hash/effect/status metadata for 12 already-approved rules
+  shared by deck `6` and deck `606`: `Angel's Grace`, `Fellwar Stone`,
+  `Library of Leng`, `Mana Vault`, `Mox Amber`, `Scroll Rack`,
+  `Seething Song`, `Silence`, `Talisman of Conviction`,
+  `Unexpected Windfall`, `Valakut Awakening // Valakut Stoneforge`, and
+  `Wayfarer's Bauble`.
+- PostgreSQL postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_postcheck_20260623_111818.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_postcheck_20260623_111958.out`.
+- Rollbacks:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_rollback_20260623_111818.sql`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_rollback_20260623_111958.sql`.
+- Final PG -> SQLite sync after both PG096A and PG096B:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_runtime_sync_report_20260623_112650.json`
+  with `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_pg096_focused_events_20260623_112650.jsonl`
+  proves `High Noon` resolves to battlefield as `passive` with rule
+  `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1`, Oracle hash
+  `dfec584c3cfdf4eb34b8a1e1d4f7da3a`, and zero `removal_resolved` events.
+  `docs/hermes-analysis/master_optimizer_reports/pg096_combined_focused_events_20260623_112546.jsonl`
+  additionally proves SQLite/runtime-selected logical keys and hashes for the
+  12 restored deck `6`/`606` rules.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_py_compile_20260623_112650.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_deck_card_battle_rule_coherence_audit_20260623_112650.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_battle_analyst_v10_3_20260623_112650.out`.
+- Post-PG096 combined card-rule queue: deck `6` `pass=100`; deck `606`
+  `pass=81`; deck `607` `high=15`, `medium=4`, `pass=75`; global `high=29`,
+  `medium=4`, `pass=172`.
+- This is a focused card-rule/runtime gate, not a new 16-seed battle replay
+  baseline and not strategy-learning evidence. No deck swap, no `deck_cards`
+  mutation, and no learned-deck promotion occurred.
+
 ## PG091 Runtime Prework - Deck 607 Token Maker Family - 2026-06-23 09:44 UTC
 
 Status: `applied_validated`.

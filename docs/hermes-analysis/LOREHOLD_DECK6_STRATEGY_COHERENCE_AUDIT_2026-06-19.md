@@ -21453,3 +21453,56 @@ Next queue:
 - PG096 should continue deck `607` battle-critical high cards.
 - Do not treat observations about any card as law; use them as prompts to
   verify Oracle, PostgreSQL rule state, runtime behavior, and replay evidence.
+
+## PG096A/PG096B Combined Gate - 2026-06-23 11:25 UTC
+
+Status: `applied_validated`.
+
+Deck 6/606 priority result:
+
+- A fresh PG -> SQLite sync initially exposed deck `6` `medium=9` and deck
+  `606` `medium=5`, all from `trusted_rule_without_oracle_hash` on previously
+  approved rules.
+- PG096B restored the PostgreSQL hash/effect/status provenance for the 12
+  shared approved rules and resynced Hermes SQLite from PostgreSQL.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg096_high_noon_runtime_post_20260623_112650.json`
+  reports `pass=100`.
+- Final deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg096_high_noon_runtime_post_20260623_112650.json`
+  reports `pass=81`.
+- No deck `6` strategy swap, no `deck_cards` mutation, and no learned-deck
+  promotion occurred.
+
+Deck 607 side effect:
+
+- PG096A also closed `High Noon` in deck `607`: the old false
+  `remove_creature` model was replaced by passive/static annotation-only
+  behavior with rule key
+  `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1`.
+- Final deck `607` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg096_high_noon_runtime_post_20260623_112650.json`
+  reports `high=15`, `medium=4`, `pass=75`.
+- Global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg096_high_noon_runtime_post_20260623_112650.json`
+  reports `high=29`, `medium=4`, `pass=172`.
+
+Validation evidence:
+
+- Combined sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_runtime_sync_report_20260623_112650.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_pg096_focused_events_20260623_112650.jsonl`.
+  `docs/hermes-analysis/master_optimizer_reports/pg096_combined_focused_events_20260623_112546.jsonl`.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_py_compile_20260623_112650.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_deck_card_battle_rule_coherence_audit_20260623_112650.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_battle_analyst_v10_3_20260623_112650.out`.
+
+Remaining queue:
+
+- Next package should be PG097 and should continue deck `607`
+  battle-critical high cards: `Avatar's Wrath`, `Call Forth the Tempest`,
+  `Creative Technique`, `Dawn's Truce`, `Everything Comes to Dust`,
+  `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.

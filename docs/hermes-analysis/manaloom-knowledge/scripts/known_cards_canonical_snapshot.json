@@ -13395,15 +13395,26 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "High Noon": {
-    "cmc": 2.0,
-    "effect": "remove_creature",
-    "instant": true,
+    "ability_kind": "static",
+    "activated_cost": "{4}{R}, Sacrifice this enchantment",
+    "activated_damage_amount": 5,
+    "activated_damage_status": "annotation_only_no_activation_executor",
+    "activated_damage_target": "any",
+    "battle_model_scope": "high_noon_one_spell_per_turn_static_activated_five_damage_annotation_v1",
+    "cmc": 2,
+    "effect": "passive",
+    "oracle_runtime_scope": "one_spell_per_turn_static_runtime_annotation_activated_five_damage_annotation",
+    "sacrifice_self_activation_status": "annotation_only",
+    "spell_limit_scope": "each_player",
+    "spell_limit_status": "annotation_only_no_static_spell_limit_executor",
+    "static_spell_limit_per_turn": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:159798b7dc7618ba252a0476874a13bb"
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fca6c4be65cae378901514ff6c8417d1",
+    "battle_rule_oracle_hash": "dfec584c3cfdf4eb34b8a1e1d4f7da3a"
   },
   "High Tide": {
     "cmc": 1.0,

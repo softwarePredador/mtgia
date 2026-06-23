@@ -4240,3 +4240,59 @@ Remaining queue:
   support/passive rows.
 - `Avatar's Wrath`, `Call Forth the Tempest`, and `High Noon` are likely
   executor/model work, not hash-only cleanup.
+
+## PG096A/PG096B High Noon + Deck 6/606 Hash Restore - 2026-06-23 11:26 UTC
+
+Status: `applied_validated`.
+
+What changed:
+
+- PG096A closed the deck `607` high finding for `High Noon`.
+- Previous trusted behavior was false `remove_creature` with no Oracle hash.
+- New trusted rule is:
+  `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1`.
+- Raw Oracle hash:
+  `dfec584c3cfdf4eb34b8a1e1d4f7da3a`.
+- Battle model scope:
+  `high_noon_one_spell_per_turn_static_activated_five_damage_annotation_v1`.
+- Runtime models the enchantment as `passive`. The one-spell-per-turn static
+  ability and activated five-damage sacrifice mode are intentionally
+  `annotation_only` until dedicated executors exist.
+- PG096B restored hash/effect/status provenance for 12 already-approved deck
+  `6`/`606` rules after drift was detected by the stricter oracle-hash audit.
+
+Evidence:
+
+- High Noon postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_postcheck_20260623_111818.out`.
+- Hash/scope restore postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_postcheck_20260623_111958.out`.
+- Final PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_runtime_sync_report_20260623_112650.json`.
+- Focused runtime event proof:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_pg096_focused_events_20260623_112650.jsonl`.
+  `docs/hermes-analysis/master_optimizer_reports/pg096_combined_focused_events_20260623_112546.jsonl`
+  also proves runtime-selected logical keys and hashes for the 12 restored deck
+  `6`/`606` rules.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_py_compile_20260623_112650.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_deck_card_battle_rule_coherence_audit_20260623_112650.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_test_battle_analyst_v10_3_20260623_112650.out`.
+
+Post-PG096 auditor result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=15`, `medium=4`, `pass=75`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=29`, `medium=4`, `pass=172`.
+
+Remaining queue:
+
+- PG097 should continue deck `607` battle-critical high cards.
+- `Call Forth the Tempest` is still a generic `damage_wipe` without
+  Oracle-specific scope/hash.
+- `Avatar's Wrath`, `Dawn's Truce`, `Everything Comes to Dust`,
+  `Promise of Loyalty`, and `Starfall Invocation` still need card-specific
+  battle models or explicit annotation boundaries before they can leave high.

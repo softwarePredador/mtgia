@@ -1,0 +1,4 @@
+ card_rows | expected_oracle_hash_rows | exact_pg096_rule_rows | trusted_executable_false_removal_rows | all_false_removal_rows | trusted_executable_without_oracle_hash_rows
+-----------+---------------------------+-----------------------+---------------------------------------+------------------------+---------------------------------------------
+         2 |                         2 |                     0 |                                     1 |                      2 |                                           1
+(1 row)

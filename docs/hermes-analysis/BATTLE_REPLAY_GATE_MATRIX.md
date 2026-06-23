@@ -4183,3 +4183,50 @@ Decision:
 - Next replay/battle work should continue from the live `event_contract_static`
   review state or from a deliberate fresh multi-seed run after the next card
   rule batch, not from PG095 alone.
+
+## PG096A/PG096B Gate Reading - 2026-06-23 11:26 UTC
+
+Scope:
+
+- PG096A/PG096B are PostgreSQL card-rule/cache gates, not replay gate
+  promotions and not deck deploys.
+- PG096A corrected `High Noon`, replacing false `remove_creature` runtime
+  behavior with an Oracle-specific passive rule.
+- PG096B restored hash/effect/status provenance for 12 previously-approved
+  deck `6`/`606` rows.
+- `High Noon` spell-limit and activated damage text remain annotation-only;
+  no full static-rule executor was claimed.
+
+Evidence:
+
+- High Noon PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_battle_rule_pg096_postcheck_20260623_111818.out`.
+- Deck 6/606 hash restore postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_hash_scope_restore_deck6_606_postcheck_20260623_111958.out`.
+- Final PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg096_high_noon_runtime_sync_report_20260623_112650.json`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/high_noon_pg096_focused_events_20260623_112650.jsonl`
+  records `High Noon` resolving to battlefield as `passive` with rule
+  `battle_rule_v1:fca6c4be65cae378901514ff6c8417d1`, Oracle hash
+  `dfec584c3cfdf4eb34b8a1e1d4f7da3a`, and no `removal_resolved` event.
+  `docs/hermes-analysis/master_optimizer_reports/pg096_combined_focused_events_20260623_112546.jsonl`
+  records runtime-selected logical keys and hashes for the 12 restored
+  deck `6`/`606` rules.
+
+Latest recurring battle remains separate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`.
+- `timestamp_utc=2026-06-23T09:47:49Z`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Decision:
+
+- PG096A/PG096B are accepted as card-rule/source-of-truth corrections.
+- They reduce deck `607` to `high=15`, `medium=4`, `pass=75` and global to
+  `high=29`, `medium=4`, `pass=172`.
+- They preserve deck `6` `pass=100` and deck `606` `pass=81`.
+- They do not change the latest recurring battle status.
+- They do not authorize a deck swap or learned-deck promotion.
