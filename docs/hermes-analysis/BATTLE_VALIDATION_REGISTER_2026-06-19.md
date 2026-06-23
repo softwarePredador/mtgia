@@ -16906,6 +16906,10 @@ Sync/auditor evidence:
 - `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
   refreshed SQLite from PostgreSQL with `pg_rows_loaded=1824`,
   `sqlite_inserted_or_updated=1802`, and `canonical_snapshot_rows_exported=3201`.
+- Focused runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg078_l2_hash_scope_restore_focused_events_20260623_063535.jsonl`
+  contains 17 records proving selected restored rule key/hash provenance in
+  replay events for six representative cards.
 - Deck `6` remained closed:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`
   reports `high=0`, `medium=0`, `pass=100`.
@@ -16915,6 +16919,10 @@ Sync/auditor evidence:
 - Global queue after sync:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg078_l2_hash_scope_restore_20260623_063535.json`
   with `high=50`, `medium=12`, `pass=143`.
+- Test added and passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  includes
+  `test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite`.
 
 Battle status:
 

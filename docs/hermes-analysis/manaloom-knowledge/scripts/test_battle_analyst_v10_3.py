@@ -238,6 +238,75 @@ def test_promoted_hotfixes_resolve_from_sqlite_without_manual_override():
         case.tearDown()
 
 
+def test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite():
+    expected = {
+        "Borrowed Knowledge": (
+            "draw_cards",
+            "modal_discard_hand_draw_equal_discarded_hand_v1",
+            "battle_rule_v1:ab8c8e79988c1b44ccf6f4cd8324aa78",
+            "8027b5b33d6dda44ff12265baabb8407",
+        ),
+        "Increasing Vengeance": (
+            "copy_spell",
+            "instant_copy_spell_requires_stack_target_v1",
+            "battle_rule_v1:30ea39d59aa1ffc3158a49675b767c30",
+            "112a3720da30692b859f8a9bedc90a2f",
+        ),
+        "Reckless Endeavor": (
+            "damage_wipe_treasure",
+            "d12_damage_wipe_treasure_average_v1",
+            "battle_rule_v1:58cf44e1552692ff62aeaf4ae3c7eaee",
+            "a9360407a1ca872b72f52acfed795194",
+        ),
+        "Wear // Tear": (
+            "remove_permanent",
+            "split_artifact_or_enchantment_removal_v1",
+            "battle_rule_v1:a89224366575c83b24415529fe686a0e",
+            "bccbbc9c0ebfc638e73f0ee82a7d72d3",
+        ),
+        "Thought Vessel": (
+            "ramp_permanent",
+            "colorless_mana_rock_no_max_hand_size_v1",
+            "battle_rule_v1:93ac5946d2f83cec409a2892520f26d0",
+            "ff80b35ee08bb1b68ec7c0be24d6eaaa",
+        ),
+        "Swiftfoot Boots": (
+            "equipment_static_attachment",
+            "equipment_auto_attach_haste_hexproof_v1",
+            "battle_rule_v1:86b568648669ceb1eef6d7f6b95d4f1c",
+            "5f4fa8fe20c8a6c55a2aee48c34c6b25",
+        ),
+    }
+    type_lines = {
+        "Borrowed Knowledge": "Sorcery",
+        "Increasing Vengeance": "Instant",
+        "Reckless Endeavor": "Sorcery",
+        "Wear // Tear": "Instant",
+        "Thought Vessel": "Artifact",
+        "Swiftfoot Boots": "Artifact - Equipment",
+    }
+
+    for name, (
+        expected_effect,
+        expected_scope,
+        expected_key,
+        expected_hash,
+    ) in expected.items():
+        effect = battle.get_card_effect(
+            {
+                "name": name,
+                "cmc": 2,
+                "type_line": type_lines[name],
+            }
+        )
+        assert effect.get("effect") == expected_effect
+        assert effect.get("battle_model_scope") == expected_scope
+        assert effect.get("_rule_logical_key") == expected_key
+        assert effect.get("_rule_oracle_hash") == expected_hash
+        assert effect.get("_rule_source") == "curated"
+        assert effect.get("_rule_execution_status") == "auto"
+
+
 if __name__ == "__main__":
     tests = [
         *battle_sba_zone_tests.register_tests(battle, player, card),
@@ -261,6 +330,7 @@ if __name__ == "__main__":
         *battle_misc_regression_tests.register_tests(battle, player, replay_auditor),
         *battle_decision_trace_tests.register_tests(battle, replay_auditor),
         test_promoted_hotfixes_resolve_from_sqlite_without_manual_override,
+        test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite,
     ]
     for test in tests:
         if hasattr(battle, "clear_pending_triggers"):

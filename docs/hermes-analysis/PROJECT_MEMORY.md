@@ -710,8 +710,14 @@ Atualizado em 2026-05-26:
   reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
   `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`
   because this step was sync-from-PG after the SQL apply.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg078_l2_hash_scope_restore_focused_events_20260623_063535.jsonl`
+  contains 17 records for selected restored rule key/hash runtime provenance.
 - Current accepted card-gate cuts: deck `6` `high=0`, `medium=0`,
   `pass=100`; deck `606` `high=7`, `medium=7`, `pass=67`; global
   `high=50`, `medium=12`, `pass=143`.
+- Test evidence: `test_battle_analyst_v10_3.py` now includes
+  `test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite`, and the full
+  script passed after the focused event file was registered.
 - Work remains: commit this batch, then run a fresh deck `6` 16-seed battle
   rebaseline. Do not treat PG078 as battle-strategy evidence by itself.

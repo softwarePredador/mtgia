@@ -3544,6 +3544,8 @@ Artifacts:
   `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`.
 - PG -> SQLite sync:
   `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg078_l2_hash_scope_restore_focused_events_20260623_063535.jsonl`.
 - Deck `6` card-gate audit:
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg078_l2_hash_scope_restore_20260623_063535.json`.
 - Deck `606` card-gate audit:
@@ -3554,6 +3556,9 @@ Gate:
 - PG078 is a provenance/hash gate only. It restored PostgreSQL `oracle_hash`
   values for 23 already scoped trusted rules and disabled 44 superseded shadow
   rows.
+- The focused event file proves representative restored rules still resolve
+  with the expected `rule_logical_key` and `rule_oracle_hash`; it is not a
+  full 16-seed battle rebaseline.
 - It does not add new battle replay evidence, does not alter target-pressure or
   table-intent behavior, and does not change deck composition.
 

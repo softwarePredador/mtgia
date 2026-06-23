@@ -20706,6 +20706,11 @@ Sync and auditor evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
   reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
   `canonical_snapshot_rows_exported=3201`, and `include_needs_review=false`.
+- Focused runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg078_l2_hash_scope_restore_focused_events_20260623_063535.jsonl`
+  records rule key/hash provenance for representative restored rules including
+  `Borrowed Knowledge`, `Increasing Vengeance`, `Reckless Endeavor`,
+  `Wear // Tear`, `Thought Vessel`, and `Swiftfoot Boots`.
 - Canonical fallback snapshot updated 22 card entries with
   `battle_rule_oracle_hash`; this is runtime cache evidence, not a new
   PostgreSQL semantic mutation.
