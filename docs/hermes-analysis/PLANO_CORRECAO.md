@@ -4,10 +4,23 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-23 07:00 UTC
+> Data: 2026-06-23 11:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao de imports quebrados e dependencias circulares de 2026-06-23
+11:00 UTC no checkout `be2d2822` confirmou que desde a ultima rodada deste foco
+(`2e69bb4c`) nao houve delta de produto/teste no recorte `app/lib`,
+`app/test`, `app/integration_test`, `server/lib`, `server/routes`,
+`server/bin` e `server/test`; somente docs Hermes mudaram. O auditor base
+continuou compativel (`221` arquivos backend, `205` classes, `116` tabelas
+textualmente referenciadas, `0` imports quebrados), mas segue backend-only e
+sem grafo de ciclos. O scanner local focado encontrou `0` diretivas locais Dart
+quebradas no runtime, `0` diretivas locais quebradas incluindo testes, `0`
+imports Python locais quebrados em `server/bin` e apenas `1` SCC Dart runtime:
+`life_counter_tabletop_engine.dart` <-> `life_counter_turn_tracker_engine.dart`.
+O ciclo backend antigo de optimize permanece stale/resolvido.
 
 A revalidacao de funcoes sem chamador de 2026-06-23 07:00 UTC no checkout
 `5c678845` confirmou que desde a ultima rodada focada (`6410d456`) somente docs

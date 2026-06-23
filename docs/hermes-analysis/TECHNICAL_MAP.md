@@ -4,7 +4,7 @@
 > Util para orientacao de produto/codigo, mas nao substitui o contrato Hermes
 > E2E nem reports frescos.
 
-> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-23 05:30 UTC.
+> Mapa tecnico detalhado do ManaLoom. Atualizado em 2026-06-23 11:00 UTC.
 
 ## Estrutura do repositorio
 
@@ -151,21 +151,25 @@ mtgia/
 
 - **P0 — Falso-positivo em massa no auditor estrutural**: **RESOLVIDO em 2026-05-28.** `STRUCTURE_AUDIT.md` reportava 178 imports "quebrados" por resolver imports relativos a partir do root errado. `docs/hermes-analysis/scripts/structure_auditor.py` agora usa `MTGIA_REPO_ROOT`/`Path.cwd()`, resolve relativos a partir do arquivo Dart origem e reconhece imports locais `package:server/...`, `package:manaloom/...` e alias historico `package:ai/...`. Nova execucao: `Imports quebrados: 0`.
 - **P1/P2 — Imports quebrados e ciclos locais fora do recorte do auditor base**:
-  **REVALIDADO em 2026-06-20 11:00 UTC no checkout `2e69bb4c`.** O auditor base
+  **REVALIDADO em 2026-06-23 11:00 UTC no checkout `be2d2822`.** O auditor base
   cobre apenas `server/lib` e `server/routes` e reportou `Imports quebrados: 0`.
-  A triagem ampliada em 429 arquivos Dart de `app/lib`, `server/lib`,
-  `server/routes` e `server/bin` resolveu 1155 diretivas locais e encontrou 0
-  imports/exports/parts locais quebrados; o controle incluindo
-  `app/test`, `app/integration_test` e `server/test` tambem encontrou 0
-  diretivas locais quebradas em 2595 checadas. A checagem estreita de 33 scripts
-  Python em `server/bin` encontrou 0 imports locais quebrados e 0 SCCs. Claims
-  antigas contra `deck_analysis_tab.dart`, `life_counter_screen.dart`,
-  `local_test_server.dart`, `commander-learning/index.dart` e o ciclo
-  Community/Social estao stale. O ciclo backend antigo entre
-  `optimize_runtime_support.dart` e `optimize_filler_loader_support.dart` foi
-  fechado por modulos neutros; o unico SCC atual e
-  `life_counter_tabletop_engine.dart` <->
-  `life_counter_turn_tracker_engine.dart`, com analyzer focado verde.
+  Desde a rodada anterior deste foco (`2e69bb4c`) nao houve delta de produto ou
+  teste em `app/lib`, `app/test`, `app/integration_test`, `server/lib`,
+  `server/routes`, `server/bin` ou `server/test`. A triagem ampliada em 429
+  arquivos Dart de `app/lib`, `server/lib`, `server/routes` e `server/bin`
+  resolveu 1155 diretivas locais e encontrou 0 imports/exports/parts locais
+  quebrados; o controle incluindo `app/test`, `app/integration_test` e
+  `server/test` tambem encontrou 0 diretivas locais quebradas em 2595 checadas.
+  A checagem estreita de 33 scripts Python em `server/bin` encontrou 0 imports
+  locais quebrados e 0 SCCs. Claims antigas contra `deck_analysis_tab.dart`,
+  `life_counter_screen.dart`, `local_test_server.dart`,
+  `commander-learning/index.dart` e o ciclo Community/Social estao stale. O
+  ciclo backend antigo entre `optimize_runtime_support.dart` e
+  `optimize_filler_loader_support.dart` segue fechado por modulos neutros; o
+  unico SCC atual e `life_counter_tabletop_engine.dart` <->
+  `life_counter_turn_tracker_engine.dart`. Nesta rodada, o app analyzer focado
+  nao foi reexecutado porque `app/.dart_tool/package_config.json` esta ausente;
+  `dart analyze` backend focado ficou verde.
 - **P1 — Gargalos do domínio de optimize permanecem acima do aceitável**:
   revalidado em 2026-06-11 no `master@321b0f24`. Os tamanhos atuais cairam para
   `server/lib/ai/optimize_runtime_support.dart` (~2386 linhas) e
