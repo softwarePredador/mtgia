@@ -1,0 +1,16 @@
+Pager usage is off.
+CREATE TABLE
+INSERT 0 5
+ target_cards_with_expected_oracle_hash | target_rule_rows | target_missing_hash_rows | backup_table_already_exists
+----------------------------------------+------------------+--------------------------+-----------------------------
+                                      5 |                5 |                        5 | f
+(1 row)
+
+       card_name        |       current_oracle_hash        |       expected_oracle_hash       |    normalized_name     |                logical_rule_key                 | review_status | execution_status | rule_version | oracle_hash |                                                                                                                effect_json
+------------------------+----------------------------------+----------------------------------+------------------------+-------------------------------------------------+---------------+------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Fellwar Stone          | d63befc8ac40d9a38732f9b5c1a7414a | d63befc8ac40d9a38732f9b5c1a7414a | fellwar stone          | battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba | active        | auto             |            2 |             | {"cmc": 2.0, "effect": "ramp_permanent", "produces": "WUBRGC", "mana_produced": 1, "battle_model_scope": "conditional_opponent_color_mana_rock_v1", "conditionally_produces_opponent_land_colors": true}
+ Mana Vault             | 35e3fd94c8453c0e326033af49ae18c8 | 35e3fd94c8453c0e326033af49ae18c8 | mana vault             | battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff | active        | auto             |            2 |             | {"cmc": 1.0, "effect": "ramp_permanent", "produces": "C", "mana_produced": 3, "battle_model_scope": "fast_mana_artifact_partial_v1", "tapped_upkeep_damage": 1, "does_not_untap_normally": true, "upkeep_optional_untap_cost_generic": 4}
+ Mox Amber              | e47b40cf2afc4c9ceac6bf91815da706 | e47b40cf2afc4c9ceac6bf91815da706 | mox amber              | battle_rule_v1:972703914ee50acd7a4e6f529fea1adf | verified      | auto             |            2 |             | {"cmc": 0.0, "effect": "ramp_permanent", "produces": "WUBRGC", "mana_produced": 1, "battle_model_scope": "legend_gated_fast_mana_v1", "requires_legendary_creature_or_planeswalker_for_mana": true}
+ Seething Song          | ccd492289c6f1c14c8fb7a248d7bbf32 | ccd492289c6f1c14c8fb7a248d7bbf32 | seething song          | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | verified      | auto             |            2 |             | {"cmc": 3.0, "effect": "ramp_ritual", "instant": true, "produces": "R", "mana_produced": 5, "battle_model_scope": "single_shot_red_ritual_v1"}
+ Talisman of Conviction | d49ceec937367a344a9f0948eea4f8f2 | d49ceec937367a344a9f0948eea4f8f2 | talisman of conviction | battle_rule_v1:02133e513da5ea98ac74d32d39b16470 | active        | auto             |            2 |             | {"cmc": 2.0, "effect": "ramp_permanent", "produces": "CRW", "mana_produced": 1, "battle_model_scope": "pain_talisman_color_pair_partial_v1", "life_for_colored_mana": 1}
+(5 rows)

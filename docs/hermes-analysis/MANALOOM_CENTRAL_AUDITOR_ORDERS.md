@@ -3141,3 +3141,22 @@ Current order:
 - The temporary runtime-cache drift is closed by the completed run plus final
   runtime restore evidence.
 - Do not open PostgreSQL deploy/rollback or deck swap from this result.
+
+### PG077 Final Addendum Order - 2026-06-23 06:28 UTC
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`
+  closed the final metadata regression found after the earlier PG077 sync.
+- `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`
+  is the accepted final PG077 sync.
+- `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`
+  is the accepted final deck `6` card-gate artifact.
+
+Current order:
+
+- Treat the `06:24:22` PG077 recheck as the active high-water mark.
+- Use PG078 for the next PostgreSQL package.
+- Deck `6` card gate is closed. Continue either with deck `606` high cards or
+  with a fresh battle rebaseline from current deck `6`; do not mix those two
+  steps in one unreviewed package.

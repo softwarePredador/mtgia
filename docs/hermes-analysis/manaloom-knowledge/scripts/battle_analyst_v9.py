@@ -891,6 +891,18 @@ def alternative_cost_for_effect(player, card, effect_data):
         or condition == "control_commander"
     ) and player_controls_commander(player):
         return str(effect_data.get("alternative_cost") or "{0}"), "control_commander"
+    overload_cost = str(effect_data.get("overload_cost") or "").strip()
+    if overload_cost and effect_data.get("effect") == "overload_recursion":
+        graveyard_spell_count = sum(
+            1
+            for grave_card in getattr(player, "graveyard", []) or []
+            if isinstance(grave_card, dict) and is_instant_or_sorcery_spell(grave_card)
+        )
+        min_targets = int(effect_data.get("overload_min_targets") or 2)
+        if graveyard_spell_count >= min_targets and player.can_pay(
+            card_mana_cost(card, alternative_cost=overload_cost)
+        ):
+            return overload_cost, "overload"
     return None, None
 
 
@@ -7715,7 +7727,28 @@ def everflowing_chalice_additional_costs(kicker_count):
     return ["{2}" for _ in range(max(0, int(kicker_count or 0)))]
 
 
-def ritual_mana_produced(player, effect_data):
+def ritual_hand_size_target(opponents):
+    candidates = [
+        opponent
+        for opponent in (opponents or [])
+        if opponent is not None and (not hasattr(opponent, "is_alive") or opponent.is_alive())
+    ]
+    if not candidates:
+        return None
+    return max(
+        candidates,
+        key=lambda opponent: (
+            len(getattr(opponent, "hand", []) or []),
+            str(getattr(opponent, "name", "")),
+        ),
+    )
+
+
+def ritual_mana_produced(player, effect_data, opponents=None):
+    if effect_data.get("mana_produced_from_target_opponent_hand_size"):
+        target = ritual_hand_size_target(opponents)
+        if target is not None:
+            return len(getattr(target, "hand", []) or [])
     if effect_data.get("mana_produced_from_sacrificed_cmc"):
         return max(0, int(float(effect_data.get("_last_sacrificed_cmc") or 0)))
     threshold_count = effect_data.get("threshold_graveyard_count")
@@ -7723,6 +7756,91 @@ def ritual_mana_produced(player, effect_data):
     if threshold_count and threshold_mana and len(player.graveyard) >= int(threshold_count):
         return int(threshold_mana)
     return int(effect_data.get("mana_produced", 3))
+
+
+def ritual_mana_replay_fields(player, effect_data, opponents=None):
+    if not effect_data.get("mana_produced_from_target_opponent_hand_size"):
+        return {}
+    target = ritual_hand_size_target(opponents)
+    if target is None:
+        return {
+            "mana_amount_model": "target_opponent_hand_size",
+            "target_opponent": None,
+            "target_opponent_hand_size": None,
+        }
+    return {
+        "mana_amount_model": "target_opponent_hand_size",
+        "target_opponent": getattr(target, "name", None),
+        "target_opponent_hand_size": len(getattr(target, "hand", []) or []),
+    }
+
+
+def choose_largest_hand_opponent(opponents):
+    alive_opponents = [
+        opponent
+        for opponent in opponents or []
+        if getattr(opponent, "is_alive", lambda: False)()
+    ]
+    if not alive_opponents:
+        return None
+    return max(
+        alive_opponents,
+        key=lambda opponent: (
+            len(getattr(opponent, "hand", []) or []),
+            getattr(opponent, "name", ""),
+        ),
+    )
+
+
+def resolve_jeskas_will(player, opponents, card, effect_data, turn):
+    target_opponent = choose_largest_hand_opponent(opponents)
+    target_hand_size = len(getattr(target_opponent, "hand", []) or []) if target_opponent else 0
+    controls_commander = player_controls_commander(player)
+    selected_modes = []
+    if target_opponent is not None:
+        selected_modes.append("add_red_mana")
+    impulse_count = int(effect_data.get("impulse_exile_top_count") or 0)
+    if controls_commander or not selected_modes:
+        if impulse_count > 0:
+            selected_modes.append("impulse_exile")
+
+    mana_before = player.mana_pool.snapshot()
+    red_added = 0
+    if "add_red_mana" in selected_modes:
+        red_added = max(0, target_hand_size)
+        player.mana_pool.add("red", red_added)
+
+    exiled = []
+    if "impulse_exile" in selected_modes:
+        for _ in range(min(impulse_count, len(player.library))):
+            exiled_card = player.library.pop(0)
+            if isinstance(exiled_card, dict):
+                exiled_card["_impulse_play_source"] = card.get("name", "?")
+                exiled_card["_impulse_play_until_turn"] = turn
+                exiled_card["_impulse_play_permission"] = True
+            move_to_exile(player, exiled_card, reason="impulse_play_until_turn", turn=turn)
+            exiled.append(exiled_card)
+
+    emit_replay_event(
+        "jeskas_will_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        selected_modes=selected_modes,
+        controls_commander=controls_commander,
+        target_player=getattr(target_opponent, "name", None),
+        target_opponent_hand_size=target_hand_size if target_opponent else None,
+        red_mana_added=red_added,
+        impulse_exiled=[item.get("name", "?") for item in exiled if isinstance(item, dict)],
+        impulse_play_permission_status=effect_data.get(
+            "impulse_play_permission_status",
+            "exiled_play_permission_tracked_cast_from_exile_not_selected_by_ai",
+        ),
+        mana_pool_before=mana_before,
+        mana_pool_after=player.mana_pool.snapshot(),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
 
 
 def controlled_land_count(player):
@@ -12565,6 +12683,99 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     return score, reason
 
 
+def mizzix_mastery_graveyard_candidates(player):
+    return [
+        grave_card
+        for grave_card in getattr(player, "graveyard", []) or []
+        if isinstance(grave_card, dict) and is_instant_or_sorcery_spell(grave_card)
+    ]
+
+
+def resolve_mizzix_mastery(player, opponents, card, effect_data, turn, rng, *, stack=None, phase=None):
+    cast_context = effect_data.get("_cast_context") or {}
+    overloaded = (
+        bool(effect_data.get("overloaded"))
+        or cast_context.get("alternative_cost_kind") == "overload"
+    )
+    candidates = mizzix_mastery_graveyard_candidates(player)
+    scored = [
+        (
+            candidate,
+            threat_score(
+                get_card_effect(candidate).get("effect", ""),
+                candidate.get("name", ""),
+                player,
+                [player] + list(opponents or []),
+                turn,
+            ),
+        )
+        for candidate in candidates
+    ]
+    scored.sort(
+        key=lambda item: (
+            -item[1],
+            -int(float(item[0].get("cmc") or 0)),
+            item[0].get("name", ""),
+        )
+    )
+    selected = [item[0] for item in scored] if overloaded else [item[0] for item in scored[:1]]
+
+    exiled_originals = []
+    for original in selected:
+        if original not in player.graveyard:
+            continue
+        player.graveyard.remove(original)
+        move_to_exile(player, original, reason="mizzix_mastery_target", turn=turn)
+        exiled_originals.append(original)
+
+    resolved_copies = []
+    for original in exiled_originals:
+        copy_card = copy.deepcopy(original)
+        copy_card["is_copy"] = True
+        copy_card["_copied_from_spell"] = original.get("name", "?")
+        copy_card["_copied_by"] = card.get("name", "?")
+        copy_effect = copy.deepcopy(get_card_effect(original))
+        copy_effect["_copied_from_spell"] = original.get("name", "?")
+        copy_effect["_copied_by"] = card.get("name", "?")
+        emit_replay_event(
+            "mizzix_mastery_copy_cast",
+            player=player.name,
+            card=card.get("name", "?"),
+            copied_spell=original.get("name", "?"),
+            cast_without_paying_mana_cost=True,
+            overloaded=overloaded,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        apply_effect_immediate(
+            player,
+            opponents,
+            copy_card,
+            turn,
+            rng,
+            effect_data_override=copy_effect,
+            stack=stack,
+            phase=phase,
+        )
+        resolved_copies.append(original.get("name", "?"))
+
+    emit_replay_event(
+        "mizzix_mastery_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        overloaded=overloaded,
+        candidate_count=len(candidates),
+        exiled_targets=[item.get("name", "?") for item in exiled_originals],
+        copied_spells=resolved_copies,
+        cast_without_paying_mana_cost=True,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def create_creature_token(
     player,
     *,
@@ -14541,7 +14752,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         life_snapshot = player.life
         try:
             # Keep this check aligned with the current ritual resolution path.
-            player.mana_pool.add_generic(ritual_mana_produced(player, ritual_effect))
+            player.mana_pool.add_generic(ritual_mana_produced(player, ritual_effect, opponents))
             for candidate, additional_generic, role in playable_candidates():
                 if (id(candidate), role) in before:
                     continue
@@ -15125,7 +15336,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     resource_delta={
                         "effect": eff.get("effect"),
                         "mana_before": mana,
-                        "one_shot_mana": ritual_mana_produced(player, eff)
+                        "one_shot_mana": ritual_mana_produced(player, eff, opponents)
                         if eff.get("effect") == "ramp_ritual"
                         else 0,
                         "resource_gate": strategy_context.get("resource_gate"),
@@ -15183,8 +15394,19 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     active_player=player,
                     all_players=all_players,
                 )
-                if eff.get("effect") == "ramp_ritual":
-                    player.mana_pool.add_generic(ritual_mana_produced(player, eff))
+                if eff.get("effect") == "ramp_ritual" and eff.get("mana_produced_from_target_opponent_hand_size"):
+                    apply_effect_immediate(
+                        player,
+                        opponents,
+                        c,
+                        turn,
+                        rng,
+                        effect_data_override=eff,
+                        stack=stack,
+                        phase=phase,
+                    )
+                elif eff.get("effect") == "ramp_ritual":
+                    player.mana_pool.add_generic(ritual_mana_produced(player, eff, opponents))
                     player.graveyard.append(c)
                 elif eff.get("effect") == "land_ramp":
                     put_lands_from_library(player, c, eff, turn, opponents=opponents, source_event="land_ramp")
@@ -15693,7 +15915,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
             outcome = "cards_drawn"
             applied.append({"effect": component_effect, "count": count})
         elif component_effect == "ramp_ritual":
-            produced = ritual_mana_produced(player, component)
+            produced = ritual_mana_produced(player, component, opponents)
             player.mana_pool.add_generic(produced)
             outcome = "ritual_mana_added"
             applied.append({"effect": component_effect, "mana_added": produced})
@@ -15922,7 +16144,21 @@ def apply_effect_immediate(
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
             return
-        player.mana_pool.add_generic(ritual_mana_produced(player, effect_data))
+        if effect_data.get("mana_produced_from_target_opponent_hand_size"):
+            resolve_jeskas_will(player, opponents, card, effect_data, turn)
+            return
+        produced = ritual_mana_produced(player, effect_data, opponents)
+        player.mana_pool.add_generic(produced)
+        emit_replay_event(
+            "ritual_mana_added",
+            player=player.name,
+            card=card.get("name", "?"),
+            mana_added=produced,
+            mana_pool_total=player.mana_pool.total(),
+            turn=turn,
+            **ritual_mana_replay_fields(player, effect_data, opponents),
+            **replay_rule_fields(effect_data),
+        )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "ramp_engine":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
@@ -16743,13 +16979,16 @@ def apply_effect_immediate(
     elif effect == "copy_creature_token":
         resolve_copy_creature_token(player, card, effect_data, turn, opponents=opponents)
     elif effect == "overload_recursion":
-        spells = [c for c in player.graveyard if isinstance(c, dict) and c.get("cmc", 0) > 0]
-        if player.copy_engines > 0: spells = spells * 2
-        dmg = len(spells) * 3
-        alive_opps = [o for o in opponents if o.is_alive()]
-        if alive_opps:
-            for opp in alive_opps: deal_damage(opp, dmg // len(alive_opps))
-        finish_resolved_spell(player, card, turn=turn)
+        resolve_mizzix_mastery(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            phase=phase,
+        )
     elif effect == "recursion":
         count = int(effect_data.get("count") or 2)
         target_type = effect_data.get("target")

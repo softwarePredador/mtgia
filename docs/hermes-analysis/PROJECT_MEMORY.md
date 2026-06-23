@@ -620,3 +620,72 @@ Atualizado em 2026-05-26:
 - `Blasphemous Act` aparece `pass/coherent_for_current_gate` no corte deck `6`;
   a nota de reducao de custo continua apenas caveat de checagem futura e nao
   reabre a carta sem mismatch real de oracle/runtime/PostgreSQL.
+
+## ManaLoom deck 6 PG077 closure - 2026-06-23 06:25 UTC
+
+- PG077 closed deck `6` for the current card battle-rule coherence gate.
+  Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062156.json`
+  reports `pass=100`.
+- Runtime rows applied in PostgreSQL:
+  `Jeska's Will`
+  `battle_rule_v1:c8621a807cc65adc820a8b8189979f70` with
+  `oracle_hash=e323893e6c38ee2d618b4f9c737fadee`, and
+  `Mizzix's Mastery`
+  `battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f` with
+  `oracle_hash=8b822f0c58e4ab4e91f9e4946e8c04e9`.
+- Hash-only addenda restored missing oracle provenance for `Silence`,
+  `Scroll Rack`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`; the 8-card addendum updated only
+  the 3 rows still missing hash after precheck and left `effect_json` and
+  `deck_role_json` unchanged.
+- Final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_hash_provenance_final_sync_report_20260623_062156.json`
+  used PostgreSQL as source, loaded `pg_rows_loaded=1825`, wrote
+  `sqlite_inserted_or_updated=1802`, and kept `include_needs_review=false`.
+- Runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl`.
+- Final deck `606` audit now reports `high=7`, `medium=29`, `pass=45`;
+  final global `--limit 200` audit reports `high=50`, `medium=34`,
+  `pass=121`.
+- Tests passed: `py_compile`, `test_battle_analyst_v10_3.py`,
+  `test_sync_battle_card_rules_pg_selection.py -v` with `PYTHONPATH`, and
+  `test_deck_card_battle_rule_coherence_audit.py -v`.
+- Next PG package is PG078. Next recommended queue is deck `606` high
+  battle-critical: `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+
+## ManaLoom PG077 final addendum - 2026-06-23 06:28 UTC
+
+- The accepted PG077 high-water is the post-addendum `06:24:22` cut, not the
+  earlier `06:21:56` sync. The later full harness run caught missing
+  `Seething Song` `mana_color_status` metadata.
+- Addendum:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`
+  restored ritual metadata and reported `target_missing_runtime_metadata_rows=0`.
+- Final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`
+  reports `high=0`, `medium=0`, `pass=100`.
+- Final variant cuts: deck `606` `high=7`, `medium=29`, `pass=45`;
+  deck `607` `high=29`, `medium=12`, `pass=53`; deck `608` `high=21`,
+  `medium=4`, `pass=43`; global `high=50`, `medium=34`, `pass=121`.
+- Final runtime event file:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`.
+- Full tests passed after this addendum. Next PG package is still PG078.
+
+## ManaLoom PG077 high-water addendum - 2026-06-23 06:26 UTC
+
+- Additional PG077 addenda were applied for ramp/ritual hash provenance and
+  `Seething Song` metadata drift:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_postcheck_20260623_062033.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`.
+- High-water final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- High-water audits: deck `6` `pass=100`, deck `606` `high=7`,
+  `medium=29`, `pass=45`, deck `607` `high=29`, `medium=12`, `pass=53`,
+  deck `608` `high=21`, `medium=4`, `pass=43`, and global `high=50`,
+  `medium=34`, `pass=121`.

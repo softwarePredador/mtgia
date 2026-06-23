@@ -3190,6 +3190,120 @@ def register_tests(battle, player):
         assert not any(card.get("name") == "Beast Token" for card in opponent.battlefield)
         assert opponent.library == []
 
+    def test_pg077_jeskas_will_uses_opponent_hand_and_impulse_exiles_top_three():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            jeska = {"name": "Jeska's Will", "cmc": 3, "type_line": "Sorcery"}
+            active.battlefield = [
+                {"name": "Lorehold, the Historian", "effect": "creature", "is_commander": True}
+            ]
+            active.library = [
+                _card("Impulse One", cmc=1, effect="draw"),
+                _card("Impulse Two", cmc=2, effect="draw"),
+                _card("Impulse Three", cmc=3, effect="draw"),
+                _card("Library Remainder", cmc=4, effect="draw"),
+            ]
+            opponent.hand = [_card(f"Opp Card {index}", cmc=1) for index in range(5)]
+            effect_data = battle.get_card_effect(jeska)
+
+            assert effect_data["effect"] == "ramp_ritual"
+            assert effect_data["mana_produced_from_target_opponent_hand_size"] is True
+            assert effect_data["impulse_exile_top_count"] == 3
+            assert effect_data["produces"] == "R"
+            assert effect_data["battle_model_scope"] == (
+                "choose_both_with_commander_red_by_target_opponent_hand_impulse_top_three_v1"
+            )
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:c8621a807cc65adc820a8b8189979f70"
+            assert effect_data["_rule_oracle_hash"] == "e323893e6c38ee2d618b4f9c737fadee"
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                jeska,
+                5,
+                random.Random(77077),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        event = next(
+            data
+            for event, data in events
+            if event == "jeskas_will_resolved"
+        )
+        assert event["selected_modes"] == ["add_red_mana", "impulse_exile"]
+        assert event["target_opponent_hand_size"] == 5
+        assert event["red_mana_added"] == 5
+        assert event["impulse_exiled"] == ["Impulse One", "Impulse Two", "Impulse Three"]
+        assert event["rule_logical_key"] == "battle_rule_v1:c8621a807cc65adc820a8b8189979f70"
+        assert event["rule_oracle_hash"] == "e323893e6c38ee2d618b4f9c737fadee"
+        assert active.mana_pool.red == 5
+        assert [card.get("name") for card in active.exile] == [
+            "Impulse One",
+            "Impulse Two",
+            "Impulse Three",
+        ]
+        assert active.library[0]["name"] == "Library Remainder"
+        assert any(card.get("name") == "Jeska's Will" for card in active.graveyard)
+
+    def test_pg077_mizzixs_mastery_exiles_graveyard_spell_and_resolves_copy():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            mizzix = {"name": "Mizzix's Mastery", "cmc": 4, "type_line": "Sorcery"}
+            grave_spell = {"name": "Refill Spell", "cmc": 2, "type_line": "Sorcery", "effect": "draw"}
+            active.graveyard = [grave_spell]
+            active.library = [_card("Drawn One", cmc=1), _card("Drawn Two", cmc=1)]
+            effect_data = battle.get_card_effect(mizzix)
+
+            assert effect_data["effect"] == "overload_recursion"
+            assert effect_data["target"] == "instant_or_sorcery_graveyard"
+            assert effect_data["exiles_self"] is True
+            assert effect_data["casts_copies_without_paying_mana"] is True
+            assert effect_data["battle_model_scope"] == (
+                "target_or_overload_graveyard_instant_sorcery_copy_cast_runtime_v1"
+            )
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f"
+            assert effect_data["_rule_oracle_hash"] == "8b822f0c58e4ab4e91f9e4946e8c04e9"
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                mizzix,
+                6,
+                random.Random(77078),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        mastery_event = next(
+            data
+            for event, data in events
+            if event == "mizzix_mastery_resolved"
+        )
+        copy_event = next(
+            data
+            for event, data in events
+            if event == "mizzix_mastery_copy_cast"
+        )
+        assert mastery_event["exiled_targets"] == ["Refill Spell"]
+        assert mastery_event["copied_spells"] == ["Refill Spell"]
+        assert mastery_event["rule_logical_key"] == "battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f"
+        assert copy_event["copied_spell"] == "Refill Spell"
+        assert copy_event["cast_without_paying_mana_cost"] is True
+        assert [card.get("name") for card in active.hand] == ["Drawn One", "Drawn Two"]
+        assert [card.get("name") for card in active.exile] == ["Refill Spell", "Mizzix's Mastery"]
+        assert active.graveyard == []
+
     def test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -6548,6 +6662,8 @@ def register_tests(battle, player):
         test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
         test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens,
         test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent,
+        test_pg077_jeskas_will_uses_opponent_hand_and_impulse_exiles_top_three,
+        test_pg077_mizzixs_mastery_exiles_graveyard_spell_and_resolves_copy,
         test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax,
         test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
         test_pg076_support_passive_annotations_and_ranger_small_creature_tutor,

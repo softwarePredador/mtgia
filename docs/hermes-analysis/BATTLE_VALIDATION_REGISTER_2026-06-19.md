@@ -16737,3 +16737,144 @@ Current queue:
 - Deck `606` high queue remains: `Flare of Duplication`, `Powerbalance`,
   `Reforge the Soul`, `Rise of the Eldrazi`, `Rite of the Dragoncaller`,
   `Storm Herd`, and `Witch Enchanter // Witch-Blessed Meadow`.
+
+## PG077 Deck 6 Final Closure - 2026-06-23 06:25 UTC
+
+Status: `applied_validated`.
+
+PostgreSQL:
+
+- Runtime package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_precheck_20260623_061411.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_apply_20260623_061411.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_postcheck_20260623_061411.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_rollback_20260623_061411.sql`.
+- Hash-only addenda:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_apply_20260623_061815.sql`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_apply_20260623_062156.sql`.
+- Backups:
+  `manaloom_deploy_audit.pg077_deck6_l4_battle_support_20260623_061411`,
+  `manaloom_deploy_audit.pg077_silence_hash_restore_20260623_061815`,
+  and
+  `manaloom_deploy_audit.pg077_deck6_hash_provenance_restore_20260623_062156`.
+
+Validated changes:
+
+- `Jeska's Will` is now oracle-specific runtime:
+  `battle_rule_v1:c8621a807cc65adc820a8b8189979f70`,
+  `oracle_hash=e323893e6c38ee2d618b4f9c737fadee`, red mana from selected
+  opponent hand size, and commander choose-both impulse exile top three.
+  Cast-from-exile selection remains tracked permission, not AI-selected.
+- `Mizzix's Mastery` is now oracle-specific runtime:
+  `battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f`,
+  `oracle_hash=8b822f0c58e4ab4e91f9e4946e8c04e9`, target/overload graveyard
+  instant-or-sorcery copy-cast without paying mana, with self exile.
+- The hash-only addenda restored missing oracle provenance for `Silence`,
+  `Scroll Rack`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`. The final deck 6 hash addendum
+  precheck showed 5 of 8 candidates already matched PostgreSQL oracle hashes,
+  so only 3 rows were updated; `effect_json` and `deck_role_json` remained
+  unchanged for all 8 checked rows.
+
+Runtime evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl`
+  contains 13 focused event records proving rule key/hash provenance for
+  `Jeska's Will`, `Mizzix's Mastery`, `Scroll Rack`, `Unexpected Windfall`,
+  and `Valakut Awakening // Valakut Stoneforge`.
+
+Sync/auditor:
+
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_hash_provenance_final_sync_report_20260623_062156.json`
+  reported `pg_rows_loaded=1825`, `sqlite_inserted_or_updated=1802`, and
+  `include_needs_review=false`.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062156.json`
+  reported `pass=100`.
+- Final deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg077_final_20260623_062156.json`
+  reported `high=7`, `medium=29`, `pass=45`.
+- Final global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg077_final_20260623_062156.json`
+  reported `high=50`, `medium=34`, `pass=121`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the PG077 Jeska's Will and Mizzix's Mastery tests.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 -m unittest docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 -m unittest docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Next:
+
+- Deck `6` is closed for the current card battle-rule coherence gate.
+- Continue with deck `606` high battle-critical queue:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+
+## PG077 Final Addendum After Harness Recheck - 2026-06-23 06:28 UTC
+
+Status: `applied_validated`.
+
+- The `06:21:56` PG077 docs were not the last accepted cut. A subsequent full
+  harness run exposed missing `Seething Song` ritual metadata, so a scoped
+  addendum was applied at `06:24:22`.
+- Addendum artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_precheck_20260623_062422.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_apply_20260623_062422.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`,
+  and rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_rollback_20260623_062422.sql`.
+- The addendum restored
+  `mana_color_status=abstracted_to_generic_pool_runtime`,
+  `oracle_runtime_scope=single_shot_red_ritual_runtime_generic_pool_color_annotation`,
+  and `pg058_l3b_simple_red_ritual_family=deck6_simple_red_rituals` for the
+  trusted `Seething Song` runtime row.
+- Final accepted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- Final accepted deck cuts: deck `6` `high=0`, `medium=0`, `pass=100`;
+  deck `606` `high=7`, `medium=29`, `pass=45`; deck `607` `high=29`,
+  `medium=12`, `pass=53`; deck `608` `high=21`, `medium=4`, `pass=43`;
+  global `high=50`, `medium=34`, `pass=121`.
+- Final focused runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`.
+- Final test pass after addendum:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`,
+  `python3 -m py_compile ...`,
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`,
+  and
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+- Use PG078 next.
+
+## PG077 High-Water Addendum - 2026-06-23 06:26 UTC
+
+Status: `applied_validated`.
+
+- Additional PostgreSQL addenda restored hash/runtime metadata that had drifted
+  during the PG077 resync loop:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_apply_20260623_062033.sql`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_apply_20260623_062422.sql`.
+- Postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_postcheck_20260623_062033.out`
+  reported `target_rule_rows=5`, `expected_hash_rows=5`,
+  `target_missing_hash_rows=0`, and `backup_rows=5`;
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`
+  reported `target_rule_rows=1`, `expected_runtime_rows=1`,
+  `target_missing_runtime_metadata_rows=0`, and `backup_rows=1`.
+- Final high-water sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- Final high-water audits:
+  deck `6` `pass=100`, deck `606` `high=7`, `medium=29`, `pass=45`,
+  deck `607` `high=29`, `medium=12`, `pass=53`, deck `608` `high=21`,
+  `medium=4`, `pass=43`, and global `high=50`, `medium=34`, `pass=121`.
+- Focused L4 runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`.

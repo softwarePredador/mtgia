@@ -7264,3 +7264,172 @@ Numbering note:
   `docs/hermes-analysis/master_optimizer_reports/deck6_pg076_support_passive_annotation_focused_events_20260623_054358.jsonl`.
 - Rollbacks remain the original PG076 rollback files listed above; PG077 is
   still the next deploy number.
+
+## PG077 Deck 6 Runtime and Hash Provenance Closure - Applied 2026-06-23 06:14-06:24 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Runtime semantic update for `Jeska's Will` and `Mizzix's Mastery`.
+- Hash-only provenance restore for `Silence`, `Scroll Rack`,
+  `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- No deck swap, no `deck_cards` mutation, and no effect/deck-role mutation in
+  the hash-only addenda.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_precheck_20260623_061411.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_apply_20260623_061411.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_postcheck_20260623_061411.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_rollback_20260623_061411.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_precheck_20260623_061815.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_apply_20260623_061815.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_postcheck_20260623_061815.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_rollback_20260623_061815.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_precheck_20260623_062156.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_apply_20260623_062156.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_postcheck_20260623_062156.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_rollback_20260623_062156.sql`
+
+Backup tables:
+
+- `manaloom_deploy_audit.pg077_deck6_l4_battle_support_20260623_061411`
+  with 4 backed-up rows.
+- `manaloom_deploy_audit.pg077_silence_hash_restore_20260623_061815`
+  with 3 backed-up rows.
+- `manaloom_deploy_audit.pg077_deck6_hash_provenance_restore_20260623_062156`
+  with 24 backed-up rows.
+
+Postcheck evidence:
+
+- L4 battle-support postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_postcheck_20260623_061411.out`
+  reported `target_rule_rows=4`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=4`.
+- Silence hash restore postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_postcheck_20260623_061815.out`
+  reported `silence_rule_rows=3`, `expected_runtime_rows=1`,
+  `target_missing_hash_rows=0`, and `backup_rows=3`.
+- Deck 6 hash provenance postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_postcheck_20260623_062156.out`
+  reported `target_rule_rows=8`, `target_hash_match_rows=8`,
+  `target_missing_hash_rows=0`, `trusted_auto_rows=8`,
+  `effect_json_unchanged_rows=8`, `deck_role_json_unchanged_rows=8`,
+  `old_active_shadow_rows=0`, and `total_backup_rows=24`.
+
+Accepted sync/audit:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg077_hash_provenance_final_sync_report_20260623_062156.json`
+  refreshed SQLite from PostgreSQL with `pg_rows_loaded=1825`,
+  `sqlite_inserted_or_updated=1802`, and `include_needs_review=false`.
+- Deck `6` final audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062156.json`
+  reported `pass=100`.
+- Deck `606` final audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg077_final_20260623_062156.json`
+  reported `high=7`, `medium=29`, `pass=45`.
+- Global `--limit 200` final audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg077_final_20260623_062156.json`
+  reported `high=50`, `medium=34`, `pass=121`.
+
+Runtime evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl`
+  proves runtime key/hash provenance for `Jeska's Will`,
+  `Mizzix's Mastery`, `Scroll Rack`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+
+Next deploy number:
+
+- Use PG078 for the next PostgreSQL package.
+
+## PG077 Seething Song Metadata Addendum and Final Recheck - Applied 2026-06-23 06:28 UTC
+
+- After the PG077 `06:21:56` sync, the full battle harness exposed a remaining
+  `Seething Song` metadata regression: `mana_color_status` was missing from
+  the trusted runtime row.
+- Applied scoped metadata-only SQL:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_precheck_20260623_062422.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_apply_20260623_062422.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.sql`,
+  and rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_rollback_20260623_062422.sql`.
+- Backup table:
+  `manaloom_deploy_audit.pg077_seething_song_metadata_restore_20260623_062422`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`
+  reported `target_rule_rows=1`, `expected_runtime_rows=1`,
+  `target_missing_runtime_metadata_rows=0`, and `backup_rows=1`.
+- Final accepted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`
+  with `pg_inserted_or_updated=0`, `pg_rows_loaded=1825`,
+  `sqlite_inserted_or_updated=1802`, `canonical_snapshot_rows_exported=3201`,
+  and `include_needs_review=false`.
+- Final accepted auditors after this addendum: deck `6` `high=0`,
+  `medium=0`, `pass=100`; deck `606` `high=7`, `medium=29`, `pass=45`;
+  deck `607` `high=29`, `medium=12`, `pass=53`; deck `608` `high=21`,
+  `medium=4`, `pass=43`; global `high=50`, `medium=34`, `pass=121`.
+- Focused runtime evidence after the final sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`.
+- Full tests passed after this addendum:
+  `test_battle_analyst_v10_3.py`, `py_compile`,
+  `test_sync_battle_card_rules_pg_selection.py -v`, and
+  `test_deck_card_battle_rule_coherence_audit.py -v`.
+- The next PostgreSQL package remains PG078.
+
+## PG077 High-Water Addendum - Applied 2026-06-23 06:20-06:26 UTC
+
+Status: `applied_validated`.
+
+Additional SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_precheck_20260623_062033.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_apply_20260623_062033.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_postcheck_20260623_062033.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_rollback_20260623_062033.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_precheck_20260623_062422.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_apply_20260623_062422.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_rollback_20260623_062422.sql`
+
+Additional backup tables:
+
+- `manaloom_deploy_audit.pg077_ramp_ritual_hash_restore_20260623_062033`
+  with 5 backed-up rows.
+- `manaloom_deploy_audit.pg077_seething_song_metadata_restore_20260623_062422`
+  with 1 backed-up row.
+
+Additional postcheck evidence:
+
+- Ramp/ritual hash restore:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_ramp_ritual_hash_restore_postcheck_20260623_062033.out`
+  reported `target_rule_rows=5`, `expected_hash_rows=5`,
+  `target_missing_hash_rows=0`, and `backup_rows=5`.
+- Seething Song metadata restore:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`
+  reported `target_rule_rows=1`, `expected_runtime_rows=1`,
+  `target_missing_runtime_metadata_rows=0`, and `backup_rows=1`.
+
+High-water sync/audit:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`
+  refreshed SQLite from PostgreSQL with `pg_rows_loaded=1825`,
+  `sqlite_inserted_or_updated=1802`, and `include_needs_review=false`.
+- High-water audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`
+  (`pass=100`),
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg077_final_20260623_062422.json`
+  (`high=7`, `medium=29`, `pass=45`),
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg077_final_20260623_062422.json`
+  (`high=29`, `medium=12`, `pass=53`),
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg077_final_20260623_062422.json`
+  (`high=21`, `medium=4`, `pass=43`), and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg077_final_20260623_062422.json`
+  (`high=50`, `medium=34`, `pass=121`).
+
+Next deploy number:
+
+- PG078 remains next.

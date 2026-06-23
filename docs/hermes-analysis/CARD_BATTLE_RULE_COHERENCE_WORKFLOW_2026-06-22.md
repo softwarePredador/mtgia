@@ -3093,3 +3093,55 @@ Workflow note:
 - Method note: user observations, including `Blasphemous Act` cost reduction,
   are validation hints only. They do not override Oracle/PostgreSQL evidence
   and do not reopen a card without a real mismatch.
+
+## PG077 Deck 6 Closure - 2026-06-23 06:25 UTC
+
+- PostgreSQL remains the source of truth. Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_hash_provenance_final_sync_report_20260623_062156.json`.
+- Runtime fixes applied:
+  `Jeska's Will` now uses opponent hand-size red mana plus commander
+  choose-both impulse exile, and `Mizzix's Mastery` now uses target/overload
+  graveyard instant-or-sorcery copy-cast runtime.
+- Hash-only addenda restored missing provenance for `Silence`, `Scroll Rack`,
+  `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`. The final 8-card hash addendum
+  proved `effect_json` and `deck_role_json` unchanged for all checked rows.
+- Runtime event artifact:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl`.
+- Final auditors:
+  deck `6` `pass=100`, deck `606` `high=7`, `medium=29`, `pass=45`, and
+  global `high=50`, `medium=34`, `pass=121`.
+- Tests passed:
+  `py_compile`, `test_battle_analyst_v10_3.py`,
+  `test_sync_battle_card_rules_pg_selection.py -v` with `PYTHONPATH`, and
+  `test_deck_card_battle_rule_coherence_audit.py -v`.
+- Next PostgreSQL package number: PG078.
+- Next queue: deck `606` high battle-critical cards, starting with
+  `Flare of Duplication`, `Powerbalance`, and `Reforge the Soul`.
+
+## PG077 Final Addendum Workflow Note - 2026-06-23 06:28 UTC
+
+- Do not treat the `06:21:56` PG077 sync as final if a later artifact is
+  available. The accepted PG077 card-gate source is the `06:24:22` recheck.
+- The recheck sequence was: `Seething Song` metadata precheck/apply/postcheck,
+  PG -> SQLite sync, focused runtime events, deck/global auditors, then full
+  tests.
+- Final accepted deck `6` source:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`.
+- Final accepted variant sources:
+  `deck606_pg077_final_20260623_062422`, `deck607_pg077_final_20260623_062422`,
+  and `deck608_pg077_final_20260623_062422`.
+- The next workflow package number is PG078.
+
+## PG077 High-Water Addendum - 2026-06-23 06:26 UTC
+
+- Additional PG077 addenda restored ramp/ritual hash provenance for 5 rows and
+  restored `Seething Song` red-ritual metadata after the final sync exposed a
+  metadata drift.
+- High-water sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- High-water audits:
+  deck `6` `pass=100`, deck `606` `high=7`, `medium=29`, `pass=45`,
+  deck `607` `high=29`, `medium=12`, `pass=53`, deck `608` `high=21`,
+  `medium=4`, `pass=43`, global `high=50`, `medium=34`, `pass=121`.
+- PG078 remains the next PostgreSQL package number.

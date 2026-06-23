@@ -3469,3 +3469,69 @@ Caveat:
 - The protection, treasure/impulse, magecraft, static nonhand-cast
   restriction, sacrifice silence, and shuffle text captured in these rows
   remain annotation/provenance unless explicitly named as runtime above.
+
+## PG077 Deck 6 Runtime Event Gate - 2026-06-23 06:25 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl`.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062156.json`.
+
+Gate:
+
+- `Jeska's Will` emits `spell_resolved` and `jeskas_will_resolved` with
+  `rule_logical_key=battle_rule_v1:c8621a807cc65adc820a8b8189979f70` and
+  `rule_oracle_hash=e323893e6c38ee2d618b4f9c737fadee`; the event proves red
+  mana equals selected opponent hand size and commander choose-both exiles the
+  top three cards with play permission tracked.
+- `Mizzix's Mastery` emits `spell_resolved`, `mizzix_mastery_copy_cast`, and
+  `mizzix_mastery_resolved` with
+  `rule_logical_key=battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f` and
+  `rule_oracle_hash=8b822f0c58e4ab4e91f9e4946e8c04e9`.
+- The same JSONL records hash-only provenance gates for `Scroll Rack`,
+  `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`; those were not semantic runtime
+  changes in PG077, but prove the executor still reads the restored
+  `logical_rule_key` and `oracle_hash`.
+
+Status:
+
+- Deck `6` is closed for the current battle-rule coherence gate:
+  `pass=100`.
+- Continue with deck `606` high battle-critical queue.
+
+## PG077 Final Metadata Recheck Gate - 2026-06-23 06:28 UTC
+
+Artifacts:
+
+- Metadata addendum postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`.
+- Final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- Final focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`.
+- Final deck `6` cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`.
+
+Gate:
+
+- The recheck closed the `Seething Song` provenance harness regression caused
+  by missing `mana_color_status`.
+- `Jeska's Will` and `Mizzix's Mastery` focused events were regenerated after
+  the final sync and still show the same rule key/hash runtime behavior.
+
+Status:
+
+- Current accepted deck `6` gate: `high=0`, `medium=0`, `pass=100`.
+- Use PG078 for the next PostgreSQL package.
+
+## PG077 L4 Focused Runtime Evidence Addendum - 2026-06-23 06:26 UTC
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl`
+  is the high-water Jeska's Will and Mizzix's Mastery focused event artifact
+  after the final PG077 sync.
+- It records scenario summaries plus `spell_resolved`,
+  `jeskas_will_resolved`, `mizzix_mastery_copy_cast`, and
+  `mizzix_mastery_resolved` events with rule key/hash provenance.

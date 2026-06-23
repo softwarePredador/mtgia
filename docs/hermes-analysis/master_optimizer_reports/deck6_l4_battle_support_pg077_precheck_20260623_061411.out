@@ -1,0 +1,24 @@
+Pager usage is off.
+SELECT 2
+SELECT 4
+ target_cards_with_expected_oracle_hash | existing_rule_rows | target_specific_rule_rows | old_active_shadow_rows | target_specific_defect_rows | backup_table_already_exists
+----------------------------------------+--------------------+---------------------------+------------------------+-----------------------------+-----------------------------
+                                      2 |                  4 |                         2 |                      2 |                           2 | f
+(1 row)
+
+       name       | type_line | mana_cost | cmc |           oracle_hash            |                                                                                         oracle_text
+------------------+-----------+-----------+-----+----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Jeska's Will     | Sorcery   | {2}{R}    | 3.0 | e323893e6c38ee2d618b4f9c737fadee | Choose one. If you control a commander as you cast this spell, you may choose both instead.                                                                                                +
+                  |           |           |     |                                  | • Add {R} for each card in target opponent's hand.                                                                                                                                         +
+                  |           |           |     |                                  | • Exile the top three cards of your library. You may play them this turn.
+ Mizzix's Mastery | Sorcery   | {3}{R}    | 4.0 | 8b822f0c58e4ab4e91f9e4946e8c04e9 | Exile target card that's an instant or sorcery from your graveyard. For each card exiled this way, copy it, and you may cast the copy without paying its mana cost. Exile Mizzix's Mastery.+
+                  |           |           |     |                                  | Overload {5}{R}{R}{R} (You may cast this spell for its overload cost. If you do, change "target" in its text to "each.")
+(2 rows)
+
+       name       | normalized_name  |                logical_rule_key                 |  source   | review_status | execution_status | confidence | rule_version | oracle_hash |                  effect_json                  |                     deck_role_json
+------------------+------------------+-------------------------------------------------+-----------+---------------+------------------+------------+--------------+-------------+-----------------------------------------------+--------------------------------------------------------
+ Jeska's Will     | jeska's will     | battle_rule_v1:c1c0185ca36901d892f46c1160113f0b | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 3.0, "effect": "ramp_ritual"}         | {"effect": "ramp_ritual", "category": "ramp"}
+ Jeska's Will     | jeska's will     | battle_rule_v1:c8621a807cc65adc820a8b8189979f70 | curated   | verified      | auto             |      1.000 |            1 |             | {"effect": "ramp_ritual", "mana_produced": 7} | {"effect": "ramp_ritual", "category": "ramp"}
+ Mizzix's Mastery | mizzix's mastery | battle_rule_v1:292b7c856716a9eb18edbfc65e331d17 | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 4.0, "effect": "overload_recursion"}  | {"effect": "overload_recursion", "category": "wincon"}
+ Mizzix's Mastery | mizzix's mastery | battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f | curated   | verified      | auto             |      1.000 |            1 |             | {"effect": "overload_recursion"}              | {"effect": "overload_recursion", "category": "wincon"}
+(4 rows)

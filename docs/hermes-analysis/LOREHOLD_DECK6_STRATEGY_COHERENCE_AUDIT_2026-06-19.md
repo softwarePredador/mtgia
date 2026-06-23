@@ -20598,3 +20598,71 @@ Current reading:
   validation hint only, not an instruction to alter the card.
 - Next deck `6` candidates are `Jeska's Will` and `Mizzix's Mastery`; after
   that, continue deck `606` high queue.
+
+## PG077 Final Deck 6 Reading - 2026-06-23 06:25 UTC
+
+Closed:
+
+- `Jeska's Will` and `Mizzix's Mastery` are now closed for the current deck
+  `6` battle-rule coherence gate.
+- Hash-only provenance drift is also closed for `Silence`, `Scroll Rack`,
+  `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- No deck swap and no `deck_cards` mutation was performed.
+
+Evidence:
+
+- PostgreSQL postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_postcheck_20260623_061411.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_postcheck_20260623_061815.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_postcheck_20260623_062156.out`.
+- Rollbacks:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l4_battle_support_pg077_rollback_20260623_061411.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg077_rollback_20260623_061815.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_hash_provenance_restore_pg077_rollback_20260623_062156.sql`.
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_hash_provenance_final_sync_report_20260623_062156.json`.
+- Runtime event gate:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl`.
+- Final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062156.json`
+  reports `pass=100`.
+- Final deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg077_final_20260623_062156.json`
+  reports `high=7`, `medium=29`, `pass=45`.
+- Final global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg077_final_20260623_062156.json`
+  reports `high=50`, `medium=34`, `pass=121`.
+
+Current reading:
+
+- Deck `6` is closed for this gate.
+- Continue with deck `606` high battle-critical cards:
+  `Flare of Duplication`, `Powerbalance`, `Reforge the Soul`,
+  `Rise of the Eldrazi`, `Rite of the Dragoncaller`, `Storm Herd`, and
+  `Witch Enchanter // Witch-Blessed Meadow`.
+
+## PG077 High-Water Deck 6 Reading - 2026-06-23 06:26 UTC
+
+- Additional PG077 addenda closed ramp/ritual hash provenance and
+  `Seething Song` metadata drift without deck mutation.
+- High-water sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg077_l4_battle_support_final_sync_report_20260623_062422.json`.
+- High-water final deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`
+  reports `pass=100`.
+- Deck `6` remains closed for this gate; continue deck `606` high queue.
+
+## PG077 Final Addendum Reading - 2026-06-23 06:28 UTC
+
+- The latest accepted deck `6` card gate is
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg077_final_20260623_062422.json`,
+  not the earlier `06:21:56` cut.
+- Reason: the full harness found missing `Seething Song` runtime metadata, then
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg077_seething_song_metadata_restore_postcheck_20260623_062422.out`
+  closed it.
+- Final state remains deck `6` `high=0`, `medium=0`, `pass=100`.
+- Strategy status is unchanged: this is a card/rule gate closure, not proof
+  that Lorehold is the best strategic deck after battles.
