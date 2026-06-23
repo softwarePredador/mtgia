@@ -42,6 +42,7 @@ HIGH_RISK_GENERIC_EFFECTS = {
     "draw_engine",
     "extra_turn",
     "finisher",
+    "graveyard_flashback_grant",
     "indestructible",
     "phase_out",
     "protect_creature",
@@ -123,9 +124,17 @@ class DeckCardUsage:
     battle_rules_json_count: int
 
 
-def load_deck_card_usage(conn: sqlite3.Connection) -> dict[str, DeckCardUsage]:
+def load_deck_card_usage(
+    conn: sqlite3.Connection,
+    deck_id: int | None = None,
+) -> dict[str, DeckCardUsage]:
+    where_clause = ""
+    params: tuple[Any, ...] = ()
+    if deck_id is not None:
+        where_clause = "WHERE deck_id = ?"
+        params = (deck_id,)
     rows = conn.execute(
-        """
+        f"""
         SELECT
             lower(trim(card_name)) AS normalized_name,
             MIN(card_name) AS display_name,
@@ -142,9 +151,11 @@ def load_deck_card_usage(conn: sqlite3.Connection) -> dict[str, DeckCardUsage]:
                 END
             ) AS battle_rules_json_count
         FROM deck_cards
+        {where_clause}
         GROUP BY lower(trim(card_name))
         ORDER BY lower(trim(card_name))
-        """
+        """,
+        params,
     ).fetchall()
     usage: dict[str, DeckCardUsage] = {}
     for row in rows:
@@ -457,9 +468,9 @@ def priority_score(severity: str, usage: DeckCardUsage) -> int:
     return base + min(usage.deck_count * 50, 2000) + min(usage.total_quantity, 500)
 
 
-def build_report(conn: sqlite3.Connection) -> dict[str, Any]:
+def build_report(conn: sqlite3.Connection, deck_id: int | None = None) -> dict[str, Any]:
     conn.row_factory = sqlite3.Row
-    usage = load_deck_card_usage(conn)
+    usage = load_deck_card_usage(conn, deck_id=deck_id)
     oracle_cache = load_oracle_cache(conn)
     rules = load_battle_rules(conn)
     cards = [
@@ -484,7 +495,10 @@ def build_report(conn: sqlite3.Connection) -> dict[str, Any]:
     return {
         "generated_at": utc_now(),
         "source": "sqlite_hermes_knowledge_db",
-        "scope": "distinct_cards_referenced_by_deck_cards",
+        "scope": "distinct_cards_referenced_by_deck_cards"
+        if deck_id is None
+        else "distinct_cards_referenced_by_deck_cards_filtered_by_deck_id",
+        "deck_id": deck_id,
         "total_cards": len(cards),
         "severity_counts": dict(sorted(severity_counts.items())),
         "finding_counts": dict(finding_counts.most_common()),
@@ -498,7 +512,9 @@ def markdown_report(report: dict[str, Any], limit: int) -> str:
         "",
         f"Generated at: `{report['generated_at']}`",
         "",
-        "Scope: distinct cards referenced by Hermes `deck_cards`.",
+        "Scope: distinct cards referenced by Hermes `deck_cards`."
+        if report.get("deck_id") is None
+        else f"Scope: distinct cards referenced by Hermes `deck_cards` for `deck_id={report['deck_id']}`.",
         "",
         "This is an audit queue. It does not promote rules and does not mutate PostgreSQL/SQLite.",
         "",
@@ -569,6 +585,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-md")
     parser.add_argument("--limit", type=int, default=80)
     parser.add_argument(
+        "--deck-id",
+        type=int,
+        help="Filter the audit to distinct cards referenced by one Hermes deck_cards.deck_id.",
+    )
+    parser.add_argument(
         "--fail-on",
         choices=["none", "critical", "high", "medium"],
         default="none",
@@ -581,14 +602,19 @@ def main() -> int:
     args = parse_args()
     sqlite_db = Path(args.sqlite_db)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    output_json = Path(args.output_json or DEFAULT_REPORT_DIR / f"deck_card_battle_rule_coherence_audit_{timestamp}.json")
-    output_md = Path(args.output_md or DEFAULT_REPORT_DIR / f"deck_card_battle_rule_coherence_audit_{timestamp}.md")
+    report_stem = "deck_card_battle_rule_coherence_audit"
+    if args.deck_id is not None:
+        report_stem += f"_deck{args.deck_id}"
+    output_json = Path(args.output_json or DEFAULT_REPORT_DIR / f"{report_stem}_{timestamp}.json")
+    output_md = Path(args.output_md or DEFAULT_REPORT_DIR / f"{report_stem}_{timestamp}.md")
     with sqlite3.connect(sqlite_db) as conn:
         conn.row_factory = sqlite3.Row
-        report = build_report(conn)
+        report = build_report(conn, deck_id=args.deck_id)
     write_report(report, output_json, output_md, args.limit)
     print(f"json_report={output_json}")
     print(f"md_report={output_md}")
+    if args.deck_id is not None:
+        print(f"deck_id={args.deck_id}")
     print(f"total_cards={report['total_cards']}")
     print(f"severity_counts={json.dumps(report['severity_counts'], sort_keys=True)}")
     if args.fail_on != "none":

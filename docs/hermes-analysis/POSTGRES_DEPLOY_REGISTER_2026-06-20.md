@@ -3131,3 +3131,1601 @@ Rollback:
   curated rows whose source is `curated`, review/execution status is
   `active|verified`/`auto`, and whose card names are listed above; then rerun
   SQLite-from-PG sync for those same cards.
+
+## PG028 Austere Command Battle Rule - applied_validated - 2026-06-22 19:10 UTC
+
+Scope:
+
+- Card: `Austere Command`.
+- Reason: the existing trusted rule was a broad selective `board_wipe` without
+  oracle hash or model scope, and the generated shadow row remained
+  `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_precheck_20260622_190701.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_apply_20260622_190701.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_postcheck_20260622_190701.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_rollback_20260622_190701.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_board_wipe_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg028_austere_command_battle_rule_20260622_190701`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:5f19a608b87445bcc5c7ebb7ad96eb64`.
+- Stored oracle hash `bce631c9a75d6856dd8c0d7de442b47f`.
+- Stored `battle_model_scope=austere_command_choose_two_destroy_modes_v1`.
+- Disabled the old curated broad row and the generated shadow row as
+  `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_board_wipe_rows=0`.
+- Active executable rule is the new modal destroy rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg028_austere_command_20260622_190701.json`.
+- `pg_rows_loaded=3`.
+- `sqlite_inserted_or_updated=3`.
+- `canonical_snapshot_rows_exported=3193`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_replay_summary_20260622_190701.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+
+## PG029 Blasphemous Act Battle Rule - applied_validated - 2026-06-22 19:29 UTC
+
+Scope:
+
+- Card: `Blasphemous Act`.
+- Reason: the existing trusted row was a broad `board_wipe` without oracle
+  hash or model scope, and the generated shadow row remained
+  `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_precheck_20260622_192517.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_apply_20260622_192517.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_postcheck_20260622_192517.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_rollback_20260622_192517.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_wipe_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg029_blasphemous_act_battle_rule_20260622_192517`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:56271789d639ef390213dbc90059e4d2`.
+- Stored oracle hash `826022a579db4551b45ad35e4cfab973`.
+- Stored `battle_model_scope=blasphemous_act_damage_13_each_creature_v1`.
+- Disabled the old curated broad row and the generated shadow row as
+  `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_wipe_rows=0`.
+- Active executable rule is the new `damage_wipe` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg029_blasphemous_act_20260622_192517.json`.
+- `pg_rows_loaded=3`.
+- `sqlite_inserted_or_updated=3`.
+- `canonical_snapshot_rows_exported=3193`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_pg029_focused_replay_summary_20260622_192517.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the two pre-PG029 rows from
+  `manaloom_deploy_audit.pg029_blasphemous_act_battle_rule_20260622_192517`
+  and removes the new active rule.
+
+## PG030 Boros Charm Battle Rule - applied_validated - 2026-06-22 19:42 UTC
+
+Scope:
+
+- Card: `Boros Charm`.
+- Reason: the existing trusted row was a broad `modal_boros_charm` without
+  oracle hash or model scope, and the generated `indestructible` shadow row
+  remained `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_precheck_20260622_193818.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_apply_20260622_193818.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_postcheck_20260622_193818.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_rollback_20260622_193818.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_modal_or_shadow_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg030_boros_charm_battle_rule_20260622_193818`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:32605a838d7a519f44eaa0899d2c40bf`.
+- Stored oracle hash `98a7be829075118b499a7c283a23501f`.
+- Stored
+  `battle_model_scope=boros_charm_choose_one_damage_indestructible_double_strike_v1`.
+- Disabled the old curated broad row and the generated shadow row as
+  `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_modal_or_shadow_rows=0`.
+- Active executable rule is the new oracle-specific `modal_boros_charm` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg030_boros_charm_20260622_193818.json`.
+- `pg_rows_loaded=3`.
+- `sqlite_inserted_or_updated=3`.
+- `canonical_snapshot_rows_exported=3193`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_pg030_focused_replay_summary_20260622_193818.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the two pre-PG030 rows from
+  `manaloom_deploy_audit.pg030_boros_charm_battle_rule_20260622_193818`
+  and removes the new active rule.
+
+## PG031 Deflecting Swat Battle Rule - applied_validated - 2026-06-22 19:56 UTC
+
+Scope:
+
+- Card: `Deflecting Swat`.
+- Reason: the existing trusted row was a broad `redirect_removal` without
+  oracle hash or model scope, and the generated `draw_cards` shadow row
+  remained `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_precheck_20260622_195126.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_apply_20260622_195126.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_postcheck_20260622_195126.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_rollback_20260622_195126.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_redirect_or_shadow_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg031_deflecting_swat_battle_rule_20260622_195126`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:bac48343654a53205d790a8268bd2631`.
+- Stored oracle hash `a34c89817f87f32bedfb3d66a5bdc672`.
+- Stored
+  `battle_model_scope=deflecting_swat_control_commander_free_redirect_target_spell_or_ability_v1`.
+- Disabled the old curated broad row and the generated shadow row as
+  `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_redirect_or_shadow_rows=0`.
+- Active executable rule is the new oracle-specific `redirect_removal` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg031_deflecting_swat_20260622_195126.json`.
+- `pg_rows_loaded=3`.
+- `sqlite_inserted_or_updated=3`.
+- `canonical_snapshot_rows_exported=3193`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_pg031_focused_replay_summary_20260622_195126.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the two pre-PG031 rows from
+  `manaloom_deploy_audit.pg031_deflecting_swat_battle_rule_20260622_195126`
+  and removes the new active rule.
+
+## PG032 Flawless Maneuver Battle Rule - applied_validated - 2026-06-22 20:10 UTC
+
+Scope:
+
+- Card: `Flawless Maneuver`.
+- Reason: the existing trusted row was a broad `indestructible` rule without
+  oracle hash or model scope, and the generated shadow row remained
+  `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_precheck_20260622_200215.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_apply_20260622_200215.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_postcheck_20260622_200215.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_rollback_20260622_200215.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_indestructible_or_shadow_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg032_flawless_maneuver_battle_rule_20260622_200215`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:73622071c1ad89267708f914a0729bf2`.
+- Stored oracle hash `fa955216fa827bf75c5b79dcbdb4b97e`.
+- Stored
+  `battle_model_scope=flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1`.
+- Disabled the old curated broad row and the generated shadow row as
+  `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_indestructible_or_shadow_rows=0`.
+- Active executable rule is the new oracle-specific `indestructible` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg032_flawless_maneuver_20260622_200215.json`.
+- `pg_rows_loaded=3`.
+- `sqlite_inserted_or_updated=3`.
+- `canonical_snapshot_rows_exported=3193`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_pg032_focused_replay_summary_20260622_200215.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the two pre-PG032 rows from
+  `manaloom_deploy_audit.pg032_flawless_maneuver_battle_rule_20260622_200215`
+  and removes the new active rule.
+
+## PG033 Land Tax Battle Rule - applied_validated - 2026-06-22 20:25 UTC
+
+Scope:
+
+- Card: `Land Tax`.
+- Reason: the existing trusted row was a broad `passive` rule without oracle
+  hash or model scope, and the generated shadow row remained
+  `needs_review`/`review_only` as generic `tutor any`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_precheck_20260622_201417.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_apply_20260622_201417.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_postcheck_20260622_201417.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_rollback_20260622_201417.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_passive_or_shadow_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg033_land_tax_battle_rule_20260622_201417`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef`.
+- Stored oracle hash `83b074e38da3e6c4eb6ec3e7568c914b`.
+- Stored
+  `battle_model_scope=land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1`.
+- Disabled the old curated broad row and the generated shadow row as
+  `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_passive_or_shadow_rows=0`.
+- Active executable rule is the new oracle-specific `land_tax` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg033_land_tax_20260622_201417.json`.
+- `pg_rows_loaded=3`.
+- `sqlite_inserted_or_updated=3`.
+- `canonical_snapshot_rows_exported=3193`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_replay_summary_20260622_201417.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the two pre-PG033 rows from
+  `manaloom_deploy_audit.pg033_land_tax_battle_rule_20260622_201417`
+  and removes the new active rule.
+
+## PG034 Lightning Greaves Battle Rule - applied_validated - 2026-06-22 20:36 UTC
+
+Scope:
+
+- Card: `Lightning Greaves`.
+- Reason: PostgreSQL had two trusted curated `equipment_haste_shroud` rows
+  without oracle hash, and a generated `indestructible` shadow row remained
+  `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply, then re-synced after aligning the local reviewed-runtime cache to
+  the new PG034 rule key.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_precheck_20260622_202908.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_apply_20260622_202908.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_postcheck_20260622_202908.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_rollback_20260622_202908.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_equipment_or_shadow_rows=3`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg034_lightning_greaves_battle_rule_20260622_202908`
+  with the three pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:5ea7f2a8349a93ea46e05b60ee8cdaac`.
+- Stored oracle hash `4a4c71d3cc58637cf00a3d7fe2331353`.
+- Stored
+  `battle_model_scope=lightning_greaves_auto_attach_haste_shroud_equip_0_v1`.
+- Disabled two old curated rows and the generated `indestructible` shadow row
+  as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_equipment_or_shadow_rows=0`.
+- Active executable rule is the new oracle-specific
+  `equipment_haste_shroud` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Initial post-apply report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg034_lightning_greaves_20260622_202908.json`.
+- The initial selective sync exposed stale local reviewed-runtime filtering:
+  SQLite still selected the old disabled curated key because
+  `reviewed_battle_card_rules.json` had not been aligned to PG034.
+- Corrected sync report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg034_lightning_greaves_retry_20260622_202908.json`.
+- Corrected sync direct check: active SQLite rule
+  `battle_rule_v1:5ea7f2a8349a93ea46e05b60ee8cdaac`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=4a4c71d3cc58637cf00a3d7fe2331353`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_pg034_focused_replay_summary_20260622_202908.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, corrected SQLite sync, focused tests, focused events, and auditor
+  rerun passed.
+- The rollback restores the three pre-PG034 rows from
+  `manaloom_deploy_audit.pg034_lightning_greaves_battle_rule_20260622_202908`
+  and removes the new active rule.
+
+## PG035 Lorehold, the Historian Battle Rule - applied_validated - 2026-06-22 20:52 UTC
+
+Scope:
+
+- Card: `Lorehold, the Historian`.
+- Reason: PostgreSQL had one trusted active passive row without oracle hash,
+  `cmc=4.0`, and no `flying`; one old trusted generic `commander` row; and one
+  generated `draw_engine` shadow row remained `needs_review`/`review_only`.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply, after aligning the local reviewed-runtime cache to the new PG035
+  rule key.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_precheck_20260622_204549.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_apply_20260622_204549.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_postcheck_20260622_204549.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_rollback_20260622_204549.sql`.
+
+Precheck:
+
+- `card_rows=4`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=4`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_lorehold_rows=3`.
+- `trusted_executable_without_oracle_hash_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg035_lorehold_historian_battle_rule_20260622_204549`
+  with the three pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4`.
+- Stored oracle hash `f1b6d4f38a533e56f0efb5a3f1547214`.
+- Stored
+  `battle_model_scope=lorehold_opponent_upkeep_miracle_v1`.
+- Disabled the old `commander` row, the old `cmc=4.0` passive row, and the
+  generated `draw_engine` shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_lorehold_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- Active executable rule is the new oracle-specific Lorehold miracle/rummage
+  rule with `cmc=5.0`, `flying=true`, `haste=true`,
+  `grants_miracle_cost=2`, and `opponent_upkeep_rummage=true`.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg035_lorehold_historian_20260622_204549.json`.
+- `pg_rows_loaded=4`.
+- `sqlite_inserted_or_updated=2`.
+- Direct SQLite check selected the active PG035 rule
+  `battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=f1b6d4f38a533e56f0efb5a3f1547214`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_replay_summary_20260622_204549.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the three pre-PG035 rows from
+  `manaloom_deploy_audit.pg035_lorehold_historian_battle_rule_20260622_204549`
+  and removes the new active rule.
+
+## PG036 Past in Flames Battle Rule - applied_validated - 2026-06-22 21:11 UTC
+
+Scope:
+
+- Card: `Past in Flames`.
+- Reason: PostgreSQL had one trusted broad `recursion` row without oracle hash
+  or model scope, and one generated `needs_review`/`review_only` `recursion`
+  shadow row. The broad executor would move instant/sorcery cards to hand,
+  while the oracle grants temporary flashback in graveyard.
+- PostgreSQL was the durable source. Hermes SQLite was synced from PG after
+  the apply.
+
+Package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_precheck_20260622_210425.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_apply_20260622_210425.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_postcheck_20260622_210425.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_rollback_20260622_210425.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_recursion_rows=2`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg036_past_in_flames_battle_rule_20260622_210425`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be`.
+- Stored oracle hash `12f293d8d746fbc4e5ba80828919dec5`.
+- Stored
+  `battle_model_scope=past_in_flames_graveyard_instants_sorceries_flashback_until_eot_v1`.
+- Disabled the old curated generic `recursion` row and the generated
+  `recursion` shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_recursion_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- Active executable rule is the new oracle-specific
+  `graveyard_flashback_grant` rule.
+- Shadow rows remain present only as disabled/deprecated history.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg036_past_in_flames_20260622_210425.json`.
+- `pg_rows_loaded=5278`.
+- `sqlite_inserted_or_updated=5243`.
+- Direct SQLite/runtime check selected the active PG036 rule
+  `battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=12f293d8d746fbc4e5ba80828919dec5`.
+
+Runtime/test evidence:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_pg036_focused_replay_summary_20260622_210425.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, focused tests, focused events, and auditor rerun
+  passed.
+- The rollback restores the two pre-PG036 rows from
+  `manaloom_deploy_audit.pg036_past_in_flames_battle_rule_20260622_210425`
+  and removes the new active rule.
+
+## PG037 Path to Exile Battle Rule Deploy - 2026-06-22 21:22 UTC
+
+PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/path_to_exile_battle_rule_pg037_precheck_20260622_212057.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/path_to_exile_battle_rule_pg037_apply_20260622_212057.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/path_to_exile_battle_rule_pg037_postcheck_20260622_212057.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/path_to_exile_battle_rule_pg037_rollback_20260622_212057.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_removal_rows=3`.
+- `trusted_executable_without_oracle_hash_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg037_path_to_exile_battle_rule_20260622_212057`
+  with the three pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd`.
+- Stored oracle hash `861c960a37be744e45f13200349e2532`.
+- Stored
+  `battle_model_scope=path_to_exile_creature_exile_basic_land_compensation_annotation_v1`.
+- Disabled the old curated active row, the old generic curated verified row,
+  and the generated review-only shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_removal_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg037_path_to_exile_20260622_212057.json`.
+- `pg_rows_loaded=5279`.
+- `sqlite_inserted_or_updated=5243`.
+- `canonical_snapshot_rows_exported=3201`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, tests, focused replay, and auditor rerun passed.
+- The rollback restores the three pre-PG037 rows from
+  `manaloom_deploy_audit.pg037_path_to_exile_battle_rule_20260622_212057`
+  and removes the new active rule.
+
+## PG038 Reverberate Battle Rule Deploy - 2026-06-22 21:43 UTC
+
+PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_battle_rule_pg038_precheck_20260622_213615.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_battle_rule_pg038_apply_20260622_213615.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_battle_rule_pg038_postcheck_20260622_213615.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_battle_rule_pg038_rollback_20260622_213615.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_copy_rows=2`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg038_reverberate_battle_rule_20260622_213615`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:0269136edf067f696c8576740b720e14`.
+- Stored oracle hash `cbae05dee4261e3ed5412fd5f3591c17`.
+- Stored
+  `battle_model_scope=reverberate_copy_stack_instant_or_sorcery_new_targets_annotation_v1`.
+- Disabled the stale curated copy row without `oracle_hash` and the generated
+  review-only shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_copy_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg038_reverberate_20260622_213615.json`.
+- `pg_rows_loaded=5280`.
+- `sqlite_inserted_or_updated=5244`.
+- `canonical_snapshot_rows_exported=3201`.
+
+Runtime/test evidence:
+
+- Runtime selected
+  `battle_rule_v1:0269136edf067f696c8576740b720e14`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=cbae05dee4261e3ed5412fd5f3591c17`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_pg038_focused_replay_summary_20260622_213615.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, tests, focused replay, and auditor rerun passed.
+- The rollback restores the two pre-PG038 rows from
+  `manaloom_deploy_audit.pg038_reverberate_battle_rule_20260622_213615`
+  and removes the new active rule.
+
+Caveat:
+
+- `Reverberate` target reassignment remains `annotation_only`; PG038 proves
+  stack copy creation/resolution, not dynamic retarget selection.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG039 Sensei's Divining Top Battle Rule Deploy - 2026-06-22 22:01 UTC
+
+PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_divining_top_battle_rule_pg039_precheck_20260622_215306.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_divining_top_battle_rule_pg039_apply_20260622_215306.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_divining_top_battle_rule_pg039_postcheck_20260622_215306.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_divining_top_battle_rule_pg039_rollback_20260622_215306.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_topdeck_rows=3`.
+- `trusted_executable_without_oracle_hash_rows=2`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg039_senseis_top_battle_rule_20260622_215306`
+  with the three pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:70c8478871f352b46cee1af296117951`.
+- Stored oracle hash `f2c5ac0f52963cd710470adc25cc6d7c`.
+- Stored
+  `battle_model_scope=senseis_top_reorder_draw_lorehold_first_draw_miracle_v1`.
+- Disabled the old active curated row, old generic verified row, and generated
+  review-only `draw_cards` shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_topdeck_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+SQLite/Hermes sync:
+
+- Initial PG039 sync exposed the reviewed-runtime cache still allowing the old
+  local Top key, so the local reviewed JSON was aligned with PG039 and the sync
+  was repeated.
+- Final report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg039_senseis_divining_top_retry_20260622_215306.json`.
+- `pg_rows_loaded=5281`.
+- `sqlite_inserted_or_updated=5244`.
+- `canonical_snapshot_rows_exported=3201`.
+
+Runtime/test evidence:
+
+- Runtime selected
+  `battle_rule_v1:70c8478871f352b46cee1af296117951`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=f2c5ac0f52963cd710470adc25cc6d7c`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_replay_summary_20260622_215306.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, tests, focused replay, and auditor rerun passed.
+- The rollback restores the three pre-PG039 rows from
+  `manaloom_deploy_audit.pg039_senseis_top_battle_rule_20260622_215306`
+  and removes the new active rule.
+
+Caveat:
+
+- Generic activated draw policy remains `annotation_only`; PG039 proves
+  top-three reorder plus the restricted Lorehold first-draw miracle
+  draw-put-self line.
+
+## PG040 Swords to Plowshares Battle Rule Deploy - 2026-06-22 22:22 UTC
+
+PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_battle_rule_pg040_precheck_20260622_221254.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_battle_rule_pg040_apply_20260622_221254.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_battle_rule_pg040_postcheck_20260622_221254.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_battle_rule_pg040_rollback_20260622_221254.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_removal_rows=2`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg040_swords_to_plowshares_battle_rule_20260622_221254`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:379008f3f03f94258292123453e3041c`.
+- Stored oracle hash `702f566e95dd477f5cf5a551e41e9df8`.
+- Stored
+  `battle_model_scope=swords_to_plowshares_creature_exile_life_equal_power_v1`.
+- Disabled the stale curated generic executable row and the generated
+  review-only shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_removal_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg040_swords_to_plowshares_20260622_221254.json`.
+- `pg_rows_loaded=5282`.
+- `sqlite_inserted_or_updated=5244`.
+- `canonical_snapshot_rows_exported=3201`.
+
+Runtime/test evidence:
+
+- Runtime selected
+  `battle_rule_v1:379008f3f03f94258292123453e3041c`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=702f566e95dd477f5cf5a551e41e9df8`.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  passed (`Ran 25 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_pg040_focused_replay_summary_20260622_221254.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, tests, focused replay, and auditor rerun passed.
+- The rollback restores the two pre-PG040 rows from
+  `manaloom_deploy_audit.pg040_swords_to_plowshares_battle_rule_20260622_221254`
+  and removes the new active rule.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG041 Teferi's Protection Battle Rule Deploy - 2026-06-22 22:41 UTC
+
+PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_battle_rule_pg041_precheck_20260622_223850.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_battle_rule_pg041_apply_20260622_223850.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_battle_rule_pg041_postcheck_20260622_223850.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_battle_rule_pg041_rollback_20260622_223850.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_executable_rule_rows=0`.
+- `legacy_enabled_phase_out_rows=2`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg041_teferis_protection_battle_rule_20260622_223850`
+  with the two pre-existing rows.
+- Inserted active executable rule
+  `battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a`.
+- Stored oracle hash `bdc0faecf4420dc6162c7e72e98cc0eb`.
+- Stored
+  `battle_model_scope=teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1`.
+- Disabled the stale curated generic executable row and the generated
+  review-only shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_executable_rule_rows=1`.
+- `legacy_enabled_phase_out_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg041_teferis_protection_20260622_223850.json`.
+- `pg_rows_loaded=5283`.
+- `sqlite_inserted_or_updated=5244`.
+- `canonical_snapshot_rows_exported=3201`.
+
+Runtime/test evidence:
+
+- Runtime selected
+  `battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=bdc0faecf4420dc6162c7e72e98cc0eb`.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  passed (`Ran 25 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_pg041_focused_replay_summary_20260622_223850.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, tests, focused replay, and auditor rerun passed.
+- The rollback restores the two pre-PG041 rows from
+  `manaloom_deploy_audit.pg041_teferis_protection_battle_rule_20260622_223850`
+  and removes the new active rule.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG042 Valakut Awakening Battle Rule Deploy - 2026-06-22 23:01 UTC
+
+PostgreSQL package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg042_precheck_20260622_225355.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg042_apply_20260622_225355.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg042_postcheck_20260622_225355.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg042_rollback_20260622_225355.sql`.
+
+Precheck:
+
+- `card_rows=1`.
+- `distinct_oracle_ids=1`.
+- `expected_oracle_hash_rows=1`.
+- `exact_full_executable_with_hash_rows=0`.
+- `exact_alias_executable_with_hash_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=4`.
+- `legacy_enabled_rows=2`.
+- `generated_review_only_shadow_rows=1`.
+
+Apply result:
+
+- Created backup table
+  `manaloom_deploy_audit.pg042_valakut_awakening_battle_rule_20260622_225355`
+  with the five pre-existing rows.
+- Activated the split-name executable rule
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d` with oracle hash
+  `22b42fcc181b7aed71f78b2e1e51e887`.
+- Activated the front-face alias rule
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a` with the same oracle hash.
+- Disabled the two legacy curated rows without `oracle_hash`/scope and the
+  generated `draw_cards` shadow row as `deprecated`/`disabled`.
+
+Postcheck:
+
+- `exact_full_executable_with_hash_rows=1`.
+- `exact_alias_executable_with_hash_rows=1`.
+- `legacy_enabled_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- `generated_review_only_shadow_rows=0`.
+
+SQLite/Hermes sync:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg042_valakut_awakening_20260622_225355.json`.
+- `pg_rows_loaded=5283`.
+- `sqlite_inserted_or_updated=5244`.
+- `canonical_snapshot_rows_exported=3201`.
+
+Runtime/test evidence:
+
+- Runtime selected
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d`,
+  `source=curated`, `review_status=active`, `execution_status=auto`,
+  `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`.
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`
+  passed (`Ran 25 tests`).
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_replay_summary_20260622_225355.md`.
+
+Rollback:
+
+- Rollback SQL was generated but not executed because precheck, apply,
+  postcheck, SQLite sync, tests, focused replay, and auditor rerun passed.
+- The rollback restores the five pre-PG042 rows from
+  `manaloom_deploy_audit.pg042_valakut_awakening_battle_rule_20260622_225355`.
+
+Caveats:
+
+- PG042 proves Valakut Awakening's instant hand-filter behavior. It does not
+  claim a land-play/tapped-red-mana executor for `Valakut Stoneforge`; that
+  remains split-name MDFC metadata for runtime lookup.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG043 Wheel of Fortune Battle Rule Deploy - 2026-06-22 23:26 UTC
+
+Status:
+
+- `applied_validated`.
+- PostgreSQL source of truth updated; Hermes SQLite/cache resynced from
+  PostgreSQL after apply.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_battle_rule_pg043_precheck_20260622_231859.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_battle_rule_pg043_apply_20260622_231859.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_battle_rule_pg043_postcheck_20260622_231859.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_battle_rule_pg043_rollback_20260622_231859.sql`.
+
+Precheck evidence:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `legacy_curated_executable_without_hash_rows=1`.
+- `generated_review_only_shadow_rows=1`.
+- `trusted_draw_without_model_scope_rows=1`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg043_wheel_of_fortune_battle_rule_20260622_231859`.
+- Backup row count: `2`.
+- Inserted active oracle-hashed rule:
+  `battle_rule_v1:f8bdb05cc883fda55628d6928c5562d3`.
+- Disabled old rows:
+  `battle_rule_v1:402155f35799993b812ca441586017cd` and
+  `battle_rule_v1:3bd7f7866ce30619d4d92b4e9e7b520e`.
+
+Postcheck evidence:
+
+- `oracle_hashed_multiplayer_wheel_rows=1`.
+- `legacy_or_shadow_enabled_rows=0`.
+- `generated_review_only_shadow_rows=0`.
+- `trusted_draw_without_model_scope_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg043_wheel_of_fortune_20260622_231859.json`.
+- Final SQLite-from-PG sync after PG044 correction:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg044_valakut_hash_refresh_20260622_232411.json`.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_232608.json`.
+- Final counts: `high=81`, `medium=39`, `pass=25`.
+- `Wheel of Fortune` reports `pass`.
+
+Rollback:
+
+- `wheel_of_fortune_battle_rule_pg043_rollback_20260622_231859.sql`
+  deletes the current Wheel rows and restores the two pre-PG043 rows from
+  `manaloom_deploy_audit.pg043_wheel_of_fortune_battle_rule_20260622_231859`.
+
+## PG044 Valakut Awakening Hash Refresh Deploy - 2026-06-22 23:26 UTC
+
+Status:
+
+- `applied_validated`.
+- Corrective metadata refresh after the post-PG043 auditor showed Valakut
+  reopened as `medium` because PostgreSQL still had trusted executable rows
+  without `oracle_hash`.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg044_hash_refresh_precheck_20260622_232411.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg044_hash_refresh_apply_20260622_232411.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg044_hash_refresh_postcheck_20260622_232411.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg044_hash_refresh_rollback_20260622_232411.sql`.
+
+Precheck evidence:
+
+- `card_rows=1`.
+- `expected_oracle_hash_rows=1`.
+- `full_rule_missing_hash_rows=1`.
+- `alias_rule_missing_hash_rows=1`.
+- `generated_shadow_review_rows=1`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg044_valakut_awakening_hash_refresh_20260622_232411`.
+- Backup row count: `5`.
+- Updated rows: full-name rule, front-face alias rule, and generated shadow.
+
+Postcheck evidence:
+
+- `exact_full_executable_with_hash_rows=1`.
+- `exact_alias_executable_with_hash_rows=1`.
+- `generated_review_only_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+- Final auditor reports `Valakut Awakening // Valakut Stoneforge` as `pass`.
+
+Rollback:
+
+- `valakut_awakening_battle_rule_pg044_hash_refresh_rollback_20260622_232411.sql`
+  restores the five pre-PG044 Valakut rows from
+  `manaloom_deploy_audit.pg044_valakut_awakening_hash_refresh_20260622_232411`.
+
+## PG045 Aetherflux Reservoir Battle Rule Deploy - 2026-06-22 23:40 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable correction for `Aetherflux Reservoir`, which had a trusted generic
+  `finisher` row without `oracle_hash`/`battle_model_scope` plus a generated
+  `needs_review`/`review_only` shadow row.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_battle_rule_pg045_precheck_20260622_233656.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_battle_rule_pg045_apply_20260622_233656.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_battle_rule_pg045_postcheck_20260622_233656.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_battle_rule_pg045_rollback_20260622_233656.sql`.
+
+Precheck evidence:
+
+- `card_rows=1`.
+- `oracle_hash_rows=1`.
+- `target_rule_rows_before=0`.
+- `legacy_generic_enabled_rows=1`.
+- `generated_review_only_shadow_rows=1`.
+- `trusted_finisher_without_model_scope_rows=1`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg045_aetherflux_reservoir_battle_rule_20260622_233656`.
+- Backup row count: `2`.
+- Inserted active oracle-hashed rule:
+  `battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5`.
+- Disabled old rows:
+  `battle_rule_v1:3895145eecb0a2ac9b7805febd67ea54` and
+  `battle_rule_v1:53d7252f111b777ddf7ff42a275c4a38`.
+
+Postcheck evidence:
+
+- `oracle_hashed_aetherflux_lifegain_rows=1`.
+- `legacy_or_shadow_enabled_rows=0`.
+- `generated_review_only_shadow_rows=0`.
+- `trusted_finisher_without_model_scope_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg045_aetherflux_reservoir_20260622_233656.json`.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_234015.json`.
+- Final counts: `high=80`, `medium=39`, `pass=26`.
+- `Aetherflux Reservoir` reports `pass`.
+
+Rollback:
+
+- `aetherflux_reservoir_battle_rule_pg045_rollback_20260622_233656.sql`
+  deletes the current Aetherflux rows and restores the two pre-PG045 rows from
+  `manaloom_deploy_audit.pg045_aetherflux_reservoir_battle_rule_20260622_233656`.
+
+## PG046 Approach of the Second Sun Battle Rule Deploy - 2026-06-23 00:02 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable correction for `Approach of the Second Sun`, which had trusted
+  executable no-hash rows and a generated `needs_review`/`review_only` shadow
+  row. PostgreSQL is the source of truth; Hermes SQLite was resynced only
+  after the PG postcheck passed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_battle_rule_pg046_precheck_20260622_235039.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_battle_rule_pg046_apply_20260622_235039.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_battle_rule_pg046_postcheck_20260622_235039.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_battle_rule_pg046_rollback_20260622_235039.sql`.
+
+Precheck evidence:
+
+- `card_rows=1`.
+- `oracle_hash_rows=1`.
+- `target_rule_rows_before=0`.
+- `legacy_trusted_enabled_rows=2`.
+- `generated_review_only_shadow_rows=1`.
+- `trusted_executable_without_oracle_hash_rows=2`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg046_approach_second_sun_battle_rule_20260622_235039`.
+- Backup row count: `3`.
+- Inserted active oracle-hashed rule:
+  `battle_rule_v1:ed74fb069b6c1d635392d907804a1d98`.
+- Disabled old rows:
+  `battle_rule_v1:c9594094630e58aa220dd4e82309f597`,
+  `battle_rule_v1:d89b90f224cfa72e048c8adef2f80185`, and
+  `battle_rule_v1:6e281d363c92040c064cda01b445b596`.
+
+Postcheck evidence:
+
+- `oracle_hashed_approach_second_cast_rows=1`.
+- `legacy_or_shadow_enabled_rows=0`.
+- `generated_review_only_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg046_approach_second_sun_20260622_235039.json`.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_000228.json`.
+- Final counts: `high=79`, `medium=39`, `pass=27`.
+- `Approach of the Second Sun` reports `pass`.
+
+Rollback:
+
+- `approach_second_sun_battle_rule_pg046_rollback_20260622_235039.sql`
+  deletes the current Approach rows and restores the three pre-PG046 rows from
+  `manaloom_deploy_audit.pg046_approach_second_sun_battle_rule_20260622_235039`.
+
+## PG047 Archaeomancer's Map Battle Rule Deploy - 2026-06-23 00:17 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable correction for `Archaeomancer's Map`, which had one trusted
+  executable no-hash/no-scope row and two generated `needs_review`/
+  `review_only` shadow rows. PostgreSQL is the source of truth; Hermes SQLite
+  was resynced only after the PG postcheck passed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_battle_rule_pg047_precheck_20260623_001244.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_battle_rule_pg047_apply_20260623_001244.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_battle_rule_pg047_postcheck_20260623_001244.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_battle_rule_pg047_rollback_20260623_001244.sql`.
+
+Precheck evidence:
+
+- `card_rows=1`.
+- `oracle_hash_rows=1`.
+- `target_rule_rows_before=0`.
+- `legacy_trusted_enabled_rows=1`.
+- `generated_review_only_shadow_rows=2`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg047_archaeomancers_map_battle_rule_20260623_001244`.
+- Backup row count: `3`.
+- Inserted active oracle-hashed rule:
+  `battle_rule_v1:69acc8f6ed179a5a32bef08190cd747e`.
+- Disabled old rows:
+  `battle_rule_v1:a2cbd7e64ee611d7284e4aa326e06d36`,
+  `battle_rule_v1:d8dfc058ea5870cde290c3d57dc34849`, and
+  `battle_rule_v1:f1fec28b4adc813d6a8a0a5722c288cd`.
+
+Postcheck evidence:
+
+- `oracle_hashed_archaeomancers_map_rows=1`.
+- `legacy_or_shadow_enabled_rows=0`.
+- `generated_review_only_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg047_archaeomancers_map_20260623_001244.json`.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_001717.json`.
+- Final counts: `high=78`, `medium=39`, `pass=28`.
+- `Archaeomancer's Map` reports `pass`.
+
+Rollback:
+
+- `archaeomancers_map_battle_rule_pg047_rollback_20260623_001244.sql`
+  deletes the current Archaeomancer's Map rows and restores the three
+  pre-PG047 rows from
+  `manaloom_deploy_audit.pg047_archaeomancers_map_battle_rule_20260623_001244`.
+
+## PG048 Blind Obedience Battle Rule Deploy - 2026-06-23 00:35 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable correction for `Blind Obedience`, which had one trusted executable
+  no-hash row and one generated `needs_review`/`review_only` shadow row.
+  PostgreSQL is the source of truth; Hermes SQLite was resynced only after the
+  PG postcheck passed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_battle_rule_pg048_precheck_20260623_003029.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_battle_rule_pg048_apply_20260623_003029.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_battle_rule_pg048_postcheck_20260623_003029.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_battle_rule_pg048_rollback_20260623_003029.sql`.
+
+Precheck evidence:
+
+- `card_rows=1`.
+- `oracle_hash_rows=1`.
+- `target_rule_rows_before=0`.
+- `legacy_trusted_enabled_rows=1`.
+- `generated_review_only_shadow_rows=1`.
+- `trusted_executable_without_oracle_hash_rows=1`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg048_blind_obedience_battle_rule_20260623_003029`.
+- Backup row count: `2`.
+- Inserted active oracle-hashed rule:
+  `battle_rule_v1:40f23fcea3b7955bacd550a9090c6872`.
+- Disabled old rows:
+  `battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93` and
+  `battle_rule_v1:81701a2e0221de09cf7cf5ba202a3ef0`.
+
+Postcheck evidence:
+
+- `oracle_hashed_blind_obedience_rows=1`.
+- `legacy_or_shadow_enabled_rows=0`.
+- `generated_review_only_shadow_rows=0`.
+- `trusted_executable_without_oracle_hash_rows=0`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg048_blind_obedience_20260623_003029.json`.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_003552.json`.
+- Final counts: `high=77`, `medium=40`, `pass=28`.
+- `Blind Obedience` reports `pass`.
+
+Rollback:
+
+- `blind_obedience_battle_rule_pg048_rollback_20260623_003029.sql`
+  deletes the current Blind Obedience rows and restores the two pre-PG048 rows
+  from
+  `manaloom_deploy_audit.pg048_blind_obedience_battle_rule_20260623_003029`.
+
+## PG049 Deck 6 L2 Hash-Only Batch Deploy - 2026-06-23 00:49 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable metadata cleanup for official Lorehold deck `6` L2 hash-only lane.
+  PostgreSQL is the source of truth; Hermes SQLite was resynced only after the
+  PG postcheck passed.
+- No deck swap, commit, push, or runtime behavior change was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_batch_pg049_precheck_20260623_004614.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_batch_pg049_apply_20260623_004614.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_batch_pg049_postcheck_20260623_004614.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_batch_pg049_rollback_20260623_004614.sql`.
+
+Target rows:
+
+- `Crawlspace` active rule
+  `battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591`.
+- `Ghostly Prison` active rule
+  `battle_rule_v1:99151859bece89ba3ead032e05b1f65a`.
+- `Valakut Awakening` active alias rule
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a`.
+- `Valakut Awakening // Valakut Stoneforge` active split-name rule
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d`.
+- Valakut generated disabled shadow
+  `battle_rule_v1:1bd5dce7cffed8d0af007d20b15e8549`.
+
+Precheck evidence:
+
+- `card_rows=3`.
+- `oracle_hash_rows=3`.
+- `target_trusted_missing_hash_rows=4`.
+- `valakut_generated_disabled_shadow_rows=1`.
+
+Apply evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg049_deck6_l2_hash_only_batch_20260623_004614`.
+- Backup row count: `9`.
+- Updated active oracle hashes: `4`.
+- Deprecated generated Valakut shadow rows: `1`.
+
+Postcheck evidence:
+
+- `crawlspace_hashed_rows=1`.
+- `ghostly_prison_hashed_rows=1`.
+- `valakut_hashed_rows=2`.
+- `target_trusted_missing_hash_rows=0`.
+- `valakut_generated_review_only_shadow_rows=0`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg049_deck6_l2_hash_only_20260623_004614.json`.
+- Deck 6 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_004857.json`.
+- Deck 6 final counts: `high=41`, `medium=30`, `pass=29`.
+- Deck 606 separate auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_004857.json`.
+
+Rollback:
+
+- `deck6_l2_hash_only_batch_pg049_rollback_20260623_004614.sql`
+  deletes the current target rows and restores the nine pre-PG049 rows from
+  `manaloom_deploy_audit.pg049_deck6_l2_hash_only_batch_20260623_004614`.

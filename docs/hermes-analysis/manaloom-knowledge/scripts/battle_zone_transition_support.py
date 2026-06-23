@@ -6,6 +6,8 @@ import copy
 
 def finish_countered_spell(player, card, *, move_to_exile_func):
     """Move a countered spell to the correct zone object."""
+    if isinstance(card, dict) and card.get("is_copy"):
+        return
     if isinstance(card, dict) and card.get("_flashback_cast"):
         move_to_exile_func(player, card, reason="flashback_countered")
         return
@@ -31,8 +33,27 @@ def move_to_exile(player, card, *, face_down=False, public=None, reason=None, tu
     return card
 
 
-def finish_resolved_spell(player, card, *, turn=None, move_to_exile_func, emit_replay_event):
+def finish_resolved_spell(
+    player,
+    card,
+    *,
+    turn=None,
+    move_to_exile_func,
+    emit_replay_event,
+    effect_data=None,
+):
     """Move a resolved nonpermanent spell, honoring Adventure/Flashback replacements."""
+    effect_data = effect_data or {}
+    if isinstance(card, dict) and card.get("is_copy"):
+        emit_replay_event(
+            "spell_copy_ceased_to_exist",
+            player=player.name,
+            card=card.get("name", "?"),
+            copied_from=card.get("_copied_from_spell"),
+            copied_by=card.get("_copied_by"),
+            turn=turn,
+        )
+        return
     if isinstance(card, dict) and card.get("_flashback_cast"):
         move_to_exile_func(player, card, reason="flashback", turn=turn)
         emit_replay_event(
@@ -52,6 +73,15 @@ def finish_resolved_spell(player, card, *, turn=None, move_to_exile_func, emit_r
             player=player.name,
             card=parent.get("name", "?"),
             adventure=card.get("name", "?"),
+            turn=turn,
+        )
+        return
+    if effect_data.get("exiles_self"):
+        move_to_exile_func(player, card, reason="self_exile", turn=turn)
+        emit_replay_event(
+            "self_exiled_on_resolution",
+            player=player.name,
+            card=card.get("name", "?") if isinstance(card, dict) else str(card),
             turn=turn,
         )
         return

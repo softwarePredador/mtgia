@@ -160,18 +160,45 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Aether Channeler"]["source"], "curated")
         self.assertEqual(by_name["Aether Channeler"]["effect_json"]["effect"], "creature")
         self.assertEqual(by_name["Aether Channeler"]["effect_json"]["etb_draw_count"], 1)
+        self.assertEqual(by_name["Aetherflux Reservoir"]["source"], "curated")
+        self.assertEqual(by_name["Aetherflux Reservoir"]["review_status"], "active")
+        self.assertEqual(by_name["Aetherflux Reservoir"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Aetherflux Reservoir"]["oracle_hash"],
+            "ea5327899fb66a2d583e80e8ca12d9b2",
+        )
+        self.assertEqual(
+            by_name["Aetherflux Reservoir"]["effect_json"]["effect"],
+            "aetherflux_reservoir",
+        )
+        self.assertTrue(by_name["Aetherflux Reservoir"]["effect_json"]["spell_cast_lifegain"])
+        self.assertTrue(
+            by_name["Aetherflux Reservoir"]["effect_json"][
+                "life_gain_equal_spells_cast_this_turn"
+            ]
+        )
+        self.assertEqual(
+            by_name["Aetherflux Reservoir"]["effect_json"]["activation_execution_status"],
+            "annotation_only",
+        )
+        self.assertEqual(
+            by_name["Aetherflux Reservoir"]["effect_json"]["battle_model_scope"],
+            "spell_cast_lifegain_pay_50_damage_annotation_v1",
+        )
         self.assertIn("Ashnod's Altar", by_name)
         self.assertIn("Akroma's Will", by_name)
         self.assertIn("Ancient Den", by_name)
         self.assertIn("Angel's Grace", by_name)
         self.assertIn("Apex of Power", by_name)
         self.assertIn("Approach of the Second Sun", by_name)
+        self.assertIn("Archaeomancer's Map", by_name)
         self.assertIn("Ancient Tomb", by_name)
         self.assertIn("Arcane Endeavor", by_name)
         self.assertIn("Aven Mindcensor", by_name)
         self.assertIn("Basking Broodscale", by_name)
         self.assertIn("Big Score", by_name)
         self.assertIn("Birgi, God of Storytelling", by_name)
+        self.assertIn("Blind Obedience", by_name)
         self.assertIn("Breena, the Demagogue", by_name)
         self.assertIn("Chrome Mox", by_name)
         self.assertIn("Chromatic Star", by_name)
@@ -230,6 +257,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Spelltwine", by_name)
         self.assertIn("Staff of Compleation", by_name)
         self.assertIn("Talisman of Conviction", by_name)
+        self.assertIn("Teferi's Protection", by_name)
         self.assertIn("Tellah, Great Sage", by_name)
         self.assertIn("The Unagi of Kyoshi Island", by_name)
         self.assertIn("Silence", by_name)
@@ -247,6 +275,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Wall of Omens", by_name)
         self.assertIn("War Room", by_name)
         self.assertIn("Wayfarer's Bauble", by_name)
+        self.assertIn("Wheel of Fortune", by_name)
         self.assertIn("Woodland Bellower", by_name)
         self.assertIn("Worldfire", by_name)
         self.assertIn("Zuran Orb", by_name)
@@ -272,10 +301,65 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Apex of Power"]["effect_json"]["effect"], "passive")
         self.assertTrue(by_name["Apex of Power"]["effect_json"]["impulse_top_seven_until_eot"])
         self.assertEqual(by_name["Approach of the Second Sun"]["source"], "curated")
-        self.assertEqual(by_name["Approach of the Second Sun"]["review_status"], "verified")
+        self.assertEqual(by_name["Approach of the Second Sun"]["review_status"], "active")
+        self.assertEqual(by_name["Approach of the Second Sun"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Approach of the Second Sun"]["oracle_hash"],
+            "0838960b80a282fb4508532f7bae8c2b",
+        )
         self.assertEqual(
             by_name["Approach of the Second Sun"]["effect_json"]["effect"],
             "approach",
+        )
+        self.assertEqual(
+            by_name["Approach of the Second Sun"]["effect_json"]["battle_model_scope"],
+            "approach_second_cast_win_v2",
+        )
+        self.assertTrue(
+            by_name["Approach of the Second Sun"]["effect_json"]["countered_first_cast_counts"]
+        )
+        self.assertTrue(
+            by_name["Approach of the Second Sun"]["effect_json"]["copy_spell_does_not_count"]
+        )
+        self.assertEqual(by_name["Archaeomancer's Map"]["source"], "curated")
+        self.assertEqual(by_name["Archaeomancer's Map"]["review_status"], "active")
+        self.assertEqual(by_name["Archaeomancer's Map"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Archaeomancer's Map"]["oracle_hash"],
+            "22b82ca6bbef42371227bc38a9a546b5",
+        )
+        self.assertEqual(by_name["Archaeomancer's Map"]["effect_json"]["effect"], "ramp_engine")
+        self.assertEqual(
+            by_name["Archaeomancer's Map"]["effect_json"]["battle_model_scope"],
+            "basic_plains_etb_plus_opponent_land_catchup_v2",
+        )
+        self.assertEqual(
+            by_name["Archaeomancer's Map"]["effect_json"]["trigger_condition"],
+            "opponent_controls_more_lands_than_you",
+        )
+        self.assertTrue(
+            by_name["Archaeomancer's Map"]["effect_json"]["trigger_rechecks_on_resolution"]
+        )
+        self.assertEqual(by_name["Blind Obedience"]["source"], "curated")
+        self.assertEqual(by_name["Blind Obedience"]["review_status"], "active")
+        self.assertEqual(by_name["Blind Obedience"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Blind Obedience"]["oracle_hash"],
+            "4e62bff316f784c1b468b9e53146d2aa",
+        )
+        self.assertEqual(by_name["Blind Obedience"]["effect_json"]["effect"], "passive")
+        self.assertTrue(
+            by_name["Blind Obedience"]["effect_json"][
+                "opponents_artifacts_creatures_enter_tapped"
+            ]
+        )
+        self.assertEqual(
+            by_name["Blind Obedience"]["effect_json"]["extort_execution_status"],
+            "annotation_only",
+        )
+        self.assertEqual(
+            by_name["Blind Obedience"]["effect_json"]["battle_model_scope"],
+            "opponent_artifact_creature_enter_tapped_extort_annotation_v1",
         )
         self.assertEqual(by_name["Arcane Endeavor"]["source"], "curated")
         self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
@@ -581,13 +665,38 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["effect"], "ramp_permanent")
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["mana_produced"], 1)
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["life_for_colored_mana"], 1)
+        self.assertEqual(by_name["Teferi's Protection"]["source"], "curated")
+        self.assertEqual(by_name["Teferi's Protection"]["review_status"], "active")
+        self.assertEqual(by_name["Teferi's Protection"]["execution_status"], "auto")
+        self.assertEqual(by_name["Teferi's Protection"]["oracle_hash"], "bdc0faecf4420dc6162c7e72e98cc0eb")
+        self.assertEqual(by_name["Teferi's Protection"]["effect_json"]["effect"], "phase_out")
+        self.assertTrue(by_name["Teferi's Protection"]["effect_json"]["life_total_cant_change"])
+        self.assertTrue(by_name["Teferi's Protection"]["effect_json"]["protection_from_everything"])
+        self.assertTrue(by_name["Teferi's Protection"]["effect_json"]["phase_out_all_permanents_you_control"])
+        self.assertTrue(by_name["Teferi's Protection"]["effect_json"]["phase_out_includes_lands"])
+        self.assertTrue(by_name["Teferi's Protection"]["effect_json"]["exiles_self"])
         self.assertEqual(by_name["Ur-Golem's Eye"]["source"], "curated")
         self.assertEqual(by_name["Ur-Golem's Eye"]["review_status"], "verified")
         self.assertEqual(by_name["Ur-Golem's Eye"]["effect_json"]["mana_produced"], 2)
         self.assertEqual(by_name["Valakut Awakening"]["source"], "curated")
+        self.assertEqual(by_name["Valakut Awakening"]["review_status"], "active")
+        self.assertEqual(by_name["Valakut Awakening"]["execution_status"], "auto")
+        self.assertEqual(by_name["Valakut Awakening"]["oracle_hash"], "22b42fcc181b7aed71f78b2e1e51e887")
         self.assertEqual(by_name["Valakut Awakening"]["effect_json"]["effect"], "hand_filter")
         self.assertEqual(by_name["Valakut Awakening"]["effect_json"]["draw_extra"], 1)
         self.assertEqual(by_name["Urza's Saga"]["effect_json"]["produces"], "C")
+        self.assertEqual(
+            by_name["Valakut Awakening // Valakut Stoneforge"]["review_status"],
+            "active",
+        )
+        self.assertEqual(
+            by_name["Valakut Awakening // Valakut Stoneforge"]["execution_status"],
+            "auto",
+        )
+        self.assertEqual(
+            by_name["Valakut Awakening // Valakut Stoneforge"]["oracle_hash"],
+            "22b42fcc181b7aed71f78b2e1e51e887",
+        )
         self.assertEqual(
             by_name["Valakut Awakening // Valakut Stoneforge"]["effect_json"]["mdfc_land_face"]["produces"],
             "R",
@@ -596,6 +705,18 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Volcanic Vision"]["effect_json"]["effect"], "recursion")
         self.assertEqual(by_name["Volcanic Vision"]["effect_json"]["target"], "instant_or_sorcery")
         self.assertTrue(by_name["Volcanic Vision"]["effect_json"]["exiles_self"])
+        self.assertEqual(by_name["Wheel of Fortune"]["source"], "curated")
+        self.assertEqual(by_name["Wheel of Fortune"]["review_status"], "active")
+        self.assertEqual(by_name["Wheel of Fortune"]["execution_status"], "auto")
+        self.assertEqual(by_name["Wheel of Fortune"]["oracle_hash"], "c37cd579d8132efac0c2118608f6f001")
+        self.assertEqual(by_name["Wheel of Fortune"]["effect_json"]["effect"], "draw_cards")
+        self.assertEqual(by_name["Wheel of Fortune"]["effect_json"]["count"], 7)
+        self.assertTrue(by_name["Wheel of Fortune"]["effect_json"]["wheel_like"])
+        self.assertTrue(by_name["Wheel of Fortune"]["effect_json"]["discard_hand_each_player"])
+        self.assertEqual(
+            by_name["Wheel of Fortune"]["effect_json"]["battle_model_scope"],
+            "multiplayer_discard_draw_v1",
+        )
         self.assertEqual(by_name["Scroll Rack"]["source"], "curated")
         self.assertEqual(by_name["Scroll Rack"]["review_status"], "active")
         self.assertTrue(by_name["Scroll Rack"]["effect_json"]["hand_to_top_exchange"])
@@ -706,6 +827,19 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(
             by_name["Approach of the Second Sun"]["effect_json"]["effect"],
             "approach",
+        )
+        self.assertEqual(
+            by_name["Approach of the Second Sun"]["effect_json"]["battle_model_scope"],
+            "approach_second_cast_win_v2",
+        )
+        self.assertEqual(by_name["Archaeomancer's Map"]["source"], "curated")
+        self.assertEqual(
+            by_name["Archaeomancer's Map"]["effect_json"]["battle_model_scope"],
+            "basic_plains_etb_plus_opponent_land_catchup_v2",
+        )
+        self.assertEqual(
+            by_name["Archaeomancer's Map"]["oracle_hash"],
+            "22b82ca6bbef42371227bc38a9a546b5",
         )
         self.assertEqual(by_name["Arcane Endeavor"]["source"], "curated")
         self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
@@ -940,6 +1074,12 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                         "type_line": "Legendary Creature — Elder Dragon",
                     }
                 )
+                aetherflux_reservoir = battle.get_card_effect(
+                    {"name": "Aetherflux Reservoir", "type_line": "Artifact"}
+                )
+                blind_obedience = battle.get_card_effect(
+                    {"name": "Blind Obedience", "type_line": "Enchantment"}
+                )
                 ancient_tomb = battle.get_card_effect({"name": "Ancient Tomb", "type_line": "Land"})
                 fellwar_stone = battle.get_card_effect({"name": "Fellwar Stone", "type_line": "Artifact"})
                 lumra = battle.get_card_effect(
@@ -955,6 +1095,12 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                 )
                 path_to_exile = battle.get_card_effect(
                     {"name": "Path to Exile", "type_line": "Instant"}
+                )
+                swords_to_plowshares = battle.get_card_effect(
+                    {"name": "Swords to Plowshares", "type_line": "Instant"}
+                )
+                teferis_protection = battle.get_card_effect(
+                    {"name": "Teferi's Protection", "type_line": "Instant"}
                 )
                 pirates_pillage = battle.get_card_effect({"name": "Pirate's Pillage", "type_line": "Sorcery"})
                 prismatic_lens = battle.get_card_effect({"name": "Prismatic Lens", "type_line": "Artifact"})
@@ -1020,6 +1166,43 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(ancient_tomb["mana_produced"], 1)
         self.assertEqual(ancient_tomb["ancient_tomb_bonus_mana"], 1)
         self.assertEqual(ancient_tomb["ancient_tomb_bonus_life_cost"], 2)
+        self.assertEqual(aetherflux_reservoir["_rule_source"], "curated")
+        self.assertEqual(aetherflux_reservoir["_rule_review_status"], "active")
+        self.assertEqual(
+            aetherflux_reservoir["_rule_logical_key"],
+            "battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5",
+        )
+        self.assertEqual(
+            aetherflux_reservoir["_rule_oracle_hash"],
+            "ea5327899fb66a2d583e80e8ca12d9b2",
+        )
+        self.assertEqual(aetherflux_reservoir["effect"], "aetherflux_reservoir")
+        self.assertTrue(aetherflux_reservoir["spell_cast_lifegain"])
+        self.assertEqual(
+            aetherflux_reservoir["activation_execution_status"],
+            "annotation_only",
+        )
+        self.assertEqual(
+            aetherflux_reservoir["battle_model_scope"],
+            "spell_cast_lifegain_pay_50_damage_annotation_v1",
+        )
+        self.assertEqual(blind_obedience["_rule_source"], "curated")
+        self.assertEqual(blind_obedience["_rule_review_status"], "active")
+        self.assertEqual(blind_obedience["_rule_execution_status"], "auto")
+        self.assertEqual(
+            blind_obedience["_rule_oracle_hash"],
+            "4e62bff316f784c1b468b9e53146d2aa",
+        )
+        self.assertEqual(blind_obedience["effect"], "passive")
+        self.assertTrue(blind_obedience["opponents_artifacts_creatures_enter_tapped"])
+        self.assertEqual(
+            blind_obedience["extort_execution_status"],
+            "annotation_only",
+        )
+        self.assertEqual(
+            blind_obedience["battle_model_scope"],
+            "opponent_artifact_creature_enter_tapped_extort_annotation_v1",
+        )
         self.assertEqual(fellwar_stone["_rule_source"], "curated")
         self.assertEqual(fellwar_stone["_rule_review_status"], "active")
         self.assertEqual(fellwar_stone["effect"], "ramp_permanent")
@@ -1091,6 +1274,35 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(path_to_exile["target"], "creature")
         self.assertTrue(path_to_exile["exile_target"])
         self.assertTrue(path_to_exile["target_controller_basic_land_tapped"])
+        self.assertEqual(swords_to_plowshares["_rule_source"], "curated")
+        self.assertEqual(swords_to_plowshares["_rule_review_status"], "active")
+        self.assertEqual(swords_to_plowshares["effect"], "remove_creature")
+        self.assertEqual(swords_to_plowshares["target"], "creature")
+        self.assertEqual(swords_to_plowshares["destination"], "exile")
+        self.assertTrue(swords_to_plowshares["exile_target"])
+        self.assertTrue(
+            swords_to_plowshares["target_controller_life_gain_equal_target_power"]
+        )
+        self.assertEqual(
+            swords_to_plowshares["life_gain_status"],
+            "dynamic_target_power_executor",
+        )
+        self.assertEqual(teferis_protection["_rule_source"], "curated")
+        self.assertEqual(teferis_protection["_rule_review_status"], "active")
+        self.assertEqual(
+            teferis_protection["_rule_logical_key"],
+            "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a",
+        )
+        self.assertEqual(
+            teferis_protection["_rule_oracle_hash"],
+            "bdc0faecf4420dc6162c7e72e98cc0eb",
+        )
+        self.assertEqual(teferis_protection["effect"], "phase_out")
+        self.assertTrue(teferis_protection["life_total_cant_change"])
+        self.assertTrue(teferis_protection["protection_from_everything"])
+        self.assertTrue(teferis_protection["phase_out_all_permanents_you_control"])
+        self.assertTrue(teferis_protection["phase_out_includes_lands"])
+        self.assertTrue(teferis_protection["exiles_self"])
         self.assertEqual(pirates_pillage["_rule_source"], "curated")
         self.assertEqual(pirates_pillage["effect"], "treasure_maker")
         self.assertEqual(pirates_pillage["treasure_count"], 2)
@@ -1302,6 +1514,261 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(resolved[0]["discarded"], 2)
         self.assertEqual(resolved[0]["cards_drawn"], 2)
         self.assertEqual([card["name"] for card in player.hand], ["New A", "New B"])
+
+    def test_wheel_of_fortune_uses_oracle_hashed_multiplayer_wheel_rule(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Caster", None, [])
+                opponent = battle.Player("Opponent", None, [])
+                player.hand = [
+                    {"name": "Old A", "type_line": "Instant"},
+                    {"name": "Old B", "type_line": "Sorcery"},
+                ]
+                opponent.hand = [
+                    {"name": "Opp Old", "type_line": "Creature"},
+                ]
+                player.library = [
+                    {"name": f"New {index}", "type_line": "Instant"}
+                    for index in range(8)
+                ]
+                opponent.library = [
+                    {"name": f"Opp New {index}", "type_line": "Creature"}
+                    for index in range(8)
+                ]
+                card = {"name": "Wheel of Fortune", "type_line": "Sorcery", "cmc": 3}
+                effect = battle.get_card_effect(card)
+                self.assertEqual(
+                    effect["_rule_logical_key"],
+                    "battle_rule_v1:f8bdb05cc883fda55628d6928c5562d3",
+                )
+                self.assertEqual(effect["_rule_oracle_hash"], "c37cd579d8132efac0c2118608f6f001")
+                battle.apply_effect_immediate(
+                    player,
+                    [opponent],
+                    card,
+                    4,
+                    __import__("random").Random(1),
+                    effect_data_override=effect,
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        resolved = [
+            data
+            for event, data in events
+            if event == "wheel_resolved"
+        ]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(resolved[0]["draw_count"], 7)
+        self.assertEqual(resolved[0]["opponent_cards_drawn"], 7)
+        self.assertEqual(
+            resolved[0]["rule_logical_key"],
+            "battle_rule_v1:f8bdb05cc883fda55628d6928c5562d3",
+        )
+        self.assertEqual(resolved[0]["rule_oracle_hash"], "c37cd579d8132efac0c2118608f6f001")
+        participants = {entry["player"]: entry for entry in resolved[0]["participants"]}
+        self.assertEqual(participants["Caster"]["discarded"], 2)
+        self.assertEqual(participants["Caster"]["drawn"], 7)
+        self.assertEqual(participants["Opponent"]["discarded"], 1)
+        self.assertEqual(participants["Opponent"]["drawn"], 7)
+
+    def test_approach_of_the_second_sun_counts_countered_first_cast_and_second_cast_wins(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        old_turn = battle.CURRENT_REPLAY_TURN
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.CURRENT_REPLAY_TURN = 4
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Caster", None, [])
+                card = {"name": "Approach of the Second Sun", "type_line": "Sorcery", "cmc": 7}
+                first_effect = battle.get_card_effect(card)
+                self.assertEqual(
+                    first_effect["_rule_logical_key"],
+                    "battle_rule_v1:ed74fb069b6c1d635392d907804a1d98",
+                )
+                self.assertEqual(
+                    first_effect["_rule_oracle_hash"],
+                    "0838960b80a282fb4508532f7bae8c2b",
+                )
+                player.mana_pool.add("white", 1)
+                player.mana_pool.add_generic(6)
+                first_context = battle.begin_cast_context(
+                    player,
+                    card,
+                    "precombat_main",
+                    effect_data=first_effect,
+                    role="test_first_countered",
+                )
+                self.assertTrue(battle.commit_cast_payment(first_context))
+                stack = battle.Stack()
+                stack.push(card, player, first_effect)
+                stack.items[-1].countered = True
+                self.assertIsNone(stack.resolve_top())
+                self.assertEqual(player.approach_count, 1)
+                self.assertEqual(player.life, 40)
+
+                second_card = {"name": "Approach of the Second Sun", "type_line": "Sorcery", "cmc": 7}
+                second_effect = battle.get_card_effect(second_card)
+                player.mana_pool.add("white", 1)
+                player.mana_pool.add_generic(6)
+                second_context = battle.begin_cast_context(
+                    player,
+                    second_card,
+                    "precombat_main",
+                    effect_data=second_effect,
+                    role="test_second_win",
+                )
+                self.assertTrue(battle.commit_cast_payment(second_context))
+                battle.apply_effect_immediate(
+                    player,
+                    [],
+                    second_card,
+                    4,
+                    __import__("random").Random(46),
+                    effect_data_override=second_effect,
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.CURRENT_REPLAY_TURN = old_turn
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        self.assertEqual(player.approach_count, 2)
+        self.assertTrue(player.has_won())
+        self.assertEqual(player.win_reason, "approach")
+        self.assertEqual(player.life, 40)
+        self.assertEqual(
+            [
+                data.get("approach_count")
+                for event, data in events
+                if event == "approach_cast_tracked"
+                and data.get("card") == "Approach of the Second Sun"
+            ],
+            [1, 2],
+        )
+        self.assertFalse(
+            [
+                data
+                for event, data in events
+                if event == "approach_first_resolution"
+                and data.get("approach_count") == 2
+            ]
+        )
+        second_resolution = [
+            data
+            for event, data in events
+            if event == "spell_resolved"
+            and data.get("card") == "Approach of the Second Sun"
+        ]
+        self.assertEqual(len(second_resolution), 1)
+        self.assertEqual(second_resolution[0]["destination"], "graveyard")
+        self.assertTrue(
+            any(
+                event == "game_won"
+                and data.get("reason") == "approach"
+                for event, data in events
+            )
+        )
+
+    def test_aetherflux_reservoir_uses_oracle_hashed_spell_cast_lifegain_rule(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                player = battle.Player("Caster", None, [])
+                card = {"name": "Aetherflux Reservoir", "type_line": "Artifact", "cmc": 4}
+                effect = battle.get_card_effect(card)
+                self.assertEqual(
+                    effect["_rule_logical_key"],
+                    "battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5",
+                )
+                self.assertEqual(
+                    effect["_rule_oracle_hash"],
+                    "ea5327899fb66a2d583e80e8ca12d9b2",
+                )
+                battle.apply_effect_immediate(
+                    player,
+                    [],
+                    card,
+                    4,
+                    __import__("random").Random(113),
+                    effect_data_override=effect,
+                )
+                player.record_spell_cast(turn_marker=4)
+                battle.trigger_spell_cast_engines(
+                    player,
+                    [player],
+                    {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant"},
+                    turn=4,
+                    phase="precombat_main",
+                )
+                player.record_spell_cast(turn_marker=4)
+                battle.trigger_spell_cast_engines(
+                    player,
+                    [player],
+                    {"name": "Faithless Looting", "cmc": 1, "type_line": "Sorcery"},
+                    turn=4,
+                    phase="precombat_main",
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.battle_rule_registry._RULE_CACHE.clear()
+
+        resolved = [
+            data
+            for event, data in events
+            if event == "aetherflux_reservoir_resolved"
+        ]
+        lifegain = [
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Aetherflux Reservoir"
+        ]
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(
+            resolved[0]["rule_logical_key"],
+            "battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5",
+        )
+        self.assertEqual(resolved[0]["rule_oracle_hash"], "ea5327899fb66a2d583e80e8ca12d9b2")
+        self.assertEqual([data["life_gained"] for data in lifegain], [1, 2])
+        self.assertEqual(
+            {data["rule_logical_key"] for data in lifegain},
+            {"battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5"},
+        )
+        self.assertEqual(
+            {data["rule_oracle_hash"] for data in lifegain},
+            {"ea5327899fb66a2d583e80e8ca12d9b2"},
+        )
+        self.assertFalse(
+            [
+                data
+                for event, data in events
+                if event == "damage_resolved" and data.get("card") == "Aetherflux Reservoir"
+            ]
+        )
 
     def test_woodland_bellower_etb_tutors_nonlegendary_green_creature_to_battlefield(self) -> None:
         old_db = battle.DB

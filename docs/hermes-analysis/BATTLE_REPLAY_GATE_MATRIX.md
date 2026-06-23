@@ -1837,3 +1837,769 @@ Reading:
 - The approved workflow for future pasted Lorehold decklists is candidate
   staging, isolated deck id materialization, trusted battle matrix, and only
   then a PostgreSQL deck swap if the candidate beats the current baseline.
+
+## PG028 Austere Command Focused Event Gate - 2026-06-22 19:10 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_replay_summary_20260622_190701.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_events_20260622_190701.jsonl`.
+- Decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_decision_trace_20260622_190701.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:5f19a608b87445bcc5c7ebb7ad96eb64`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime selection: pass. The executor selected two modes from
+  `modal_destroy_modes`.
+- Event contract: pass. `board_wipe_resolved` includes the logical rule key,
+  oracle hash, selected modes, destroyed cards, and separated permanent versus
+  creature counters.
+
+Reading:
+
+- This closes card-level event proof for `Austere Command`.
+- It proves modal destroy resolution for the card rule; it is not evidence for
+  broader deck promotion or strategy win-rate changes.
+
+## PG029 Blasphemous Act Focused Event Gate - 2026-06-22 19:29 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_pg029_focused_replay_summary_20260622_192517.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_pg029_focused_events_20260622_192517.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:56271789d639ef390213dbc90059e4d2`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime resolution: pass. `damage_wipe_resolved` destroyed creatures with
+  toughness `<=13`, preserved an indestructible creature, and preserved a
+  toughness-14 creature.
+- Event contract: pass. `spell_resolved` and `damage_wipe_resolved` both
+  include the PG029 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Blasphemous Act` damage resolution.
+- The card's cost reduction is represented as `annotation_only` metadata in
+  the PG rule; this focused event does not prove dynamic cost reduction.
+
+## PG030 Boros Charm Focused Event Gate - 2026-06-22 19:42 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_pg030_focused_replay_summary_20260622_193818.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_pg030_focused_events_20260622_193818.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:32605a838d7a519f44eaa0899d2c40bf`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime protection mode: pass. `modal_boros_charm_resolved` selected
+  `permanents_you_control_gain_indestructible_until_eot` and affected a
+  creature, artifact, enchantment, and land until cleanup.
+- Runtime combat mode: pass. `modal_boros_charm_resolved` selected
+  `target_creature_gains_double_strike_until_eot` and affected exactly one
+  creature until cleanup.
+- Event contract: pass. `spell_resolved` and `modal_boros_charm_resolved`
+  both include the PG030 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Boros Charm` protection/combat
+  modal resolution.
+- The card's 4 damage player/planeswalker mode is represented as
+  `annotation_only` metadata in the PG rule; this focused event does not prove
+  direct modal damage target selection.
+
+## PG031 Deflecting Swat Focused Event Gate - 2026-06-22 19:56 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_pg031_focused_replay_summary_20260622_195126.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_pg031_focused_events_20260622_195126.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:bac48343654a53205d790a8268bd2631`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime free-cast condition: pass. `spell_cast` for `Deflecting Swat`
+  includes `alternative_cost={0}` and
+  `alternative_cost_kind=control_commander` with zero available mana.
+- Runtime redirect resolution: pass. `redirect_removal_resolved` changed the
+  target from `Protected Creature` to `Opponent Threat`; the protected
+  creature survived and the opponent threat was removed.
+- Event contract: pass. `spell_cast` and `redirect_removal_resolved` both
+  include the PG031 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Deflecting Swat` free-cast
+  redirection of a single-target removal spell.
+- The card's broader spell-or-ability target class is represented as
+  `annotation_only` metadata for activated/triggered abilities; this focused
+  event does not prove ability target redirection.
+
+## PG032 Flawless Maneuver Focused Event Gate - 2026-06-22 20:10 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_pg032_focused_replay_summary_20260622_200215.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_pg032_focused_events_20260622_200215.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:73622071c1ad89267708f914a0729bf2`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime free-cast condition: pass. `spell_cast` for `Flawless Maneuver`
+  includes `alternative_cost={0}` and
+  `alternative_cost_kind=control_commander` with zero available mana.
+- Runtime protection resolution: pass. `protection_resolved` granted
+  indestructible to `Lorehold, the Historian` and `Protected Creature`; both
+  survived `Blasphemous Act`.
+- Event contract: pass. `spell_cast`, `spell_resolved`, and
+  `protection_resolved` include the PG032 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Flawless Maneuver` free-cast
+  protection of creatures controlled by the player.
+- `Blasphemous Act` appears in this focused event as the incoming wipe, but its
+  PG029 cost reduction remains `annotation_only`; this gate proves Flawless
+  protection, not dynamic Blasphemous Act cost reduction.
+
+## PG033 Land Tax Focused Event Gate - 2026-06-22 20:25 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_replay_summary_20260622_201417.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_events_20260622_201417.jsonl`.
+- Decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_decision_trace_20260622_201417.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime condition: pass. `land_tax_trigger_resolved` fired only because the
+  live opponent controlled 3 lands while the controller controlled 1.
+- Runtime tutor resolution: pass. The executor moved exactly three basic land
+  cards from library to hand and left nonbasic `Command Tower` in library.
+- Event contract: pass. `spell_resolved`, `land_tax_trigger_resolved`, and
+  `land_tax_upkeep_tutor` include the PG033 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Land Tax` beginning-of-upkeep basic
+  land tutoring when an opponent controls more lands.
+- Reveal and shuffle are represented as structured metadata in this focused
+  deterministic replay; this gate does not prove randomized library order after
+  the search.
+
+## PG034 Lightning Greaves Focused Event Gate - 2026-06-22 20:36 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_pg034_focused_replay_summary_20260622_202908.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_pg034_focused_events_20260622_202908.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted rule key is
+  `battle_rule_v1:5ea7f2a8349a93ea46e05b60ee8cdaac`.
+- SQLite/Hermes sync: pass after corrected local reviewed-runtime cache sync.
+  The first post-PG034 selective sync exposed stale local cache filtering; the
+  retry report selected the new active PostgreSQL rule.
+- Runtime attach resolution: pass. `equipment_attached` granted haste and
+  shroud to `Target Creature`.
+- Negative shadow proof: pass. The target did not gain indestructible.
+- Event contract: pass. `spell_resolved` and `equipment_attached` both include
+  the PG034 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Lightning Greaves` haste/shroud
+  equipment behavior under the current battle model.
+- The current runtime model is the documented approximation
+  `auto_attach_best_creature_on_resolution`; this gate does not prove full
+  Equipment attach/retarget timing.
+
+## PG035 Lorehold, the Historian Focused Event Gate - 2026-06-22 20:52 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_replay_summary_20260622_204549.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_events_20260622_204549.jsonl`.
+- Decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_decision_trace_20260622_204549.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Lorehold rule key is
+  `battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db` and aligning the local
+  reviewed-runtime cache.
+- Runtime upkeep rummage: pass. `lorehold_upkeep_rummage` discarded
+  `Nine Mana Spell`, drew `Reforge the Soul`, and emitted the PG035 rule
+  provenance.
+- Event contract: pass. `lorehold_upkeep_rummage` includes the PG035 logical
+  rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Lorehold, the Historian` as a
+  miracle/rummage commander under the current battle model.
+- The runtime model covers opponent-upkeep rummage and first-draw miracle
+  windows; this gate does not claim every Magic policy edge for miracle,
+  replacement effects, or timing choices.
+
+## PG036 Past in Flames Focused Event Gate - 2026-06-22 21:11 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_pg036_focused_replay_summary_20260622_210425.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_pg036_focused_events_20260622_210425.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Past in Flames rule key is
+  `battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime flashback grant: pass. `graveyard_flashback_granted` granted
+  flashback to `Battle Cantrip` and `Reforge the Soul`, and did not grant it to
+  `Monastery Mentor`.
+- Runtime flashback cast provenance: pass. `flashback_cast` for
+  `Battle Cantrip` includes
+  `flashback_granted_rule_key=battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be`.
+- Event contract: pass. `spell_resolved` and
+  `graveyard_flashback_granted` both include the PG036 logical rule key and
+  oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Past in Flames` as a temporary
+  graveyard flashback grant under the current battle model.
+- The runtime model does not claim full priority/timing policy for every
+  possible flashback spell. The base flashback exile-on-resolution path is
+  covered by `test_flashback_cast_from_graveyard_exiles_after_resolution`.
+
+## PG037 Path to Exile Focused Event Gate - 2026-06-22 21:25 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/path_to_exile_pg037_focused_replay_summary_20260622_212057.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/path_to_exile_pg037_focused_events_20260622_212057.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Path to Exile rule key is
+  `battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime target zone: pass. The opponent `Siege Rhino` left battlefield and
+  was placed in exile, not graveyard.
+- Runtime spell zone: pass. The `Path to Exile` instant itself resolved to
+  graveyard.
+- Compensation caveat: pass. The target-controller basic-land rider is
+  emitted as `basic_land_compensation_status=annotation_only`; no dynamic
+  search/shuffle/ramp executor is claimed.
+- Event contract: pass. `spell_resolved` and `removal_resolved` both include
+  the PG037 logical rule key and oracle hash.
+
+Carry-forward caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG047 Archaeomancer's Map Focused Event Gate - 2026-06-23 00:17 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_events_20260623_001244.jsonl`.
+- Focused summary:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_replay_summary_20260623_001244.md`.
+- Focused decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_decision_trace_20260623_001244.jsonl`
+  (empty; no runtime decision was needed).
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_battle_rule_pg047_apply_20260623_001244.sql`.
+
+Gate:
+
+- Event `spell_resolved` includes:
+  `rule_logical_key=battle_rule_v1:69acc8f6ed179a5a32bef08190cd747e`.
+- Event `spell_resolved` includes:
+  `rule_oracle_hash=22b82ca6bbef42371227bc38a9a546b5`.
+- Event `tutor_resolved` uses the same PG047 rule, finds two basic Plains,
+  and puts them into hand while the artifact remains on the battlefield.
+- Successful `trigger_resolved` uses the same PG047 rule and records land
+  counts proving the Map controller is behind before putting a land from hand
+  onto the battlefield.
+- Equal-land `trigger_skipped` uses the same PG047 rule, records
+  `reason=opponent_does_not_control_more_lands`, and preserves the land in
+  hand.
+
+Status:
+
+- `Archaeomancer's Map` is closed for the current battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_001717.json`
+  reports `Archaeomancer's Map` as `pass`.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG048 Blind Obedience Focused Event Gate - 2026-06-23 00:35 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_pg048_focused_events_20260623_003029.jsonl`.
+- Focused summary:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_pg048_focused_replay_summary_20260623_003029.md`.
+- Focused decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_pg048_focused_decision_trace_20260623_003029.jsonl`
+  (empty; no runtime decision was needed).
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_battle_rule_pg048_apply_20260623_003029.sql`.
+
+Gate:
+
+- Event `static_enter_tapped_applied` includes:
+  `rule_logical_key=battle_rule_v1:40f23fcea3b7955bacd550a9090c6872`.
+- Event `static_enter_tapped_applied` includes:
+  `rule_oracle_hash=4e62bff316f784c1b468b9e53146d2aa`.
+- The focused replay proves an opponent creature enters tapped from the Blind
+  Obedience static source.
+- The focused replay proves an opponent artifact enters tapped from the same
+  source.
+- The controller's own artifact does not enter tapped from its own Blind
+  Obedience source.
+
+Status:
+
+- `Blind Obedience` is closed for the current battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_003552.json`
+  reports `Blind Obedience` as `pass`.
+
+Caveats:
+
+- Extort remains `annotation_only`; this gate does not claim a dynamic optional
+  `{W/B}` payment trigger executor.
+- This gate proves normal permanent entry paths covered by the current runtime
+  hook. It does not claim unrelated alternate-entry code paths that bypass
+  `prepare_entering_permanent`.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG038 Reverberate Focused Event Gate - 2026-06-22 21:43 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_pg038_focused_replay_summary_20260622_213615.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_pg038_focused_events_20260622_213615.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Reverberate rule key is
+  `battle_rule_v1:0269136edf067f696c8576740b720e14`.
+- SQLite/Hermes sync: pass. The event was generated after syncing the card
+  rule from PostgreSQL into `knowledge.db`.
+- Runtime stack response: pass. `Reverberate` was cast by the responder while
+  `Targeted Insight` was on the stack.
+- Runtime copy semantics: pass. The copied spell was not cast, resolved for
+  the responder, and emitted `spell_copy_ceased_to_exist` instead of entering a
+  graveyard.
+- Runtime original semantics: pass. The original `Targeted Insight` remained
+  on stack after the copy and then resolved for the original controller.
+- Event contract: pass. `spell_cast` and `spell_copied` both include the PG038
+  logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Reverberate` as a stack-copy
+  response under the current battle model.
+- `may_choose_new_targets` is retained as
+  `choose_new_targets_status=annotation_only`; this gate does not claim
+  dynamic target reassignment.
+
+Carry-forward caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG039 Sensei's Divining Top Focused Event Gate - 2026-06-22 22:01 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_replay_summary_20260622_215306.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_events_20260622_215306.jsonl`.
+- Decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_decision_trace_20260622_215306.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Top rule key is
+  `battle_rule_v1:70c8478871f352b46cee1af296117951`.
+- SQLite/Hermes sync: pass after aligning the reviewed runtime cache with the
+  active PostgreSQL key.
+- Runtime topdeck reorder: pass. `topdeck_manipulation_activated` moved
+  `Approach of the Second Sun` above `Small Creature` for Lorehold's first
+  draw.
+- Runtime win-line chain: pass. Lorehold rummage drew `Approach`, miracle-cast
+  it, and the game ended with `reason=approach`.
+- Event contract: pass. `topdeck_manipulation_activated` includes the PG039
+  logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Sensei's Divining Top` as a
+  top-three reorder tool under the current Lorehold battle model.
+- Generic activated draw policy remains `annotation_only`; this gate only
+  proves the restricted first-draw miracle draw-put-self line.
+
+Carry-forward caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG040 Swords to Plowshares Focused Event Gate - 2026-06-22 22:22 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_pg040_focused_replay_summary_20260622_221254.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_pg040_focused_events_20260622_221254.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Swords rule key is
+  `battle_rule_v1:379008f3f03f94258292123453e3041c`.
+- SQLite/Hermes sync: pass after aligning the reviewed runtime cache with the
+  active PostgreSQL key.
+- Runtime exile resolution: pass. `removal_resolved` moved `Siege Rhino` from
+  battlefield to exile.
+- Runtime life gain: pass. `removal_resolved` recorded
+  `life_gain_requested=4` and `life_gained=4`, equal to the target creature's
+  power.
+- Event contract: pass. `removal_resolved` includes the PG040 logical rule key
+  and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Swords to Plowshares` as an exile
+  removal spell with target-controller life gain equal to target power under
+  the current battle model.
+
+Carry-forward caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG041 Teferi's Protection Focused Event Gate - 2026-06-22 22:41 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_pg041_focused_replay_summary_20260622_223850.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_pg041_focused_events_20260622_223850.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Teferi rule key is
+  `battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a`.
+- SQLite/Hermes sync: pass after aligning the reviewed runtime cache with the
+  active PostgreSQL key.
+- Runtime phase-out: pass. `phase_out_resolved` moved `Monastery Mentor`,
+  `Sol Ring`, and `Plateau` from battlefield to phased-out state.
+- Runtime life/protection: pass. Replacement events prevented a 20-damage
+  attempt and a 5-life gain attempt while life stayed at `8`.
+- Runtime self-exile: pass. `spell_resolved.destination=exile` and
+  `self_exiled_on_resolution` prove Teferi's Protection did not go to
+  graveyard.
+- Event contract: pass. `spell_resolved` and `phase_out_resolved` both include
+  the PG041 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Teferi's Protection` as a protection
+  instant with life-total lock, protection from everything, all-permanent
+  phase-out including lands, and self-exile under the current battle model.
+
+Carry-forward caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG042 Valakut Awakening Focused Event Gate - 2026-06-22 23:01 UTC
+
+Artifacts:
+
+- Summary:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_replay_summary_20260622_225355.md`.
+- Events:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_events_20260622_225355.jsonl`.
+
+Statuses:
+
+- Focused event proof only. This is not a full 16-seed deck battle matrix and
+  does not change the PG026 official Lorehold deck baseline.
+- PG source rule: pass. The emitted Valakut split-name rule key is
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d`.
+- SQLite/Hermes sync: pass after syncing PG042 and aligning the reviewed
+  runtime cache with the active PostgreSQL hash.
+- Runtime hand filter: pass. `hand_filter_resolved` bottomed `Nine Drop B` and
+  `Eight Drop A`, drew three cards, and preserved
+  `Approach of the Second Sun` in hand.
+- Runtime spell zone: pass for the focused cast object. `spell_resolved`
+  recorded `destination=graveyard` using PostgreSQL's `Instant` type line.
+- Event contract: pass. `spell_resolved` and `hand_filter_resolved` both
+  include the PG042 logical rule key and oracle hash.
+
+Reading:
+
+- This closes card-level event proof for `Valakut Awakening // Valakut
+  Stoneforge` as a bottom-then-draw-plus-one instant under the current battle
+  model.
+- The MDFC land-face metadata remains available on the split-name rule for
+  lookup coherence, but this focused gate does not claim land-play or tapped
+  red-mana execution for `Valakut Stoneforge`.
+
+Carry-forward caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG043 Wheel of Fortune Focused Event Gate - 2026-06-22 23:26 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_events_20260622_231859.jsonl`.
+- Focused summary:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_replay_summary_20260622_231859.md`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_battle_rule_pg043_apply_20260622_231859.sql`.
+
+Gate:
+
+- Event `wheel_resolved` includes:
+  `rule_logical_key=battle_rule_v1:f8bdb05cc883fda55628d6928c5562d3`.
+- Event `wheel_resolved` includes:
+  `rule_oracle_hash=c37cd579d8132efac0c2118608f6f001`.
+- Event proves multiplayer wheel resolution: controller discarded `2`, drew
+  `7`; opponent discarded `1`, drew `7`.
+- Event proves payoff propagation for the modeled battlefield: Smothering
+  Tithe created `7` Treasure tokens from opponent draws.
+- Decision trace uses `model_scope=multiplayer_discard_draw_v1` and records
+  `wheel_payoffs=['Smothering Tithe']`.
+
+Status:
+
+- `Wheel of Fortune` is closed for the current battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_232608.json`
+  reports `Wheel of Fortune` as `pass`.
+
+Caveats:
+
+- This gate proves the modeled `Wheel of Fortune` discard-hand/draw-seven
+  executor and replay provenance. It does not claim every possible replacement
+  effect or opponent denial policy beyond the currently modeled
+  `multiplayer_discard_draw_v1` path.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG044 Valakut Awakening Metadata Refresh Gate Note - 2026-06-22 23:26 UTC
+
+Artifacts:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_battle_rule_pg044_hash_refresh_apply_20260622_232411.sql`.
+- Existing PG042 focused events remain the behavior proof:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_events_20260622_225355.jsonl`.
+
+Gate:
+
+- PG044 did not add a new executor and did not require a new replay. It
+  restored PostgreSQL metadata so the existing PG042 replay evidence points to
+  oracle-hashed active rules in the source of truth.
+- Postcheck shows full-name and alias Valakut rows with
+  `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`, and no trusted executable
+  Valakut rows without hash.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_232608.json`
+  reports `Valakut Awakening // Valakut Stoneforge` as `pass`.
+
+Caveat:
+
+- The MDFC land face remains metadata for split-name lookup; PG044 does not
+  claim land-play or tapped-red-mana execution for `Valakut Stoneforge`.
+
+## PG045 Aetherflux Reservoir Focused Event Gate - 2026-06-22 23:40 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_pg045_focused_events_20260622_233656.jsonl`.
+- Focused summary:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_pg045_focused_replay_summary_20260622_233656.md`.
+- Focused decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_pg045_focused_decision_trace_20260622_233656.jsonl`
+  (empty; no runtime decision was needed).
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_battle_rule_pg045_apply_20260622_233656.sql`.
+
+Gate:
+
+- Event `aetherflux_reservoir_resolved` includes:
+  `rule_logical_key=battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5`.
+- Event `aetherflux_reservoir_resolved` includes:
+  `rule_oracle_hash=ea5327899fb66a2d583e80e8ca12d9b2`.
+- Two `trigger_resolved` events for future spell casts include the same
+  logical rule key and oracle hash.
+- Lifegain sequence is `[1, 2]`, matching the current turn spell-count model.
+- No `damage_resolved` event is emitted for Aetherflux Reservoir in this
+  focused gate.
+
+Status:
+
+- `Aetherflux Reservoir` is closed for the current battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_234015.json`
+  reports `Aetherflux Reservoir` as `pass`.
+
+Caveats:
+
+- This gate proves the modeled spell-cast lifegain trigger and replay
+  provenance. It does not claim the activated `Pay 50 life: deal 50 damage`
+  ability as executable; that remains `annotation_only`.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG046 Approach of the Second Sun Focused Event Gate - 2026-06-23 00:02 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_pg046_focused_events_20260622_235039.jsonl`.
+- Focused summary:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_pg046_focused_replay_summary_20260622_235039.md`.
+- Focused decision trace:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_pg046_focused_decision_trace_20260622_235039.jsonl`
+  (empty; no runtime decision was needed).
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_battle_rule_pg046_apply_20260622_235039.sql`.
+
+Gate:
+
+- Events `approach_cast_tracked` include:
+  `rule_logical_key=battle_rule_v1:ed74fb069b6c1d635392d907804a1d98`.
+- Events `approach_cast_tracked` include:
+  `rule_oracle_hash=0838960b80a282fb4508532f7bae8c2b`.
+- The focused replay proves copied Approach did not increment the cast ledger:
+  count stayed `0 -> 0`.
+- The first cast from hand was countered through `Stack.resolve_top()` and
+  still left Approach count at `1`.
+- The second cast from hand emitted `approach_cast_tracked` with
+  `approach_count=2`, emitted `spell_resolved` with `destination=graveyard`,
+  did not emit the `approach_first_resolution` life-gain/library branch, and
+  emitted `game_won` with `reason=approach`.
+
+Status:
+
+- `Approach of the Second Sun` is closed for the current battle-rule coherence
+  gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_000228.json`
+  reports `Approach of the Second Sun` as `pass`.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.

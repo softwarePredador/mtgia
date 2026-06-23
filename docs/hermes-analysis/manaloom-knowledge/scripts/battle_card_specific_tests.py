@@ -236,6 +236,685 @@ def register_tests(battle, player):
         assert stack.empty()
         assert not any(event == "miracle_cast" for event, _ in events)
 
+    def test_lorehold_upkeep_rummage_emits_pg035_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            lorehold_card = {
+                "name": "Lorehold, the Historian",
+                "cmc": 5,
+                "type_line": "Legendary Creature — Elder Dragon",
+                "mana_cost": "{3}{R}{W}",
+            }
+            lorehold_effect = battle.get_card_effect(lorehold_card)
+            assert lorehold_effect["effect"] == "passive"
+            assert lorehold_effect["cmc"] == 5.0
+            assert lorehold_effect["flying"] is True
+            assert lorehold_effect["haste"] is True
+            assert lorehold_effect["_rule_logical_key"] == "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4"
+            assert lorehold_effect["_rule_oracle_hash"] == "f1b6d4f38a533e56f0efb5a3f1547214"
+
+            active = player("Lorehold")
+            active.is_human = True
+            active.battlefield = [
+                {**lorehold_card, **lorehold_effect},
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+            ]
+            active.hand = [
+                {
+                    "name": "Nine Mana Spell",
+                    "cmc": 9,
+                    "type_line": "Sorcery",
+                    "effect": "draw_cards",
+                }
+            ]
+            active.library = [
+                {
+                    "name": "Reforge the Soul",
+                    "cmc": 7,
+                    "type_line": "Sorcery",
+                }
+            ]
+            active.refresh_mana_sources(turn=5)
+            opponent = player("Opponent")
+            opponent.library = [_card("Opponent Draw", cmc=1)]
+
+            triggered = battle.process_lorehold_opponent_upkeep_rummage(
+                opponent,
+                [active, opponent],
+                5,
+                random.Random(196),
+                battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert triggered == 1
+        rummage_event = next(
+            data
+            for event, data in events
+            if event == "lorehold_upkeep_rummage"
+        )
+        assert rummage_event["discarded"] == "Nine Mana Spell"
+        assert rummage_event["drawn"] == "Reforge the Soul"
+        assert rummage_event["rule_logical_key"] == "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4"
+        assert rummage_event["rule_oracle_hash"] == "f1b6d4f38a533e56f0efb5a3f1547214"
+        assert rummage_event["rule_review_status"] == "active"
+        assert rummage_event["rule_execution_status"] == "auto"
+
+    def test_past_in_flames_grants_flashback_with_pg036_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            past = {
+                "name": "Past in Flames",
+                "cmc": 4,
+                "mana_cost": "{3}{R}",
+                "type_line": "Sorcery",
+            }
+            past_effect = battle.get_card_effect(past)
+            assert past_effect["effect"] == "graveyard_flashback_grant"
+            assert past_effect["battle_model_scope"] == (
+                "past_in_flames_graveyard_instants_sorceries_flashback_until_eot_v1"
+            )
+            assert past_effect["_rule_logical_key"] == "battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be"
+            assert past_effect["_rule_oracle_hash"] == "12f293d8d746fbc4e5ba80828919dec5"
+
+            active = player("Lorehold")
+            instant = {
+                "name": "Battle Cantrip",
+                "cmc": 1,
+                "mana_cost": "{1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "count": 1,
+            }
+            sorcery = {
+                "name": "Reforge the Soul",
+                "cmc": 5,
+                "mana_cost": "{3}{R}{R}",
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+            }
+            creature = {
+                "name": "Monastery Mentor",
+                "cmc": 3,
+                "mana_cost": "{2}{W}",
+                "type_line": "Creature",
+                "effect": "creature",
+            }
+            active.graveyard = [instant, sorcery, creature]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                past,
+                turn=5,
+                rng=random.Random(197),
+                effect_data_override=past_effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert instant["flashback_cost"] == "{1}"
+        assert sorcery["flashback_cost"] == "{3}{R}{R}"
+        assert "flashback_cost" not in creature
+        assert any(card.get("name") == "Past in Flames" for card in active.graveyard)
+        grant_event = next(
+            data
+            for event, data in events
+            if event == "graveyard_flashback_granted"
+        )
+        assert grant_event["card"] == "Past in Flames"
+        assert grant_event["granted_count"] == 2
+        assert grant_event["rule_logical_key"] == "battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be"
+        assert grant_event["rule_oracle_hash"] == "12f293d8d746fbc4e5ba80828919dec5"
+        assert grant_event["rule_review_status"] == "active"
+        assert grant_event["rule_execution_status"] == "auto"
+
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active.library = [_card("Drawn Card", cmc=1)]
+            active.mana_pool.add_generic(1)
+            stack = battle.Stack()
+            assert battle.cast_flashback_spell_from_graveyard(
+                active,
+                instant,
+                [],
+                [active],
+                5,
+                "precombat_main",
+                stack,
+                random.Random(198),
+            ) is True
+            flashback_event = next(
+                data
+                for event, data in events
+                if event == "flashback_cast"
+            )
+            assert flashback_event["card"] == "Battle Cantrip"
+            assert flashback_event["flashback_granted_by"] == "Past in Flames"
+            assert flashback_event["flashback_granted_rule_key"] == "battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be"
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        battle.clear_until_eot(active)
+        assert "flashback_cost" not in sorcery
+
+    def test_path_to_exile_exiles_creature_with_pg037_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            path = {
+                "name": "Path to Exile",
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "type_line": "Instant",
+            }
+            path_effect = battle.get_card_effect(path)
+            assert path_effect["effect"] == "remove_creature"
+            assert path_effect["target"] == "creature"
+            assert path_effect["destination"] == "exile"
+            assert path_effect["exile_target"] is True
+            assert path_effect["target_controller_basic_land_tapped"] is True
+            assert path_effect["basic_land_compensation_status"] == "annotation_only"
+            assert path_effect["battle_model_scope"] == (
+                "path_to_exile_creature_exile_basic_land_compensation_annotation_v1"
+            )
+            assert path_effect["_rule_logical_key"] == "battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd"
+            assert path_effect["_rule_oracle_hash"] == "861c960a37be744e45f13200349e2532"
+
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            target = {
+                "name": "Siege Rhino",
+                "cmc": 4,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 5,
+            }
+            basic_land = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            opponent.battlefield = [target]
+            opponent.library = [basic_land]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                path,
+                turn=6,
+                rng=random.Random(198),
+                effect_data_override=path_effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target not in opponent.battlefield
+        assert target in opponent.exile
+        assert target not in opponent.graveyard
+        assert basic_land in opponent.library
+        assert basic_land not in opponent.battlefield
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Path to Exile"
+        )
+        assert removal_event["destination"] == "exile"
+        assert removal_event["rule_logical_key"] == "battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd"
+        assert removal_event["rule_oracle_hash"] == "861c960a37be744e45f13200349e2532"
+        assert removal_event["target_controller_basic_land_tapped"] is True
+        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+
+    def test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            swords = {
+                "name": "Swords to Plowshares",
+                "cmc": 1,
+                "mana_cost": "{W}",
+                "type_line": "Instant",
+            }
+            swords_effect = battle.get_card_effect(swords)
+            assert swords_effect["effect"] == "remove_creature"
+            assert swords_effect["target"] == "creature"
+            assert swords_effect["destination"] == "exile"
+            assert swords_effect["exile_target"] is True
+            assert swords_effect["target_controller_life_gain_equal_target_power"] is True
+            assert swords_effect["life_gain_status"] == "dynamic_target_power_executor"
+            assert swords_effect["battle_model_scope"] == (
+                "swords_to_plowshares_creature_exile_life_equal_power_v1"
+            )
+            assert swords_effect["_rule_logical_key"] == "battle_rule_v1:379008f3f03f94258292123453e3041c"
+            assert swords_effect["_rule_oracle_hash"] == "702f566e95dd477f5cf5a551e41e9df8"
+
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            opponent.life = 31
+            target = {
+                "name": "Siege Rhino",
+                "cmc": 4,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 5,
+            }
+            opponent.battlefield = [target]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                swords,
+                turn=6,
+                rng=random.Random(199),
+                effect_data_override=swords_effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target not in opponent.battlefield
+        assert target in opponent.exile
+        assert target not in opponent.graveyard
+        assert opponent.life == 35
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Swords to Plowshares"
+        )
+        assert removal_event["destination"] == "exile"
+        assert removal_event["rule_logical_key"] == "battle_rule_v1:379008f3f03f94258292123453e3041c"
+        assert removal_event["rule_oracle_hash"] == "702f566e95dd477f5cf5a551e41e9df8"
+        assert removal_event["target_controller_life_gain_equal_target_power"] is True
+        assert removal_event["life_gain_status"] == "dynamic_target_power_executor"
+        assert removal_event["life_gain_requested"] == 4
+        assert removal_event["life_gained"] == 4
+
+    def test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            teferi = {
+                "name": "Teferi's Protection",
+                "cmc": 3,
+                "mana_cost": "{2}{W}",
+                "type_line": "Instant",
+            }
+            teferi_effect = battle.get_card_effect(teferi)
+            assert teferi_effect["effect"] == "phase_out"
+            assert teferi_effect["life_total_cant_change"] is True
+            assert teferi_effect["protection_from_everything"] is True
+            assert teferi_effect["phase_out_all_permanents_you_control"] is True
+            assert teferi_effect["phase_out_includes_lands"] is True
+            assert teferi_effect["exiles_self"] is True
+            assert teferi_effect["battle_model_scope"] == (
+                "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1"
+            )
+            assert teferi_effect["_rule_logical_key"] == "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a"
+            assert teferi_effect["_rule_oracle_hash"] == "bdc0faecf4420dc6162c7e72e98cc0eb"
+
+            active = player("Lorehold")
+            active.life = 8
+            creature = {
+                "name": "Monastery Mentor",
+                "cmc": 3,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            artifact = {
+                "name": "Sol Ring",
+                "cmc": 1,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+            }
+            land = {
+                "name": "Plateau",
+                "cmc": 0,
+                "type_line": "Land",
+                "effect": "land",
+            }
+            active.battlefield = [creature, artifact, land]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                teferi,
+                turn=7,
+                rng=random.Random(200),
+                effect_data_override=teferi_effect,
+            )
+            battle.deal_damage(active, 20)
+            battle.gain_life(active, 5)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.battlefield == []
+        assert creature in active.phased_out
+        assert artifact in active.phased_out
+        assert land in active.phased_out
+        assert active.life_cant_change is True
+        assert active.protection_from_everything is True
+        assert active.life == 8
+        assert teferi in active.exile
+        assert teferi not in active.graveyard
+
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Teferi's Protection"
+        )
+        assert spell_event["destination"] == "exile"
+        assert spell_event["zone_after"] == "exile"
+        assert spell_event["rule_logical_key"] == "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a"
+        assert spell_event["rule_oracle_hash"] == "bdc0faecf4420dc6162c7e72e98cc0eb"
+        phase_event = next(
+            data
+            for event, data in events
+            if event == "phase_out_resolved" and data.get("card") == "Teferi's Protection"
+        )
+        assert phase_event["phased_count"] == 3
+        assert phase_event["phase_out_includes_lands"] is True
+        assert phase_event["life_total_cant_change"] is True
+        assert phase_event["protection_from_everything"] is True
+        assert phase_event["exiles_self"] is True
+        assert phase_event["spell_destination"] == "exile"
+        assert phase_event["rule_logical_key"] == "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a"
+        assert phase_event["rule_oracle_hash"] == "bdc0faecf4420dc6162c7e72e98cc0eb"
+
+    def test_reverberate_copies_stack_spell_with_pg038_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            reverberate = {
+                "name": "Reverberate",
+                "cmc": 2,
+                "mana_cost": "{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [reverberate]
+            responder.mana_pool.add("red", 2)
+            active.library = [_card("Active Draw", cmc=1)]
+            responder.library = [_card("Responder Draw", cmc=1)]
+            target_spell = {
+                "name": "Targeted Insight",
+                "cmc": 3,
+                "mana_cost": "{2}{U}",
+                "type_line": "Sorcery",
+            }
+            target_effect = {"effect": "draw_cards", "count": 1}
+            reverberate_effect = battle.get_card_effect(reverberate)
+            assert reverberate_effect["effect"] == "copy_spell"
+            assert reverberate_effect["target"] == "instant_or_sorcery_on_stack"
+            assert reverberate_effect["copy_is_not_cast"] is True
+            assert reverberate_effect["choose_new_targets_status"] == "annotation_only"
+            assert reverberate_effect["battle_model_scope"] == (
+                "reverberate_copy_stack_instant_or_sorcery_new_targets_annotation_v1"
+            )
+            assert reverberate_effect["_rule_logical_key"] == "battle_rule_v1:0269136edf067f696c8576740b720e14"
+            assert reverberate_effect["_rule_oracle_hash"] == "cbae05dee4261e3ed5412fd5f3591c17"
+
+            stack = battle.Stack()
+            stack.push(target_spell, active, target_effect)
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(199),
+                phase="precombat_main",
+            ) is True
+            assert stack.items[-1].card.get("is_copy") is True
+            assert stack.items[-1].controller is responder
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert reverberate not in responder.hand
+        assert reverberate in responder.graveyard
+        cast_event = next(
+            data
+            for event, data in events
+            if event == "spell_cast" and data.get("card") == "Reverberate"
+        )
+        copied_event = next(
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Reverberate"
+        )
+        assert cast_event["response_to"] == "Targeted Insight"
+        assert cast_event["rule_logical_key"] == "battle_rule_v1:0269136edf067f696c8576740b720e14"
+        assert copied_event["copied_spell"] == "Targeted Insight"
+        assert copied_event["copy_is_cast"] is False
+        assert copied_event["rule_logical_key"] == "battle_rule_v1:0269136edf067f696c8576740b720e14"
+        assert copied_event["rule_oracle_hash"] == "cbae05dee4261e3ed5412fd5f3591c17"
+        assert copied_event["choose_new_targets_status"] == "annotation_only"
+
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(200),
+                phase="precombat_main",
+            ) is False
+            assert any(card.get("name") == "Responder Draw" for card in responder.hand)
+            assert any(
+                event == "spell_copy_ceased_to_exist"
+                and data.get("card") == "Targeted Insight"
+                for event, data in events
+            )
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(201),
+                phase="precombat_main",
+            ) is False
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert any(card.get("name") == "Active Draw" for card in active.hand)
+        assert any(card.get("name") == "Targeted Insight" for card in active.graveyard)
+
+    def test_deflecting_swat_redirects_targeted_removal_for_free_with_commander():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            swat = {
+                "name": "Deflecting Swat",
+                "cmc": 3,
+                "type_line": "Instant",
+                "mana_cost": "{2}{R}",
+            }
+            active = player("Lorehold", [swat])
+            active.hand = [swat]
+            active.is_human = True
+            commander = {
+                "name": "Lorehold, the Historian",
+                "effect": "creature",
+                "type_line": "Legendary Creature",
+                "power": 3,
+                "toughness": 3,
+                "is_commander": True,
+            }
+            protected = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            active.battlefield = [commander, protected]
+
+            caster = player("Caster")
+            opponent_threat = {
+                "name": "Opponent Threat",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 6,
+                "toughness": 6,
+            }
+            caster.battlefield = [opponent_threat]
+            removal = {"name": "Targeted Removal", "cmc": 2, "type_line": "Instant"}
+            removal_effect = {
+                "effect": "remove_creature",
+                "instant": True,
+                "declared_targets": [
+                    {
+                        "target": protected,
+                        "controller": active,
+                        "target_type": "creature",
+                    }
+                ],
+            }
+            stack = battle.Stack()
+            stack.push(removal, caster, removal_effect)
+
+            assert battle.priority_round(
+                caster,
+                [caster, active],
+                stack,
+                3,
+                random.Random(194),
+                phase="combat",
+            )
+            while not stack.empty():
+                battle.priority_round(
+                    caster,
+                    [caster, active],
+                    stack,
+                    3,
+                    random.Random(195),
+                    phase="combat",
+                )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert swat not in active.hand
+        assert protected in active.battlefield
+        assert opponent_threat not in caster.battlefield
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_cast" and data.get("card") == "Deflecting Swat"
+        )
+        assert spell_event["alternative_cost"] == "{0}"
+        assert spell_event["alternative_cost_kind"] == "control_commander"
+        assert spell_event["locked_cost"]["generic"] == 0
+        redirect_event = next(
+            data
+            for event, data in events
+            if event == "redirect_removal_resolved"
+        )
+        assert redirect_event["target_change_applied"] is True
+        assert redirect_event["old_target"] == "Protected Creature"
+        assert redirect_event["new_target"] == "Opponent Threat"
+        assert redirect_event["rule_logical_key"] == "battle_rule_v1:bac48343654a53205d790a8268bd2631"
+
+    def test_flawless_maneuver_protects_creatures_for_free_with_commander():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            maneuver = {
+                "name": "Flawless Maneuver",
+                "cmc": 3,
+                "type_line": "Instant",
+                "mana_cost": "{2}{W}",
+            }
+            active = player("Lorehold", [maneuver])
+            active.hand = [maneuver]
+            active.is_human = True
+            commander = {
+                "name": "Lorehold, the Historian",
+                "effect": "creature",
+                "type_line": "Legendary Creature",
+                "power": 3,
+                "toughness": 3,
+                "is_commander": True,
+            }
+            protected = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            active.battlefield = [commander, protected]
+
+            caster = player("Caster")
+            doomed = {
+                "name": "Doomed Opponent Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 6,
+                "toughness": 6,
+            }
+            caster.battlefield = [doomed]
+            wipe = {"name": "Blasphemous Act", "cmc": 9, "type_line": "Sorcery"}
+            stack = battle.Stack()
+            stack.push(wipe, caster, battle.get_card_effect(wipe))
+
+            assert battle.priority_round(
+                caster,
+                [caster, active],
+                stack,
+                3,
+                random.Random(196),
+                phase="main",
+            )
+            while not stack.empty():
+                battle.priority_round(
+                    caster,
+                    [caster, active],
+                    stack,
+                    3,
+                    random.Random(197),
+                    phase="main",
+                )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert maneuver not in active.hand
+        assert commander in active.battlefield
+        assert protected in active.battlefield
+        assert doomed not in caster.battlefield
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_cast" and data.get("card") == "Flawless Maneuver"
+        )
+        assert spell_event["alternative_cost"] == "{0}"
+        assert spell_event["alternative_cost_kind"] == "control_commander"
+        assert spell_event["locked_cost"]["generic"] == 0
+        assert spell_event["rule_logical_key"] == "battle_rule_v1:73622071c1ad89267708f914a0729bf2"
+        protection_event = next(
+            data
+            for event, data in events
+            if event == "protection_resolved" and data.get("card") == "Flawless Maneuver"
+        )
+        assert protection_event["target_scope"] == "creatures_you_control"
+        assert protection_event["affected_count"] == 2
+        assert protection_event["rule_logical_key"] == "battle_rule_v1:73622071c1ad89267708f914a0729bf2"
+
     def test_landfall_does_not_enqueue_without_real_landfall_source():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -349,6 +1028,287 @@ def register_tests(battle, player):
         assert creature["indestructible"] is True
         battle.clear_until_eot(active)
         assert "indestructible" not in creature
+
+    def test_boros_charm_grants_indestructible_to_all_permanents_until_cleanup():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            creature = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 3,
+                "toughness": 3,
+            }
+            artifact = {
+                "name": "Protected Artifact",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "cmc": 2,
+            }
+            enchantment = {
+                "name": "Protected Enchantment",
+                "effect": "draw_engine",
+                "type_line": "Enchantment",
+                "cmc": 3,
+            }
+            active.battlefield = [creature, artifact, enchantment, "land"]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Boros Charm", "cmc": 2, "type_line": "Instant"},
+                turn=3,
+                rng=random.Random(30),
+                effect_data_override={
+                    "effect": "modal_boros_charm",
+                    "instant": True,
+                    "_rule_logical_key": "battle_rule_v1:boros-charm-test",
+                    "_rule_oracle_hash": "boros-charm-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        for permanent in (creature, artifact, enchantment):
+            assert permanent["indestructible"] is True
+        event = next(data for event, data in events if event == "modal_boros_charm_resolved")
+        assert event["selected_mode"] == "permanents_you_control_gain_indestructible_until_eot"
+        assert event["affected_count"] == 3
+        assert event["rule_logical_key"] == "battle_rule_v1:boros-charm-test"
+        battle.clear_until_eot(active)
+        for permanent in (creature, artifact, enchantment):
+            assert "indestructible" not in permanent
+
+    def test_boros_charm_double_strike_targets_one_creature_until_cleanup():
+        active = player("Lorehold")
+        small = {
+            "name": "Small Creature",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        large = {
+            "name": "Large Creature",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 5,
+            "toughness": 5,
+        }
+        active.battlefield = [small, large]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {
+                "name": "Boros Charm",
+                "cmc": 2,
+                "type_line": "Instant",
+                "preferred_mode": "double_strike",
+            },
+            turn=3,
+            rng=random.Random(31),
+            effect_data_override={
+                "effect": "modal_boros_charm",
+                "instant": True,
+            },
+        )
+
+        double_strike_creatures = [
+            creature
+            for creature in (small, large)
+            if creature.get("double_strike")
+        ]
+        assert len(double_strike_creatures) == 1
+        assert double_strike_creatures[0]["name"] == "Large Creature"
+        battle.clear_until_eot(active)
+        assert "double_strike" not in small
+        assert "double_strike" not in large
+
+    def test_austere_command_resolves_two_destroy_modes():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Self Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Self Enchantment",
+                    "effect": "draw_engine",
+                    "type_line": "Enchantment",
+                    "cmc": 3,
+                },
+            ]
+            opponent.battlefield = [
+                {
+                    "name": "Opponent Mana Rock",
+                    "effect": "ramp_permanent",
+                    "type_line": "Artifact",
+                    "cmc": 2,
+                },
+                {
+                    "name": "Opponent Enchantment",
+                    "effect": "draw_engine",
+                    "type_line": "Enchantment",
+                    "cmc": 3,
+                },
+                {
+                    "name": "Opponent Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Opponent Large Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "cmc": 6,
+                    "power": 6,
+                    "toughness": 6,
+                },
+            ]
+            effect_data = {
+                "effect": "board_wipe",
+                "modal_destroy_modes": [
+                    "artifacts",
+                    "enchantments",
+                    "creatures_mana_value_3_or_less",
+                    "creatures_mana_value_4_or_greater",
+                ],
+                "choose_modes": 2,
+                "battle_model_scope": "austere_command_choose_two_destroy_modes_v1",
+                "_rule_logical_key": "battle_rule_v1:austere-command-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "active",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Austere Command", "cmc": 6, "type_line": "Sorcery"},
+                turn=6,
+                rng=random.Random(220622),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        opponent_names = {card.get("name") for card in opponent.battlefield}
+        active_names = {card.get("name") for card in active.battlefield}
+        assert "Opponent Mana Rock" not in opponent_names
+        assert "Opponent Large Creature" not in opponent_names
+        assert "Opponent Small Creature" in opponent_names
+        assert "Opponent Enchantment" in opponent_names
+        assert "Self Small Creature" in active_names
+        assert "Self Enchantment" in active_names
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert set(wipe_event["selected_modes"]) == {
+            "artifacts",
+            "creatures_mana_value_4_or_greater",
+        }
+        assert wipe_event["rule_logical_key"] == "battle_rule_v1:austere-command-test"
+        assert wipe_event["destroyed"] == 2
+
+    def test_blasphemous_act_deals_13_damage_to_each_creature():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Own Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Own Indestructible Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 4,
+                    "toughness": 4,
+                    "indestructible": True,
+                },
+            ]
+            opponent.battlefield = [
+                {
+                    "name": "Opponent Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 3,
+                    "toughness": 3,
+                },
+                {
+                    "name": "Opponent Ancient",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 14,
+                    "toughness": 14,
+                },
+                {
+                    "name": "Opponent Artifact",
+                    "effect": "ramp_permanent",
+                    "type_line": "Artifact",
+                },
+            ]
+            effect_data = {
+                "effect": "damage_wipe",
+                "damage": 13,
+                "damage_scope": "each_creature",
+                "battle_model_scope": "blasphemous_act_damage_13_each_creature_v1",
+                "_rule_logical_key": "battle_rule_v1:blasphemous-act-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "active",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Blasphemous Act", "cmc": 9, "type_line": "Sorcery"},
+                turn=5,
+                rng=random.Random(220623),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        active_names = {card.get("name") for card in active.battlefield}
+        opponent_names = {card.get("name") for card in opponent.battlefield}
+        assert "Own Small Creature" not in active_names
+        assert "Own Indestructible Creature" in active_names
+        assert "Opponent Small Creature" not in opponent_names
+        assert "Opponent Ancient" in opponent_names
+        assert "Opponent Artifact" in opponent_names
+        damage_event = next(data for event, data in events if event == "damage_wipe_resolved")
+        assert damage_event["damage"] == 13
+        assert damage_event["creatures_destroyed"] == 2
+        assert damage_event["live_opponent_creatures_destroyed"] == 1
+        assert damage_event["rule_logical_key"] == "battle_rule_v1:blasphemous-act-test"
+        assert any(
+            entry["name"] == "Own Indestructible Creature"
+            for entry in damage_event["protected"]
+        )
+        assert any(
+            entry["name"] == "Opponent Ancient"
+            for entry in damage_event["survived_damage"]
+        )
 
     def test_akromas_will_keywords_are_until_end_of_turn_without_power_boost():
         active = player("Lorehold")
@@ -1042,6 +2002,8 @@ def register_tests(battle, player):
         )
 
     def test_lightning_greaves_grants_haste_and_shroud_without_indestructible():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
         active = player("Active")
         target = {
             "name": "Target Creature",
@@ -1052,6 +2014,12 @@ def register_tests(battle, player):
             "summoning_sick": True,
         }
         active.battlefield = [target]
+        effect_data = battle.get_card_effect(
+            {"name": "Lightning Greaves", "cmc": 2, "type_line": "Artifact — Equipment"}
+        )
+
+        assert effect_data.get("effect") == "equipment_haste_shroud"
+        assert effect_data.get("_rule_logical_key") == "battle_rule_v1:5ea7f2a8349a93ea46e05b60ee8cdaac"
 
         battle.apply_effect_immediate(
             active,
@@ -1059,6 +2027,7 @@ def register_tests(battle, player):
             {"name": "Lightning Greaves", "cmc": 2, "type_line": "Artifact — Equipment"},
             3,
             random.Random(46),
+            effect_data_override=effect_data,
         )
 
         assert any(
@@ -1071,6 +2040,14 @@ def register_tests(battle, player):
         assert target.get("shroud") is True
         assert target.get("summoning_sick") is False
         assert target.get("indestructible") is not True
+        attached_events = [
+            data
+            for event, data in events
+            if event == "equipment_attached"
+        ]
+        assert attached_events
+        assert attached_events[-1]["rule_logical_key"] == "battle_rule_v1:5ea7f2a8349a93ea46e05b60ee8cdaac"
+        assert attached_events[-1]["rule_oracle_hash"] == "4a4c71d3cc58637cf00a3d7fe2331353"
 
     def test_static_equipment_applies_boost_and_keywords_to_best_creature():
         active = player("Active")
@@ -1138,6 +2115,298 @@ def register_tests(battle, player):
             for permanent in active.battlefield
             if isinstance(permanent, dict)
         )
+
+    def test_archaeomancers_map_opponent_land_trigger_requires_controller_behind_on_lands():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active Land Player")
+            controller = player("Map Controller")
+            active.battlefield = [
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+                {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land — Mountain Plains", "effect": "land"},
+            ]
+            controller.battlefield = [
+                {
+                    "name": "Archaeomancer's Map",
+                    "cmc": 3,
+                    "type_line": "Artifact",
+                    "effect": "ramp_engine",
+                    "trigger": "opponent_land_play",
+                    "_rule_logical_key": "battle_rule_v1:archaeomancers-map-test",
+                    "_rule_oracle_hash": "22b82ca6bbef42371227bc38a9a546b5",
+                },
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            ]
+            controller.hand = [
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            trigger_land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+
+            battle.trigger_opponent_land_play_engines(active, [controller], trigger_land, 4)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert not controller.hand
+        assert any(
+            permanent.get("name") == "Mountain"
+            for permanent in controller.battlefield
+            if isinstance(permanent, dict)
+        )
+        resolved = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Archaeomancer's Map"
+            and data.get("trigger") == "opponent_land_play"
+        ]
+        assert len(resolved) == 1
+        assert resolved[0]["active_player_land_count"] == 3
+        assert resolved[0]["controller_land_count"] == 1
+        assert resolved[0]["rule_logical_key"] == "battle_rule_v1:archaeomancers-map-test"
+        assert resolved[0]["rule_oracle_hash"] == "22b82ca6bbef42371227bc38a9a546b5"
+
+    def test_archaeomancers_map_opponent_land_trigger_skips_when_controller_not_behind():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active Land Player")
+            controller = player("Map Controller")
+            active.battlefield = [
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            controller.battlefield = [
+                {
+                    "name": "Archaeomancer's Map",
+                    "cmc": 3,
+                    "type_line": "Artifact",
+                    "effect": "ramp_engine",
+                    "trigger": "opponent_land_play",
+                    "_rule_logical_key": "battle_rule_v1:archaeomancers-map-test",
+                    "_rule_oracle_hash": "22b82ca6bbef42371227bc38a9a546b5",
+                },
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            ]
+            controller.hand = [
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            trigger_land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+
+            battle.trigger_opponent_land_play_engines(active, [controller], trigger_land, 4)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in controller.hand] == ["Mountain"]
+        skipped = [
+            data
+            for event, data in events
+            if event == "trigger_skipped"
+            and data.get("card") == "Archaeomancer's Map"
+            and data.get("trigger") == "opponent_land_play"
+        ]
+        assert len(skipped) == 1
+        assert skipped[0]["reason"] == "opponent_does_not_control_more_lands"
+        assert skipped[0]["active_player_land_count"] == 1
+        assert skipped[0]["controller_land_count"] == 1
+        assert skipped[0]["rule_logical_key"] == "battle_rule_v1:archaeomancers-map-test"
+
+    def test_blind_obedience_taps_opponent_artifacts_and_creatures_on_entry():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Blind Controller")
+            opponent = player("Opponent")
+            blind_effect = {
+                "effect": "passive",
+                "opponents_artifacts_creatures_enter_tapped": True,
+                "extort": True,
+                "extort_execution_status": "annotation_only",
+                "battle_model_scope": "opponent_artifact_creature_enter_tapped_extort_annotation_v1",
+                "_rule_logical_key": "battle_rule_v1:blind-obedience-test",
+                "_rule_oracle_hash": "4e62bff316f784c1b468b9e53146d2aa",
+                "_rule_source": "curated",
+                "_rule_review_status": "active",
+                "_rule_execution_status": "auto",
+            }
+            battle.apply_effect_immediate(
+                controller,
+                [opponent],
+                {"name": "Blind Obedience", "cmc": 2, "type_line": "Enchantment"},
+                3,
+                random.Random(1164),
+                effect_data_override=blind_effect,
+            )
+            battle.apply_effect_immediate(
+                opponent,
+                [controller],
+                {"name": "Opponent Bear", "cmc": 2, "type_line": "Creature — Bear"},
+                3,
+                random.Random(1165),
+                effect_data_override={
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "battle_model_scope": "test_creature_body",
+                },
+            )
+            battle.apply_effect_immediate(
+                opponent,
+                [controller],
+                {"name": "Opponent Rock", "cmc": 2, "type_line": "Artifact"},
+                3,
+                random.Random(1166),
+                effect_data_override={
+                    "effect": "passive",
+                    "battle_model_scope": "test_artifact_body",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        blind = next(
+            permanent
+            for permanent in controller.battlefield
+            if permanent.get("name") == "Blind Obedience"
+        )
+        bear = next(
+            permanent
+            for permanent in opponent.battlefield
+            if permanent.get("name") == "Opponent Bear"
+        )
+        rock = next(
+            permanent
+            for permanent in opponent.battlefield
+            if permanent.get("name") == "Opponent Rock"
+        )
+        assert not blind.get("tapped")
+        assert bear.get("tapped") is True
+        assert rock.get("tapped") is True
+        tapped_events = [
+            data
+            for event, data in events
+            if event == "static_enter_tapped_applied"
+            and data.get("source_card") == "Blind Obedience"
+        ]
+        assert {event.get("card") for event in tapped_events} == {
+            "Opponent Bear",
+            "Opponent Rock",
+        }
+        assert {
+            event.get("rule_logical_key")
+            for event in tapped_events
+        } == {"battle_rule_v1:blind-obedience-test"}
+        assert {
+            event.get("rule_oracle_hash")
+            for event in tapped_events
+        } == {"4e62bff316f784c1b468b9e53146d2aa"}
+
+    def test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = lambda payload: decisions.append(payload)
+        active = player("Active")
+        opponent = player("Opponent")
+        active.battlefield = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+        ]
+        opponent.battlefield = [
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+        ]
+        active.library = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            {"name": "Island", "cmc": 0, "type_line": "Basic Land — Island", "effect": "land"},
+        ]
+        land_tax = {"name": "Land Tax", "cmc": 1, "type_line": "Enchantment"}
+        effect_data = battle.get_card_effect(land_tax)
+
+        assert effect_data.get("effect") == "land_tax"
+        assert effect_data.get("_rule_logical_key") == "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef"
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            land_tax,
+            2,
+            random.Random(1164),
+            effect_data_override=effect_data,
+        )
+        triggers = battle.process_upkeep_utility_lands(
+            active,
+            3,
+            all_players=[active, opponent],
+        )
+
+        assert triggers == 3
+        assert sorted(card.get("name") for card in active.hand) == ["Island", "Mountain", "Plains"]
+        assert [card.get("name") for card in active.library] == ["Command Tower"]
+        resolved = [
+            data
+            for event, data in events
+            if event == "land_tax_trigger_resolved"
+        ]
+        assert resolved
+        assert resolved[-1]["found_count"] == 3
+        assert resolved[-1]["destination"] == "hand"
+        assert resolved[-1]["rule_logical_key"] == "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef"
+        assert resolved[-1]["rule_oracle_hash"] == "83b074e38da3e6c4eb6ec3e7568c914b"
+        assert any(
+            decision.get("decision_type") == "land_tax_upkeep_tutor"
+            and decision.get("chosen_option", {}).get("found_cards") == ["Island", "Mountain", "Plains"]
+            for decision in decisions
+        )
+
+    def test_land_tax_skips_when_no_opponent_controls_more_lands():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        opponent = player("Opponent")
+        active.battlefield = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+        ]
+        opponent.battlefield = [
+            {"name": "Island", "cmc": 0, "type_line": "Basic Land — Island", "effect": "land"},
+            {"name": "Swamp", "cmc": 0, "type_line": "Basic Land — Swamp", "effect": "land"},
+        ]
+        active.library = [
+            {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+        ]
+        land_tax = {"name": "Land Tax", "cmc": 1, "type_line": "Enchantment"}
+        effect_data = battle.get_card_effect(land_tax)
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            land_tax,
+            2,
+            random.Random(1165),
+            effect_data_override=effect_data,
+        )
+        triggers = battle.process_upkeep_utility_lands(
+            active,
+            3,
+            all_players=[active, opponent],
+        )
+
+        assert triggers == 0
+        assert active.hand == []
+        assert [card.get("name") for card in active.library] == ["Plains", "Mountain"]
+        assert not any(event == "land_tax_trigger_resolved" for event, _ in events)
+        skipped = [
+            data
+            for event, data in events
+            if event == "land_tax_trigger_skipped"
+        ]
+        assert skipped
+        assert skipped[-1]["condition_met"] is False
+        assert skipped[-1]["rule_logical_key"] == "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef"
 
     def test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target():
         active = player("Active")
@@ -1353,6 +2622,47 @@ def register_tests(battle, player):
             and "Nine Drop B" in set(data.get("bottomed", []))
             for event, data in events
         )
+
+    def test_valakut_awakening_split_name_emits_pg042_rule_provenance():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Lorehold")
+        card = {
+            "name": "Valakut Awakening // Valakut Stoneforge",
+            "cmc": 3,
+            "type_line": "Instant",
+        }
+        active.hand = [
+            card,
+            {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"},
+            {"name": "Nine Drop B", "cmc": 9, "type_line": "Sorcery", "effect": "draw_cards"},
+            {"name": "Cheap Removal", "cmc": 1, "type_line": "Instant", "effect": "remove_creature"},
+        ]
+        active.library = [
+            {"name": "Draw One", "cmc": 2, "type_line": "Sorcery"},
+            {"name": "Draw Two", "cmc": 2, "type_line": "Sorcery"},
+        ]
+
+        effect = battle.get_card_effect(card)
+        assert effect["effect"] == "hand_filter"
+        assert effect["battle_model_scope"] == "bottom_then_draw_plus_one_mdfc_land_v1"
+        assert effect["_rule_logical_key"] == "battle_rule_v1:6e1f3b876822abafe1de47610f46858d"
+        assert effect["_rule_oracle_hash"] == "22b42fcc181b7aed71f78b2e1e51e887"
+
+        battle.apply_effect_immediate(active, [], card, 4, random.Random(52))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        spell_event = next(data for event, data in events if event == "spell_resolved")
+        filter_event = next(data for event, data in events if event == "hand_filter_resolved")
+        assert spell_event["rule_logical_key"] == "battle_rule_v1:6e1f3b876822abafe1de47610f46858d"
+        assert spell_event["rule_oracle_hash"] == "22b42fcc181b7aed71f78b2e1e51e887"
+        assert spell_event["destination"] == "graveyard"
+        assert filter_event["rule_logical_key"] == "battle_rule_v1:6e1f3b876822abafe1de47610f46858d"
+        assert filter_event["rule_oracle_hash"] == "22b42fcc181b7aed71f78b2e1e51e887"
+        assert filter_event["draw_count"] == 2
+        assert filter_event["bottomed"] == ["Nine Drop B"]
+        hand_names = [entry.get("name") for entry in active.hand if isinstance(entry, dict)]
+        assert "Approach of the Second Sun" in hand_names
 
     def test_mulligan_trace_scores_keep_vs_mulligan_for_heavy_dead_hand():
         decisions = []
@@ -2250,9 +3560,24 @@ def register_tests(battle, player):
                 "cmc": 1,
                 "type_line": "Artifact",
             }
+            top_effect = battle.get_card_effect(top_card)
+            assert top_effect["effect"] == "topdeck_manipulation"
+            assert top_effect["peek_top_count"] == 3
+            assert top_effect["reorder_top"] is True
+            assert top_effect["reorder_top_status"] == "lorehold_first_draw_planning_executor"
+            assert top_effect["activated_draw_put_self_on_top"] is True
+            assert top_effect["activated_draw_put_self_on_top_status"] == (
+                "lorehold_first_draw_miracle_window_executor"
+            )
+            assert top_effect["generic_draw_activation_status"] == "annotation_only"
+            assert top_effect["battle_model_scope"] == (
+                "senseis_top_reorder_draw_lorehold_first_draw_miracle_v1"
+            )
+            assert top_effect["_rule_logical_key"] == "battle_rule_v1:70c8478871f352b46cee1af296117951"
+            assert top_effect["_rule_oracle_hash"] == "f2c5ac0f52963cd710470adc25cc6d7c"
             top_permanent = {
                 **top_card,
-                **battle.get_card_effect(top_card),
+                **top_effect,
             }
             lorehold.battlefield = [
                 {
@@ -2310,6 +3635,8 @@ def register_tests(battle, player):
             and data.get("card") == "Sensei's Divining Top"
             and data.get("top_before") == "Small Creature"
             and data.get("top_after") == "Approach of the Second Sun"
+            and data.get("rule_logical_key") == "battle_rule_v1:70c8478871f352b46cee1af296117951"
+            and data.get("rule_oracle_hash") == "f2c5ac0f52963cd710470adc25cc6d7c"
             for event, data in events
         )
         assert any(
@@ -2322,7 +3649,7 @@ def register_tests(battle, player):
             event == "miracle_cast"
             and data.get("card") == "Approach of the Second Sun"
             and data.get("source") == "lorehold_opponent_upkeep_rummage"
-            and data.get("rule_review_status") == "verified"
+            and data.get("rule_review_status") == "active"
             for event, data in events
         )
         assert any(
@@ -3587,10 +4914,22 @@ def register_tests(battle, player):
         test_lorehold_miracle_skips_bad_wheel_refill,
         test_lorehold_miracle_does_not_cast_counter_without_stack_target,
         test_lorehold_miracle_does_not_cast_redirect_without_stack_target,
+        test_lorehold_upkeep_rummage_emits_pg035_rule_provenance,
+        test_past_in_flames_grants_flashback_with_pg036_rule_provenance,
+        test_path_to_exile_exiles_creature_with_pg037_rule_provenance,
+        test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance,
+        test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,
+        test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
+        test_deflecting_swat_redirects_targeted_removal_for_free_with_commander,
+        test_flawless_maneuver_protects_creatures_for_free_with_commander,
         test_landfall_does_not_enqueue_without_real_landfall_source,
         test_landfall_enqueue_with_real_landfall_source,
         test_reforge_resolution_draws_seven_when_count_missing,
         test_boros_charm_protects_creatures_until_cleanup,
+        test_boros_charm_grants_indestructible_to_all_permanents_until_cleanup,
+        test_boros_charm_double_strike_targets_one_creature_until_cleanup,
+        test_austere_command_resolves_two_destroy_modes,
+        test_blasphemous_act_deals_13_damage_to_each_creature,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_mox_amber_only_counts_mana_with_live_legend,
         test_silence_effect_blocks_counterspell_responses,
@@ -3613,6 +4952,11 @@ def register_tests(battle, player):
         test_lightning_greaves_grants_haste_and_shroud_without_indestructible,
         test_static_equipment_applies_boost_and_keywords_to_best_creature,
         test_artifact_etb_tutors_two_basic_plains_to_hand_and_stays_on_battlefield,
+        test_archaeomancers_map_opponent_land_trigger_requires_controller_behind_on_lands,
+        test_archaeomancers_map_opponent_land_trigger_skips_when_controller_not_behind,
+        test_blind_obedience_taps_opponent_artifacts_and_creatures_on_entry,
+        test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands,
+        test_land_tax_skips_when_no_opponent_controls_more_lands,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
@@ -3620,6 +4964,7 @@ def register_tests(battle, player):
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_valakut_awakening_filters_hand_and_draws_plus_one,
         test_valakut_awakening_preserves_approach_as_win_condition,
+        test_valakut_awakening_split_name_emits_pg042_rule_provenance,
         test_mulligan_trace_scores_keep_vs_mulligan_for_heavy_dead_hand,
         test_special_lands_are_modelled_as_lands_not_spell_heuristics,
         test_war_room_activates_when_hand_is_low_and_life_is_safe,

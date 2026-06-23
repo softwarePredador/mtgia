@@ -43,6 +43,33 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-20 against PostgreSQL/Scryfall text: Aether Channeler is a 2/1 creature with a modal ETB. Runtime keeps the creature body and uses the safe draw mode until a modal target selector supports token and bounce choices."
   },
+  "Aetherflux Reservoir": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "aetherflux_reservoir",
+      "artifact": true,
+      "spell_cast_lifegain": true,
+      "life_gain_equal_spells_cast_this_turn": true,
+      "activation_life_cost": 50,
+      "activation_damage": 50,
+      "activation_target": "any_target",
+      "activation_execution_status": "annotation_only",
+      "battle_model_scope": "spell_cast_lifegain_pay_50_damage_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "wincon",
+      "effect": "aetherflux_reservoir",
+      "subtype": "spell_chain_lifegain_finisher",
+      "activation": "pay_50_life_deal_50_annotation_only",
+      "timing": "artifact_permanent"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "ea5327899fb66a2d583e80e8ca12d9b2",
+    "notes": "PG-045 mirror of PostgreSQL source rule: spell-cast trigger gains life equal to spells cast this turn and is runtime-executable. The Pay 50 life, deal 50 damage activated ability remains annotation_only until a dedicated life-payment activated-wincon executor exists."
+  },
   "Ashnod's Altar": {
     "effect_json": {
       "cmc": 3.0,
@@ -108,6 +135,28 @@
       }
     ]
   },
+  "Blind Obedience": {
+    "effect_json": {
+      "cmc": 2.0,
+      "effect": "passive",
+      "opponents_artifacts_creatures_enter_tapped": true,
+      "extort": true,
+      "extort_payment": "{W/B}",
+      "extort_execution_status": "annotation_only",
+      "battle_model_scope": "opponent_artifact_creature_enter_tapped_extort_annotation_v1"
+    },
+    "deck_role_json": {
+      "category": "stax",
+      "effect": "opponent_artifact_creature_enter_tapped",
+      "subtype": "extort_annotation"
+    },
+    "source": "curated",
+    "confidence": 0.94,
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "4e62bff316f784c1b468b9e53146d2aa",
+    "notes": "PG-048 mirror of PostgreSQL source rule: artifacts and creatures opponents control enter tapped is runtime-executable for normal permanent entry paths. Extort remains annotation_only until a spell-cast optional hybrid-mana payment trigger exists."
+  },
   "Basking Broodscale": {
     "effect_json": {
       "cmc": 2.0,
@@ -172,7 +221,12 @@
       "cmc": 7.0,
       "effect": "approach",
       "gain_life": 7,
-      "battle_model_scope": "approach_second_cast_win_v1"
+      "first_resolution_library_position": 7,
+      "second_cast_wins_game": true,
+      "second_cast_requires_cast_from_hand": true,
+      "countered_first_cast_counts": true,
+      "copy_spell_does_not_count": true,
+      "battle_model_scope": "approach_second_cast_win_v2"
     },
     "deck_role_json": {
       "category": "wincon",
@@ -181,8 +235,10 @@
     },
     "source": "curated",
     "confidence": 0.99,
-    "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: on first resolution it gains 7 life and is put seventh from the top if cast from hand; on the second resolving cast by the same player, that player wins the game. Runtime models the explicit second-cast win state instead of collapsing the card into a generic finisher bucket."
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "0838960b80a282fb4508532f7bae8c2b",
+    "notes": "PG-046 mirror of PostgreSQL source rule: first cast from hand can resolve by gaining 7 life and putting the spell seventh from top; a later resolving cast from hand wins the game. Runtime now counts a countered first cast and excludes copied spells from the cast ledger."
   },
   "Arcane Endeavor": {
     "effect_json": {
@@ -884,9 +940,10 @@
   },
   "Lorehold, the Historian": {
     "effect_json": {
-      "cmc": 4.0,
+      "cmc": 5.0,
       "effect": "passive",
       "is_commander": true,
+      "flying": true,
       "haste": true,
       "grants_miracle_cost": 2,
       "opponent_upkeep_rummage": true,
@@ -894,12 +951,14 @@
     },
     "deck_role_json": {
       "category": "engine",
-      "effect": "miracle_engine"
+      "effect": "miracle_engine",
+      "battle_model_scope": "lorehold_opponent_upkeep_miracle_v1"
     },
     "source": "curated",
-    "confidence": 0.91,
+    "confidence": 0.94,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer and commander coverage: instants and sorceries in hand gain miracle {2}; at the beginning of each opponent's upkeep you may discard a card, and if you do draw a card. Runtime currently models the opponent-upkeep rummage and miracle window, not every policy edge."
+    "oracle_hash": "f1b6d4f38a533e56f0efb5a3f1547214",
+    "notes": "PG-035 oracle-reviewed against PostgreSQL/Scryfall text: Lorehold is a five-mana flying, haste commander; instants and sorceries in hand gain miracle {2}; at the beginning of each opponent's upkeep you may discard a card, and if you do draw a card. Runtime currently models the opponent-upkeep rummage and miracle window, not every policy edge."
   },
   "Lumra, Bellow of the Woods": {
     "effect_json": {
@@ -1051,9 +1110,11 @@
       "effect": "remove_creature",
       "instant": true,
       "target": "creature",
+      "destination": "exile",
       "exile_target": true,
       "target_controller_basic_land_tapped": true,
-      "battle_model_scope": "one_for_one_exile_removal_partial_v1"
+      "basic_land_compensation_status": "annotation_only",
+      "battle_model_scope": "path_to_exile_creature_exile_basic_land_compensation_annotation_v1"
     },
     "deck_role_json": {
       "category": "removal",
@@ -1064,7 +1125,8 @@
     "source": "curated",
     "confidence": 0.9,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Path to Exile exiles target creature and may ramp that creature's controller with a tapped basic land. Runtime keeps the strict instant exile-removal semantic and records the compensation rider for future parity work; the opponent land-search compensation is still modeled conservatively."
+    "oracle_hash": "861c960a37be744e45f13200349e2532",
+    "notes": "PG-037 oracle-reviewed on 2026-06-22 against PostgreSQL/Scryfall text: Path to Exile exiles target creature. Runtime executes the exile destination; the target-controller basic-land search/tapped battlefield compensation remains annotation_only and is not a dynamic search/shuffle executor."
   },
   "Splendid Reclamation": {
     "effect_json": {
@@ -1141,17 +1203,23 @@
       "activation_cost_generic": 1,
       "peek_top_count": 3,
       "reorder_top": true,
+      "reorder_top_status": "lorehold_first_draw_planning_executor",
       "activated_draw_put_self_on_top": true,
-      "battle_model_scope": "senseis_top_reorder_draw_v1"
+      "draw_activation_requires_tap": true,
+      "draw_activation_cost_generic": 0,
+      "activated_draw_put_self_on_top_status": "lorehold_first_draw_miracle_window_executor",
+      "generic_draw_activation_status": "annotation_only",
+      "battle_model_scope": "senseis_top_reorder_draw_lorehold_first_draw_miracle_v1"
     },
     "deck_role_json": {
       "category": "draw",
       "effect": "topdeck_manipulation"
     },
     "source": "curated",
-    "confidence": 0.88,
+    "confidence": 0.9,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17: {1}: Look at the top three cards of your library, then put them back in any order. {T}: Draw a card, then put Sensei's Divining Top on top of its owner's library. Runtime now supports the low-risk reorder use for first-draw planning and the immediate draw-put-self miracle line when the current top card is already the best castable first draw; broader generic policy remains pending."
+    "oracle_hash": "f2c5ac0f52963cd710470adc25cc6d7c",
+    "notes": "PG-039 mirror of PostgreSQL source rule: {1} top-three reorder is executable for Lorehold first-draw planning, and the tap draw-put-self-on-top line is executable only in the Lorehold first-draw miracle window. Generic activated draw policy remains annotation_only."
   },
   "Soul-Guide Lantern": {
     "effect_json": {
@@ -1325,18 +1393,29 @@
   },
   "Lightning Greaves": {
     "effect_json": {
-      "cmc": 2.0,
       "effect": "equipment_haste_shroud",
-      "battle_model_scope": "equipment_auto_attach_haste_shroud_v1"
+      "battle_model_scope": "lightning_greaves_auto_attach_haste_shroud_equip_0_v1",
+      "attach_model": "auto_attach_best_creature_on_resolution",
+      "grants": [
+        "haste",
+        "shroud"
+      ],
+      "equip_cost": 0,
+      "target": "creature_you_control",
+      "duration": "while_attached"
     },
     "deck_role_json": {
       "category": "protection",
-      "effect": "equipment_haste_shroud"
+      "effect": "equipment_haste_shroud",
+      "target": "creature_you_control",
+      "timing": "equipment_resolution_heuristic",
+      "battle_model_scope": "lightning_greaves_auto_attach_haste_shroud_equip_0_v1"
     },
     "source": "curated",
-    "confidence": 0.96,
-    "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this equipment grants haste and shroud. Runtime models the immediate attach-to-best-creature heuristic and must not turn it into indestructible."
+    "confidence": 0.93,
+    "review_status": "active",
+    "oracle_hash": "4a4c71d3cc58637cf00a3d7fe2331353",
+    "notes": "PG-034: oracle-reviewed against current PostgreSQL text. Runtime models Lightning Greaves as immediate attach-to-best-creature heuristic granting haste and shroud; full Equipment attach/retarget timing is not modeled here, and the old generated indestructible shadow row is disabled in PostgreSQL."
   },
   "Inventors' Fair": {
     "effect_json": {
@@ -1582,7 +1661,9 @@
     },
     "source": "curated",
     "confidence": 0.9,
-    "review_status": "verified",
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: put any number of cards from your hand on the bottom, then draw that many plus one. Runtime should use the bottom-then-draw filter helper instead of leaving it unknown."
   },
   "Valakut Awakening // Valakut Stoneforge": {
@@ -1607,7 +1688,9 @@
     },
     "source": "curated",
     "confidence": 0.95,
-    "review_status": "verified",
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: front face is the hand-filter instant, back face is Valakut Stoneforge tapped red land. Runtime keeps both faces together so split-name lookups do not degrade into generic draw heuristics."
   },
   "Volcanic Vision": {
@@ -2035,7 +2118,10 @@
       "trigger": "opponent_land_play",
       "etb_tutor_target": "basic_plains",
       "etb_tutor_count": 2,
-      "battle_model_scope": "basic_plains_etb_plus_opponent_land_catchup_v1"
+      "may_put_land_from_hand": true,
+      "trigger_condition": "opponent_controls_more_lands_than_you",
+      "trigger_rechecks_on_resolution": true,
+      "battle_model_scope": "basic_plains_etb_plus_opponent_land_catchup_v2"
     },
     "deck_role_json": {
       "category": "ramp",
@@ -2046,7 +2132,8 @@
     "confidence": 0.93,
     "review_status": "active",
     "execution_status": "auto",
-    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: ETB searches up to two basic Plains to hand, and later may put lands from hand onto the battlefield when opponents get ahead on lands. Runtime now executes the basic-Plains hand tutor and reuses the reviewed opponent_land_play ramp-engine trigger."
+    "oracle_hash": "22b82ca6bbef42371227bc38a9a546b5",
+    "notes": "Oracle-reviewed on 2026-06-23 against PostgreSQL text and ruling: ETB searches up to two basic Plains to hand; the opponent-land trigger only resolves if that opponent still controls more lands than the Map controller. Runtime executes the basic-Plains hand tutor and rechecks the catch-up land condition at trigger creation and resolution."
   },
   "Borrowed Knowledge": {
     "effect_json": {
@@ -2432,6 +2519,57 @@
     "execution_status": "auto",
     "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: equipped creature has hexproof and haste. Runtime auto-attaches to the best creature and applies persistent haste and hexproof."
   },
+  "Swords to Plowshares": {
+    "effect_json": {
+      "cmc": 1.0,
+      "effect": "remove_creature",
+      "instant": true,
+      "target": "creature",
+      "destination": "exile",
+      "exile_target": true,
+      "target_controller_life_gain_equal_target_power": true,
+      "life_gain_status": "dynamic_target_power_executor",
+      "battle_model_scope": "swords_to_plowshares_creature_exile_life_equal_power_v1"
+    },
+    "deck_role_json": {
+      "category": "removal",
+      "effect": "remove_creature",
+      "target": "creature",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "702f566e95dd477f5cf5a551e41e9df8",
+    "notes": "PG-040 mirror of PostgreSQL source rule: Swords to Plowshares exiles target creature and the target controller gains life equal to that creature's power. Runtime executes both exile destination and dynamic target-power life gain."
+  },
+  "Teferi's Protection": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "phase_out",
+      "instant": true,
+      "duration": "until_your_next_turn",
+      "life_total_cant_change": true,
+      "protection_from_everything": true,
+      "phase_out_all_permanents_you_control": true,
+      "phase_out_includes_lands": true,
+      "exiles_self": true,
+      "battle_model_scope": "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "phase_out",
+      "scope": "teferis_protection",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "bdc0faecf4420dc6162c7e72e98cc0eb",
+    "notes": "PG-041 mirror of PostgreSQL source rule: Teferi's Protection locks life total changes until the next turn, grants protection from everything, phases out all permanents controlled including lands, and exiles itself on resolution."
+  },
   "Thought Vessel": {
     "effect_json": {
       "cmc": 2.0,
@@ -2493,6 +2631,30 @@
     "review_status": "verified",
     "execution_status": "auto",
     "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: Wear destroys target artifact, Tear destroys target enchantment, and Fuse can cast both. Runtime models the combined artifact-or-enchantment instant removal target."
+  },
+  "Wheel of Fortune": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "draw_cards",
+      "count": 7,
+      "sorcery": true,
+      "wheel_like": true,
+      "discard_hand_each_player": true,
+      "battle_model_scope": "multiplayer_discard_draw_v1"
+    },
+    "deck_role_json": {
+      "category": "draw",
+      "effect": "draw_cards",
+      "subtype": "wheel",
+      "scope": "each_player_discard_hand_draw_seven",
+      "timing": "sorcery"
+    },
+    "source": "curated",
+    "confidence": 0.95,
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "c37cd579d8132efac0c2118608f6f001",
+    "notes": "PG-043 mirror of PostgreSQL source rule: each player discards their hand, then draws seven cards. Runtime uses the multiplayer wheel executor and records opponent refill/payoff context instead of treating this as controller-only draw seven."
   },
   "Victory Chimes": {
     "effect_json": {

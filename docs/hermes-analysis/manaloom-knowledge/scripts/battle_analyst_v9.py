@@ -145,10 +145,13 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "copy_creature_token",
     "copy_spell",
     "damage_player_and_creatures",
+    "damage_wipe",
     "damage_wipe_treasure",
     "draw_engine",
     "equipment_static_attachment",
     "finisher",
+    "graveyard_flashback_grant",
+    "land_tax",
     "overload_recursion",
     "protection",
     "remove_creature",
@@ -248,6 +251,7 @@ OPENING_HAND_CARD_FLOW_EFFECTS = {
     "draw_engine",
     "impulse_draw",
     "loot_draw",
+    "land_tax",
     "rummage",
     "topdeck_setup",
     "tutor",
@@ -714,7 +718,9 @@ def ensure_stack_cast_ledger_event(stack_item, turn, phase):
     return True
 
 
-def resolved_spell_destination(card, effect_data, effect):
+def resolved_spell_destination(card, effect_data, effect, player=None):
+    if isinstance(card, dict) and card.get("is_copy"):
+        return "ceased_to_exist"
     if isinstance(card, dict) and card.get("_flashback_cast"):
         return "exile"
     if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
@@ -722,6 +728,14 @@ def resolved_spell_destination(card, effect_data, effect):
     if effect_data.get("exiles_self"):
         return "exile"
     if effect == "approach":
+        recorded_count = effect_data.get("_approach_cast_count_after_recorded")
+        if recorded_count is not None:
+            try:
+                return "graveyard" if int(recorded_count) >= 2 else "library"
+            except (TypeError, ValueError):
+                pass
+        if not effect_data.get("_approach_cast_count_recorded") and player is not None:
+            return "graveyard" if getattr(player, "approach_count", 0) >= 1 else "library"
         return "library"
     if is_instant_or_sorcery_spell(card):
         return "graveyard"
@@ -730,12 +744,12 @@ def resolved_spell_destination(card, effect_data, effect):
     return "battlefield"
 
 
-def spell_resolution_context_fields(card, effect_data, effect):
+def spell_resolution_context_fields(card, effect_data, effect, player=None):
     fields = {}
     if isinstance(effect_data, dict):
         fields.update(copy.deepcopy(effect_data.get("_cast_context") or {}))
         fields.update(copy.deepcopy(effect_data.get("_resolution_context") or {}))
-    destination = resolved_spell_destination(card, effect_data, effect)
+    destination = resolved_spell_destination(card, effect_data, effect, player=player)
     source_zone = fields.get("source_zone") or effect_data.get("source_zone")
     fields.setdefault("stack_object", card.get("name", "?"))
     fields.setdefault("result", "resolved")
@@ -807,6 +821,8 @@ def attach_direct_resolution_context(
     source_zone="hand",
     locked_cost=None,
     targets=None,
+    alternative_cost=None,
+    alternative_cost_kind=None,
 ):
     fields = copy.deepcopy(effect_data.get("_cast_context") or {})
     fields.update(
@@ -818,6 +834,8 @@ def attach_direct_resolution_context(
             "source_zone": source_zone,
             "cast_pipeline": fields.get("cast_pipeline") or "direct_resolution",
             "locked_cost": locked_cost or fields.get("locked_cost"),
+            "alternative_cost": alternative_cost or fields.get("alternative_cost"),
+            "alternative_cost_kind": alternative_cost_kind or fields.get("alternative_cost_kind"),
             "targets": list(targets or fields.get("targets") or []),
             "resolved_from_stack": False,
             "result": "resolved",
@@ -839,6 +857,51 @@ def can_cast_in_phase(card, effect_data, phase):
     if is_sorcery(card) and phase not in MAIN_PHASES:
         return False
     return True
+
+
+def player_controls_commander(player):
+    commander_names = set()
+    commander = getattr(player, "commander", None)
+    if isinstance(commander, dict):
+        commander_names.add(normalize_card_name(commander.get("name", "")))
+    for commander_card in getattr(player, "command_zone", []) or []:
+        if isinstance(commander_card, dict):
+            commander_names.add(normalize_card_name(commander_card.get("name", "")))
+    commander_names.discard("")
+
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("is_commander"):
+            return True
+        if commander_names and normalize_card_name(permanent.get("name", "")) in commander_names:
+            return True
+    return False
+
+
+def alternative_cost_for_effect(player, card, effect_data):
+    if not isinstance(effect_data, dict):
+        return None, None
+    condition = str(effect_data.get("alternative_cost_condition") or "").strip().lower()
+    if (
+        effect_data.get("free_if_control_commander")
+        or condition == "control_commander"
+    ) and player_controls_commander(player):
+        return str(effect_data.get("alternative_cost") or "{0}"), "control_commander"
+    return None, None
+
+
+def card_cost_for_effect(player, card, effect_data, additional_generic=0):
+    alternative_cost, _alternative_cost_kind = alternative_cost_for_effect(player, card, effect_data)
+    return card_mana_cost(
+        card,
+        additional_generic,
+        alternative_cost=alternative_cost,
+    )
+
+
+def can_pay_card_for_effect(player, card, effect_data, additional_generic=0):
+    return player.can_pay(card_cost_for_effect(player, card, effect_data, additional_generic))
 
 
 def begin_cast_context(
@@ -930,6 +993,7 @@ def commit_cast_payment(ctx):
     if not ctx.paid:
         return False
     ctx.controller.record_spell_cast(CURRENT_REPLAY_TURN)
+    record_approach_cast_from_hand(ctx.controller, ctx.card, ctx.effect_data, phase=ctx.phase)
     emit_replay_event(
         "cost_paid",
         player=ctx.controller.name,
@@ -1306,6 +1370,8 @@ def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, tu
         player=player.name,
         card=card.get("name", "?"),
         flashback_cost=flashback_cost,
+        flashback_granted_by=card.get("_flashback_granted_by"),
+        flashback_granted_rule_key=card.get("_flashback_granted_rule_key"),
         turn=turn,
         phase=phase,
         **ctx.to_replay_fields(),
@@ -1440,14 +1506,54 @@ def finish_countered_spell(player, card):
     return _finish_countered_spell(player, card, move_to_exile_func=move_to_exile)
 
 
-def finish_resolved_spell(player, card, turn=None):
+def finish_resolved_spell(player, card, turn=None, effect_data=None):
     return _finish_resolved_spell(
         player,
         card,
         turn=turn,
         move_to_exile_func=move_to_exile,
         emit_replay_event=emit_replay_event,
+        effect_data=effect_data,
     )
+
+
+def is_approach_of_the_second_sun(card, effect_data=None):
+    if isinstance(card, dict):
+        name = normalize_card_name(card.get("name") or card.get("card_name") or "")
+    else:
+        name = normalize_card_name(str(card or ""))
+    effect = (effect_data or {}).get("effect") if isinstance(effect_data, dict) else None
+    return name == "approach of the second sun" or effect == "approach"
+
+
+def record_approach_cast_from_hand(player, card, effect_data, *, phase=None):
+    if not isinstance(effect_data, dict):
+        return False
+    if not is_approach_of_the_second_sun(card, effect_data):
+        return False
+    if isinstance(card, dict) and card.get("is_copy"):
+        return False
+    if effect_data.get("_copied_from_spell"):
+        return False
+    cast_context = effect_data.get("_cast_context") or {}
+    source_zone = cast_context.get("source_zone") or effect_data.get("source_zone") or "hand"
+    if source_zone != "hand":
+        return False
+    if effect_data.get("_approach_cast_count_recorded"):
+        return False
+    player.approach_count += 1
+    effect_data["_approach_cast_count_recorded"] = True
+    effect_data["_approach_cast_count_after_recorded"] = player.approach_count
+    emit_replay_event(
+        "approach_cast_tracked",
+        player=player.name,
+        card=(card.get("name", "?") if isinstance(card, dict) else str(card)),
+        approach_count=player.approach_count,
+        source_zone=source_zone,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return True
 
 
 def commander_origin_id(card, owner_name=None):
@@ -2451,6 +2557,22 @@ def normalize_effect_by_oracle(card, effect_data):
         normalized["amount"] = amount
         normalized["target"] = "player_or_planeswalker_controller"
         normalized["battle_model_scope"] = "target_player_and_controller_creatures"
+        normalized.pop("instant", None)
+        return normalized
+
+    if (
+        re.search(r"\bdeals?\s+\d+\s+damage\s+to\s+each\s+creature\b", text)
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        amount_match = re.search(r"\bdeals?\s+(\d+)\s+damage\b", text)
+        amount = int(amount_match.group(1)) if amount_match else int(normalized.get("damage") or 0)
+        normalized["effect"] = "damage_wipe"
+        normalized["damage"] = amount
+        normalized["damage_scope"] = "each_creature"
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "oracle_damage_each_creature_wipe_v1"
+        )
         normalized.pop("instant", None)
         return normalized
 
@@ -3980,28 +4102,59 @@ def resolve_or_enqueue_trigger(
     enqueue_trigger(source, event_type, controller, resolver, data=data)
 
 
-def copy_spell_on_stack(original, controller, stack):
+def copy_spell_on_stack(
+    original,
+    controller,
+    stack,
+    *,
+    original_effect_data=None,
+    source_card=None,
+    source_effect_data=None,
+):
     """v9: Copy a spell on the stack (CR 706.10).
     The copy is NOT cast — triggers that care about casting do not fire.
     """
     if not isinstance(original, dict):
         return None
-    copy = {
-        "name": original.get("name", ""),
-        "cmc": original.get("cmc", 0),
-        "type_line": original.get("type_line", ""),
-        "effect": original.get("effect", ""),
-        "is_copy": True,
-        "was_cast": False,
-        "controller": controller.name,
-        "colors": original.get("colors", []),
-        "modes": original.get("modes", []),
-        "targets": original.get("targets", []),
-    }
-    item = StackItem(copy, controller, {})
+    copied_card = copy.deepcopy(original)
+    copied_card["is_copy"] = True
+    copied_card["was_cast"] = False
+    copied_card["controller"] = controller.name
+    copied_card["_copied_from_spell"] = original.get("name", "?")
+    if isinstance(source_card, dict):
+        copied_card["_copied_by"] = source_card.get("name", "?")
+    copied_effect = copy.deepcopy(original_effect_data or get_card_effect(original))
+    for transient_key in ("_cast_context", "_resolution_context", "_cast_ledger_emitted"):
+        copied_effect.pop(transient_key, None)
+    copied_effect["_copied_from_spell"] = original.get("name", "?")
+    if isinstance(source_card, dict):
+        copied_effect["_copied_by"] = source_card.get("name", "?")
+    if isinstance(source_effect_data, dict):
+        copied_effect["_copy_source_rule_logical_key"] = source_effect_data.get("_rule_logical_key")
+        copied_effect["_copy_source_rule_oracle_hash"] = source_effect_data.get("_rule_oracle_hash")
+    item = StackItem(copied_card, controller, copied_effect)
     item.was_cast = False
     stack.push(item)
     return item
+
+
+def copy_spell_stack_target_context(player, stack_item, effect_data):
+    if not stack_item or getattr(stack_item, "countered", False):
+        return None
+    target_card = getattr(stack_item, "card", None)
+    if not is_instant_or_sorcery_spell(target_card):
+        return None
+    target_scope = str((effect_data or {}).get("target") or "instant_or_sorcery_on_stack").lower()
+    if target_scope.startswith("own_") and getattr(stack_item, "controller", None) is not player:
+        return None
+    return {
+        "target": target_card.get("name", "?"),
+        "target_type": "instant_or_sorcery_on_stack",
+        "target_controller": getattr(getattr(stack_item, "controller", None), "name", None),
+        "target_legal": True,
+        "targeting_pipeline": "stack_copy_target_minimal",
+    }
+
 
 class StackItem:
     def __init__(self, card, controller, effect_data):
@@ -4045,7 +4198,7 @@ class Stack:
         """Is the top spell threatening enough for opponents to counter?"""
         if not self.items: return False
         effect = self.items[-1].effect_data.get("effect", "")
-        threats = {"board_wipe", "finisher", "approach", "steal_all_creatures",
+        threats = {"board_wipe", "damage_wipe", "finisher", "approach", "steal_all_creatures",
                    "overload_recursion", "pump_all", "token_maker", "copy_creature_token",
                    "worldfire_reset"}
         return effect in threats
@@ -4768,6 +4921,78 @@ def removal_target_type(effect_data):
     )
 
 
+def removal_destination(effect_data):
+    if not isinstance(effect_data, dict):
+        return "graveyard"
+    explicit_destination = effect_data.get("destination")
+    if explicit_destination:
+        return str(explicit_destination).lower()
+    if effect_data.get("exile_target"):
+        return "exile"
+    return "graveyard"
+
+
+def removal_annotation_replay_fields(effect_data):
+    fields = {}
+    if not isinstance(effect_data, dict):
+        return fields
+    if effect_data.get("target_controller_basic_land_tapped") is not None:
+        fields["target_controller_basic_land_tapped"] = bool(
+            effect_data.get("target_controller_basic_land_tapped")
+        )
+    if effect_data.get("basic_land_compensation_status"):
+        fields["basic_land_compensation_status"] = effect_data.get(
+            "basic_land_compensation_status"
+        )
+    return fields
+
+
+def removal_life_gain_requested(effect_data, target):
+    if not isinstance(effect_data, dict):
+        return 0
+    if effect_data.get("target_controller_life_gain_equal_target_power"):
+        try:
+            return max(0, int((target or {}).get("power") or 0))
+        except Exception:
+            return 0
+    if effect_data.get("target_controller_gains_life"):
+        try:
+            return max(0, int(effect_data.get("target_controller_gains_life") or 0))
+        except Exception:
+            return 0
+    return 0
+
+
+def apply_removal_life_gain(effect_data, target_controller, target):
+    requested = removal_life_gain_requested(effect_data, target)
+    if requested <= 0 or target_controller is None:
+        return requested, 0
+    before = int(getattr(target_controller, "life", 0) or 0)
+    gain_life(target_controller, requested)
+    after = int(getattr(target_controller, "life", 0) or 0)
+    return requested, max(0, after - before)
+
+
+def removal_life_gain_replay_fields(effect_data, requested, gained):
+    fields = {}
+    if not isinstance(effect_data, dict):
+        return fields
+    if effect_data.get("target_controller_life_gain_equal_target_power"):
+        fields["target_controller_life_gain_equal_target_power"] = True
+        fields["life_gain_status"] = effect_data.get(
+            "life_gain_status",
+            "dynamic_target_power_executor",
+        )
+    elif effect_data.get("target_controller_gains_life"):
+        fields["target_controller_gains_life"] = int(
+            effect_data.get("target_controller_gains_life") or 0
+        )
+    if fields:
+        fields["life_gain_requested"] = int(requested or 0)
+        fields["life_gained"] = int(gained or 0)
+    return fields
+
+
 def declared_target_replay_entry(decision):
     return {
         "target": decision.get("target_name"),
@@ -5004,8 +5229,11 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         )
         return True
 
-    if effect_data.get("target_controller_gains_life"):
-        gain_life(target_controller, int(effect_data.get("target_controller_gains_life") or 0))
+    life_gain_requested, life_gained = apply_removal_life_gain(
+        effect_data,
+        target_controller,
+        target,
+    )
 
     if effect_data.get("uses_stat_modifier_removal"):
         try:
@@ -5052,11 +5280,18 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         target_is_creature=is_battlefield_creature(target),
         target_type_line=target.get("type_line", ""),
         available_targets=1,
-        destination=str(effect_data.get("destination") or "graveyard").lower(),
+        destination=removal_destination(effect_data),
         turn=turn,
         **decision,
+        **removal_annotation_replay_fields(effect_data),
+        **removal_life_gain_replay_fields(
+            effect_data,
+            life_gain_requested,
+            life_gained,
+        ),
+        **replay_rule_fields(effect_data),
     )
-    destination = str(effect_data.get("destination") or "graveyard").lower()
+    destination = removal_destination(effect_data)
     if destination == "exile":
         move_zone_object_to_exile(
             target_controller,
@@ -5126,8 +5361,14 @@ def redirectable_stack_context(redirector, all_players, stack_item):
             "result": "no_legal_new_target",
         }
 
-    chosen_target = choose_best_creature_target([candidate["target"] for candidate in candidates])
-    chosen = next(candidate for candidate in candidates if candidate["target"] is chosen_target)
+    preferred_candidates = [
+        candidate
+        for candidate in candidates
+        if candidate["controller"] is not redirector
+    ]
+    target_pool = preferred_candidates or candidates
+    chosen_target = choose_best_creature_target([candidate["target"] for candidate in target_pool])
+    chosen = next(candidate for candidate in target_pool if candidate["target"] is chosen_target)
     return {
         "stack_item": stack_item,
         "declared_entry": entry,
@@ -5273,6 +5514,7 @@ SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "phase_out",
     "cannot_lose_turn",
     "board_wipe",
+    "damage_wipe",
     "damage_player_and_creatures",
     "remove_creature",
     "remove_permanent",
@@ -5789,15 +6031,19 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
         ):
             continue
         if player != top_item.controller:
-            instants = [c for c in player.hand if is_instant(c) and player.can_pay_card(c)]
+            instants = [c for c in player.hand if is_instant(c)]
             for c in instants:
                 eff = get_card_effect(c)
                 if eff.get("effect") != "redirect_removal":
+                    continue
+                if not can_pay_card_for_effect(player, c, eff):
                     continue
                 redirect_context = redirectable_stack_context(player, all_players, top_item)
                 if not redirect_context or not redirect_context.get("new_target"):
                     continue
                 fields = replay_rule_fields(eff)
+                alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
+                locked_cost = card_cost_for_effect(player, c, eff)
                 emit_decision_trace(
                     decision_type="response",
                     player=player,
@@ -5833,7 +6079,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     actual_outcome="redirect_response_cast",
                     reason="redirect_targeted_stack_object",
                 )
-                if not player.spend_card_mana(c):
+                if not player.spend_mana(locked_cost):
                     continue
                 player.hand.remove(c)
                 emit_replay_event(
@@ -5847,6 +6093,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     phase=phase,
                     role="response",
                     response_to=top_item.card.get("name", "?"),
+                    locked_cost=replay_cost_snapshot(locked_cost),
+                    alternative_cost=alternative_cost,
+                    alternative_cost_kind=alternative_cost_kind,
                     **fields,
                 )
                 resolve_redirect_removal(
@@ -5858,11 +6107,130 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     phase=phase,
                 )
                 return True
+        instants = [c for c in player.hand if is_instant(c)]
+        for c in instants:
+            eff = get_card_effect(c)
+            if eff.get("effect") != "copy_spell":
+                continue
+            if not can_pay_card_for_effect(player, c, eff):
+                continue
+            copy_target = copy_spell_stack_target_context(player, top_item, eff)
+            if not copy_target:
+                continue
+            fields = replay_rule_fields(eff)
+            alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
+            locked_cost = card_cost_for_effect(player, c, eff)
+            emit_decision_trace(
+                decision_type="response",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        option_card,
+                        get_card_effect(option_card),
+                        action="respond",
+                    )
+                    for option_card in instants[:8]
+                ],
+                chosen_option=decision_card_option(c, eff, action="copy_spell"),
+                rejected_options=[
+                    decision_card_option(
+                        option_card,
+                        get_card_effect(option_card),
+                        action="reject_response",
+                    )
+                    for option_card in instants
+                    if option_card is not c
+                ][:8],
+                score_components={
+                    "stack_threat_score": score,
+                    "available_instants": len(instants),
+                    "copyable_stack_target": 1,
+                },
+                rule_source=fields.get("rule_source", "battle_heuristic"),
+                rule_status=fields.get("rule_review_status", "heuristic"),
+                confidence="medium",
+                expected_benefit_score=max(10, score),
+                actual_outcome="copy_spell_response_cast",
+                reason="copy_target_instant_or_sorcery_stack_spell",
+            )
+            if not player.spend_mana(locked_cost):
+                continue
+            player.hand.remove(c)
+            emit_replay_event(
+                "spell_cast",
+                player=player.name,
+                card=c.get("name", "?"),
+                effect=eff.get("effect", "unknown"),
+                type_line=c.get("type_line", ""),
+                cmc=c.get("cmc", 0),
+                turn=turn,
+                phase=phase,
+                role="response",
+                response_to=top_item.card.get("name", "?"),
+                locked_cost=replay_cost_snapshot(locked_cost),
+                alternative_cost=alternative_cost,
+                alternative_cost_kind=alternative_cost_kind,
+                **copy_target,
+                **fields,
+            )
+            mark_cast_ledger_emitted(eff)
+            copied_item = copy_spell_on_stack(
+                top_item.card,
+                player,
+                stack,
+                original_effect_data=top_item.effect_data,
+                source_card=c,
+                source_effect_data=eff,
+            )
+            emit_replay_event(
+                "spell_copied",
+                player=player.name,
+                card=c.get("name", "?"),
+                copied_spell=top_item.card.get("name", "?"),
+                copied_spell_controller=getattr(top_item.controller, "name", None),
+                copy_controller=player.name,
+                copy_is_cast=False,
+                copy_stack_depth=len(stack.items),
+                may_choose_new_targets=bool(eff.get("may_choose_new_targets")),
+                choose_new_targets_status=eff.get("choose_new_targets_status"),
+                turn=turn,
+                phase=phase,
+                **copy_target,
+                **fields,
+            )
+            attach_direct_resolution_context(
+                eff,
+                c,
+                phase,
+                priority_window="copy_spell_response",
+                locked_cost=replay_cost_snapshot(locked_cost),
+                alternative_cost=alternative_cost,
+                alternative_cost_kind=alternative_cost_kind,
+                targets=[copy_target],
+            )
+            emit_replay_event(
+                "spell_resolved",
+                player=player.name,
+                card=c.get("name", "?"),
+                cmc=c.get("cmc", 0),
+                type_line=c.get("type_line", ""),
+                effect=eff.get("effect", "unknown"),
+                copied_spell=top_item.card.get("name", "?"),
+                copied_stack_object=getattr(copied_item, "card", {}).get("name", "?") if copied_item else None,
+                turn=turn,
+                **spell_resolution_context_fields(c, eff, eff.get("effect", "unknown")),
+                **fields,
+            )
+            finish_resolved_spell(player, c, turn=turn)
+            return True
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             top_effect = top_item.effect_data.get("effect", "")
             own_stack_protection_targets = {
                 "board_wipe",
+                "damage_wipe",
                 "damage_player_and_creatures",
                 "worldfire_reset",
             }
@@ -5871,7 +6239,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 or top_effect in own_stack_protection_targets
             )
             if should_consider_protection:
-                instants = [c for c in player.hand if is_instant(c) and player.can_pay_card(c)]
+                instants = [c for c in player.hand if is_instant(c)]
                 for c in instants:
                     eff = get_card_effect(c)
                     protection_effect = eff.get("effect")
@@ -5883,7 +6251,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     elif protection_effect not in ("phase_out", "indestructible", "modal_boros_charm"):
                         continue
                     if protection_effect in ("phase_out", "indestructible", "modal_boros_charm", "cannot_lose_turn"):
-                        if player.can_pay_card(c):
+                        if can_pay_card_for_effect(player, c, eff):
+                            alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
+                            locked_cost = card_cost_for_effect(player, c, eff)
                             fields = replay_rule_fields(eff)
                             score_components = {
                                 "stack_threat_score": score,
@@ -5929,8 +6299,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                     or "high_threat_stack_response"
                                 ),
                             )
+                            if not player.spend_mana(locked_cost):
+                                continue
                             player.hand.remove(c)
-                            player.spend_card_mana(c)
                             c["_response_to_effect"] = top_item.effect_data.get("effect")
                             emit_replay_event(
                                 "spell_cast",
@@ -5943,6 +6314,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 phase=phase,
                                 role="response",
                                 response_to=top_item.card.get("name", "?"),
+                                locked_cost=replay_cost_snapshot(locked_cost),
+                                alternative_cost=alternative_cost,
+                                alternative_cost_kind=alternative_cost_kind,
                                 **replay_rule_fields(eff),
                             )
                             attach_direct_resolution_context(
@@ -5950,7 +6324,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 c,
                                 phase,
                                 priority_window="response_direct_resolution",
-                                locked_cost=replay_cost_snapshot(card_mana_cost(c)),
+                                locked_cost=replay_cost_snapshot(locked_cost),
+                                alternative_cost=alternative_cost,
+                                alternative_cost_kind=alternative_cost_kind,
                             )
                             apply_effect_immediate(
                                 player,
@@ -6123,7 +6499,7 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         return 35
 
     # ── MASSIVE BOARD IMPACT ──
-    if effect_name == "board_wipe":
+    if effect_name in ("board_wipe", "damage_wipe"):
         # Higher threat if caster has protection (asymmetric wipe)
         if controller.indestructible or controller.protection_from_everything:
             return 85
@@ -6305,8 +6681,8 @@ def set_until_eot(card, key, value):
 
 
 def clear_until_eot(player):
-    """Restore temporary combat keywords/stat changes at cleanup."""
-    zones = (player.battlefield, player.phased_out)
+    """Restore temporary card changes at cleanup."""
+    zones = (player.battlefield, player.phased_out, player.graveyard)
     for zone in zones:
         for card in zone:
             if not isinstance(card, dict):
@@ -6346,6 +6722,58 @@ def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
                 base_power = 2
             creature["power"] = base_power * power_multiplier
     return len(creatures)
+
+
+def grant_permanents_until_eot(player, *, keywords=()):
+    permanents = [
+        card
+        for card in player.battlefield
+        if isinstance(card, dict)
+    ]
+    for permanent in permanents:
+        for keyword in keywords:
+            set_until_eot(permanent, keyword, True)
+    return permanents
+
+
+def grant_graveyard_flashback_until_eot(player, source_card, effect_data, turn):
+    """Grant temporary flashback to instant/sorcery cards in the player's graveyard."""
+    granted = []
+    skipped_no_mana_cost = []
+    for grave_card in list(player.graveyard):
+        if not isinstance(grave_card, dict) or not is_instant_or_sorcery_spell(grave_card):
+            continue
+        mana_cost = str(grave_card.get("mana_cost") or "").strip()
+        if not mana_cost:
+            skipped_no_mana_cost.append(grave_card.get("name", "?"))
+            continue
+        set_until_eot(grave_card, "flashback_cost", mana_cost)
+        set_until_eot(grave_card, "_flashback_granted_by", source_card.get("name", "?"))
+        set_until_eot(
+            grave_card,
+            "_flashback_granted_rule_key",
+            effect_data.get("_rule_logical_key"),
+        )
+        granted.append(
+            {
+                "name": grave_card.get("name", "?"),
+                "flashback_cost": mana_cost,
+            }
+        )
+    emit_replay_event(
+        "graveyard_flashback_granted",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        target_zone=effect_data.get("target_zone", "graveyard"),
+        grants_flashback_to=effect_data.get("grants_flashback_to", "instant_or_sorcery"),
+        duration=effect_data.get("duration", "until_end_of_turn"),
+        granted_count=len(granted),
+        granted=granted,
+        skipped_no_mana_cost=skipped_no_mana_cost,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return granted
 
 
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
@@ -7126,6 +7554,241 @@ def board_wipe_decision_context(player, opponents):
     }
 
 
+def _permanent_mana_value(permanent):
+    try:
+        return float(permanent.get("cmc") or permanent.get("mana_value") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _modal_destroy_mode_matches(permanent, mode):
+    if not isinstance(permanent, dict):
+        return False
+    normalized = str(mode or "").strip().lower()
+    if normalized in {"artifact", "artifacts"}:
+        return is_artifact_permanent(permanent)
+    if normalized in {"enchantment", "enchantments"}:
+        return is_enchantment_permanent(permanent)
+    if normalized in {
+        "creatures_mana_value_3_or_less",
+        "creatures_cmc_3_or_less",
+        "creatures_cmc_le_3",
+    }:
+        return is_battlefield_creature(permanent) and _permanent_mana_value(permanent) <= 3
+    if normalized in {
+        "creatures_mana_value_4_or_greater",
+        "creatures_cmc_4_or_greater",
+        "creatures_cmc_ge_4",
+    }:
+        return is_battlefield_creature(permanent) and _permanent_mana_value(permanent) >= 4
+    if normalized in {"creature", "creatures"}:
+        return is_battlefield_creature(permanent)
+    return False
+
+
+def _modal_destroy_selection(player, opponents, modes, choose_count):
+    live_participants = [player] + list(opponents)
+    normalized_modes = [
+        str(mode or "").strip().lower()
+        for mode in modes
+        if str(mode or "").strip()
+    ]
+    if not normalized_modes:
+        return [], [], {}
+    choose_count = max(1, min(int(choose_count or len(normalized_modes)), len(normalized_modes)))
+    best = None
+    for candidate_modes in combinations(normalized_modes, choose_count):
+        selected = []
+        selected_keys = set()
+        protected = 0
+        own_destroyed = 0
+        opponent_destroyed = 0
+        live_opponent_destroyed = 0
+        own_creatures_destroyed = 0
+        opponent_creatures_destroyed = 0
+        live_opponent_creatures_destroyed = 0
+        mode_counts = {mode: 0 for mode in candidate_modes}
+        for participant in live_participants:
+            is_self = participant is player
+            is_live_opponent = (not is_self) and participant.is_alive()
+            for permanent in list(participant.battlefield):
+                matched_modes = [
+                    mode
+                    for mode in candidate_modes
+                    if _modal_destroy_mode_matches(permanent, mode)
+                ]
+                if not matched_modes:
+                    continue
+                for mode in matched_modes:
+                    mode_counts[mode] += 1
+                key = (id(participant), id(permanent))
+                if key in selected_keys:
+                    continue
+                if permanent.get("indestructible"):
+                    protected += 1
+                    continue
+                selected_keys.add(key)
+                selected.append((participant, permanent, matched_modes))
+                selected_is_creature = is_battlefield_creature(permanent)
+                if is_self:
+                    own_destroyed += 1
+                    if selected_is_creature:
+                        own_creatures_destroyed += 1
+                else:
+                    opponent_destroyed += 1
+                    if selected_is_creature:
+                        opponent_creatures_destroyed += 1
+                    if is_live_opponent:
+                        live_opponent_destroyed += 1
+                        if selected_is_creature:
+                            live_opponent_creatures_destroyed += 1
+        score = (
+            live_opponent_destroyed * 10
+            + opponent_destroyed * 3
+            - own_destroyed * 8
+            - protected
+        )
+        candidate = {
+            "modes": list(candidate_modes),
+            "selected": selected,
+            "mode_counts": mode_counts,
+            "protected": protected,
+            "own_destroyed": own_destroyed,
+            "opponent_destroyed": opponent_destroyed,
+            "live_opponent_destroyed": live_opponent_destroyed,
+            "own_creatures_destroyed": own_creatures_destroyed,
+            "opponent_creatures_destroyed": opponent_creatures_destroyed,
+            "live_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+            "score": score,
+        }
+        if best is None or (
+            candidate["score"],
+            candidate["live_opponent_destroyed"],
+            -candidate["own_destroyed"],
+            candidate["modes"],
+        ) > (
+            best["score"],
+            best["live_opponent_destroyed"],
+            -best["own_destroyed"],
+            best["modes"],
+        ):
+            best = candidate
+    return best["modes"], best["selected"], best
+
+
+def resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn):
+    modes = effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes") or []
+    choose_count = effect_data.get("choose_modes") or effect_data.get("choose_count") or 2
+    selected_modes, selected, selection_context = _modal_destroy_selection(
+        player,
+        opponents,
+        modes,
+        choose_count,
+    )
+    destroyed = []
+    for controller, permanent, matched_modes in selected:
+        destination = move_permanent_from_battlefield(
+            controller,
+            permanent,
+            reason="modal_board_wipe",
+            source=card,
+        )
+        destroyed.append(
+            {
+                "controller": controller.name,
+                "name": permanent.get("name", "?"),
+                "type_line": permanent.get("type_line", ""),
+                "mana_value": _permanent_mana_value(permanent),
+                "matched_modes": matched_modes,
+                "destination": destination,
+            }
+        )
+    context = board_wipe_decision_context(player, opponents)
+    own_permanents_destroyed = int(selection_context.get("own_destroyed", 0))
+    opponent_permanents_destroyed = int(selection_context.get("opponent_destroyed", 0))
+    live_opponent_permanents_destroyed = int(selection_context.get("live_opponent_destroyed", 0))
+    own_creatures_destroyed = int(selection_context.get("own_creatures_destroyed", 0))
+    opponent_creatures_destroyed = int(selection_context.get("opponent_creatures_destroyed", 0))
+    live_opponent_creatures_destroyed = int(selection_context.get("live_opponent_creatures_destroyed", 0))
+    actual_asymmetry = live_opponent_permanents_destroyed - own_permanents_destroyed
+    resolution_context = {
+        **context,
+        "modal_destroy_modes": list(modes),
+        "selected_modes": selected_modes,
+        "mode_counts": dict(selection_context.get("mode_counts", {})),
+        "actual_destroyed": len(destroyed),
+        "protected": int(selection_context.get("protected", 0)),
+        "own_permanents_destroyed": own_permanents_destroyed,
+        "opponent_permanents_destroyed": opponent_permanents_destroyed,
+        "live_opponent_permanents_destroyed": live_opponent_permanents_destroyed,
+        "own_creatures_destroyed": own_creatures_destroyed,
+        "opponent_creatures_destroyed": opponent_creatures_destroyed,
+        "live_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_destroyed,
+        "actual_asymmetry": actual_asymmetry,
+        "self_protected_from_wipe": bool(
+            getattr(player, "protection_from_everything", False)
+            or getattr(player, "phased_out", [])
+        ),
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_permanents_destroyed > 0
+        ),
+    }
+    risk_flags = []
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif actual_asymmetry <= 0 and not context["lethal_pressure"] and not context["behind_on_board"]:
+        risk_flags.append("wipe_without_clear_asymmetry")
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_modal_board_wipe"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(card, effect_data, action="resolve_modal_board_wipe"),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10) + min(live_opponent_permanents_destroyed * 5, 30),
+        actual_outcome="board_wipe_resolved",
+        reason="resolve_best_modal_destroy_modes",
+        strategic_principle="choose_modal_wipe_modes_with_best_live_board_impact",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        destroyed=len(destroyed),
+        protected=int(selection_context.get("protected", 0)),
+        modal_destroy_modes=list(modes),
+        selected_modes=selected_modes,
+        mode_counts=dict(selection_context.get("mode_counts", {})),
+        destroyed_cards=destroyed[:20],
+        own_permanents_destroyed=own_permanents_destroyed,
+        opponent_permanents_destroyed=opponent_permanents_destroyed,
+        live_opponent_permanents_destroyed=live_opponent_permanents_destroyed,
+        own_creatures_destroyed=own_creatures_destroyed,
+        opponent_creatures_destroyed=opponent_creatures_destroyed,
+        live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        actual_asymmetry=actual_asymmetry,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
 def wheel_decision_context(player, opponents, draw_count):
     hand_size = len(player.hand)
     library_cards_before = len(getattr(player, "library", []) or [])
@@ -7167,10 +7830,194 @@ def wheel_decision_context(player, opponents, draw_count):
     }
 
 
-def process_upkeep_utility_lands(player, turn):
-    """Resolve passive utility-land text that is low-risk under the current model."""
+def is_land_tax_upkeep_permanent(permanent):
+    return (
+        isinstance(permanent, dict)
+        and (
+            permanent.get("effect") == "land_tax"
+            or permanent.get("battle_model_scope")
+            == "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1"
+            or normalize_card_name(permanent.get("name", "")) == "land tax"
+        )
+    )
+
+
+def resolve_land_tax_upkeep_trigger(player, permanent, turn, all_players=None):
+    """Resolve Land Tax's beginning-of-upkeep basic-land tutor."""
+    effect_data = permanent if isinstance(permanent, dict) else {}
+    fields = replay_rule_fields(effect_data)
+    all_players = list(all_players or [])
+    opponents = [
+        candidate
+        for candidate in all_players
+        if candidate is not player and getattr(candidate, "is_alive", lambda: True)()
+    ]
+    player_land_count = controlled_land_count(player)
+    opponent_land_counts = [
+        {
+            "player": getattr(opponent, "name", "Opponent"),
+            "lands": controlled_land_count(opponent),
+        }
+        for opponent in opponents
+    ]
+    max_opponent_land_count = max(
+        (entry["lands"] for entry in opponent_land_counts),
+        default=0,
+    )
+    condition_met = max_opponent_land_count > player_land_count
+    target_type = str(effect_data.get("tutor_target") or effect_data.get("target") or "basic_land")
+    try:
+        max_count = max(0, int(effect_data.get("max_count") or effect_data.get("count") or 3))
+    except (TypeError, ValueError):
+        max_count = 3
+
+    if not condition_met:
+        emit_replay_event(
+            "land_tax_trigger_skipped",
+            player=player.name,
+            card=permanent.get("name", "Land Tax"),
+            trigger="beginning_of_your_upkeep",
+            condition="opponent_controls_more_lands",
+            condition_met=False,
+            player_land_count=player_land_count,
+            opponent_land_counts=opponent_land_counts,
+            max_opponent_land_count=max_opponent_land_count,
+            turn=turn,
+            **fields,
+        )
+        return 0
+
+    candidates = library_tutor_candidates(player, target_type)
+    scored_candidates = [
+        (
+            candidate,
+            *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+        )
+        for candidate in candidates
+    ]
+    scored_candidates.sort(
+        key=lambda item: (
+            -item[1],
+            item[0].get("name", ""),
+            str(item[0].get("type_line") or ""),
+        )
+    )
+    selected = scored_candidates[:max_count]
+    moved = []
+    for selected_card, _score, _reason in selected:
+        if selected_card not in player.library:
+            continue
+        player.library.remove(selected_card)
+        player.hand.append(selected_card)
+        moved.append(selected_card)
+
+    selected_names = [card.get("name", "?") for card in moved]
+    expected_score = sum(score for _card, score, _reason in selected)
+    risk_flags = [] if moved else ["no_basic_land_target"]
+    chosen_option = {
+        "card": permanent.get("name", "Land Tax"),
+        "action": "resolve_upkeep_tutor",
+        "effect": "land_tax",
+        "score": expected_score,
+        "found_cards": selected_names,
+        "target_type": target_type,
+    }
+    emit_decision_trace(
+        decision_type="land_tax_upkeep_tutor",
+        player=player,
+        turn=turn,
+        phase="upkeep",
+        available_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="tutor_to_hand",
+                reason=reason,
+                target_type=target_type,
+            )
+            for candidate, score, reason in scored_candidates[:10]
+        ] or [{"action": "resolve_without_target", "target_type": target_type}],
+        chosen_option=chosen_option,
+        rejected_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="reject_tutor_target",
+                reason=reason,
+                target_type=target_type,
+            )
+            for candidate, score, reason in scored_candidates[max_count:10]
+        ],
+        score_components={
+            "player_land_count": player_land_count,
+            "opponent_land_counts": opponent_land_counts,
+            "max_opponent_land_count": max_opponent_land_count,
+            "candidate_count": len(scored_candidates),
+            "selected_count": len(moved),
+            "max_count": max_count,
+            "reveals": bool(effect_data.get("reveals", True)),
+            "shuffle_after": bool(effect_data.get("shuffle_after", True)),
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=expected_score,
+        actual_outcome="land_tax_upkeep_tutor_resolved",
+        reason="opponent_controls_more_lands",
+        strategic_principle="convert_land_deficit_into_basic_land_card_advantage",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "cards": len(moved),
+            "lands": 0,
+            "selected": selected_names,
+            "zone_move": "library_to_hand",
+        },
+        risk_flags=risk_flags,
+        rejected_reason="not_selected_within_land_tax_limit",
+    )
+    emit_replay_event(
+        "land_tax_trigger_resolved",
+        player=player.name,
+        card=permanent.get("name", "Land Tax"),
+        trigger="beginning_of_your_upkeep",
+        condition="opponent_controls_more_lands",
+        condition_met=True,
+        target_type=target_type,
+        found=selected_names[0] if selected_names else None,
+        found_cards=selected_names,
+        found_count=len(moved),
+        max_count=max_count,
+        destination="hand",
+        reveals=bool(effect_data.get("reveals", True)),
+        shuffle_after=bool(effect_data.get("shuffle_after", True)),
+        library_order_model="deterministic_no_random_shuffle",
+        player_land_count=player_land_count,
+        opponent_land_counts=opponent_land_counts,
+        max_opponent_land_count=max_opponent_land_count,
+        turn=turn,
+        **fields,
+    )
+    return len(moved)
+
+
+def process_upkeep_utility_lands(player, turn, all_players=None):
+    """Resolve low-risk beginning-of-upkeep utility effects."""
     triggers = 0
     artifact_count = controlled_artifact_count(player)
+    for permanent in list(player.battlefield):
+        if not is_land_tax_upkeep_permanent(permanent):
+            continue
+        if permanent.get("land_tax_last_trigger_turn") == turn:
+            continue
+        permanent["land_tax_last_trigger_turn"] = turn
+        triggers += resolve_land_tax_upkeep_trigger(
+            player,
+            permanent,
+            turn,
+            all_players=all_players,
+        )
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict) or not is_effective_land(permanent):
             continue
@@ -7411,7 +8258,8 @@ def should_cast_wheel(player, opponents, effect_data):
     )["timing_justified"]
 
 
-def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng):
+def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng, effect_data=None):
+    fields = replay_rule_fields(effect_data if isinstance(effect_data, dict) else {})
     participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
     results = []
     total_opponent_drawn = 0
@@ -7454,6 +8302,7 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng):
         opponent_cards_drawn=total_opponent_drawn,
         treasures_created=treasures_created,
         turn=turn,
+        **fields,
     )
     return results
 
@@ -7689,7 +8538,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
             continue
         if not _can_pay_card_with_bonus_mana(player, card):
             continue
-        if effect == "board_wipe" and not should_cast_board_wipe(player, opponents):
+        if effect in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
             if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
@@ -7707,7 +8556,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 18 if cmc <= 4 else 10
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
             score += 24
             reason = "unlock_high_impact_spell"
         else:
@@ -7793,7 +8642,7 @@ def sacrifice_mana_unlock_candidates(
             bonus_color=bonus_color,
         ):
             continue
-        if effect == "board_wipe" and not should_cast_board_wipe(player, opponents):
+        if effect in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
             if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
@@ -7811,7 +8660,7 @@ def sacrifice_mana_unlock_candidates(
         elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 16 if cmc <= 4 else 8
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
+        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
             score += 26
             reason = "unlock_high_impact_spell"
         else:
@@ -9378,13 +10227,17 @@ def _player_permanents_with_flag(player, flag):
 
 
 def _player_has_named_permanent(player, expected_name):
+    return _player_named_permanent(player, expected_name) is not None
+
+
+def _player_named_permanent(player, expected_name):
     normalized_expected = normalize_card_name(expected_name)
     for permanent in player.battlefield:
         if not isinstance(permanent, dict):
             continue
         if normalize_card_name(permanent.get("name", "")) == normalized_expected:
-            return True
-    return False
+            return permanent
+    return None
 
 
 def player_has_no_maximum_hand_size(player):
@@ -9408,6 +10261,7 @@ def discard_replacement_priority(card, player):
         "counter",
         "remove_creature",
         "remove_permanent",
+        "damage_wipe",
         "damage_wipe_treasure",
         "redistribute_life_totals",
         "board_wipe",
@@ -9481,16 +10335,20 @@ def resolve_effect_discard_cards(player, discarded_cards, *, top_limit=None):
 
 
 def player_has_lorehold_miracle_engine(player):
-    return bool(_player_permanents_with_flag(player, "opponent_upkeep_rummage")) or _player_has_named_permanent(
-        player,
-        "Lorehold, the Historian",
-    )
+    return lorehold_miracle_engine_permanent(player) is not None
+
+
+def lorehold_miracle_engine_permanent(player):
+    permanents = _player_permanents_with_flag(player, "opponent_upkeep_rummage")
+    if permanents:
+        return permanents[0]
+    return _player_named_permanent(player, "Lorehold, the Historian")
 
 
 def lorehold_miracle_cost(player):
     permanents = _player_permanents_with_flag(player, "grants_miracle_cost")
     if not permanents:
-        return 2 if _player_has_named_permanent(player, "Lorehold, the Historian") else None
+        return 2 if lorehold_miracle_engine_permanent(player) is not None else None
     costs = [
         int(permanent.get("grants_miracle_cost") or 0)
         for permanent in permanents
@@ -9699,6 +10557,7 @@ def activate_lorehold_topdeck_artifacts(
                 exchange_count=1,
                 phase=phase,
                 turn=turn,
+                **replay_rule_fields(permanent),
             )
             return 1
 
@@ -9884,6 +10743,7 @@ def activate_lorehold_topdeck_artifacts(
                 putback=[card.get("name", "?") for card in putback_cards],
                 phase=phase,
                 turn=turn,
+                **replay_rule_fields(permanent),
             )
             try_lorehold_miracle_cast(
                 player,
@@ -10026,6 +10886,7 @@ def activate_lorehold_topdeck_artifacts(
                 peek_count=len(visible),
                 phase=phase,
                 turn=turn,
+                **replay_rule_fields(permanent),
             )
             try_lorehold_miracle_cast(
                 player,
@@ -10120,6 +10981,7 @@ def activate_lorehold_topdeck_artifacts(
             peek_count=len(visible),
             phase=phase,
             turn=turn,
+            **replay_rule_fields(permanent),
         )
         return 1
     return 0
@@ -10302,7 +11164,7 @@ def try_lorehold_miracle_cast(
     if last_drawn not in player.hand:
         return False
     opponents = [candidate for candidate in all_players if candidate is not player]
-    if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+    if eff.get("effect") in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
         return False
     if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
         return False
@@ -10337,6 +11199,7 @@ def try_lorehold_miracle_cast(
     ) if declared_targets else {}
     player.hand.remove(last_drawn)
     player.spend_mana(miracle_cost)
+    record_approach_cast_from_hand(player, last_drawn, eff, phase=phase)
     emit_replay_event(
         "miracle_cast",
         player=player.name,
@@ -10366,7 +11229,8 @@ def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, r
     for player in all_players:
         if player is active_player or not player.is_alive():
             continue
-        if not player_has_lorehold_miracle_engine(player):
+        lorehold_engine = lorehold_miracle_engine_permanent(player)
+        if lorehold_engine is None:
             continue
 
         activate_lorehold_topdeck_artifacts(
@@ -10387,6 +11251,7 @@ def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, r
                 active_player=active_player.name,
                 reason="no_strategic_discard_candidate",
                 turn=turn,
+                **replay_rule_fields(lorehold_engine),
             )
             continue
         if discarded not in player.hand:
@@ -10487,6 +11352,7 @@ def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, r
             replacement_used=use_top_replacement,
             reason=discard_reason,
             turn=turn,
+            **replay_rule_fields(lorehold_engine),
         )
         try_lorehold_miracle_cast(
             player,
@@ -11296,11 +12162,65 @@ def create_creature_token(
     return token
 
 
-def prepare_entering_permanent(permanent):
+def permanent_is_opponent_enter_tapped_subject(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    type_line = str(permanent.get("type_line") or "").lower()
+    return is_battlefield_creature(permanent) or "artifact" in type_line
+
+
+def opponent_enter_tapped_static_sources(permanent, controller, all_players):
+    if (
+        not permanent_is_opponent_enter_tapped_subject(permanent)
+        or controller is None
+        or not all_players
+    ):
+        return []
+    sources = []
+    for source_controller in all_players:
+        if source_controller is controller:
+            continue
+        for source in getattr(source_controller, "battlefield", []) or []:
+            if not isinstance(source, dict):
+                continue
+            if (
+                source.get("opponents_artifacts_creatures_enter_tapped")
+                or source.get("opponents_artifacts_and_creatures_enter_tapped")
+            ):
+                sources.append((source_controller, source))
+    return sources
+
+
+def apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=None):
+    sources = opponent_enter_tapped_static_sources(permanent, controller, all_players)
+    if not sources:
+        return False
+    source_controller, source = sources[0]
+    permanent["enters_tapped"] = True
+    permanent["tapped"] = True
+    permanent["entered_tapped_by_static"] = source.get("name", "?")
+    permanent["entered_tapped_by_static_rule_key"] = source.get("_rule_logical_key")
+    emit_replay_event(
+        "static_enter_tapped_applied",
+        player=getattr(controller, "name", "?"),
+        card=permanent.get("name", "?"),
+        type_line=permanent.get("type_line", ""),
+        source_player=getattr(source_controller, "name", "?"),
+        source_card=source.get("name", "?"),
+        applies_to="opponent_artifact_or_creature",
+        turn=turn,
+        **replay_rule_fields(source),
+    )
+    return True
+
+
+def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
         return permanent
     enters_tapped = bool(permanent.get("enters_tapped"))
+    if apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=turn):
+        enters_tapped = True
     if is_battlefield_creature(permanent):
         permanent["haste"] = has_haste(permanent)
         permanent["summoning_sick"] = not permanent["haste"]
@@ -11606,6 +12526,23 @@ def trigger_opponent_land_play_engines(
         ]
         if not engines:
             continue
+        active_lands = controlled_land_count(active_player)
+        controller_lands = controlled_land_count(opponent)
+        if active_lands <= controller_lands:
+            emit_replay_event(
+                "trigger_skipped",
+                player=opponent.name,
+                card=engines[0].get("name", "?"),
+                trigger="opponent_land_play",
+                reason="opponent_does_not_control_more_lands",
+                active_player=active_player.name,
+                active_player_land_count=active_lands,
+                controller_land_count=controller_lands,
+                trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                turn=turn,
+                **replay_rule_fields(engines[0]),
+            )
+            continue
         land_from_hand = next((card for card in opponent.hand if is_effective_land(card)), None)
         if not land_from_hand:
             continue
@@ -11615,6 +12552,23 @@ def trigger_opponent_land_play_engines(
             engine=engines[0],
         ):
             if land_from_hand not in opponent.hand:
+                return
+            active_lands_now = controlled_land_count(active_player)
+            controller_lands_now = controlled_land_count(opponent)
+            if active_lands_now <= controller_lands_now:
+                emit_replay_event(
+                    "trigger_skipped",
+                    player=opponent.name,
+                    card=engine.get("name", "?"),
+                    trigger="opponent_land_play",
+                    reason="opponent_does_not_control_more_lands_on_resolution",
+                    active_player=active_player.name,
+                    active_player_land_count=active_lands_now,
+                    controller_land_count=controller_lands_now,
+                    trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                    turn=turn,
+                    **replay_rule_fields(engine),
+                )
                 return
             opponent.hand.remove(land_from_hand)
             extra_land = enrich_card({**land_from_hand, "effect": "land"})
@@ -11629,7 +12583,10 @@ def trigger_opponent_land_play_engines(
                 trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
                 effect="land",
                 put_land=extra_land.get("name", "?"),
+                active_player_land_count=active_lands_now,
+                controller_land_count=controller_lands_now,
                 turn=turn,
+                **replay_rule_fields(engine),
             )
 
         resolve_or_enqueue_trigger(
@@ -11896,6 +12853,7 @@ def apply_equipment_haste_shroud(player, card, effect_data, turn):
     equipment = enrich_card({**card, **effect_data})
     equipment["effect"] = "equipment_haste_shroud"
     player.battlefield.append(equipment)
+    fields = replay_rule_fields(effect_data)
     creatures = [
         permanent
         for permanent in player.battlefield
@@ -11907,6 +12865,7 @@ def apply_equipment_haste_shroud(player, card, effect_data, turn):
             player=player.name,
             card=card.get("name", "?"),
             turn=turn,
+            **fields,
         )
         return
     target = choose_best_creature_target(creatures)
@@ -11920,6 +12879,7 @@ def apply_equipment_haste_shroud(player, card, effect_data, turn):
         target=target.get("name", "?"),
         grants=["haste", "shroud"],
         turn=turn,
+        **fields,
     )
 
 
@@ -12271,6 +13231,81 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
         creatures_destroyed=len(destroyed),
         destroyed=destroyed[:20],
         protected=protected[:20],
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def apply_damage_wipe(player, opponents, card, effect_data, turn):
+    amount = int(effect_data.get("damage") or effect_data.get("amount") or 0)
+    destroyed = []
+    protected = []
+    survived_damage = []
+    creatures_seen = 0
+    own_creatures_destroyed = 0
+    opponent_creatures_destroyed = 0
+    live_opponent_creatures_destroyed = 0
+    for participant in [player] + list(opponents):
+        is_self = participant is player
+        is_live_opponent = (not is_self) and participant.is_alive()
+        for permanent in list(participant.battlefield):
+            if not is_battlefield_creature(permanent):
+                continue
+            creatures_seen += 1
+            if permanent.get("indestructible"):
+                protected.append(
+                    {
+                        "controller": participant.name,
+                        "name": permanent.get("name", "?"),
+                    }
+                )
+                continue
+            toughness = _damage_sweep_creature_toughness(permanent)
+            if toughness > amount:
+                survived_damage.append(
+                    {
+                        "controller": participant.name,
+                        "name": permanent.get("name", "?"),
+                        "toughness": toughness,
+                    }
+                )
+                continue
+            destination = move_creature_from_battlefield(
+                participant,
+                permanent,
+                reason="damage_wipe",
+                source=card,
+            )
+            destroyed.append(
+                {
+                    "controller": participant.name,
+                    "name": permanent.get("name", "?"),
+                    "toughness": toughness,
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_creatures_destroyed += 1
+            else:
+                opponent_creatures_destroyed += 1
+                if is_live_opponent:
+                    live_opponent_creatures_destroyed += 1
+
+    emit_replay_event(
+        "damage_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        damage=amount,
+        damage_scope=effect_data.get("damage_scope", "each_creature"),
+        creatures_seen=creatures_seen,
+        creatures_destroyed=len(destroyed),
+        own_creatures_destroyed=own_creatures_destroyed,
+        opponent_creatures_destroyed=opponent_creatures_destroyed,
+        live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        protected=protected[:20],
+        survived_damage=survived_damage[:20],
+        destroyed=destroyed[:20],
         turn=turn,
         **replay_rule_fields(effect_data),
     )
@@ -13612,7 +14647,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             c = wincons[0]
             if c in player.hand and player.can_pay_card(c):
                 eff = get_card_effect(c)
-                if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+                if eff.get("effect") in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
                     wincons = []
                 elif eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                     wincons = []
@@ -13735,7 +14770,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         if played >= 2: break
         if c in player.hand and player.can_pay_card(c):
             eff = get_card_effect(c)
-            if eff.get("effect") == "board_wipe" and not should_cast_board_wipe(player, opponents):
+            if eff.get("effect") in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
                 continue
             if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                 continue
@@ -14158,7 +15193,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect = effect_data.get("effect", "unknown")
     spell_resolved_fields = {
-        **spell_resolution_context_fields(card, effect_data, effect),
+        **spell_resolution_context_fields(card, effect_data, effect, player=player),
         **replay_fields_for_declared_targets(effect_data),
         **replay_rule_fields(effect_data),
     }
@@ -14172,6 +15207,15 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         turn=turn,
         **spell_resolved_fields,
     )
+    all_players_for_entry = [player] + list(opponents or [])
+
+    def prepare_resolved_permanent(payload):
+        return prepare_entering_permanent(
+            payload,
+            controller=player,
+            all_players=all_players_for_entry,
+            turn=turn,
+        )
 
     if effect == "composite_resolution":
         summary = resolve_composite_resolution_effect(
@@ -14199,7 +15243,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             finish_resolved_spell(player, card, turn=turn)
     elif effect == "land": pass
     elif effect == "creature":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "creature"
         player.battlefield.append(permanent)
         if effect_data.get("etb_draw_count"):
@@ -14218,18 +15262,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         if is_instant(card) or is_sorcery(card):
             finish_resolved_spell(player, card, turn=turn)
         else:
-            permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
     elif effect in ("attack_limit", "attack_tax"):
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = effect
+        player.battlefield.append(permanent)
+    elif effect == "land_tax":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "land_tax"
         player.battlefield.append(permanent)
     elif effect == "ramp_permanent":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
             return
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         player.battlefield.append(permanent)
     elif effect == "ramp_ritual":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
@@ -14238,7 +15286,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         player.mana_pool.add_generic(ritual_mana_produced(player, effect_data))
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "ramp_engine":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "ramp_engine"
         player.battlefield.append(permanent)
         treasure_count = int(effect_data.get("enters_treasure") or 0)
@@ -14246,7 +15294,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         if effect_data.get("etb_tutor_target"):
             resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn)
     elif effect == "draw_engine":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "draw_engine"
         if is_the_one_ring(card):
             permanent["burden"] = True
@@ -14273,7 +15321,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         if draw_on_enter:
             player.draw(1, rng)
     elif effect == "cantrip_mana_filter_artifact":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "cantrip_mana_filter_artifact"
         player.battlefield.append(permanent)
         emit_replay_event(
@@ -14352,6 +15400,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                 ),
                 turn,
                 rng,
+                effect_data,
             )
         elif effect_data.get("draw_equal_to_discarded_hand"):
             discarded_cards = list(player.hand)
@@ -14440,6 +15489,9 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
     elif effect == "land_recursion":
         return_graveyard_lands_to_battlefield(player, card, turn, opponents=opponents)
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "graveyard_flashback_grant":
+        grant_graveyard_flashback_until_eot(player, card, effect_data, turn)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
         declared_targets = effect_data.get("declared_targets") or []
         if len(declared_targets) == 1 and resolve_declared_single_removal(
@@ -14481,8 +15533,11 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                     )
                     finish_resolved_spell(player, card, turn=turn)
                     return
-                if effect_data.get("target_controller_gains_life"):
-                    gain_life(opp, int(effect_data.get("target_controller_gains_life") or 0))
+                life_gain_requested, life_gained = apply_removal_life_gain(
+                    effect_data,
+                    opp,
+                    t,
+                )
                 if effect_data.get("uses_stat_modifier_removal"):
                     try:
                         power_delta = int(effect_data.get("power_boost") or 0)
@@ -14525,15 +15580,22 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                     target_effect=get_card_effect(t).get("effect", t.get("effect")),
                     target_power=t.get("power"),
                     target_toughness=t.get("toughness"),
-                    target_is_creature=is_battlefield_creature(t),
-                    target_type_line=t.get("type_line", ""),
-                    available_targets=len(targets),
-                    **target_selection_replay_fields(t, targets),
-                    destination=str(effect_data.get("destination") or "graveyard").lower(),
-                    turn=turn,
-                    **decision,
-                )
-                destination = str(effect_data.get("destination") or "graveyard").lower()
+                        target_is_creature=is_battlefield_creature(t),
+                        target_type_line=t.get("type_line", ""),
+                        available_targets=len(targets),
+                        **target_selection_replay_fields(t, targets),
+                        destination=removal_destination(effect_data),
+                        turn=turn,
+                        **decision,
+                        **removal_annotation_replay_fields(effect_data),
+                        **removal_life_gain_replay_fields(
+                            effect_data,
+                            life_gain_requested,
+                            life_gained,
+                        ),
+                        **replay_rule_fields(effect_data),
+                    )
+                destination = removal_destination(effect_data)
                 if destination == "exile":
                     move_zone_object_to_exile(
                         opp,
@@ -14556,6 +15618,8 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_player_and_creatures":
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "damage_wipe":
+        apply_damage_wipe(player, opponents, card, effect_data, turn)
     elif effect == "damage_wipe_treasure":
         apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":
@@ -14563,6 +15627,9 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
     elif effect == "equipment_static_attachment":
         apply_equipment_static_attachment(player, card, effect_data, turn)
     elif effect == "board_wipe":
+        if effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes"):
+            resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
+            return
         context = board_wipe_decision_context(player, opponents)
         destroyed = 0
         protected = 0
@@ -14815,13 +15882,46 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "phase_out":
-        player.phased_out = [c for c in player.battlefield if isinstance(c, dict) and c.get("effect") not in ("land",)]
-        player.battlefield = [c for c in player.battlefield if c == "land" or (isinstance(c, dict) and c.get("effect") == "land")]
-        player.life_cant_change = True
-        player.life_cant_change_source = card
-        player.protection_from_everything = True
-        player.protection_from_everything_source = card
-        finish_resolved_spell(player, card, turn=turn)
+        include_lands = bool(effect_data.get("phase_out_includes_lands"))
+        targets = []
+        for permanent in list(player.battlefield):
+            if include_lands:
+                targets.append(permanent)
+            elif isinstance(permanent, dict) and permanent.get("effect") != "land":
+                targets.append(permanent)
+        target_ids = {id(permanent) for permanent in targets}
+        player.phased_out.extend(targets)
+        player.battlefield = [
+            permanent
+            for permanent in player.battlefield
+            if id(permanent) not in target_ids
+        ]
+        if effect_data.get("life_total_cant_change"):
+            player.life_cant_change = True
+            player.life_cant_change_source = card
+        if effect_data.get("protection_from_everything"):
+            player.protection_from_everything = True
+            player.protection_from_everything_source = card
+        emit_replay_event(
+            "phase_out_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            phased=[
+                permanent.get("name", permanent.get("effect", "?"))
+                if isinstance(permanent, dict)
+                else str(permanent)
+                for permanent in targets
+            ],
+            phased_count=len(targets),
+            phase_out_includes_lands=include_lands,
+            life_total_cant_change=bool(effect_data.get("life_total_cant_change")),
+            protection_from_everything=bool(effect_data.get("protection_from_everything")),
+            exiles_self=bool(effect_data.get("exiles_self")),
+            spell_destination=resolved_spell_destination(card, effect_data, effect),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "phase_creatures":
         targets = [c for c in player.battlefield if is_battlefield_creature(c)]
         player.phased_out.extend(targets)
@@ -14855,8 +15955,24 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         player.silenced_opponents_until_eot = True
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "indestructible":
+        protected = [
+            creature
+            for creature in player.battlefield
+            if is_battlefield_creature(creature)
+        ]
         grant_creatures_until_eot(player, keywords=("indestructible",))
         player.indestructible = True
+        emit_replay_event(
+            "protection_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            grants=["indestructible"],
+            target_scope=effect_data.get("target_scope") or "creatures_you_control",
+            affected=[c.get("name", "?") for c in protected],
+            affected_count=len(protected),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "protect_creature":
         targets = [creature for creature in player.battlefield if is_battlefield_creature(creature)]
@@ -14881,15 +15997,40 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
     elif effect == "modal_boros_charm":
         response_to = card.get("_response_to_effect")
         preferred_mode = card.get("preferred_mode")
+        selected_mode = None
+        affected = []
         if preferred_mode == "double_strike" and response_to != "board_wipe":
-            grant_creatures_until_eot(player, keywords=("double_strike",))
+            targets = [
+                creature
+                for creature in player.battlefield
+                if is_battlefield_creature(creature)
+            ]
+            target = choose_best_creature_target(targets) if targets else None
+            selected_mode = "target_creature_gains_double_strike_until_eot"
+            if target:
+                set_until_eot(target, "double_strike", True)
+                affected = [target.get("name", "?")]
         else:
-            grant_creatures_until_eot(player, keywords=("indestructible",))
+            protected = grant_permanents_until_eot(player, keywords=("indestructible",))
             player.indestructible = True
+            selected_mode = "permanents_you_control_gain_indestructible_until_eot"
+            affected = [permanent.get("name", "?") for permanent in protected]
+        emit_replay_event(
+            "modal_boros_charm_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            selected_mode=selected_mode,
+            preferred_mode=preferred_mode,
+            response_to=response_to,
+            affected_permanents=affected[:20],
+            affected_count=len(affected),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "approach":
-        player.approach_count += 1
-        gain_life(player, 7)
+        if not effect_data.get("_approach_cast_count_recorded"):
+            player.approach_count += 1
         # v8.1: THREAT — all opponents now know Approach was cast
         player.threat_level += 50  # massive threat spike
         for opp in opponents:
@@ -14918,6 +16059,18 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
                 )
             finish_resolved_spell(player, card, turn=turn)
             return
+        life_gained = int(effect_data.get("gain_life") or 7)
+        gain_life(player, life_gained)
+        emit_replay_event(
+            "approach_first_resolution",
+            player=player.name,
+            card=card.get("name", "?"),
+            approach_count=player.approach_count,
+            life_gained=life_gained,
+            library_position=7,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
         if len(player.library) >= 7:
             player.library.insert(6, card)
         else:
@@ -15167,12 +16320,12 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         else:
             finish_resolved_spell(player, card, turn=turn)
     elif effect == "topdeck_manipulation":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "topdeck_manipulation"
         player.battlefield.append(permanent)
         player.draw(1, rng)
     elif effect == "aetherflux_reservoir":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "aetherflux_reservoir"
         permanent["aetherflux_lifegain"] = True
         player.battlefield.append(permanent)
@@ -15185,7 +16338,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             **replay_rule_fields(effect_data),
         )
     elif effect == "life_artifact":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "life_artifact"
         player.battlefield.append(permanent)
         emit_replay_event(
@@ -15196,7 +16349,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
             turn=turn,
         )
     elif effect == "hate_artifact":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "hate_artifact"
         player.battlefield.append(permanent)
         emit_replay_event(
@@ -15257,7 +16410,7 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "thassa_oracle":
-        permanent = prepare_entering_permanent(enrich_card({**card, **effect_data}))
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "creature"
         player.battlefield.append(permanent)
         devotion = max(blue_devotion(player), int(effect_data.get("blue_devotion_pips") or 0))
@@ -17038,7 +18191,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.protection_from_everything = False
     player.protection_from_everything_source = None
     player.refresh_mana_sources(turn)
-    process_upkeep_utility_lands(player, turn)
+    process_upkeep_utility_lands(player, turn, all_players=all_players)
 
     # The One Ring loses life on upkeep; drawing happens through its tap
     # activation, not automatically when the upkeep starts.

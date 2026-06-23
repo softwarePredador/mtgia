@@ -84,13 +84,19 @@ def create_schema(conn: sqlite3.Connection) -> None:
     )
 
 
-def insert_deck_card(conn: sqlite3.Connection, name: str, oracle_text: str = "text", type_line: str = "Instant") -> None:
+def insert_deck_card(
+    conn: sqlite3.Connection,
+    name: str,
+    oracle_text: str = "text",
+    type_line: str = "Instant",
+    deck_id: int = 6,
+) -> None:
     conn.execute(
         """
         INSERT INTO deck_cards (deck_id, card_name, quantity, type_line, oracle_text)
-        VALUES (6, ?, 1, ?, ?)
+        VALUES (?, ?, 1, ?, ?)
         """,
-        (name, type_line, oracle_text),
+        (deck_id, name, type_line, oracle_text),
     )
     conn.execute(
         """
@@ -237,6 +243,32 @@ class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
         by_name = {card["card_name"]: card for card in report["cards"]}
         self.assertEqual(by_name["Missing Rule Spell"]["severity"], "high")
         self.assertEqual(by_name["Plains"]["severity"], "medium")
+
+    def test_build_report_filters_by_deck_id(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                create_schema(conn)
+                insert_deck_card(conn, "Deck Six Spell", deck_id=6)
+                insert_rule(
+                    conn,
+                    "Deck Six Spell",
+                    {"effect": "draw_cards", "battle_model_scope": "deck_six_spell_draw_v1"},
+                )
+                insert_deck_card(conn, "Deck Six Oh Six Spell", deck_id=606)
+                insert_rule(
+                    conn,
+                    "Deck Six Oh Six Spell",
+                    {"effect": "copy_spell", "battle_model_scope": "deck606_copy_v1"},
+                )
+                report = audit.build_report(conn, deck_id=6)
+
+        self.assertEqual(report["deck_id"], 6)
+        self.assertEqual(report["scope"], "distinct_cards_referenced_by_deck_cards_filtered_by_deck_id")
+        self.assertEqual(report["total_cards"], 1)
+        self.assertEqual(report["cards"][0]["card_name"], "Deck Six Spell")
+        self.assertEqual(report["cards"][0]["deck_ids"], [6])
 
 
 if __name__ == "__main__":

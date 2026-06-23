@@ -91,6 +91,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "deal_damage": "removal",
     "copy_spell": "engine",
     "recursion": "engine",
+    "graveyard_flashback_grant": "engine",
     "redistribute_life_totals": "wincon",
     "land_recursion": "engine",
     "land_recursion_creature": "engine",

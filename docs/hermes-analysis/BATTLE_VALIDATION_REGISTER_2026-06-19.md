@@ -13963,3 +13963,1193 @@ Current interpretation:
   `deck_cards`/`battle_card_rules` as the local queue surface. Any durable fix
   still must be sourced from PostgreSQL, applied through precheck/apply/
   postcheck/rollback evidence, then synced back into SQLite/Hermes.
+
+## PG028 Austere Command Coherence Closure - 2026-06-22 19:10 UTC
+
+Scope:
+
+- Closed the first card from the deck-card battle-rule coherence queue:
+  `Austere Command`.
+- PostgreSQL was treated as source of truth. Hermes SQLite was refreshed from
+  PostgreSQL before the audit cycle and again after the PG028 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old broad curated `board_wipe/selective` row and the generated
+  `needs_review`/`review_only` shadow row as `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:5f19a608b87445bcc5c7ebb7ad96eb64` with oracle hash
+  `bce631c9a75d6856dd8c0d7de442b47f` and
+  `battle_model_scope=austere_command_choose_two_destroy_modes_v1`.
+- Added runtime support for modal destroy-board-wipe rules with
+  `modal_destroy_modes` and `choose_modes`, while preserving the legacy
+  creature-only board-wipe path for rules without modal metadata.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_precheck_20260622_190701.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_apply_20260622_190701.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_postcheck_20260622_190701.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_battle_rule_pg028_rollback_20260622_190701.sql`.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_board_wipe_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg028_austere_command_20260622_190701.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_events_20260622_190701.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_decision_trace_20260622_190701.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_replay_summary_20260622_190701.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_190930.json`
+  and `.md`.
+
+Reading:
+
+- `Austere Command` is closed for the current coherence gate and moved to
+  `pass`.
+- The next card in the queue is `Blasphemous Act`.
+
+## PG029 Blasphemous Act Coherence Closure - 2026-06-22 19:29 UTC
+
+Scope:
+
+- Closed the second card from the deck-card battle-rule coherence queue:
+  `Blasphemous Act`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG029 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old broad curated `board_wipe` row and the generated
+  `needs_review`/`review_only` shadow row as `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:56271789d639ef390213dbc90059e4d2` with oracle hash
+  `826022a579db4551b45ad35e4cfab973` and
+  `battle_model_scope=blasphemous_act_damage_13_each_creature_v1`.
+- Added runtime support for `damage_wipe`: lethal damage to each creature
+  using the existing simplified toughness threshold, preserving indestructible
+  and high-toughness survivors.
+- The card's `{1}` cost reduction per creature is stored as
+  `annotation_only` metadata. This cycle proves the damage resolution, not a
+  dynamic generic-cost executor.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_precheck_20260622_192517.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_apply_20260622_192517.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_postcheck_20260622_192517.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_battle_rule_pg029_rollback_20260622_192517.sql`.
+- PG precheck: `card_rows=1`, `expected_oracle_hash_rows=1`,
+  `exact_executable_rule_rows=0`, `legacy_enabled_wipe_rows=2`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg029_blasphemous_act_battle_rule_20260622_192517`
+  captured `2` rows; apply inserted `1` active rule and updated `2` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_wipe_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg029_blasphemous_act_20260622_192517.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_pg029_focused_events_20260622_192517.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/blasphemous_act_pg029_focused_replay_summary_20260622_192517.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_192856.json`
+  and `.md`.
+
+Reading:
+
+- `Blasphemous Act` is closed for the current coherence gate and moved to
+  `pass`.
+- The next card in the queue is `Boros Charm`.
+
+## PG030 Boros Charm Coherence Closure - 2026-06-22 19:42 UTC
+
+Scope:
+
+- Closed the third card from the deck-card battle-rule coherence queue:
+  `Boros Charm`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG030 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old broad curated `modal_boros_charm` row and the generated
+  `needs_review`/`review_only` `indestructible` shadow row as
+  `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:32605a838d7a519f44eaa0899d2c40bf` with oracle hash
+  `98a7be829075118b499a7c283a23501f` and
+  `battle_model_scope=boros_charm_choose_one_damage_indestructible_double_strike_v1`.
+- Updated runtime semantics so the indestructible mode affects all permanents
+  you control until EOT and the double-strike mode affects one target creature
+  until EOT.
+- Added `modal_boros_charm_resolved` event output with selected mode and
+  PG030 rule provenance.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_precheck_20260622_193818.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_apply_20260622_193818.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_postcheck_20260622_193818.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_battle_rule_pg030_rollback_20260622_193818.sql`.
+- PG precheck: `card_rows=1`, `expected_oracle_hash_rows=1`,
+  `exact_executable_rule_rows=0`,
+  `legacy_enabled_modal_or_shadow_rows=2`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg030_boros_charm_battle_rule_20260622_193818`
+  captured `2` rows; apply inserted `1` active rule and updated `2` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_modal_or_shadow_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg030_boros_charm_20260622_193818.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_pg030_focused_events_20260622_193818.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/boros_charm_pg030_focused_replay_summary_20260622_193818.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_194227.json`
+  and `.md`.
+
+Reading:
+
+- `Boros Charm` is closed for the current coherence gate and moved to `pass`.
+- The next card in the queue is `Deflecting Swat`.
+
+## PG031 Deflecting Swat Coherence Closure - 2026-06-22 19:56 UTC
+
+Scope:
+
+- Closed the fourth card from the deck-card battle-rule coherence queue:
+  `Deflecting Swat`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG031 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old broad curated `redirect_removal` row and the generated
+  `needs_review`/`review_only` `draw_cards` shadow row as
+  `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:bac48343654a53205d790a8268bd2631` with oracle hash
+  `a34c89817f87f32bedfb3d66a5bdc672` and
+  `battle_model_scope=deflecting_swat_control_commander_free_redirect_target_spell_or_ability_v1`.
+- Updated runtime payment semantics so `redirect_removal` rules can use
+  `alternative_cost={0}` when their controller controls a commander.
+- Updated redirect target selection to prefer opponent-controlled legal
+  targets before self-controlled fallback targets.
+- Updated threat scoring so `damage_wipe` is treated as a board-wipe threat
+  for protection responses.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_precheck_20260622_195126.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_apply_20260622_195126.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_postcheck_20260622_195126.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_battle_rule_pg031_rollback_20260622_195126.sql`.
+- PG precheck: `card_rows=1`, `expected_oracle_hash_rows=1`,
+  `exact_executable_rule_rows=0`,
+  `legacy_enabled_redirect_or_shadow_rows=2`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg031_deflecting_swat_battle_rule_20260622_195126`
+  captured `2` rows; apply inserted `1` active rule and updated `2` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_redirect_or_shadow_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg031_deflecting_swat_20260622_195126.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_pg031_focused_events_20260622_195126.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/deflecting_swat_pg031_focused_replay_summary_20260622_195126.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_195607.json`
+  and `.md`.
+
+Reading:
+
+- `Deflecting Swat` is closed for the current coherence gate and moved to
+  `pass`.
+- The next card in the queue is `Flawless Maneuver`.
+
+## PG032 Flawless Maneuver Coherence Closure - 2026-06-22 20:10 UTC
+
+Scope:
+
+- Closed the fifth card from the deck-card battle-rule coherence queue:
+  `Flawless Maneuver`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG032 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old broad curated `indestructible` row and the generated
+  `needs_review`/`review_only` `indestructible` shadow row as
+  `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:73622071c1ad89267708f914a0729bf2` with oracle hash
+  `fa955216fa827bf75c5b79dcbdb4b97e` and
+  `battle_model_scope=flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1`.
+- Updated stack-protection response casting so protection instants can use
+  oracle-specific alternative costs when the rule provides them.
+- Added `protection_resolved` event provenance for generic
+  `indestructible` protection resolution.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_precheck_20260622_200215.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_apply_20260622_200215.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_postcheck_20260622_200215.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_battle_rule_pg032_rollback_20260622_200215.sql`.
+- PG precheck: `card_rows=1`, `expected_oracle_hash_rows=1`,
+  `exact_executable_rule_rows=0`,
+  `legacy_enabled_indestructible_or_shadow_rows=2`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg032_flawless_maneuver_battle_rule_20260622_200215`
+  captured `2` rows; apply inserted `1` active rule and updated `2` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_indestructible_or_shadow_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg032_flawless_maneuver_20260622_200215.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_pg032_focused_events_20260622_200215.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/flawless_maneuver_pg032_focused_replay_summary_20260622_200215.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_201035.json`
+  and `.md`.
+
+Reading:
+
+- `Flawless Maneuver` is closed for the current coherence gate and moved to
+  `pass`.
+- The next card in the queue is `Land Tax`.
+- PG029 `Blasphemous Act` still has its cost reduction as `annotation_only`;
+  only the 13-damage creature wipe executor is implemented and proved.
+
+## PG037 Path to Exile - Closed 2026-06-22 21:25 UTC
+
+Status:
+
+- Closed for the current card battle-rule coherence gate.
+- Auditor status: `pass`.
+- Deck coverage: decks `6` and `606`, quantity `2`.
+
+Rule:
+
+- `logical_rule_key=battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd`.
+- `oracle_hash=861c960a37be744e45f13200349e2532`.
+- `battle_model_scope=path_to_exile_creature_exile_basic_land_compensation_annotation_v1`.
+- Executed behavior: instant creature removal sends the target to exile.
+- Non-executed rider: target-controller basic-land search/tapped battlefield
+  compensation is `annotation_only`.
+
+Validation:
+
+- PostgreSQL precheck/apply/postcheck passed.
+- Hermes SQLite synced from PostgreSQL after apply.
+- Runtime selected the PG037 rule from `knowledge.db`.
+- Focused unit test passed:
+  `test_path_to_exile_exiles_creature_with_pg037_rule_provenance`.
+- Full battle regression suite passed.
+- Auditor rerun
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_212554.json`
+  reports `Path to Exile` as `pass`.
+
+Replay evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/path_to_exile_pg037_focused_events_20260622_212057.jsonl`.
+- `docs/hermes-analysis/master_optimizer_reports/path_to_exile_pg037_focused_replay_summary_20260622_212057.md`.
+- `removal_resolved` event includes
+  `rule_logical_key=battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd`,
+  `destination=exile`, and
+  `basic_land_compensation_status=annotation_only`.
+
+Caveat carried forward:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; no dynamic cost-reduction executor was claimed.
+
+## PG035 Lorehold, the Historian Coherence Closure - 2026-06-22 20:52 UTC
+
+Scope:
+
+- Closed the eighth card from the deck-card battle-rule coherence queue:
+  `Lorehold, the Historian`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG035 apply.
+- No deck swap, rollback execution, stage, commit, or push was performed in
+  this cycle.
+
+Rule/runtime changes:
+
+- Added executable rule
+  `battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4` with oracle hash
+  `f1b6d4f38a533e56f0efb5a3f1547214` and
+  `battle_model_scope=lorehold_opponent_upkeep_miracle_v1`.
+- Corrected the durable rule to match oracle structure: `cmc=5.0`,
+  `flying=true`, `haste=true`, miracle `{2}`, and opponent-upkeep rummage.
+- Disabled the legacy `commander` row, the old `cmc=4.0` passive row, and the
+  generated `needs_review`/`review_only` `draw_engine` shadow row as
+  `deprecated`/`disabled`.
+- Updated local reviewed-runtime cache for Lorehold so Hermes sync keeps the
+  new PG035 PostgreSQL rule.
+- Added Lorehold rule provenance to `lorehold_upkeep_rummage` and
+  `lorehold_upkeep_rummage_skipped` replay events.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_precheck_20260622_204549.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_apply_20260622_204549.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_postcheck_20260622_204549.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_battle_rule_pg035_rollback_20260622_204549.sql`.
+- PG precheck: `card_rows=4`, `distinct_oracle_ids=1`,
+  `expected_oracle_hash_rows=4`, `exact_executable_rule_rows=0`,
+  `legacy_enabled_lorehold_rows=3`,
+  `trusted_executable_without_oracle_hash_rows=2`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg035_lorehold_historian_battle_rule_20260622_204549`
+  captured `3` rows; apply inserted `1` active rule and updated `3` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_lorehold_rows=0`,
+  `trusted_executable_without_oracle_hash_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg035_lorehold_historian_20260622_204549.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_events_20260622_204549.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_decision_trace_20260622_204549.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_historian_pg035_focused_replay_summary_20260622_204549.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_205233.json`
+  and `.md`.
+
+Reading:
+
+- `Lorehold, the Historian` is closed for the current coherence gate and moved
+  to `pass`.
+- The next card in the queue is `Past in Flames`.
+- The runtime model remains an explicit approximation for opponent-upkeep
+  rummage and miracle windows; it does not claim every Magic policy edge.
+- PG029 `Blasphemous Act` still has its cost reduction as `annotation_only`;
+  only the 13-damage creature wipe executor is implemented and proved.
+
+## PG033 Land Tax Coherence Closure - 2026-06-22 20:25 UTC
+
+Scope:
+
+- Closed the sixth card from the deck-card battle-rule coherence queue:
+  `Land Tax`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG033 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old broad curated `passive` row and the generated
+  `needs_review`/`review_only` `tutor any` shadow row as
+  `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef` with oracle hash
+  `83b074e38da3e6c4eb6ec3e7568c914b` and
+  `battle_model_scope=land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1`.
+- Added runtime support for the Land Tax upkeep trigger: if any live opponent
+  controls more lands than the controller, move up to three basic land cards
+  from library to hand.
+- Added `land_tax_trigger_resolved`/`land_tax_trigger_skipped` event
+  provenance and a `land_tax_upkeep_tutor` decision trace.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_precheck_20260622_201417.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_apply_20260622_201417.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_postcheck_20260622_201417.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_battle_rule_pg033_rollback_20260622_201417.sql`.
+- PG precheck: `card_rows=1`, `expected_oracle_hash_rows=1`,
+  `exact_executable_rule_rows=0`,
+  `legacy_enabled_passive_or_shadow_rows=2`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg033_land_tax_battle_rule_20260622_201417`
+  captured `2` rows; apply inserted `1` active rule and updated `2` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_passive_or_shadow_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg033_land_tax_20260622_201417.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_events_20260622_201417.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_decision_trace_20260622_201417.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/land_tax_pg033_focused_replay_summary_20260622_201417.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_202458.json`
+  and `.md`.
+
+Reading:
+
+- `Land Tax` is closed for the current coherence gate and moved to `pass`.
+- The next card in the queue is `Lightning Greaves`.
+- Reveal and shuffle are tracked as event metadata in the focused proof; this
+  deterministic replay does not randomize library order after the search.
+- PG029 `Blasphemous Act` still has its cost reduction as `annotation_only`;
+  only the 13-damage creature wipe executor is implemented and proved.
+
+## PG034 Lightning Greaves Coherence Closure - 2026-06-22 20:36 UTC
+
+Scope:
+
+- Closed the seventh card from the deck-card battle-rule coherence queue:
+  `Lightning Greaves`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG034 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled two old curated `equipment_haste_shroud` rows and the generated
+  `needs_review`/`review_only` `indestructible` shadow row as
+  `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:5ea7f2a8349a93ea46e05b60ee8cdaac` with oracle hash
+  `4a4c71d3cc58637cf00a3d7fe2331353` and
+  `battle_model_scope=lightning_greaves_auto_attach_haste_shroud_equip_0_v1`.
+- Updated local reviewed-runtime cache for Lightning Greaves so Hermes sync no
+  longer filters out the new active PostgreSQL rule.
+- Added rule provenance to `equipment_attached` and `equipment_unattached`
+  replay events.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_precheck_20260622_202908.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_apply_20260622_202908.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_postcheck_20260622_202908.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_battle_rule_pg034_rollback_20260622_202908.sql`.
+- PG precheck: `card_rows=1`, `expected_oracle_hash_rows=1`,
+  `exact_executable_rule_rows=0`,
+  `legacy_enabled_equipment_or_shadow_rows=3`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg034_lightning_greaves_battle_rule_20260622_202908`
+  captured `3` rows; apply inserted `1` active rule and updated `3` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_equipment_or_shadow_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg034_lightning_greaves_retry_20260622_202908.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_pg034_focused_events_20260622_202908.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/lightning_greaves_pg034_focused_replay_summary_20260622_202908.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_203604.json`
+  and `.md`.
+
+Reading:
+
+- `Lightning Greaves` is closed for the current coherence gate and moved to
+  `pass`.
+- The next card in the queue is `Lorehold, the Historian`.
+- The runtime model remains the documented battle approximation
+  `auto_attach_best_creature_on_resolution`; it does not claim full Equipment
+  attach/retarget timing.
+- PG029 `Blasphemous Act` still has its cost reduction as `annotation_only`;
+  only the 13-damage creature wipe executor is implemented and proved.
+
+## PG036 Past in Flames Coherence Closure - 2026-06-22 21:11 UTC
+
+Scope:
+
+- Closed the ninth card from the deck-card battle-rule coherence queue:
+  `Past in Flames`.
+- PostgreSQL remained the durable source of truth. Hermes SQLite was refreshed
+  from PostgreSQL before the cycle and again after the PG036 apply.
+- No deck swap, rollback, stage, commit, or push was performed in this cycle.
+
+Rule/runtime changes:
+
+- Disabled the old curated generic `recursion` row and generated
+  `needs_review`/`review_only` `recursion` shadow row as
+  `deprecated`/`disabled`.
+- Added executable rule
+  `battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be` with oracle hash
+  `12f293d8d746fbc4e5ba80828919dec5` and
+  `battle_model_scope=past_in_flames_graveyard_instants_sorceries_flashback_until_eot_v1`.
+- Added runtime executor `graveyard_flashback_grant`: instant/sorcery cards in
+  the controller graveyard gain `flashback_cost` equal to their `mana_cost`
+  until end of turn.
+- Added `graveyard_flashback_granted` replay event and
+  `flashback_granted_by`/`flashback_granted_rule_key` provenance on
+  `flashback_cast`.
+
+Evidence:
+
+- PG package:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_precheck_20260622_210425.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_apply_20260622_210425.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_postcheck_20260622_210425.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_battle_rule_pg036_rollback_20260622_210425.sql`.
+- PG precheck: `card_rows=1`, `distinct_oracle_ids=1`,
+  `expected_oracle_hash_rows=1`, `exact_executable_rule_rows=0`,
+  `legacy_enabled_recursion_rows=2`,
+  `trusted_executable_without_oracle_hash_rows=1`.
+- PG apply: backup table
+  `manaloom_deploy_audit.pg036_past_in_flames_battle_rule_20260622_210425`
+  captured `2` rows; apply inserted `1` active rule and updated `2` old rows.
+- PG postcheck: `exact_executable_rule_rows=1`,
+  `legacy_enabled_recursion_rows=0`,
+  `trusted_executable_without_oracle_hash_rows=0`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg036_past_in_flames_20260622_210425.json`.
+- Tests:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_rule_registry.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed.
+- Tests:
+  `PYTHONPATH=docs/hermes-analysis/manaloom-knowledge/scripts python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py`
+  passed (`Ran 5 tests`).
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_pg036_focused_events_20260622_210425.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/past_in_flames_pg036_focused_replay_summary_20260622_210425.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_211117.json`
+  and `.md`.
+
+Reading:
+
+- `Past in Flames` is closed for the current coherence gate and moved to
+  `pass`.
+- The next card in the queue is `Path to Exile`.
+- The runtime model covers the temporary flashback grant and provenance; full
+  priority/timing policy for every possible flashback spell is not claimed.
+- PG029 `Blasphemous Act` still has its cost reduction as `annotation_only`;
+  only the 13-damage creature wipe executor is implemented and proved.
+
+## PG038 Reverberate - Closed 2026-06-22 21:43 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:0269136edf067f696c8576740b720e14`.
+- Oracle hash:
+  `cbae05dee4261e3ed5412fd5f3591c17`.
+- Model scope:
+  `reverberate_copy_stack_instant_or_sorcery_new_targets_annotation_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Copy target instant or sorcery spell. You may choose new targets for the copy.`
+- Old active/shadow rows were corrected in PostgreSQL, then Hermes SQLite was
+  synced from PostgreSQL.
+- Runtime selected the PG038 rule from `knowledge.db`.
+- Focused unit test proved `Reverberate` casts in response to a sorcery on the
+  stack, creates a non-cast copy, resolves the copy for the responder, and
+  leaves the original spell to resolve for the original controller.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_pg038_focused_events_20260622_213615.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/reverberate_pg038_focused_replay_summary_20260622_213615.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_215028.json`
+  reports `Reverberate` as `pass`.
+
+Gate result:
+
+- `high=86`, `medium=39`, `pass=20`.
+- The next card in the queue is `Sensei's Divining Top`.
+
+Caveats:
+
+- `Reverberate` `may_choose_new_targets` is preserved as
+  `choose_new_targets_status=annotation_only`; dynamic target reassignment is
+  not implemented by PG038.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG047 Archaeomancer's Map - Closed 2026-06-23 00:17 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:69acc8f6ed179a5a32bef08190cd747e`.
+- Oracle hash:
+  `22b82ca6bbef42371227bc38a9a546b5`.
+- Model scope:
+  `basic_plains_etb_plus_opponent_land_catchup_v2`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `When this artifact enters, search your library for up to two basic Plains cards, reveal them, put them into your hand, then shuffle.`
+  and
+  `Whenever a land an opponent controls enters, if that player controls more lands than you, you may put a land card from your hand onto the battlefield.`
+- PostgreSQL ruling checked: the opponent-land trigger only resolves if that
+  player still controls more lands than the Map controller as the trigger tries
+  to resolve.
+- PG047 inserted one oracle-hashed curated `ramp_engine` rule with
+  `trigger_condition=opponent_controls_more_lands_than_you` and
+  `trigger_rechecks_on_resolution=true`.
+- PG047 disabled the legacy trusted no-hash/no-scope row and the two generated
+  `needs_review`/`review_only` shadow rows.
+- Runtime now checks the active land player's land count before putting a land
+  from hand, and rechecks the same condition on trigger resolution.
+- PG postcheck:
+  `oracle_hashed_archaeomancers_map_rows=1`,
+  `legacy_or_shadow_enabled_rows=0`,
+  `generated_review_only_shadow_rows=0`, and
+  `trusted_executable_without_oracle_hash_rows=0`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg047_archaeomancers_map_20260623_001244.json`.
+- Focused unit coverage:
+  `test_archaeomancers_map_opponent_land_trigger_requires_controller_behind_on_lands`
+  and
+  `test_archaeomancers_map_opponent_land_trigger_skips_when_controller_not_behind`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_events_20260623_001244.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_replay_summary_20260623_001244.md`.
+- The focused replay proves the ETB basic Plains tutor, the successful
+  catch-up land put when the opponent has more lands, and the skipped trigger
+  when land counts are equal. Each material event carries the PG047
+  `rule_logical_key` and `rule_oracle_hash`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_001717.json`
+  reports `Archaeomancer's Map` as `pass`.
+
+Gate result:
+
+- `high=78`, `medium=39`, `pass=28`.
+- The next card in the queue is `Blind Obedience`.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG048 Blind Obedience - Closed 2026-06-23 00:35 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:40f23fcea3b7955bacd550a9090c6872`.
+- Oracle hash:
+  `4e62bff316f784c1b468b9e53146d2aa`.
+- Model scope:
+  `opponent_artifact_creature_enter_tapped_extort_annotation_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Extort (Whenever you cast a spell, you may pay {W/B}. If you do, each opponent loses 1 life and you gain that much life.)`
+  and `Artifacts and creatures your opponents control enter tapped.`
+- PostgreSQL rulings checked for extort payment timing, no targeting, and
+  life-gain amount. Extort remains `annotation_only`; no dynamic optional
+  hybrid-mana trigger executor was promoted.
+- PG048 inserted one oracle-hashed curated `passive` rule with
+  `opponents_artifacts_creatures_enter_tapped=true` and
+  `extort_execution_status=annotation_only`.
+- PG048 disabled the legacy trusted no-hash `passive` row and the generated
+  `draw_engine` `needs_review`/`review_only` shadow row.
+- Runtime now applies the static enter-tapped source on normal permanent entry
+  paths for opponent-controlled artifact or creature permanents.
+- PG postcheck:
+  `oracle_hashed_blind_obedience_rows=1`,
+  `legacy_or_shadow_enabled_rows=0`,
+  `generated_review_only_shadow_rows=0`, and
+  `trusted_executable_without_oracle_hash_rows=0`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg048_blind_obedience_20260623_003029.json`.
+- Focused unit coverage:
+  `test_blind_obedience_taps_opponent_artifacts_and_creatures_on_entry`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_pg048_focused_events_20260623_003029.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/blind_obedience_pg048_focused_replay_summary_20260623_003029.md`.
+- The focused replay proves an opponent creature and opponent artifact enter
+  tapped, while the controller's own artifact does not enter tapped from its
+  own Blind Obedience. The `static_enter_tapped_applied` events carry the
+  PG048 `rule_logical_key` and `rule_oracle_hash`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_003552.json`
+  reports `Blind Obedience` as `pass`.
+
+Gate result:
+
+- `high=77`, `medium=40`, `pass=28`.
+- The next card in the queue is `Borrowed Knowledge`.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG049 Deck 6 L2 Hash-Only Batch - Closed 2026-06-23 00:49 UTC
+
+Status:
+
+- Closed for the deck 6 L2 hash-only lane.
+- Cards included: `Crawlspace`, `Ghostly Prison`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- No runtime behavior changed; no replay was required.
+
+Validation:
+
+- The auditor now supports `--deck-id`, allowing separate reports for official
+  Lorehold deck `6` and variant deck `606`.
+- PostgreSQL oracle/type validation:
+  - `Crawlspace`: `Artifact`, oracle hash
+    `57fcd38030641ceb36bbcf1a6dcbc6c8`.
+  - `Ghostly Prison`: `Enchantment`, oracle hash
+    `5725b39ca4bb7c5e8e4bebf0d246be13`.
+  - `Valakut Awakening // Valakut Stoneforge`: `Instant`, oracle hash
+    `22b42fcc181b7aed71f78b2e1e51e887`.
+- `cards.card_faces_json` is not populated for these rows in PostgreSQL; the
+  Valakut MDFC back-face metadata remains represented in the active
+  `mdfc_land_face` rule payload.
+- PG049 updated four active curated/verified/auto rows with oracle hashes and
+  deprecated one disabled generated Valakut `draw_cards` shadow row.
+- PG049 did not change `effect_json`, executor dispatch, or battle behavior.
+- PG postcheck:
+  `crawlspace_hashed_rows=1`,
+  `ghostly_prison_hashed_rows=1`,
+  `valakut_hashed_rows=2`,
+  `target_trusted_missing_hash_rows=0`, and
+  `valakut_generated_review_only_shadow_rows=0`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg049_deck6_l2_hash_only_20260623_004614.json`.
+- Focused test:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+
+Auditor result:
+
+- Deck 6 before:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_004446.json`
+  reported `high=41`, `medium=33`, `pass=26`.
+- Deck 6 after:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_004857.json`
+  reports `high=41`, `medium=30`, `pass=29`.
+- Deck 606 separate report after sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_004857.json`
+  reports `high=43`, `medium=17`, `pass=21`.
+
+Gate result:
+
+- Removed from deck 6 queue: `Crawlspace`, `Ghostly Prison`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- Next recommended lane: deck 6 `L1` land/mana-base, split simple mana lands
+  from utility/fetch lands with real battle effects.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG046 Approach of the Second Sun Coherence Closure - 2026-06-23 00:02 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:ed74fb069b6c1d635392d907804a1d98`.
+- Oracle hash:
+  `0838960b80a282fb4508532f7bae8c2b`.
+- Model scope:
+  `approach_second_cast_win_v2`.
+
+Validation:
+
+- Oracle text and rulings were validated from PostgreSQL. Relevant rulings
+  confirmed that a countered first Approach still counts, a copied spell does
+  not count, and the second Approach must be cast from hand.
+- PG046 inserted one oracle-hashed curated `approach` rule and disabled the
+  two legacy trusted no-hash rows plus the generated `needs_review`/
+  `review_only` shadow row.
+- PG postcheck:
+  `oracle_hashed_approach_second_cast_rows=1`,
+  `legacy_or_shadow_enabled_rows=0`,
+  `generated_review_only_shadow_rows=0`, and
+  `trusted_executable_without_oracle_hash_rows=0`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg046_approach_second_sun_20260622_235039.json`.
+- Focused unit coverage:
+  `test_approach_of_the_second_sun_counts_countered_first_cast_and_second_cast_wins`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_pg046_focused_events_20260622_235039.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/approach_second_sun_pg046_focused_replay_summary_20260622_235039.md`.
+- The focused replay proves copied Approach does not increment the cast ledger,
+  the first countered cast from hand increments Approach count to `1`, the
+  second cast from hand increments it to `2`, no second-cast life gain occurs,
+  the second spell resolves to `graveyard`, and `game_won` fires with
+  `reason=approach`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_000228.json`
+  reports `Approach of the Second Sun` as `pass`.
+
+Gate result:
+
+- `high=79`, `medium=39`, `pass=27`.
+- The next card in the queue is `Archaeomancer's Map`.
+
+Caveats:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG039 Sensei's Divining Top - Closed 2026-06-22 22:01 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:70c8478871f352b46cee1af296117951`.
+- Oracle hash:
+  `f2c5ac0f52963cd710470adc25cc6d7c`.
+- Model scope:
+  `senseis_top_reorder_draw_lorehold_first_draw_miracle_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `{1}: Look at the top three cards of your library, then put them back in any order. {T}: Draw a card, then put this artifact on top of its owner's library.`
+- Three old/shadow rows were disabled in PostgreSQL, then Hermes SQLite was
+  synced from PostgreSQL after aligning the reviewed runtime cache.
+- Runtime selected the PG039 rule from `knowledge.db`.
+- Focused unit test proved the Top reorder line sets
+  `Approach of the Second Sun` as Lorehold's first draw and emits PG039
+  provenance on `topdeck_manipulation_activated`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_events_20260622_215306.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_decision_trace_20260622_215306.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/senseis_top_pg039_focused_replay_summary_20260622_215306.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_220121.json`
+  reports `Sensei's Divining Top` as `pass`.
+
+Gate result:
+
+- `high=85`, `medium=39`, `pass=21`.
+- The next card in the queue is `Swords to Plowshares`.
+
+Caveats:
+
+- Generic activated draw policy remains `annotation_only`; PG039 executes only
+  the top-three reorder and the restricted Lorehold first-draw miracle
+  draw-put-self line.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG040 Swords to Plowshares - Closed 2026-06-22 22:22 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:379008f3f03f94258292123453e3041c`.
+- Oracle hash:
+  `702f566e95dd477f5cf5a551e41e9df8`.
+- Model scope:
+  `swords_to_plowshares_creature_exile_life_equal_power_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Exile target creature. Its controller gains life equal to its power.`
+- Two old rows were disabled in PostgreSQL: the curated generic executable row
+  without `oracle_hash`/scope and the generated `needs_review`/`review_only`
+  shadow row.
+- Runtime selected the PG040 rule from `knowledge.db`.
+- Focused unit test proved that Swords exiles the target creature and gives
+  its controller life equal to target power while emitting PG040 provenance on
+  `removal_resolved`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_pg040_focused_events_20260622_221254.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/swords_to_plowshares_pg040_focused_replay_summary_20260622_221254.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_222210.json`
+  reports `Swords to Plowshares` as `pass`.
+
+Gate result:
+
+- `high=84`, `medium=39`, `pass=22`.
+- The next card in the queue is `Teferi's Protection`.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG041 Teferi's Protection - Closed 2026-06-22 22:41 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a`.
+- Oracle hash:
+  `bdc0faecf4420dc6162c7e72e98cc0eb`.
+- Model scope:
+  `teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Until your next turn, your life total can't change and you gain protection from everything. All permanents you control phase out. ... Exile Teferi's Protection.`
+- Two old rows were disabled in PostgreSQL: the curated generic executable
+  `phase_out` row without `oracle_hash`/scope and the generated
+  `needs_review`/`review_only` shadow row.
+- Runtime selected the PG041 rule from `knowledge.db`.
+- Focused unit test proved all permanents including a land phase out, life
+  total changes are prevented, protection from everything is active, and
+  Teferi's Protection exiles itself while emitting PG041 provenance.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_pg041_focused_events_20260622_223850.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/teferis_protection_pg041_focused_replay_summary_20260622_223850.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_224124.json`
+  reports `Teferi's Protection` as `pass`.
+
+Gate result:
+
+- `high=83`, `medium=39`, `pass=23`.
+- The next card in the queue is `Valakut Awakening // Valakut Stoneforge`.
+
+Caveat:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG042 Valakut Awakening // Valakut Stoneforge - Closed 2026-06-22 23:01 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d`.
+- Oracle hash:
+  `22b42fcc181b7aed71f78b2e1e51e887`.
+- Model scope:
+  `bottom_then_draw_plus_one_mdfc_land_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Put any number of cards from your hand on the bottom of your library, then draw that many cards plus one.`
+- PostgreSQL rulings checked: putting zero cards on bottom draws one card, and
+  the number of cards to bottom is chosen as Valakut Awakening resolves.
+- PG042 updated the split-name rule and front-face alias with the PostgreSQL
+  oracle hash, then disabled the two legacy no-scope/no-hash curated rows and
+  the generated `draw_cards` `needs_review`/`review_only` shadow row.
+- Runtime selected the PG042 split-name rule from `knowledge.db`.
+- Focused unit test:
+  `test_valakut_awakening_split_name_emits_pg042_rule_provenance`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_events_20260622_225355.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_replay_summary_20260622_225355.md`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_230104.json`
+  reports `Valakut Awakening // Valakut Stoneforge` as `pass`.
+
+Gate result:
+
+- `high=82`, `medium=39`, `pass=24`.
+- The next card in the queue is `Wheel of Fortune`.
+
+Caveats:
+
+- PG042 proves the instant hand-filter executor: bottom chosen cards, then draw
+  that many plus one. The MDFC land-face metadata remains attached for
+  split-name lookup, but this cycle does not claim a land-play/tapped-red-mana
+  executor for `Valakut Stoneforge`.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG043 Wheel of Fortune - Closed 2026-06-22 23:26 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:f8bdb05cc883fda55628d6928c5562d3`.
+- Oracle hash:
+  `c37cd579d8132efac0c2118608f6f001`.
+- Model scope:
+  `multiplayer_discard_draw_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Each player discards their hand, then draws seven cards.`
+- PG043 inserted the oracle-hashed curated wheel rule, then disabled the
+  legacy no-hash/no-scope curated `draw_cards` row and the generated
+  `needs_review`/`review_only` shadow row.
+- Runtime selected the PG043 rule from `knowledge.db`.
+- Focused unit test proved `Wheel of Fortune` resolves as multiplayer
+  discard-hand/draw-seven and emits PG043 provenance on `wheel_resolved`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_events_20260622_231859.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_replay_summary_20260622_231859.md`.
+- The focused replay includes `rule_logical_key`,
+  `rule_oracle_hash`, participant discard/draw counts, and a Smothering Tithe
+  payoff creating `7` Treasure tokens from opponent draws.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_232608.json`
+  reports `Wheel of Fortune` as `pass`.
+
+Gate result:
+
+- `high=81`, `medium=39`, `pass=25`.
+- The next card in the queue is `Aetherflux Reservoir`.
+
+Caveats:
+
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.
+
+## PG044 Valakut Awakening Hash Refresh - Closed 2026-06-22 23:26 UTC
+
+Status:
+
+- Corrective closure for a PostgreSQL metadata regression found by the
+  post-PG043 auditor.
+- PostgreSQL source rules refreshed:
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d` and
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a`.
+- Oracle hash:
+  `22b42fcc181b7aed71f78b2e1e51e887`.
+
+Validation:
+
+- PG044 did not change Valakut battle behavior. It restored durable
+  PostgreSQL metadata: `review_status=active`, `execution_status=auto`, and
+  `oracle_hash` on the full-name and front-face alias rules.
+- The generated Valakut `draw_cards` shadow was moved from
+  `needs_review`/`disabled` to `deprecated`/`disabled`.
+- PG postcheck: full-name hash row `1`, alias hash row `1`,
+  generated review-only shadow `0`, trusted executable without hash `0`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg044_valakut_hash_refresh_20260622_232411.json`.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_232608.json`
+  reports `Valakut Awakening // Valakut Stoneforge` as `pass`.
+
+Caveat:
+
+- PG044 still does not claim a land-play or tapped-red-mana executor for
+  `Valakut Stoneforge`; the MDFC land face remains metadata for split-name
+  lookup.
+
+## PG045 Aetherflux Reservoir - Closed 2026-06-22 23:40 UTC
+
+Status:
+
+- Closed for the deck-card battle-rule coherence gate.
+- PostgreSQL source rule:
+  `battle_rule_v1:3147dc90542c79e439ca1f77df02e4e5`.
+- Oracle hash:
+  `ea5327899fb66a2d583e80e8ca12d9b2`.
+- Model scope:
+  `spell_cast_lifegain_pay_50_damage_annotation_v1`.
+
+Validation:
+
+- Oracle text validated from PostgreSQL card row:
+  `Whenever you cast a spell, you gain 1 life for each spell you've cast this turn.`
+  and `Pay 50 life: This artifact deals 50 damage to any target.`
+- PG045 inserted the oracle-hashed curated `aetherflux_reservoir` rule, then
+  disabled the legacy no-hash/no-scope curated `finisher` row and the
+  generated `needs_review`/`review_only` shadow row.
+- PG postcheck:
+  `oracle_hashed_aetherflux_lifegain_rows=1`,
+  `legacy_or_shadow_enabled_rows=0`,
+  `generated_review_only_shadow_rows=0`,
+  `trusted_finisher_without_model_scope_rows=0`, and
+  `trusted_executable_without_oracle_hash_rows=0`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg045_aetherflux_reservoir_20260622_233656.json`.
+- Focused unit coverage:
+  `test_aetherflux_reservoir_uses_oracle_hashed_spell_cast_lifegain_rule`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_pg045_focused_events_20260622_233656.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/aetherflux_reservoir_pg045_focused_replay_summary_20260622_233656.md`.
+- The focused replay includes `rule_logical_key`,
+  `rule_oracle_hash`, `aetherflux_reservoir_resolved`, and
+  `trigger_resolved` lifegain events for `1` then `2` life; no
+  `damage_resolved` event is emitted.
+- Auditor rerun:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260622_234015.json`
+  reports `Aetherflux Reservoir` as `pass`.
+
+Gate result:
+
+- `high=80`, `medium=39`, `pass=26`.
+- The next card in the queue is `Approach of the Second Sun`.
+
+Caveats:
+
+- Aetherflux Reservoir's spell-cast lifegain trigger is executable. Its
+  `Pay 50 life: deal 50 damage` activated ability remains `annotation_only`;
+  PG045 does not add a dynamic life-payment activation executor.
+- `Blasphemous Act` cost reduction `{1}` per creature remains
+  `annotation_only`; PG029 proved the 13-damage creature wipe executor, not a
+  dynamic cost-reduction executor.

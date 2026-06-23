@@ -184,7 +184,7 @@ def register_tests(battle, replay_auditor):
             approach_effect = battle.get_card_effect(approach)
             assert approach_effect["effect"] == "approach"
             assert approach_effect["gain_life"] == 7
-            assert approach_effect["_rule_review_status"] == "verified"
+            assert approach_effect["_rule_review_status"] == "active"
 
             def topdeck_option(card, score):
                 effect = battle.get_card_effect(card)
