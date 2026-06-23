@@ -250,6 +250,7 @@ OPENING_HAND_CARD_FLOW_EFFECTS = {
     "draw_cards",
     "draw_engine",
     "impulse_draw",
+    "loot",
     "loot_draw",
     "land_tax",
     "rummage",
@@ -727,6 +728,8 @@ def resolved_spell_destination(card, effect_data, effect, player=None):
         return "exile"
     if effect_data.get("exiles_self"):
         return "exile"
+    if effect == "ramp_ritual" and effect_data.get("sacrifice_self_for_mana"):
+        return "graveyard"
     if effect == "approach":
         recorded_count = effect_data.get("_approach_cast_count_after_recorded")
         if recorded_count is not None:
@@ -16588,7 +16591,40 @@ def apply_effect_immediate(
             found_cards=[item.get("name", "?") for item in moved_cards],
             destination=destination,
             turn=turn,
+            **fields,
         )
+        if effect_data.get("discard_after_tutor_random"):
+            discarded_card = None
+            discard_resolution = {
+                "to_top": [],
+                "to_graveyard": [],
+                "used_replacement": False,
+            }
+            if player.hand:
+                discard_index = rng.randrange(len(player.hand))
+                discarded_card = player.hand.pop(discard_index)
+                discard_resolution = resolve_effect_discard_cards(
+                    player,
+                    [discarded_card],
+                )
+            emit_replay_event(
+                "random_discard_after_tutor",
+                player=player.name,
+                card=card.get("name", "?"),
+                discarded=discarded_card.get("name", "?") if isinstance(discarded_card, dict) else None,
+                discarded_to_top=[
+                    entry.get("name", "?")
+                    for entry in discard_resolution["to_top"]
+                ],
+                discarded_to_graveyard=[
+                    entry.get("name", "?")
+                    for entry in discard_resolution["to_graveyard"]
+                ],
+                replacement_used=discard_resolution["used_replacement"],
+                hand_size=len(player.hand),
+                turn=turn,
+                **fields,
+            )
         if effect_data.get("exiles_self"):
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:
@@ -16655,6 +16691,7 @@ def apply_effect_immediate(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "brain_freeze":
         copies = brain_freeze_copy_count(player)
         per_copy = int(effect_data.get("mill_count") or 3)

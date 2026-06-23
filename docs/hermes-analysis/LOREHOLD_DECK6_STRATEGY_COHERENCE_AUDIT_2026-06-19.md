@@ -20259,3 +20259,173 @@ Current reading:
   `Chaos Warp`, `Esper Sentinel`, `Faithless Looting`, `Gamble`, `Get Lost`,
   `Pyroblast`, and `Wheel of Misfortune`.
 - The next PG package must be PG070.
+
+## PG070 Deck 6 Hash Cleanup + Red Discard Runtime - 2026-06-23 04:30 UTC
+
+What changed:
+
+- Closed the deck `6` L2 hash-only medium queue for `Fellwar Stone`,
+  `Mana Vault`, `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- Restored `Seething Song` red-mana metadata as an annotation on the existing
+  `single_shot_red_ritual_v1` executor; this was not a new dynamic colored
+  mana executor.
+- Closed `Faithless Looting` and `Gamble` from the high queue with scoped
+  runtime behavior.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- L2 PG070 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_precheck_20260623_011859.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_apply_20260623_011859.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_postcheck_20260623_011859.out`.
+- L2 Seething metadata addendum:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_seething_metadata_postcheck_20260623_011859.out`.
+- Red-discard PG070 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_precheck_20260623_042617.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_apply_20260623_042617.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`.
+- Accepted SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg070_deck6_red_discard_runtime_20260623_042617.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+- Deck `6` accepted auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`
+  reports `high=5`, `medium=10`, `pass=85`.
+- Deck `606` accepted auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg070_20260623_042617.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Deck `607` accepted auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg070_20260623_042617.json`
+  reports `high=30`, `medium=17`, `pass=47`.
+- Deck `608` accepted auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg070_20260623_042617.json`
+  reports `high=21`, `medium=9`, `pass=38`.
+- Global accepted auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg070_20260623_042617.json`
+  reports `high=55`, `medium=44`, `pass=106`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG070 sync and runtime changes.
+
+Runtime details:
+
+- `Faithless Looting` now resolves as draw two then discard two with
+  `battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa`; flashback remains
+  annotation-only.
+- `Gamble` now resolves as any-card tutor to hand, followed by random discard
+  from hand, with
+  `battle_rule_v1:2861739f22e978549e28d2339288df2a`; library shuffle remains
+  annotation-only.
+- `Blasphemous Act` was not part of this package. Its cost-reduction caveat
+  remains annotation-only and should not be treated as a rule source unless a
+  future oracle/runtime validation proves a real mismatch.
+
+Current reading:
+
+- Deck `6` accepted gate improved from the PG069 cut
+  `high=7`, `medium=10`, `pass=83` to the PG071 accepted cut
+  `high=5`, `medium=8`, `pass=87`.
+- Deck `606` accepted gate is currently `high=7`, `medium=30`,
+  `pass=44`.
+- Deck `607` accepted gate is currently `high=30`, `medium=16`,
+  `pass=48`.
+- Deck `608` accepted gate is currently `high=21`, `medium=7`,
+  `pass=40`.
+- Global deck-card accepted gate is currently `high=55`, `medium=42`,
+  `pass=108`.
+- Remaining deck `6` high queue:
+  `Chaos Warp`, `Esper Sentinel`, `Get Lost`, `Pyroblast`, and
+  `Wheel of Misfortune`.
+- The sync generated with review-only rules is rejected as a strategy gate and
+  must not reopen cards that are clean in the trusted runtime cut.
+- The next PG package must be PG072.
+
+## PG071 Deck 6 L3 Fast Mana/Cost Reduction - 2026-06-23 04:45 UTC
+
+What changed:
+
+- `Lotus Petal` now has scoped one-shot artifact fast mana runtime:
+  `battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d`,
+  `oracle_hash=a5b9069217908acfd75c5704b414b035`, and
+  `battle_model_scope=zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1`.
+- `Ruby Medallion` now has scoped passive cost-reduction metadata:
+  `battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a`,
+  `oracle_hash=52bc55846d69bacf3afba1ffa734b81e`, and
+  `battle_model_scope=red_spell_cost_reduction_annotation_only_v1`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG071 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_precheck_20260623_043623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_apply_20260623_043623.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_postcheck_20260623_043623.out`.
+- Trusted SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg071_l3_fast_mana_cost_reduction_trusted_sync_report_20260623_043623.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg071_l3_fast_mana_runtime_focused_events_20260623_043623.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg071_l3_fast_mana_cost_reduction_trusted_20260623_043623.json`
+  reports `high=5`, `medium=8`, `pass=87`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg071_l3_fast_mana_cost_reduction_trusted_20260623_043623.json`
+  reports `high=55`, `medium=42`, `pass=108`.
+Current reading:
+
+- `Lotus Petal` and `Ruby Medallion` are closed for this gate.
+- Remaining high queue:
+  `Chaos Warp`, `Esper Sentinel`, `Get Lost`, `Pyroblast`, and
+  `Wheel of Misfortune`.
+- The broad sync generated with review-only rules is rejected as a strategy
+  gate.
+- The next PG package must be PG072.
+
+## PG070 Deck 6 Red Discard Runtime - 2026-06-23 04:29 UTC
+
+What changed:
+
+- `Faithless Looting` now uses scoped `loot` runtime: draw two, discard two,
+  then finish the spell normally.
+- `Gamble` now tutors any card to hand and then performs a runtime random
+  discard from hand.
+- The opening-hand card-flow heuristic now treats `loot` as card flow, keeping
+  the prior mulligan behavior for Faithless Looting after its effect changed
+  from generic `draw_cards` to `loot`.
+- Two superseded generated/review-only rows were disabled.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG070 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_precheck_20260623_042617.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_apply_20260623_042617.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg070_deck6_red_discard_runtime_20260623_042617.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`
+  reports `high=5`, `medium=10`, `pass=85`; `Faithless Looting` and
+  `Gamble` report `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG070 sync and runtime changes.
+
+Current reading:
+
+- Deck `6` improved from `high=7`, `medium=10`, `pass=83` after PG069 to
+  `high=5`, `medium=10`, `pass=85`.
+- Remaining high queue:
+  `Chaos Warp`, `Esper Sentinel`, `Get Lost`, `Pyroblast`, and
+  `Wheel of Misfortune`.
+- The next PG package must be PG072.

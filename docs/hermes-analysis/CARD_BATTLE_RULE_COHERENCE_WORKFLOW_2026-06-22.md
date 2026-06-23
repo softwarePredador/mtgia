@@ -2762,3 +2762,159 @@ Next lane recommendation:
 - Deck `6` high queue remains unchanged: `Chaos Warp`, `Esper Sentinel`,
   `Faithless Looting`, `Gamble`, `Get Lost`, `Pyroblast`, and
   `Wheel of Misfortune`.
+
+## PG070 L2 Hash Cleanup + Red Discard Runtime - 2026-06-23 04:30 UTC
+
+Closed:
+
+- L2 hash-only/runtime metadata cleanup:
+  `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Scroll Rack`,
+  `Seething Song`, `Silence`, `Talisman of Conviction`,
+  `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- Red card-flow/runtime:
+  `Faithless Looting` and `Gamble`.
+
+Why this was split inside PG070:
+
+- The first PG070 package was a safe L2 batch: the trusted executable rows were
+  already selected, but live PostgreSQL lacked persisted oracle hashes.
+- `Seething Song` exposed a metadata regression after the hash-only package:
+  the executor was still correct, but the PG058/PG059 generic-pool red-mana
+  annotation was missing from the persisted row. The addendum restored only
+  that metadata.
+- The second PG070 package addressed two high card-flow cards with a shared
+  red discard/tutor lane: `Faithless Looting` and `Gamble`.
+
+Evidence:
+
+- L2 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_postcheck_20260623_011859.out`
+  reports `hashed_runtime_rows=9`, `hash_mismatch_rows=0`,
+  `scope_mismatch_rows=0`, and `backup_rows=27`.
+- Seething metadata postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_seething_metadata_postcheck_20260623_011859.out`
+  reports `seething_metadata_restored_rows=1`.
+- Red-discard postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`
+  reports `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0`, and `backup_rows=4`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+- Accepted deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`
+  reports `high=5`, `medium=10`, `pass=85`.
+- Accepted deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg070_20260623_042617.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Accepted deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg070_20260623_042617.json`
+  reports `high=30`, `medium=17`, `pass=47`.
+- Accepted deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg070_20260623_042617.json`
+  reports `high=21`, `medium=9`, `pass=38`.
+- Accepted global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg070_20260623_042617.json`
+  reports `high=55`, `medium=44`, `pass=106`.
+- The review-rule sync generated during the batch is rejected for workflow
+  gating; only the trusted runtime sync should drive queue ordering.
+
+Runtime details:
+
+- `Faithless Looting` is now modeled as `effect=loot`,
+  `battle_model_scope=draw_two_discard_two_flashback_annotation_v1`; flashback
+  is annotation-only, not automatic graveyard casting.
+- `Gamble` is now modeled as `effect=tutor`,
+  `battle_model_scope=any_card_to_hand_then_random_discard_v1`; hidden-zone
+  library shuffle remains annotation-only, while random discard from hand is
+  executable.
+- `Blasphemous Act` was not reopened in PG070. Any cost-reduction note is a
+  caveat to verify when that lane is revisited, not a normative rule source.
+
+Next lane recommendation:
+
+- Use PG072 for the next PostgreSQL package.
+- Current trusted deck `6` high queue is `Chaos Warp`, `Esper Sentinel`,
+  `Get Lost`, `Pyroblast`, and `Wheel of Misfortune`.
+- By battle criticality, the next efficient L6 sublane is
+  interaction/removal/counter: `Chaos Warp`, `Get Lost`, and `Pyroblast`.
+
+## PG070 Red Discard Runtime - 2026-06-23 04:29 UTC
+
+Closed:
+
+- `Faithless Looting`: replaced broad `draw_cards` with scoped `loot`
+  runtime: draw two, discard two, finish spell normally.
+- `Gamble`: kept any-card tutor but added scoped random post-tutor discard
+  runtime.
+
+Why this was a runtime package:
+
+- Both cards had current oracle text and trusted executable rows, but the
+  trusted rows were broad and missing oracle hash/model scope.
+- The package also changed runtime where needed instead of marking the cards
+  coherent by metadata alone.
+- `Pyroblast`, `Get Lost`, `Chaos Warp`, `Esper Sentinel`, and
+  `Wheel of Misfortune` remain open because each still requires card-specific
+  semantics beyond a hash/scope refresh.
+
+Evidence:
+
+- PG070 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`
+  reports `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0`, and `backup_rows=4`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`
+  reports `high=5`, `medium=10`, `pass=85`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg070_20260623_042617.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg070_20260623_042617.json`
+  reports `high=55`, `medium=44`, `pass=106`.
+
+Next lane recommendation:
+
+- Use PG072 for the next PostgreSQL package.
+- Deck `6` high queue is now `Chaos Warp`, `Esper Sentinel`, `Get Lost`,
+  `Pyroblast`, and `Wheel of Misfortune`.
+- Recommended next safe family: either `Pyroblast` with blue-target counter
+  runtime, or `Get Lost` with creature/enchantment/planeswalker targeting and
+  Map-token compensation.
+
+## PG071 L3 Fast Mana/Cost Reduction - 2026-06-23 04:45 UTC
+
+Closed:
+
+- `Lotus Petal`: scoped as zero-mana artifact fast mana with one-shot
+  tap/sacrifice runtime.
+- `Ruby Medallion`: scoped as passive red-spell cost reduction metadata,
+  annotation-only until a dynamic cost reducer executor exists.
+
+Evidence:
+
+- PG071 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_precheck_20260623_043623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_apply_20260623_043623.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_postcheck_20260623_043623.out`.
+- Trusted sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg071_l3_fast_mana_cost_reduction_trusted_sync_report_20260623_043623.json`.
+- Focused runtime events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg071_l3_fast_mana_runtime_focused_events_20260623_043623.jsonl`.
+- Accepted auditors:
+  deck `6` `high=5`, `medium=8`, `pass=87`; deck `606` `high=7`,
+  `medium=30`, `pass=44`; deck `607` `high=30`, `medium=16`,
+  `pass=48`; deck `608` `high=21`, `medium=7`, `pass=40`; global
+  `high=55`, `medium=42`, `pass=108`.
+Workflow note:
+
+- The broad sync generated with review rows is rejected for workflow gating.
+- Use PG072 for the next PostgreSQL package.
+- Remaining trusted deck `6` high queue is `Chaos Warp`, `Esper Sentinel`,
+  `Get Lost`, `Pyroblast`, and `Wheel of Misfortune`.

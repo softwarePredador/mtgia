@@ -9373,14 +9373,20 @@
     "battle_rule_logical_key": "battle_rule_v1:1f26dde3112dc95d335eb5bcb395e3b6"
   },
   "Faithless Looting": {
+    "battle_model_scope": "draw_two_discard_two_flashback_annotation_v1",
     "count": 2,
-    "effect": "draw_cards",
+    "discard_count": 2,
+    "draw_count": 2,
+    "effect": "loot",
+    "flashback_status": "annotation_only_cost_2r_exile_on_resolution_not_autocast",
+    "sorcery": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa"
+    "battle_rule_logical_key": "battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa",
+    "battle_rule_oracle_hash": "2e734d8bae3f331866abf1b030c92781"
   },
   "Fake Your Own Death": {
     "cmc": 2.0,
@@ -10884,15 +10890,21 @@
     "battle_rule_logical_key": "battle_rule_v1:d0505af096c10168b5ee4c6e65d71ef2"
   },
   "Gamble": {
+    "battle_model_scope": "any_card_to_hand_then_random_discard_v1",
+    "discard_after_tutor_random": true,
     "discard_risk": true,
     "effect": "tutor",
+    "library_shuffle_status": "annotation_only_hidden_zone_shuffle_no_order_model",
+    "random_discard_status": "runtime_random_from_hand_after_tutor",
+    "sorcery": true,
     "target": "any",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2861739f22e978549e28d2339288df2a"
+    "battle_rule_logical_key": "battle_rule_v1:2861739f22e978549e28d2339288df2a",
+    "battle_rule_oracle_hash": "9b3fc8ab7f664f6c084e0bda0ccf9a7c"
   },
   "Game Trail": {
     "effect": "land",
@@ -16542,15 +16554,23 @@
     "battle_rule_logical_key": "battle_rule_v1:f7405a62befa9f74d6041540c16e8daa"
   },
   "Lotus Petal": {
+    "activation_cost": "tap_sacrifice_self",
+    "activation_timing_status": "runtime_abstracts_cast_then_tap_sacrifice_to_same_turn_one_shot_mana",
+    "artifact": true,
+    "battle_model_scope": "zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1",
+    "color_model_status": "any_color_abstracted_to_generic_pool_runtime",
     "effect": "ramp_ritual",
     "mana_produced": 1,
+    "oracle_runtime_scope": "tap_sacrifice_artifact_add_one_mana_any_color_runtime_as_one_shot_mana_v1",
     "produces": "WUBRGC",
+    "sacrifice_self_for_mana": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d"
+    "battle_rule_logical_key": "battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d",
+    "battle_rule_oracle_hash": "a5b9069217908acfd75c5704b414b035"
   },
   "Lotus Vale": {
     "effect": "land",
@@ -23318,13 +23338,22 @@
     "battle_rule_logical_key": "battle_rule_v1:cf71f740297d9cf175957ff99a270d98"
   },
   "Ruby Medallion": {
-    "effect": "ramp_engine",
+    "artifact": true,
+    "battle_model_scope": "red_spell_cost_reduction_annotation_only_v1",
+    "cost_reduction": 1,
+    "cost_reduction_applies_to": "red_spells_you_cast",
+    "cost_reduction_color": "R",
+    "cost_reduction_status": "annotation_only_no_dynamic_cost_executor",
+    "dynamic_cost_executor": false,
+    "effect": "passive",
+    "oracle_runtime_scope": "red_spells_cost_one_less_annotation_only_no_dynamic_executor_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+    "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a",
+    "battle_rule_oracle_hash": "52bc55846d69bacf3afba1ffa734b81e"
   },
   "Ruby, Daring Tracker": {
     "cmc": 2.0,
@@ -24107,13 +24136,11 @@
     "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
     "cmc": 2.0,
     "effect": "topdeck_manipulation",
-    "full_exchange_status": "annotation_only",
     "hand_to_top_exchange": true,
-    "runtime_slice": "lorehold_opponent_upkeep_single_exchange_for_first_draw",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 0.8,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
     "battle_rule_oracle_hash": "8133928f03d5a5a77f2beecfcbd09e30"
@@ -24500,6 +24527,8 @@
     "instant": true,
     "mana_color_status": "abstracted_to_generic_pool_runtime",
     "mana_produced": 5,
+    "oracle_runtime_scope": "single_shot_red_ritual_runtime_generic_pool_color_annotation",
+    "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
     "produces": "R",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
@@ -31136,13 +31165,11 @@
     "battle_rule_logical_key": "battle_rule_v1:e055849cd43b61d89274f222f0a1efcd"
   },
   "Unexpected Windfall": {
-    "additional_cost_discard_status": "runtime_required_card_discard",
     "battle_model_scope": "discard_draw_create_treasures_v1",
     "cmc": 4.0,
     "draw_count": 2,
     "effect": "treasure_maker",
     "instant": true,
-    "oracle_runtime_scope": "additional_cost_discard_draw_two_create_two_treasures_v1",
     "requires_discard_card": true,
     "treasure_count": 2,
     "battle_rule_source": "curated",
@@ -31613,8 +31640,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a",
-    "battle_rule_oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887"
+    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a"
   },
   "Valakut Awakening // Valakut Stoneforge": {
     "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1",

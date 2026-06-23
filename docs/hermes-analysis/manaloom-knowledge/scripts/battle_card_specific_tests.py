@@ -2783,6 +2783,204 @@ def register_tests(battle, player):
         assert treasure_event["rule_logical_key"] == "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4"
         assert treasure_event["rule_oracle_hash"] == "9c4fbe06104051a2e8b1d295d307b26a"
 
+    def test_pg070_faithless_looting_draws_two_discards_two_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            looting = {"name": "Faithless Looting", "cmc": 1, "type_line": "Sorcery"}
+            active.hand = [
+                looting,
+                {"name": "Discard Candidate A", "cmc": 6, "type_line": "Sorcery", "effect": "draw_cards"},
+                {"name": "Discard Candidate B", "cmc": 5, "type_line": "Sorcery", "effect": "draw_cards"},
+            ]
+            active.library = [
+                {"name": "Drawn One", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Drawn Two", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            effect_data = battle.get_card_effect(looting)
+
+            assert effect_data["effect"] == "loot"
+            assert effect_data["count"] == 2
+            assert effect_data["battle_model_scope"] == "draw_two_discard_two_flashback_annotation_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa"
+            assert effect_data["_rule_oracle_hash"] == "2e734d8bae3f331866abf1b030c92781"
+
+            active.hand.remove(looting)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                looting,
+                3,
+                random.Random(7070),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        loot_event = next(
+            data
+            for event, data in events
+            if event == "loot_resolved" and data.get("card") == "Faithless Looting"
+        )
+        assert loot_event["cards_drawn"] == ["Drawn One", "Drawn Two"]
+        assert len(loot_event["discarded_to_graveyard"]) == 2
+        assert loot_event["rule_logical_key"] == "battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa"
+        assert loot_event["rule_oracle_hash"] == "2e734d8bae3f331866abf1b030c92781"
+        assert any(card.get("name") == "Faithless Looting" for card in active.graveyard)
+        assert len([card for card in active.graveyard if isinstance(card, dict)]) == 3
+        assert len(active.hand) == 2
+
+    def test_pg070_gamble_tutors_then_randomly_discards_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            gamble = {"name": "Gamble", "cmc": 1, "type_line": "Sorcery"}
+            tutored = {
+                "name": "Tutored Wincon",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+            }
+            active.hand = [
+                gamble,
+                {"name": "Keep A", "cmc": 2, "type_line": "Instant", "effect": "remove_creature"},
+                {"name": "Keep B", "cmc": 2, "type_line": "Instant", "effect": "counter"},
+            ]
+            active.library = [tutored]
+            effect_data = battle.get_card_effect(gamble)
+
+            assert effect_data["effect"] == "tutor"
+            assert effect_data["target"] == "any"
+            assert effect_data["discard_after_tutor_random"] is True
+            assert effect_data["battle_model_scope"] == "any_card_to_hand_then_random_discard_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:2861739f22e978549e28d2339288df2a"
+            assert effect_data["_rule_oracle_hash"] == "9b3fc8ab7f664f6c084e0bda0ccf9a7c"
+
+            active.hand.remove(gamble)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                gamble,
+                3,
+                random.Random(7071),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        tutor_event = next(
+            data
+            for event, data in events
+            if event == "tutor_resolved" and data.get("card") == "Gamble"
+        )
+        discard_event = next(
+            data
+            for event, data in events
+            if event == "random_discard_after_tutor" and data.get("card") == "Gamble"
+        )
+        assert tutor_event["found"] == "Tutored Wincon"
+        assert tutor_event["destination"] == "hand"
+        assert tutor_event["rule_logical_key"] == "battle_rule_v1:2861739f22e978549e28d2339288df2a"
+        assert discard_event["discarded"] in {"Keep A", "Keep B", "Tutored Wincon"}
+        assert discard_event["rule_logical_key"] == "battle_rule_v1:2861739f22e978549e28d2339288df2a"
+        assert discard_event["rule_oracle_hash"] == "9b3fc8ab7f664f6c084e0bda0ccf9a7c"
+        assert any(card.get("name") == "Gamble" for card in active.graveyard)
+        assert not active.library
+        assert len(active.hand) == 2
+
+    def test_pg071_lotus_petal_is_one_shot_fast_mana_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            lotus = {"name": "Lotus Petal", "cmc": 0, "type_line": "Artifact"}
+            active.hand = [lotus]
+            effect_data = battle.get_card_effect(lotus)
+
+            assert effect_data["effect"] == "ramp_ritual"
+            assert effect_data["mana_produced"] == 1
+            assert effect_data["sacrifice_self_for_mana"] is True
+            assert effect_data["battle_model_scope"] == "zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d"
+            assert effect_data["_rule_oracle_hash"] == "a5b9069217908acfd75c5704b414b035"
+
+            active.hand.remove(lotus)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                lotus,
+                3,
+                random.Random(7072),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Lotus Petal"
+        )
+        assert spell_event["destination"] == "graveyard"
+        assert spell_event["rule_logical_key"] == "battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d"
+        assert spell_event["rule_oracle_hash"] == "a5b9069217908acfd75c5704b414b035"
+        assert active.mana_pool.total() == 1
+        assert any(card.get("name") == "Lotus Petal" for card in active.graveyard)
+        assert not any(card.get("name") == "Lotus Petal" for card in active.battlefield)
+
+    def test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            ruby = {"name": "Ruby Medallion", "cmc": 2, "type_line": "Artifact"}
+            active.hand = [ruby]
+            effect_data = battle.get_card_effect(ruby)
+
+            assert effect_data["effect"] == "passive"
+            assert effect_data["cost_reduction"] == 1
+            assert effect_data["cost_reduction_color"] == "R"
+            assert effect_data["cost_reduction_status"] == "annotation_only_no_dynamic_cost_executor"
+            assert effect_data["dynamic_cost_executor"] is False
+            assert effect_data["battle_model_scope"] == "red_spell_cost_reduction_annotation_only_v1"
+            assert effect_data["_rule_logical_key"] == "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+            assert effect_data["_rule_oracle_hash"] == "52bc55846d69bacf3afba1ffa734b81e"
+
+            active.hand.remove(ruby)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                ruby,
+                3,
+                random.Random(7073),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Ruby Medallion"
+        )
+        assert spell_event["destination"] == "battlefield"
+        assert spell_event["rule_logical_key"] == "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+        assert spell_event["rule_oracle_hash"] == "52bc55846d69bacf3afba1ffa734b81e"
+        ruby_permanent = next(
+            card
+            for card in active.battlefield
+            if card.get("name") == "Ruby Medallion"
+        )
+        assert ruby_permanent["effect"] == "passive"
+        assert not battle.is_mana_source_permanent(ruby_permanent)
+        assert active.available_mana() == 0
+
     def test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -5856,6 +6054,10 @@ def register_tests(battle, player):
         test_land_tax_skips_when_no_opponent_controls_more_lands,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
         test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance,
+        test_pg070_faithless_looting_draws_two_discards_two_with_rule_provenance,
+        test_pg070_gamble_tutors_then_randomly_discards_with_rule_provenance,
+        test_pg071_lotus_petal_is_one_shot_fast_mana_with_rule_provenance,
+        test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,

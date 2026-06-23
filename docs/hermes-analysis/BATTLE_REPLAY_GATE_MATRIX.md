@@ -3173,3 +3173,141 @@ Caveat:
 - PG069 did not change game semantics. It preserved already-tested executors,
   corrected persisted metadata/shadow rows, and added replay provenance to the
   final Treasure event.
+
+## PG070 Deck 6 L2 Hash Cleanup + Red Discard Runtime Gate - 2026-06-23 04:30 UTC
+
+Artifacts:
+
+- L2 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_postcheck_20260623_011859.out`.
+- L2 Seething metadata postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_seething_metadata_postcheck_20260623_011859.out`.
+- Red-discard postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`.
+- Accepted SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg070_deck6_red_discard_runtime_20260623_042617.json`.
+- Accepted deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`.
+- Accepted deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg070_20260623_042617.json`.
+- Accepted deck `607` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg070_20260623_042617.json`.
+- Accepted deck `608` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg070_20260623_042617.json`.
+- Accepted global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg070_20260623_042617.json`.
+- L2 focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl`.
+- Red-discard focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+
+Gate:
+
+- L2 hash-only cards now expose stable `rule_oracle_hash` provenance in
+  focused runtime events without changing their existing executors.
+- `Seething Song` keeps `battle_model_scope=single_shot_red_ritual_v1`; the
+  addendum only restored the persisted generic-pool red-mana annotation
+  metadata expected by the ritual family tests.
+- `Faithless Looting` emits `loot_resolved` with
+  `rule_logical_key=battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa` and
+  `rule_oracle_hash=2e734d8bae3f331866abf1b030c92781`.
+- `Gamble` emits `tutor_resolved` and `random_discard_after_tutor` with
+  `rule_logical_key=battle_rule_v1:2861739f22e978549e28d2339288df2a` and
+  `rule_oracle_hash=9b3fc8ab7f664f6c084e0bda0ccf9a7c`.
+
+Status:
+
+- `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Scroll Rack`,
+  `Seething Song`, `Silence`, `Talisman of Conviction`,
+  `Unexpected Windfall`, and
+  `Valakut Awakening // Valakut Stoneforge` are closed for the current
+  L2 hash-only cleanup gate.
+- `Faithless Looting` and `Gamble` are closed for the current red card-flow
+  runtime gate.
+- Accepted gate counts are deck `6` `high=5`, `medium=10`, `pass=85`;
+  deck `606` `high=7`, `medium=30`, `pass=44`; deck `607` `high=30`,
+  `medium=17`, `pass=47`; deck `608` `high=21`, `medium=9`, `pass=38`;
+  global `high=55`, `medium=44`, `pass=106`.
+- The rejected review-rule sync is not a replay gate source and must not be
+  used to reopen cards that only appear because untrusted review rows were
+  imported.
+
+Caveat:
+
+- `Faithless Looting` flashback is annotation-only; the runtime proves the
+  cast-from-hand draw-two/discard-two path.
+- `Gamble` library shuffle is annotation-only because hidden-zone ordering is
+  not modeled; the runtime proves the tutor-to-hand plus random discard path.
+- `Blasphemous Act` was not a PG070 target. Its cost-reduction note remains a
+  caveat only, not a rule source or blocker.
+
+## PG070 Deck 6 Red Discard Runtime Gate - 2026-06-23 04:29 UTC
+
+Artifacts:
+
+- PG070 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg070_deck6_red_discard_runtime_20260623_042617.json`.
+- Current deck `6` audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+
+Gate:
+
+- `Faithless Looting` emits `loot_resolved` with two drawn cards, two
+  discarded cards, and PG070 rule key/hash provenance.
+- `Gamble` emits `tutor_resolved` for the selected card, then
+  `random_discard_after_tutor` with PG070 rule key/hash provenance.
+
+Status:
+
+- `Faithless Looting` and `Gamble` are closed for the current red discard
+  runtime gate.
+- Deck `6` now reports `high=5`, `medium=10`, `pass=85`.
+
+Caveat:
+
+- `Faithless Looting` flashback and `Gamble` library shuffle are explicit
+  annotation-only metadata in this runtime slice; the proved runtime behavior
+  is draw/discard and tutor/random-discard.
+
+## PG071 Deck 6 L3 Fast Mana/Cost Reduction Gate - 2026-06-23 04:45 UTC
+
+Artifacts:
+
+- PG071 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_postcheck_20260623_043623.out`.
+- Trusted SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg071_l3_fast_mana_cost_reduction_trusted_sync_report_20260623_043623.json`.
+- Current deck `6` audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg071_l3_fast_mana_cost_reduction_trusted_20260623_043623.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg071_l3_fast_mana_runtime_focused_events_20260623_043623.jsonl`.
+
+Gate:
+
+- `Lotus Petal` emits `spell_resolved` with
+  `rule_logical_key=battle_rule_v1:d3366a0b9063a1af91a75a6398c1962d`,
+  `rule_oracle_hash=a5b9069217908acfd75c5704b414b035`, resolves to
+  graveyard, and focused state proves `mana_pool_total=1`.
+- `Ruby Medallion` emits `spell_resolved` with
+  `rule_logical_key=battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a`,
+  `rule_oracle_hash=52bc55846d69bacf3afba1ffa734b81e`, resolves to
+  battlefield as `passive`, and focused state proves `is_mana_source=false`.
+
+Status:
+
+- `Lotus Petal` and `Ruby Medallion` are closed for the current L3
+  fast-mana/cost-reduction gate.
+- Deck `6` accepted cut reports `high=5`, `medium=8`, `pass=87`; global
+  accepted cut reports `high=55`, `medium=42`, `pass=108`.
+- The broad review-rule sync generated during the batch is rejected as a
+  replay gate source.
+
+Caveat:
+
+- `Ruby Medallion` cost reduction is annotation-only until a dynamic cost
+  reducer executor exists; the current runtime proof is that it no longer
+  behaves as a mana source.

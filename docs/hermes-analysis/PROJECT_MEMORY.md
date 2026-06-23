@@ -352,3 +352,109 @@ Atualizado em 2026-05-26:
   `high=7`, `medium=30`, `pass=44`; global esta em `high=57`,
   `medium=44`, `pass=104`.
 - Proximo deploy deve usar PG070.
+
+## ManaLoom deck 6 PG070 hash cleanup and red-discard runtime - 2026-06-23
+
+- PG070 tem duas backup tables validas:
+  `pg070_deck6_l2_hash_only_runtime_rules_20260623_011859` e
+  `pg070_deck6_red_discard_runtime_20260623_042617`; proximo deploy deve usar
+  PG071.
+- O primeiro pacote fechou a fila L2/hash-only de `Fellwar Stone`,
+  `Mana Vault`, `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall` e
+  `Valakut Awakening // Valakut Stoneforge`; o addendum restaurou apenas a
+  metadata de mana vermelha generica de `Seething Song`, sem trocar o executor
+  `single_shot_red_ritual_v1`.
+- O segundo pacote fechou `Faithless Looting` e `Gamble`: `Faithless Looting`
+  agora usa `effect=loot` com draw two/discard two; `Gamble` usa tutor para a
+  mao seguido de descarte aleatorio runtime. Flashback e shuffle continuam
+  annotation-only.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_postcheck_20260623_011859.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_only_runtime_rules_pg070_seething_metadata_postcheck_20260623_011859.out`
+  e
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl`
+  e
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`.
+- Sync aceito PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg070_deck6_red_discard_runtime_20260623_042617.json`
+  usou `include_needs_review=false`, carregou `pg_rows_loaded=1825`,
+  escreveu `sqlite_inserted_or_updated=2493` e exportou
+  `canonical_snapshot_rows_exported=3201`.
+- Auditor aceito:
+  deck `6` em
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`
+  esta em `high=5`, `medium=10`, `pass=85`; deck `606` esta em
+  `high=7`, `medium=30`, `pass=44`; deck `607` esta em `high=30`,
+  `medium=17`, `pass=47`; deck `608` esta em `high=21`, `medium=9`,
+  `pass=38`; global esta em `high=55`, `medium=44`, `pass=106`.
+- O corte gerado com regras ainda em revisao foi descartado como gate aceito;
+  ele nao deve orientar fila de ajuste nem fechamento de carta.
+- `Blasphemous Act` nao foi alvo do PG070. A reducao de custo continua apenas
+  caveat/annotation-only, e nao deve ser tratada como regra normativa ou
+  bloqueador fora da lane propria.
+
+## ManaLoom deck 6 red discard runtime - 2026-06-23
+
+- PG070 fechou `Faithless Looting` e `Gamble`.
+- `Faithless Looting` saiu de `draw_cards` generico para `loot` com
+  `count=2`, `oracle_hash=2e734d8bae3f331866abf1b030c92781` e
+  `battle_model_scope=draw_two_discard_two_flashback_annotation_v1`.
+- `Gamble` manteve tutor `target=any`, mas agora tem
+  `discard_after_tutor_random=true`,
+  `oracle_hash=9b3fc8ab7f664f6c084e0bda0ccf9a7c` e
+  `battle_model_scope=any_card_to_hand_then_random_discard_v1`.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_red_discard_runtime_pg070_postcheck_20260623_042617.out`
+  fechou `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0` e `backup_rows=4`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl`
+  prova `loot_resolved`, `tutor_resolved` e `random_discard_after_tutor` com
+  rule key/hash.
+- Sync final PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg070_deck6_red_discard_runtime_20260623_042617.json`
+  usou `include_needs_review=false`, carregou `pg_rows_loaded=1825` e escreveu
+  `sqlite_inserted_or_updated=2493`.
+- Auditor deck `6` em
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg070_20260623_042617.json`
+  passou para `high=5`, `medium=10`, `pass=85`; deck `606` esta em
+  `high=7`, `medium=30`, `pass=44`; global esta em `high=55`,
+  `medium=44`, `pass=106`.
+- Proximo deploy deve usar PG072.
+
+## ManaLoom deck 6 PG071 L3 fast mana/cost reduction - 2026-06-23
+
+- PG071 fechou `Lotus Petal` e `Ruby Medallion` como lane L3
+  fast-mana/cost-reduction: `Lotus Petal` agora tem oracle hash
+  `a5b9069217908acfd75c5704b414b035`,
+  `battle_model_scope=zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1`
+  e runtime one-shot para mana; `Ruby Medallion` agora tem oracle hash
+  `52bc55846d69bacf3afba1ffa734b81e`,
+  `battle_model_scope=red_spell_cost_reduction_annotation_only_v1` e nao e
+  tratado como fonte de mana recorrente.
+- Evidencia PG:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_precheck_20260623_043623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_apply_20260623_043623.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_postcheck_20260623_043623.out`
+  e rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3_fast_mana_cost_reduction_pg071_rollback_20260623_043623.sql`.
+- Focused event:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_pg071_l3_fast_mana_runtime_focused_events_20260623_043623.jsonl`
+  prova `Lotus Petal` resolvendo para graveyard com mana pool `1` e
+  `Ruby Medallion` resolvendo para battlefield como `passive` sem virar mana
+  source.
+- Sync aceito PG -> SQLite:
+  `docs/hermes-analysis/master_optimizer_reports/pg071_l3_fast_mana_cost_reduction_trusted_sync_report_20260623_043623.json`
+  usou `include_needs_review=false`, carregou `pg_rows_loaded=1825`,
+  escreveu `sqlite_inserted_or_updated=2493` e exportou
+  `canonical_snapshot_rows_exported=3201`.
+- Auditor aceito pos-PG071: deck `6` esta em `high=5`, `medium=8`,
+  `pass=87`; deck `606` esta em `high=7`, `medium=30`, `pass=44`;
+  deck `607` esta em `high=30`, `medium=16`, `pass=48`; deck `608`
+  esta em `high=21`, `medium=7`, `pass=40`; global esta em `high=55`,
+  `medium=42`, `pass=108`.
+- O sync amplo gerado com regras em revisao foi descartado como gate aceito.
+- Proximo deploy deve usar PG072.
