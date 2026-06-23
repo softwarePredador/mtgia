@@ -21035,3 +21035,56 @@ Current reading:
   `Hexing Squelcher`, `Ragavan, Nimble Pilferer`, `Skyclave Apparition`, and
   `Underworld Breach`.
 - Global card-rule queue is now `high=40`, `medium=8`, `pass=157`.
+
+## PG087/PG088 Deck 606 Remaining Semantic Card Gate - 2026-06-23 09:03 UTC
+
+What changed:
+
+- Deck `606` is now closed for card-rule coherence:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg088_after_hash_fix_20260623_090018.json`
+  reports `pass=81`.
+- Closed cards: `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
+  `Skyclave Apparition`, and `Underworld Breach`.
+- Deck `6` remains closed at `pass=100`.
+- No deck swap, no `deck_cards` mutation, and no learned-deck promotion.
+
+Runtime reading:
+
+- `Hexing Squelcher` now has an executable counter-target shield for spells
+  controlled by its controller; ward-pay-life clauses are explicit
+  annotations.
+- `Skyclave Apparition` now has executable ETB exile target filtering for
+  nonland, nontoken permanents with mana value <= 4; the leave-battlefield
+  Illusion token clause is annotation-only.
+- `Ragavan, Nimble Pilferer` remains creature/haste runtime with combat-damage
+  Treasure/exile/cast and dash annotation-only.
+- `Underworld Breach` remains passive enchantment runtime with escape and
+  end-step sacrifice annotation-only.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.out`.
+- PG088 raw-hash correction postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_rollback_20260623_085349.sql`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg088_remaining_semantic_focused_events_20260623_090018.jsonl`.
+- Full runtime wrapper:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG088.
+
+Current candidate status:
+
+- Deck `606`: `pass=81`.
+- Deck `607`: still has high-card backlog from the PG085 checkpoint.
+- Deck `608`: `high=16`, `medium=3`, `pass=49` after PG086/PG088 sync state.
+- Global card-rule queue: `high=39`, `medium=4`, `pass=162`.
+
+Auditor decision:
+
+- Deck `606` is no longer blocked by card-rule coherence findings, but this is
+  still not a deck-promotion or strategy-learning claim.
+- Continue closing candidate deck high queues and run a fresh multi-seed battle
+  artifact before comparing or promoting variants.

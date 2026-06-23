@@ -953,6 +953,54 @@ Evidence:
 Next package number is PG086. Next queue should prioritize remaining deck
 `607`/`608` high battle-critical cards before any new battle-ranking claim.
 
+## ManaLoom PG087/PG088 deck 606 remaining semantic gate - 2026-06-23 09:03 UTC
+
+- PG087 closed the remaining deck `606` card-rule coherence queue:
+  `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
+  `Skyclave Apparition`, and `Underworld Breach`.
+- These four were validated as semantic-specific rules, not hash-only:
+  PostgreSQL now stores card-specific `logical_rule_key`,
+  `battle_model_scope`, and runtime/annotation split fields. PG088 corrected
+  their `oracle_hash` values to the raw `oracle_text` md5 convention.
+- Runtime scope:
+  Hexing's uncounterable/static counter shield is executable through the
+  counter target filter; Skyclave ETB exile is executable with nonland,
+  nontoken, mana-value <= 4 target filtering. Ragavan combat-damage
+  Treasure/impulse/dash and Underworld Breach escape/end-step sacrifice are
+  explicit annotations.
+- PG087 semantic evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.out`
+  closed `target_rule_rows=4`, `target_hash_match_rows=4` under the original
+  normalized-hash convention,
+  `target_missing_hash_rows=0`, `non_disabled_shadow_rows=0`, and
+  `backup_rows=8`.
+- PG088 hash evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.out`
+  reported four raw-hash matches and `backup_rows=4`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg088_deck606_hash_convention_fix_sync_report_20260623_090018.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg088_remaining_semantic_focused_events_20260623_090018.jsonl`.
+- Tests passed:
+  `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py`.
+- Accepted audits after PG088: deck `6` `pass=100`; deck `606` `pass=81`;
+  deck `608` `high=16`, `medium=3`, `pass=49`; global `high=39`,
+  `medium=4`, `pass=162`.
+- PG086 was already occupied by deck `608` `Angel's Grace` artifacts during
+  this cycle, and PG088 subsequently corrected the PG087 hash convention; use
+  PG089 for the next package.
+- A read-only PG089 start snapshot was generated after the PG088 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg089_start_sync_report_20260623_061026.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg089_start_20260623_061026.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg089_start_20260623_061026.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg089_start_20260623_061026.json`.
+  It is not a deploy; it confirms deck `6` `pass=100`, deck `606` `pass=81`,
+  and global `high=39`, `medium=4`, `pass=162` before the next PG089 write.
+
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 
 - PG086 was applied and validated for `Angel's Grace` in deck `608`.
@@ -985,4 +1033,6 @@ Next package number is PG086. Next queue should prioritize remaining deck
   remain pending until a PG087 precheck/apply/postcheck/rollback package exists.
 - This was a card-rule/cache gate only. It did not create a new multi-seed
   battle baseline and did not mutate `deck_cards`.
-- Next package number is PG087.
+- At that PG086 checkpoint, the next package number was PG087; this was
+  superseded by the PG087/PG088 deck `606` checkpoint above. Current next
+  package number is PG089.

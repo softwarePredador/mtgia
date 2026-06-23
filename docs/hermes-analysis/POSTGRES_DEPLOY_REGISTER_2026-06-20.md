@@ -8015,4 +8015,104 @@ Test evidence:
 
 Next deploy number:
 
-- PG087 is next for any future PostgreSQL package.
+- At this checkpoint PG087 was next; PG087/PG088 are recorded below, so PG089
+  is now next for any future PostgreSQL package.
+
+## PG087 Deck 606 Remaining Semantic Rules - Applied 2026-06-23 08:53-08:59 UTC
+
+Status: `applied_then_hash_convention_corrected_by_pg088`.
+
+Scope:
+
+- Closed the four remaining deck `606` medium card-rule rows:
+  `Hexing Squelcher`, `Ragavan, Nimble Pilferer`, `Skyclave Apparition`, and
+  `Underworld Breach`.
+- Added card-specific logical rule keys, scoped effect JSON, deck-role JSON,
+  reviewed runtime/annotation split, and disabled four generated/review-only
+  shadows.
+- No deck swap, no `deck_cards` mutation, and no learned-deck state mutation.
+
+Important correction:
+
+- PG087 was observed applied with whitespace-normalized `oracle_hash` values.
+  That closed the audit mechanically, but it diverged from the raw
+  `oracle_text` md5 convention used by prior packages. PG088 immediately
+  corrected only the four hashes, preserving the PG087 semantic payload.
+
+PG087 evidence:
+
+- SQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_precheck_20260623_085349.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_apply_20260623_085349.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_rollback_20260623_085349.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_apply_20260623_085349.out`
+  reported backup creation with eight rows, four target updates, four shadow
+  disables, and `COMMIT`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.out`
+  reported four target rows, four hash matches under the original PG087
+  normalized-hash convention, four scopes, zero non-disabled shadow rows, four
+  disabled shadow rows, and eight backup rows.
+
+## PG088 Deck 606 PG087 Hash Convention Fix - Applied 2026-06-23 09:00-09:03 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Corrected only the `oracle_hash` values for the four PG087 target rules from
+  whitespace-normalized hashes to raw `oracle_text` md5 hashes.
+- Preserved the PG087 semantic payload and rule keys.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_precheck_20260623_090018.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_apply_20260623_090018.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_rollback_20260623_090018.sql`
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_precheck_20260623_090018.out`
+  reported `target_rows=4`, `raw_hash_input_match_rows=4`,
+  `already_raw_hash_rows=0`, `currently_normalized_hash_rows=4`,
+  `trusted_auto_rows=4`, `scoped_rows=4`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_apply_20260623_090018.out`
+  reported backup creation with four rows, four updates, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.out`
+  reported `target_rows=4`, `raw_hash_input_match_rows=4`,
+  `target_hash_match_rows=4`, `target_missing_hash_rows=0`,
+  `expected_scope_rows=4`, `trusted_auto_rows=4`,
+  `rule_version_at_least_2_rows=4`, and `backup_rows=4`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg088_deck606_hash_convention_fix_sync_report_20260623_090018.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused runtime evidence after the correction:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg088_remaining_semantic_focused_events_20260623_090018.jsonl`.
+- Deck `606` post-PG088 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg088_after_hash_fix_20260623_090018.json`
+  reports `pass=81`.
+- Global post-PG088 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg088_after_hash_fix_20260623_090018.json`
+  reports `high=39`, `medium=4`, `pass=162`.
+
+Test evidence:
+
+- Added PG087 provenance/runtime tests for the four deck `606` rules.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG088 sync.
+
+Next deploy number:
+
+- PG089 is next for any future PostgreSQL package.

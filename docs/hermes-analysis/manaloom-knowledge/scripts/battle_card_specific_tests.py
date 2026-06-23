@@ -7497,6 +7497,139 @@ def register_tests(battle, player):
         assert effect_data["split_second"] is True
         assert effect_data["opponents_cant_win_this_turn"] is True
 
+    def test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache():
+        expected = {
+            "Hexing Squelcher": (
+                "battle_rule_v1:c6587e309bfd402ee1b98b4848abc6d3",
+                "ed00818e6ca804b7d1a3ef47c29277ea",
+                "creature_body_uncounterable_ward_static_counter_protection_annotations_v1",
+            ),
+            "Ragavan, Nimble Pilferer": (
+                "battle_rule_v1:3e0569d6bae4ed8b6e6e4289ea75084e",
+                "e337b9515b6984af8a1572db48f47eec",
+                "creature_body_haste_combat_damage_treasure_impulse_dash_annotations_v1",
+            ),
+            "Skyclave Apparition": (
+                "battle_rule_v1:4f29c7a4bbe21a160f28452406153846",
+                "4d0c162906712b2c428b754ad2f0b3a0",
+                "creature_etb_exile_nonland_nontoken_mv_lte4_leave_illusion_annotation_v1",
+            ),
+            "Underworld Breach": (
+                "battle_rule_v1:3f9f5259b05245670ee19b357aa2e999",
+                "a98ca5777789e48c44daff97999f2beb",
+                "escape_grant_nonland_graveyard_end_step_sacrifice_annotation_v1",
+            ),
+        }
+        for name, (logical_key, oracle_hash, scope) in expected.items():
+            effect_data = battle.get_card_effect({"name": name, "cmc": 2, "type_line": "Creature"})
+            assert effect_data["_rule_logical_key"] == logical_key
+            assert effect_data["_rule_oracle_hash"] == oracle_hash
+            assert effect_data["battle_model_scope"] == scope
+
+        hexing = battle.get_card_effect({"name": "Hexing Squelcher", "type_line": "Creature", "cmc": 2})
+        assert hexing["spells_you_control_cant_be_countered"] is True
+        assert hexing["ward_pay_life_status"] == "annotation_only"
+
+        ragavan = battle.get_card_effect({"name": "Ragavan, Nimble Pilferer", "type_line": "Creature", "cmc": 1})
+        assert ragavan["haste"] is True
+        assert ragavan["combat_damage_treasure_trigger_status"] == "annotation_only"
+        assert ragavan["dash_status"] == "annotation_only"
+
+        skyclave = battle.get_card_effect({"name": "Skyclave Apparition", "type_line": "Creature", "cmc": 3})
+        assert skyclave["etb_remove_target"] == "nonland_permanent"
+        assert skyclave["target_mana_value_max"] == 4
+        assert skyclave["target_nontoken"] is True
+        assert skyclave["exile_target"] is True
+        assert skyclave["leave_battlefield_illusion_token_status"] == "annotation_only"
+
+        breach = battle.get_card_effect({"name": "Underworld Breach", "type_line": "Enchantment", "cmc": 2})
+        assert breach["effect"] == "passive"
+        assert breach["escape_grant_status"] == "annotation_only"
+        assert breach["end_step_sacrifice_status"] == "annotation_only"
+
+    def test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule():
+        active = player("Lorehold")
+        opponent = player("Opponent")
+        hexing_card = {"name": "Hexing Squelcher", "type_line": "Creature — Goblin Sorcerer", "cmc": 2}
+        hexing_effect = battle.get_card_effect(hexing_card)
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            hexing_card,
+            turn=4,
+            rng=random.Random(8701),
+            effect_data_override=hexing_effect,
+        )
+        protected_spell = {"name": "Lorehold Spell", "cmc": 4, "type_line": "Sorcery"}
+        stack_item = battle.StackItem(
+            protected_spell,
+            active,
+            {"effect": "draw_cards"},
+        )
+        counterspell = {"name": "Cancel", "cmc": 3, "type_line": "Instant", "effect": "counter"}
+        opponent.hand = [counterspell]
+        opponent.mana_pool.add("blue", 3)
+
+        assert not opponent.counterspell_cards(
+            castable_only=True,
+            target_card=protected_spell,
+            stack_item=stack_item,
+        )
+
+    def test_pg087_skyclave_apparition_exiles_only_nontoken_mv_lte_four_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            legal_target = {
+                "name": "Legal Engine",
+                "cmc": 4,
+                "type_line": "Enchantment",
+                "effect": "draw_engine",
+            }
+            opponent.battlefield = [
+                {
+                    "name": "Large Engine",
+                    "cmc": 5,
+                    "type_line": "Enchantment",
+                    "effect": "draw_engine",
+                },
+                {
+                    "name": "Token Engine",
+                    "cmc": 2,
+                    "type_line": "Creature Token",
+                    "effect": "creature",
+                    "tag": "token",
+                },
+                legal_target,
+            ]
+            card = {"name": "Skyclave Apparition", "type_line": "Creature — Kor Spirit", "cmc": 3}
+            effect_data = battle.get_card_effect(card)
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                turn=5,
+                rng=random.Random(8702),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert legal_target not in opponent.battlefield
+        assert legal_target in opponent.exile
+        assert any(
+            event == "etb_removal_resolved"
+            and data.get("card") == "Skyclave Apparition"
+            and data.get("target") == "Legal Engine"
+            and data.get("target_type") == "nonland_permanent"
+            and data.get("rule_logical_key") == "battle_rule_v1:4f29c7a4bbe21a160f28452406153846"
+            and data.get("rule_oracle_hash") == "4d0c162906712b2c428b754ad2f0b3a0"
+            for event, data in events
+        )
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -7692,4 +7825,7 @@ def register_tests(battle, player):
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
+        test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
+        test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,
+        test_pg087_skyclave_apparition_exiles_only_nontoken_mv_lte_four_with_rule_provenance,
     ]

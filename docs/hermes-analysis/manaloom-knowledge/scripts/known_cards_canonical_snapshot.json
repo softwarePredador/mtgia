@@ -13239,16 +13239,27 @@
     "battle_rule_logical_key": "battle_rule_v1:3962fa5937b9b37311d110e5c30a29cb"
   },
   "Hexing Squelcher": {
+    "battle_model_scope": "creature_body_uncounterable_ward_static_counter_protection_annotations_v1",
+    "cmc": 2.0,
     "effect": "creature",
     "is_creature_permanent": true,
+    "oracle_runtime_scope": "self_uncounterable_and_controller_spell_counter_shield_runtime_ward_pay_life_annotation_v1",
+    "other_creatures_ward_status": "annotation_only",
+    "other_creatures_you_control_ward_pay_life": 2,
     "power": 2,
+    "spells_you_control_cant_be_countered": true,
+    "spells_you_control_cant_be_countered_status": "runtime_counter_target_filter",
     "toughness": 2,
+    "uncounterable": true,
+    "ward_pay_life": 2,
+    "ward_pay_life_status": "annotation_only",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c6587e309bfd402ee1b98b4848abc6d3",
+    "battle_rule_oracle_hash": "ed00818e6ca804b7d1a3ef47c29277ea"
   },
   "Hickory Woodlot": {
     "effect": "land",
@@ -21766,19 +21777,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Ragavan, Nimble Pilferer": {
+    "battle_model_scope": "creature_body_haste_combat_damage_treasure_impulse_dash_annotations_v1",
+    "cmc": 1.0,
+    "combat_damage_exile_top_opponent_library_status": "annotation_only",
+    "combat_damage_treasure_count": 1,
+    "combat_damage_treasure_trigger_status": "annotation_only",
+    "dash_cost": "{1}{R}",
+    "dash_status": "annotation_only",
     "effect": "creature",
+    "haste": true,
     "is_creature_permanent": true,
     "keywords": [
       "haste"
     ],
+    "oracle_runtime_scope": "creature_body_haste_runtime_combat_damage_treasure_impulse_dash_annotations_v1",
     "power": 2,
+    "runtime_modeled_effect": "creature_body_haste_only",
+    "temporary_cast_permission_status": "annotation_only",
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d2076e435470ab6c446676d321a12f1b"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3e0569d6bae4ed8b6e6e4289ea75084e",
+    "battle_rule_oracle_hash": "e337b9515b6984af8a1572db48f47eec"
   },
   "Raging Ravine": {
     "effect": "land",
@@ -25889,16 +25912,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Skyclave Apparition": {
+    "battle_model_scope": "creature_etb_exile_nonland_nontoken_mv_lte4_leave_illusion_annotation_v1",
+    "cmc": 3.0,
     "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "nonland_permanent",
+    "exile_target": true,
+    "illusion_token_power_toughness_equal_exiled_mana_value": true,
     "is_creature_permanent": true,
+    "leave_battlefield_illusion_token_status": "annotation_only",
+    "oracle_runtime_scope": "creature_body_etb_exile_nonland_nontoken_mv_lte4_runtime_leave_token_annotation_v1",
     "power": 2,
+    "target_controller": "opponent",
+    "target_mana_value_max": 4,
+    "target_nontoken": true,
     "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f29c7a4bbe21a160f28452406153846",
+    "battle_rule_oracle_hash": "4d0c162906712b2c428b754ad2f0b3a0"
   },
   "Skyclave Relic": {
     "cmc": 3.0,
@@ -31365,13 +31400,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Underworld Breach": {
+    "battle_model_scope": "escape_grant_nonland_graveyard_end_step_sacrifice_annotation_v1",
+    "cmc": 2.0,
     "effect": "passive",
+    "end_step_sacrifice_status": "annotation_only",
+    "escape_additional_cost_exile_other_graveyard_cards": 3,
+    "escape_cost_model": "mana_cost_plus_exile_three_other_cards",
+    "escape_grant_status": "annotation_only",
+    "grants_escape_to_nonland_cards_in_graveyard": true,
+    "is_enchantment_permanent": true,
+    "oracle_runtime_scope": "passive_enchantment_runtime_escape_and_end_step_sacrifice_annotations_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3f9f5259b05245670ee19b357aa2e999",
+    "battle_rule_oracle_hash": "a98ca5777789e48c44daff97999f2beb"
   },
   "Underworld Dreams": {
     "cmc": 3.0,

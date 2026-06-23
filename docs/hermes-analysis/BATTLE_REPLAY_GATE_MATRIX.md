@@ -3800,3 +3800,55 @@ Status:
 - Next card-rule gate should process deck `606` semantic reviews, not
   hash-only cleanup: `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
   `Skyclave Apparition`, and `Underworld Breach`.
+
+## PG087/PG088 Deck 606 Remaining Semantic Focused Card-Rule Gate - 2026-06-23 09:03 UTC
+
+Replay relevance:
+
+- This is a focused card-rule/runtime gate, not a new 16-seed battle replay
+  baseline and not strategy-learning evidence.
+- The latest accepted deck `6` multi-seed replay baseline remains the PG078
+  `trusted_for_strategy_learning` artifact until a fresh multi-seed run is
+  intentionally generated.
+
+Artifacts:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.out`.
+- PG088 hash-convention postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.out`.
+- PG088 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg088_deck606_hash_convention_fix_sync_report_20260623_090018.json`.
+- Focused event evidence after raw-hash correction:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg088_remaining_semantic_focused_events_20260623_090018.jsonl`.
+- Post-test deck `606` card-gate audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg088_after_hash_fix_20260623_090018.json`.
+
+Gate:
+
+- PG087 applied the four semantic payloads; PG088 corrected their
+  `oracle_hash` values from whitespace-normalized hashes to raw
+  `oracle_text` md5 hashes. The final trusted runtime evidence is the PG088
+  focused event artifact.
+- `Hexing Squelcher`: proves the trusted rule resolves and the static
+  counter-filter leaves zero legal counterspell responses against a protected
+  controller spell.
+- `Skyclave Apparition`: proves ETB exile targets only the legal nonland,
+  nontoken permanent with mana value <= 4 while leaving a token and mana value
+  5 permanent untouched.
+- `Ragavan, Nimble Pilferer`: rule provenance is proved on resolution; combat
+  damage Treasure/exile/cast and dash remain explicit annotations.
+- `Underworld Breach`: rule provenance is proved on resolution; escape grant
+  and end-step sacrifice remain explicit annotations.
+
+Validation:
+
+- Full wrapper passed after PG088:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`; card-rule gate closed for this deck.
+- Global queue after PG088: `high=39`, `medium=4`, `pass=162`.
+- No deck swap, no `deck_cards` mutation, and no new battle rebaseline.

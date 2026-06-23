@@ -3647,3 +3647,108 @@ Next workflow:
 - Continue deck `606` semantic review for `Hexing Squelcher`,
   `Ragavan, Nimble Pilferer`, `Skyclave Apparition`, and
   `Underworld Breach`.
+
+## PG087/PG088 Deck 606 Remaining Semantic Batch - 2026-06-23 09:03 UTC
+
+Closed:
+
+- Deck `606` is now closed for the card-rule coherence gate:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg088_after_hash_fix_20260623_090018.json`
+  reports `pass=81`.
+- The closed cards are `Hexing Squelcher`,
+  `Ragavan, Nimble Pilferer`, `Skyclave Apparition`, and
+  `Underworld Breach`.
+- No deck swap, no `deck_cards` mutation, and no learned-deck mutation.
+
+Why this was not hash-only:
+
+- All four cards had trusted executable rows lacking `oracle_hash`, but their
+  prior trusted rows were too generic relative to Oracle text.
+- PG087 replaced the generic rows with card-specific scopes and preserved
+  unsupported clauses as explicit annotations instead of implying runtime
+  execution. PG088 then corrected the four `oracle_hash` values to the raw
+  `oracle_text` md5 convention.
+
+Runtime/modeling notes:
+
+- `Hexing Squelcher`: creature body plus self-uncounterable and
+  controller-spell counter shield are executable through the counter target
+  filter; ward-pay-life clauses remain annotation-only.
+- `Ragavan, Nimble Pilferer`: creature body and haste are executable;
+  combat-damage Treasure/exile/cast and dash remain annotation-only.
+- `Skyclave Apparition`: creature body plus ETB exile now uses runtime target
+  filters for nonland, nontoken, mana value <= 4; leave-battlefield Illusion
+  token remains annotation-only.
+- `Underworld Breach`: passive enchantment resolution is modeled; escape grant,
+  escape additional cost, and end-step sacrifice remain annotation-only.
+
+PostgreSQL package:
+
+- Precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_precheck_20260623_085349.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_apply_20260623_085349.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_rollback_20260623_085349.sql`.
+- Postcheck facts: `target_rule_rows=4`, `target_hash_match_rows=4`,
+  `target_missing_hash_rows=0`, `target_expected_effect_rows=4`,
+  `target_expected_scope_rows=4`, `trusted_auto_rows=4`,
+  `non_disabled_shadow_rows=0`, `disabled_shadow_rows=4`, and
+  `backup_rows=8` under the original PG087 normalized-hash convention.
+- PG088 hash-convention correction:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.out`
+  reports four raw-hash matches and `backup_rows=4`.
+
+Sync and focused evidence:
+
+- PG088 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg088_deck606_hash_convention_fix_sync_report_20260623_090018.json`
+  with `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg088_remaining_semantic_focused_events_20260623_090018.jsonl`
+  proves all four final raw-hash logical rule keys plus Hexing and Skyclave
+  runtime behavior.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+
+All passed for the PG088 checkpoint.
+
+Auditor result after tests:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- Global: `high=39`, `medium=4`, `pass=162`.
+
+Next workflow:
+
+- PG088 was consumed by the deck `606` PG087 hash-convention correction; use
+  PG089 for the next PostgreSQL package.
+- Continue with remaining candidate deck high queues (`607`/`608`) before any
+  battle-ranking or deck-promotion claim.
+
+## PG089 Start Queue Snapshot - 2026-06-23 09:11 UTC
+
+Status: `read_only_start_snapshot`.
+
+- This is not a PostgreSQL deploy, not a deck swap, and not a battle
+  rebaseline.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg089_start_sync_report_20260623_061026.json`
+  reports `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Start audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg089_start_20260623_061026.json`
+  reports deck `6` `pass=100`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg089_start_20260623_061026.json`
+  reports deck `606` `pass=81`; and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg089_start_20260623_061026.json`
+  reports global `high=39`, `medium=4`, `pass=162`.
+- The next write package is still PG089 and should target the remaining
+  candidate deck high queues, primarily deck `607`/`608` high cards.

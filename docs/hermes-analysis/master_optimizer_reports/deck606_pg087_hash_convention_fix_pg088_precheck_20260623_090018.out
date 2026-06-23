@@ -1,0 +1,15 @@
+Pager usage is off.
+SELECT 4
+SELECT 4
+ target_rows | raw_hash_input_match_rows | already_raw_hash_rows | currently_normalized_hash_rows | trusted_auto_rows | scoped_rows | backup_table_already_exists
+-------------+---------------------------+-----------------------+--------------------------------+-------------------+-------------+-----------------------------
+           4 |                         4 |                     0 |                              4 |                 4 |           4 | f
+(1 row)
+
+           name           |     computed_raw_oracle_hash     |         raw_oracle_hash          |      normalized_oracle_hash      |                logical_rule_key                 |     current_rule_oracle_hash     | review_status | execution_status | rule_version |                            battle_model_scope
+--------------------------+----------------------------------+----------------------------------+----------------------------------+-------------------------------------------------+----------------------------------+---------------+------------------+--------------+---------------------------------------------------------------------------
+ Hexing Squelcher         | ed00818e6ca804b7d1a3ef47c29277ea | ed00818e6ca804b7d1a3ef47c29277ea | 6d80ef23b5d6ea0bf67915e13696ecea | battle_rule_v1:c6587e309bfd402ee1b98b4848abc6d3 | 6d80ef23b5d6ea0bf67915e13696ecea | verified      | auto             |            2 | creature_body_uncounterable_ward_static_counter_protection_annotations_v1
+ Ragavan, Nimble Pilferer | e337b9515b6984af8a1572db48f47eec | e337b9515b6984af8a1572db48f47eec | f6cbf3510c580b30fd12924102f60c23 | battle_rule_v1:3e0569d6bae4ed8b6e6e4289ea75084e | f6cbf3510c580b30fd12924102f60c23 | verified      | auto             |            2 | creature_body_haste_combat_damage_treasure_impulse_dash_annotations_v1
+ Skyclave Apparition      | 4d0c162906712b2c428b754ad2f0b3a0 | 4d0c162906712b2c428b754ad2f0b3a0 | d836e2ea0841430311033eceee434516 | battle_rule_v1:4f29c7a4bbe21a160f28452406153846 | d836e2ea0841430311033eceee434516 | verified      | auto             |            2 | creature_etb_exile_nonland_nontoken_mv_lte4_leave_illusion_annotation_v1
+ Underworld Breach        | a98ca5777789e48c44daff97999f2beb | a98ca5777789e48c44daff97999f2beb | 25c7dace100adb2e15b64b0b889b961c | battle_rule_v1:3f9f5259b05245670ee19b357aa2e999 | 25c7dace100adb2e15b64b0b889b961c | verified      | auto             |            2 | escape_grant_nonland_graveyard_end_step_sacrifice_annotation_v1
+(4 rows)

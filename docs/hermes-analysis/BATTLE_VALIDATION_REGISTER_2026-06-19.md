@@ -17316,3 +17316,74 @@ Next queue:
   cards, but do not treat them as hash-only safe: `Hexing Squelcher`,
   `Ragavan, Nimble Pilferer`, `Skyclave Apparition`, and
   `Underworld Breach`.
+
+## PG087/PG088 Deck 606 Remaining Semantic Card Gate - 2026-06-23 09:03 UTC
+
+Status: `card_gate_closed_for_deck606_after_pg088_hash_fix`.
+
+Scope:
+
+- Closed the remaining deck `606` card-rule queue for
+  `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
+  `Skyclave Apparition`, and `Underworld Breach`.
+- These were not treated as hash-only. PG087 applied card-specific
+  `logical_rule_key`, `battle_model_scope`, and runtime-vs-annotation metadata
+  in PostgreSQL; PG088 corrected the four `oracle_hash` values to the raw
+  `oracle_text` md5 convention.
+- Runtime additions were deliberately scoped:
+  Hexing's uncounterable/static counter shield is handled by the counter target
+  filter; Skyclave ETB exile now uses target filters for nonland, nontoken, and
+  mana value <= 4. Ragavan combat-damage Treasure/impulse/dash and Underworld
+  Breach escape/end-step sacrifice remain explicit `annotation_only`.
+- No deck swap, no `deck_cards` mutation, and no strategy-learning claim.
+
+PostgreSQL evidence:
+
+- SQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_precheck_20260623_085349.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_apply_20260623_085349.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_rollback_20260623_085349.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_remaining_semantic_pg087_postcheck_20260623_085349.out`
+  reports four target rows, four scopes, zero non-disabled shadow rows, four
+  disabled shadow rows, and eight backed-up rows under the original PG087
+  normalized-hash convention.
+- Hash convention correction:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg087_hash_convention_fix_pg088_postcheck_20260623_090018.out`
+  reports `target_rows=4`, `raw_hash_input_match_rows=4`,
+  `target_hash_match_rows=4`, `target_missing_hash_rows=0`, and
+  `backup_rows=4`.
+
+Runtime/cache evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg088_deck606_hash_convention_fix_sync_report_20260623_090018.json`
+  reports `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg088_remaining_semantic_focused_events_20260623_090018.jsonl`
+  proves final raw-hash rule selection and focused runtime behavior.
+
+Tests:
+
+- `python3 -m py_compile` passed for the touched runtime/test/audit/sync
+  scripts.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG088 sync, including the PG087 cache/runtime focused tests
+  updated to the raw hashes.
+
+Auditor status after tests:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49` after the concurrent PG086
+  `Angel's Grace` package.
+- Global: `high=39`, `medium=4`, `pass=162`.
+
+Next queue:
+
+- Continue with the remaining candidate deck high queues, prioritizing deck
+  `608`/`607` high battle-critical cards before any deck-selection or
+  strategy-learning claim.
