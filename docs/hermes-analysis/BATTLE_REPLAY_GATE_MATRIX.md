@@ -3908,3 +3908,66 @@ Status:
 - Deck `608`: `high=16`, `medium=3`, `pass=49`.
 - Global queue after PG090: `high=37`, `medium=4`, `pass=164`.
 - No deck swap, no `deck_cards` mutation, and no new battle rebaseline.
+
+## PG091 Deck 607 Token Maker Family Card-Rule Gate - 2026-06-23 09:44 UTC
+
+Replay relevance:
+
+- This is a focused card-rule/runtime gate, not a new 16-seed battle replay
+  baseline and not strategy-learning evidence.
+- The latest accepted deck `6` multi-seed replay baseline remains unchanged
+  until a fresh multi-seed run is intentionally generated.
+- Current latest recurring battle artifact is
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_084342/summary.json`
+  with `battle_replay_final_status=review_required` due to
+  `event_contract_static=review_required`; this focused gate does not override
+  that latest-recurring status.
+
+Artifacts:
+
+- PG091 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.out`.
+- PG091 current apply-state/rerun guard:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_state_verified_20260623_094457.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_rerun_guard_20260623_094457.out`.
+- PG091 PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_deck607_token_maker_family_sync_report_20260623_093259.json`.
+- PG091 focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl`.
+- Final card-rule audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg091_after_token_maker_20260623_093259.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg091_after_token_maker_20260623_093259.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg091_after_token_maker_20260623_093259.json`.
+
+Gate:
+
+- `Furygale Flocking` proves logical rule key
+  `battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5` from SQLite cache after
+  PostgreSQL sync and emits six 3/3 flying hasty Elemental tokens with three
+  opponents. Cost reduction and attack-if-able clauses remain annotations.
+- `Prismari Pianist` proves logical rule key
+  `battle_rule_v1:0288989021534a6f036968f62361f634` and emits one Elemental
+  for a low-mana-value instant and three Elementals for a mana-value-five
+  instant/sorcery.
+- `Tempt with Bunnies` proves composed rule keys
+  `battle_rule_v1:64814289c1def19e7cd5bb7462c4cf86` and
+  `battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80`, creating the base 1/1
+  white Rabbit and drawing one card. Opponent tempting-offer choices remain
+  annotation-only with the runtime default `opponents_decline`.
+
+Validation:
+
+- Full runtime wrapper passed after PG091:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- The deck-card coherence auditor was rerun after PostgreSQL -> SQLite sync.
+
+Status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=18`, `medium=4`, `pass=72`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- Global queue after PG091: `high=34`, `medium=4`, `pass=167`.
+- No deck swap, no `deck_cards` mutation, and no new battle rebaseline.

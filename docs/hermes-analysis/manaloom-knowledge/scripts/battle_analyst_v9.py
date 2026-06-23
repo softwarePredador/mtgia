@@ -13035,19 +13035,27 @@ def create_creature_token(
     haste=False,
     flying=False,
     artifact=False,
+    subtype=None,
+    colors=None,
 ):
+    base_type_line = "Artifact Creature Token" if artifact else "Creature Token"
+    if subtype:
+        base_type_line = f"{base_type_line} — {subtype}"
     token = {
         "name": name,
         "cmc": 0,
         "tag": "token",
         "effect": "creature",
-        "type_line": "Artifact Creature Token" if artifact else "Creature Token",
+        "type_line": base_type_line,
         "power": power,
         "toughness": toughness if toughness is not None else power,
         "haste": bool(haste),
         "summoning_sick": not bool(haste),
         "tapped": False,
     }
+    if colors:
+        token["colors"] = list(colors)
+        token["color_identity"] = list(colors)
     if flying:
         token["flying"] = True
         token["keywords"] = ["flying"]
@@ -13078,24 +13086,44 @@ def create_creature_token(
     return token
 
 
-def token_count_for_effect(player, effect_data, default=5):
+def token_count_for_effect(player, effect_data, default=5, opponents=None):
+    per_opponent = (effect_data or {}).get("token_count_per_opponent")
+    if per_opponent not in (None, "", False):
+        live_opponents = [
+            opponent
+            for opponent in (opponents or [])
+            if getattr(opponent, "is_alive", lambda: True)()
+        ]
+        return int(per_opponent) * len(live_opponents)
     token_count = (effect_data or {}).get("token_count", default)
     if isinstance(token_count, str):
         if token_count == "life_total":
             token_count = player.life
         elif token_count == "lands":
             token_count = controlled_land_count(player)
+        elif token_count == "opponents":
+            token_count = len([
+                opponent
+                for opponent in (opponents or [])
+                if getattr(opponent, "is_alive", lambda: True)()
+            ])
     return int(token_count)
 
 
-def create_creature_tokens_from_effect(player, effect_data, *, count=None):
-    token_count = token_count_for_effect(player, effect_data) if count is None else int(count)
+def create_creature_tokens_from_effect(player, effect_data, *, count=None, opponents=None):
+    token_count = (
+        token_count_for_effect(player, effect_data, opponents=opponents)
+        if count is None
+        else int(count)
+    )
     token_name = (effect_data or {}).get("token_name") or "Token"
+    token_subtype = (effect_data or {}).get("token_subtype")
     token_power = (effect_data or {}).get("token_power", 2)
     token_toughness = (effect_data or {}).get("token_toughness", token_power)
     token_haste = bool((effect_data or {}).get("token_haste") or (effect_data or {}).get("haste"))
     token_flying = bool((effect_data or {}).get("token_flying") or (effect_data or {}).get("flying"))
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
+    token_colors = (effect_data or {}).get("token_colors") or []
     for _ in range(min(max(0, token_count), 20)):
         create_creature_token(
             player,
@@ -13105,6 +13133,8 @@ def create_creature_tokens_from_effect(player, effect_data, *, count=None):
             haste=token_haste,
             flying=token_flying,
             artifact=artifact_tokens,
+            subtype=token_subtype,
+            colors=token_colors,
         )
     return token_count
 
@@ -14801,6 +14831,18 @@ def trigger_spell_cast_engines(
             continue
         if permanent.get("trigger_effect") == "token_maker":
             token_count = max(1, int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1))
+            threshold = permanent.get("trigger_token_count_if_spell_cmc_at_least")
+            if threshold not in (None, "", False):
+                spell_cmc = int(float(spell.get("cmc") or 0))
+                if spell_cmc >= int(threshold):
+                    token_count = max(
+                        1,
+                        int(
+                            permanent.get("trigger_token_count_at_or_above_threshold")
+                            or permanent.get("trigger_token_count_if_threshold_met")
+                            or token_count
+                        ),
+                    )
 
             def resolve_spell_cast_token_maker_trigger(
                 permanent=permanent,
@@ -14822,7 +14864,12 @@ def trigger_spell_cast_engines(
                     token_name=permanent.get("token_name") or permanent.get("spell_cast_token_name") or "Token",
                     token_power=permanent.get("token_power"),
                     token_toughness=permanent.get("token_toughness") or permanent.get("token_power"),
+                    token_subtype=permanent.get("token_subtype"),
+                    token_colors=permanent.get("token_colors") or [],
                     token_flying=bool(permanent.get("token_flying") or permanent.get("spell_cast_token_flying")),
+                    token_count_if_spell_cmc_at_least=permanent.get(
+                        "trigger_token_count_if_spell_cmc_at_least"
+                    ),
                     turn=turn,
                     phase=phase,
                     **replay_rule_fields(permanent),
@@ -16530,7 +16577,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 "cards_drawn": draw_count,
             })
         elif component_effect == "token_maker":
-            token_count = create_creature_tokens_from_effect(player, component)
+            token_count = create_creature_tokens_from_effect(player, component, opponents=opponents)
             outcome = "tokens_created"
             applied.append({"effect": component_effect, "tokens_created": token_count})
         elif component_effect == "extra_turn":
@@ -17584,7 +17631,7 @@ def apply_effect_immediate(
             permanent["effect"] = "token_maker"
             player.battlefield.append(permanent)
         else:
-            requested_tokens = create_creature_tokens_from_effect(player, effect_data)
+            requested_tokens = create_creature_tokens_from_effect(player, effect_data, opponents=opponents)
             emit_replay_event(
                 "tokens_created",
                 player=player.name,
@@ -17595,6 +17642,9 @@ def apply_effect_immediate(
                 token_name=effect_data.get("token_name") or "Token",
                 token_power=effect_data.get("token_power", 2),
                 token_toughness=effect_data.get("token_toughness", effect_data.get("token_power", 2)),
+                token_subtype=effect_data.get("token_subtype"),
+                token_colors=effect_data.get("token_colors") or [],
+                token_count_per_opponent=effect_data.get("token_count_per_opponent"),
                 token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
                 token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),
                 token_cap_applied=requested_tokens > 20,

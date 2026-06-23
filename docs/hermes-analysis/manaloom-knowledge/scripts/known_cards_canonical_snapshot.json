@@ -10838,14 +10838,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Furygale Flocking": {
-    "cmc": 0.0,
+    "attack_each_opponent_this_turn_status": "annotation_only",
+    "battle_model_scope": "per_opponent_two_3_3_flying_hasty_elemental_tokens_v1",
+    "cmc": 10.0,
+    "cost_reduction_per_instant_sorcery_in_graveyard": 1,
+    "cost_reduction_status": "annotation_only",
     "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443"
+    "oracle_runtime_scope": "per_opponent_two_3_3_flying_hasty_elemental_tokens_cost_reduction_attack_annotation_v1",
+    "token_colors": [
+      "U",
+      "R"
+    ],
+    "token_count_per_opponent": 2,
+    "token_flying": true,
+    "token_haste": true,
+    "token_name": "Elemental Token",
+    "token_power": 3,
+    "token_subtype": "Elemental",
+    "token_toughness": 3,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.95,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+    "battle_rule_oracle_hash": "8946b0e85c8430c6105ea70c7fb2724a"
   },
   "Fyndhorn Elves": {
     "effect": "creature",
@@ -21284,14 +21301,30 @@
     "battle_rule_logical_key": "battle_rule_v1:9d5afecce0b2500c1dff74bcd97e6eb4"
   },
   "Prismari Pianist": {
-    "cmc": 0.0,
+    "battle_model_scope": "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+    "cmc": 3.0,
     "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443"
+    "oracle_runtime_scope": "instant_sorcery_spell_cast_trigger_create_elementals_by_spell_mana_value_v1",
+    "token_colors": [
+      "U",
+      "R"
+    ],
+    "token_name": "Elemental Token",
+    "token_power": 1,
+    "token_subtype": "Elemental",
+    "token_toughness": 1,
+    "trigger": "instant_sorcery_cast",
+    "trigger_effect": "token_maker",
+    "trigger_token_count": 1,
+    "trigger_token_count_at_or_above_threshold": 3,
+    "trigger_token_count_if_spell_cmc_at_least": 5,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.95,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0288989021534a6f036968f62361f634",
+    "battle_rule_oracle_hash": "1594ae692e3095e544f3cd3430d43e86"
   },
   "Prismatic Lens": {
     "activation_cost_generic_for_colored_filter": 1,
@@ -28926,14 +28959,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Tempt with Bunnies": {
+    "battle_model_scope": "tempting_offer_base_draw_one_component_v1",
     "cmc": 3.0,
-    "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:adf4845203520f2f668e196538e532f2"
+    "compose_on_resolution": true,
+    "count": 1,
+    "effect": "draw_cards",
+    "oracle_runtime_scope": "tempting_offer_base_draw_one_opponent_choice_annotation_v1",
+    "tempting_offer_default": "opponents_decline",
+    "tempting_offer_opponent_choice_status": "annotation_only",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.92,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80",
+    "battle_rule_oracle_hash": "201f6c7234bfef550f3d497e736f0d7a"
   },
   "Tempt with Discovery": {
     "cmc": 4.0,

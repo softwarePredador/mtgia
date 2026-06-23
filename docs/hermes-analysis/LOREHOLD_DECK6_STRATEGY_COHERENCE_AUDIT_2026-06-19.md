@@ -21144,3 +21144,76 @@ Next recommended card-rule queue:
   `Winds of Abandon`.
 - Treat user card comments as audit hints only; Oracle text, PostgreSQL state,
   and runtime evidence remain the decision sources.
+
+## PG091 Lorehold Candidate Card-Rule Reading - 2026-06-23 09:44 UTC
+
+What changed:
+
+- PG091 closed three deck `607` high battle-critical token-maker findings:
+  `Furygale Flocking`, `Prismari Pianist`, and `Tempt with Bunnies`.
+- `Furygale Flocking` now models the per-opponent 3/3 blue/red flying hasty
+  Elemental token output. Its graveyard instant/sorcery cost reduction and
+  attack-if-able clause are explicit annotations.
+- `Prismari Pianist` now models the instant/sorcery cast trigger that creates
+  one 1/1 blue/red Elemental, or three when the triggering spell has mana value
+  five or greater.
+- `Tempt with Bunnies` now composes the base draw-one and create-one 1/1 white
+  Rabbit effects. Opponent tempting-offer choices remain annotation-only with
+  the runtime default `opponents_decline`.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_rollback_20260623_093259.sql`.
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_deck607_token_maker_family_sync_report_20260623_093259.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl`.
+- Full runtime wrapper:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG091.
+
+Current candidate status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=18`, `medium=4`, `pass=72`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- Global card-rule queue: `high=34`, `medium=4`, `pass=167`.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  new multi-seed battle baseline.
+- Current latest recurring battle remains
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_084342/summary.json`
+  with `battle_replay_final_status=review_required` due to
+  `event_contract_static=review_required`; PG091 does not override that.
+
+Next recommended card-rule queue:
+
+- Continue deck `607` high battle-critical cards first:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Insurrection`, `Promise of Loyalty`, `Starfall Invocation`, and
+  `Winds of Abandon`.
+- Do not carry user comments forward as hard law for cards such as
+  `Blasphemous Act`; validate each card from Oracle, PostgreSQL rule state, and
+  runtime evidence, then adjust only when the evidence requires it.
+
+## PG092 Start Queue Snapshot - 2026-06-23 09:54 UTC
+
+- PG092 start is read-only: no PostgreSQL write, no deck swap, no battle
+  rebaseline.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_start_sync_report_20260623_101000.json`
+  reports `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Start status:
+  deck `6` `pass=100`; deck `606` `pass=81`; deck `607` `high=18`,
+  `medium=4`, `pass=72`; deck `608` `high=16`, `medium=3`, `pass=49`;
+  global `high=34`, `medium=4`, `pass=167`.
+- PG092 should continue with deck `607` battle-critical high cards first:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Insurrection`, `Promise of Loyalty`, `Starfall Invocation`, and
+  `Winds of Abandon`.

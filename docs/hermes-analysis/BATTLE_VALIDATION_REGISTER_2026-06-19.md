@@ -17411,3 +17411,43 @@ Status: `applied_validated_after_pg090_restore`.
   `pass=69`; deck `608` `high=16`, `medium=3`, `pass=49`; global
   `high=37`, `medium=4`, `pass=164`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+## PG091 Runtime Prework - Deck 607 Token Maker Family - 2026-06-23 09:44 UTC
+
+Status: `applied_validated`.
+
+- Added runtime support for creature-token effects that need explicit subtype
+  and color metadata, token counts derived from opponent count, composed
+  resolution of token plus draw components, and instant/sorcery cast triggers
+  whose token quantity changes at a spell mana-value threshold.
+- Closed three deck `607` high battle-critical findings:
+  `Furygale Flocking`, `Prismari Pianist`, and `Tempt with Bunnies`.
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.out`
+  reports four promoted target rules, four raw Oracle hash matches, four
+  expected model scopes, zero active shadows, two disabled generated shadows,
+  and six backed-up pre-apply rows.
+- Rerun/apply-state evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_rerun_guard_20260623_094457.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_state_verified_20260623_094457.out`.
+- PostgreSQL rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_rollback_20260623_093259.sql`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_deck607_token_maker_family_sync_report_20260623_093259.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1813`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl`
+  prove selected logical rule keys for all three cards and the runtime token
+  quantities/colors/subtypes.
+- Focused tests added:
+  `test_pg091_token_maker_family_runtime_support` and
+  `test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache`.
+- Validation:
+  `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed after the PG091 sync.
+- Post-PG091 card-rule queue: deck `607` `high=18`, `medium=4`, `pass=72`;
+  deck `608` `high=16`, `medium=3`, `pass=49`; global `high=34`,
+  `medium=4`, `pass=167`.
+- No deck swap, no `deck_cards` mutation, and no battle rebaseline.

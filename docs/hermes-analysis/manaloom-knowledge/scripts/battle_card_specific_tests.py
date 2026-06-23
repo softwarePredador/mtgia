@@ -7738,6 +7738,194 @@ def register_tests(battle, player):
             assert effect_data["target_controller_token_colors"] == colors
             assert effect_data["compensation_token_status"] == "dynamic_creature_token_executor"
 
+    def test_pg091_token_maker_family_runtime_support():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponents = [player("Opponent A"), player("Opponent B"), player("Opponent C")]
+            battle.apply_effect_immediate(
+                active,
+                opponents,
+                {"name": "Furygale Flocking", "type_line": "Sorcery", "cmc": 10},
+                turn=7,
+                rng=random.Random(9101),
+                effect_data_override={
+                    "effect": "token_maker",
+                    "token_count_per_opponent": 2,
+                    "token_name": "Elemental Token",
+                    "token_subtype": "Elemental",
+                    "token_colors": ["U", "R"],
+                    "token_power": 3,
+                    "token_toughness": 3,
+                    "token_flying": True,
+                    "token_haste": True,
+                    "battle_model_scope": "per_opponent_two_3_3_flying_hasty_elemental_tokens_v1",
+                    "_rule_logical_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+                    "_rule_oracle_hash": "8946b0e85c8430c6105ea70c7fb2724a",
+                },
+            )
+
+            pianist = {
+                "name": "Prismari Pianist",
+                "cmc": 3,
+                "type_line": "Creature — Djinn Bard",
+                "effect": "token_maker",
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 1,
+                "trigger_token_count_if_spell_cmc_at_least": 5,
+                "trigger_token_count_at_or_above_threshold": 3,
+                "token_name": "Elemental Token",
+                "token_subtype": "Elemental",
+                "token_colors": ["U", "R"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "battle_model_scope": "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+                "_rule_logical_key": "battle_rule_v1:0288989021534a6f036968f62361f634",
+                "_rule_oracle_hash": "1594ae692e3095e544f3cd3430d43e86",
+            }
+            active.battlefield.append(pianist)
+            before_small = len(active.battlefield)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, *opponents],
+                {"name": "Lightning Helix", "type_line": "Instant", "cmc": 2},
+                turn=7,
+                phase="precombat_main",
+            )
+            after_small = len(active.battlefield)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, *opponents],
+                {"name": "Apex Spell", "type_line": "Sorcery", "cmc": 5},
+                turn=7,
+                phase="precombat_main",
+            )
+
+            active.library = [{"name": "Drawn Card", "type_line": "Sorcery", "cmc": 1}]
+            battle.apply_effect_immediate(
+                active,
+                opponents,
+                {"name": "Tempt with Bunnies", "type_line": "Sorcery", "cmc": 3},
+                turn=7,
+                rng=random.Random(9102),
+                effect_data_override={
+                    "effect": "composite_resolution",
+                    "_rule_logical_key": (
+                        "battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80+"
+                        "battle_rule_v1:64814289c1def19e7cd5bb7462c4cf86"
+                    ),
+                    "_rule_oracle_hash": "201f6c7234bfef550f3d497e736f0d7a",
+                    "_composite_rule_components": [
+                        {
+                            "effect": "draw_cards",
+                            "count": 1,
+                            "battle_model_scope": "tempting_offer_base_draw_one_component_v1",
+                        },
+                        {
+                            "effect": "token_maker",
+                            "token_count": 1,
+                            "token_name": "Rabbit Token",
+                            "token_subtype": "Rabbit",
+                            "token_colors": ["W"],
+                            "token_power": 1,
+                            "token_toughness": 1,
+                            "battle_model_scope": "tempting_offer_base_create_1_1_white_rabbit_component_v1",
+                        },
+                    ],
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        furygale_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if permanent.get("name") == "Elemental Token"
+            and permanent.get("power") == 3
+            and permanent.get("flying") is True
+            and permanent.get("haste") is True
+        ]
+        assert len(furygale_tokens) == 6
+        assert all(token.get("colors") == ["U", "R"] for token in furygale_tokens)
+        assert after_small == before_small + 1
+        pianist_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if permanent.get("name") == "Elemental Token"
+            and permanent.get("power") == 1
+        ]
+        assert len(pianist_tokens) == 4
+        rabbit = next(permanent for permanent in active.battlefield if permanent.get("name") == "Rabbit Token")
+        assert rabbit["power"] == 1
+        assert rabbit["toughness"] == 1
+        assert rabbit["colors"] == ["W"]
+        assert [card.get("name") for card in active.hand] == ["Drawn Card"]
+        assert any(
+            event == "tokens_created"
+            and data.get("card") == "Furygale Flocking"
+            and data.get("tokens_created") == 6
+            and data.get("token_count_per_opponent") == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Prismari Pianist"
+            and data.get("trigger_spell") == "Apex Spell"
+            and data.get("tokens_created") == 3
+            and data.get("token_count_if_spell_cmc_at_least") == 5
+            for event, data in events
+        )
+        assert any(
+            event == "composite_rule_resolved"
+            and data.get("card") == "Tempt with Bunnies"
+            and data.get("components_applied") == 2
+            for event, data in events
+        )
+
+    def test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache():
+        expected_single_rules = {
+            "Furygale Flocking": (
+                "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+                "8946b0e85c8430c6105ea70c7fb2724a",
+                "per_opponent_two_3_3_flying_hasty_elemental_tokens_v1",
+            ),
+            "Prismari Pianist": (
+                "battle_rule_v1:0288989021534a6f036968f62361f634",
+                "1594ae692e3095e544f3cd3430d43e86",
+                "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+            ),
+        }
+        for name, (logical_key, oracle_hash, scope) in expected_single_rules.items():
+            effect_data = battle.get_card_effect({"name": name, "type_line": "Sorcery", "cmc": 3})
+            assert effect_data["_rule_logical_key"] == logical_key
+            assert effect_data["_rule_oracle_hash"] == oracle_hash
+            assert effect_data["battle_model_scope"] == scope
+            assert effect_data["effect"] == "token_maker"
+
+        tempt_effect = battle.get_card_effect({"name": "Tempt with Bunnies", "type_line": "Sorcery", "cmc": 3})
+        assert tempt_effect["effect"] == "composite_resolution"
+        assert tempt_effect["_rule_oracle_hash"] == "201f6c7234bfef550f3d497e736f0d7a"
+        component_keys = {
+            component.get("_rule_logical_key")
+            for component in tempt_effect.get("_composite_rule_components", [])
+        }
+        assert component_keys == {
+            "battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80",
+            "battle_rule_v1:64814289c1def19e7cd5bb7462c4cf86",
+        }
+        scopes = {
+            component.get("battle_model_scope")
+            for component in tempt_effect.get("_composite_rule_components", [])
+        }
+        assert scopes == {
+            "tempting_offer_base_draw_one_component_v1",
+            "tempting_offer_base_create_1_1_white_rabbit_component_v1",
+        }
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -7938,4 +8126,6 @@ def register_tests(battle, player):
         test_pg087_skyclave_apparition_exiles_only_nontoken_mv_lte_four_with_rule_provenance,
         test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller,
         test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache,
+        test_pg091_token_maker_family_runtime_support,
+        test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
     ]

@@ -8234,3 +8234,86 @@ Evidence:
 Next deploy number:
 
 - PG091 is next for any future PostgreSQL package.
+
+## PG091 Deck 607 Token Maker Family - Applied 2026-06-23 09:44 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Promoted deck `607` token-maker family rules for `Furygale Flocking`,
+  `Prismari Pianist`, and `Tempt with Bunnies`.
+- This package changed only `card_battle_rules` and associated runtime support.
+  It did not mutate `deck_cards`, did not apply deck swaps, and did not create
+  a new multi-seed battle baseline.
+- User comments about individual cards are treated as audit hints only. Oracle
+  text, PostgreSQL rows, and runtime evidence remain the decision sources.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_precheck_20260623_093259.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_20260623_093259.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_rollback_20260623_093259.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg091_deck607_token_maker_family_20260623_093259`.
+- A duplicate apply rerun stopped on the existing backup guard, as expected
+  after PG091 had already been applied:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_rerun_guard_20260623_094457.out`.
+- Current apply-state verification:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_state_verified_20260623_094457.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.out`
+  reported `target_rule_rows=4`, `target_hash_match_rows=4`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=4`,
+  `trusted_auto_rows=4`, `rule_version_at_least_2_rows=4`,
+  `token_color_rows=3`, `token_subtype_rows=3`,
+  `tempt_compose_rows=2`, `furygale_per_opponent_rows=1`,
+  `prismari_threshold_rows=1`, `non_disabled_shadow_rows=0`,
+  `disabled_shadow_rows=2`, and `backup_rows=6`.
+- `Furygale Flocking` now has Oracle hash
+  `8946b0e85c8430c6105ea70c7fb2724a`, logical rule key
+  `battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5`, and scope
+  `per_opponent_two_3_3_flying_hasty_elemental_tokens_v1`. Its cost
+  reduction and attack-if-able clauses remain explicit annotations.
+- `Prismari Pianist` now has Oracle hash
+  `1594ae692e3095e544f3cd3430d43e86`, logical rule key
+  `battle_rule_v1:0288989021534a6f036968f62361f634`, and scope
+  `instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1`.
+- `Tempt with Bunnies` now has Oracle hash
+  `201f6c7234bfef550f3d497e736f0d7a` and two composed runtime components:
+  `battle_rule_v1:64814289c1def19e7cd5bb7462c4cf86` for the Rabbit token
+  and `battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80` for drawing one
+  card. Opponent tempting-offer choice remains annotation-only with the
+  default runtime assumption `opponents_decline`.
+
+Sync/audit/runtime evidence:
+
+- PG091 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_deck607_token_maker_family_sync_report_20260623_093259.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1813`,
+  `canonical_snapshot_rows_exported=3201`, and `pg_inserted_or_updated=0`.
+- Focused event proof:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl`
+  proves runtime selection of the final logical rule keys. It covers six
+  3/3 flying hasty Elemental tokens for `Furygale Flocking` with three
+  opponents, one versus three Elemental tokens for `Prismari Pianist` based on
+  spell mana value, and the composed draw plus 1/1 white Rabbit base resolution
+  for `Tempt with Bunnies`.
+- Post-PG091 audits:
+  deck `6` `pass=100`; deck `606` `pass=81`; deck `607` `high=18`,
+  `medium=4`, `pass=72`; deck `608` `high=16`, `medium=3`, `pass=49`;
+  global `high=34`, `medium=4`, `pass=167`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+
+Next deploy number:
+
+- PG092 is next for any future PostgreSQL package.

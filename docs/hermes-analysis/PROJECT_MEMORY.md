@@ -1029,6 +1029,26 @@ Next package number is PG086. Next queue should prioritize remaining deck
   It is not a deploy; it confirms deck `6` `pass=100`, deck `606`
   `pass=81`, deck `607` `high=21`, `medium=4`, `pass=69`, and deck `608`
   `high=16`, `medium=3`, `pass=49` as the next cycle baseline.
+- PG091 closed the deck `607` token-maker family:
+  `Furygale Flocking`, `Prismari Pianist`, and `Tempt with Bunnies`.
+  Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg091_deck607_token_maker_family_sync_report_20260623_093259.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl`.
+  The runtime now supports token subtype/color metadata, token count by
+  opponent count, composed token plus draw resolution, and instant/sorcery
+  trigger token counts by spell mana value. User observations about individual
+  cards remain audit hints only, not rule sources. Final post-PG091 state:
+  deck `607` `high=18`, `medium=4`, `pass=72`; deck `608` `high=16`,
+  `medium=3`, `pass=49`; global `high=34`, `medium=4`, `pass=167`.
+  PG092 is next.
+- PG092 read-only start snapshot was then generated:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_start_sync_report_20260623_101000.json`
+  plus deck `6`/`606`/`607`/`608`/global PG092 start audits. It did not write
+  PostgreSQL and preserves the same counts as the PG091 closeout. The full
+  current-state wrapper passed at
+  `docs/hermes-analysis/master_optimizer_reports/pg092_start_test_battle_analyst_v10_3_20260623_101200.out`.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

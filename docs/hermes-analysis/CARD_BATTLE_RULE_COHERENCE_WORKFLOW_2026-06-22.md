@@ -3806,3 +3806,89 @@ Status: `read_only_start_snapshot`.
   reports deck `608` `high=16`, `medium=3`, `pass=49`.
 - The next write package is PG091 and should keep prioritizing battle-critical
   high-card queues in deck `607`/`608`.
+
+## PG091 Deck 607 Token Maker Family - 2026-06-23 09:44 UTC
+
+Status: `applied_validated`.
+
+- PG091 closed three deck `607` high battle-critical token-maker findings:
+  `Furygale Flocking`, `Prismari Pianist`, and `Tempt with Bunnies`.
+- The batch was selected because all three shared a real token-creation
+  executor need after Oracle review. Board wipes and other modal cards were
+  deliberately left out because their Oracle behavior is not homogeneous.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_precheck_20260623_093259.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_20260623_093259.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_rollback_20260623_093259.sql`.
+- Postcheck evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_postcheck_20260623_093259.out`
+  reported `target_rule_rows=4`, `target_hash_match_rows=4`,
+  `target_expected_scope_rows=4`, `trusted_auto_rows=4`,
+  `non_disabled_shadow_rows=0`, `disabled_shadow_rows=2`, and
+  `backup_rows=6`.
+- Rerun/apply-state evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_rerun_guard_20260623_094457.out`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck607_token_maker_family_pg091_apply_state_verified_20260623_094457.out`.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg091_deck607_token_maker_family_sync_report_20260623_093259.json`
+  reported `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1813`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Runtime/test coverage:
+  `test_pg091_token_maker_family_runtime_support` and
+  `test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache` were added.
+  `py_compile`, `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` passed.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl`
+  prove the selected logical rule keys and token/draw runtime outputs.
+
+Post-PG091 auditor result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=18`, `medium=4`, `pass=72`.
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- Global: `high=34`, `medium=4`, `pass=167`.
+
+Remaining queue:
+
+- Continue deck `607` high battle-critical cards first:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
+  `Insurrection`, `Promise of Loyalty`, `Starfall Invocation`, and
+  `Winds of Abandon`.
+- Then proceed to high `battle_support`, high `support_or_passive`, and medium
+  rows in the normal queue order.
+- Treat user notes about specific cards as hints only. They do not override
+  Oracle text, PostgreSQL state, or runtime evidence.
+- PG092 is the next PostgreSQL package number.
+
+## PG092 Start Queue Snapshot - 2026-06-23 09:54 UTC
+
+Status: `read_only_start_snapshot`.
+
+- This is not a PostgreSQL deploy, not a deck swap, and not a battle
+  rebaseline.
+- PG -> SQLite/canonical refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_start_sync_report_20260623_101000.json`
+  reports `pg_rows_loaded=1829`, `sqlite_inserted_or_updated=1807`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Start audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg092_start_20260623_095405.json`
+  reports deck `6` `pass=100`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg092_start_20260623_095405.json`
+  reports deck `606` `pass=81`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg092_start_20260623_095405.json`
+  reports deck `607` `high=18`, `medium=4`, `pass=72`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg092_start_20260623_095405.json`
+  reports deck `608` `high=16`, `medium=3`, `pass=49`; and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg092_start_20260623_095405.json`
+  reports global `high=34`, `medium=4`, `pass=167`.
+- Current-state validation after this PG092 start refresh:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_start_test_battle_analyst_v10_3_20260623_101200.out`
+  passed the full battle analyst wrapper.
+- The next write package remains PG092 and should target remaining deck `607`
+  high battle-critical cards before support/passive rows.

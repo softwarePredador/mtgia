@@ -1,0 +1,9 @@
+  normalized_name   |                logical_rule_key                 | review_status | execution_status |           oracle_hash            |                        battle_model_scope
+--------------------+-------------------------------------------------+---------------+------------------+----------------------------------+------------------------------------------------------------------
+ furygale flocking  | battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5 | verified      | auto             | 8946b0e85c8430c6105ea70c7fb2724a | per_opponent_two_3_3_flying_hasty_elemental_tokens_v1
+ furygale flocking  | battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443 | deprecated    | disabled         |                                  |
+ prismari pianist   | battle_rule_v1:0288989021534a6f036968f62361f634 | verified      | auto             | 1594ae692e3095e544f3cd3430d43e86 | instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1
+ prismari pianist   | battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443 | deprecated    | disabled         |                                  |
+ tempt with bunnies | battle_rule_v1:64814289c1def19e7cd5bb7462c4cf86 | verified      | auto             | 201f6c7234bfef550f3d497e736f0d7a | tempting_offer_base_create_1_1_white_rabbit_component_v1
+ tempt with bunnies | battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80 | verified      | auto             | 201f6c7234bfef550f3d497e736f0d7a | tempting_offer_base_draw_one_component_v1
+(6 rows)
