@@ -3,12 +3,12 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG102, applied, postchecked, synced from PostgreSQL to Hermes
+this thread is PG105, applied, postchecked, synced from PostgreSQL to Hermes
 SQLite/canonical snapshot, tested, battle-gated, and documented on
-2026-06-23 13:24 UTC. PG102 promoted `Creative Technique` from stale generated
-`draw_cards` review-only shadows to an Oracle-backed executable demonstrate /
-top-nonland free-cast rule. This was not a deck swap, learned-deck promotion,
-or battle rebaseline.
+2026-06-23 13:49 UTC. PG103 promoted `Dawn's Truce` to an Oracle-backed
+`gift_hexproof_indestructible` executable protection rule. PG104/PG105 restored
+drifted Oracle hash/scope metadata for existing runtime-safe rules. This was
+not a deck swap, learned-deck promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -8856,7 +8856,119 @@ Post-PG102 deck audit counts:
 
 Next deploy number:
 
-- PG103 is next for any future PostgreSQL package.
+- PG103 was consumed by the Dawn's Truce package below. PG106 is next for any
+  future PostgreSQL package.
+
+## PG103-PG105 Dawn's Truce and Current Drift Restore - Applied 2026-06-23 13:49 UTC
+
+Status: `applied_validated_synced_battle_review_required_static_contract_only`.
+
+Scope:
+
+- PG103 promoted `Dawn's Truce` from two stale/generated protection shadows to
+  one curated verified executable rule.
+- PG104 restored drifted runtime metadata for the existing `Seething Song`
+  trusted rule after the full test suite exposed missing `mana_color_status`
+  and related provenance fields.
+- PG105 restored current Oracle hash/scope/status/effect metadata for the
+  12-row drift group from the prior PG094/PG096 family:
+  `Angel's Grace`, `Fellwar Stone`, `Library of Leng`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- No `deck_cards` mutation, no learned-deck promotion, and no deck swap.
+
+Promoted PG103 rule:
+
+- `logical_rule_key=battle_rule_v1:74537642d9a7fded7b0e5616b88703ef`
+- `oracle_hash=9cc2a1e412623ff79367f88b163c5216`
+- `effect=gift_hexproof_indestructible`
+- `battle_model_scope=gift_card_you_and_permanents_hexproof_gifted_indestructible_v1`
+- `review_status=verified`
+- `execution_status=auto`
+- `source=curated`
+
+PostgreSQL evidence:
+
+- PG103 precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg103_dawns_truce_gift_hexproof_indestructible_precheck_20260623_133226.out`
+  reported `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `new_rule_already_present_rows=0`, `review_or_disabled_shadow_rows=2`,
+  `rows_still_claiming_plain_indestructible=2`, and
+  `backup_table_already_exists=f`.
+- PG103 apply/postcheck:
+  `pg103_dawns_truce_gift_hexproof_indestructible_apply_20260623_133226.out`
+  reported backup `SELECT 2`, `deprecated_shadow_rows=2`,
+  `upserted_rows=1`, and `COMMIT`; the postcheck reported
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `promoted_expected_effect_rows=1`,
+  `active_shadow_rows=0`, and `backup_rows=2`.
+- PG104 apply/postcheck:
+  `pg104_seething_song_runtime_metadata_apply_20260623_133601.out`
+  reported backup `SELECT 1`, `patched_rows=1`, and `COMMIT`; the postcheck
+  restored hash, `mana_color_status`, `oracle_runtime_scope`, and PG058 family
+  metadata for `Seething Song`.
+- PG105 apply/postcheck:
+  `pg105_hash_scope_restore_current_drift_apply_20260623_133948.out`
+  reported backup `SELECT 12`, `updated_rows=12`, and `COMMIT`; the postcheck
+  reported `target_rule_rows=12`, `hash_restored_rows=12`,
+  `effect_json_restored_rows=12`, `status_restored_rows=12`, and
+  `backup_rows=12`.
+
+Rollback tables:
+
+- `manaloom_deploy_audit.pg103_dawns_truce_gift_hexproof_indestructible_20260623_133226`
+- `manaloom_deploy_audit.pg104_seething_song_runtime_metadata_20260623_133601`
+- `manaloom_deploy_audit.pg105_hash_scope_restore_current_drift_20260623_133948`
+
+Runtime/sync evidence:
+
+- Runtime now supports `gift_hexproof_indestructible` for `Dawn's Truce`:
+  choose gift recipient, let that opponent draw a card, grant the controller
+  hexproof, grant controlled permanents hexproof, and grant those permanents
+  indestructible when the gift is promised.
+- Sync reports:
+  `pg103_dawns_truce_gift_hexproof_indestructible_sync_report_20260623_133226.json`,
+  `pg104_seething_song_runtime_metadata_sync_report_20260623_133601.json`,
+  and `pg105_hash_scope_restore_current_drift_sync_report_20260623_133948.json`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg103_dawns_truce_focused_replay_20260623_133226.json`
+  records starting hands and battlefield, shows the gift recipient drawing one
+  card, the active player gaining hexproof, three permanents gaining
+  hexproof/indestructible, and cleanup removing the temporary flags.
+
+Tests and battle gate:
+
+- Final tests after PG105 all passed:
+  `pg105_postfix_battle_analyst_v10_3_test_20260623_133948.out`,
+  `pg105_postfix_py_compile_20260623_133948.out`,
+  `pg105_postfix_test_battle_forensic_audit_supported_effects_20260623_133948.out`,
+  `pg105_postfix_event_contract_static_test_20260623_133948.out`,
+  `pg105_postfix_test_sync_battle_card_rules_pg_selection_20260623_133948.out`,
+  `pg105_postfix_test_deck_card_battle_rule_coherence_audit_20260623_133948.out`,
+  and `pg105_postfix_test_reviewed_battle_card_rules_20260623_133948.out`.
+- 16-seed battle gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_134312/summary.json`
+  ran with `run_profile=pg105_dawns_truce_drift_restore_16_seed`,
+  `invocation_kind=manual_codex_pg105`, `start_seed=63241232`,
+  `seeds_completed=16`, and wrapper tests `{"pass":18}`.
+- Action, forensic, replay-decision, target-pressure, and table-intent gates
+  passed with zero blockers. Final status remains `review_required` only
+  because `event_contract_static=review_required` is still a mandatory static
+  fixture backlog.
+
+Post-PG105 deck audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=11`, `medium=4`, `pass=79`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=25`, `medium=4`, `pass=176`.
+- `Dawn's Truce` is now `pass` for deck `607` with one trusted executable
+  rule.
+
+Next deploy number:
+
+- PG106 is next for any future PostgreSQL package.
 
 ## PG099 Avatar's Wrath Airbend Runtime Rule - Applied 2026-06-23 12:37 UTC
 

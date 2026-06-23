@@ -56,6 +56,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "treasure_maker": "ramp",
     "silence_opponents": "protection",
     "silence_spell": "protection",
+    "gift_hexproof_indestructible": "protection",
     "indestructible": "protection",
     "phase_out": "protection",
     "phase_creatures": "protection",

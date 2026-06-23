@@ -152,6 +152,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "equipment_static_attachment",
     "exile_top_nonland_free_cast",
     "finisher",
+    "gift_hexproof_indestructible",
     "graveyard_flashback_grant",
     "land_tax",
     "overload_recursion",
@@ -167,6 +168,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
 }
 RESPONSE_WINDOW_ONLY_EFFECTS = {
     "cannot_lose_turn",
+    "gift_hexproof_indestructible",
     "indestructible",
     "modal_boros_charm",
     "phase_out",
@@ -2799,6 +2801,28 @@ def normalize_effect_by_oracle(card, effect_data):
         return normalized
 
     if (
+        "gift a card" in text
+        and "you and permanents you control gain hexproof until end of turn" in text
+        and "permanents you control also gain indestructible until end of turn" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "gift_hexproof_indestructible"
+        normalized["instant"] = True
+        normalized["gift"] = "card"
+        normalized["gift_default_promised"] = True
+        normalized["gift_card_draw"] = True
+        normalized["gift_choice_model"] = "lowest_visible_threat_opponent"
+        normalized["grants_player_hexproof"] = True
+        normalized["grants_permanents_hexproof"] = True
+        normalized["gift_grants_permanents_indestructible"] = True
+        normalized["target_scope"] = "you_and_permanents_you_control"
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1"
+        )
+        return normalized
+
+    if (
         normalized_name == "ephemerate"
         and "exile target creature you control" in text
         and "return it to the battlefield" in text
@@ -3912,6 +3936,8 @@ class Player:
         self.max_lands_per_turn = 1
         self.is_human = is_human
         self.strategy = strategy
+        self.hexproof = False
+        self.hexproof_source = None
         self.indestructible = False
         self.life_cant_change = False
         self.life_cant_change_source = None
@@ -6110,7 +6136,7 @@ def should_hold_for_response_window(player, card, effect_data, phase):
 
 
 SURVIVAL_RESPONSE_RESERVE_LIFE_TOTAL = 15
-SURVIVAL_RESPONSE_EFFECTS = {"phase_out", "cannot_lose_turn"}
+SURVIVAL_RESPONSE_EFFECTS = {"phase_out", "cannot_lose_turn", "gift_hexproof_indestructible"}
 PROACTIVE_COMBAT_DEFENSE_EFFECTS = {"attack_limit", "attack_tax", "equipment_static_attachment"}
 SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "phase_out",
@@ -6869,9 +6895,20 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         cannot_lose_context = cannot_lose_turn_stack_response_context(player, top_item)
                         if cannot_lose_context is None:
                             continue
-                    elif protection_effect not in ("phase_out", "indestructible", "modal_boros_charm"):
+                    elif protection_effect not in (
+                        "phase_out",
+                        "gift_hexproof_indestructible",
+                        "indestructible",
+                        "modal_boros_charm",
+                    ):
                         continue
-                    if protection_effect in ("phase_out", "indestructible", "modal_boros_charm", "cannot_lose_turn"):
+                    if protection_effect in (
+                        "phase_out",
+                        "gift_hexproof_indestructible",
+                        "indestructible",
+                        "modal_boros_charm",
+                        "cannot_lose_turn",
+                    ):
                         if can_pay_card_for_effect(player, c, eff):
                             alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
                             locked_cost = card_cost_for_effect(player, c, eff)
@@ -7318,6 +7355,8 @@ def clear_until_eot(player):
                     card[key] = original
             card.pop("_landfall_triggers_this_turn", None)
     player.indestructible = False
+    player.hexproof = False
+    player.hexproof_source = None
     player.silenced_opponents_until_eot = False
     player.creatures_cant_attack_this_turn = False
     player.creatures_cant_attack_source = None
@@ -8254,6 +8293,10 @@ def choose_demonstrate_opponent(player, opponents):
             getattr(opponent, "name", ""),
         ),
     )
+
+
+def choose_gift_opponent(player, opponents):
+    return choose_demonstrate_opponent(player, opponents)
 
 
 def reveal_top_nonland_for_free_cast(player, rng, source_card, turn, effect_data):
@@ -18168,6 +18211,54 @@ def apply_effect_immediate(
             **replay_rule_fields(effect_data),
         )
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "gift_hexproof_indestructible":
+        gift_recipient = (
+            choose_gift_opponent(player, opponents)
+            if effect_data.get("gift_default_promised", True)
+            else None
+        )
+        gift_promised = gift_recipient is not None
+        gifted_cards = gift_recipient.draw(1, rng) if gift_promised else []
+        hexproof_permanents = grant_permanents_until_eot(player, keywords=("hexproof",))
+        indestructible_permanents = []
+        player.hexproof = True
+        player.hexproof_source = card
+        if gift_promised:
+            indestructible_permanents = grant_permanents_until_eot(
+                player,
+                keywords=("indestructible",),
+            )
+            player.indestructible = True
+        grants = ["hexproof"]
+        if gift_promised:
+            grants.append("indestructible")
+        affected_names = [
+            permanent.get("name", "?")
+            for permanent in hexproof_permanents
+            if isinstance(permanent, dict)
+        ]
+        emit_replay_event(
+            "protection_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            grants=grants,
+            target_scope=effect_data.get("target_scope") or "you_and_permanents_you_control",
+            player_hexproof=True,
+            gift_promised=gift_promised,
+            gift_recipient=getattr(gift_recipient, "name", None),
+            gift_cards_drawn=len(gifted_cards),
+            gift_drawn_cards=[
+                gifted.get("name", "?")
+                for gifted in gifted_cards
+                if isinstance(gifted, dict)
+            ],
+            affected_permanents=affected_names[:20],
+            affected_count=len(affected_names),
+            indestructible_affected_count=len(indestructible_permanents),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "protect_creature":
         targets = [creature for creature in player.battlefield if is_battlefield_creature(creature)]
         if targets:

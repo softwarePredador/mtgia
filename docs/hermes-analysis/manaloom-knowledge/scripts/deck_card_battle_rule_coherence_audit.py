@@ -42,6 +42,7 @@ HIGH_RISK_GENERIC_EFFECTS = {
     "draw_engine",
     "extra_turn",
     "finisher",
+    "gift_hexproof_indestructible",
     "graveyard_flashback_grant",
     "indestructible",
     "phase_out",

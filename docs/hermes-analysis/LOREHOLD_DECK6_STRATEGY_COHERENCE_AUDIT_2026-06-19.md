@@ -21863,3 +21863,65 @@ Next validation focus:
   `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
   `Promise of Loyalty`, and `Starfall Invocation`.
   `Pearl Medallion` remains the next high `battle_support` card after those.
+
+## PG103-PG105 Dawn's Truce Validation - 2026-06-23 13:49 UTC
+
+Status: `deck607_queue_reduced_battle_gate_review_required_static_contract_only`.
+
+What changed:
+
+- `Dawn's Truce` was validated against current Oracle text and promoted from
+  stale generated protection shadows to:
+  `battle_rule_v1:74537642d9a7fded7b0e5616b88703ef`,
+  `oracle_hash=9cc2a1e412623ff79367f88b163c5216`,
+  `effect=gift_hexproof_indestructible`, and
+  `battle_model_scope=gift_card_you_and_permanents_hexproof_gifted_indestructible_v1`.
+- Runtime now models gift-recipient card draw, controller hexproof, permanent
+  hexproof, gifted permanent indestructible, and end-of-turn cleanup.
+- PG104/PG105 restored drifted provenance/runtime metadata for already trusted
+  rules so the local Hermes view stays aligned with PostgreSQL.
+
+Evidence:
+
+- PostgreSQL postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/pg103_dawns_truce_gift_hexproof_indestructible_postcheck_20260623_133226.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg104_seething_song_runtime_metadata_postcheck_20260623_133601.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg105_hash_scope_restore_current_drift_postcheck_20260623_133948.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg105_hash_scope_restore_current_drift_sync_report_20260623_133948.json`.
+- Focused Dawn's Truce replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg103_dawns_truce_focused_replay_20260623_133226.json`.
+- Full suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg105_postfix_battle_analyst_v10_3_test_20260623_133948.out`.
+- Fresh 16-seed battle artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_134312/summary.json`.
+
+Current audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=11`, `medium=4`, `pass=79`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=25`, `medium=4`, `pass=176`.
+- `Dawn's Truce` is closed for the current deck `607` gate.
+
+Current deck `607` high queue:
+
+- `Everything Comes to Dust`
+- `Fated Clash`
+- `Promise of Loyalty`
+- `Starfall Invocation`
+- `Pearl Medallion`
+- `Emeria's Call // Emeria, Shattered Skyclave`
+- `Molecule Man`
+- `The Mind Stone`
+- `The Scarlet Witch`
+- `Thor, God of Thunder`
+- `Tragic Arrogance`
+
+Next validation focus:
+
+- Continue deck `607` high `battle_critical` first:
+  `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
+  `Starfall Invocation`. `Pearl Medallion` remains the next high
+  `battle_support` card after those.

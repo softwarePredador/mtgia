@@ -6519,16 +6519,24 @@
     "battle_rule_logical_key": "battle_rule_v1:93c180ba34c0c9f4cfbbe9f42ba9168a"
   },
   "Dawn's Truce": {
-    "cmc": 2.0,
-    "duration": 1,
-    "effect": "indestructible",
+    "battle_model_scope": "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1",
+    "effect": "gift_hexproof_indestructible",
+    "gift": "card",
+    "gift_card_draw": true,
+    "gift_choice_model": "lowest_visible_threat_opponent",
+    "gift_default_promised": true,
+    "gift_grants_permanents_indestructible": true,
+    "grants_permanents_hexproof": true,
+    "grants_player_hexproof": true,
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9977234fa8a11ea05ac1292509983e30"
+    "target_scope": "you_and_permanents_you_control",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.98,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:74537642d9a7fded7b0e5616b88703ef",
+    "battle_rule_oracle_hash": "9cc2a1e412623ff79367f88b163c5216"
   },
   "Dawnbringer Cleric": {
     "effect": "creature",

@@ -18016,3 +18016,55 @@ Battle gate interpretation:
   `etb_recursion_resolved`, `etb_removal_resolved`,
   `etb_removal_skipped`, `powerbalance_trigger_resolved`,
   `steal_all_creatures_resolved`, and `tokens_created`.
+
+## PG103-PG105 Battle Validation - Dawn's Truce and Drift Restore
+
+Status: `validated_runtime_and_16_seed_gate_review_required_static_contract_only`.
+
+Runtime changes validated:
+
+- Added executable `gift_hexproof_indestructible` support for `Dawn's Truce`.
+- Added gift-recipient selection, opponent card draw, player hexproof,
+  permanent hexproof, gifted permanent indestructible, and cleanup behavior.
+- Added replay event coverage for `protection_resolved` with gift/protection
+  provenance fields.
+- Restored drifted PostgreSQL metadata for `Seething Song` and the current
+  12-row PG094/PG096 hash/scope group before final testing.
+
+PostgreSQL/source-of-truth changes:
+
+- PG103 promoted `Dawn's Truce`:
+  `battle_rule_v1:74537642d9a7fded7b0e5616b88703ef`,
+  `oracle_hash=9cc2a1e412623ff79367f88b163c5216`,
+  `effect=gift_hexproof_indestructible`,
+  `review_status=verified`, `execution_status=auto`.
+- PG104 patched one trusted `Seething Song` row.
+- PG105 patched 12 drifted trusted rows and re-synced PostgreSQL to Hermes
+  SQLite/canonical snapshot.
+
+Evidence:
+
+- PostgreSQL postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/pg103_dawns_truce_gift_hexproof_indestructible_postcheck_20260623_133226.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg104_seething_song_runtime_metadata_postcheck_20260623_133601.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg105_hash_scope_restore_current_drift_postcheck_20260623_133948.out`.
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg105_hash_scope_restore_current_drift_sync_report_20260623_133948.json`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg103_dawns_truce_focused_replay_20260623_133226.json`.
+- Full test output:
+  `docs/hermes-analysis/master_optimizer_reports/pg105_postfix_battle_analyst_v10_3_test_20260623_133948.out`.
+- 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_134312/summary.json`.
+
+Battle gate interpretation:
+
+- `seeds_completed=16`.
+- Wrapper tests: `{"pass":18}`.
+- Action, forensic, replay-decision, target-pressure, and table-intent gates
+  pass with zero blockers/findings.
+- `target_wins=0` and `opponent_wins=16` in this adversarial sampled gate.
+- Final status remains `review_required` only from
+  `event_contract_static=review_required`; this is the same static fixture
+  backlog category, not a new Dawn's Truce runtime blocker.

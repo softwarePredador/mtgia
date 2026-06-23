@@ -1297,3 +1297,34 @@ Next package number is PG086. Next queue should prioritize remaining deck
   Next deck `607` battle-critical cards are `Dawn's Truce`,
   `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
   `Starfall Invocation`.
+
+## ManaLoom PG103-PG105 Dawn's Truce and drift restore - 2026-06-23 13:49 UTC
+
+- PG103 promoted `Dawn's Truce` to a verified executable protection rule:
+  `battle_rule_v1:74537642d9a7fded7b0e5616b88703ef`,
+  `oracle_hash=9cc2a1e412623ff79367f88b163c5216`,
+  `effect=gift_hexproof_indestructible`, scope
+  `gift_card_you_and_permanents_hexproof_gifted_indestructible_v1`.
+- Runtime now models the actual gift sequence: chosen opponent draws a card,
+  the controller gains hexproof, controlled permanents gain hexproof, and those
+  permanents gain indestructible when the gift was promised; cleanup removes
+  the temporary flags.
+- PG104 restored the existing `Seething Song` runtime metadata after the full
+  suite exposed drifted provenance fields. PG105 restored current hash,
+  effect/status, and runtime-scope metadata for the 12-row PG094/PG096 drift
+  group.
+- Final evidence:
+  `pg103_dawns_truce_gift_hexproof_indestructible_postcheck_20260623_133226.out`,
+  `pg104_seething_song_runtime_metadata_postcheck_20260623_133601.out`,
+  `pg105_hash_scope_restore_current_drift_postcheck_20260623_133948.out`,
+  `pg105_hash_scope_restore_current_drift_sync_report_20260623_133948.json`,
+  `pg103_dawns_truce_focused_replay_20260623_133226.json`, and
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_134312/summary.json`.
+- Tests passed after PG105: full `test_battle_analyst_v10_3.py`, py_compile,
+  forensic supported effects, static event contract test, PG sync selection,
+  deck-card coherence audit tests, and reviewed battle card rules.
+- Current card-rule queue after PG105: deck `6` `pass=100`, deck `607`
+  `high=11`, `medium=4`, `pass=79`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, global `high=25`, `medium=4`, `pass=176`.
+  Next deck `607` battle-critical cards are `Everything Comes to Dust`,
+  `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.

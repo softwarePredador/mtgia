@@ -4382,3 +4382,36 @@ Decision:
   `high=15`, `medium=4`, `pass=75`, deck `608` `high=14`, `medium=3`,
   `pass=51`, and global `high=29`, `medium=4`, `pass=172`.
 - It does not change the latest recurring battle status.
+
+## PG105 Manual Battle Gate - Dawn's Truce and Drift Restore
+
+Fresh manual battle gate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_134312/summary.json`.
+- `timestamp_utc=2026-06-23T13:43:12Z`.
+- `run_profile=pg105_dawns_truce_drift_restore_16_seed`.
+- `invocation_kind=manual_codex_pg105`.
+- `seeds_requested=16`, `start_seed=63241232`, `seeds_completed=16`.
+- `test_results_status_counts={"pass":18}` and `test_result_failures=[]`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Gate interpretation:
+
+- Action, forensic, replay-decision, table-intent, and target-pressure gates
+  passed with zero blockers.
+- `table_intent_statuses={"pass":16}` and
+  `target_pressure_statuses={"pass":16}`.
+- `target_wins=0`, `opponent_wins=16`; this run confirms the sampled
+  adversarial table still beats the target deck after PG103-PG105.
+- The remaining `review_required` state is the static event-contract fixture
+  backlog, not an observed Dawn's Truce runtime failure.
+
+Decision:
+
+- PG103-PG105 is accepted as a card-rule/source-of-truth correction and drift
+  restore package.
+- It reduces deck `607` card-rule queue to `high=11`, `medium=4`, `pass=79`.
+- Continue deck `607` high `battle_critical` cards before using the battle
+  win-rate as deck-quality evidence.

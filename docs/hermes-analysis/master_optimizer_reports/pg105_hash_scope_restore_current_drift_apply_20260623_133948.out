@@ -1,0 +1,11 @@
+Pager usage is off.
+BEGIN
+CREATE SCHEMA
+DO
+SELECT 12
+ updated_rows
+--------------
+           12
+(1 row)
+
+COMMIT

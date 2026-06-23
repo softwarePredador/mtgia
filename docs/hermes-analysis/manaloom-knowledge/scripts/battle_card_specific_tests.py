@@ -1510,6 +1510,109 @@ def register_tests(battle, player):
         assert "double_strike" not in small
         assert "double_strike" not in large
 
+    def test_dawns_truce_oracle_normalizes_to_gift_hexproof_indestructible():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Dawn's Truce",
+                "cmc": 2,
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Gift a card (You may promise an opponent a gift as you cast this spell. "
+                    "If you do, they draw a card before its other effects.)\n"
+                    "You and permanents you control gain hexproof until end of turn. "
+                    "If the gift was promised, permanents you control also gain "
+                    "indestructible until end of turn."
+                ),
+            },
+            {"effect": "indestructible"},
+        )
+
+        assert effect_data["effect"] == "gift_hexproof_indestructible"
+        assert effect_data["gift_default_promised"] is True
+        assert effect_data["gift_card_draw"] is True
+        assert effect_data["grants_player_hexproof"] is True
+        assert effect_data["grants_permanents_hexproof"] is True
+        assert effect_data["gift_grants_permanents_indestructible"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1"
+        )
+
+    def test_dawns_truce_gifts_card_and_grants_hexproof_indestructible_until_cleanup():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            opponent.library = [
+                {"name": "Gift Draw", "type_line": "Sorcery", "effect": "draw_cards"}
+            ]
+            creature = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 3,
+                "toughness": 3,
+            }
+            artifact = {
+                "name": "Protected Artifact",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "cmc": 2,
+            }
+            land = {
+                "name": "Protected Land",
+                "effect": "land",
+                "type_line": "Land",
+            }
+            active.battlefield = [creature, artifact, land]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Dawn's Truce", "cmc": 2, "type_line": "Instant"},
+                turn=4,
+                rng=random.Random(617),
+                effect_data_override={
+                    "effect": "gift_hexproof_indestructible",
+                    "instant": True,
+                    "gift": "card",
+                    "gift_default_promised": True,
+                    "gift_card_draw": True,
+                    "target_scope": "you_and_permanents_you_control",
+                    "battle_model_scope": (
+                        "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:dawns-truce-test",
+                    "_rule_oracle_hash": "dawns-truce-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opponent.hand[0]["name"] == "Gift Draw"
+        assert active.hexproof is True
+        for permanent in (creature, artifact, land):
+            assert permanent["hexproof"] is True
+            assert permanent["indestructible"] is True
+        event = next(data for event, data in events if event == "protection_resolved")
+        assert event["card"] == "Dawn's Truce"
+        assert event["grants"] == ["hexproof", "indestructible"]
+        assert event["gift_promised"] is True
+        assert event["gift_recipient"] == "Opponent"
+        assert event["gift_cards_drawn"] == 1
+        assert event["player_hexproof"] is True
+        assert event["affected_count"] == 3
+        assert event["indestructible_affected_count"] == 3
+        assert event["rule_logical_key"] == "battle_rule_v1:dawns-truce-test"
+
+        battle.clear_until_eot(active)
+        assert active.hexproof is False
+        for permanent in (creature, artifact, land):
+            assert "hexproof" not in permanent
+            assert "indestructible" not in permanent
+
     def test_austere_command_resolves_two_destroy_modes():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -8759,6 +8862,8 @@ def register_tests(battle, player):
         test_boros_charm_protects_creatures_until_cleanup,
         test_boros_charm_grants_indestructible_to_all_permanents_until_cleanup,
         test_boros_charm_double_strike_targets_one_creature_until_cleanup,
+        test_dawns_truce_oracle_normalizes_to_gift_hexproof_indestructible,
+        test_dawns_truce_gifts_card_and_grants_hexproof_indestructible_until_cleanup,
         test_austere_command_resolves_two_destroy_modes,
         test_blasphemous_act_deals_13_damage_to_each_creature,
         test_pg098_call_forth_tempest_uses_dynamic_opponent_creature_damage,
