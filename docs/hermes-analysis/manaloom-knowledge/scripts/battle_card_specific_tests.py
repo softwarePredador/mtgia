@@ -1609,6 +1609,73 @@ def register_tests(battle, player):
             assert rule["_rule_oracle_hash"] == oracle_hash
             assert rule["_rule_execution_status"] == "auto"
 
+    def test_pg058_simple_red_ritual_family_rule_provenance():
+        cases = [
+            (
+                {"name": "Rite of Flame", "cmc": 1, "type_line": "Sorcery"},
+                "rite_of_flame_singleton_baseline_red_ritual_v1",
+                "battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518",
+                "35a034ee45b092bc443cd5992d8793f4",
+                2,
+            ),
+            (
+                {"name": "Seething Song", "cmc": 3, "type_line": "Instant"},
+                "single_shot_red_ritual_v1",
+                "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
+                "ccd492289c6f1c14c8fb7a248d7bbf32",
+                5,
+            ),
+        ]
+
+        for card, scope, logical_key, oracle_hash, mana_produced in cases:
+            rule = battle.get_card_effect(card)
+            assert rule["effect"] == "ramp_ritual"
+            assert rule["battle_model_scope"] == scope
+            assert rule["produces"] == "R"
+            assert rule["mana_produced"] == mana_produced
+            assert rule["mana_color_status"] == "abstracted_to_generic_pool_runtime"
+            assert rule["_rule_logical_key"] == logical_key
+            assert rule["_rule_oracle_hash"] == oracle_hash
+            assert rule["_rule_execution_status"] == "auto"
+
+        rite = battle.get_card_effect(
+            {"name": "Rite of Flame", "cmc": 1, "type_line": "Sorcery"}
+        )
+        assert rite["sorcery"] is True
+        assert rite["singleton_commander_baseline"] is True
+        assert rite["graveyard_named_copy_scaling_status"] == "annotation_only"
+
+    def test_pg058_simple_red_ritual_family_runtime_adds_one_shot_mana():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Ritualist")
+
+        try:
+            rite = {"name": "Rite of Flame", "cmc": 1, "type_line": "Sorcery"}
+            seething = {"name": "Seething Song", "cmc": 3, "type_line": "Instant"}
+            battle.apply_effect_immediate(active, [], rite, 3, random.Random(58))
+            assert active.mana_pool.generic == 2
+            battle.apply_effect_immediate(active, [], seething, 3, random.Random(59))
+            assert active.mana_pool.generic == 7
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        graveyard_names = [card.get("name") for card in active.graveyard if isinstance(card, dict)]
+        assert graveyard_names == ["Rite of Flame", "Seething Song"]
+        resolved_by_card = {
+            data.get("card"): data
+            for event, data in events
+            if event == "spell_resolved"
+        }
+        assert (
+            resolved_by_card["Rite of Flame"]["rule_logical_key"]
+            == "battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518"
+        )
+        assert (
+            resolved_by_card["Seething Song"]["rule_logical_key"]
+            == "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7"
+        )
+
     def test_samis_curiosity_creates_lander_token_not_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -5127,6 +5194,8 @@ def register_tests(battle, player):
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_pg054_silence_lock_family_rule_provenance,
         test_pg055_artifact_mana_rock_family_rule_provenance,
+        test_pg058_simple_red_ritual_family_rule_provenance,
+        test_pg058_simple_red_ritual_family_runtime_adds_one_shot_mana,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
         test_snapback_return_target_creature_stays_creature_removal,

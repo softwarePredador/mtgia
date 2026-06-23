@@ -22865,14 +22865,23 @@
     "battle_rule_logical_key": "battle_rule_v1:332b66f2b05dab9cff48bfe602d740ae"
   },
   "Rite of Flame": {
+    "battle_model_scope": "rite_of_flame_singleton_baseline_red_ritual_v1",
     "effect": "ramp_ritual",
+    "graveyard_named_copy_scaling_status": "annotation_only",
+    "mana_color_status": "abstracted_to_generic_pool_runtime",
     "mana_produced": 2,
+    "oracle_runtime_scope": "single_shot_red_ritual_runtime_graveyard_copy_scaling_annotation_only",
+    "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
+    "produces": "R",
+    "singleton_commander_baseline": true,
+    "sorcery": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518"
+    "battle_rule_logical_key": "battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518",
+    "battle_rule_oracle_hash": "35a034ee45b092bc443cd5992d8793f4"
   },
   "Rite of Replication": {
     "cmc": 4.0,
@@ -24307,14 +24316,18 @@
     "cmc": 3.0,
     "effect": "ramp_ritual",
     "instant": true,
+    "mana_color_status": "abstracted_to_generic_pool_runtime",
     "mana_produced": 5,
+    "oracle_runtime_scope": "single_shot_red_ritual_runtime_generic_pool_color_annotation",
+    "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
     "produces": "R",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7"
+    "battle_rule_logical_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
+    "battle_rule_oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32"
   },
   "Seize the Day": {
     "cmc": 4.0,

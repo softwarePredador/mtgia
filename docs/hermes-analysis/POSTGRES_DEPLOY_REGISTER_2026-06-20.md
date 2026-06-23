@@ -5080,6 +5080,8 @@ Postcheck evidence:
 - `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
 - `disabled_or_deprecated_rows=3`.
 - `backup_rows=5`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
 
 Post-apply sync/audit:
 
@@ -5319,3 +5321,73 @@ Rollback:
 - `deck608_dragons_approach_thrumming_pg056_rollback_20260623_015223.sql`
   deletes the current target rows and restores the 4 pre-PG056 rows from
   `manaloom_deploy_audit.pg056_deck608_dragons_approach_thrumming_20260623_015223`.
+
+## PG058 Deck 6 L3B Simple Red Ritual Batch - Applied 2026-06-23 02:08 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable runtime/provenance update for `Rite of Flame` and `Seething Song` in
+  official Lorehold deck `6`.
+- PostgreSQL already matched the PG058 post-apply state when the central
+  auditor found the SQL artifacts after commit `955f4d25`; the apply SQL was
+  not re-run in this reconciliation step.
+- PostgreSQL is the source of truth; Hermes SQLite was full-refreshed after
+  scoped sync evidence was captured.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_precheck_20260623_020031.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_postcheck_20260623_020031.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_rollback_20260623_020031.sql`.
+
+Target cards:
+
+- `Rite of Flame`.
+- `Seething Song`.
+
+Postcheck evidence:
+
+- `deck_target_cards=2`.
+- `target_rule_rows=5`.
+- `target_runtime_rows=2`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `trusted_without_scope_rows=0`.
+- `target_runtime_rows_without_produces=0`.
+- `target_runtime_rows_bad_mana_produced=0`.
+- `target_runtime_rows_bad_scope=0`.
+- `generated_review_only_rows=0`.
+- `active_curated_shadow_rows=0`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `disabled_or_deprecated_rows=3`.
+- `backup_rows=5`.
+
+Post-apply sync/audit:
+
+- Scoped SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
+- Full SQLite-from-PG refresh:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
+- Deck 6 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_021017.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck 606 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_021017.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+
+Rollback:
+
+- `deck6_l3b_simple_red_rituals_pg058_rollback_20260623_020031.sql`
+  deletes current rows for the two target names and restores the 5 pre-PG058
+  rows from
+  `manaloom_deploy_audit.pg058_deck6_l3b_simple_red_rituals_20260623_020031`.

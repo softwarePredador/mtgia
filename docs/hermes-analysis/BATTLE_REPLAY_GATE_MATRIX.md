@@ -2779,3 +2779,41 @@ Caveats:
 - This gate proves the focused runtime paths needed by the deck `608` Dragon's
   Approach package. It does not claim full Magic-equivalent stack, search,
   replacement, or shuffle behavior.
+
+## PG058 Deck 6 L3B Simple Red Ritual Focused Event Gate - 2026-06-23 02:08 UTC
+
+Artifacts:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_postcheck_20260623_020031.out`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
+- Full SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
+
+Gate:
+
+- `Rite of Flame` resolves with
+  `rule_logical_key=battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518`,
+  `rule_oracle_hash=35a034ee45b092bc443cd5992d8793f4`, and adds `2` mana in
+  the current singleton-baseline runtime.
+- `Seething Song` resolves with
+  `rule_logical_key=battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`,
+  `rule_oracle_hash=ccd492289c6f1c14c8fb7a248d7bbf32`, and adds `5` mana.
+- Both spells resolve to graveyard and keep
+  `mana_color_status=abstracted_to_generic_pool_runtime`.
+
+Status:
+
+- `Rite of Flame` and `Seething Song` are closed for the current deck `6`
+  battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_021017.json`
+  reports deck `6` at `high=30`, `medium=8`, `pass=62`.
+
+Caveats:
+
+- This gate proves the current one-shot ritual abstraction. It does not model
+  Rite of Flame named-copy graveyard scaling across all graveyards.

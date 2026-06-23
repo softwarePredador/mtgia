@@ -2284,3 +2284,61 @@ Remaining risk:
   `Cool but Rude`, `Enlightened Tutor`, `Goblin Engineer`,
   `Idyllic Tutor`, `Imperial Recruiter`, `Magmakin Artillerist`,
   `Pyromancer Ascension`, and `Naktamun Lorespinner // Wheel of Fortune`.
+
+## PG058 Deck 6 L3B Simple Red Ritual Batch - Closed 2026-06-23 02:08 UTC
+
+Status:
+
+- Closed `Rite of Flame` and `Seething Song` for the official deck `6`
+  battle-rule coherence gate.
+- PostgreSQL already matched the PG058 post-apply state when the central
+  auditor found the untracked SQL artifacts after commit `955f4d25`; the apply
+  SQL was not re-run by the central auditor.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Validation:
+
+- Current-state precheck showed `deck_target_cards=2`, `target_rule_rows=5`,
+  `target_runtime_rows=2`, `generated_review_only_rows=0`,
+  `curated_shadow_rows_to_disable=0`, `trusted_missing_hash_rows=0`,
+  `trusted_without_scope_rows=0`, and no active card-id mismatches.
+- PG postcheck:
+  `target_runtime_rows=2`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
+  `target_runtime_rows_without_produces=0`,
+  `target_runtime_rows_bad_mana_produced=0`,
+  `target_runtime_rows_bad_scope=0`, `generated_review_only_rows=0`,
+  `active_curated_shadow_rows=0`, `disabled_or_deprecated_rows=3`, and
+  `backup_rows=5`.
+- Apply output captured before central-auditor reconciliation:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
+- Scoped SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
+- Full SQLite-from-PG refresh after scoped sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
+- Test added:
+  `test_pg058_simple_red_ritual_family_rule_provenance`.
+
+Auditor result:
+
+- Deck 6 moved from `high=32`, `medium=8`, `pass=60` to `high=30`,
+  `medium=8`, `pass=62`.
+- Deck 606 stayed at `high=38`, `medium=8`, `pass=35`.
+- Global deck-card audit across the current Hermes deck corpus:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_021017.json`
+  reports `high=116`, `medium=23`, `pass=66`.
+- `Rite of Flame` is now `pass` with logical key
+  `battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518`.
+- `Seething Song` is now `pass` with logical key
+  `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`.
+
+Remaining risk:
+
+- `Rite of Flame` named-copy scaling across all graveyards is recorded as
+  `annotation_only`; the current runtime uses the singleton Commander baseline
+  of `mana_produced=2`.
+- Ritual color is annotated as red with `produces=R`, while the executor still
+  adds to the generic mana pool through
+  `mana_color_status=abstracted_to_generic_pool_runtime`.

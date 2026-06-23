@@ -15468,3 +15468,54 @@ Caveats:
 - The Dragon tutor picks a Dragon creature from library into battlefield using
   the current simulator abstraction. Search/shuffle and all replacement effects
   remain outside this focused gate.
+
+## PG058 Deck 6 L3B Simple Red Ritual Batch - Closed 2026-06-23 02:08 UTC
+
+Status:
+
+- Closed `Rite of Flame` and `Seething Song` for deck `6`.
+- PostgreSQL already matched the PG058 post-apply state when the central
+  auditor found the SQL artifacts after commit `955f4d25`; apply was not re-run
+  in this reconciliation step.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- Current-state precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_precheck_20260623_020031.out`.
+- PG postcheck:
+  `target_runtime_rows=2`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
+  `target_runtime_rows_without_produces=0`,
+  `target_runtime_rows_bad_mana_produced=0`,
+  `target_runtime_rows_bad_scope=0`, `generated_review_only_rows=0`,
+  `active_curated_shadow_rows=0`, `disabled_or_deprecated_rows=3`, and
+  `backup_rows=5`.
+- Apply output captured before central-auditor reconciliation:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
+- Scoped SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_deck6_l3b_simple_red_rituals_20260623_020031.json`.
+- Full SQLite-from-PG refresh:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_021017.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+
+Gate result:
+
+- Deck 6 moved from `high=32`, `medium=8`, `pass=60` to `high=30`,
+  `medium=8`, `pass=62`.
+- Deck 606 stayed at `high=38`, `medium=8`, `pass=35`.
+- Global deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_021017.json`
+  reports `high=116`, `medium=23`, `pass=66`.
+- `Rite of Flame` and `Seething Song` are both `pass` in the current deck `6`
+  coherence audit.
+
+Caveats:
+
+- `Rite of Flame` graveyard named-copy scaling remains annotation-only.
+- Red color production is provenance metadata; the current executor adds ritual
+  mana into the generic pool abstraction.

@@ -19825,3 +19825,42 @@ Next deck 608 queue:
   `Magmakin Artillerist`, `Pyromancer Ascension`,
   `Razorgrass Ambush // Razorgrass Field`, and
   `Naktamun Lorespinner // Wheel of Fortune`.
+
+## Deck 6 L3B Simple Red Ritual PG058 Closure - 2026-06-23 02:08 UTC
+
+What changed:
+
+- Reconciled and validated `PG058 Deck 6 L3B Simple Red Ritual Package` for
+  `Rite of Flame` and `Seething Song`.
+- PostgreSQL was already in the PG058 post-apply state when the central auditor
+  found the untracked SQL artifacts; no duplicate apply command was executed.
+- Added focused runtime/provenance coverage for the two ritual rules.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_postcheck_20260623_020031.out`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_apply_20260623_020031.out`.
+- Full SQLite-from-PG refresh:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg058_full_refresh_20260623_020814.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_pg058_focused_events_20260623_020031.jsonl`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_021017.json`.
+- Deck 6 result changed from `high=32`, `medium=8`, `pass=60` to
+  `high=30`, `medium=8`, `pass=62`.
+
+Card-level result:
+
+- `Rite of Flame`: `pass`, one trusted executable rule, logical key
+  `battle_rule_v1:b66dd96fa32c9822c798f16a83fa5518`.
+- `Seething Song`: `pass`, one trusted executable rule, logical key
+  `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`.
+
+Remaining caveat:
+
+- `Rite of Flame` graveyard named-copy scaling and exact red pool handling are
+  not full Magic-equivalent runtime models yet; both limitations are explicitly
+  recorded in rule metadata.
