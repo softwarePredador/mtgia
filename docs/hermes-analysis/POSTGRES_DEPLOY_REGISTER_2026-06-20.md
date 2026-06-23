@@ -7945,3 +7945,74 @@ Test evidence:
 Next deploy number:
 
 - PG086 is next for any future PostgreSQL package.
+
+## PG086 Deck 608 Angel's Grace Rule Provenance - Applied 2026-06-23 08:49-08:52 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Completed the deck `608` high-card gate for `Angel's Grace`.
+- Added trusted `oracle_hash`, `battle_model_scope`,
+  `oracle_runtime_scope`, explicit split-second annotation, and
+  opponents-cannot-win annotation to the existing verified runtime rule.
+- Kept the existing runtime behavior: cannot lose this turn, opponent Approach
+  win prevention, and damage floor at 1 life.
+- Disabled two generated `silence_opponents` shadow rows for `Angel's Grace`.
+- No deck swap, no `deck_cards` mutation, and no learned-deck state mutation.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_precheck_20260623_084922.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_apply_20260623_084922.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_rollback_20260623_084922.sql`
+
+PostgreSQL evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_precheck_20260623_084922.out`
+  reported `target_rows=1`, `trusted_auto_rows=1`,
+  `oracle_hash_match_rows=1`, `missing_rule_hash_rows=1`,
+  `missing_scope_rows=1`, `generated_shadow_rows=2`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_apply_20260623_084922.out`
+  reported backup creation with three rows, one target update, two shadow-row
+  disables, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.out`
+  reported `target_rows=1`, `target_hash_match_rows=1`,
+  `target_missing_hash_rows=0`, `expected_scope_rows=1`,
+  `expected_runtime_scope_rows=1`, `split_second_annotation_rows=1`,
+  `opponents_cant_win_rows=1`, `trusted_auto_rows=1`,
+  `rule_version_at_least_2_rows=1`, `non_disabled_shadow_rows=0`,
+  `disabled_shadow_rows=2`, and `backup_rows=3`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg086_angels_grace_sync_report_20260623_084922.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Deck `608` post-PG086 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg086_after_angels_grace_20260623_084922.json`
+  reports `high=16`, `medium=3`, `pass=49`.
+- Deck `607` post-PG086 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg086_after_angels_grace_20260623_084922.json`
+  remains `high=23`, `medium=5`, `pass=66`.
+- Global post-PG086 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg086_after_angels_grace_20260623_084922.json`
+  reports `high=39`, `medium=8`, `pass=158`.
+
+Test evidence:
+
+- Added `test_pg086_angels_grace_rule_resolves_from_sqlite_cache`.
+- Existing Angel's Grace behavior tests still cover lethal damage floor and
+  opponent Approach win prevention.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG086 sync.
+
+Next deploy number:
+
+- PG087 is next for any future PostgreSQL package.

@@ -952,3 +952,37 @@ Evidence:
 
 Next package number is PG086. Next queue should prioritize remaining deck
 `607`/`608` high battle-critical cards before any new battle-ranking claim.
+
+## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
+
+- PG086 was applied and validated for `Angel's Grace` in deck `608`.
+- The existing verified `cannot_lose_turn` runtime rule was completed with
+  `oracle_hash=627c4ce7adf5be44b93e2b850159e5d9`,
+  `battle_model_scope=split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1`,
+  `oracle_runtime_scope=cannot_lose_opponents_cannot_win_damage_life_floor_split_second_annotation`,
+  `split_second=true`, and `opponents_cant_win_this_turn=true`.
+- Two generated `silence_opponents` shadow rows were disabled.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_precheck_20260623_084922.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_apply_20260623_084922.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.out`,
+  and rollback
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_rollback_20260623_084922.sql`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg086_angels_grace_sync_report_20260623_084922.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Added provenance regression:
+  `test_pg086_angels_grace_rule_resolves_from_sqlite_cache`.
+- Post-PG086 audits: deck `608` moved to `high=16`, `medium=3`, `pass=49`;
+  deck `607` remained `high=23`, `medium=5`, `pass=66`; global moved to
+  `high=39`, `medium=8`, `pass=158`.
+- Runtime prework also landed for future PG087 candidates, without PostgreSQL
+  promotion yet: counter targeting now respects explicit uncounterable/static
+  shield metadata, and removal target selection can filter non-token permanents
+  by maximum mana value. This is aligned with the current Oracle gaps for
+  `Hexing Squelcher` and `Skyclave Apparition`, but those two cards still
+  remain pending until a PG087 precheck/apply/postcheck/rollback package exists.
+- This was a card-rule/cache gate only. It did not create a new multi-seed
+  battle baseline and did not mutate `deck_cards`.
+- Next package number is PG087.

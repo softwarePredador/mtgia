@@ -20963,6 +20963,36 @@ Auditor decision:
   a fresh multi-seed battle artifact is generated.
 - The next PostgreSQL package number is PG086.
 
+## PG086 Lorehold Candidate Reading - 2026-06-23 08:52 UTC
+
+What changed:
+
+- `Angel's Grace` was closed for deck `608` card-rule coherence.
+- PG086 added Oracle hash, model scope, runtime scope, split-second annotation,
+  and opponents-cannot-win annotation to the existing verified runtime rule.
+- No deck swap, no `deck_cards` mutation, and no learned-deck promotion was
+  performed.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg086_angels_grace_sync_report_20260623_084922.json`.
+- Post-PG086 deck `608` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg086_after_angels_grace_20260623_084922.json`
+  reports `high=16`, `medium=3`, `pass=49`.
+- Global post-PG086 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg086_after_angels_grace_20260623_084922.json`
+  reports `high=39`, `medium=8`, `pass=158`.
+
+Current reading:
+
+- Deck `6` remains the clean current reference for card-rule coherence.
+- Deck `608` improved by one high-card closure, but it is still not ready for
+  final battle-ranking claims.
+- Next PostgreSQL package number is PG087.
+
 ## PG082 Deck 6/606 Hash-Only Card Gate - 2026-06-23 08:37 UTC
 
 Scope:

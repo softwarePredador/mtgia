@@ -3292,6 +3292,101 @@ def register_tests(battle, player):
         assert counter_event["rule_logical_key"] == "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
         assert counter_event["rule_oracle_hash"] == "ecf9ad1f393a664f16867aab8a6edf77"
 
+    def test_pg086_counter_target_filter_respects_uncounterable_static_shield():
+        active = player("Active")
+        opponent = player("Opponent")
+        counterspell = {
+            "name": "Cancel",
+            "cmc": 3,
+            "type_line": "Instant",
+            "effect": "counter",
+        }
+        opponent.hand = [counterspell]
+        opponent.mana_pool.add("blue", 3)
+
+        protected_spell = {"name": "Protected Spell", "cmc": 2, "type_line": "Sorcery"}
+        protected_stack_item = battle.StackItem(
+            protected_spell,
+            active,
+            {"effect": "draw_cards"},
+        )
+        active.battlefield = [
+            {
+                "name": "Hexing Squelcher",
+                "type_line": "Creature",
+                "effect": "creature",
+                "spells_you_control_cant_be_countered": True,
+            }
+        ]
+
+        assert not battle.counter_can_target(
+            counterspell,
+            battle.get_card_effect(counterspell),
+            protected_spell,
+            stack_item=protected_stack_item,
+        )
+        assert not opponent.counterspell_cards(
+            castable_only=True,
+            target_card=protected_spell,
+            stack_item=protected_stack_item,
+        )
+
+        uncounterable_spell = {
+            "name": "Uncounterable Threat",
+            "cmc": 6,
+            "type_line": "Sorcery",
+            "uncounterable": True,
+        }
+        uncounterable_stack_item = battle.StackItem(
+            uncounterable_spell,
+            active,
+            {"effect": "token_maker"},
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            battle.get_card_effect(counterspell),
+            uncounterable_spell,
+            stack_item=uncounterable_stack_item,
+        )
+
+    def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
+        active = player("Active")
+        opponent = player("Opponent")
+        legal_target = {
+            "name": "Legal Engine",
+            "cmc": 4,
+            "type_line": "Enchantment",
+            "effect": "draw_engine",
+        }
+        too_large = {
+            "name": "Large Engine",
+            "cmc": 5,
+            "type_line": "Enchantment",
+            "effect": "draw_engine",
+        }
+        token_target = {
+            "name": "Token Engine",
+            "cmc": 2,
+            "type_line": "Creature Token",
+            "effect": "creature",
+            "tag": "token",
+        }
+        opponent.battlefield = [too_large, token_target, legal_target]
+
+        candidates = battle.removal_target_candidates(
+            opponent,
+            {
+                "effect": "remove_permanent",
+                "target": "nonland_permanent",
+                "target_mana_value_max": 4,
+                "target_nontoken": True,
+            },
+            controller=active,
+            source={"name": "Skyclave Apparition"},
+        )
+
+        assert candidates == [legal_target]
+
     def test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -7382,6 +7477,26 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg086_angels_grace_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect(
+            {"name": "Angel's Grace", "type_line": "Instant", "cmc": 1}
+        )
+
+        assert effect_data["effect"] == "cannot_lose_turn"
+        assert effect_data["_rule_logical_key"] == (
+            "battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227"
+        )
+        assert effect_data["_rule_oracle_hash"] == "627c4ce7adf5be44b93e2b850159e5d9"
+        assert effect_data["battle_model_scope"] == (
+            "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1"
+        )
+        assert effect_data["oracle_runtime_scope"] == (
+            "cannot_lose_opponents_cannot_win_damage_life_floor_split_second_annotation"
+        )
+        assert effect_data["life_floor_on_damage"] == 1
+        assert effect_data["split_second"] is True
+        assert effect_data["opponents_cant_win_this_turn"] is True
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -7495,6 +7610,8 @@ def register_tests(battle, player):
         test_pg071_lotus_petal_is_one_shot_fast_mana_with_rule_provenance,
         test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source,
         test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
+        test_pg086_counter_target_filter_respects_uncounterable_static_shield,
+        test_pg086_removal_targets_filter_nontoken_and_mana_value_max,
         test_pg072_get_lost_removes_allowed_permanent_and_creates_map_tokens,
         test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent,
         test_pg077_jeskas_will_uses_opponent_hand_and_impulse_exiles_top_three,
@@ -7574,4 +7691,5 @@ def register_tests(battle, player):
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
+        test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
     ]

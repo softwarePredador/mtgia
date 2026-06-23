@@ -3592,9 +3592,39 @@ def first_present_value(mapping, keys):
     return None
 
 
+def spell_cant_be_countered(target_card, stack_item=None):
+    if not isinstance(target_card, dict):
+        return False
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    if (
+        target_card.get("uncounterable")
+        or target_card.get("cant_be_countered")
+        or effect_data.get("uncounterable")
+        or effect_data.get("cant_be_countered")
+    ):
+        return True
+    controller = getattr(stack_item, "controller", None)
+    if controller is None:
+        return False
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("spells_you_control_cant_be_countered"):
+            return True
+        try:
+            permanent_effect = get_card_effect(permanent)
+        except Exception:
+            permanent_effect = {}
+        if permanent_effect.get("spells_you_control_cant_be_countered"):
+            return True
+    return False
+
+
 def counter_can_target(counter_card, counter_effect, target_card, stack_item=None):
     if not isinstance(target_card, dict):
         return True
+    if spell_cant_be_countered(target_card, stack_item=stack_item):
+        return False
     if counter_effect.get("requires_blue_target") or str(counter_effect.get("target") or "").lower() in (
         "blue_spell",
         "blue_spell_or_permanent",
@@ -7195,6 +7225,24 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
             target_controller=player,
         ):
             continue
+        if effect_data.get("target_nontoken") or effect_data.get("target_non_token"):
+            if is_token_permanent(card):
+                continue
+        max_value = first_present_value(
+            effect_data,
+            (
+                "target_cmc_max",
+                "target_mana_value_max",
+                "max_target_cmc",
+                "max_target_mana_value",
+            ),
+        )
+        if max_value is not None:
+            try:
+                if card_mana_value(card) > int(float(max_value)):
+                    continue
+            except Exception:
+                continue
         candidates.append(card)
     return candidates
 

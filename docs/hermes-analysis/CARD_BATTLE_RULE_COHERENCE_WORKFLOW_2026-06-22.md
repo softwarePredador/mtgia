@@ -3533,6 +3533,48 @@ Rule for the next cycle:
   until the remaining high-card rules for the candidate deck are closed and a
   fresh multi-seed battle artifact is generated.
 
+## PG086 Angel's Grace Deck 608 Gate - 2026-06-23 08:52 UTC
+
+Closed:
+
+- `Angel's Grace` moved out of the deck `608` high queue.
+- The verified runtime rule now carries stable Oracle provenance, model scope,
+  split-second annotation, and opponents-cannot-win annotation.
+- Two stale generated `silence_opponents` shadows were disabled.
+
+Evidence:
+
+- PostgreSQL precheck/apply/postcheck/rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_precheck_20260623_084922.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_apply_20260623_084922.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_rollback_20260623_084922.sql`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg086_angels_grace_sync_report_20260623_084922.json`.
+- Test:
+  `test_pg086_angels_grace_rule_resolves_from_sqlite_cache`, plus the existing
+  Angel's Grace lethal-damage-floor and opponent-Approach-prevention tests.
+
+Accepted cuts:
+
+- Deck `608`: `high=16`, `medium=3`, `pass=49`.
+- Deck `607`: unchanged at `high=23`, `medium=5`, `pass=66`.
+- Global: `high=39`, `medium=8`, `pass=158`.
+
+Next workflow:
+
+- Use PG087 for the next PostgreSQL package.
+- Continue with remaining high-card queue. Avoid promoting `High Noon`,
+  `Victory Chimes`, `Return the Favor`, or `Untimely Malfunction` from their
+  current broad abstractions until their actual modal/static/oracle behavior is
+  modeled or explicitly annotated as partial.
+- Runtime prework is available for the PG087 deck `606` medium queue:
+  uncounterable/static-shield counter targeting for `Hexing Squelcher`, and
+  non-token plus mana-value-limited removal targeting for `Skyclave Apparition`.
+  These cards are still pending until PostgreSQL provenance, sync, and
+  post-audit evidence are generated.
+
 ## PG082 Deck 6/606 Hash-Only Batch - 2026-06-23 08:37 UTC
 
 Closed:

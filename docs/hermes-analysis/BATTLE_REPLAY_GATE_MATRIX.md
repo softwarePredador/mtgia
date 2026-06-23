@@ -3740,6 +3740,34 @@ Decision:
   until a fresh multi-seed run is generated after the remaining deck `607` or
   deck `608` high-card queue is addressed.
 
+## PG086 Angel's Grace Card-Rule/Cache Gate - 2026-06-23 08:52 UTC
+
+Replay relevance:
+
+- This cycle did not produce a new accepted multi-seed battle replay baseline.
+- The latest accepted replay-learning baseline remains PG078:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  with `run_profile=deck6_pg078_learning_gate_fix_16_seed` and
+  `battle_replay_final_status=trusted_for_strategy_learning`.
+
+Gate artifacts:
+
+- PG086 PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.out`.
+- PG086 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg086_angels_grace_sync_report_20260623_084922.json`.
+- PG086 post-audits:
+  deck `608` `high=16`, `medium=3`, `pass=49`; deck `607` unchanged at
+  `high=23`, `medium=5`, `pass=66`; global `high=39`, `medium=8`,
+  `pass=158`.
+
+Decision:
+
+- PG086 is accepted as a card-rule/cache gate for `Angel's Grace`.
+- Do not use it as win-rate evidence. A new battle baseline still requires the
+  relevant deck candidate's high-card queue to be closed or explicitly accepted
+  as known limitation.
+
 ## PG082 Deck 6/606 Hash-Only Focused Card-Rule Gate - 2026-06-23 08:37 UTC
 
 Artifacts:

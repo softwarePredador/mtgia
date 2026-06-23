@@ -17208,6 +17208,44 @@ Next validation:
   candidate deck's remaining high-card queue is intentionally closed or
   explicitly accepted as known limitation.
 
+## PG086 Angel's Grace Card-Rule/Cache Gate - 2026-06-23 08:52 UTC
+
+Artifacts:
+
+- PostgreSQL precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_precheck_20260623_084922.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_apply_20260623_084922.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_postcheck_20260623_084922.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_angels_grace_pg086_rollback_20260623_084922.sql`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg086_angels_grace_sync_report_20260623_084922.json`.
+- Post-PG086 audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg086_after_angels_grace_20260623_084922.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg086_after_angels_grace_20260623_084922.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg086_after_angels_grace_20260623_084922.json`.
+
+Gate:
+
+- `Angel's Grace` now has trusted Oracle provenance and model scope for the
+  tested cannot-lose/damage-floor/opponents-cannot-win behavior.
+- Split second is present as an explicit annotation, not as a new complete
+  priority-engine lock.
+- This is card-rule/cache evidence only. It is not a new battle rebaseline and
+  is not strategy-learning evidence.
+
+Status:
+
+- Deck `608` moved from `high=17`, `pass=48` to `high=16`, `pass=49`.
+- Deck `607` remains `high=23`, `medium=5`, `pass=66`.
+- Global queue moved from `high=40`, `pass=157` to `high=39`, `pass=158`.
+- Next package number is PG087.
+- Runtime/test prework exists for future `Hexing Squelcher` and
+  `Skyclave Apparition` handling, but neither card is closed until a PG087
+  PostgreSQL package and post-audit evidence are produced.
+
 ## PG082 Deck 6/606 Hash-Only Provenance Gate - 2026-06-23 08:37 UTC
 
 Status: `card_gate_closed_for_pg082_hash_only_batch`.

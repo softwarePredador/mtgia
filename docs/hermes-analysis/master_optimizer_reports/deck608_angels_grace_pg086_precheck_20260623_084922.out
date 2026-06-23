@@ -1,0 +1,11 @@
+Pager usage is off.
+SELECT 1
+ target_rows | trusted_auto_rows | oracle_hash_match_rows | missing_rule_hash_rows | missing_scope_rows | generated_shadow_rows | backup_table_already_exists
+-------------+-------------------+------------------------+------------------------+--------------------+-----------------------+-----------------------------
+           1 |                 1 |                      1 |                      1 |                  1 |                     2 | f
+(1 row)
+
+     name      | type_line | mana_cost |       computed_oracle_hash       |       expected_oracle_hash       |                logical_rule_key                 | current_rule_oracle_hash | review_status | execution_status | rule_version |                                      effect_json                                       |                                deck_role_json
+---------------+-----------+-----------+----------------------------------+----------------------------------+-------------------------------------------------+--------------------------+---------------+------------------+--------------+----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------
+ Angel's Grace | Instant   | {W}       | 627c4ce7adf5be44b93e2b850159e5d9 | 627c4ce7adf5be44b93e2b850159e5d9 | battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227 |                          | verified      | auto             |            1 | {"cmc": 1.0, "effect": "cannot_lose_turn", "instant": true, "life_floor_on_damage": 1} | {"effect": "cannot_lose_turn", "timing": "instant", "category": "protection"}
+(1 row)
