@@ -15691,6 +15691,7 @@ def apply_effect_immediate(
             treasures=player.treasures,
             cards_drawn=draw_count,
             turn=turn,
+            **replay_rule_fields(effect_data),
         )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "lander_token_maker":

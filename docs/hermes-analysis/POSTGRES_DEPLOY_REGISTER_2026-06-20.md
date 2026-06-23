@@ -6421,3 +6421,99 @@ Numbering note:
   and
   `manaloom_deploy_audit.pg068_deck6_copy_token_stack_rules_20260623_034443`.
 - The next PostgreSQL package must use PG069.
+
+## PG069 Deck 6 L2 Specific Runtime Cleanup - Applied 2026-06-23 04:02 UTC
+
+Status:
+
+- `applied_validated`.
+- Scope: `The One Ring` and `Unexpected Windfall` in `card_battle_rules`.
+- Purpose: refresh current oracle hashes/runtime-scope metadata for existing
+  scoped runtime rows and disable superseded broad/review-only shadow rows.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_precheck_20260623_005736.sql`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_precheck_20260623_005736.out`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_apply_20260623_005736.sql`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_apply_20260623_005736.out`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.sql`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_rollback_20260623_005736.sql`.
+
+Postcheck evidence:
+
+- `target_rule_rows=6`.
+- `expected_runtime_rows=2`.
+- `old_active_shadow_rows=0`.
+- `runtime_missing_hash_rows=0`.
+- `backup_rows=6`.
+
+Rules confirmed:
+
+- `The One Ring`:
+  `battle_rule_v1:a71907ee296b5801e92e8d7f1940dba1`,
+  `oracle_hash=644d5305e6be932586a6d3b7325cadf7`,
+  `battle_model_scope=the_one_ring_etb_protection_burden_draw_v1`,
+  `oracle_runtime_scope=indestructible_cast_etb_protection_upkeep_burden_tap_draw_v1`.
+- `Unexpected Windfall`:
+  `battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4`,
+  `oracle_hash=9c4fbe06104051a2e8b1d295d307b26a`,
+  `battle_model_scope=discard_draw_create_treasures_v1`,
+  `oracle_runtime_scope=additional_cost_discard_draw_two_create_two_treasures_v1`.
+- Runtime replay evidence: `treasure_created` now emits the same
+  `rule_logical_key` and `rule_oracle_hash` for `Unexpected Windfall`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`
+  exported `canonical_snapshot_rows_exported=3201`, loaded
+  `pg_rows_loaded=1825`, and wrote `sqlite_inserted_or_updated=2493`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
+  reports `high=7`, `medium=10`, `pass=83`; `The One Ring` and
+  `Unexpected Windfall` report `pass/coherent_for_current_gate`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg069_20260623_040215.json`
+  reports `high=7`, `medium=30`, `pass=44`.
+- Deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg069_20260623_040215.json`
+  reports `high=30`, `medium=17`, `pass=47`; `Unexpected Windfall` reports
+  `pass/coherent_for_current_gate`.
+- Deck `608` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg069_20260623_040215.json`
+  reports `high=21`, `medium=9`, `pass=38`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg069_20260623_040215.json`
+  reports `high=57`, `medium=44`, `pass=104`.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including
+  `test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Rollback:
+
+- `deck6_l2_specific_runtime_cleanup_pg069_rollback_20260623_005736.sql`
+  restores the six backed-up rows from
+  `manaloom_deploy_audit.pg069_deck6_l2_specific_runtime_cleanup_20260623_005736`.
+
+Numbering note:
+
+- The next PostgreSQL package must use PG070.

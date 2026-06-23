@@ -3138,3 +3138,36 @@ Caveat:
 - `Molten Duplication` proves temporary artifact-copy creation and end-step
   sacrifice, not downstream activated abilities of copied artifacts beyond the
   copied permanent metadata.
+
+## PG069 Deck 6 L2 Specific Runtime Cleanup Gate - 2026-06-23 04:02 UTC
+
+Artifacts:
+
+- PG069 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`.
+- Current deck `6` audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`.
+
+Gate:
+
+- `The One Ring` remains covered by the existing runtime tests for ETB/cast
+  protection and burden-counter draw; PG069 refreshed the persisted
+  `oracle_hash` and added an explicit `oracle_runtime_scope`.
+- `Unexpected Windfall` remains covered by the existing
+  discard/draw/Treasure executor; PG069 persisted the current oracle hash and
+  explicit additional-cost runtime scope, and `treasure_created` now emits the
+  rule key/hash provenance.
+
+Status:
+
+- `The One Ring` and `Unexpected Windfall` are closed for the current
+  hash/scope cleanup gate.
+- Deck `6` now reports `high=7`, `medium=10`, `pass=83`.
+
+Caveat:
+
+- PG069 did not change game semantics. It preserved already-tested executors,
+  corrected persisted metadata/shadow rows, and added replay provenance to the
+  final Treasure event.

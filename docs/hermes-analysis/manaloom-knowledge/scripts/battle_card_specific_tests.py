@@ -5855,6 +5855,7 @@ def register_tests(battle, player):
         test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands,
         test_land_tax_skips_when_no_opponent_controls_more_lands,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
+        test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,

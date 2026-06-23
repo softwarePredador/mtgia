@@ -16132,3 +16132,77 @@ Numbering note:
 
 - PG068 was used for two related copy-family packages with distinct backup
   tables. The next PostgreSQL package must use PG069.
+
+## PG069 Deck 6 L2 Specific Runtime Cleanup - Applied 2026-06-23 04:02 UTC
+
+Status:
+
+- `applied_validated`.
+- Closed the current hash/scope defects for `The One Ring` and
+  `Unexpected Windfall`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+PostgreSQL validation:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_precheck_20260623_005736.out`
+  reported `target_cards_with_expected_oracle_hash=2`,
+  `existing_rule_rows=6`, `target_specific_rule_rows=2`,
+  `old_active_shadow_rows=3`, `target_specific_hash_defect_rows=2`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_apply_20260623_005736.out`
+  reported `SELECT 6`, `UPDATE 1`, `UPDATE 1`, `UPDATE 3`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`
+  reported `target_rule_rows=6`, `expected_runtime_rows=2`,
+  `old_active_shadow_rows=0`, `runtime_missing_hash_rows=0`, and
+  `backup_rows=6`.
+
+Runtime gate:
+
+- `The One Ring` keeps the PG025 runtime behavior:
+  ETB/cast protection from everything until next turn, no ETB draw, upkeep
+  burden life loss, and tap burden draw.
+- `Unexpected Windfall` keeps the discard/draw/two-Treasure executor and now
+  has current oracle hash plus
+  `oracle_runtime_scope=additional_cost_discard_draw_two_create_two_treasures_v1`.
+- Runtime replay now emits `rule_logical_key` and `rule_oracle_hash` on the
+  `treasure_created` event for this card.
+
+Tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including
+  `test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+
+Auditor result:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`
+  loaded `pg_rows_loaded=1825`, wrote `sqlite_inserted_or_updated=2493`, and
+  exported `canonical_snapshot_rows_exported=3201`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
+  reports `high=7`, `medium=10`, `pass=83`.
+- Deck `607` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg069_20260623_040215.json`
+  reports `high=30`, `medium=17`, `pass=47`.
+- Global deck-card audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg069_20260623_040215.json`
+  reports `high=57`, `medium=44`, `pass=104`.
+
+Remaining deck `6` high queue:
+
+- `Chaos Warp`, `Esper Sentinel`, `Faithless Looting`, `Gamble`, `Get Lost`,
+  `Pyroblast`, and `Wheel of Misfortune`.
+
+Numbering note:
+
+- The next PostgreSQL package must use PG070.

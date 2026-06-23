@@ -320,3 +320,26 @@ Atualizado em 2026-05-26:
   `pg068_deck6_l5a_copy_spell_stack_20260623_004158` e
   `pg068_deck6_copy_token_stack_rules_20260623_034443`. Proximo deploy deve
   usar PG069.
+
+## ManaLoom deck 6 L2 specific runtime cleanup - 2026-06-23
+
+- PG069 fechou a limpeza de metadata/runtime especifico para `The One Ring` e
+  `Unexpected Windfall`.
+- `The One Ring` manteve a semantica PG025 ja testada, mas recebeu
+  `oracle_hash=644d5305e6be932586a6d3b7325cadf7` e
+  `oracle_runtime_scope=indestructible_cast_etb_protection_upkeep_burden_tap_draw_v1`.
+- `Unexpected Windfall` recebeu
+  `oracle_hash=9c4fbe06104051a2e8b1d295d307b26a`,
+  `oracle_runtime_scope=additional_cost_discard_draw_two_create_two_treasures_v1`
+  e `additional_cost_discard_status=runtime_required_card_discard`.
+- Runtime tambem passou a emitir `rule_logical_key` e `rule_oracle_hash` no
+  evento `treasure_created` dessa carta.
+- Evidencia:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`
+  fechou `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0` e `backup_rows=6`.
+- Auditor deck `6` em
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
+  passou para `high=7`, `medium=10`, `pass=83`; global passou para
+  `high=57`, `medium=44`, `pass=104`.
+- Proximo deploy deve usar PG070.

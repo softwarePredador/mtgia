@@ -20217,3 +20217,43 @@ Current reading:
   `Wheel of Misfortune`.
 - The next PG package must be PG069 because PG068 now has two valid backup
   tables for related copy-family packages.
+
+## PG069 Deck 6 L2 Specific Runtime Cleanup - 2026-06-23 04:02 UTC
+
+What changed:
+
+- `The One Ring` kept its PG025 runtime semantics but now has the current
+  PostgreSQL oracle hash and explicit `oracle_runtime_scope`.
+- `Unexpected Windfall` moved out of the deck `6` medium queue by persisting
+  current oracle hash, discard additional-cost status, and explicit
+  draw/two-Treasure runtime scope.
+- The `treasure_created` replay event now carries `rule_logical_key` and
+  `rule_oracle_hash` for `Unexpected Windfall`.
+- Three superseded broad/review-only rows were disabled.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG069 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_precheck_20260623_005736.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_apply_20260623_005736.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg069_l2_specific_runtime_cleanup_20260623_040215.json`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
+  reports `high=7`, `medium=10`, `pass=83`; `The One Ring` and
+  `Unexpected Windfall` report `pass/coherent_for_current_gate`.
+- Full battle harness:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after PG069 sync and replay-provenance runtime update.
+
+Current reading:
+
+- Deck `6` improved from `high=7`, `medium=11`, `pass=82` after PG068 to
+  `high=7`, `medium=10`, `pass=83`.
+- Remaining high queue is unchanged and still battle-critical:
+  `Chaos Warp`, `Esper Sentinel`, `Faithless Looting`, `Gamble`, `Get Lost`,
+  `Pyroblast`, and `Wheel of Misfortune`.
+- The next PG package must be PG070.

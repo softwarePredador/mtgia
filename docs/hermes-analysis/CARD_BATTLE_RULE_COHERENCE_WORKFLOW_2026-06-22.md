@@ -2716,3 +2716,44 @@ Next lane recommendation:
 - Prioritize by battle impact and reusable executor family: interaction
   (`Chaos Warp`, `Get Lost`, `Pyroblast`), then card-flow/search
   (`Esper Sentinel`, `Faithless Looting`, `Gamble`, `Wheel of Misfortune`).
+
+## PG069 L2 Specific Runtime Cleanup - 2026-06-23 04:02 UTC
+
+Closed:
+
+- `The One Ring`: current oracle hash and explicit runtime scope were persisted
+  onto the existing PG025 scoped runtime rule.
+- `Unexpected Windfall`: current oracle hash and explicit additional-cost
+  discard/draw/two-Treasure runtime scope were persisted onto the existing
+  scoped runtime rule, and its `treasure_created` replay event now emits
+  rule key/hash provenance.
+
+Why this was a cleanup batch:
+
+- Both cards already had specific runtime behavior and passing focused tests.
+- The audit still counted metadata defects because the current trusted rows had
+  stale/missing oracle hash or lacked the newer explicit runtime-scope marker.
+- The package disabled three superseded broad/review-only shadow rows instead
+  of adding another overlapping behavior.
+- Runtime code changed only to include `replay_rule_fields(effect_data)` on the
+  final `treasure_created` event.
+
+Evidence:
+
+- PG069 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_specific_runtime_cleanup_pg069_postcheck_20260623_005736.out`
+  reports `expected_runtime_rows=2`, `old_active_shadow_rows=0`,
+  `runtime_missing_hash_rows=0`, and `backup_rows=6`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg069_20260623_040215.json`
+  reports `high=7`, `medium=10`, `pass=83`.
+- Global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg069_20260623_040215.json`
+  reports `high=57`, `medium=44`, `pass=104`.
+
+Next lane recommendation:
+
+- Use PG070 for the next PostgreSQL package.
+- Deck `6` high queue remains unchanged: `Chaos Warp`, `Esper Sentinel`,
+  `Faithless Looting`, `Gamble`, `Get Lost`, `Pyroblast`, and
+  `Wheel of Misfortune`.
