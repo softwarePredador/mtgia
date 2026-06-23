@@ -1399,3 +1399,35 @@ Next package number is PG086. Next queue should prioritize remaining deck
   `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
   `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
   `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.
+
+## ManaLoom PG112/PG113 runtime metadata restore - 2026-06-23 19:50 UTC
+
+- PG112 restored `Seething Song` metadata after the PG111 full-suite attempt
+  hit PG058 `mana_color_status` drift. Postcheck restored oracle hash,
+  `mana_color_status`, `oracle_runtime_scope`, and PG058 family marker.
+- PG113 restored `Angel's Grace` metadata after the next full-suite attempt hit
+  PG086 scope/flag drift. Postcheck restored oracle hash,
+  `battle_model_scope`, `oracle_runtime_scope`, `split_second`, and
+  `opponents_cant_win_this_turn`.
+- Intermediate PG112 full-suite evidence:
+  `pg112_seething_song_runtime_metadata_restore_battle_analyst_v10_3_20260623_194506.out`;
+  PG058 passed and PG086 became the next drift.
+- Both packages were metadata/provenance-only: no executor, `deck_cards`,
+  learned-deck, or deck composition change.
+- Final PG -> SQLite sync:
+  `pg112_pg113_runtime_metadata_restore_sync_report_20260623_194817.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=5`, `canonical_snapshot_rows_exported=3195`.
+- Focused tests passed:
+  `pg112_pg113_runtime_metadata_restore_focused_tests_20260623_194817.out`.
+- Full battle suite passed:
+  `pg112_pg113_runtime_metadata_restore_battle_analyst_v10_3_20260623_194817.out`
+  with `exit_status=0`.
+- Audit state after PG112/PG113: deck `6` `pass=100`, deck `606`
+  `medium=7`, `pass=74`, deck `607` `high=8`, `medium=8`, `pass=78`,
+  deck `608` `high=15`, `medium=6`, `pass=47`, global `high=22`,
+  `medium=15`, `pass=168`.
+- Current Deck `607` high queue is unchanged after PG112/PG113:
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.

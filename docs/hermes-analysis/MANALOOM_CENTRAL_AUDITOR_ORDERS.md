@@ -3792,3 +3792,60 @@ Current order:
   evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg111_board_wipe_choice_full_suite_attempt_20260623_192502.out`.
   Handle it as a separate runtime/metadata drift item.
+
+## PG112/PG113 Runtime Metadata Restored - 2026-06-23
+
+Central order update:
+
+- PG112 restored the trusted `Seething Song` row after the PG111 full-suite
+  attempt exposed PG058 `mana_color_status` drift.
+- PG113 restored the trusted `Angel's Grace` row after the next full-suite
+  attempt exposed PG086 scope/flag drift.
+- Both packages are metadata-only restores. They do not alter executors,
+  `deck_cards`, learned-deck state, or deck composition.
+- PG112 and PG113 are closed. Do not reuse these package numbers.
+- Intermediate PG112 full-suite evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_battle_analyst_v10_3_20260623_194506.out`;
+  it advanced past PG058 and stopped at PG086 `Angel's Grace`.
+
+PostgreSQL evidence:
+
+- PG112 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_precheck_20260623_194506.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_apply_20260623_194506.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_postcheck_20260623_194506.out`.
+  Apply result: `patched_rows=1`; postcheck restored hash, mana color status,
+  runtime scope, and PG058 family marker.
+- PG113 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_precheck_20260623_194817.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_apply_20260623_194817.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_postcheck_20260623_194817.out`.
+  Apply result: `patched_rows=1`; postcheck restored hash, battle model
+  scope, runtime scope, split-second, and opponents-cannot-win flags.
+
+Sync and validation:
+
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_sync_report_20260623_194817.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=5`, `canonical_snapshot_rows_exported=3195`.
+- Focused tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_focused_tests_20260623_194817.out`;
+  PG058 and PG086 focused tests passed.
+- Full battle suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_battle_analyst_v10_3_20260623_194817.out`;
+  `exit_status=0`.
+- Post-restore deck-card audits:
+  Deck `6` `pass=100`; Deck `606` `medium=7`, `pass=74`;
+  Deck `607` `high=8`, `medium=8`, `pass=78`;
+  Deck `608` `high=15`, `medium=6`, `pass=47`;
+  global `high=22`, `medium=15`, `pass=168`.
+
+Current order:
+
+- The test gate is unblocked again.
+- Continue mass work by semantic family. Remaining Deck `607` high queue:
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.
+- Next package number is PG114.

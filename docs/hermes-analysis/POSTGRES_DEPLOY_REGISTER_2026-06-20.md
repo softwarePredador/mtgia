@@ -10006,3 +10006,123 @@ Register decision:
 - Do not reuse PG111.
 - Any future change to these three cards requires a new package and fresh
   precheck/apply/postcheck/sync/audit evidence.
+
+## PG112 Seething Song Runtime Metadata Restore - Applied 2026-06-23
+
+Authorization and scope:
+
+- Continuation of the approved mass XMage -> ManaLoom adaptation goal with
+  PostgreSQL write permission.
+- Restores one trusted `Seething Song` runtime row after the PG111 full-suite
+  attempt exposed PG058 `mana_color_status` drift.
+- Metadata/provenance only: no executor, `deck_cards`, learned-deck, or deck
+  composition change.
+
+Target rule:
+
+- `Seething Song`:
+  `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`,
+  `oracle_hash=ccd492289c6f1c14c8fb7a248d7bbf32`,
+  `effect=ramp_ritual`,
+  `battle_model_scope=single_shot_red_ritual_v1`.
+
+Package files:
+
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_precheck_20260623_194506.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_apply_20260623_194506.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_postcheck_20260623_194506.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_rollback_20260623_194506.sql`.
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_precheck_20260623_194506.out`;
+  `target_rule_rows=1`, `trusted_auto_rows=1`, `card_hash_match_rows=1`,
+  `rule_hash_match_rows=0`, `metadata_deficient_rows=1`,
+  `backup_table_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_apply_20260623_194506.out`;
+  `patched_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_postcheck_20260623_194506.out`;
+  `target_rule_rows=1`, `trusted_auto_rows=1`, `card_hash_match_rows=1`,
+  `rule_hash_match_rows=1`, `expected_scope_rows=1`,
+  `expected_mana_color_status_rows=1`, `expected_runtime_scope_rows=1`,
+  `expected_family_rows=1`, `backup_rows=1`.
+- Intermediate full-suite attempt:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_battle_analyst_v10_3_20260623_194506.out`;
+  PG058 passed and the run then exposed PG086 `Angel's Grace` drift.
+
+## PG113 Angel's Grace Runtime Metadata Restore - Applied 2026-06-23
+
+Authorization and scope:
+
+- Continuation of the approved mass XMage -> ManaLoom adaptation goal with
+  PostgreSQL write permission.
+- Restores one trusted `Angel's Grace` runtime row after the PG112 full-suite
+  attempt exposed PG086 scope/flag drift.
+- Metadata/provenance only: no executor, `deck_cards`, learned-deck, or deck
+  composition change.
+
+Target rule:
+
+- `Angel's Grace`:
+  `battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227`,
+  `oracle_hash=627c4ce7adf5be44b93e2b850159e5d9`,
+  `effect=cannot_lose_turn`,
+  `battle_model_scope=split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1`.
+
+Package files:
+
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_precheck_20260623_194817.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_apply_20260623_194817.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_postcheck_20260623_194817.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_rollback_20260623_194817.sql`.
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_precheck_20260623_194817.out`;
+  `target_rule_rows=1`, `trusted_auto_rows=1`, `card_hash_match_rows=1`,
+  `rule_hash_match_rows=0`, `expected_scope_rows=0`,
+  `metadata_deficient_rows=1`, `backup_table_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_apply_20260623_194817.out`;
+  `patched_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_postcheck_20260623_194817.out`;
+  `target_rule_rows=1`, `trusted_auto_rows=1`, `card_hash_match_rows=1`,
+  `rule_hash_match_rows=1`, `expected_scope_rows=1`,
+  `expected_runtime_scope_rows=1`, `split_second_rows=1`,
+  `opponents_cant_win_rows=1`, `backup_rows=1`.
+
+Runtime cache sync and validation:
+
+- Final PG112/PG113 sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_sync_report_20260623_194817.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=5`, `canonical_snapshot_rows_exported=3195`.
+- Focused tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_focused_tests_20260623_194817.out`.
+- Full battle suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_battle_analyst_v10_3_20260623_194817.out`;
+  `exit_status=0`.
+- Post-sync deck-card audits:
+  Deck `6` `pass=100`; Deck `606` `medium=7`, `pass=74`;
+  Deck `607` `high=8`, `medium=8`, `pass=78`;
+  Deck `608` `high=15`, `medium=6`, `pass=47`;
+  global `high=22`, `medium=15`, `pass=168`.
+
+Register decision:
+
+- PG112 and PG113 are closed as applied, postchecked, synced, and audited.
+- Do not reuse PG112 or PG113.
+- Next package number is PG114.

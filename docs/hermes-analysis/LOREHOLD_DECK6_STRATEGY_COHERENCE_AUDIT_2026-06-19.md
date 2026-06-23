@@ -23166,3 +23166,89 @@ Active pending list after PG111:
 - Next recommended mass slice: choose the next semantic family from the eight
   remaining high rows; do not return to one-card-only processing unless a card
   is isolated by missing source data.
+
+## PG112/PG113 Runtime Metadata Drift Restore - 2026-06-23
+
+Scope closed:
+
+- PG112 restored `Seething Song` runtime metadata that blocked the full battle
+  suite at PG058 after the PG111 run.
+- PG113 restored `Angel's Grace` runtime metadata that surfaced next at PG086.
+- These packages are metadata/provenance restores only. They do not change
+  runtime executors, `deck_cards`, learned-deck state, or deck composition.
+- Intermediate PG112 full-suite evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_battle_analyst_v10_3_20260623_194506.out`;
+  PG058 passed and the run then stopped at PG086 `Angel's Grace`, proving the
+  need for PG113.
+
+PostgreSQL evidence:
+
+- PG112 `Seething Song` precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_precheck_20260623_194506.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_apply_20260623_194506.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_postcheck_20260623_194506.out`.
+- PG112 result: one trusted verified/auto row was deficient before apply;
+  apply returned `patched_rows=1`; postcheck returned
+  `target_rule_rows=1`, `trusted_auto_rows=1`, `card_hash_match_rows=1`,
+  `rule_hash_match_rows=1`, `expected_scope_rows=1`,
+  `expected_mana_color_status_rows=1`, `expected_runtime_scope_rows=1`,
+  `expected_family_rows=1`, and `backup_rows=1`.
+- PG113 `Angel's Grace` precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_precheck_20260623_194817.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_apply_20260623_194817.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_postcheck_20260623_194817.out`.
+- PG113 result: one trusted verified/auto row was deficient before apply;
+  apply returned `patched_rows=1`; postcheck returned
+  `target_rule_rows=1`, `trusted_auto_rows=1`, `card_hash_match_rows=1`,
+  `rule_hash_match_rows=1`, `expected_scope_rows=1`,
+  `expected_runtime_scope_rows=1`, `split_second_rows=1`,
+  `opponents_cant_win_rows=1`, and `backup_rows=1`.
+- Rollbacks prepared but not needed:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_seething_song_runtime_metadata_restore_rollback_20260623_194506.sql`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg113_angels_grace_runtime_metadata_restore_rollback_20260623_194817.sql`.
+
+Hermes/runtime sync and tests:
+
+- Final PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_sync_report_20260623_194817.json`.
+- Sync result: `selected_card_count=2`, selected cards
+  `["Angel's Grace","Seething Song"]`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=5`, `canonical_snapshot_rows_exported=3195`.
+- Focused tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_focused_tests_20260623_194817.out`;
+  PG058 and PG086 focused tests passed.
+- Full battle suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg112_pg113_runtime_metadata_restore_battle_analyst_v10_3_20260623_194817.out`;
+  `exit_status=0`.
+
+Post-restore audit evidence:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg112_pg113_runtime_metadata_restore_20260623_194817.json`;
+  `severity_counts={"pass":100}`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg112_pg113_runtime_metadata_restore_20260623_194817.json`;
+  `severity_counts={"medium":7,"pass":74}`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg112_pg113_runtime_metadata_restore_20260623_194817.json`;
+  `severity_counts={"high":8,"medium":8,"pass":78}`.
+- Deck `608`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg112_pg113_runtime_metadata_restore_20260623_194817.json`;
+  `severity_counts={"high":15,"medium":6,"pass":47}`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_global_pg112_pg113_runtime_metadata_restore_20260623_194817.json`;
+  `severity_counts={"high":22,"medium":15,"pass":168}`.
+
+Active pending list after PG112/PG113:
+
+- Deck `607` high queue is unchanged from PG111:
+  `Surge to Victory`, `Tempt with Bunnies`, `Big Score`,
+  `Monument to Endurance`, `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, and `Thor, God of Thunder`.
+- Deck `608` and global improved because `Angel's Grace` is no longer a real
+  high metadata drift item.
+- PG112 and PG113 are closed as applied, postchecked, synced, and audited.
+  Do not reuse these package numbers. Next package number is PG114.

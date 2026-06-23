@@ -1,0 +1,10 @@
+Pager usage is off.
+ target_rule_rows | trusted_auto_rows | card_hash_match_rows | rule_hash_match_rows | expected_scope_rows | expected_mana_color_status_rows | expected_runtime_scope_rows | expected_family_rows | backup_rows
+------------------+-------------------+----------------------+----------------------+---------------------+---------------------------------+-----------------------------+----------------------+-------------
+                1 |                 1 |                    1 |                    1 |                   1 |                               1 |                           1 |                    1 |           1
+(1 row)
+
+   card_name   | normalized_name |                logical_rule_key                 | review_status | execution_status | rule_version |           oracle_hash            |   effect    |    battle_model_scope     | produces | mana_produced |         mana_color_status          |                     oracle_runtime_scope                     |       pg058_family       | reviewed_by |          updated_at
+---------------+-----------------+-------------------------------------------------+---------------+------------------+--------------+----------------------------------+-------------+---------------------------+----------+---------------+------------------------------------+--------------------------------------------------------------+--------------------------+-------------+-------------------------------
+ Seething Song | seething song   | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | verified      | auto             |            2 | ccd492289c6f1c14c8fb7a248d7bbf32 | ramp_ritual | single_shot_red_ritual_v1 | R        | 5             | abstracted_to_generic_pool_runtime | single_shot_red_ritual_runtime_generic_pool_color_annotation | deck6_simple_red_rituals | codex-pg112 | 2026-06-23 19:46:40.235497+00
+(1 row)
