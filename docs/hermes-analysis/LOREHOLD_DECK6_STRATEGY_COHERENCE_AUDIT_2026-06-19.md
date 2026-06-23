@@ -21217,3 +21217,49 @@ Next recommended card-rule queue:
   `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`, `High Noon`,
   `Insurrection`, `Promise of Loyalty`, `Starfall Invocation`, and
   `Winds of Abandon`.
+
+## PG092 Deck 608 L7 Modal Interaction Reading - 2026-06-23 10:00 UTC
+
+What changed:
+
+- PG092 closed two deck `608` high battle-critical findings:
+  `Return the Favor` and `Untimely Malfunction`.
+- Both cards were handled as L7 cleanup, not as full new executor work:
+  existing compact executors were made card-specific with raw Oracle hashes,
+  battle model scopes, and explicit annotation-only fields for unsupported
+  branches.
+- `Return the Favor` executes the instant/sorcery stack-copy subset only.
+  Spree cost accounting, activated/triggered ability copying, and target-change
+  mode remain `annotation_only`.
+- `Untimely Malfunction` executes the destroy-target-artifact mode only.
+  Redirect and can't-block modes remain `annotation_only`.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_rollback_20260623_095405.sql`.
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_deck608_l7_modal_interaction_sync_report_20260623_095405.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_pg092_l7_modal_interaction_focused_events_20260623_095405.jsonl`.
+- Full runtime wrapper:
+  `docs/hermes-analysis/master_optimizer_reports/pg092_test_battle_analyst_v10_3_20260623_095405.out`.
+
+Current candidate status:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=18`, `medium=4`, `pass=72`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global card-rule queue: `high=32`, `medium=4`, `pass=169`.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  new multi-seed battle baseline.
+
+Next recommended queue:
+
+- Continue backlog high battle-critical cards with strict separation between
+  executable runtime and annotations.
+- Avoid treating `High Noon`, `Call Forth the Tempest`, or `Insurrection` as
+  metadata-only cleanup until their real Oracle/runtime scope is reviewed.
