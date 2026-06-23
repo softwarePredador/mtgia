@@ -3568,3 +3568,25 @@ Status:
 - Deck `606` remains open at `high=7`, `medium=7`, `pass=67`.
 - A fresh 16-seed deck `6` battle rebaseline is still required before drawing
   strategic conclusions from the post-PG078 state.
+
+## PG078 Battle Rebaseline Preflight Gate - 2026-06-23 06:50 UTC
+
+Artifacts:
+
+- Failed preflight run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065035/test_battle_runtime_surface_manifest.log`.
+
+Gate:
+
+- The battle wrapper correctly stopped before replay because the runtime
+  surface manifest had two unclassified files:
+  `deck_card_battle_rule_coherence_audit.py` and
+  `test_deck_card_battle_rule_coherence_audit.py`.
+- The manifest classification was corrected to `rule registry/sync`.
+
+Status:
+
+- `test_battle_runtime_surface_manifest.py` now passes.
+- `battle_runtime_surface_manifest.py --fail-on-unclassified` now exits cleanly.
+- The 16-seed deck `6` battle rebaseline still needs to be rerun after this
+  harness fix is committed.

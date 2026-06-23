@@ -721,3 +721,18 @@ Atualizado em 2026-05-26:
   script passed after the focused event file was registered.
 - Work remains: commit this batch, then run a fresh deck `6` 16-seed battle
   rebaseline. Do not treat PG078 as battle-strategy evidence by itself.
+
+## ManaLoom PG078 battle preflight fix - 2026-06-23 06:50 UTC
+
+- First deck `6` PG078 rebaseline attempt stopped during preflight at
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065035/test_battle_runtime_surface_manifest.log`.
+- The failure was not a battle/replay result. The runtime surface manifest had
+  two unclassified files from the new card-rule coherence audit surface.
+- Fixed by classifying `deck_card_battle_rule_coherence_audit.py` and
+  `test_deck_card_battle_rule_coherence_audit.py` under `rule registry/sync`
+  and updating the expected total/category/coverage/gate counts.
+- Validation passed:
+  `test_battle_runtime_surface_manifest.py` and
+  `battle_runtime_surface_manifest.py --fail-on-unclassified`.
+- Next action remains: commit this harness fix, rerun deck `6`
+  `deck6_pg078_rebaseline_16_seed` with `start_seed=64270200`.

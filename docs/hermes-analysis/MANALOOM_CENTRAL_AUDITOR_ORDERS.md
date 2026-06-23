@@ -3183,3 +3183,21 @@ Current order:
   clean.
 - Keep the next card-rule package separate from battle rebaseline evidence;
   the likely next card queue remains deck `606` high battle-critical cards.
+
+### PG078 Rebaseline Preflight Fix Order - 2026-06-23 06:50 UTC
+
+Evidence:
+
+- Rebaseline attempt `20260623_065035` stopped before replay because
+  `test_battle_runtime_surface_manifest.py` found unclassified runtime surface
+  files.
+- `test_battle_runtime_surface_manifest.py` passed after classifying the
+  deck-card coherence audit scripts under `rule registry/sync`.
+- `battle_runtime_surface_manifest.py --fail-on-unclassified` also passed.
+
+Current order:
+
+- Commit and push the manifest/harness fix.
+- Rerun the same deck `6` 16-seed rebaseline with
+  `start_seed=64270200`, `run_profile=deck6_pg078_rebaseline_16_seed`, and
+  `MANALOOM_BATTLE_TARGET_DECK_ID=6`.

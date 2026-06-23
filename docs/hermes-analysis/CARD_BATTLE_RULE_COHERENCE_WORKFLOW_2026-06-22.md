@@ -3145,3 +3145,60 @@ Workflow note:
   deck `607` `high=29`, `medium=12`, `pass=53`, deck `608` `high=21`,
   `medium=4`, `pass=43`, global `high=50`, `medium=34`, `pass=121`.
 - PG078 remains the next PostgreSQL package number.
+
+## PG078 Deck 606 L2 Hash/Scope Restore - 2026-06-23 06:42 UTC
+
+Closed:
+
+- Restored `oracle_hash` provenance for 23 already curated/scoped executable
+  PostgreSQL `card_battle_rules` rows used by the deck `606` L2 queue.
+- Disabled 44 superseded generated/shadow rows for the same target cards.
+- No deck swap, no `deck_cards` mutation, and no `effect_json` or
+  `deck_role_json` semantic change was performed.
+
+Evidence:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_precheck_20260623_063535.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_apply_20260623_063535.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_postcheck_20260623_063535.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l2_hash_scope_restore_pg078_rollback_20260623_063535.sql`.
+- Postcheck facts: `target_rule_rows=23`, `target_hash_match_rows=23`,
+  `target_missing_hash_rows=0`, `trusted_auto_rows=23`,
+  `scoped_target_rows=23`, `active_shadow_rows=0`,
+  `disabled_shadow_rows=44`, and `total_backup_rows=67`.
+- PG -> SQLite/canonical snapshot sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg078_l2_hash_scope_restore_sync_report_20260623_063535.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
+  `canonical_snapshot_rows_exported=3201`, and `include_needs_review=false`.
+- Focused runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg078_l2_hash_scope_restore_focused_events_20260623_063535.jsonl`
+  contains 17 records proving representative restored `rule_logical_key` and
+  `rule_oracle_hash` propagation for `Borrowed Knowledge`,
+  `Increasing Vengeance`, `Reckless Endeavor`, `Wear // Tear`,
+  `Thought Vessel`, and `Swiftfoot Boots`.
+- Runtime caveat: `Increasing Vengeance` currently proves the no-stack-target
+  guard for the instant copy-spell model, not a full dynamic stack-copy
+  executor. Treat that as model-scope evidence, not as proof of complete copy
+  resolution.
+- Accepted audits after sync: deck `6` `high=0`, `medium=0`, `pass=100`;
+  deck `606` `high=7`, `medium=7`, `pass=67`; global `high=50`,
+  `medium=12`, `pass=143`.
+- Tests passed after the focused PG078 test was added:
+  `py_compile`, `test_sync_battle_card_rules_pg_selection.py -v`,
+  `test_deck_card_battle_rule_coherence_audit.py -v`, and
+  `test_battle_analyst_v10_3.py` including
+  `test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite`.
+
+Workflow note:
+
+- User observations, including the `Blasphemous Act` cost-reduction caveat, are
+  validation hints only. They do not override Oracle/PostgreSQL/runtime
+  evidence and do not reopen a card without a real mismatch.
+- Use PG079 for the next PostgreSQL package.
+- Current deck `606` queue is `high=7`, `medium=7`, `pass=67`. The remaining
+  high battle-critical cards are `Flare of Duplication`, `Powerbalance`,
+  `Reforge the Soul`, `Rise of the Eldrazi`, `Rite of the Dragoncaller`,
+  `Storm Herd`, and `Witch Enchanter // Witch-Blessed Meadow`.

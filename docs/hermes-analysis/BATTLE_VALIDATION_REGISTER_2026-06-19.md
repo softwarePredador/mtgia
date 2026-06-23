@@ -16930,3 +16930,27 @@ Battle status:
   rebaseline and does not prove the current Lorehold deck strategic win rate.
 - Next battle action is to rerun the 16-seed strategy audit explicitly against
   deck `6` after this batch is committed.
+
+## PG078 Rebaseline Preflight Fix - 2026-06-23 06:50 UTC
+
+Status: `fixed_validated_preflight`.
+
+- Attempted deck `6` rebaseline with
+  `MANALOOM_BATTLE_TARGET_DECK_ID=6`,
+  `run_profile=deck6_pg078_rebaseline_16_seed`, `start_seed=64270200`.
+- The wrapper stopped before any replay because
+  `test_battle_runtime_surface_manifest.py` failed in
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_065035/test_battle_runtime_surface_manifest.log`.
+- Root cause: the new card-rule coherence audit scripts were scanned by the
+  runtime surface manifest but were still unclassified, producing
+  `total_files=116` and two unclassified files.
+- Fix: classified `deck_card_battle_rule_coherence_audit.py` and
+  `test_deck_card_battle_rule_coherence_audit.py` as `rule registry/sync` and
+  updated the expected manifest counts.
+- Validation:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_runtime_surface_manifest.py`
+  passed, and
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_runtime_surface_manifest.py --json-output /tmp/battle_runtime_surface_manifest_after_fix.json --fail-on-unclassified`
+  exited cleanly.
+- This is a harness/preflight fix only; no battle replay result was produced
+  by the failed `065035` run.
