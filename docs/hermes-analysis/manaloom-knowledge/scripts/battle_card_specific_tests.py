@@ -1613,6 +1613,149 @@ def register_tests(battle, player):
             assert "hexproof" not in permanent
             assert "indestructible" not in permanent
 
+    def test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Everything Comes to Dust",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Convoke (Your creatures can help cast this spell. Each creature "
+                    "you tap while casting this spell pays for {1} or one mana of "
+                    "that creature's color.)\n"
+                    "Exile all creatures except those that share a creature type with "
+                    "a creature that convoked this spell, all artifacts, and all "
+                    "enchantments."
+                ),
+            },
+            {"effect": "board_wipe", "cmc": 10.0},
+        )
+
+        assert effect_data["effect"] == "exile_artifact_enchantment_creature_convoke_wipe"
+        assert effect_data["destination"] == "exile"
+        assert effect_data["exile_creatures_except_convoked_types"] is True
+        assert effect_data["exile_artifacts"] is True
+        assert effect_data["exile_enchantments"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "exile_creatures_except_convoked_types_artifacts_enchantments_v1"
+        )
+
+    def test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Human Convoker",
+                    "effect": "creature",
+                    "type_line": "Creature — Human Wizard",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                {
+                    "name": "Own Spirit",
+                    "effect": "creature",
+                    "type_line": "Creature — Spirit",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Own Human Artifact",
+                    "effect": "creature",
+                    "type_line": "Artifact Creature — Human",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Own Enchantment",
+                    "effect": "draw_engine",
+                    "type_line": "Enchantment",
+                },
+            ]
+            opponent.battlefield = [
+                {
+                    "name": "Opponent Human",
+                    "effect": "creature",
+                    "type_line": "Creature — Human Soldier",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {
+                    "name": "Opponent Elf",
+                    "effect": "creature",
+                    "type_line": "Creature — Elf",
+                    "power": 3,
+                    "toughness": 3,
+                },
+                {
+                    "name": "Opponent Rock",
+                    "effect": "ramp_permanent",
+                    "type_line": "Artifact",
+                },
+                {
+                    "name": "Opponent Aura",
+                    "effect": "draw_engine",
+                    "type_line": "Enchantment",
+                },
+            ]
+            effect_data = {
+                "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+                "destination": "exile",
+                "convoked_creature_types": ["Human"],
+                "battle_model_scope": (
+                    "exile_creatures_except_convoked_types_artifacts_enchantments_v1"
+                ),
+                "_rule_logical_key": "battle_rule_v1:everything-dust-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Everything Comes to Dust",
+                    "cmc": 10,
+                    "type_line": "Sorcery",
+                },
+                turn=7,
+                rng=random.Random(230623),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        active_names = {card.get("name") for card in active.battlefield}
+        opponent_names = {card.get("name") for card in opponent.battlefield}
+        active_exile_names = {card.get("name") for card in active.exile}
+        opponent_exile_names = {card.get("name") for card in opponent.exile}
+
+        assert "Human Convoker" in active_names
+        assert "Opponent Human" in opponent_names
+        assert "Own Spirit" in active_exile_names
+        assert "Own Human Artifact" in active_exile_names
+        assert "Own Enchantment" in active_exile_names
+        assert "Opponent Elf" in opponent_exile_names
+        assert "Opponent Rock" in opponent_exile_names
+        assert "Opponent Aura" in opponent_exile_names
+
+        wipe_event = next(data for event, data in events if event == "board_wipe_resolved")
+        assert wipe_event["card"] == "Everything Comes to Dust"
+        assert wipe_event["rule_logical_key"] == "battle_rule_v1:everything-dust-test"
+        assert wipe_event["destination"] == "exile"
+        assert wipe_event["destroyed"] == 0
+        assert wipe_event["exiled"] == 6
+        assert wipe_event["protected"] == 2
+        assert wipe_event["convoked_creature_types"] == ["human"]
+        assert wipe_event["convoked_type_source"] == "explicit"
+        assert {entry["name"] for entry in wipe_event["preserved_by_convoke"]} == {
+            "Human Convoker",
+            "Opponent Human",
+        }
+
     def test_austere_command_resolves_two_destroy_modes():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -4202,6 +4345,62 @@ def register_tests(battle, player):
         assert [card.get("name") for card in active.hand] == ["Drawn One", "Drawn Two"]
         assert [card.get("name") for card in active.exile] == ["Refill Spell", "Mizzix's Mastery"]
         assert active.graveyard == []
+
+    def test_pg106_mizzixs_mastery_copy_declares_target_before_removal_resolution():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            mizzix = {"name": "Mizzix's Mastery", "cmc": 4, "type_line": "Sorcery"}
+            path = {"name": "Path to Exile", "cmc": 1, "type_line": "Instant"}
+            threat = {
+                "name": "Opponent Threat",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            active.graveyard = [path]
+            opponent.battlefield = [threat]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                mizzix,
+                7,
+                random.Random(10677),
+                effect_data_override=battle.get_card_effect(mizzix),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        copy_resolution = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Path to Exile"
+        )
+        removal_resolution = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Path to Exile"
+        )
+        assert copy_resolution["cast_pipeline"] == "spell_copy_resolution"
+        assert copy_resolution["source_zone"] == "stack_copy"
+        assert copy_resolution["target"] == "Opponent Threat"
+        assert copy_resolution["targets"] == [
+            {
+                "target": "Opponent Threat",
+                "target_controller": "Opponent",
+                "target_type": "creature",
+                "target_legal": True,
+                "targeting_pipeline": "targeting_formal_minimal",
+            }
+        ]
+        assert removal_resolution["target"] == "Opponent Threat"
+        assert opponent.battlefield == []
+        assert [card.get("name") for card in opponent.exile] == ["Opponent Threat"]
 
     def test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax():
         events = []
@@ -8918,6 +9117,7 @@ def register_tests(battle, player):
         test_pg076_chaos_warp_shuffles_target_into_library_and_reveals_top_permanent,
         test_pg077_jeskas_will_uses_opponent_hand_and_impulse_exiles_top_three,
         test_pg077_mizzixs_mastery_exiles_graveyard_spell_and_resolves_copy,
+        test_pg106_mizzixs_mastery_copy_declares_target_before_removal_resolution,
         test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax,
         test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
         test_pg076_support_passive_annotations_and_ranger_small_creature_tutor,
@@ -8984,6 +9184,8 @@ def register_tests(battle, player):
         test_thrumming_stone_ripples_dragons_approach_without_bonus_damage,
         test_pg079_powerbalance_casts_same_mana_value_top_card_without_paying,
         test_pg102_creative_technique_demonstrates_top_nonland_free_casts,
+        test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe,
+        test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
         test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,
         test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope,
         test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile,

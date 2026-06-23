@@ -150,6 +150,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "damage_wipe_treasure",
     "draw_engine",
     "equipment_static_attachment",
+    "exile_artifact_enchantment_creature_convoke_wipe",
     "exile_top_nonland_free_cast",
     "finisher",
     "gift_hexproof_indestructible",
@@ -2913,6 +2914,27 @@ def normalize_effect_by_oracle(card, effect_data):
         and "nonland permanent" in text
     ):
         normalized["effect"] = "board_wipe"
+        return normalized
+
+    if (
+        "exile all creatures except those that share a creature type with a creature that convoked this spell" in text
+        and "all artifacts" in text
+        and "all enchantments" in text
+    ):
+        normalized["effect"] = "exile_artifact_enchantment_creature_convoke_wipe"
+        normalized["destination"] = "exile"
+        normalized["exile_creatures_except_convoked_types"] = True
+        normalized["exile_artifacts"] = True
+        normalized["exile_enchantments"] = True
+        normalized["convoke_exception"] = "share_creature_type_with_convoked_creature"
+        normalized["convoke_creature_type_source"] = normalized.get(
+            "convoke_creature_type_source",
+            "explicit_or_controller_creature_inference",
+        )
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "exile_creatures_except_convoked_types_artifacts_enchantments_v1"
+        )
         return normalized
 
     if (
@@ -6144,6 +6166,7 @@ SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "airbend_other_creatures",
     "board_wipe",
     "damage_wipe",
+    "exile_artifact_enchantment_creature_convoke_wipe",
     "damage_player_and_creatures",
     "remove_creature",
     "remove_permanent",
@@ -8881,6 +8904,273 @@ def resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
         opponent_creatures_destroyed=opponent_creatures_destroyed,
         live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
         actual_asymmetry=actual_asymmetry,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+CREATURE_TYPE_STOPWORDS = {
+    "artifact",
+    "battle",
+    "creature",
+    "enchantment",
+    "instant",
+    "kindred",
+    "land",
+    "legendary",
+    "planeswalker",
+    "snow",
+    "sorcery",
+    "token",
+}
+
+
+def creature_types_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return set()
+    explicit = permanent.get("creature_types") or permanent.get("subtypes")
+    if isinstance(explicit, str):
+        return {
+            value.strip().lower()
+            for value in re.split(r"[,/ ]+", explicit)
+            if value.strip()
+        }
+    if isinstance(explicit, (list, tuple, set)):
+        return {
+            str(value).strip().lower()
+            for value in explicit
+            if str(value).strip()
+        }
+
+    type_line = str(permanent.get("type_line") or "")
+    if "creature" not in type_line.lower():
+        return set()
+    if "—" in type_line:
+        subtype_text = type_line.split("—", 1)[1]
+    elif " - " in type_line:
+        subtype_text = type_line.split(" - ", 1)[1]
+    else:
+        match = re.search(r"\bcreature\b(.*)$", type_line, flags=re.IGNORECASE)
+        subtype_text = match.group(1) if match else ""
+    return {
+        token.strip().lower()
+        for token in re.split(r"[^A-Za-z0-9']+", subtype_text)
+        if token.strip() and token.strip().lower() not in CREATURE_TYPE_STOPWORDS
+    }
+
+
+def convoked_creature_types_for_wipe(player, effect_data):
+    explicit = (effect_data or {}).get("convoked_creature_types")
+    if isinstance(explicit, str):
+        values = {
+            value.strip().lower()
+            for value in re.split(r"[,/ ]+", explicit)
+            if value.strip()
+        }
+        if values:
+            return values, "explicit"
+    if isinstance(explicit, (list, tuple, set)):
+        values = {
+            str(value).strip().lower()
+            for value in explicit
+            if str(value).strip()
+        }
+        if values:
+            return values, "explicit"
+
+    inferred = set()
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not is_battlefield_creature(permanent):
+            continue
+        if permanent.get("convoked_this_spell") or permanent.get("tapped_for_convoke"):
+            inferred.update(creature_types_for_permanent(permanent))
+    if inferred:
+        return inferred, "marked_convoked_permanents"
+
+    if (effect_data or {}).get("infer_convoked_types_from_controller_creatures"):
+        for permanent in getattr(player, "battlefield", []) or []:
+            if is_battlefield_creature(permanent):
+                inferred.update(creature_types_for_permanent(permanent))
+        if inferred:
+            return inferred, "controller_creature_inference"
+
+    return set(), "fallback_no_convoked_types"
+
+
+def permanent_matches_everything_comes_to_dust(permanent, convoked_types):
+    if not isinstance(permanent, dict):
+        return False, "not_permanent"
+    if is_artifact_permanent(permanent):
+        return True, "artifact"
+    if is_enchantment_permanent(permanent):
+        return True, "enchantment"
+    if not is_battlefield_creature(permanent):
+        return False, "not_creature_artifact_or_enchantment"
+    creature_types = creature_types_for_permanent(permanent)
+    if creature_types and convoked_types and creature_types.intersection(convoked_types):
+        return False, "shares_convoked_creature_type"
+    return True, "creature_without_convoked_type"
+
+
+def resolve_everything_comes_to_dust(player, opponents, card, effect_data, turn):
+    convoked_types, convoked_type_source = convoked_creature_types_for_wipe(
+        player,
+        effect_data,
+    )
+    context = board_wipe_decision_context(player, opponents)
+    exiled = []
+    preserved_by_convoke = []
+    seen = 0
+    own_exiled = 0
+    opponent_exiled = 0
+    live_opponent_exiled = 0
+    own_creatures_exiled = 0
+    opponent_creatures_exiled = 0
+    live_opponent_creatures_exiled = 0
+    for controller in [player] + list(opponents or []):
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            should_exile, reason = permanent_matches_everything_comes_to_dust(
+                permanent,
+                convoked_types,
+            )
+            if reason != "not_permanent":
+                seen += 1
+            if not should_exile:
+                if reason == "shares_convoked_creature_type":
+                    preserved_by_convoke.append(
+                        {
+                            "controller": controller.name,
+                            "name": permanent.get("name", "?"),
+                            "type_line": permanent.get("type_line", ""),
+                            "creature_types": sorted(
+                                creature_types_for_permanent(permanent)
+                            ),
+                        }
+                    )
+                continue
+
+            was_creature = is_battlefield_creature(permanent)
+            destination = move_zone_object_to_exile(
+                controller,
+                "battlefield",
+                permanent,
+                reason="everything_comes_to_dust",
+                source=card,
+                turn=turn,
+            )
+            exiled.append(
+                {
+                    "controller": controller.name,
+                    "name": permanent.get("name", "?"),
+                    "type_line": permanent.get("type_line", ""),
+                    "match_reason": reason,
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_exiled += 1
+            else:
+                opponent_exiled += 1
+                if is_live_opponent:
+                    live_opponent_exiled += 1
+            if was_creature:
+                if is_self:
+                    own_creatures_exiled += 1
+                else:
+                    opponent_creatures_exiled += 1
+                    if is_live_opponent:
+                        live_opponent_creatures_exiled += 1
+
+    actual_asymmetry = live_opponent_exiled - own_exiled
+    resolution_context = {
+        **context,
+        "destination": "exile",
+        "convoked_creature_types": sorted(convoked_types),
+        "convoked_type_source": convoked_type_source,
+        "permanents_seen": seen,
+        "actual_exiled": len(exiled),
+        "preserved_by_convoke": len(preserved_by_convoke),
+        "own_permanents_exiled": own_exiled,
+        "opponent_permanents_exiled": opponent_exiled,
+        "live_opponent_permanents_exiled": live_opponent_exiled,
+        "own_creatures_exiled": own_creatures_exiled,
+        "opponent_creatures_exiled": opponent_creatures_exiled,
+        "live_opponent_creatures_exiled": live_opponent_creatures_exiled,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_exiled,
+        "actual_asymmetry": actual_asymmetry,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_exiled > 0
+        ),
+    }
+    risk_flags = []
+    if convoked_type_source == "fallback_no_convoked_types":
+        risk_flags.append("convoke_creature_types_not_observed")
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif (
+        actual_asymmetry <= 0
+        and not context["lethal_pressure"]
+        and not context["behind_on_board"]
+    ):
+        risk_flags.append("wipe_without_clear_asymmetry")
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_convoke_exile_wipe"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            action="resolve_convoke_exile_wipe",
+        ),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium"
+        if convoked_type_source != "fallback_no_convoked_types"
+        else "low",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_exiled * 5, 35),
+        actual_outcome="board_wipe_resolved",
+        reason="resolve_convoke_exception_exile_wipe",
+        strategic_principle="exile_wipe_when_opponent_board_loss_outweighs_own_loss",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        destroyed=0,
+        exiled=len(exiled),
+        protected=len(preserved_by_convoke),
+        destination="exile",
+        convoked_creature_types=sorted(convoked_types),
+        convoked_type_source=convoked_type_source,
+        preserved_by_convoke=preserved_by_convoke[:20],
+        exiled_cards=exiled[:20],
+        own_permanents_exiled=own_exiled,
+        opponent_permanents_exiled=opponent_exiled,
+        live_opponent_permanents_exiled=live_opponent_exiled,
+        own_creatures_exiled=own_creatures_exiled,
+        opponent_creatures_exiled=opponent_creatures_exiled,
+        live_opponent_creatures_exiled=live_opponent_creatures_exiled,
+        actual_asymmetry=actual_asymmetry,
+        risk_flags=risk_flags,
         turn=turn,
         **fields,
     )
@@ -17401,6 +17691,13 @@ def apply_effect_immediate(
             source_zone="stack_copy",
             locked_cost={"copied_spell": True},
         )
+    if effect in TARGETED_REMOVAL_EFFECTS and not effect_data.get("declared_targets"):
+        effect_data, _ = prepare_declared_removal_targets(
+            player,
+            opponents,
+            card,
+            effect_data,
+        )
     spell_resolved_fields = {
         **spell_resolution_context_fields(card, effect_data, effect, player=player),
         **replay_fields_for_declared_targets(effect_data),
@@ -17857,6 +18154,8 @@ def apply_effect_immediate(
         apply_damage_wipe(player, opponents, card, effect_data, turn)
     elif effect == "airbend_other_creatures":
         apply_airbend_other_creatures(player, opponents, card, effect_data, turn)
+    elif effect == "exile_artifact_enchantment_creature_convoke_wipe":
+        resolve_everything_comes_to_dust(player, opponents, card, effect_data, turn)
     elif effect == "damage_wipe_treasure":
         apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":

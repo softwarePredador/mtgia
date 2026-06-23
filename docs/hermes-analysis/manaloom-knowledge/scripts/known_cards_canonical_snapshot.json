@@ -9109,14 +9109,23 @@
     "battle_rule_logical_key": "battle_rule_v1:40b7f8abe6b46d6e65a2009b93c3438e"
   },
   "Everything Comes to Dust": {
-    "cmc": 10.0,
-    "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e73c68daef28ce8007fecb8ee4159ef6"
+    "battle_model_scope": "exile_creatures_except_convoked_types_artifacts_enchantments_v1",
+    "convoke_creature_type_source": "explicit_or_controller_creature_inference",
+    "convoke_exception": "share_creature_type_with_convoked_creature",
+    "destination": "exile",
+    "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+    "exile_artifacts": true,
+    "exile_creatures_except_convoked_types": true,
+    "exile_enchantments": true,
+    "infer_convoked_types_from_controller_creatures": true,
+    "sorcery": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.98,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42d629a9ccceff95dbed01e2226291a7",
+    "battle_rule_oracle_hash": "1d823f07340ed6833c15a9c6065a1742"
   },
   "Evolution Witness": {
     "cmc": 3.0,

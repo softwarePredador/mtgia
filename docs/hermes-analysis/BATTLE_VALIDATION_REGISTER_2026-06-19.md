@@ -18068,3 +18068,55 @@ Battle gate interpretation:
 - Final status remains `review_required` only from
   `event_contract_static=review_required`; this is the same static fixture
   backlog category, not a new Dawn's Truce runtime blocker.
+
+## PG106 Battle Validation - Everything Comes to Dust and Copied Target Replay
+
+Status: `validated_runtime_pg_and_16_seed_gate_review_required_static_contract_only`.
+
+Runtime changes validated:
+
+- Added executable `exile_artifact_enchantment_creature_convoke_wipe` support
+  for `Everything Comes to Dust`.
+- The effect exiles artifacts, enchantments, and creatures not sharing a
+  creature type with a creature that convoked the spell.
+- Added replay trace fields for `board_wipe_resolved`: exile destination,
+  convoked creature types, source of convoked types, preserved permanents, and
+  exiled cards.
+- Fixed copied targeted-removal replay metadata: copied `Path to Exile` and
+  `Swords to Plowshares` now emit `target/targets` on `spell_resolved`, before
+  the later `removal_resolved` event.
+
+PostgreSQL/source-of-truth changes:
+
+- PG106 promoted `Everything Comes to Dust`:
+  `battle_rule_v1:42d629a9ccceff95dbed01e2226291a7`,
+  `oracle_hash=1d823f07340ed6833c15a9c6065a1742`,
+  `effect=exile_artifact_enchantment_creature_convoke_wipe`,
+  `review_status=verified`, `execution_status=auto`.
+- Two old generated board-wipe shadows were disabled.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_convoke_exile_postcheck_20260623_140650.out`.
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_convoke_exile_sync_report_20260623_140650.json`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_focused_replay_20260623_140650.json`.
+- Full test output after copied-target fix:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_copy_target_replay_battle_analyst_v10_3_test_20260623_143700.out`.
+- 16-seed corrected gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`.
+
+Battle gate interpretation:
+
+- `seeds_completed=16`.
+- Wrapper tests: `{"pass":18}`.
+- Action, forensic, replay-decision, target-pressure, and table-intent gates
+  pass with zero blockers/findings.
+- The prior copied-removal blocker is closed: `action_findings=0`, and seeds
+  `63241252`/`63241255` now show target metadata on the copied
+  `spell_resolved` events.
+- Final status remains `review_required` only from
+  `event_contract_static=review_required`; this is the same static fixture
+  backlog category, not an observed PG106 runtime failure.

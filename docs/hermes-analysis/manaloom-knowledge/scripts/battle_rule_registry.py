@@ -86,6 +86,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "board_wipe": "wipe",
     "damage_wipe": "wipe",
     "damage_wipe_treasure": "wipe",
+    "exile_artifact_enchantment_creature_convoke_wipe": "wipe",
     "remove_creature": "removal",
     "remove_permanent": "removal",
     "remove_artifact_or_3dmg": "removal",

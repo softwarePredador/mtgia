@@ -3201,3 +3201,50 @@ Current order:
 - Rerun the same deck `6` 16-seed rebaseline with
   `start_seed=64270200`, `run_profile=deck6_pg078_rebaseline_16_seed`, and
   `MANALOOM_BATTLE_TARGET_DECK_ID=6`.
+
+### Local Cron Pause Order - 2026-06-23 14:25 UTC
+
+Evidence:
+
+- Current operator authorization allowed adjusting or removing local Mac cron
+  jobs if they were interfering with the validation loop.
+- The active scheduler inventory found no crontab entries and no real Codex
+  automation files beyond `~/.codex/automations/.run-jitter-salt`.
+- Five local ManaLoom LaunchAgents were unloaded and disabled:
+  `com.manaloom.battle-strategy-audit`,
+  `com.manaloom.battle-strategy-nightly`,
+  `com.manaloom.card-semantics-audit`,
+  `com.manaloom.structure-audit`, and
+  `com.manaloom.weekend-learning`.
+- `launchctl print-disabled gui/$(id -u)` reports all five labels as
+  `disabled`; `launchctl list` no longer returns ManaLoom/Hermes/battle labels.
+- No active ManaLoom/battle cron process remains after the manually launched
+  PG106 runner finished.
+- Saved checks:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_launchagents_disabled_check_20260623_143700.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg106_launchagents_active_list_check_20260623_143700.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg106_active_process_check_20260623_143700.out`.
+- Retained local evidence footprint is large enough to justify pausing
+  unattended runs during manual card-rule work:
+  battle artifacts `7.3G`, logs `226M`, and `461` battle run directories.
+- Final latest after waiting for the active runner:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`,
+  `run_profile=pg106_copy_target_replay_16_seed`,
+  `invocation_kind=manual_codex_pg106_copy_target`, `seeds_completed=16`,
+  `battle_replay_final_status=review_required`, and only mandatory divergence
+  `event_contract_static=review_required`.
+
+Current order:
+
+- Keep local ManaLoom LaunchAgents disabled during the active manual
+  PG/card-rule and deck-consistency stage.
+- Run battle, learned-deck coherence, and card-rule audits explicitly with
+  named run profiles when they are needed as evidence.
+- Do not delete historical artifacts or plist/script files without a separate
+  cleanup order.
+- Do not reenable unattended jobs until the schedule has explicit retention,
+  dirty-worktree protection, and a non-conflicting evidence path or reviewed
+  `latest` policy.
+- This order performed no PostgreSQL write, rollback, deck swap, commit, push,
+  stash, revert, script deletion, plist deletion, or artifact deletion.

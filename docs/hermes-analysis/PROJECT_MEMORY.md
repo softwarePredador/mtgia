@@ -1328,3 +1328,36 @@ Next package number is PG086. Next queue should prioritize remaining deck
   `pass=51`, global `high=25`, `medium=4`, `pass=176`.
   Next deck `607` battle-critical cards are `Everything Comes to Dust`,
   `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.
+
+## ManaLoom PG106 Everything Comes to Dust and copied-target replay fix - 2026-06-23 14:20 UTC
+
+- PG106 promoted `Everything Comes to Dust` to a verified executable exile
+  wipe rule:
+  `battle_rule_v1:42d629a9ccceff95dbed01e2226291a7`,
+  `oracle_hash=1d823f07340ed6833c15a9c6065a1742`,
+  `effect=exile_artifact_enchantment_creature_convoke_wipe`, scope
+  `exile_creatures_except_convoked_types_artifacts_enchantments_v1`.
+- Runtime now exiles artifacts, enchantments, and creatures that do not share
+  a type with a convoking creature; artifact/enchantment creatures are still
+  exiled by the artifact/enchantment clauses.
+- PG106 precheck/apply/postcheck/sync/focused replay evidence:
+  `pg106_everything_comes_to_dust_convoke_exile_postcheck_20260623_140650.out`,
+  `pg106_everything_comes_to_dust_convoke_exile_sync_report_20260623_140650.json`,
+  and `pg106_everything_comes_to_dust_focused_replay_20260623_140650.json`.
+- During the PG106 battle gate, copied `Path to Exile` and
+  `Swords to Plowshares` exposed missing `target/targets` metadata on the
+  copied spell's `spell_resolved` event. The runtime now prepares declared
+  removal targets before emitting `spell_resolved`; regression evidence:
+  `pg106_copy_target_replay_battle_analyst_v10_3_test_20260623_143700.out`.
+- Corrected 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`
+  completed 16/16 seeds, passed all 18 wrapper tests, and reports
+  `action_findings=0`, `table_intent_statuses={"pass":16}`,
+  `target_pressure_statuses={"pass":16}`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- Current card-rule queue after PG106: deck `6` `pass=100`, deck `607`
+  `high=10`, `medium=4`, `pass=80`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, global `high=24`, `medium=4`, `pass=177`.
+  Next deck `607` battle-critical cards are `Fated Clash`,
+  `Promise of Loyalty`, and `Starfall Invocation`; `Pearl Medallion` remains
+  the next high battle-support card.

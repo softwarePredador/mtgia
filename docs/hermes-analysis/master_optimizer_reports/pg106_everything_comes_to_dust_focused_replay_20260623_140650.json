@@ -1,0 +1,306 @@
+{
+  "artifact_type": "focused_card_replay",
+  "battle_model_scope": "exile_creatures_except_convoked_types_artifacts_enchantments_v1",
+  "card": "Everything Comes to Dust",
+  "decision_traces": [
+    {
+      "actual_outcome": "board_wipe_resolved",
+      "alternatives_considered": [
+        {
+          "action": "resolve_convoke_exile_wipe",
+          "card": "Everything Comes to Dust",
+          "cmc": 10,
+          "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+          "type_line": "Sorcery"
+        },
+        {
+          "action": "defer_wipe_not_available_after_resolution"
+        }
+      ],
+      "available_option_scores": [],
+      "available_options": [
+        {
+          "action": "resolve_convoke_exile_wipe",
+          "card": "Everything Comes to Dust",
+          "cmc": 10,
+          "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+          "type_line": "Sorcery"
+        },
+        {
+          "action": "defer_wipe_not_available_after_resolution"
+        }
+      ],
+      "best_available_option_score": 15.0,
+      "best_rejected_option_score": null,
+      "chosen_option": {
+        "action": "resolve_convoke_exile_wipe",
+        "card": "Everything Comes to Dust",
+        "cmc": 10,
+        "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+        "type_line": "Sorcery"
+      },
+      "chosen_option_score": 15.0,
+      "confidence": "medium",
+      "decision_id": "decision-000001",
+      "decision_type": "board_wipe",
+      "expected_benefit_score": 15,
+      "expected_payoff_reason": "resolve_convoke_exception_exile_wipe",
+      "heuristic_version": "battle_decision_strategy_v1_2026_06_15",
+      "phase": "resolution",
+      "player": "Lorehold",
+      "reason": "resolve_convoke_exception_exile_wipe",
+      "rejected_option_scores": [],
+      "rejected_options": [
+        {
+          "action": "defer_wipe_not_available_after_resolution"
+        }
+      ],
+      "rejected_reason": "spell_already_resolving",
+      "replay_id": null,
+      "resource_delta": {
+        "actual_asymmetry": 0,
+        "actual_exiled": 6,
+        "asymmetry": -1,
+        "behind_on_board": false,
+        "convoked_creature_types": [
+          "human"
+        ],
+        "convoked_type_source": "explicit",
+        "destination": "exile",
+        "effective_opponent_creatures_destroyed": 1,
+        "lethal_pressure": false,
+        "live_opponent_creatures_exiled": 1,
+        "live_opponent_permanents_exiled": 3,
+        "opponent_creatures": 2,
+        "opponent_creatures_exiled": 1,
+        "opponent_permanents_exiled": 3,
+        "opponent_power": 5,
+        "own_creatures": 3,
+        "own_creatures_exiled": 2,
+        "own_permanents_exiled": 3,
+        "own_power": 5,
+        "permanents_seen": 8,
+        "preserved_by_convoke": 2,
+        "rebuild_cards_in_hand": 0,
+        "rebuild_engines": [
+          "Own Enchantment"
+        ],
+        "rebuild_plan": true,
+        "timing_justified": true
+      },
+      "risk_flags": [
+        "wipe_without_clear_asymmetry"
+      ],
+      "rule_source": "curated",
+      "rule_status": "verified",
+      "schema_version": "decision_trace_v1",
+      "score_components": {
+        "actual_asymmetry": 0,
+        "actual_exiled": 6,
+        "asymmetry": -1,
+        "behind_on_board": false,
+        "convoked_creature_types": [
+          "human"
+        ],
+        "convoked_type_source": "explicit",
+        "destination": "exile",
+        "effective_opponent_creatures_destroyed": 1,
+        "lethal_pressure": false,
+        "live_opponent_creatures_exiled": 1,
+        "live_opponent_permanents_exiled": 3,
+        "opponent_creatures": 2,
+        "opponent_creatures_exiled": 1,
+        "opponent_permanents_exiled": 3,
+        "opponent_power": 5,
+        "own_creatures": 3,
+        "own_creatures_exiled": 2,
+        "own_permanents_exiled": 3,
+        "own_power": 5,
+        "permanents_seen": 8,
+        "preserved_by_convoke": 2,
+        "rebuild_cards_in_hand": 0,
+        "rebuild_engines": [
+          "Own Enchantment"
+        ],
+        "rebuild_plan": true,
+        "timing_justified": true
+      },
+      "score_gap_vs_best_rejected": null,
+      "strategic_principle": "exile_wipe_when_opponent_board_loss_outweighs_own_loss",
+      "turn": 7
+    }
+  ],
+  "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+  "ending_state": {
+    "active_battlefield": [
+      "Human Convoker"
+    ],
+    "active_exile": [
+      "Own Spirit",
+      "Own Human Artifact",
+      "Own Enchantment"
+    ],
+    "active_graveyard": [
+      "Everything Comes to Dust"
+    ],
+    "opponent_battlefield": [
+      "Opponent Human"
+    ],
+    "opponent_exile": [
+      "Opponent Elf",
+      "Opponent Rock",
+      "Opponent Aura"
+    ]
+  },
+  "events": [
+    {
+      "card": "Everything Comes to Dust",
+      "cmc": 10,
+      "destination": "graveyard",
+      "effect": "exile_artifact_enchantment_creature_convoke_wipe",
+      "event": "spell_resolved",
+      "player": "Lorehold",
+      "result": "resolved",
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.98,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:42d629a9ccceff95dbed01e2226291a7",
+      "rule_oracle_hash": "1d823f07340ed6833c15a9c6065a1742",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "stack_object": "Everything Comes to Dust",
+      "to_zone": "graveyard",
+      "turn": 7,
+      "type_line": "Sorcery",
+      "zone_after": "graveyard"
+    },
+    {
+      "actual_asymmetry": 0,
+      "card": "Everything Comes to Dust",
+      "convoked_creature_types": [
+        "human"
+      ],
+      "convoked_type_source": "explicit",
+      "destination": "exile",
+      "destroyed": 0,
+      "event": "board_wipe_resolved",
+      "exiled": 6,
+      "exiled_cards": [
+        {
+          "controller": "Lorehold",
+          "destination": "exile",
+          "match_reason": "creature_without_convoked_type",
+          "name": "Own Spirit",
+          "type_line": "Creature \u2014 Spirit"
+        },
+        {
+          "controller": "Lorehold",
+          "destination": "exile",
+          "match_reason": "artifact",
+          "name": "Own Human Artifact",
+          "type_line": "Artifact Creature \u2014 Human"
+        },
+        {
+          "controller": "Lorehold",
+          "destination": "exile",
+          "match_reason": "enchantment",
+          "name": "Own Enchantment",
+          "type_line": "Enchantment"
+        },
+        {
+          "controller": "Opponent",
+          "destination": "exile",
+          "match_reason": "creature_without_convoked_type",
+          "name": "Opponent Elf",
+          "type_line": "Creature \u2014 Elf"
+        },
+        {
+          "controller": "Opponent",
+          "destination": "exile",
+          "match_reason": "artifact",
+          "name": "Opponent Rock",
+          "type_line": "Artifact"
+        },
+        {
+          "controller": "Opponent",
+          "destination": "exile",
+          "match_reason": "enchantment",
+          "name": "Opponent Aura",
+          "type_line": "Enchantment"
+        }
+      ],
+      "live_opponent_creatures_exiled": 1,
+      "live_opponent_permanents_exiled": 3,
+      "opponent_creatures_exiled": 1,
+      "opponent_permanents_exiled": 3,
+      "own_creatures_exiled": 2,
+      "own_permanents_exiled": 3,
+      "player": "Lorehold",
+      "preserved_by_convoke": [
+        {
+          "controller": "Lorehold",
+          "creature_types": [
+            "human",
+            "wizard"
+          ],
+          "name": "Human Convoker",
+          "type_line": "Creature \u2014 Human Wizard"
+        },
+        {
+          "controller": "Opponent",
+          "creature_types": [
+            "human",
+            "soldier"
+          ],
+          "name": "Opponent Human",
+          "type_line": "Creature \u2014 Human Soldier"
+        }
+      ],
+      "protected": 2,
+      "risk_flags": [
+        "wipe_without_clear_asymmetry"
+      ],
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.98,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:42d629a9ccceff95dbed01e2226291a7",
+      "rule_oracle_hash": "1d823f07340ed6833c15a9c6065a1742",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "turn": 7
+    }
+  ],
+  "generated_at": "2026-06-23T14:06:50Z",
+  "oracle_summary": "Exile all creatures except those sharing a creature type with a creature that convoked this spell, all artifacts, and all enchantments.",
+  "rule_logical_key": "battle_rule_v1:42d629a9ccceff95dbed01e2226291a7",
+  "rule_oracle_hash": "1d823f07340ed6833c15a9c6065a1742",
+  "source": "local_runtime_after_pg106_sync",
+  "starting_state": {
+    "active_battlefield": [
+      "Human Convoker",
+      "Own Spirit",
+      "Own Human Artifact",
+      "Own Enchantment"
+    ],
+    "active_hand": [
+      "Everything Comes to Dust",
+      "Plains"
+    ],
+    "convoked_creature_types": [
+      "Human"
+    ],
+    "opponent_battlefield": [
+      "Opponent Human",
+      "Opponent Elf",
+      "Opponent Rock",
+      "Opponent Aura"
+    ],
+    "opponent_hand": [
+      "Opponent Keep"
+    ]
+  }
+}

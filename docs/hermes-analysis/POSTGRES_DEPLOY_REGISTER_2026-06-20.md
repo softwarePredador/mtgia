@@ -3,12 +3,12 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG105, applied, postchecked, synced from PostgreSQL to Hermes
+this thread is PG106, applied, postchecked, synced from PostgreSQL to Hermes
 SQLite/canonical snapshot, tested, battle-gated, and documented on
-2026-06-23 13:49 UTC. PG103 promoted `Dawn's Truce` to an Oracle-backed
-`gift_hexproof_indestructible` executable protection rule. PG104/PG105 restored
-drifted Oracle hash/scope metadata for existing runtime-safe rules. This was
-not a deck swap, learned-deck promotion, or battle rebaseline.
+2026-06-23 14:20 UTC. PG106 promoted `Everything Comes to Dust` to an
+Oracle-backed convoke-aware exile wipe rule and closed a replay target metadata
+gap for copied targeted removal. This was not a deck swap, learned-deck
+promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -8968,7 +8968,103 @@ Post-PG105 deck audit counts:
 
 Next deploy number:
 
-- PG106 is next for any future PostgreSQL package.
+- PG106 was consumed by the Everything Comes to Dust package below. PG107 is
+  next for any future PostgreSQL package.
+
+## PG106 Everything Comes to Dust Convoke Exile Wipe - Applied 2026-06-23 14:20 UTC
+
+Status: `applied_validated_synced_battle_review_required_static_contract_only`.
+
+Scope:
+
+- PG106 promoted `Everything Comes to Dust` from two generated
+  `needs_review`/`review_only` board-wipe shadows to one curated verified
+  executable rule.
+- Runtime now models the Oracle scope as exile all artifacts, all
+  enchantments, and all creatures except non-artifact/non-enchantment creatures
+  that share a type with a creature that convoked the spell.
+- A replay-contract gap found during the PG106 battle gate was also fixed:
+  copied targeted removal spells now declare target metadata before their
+  `spell_resolved` event is emitted.
+- No `deck_cards` mutation, no learned-deck promotion, and no deck swap.
+
+Promoted PG106 rule:
+
+- `logical_rule_key=battle_rule_v1:42d629a9ccceff95dbed01e2226291a7`
+- `oracle_hash=1d823f07340ed6833c15a9c6065a1742`
+- `effect=exile_artifact_enchantment_creature_convoke_wipe`
+- `battle_model_scope=exile_creatures_except_convoked_types_artifacts_enchantments_v1`
+- `review_status=verified`
+- `execution_status=auto`
+- `source=curated`
+
+PostgreSQL evidence:
+
+- PG106 precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_convoke_exile_precheck_20260623_140650.out`
+  reported `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `new_rule_already_present_rows=0`, `active_shadow_rows=2`,
+  `review_or_disabled_shadow_rows=2`, and `backup_table_already_exists=f`.
+- PG106 apply/postcheck:
+  `pg106_everything_comes_to_dust_convoke_exile_apply_20260623_140650.out`
+  reported backup `SELECT 2`, `deprecated_shadow_rows=2`,
+  `upserted_rows=1`, and `COMMIT`; the postcheck reported
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `promoted_expected_effect_rows=1`,
+  `active_shadow_rows=0`, `active_rows_still_claiming_plain_board_wipe=0`,
+  and `backup_rows=2`.
+- Rollback table:
+  `manaloom_deploy_audit.pg106_everything_comes_to_dust_convoke_exile_20260623_140650`.
+
+Runtime/sync evidence:
+
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_convoke_exile_sync_report_20260623_140650.json`
+  reported `pg_rows_loaded=1834`, `sqlite_inserted_or_updated=1814`,
+  `canonical_snapshot_rows_exported=3201`, and `curated_rows=132`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_focused_replay_20260623_140650.json`
+  records `exiled=6`, `protected=2`, `destination=exile`,
+  `convoked_creature_types=["human"]`, and artifact/enchantment exile even
+  when the artifact creature shares the convoked type.
+- Replay target fix evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_copy_target_replay_battle_analyst_v10_3_test_20260623_143700.out`
+  includes `PASS test_pg106_mizzixs_mastery_copy_declares_target_before_removal_resolution`.
+
+Tests and battle gate:
+
+- PG106 card/runtime tests passed:
+  `pg106_everything_comes_to_dust_battle_analyst_v10_3_test_20260623_140650.out`,
+  `pg106_everything_comes_to_dust_py_compile_20260623_140650.out`,
+  `pg106_everything_comes_to_dust_test_battle_forensic_audit_supported_effects_20260623_140650.out`,
+  `pg106_everything_comes_to_dust_event_contract_static_test_20260623_140650.out`,
+  `pg106_everything_comes_to_dust_test_sync_battle_card_rules_pg_selection_20260623_140650.out`,
+  `pg106_everything_comes_to_dust_test_deck_card_battle_rule_coherence_audit_20260623_140650.out`,
+  and `pg106_everything_comes_to_dust_test_reviewed_battle_card_rules_20260623_140650.out`.
+- Corrected 16-seed battle gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`
+  ran with `run_profile=pg106_copy_target_replay_16_seed`,
+  `invocation_kind=manual_codex_pg106_copy_target`, `start_seed=63241248`,
+  `seeds_completed=16`, and wrapper tests `{"pass":18}`.
+- Action, forensic, replay-decision, target-pressure, and table-intent gates
+  passed with zero blockers. `action_findings=0`; the previous copied
+  `Path to Exile`/`Swords to Plowshares` target-metadata findings are closed.
+  Final status remains `review_required` only because
+  `event_contract_static=review_required` is still a mandatory static fixture
+  backlog.
+
+Post-PG106 deck audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=10`, `medium=4`, `pass=80`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=24`, `medium=4`, `pass=177`.
+- `Everything Comes to Dust` is now `pass` for deck `607` with one trusted
+  executable rule.
+
+Next deploy number:
+
+- PG107 is next for any future PostgreSQL package.
 
 ## PG099 Avatar's Wrath Airbend Runtime Rule - Applied 2026-06-23 12:37 UTC
 

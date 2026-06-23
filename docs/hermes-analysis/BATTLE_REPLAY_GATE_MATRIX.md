@@ -4415,3 +4415,43 @@ Decision:
 - It reduces deck `607` card-rule queue to `high=11`, `medium=4`, `pass=79`.
 - Continue deck `607` high `battle_critical` cards before using the battle
   win-rate as deck-quality evidence.
+
+## PG106 Manual Battle Gate - Everything Comes to Dust and Copied Target Replay
+
+Fresh corrected manual battle gate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`.
+- `timestamp_utc=2026-06-23T14:20:12Z`.
+- `run_profile=pg106_copy_target_replay_16_seed`.
+- `invocation_kind=manual_codex_pg106_copy_target`.
+- `seeds_requested=16`, `start_seed=63241248`, `seeds_completed=16`.
+- `test_results_status_counts={"pass":18}` and `test_result_failures=[]`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Gate interpretation:
+
+- Action, forensic, replay-decision, table-intent, and target-pressure gates
+  passed with zero blockers.
+- `action_findings=0`, `table_intent_statuses={"pass":16}`, and
+  `target_pressure_statuses={"pass":16}`.
+- The earlier PG106 pre-fix gate
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_141120/summary.json`
+  blocked because copied targeted-removal spells lacked declared target
+  metadata on their `spell_resolved` events.
+- The corrected run proves closure for that replay-contract blocker: seed
+  `63241252` copied `Path to Exile` with target
+  `Rograkh, Son of Rohgahh`; seed `63241255` copied
+  `Swords to Plowshares` with target `Ranger-Captain of Eos`.
+- The remaining `review_required` state is the static event-contract fixture
+  backlog, not an observed `Everything Comes to Dust` or copied-removal
+  runtime failure.
+
+Decision:
+
+- PG106 is accepted as a card-rule/source-of-truth correction and replay
+  contract fix.
+- It reduces deck `607` card-rule queue to `high=10`, `medium=4`, `pass=80`.
+- Continue deck `607` high `battle_critical` cards before using battle
+  win-rate as deck-quality evidence.

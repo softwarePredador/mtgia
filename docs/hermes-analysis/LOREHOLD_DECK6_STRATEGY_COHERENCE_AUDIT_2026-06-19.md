@@ -21925,3 +21925,119 @@ Next validation focus:
   `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
   `Starfall Invocation`. `Pearl Medallion` remains the next high
   `battle_support` card after those.
+
+## PG106 Everything Comes to Dust Validation - 2026-06-23 14:20 UTC
+
+Status: `deck607_queue_reduced_battle_gate_review_required_static_contract_only`.
+
+What changed:
+
+- `Everything Comes to Dust` was validated against current Oracle text and
+  promoted from generated board-wipe shadows to:
+  `battle_rule_v1:42d629a9ccceff95dbed01e2226291a7`,
+  `oracle_hash=1d823f07340ed6833c15a9c6065a1742`,
+  `effect=exile_artifact_enchantment_creature_convoke_wipe`, and
+  `battle_model_scope=exile_creatures_except_convoked_types_artifacts_enchantments_v1`.
+- Runtime now treats the spell as an exile wipe, not destruction: exile all
+  artifacts, all enchantments, and creatures that do not share a type with a
+  creature that convoked the spell.
+- The PG106 battle gate exposed an unrelated replay-contract defect where
+  copied targeted-removal spells resolved without `target/targets` on the
+  `spell_resolved` event. The runtime now declares targets before emitting
+  copied targeted-removal resolution events.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_convoke_exile_postcheck_20260623_140650.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_convoke_exile_sync_report_20260623_140650.json`.
+- Focused Everything Comes to Dust replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_everything_comes_to_dust_focused_replay_20260623_140650.json`.
+- Full suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg106_copy_target_replay_battle_analyst_v10_3_test_20260623_143700.out`.
+- Fresh corrected 16-seed battle artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`.
+
+Current audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=10`, `medium=4`, `pass=80`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=24`, `medium=4`, `pass=177`.
+- `Everything Comes to Dust` is closed for the current deck `607` gate.
+
+Current deck `607` high queue:
+
+- `Fated Clash`
+- `Promise of Loyalty`
+- `Starfall Invocation`
+- `Pearl Medallion`
+- `Emeria's Call // Emeria, Shattered Skyclave`
+- `Molecule Man`
+- `The Mind Stone`
+- `The Scarlet Witch`
+- `Thor, God of Thunder`
+- `Tragic Arrogance`
+
+Next validation focus:
+
+- Continue deck `607` high `battle_critical` first:
+  `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.
+  `Pearl Medallion` remains the next high `battle_support` card after those.
+
+## Local Cron Pause For Manual PG/Card-Rule Stage - 2026-06-23 14:25 UTC
+
+Status: `local_manaloom_launchagents_disabled_pending_manual_reenable`.
+
+Operational decision:
+
+- The current stage is manual PG/card-rule validation and focused battle
+  replay, not unattended scheduled mutation of the evidence stream.
+- Local ManaLoom LaunchAgents were adding noise to the evidence loop by
+  mutating `battle-strategy-audit/latest`, running against dirty/intermediate
+  code, and producing large recurring artifacts. They are paused until a new
+  explicit scheduling policy is chosen.
+- The pause is reversible: scripts, plist files, logs, and historical artifacts
+  were preserved. No cleanup/delete/stash/revert was performed.
+
+LaunchAgents disabled and unloaded:
+
+- `com.manaloom.battle-strategy-audit`
+- `com.manaloom.battle-strategy-nightly`
+- `com.manaloom.card-semantics-audit`
+- `com.manaloom.structure-audit`
+- `com.manaloom.weekend-learning`
+
+Evidence:
+
+- `launchctl print-disabled gui/$(id -u)` reports all five labels as
+  `disabled`.
+- `launchctl list | rg -i 'manaloom|hermes|mtg|battle|optimizer|lorehold'`
+  returned no loaded ManaLoom/Hermes jobs after `bootout`.
+- `ps -axo ... | rg 'manaloom|battle-strategy-audit|battle_replay_v10_3|weekend-learning|structure-audit|card-semantics'`
+  returned no active ManaLoom/battle cron process after the active manual
+  runner finished.
+- `crontab -l` returned empty and `~/.codex/automations` only contained
+  `.run-jitter-salt`.
+- Local retained footprint at the time of pause:
+  `/Users/desenvolvimentomobile/.manaloom-agents/logs` = `226M`,
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit`
+  = `7.3G`, with `461` battle run directories.
+- Final `battle-strategy-audit/latest` after waiting for the active manual
+  runner:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_142012/summary.json`,
+  `run_profile=pg106_copy_target_replay_16_seed`,
+  `invocation_kind=manual_codex_pg106_copy_target`, `seeds_completed=16`,
+  `battle_replay_final_status=review_required`,
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`,
+  and `test_results_status_counts.pass=18`.
+
+Scope guard:
+
+- No PostgreSQL write, rollback, deck swap, commit, push, artifact deletion,
+  plist deletion, script deletion, stash, or revert was performed.
+- While the deck/card-rule work remains active, use explicit manual commands
+  with named run profiles for battle and learned-deck evidence. Do not reenable
+  unattended LaunchAgents unless the schedule writes to a non-conflicting
+  evidence path or has retention and dirty-worktree guards.
