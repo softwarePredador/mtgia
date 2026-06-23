@@ -1049,6 +1049,19 @@ Next package number is PG086. Next queue should prioritize remaining deck
   PostgreSQL and preserves the same counts as the PG091 closeout. The full
   current-state wrapper passed at
   `docs/hermes-analysis/master_optimizer_reports/pg092_start_test_battle_analyst_v10_3_20260623_101200.out`.
+- PG092 then closed two deck `608` high L7 modal interaction findings:
+  `Return the Favor` and `Untimely Malfunction`. Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_l7_modal_interaction_pg092_postcheck_20260623_095405.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg092_deck608_l7_modal_interaction_sync_report_20260623_095405.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck608_pg092_l7_modal_interaction_focused_events_20260623_095405.jsonl`.
+  The executable subset for `Return the Favor` is stack-copy of instant/sorcery
+  spells; spree costs, activated/triggered ability copying, and target-change
+  mode remain annotations. The executable subset for `Untimely Malfunction` is
+  destroy target artifact; redirect and can't-block modes remain annotations.
+  Post-PG092 applied state: deck `6` `pass=100`, deck `606` `pass=81`,
+  deck `608` `high=14`, `medium=3`, `pass=51`, and global `high=32`,
+  `medium=4`, `pass=169`. PG093 is next.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 
