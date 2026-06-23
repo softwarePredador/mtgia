@@ -2156,3 +2156,131 @@ Remaining risk:
   outside hand" lock.
 - `Ranger-Captain of Eos` still needs a separate model/waiver for its sacrifice
   silence ability.
+
+## PG057 Deck 6 L3A Artifact Mana-Rock Batch - Closed 2026-06-23 01:50 UTC
+
+Status:
+
+- Closed `7` official Lorehold deck `6` L3 artifact mana-rock cards using the
+  shared `ramp_permanent` mana-source runtime:
+  `Arcane Signet`, `Boros Signet`, `Fellwar Stone`, `Mana Vault`,
+  `Mox Amber`, `Sol Ring`, and `Talisman of Conviction`.
+- Explicitly excluded from this package:
+  `Lotus Petal` (sacrifice one-shot), `Ruby Medallion` (cost reduction), and
+  the remaining ritual/treasure/cost-engine cards.
+
+Validation:
+
+- PostgreSQL oracle/type checked for every included card before apply.
+- PG057 added `oracle_hash`, `produces`, `mana_produced`,
+  `battle_model_scope`, and `oracle_runtime_scope` to the trusted runtime rows.
+- Non-executed clauses were not promoted by inference:
+  Boros Signet activation cost is `abstracted_as_net_one_mana`;
+  Mana Vault untap/damage clauses are `annotation_only`; Talisman life loss is
+  `annotation_only`; Fellwar Stone opponent-color dependency is abstracted;
+  Mox Amber keeps the live legendary-presence gate while color choice remains
+  abstracted.
+- PG057 disabled `7` generated review-only shadows and `4` older curated
+  generic shadows after retaining one oracle-hashed trusted runtime row per
+  target card.
+- PG postcheck:
+  `target_runtime_rows=7`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
+  `target_runtime_rows_without_produces=0`,
+  `target_runtime_rows_bad_mana_produced=0`,
+  `target_runtime_rows_bad_scope=0`, `generated_review_only_rows=0`,
+  `active_curated_shadow_rows=0`, `disabled_or_deprecated_rows=11`, and
+  `backup_rows=18`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg055_deck6_l3a_artifact_mana_rocks_20260623_014032.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_focused_events_20260623_014032.jsonl`.
+- Tests passed:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+
+Auditor result:
+
+- Deck 6 pre-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_014032.json`
+  reported `high=39`, `medium=8`, `pass=53`.
+- Deck 6 post-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_015020.json`
+  reported `high=32`, `medium=8`, `pass=60`.
+- Deck 606 separate post-sync report:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_015020.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+
+Test-suite note:
+
+- Numbering note: the physical SQL/sync/event artifacts and PG backup table use
+  a `pg055_deck6_l3a_artifact_mana_rocks...` prefix because the package was
+  generated and applied before the parallel `PG055 Lorehold Variant 03` register
+  entry and separate `PG056` deck 608 package artifacts appeared in this
+  worktree. This batch is tracked logically as `PG057`.
+- The full battle suite exposed an unrelated name-normalization issue in the
+  `Dragon's Approach` graveyard-copy cost path. The code now accepts both
+  normalized spellings (`dragon's approach` and `dragon s approach`), and the
+  existing Dragon's Approach tests pass. The later `PG056 Deck 608 Dragon
+  Package` promoted the PostgreSQL rule provenance and scope for
+  `Dragon's Approach` and `Thrumming Stone`.
+
+## PG056 Deck 608 Dragon Package - Closed 2026-06-23 01:58 UTC
+
+Status:
+
+- Closed `Dragon's Approach` and `Thrumming Stone` for the current deck `608`
+  battle-rule coherence gate.
+- This package fixes a real runtime bug: `Dragon's Approach` damage is fixed at
+  `3` to each opponent; graveyard copies are only the optional cost for the
+  Dragon tutor clause.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Validation:
+
+- PostgreSQL precheck found `2` target cards, `4` target rule rows,
+  `trusted_active_rows=1`, `trusted_missing_hash_rows=1`,
+  `trusted_without_scope_rows=1`, `generated_review_only_rows=3`, and no
+  active card-id mismatches.
+- PG apply created backup table
+  `manaloom_deploy_audit.pg056_deck608_dragons_approach_thrumming_20260623_015223`
+  with `4` rows, updated `2` trusted runtime rows, and disabled `2`
+  generated review-only/shadow rows.
+- PG postcheck:
+  `target_cards=2`, `target_rule_rows=4`, `trusted_active_rows=2`,
+  `trusted_missing_hash_rows=0`, `trusted_hash_mismatch_rows=0`,
+  `trusted_without_scope_rows=0`, `generated_review_only_rows=0`,
+  `disabled_or_deprecated_rows=2`, and `backup_rows=4`.
+- SQLite was resynced from PostgreSQL:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg056_deck608_dragons_approach_thrumming_20260623_015223.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_focused_events_20260623_015223.jsonl`.
+- Tests added:
+  `test_dragons_approach_deals_fixed_damage_and_tutors_dragon_from_graveyard_cost`
+  and `test_thrumming_stone_ripples_dragons_approach_without_bonus_damage`.
+
+Auditor result:
+
+- Deck 608 pre-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_014500.json`
+  reported `high=43`, `medium=11`, `pass=14`.
+- Deck 608 post-batch:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_015223.json`
+  reports `high=38`, `medium=11`, `pass=19`.
+- `Dragon's Approach` is now `pass` with quantity `20`, one trusted executable
+  rule, zero review-only rules, and logical key
+  `battle_rule_v1:78d365e6550e295f9cbfa4f92245f864`.
+- `Thrumming Stone` is now `pass` with one trusted executable rule, zero
+  review-only rules, and logical key
+  `battle_rule_v1:aab9a1ed1e17a7a4d3446562be30775f`.
+
+Remaining risk:
+
+- Deck `608` still has `38` high-severity card-model findings. The next
+  battle-critical queue starts with `Angel's Grace`, `Artist's Talent`,
+  `Cool but Rude`, `Enlightened Tutor`, `Goblin Engineer`,
+  `Idyllic Tutor`, `Imperial Recruiter`, `Magmakin Artillerist`,
+  `Pyromancer Ascension`, and `Naktamun Lorespinner // Wheel of Fortune`.

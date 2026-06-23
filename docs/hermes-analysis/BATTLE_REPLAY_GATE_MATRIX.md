@@ -2701,3 +2701,81 @@ Caveat:
 
 - Grand Abolisher's activated-ability lock remains `annotation_only`; this
   gate proves the current opponent spell-cast lock runtime path.
+
+## PG057 Deck 6 L3A Artifact Mana-Rock Focused Event Gate - 2026-06-23 01:50 UTC
+
+Artifacts:
+
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_focused_events_20260623_014032.jsonl`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_apply_20260623_014032.sql`.
+
+Gate:
+
+- The `rule_resolution_batch` row proves all seven target cards resolve to
+  trusted `ramp_permanent` rules with `rule_logical_key`, `rule_oracle_hash`,
+  `battle_model_scope`, `produces`, and `mana_produced`.
+- Runtime sample without a legendary permanent reports `sources=6`,
+  `available_mana=9`, `colorless=5`, and `wildcard=4`; `Mox Amber` is not
+  counted.
+- Runtime sample after adding `Lorehold, the Historian` reports `sources=7`,
+  `available_mana=10`, `colorless=5`, and `wildcard=5`; `Mox Amber` is counted
+  only with a live legendary permanent.
+
+Status:
+
+- `Arcane Signet`, `Boros Signet`, `Fellwar Stone`, `Mana Vault`,
+  `Mox Amber`, `Sol Ring`, and `Talisman of Conviction` are closed for the
+  current battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_015020.json`
+  reports deck `6` at `high=32`, `medium=8`, `pass=60`.
+
+Caveats:
+
+- This gate proves mana-source runtime provenance and current refresh behavior.
+  It does not claim full Magic-equivalent tap/cost sequencing for Boros Signet,
+  exact color production for Fellwar Stone/Mox Amber, Mana Vault's untap/damage
+  clauses, or Talisman life-loss resolution.
+- Numbering note: the focused event artifact keeps the physical `pg055` prefix;
+  this gate is tracked logically as `PG057` because `PG055` is used by the
+  parallel Lorehold Variant 03 metadata deploy and separate `PG056` deck 608
+  package artifacts exist in this worktree.
+
+## PG056 Deck 608 Dragon Package Focused Runtime Gate - 2026-06-23 01:58 UTC
+
+Artifacts:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_apply_20260623_015223.sql`.
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_postcheck_20260623_015223.out`.
+- SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg056_deck608_dragons_approach_thrumming_20260623_015223.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_focused_events_20260623_015223.jsonl`.
+
+Gate:
+
+- `Dragon's Approach` resolves with fixed `damage_each_opponent=3`; graveyard
+  copies are counted only for the optional five-copy Dragon tutor cost.
+- The focused Dragon's Approach test proves five graveyard copies move to exile
+  and `Goldspan Dragon` moves from library to battlefield.
+- `Thrumming Stone` resolves as `ripple_engine` with same-name `ripple 4`
+  support; the focused ripple test proves two additional Dragon's Approach
+  copies are cast from the top four without increasing per-copy damage.
+
+Status:
+
+- `Dragon's Approach` and `Thrumming Stone` are closed for the current deck
+  `608` battle-rule coherence gate.
+- Final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_015223.json`
+  reports deck `608` at `high=38`, `medium=11`, `pass=19`.
+
+Caveats:
+
+- This gate proves the focused runtime paths needed by the deck `608` Dragon's
+  Approach package. It does not claim full Magic-equivalent stack, search,
+  replacement, or shuffle behavior.

@@ -15348,3 +15348,123 @@ Caveat:
 - Grand Abolisher's activated-ability lock is stored as `annotation_only`.
   PG054 proves the current opponent spell-cast lock runtime path, not a full
   activated-ability-lock executor.
+
+## PG057 Deck 6 L3A Artifact Mana-Rock Batch - Closed 2026-06-23 01:50 UTC
+
+Status:
+
+- Closed `7` official Lorehold deck `6` L3 artifact mana rocks:
+  `Arcane Signet`, `Boros Signet`, `Fellwar Stone`, `Mana Vault`,
+  `Mox Amber`, `Sol Ring`, and `Talisman of Conviction`.
+- Excluded and still open:
+  `Lotus Petal`, `Ruby Medallion`, `Birgi, God of Storytelling // Harnfel, Horn of Bounty`,
+  `Jeska's Will`, `Rite of Flame`, `Seething Song`, `Smothering Tithe`,
+  `Storm-Kiln Artist`, `Professional Face-Breaker`, and
+  `Unexpected Windfall`.
+
+Evidence:
+
+- PG057 precheck:
+  `deck_target_cards=7`, `target_rule_rows=18`,
+  `target_runtime_rows=7`, `generated_review_only_rows=7`,
+  `curated_shadow_rows_to_disable=4`, `trusted_missing_hash_rows=11`,
+  `trusted_without_scope_rows=7`,
+  `target_runtime_rows_without_produces=3`,
+  `active_card_id_mismatch_same_oracle_rows=2`,
+  `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`, and
+  `target_names_missing_rules=0`.
+- PG apply created backup table
+  `manaloom_deploy_audit.pg055_deck6_l3a_artifact_mana_rocks_20260623_014032`
+  with `18` rows, updated `7` trusted runtime rows, and disabled `11`
+  generated/legacy shadows.
+- PG postcheck:
+  `trusted_missing_hash_rows=0`, `trusted_hash_mismatch_rows=0`,
+  `trusted_without_scope_rows=0`, `target_runtime_rows_without_produces=0`,
+  `target_runtime_rows_bad_mana_produced=0`,
+  `target_runtime_rows_bad_scope=0`, `generated_review_only_rows=0`,
+  `active_curated_shadow_rows=0`, `active_card_id_mismatch_same_oracle_rows=0`,
+  `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`,
+  `disabled_or_deprecated_rows=11`, and `backup_rows=18`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg055_deck6_l3a_artifact_mana_rocks_20260623_014032.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_focused_events_20260623_014032.jsonl`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+
+Gate result:
+
+- Deck 6 moved from `high=39`, `medium=8`, `pass=53` to
+  `high=32`, `medium=8`, `pass=60`.
+- Deck 606 moved from `high=43`, `medium=8`, `pass=30` after PG054 to
+  `high=38`, `medium=8`, `pass=35` after the shared PG057 rule sync.
+
+Caveats:
+
+- Boros Signet activation cost is modeled as net one mana, not a full tap/cost
+  activation executor.
+- Mana Vault untap and damage clauses remain annotation-only.
+- Talisman life loss remains annotation-only.
+- Mox Amber's legendary-permanent gate is executable, but exact produced-color
+  choice remains abstracted.
+- Numbering note: the physical SQL/sync/event artifacts and PG backup table use
+  a `pg055_deck6_l3a_artifact_mana_rocks...` prefix because this package was
+  generated and applied before the parallel `PG055 Lorehold Variant 03` register
+  entry and separate `PG056` deck 608 package artifacts appeared in this
+  worktree. This batch is tracked logically as `PG057`.
+- A separate code-path fix in the same validation run corrected
+  `Dragon's Approach` name normalization in its existing graveyard-copy test.
+  The later `PG056 Deck 608 Dragon Package` promoted the PostgreSQL rule
+  provenance and scope for `Dragon's Approach` and `Thrumming Stone`.
+
+## PG056 Deck 608 Dragon Package - Closed 2026-06-23 01:58 UTC
+
+Status:
+
+- Closed `Dragon's Approach` and `Thrumming Stone` for deck `608`.
+- Corrected the simulator model so `Dragon's Approach` deals fixed `3` damage
+  to each opponent and uses five graveyard copies only for the optional Dragon
+  tutor cost.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG056 precheck:
+  `target_cards=2`, `target_rule_rows=4`, `trusted_active_rows=1`,
+  `trusted_missing_hash_rows=1`, `trusted_without_scope_rows=1`,
+  `generated_review_only_rows=3`, `thrumming_trusted_active_rows=0`, and no
+  active card-id mismatches.
+- PG apply created backup table
+  `manaloom_deploy_audit.pg056_deck608_dragons_approach_thrumming_20260623_015223`
+  with `4` rows, updated `2` trusted runtime rows, and disabled `2`
+  generated/shadow rows.
+- PG postcheck:
+  `trusted_active_rows=2`, `trusted_missing_hash_rows=0`,
+  `trusted_hash_mismatch_rows=0`, `trusted_without_scope_rows=0`,
+  `generated_review_only_rows=0`, `disabled_or_deprecated_rows=2`, and
+  `backup_rows=4`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg056_deck608_dragons_approach_thrumming_20260623_015223.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_focused_events_20260623_015223.jsonl`.
+- Deck 608 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_015223.json`
+  reports `high=38`, `medium=11`, `pass=19`.
+
+Gate result:
+
+- Deck 608 moved from `high=43`, `medium=11`, `pass=14` to `high=38`,
+  `medium=11`, `pass=19`.
+- `Dragon's Approach` and `Thrumming Stone` are both `pass` in the current
+  deck `608` coherence audit.
+
+Caveats:
+
+- Thrumming Stone is modeled as same-name `ripple 4` free-cast support for
+  spells the controller casts. The current gate does not claim a complete
+  Magic-equivalent priority stack implementation.
+- The Dragon tutor picks a Dragon creature from library into battlefield using
+  the current simulator abstraction. Search/shuffle and all replacement effects
+  remain outside this focused gate.

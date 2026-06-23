@@ -1086,14 +1086,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Arcane Signet": {
+    "battle_model_scope": "commander_identity_mana_rock_deck_scoped_v1",
+    "commander_identity_status": "deck6_lorehold_rw_runtime_scope",
     "effect": "ramp_permanent",
     "mana_produced": 1,
+    "oracle_runtime_scope": "mana_source_runtime_commander_identity_annotation",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
+    "produces": "RW",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea"
+    "battle_rule_logical_key": "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea",
+    "battle_rule_oracle_hash": "df826611f7a0a91ba8781558b346e7af"
   },
   "Arch of Orazca": {
     "effect": "land",
@@ -3183,14 +3189,21 @@
     "battle_rule_logical_key": "battle_rule_v1:c9cc5190a31f2f27e2f5651e035ba23a"
   },
   "Boros Signet": {
+    "activation_cost_generic": 1,
+    "activation_cost_status": "abstracted_as_net_one_mana",
+    "battle_model_scope": "activation_cost_net_mana_pair_rock_v1",
     "effect": "ramp_permanent",
     "mana_produced": 1,
+    "oracle_runtime_scope": "net_mana_source_runtime_activation_cost_abstracted",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
+    "produces": "RW",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea"
+    "battle_rule_logical_key": "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea",
+    "battle_rule_oracle_hash": "b51ade19cfed2b8af843dc3d5459dfee"
   },
   "Borrowed Knowledge": {
     "battle_model_scope": "modal_discard_hand_draw_equal_discarded_hand_v1",
@@ -7502,14 +7515,22 @@
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
   "Dragon's Approach": {
+    "battle_model_scope": "fixed_damage_graveyard_dragon_tutor_ripple_v1",
+    "copy_limit_exception": true,
     "damage": 3,
+    "dragon_tutor_destination": "battlefield",
     "effect": "dragons_approach",
+    "graveyard_cost_named_copies": 5,
+    "oracle_runtime_scope": "fixed_each_opponent_damage_optional_graveyard_cost_dragon_library_to_battlefield",
+    "pg056_deck608_dragon_package": "dragon_approach",
+    "ripple_interop_status": "same_name_ripple_runtime",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:78d365e6550e295f9cbfa4f92245f864"
+    "battle_rule_logical_key": "battle_rule_v1:78d365e6550e295f9cbfa4f92245f864",
+    "battle_rule_oracle_hash": "ae76127a796805d8e77b0a50b442656b"
   },
   "Dragon's Hoard": {
     "cmc": 3.0,
@@ -9569,13 +9590,17 @@
     "conditionally_produces_opponent_land_colors": true,
     "effect": "ramp_permanent",
     "mana_produced": 1,
+    "opponent_color_status": "abstracted_to_available_table_colors",
+    "oracle_runtime_scope": "mana_source_runtime_opponent_land_colors_abstracted",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
     "produces": "WUBRGC",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba"
+    "battle_rule_logical_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+    "battle_rule_oracle_hash": "d63befc8ac40d9a38732f9b5c1a7414a"
   },
   "Ferrous Lake": {
     "effect": "land",
@@ -16874,17 +16899,23 @@
     "battle_model_scope": "fast_mana_artifact_partial_v1",
     "cmc": 1.0,
     "does_not_untap_normally": true,
+    "draw_step_damage_status": "annotation_only",
     "effect": "ramp_permanent",
     "mana_produced": 3,
+    "normal_untap_status": "annotation_only",
+    "oracle_runtime_scope": "fast_mana_source_runtime_annotation_only_untap_damage_clauses",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
     "produces": "C",
     "tapped_upkeep_damage": 1,
     "upkeep_optional_untap_cost_generic": 4,
+    "upkeep_untap_status": "annotation_only",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff"
+    "battle_rule_logical_key": "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+    "battle_rule_oracle_hash": "35e3fd94c8453c0e326033af49ae18c8"
   },
   "Manabarbs": {
     "cmc": 4.0,
@@ -18228,7 +18259,10 @@
     "battle_model_scope": "legend_gated_fast_mana_v1",
     "cmc": 0.0,
     "effect": "ramp_permanent",
+    "legend_gate_status": "runtime_requires_legendary_creature_or_planeswalker",
     "mana_produced": 1,
+    "oracle_runtime_scope": "legendary_presence_gate_runtime_color_choice_abstracted",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
     "produces": "WUBRGC",
     "requires_legendary_creature_or_planeswalker_for_mana": true,
     "battle_rule_source": "curated",
@@ -18236,7 +18270,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:972703914ee50acd7a4e6f529fea1adf"
+    "battle_rule_logical_key": "battle_rule_v1:972703914ee50acd7a4e6f529fea1adf",
+    "battle_rule_oracle_hash": "e47b40cf2afc4c9ceac6bf91815da706"
   },
   "Mox Diamond": {
     "battle_model_scope": "discard_land_fast_mana_v1",
@@ -25827,14 +25862,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Sol Ring": {
+    "battle_model_scope": "colorless_two_mana_rock_v1",
     "effect": "ramp_permanent",
     "mana_produced": 2,
+    "oracle_runtime_scope": "colorless_mana_source_runtime",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
+    "produces": "C",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:54660395e3972806e107ca61c374b218"
+    "battle_rule_logical_key": "battle_rule_v1:54660395e3972806e107ca61c374b218",
+    "battle_rule_oracle_hash": "7d286f5619ac8934fb07abf152ffcb60"
   },
   "Sol Ring // Sol Ring": {
     "cmc": 1.0,
@@ -27772,14 +27812,18 @@
     "cmc": 2.0,
     "effect": "ramp_permanent",
     "life_for_colored_mana": 1,
+    "life_loss_status": "annotation_only",
     "mana_produced": 1,
+    "oracle_runtime_scope": "mana_source_runtime_life_loss_annotation_only",
+    "pg055_l3a_artifact_mana_family": "deck6_artifact_mana_rocks",
     "produces": "CRW",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470"
+    "battle_rule_logical_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+    "battle_rule_oracle_hash": "d49ceec937367a344a9f0948eea4f8f2"
   },
   "Talisman of Creativity": {
     "effect": "ramp_permanent",
@@ -29596,14 +29640,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Thrumming Stone": {
+    "battle_model_scope": "static_spell_ripple_4_same_name_runtime_v1",
     "cmc": 5.0,
     "effect": "ripple_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "oracle_runtime_scope": "controller_spells_gain_ripple_4_runtime_same_name_free_cast",
+    "pg056_deck608_dragon_package": "thrumming_stone",
+    "ripple_applies_to": "spells_you_cast",
+    "ripple_count": 4,
+    "ripple_resolution_model": "reveal_top_four_cast_same_name_bottom_rest",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ed12791327f86f031a26f28af61ab9b2"
+    "battle_rule_logical_key": "battle_rule_v1:aab9a1ed1e17a7a4d3446562be30775f",
+    "battle_rule_oracle_hash": "2051804759af48573b5c1824c81d2c13"
   },
   "Thunderdrum Soloist": {
     "cmc": 0.0,

@@ -4886,7 +4886,7 @@ Status:
 - Durable runtime/provenance update for `11` official Lorehold deck `6`
   non-fetch lands. PostgreSQL is the source of truth; Hermes SQLite was
   resynced after PG postcheck passed.
-- No deck swap, commit, or push was executed.
+- No deck swap and no `deck_cards` mutation was executed.
 
 Applied package:
 
@@ -5028,7 +5028,7 @@ Status:
   official Lorehold deck `6`.
 - PostgreSQL is the source of truth; Hermes SQLite was resynced after PG
   postcheck passed.
-- No deck swap, commit, or push was executed.
+- No deck swap and no `deck_cards` mutation was executed.
 
 Applied package:
 
@@ -5099,6 +5099,87 @@ Rollback:
 - `deck6_l6_silence_lock_pg054_rollback_20260623_013119.sql`
   deletes the current target rows and restores the 5 pre-PG054 rows from
   `manaloom_deploy_audit.pg054_deck6_l6_silence_lock_20260623_013119`.
+
+## PG057 Deck 6 L3A Artifact Mana-Rock Batch - Applied 2026-06-23 01:45 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable runtime/provenance update for `7` official Lorehold deck `6`
+  artifact mana rocks.
+- Logical deploy id: `PG057`.
+- Numbering note: the physical SQL/sync/event artifacts and PG backup table
+  were generated with a `pg055_deck6_l3a_artifact_mana_rocks...` prefix before
+  the parallel `PG055 Lorehold Variant 03` register entry and separate `PG056`
+  deck 608 package artifacts appeared in this worktree. This deploy is tracked
+  here as `PG057` to avoid duplicate logical IDs.
+- PostgreSQL is the source of truth; Hermes SQLite was resynced after PG
+  postcheck passed.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_precheck_20260623_014032.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_apply_20260623_014032.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_postcheck_20260623_014032.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_rollback_20260623_014032.sql`.
+
+Target cards:
+
+- `Arcane Signet`.
+- `Boros Signet`.
+- `Fellwar Stone`.
+- `Mana Vault`.
+- `Mox Amber`.
+- `Sol Ring`.
+- `Talisman of Conviction`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg055_deck6_l3a_artifact_mana_rocks_20260623_014032`.
+- Backup row count: `18`.
+- Updated trusted runtime rows: `7`.
+- Disabled generated/legacy shadow rows: `11`.
+
+Postcheck evidence:
+
+- `target_runtime_rows=7`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `trusted_without_scope_rows=0`.
+- `target_runtime_rows_without_produces=0`.
+- `target_runtime_rows_bad_mana_produced=0`.
+- `target_runtime_rows_bad_scope=0`.
+- `generated_review_only_rows=0`.
+- `active_curated_shadow_rows=0`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `disabled_or_deprecated_rows=11`.
+- `backup_rows=18`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg055_deck6_l3a_artifact_mana_rocks_20260623_014032.json`.
+- Deck 6 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_015020.json`
+  reports `high=32`, `medium=8`, `pass=60`.
+- Deck 606 separate auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_015020.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3a_artifact_mana_rocks_pg055_focused_events_20260623_014032.jsonl`.
+
+Rollback:
+
+- `deck6_l3a_artifact_mana_rocks_pg055_rollback_20260623_014032.sql`
+  deletes the current target rows and restores the 18 pre-PG057 rows from
+  `manaloom_deploy_audit.pg055_deck6_l3a_artifact_mana_rocks_20260623_014032`.
 
 ## PG055 Lorehold Variant 03 Card Metadata - Applied 2026-06-23 01:31 UTC
 
@@ -5171,3 +5252,70 @@ Rollback:
 - `lorehold_variant03_card_metadata_pg054_rollback_20260623_013138.sql`
   restores the two pre-apply `cards` rows from
   `manaloom_deploy_audit.pg054_lorehold_variant03_card_metadata_20260623_013138`.
+
+## PG056 Deck 608 Dragon Package - Applied 2026-06-23 01:58 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable runtime/provenance update for `Dragon's Approach` and
+  `Thrumming Stone` in Lorehold Variant 03 / `deck_id=608`.
+- Logical deploy id: `PG056`.
+- PostgreSQL is the source of truth; Hermes SQLite was resynced after PG
+  postcheck passed.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_precheck_20260623_015223.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_apply_20260623_015223.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_postcheck_20260623_015223.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_rollback_20260623_015223.sql`.
+
+Target cards:
+
+- `Dragon's Approach`.
+- `Thrumming Stone`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg056_deck608_dragons_approach_thrumming_20260623_015223`.
+- Backup row count: `4`.
+- Updated trusted runtime rows: `2`.
+- Disabled generated/shadow rows: `2`.
+
+Postcheck evidence:
+
+- `target_cards=2`.
+- `target_rule_rows=4`.
+- `trusted_active_rows=2`.
+- `trusted_missing_hash_rows=0`.
+- `trusted_hash_mismatch_rows=0`.
+- `trusted_without_scope_rows=0`.
+- `generated_review_only_rows=0`.
+- `disabled_or_deprecated_rows=2`.
+- `active_card_id_mismatch_same_oracle_rows=0`.
+- `active_card_id_mismatch_unknown_or_mismatch_oracle_rows=0`.
+- `backup_rows=4`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg056_deck608_dragons_approach_thrumming_20260623_015223.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_focused_events_20260623_015223.jsonl`.
+- Deck 608 final auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_015223.json`
+  reports `high=38`, `medium=11`, `pass=19`.
+- `Dragon's Approach` and `Thrumming Stone` are both `pass` in that auditor.
+
+Rollback:
+
+- `deck608_dragons_approach_thrumming_pg056_rollback_20260623_015223.sql`
+  deletes the current target rows and restores the 4 pre-PG056 rows from
+  `manaloom_deploy_audit.pg056_deck608_dragons_approach_thrumming_20260623_015223`.

@@ -16533,32 +16533,103 @@ def apply_effect_immediate(player, opponents, card, turn, rng, effect_data_overr
         player.copy_engines += 1  # reuse copy counter for ripple tracking
 
     elif effect == "dragons_approach":
-        # Dragon's Approach — 3 damage to each opponent per copy
-        # Count copies in graveyard for bonus damage
-        grave_copies = sum(1 for c in player.graveyard if isinstance(c, dict) and c.get("name") == "Dragon's Approach")
-        total_damage = 3 + grave_copies  # +3 per copy in grave
+        # Dragon's Approach deals a fixed 3 damage. Graveyard copies are used
+        # only for the optional Dragon tutor clause, not for bonus damage.
+        total_damage = int(effect_data.get("damage") or 3)
         for opp in opponents:
             if opp.is_alive():
                 deal_damage(opp, total_damage)
 
-        # Ripple: after casting, reveal top 4 and cast matching spells for free
+        dragon_tutored = None
+        graveyard_copies = [
+            grave_card
+            for grave_card in list(player.graveyard)
+            if isinstance(grave_card, dict)
+            and normalize_card_name(grave_card.get("name", ""))
+            in {"dragon's approach", "dragon s approach"}
+        ]
+        dragon_candidates = [
+            candidate
+            for candidate in list(player.library)
+            if isinstance(candidate, dict)
+            and is_creature_card(candidate)
+            and "dragon" in str(candidate.get("type_line") or "").lower()
+        ]
+        if len(graveyard_copies) >= 5 and dragon_candidates:
+            dragon_candidates.sort(
+                key=lambda candidate: (
+                    -int(float(candidate.get("cmc") or 0)),
+                    -int(float(candidate.get("power") or 0)),
+                    candidate.get("name", ""),
+                )
+            )
+            dragon_tutored = dragon_candidates[0]
+            for grave_card in graveyard_copies[:5]:
+                if grave_card in player.graveyard:
+                    player.graveyard.remove(grave_card)
+                    move_to_exile(player, grave_card, reason="dragons_approach_graveyard_cost", turn=turn)
+            if dragon_tutored in player.library:
+                player.library.remove(dragon_tutored)
+                permanent = prepare_resolved_permanent(
+                    enrich_card({**dragon_tutored, **get_card_effect(dragon_tutored)})
+                )
+                permanent["effect"] = "creature"
+                player.battlefield.append(permanent)
+                emit_replay_event(
+                    "dragons_approach_dragon_tutored",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    found=dragon_tutored.get("name", "?"),
+                    exiled_graveyard_copies=5,
+                    destination="battlefield",
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
+
+        emit_replay_event(
+            "dragons_approach_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            damage_each_opponent=total_damage,
+            graveyard_copies_available=len(graveyard_copies),
+            dragon_tutored=dragon_tutored.get("name") if dragon_tutored else None,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+
+        # Thrumming Stone: after a spell is cast, reveal top 4 and cast same-name
+        # spells for free. Nonmatching revealed cards go to the bottom.
         has_ripple = any(isinstance(c, dict) and c.get("effect") == "ripple_engine" for c in player.battlefield)
         if has_ripple and player.library:
-            ripple_count = min(4, len(player.library))
-            extra_casts = 0
-            for i in range(ripple_count):
-                if i >= len(player.library): break
-                c = player.library[i]
-                if isinstance(c, dict) and c.get("name") == "Dragon's Approach":
-                    extra_casts += 1
-                    # Cast it for free — deal damage again
-                    for opp in opponents:
-                        if opp.is_alive():
-                            deal_damage(opp, total_damage)
-                    # Remove from library
-                    player.library.pop(i)
-            if extra_casts > 0:
-                print(f"  [RIPPLE] Cast {extra_casts} extra Dragon's Approach!")
+            source_name = normalize_card_name(card.get("name", ""))
+            revealed = [player.library.pop(0) for _ in range(min(4, len(player.library)))]
+            matching = [
+                revealed_card
+                for revealed_card in revealed
+                if isinstance(revealed_card, dict)
+                and normalize_card_name(revealed_card.get("name", "")) == source_name
+            ]
+            rest = [revealed_card for revealed_card in revealed if revealed_card not in matching]
+            player.library.extend(rest)
+            emit_replay_event(
+                "ripple_trigger_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                revealed_count=len(revealed),
+                free_cast_count=len(matching),
+                bottomed_count=len(rest),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            for extra_card in matching:
+                apply_effect_immediate(
+                    player,
+                    opponents,
+                    extra_card,
+                    turn,
+                    rng,
+                    effect_data_override=effect_data,
+                )
 
         finish_resolved_spell(player, card, turn=turn)
 

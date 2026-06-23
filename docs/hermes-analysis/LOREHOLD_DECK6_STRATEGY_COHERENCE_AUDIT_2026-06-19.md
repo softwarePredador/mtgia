@@ -19777,7 +19777,51 @@ Current reading:
 
 - Variant 03 is structurally valid and registered as isolated deck `608`.
 - It is not yet a trusted battle comparison candidate because the battle-rule
-  queue still has `43` high-severity card-model findings.
+  queue still has `38` high-severity card-model findings after PG056.
 - The opponent pool used by the current battle artifacts is now inventoried and
   identity-resolved, but their per-card executable battle-rule quality still
   needs the same card-by-card gate before claiming full battle fidelity.
+
+## Lorehold Variant 03 Dragon Package PG056 Closure - 2026-06-23 01:58 UTC
+
+What changed:
+
+- Applied and validated `PG056 Deck 608 Dragon Package` for
+  `Dragon's Approach` and `Thrumming Stone`.
+- Corrected simulator behavior so `Dragon's Approach` deals fixed `3` damage
+  to each opponent; graveyard copies are only the optional five-copy Dragon
+  tutor cost.
+- Added focused tests for Dragon's Approach fixed damage/tutor and Thrumming
+  Stone same-name ripple.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- PG postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_postcheck_20260623_015223.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg056_deck608_dragons_approach_thrumming_20260623_015223.json`.
+- Focused events:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_focused_events_20260623_015223.jsonl`.
+- Deck 608 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_015223.json`.
+- Audit result changed from `high=43`, `medium=11`, `pass=14` to
+  `high=38`, `medium=11`, `pass=19`.
+
+Card-level result:
+
+- `Dragon's Approach`: `pass`, quantity `20`, one trusted executable rule,
+  zero review-only rows, logical key
+  `battle_rule_v1:78d365e6550e295f9cbfa4f92245f864`.
+- `Thrumming Stone`: `pass`, one trusted executable rule, zero review-only
+  rows, logical key
+  `battle_rule_v1:aab9a1ed1e17a7a4d3446562be30775f`.
+
+Next deck 608 queue:
+
+- Continue with the remaining high-impact battle-critical items:
+  `Angel's Grace`, `Artist's Talent`, `Cool but Rude`, `Enlightened Tutor`,
+  `Goblin Engineer`, `Idyllic Tutor`, `Imperial Recruiter`,
+  `Magmakin Artillerist`, `Pyromancer Ascension`,
+  `Razorgrass Ambush // Razorgrass Field`, and
+  `Naktamun Lorespinner // Wheel of Fortune`.

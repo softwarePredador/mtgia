@@ -85,6 +85,74 @@ def register_tests(battle, player):
         assert active.spend_card_mana({"name": "Boros Spell", "cmc": 2, "mana_cost": "{W}{R}"})
         assert active.available_mana() == 0
 
+    def test_l3a_artifact_mana_rocks_refresh_with_oracle_scopes():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Arcane Signet",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "produces": "RW",
+                "mana_produced": 1,
+                "battle_model_scope": "commander_identity_mana_rock_deck_scoped_v1",
+            },
+            {
+                "name": "Boros Signet",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "produces": "RW",
+                "mana_produced": 1,
+                "activation_cost_generic": 1,
+                "activation_cost_status": "abstracted_as_net_one_mana",
+                "battle_model_scope": "activation_cost_net_mana_pair_rock_v1",
+            },
+            {
+                "name": "Sol Ring",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "produces": "C",
+                "mana_produced": 2,
+                "battle_model_scope": "colorless_two_mana_rock_v1",
+            },
+            {
+                "name": "Mana Vault",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "produces": "C",
+                "mana_produced": 3,
+                "normal_untap_status": "annotation_only",
+                "draw_step_damage_status": "annotation_only",
+                "battle_model_scope": "fast_mana_artifact_partial_v1",
+            },
+            {
+                "name": "Mox Amber",
+                "effect": "ramp_permanent",
+                "type_line": "Legendary Artifact",
+                "produces": "WUBRGC",
+                "mana_produced": 1,
+                "requires_legendary_creature_or_planeswalker_for_mana": True,
+                "battle_model_scope": "legend_gated_fast_mana_v1",
+            },
+        ]
+
+        active.refresh_mana_sources(turn=1)
+        assert active.available_mana() == 7
+        assert active.mana_pool.wildcard == 2
+        assert active.mana_pool.colorless == 5
+
+        active.battlefield.append(
+            {
+                "name": "Lorehold, the Historian",
+                "effect": "creature",
+                "type_line": "Legendary Creature - Elder Dragon",
+                "power": 5,
+                "toughness": 5,
+            }
+        )
+        active.refresh_mana_sources(turn=2)
+        assert active.available_mana() == 8
+        assert active.mana_pool.wildcard == 3
+
     def test_hybrid_and_phyrexian_mana_use_legal_payment_options():
         white_payer = player("White")
         white_payer.mana_pool.add("white", 1)
@@ -230,6 +298,7 @@ def register_tests(battle, player):
         test_treasure_and_flexible_sources_pay_colored_costs,
         test_basic_lands_refresh_as_colored_sources,
         test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources,
+        test_l3a_artifact_mana_rocks_refresh_with_oracle_scopes,
         test_hybrid_and_phyrexian_mana_use_legal_payment_options,
         test_monocolored_hybrid_and_hybrid_phyrexian_mana_use_legal_payment_options,
         test_restricted_mana_only_pays_matching_spell_categories,

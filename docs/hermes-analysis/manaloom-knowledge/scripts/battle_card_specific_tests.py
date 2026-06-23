@@ -1547,6 +1547,68 @@ def register_tests(battle, player):
             assert rule["_rule_oracle_hash"] == oracle_hash
             assert rule["_rule_execution_status"] == "auto"
 
+    def test_pg055_artifact_mana_rock_family_rule_provenance():
+        cases = [
+            (
+                {"name": "Arcane Signet", "cmc": 2, "type_line": "Artifact"},
+                "commander_identity_mana_rock_deck_scoped_v1",
+                "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea",
+                "df826611f7a0a91ba8781558b346e7af",
+                1,
+            ),
+            (
+                {"name": "Boros Signet", "cmc": 2, "type_line": "Artifact"},
+                "activation_cost_net_mana_pair_rock_v1",
+                "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea",
+                "b51ade19cfed2b8af843dc3d5459dfee",
+                1,
+            ),
+            (
+                {"name": "Fellwar Stone", "cmc": 2, "type_line": "Artifact"},
+                "conditional_opponent_color_mana_rock_v1",
+                "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+                "d63befc8ac40d9a38732f9b5c1a7414a",
+                1,
+            ),
+            (
+                {"name": "Mana Vault", "cmc": 1, "type_line": "Artifact"},
+                "fast_mana_artifact_partial_v1",
+                "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+                "35e3fd94c8453c0e326033af49ae18c8",
+                3,
+            ),
+            (
+                {"name": "Mox Amber", "cmc": 0, "type_line": "Legendary Artifact"},
+                "legend_gated_fast_mana_v1",
+                "battle_rule_v1:972703914ee50acd7a4e6f529fea1adf",
+                "e47b40cf2afc4c9ceac6bf91815da706",
+                1,
+            ),
+            (
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact"},
+                "colorless_two_mana_rock_v1",
+                "battle_rule_v1:54660395e3972806e107ca61c374b218",
+                "7d286f5619ac8934fb07abf152ffcb60",
+                2,
+            ),
+            (
+                {"name": "Talisman of Conviction", "cmc": 2, "type_line": "Artifact"},
+                "pain_talisman_color_pair_partial_v1",
+                "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+                "d49ceec937367a344a9f0948eea4f8f2",
+                1,
+            ),
+        ]
+
+        for card, scope, logical_key, oracle_hash, mana_produced in cases:
+            rule = battle.get_card_effect(card)
+            assert rule["effect"] == "ramp_permanent"
+            assert rule["battle_model_scope"] == scope
+            assert rule["mana_produced"] == mana_produced
+            assert rule["_rule_logical_key"] == logical_key
+            assert rule["_rule_oracle_hash"] == oracle_hash
+            assert rule["_rule_execution_status"] == "auto"
+
     def test_samis_curiosity_creates_lander_token_not_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -4937,6 +4999,103 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_dragons_approach_deals_fixed_damage_and_tutors_dragon_from_graveyard_cost():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Dragon Approach")
+            active.graveyard = [
+                {"name": "Dragon's Approach", "type_line": "Sorcery", "cmc": 3}
+                for _ in range(5)
+            ]
+            active.library = [
+                {"name": "Filler Spell", "type_line": "Sorcery", "cmc": 1},
+                {
+                    "name": "Goldspan Dragon",
+                    "type_line": "Creature — Dragon",
+                    "cmc": 5,
+                    "power": 4,
+                    "toughness": 4,
+                    "oracle_text": "Flying, haste",
+                },
+            ]
+            opponent = player("Opponent")
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Dragon's Approach", "type_line": "Sorcery", "cmc": 3},
+                turn=4,
+                rng=random.Random(608),
+                effect_data_override={
+                    "effect": "dragons_approach",
+                    "damage": 3,
+                    "_rule_logical_key": "battle_rule_v1:78d365e6550e295f9cbfa4f92245f864",
+                    "_rule_oracle_hash": "dragon-approach-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert opponent.life == 37
+        assert len(active.exile) == 5
+        assert all(card.get("name") == "Dragon's Approach" for card in active.exile)
+        assert any(card.get("name") == "Goldspan Dragon" for card in active.battlefield)
+        assert active.graveyard[-1]["name"] == "Dragon's Approach"
+        assert any(
+            event == "dragons_approach_resolved"
+            and data.get("damage_each_opponent") == 3
+            and data.get("dragon_tutored") == "Goldspan Dragon"
+            for event, data in events
+        )
+        assert any(
+            event == "dragons_approach_dragon_tutored"
+            and data.get("exiled_graveyard_copies") == 5
+            and data.get("found") == "Goldspan Dragon"
+            for event, data in events
+        )
+
+    def test_thrumming_stone_ripples_dragons_approach_without_bonus_damage():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Ripple Approach")
+            active.battlefield = [{"name": "Thrumming Stone", "effect": "ripple_engine"}]
+            active.library = [
+                {"name": "Dragon's Approach", "type_line": "Sorcery", "cmc": 3},
+                {"name": "Filler Spell", "type_line": "Sorcery", "cmc": 1},
+                {"name": "Dragon's Approach", "type_line": "Sorcery", "cmc": 3},
+                {"name": "Ancient Copper Dragon", "type_line": "Creature — Elder Dragon", "cmc": 6},
+            ]
+            opponent = player("Opponent")
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Dragon's Approach", "type_line": "Sorcery", "cmc": 3},
+                turn=5,
+                rng=random.Random(609),
+                effect_data_override={
+                    "effect": "dragons_approach",
+                    "damage": 3,
+                    "battle_model_scope": "fixed_damage_graveyard_dragon_tutor_ripple_v1",
+                    "_rule_logical_key": "battle_rule_v1:78d365e6550e295f9cbfa4f92245f864",
+                    "_rule_oracle_hash": "dragon-approach-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert opponent.life == 31
+        assert [card.get("name") for card in active.graveyard].count("Dragon's Approach") == 3
+        assert [card.get("name") for card in active.library] == ["Filler Spell", "Ancient Copper Dragon"]
+        assert any(
+            event == "ripple_trigger_resolved"
+            and data.get("free_cast_count") == 2
+            and data.get("bottomed_count") == 2
+            for event, data in events
+        )
+
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
@@ -4967,6 +5126,7 @@ def register_tests(battle, player):
         test_lorehold_miracle_rejects_flash_creatures,
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_pg054_silence_lock_family_rule_provenance,
+        test_pg055_artifact_mana_rock_family_rule_provenance,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
         test_snapback_return_target_creature_stays_creature_removal,
@@ -5039,4 +5199,6 @@ def register_tests(battle, player):
         test_aetherflux_reservoir_gains_life_on_future_spell_casts_not_resolution_damage,
         test_brain_freeze_mills_library_instead_of_dealing_life_damage,
         test_thassas_oracle_wins_only_when_library_is_within_blue_devotion,
+        test_dragons_approach_deals_fixed_damage_and_tutors_dragon_from_graveyard_cost,
+        test_thrumming_stone_ripples_dragons_approach_without_bonus_damage,
     ]
