@@ -35,6 +35,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "aetherflux_reservoir" in audit.SUPPORTED_EFFECTS
     assert "attack_limit" in audit.SUPPORTED_EFFECTS
     assert "attack_tax" in audit.SUPPORTED_EFFECTS
+    assert "airbend_other_creatures" in audit.SUPPORTED_EFFECTS
     assert "brain_freeze" in audit.SUPPORTED_EFFECTS
     assert "cannot_lose_turn" in audit.SUPPORTED_EFFECTS
     assert "composite_resolution" in audit.SUPPORTED_EFFECTS

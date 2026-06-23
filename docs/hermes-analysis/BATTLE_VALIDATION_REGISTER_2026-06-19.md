@@ -17903,3 +17903,67 @@ Next validation focus:
 - Continue deck `607` high `battle_critical` queue: `Avatar's Wrath`,
   `Creative Technique`, `Dawn's Truce`, `Everything Comes to Dust`,
   `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.
+
+## PG099-PG101 Battle Validation - Avatar's Wrath Airbend and Hash Drift Restore
+
+Status: `validated_current`.
+
+Runtime changes validated:
+
+- Added executable `airbend_other_creatures` support for `Avatar's Wrath`.
+- Added opponent non-hand cast lock tracking and expiry.
+- Added airbend creature recast from exile for `{2}`.
+- Added replay events:
+  `airbend_other_creatures_resolved` and
+  `airbend_creature_cast_from_exile`.
+- Preserved the guard that `review_only` or
+  `canonical_snapshot_rule_not_runtime_safe` rules do not become executable
+  through Oracle normalization.
+
+PostgreSQL/source-of-truth changes:
+
+- PG099 promoted `Avatar's Wrath`:
+  `battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5`,
+  `oracle_hash=21a711291b98f2e66a6d94a6c806945d`.
+- PG100 restored `Seething Song` runtime metadata but was superseded by PG101.
+- PG101 restored the current live PG drift for the 12-row hash/scope group and
+  is the current accepted source-of-truth state.
+
+Evidence:
+
+- PG099 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_postcheck_20260623_093427.out`.
+- PG101 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_postcheck_20260623_094218.out`.
+- Final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_sync_report_20260623_094218.json`.
+- Focused Avatar's Wrath replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_avatars_wrath_focused_replay_20260623_094218.json`.
+- Full suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_battle_analyst_v10_3_test_20260623_094218.out`
+  passed.
+- Additional local gates passed:
+  `pg101_test_sync_battle_card_rules_pg_selection_20260623_094218.out`,
+  `pg101_test_deck_card_battle_rule_coherence_audit_20260623_094218.out`,
+  `pg101_test_reviewed_battle_card_rules_20260623_094218.out`, and
+  `pg101_test_battle_forensic_audit_supported_effects_20260623_094218.out`.
+- 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_124826/summary.json`
+  completed `16/16` seeds with `15495` events, `2438` decisions, 18 wrapper
+  tests passed, and no high/critical action, strategy, replay-decision,
+  forensic, target-pressure, or table-intent blockers.
+
+Current battle/deck audit interpretation:
+
+- Deck `6` is clean at card-rule coherence: `pass=100`.
+- Deck `607` remaining queue is now `high=13`, `medium=4`, `pass=77`.
+- Deck `608` remains `high=14`, `medium=3`, `pass=51`.
+- Global queue is `high=27`, `medium=4`, `pass=174`.
+- Do not treat the old `Avatar's Wrath` queue entry as open; it is closed by
+  PG099/PG101 evidence.
+
+Next work:
+
+- Continue deck `607` high `battle_critical`: `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
+  `Promise of Loyalty`, and `Starfall Invocation`.

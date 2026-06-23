@@ -113,6 +113,14 @@ EVENT_CONTRACT_OVERRIDES = {
         "technical",
         "adventure spell exile ledger after the spell half resolves.",
     ),
+    "airbend_creature_cast_from_exile": (
+        "strategy_signal",
+        "airbend alternate exile cast represented in stack/cast context and human replay.",
+    ),
+    "airbend_other_creatures_resolved": (
+        "strategy_signal",
+        "Avatar's Wrath airbend resolution changes creature zones and non-hand cast permissions.",
+    ),
     "aetherflux_reservoir_resolved": (
         "strategy_signal",
         "Aetherflux Reservoir permanent resolution is engine context for later spell-cast lifegain.",

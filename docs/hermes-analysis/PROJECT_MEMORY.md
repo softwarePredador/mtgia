@@ -1238,3 +1238,36 @@ Next package number is PG086. Next queue should prioritize remaining deck
 - Post-PG098 counts: deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
   `high=14`, `medium=4`, `pass=76`, deck `608` `high=14`, `medium=3`,
   `pass=51`, and global `high=28`, `medium=4`, `pass=173`.
+
+## ManaLoom PG099-PG101 Avatar's Wrath and drift restore - 2026-06-23 12:55 UTC
+
+- PG099 promoted `Avatar's Wrath` to a verified executable airbend rule:
+  `battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5`,
+  `oracle_hash=21a711291b98f2e66a6d94a6c806945d`,
+  `effect=airbend_other_creatures`, scope
+  `avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1`.
+- Runtime now handles airbend exile/recast, opponent non-hand cast lock,
+  self-exile, and replay event provenance for
+  `airbend_other_creatures_resolved` and
+  `airbend_creature_cast_from_exile`.
+- PG100 restored `Seething Song` metadata while debugging the suite; PG101 then
+  restored the broader 12-row PG094/PG096 hash/scope group after live PG drift
+  was found (`Angel's Grace`, `Fellwar Stone`, `Library of Leng`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`).
+- Final evidence:
+  `pg099_avatars_wrath_airbend_rule_postcheck_20260623_093427.out`,
+  `pg101_hash_scope_restore_current_drift_postcheck_20260623_094218.out`,
+  `pg101_hash_scope_restore_current_drift_sync_report_20260623_094218.json`,
+  `pg101_avatars_wrath_focused_replay_20260623_094218.json`, and
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_124826/summary.json`.
+- Tests passed: full `test_battle_analyst_v10_3.py`, sync selection,
+  deck-card coherence audit tests, reviewed battle card rules, forensic
+  supported effects, and the 18-wrapper 16-seed battle gate.
+- Current card-rule queue: deck `6` `pass=100`; deck `607` `high=13`,
+  `medium=4`, `pass=77`; deck `608` `high=14`, `medium=3`, `pass=51`;
+  global `high=27`, `medium=4`, `pass=174`.
+  Next deck `607` battle-critical cards are `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
+  `Promise of Loyalty`, and `Starfall Invocation`.

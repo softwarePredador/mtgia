@@ -1772,6 +1772,112 @@ def register_tests(battle, player):
         assert damage_event["rule_logical_key"] == "battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739"
         assert damage_event["rule_oracle_hash"] == "5e76c466448cabbfd764e746566b41c1"
 
+    def test_pg099_avatars_wrath_airbends_all_other_creatures_and_locks_nonhand_casts():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            avatar = {
+                "name": "Avatar's Wrath",
+                "cmc": 4,
+                "mana_cost": "{2}{W}{W}",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Choose up to one target creature, then airbend all other creatures. "
+                    "(Exile them. While each one is exiled, its owner may cast it for {2} "
+                    "rather than its mana cost.)\nUntil your next turn, your opponents can't "
+                    "cast spells from anywhere other than their hands.\nExile Avatar's Wrath."
+                ),
+            }
+            effect = battle.get_card_effect(avatar)
+            assert effect["effect"] == "airbend_other_creatures"
+            assert effect["target_choice"] == "up_to_one_creature_to_spare"
+            assert effect["airbend_recast_cost"] == "{2}"
+            assert effect["opponents_non_hand_cast_lock"] is True
+            assert effect["exiles_self"] is True
+            assert effect["battle_model_scope"] == (
+                "avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1"
+            )
+            assert effect["_rule_logical_key"] == "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5"
+            assert effect["_rule_oracle_hash"] == "21a711291b98f2e66a6d94a6c806945d"
+
+            active = player("Lorehold")
+            keeper = {
+                "name": "Own Best Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 5,
+                "power": 6,
+                "toughness": 6,
+            }
+            own_exiled = {
+                "name": "Own Utility Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 2,
+                "power": 2,
+                "toughness": 2,
+            }
+            active.battlefield = [keeper, own_exiled]
+            opponent = player("Opponent")
+            opposing_exiled = {
+                "name": "Opponent Threat",
+                "effect": "creature",
+                "type_line": "Creature",
+                "cmc": 3,
+                "power": 4,
+                "toughness": 4,
+            }
+            opponent.battlefield = [opposing_exiled]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                avatar,
+                turn=8,
+                rng=random.Random(99099),
+                effect_data_override=effect,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert keeper in active.battlefield
+        assert own_exiled not in active.battlefield
+        assert own_exiled in active.exile
+        assert own_exiled["_airbend_available"] is True
+        assert own_exiled["_airbend_recast_cost"] == "{2}"
+        assert opposing_exiled not in opponent.battlefield
+        assert opposing_exiled in opponent.exile
+        assert opposing_exiled["_airbend_available"] is True
+        assert opponent.non_hand_cast_locks[0]["source"] == "Avatar's Wrath"
+        assert opponent.non_hand_cast_locks[0]["expires_at_turn"] == 9
+        assert avatar in active.exile
+        assert avatar not in active.graveyard
+
+        airbend_event = next(
+            data for event, data in events if event == "airbend_other_creatures_resolved"
+        )
+        assert airbend_event["spared_target"] == "Own Best Creature"
+        assert airbend_event["own_creatures_exiled"] == 1
+        assert airbend_event["live_opponent_creatures_exiled"] == 1
+        assert airbend_event["locked_opponents"] == ["Opponent"]
+        assert airbend_event["rule_logical_key"] == "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5"
+        assert airbend_event["rule_oracle_hash"] == "21a711291b98f2e66a6d94a6c806945d"
+
+        active.mana_pool.add("generic", 2)
+        assert battle.cast_airbend_card_from_exile(active, own_exiled, 8, "postcombat_main") is True
+        assert own_exiled not in active.exile
+        assert any(card.get("name") == "Own Utility Creature" for card in active.battlefield)
+
+        opponent.mana_pool.add("generic", 2)
+        assert battle.cast_airbend_card_from_exile(opponent, opposing_exiled, 8, "precombat_main") is False
+        assert opposing_exiled in opponent.exile
+        battle.clear_expired_non_hand_cast_locks(active, [active, opponent], 9)
+        assert opponent.non_hand_cast_locks == []
+        assert battle.cast_airbend_card_from_exile(opponent, opposing_exiled, 9, "precombat_main") is True
+        assert opposing_exiled not in opponent.exile
+        assert any(card.get("name") == "Opponent Threat" for card in opponent.battlefield)
+
     def test_akromas_will_keywords_are_until_end_of_turn_without_power_boost():
         active = player("Lorehold")
         creature = {
@@ -8558,6 +8664,7 @@ def register_tests(battle, player):
         test_austere_command_resolves_two_destroy_modes,
         test_blasphemous_act_deals_13_damage_to_each_creature,
         test_pg098_call_forth_tempest_uses_dynamic_opponent_creature_damage,
+        test_pg099_avatars_wrath_airbends_all_other_creatures_and_locks_nonhand_casts,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_mox_amber_only_counts_mana_with_live_legend,
         test_silence_effect_blocks_counterspell_responses,

@@ -1,0 +1,17 @@
+........<frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107e20b80>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107e20d60>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107e20f40>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107e21030>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107e21210>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+<frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x107e21300>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..
+----------------------------------------------------------------------
+Ran 10 tests in 0.044s
+
+OK

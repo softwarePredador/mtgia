@@ -81,6 +81,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "pump_all": "wincon",
     "extra_turn": "wincon",
     "worldfire_reset": "wincon",
+    "airbend_other_creatures": "wipe",
     "board_wipe": "wipe",
     "damage_wipe": "wipe",
     "damage_wipe_treasure": "wipe",

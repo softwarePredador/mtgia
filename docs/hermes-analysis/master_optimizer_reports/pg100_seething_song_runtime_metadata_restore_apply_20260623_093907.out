@@ -1,0 +1,9 @@
+Pager usage is off.
+BEGIN
+psql:../docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_apply_20260623_093907.sql:5: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+DO
+SELECT 1
+DO
+UPDATE 1
+COMMIT

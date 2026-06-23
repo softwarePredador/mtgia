@@ -21733,3 +21733,73 @@ Interpretation:
   backlog, not because of a deck id `6` card-coherence failure.
 - No PostgreSQL write, deck swap, `deck_cards` mutation, commit, push, cleanup,
   revert, or stash was performed in this check.
+
+## PG099-PG101 Avatar's Wrath and Current Battle Gate - 2026-06-23 12:55 UTC
+
+Status: `deck6_clean_deck607_queue_reduced_battle_gate_passed`.
+
+What changed:
+
+- `Avatar's Wrath` was validated against current Oracle text and promoted as
+  an executable airbend tempo-wipe rule:
+  `battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5`,
+  `oracle_hash=21a711291b98f2e66a6d94a6c806945d`,
+  `effect=airbend_other_creatures`,
+  `battle_model_scope=avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1`.
+- Runtime now handles airbend exile/recast, opponent non-hand cast locks, and
+  self-exile for the spell. The replay event contract also recognizes
+  `airbend_other_creatures_resolved` and
+  `airbend_creature_cast_from_exile`.
+- PG100/PG101 restored live PostgreSQL hash/scope drift found while running the
+  full suite. PG101 is the current canonical state for the 12-row hash/scope
+  restore group.
+
+Evidence:
+
+- PostgreSQL PG099 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_postcheck_20260623_093427.out`.
+- PostgreSQL PG101 postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_postcheck_20260623_094218.out`.
+- Final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_sync_report_20260623_094218.json`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_avatars_wrath_focused_replay_20260623_094218.json`.
+  It records starting hands, battlefield/exile transitions,
+  `active_recast_turn8=true`,
+  `opponent_recast_turn8_while_locked=false`, and
+  `opponent_recast_turn9_after_expiry=true`.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_battle_analyst_v10_3_test_20260623_094218.out`
+  and the supporting sync/coherence/reviewed-rule test outputs all passed.
+- Fresh 16-seed battle artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_124826/summary.json`.
+
+Current audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=13`, `medium=4`, `pass=77`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=27`, `medium=4`, `pass=174`.
+
+Current deck `607` high queue:
+
+- `Creative Technique`
+- `Dawn's Truce`
+- `Everything Comes to Dust`
+- `Fated Clash`
+- `Promise of Loyalty`
+- `Starfall Invocation`
+- `Pearl Medallion`
+- `Emeria's Call // Emeria, Shattered Skyclave`
+- `Molecule Man`
+- `The Mind Stone`
+- `The Scarlet Witch`
+- `Thor, God of Thunder`
+- `Tragic Arrogance`
+
+Next validation focus:
+
+- Continue deck `607` high `battle_critical` first:
+  `Creative Technique`, `Dawn's Truce`, `Everything Comes to Dust`,
+  `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.
+  `Pearl Medallion` is the next high `battle_support` card after those.

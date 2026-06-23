@@ -1,0 +1,426 @@
+{
+  "after": {
+    "active_battlefield": [
+      "Own Best Creature",
+      "Own Utility Creature"
+    ],
+    "active_exile": [
+      "Avatar's Wrath"
+    ],
+    "active_graveyard": [],
+    "active_hand": [
+      "Avatar's Wrath",
+      "Plains",
+      "Boros Charm"
+    ],
+    "active_recast_turn8": true,
+    "opponent_battlefield": [
+      "Opponent Threat"
+    ],
+    "opponent_exile": [],
+    "opponent_hand": [
+      "Flashback Spell",
+      "Mountain"
+    ],
+    "opponent_non_hand_cast_locks": [],
+    "opponent_recast_turn8_while_locked": false,
+    "opponent_recast_turn9_after_expiry": true
+  },
+  "before": {
+    "active_battlefield": [
+      "Own Best Creature",
+      "Own Utility Creature"
+    ],
+    "active_hand": [
+      "Avatar's Wrath",
+      "Plains",
+      "Boros Charm"
+    ],
+    "opponent_battlefield": [
+      "Opponent Threat"
+    ],
+    "opponent_hand": [
+      "Flashback Spell",
+      "Mountain"
+    ]
+  },
+  "card_effect": {
+    "_rule_execution_status": "auto",
+    "_rule_logical_key": "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5",
+    "_rule_oracle_hash": "21a711291b98f2e66a6d94a6c806945d",
+    "_rule_review_status": "verified",
+    "airbend_recast_cost": "{2}",
+    "airbend_recast_permission": "owner_may_cast_from_exile",
+    "battle_model_scope": "avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1",
+    "effect": "airbend_other_creatures",
+    "exiles_self": true,
+    "opponents_non_hand_cast_lock": true,
+    "opponents_non_hand_cast_lock_duration": "until_your_next_turn"
+  },
+  "events": [
+    {
+      "data": {
+        "card": "Avatar's Wrath",
+        "cmc": 4,
+        "destination": "exile",
+        "effect": "airbend_other_creatures",
+        "player": "Lorehold",
+        "result": "resolved",
+        "rule_alternative_count": 1,
+        "rule_confidence": 0.98,
+        "rule_execution_status": "auto",
+        "rule_logical_key": "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5",
+        "rule_oracle_hash": "21a711291b98f2e66a6d94a6c806945d",
+        "rule_review_status": "verified",
+        "rule_runtime_selection_mode": "single_selected",
+        "rule_source": "curated",
+        "rule_version": 2,
+        "stack_object": "Avatar's Wrath",
+        "to_zone": "exile",
+        "turn": 8,
+        "type_line": "Sorcery",
+        "zone_after": "exile"
+      },
+      "event": "spell_resolved"
+    },
+    {
+      "data": {
+        "airbend_recast_cost": "{2}",
+        "airbend_recast_permission": "owner_may_cast_from_exile",
+        "airbend_recast_permission_status": "tracked_for_cast_from_exile",
+        "card": "Avatar's Wrath",
+        "commanders_to_command_zone": 0,
+        "exiled": [
+          {
+            "airbend_recast_cost": "{2}",
+            "controller": "Lorehold",
+            "destination": "exile",
+            "name": "Own Utility Creature"
+          },
+          {
+            "airbend_recast_cost": "{2}",
+            "controller": "Opponent",
+            "destination": "exile",
+            "name": "Opponent Threat"
+          }
+        ],
+        "exiled_count": 2,
+        "expires_at_turn": 9,
+        "live_opponent_creatures_exiled": 1,
+        "locked_opponents": [
+          "Opponent"
+        ],
+        "non_hand_cast_lock_duration": "until_your_next_turn",
+        "opponent_creatures_exiled": 1,
+        "opponents_non_hand_cast_lock": true,
+        "own_creatures_exiled": 1,
+        "player": "Lorehold",
+        "rule_alternative_count": 1,
+        "rule_confidence": 0.98,
+        "rule_execution_status": "auto",
+        "rule_logical_key": "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5",
+        "rule_oracle_hash": "21a711291b98f2e66a6d94a6c806945d",
+        "rule_review_status": "verified",
+        "rule_runtime_selection_mode": "single_selected",
+        "rule_source": "curated",
+        "rule_version": 2,
+        "spared_target": "Own Best Creature",
+        "tokens_vanished": 0,
+        "turn": 8
+      },
+      "event": "airbend_other_creatures_resolved"
+    },
+    {
+      "data": {
+        "card": "Avatar's Wrath",
+        "player": "Lorehold",
+        "turn": 8
+      },
+      "event": "self_exiled_on_resolution"
+    },
+    {
+      "data": {
+        "additional_costs": [],
+        "additional_generic": 0,
+        "alternative_cost": "{2}",
+        "alternative_cost_kind": "airbend",
+        "card": "Own Utility Creature",
+        "cast_pipeline": "601.2_minimal",
+        "effect": "creature",
+        "locked_cost": {
+          "colored": {},
+          "generic": 2,
+          "hybrid": [],
+          "monocolored_hybrid": [],
+          "phyrexian": [],
+          "phyrexian_hybrid": [],
+          "spend_tags": [
+            "creature_spell"
+          ]
+        },
+        "modes": [
+          "creature_from_exile"
+        ],
+        "phase": "postcombat_main",
+        "player": "Lorehold",
+        "role": "airbend_recast",
+        "rule_confidence": 0.65,
+        "rule_execution_status": "auto",
+        "rule_review_status": "fact",
+        "rule_source": "type_line_creature",
+        "rule_version": null,
+        "source_zone": "exile",
+        "targets": [],
+        "x_value": 0
+      },
+      "event": "cast_announced"
+    },
+    {
+      "data": {
+        "additional_costs": [],
+        "additional_generic": 0,
+        "alternative_cost": "{2}",
+        "alternative_cost_kind": "airbend",
+        "card": "Own Utility Creature",
+        "cast_pipeline": "601.2_minimal",
+        "effect": "creature",
+        "life_after": 40,
+        "life_before": 40,
+        "life_paid": 0,
+        "locked_cost": {
+          "colored": {},
+          "generic": 2,
+          "hybrid": [],
+          "monocolored_hybrid": [],
+          "phyrexian": [],
+          "phyrexian_hybrid": [],
+          "spend_tags": [
+            "creature_spell"
+          ]
+        },
+        "mana_after": 0,
+        "mana_before": 2,
+        "mana_pool_after": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 0,
+          "green": 0,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "mana_pool_before": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 2,
+          "green": 0,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "modes": [
+          "creature_from_exile"
+        ],
+        "phase": "postcombat_main",
+        "player": "Lorehold",
+        "role": "airbend_recast",
+        "rule_confidence": 0.65,
+        "rule_execution_status": "auto",
+        "rule_review_status": "fact",
+        "rule_source": "type_line_creature",
+        "rule_version": null,
+        "source_zone": "exile",
+        "spell_mana_value_cast_this_turn": 2,
+        "spells_cast_this_turn": 1,
+        "targets": [],
+        "treasures_after": 0,
+        "treasures_before": 0,
+        "x_value": 0
+      },
+      "event": "cost_paid"
+    },
+    {
+      "data": {
+        "additional_costs": [],
+        "additional_generic": 0,
+        "alternative_cost": "{2}",
+        "alternative_cost_kind": "airbend",
+        "card": "Own Utility Creature",
+        "cast_pipeline": "601.2_minimal",
+        "locked_cost": {
+          "colored": {},
+          "generic": 2,
+          "hybrid": [],
+          "monocolored_hybrid": [],
+          "phyrexian": [],
+          "phyrexian_hybrid": [],
+          "spend_tags": [
+            "creature_spell"
+          ]
+        },
+        "modes": [
+          "creature_from_exile"
+        ],
+        "phase": "postcombat_main",
+        "player": "Lorehold",
+        "role": "airbend_recast",
+        "rule_confidence": 0.65,
+        "rule_execution_status": "auto",
+        "rule_review_status": "fact",
+        "rule_source": "type_line_creature",
+        "rule_version": null,
+        "source_zone": "exile",
+        "targets": [],
+        "turn": 8,
+        "type_line": "Creature",
+        "x_value": 0
+      },
+      "event": "airbend_creature_cast_from_exile"
+    },
+    {
+      "data": {
+        "additional_costs": [],
+        "additional_generic": 0,
+        "alternative_cost": "{2}",
+        "alternative_cost_kind": "airbend",
+        "card": "Opponent Threat",
+        "cast_pipeline": "601.2_minimal",
+        "effect": "creature",
+        "locked_cost": {
+          "colored": {},
+          "generic": 2,
+          "hybrid": [],
+          "monocolored_hybrid": [],
+          "phyrexian": [],
+          "phyrexian_hybrid": [],
+          "spend_tags": [
+            "creature_spell"
+          ]
+        },
+        "modes": [
+          "creature_from_exile"
+        ],
+        "phase": "precombat_main",
+        "player": "Opponent",
+        "role": "airbend_recast",
+        "rule_confidence": 0.65,
+        "rule_execution_status": "auto",
+        "rule_review_status": "fact",
+        "rule_source": "type_line_creature",
+        "rule_version": null,
+        "source_zone": "exile",
+        "targets": [],
+        "x_value": 0
+      },
+      "event": "cast_announced"
+    },
+    {
+      "data": {
+        "additional_costs": [],
+        "additional_generic": 0,
+        "alternative_cost": "{2}",
+        "alternative_cost_kind": "airbend",
+        "card": "Opponent Threat",
+        "cast_pipeline": "601.2_minimal",
+        "effect": "creature",
+        "life_after": 40,
+        "life_before": 40,
+        "life_paid": 0,
+        "locked_cost": {
+          "colored": {},
+          "generic": 2,
+          "hybrid": [],
+          "monocolored_hybrid": [],
+          "phyrexian": [],
+          "phyrexian_hybrid": [],
+          "spend_tags": [
+            "creature_spell"
+          ]
+        },
+        "mana_after": 0,
+        "mana_before": 2,
+        "mana_pool_after": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 0,
+          "green": 0,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "mana_pool_before": {
+          "black": 0,
+          "blue": 0,
+          "colorless": 0,
+          "generic": 2,
+          "green": 0,
+          "red": 0,
+          "white": 0,
+          "wildcard": 0
+        },
+        "modes": [
+          "creature_from_exile"
+        ],
+        "phase": "precombat_main",
+        "player": "Opponent",
+        "role": "airbend_recast",
+        "rule_confidence": 0.65,
+        "rule_execution_status": "auto",
+        "rule_review_status": "fact",
+        "rule_source": "type_line_creature",
+        "rule_version": null,
+        "source_zone": "exile",
+        "spell_mana_value_cast_this_turn": 3,
+        "spells_cast_this_turn": 1,
+        "targets": [],
+        "treasures_after": 0,
+        "treasures_before": 0,
+        "x_value": 0
+      },
+      "event": "cost_paid"
+    },
+    {
+      "data": {
+        "additional_costs": [],
+        "additional_generic": 0,
+        "alternative_cost": "{2}",
+        "alternative_cost_kind": "airbend",
+        "card": "Opponent Threat",
+        "cast_pipeline": "601.2_minimal",
+        "locked_cost": {
+          "colored": {},
+          "generic": 2,
+          "hybrid": [],
+          "monocolored_hybrid": [],
+          "phyrexian": [],
+          "phyrexian_hybrid": [],
+          "spend_tags": [
+            "creature_spell"
+          ]
+        },
+        "modes": [
+          "creature_from_exile"
+        ],
+        "phase": "precombat_main",
+        "player": "Opponent",
+        "role": "airbend_recast",
+        "rule_confidence": 0.65,
+        "rule_execution_status": "auto",
+        "rule_review_status": "fact",
+        "rule_source": "type_line_creature",
+        "rule_version": null,
+        "source_zone": "exile",
+        "targets": [],
+        "turn": 9,
+        "type_line": "Creature",
+        "x_value": 0
+      },
+      "event": "airbend_creature_cast_from_exile"
+    }
+  ],
+  "package": "PG099/PG101",
+  "scenario": "Avatar's Wrath airbend all other creatures, non-hand cast lock, self-exile, and recast proof"
+}

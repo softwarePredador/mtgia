@@ -1,0 +1,16 @@
+BEGIN
+psql:../docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_apply_20260623_093427.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+SELECT 2
+DO
+ deprecated_shadow_rows 
+------------------------
+                      2
+(1 row)
+
+ upserted_rows 
+---------------
+             1
+(1 row)
+
+COMMIT

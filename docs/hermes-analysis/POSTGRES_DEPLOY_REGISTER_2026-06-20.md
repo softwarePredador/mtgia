@@ -8733,6 +8733,180 @@ Next deploy number:
 
 - PG098 is next for any future PostgreSQL package.
 
+## PG099 Avatar's Wrath Airbend Runtime Rule - Applied 2026-06-23 12:37 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Promoted the deck `607` `Avatar's Wrath` rule from two stale generated
+  `silence_opponents` review-only shadows to one Oracle-backed runtime rule.
+- Rule:
+  `battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5`,
+  `oracle_hash=21a711291b98f2e66a6d94a6c806945d`,
+  `review_status=verified`, `execution_status=auto`, and
+  `battle_model_scope=avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1`.
+- Runtime now models `airbend_other_creatures`: spare up to one creature,
+  exile other battlefield creatures, track owner recast for `{2}`, apply the
+  opponent non-hand cast lock until the caster's next turn, and self-exile the
+  spell.
+- No `deck_cards` mutation, no deck swap, and no learned-deck promotion.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_precheck_20260623_093427.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_apply_20260623_093427.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_postcheck_20260623_093427.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_rollback_20260623_093427.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg099_avatars_wrath_airbend_rule_20260623_093427`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_precheck_20260623_093427.out`
+  reported `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `new_rule_already_present_rows=0`, `active_shadow_rows=0`,
+  `rows_still_claiming_silence_opponents=2`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_apply_20260623_093427.out`
+  reported backup `SELECT 2`, `deprecated_shadow_rows=2`,
+  `upserted_rows=1`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_postcheck_20260623_093427.out`
+  reported `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, `promoted_oracle_hash_rows=1`,
+  `promoted_expected_effect_rows=1`, `active_shadow_rows=0`,
+  `active_rows_still_claiming_silence=0`, and `backup_rows=2`.
+
+Sync/runtime/test evidence:
+
+- Initial PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg099_avatars_wrath_airbend_rule_sync_report_20260623_093427.json`
+  reported `pg_rows_loaded=1831`, `sqlite_inserted_or_updated=1811`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Focused replay proof after PG101 final sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_avatars_wrath_focused_replay_20260623_094218.json`
+  proves the selected rule key, self-exile, airbend exile/recast, and opponent
+  non-hand cast lock.
+- Runtime regression:
+  `test_pg099_avatars_wrath_airbends_all_other_creatures_and_locks_nonhand_casts`
+  now passes inside
+  `docs/hermes-analysis/master_optimizer_reports/pg101_battle_analyst_v10_3_test_20260623_094218.out`.
+
+## PG100 Seething Song Runtime Metadata Restore - Applied 2026-06-23 12:40 UTC
+
+Status: `applied_validated_superseded_by_pg101`.
+
+- Restored `Seething Song` runtime metadata that the current live PostgreSQL
+  state had lost while validating PG099.
+- Target rule:
+  `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`.
+- Restored `oracle_hash=ccd492289c6f1c14c8fb7a248d7bbf32`,
+  `mana_color_status=abstracted_to_generic_pool_runtime`,
+  `oracle_runtime_scope=single_shot_red_ritual_runtime_generic_pool_color_annotation`,
+  and `pg058_l3b_simple_red_ritual_family=deck6_simple_red_rituals`.
+- No executor or deck behavior changed. PG101 later restored the broader
+  12-row canonical hash/scope group, including this same row.
+
+Evidence:
+
+- SQL package:
+  `docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_precheck_20260623_093907.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_apply_20260623_093907.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_postcheck_20260623_093907.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_rollback_20260623_093907.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_postcheck_20260623_093907.out`
+  reported `target_rows=1`, `hash_match_rows=1`,
+  `expected_mana_color_status_rows=1`,
+  `expected_runtime_scope_rows=1`, `expected_family_rows=1`, and
+  `backup_rows=1`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg100_seething_song_runtime_metadata_restore_sync_report_20260623_093907.json`.
+
+## PG101 Current Hash/Scope Drift Restore - Applied 2026-06-23 12:45 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- During PG099 verification, the full battle suite exposed live PG drift in the
+  already-approved PG094/PG096 hash/scope group. The current PostgreSQL state
+  had only `Seething Song` with a persisted Oracle hash; 11 of the 12 target
+  rows had empty `oracle_hash`, and `Angel's Grace`/`Silence` had effect JSON
+  drift versus the canonical expected runtime snapshot.
+- PG101 restored the 12-row canonical group:
+  `Angel's Grace`, `Fellwar Stone`, `Library of Leng`, `Mana Vault`,
+  `Mox Amber`, `Scroll Rack`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- This was a source-of-truth provenance restore. It did not create a deck swap,
+  mutate `deck_cards`, or promote a learned deck.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_precheck_20260623_094218.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_apply_20260623_094218.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_postcheck_20260623_094218.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_rollback_20260623_094218.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg101_hash_scope_restore_current_drift_20260623_094218`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_precheck_20260623_094218.out`
+  reported `target_rule_rows=12`, `current_card_hash_match_rows=12`,
+  `hash_restored_rows=1`, `effect_json_restored_rows=10`,
+  `status_restored_rows=11`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_apply_20260623_094218.out`
+  reported backup `SELECT 12`, `updated_rows=12`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_postcheck_20260623_094218.out`
+  reported `target_rule_rows=12`, `hash_restored_rows=12`,
+  `effect_json_restored_rows=12`, `status_restored_rows=12`, and
+  `backup_rows=12`.
+
+Sync/audit/runtime evidence:
+
+- Final PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_hash_scope_restore_current_drift_sync_report_20260623_094218.json`
+  reported `pg_rows_loaded=1831`, `sqlite_inserted_or_updated=1809`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Runtime probe:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_runtime_rule_probe_20260623_094218.out`
+  shows current SQLite/runtime selection for `Avatar's Wrath`,
+  `Angel's Grace`, `Silence`, and `Seething Song`.
+- Full battle regression:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_battle_analyst_v10_3_test_20260623_094218.out`
+  passed.
+- Additional tests passed:
+  `docs/hermes-analysis/master_optimizer_reports/pg101_test_sync_battle_card_rules_pg_selection_20260623_094218.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg101_test_deck_card_battle_rule_coherence_audit_20260623_094218.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg101_test_reviewed_battle_card_rules_20260623_094218.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg101_test_battle_forensic_audit_supported_effects_20260623_094218.out`.
+- Post-PG101 card-rule audits:
+  deck `6` `pass=100`; deck `607` `high=13`, `medium=4`, `pass=77`;
+  deck `608` `high=14`, `medium=3`, `pass=51`; global `high=27`,
+  `medium=4`, `pass=174`.
+- Fresh manual 16-seed battle gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_124826/summary.json`
+  reports `run_profile=pg101_avatars_wrath_hash_scope_16_seed`,
+  `invocation_kind=manual_codex_pg101`, `seeds_requested=16`,
+  `seeds_completed=16`, `events=15495`, `decisions=2438`,
+  `test_results_status_counts={"pass":18}`, and no high/critical action,
+  strategy, replay-decision, forensic, target-pressure, or table-intent
+  blockers.
+
+Next deploy number:
+
+- PG102 is next for any future PostgreSQL package.
+
 ## PG098 Call Forth the Tempest Dynamic Damage Rule - Applied 2026-06-23 12:00 UTC
 
 Status: `applied_validated_rebaseline_review_required`.

@@ -137,6 +137,7 @@ EVALUATION_MODE_ENV = "MANALOOM_BATTLE_EVALUATION_MODE"
 TABLE_INTENT_ENV = "MANALOOM_BATTLE_TABLE_INTENT"
 HIGH_IMPACT_PAYOFF_EFFECTS = {
     "aetherflux_reservoir",
+    "airbend_other_creatures",
     "attack_limit",
     "attack_tax",
     "approach",
@@ -1372,9 +1373,54 @@ def process_warp_end_step(player, turn):
     return moved
 
 
+def active_non_hand_cast_locks(player, turn=None):
+    locks = []
+    for lock in list(getattr(player, "non_hand_cast_locks", []) or []):
+        if not isinstance(lock, dict):
+            continue
+        expires_at = lock.get("expires_at_turn")
+        try:
+            expires_at = int(expires_at) if expires_at is not None else None
+        except (TypeError, ValueError):
+            expires_at = None
+        if turn is not None and expires_at is not None and expires_at <= int(turn):
+            continue
+        locks.append(lock)
+    return locks
+
+
+def non_hand_cast_locked(player, turn=None):
+    return bool(active_non_hand_cast_locks(player, turn=turn))
+
+
+def clear_expired_non_hand_cast_locks(active_player, all_players, turn):
+    source_name = getattr(active_player, "name", None)
+    for participant in all_players:
+        locks = list(getattr(participant, "non_hand_cast_locks", []) or [])
+        if not locks:
+            continue
+        kept = []
+        for lock in locks:
+            if not isinstance(lock, dict):
+                continue
+            try:
+                expires_at = int(lock.get("expires_at_turn") or 0)
+            except (TypeError, ValueError):
+                expires_at = 0
+            lock_source = lock.get("source_player")
+            if lock_source == source_name and expires_at <= int(turn):
+                continue
+            if not lock_source and expires_at and expires_at <= int(turn):
+                continue
+            kept.append(lock)
+        participant.non_hand_cast_locks = kept
+
+
 def cast_warp_card_from_exile(player, card, turn, phase):
     """Recast a card previously exiled by warp using its normal cost."""
     if phase not in MAIN_PHASES or not isinstance(card, dict):
+        return False
+    if non_hand_cast_locked(player, turn=turn):
         return False
     if not card.get("_warp_recast_available") or card not in player.exile:
         return False
@@ -1411,9 +1457,59 @@ def cast_warp_card_from_exile(player, card, turn, phase):
     return True
 
 
+def cast_airbend_card_from_exile(player, card, turn, phase):
+    """Cast a creature exiled by airbend for the tracked generic alternative cost."""
+    if phase not in MAIN_PHASES or not isinstance(card, dict):
+        return False
+    if non_hand_cast_locked(player, turn=turn):
+        return False
+    if not card.get("_airbend_available") or card not in player.exile:
+        return False
+    if not is_creature_card(card):
+        return False
+    airbend_cost = str(card.get("_airbend_recast_cost") or "{2}")
+    effect_data = get_card_effect(card)
+    cast_ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="airbend_recast",
+        modes=["creature_from_exile"],
+        source_zone="exile",
+        alternative_cost=airbend_cost,
+        alternative_cost_kind="airbend",
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False
+    player.exile.remove(card)
+    permanent = enrich_card({**card, **effect_data})
+    permanent.pop("_airbend_available", None)
+    permanent.pop("_airbend_recast_cost", None)
+    permanent.pop("_airbend_source", None)
+    permanent["effect"] = "creature"
+    permanent["haste"] = has_haste(permanent)
+    permanent["summoning_sick"] = not permanent["haste"]
+    permanent["tapped"] = False
+    player.battlefield.append(permanent)
+    emit_replay_event(
+        "airbend_creature_cast_from_exile",
+        player=player.name,
+        card=card.get("name", "?"),
+        type_line=permanent.get("type_line", ""),
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    return True
+
+
 def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, turn, phase, stack, rng):
     """Cast an instant/sorcery from graveyard for flashback, exiling on resolution."""
     if not isinstance(card, dict) or card not in player.graveyard:
+        return False
+    if non_hand_cast_locked(player, turn=turn):
         return False
     flashback_cost = card.get("flashback_cost") or card.get("flashback")
     if not flashback_cost:
@@ -2779,6 +2875,40 @@ def normalize_effect_by_oracle(card, effect_data):
         return normalized
 
     if (
+        "airbend all other creatures" in text
+        and str(normalized.get("_rule_execution_status") or "auto").lower()
+        not in {"review_only", "disabled"}
+        and str(normalized.get("_rule_review_status") or "verified").lower()
+        in {"verified", "active", "heuristic", "fact"}
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "airbend_other_creatures"
+        normalized["target"] = "creature"
+        normalized["target_choice"] = "up_to_one_creature_to_spare"
+        normalized["target_scope"] = "any_creature"
+        normalized["airbend_scope"] = "all_other_creatures"
+        normalized["destination"] = "exile"
+        normalized["exile_creatures"] = True
+        normalized["airbend_recast_cost"] = normalized.get("airbend_recast_cost") or "{2}"
+        normalized["airbend_recast_permission"] = (
+            normalized.get("airbend_recast_permission")
+            or "owner_may_cast_from_exile"
+        )
+        normalized["airbend_recast_permission_status"] = (
+            normalized.get("airbend_recast_permission_status")
+            or "tracked_for_cast_from_exile"
+        )
+        normalized["opponents_non_hand_cast_lock"] = True
+        normalized["opponents_non_hand_cast_lock_duration"] = "until_your_next_turn"
+        normalized["exiles_self"] = True
+        normalized["sorcery"] = True
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1"
+        )
+        return normalized
+
+    if (
         effect == "silence_opponents"
         and "can't be countered" in text
         and not re.search(r"opponents? can't cast", text)
@@ -3775,6 +3905,7 @@ class Player:
         self.damage_prevention_shields = []
         self.silenced_opponents = False
         self.silenced_opponents_until_eot = False
+        self.non_hand_cast_locks = []
         self.approach_count = 0
         self.treasures = 0
         self.draw_engines = 0
@@ -4384,7 +4515,7 @@ class Stack:
         """Is the top spell threatening enough for opponents to counter?"""
         if not self.items: return False
         effect = self.items[-1].effect_data.get("effect", "")
-        threats = {"board_wipe", "damage_wipe", "finisher", "approach", "steal_all_creatures",
+        threats = {"airbend_other_creatures", "board_wipe", "damage_wipe", "finisher", "approach", "steal_all_creatures",
                    "overload_recursion", "pump_all", "token_maker", "copy_creature_token",
                    "worldfire_reset"}
         return effect in threats
@@ -5967,6 +6098,7 @@ PROACTIVE_COMBAT_DEFENSE_EFFECTS = {"attack_limit", "attack_tax", "equipment_sta
 SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "phase_out",
     "cannot_lose_turn",
+    "airbend_other_creatures",
     "board_wipe",
     "damage_wipe",
     "damage_player_and_creatures",
@@ -6973,7 +7105,7 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         return 35
 
     # ── MASSIVE BOARD IMPACT ──
-    if effect_name in ("board_wipe", "damage_wipe"):
+    if effect_name in ("airbend_other_creatures", "board_wipe", "damage_wipe"):
         # Higher threat if caster has protection (asymmetric wipe)
         if controller.indestructible or controller.protection_from_everything:
             return 85
@@ -9295,7 +9427,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
             continue
         if not _can_pay_card_with_bonus_mana(player, card):
             continue
-        if effect in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+        if effect in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
             if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
@@ -9313,7 +9445,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 18 if cmc <= 4 else 10
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
+        elif effect in ("airbend_other_creatures", "finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
             score += 24
             reason = "unlock_high_impact_spell"
         else:
@@ -9399,7 +9531,7 @@ def sacrifice_mana_unlock_candidates(
             bonus_color=bonus_color,
         ):
             continue
-        if effect in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+        if effect in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
             continue
         if effect == "draw_cards" and is_wheel_like_card(card, effect_data):
             if not should_cast_wheel(player, opponents, {**effect_data, "name": card.get("name")}):
@@ -9417,7 +9549,7 @@ def sacrifice_mana_unlock_candidates(
         elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
             score += 16 if cmc <= 4 else 8
             reason = "unlock_board_or_engine_development"
-        elif effect in ("finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
+        elif effect in ("airbend_other_creatures", "finisher", "approach", "token_maker", "board_wipe", "damage_wipe", "damage_wipe_treasure", "redistribute_life_totals", "worldfire_reset"):
             score += 26
             reason = "unlock_high_impact_spell"
         else:
@@ -11921,7 +12053,7 @@ def try_lorehold_miracle_cast(
     if last_drawn not in player.hand:
         return False
     opponents = [candidate for candidate in all_players if candidate is not player]
-    if eff.get("effect") in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+    if eff.get("effect") in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
         return False
     if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
         return False
@@ -12923,7 +13055,7 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     elif effect in ("ramp_permanent", "land_ramp", "ramp_engine") and lands < 4:
         score += 65
         reason = "accelerate_underdeveloped_mana"
-    elif effect in ("remove_creature", "remove_permanent", "board_wipe") and opponent_creatures >= 3:
+    elif effect in ("airbend_other_creatures", "remove_creature", "remove_permanent", "board_wipe") and opponent_creatures >= 3:
         score += 55
         reason = "find_interaction_for_board_pressure"
     elif effect in ("draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax") and turn <= 5:
@@ -14507,6 +14639,157 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
     finish_resolved_spell(player, card, turn=turn)
 
 
+def choose_airbend_spared_creature(player):
+    own_creatures = [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if is_battlefield_creature(permanent)
+    ]
+    if not own_creatures:
+        return None
+    return choose_best_creature_target(own_creatures)
+
+
+def apply_airbend_other_creatures(player, opponents, card, effect_data, turn):
+    context = board_wipe_decision_context(player, opponents)
+    spared = choose_airbend_spared_creature(player)
+    spared_id = id(spared) if spared is not None else None
+    participants = [player] + list(opponents)
+    airbend_cost = str(effect_data.get("airbend_recast_cost") or "{2}")
+    exiled = []
+    commanders_to_command_zone = 0
+    tokens_vanished = 0
+    own_creatures_exiled = 0
+    opponent_creatures_exiled = 0
+    live_opponent_creatures_exiled = 0
+
+    for participant in participants:
+        is_self = participant is player
+        is_live_opponent = (not is_self) and participant.is_alive()
+        for permanent in list(participant.battlefield):
+            if not is_battlefield_creature(permanent):
+                continue
+            if id(permanent) == spared_id:
+                continue
+            destination = move_zone_object_to_exile(
+                participant,
+                "battlefield",
+                permanent,
+                reason="airbend",
+                source=card,
+                turn=turn,
+            )
+            if destination == "command_zone":
+                commanders_to_command_zone += 1
+            elif destination == "vanished_token":
+                tokens_vanished += 1
+            elif destination == "exile":
+                permanent["_airbend_available"] = True
+                permanent["_airbend_recast_cost"] = airbend_cost
+                permanent["_airbend_source"] = card.get("name", "?")
+                if is_self:
+                    own_creatures_exiled += 1
+                else:
+                    opponent_creatures_exiled += 1
+                    if is_live_opponent:
+                        live_opponent_creatures_exiled += 1
+            exiled.append(
+                {
+                    "controller": participant.name,
+                    "name": permanent.get("name", "?"),
+                    "destination": destination,
+                    "airbend_recast_cost": airbend_cost if destination == "exile" else None,
+                }
+            )
+
+    locked_opponents = []
+    expires_at_turn = int(turn) + 1
+    if effect_data.get("opponents_non_hand_cast_lock", True):
+        for opponent in opponents:
+            if not opponent.is_alive():
+                continue
+            lock = {
+                "source": card.get("name", "?"),
+                "source_player": player.name,
+                "started_turn": int(turn),
+                "expires_at_turn": expires_at_turn,
+                "restriction": "cannot_cast_from_non_hand_zones",
+            }
+            opponent.non_hand_cast_locks = list(getattr(opponent, "non_hand_cast_locks", []) or [])
+            opponent.non_hand_cast_locks.append(lock)
+            locked_opponents.append(opponent.name)
+
+    actual_asymmetry = live_opponent_creatures_exiled - own_creatures_exiled
+    resolution_context = {
+        **context,
+        "actual_exiled": len(exiled),
+        "own_creatures_exiled": own_creatures_exiled,
+        "opponent_creatures_exiled": opponent_creatures_exiled,
+        "live_opponent_creatures_exiled": live_opponent_creatures_exiled,
+        "effective_opponent_creatures_exiled": live_opponent_creatures_exiled,
+        "actual_asymmetry": actual_asymmetry,
+        "spared_target": spared.get("name", "?") if spared else None,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_creatures_exiled > 0
+        ),
+    }
+    risk_flags = []
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif actual_asymmetry <= 0 and not context["lethal_pressure"] and not context["behind_on_board"]:
+        risk_flags.append("wipe_without_clear_asymmetry")
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_airbend_other_creatures"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(card, effect_data, action="resolve_airbend_other_creatures"),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10) + min(live_opponent_creatures_exiled * 5, 30),
+        actual_outcome="airbend_other_creatures_resolved",
+        reason="tempo_exile_all_other_creatures_and_lock_opponent_nonhand_casts",
+        strategic_principle="use_airbend_wrath_as_tempo_wipe_when_board_pressure_or_asymmetry_justifies",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "airbend_other_creatures_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        spared_target=spared.get("name", "?") if spared else None,
+        exiled_count=len(exiled),
+        exiled=exiled[:20],
+        own_creatures_exiled=own_creatures_exiled,
+        opponent_creatures_exiled=opponent_creatures_exiled,
+        live_opponent_creatures_exiled=live_opponent_creatures_exiled,
+        commanders_to_command_zone=commanders_to_command_zone,
+        tokens_vanished=tokens_vanished,
+        airbend_recast_cost=airbend_cost,
+        airbend_recast_permission=effect_data.get("airbend_recast_permission"),
+        airbend_recast_permission_status=effect_data.get("airbend_recast_permission_status"),
+        opponents_non_hand_cast_lock=bool(effect_data.get("opponents_non_hand_cast_lock", True)),
+        non_hand_cast_lock_duration=effect_data.get("opponents_non_hand_cast_lock_duration"),
+        locked_opponents=locked_opponents,
+        expires_at_turn=expires_at_turn,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def apply_redistribute_life_totals(player, opponents, card, effect_data, turn):
     participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
     if not participants:
@@ -15357,6 +15640,8 @@ def cast_adventure_spell_from_hand(player, card, opponents, all_players, turn, p
 def cast_adventure_creature_from_exile(player, card, turn, phase):
     if phase not in MAIN_PHASES or not isinstance(card, dict) or not card.get("_adventure_available"):
         return False
+    if non_hand_cast_locked(player, turn=turn):
+        return False
     if not is_creature_card(card) or not player.can_pay_card(card):
         return False
     effect_data = get_card_effect(card)
@@ -15865,6 +16150,10 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if note_action():
                     return True
                 break
+            if cast_airbend_card_from_exile(player, exiled_card, turn, phase):
+                if note_action():
+                    return True
+                break
 
         for graveyard_card in list(player.graveyard):
             if cast_flashback_spell_from_graveyard(
@@ -16229,7 +16518,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             c = wincons[0]
             if c in player.hand and player.can_pay_card(c):
                 eff = get_card_effect(c)
-                if eff.get("effect") in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+                if eff.get("effect") in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
                     wincons = []
                 elif eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                     wincons = []
@@ -16352,7 +16641,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         if played >= 2: break
         if c in player.hand and player.can_pay_card(c):
             eff = get_card_effect(c)
-            if eff.get("effect") in ("board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
+            if eff.get("effect") in ("airbend_other_creatures", "board_wipe", "damage_wipe") and not should_cast_board_wipe(player, opponents):
                 continue
             if eff.get("effect") == "worldfire_reset" and not should_cast_worldfire_reset(player, opponents):
                 continue
@@ -17211,6 +17500,8 @@ def apply_effect_immediate(
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_wipe":
         apply_damage_wipe(player, opponents, card, effect_data, turn)
+    elif effect == "airbend_other_creatures":
+        apply_airbend_other_creatures(player, opponents, card, effect_data, turn)
     elif effect == "damage_wipe_treasure":
         apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":
@@ -19948,6 +20239,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         hand_snapshot=[replay_card_snapshot(card) for card in player.hand],
         board=len(player.battlefield),
     )
+    clear_expired_non_hand_cast_locks(player, all_players, turn)
     decay_table_intent_memory(player)
     player.lands_played_this_turn = 0
     player.cards_drawn_this_turn = 0
@@ -20646,6 +20938,8 @@ def infer_battle_card_identity(card):
         and "life total becomes 1" in oracle_text
     ):
         return "wincon", "worldfire_reset"
+    if "airbend all other creatures" in oracle_text:
+        return "board_wipe", "airbend_other_creatures"
     if roles.intersection({"board_wipe", "wipe", "sweeper"}) or "destroy all" in oracle_text or "exile all" in oracle_text:
         return "board_wipe", "board_wipe"
     if "removal" in roles or "destroy target" in oracle_text or "exile target" in oracle_text:
