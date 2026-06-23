@@ -4037,14 +4037,22 @@ Artifacts:
   `docs/hermes-analysis/master_optimizer_reports/deck607_insurrection_pg093_postcheck_20260623_100709.out`.
 - PG093 PG -> SQLite/canonical sync:
   `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_20260623_100709.json`.
+- PG093 current PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_rerun_current_20260623_101800.json`.
 - PG093 focused event evidence:
   `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_20260623_100709.jsonl`.
 - PG093 current focused event rerun:
   `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`.
 - Post-test card-rule audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg093_after_insurrection_20260623_101800.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg093_after_insurrection_20260623_101800.json`,
   `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg093_after_insurrection_20260623_100709.json`
   and
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg093_after_insurrection_20260623_100709.json`.
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg093_after_insurrection_20260623_101800.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg093_after_insurrection_20260623_101800.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg093_after_insurrection_20260623_100709.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg093_after_insurrection_20260623_101800.json`.
 
 Gate:
 
@@ -4062,10 +4070,16 @@ Validation:
 
 - Full runtime wrapper passed after PG093:
   `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+- Current saved wrapper output:
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`
+  with 387 PASS lines.
 - The deck-card coherence auditor was rerun after PostgreSQL -> SQLite sync.
 
 Status:
 
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
 - Deck `607`: `high=17`, `medium=4`, `pass=73`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
 - Global queue after PG093: `high=31`, `medium=4`, `pass=170`.
 - No deck swap, no `deck_cards` mutation, and no new battle rebaseline.

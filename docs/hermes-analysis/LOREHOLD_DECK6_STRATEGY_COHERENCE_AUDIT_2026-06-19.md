@@ -21292,12 +21292,17 @@ Evidence:
 - Full runtime wrapper:
   `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_100709.out`.
 - Current rerun pack:
-  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`
+  `docs/hermes-analysis/master_optimizer_reports/pg093_insurrection_sync_report_rerun_current_20260623_101800.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck607_pg093_insurrection_focused_events_current_20260623_101800.jsonl`,
+  `docs/hermes-analysis/master_optimizer_reports/pg093_test_battle_analyst_v10_3_20260623_101800.out`,
   and the `deck*_pg093_after_insurrection_20260623_101800` audit artifacts.
 
 Current candidate status:
 
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
 - Deck `607`: `high=17`, `medium=4`, `pass=73`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
 - Global card-rule queue: `high=31`, `medium=4`, `pass=170`.
 - No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
   new multi-seed battle baseline.
