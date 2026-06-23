@@ -1,0 +1,17 @@
+ promoted_rule_rows | promoted_verified_auto_rows | deprecated_legacy_rows 
+--------------------+-----------------------------+------------------------
+                  1 |                           1 |                      2
+(1 row)
+
+ backup_rows 
+-------------
+           2
+(1 row)
+
+ normalized_name  |                logical_rule_key                 | review_status | execution_status | rule_version |           oracle_hash            |                                                                                                                                                                         effect_json                                                                                                                                                                         |                                                      deck_role_json                                                      
+------------------+-------------------------------------------------+---------------+------------------+--------------+----------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------
+ surge to victory | battle_rule_v1:4ea05a4d2ce8454073d85afff5e3f790 | deprecated    | disabled         |            1 |                                  | {"cmc": 6.0, "effect": "remove_permanent"}                                                                                                                                                                                                                                                                                                                  | {"effect": "remove_permanent", "category": "removal"}
+ surge to victory | battle_rule_v1:cc95729e96832afbdb1eb194ec6212d4 | deprecated    | disabled         |            1 |                                  | {"effect": "pump_all", "recursion": true}                                                                                                                                                                                                                                                                                                                   | {"effect": "pump_all", "category": "wincon"}
+ surge to victory | battle_rule_v1:44a0c5f4d0c51f52db6a36d12f9db98e | verified      | auto             |            2 | 5381f78ff0798b9afad371e0fa495831 | {"cmc": 6.0, "effect": "pump_all", "target": "instant_or_sorcery_graveyard", "battle_model_scope": "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1", "exiles_target_from_graveyard": true, "casts_copies_without_paying_mana": true, "pump_power_from_exiled_card_mana_value": true, "combat_damage_player_copies_exiled_card": true} | {"effect": "pump_all", "timing": "combat", "subtype": "graveyard_spell_exile_team_pump_copy_cast", "category": "combat"}
+(3 rows)
+

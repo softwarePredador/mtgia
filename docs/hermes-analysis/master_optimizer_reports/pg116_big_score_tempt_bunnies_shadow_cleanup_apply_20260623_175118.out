@@ -1,0 +1,10 @@
+BEGIN
+CREATE SCHEMA
+SELECT 3
+DO
+ deprecated_shadow_rows 
+------------------------
+                      3
+(1 row)
+
+COMMIT

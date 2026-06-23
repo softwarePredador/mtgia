@@ -1,0 +1,11 @@
+    normalized_name    |          expected_hash           | card_rows | existing_rule_rows | target_active_rows | shadow_rows | rows_missing_oracle_hash_before 
+-----------------------+----------------------------------+-----------+--------------------+--------------------+-------------+---------------------------------
+ monument to endurance | a60dc736f7e86e15001c8c7e59ff23c4 |         1 |                  2 |                  0 |           2 |                               2
+(1 row)
+
+    normalized_name    |                logical_rule_key                 | review_status | execution_status | rule_version | oracle_hash |              effect_json              |                deck_role_json                 
+-----------------------+-------------------------------------------------+---------------+------------------+--------------+-------------+---------------------------------------+-----------------------------------------------
+ monument to endurance | battle_rule_v1:4c6d0e500c8211803b6c7d1d3df3dced | needs_review  | review_only      |            1 |             | {"cmc": 3.0, "effect": "ramp_engine"} | {"effect": "ramp_engine", "category": "ramp"}
+ monument to endurance | battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93 | verified      | auto             |            1 |             | {"effect": "passive"}                 | {"effect": "passive", "category": "unknown"}
+(2 rows)
+

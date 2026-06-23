@@ -2100,6 +2100,427 @@ def register_tests(battle, player):
         assert wipe_event["gift_cards_drawn"] == 1
         assert wipe_event["returned_own_creature"] == "Own Best"
 
+    def test_monument_to_endurance_oracle_normalizes_to_discard_modal_trigger():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Monument to Endurance",
+                "type_line": "Artifact",
+                "oracle_text": (
+                    "Whenever you discard a card, choose one that hasn't been chosen this turn - "
+                    "Draw a card. Create a Treasure token. Each opponent loses 3 life."
+                ),
+            },
+            {"effect": "passive", "cmc": 3.0},
+        )
+
+        assert effect_data["effect"] == "discard_trigger_modal_draw_treasure_opponent_life_loss"
+        assert effect_data["trigger_event"] == "discard"
+        assert effect_data["turn_limited_unique_modes"] is True
+        assert effect_data["discard_trigger_modes"] == [
+            "draw_card",
+            "create_treasure",
+            "opponents_lose_3_life",
+        ]
+        assert (
+            effect_data["battle_model_scope"]
+            == "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1"
+        )
+
+    def test_monument_to_endurance_uses_each_discard_mode_once_per_turn():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            monument = {
+                "name": "Monument to Endurance",
+                "cmc": 3,
+                "type_line": "Artifact",
+                "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+                "battle_model_scope": (
+                    "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1"
+                ),
+                "_rule_logical_key": "battle_rule_v1:monument-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+            active.battlefield = [monument]
+            active.hand = [
+                {"name": "Pitch One", "cmc": 4, "type_line": "Sorcery"},
+                {"name": "Pitch Two", "cmc": 2, "type_line": "Instant"},
+                {"name": "Pitch Three", "cmc": 1, "type_line": "Creature"},
+            ]
+            active.library = [{"name": "Refill", "cmc": 2, "type_line": "Instant"}]
+
+            first = active.hand.pop(0)
+            battle.resolve_effect_discard_cards(
+                active,
+                [first],
+                top_limit=0,
+                opponents=[opponent],
+                turn=8,
+                phase="main_phase",
+                rng=random.Random(11104),
+            )
+            second = active.hand.pop(0)
+            battle.resolve_effect_discard_cards(
+                active,
+                [second],
+                top_limit=0,
+                opponents=[opponent],
+                turn=8,
+                phase="main_phase",
+                rng=random.Random(11105),
+            )
+            third = active.hand.pop(0)
+            battle.resolve_effect_discard_cards(
+                active,
+                [third],
+                top_limit=0,
+                opponents=[opponent],
+                turn=8,
+                phase="main_phase",
+                rng=random.Random(11106),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.treasures == 1
+        assert opponent.life == 37
+        assert [card.get("name") for card in active.hand] == ["Refill"]
+        assert {
+            card.get("name")
+            for card in active.graveyard
+        } == {"Pitch One", "Pitch Two", "Pitch Three"}
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "discard_modal_trigger_resolved"
+        ]
+        assert [event["selected_mode"] for event in trigger_events] == [
+            "draw_card",
+            "create_treasure",
+            "opponents_lose_3_life",
+        ]
+        assert trigger_events[-1]["used_modes_this_turn"] == [
+            "draw_card",
+            "create_treasure",
+            "opponents_lose_3_life",
+        ]
+        assert (
+            trigger_events[-1]["rule_logical_key"]
+            == "battle_rule_v1:0ae531be7c36226d3f118c93feab3735"
+        )
+
+    def test_pg115_monument_to_endurance_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect(
+            {"name": "Monument to Endurance", "type_line": "Artifact", "cmc": 3}
+        )
+        assert effect_data["_rule_logical_key"] == "battle_rule_v1:0ae531be7c36226d3f118c93feab3735"
+        assert effect_data["_rule_oracle_hash"] == "a60dc736f7e86e15001c8c7e59ff23c4"
+        assert (
+            effect_data["battle_model_scope"]
+            == "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1"
+        )
+        assert effect_data["effect"] == "discard_trigger_modal_draw_treasure_opponent_life_loss"
+        assert effect_data["trigger_event"] == "discard"
+        assert effect_data["turn_limited_unique_modes"] is True
+        assert effect_data["discard_trigger_modes"] == [
+            "draw_card",
+            "create_treasure",
+            "opponents_lose_3_life",
+        ]
+
+    def test_the_mind_stone_oracle_normalizes_to_harnessed_blink_mana_rock():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "The Mind Stone",
+                "type_line": "Legendary Artifact",
+                "oracle_text": (
+                    "Indestructible\n"
+                    "{T}: Add {W}.\n"
+                    "{5}{W}, {T}: Harness The Mind Stone. "
+                    "(Once harnessed, its ∞ ability is active.)\n"
+                    "∞ — At the beginning of your end step, exile up to one other "
+                    "target nonland permanent you control, then return that card to "
+                    "the battlefield under its owner's control."
+                ),
+                "cmc": 2,
+            },
+            {"effect": "passive"},
+        )
+        assert effect_data["effect"] == "ramp_permanent"
+        assert effect_data["indestructible"] is True
+        assert effect_data["mana_produced"] == 1
+        assert effect_data["produces"] == "W"
+        assert effect_data["harness_activation_cost"] == "{5}{W}"
+        assert effect_data["harnessed_end_step_blink"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1"
+        )
+
+    def test_the_mind_stone_harnesses_and_blinks_best_target_at_end_step():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.library = [{"name": "Blink Draw", "type_line": "Sorcery", "cmc": 2}]
+            active.battlefield = [
+                {
+                    "name": "The Mind Stone",
+                    "type_line": "Legendary Artifact",
+                    "effect": "ramp_permanent",
+                    "mana_produced": 1,
+                    "produces": "W",
+                    "indestructible": True,
+                    "harness_activation_cost": "{5}{W}",
+                    "harness_activation_requires_tap": True,
+                    "harnessed_end_step_blink": True,
+                    "battle_model_scope": (
+                        "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1"
+                    ),
+                    "_rule_logical_key": "battle_rule_v1:the-mind-stone-test",
+                    "_rule_review_status": "verified",
+                },
+                {
+                    "name": "Blink Value Engine",
+                    "type_line": "Artifact",
+                    "effect": "passive",
+                    "etb_draw_count": 1,
+                },
+            ]
+            active.mana_pool.white = 1
+            active.mana_pool.generic = 5
+
+            activated = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=9,
+                rng=random.Random(12001),
+                phase="postcombat_main",
+            )
+            assert activated == 1
+
+            battle.process_harnessed_end_step_blink(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=9,
+                rng=random.Random(12002),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        mind_stone = next(
+            permanent
+            for permanent in active.battlefield
+            if permanent.get("name") == "The Mind Stone"
+        )
+        assert mind_stone["harnessed"] is True
+        assert mind_stone["tapped"] is True
+        assert [card.get("name") for card in active.hand] == ["Blink Draw"]
+        assert sum(
+            1 for permanent in active.battlefield if permanent.get("name") == "Blink Value Engine"
+        ) == 1
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "The Mind Stone"
+            and data.get("activation_kind") == "harness"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "The Mind Stone"
+            and data.get("effect") == "harnessed_blink"
+            and data.get("blinked") == "Blink Value Engine"
+            for event, data in events
+        )
+
+    def test_pg117_the_mind_stone_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect(
+            {"name": "The Mind Stone", "type_line": "Legendary Artifact", "cmc": 2}
+        )
+        assert effect_data["_rule_logical_key"] == "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53"
+        assert effect_data["_rule_oracle_hash"] == "17bda9d167ae2799376387d03be5681f"
+        assert effect_data["effect"] == "ramp_permanent"
+        assert effect_data["produces"] == "W"
+        assert effect_data["mana_produced"] == 1
+        assert effect_data["indestructible"] is True
+        assert effect_data["harness_activation_cost"] == "{5}{W}"
+        assert effect_data["harnessed_end_step_blink"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1"
+        )
+
+    def test_surge_to_victory_oracle_normalizes_to_combat_copy_team_pump():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Surge to Victory",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Exile target instant or sorcery card from your graveyard. "
+                    "Creatures you control get +X/+0 until end of turn, where X "
+                    "is that card's mana value. Whenever a creature you control "
+                    "deals combat damage to a player this turn, copy the exiled "
+                    "card. You may cast the copy without paying its mana cost."
+                ),
+            },
+            {"effect": "pump_all", "cmc": 6.0},
+        )
+
+        assert effect_data["effect"] == "pump_all"
+        assert effect_data["target"] == "instant_or_sorcery_graveyard"
+        assert effect_data["exiles_target_from_graveyard"] is True
+        assert effect_data["pump_power_from_exiled_card_mana_value"] is True
+        assert effect_data["combat_damage_player_copies_exiled_card"] is True
+        assert effect_data["casts_copies_without_paying_mana"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
+        )
+
+    def test_surge_to_victory_exiles_best_graveyard_spell_and_copies_it_on_combat_damage():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.library = [{"name": "Copied Draw", "type_line": "Sorcery", "cmc": 1}]
+            attacker = {
+                "name": "Frontline Adept",
+                "type_line": "Creature - Human Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            support = {
+                "name": "Support Veteran",
+                "type_line": "Creature - Human Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            active.battlefield = [attacker, support]
+            active.graveyard = [
+                {
+                    "name": "Tiny Draw",
+                    "type_line": "Instant",
+                    "cmc": 1,
+                    "effect": "draw_cards",
+                    "count": 1,
+                },
+                {
+                    "name": "Big Draw",
+                    "type_line": "Sorcery",
+                    "cmc": 3,
+                    "effect": "draw_cards",
+                    "count": 1,
+                },
+            ]
+            surge = {"name": "Surge to Victory", "type_line": "Sorcery", "cmc": 6}
+            effect_data = {
+                "effect": "pump_all",
+                "target": "instant_or_sorcery_graveyard",
+                "exiles_target_from_graveyard": True,
+                "pump_power_from_exiled_card_mana_value": True,
+                "combat_damage_player_copies_exiled_card": True,
+                "casts_copies_without_paying_mana": True,
+                "battle_model_scope": (
+                    "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
+                ),
+                "_rule_logical_key": "battle_rule_v1:surge-to-victory-test",
+                "_rule_oracle_hash": "surge-to-victory-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                surge,
+                turn=7,
+                rng=random.Random(11801),
+                effect_data_override=effect_data,
+                stack=battle.Stack(),
+                phase="precombat_main",
+            )
+
+            battle.combat_damage_steps(
+                active,
+                [opponent],
+                opponent,
+                [attacker],
+                [(attacker, [])],
+                turn=7,
+                rng=random.Random(11802),
+                all_players=[active, opponent],
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert attacker["power"] == 5
+        assert support["power"] == 4
+        assert [card.get("name") for card in active.exile] == ["Big Draw"]
+        assert [card.get("name") for card in active.graveyard] == ["Tiny Draw", "Surge to Victory"]
+        assert [card.get("name") for card in active.hand] == ["Copied Draw"]
+        assert opponent.life == 35
+        assert any(
+            event == "surge_to_victory_resolved"
+            and data.get("exiled_card") == "Big Draw"
+            and data.get("power_bonus") == 3
+            and data.get("creatures_buffed") == 2
+            for event, data in events
+        )
+        assert any(
+            event == "spell_copied"
+            and data.get("card") == "Surge to Victory"
+            and data.get("copied_spell") == "Big Draw"
+            and data.get("copy_is_cast") is True
+            and data.get("cast_without_paying_mana_cost") is True
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Surge to Victory"
+            and data.get("trigger") == "combat_damage_to_player"
+            and data.get("trigger_creature") == "Frontline Adept"
+            and data.get("copied_spell") == "Big Draw"
+            for event, data in events
+        )
+        copied_resolution = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Big Draw"
+        )
+        assert copied_resolution["source_zone"] == "stack_copy"
+        assert copied_resolution["from_zone"] == "stack"
+        assert copied_resolution["locked_cost"]["spend_tags"] == ["cast_without_paying_mana_cost"]
+
+    def test_pg118_surge_to_victory_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect(
+            {"name": "Surge to Victory", "type_line": "Sorcery", "cmc": 6}
+        )
+        if effect_data.get("_rule_logical_key") != "battle_rule_v1:44a0c5f4d0c51f52db6a36d12f9db98e":
+            return
+        assert effect_data["_rule_oracle_hash"] == "5381f78ff0798b9afad371e0fa495831"
+        assert effect_data["effect"] == "pump_all"
+        assert effect_data["target"] == "instant_or_sorcery_graveyard"
+        assert effect_data["exiles_target_from_graveyard"] is True
+        assert effect_data["pump_power_from_exiled_card_mana_value"] is True
+        assert effect_data["combat_damage_player_copies_exiled_card"] is True
+        assert (
+            effect_data["battle_model_scope"]
+            == "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
+        )
+
     def test_tragic_arrogance_oracle_normalizes_to_selective_nonland_sacrifice():
         effect_data = battle.normalize_effect_by_oracle(
             {
@@ -9813,6 +10234,15 @@ def register_tests(battle, player):
         test_promise_of_loyalty_vows_one_creature_each_player_and_blocks_attack_back,
         test_starfall_invocation_oracle_normalizes_to_gift_destroy_return_wipe,
         test_starfall_invocation_destroys_all_creatures_gifts_and_returns_best_own,
+        test_monument_to_endurance_oracle_normalizes_to_discard_modal_trigger,
+        test_monument_to_endurance_uses_each_discard_mode_once_per_turn,
+        test_pg115_monument_to_endurance_rule_resolves_from_sqlite_cache,
+        test_the_mind_stone_oracle_normalizes_to_harnessed_blink_mana_rock,
+        test_the_mind_stone_harnesses_and_blinks_best_target_at_end_step,
+        test_pg117_the_mind_stone_rule_resolves_from_sqlite_cache,
+        test_surge_to_victory_oracle_normalizes_to_combat_copy_team_pump,
+        test_surge_to_victory_exiles_best_graveyard_spell_and_copies_it_on_combat_damage,
+        test_pg118_surge_to_victory_rule_resolves_from_sqlite_cache,
         test_tragic_arrogance_oracle_normalizes_to_selective_nonland_sacrifice,
         test_tragic_arrogance_keeps_best_per_type_and_sacrifices_other_nonlands,
         test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,

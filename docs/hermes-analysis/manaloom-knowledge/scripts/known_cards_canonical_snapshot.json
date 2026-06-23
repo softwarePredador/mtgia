@@ -18404,13 +18404,24 @@
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
   "Monument to Endurance": {
-    "effect": "passive",
+    "ability_kind": "triggered",
+    "battle_model_scope": "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1",
+    "cmc": 3.0,
+    "discard_trigger_modes": [
+      "draw_card",
+      "create_treasure",
+      "opponents_lose_3_life"
+    ],
+    "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+    "trigger_event": "discard",
+    "turn_limited_unique_modes": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ae531be7c36226d3f118c93feab3735",
+    "battle_rule_oracle_hash": "a60dc736f7e86e15001c8c7e59ff23c4"
   },
   "Monumental Henge": {
     "effect": "land",
@@ -27931,14 +27942,22 @@
     "battle_rule_logical_key": "battle_rule_v1:b48f4fcab66f3fe1e92596c0883a37ec"
   },
   "Surge to Victory": {
-    "effect": "remove_permanent",
-    "recursion": true,
+    "battle_model_scope": "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1",
+    "casts_copies_without_paying_mana": true,
+    "cmc": 6.0,
+    "combat_damage_player_copies_exiled_card": true,
+    "effect": "pump_all",
+    "exiles_target_from_graveyard": true,
+    "pump_power_from_exiled_card_mana_value": true,
+    "target": "instant_or_sorcery_graveyard",
+    "sorcery": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cc95729e96832afbdb1eb194ec6212d4"
+    "battle_rule_confidence": 0.95,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:44a0c5f4d0c51f52db6a36d12f9db98e",
+    "battle_rule_oracle_hash": "5381f78ff0798b9afad371e0fa495831"
   },
   "Surly Badgersaur": {
     "cmc": 4.0,
@@ -29574,6 +29593,25 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
+  },
+  "The Mind Stone": {
+    "battle_model_scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+    "cmc": 2.0,
+    "effect": "ramp_permanent",
+    "harness_activation_cost": "{5}{W}",
+    "harness_activation_requires_tap": true,
+    "harnessed_blink_target_scope": "other_nonland_permanent_you_control",
+    "harnessed_end_step_blink": true,
+    "indestructible": true,
+    "mana_produced": 1,
+    "produces": "W",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.95,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53",
+    "battle_rule_oracle_hash": "17bda9d167ae2799376387d03be5681f"
   },
   "The Monumental Facade": {
     "effect": "land",

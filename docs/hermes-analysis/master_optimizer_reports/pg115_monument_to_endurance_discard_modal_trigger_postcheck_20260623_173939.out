@@ -1,0 +1,12 @@
+    normalized_name    |                expected_rule_key                | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | active_shadow_rows | backup_rows 
+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+--------------------+-------------
+ monument to endurance | battle_rule_v1:0ae531be7c36226d3f118c93feab3735 |                  1 |                           1 |                         1 |                  0 |           2
+(1 row)
+
+    normalized_name    |                logical_rule_key                 | review_status | execution_status |           oracle_hash            |                       battle_model_scope                        |                         effect                         | trigger_event | turn_limited_unique_modes |                   discard_trigger_modes                   
+-----------------------+-------------------------------------------------+---------------+------------------+----------------------------------+-----------------------------------------------------------------+--------------------------------------------------------+---------------+---------------------------+-----------------------------------------------------------
+ monument to endurance | battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93 | deprecated    | disabled         |                                  |                                                                 | passive                                                |               |                           | 
+ monument to endurance | battle_rule_v1:4c6d0e500c8211803b6c7d1d3df3dced | deprecated    | disabled         |                                  |                                                                 | ramp_engine                                            |               |                           | 
+ monument to endurance | battle_rule_v1:0ae531be7c36226d3f118c93feab3735 | verified      | auto             | a60dc736f7e86e15001c8c7e59ff23c4 | discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1 | discard_trigger_modal_draw_treasure_opponent_life_loss | discard       | true                      | ["draw_card", "create_treasure", "opponents_lose_3_life"]
+(3 rows)
+

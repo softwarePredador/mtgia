@@ -509,6 +509,14 @@ def gain_life(player, amount, cap=40):
     return _gain_life(player, amount, cap=cap, emit_replay_event=emit_replay_event)
 
 
+def clear_turn_scoped_permanent_flags(all_players):
+    for participant in all_players or []:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            permanent.pop("discard_modal_modes_used_this_turn", None)
+
+
 class EngineMetrics:
     """Lightweight health telemetry for battle-engine simulations."""
 
@@ -3225,6 +3233,47 @@ def normalize_effect_by_oracle(card, effect_data):
         return normalized
 
     if (
+        "whenever you discard a card" in text
+        and "choose one that hasn't been chosen this turn" in text
+        and "draw a card" in text
+        and "create a treasure token" in text
+        and "each opponent loses 3 life" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "discard_trigger_modal_draw_treasure_opponent_life_loss"
+        normalized["trigger_event"] = "discard"
+        normalized["turn_limited_unique_modes"] = True
+        normalized["discard_trigger_modes"] = list(DISCARD_MODAL_MONUMENT_MODES)
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or DISCARD_MODAL_MONUMENT_SCOPE
+        )
+        return normalized
+
+    if (
+        "indestructible" in text
+        and "{t}: add {w}" in text
+        and "harness the mind stone" in text
+        and "at the beginning of your end step" in text
+        and "exile up to one other target nonland permanent you control" in text
+        and "return that card to the battlefield under its owner's control" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "ramp_permanent"
+        normalized["indestructible"] = True
+        normalized["mana_produced"] = 1
+        normalized["produces"] = "W"
+        normalized["harness_activation_cost"] = "{5}{W}"
+        normalized["harness_activation_requires_tap"] = True
+        normalized["harnessed_end_step_blink"] = True
+        normalized["harnessed_blink_target_scope"] = "other_nonland_permanent_you_control"
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or THE_MIND_STONE_SCOPE
+        )
+        return normalized
+
+    if (
         "target creature you control and target creature an opponent controls each gain indestructible until end of turn" in text
         and "then destroy all creatures" in text
         and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
@@ -3284,6 +3333,29 @@ def normalize_effect_by_oracle(card, effect_data):
         normalized["casts_copies_without_paying_mana"] = True
         normalized["exiles_target_cards"] = True
         normalized["exiles_self"] = True
+        return normalized
+
+    if (
+        normalized_name == "surge to victory"
+        and "exile target instant or sorcery card from your graveyard" in text
+        and "creatures you control get +x/+0 until end of turn" in text
+        and "whenever a creature you control deals combat damage to a player this turn" in text
+        and "copy the exiled card" in text
+        and "cast the copy without paying its mana cost" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "pump_all"
+        normalized["sorcery"] = True
+        normalized["target"] = "instant_or_sorcery_graveyard"
+        normalized["exiles_target_from_graveyard"] = True
+        normalized["pump_power_from_exiled_card_mana_value"] = True
+        normalized["combat_damage_player_copies_exiled_card"] = True
+        normalized["casts_copies_without_paying_mana"] = True
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or SURGE_TO_VICTORY_SCOPE
+        )
+        normalized.pop("instant", None)
         return normalized
 
     if re.search(r"\b(destroy|exile)\s+target\b", text):
@@ -4490,6 +4562,7 @@ class Player:
         self._spells_cast_turn_marker = None
         self.noncreature_spells_cast_this_turn = 0
         self._noncreature_spells_cast_turn_marker = None
+        self.surge_to_victory_delayed_triggers = []
         self.failed_draw_from_empty_library = False
 
     def refresh_mana_sources(self, turn=None):
@@ -7891,7 +7964,259 @@ def clear_until_eot(player):
     player.damage_prevention_shields = []
 
 
-def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
+DISCARD_MODAL_MONUMENT_SCOPE = (
+    "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1"
+)
+DISCARD_MODAL_MONUMENT_MODES = (
+    "draw_card",
+    "create_treasure",
+    "opponents_lose_3_life",
+)
+THE_MIND_STONE_SCOPE = (
+    "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1"
+)
+SURGE_TO_VICTORY_SCOPE = (
+    "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
+)
+
+
+def _available_discard_modal_modes(permanent):
+    used = permanent.setdefault("discard_modal_modes_used_this_turn", [])
+    used_set = {str(mode) for mode in used}
+    return [
+        mode
+        for mode in DISCARD_MODAL_MONUMENT_MODES
+        if mode not in used_set
+    ]
+
+
+def _choose_discard_modal_mode(player, permanent, opponents):
+    available = _available_discard_modal_modes(permanent)
+    if not available:
+        return None
+    hand_size = len(getattr(player, "hand", []) or [])
+    alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
+    if "draw_card" in available and hand_size <= 2 and player.library:
+        return "draw_card"
+    if "create_treasure" in available and player.available_mana() <= 2:
+        return "create_treasure"
+    if "opponents_lose_3_life" in available and alive_opponents:
+        return "opponents_lose_3_life"
+    if "draw_card" in available and player.library:
+        return "draw_card"
+    if "create_treasure" in available:
+        return "create_treasure"
+    if "opponents_lose_3_life" in available and alive_opponents:
+        return "opponents_lose_3_life"
+    return available[0]
+
+
+def process_discard_modal_triggers(
+    player,
+    discarded_cards,
+    *,
+    opponents=None,
+    turn=None,
+    phase=None,
+    rng=None,
+):
+    discarded = [card for card in discarded_cards if isinstance(card, dict)]
+    if not discarded:
+        return []
+    opponents = list(opponents or [])
+    rng = rng or random.Random(0)
+    trigger_events = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = get_card_effect(permanent)
+        if effect_data.get("effect") != "discard_trigger_modal_draw_treasure_opponent_life_loss":
+            continue
+        for discarded_card in discarded:
+            selected_mode = _choose_discard_modal_mode(player, permanent, opponents)
+            if selected_mode is None:
+                break
+            permanent.setdefault("discard_modal_modes_used_this_turn", []).append(selected_mode)
+            cards_drawn = []
+            treasures_created = 0
+            life_loss_each = 0
+            affected_opponents = []
+            if selected_mode == "draw_card":
+                cards_drawn = player.draw(1, rng)
+            elif selected_mode == "create_treasure":
+                treasures_created = 1
+                player.treasures += treasures_created
+            elif selected_mode == "opponents_lose_3_life":
+                life_loss_each = 3
+                for opponent in opponents:
+                    if not opponent.is_alive():
+                        continue
+                    change_life(opponent, -life_loss_each)
+                    affected_opponents.append(opponent.name)
+            event_payload = {
+                "player": player.name,
+                "card": permanent.get("name", "?"),
+                "discarded_card": discarded_card.get("name", "?"),
+                "selected_mode": selected_mode,
+                "used_modes_this_turn": list(permanent.get("discard_modal_modes_used_this_turn", [])),
+                "cards_drawn": len(cards_drawn),
+                "drawn_cards": [
+                    drawn_card.get("name", "?")
+                    for drawn_card in cards_drawn
+                    if isinstance(drawn_card, dict)
+                ],
+                "treasures_created": treasures_created,
+                "treasures": player.treasures,
+                "life_loss_each_opponent": life_loss_each,
+                "affected_opponents": affected_opponents,
+                "turn": turn,
+                "phase": phase,
+                **replay_rule_fields(effect_data),
+            }
+            emit_replay_event("discard_modal_trigger_resolved", **event_payload)
+            trigger_events.append(event_payload)
+    return trigger_events
+
+
+def resolve_generic_permanent_etb(player, opponents, permanent, effect_data, turn, rng):
+    if effect_data.get("etb_land_ramp_count"):
+        etb_eff = {
+            **effect_data,
+            "land_count": int(effect_data.get("etb_land_ramp_count") or 1),
+            "requires_sacrifice_land": bool(effect_data.get("etb_requires_sacrifice_land")),
+        }
+        put_lands_from_library(
+            player,
+            permanent,
+            etb_eff,
+            turn,
+            opponents=opponents,
+            source_event="etb_land_ramp",
+        )
+    if effect_data.get("etb_draw_count"):
+        player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
+    resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
+    if effect_data.get("etb_tutor_target"):
+        resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
+    if effect_data.get("etb_remove_target") or effect_data.get("etb_removal_target"):
+        resolve_etb_removal(player, opponents, permanent, effect_data, turn, rng)
+    if effect_data.get("etb_token_count"):
+        for _ in range(min(int(effect_data.get("etb_token_count") or 1), 20)):
+            create_creature_token(
+                player,
+                name=effect_data.get("etb_token_name", "Token"),
+                power=int(effect_data.get("etb_token_power") or 1),
+                toughness=int(
+                    effect_data.get("etb_token_toughness")
+                    or effect_data.get("etb_token_power")
+                    or 1
+                ),
+                artifact=bool(effect_data.get("etb_artifact_tokens")),
+            )
+    if effect_data.get("etb_recursion_count"):
+        resolve_etb_graveyard_recursion(player, permanent, effect_data, turn)
+
+
+def _harnessed_blink_target_score(permanent):
+    if not isinstance(permanent, dict):
+        return -999
+    type_line = str(permanent.get("type_line") or "").lower()
+    if "land" in type_line:
+        return -999
+    if permanent.get("is_token") or permanent.get("tag") == "token" or "token" in type_line:
+        return -999
+
+    score = 0
+    if permanent.get("etb_draw_count"):
+        score += 18 * int(permanent.get("etb_draw_count") or 1)
+    if permanent.get("etb_tutor_target"):
+        score += 28
+    if permanent.get("etb_land_ramp_count"):
+        score += 22
+    if permanent.get("etb_remove_target") or permanent.get("etb_removal_target"):
+        score += 24
+    if permanent.get("etb_recursion_count"):
+        score += 24
+    if permanent.get("etb_token_count"):
+        score += 12 * int(permanent.get("etb_token_count") or 1)
+    if permanent.get("trigger") in {"spell_cast", "noncreature_spell_cast"}:
+        score += 6
+    if permanent.get("tapped"):
+        score += 4
+    if permanent.get("utility_artifact_used_this_turn"):
+        score += 3
+    if permanent.get("effect") in {"passive", "ramp_permanent"} and score == 0:
+        score -= 8
+    return score
+
+
+def _choose_harnessed_blink_target(player, source_permanent):
+    candidates = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if permanent is source_permanent or not isinstance(permanent, dict):
+            continue
+        score = _harnessed_blink_target_score(permanent)
+        if score <= 0:
+            continue
+        candidates.append((score, permanent))
+    if not candidates:
+        return None, 0
+    candidates.sort(key=lambda item: (-item[0], item[1].get("name", "?")))
+    return candidates[0][1], candidates[0][0]
+
+
+def process_harnessed_end_step_blink(player, opponents, all_players, turn, rng):
+    for source_permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(source_permanent, dict):
+            continue
+        if not source_permanent.get("harnessed_end_step_blink") or not source_permanent.get("harnessed"):
+            continue
+        target, target_score = _choose_harnessed_blink_target(player, source_permanent)
+        if target is None:
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=source_permanent.get("name", "?"),
+                trigger="end_step",
+                reason="no_valid_harnessed_blink_target",
+                turn=turn,
+                phase="end_step",
+                **replay_rule_fields(source_permanent),
+            )
+            continue
+        if target in player.battlefield:
+            player.battlefield.remove(target)
+
+        target_effect = get_card_effect(target)
+        reentry_payload = {**target_effect, **target}
+        for transient_key in (
+            "tapped",
+            "summoning_sick",
+            "utility_artifact_used_this_turn",
+            "utility_land_used_this_turn",
+            "discard_modal_modes_used_this_turn",
+        ):
+            reentry_payload.pop(transient_key, None)
+        returned = prepare_entering_permanent(enrich_card(reentry_payload))
+        player.battlefield.append(returned)
+        resolve_generic_permanent_etb(player, opponents, returned, reentry_payload, turn, rng)
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=source_permanent.get("name", "?"),
+            trigger="end_step",
+            effect="harnessed_blink",
+            blinked=target.get("name", "?"),
+            target_score=target_score,
+            returned=returned.get("name", "?"),
+            turn=turn,
+            phase="end_step",
+            **replay_rule_fields(source_permanent),
+        )
+        check_sbas_until_stable(all_players)
+
+
+def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None, power_bonus=0):
     creatures = [
         card
         for card in player.battlefield
@@ -7909,6 +8234,13 @@ def grant_creatures_until_eot(player, *, keywords=(), power_multiplier=None):
             except (TypeError, ValueError):
                 base_power = 2
             creature["power"] = base_power * power_multiplier
+        if power_bonus:
+            remember_until_eot(creature, "power")
+            try:
+                current_power = int(float(creature.get("power", 2)))
+            except (TypeError, ValueError):
+                current_power = 2
+            creature["power"] = current_power + int(power_bonus)
     return len(creatures)
 
 
@@ -8459,13 +8791,21 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             )
             return False
         player.hand.remove(discard_any)
-        player.graveyard.append(discard_any)
+        discard_resolution = resolve_effect_discard_cards(player, [discard_any], top_limit=0)
         emit_replay_event(
             "additional_cost_paid",
             player=player.name,
             card=card.get("name", "?"),
             cost="discard_card",
             discarded=discard_any.get("name", "?"),
+            discarded_to_top=[
+                entry.get("name", "?")
+                for entry in discard_resolution.get("to_top", [])
+            ],
+            discarded_to_graveyard=[
+                entry.get("name", "?")
+                for entry in discard_resolution.get("to_graveyard", [])
+            ],
             turn=turn,
         )
     if effect_data.get("requires_discard_land"):
@@ -8496,13 +8836,21 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             )
             return False
         player.hand.remove(discard)
-        player.graveyard.append(discard)
+        discard_resolution = resolve_effect_discard_cards(player, [discard], top_limit=0)
         emit_replay_event(
             "additional_cost_paid",
             player=player.name,
             card=card.get("name", "?"),
             cost="discard_land",
             discarded=discard.get("name", "?"),
+            discarded_to_top=[
+                entry.get("name", "?")
+                for entry in discard_resolution.get("to_top", [])
+            ],
+            discarded_to_graveyard=[
+                entry.get("name", "?")
+                for entry in discard_resolution.get("to_graveyard", [])
+            ],
             turn=turn,
             land_options=land_options,
             selection_reason=selection_reason,
@@ -11029,6 +11377,10 @@ def resolve_wheel_of_misfortune(player, opponents, card, draw_count, turn, rng, 
             participant,
             discarded_cards,
             top_limit=draw_count,
+            opponents=[candidate for candidate in participants if candidate is not participant],
+            turn=turn,
+            phase="resolution",
+            rng=rng,
         )
         drawn = participant.draw(draw_count, rng)
         if participant is not player:
@@ -11099,6 +11451,10 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng, effe
             participant,
             discarded_cards,
             top_limit=draw_count,
+            opponents=[candidate for candidate in participants if candidate is not participant],
+            turn=turn,
+            phase="resolution",
+            rng=rng,
         )
         drawn = participant.draw(draw_count, rng)
         if participant is not player:
@@ -12953,7 +13309,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         )
         and not permanent.get("utility_artifact_used_this_turn")
     ]
-    if phase != "postcombat_main" or not self_sacrifice_draw_artifacts:
+    if phase != "postcombat_main":
         return 0
 
     for permanent in self_sacrifice_draw_artifacts:
@@ -13064,6 +13420,104 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         )
         return 1
 
+    harness_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("harnessed_end_step_blink")
+        and not permanent.get("harnessed")
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    for permanent in harness_artifacts:
+        if permanent.get("harness_activation_requires_tap", True) and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "artifact_already_tapped_for_harness_activation",
+                phase=phase,
+            )
+            continue
+        target, target_score = _choose_harnessed_blink_target(player, permanent)
+        if target is None:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_valid_harness_target",
+                phase=phase,
+            )
+            continue
+        activation_cost = str(permanent.get("harness_activation_cost") or "{5}{W}")
+        if not player.spend_mana(activation_cost):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "failed_to_pay_harness_activation_cost",
+                phase=phase,
+            )
+            continue
+        if permanent.get("harness_activation_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        permanent["harnessed"] = True
+        permanent["harnessed_turn"] = turn
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="activate_harness",
+                    effect=permanent.get("effect", "artifact"),
+                    score=20 + target_score,
+                    blink_target=target.get("name", "?"),
+                )
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="activate_harness",
+                effect=permanent.get("effect", "artifact"),
+                score=20 + target_score,
+                blink_target=target.get("name", "?"),
+            ),
+            score_components={
+                "activation_cost": activation_cost,
+                "blink_target": target.get("name", "?"),
+                "blink_target_score": target_score,
+            },
+            rule_source="utility_artifact_activation_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=20 + target_score,
+            reason="invest_in_repeatable_end_step_blink_engine",
+            strategic_principle="convert spare mana into persistent end-step value when a worthwhile blink target exists",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "mana": -6,
+                "harnessed": 1,
+                "blink_target": target.get("name", "?"),
+            },
+            risk_flags=["sorcery_speed_setup", "mana_intensive_activation"],
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="harness",
+            activation_cost=activation_cost,
+            blink_target=target.get("name", "?"),
+            blink_target_score=target_score,
+            harnessed=True,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+
     return 0
 
 
@@ -13137,13 +13591,23 @@ def discard_replacement_priority(card, player):
     return 58
 
 
-def resolve_effect_discard_cards(player, discarded_cards, *, top_limit=None):
+def resolve_effect_discard_cards(
+    player,
+    discarded_cards,
+    *,
+    top_limit=None,
+    opponents=None,
+    turn=None,
+    phase=None,
+    rng=None,
+):
     cards = [card for card in discarded_cards if isinstance(card, dict)]
     if not cards:
         return {
             "to_top": [],
             "to_graveyard": [],
             "used_replacement": False,
+            "trigger_events": [],
         }
 
     if not player_has_discard_to_top_replacement(player):
@@ -13152,6 +13616,14 @@ def resolve_effect_discard_cards(player, discarded_cards, *, top_limit=None):
             "to_top": [],
             "to_graveyard": cards,
             "used_replacement": False,
+            "trigger_events": process_discard_modal_triggers(
+                player,
+                cards,
+                opponents=opponents,
+                turn=turn,
+                phase=phase,
+                rng=rng,
+            ),
         }
 
     scored_cards = sorted(
@@ -13180,6 +13652,14 @@ def resolve_effect_discard_cards(player, discarded_cards, *, top_limit=None):
         "to_top": chosen_to_top,
         "to_graveyard": to_graveyard,
         "used_replacement": bool(chosen_to_top),
+        "trigger_events": process_discard_modal_triggers(
+            player,
+            cards,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        ),
     }
 
 
@@ -15133,6 +15613,244 @@ def resolve_mizzix_mastery(player, opponents, card, effect_data, turn, rng, *, s
     finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 
 
+def choose_surge_to_victory_graveyard_spell(player, opponents, turn):
+    candidates = mizzix_mastery_graveyard_candidates(player)
+    if not candidates:
+        return None
+    scored = [
+        (
+            candidate,
+            threat_score(
+                get_card_effect(candidate).get("effect", ""),
+                candidate.get("name", ""),
+                player,
+                [player] + list(opponents or []),
+                turn,
+            ),
+        )
+        for candidate in candidates
+    ]
+    scored.sort(
+        key=lambda item: (
+            -item[1],
+            -int(float(item[0].get("cmc") or 0)),
+            item[0].get("name", ""),
+        )
+    )
+    return scored[0][0]
+
+
+def cast_spell_copy_without_paying_mana(
+    player,
+    opponents,
+    all_players,
+    source_card,
+    original,
+    turn,
+    rng,
+    *,
+    source_effect_data,
+    stack=None,
+    phase=None,
+    priority_window="copy_cast_without_paying_mana",
+    trigger_context=None,
+):
+    if not isinstance(original, dict):
+        return None
+    copy_card = copy.deepcopy(original)
+    copy_card["is_copy"] = True
+    copy_card["_copied_from_spell"] = original.get("name", "?")
+    copy_card["_copied_by"] = source_card.get("name", "?")
+    copy_effect = copy.deepcopy(get_card_effect(original))
+    if (
+        copy_effect.get("effect") in {None, "unknown"}
+        and isinstance(original, dict)
+        and original.get("effect") not in {None, "unknown"}
+    ):
+        copy_effect = copy.deepcopy(original)
+    copy_effect["_copied_from_spell"] = original.get("name", "?")
+    copy_effect["_copied_by"] = source_card.get("name", "?")
+    attach_direct_resolution_context(
+        copy_effect,
+        copy_card,
+        phase,
+        priority_window=priority_window,
+        source_zone="stack_copy",
+        locked_cost=zero_mana_cost_snapshot("cast_without_paying_mana_cost"),
+        alternative_cost="{0}",
+        alternative_cost_kind="cast_without_paying_mana",
+    )
+    player.record_spell_cast(CURRENT_REPLAY_TURN, card=copy_card)
+    emit_replay_event(
+        "spell_copied",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        copied_spell=original.get("name", "?"),
+        copy_controller=player.name,
+        copy_is_cast=True,
+        cast_without_paying_mana_cost=True,
+        turn=turn,
+        phase=phase,
+        **(trigger_context or {}),
+        **replay_rule_fields(source_effect_data),
+    )
+    copy_cast_fields = copy.deepcopy(copy_effect.get("_resolution_context") or {})
+    copy_cast_fields.pop("phase", None)
+    copy_cast_fields.pop("result", None)
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=copy_card.get("name", "?"),
+        effect=copy_effect.get("effect", "unknown"),
+        type_line=copy_card.get("type_line", ""),
+        cmc=copy_card.get("cmc", 0),
+        cast_without_paying_mana_cost=True,
+        turn=turn,
+        phase=phase,
+        **copy_cast_fields,
+        **replay_rule_fields(copy_effect),
+    )
+    mark_cast_ledger_emitted(copy_effect)
+    trigger_spell_cast_engines(
+        player,
+        all_players,
+        copy_card,
+        turn,
+        phase,
+        stack=stack,
+        active_player=player,
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        list(opponents or []),
+        copy_card,
+        turn,
+        phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    apply_effect_immediate(
+        player,
+        list(opponents or []),
+        copy_card,
+        turn,
+        rng,
+        effect_data_override=copy_effect,
+        stack=stack,
+        phase=phase,
+    )
+    return copy_card
+
+
+def resolve_surge_to_victory(player, opponents, all_players, card, effect_data, turn, rng, *, stack=None, phase=None):
+    target_spell = choose_surge_to_victory_graveyard_spell(player, opponents, turn)
+    if target_spell is None:
+        emit_replay_event(
+            "surge_to_victory_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            result="no_graveyard_target",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return
+    if target_spell in player.graveyard:
+        player.graveyard.remove(target_spell)
+    move_to_exile(player, target_spell, reason="surge_to_victory_target", turn=turn)
+    try:
+        power_bonus = max(0, int(float(target_spell.get("cmc") or 0)))
+    except Exception:
+        power_bonus = 0
+    creatures_buffed = grant_creatures_until_eot(player, power_bonus=power_bonus)
+    player.surge_to_victory_delayed_triggers.append(
+        {
+            "source_card": card.get("name", "?"),
+            "exiled_card": copy.deepcopy(target_spell),
+            "power_bonus": power_bonus,
+            "_rule_logical_key": effect_data.get("_rule_logical_key"),
+            "_rule_oracle_hash": effect_data.get("_rule_oracle_hash"),
+            "_rule_review_status": effect_data.get("_rule_review_status"),
+            "_rule_execution_status": effect_data.get("_rule_execution_status"),
+            "battle_model_scope": effect_data.get("battle_model_scope"),
+        }
+    )
+    emit_replay_event(
+        "surge_to_victory_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        exiled_card=target_spell.get("name", "?"),
+        power_bonus=power_bonus,
+        creatures_buffed=creatures_buffed,
+        delayed_triggers=len(player.surge_to_victory_delayed_triggers),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
+def process_surge_to_victory_combat_damage_triggers(
+    player,
+    opponents,
+    all_players,
+    creature,
+    damaged_player,
+    turn,
+    rng,
+    *,
+    stack=None,
+    phase="combat_damage",
+):
+    delayed_triggers = list(getattr(player, "surge_to_victory_delayed_triggers", []) or [])
+    if not delayed_triggers:
+        return 0
+    resolved = 0
+    for delayed_trigger in delayed_triggers:
+        exiled_card = delayed_trigger.get("exiled_card")
+        if not isinstance(exiled_card, dict):
+            continue
+        trigger_context = {
+            "trigger": "combat_damage_to_player",
+            "trigger_creature": creature.get("name", "?") if isinstance(creature, dict) else "?",
+            "damaged_player": getattr(damaged_player, "name", "?"),
+        }
+        copied_card = cast_spell_copy_without_paying_mana(
+            player,
+            opponents,
+            all_players,
+            {"name": delayed_trigger.get("source_card", "Surge to Victory")},
+            exiled_card,
+            turn,
+            rng,
+            source_effect_data=delayed_trigger,
+            stack=stack,
+            phase=phase,
+            priority_window="surge_to_victory_combat_damage_copy_cast",
+            trigger_context=trigger_context,
+        )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=delayed_trigger.get("source_card", "Surge to Victory"),
+            trigger="combat_damage_to_player",
+            trigger_creature=creature.get("name", "?") if isinstance(creature, dict) else "?",
+            damaged_player=getattr(damaged_player, "name", "?"),
+            effect="copy_spell",
+            copied_spell=exiled_card.get("name", "?"),
+            copied_card=copied_card.get("name", "?") if isinstance(copied_card, dict) else None,
+            cast_without_paying_mana_cost=True,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(delayed_trigger),
+        )
+        resolved += 1
+    return resolved
+
+
 def create_creature_token(
     player,
     *,
@@ -16886,6 +17604,7 @@ def trigger_spell_cast_engines(
     stack=None,
     active_player=None,
 ):
+    opponents = [candidate for candidate in (all_players or []) if candidate is not player]
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):
             continue
@@ -16975,6 +17694,9 @@ def trigger_spell_cast_engines(
                     player,
                     [discard_card],
                     top_limit=1 if use_top_replacement else 0,
+                    opponents=opponents,
+                    turn=turn,
+                    phase=phase,
                 )
                 drawn = player.draw(1)
                 emit_replay_event(
@@ -19111,6 +19833,10 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
+    elif effect == "discard_trigger_modal_draw_treasure_opponent_life_loss":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = effect
+        player.battlefield.append(permanent)
     elif effect in ("attack_limit", "attack_tax"):
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = effect
@@ -19269,6 +19995,10 @@ def apply_effect_immediate(
                 player,
                 discarded_cards,
                 top_limit=0,
+                opponents=opponents,
+                turn=turn,
+                phase="resolution",
+                rng=rng,
             )
             drawn = player.draw(len(discarded_cards), rng)
             emit_replay_event(
@@ -20131,6 +20861,19 @@ def apply_effect_immediate(
         else:
             finish_resolved_spell(player, card, turn=turn)
     elif effect == "pump_all":
+        if effect_data.get("combat_damage_player_copies_exiled_card"):
+            resolve_surge_to_victory(
+                player,
+                opponents,
+                [player] + list(opponents or []),
+                card,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                phase=phase,
+            )
+            return
         kw = effect_data.get("keywords", [])
         combat_keywords = [
             keyword
@@ -20350,6 +21093,10 @@ def apply_effect_immediate(
                 discard_resolution = resolve_effect_discard_cards(
                     player,
                     [discarded_card],
+                    opponents=opponents,
+                    turn=turn,
+                    phase="resolution",
+                    rng=rng,
                 )
             emit_replay_event(
                 "random_discard_after_tutor",
@@ -20421,7 +21168,14 @@ def apply_effect_immediate(
         for _ in range(min(n, len(player.hand))):
             if player.hand:
                 discarded_cards.append(player.hand.pop(rng.randint(0, len(player.hand) - 1)))
-        discard_resolution = resolve_effect_discard_cards(player, discarded_cards)
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            discarded_cards,
+            opponents=opponents,
+            turn=turn,
+            phase="resolution",
+            rng=rng,
+        )
         emit_replay_event(
             "loot_resolved",
             player=player.name,
@@ -21953,9 +22707,10 @@ def combat_damage_assignment_order(attacking_creature, blockers, marked_damage=N
     return sorted(blockers, key=order_key)
 
 
-def combat_damage_steps(attacker, opponents, target, attackers, block_assignments, turn):
+def combat_damage_steps(attacker, opponents, target, attackers, block_assignments, turn, rng=None, *, all_players=None, stack=None):
     combat_target_life_before = target.life
     combat_attacker_life_before = attacker.life
+    rng = rng or random.Random(turn or 0)
 
     def deal_player_damage(creature, damage=None):
         damage = combat_stat(creature, "power", 2) if damage is None else damage
@@ -21975,6 +22730,17 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             source_key = commander_damage_key(target.name, creature, attacker.name)
             attacker.commander_damage_by_source[source_key] += damage
             attacker.commander_damage[target.name] += damage
+        if damage_dealt:
+            process_surge_to_victory_combat_damage_triggers(
+                attacker,
+                opponents,
+                all_players or [attacker, *list(opponents or [])],
+                creature,
+                target,
+                turn,
+                rng,
+                stack=stack,
+            )
 
     marked_damage = defaultdict(int)
     deathtouch_damage = set()
@@ -22302,6 +23068,9 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             group_attackers,
             group_block_assignments,
             turn,
+            rng,
+            all_players=all_players,
+            stack=stack,
         )
     end_of_combat_step(attacker, all_players, turn, rng, stack)
 
@@ -22311,6 +23080,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     CURRENT_REPLAY_TURN = turn
     if game_winner(all_players):
         return
+    clear_turn_scoped_permanent_flags(all_players)
     emit_replay_event(
         "turn_start",
         player=player.name,
@@ -22324,6 +23094,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     decay_table_intent_memory(player)
     player.lands_played_this_turn = 0
     player.cards_drawn_this_turn = 0
+    player.surge_to_victory_delayed_triggers = []
     clear_until_eot(player)
     clear_until_next_turn_effects(player, turn)
     player.indestructible = False
@@ -22534,6 +23305,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     for c in player.battlefield:
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and not c.get("burden"):
             player.draw(1, rng)
+    process_harnessed_end_step_blink(player, opponents, all_players, turn, rng)
     process_warp_end_step(player, turn)
     process_end_step_token_sacrifices(player, turn)
 
@@ -22639,6 +23411,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     for participant in all_players:
         clear_until_eot(participant)
+        participant.surge_to_victory_delayed_triggers = []
 
     # v8: SBA check at end of turn
     check_sbas(all_players)
