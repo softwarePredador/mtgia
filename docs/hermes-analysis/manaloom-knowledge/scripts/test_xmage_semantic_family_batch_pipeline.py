@@ -33,6 +33,7 @@ def sample_batch_audit() -> dict:
                         "effect": "static_cost_reduction",
                         "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
                         "ability_kind": "static",
+                        "cost_reduction_applies_to": "spells_you_cast",
                         "applies_to_spell_colors": ["W"],
                         "cost_reduction_generic": 1,
                     },
@@ -118,6 +119,35 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_name["Pearl Medallion"]["effect_json"]["cmc"], 2.0)
         self.assertEqual(by_name["Promise of Loyalty"]["proposal_status"], "runtime_family_implementation_required")
         self.assertFalse(by_name["Molecule Man"]["safe_for_batch_pg_package"])
+
+    def test_classifier_demotes_custom_static_cost_scope_from_batch_safe_lane(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Training Grounds",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TrainingGrounds",
+                            "path": "/xmage/TrainingGrounds.java",
+                            "primary_effect": {
+                                "effect": "static_cost_reduction",
+                                "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
+                                "cost_reduction_applies_to": "activated_abilities_of_creatures_you_control",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "split_family_scope_review_required")
 
     def test_package_builder_writes_review_only_sql_package_for_safe_proposals(self) -> None:
         proposal_report = generator.build_generator_report(

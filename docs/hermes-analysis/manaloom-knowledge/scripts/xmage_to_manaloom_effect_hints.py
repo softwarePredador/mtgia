@@ -28,6 +28,10 @@ def _slug(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
 
 
+def _normalized_rules_text(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "").replace('"', " ").replace("+", " ").lower()).strip()
+
+
 def _ability_kind(ability_classes: set[str]) -> str:
     if any("Replacement" in cls for cls in ability_classes):
         return "replacement"
@@ -65,21 +69,34 @@ def _target_constraints(target_classes: set[str], filter_classes: set[str]) -> d
 
 
 def static_cost_reduction_fields_from_oracle(oracle_text: str) -> dict[str, Any]:
-    text = str(oracle_text or "").lower()
+    text = _normalized_rules_text(oracle_text)
     fields: dict[str, Any] = {
         "cost_reduction_generic": 1,
         "cost_reduction_applies_to": "spells_you_cast",
         "applies_to_controller": "source_controller",
     }
+    if "activated abilities of creatures you control" in text:
+        fields["cost_reduction_applies_to"] = "activated_abilities_of_creatures_you_control"
+    elif "activated abilities of artifacts you control" in text:
+        fields["cost_reduction_applies_to"] = "activated_abilities_of_artifacts_you_control"
+    elif "activated abilities you activate" in text:
+        fields["cost_reduction_applies_to"] = "activated_abilities_you_activate"
+    elif "this spell costs" in text:
+        fields["cost_reduction_applies_to"] = "this_spell"
     if "where x is" in text and "power" in text:
         fields.pop("cost_reduction_generic", None)
         fields["cost_reduction_amount_source"] = "source_power"
+    if "for each artifact or creature you've sacrificed this turn" in text:
+        fields.pop("cost_reduction_generic", None)
+        fields["cost_reduction_amount_source"] = "sacrificed_artifact_or_creature_count_this_turn"
     if "instant and sorcery" in text or "instant or sorcery" in text:
         fields["applies_to_card_types"] = ["instant", "sorcery"]
         fields["cost_reduction_applies_to"] = "instant_sorcery_spells_you_cast"
     mana_value_match = re.search(r"mana\s+value\s+(\d+)\s+or\s+greater", text)
     if mana_value_match:
         fields["minimum_mana_value"] = int(mana_value_match.group(1))
+    if "if you control a wizard" in text:
+        fields["cost_reduction_condition"] = "control_wizard"
     color_map = {
         "white": "W",
         "blue": "U",
@@ -95,6 +112,34 @@ def static_cost_reduction_fields_from_oracle(oracle_text: str) -> dict[str, Any]
     if amount_match:
         fields["cost_reduction_generic"] = int(amount_match.group(1))
     return fields
+
+
+def static_cost_reduction_scope_from_fields(fields: dict[str, Any]) -> str:
+    applies_to = str(fields.get("cost_reduction_applies_to") or "")
+    if applies_to.startswith("activated_abilities_"):
+        return "static_activated_ability_cost_reduction_variant_v1"
+    if applies_to == "this_spell":
+        if fields.get("cost_reduction_amount_source") == "sacrificed_artifact_or_creature_count_this_turn":
+            return "static_variable_self_spell_cost_reduction_variant_v1"
+        if fields.get("cost_reduction_condition"):
+            return "static_conditional_self_spell_cost_reduction_variant_v1"
+        return "static_self_spell_cost_reduction_variant_v1"
+    if (
+        fields.get("cost_reduction_amount_source") == "source_power"
+        and fields.get("applies_to_card_types") == ["instant", "sorcery"]
+        and fields.get("minimum_mana_value") == 4
+    ):
+        return "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
+    return "static_cost_reduction_for_matching_spells_v1"
+
+
+def oracle_supports_cost_reduction_mapping(oracle_text: str) -> bool:
+    text = _normalized_rules_text(oracle_text)
+    if "cost" not in text:
+        return False
+    if "more to cast" in text or "cost more to cast" in text:
+        return False
+    return "less to cast" in text or "less to activate" in text
 
 
 def _scenario_names(effect: str, scope: str = "") -> list[str]:
@@ -224,24 +269,23 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     if "SpellsCostReductionControllerEffect" in effect_classes or "SpellCostReductionSourceEffect" in effect_classes:
-        candidates.append(
-            _candidate(
-                effect="static_cost_reduction",
-                scope="static_cost_reduction_for_matching_spells_v1",
-                reason="XMage uses a spell-cost-reduction effect; this is support/cost shaping, not mana production.",
-                ability_kind="static",
-                requires_runtime_executor=True,
-                extra_effect_fields=static_cost_reduction_fields_from_oracle(rules_text),
-                matched_signals=["cost_reduction"],
+        cost_fields = static_cost_reduction_fields_from_oracle(rules_text)
+        if oracle_supports_cost_reduction_mapping(rules_text):
+            candidates.append(
+                _candidate(
+                    effect="static_cost_reduction",
+                    scope=static_cost_reduction_scope_from_fields(cost_fields),
+                    reason="XMage uses a spell-cost-reduction effect; this is support/cost shaping, not mana production.",
+                    ability_kind="static",
+                    requires_runtime_executor=True,
+                    extra_effect_fields=cost_fields,
+                    matched_signals=["cost_reduction"],
+                )
             )
-        )
 
-    if "CostModificationEffectImpl" in inner_extends and (
-        "REDUCE_COST" in rules_text or "cost " in rules_text.lower()
-    ):
-        scope = "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
-        if "instant" not in rules_text.lower() and "sorcery" not in rules_text.lower():
-            scope = "static_custom_cost_reduction_variant_v1"
+    if "CostModificationEffectImpl" in inner_extends and oracle_supports_cost_reduction_mapping(rules_text):
+        cost_fields = static_cost_reduction_fields_from_oracle(rules_text)
+        scope = static_cost_reduction_scope_from_fields(cost_fields)
         candidates.append(
             _candidate(
                 effect="static_cost_reduction",
@@ -249,7 +293,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 reason="XMage custom inner effect extends CostModificationEffectImpl and reduces spell costs.",
                 ability_kind="static",
                 requires_runtime_executor=True,
-                extra_effect_fields=static_cost_reduction_fields_from_oracle(rules_text),
+                extra_effect_fields=cost_fields,
                 matched_signals=["custom_cost_modification", "reduce_cost"],
             )
         )

@@ -133,12 +133,28 @@ def family_for_effect(effect: str | None) -> str:
     return "manual_model"
 
 
+def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
+    effect_json = primary_effect(card)
+    scope = str(effect_json.get("battle_model_scope") or "")
+    applies_to = str(effect_json.get("cost_reduction_applies_to") or "")
+    if scope not in {
+        "static_cost_reduction_for_matching_spells_v1",
+        "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+    }:
+        return False
+    if applies_to not in {"spells_you_cast", "instant_sorcery_spells_you_cast"}:
+        return False
+    return "cost_reduction_condition" not in effect_json
+
+
 def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     if card.get("status") == "blocked_missing_xmage_class":
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
     support_status = str(family.get("support_status") or "")
+    if family.get("effects") == {"static_cost_reduction"} and not static_cost_reducer_batch_safe(card):
+        return "split_family_scope_review_required"
     if support_status in {"runtime_supported_family", "runtime_supported_by_local_artifact"}:
         return "batch_metadata_candidate_requires_pg_precheck"
     if support_status == "runtime_family_required":

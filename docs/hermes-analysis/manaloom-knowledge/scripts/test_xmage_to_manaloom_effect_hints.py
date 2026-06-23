@@ -56,6 +56,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             result["primary_candidate"]["suggested_tests"][0],
         )
 
+    def test_training_grounds_is_scoped_as_activated_ability_cost_reduction(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SpellsCostReductionControllerEffect"],
+                "ability_classes": ["SimpleStaticAbility"],
+            },
+            "Activated abilities of creatures you control cost {2} less to activate. This effect can't reduce the mana in that cost to less than one mana.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "static_cost_reduction")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "static_activated_ability_cost_reduction_variant_v1",
+        )
+        self.assertEqual(
+            primary["cost_reduction_applies_to"],
+            "activated_abilities_of_creatures_you_control",
+        )
+
+    def test_dargo_is_scoped_as_variable_self_spell_cost_reduction(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "custom_inner_classes": [
+                    {"class_name": "DargoCostReductionEffect", "extends": "CostModificationEffectImpl"}
+                ],
+            },
+            "This spell costs {2} less to cast for each artifact or creature you've sacrificed this turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "static_cost_reduction")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "static_variable_self_spell_cost_reduction_variant_v1",
+        )
+        self.assertEqual(primary["cost_reduction_applies_to"], "this_spell")
+        self.assertEqual(
+            primary["cost_reduction_amount_source"],
+            "sacrificed_artifact_or_creature_count_this_turn",
+        )
+
     def test_oracle_text_can_trigger_gift_destroy_all_hint(self) -> None:
         result = hints.build_effect_hints(
             {"effect_classes": ["DestroyAllEffect"], "ability_classes": [], "condition_classes": []},
