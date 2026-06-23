@@ -4296,3 +4296,104 @@ Remaining queue:
 - `Avatar's Wrath`, `Dawn's Truce`, `Everything Comes to Dust`,
   `Promise of Loyalty`, and `Starfall Invocation` still need card-specific
   battle models or explicit annotation boundaries before they can leave high.
+
+## PG097 Start Checkpoint - 2026-06-23 11:40 UTC
+
+Status: `sync_audit_gate_refresh_complete`.
+
+Operator rule:
+
+- User card observations are audit hints only. They must trigger Oracle,
+  PostgreSQL, SQLite/runtime, and replay/evidence checks, but they are not
+  durable rule sources by themselves.
+- Durable behavior still comes from PostgreSQL rows backed by Oracle/ruling
+  evidence and, when battle-relevant, runtime event proof.
+
+Actions completed:
+
+- Synced PostgreSQL to Hermes SQLite/canonical with
+  `include_needs_review=false`.
+- Ran filtered deck-card audits for deck `6`, deck `606`, and deck `607`, plus
+  the global audit.
+- Ran a fresh manual `recurring_16_seed` battle strategy gate after the sync.
+- No PostgreSQL apply package was executed; PG097 remains available as the
+  next PostgreSQL package number.
+
+Evidence:
+
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`
+  reports `pg_rows_loaded=1830`, `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_start_20260623_113452.json`
+  reports `pass=100`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_start_20260623_113452.json`
+  reports `pass=81`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_start_20260623_113452.json`
+  reports `high=15`, `medium=4`, `pass=75`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_start_20260623_113452.json`
+  reports `high=29`, `medium=4`, `pass=172`.
+- Fresh 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711/summary.json`
+  reports `seeds_completed=16`, `events=13752`, `decisions=2198`,
+  `test_results_status_counts={"pass":18}`, and
+  `battle_replay_final_status=review_required`.
+
+Gate decision:
+
+- Deck `6` and deck `606` remain closed at the card-rule-audit layer.
+- The fresh recurring battle gate is still blocked by
+  `event_contract_static=review_required`.
+- This is a static event-contract residual, not evidence of a new deck `6` or
+  deck `606` card-rule failure.
+
+Current deck `607` open queue:
+
+- `high` + `battle_critical`: `Avatar's Wrath`,
+  `Call Forth the Tempest`, `Creative Technique`, `Dawn's Truce`,
+  `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
+  `Starfall Invocation`.
+- `high` + `battle_support`: `Pearl Medallion`.
+- `high` + `support_or_passive`: `Emeria's Call // Emeria, Shattered
+  Skyclave`, `Molecule Man`, `The Mind Stone`, `The Scarlet Witch`,
+  `Thor, God of Thunder`, and `Tragic Arrogance`.
+- `medium`: `Bender's Waterskin`, `Victory Chimes`,
+  `Monument to Endurance`, and `Surge to Victory`.
+
+Next recommended lot:
+
+- Start with the deck `607` `battle_critical` high cards, grouping by executor
+  family where the Oracle text supports it.
+- Candidate families: board/wipe-style effects (`Everything Comes to Dust`,
+  `Fated Clash`, `Starfall Invocation`), protection/prevention (`Dawn's
+  Truce`), impulse/cascade-style card flow (`Creative Technique`, `Promise of
+  Loyalty` requires separate Oracle check before grouping), and unique review
+  for `Avatar's Wrath` / `Call Forth the Tempest` if they do not share a safe
+  executor model.
+
+## PG097 Valakut Awakening Sync Guard - 2026-06-23 11:41 UTC
+
+- Trigger: fresh PG097 start sync tried to degrade the canonical snapshot for
+  `Valakut Awakening` by exporting a simple-name row without
+  `oracle_hash`.
+- PostgreSQL fix: restored the simple-name rule
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a` to
+  `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`, `active/auto`, with
+  `battle_model_scope=bottom_then_draw_plus_one_v1`.
+- Code fix: SQLite upsert now preserves an existing `oracle_hash` when an
+  incoming mirror row lacks it; PG + reviewed runtime merge now fills missing
+  hash/scope from a reviewed same-key row before canonical export.
+- Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_sync_battle_card_rules_pg_selection_20260623_114030.out`.
+- Queue counts stayed stable after the guard: deck `6` `pass=100`, deck `606`
+  `pass=81`, deck `607` `high=15`, `medium=4`, `pass=75`, deck `608`
+  `high=14`, `medium=3`, `pass=51`, global `high=29`, `medium=4`,
+  `pass=172`.
+- Next package is PG098, returning to deck `607` battle-critical high cards.

@@ -56,6 +56,31 @@ ver a `master` viva. A sync mergeia `origin/master` em
 - Toda tela do fluxo core precisa preservar: `formato`, `deckId`, feedback de erro e estado de carregamento.
 - Toda melhoria de UX precisa de validacao tecnica repetivel.
 
+## ManaLoom PG097 start sync/audit/gate refresh - 2026-06-23 11:40 UTC
+
+- PostgreSQL remained the source of truth; Hermes SQLite/canonical cache was
+  refreshed with
+  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`.
+  The sync reported `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Fresh deck-card audits after the sync: deck `6` `pass=100`, deck `606`
+  `pass=81`, deck `607` `high=15`, `medium=4`, `pass=75`, and global
+  `high=29`, `medium=4`, `pass=172`.
+- A fresh manual recurring 16-seed gate ran at
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711`.
+  It completed 16/16 seeds, recorded 13,752 events and 2,198 decisions, and
+  passed all 18 wrapper tests.
+- The recurring battle baseline remains `review_required`, with
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+  This is an event-contract/static-fixture residual, not a new deck `6` or
+  deck `606` card-rule failure.
+- No PostgreSQL apply package, no deck swap, no `deck_cards` mutation, no
+  learned-deck promotion, and no commit/push occurred in this checkpoint.
+- Operator card observations remain audit hints only; durable behavior still
+  requires Oracle/ruling-backed PostgreSQL rows and runtime/replay evidence
+  when battle-relevant.
+
 ## Estado do agente neste servidor
 
 Hermes consegue ler, auditar e analisar o repositorio. No recorte atual de
@@ -1127,7 +1152,26 @@ Next package number is PG086. Next queue should prioritize remaining deck
   `6`/`606` rules. Final PG -> SQLite sync used `include_needs_review=false`;
   post-PG096 state: deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
   `high=15`, `medium=4`, `pass=75`, deck `608` `high=14`, `medium=3`,
-  `pass=51`, and global `high=29`, `medium=4`, `pass=172`. PG097 is next.
+  `pass=51`, and global `high=29`, `medium=4`, `pass=172`. PG097 followed as
+  the next package.
+- PG097 restored the simple-name `Valakut Awakening` rule provenance after a
+  PG -> SQLite/canonical sync exposed that the simple row lacked the reviewed
+  `oracle_hash`. The applied row is
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a`,
+  `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`, `review_status=active`,
+  `execution_status=auto`, and scope `bottom_then_draw_plus_one_v1`. The split
+  MDFC rule remained intact with scope `bottom_then_draw_plus_one_mdfc_land_v1`.
+  Code guards now preserve SQLite `oracle_hash` on incoming missing-hash rows
+  and fill same-key reviewed hash/scope metadata during PG + reviewed runtime
+  merge. Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`.
+  Post-PG097 state is unchanged for card-rule queue counts: deck `6`
+  `pass=100`, deck `606` `pass=81`, deck `607` `high=15`, `medium=4`,
+  `pass=75`, deck `608` `high=14`, `medium=3`, `pass=51`, and global
+  `high=29`, `medium=4`, `pass=172`. PG098 is next.
 
 ## ManaLoom PG086 Angel's Grace card-rule provenance - 2026-06-23 08:52 UTC
 

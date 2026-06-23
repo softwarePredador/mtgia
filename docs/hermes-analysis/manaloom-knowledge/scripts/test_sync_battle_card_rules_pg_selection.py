@@ -375,6 +375,122 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(payload["Brainstone"]["battle_rule_review_status"], "active")
         self.assertEqual(payload["Brainstone"]["battle_rule_execution_status"], "auto")
 
+    def test_merge_pg_rows_restores_reviewed_hash_for_same_runtime_key(self) -> None:
+        pg_rows = [
+            {
+                "normalized_name": "valakut awakening",
+                "card_name": "Valakut Awakening",
+                "logical_rule_key": "battle_rule_v1:valakut-simple",
+                "effect_json": {
+                    "effect": "hand_filter",
+                    "draw_extra": 1,
+                    "max_bottom": 99,
+                },
+                "deck_role_json": {"category": "draw"},
+                "source": "curated",
+                "confidence": 0.9,
+                "review_status": "verified",
+                "execution_status": "auto",
+                "rule_version": 2,
+                "notes": "PG row missing provenance",
+                "oracle_hash": None,
+            }
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Valakut Awakening",
+                "logical_rule_key": "battle_rule_v1:valakut-simple",
+                "effect_json": {
+                    "effect": "hand_filter",
+                    "draw_extra": 1,
+                    "max_bottom": 99,
+                    "battle_model_scope": "bottom_then_draw_plus_one_v1",
+                },
+                "deck_role_json": {"category": "draw"},
+                "source": "curated",
+                "confidence": 0.9,
+                "review_status": "active",
+                "execution_status": "auto",
+                "oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887",
+            }
+        ]
+
+        merged = sync_pg.merge_pg_rows_with_reviewed_runtime_rows(
+            pg_rows,
+            reviewed_rows,
+        )
+
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(
+            merged[0]["oracle_hash"],
+            "22b42fcc181b7aed71f78b2e1e51e887",
+        )
+        self.assertEqual(
+            merged[0]["effect_json"]["battle_model_scope"],
+            "bottom_then_draw_plus_one_v1",
+        )
+
+    def test_pg_mirror_preserves_existing_sqlite_hash_when_pg_hash_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(sqlite_db) as conn:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Valakut Awakening",
+                    {
+                        "effect": "hand_filter",
+                        "draw_extra": 1,
+                        "max_bottom": 99,
+                        "battle_model_scope": "bottom_then_draw_plus_one_v1",
+                    },
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    oracle_hash="22b42fcc181b7aed71f78b2e1e51e887",
+                    logical_rule_key_value="battle_rule_v1:valakut-simple",
+                    rule_version=2,
+                )
+                conn.commit()
+
+            sync_pg.mirror_pg_rules_to_sqlite(
+                str(sqlite_db),
+                [
+                    {
+                        "normalized_name": "valakut awakening",
+                        "card_name": "Valakut Awakening",
+                        "logical_rule_key": "battle_rule_v1:valakut-simple",
+                        "effect_json": {
+                            "effect": "hand_filter",
+                            "draw_extra": 1,
+                            "max_bottom": 99,
+                            "battle_model_scope": "bottom_then_draw_plus_one_v1",
+                        },
+                        "deck_role_json": {"category": "draw"},
+                        "source": "curated",
+                        "confidence": 0.9,
+                        "review_status": "verified",
+                        "execution_status": "auto",
+                        "rule_version": 2,
+                        "notes": "PG row missing hash",
+                        "oracle_hash": None,
+                    }
+                ],
+            )
+
+            with sqlite3.connect(sqlite_db) as conn:
+                row = conn.execute(
+                    """
+                    SELECT oracle_hash
+                    FROM battle_card_rules
+                    WHERE normalized_name = 'valakut awakening'
+                      AND logical_rule_key = 'battle_rule_v1:valakut-simple'
+                    """
+                ).fetchone()
+
+        self.assertEqual(row[0], "22b42fcc181b7aed71f78b2e1e51e887")
+
 
 if __name__ == "__main__":
     unittest.main()

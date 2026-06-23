@@ -622,7 +622,10 @@ def upsert_battle_card_rule(
             review_status=excluded.review_status,
             execution_status=excluded.execution_status,
             rule_version=excluded.rule_version,
-            oracle_hash=excluded.oracle_hash,
+            oracle_hash=COALESCE(
+                NULLIF(excluded.oracle_hash, ''),
+                battle_card_rules.oracle_hash
+            ),
             notes=excluded.notes,
             updated_at=excluded.updated_at,
             last_seen_at=excluded.last_seen_at

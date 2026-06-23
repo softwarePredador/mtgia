@@ -21506,3 +21506,118 @@ Remaining queue:
   battle-critical high cards: `Avatar's Wrath`, `Call Forth the Tempest`,
   `Creative Technique`, `Dawn's Truce`, `Everything Comes to Dust`,
   `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.
+
+## PG097 Valakut Awakening Provenance/Sync Guard - 2026-06-23 11:41 UTC
+
+Status: `applied_validated`.
+
+- PG097 was a source-of-truth/cache correction discovered during the PG097
+  start heartbeat, not a Lorehold deck strategy change.
+- The simple-name `Valakut Awakening` PostgreSQL row for
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a` lacked the reviewed
+  `oracle_hash` and had drifted to `review_status=verified`.
+- PostgreSQL restored `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`,
+  `review_status=active`, `execution_status=auto`, and preserved
+  `battle_model_scope=bottom_then_draw_plus_one_v1`.
+- The split-name MDFC rule
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d` remained intact with
+  `battle_model_scope=bottom_then_draw_plus_one_mdfc_land_v1`.
+- The sync/cache path now preserves existing SQLite `oracle_hash` when incoming
+  rows lack one and fills same-key hash/scope metadata from the reviewed runtime
+  layer before canonical export.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`.
+- Post-PG097 audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_valakut_post_20260623_114030.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_valakut_post_20260623_114030.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_valakut_post_20260623_114030.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg097_valakut_post_20260623_114030.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_valakut_post_20260623_114030.json`.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_sync_battle_card_rules_pg_selection_20260623_114030.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_reviewed_battle_card_rules_20260623_114030.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`.
+
+Result:
+
+- Deck `6`: `pass=100`.
+- Deck `606`: `pass=81`.
+- Deck `607`: `high=15`, `medium=4`, `pass=75`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=29`, `medium=4`, `pass=172`.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  battle rebaseline.
+
+Remaining queue:
+
+- PG098 should return to deck `607` battle-critical high cards.
+- `Call Forth the Tempest` remains high because its trusted row is still a
+  generic `damage_wipe` without Oracle-specific scope/hash.
+
+## PG097 Start Fresh Sync + Battle Gate - 2026-06-23 11:40 UTC
+
+Status: `deck6_deck606_card_rule_clean_replay_gate_review_required`.
+
+What was refreshed:
+
+- PostgreSQL was resynced into Hermes SQLite/canonical cache with
+  `include_needs_review=false`.
+- Deck `6`, deck `606`, deck `607`, and global deck-card audits were rerun.
+- A fresh manual recurring 16-seed battle strategy gate was run after the sync.
+- No PostgreSQL apply, no deck swap, no `deck_cards` mutation, and no
+  learned-deck promotion occurred.
+
+Card-rule audit result:
+
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`
+  reports `pg_rows_loaded=1830`, `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_start_20260623_113452.json`
+  reports `pass=100`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_start_20260623_113452.json`
+  reports `pass=81`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_start_20260623_113452.json`
+  reports `high=15`, `medium=4`, `pass=75`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_start_20260623_113452.json`
+  reports `high=29`, `medium=4`, `pass=172`.
+
+Battle gate result:
+
+- Run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711`.
+- `summary.json` reports `run_profile=recurring_16_seed`,
+  `run_scope=recurring_full`, `seeds_requested=16`,
+  `start_seed=63241137`, `seeds_completed=16`, `events=13752`, and
+  `decisions=2198`.
+- All 18 wrapper tests passed in the gate.
+- `battle_replay_final_status=review_required` remains because
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Interpretation:
+
+- Deck `6` and deck `606` remain clean at the card-rule audit layer.
+- The replay gate is not green because of event-contract/static-fixture
+  residuals, not because of a new deck `6` card-rule failure.
+- The residual static unclassified event types are
+  `etb_recursion_resolved`, `etb_removal_resolved`,
+  `etb_removal_skipped`, `powerbalance_trigger_resolved`,
+  `steal_all_creatures_resolved`, and `tokens_created`.
+
+Next queue:
+
+- Continue deck `607` high `battle_critical` before support/passive rows:
+  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
+  `Promise of Loyalty`, and `Starfall Invocation`.

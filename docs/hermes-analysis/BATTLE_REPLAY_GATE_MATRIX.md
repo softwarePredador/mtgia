@@ -4230,3 +4230,114 @@ Decision:
 - They preserve deck `6` `pass=100` and deck `606` `pass=81`.
 - They do not change the latest recurring battle status.
 - They do not authorize a deck swap or learned-deck promotion.
+
+## PG097 Start Fresh 16-Seed Gate Reading - 2026-06-23 11:40 UTC
+
+Scope:
+
+- This is a replay/gate refresh after the PG097 start PG -> SQLite sync and
+  deck-card audits.
+- No PostgreSQL apply package was executed in this cycle.
+- No deck swap, no `deck_cards` mutation, and no learned-deck promotion
+  occurred.
+
+Pre-gate card-rule evidence:
+
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`
+  reports `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_start_20260623_113452.json`
+  reports `pass=100`.
+- Deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_start_20260623_113452.json`
+  reports `pass=81`.
+- Deck `607` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_start_20260623_113452.json`
+  reports `high=15`, `medium=4`, `pass=75`.
+- Global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_start_20260623_113452.json`
+  reports `high=29`, `medium=4`, `pass=172`.
+
+Fresh recurring battle gate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711/summary.json`.
+- `timestamp_utc=2026-06-23T11:37:11Z`.
+- `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `invocation_kind=manual_cli`.
+- `seeds_requested=16`, `start_seed=63241137`, `seeds_completed=16`.
+- `events=13752`, `decisions=2198`.
+- `test_results_status_counts={"pass":18}` and `test_result_failures=[]`.
+- `effect_coverage_residual_status=effect_coverage_residual_accepted`.
+- `unknown_template_backlog_status=focused_template_backlog_ready`.
+- `runtime_surface_manifest_status=runtime_surface_manifest_ready`.
+- `battle_replay_final_status=review_required`.
+- `battle_replay_final_status_reason=one_or_more_mandatory_gates_require_review`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Event-contract residual:
+
+- `event_contract_static.json` reports 144 static event types and 85 observed
+  event types across the 16-seed run.
+- No observed required-field misses and no observed unclassified event types
+  were reported.
+- The remaining static unclassified types are:
+  `etb_recursion_resolved`, `etb_removal_resolved`,
+  `etb_removal_skipped`, `powerbalance_trigger_resolved`,
+  `steal_all_creatures_resolved`, and `tokens_created`.
+
+Decision:
+
+- Deck `6` and deck `606` remain card-rule-audit clean after a fresh PG ->
+  SQLite sync.
+- The 16-seed gate itself ran successfully, but the recurring battle baseline
+  is still not promotable while `event_contract_static=review_required`.
+- This residual is a battle event-contract/static-fixture issue, not evidence
+  of a new deck `6` card-rule regression.
+- Next card-rule work should continue with deck `607` battle-critical high
+  cards before support/passive rows.
+
+## PG097 Valakut Awakening Provenance/Sync Guard Reading - 2026-06-23 11:41 UTC
+
+Scope:
+
+- PG097 is a PostgreSQL card-rule provenance and Hermes sync guard gate, not a
+  replay baseline, deck deploy, or strategy-learning promotion.
+- It restored the simple-name `Valakut Awakening` rule hash/status in
+  PostgreSQL and hardened the PG -> SQLite/canonical export path against
+  future missing-hash overwrites.
+- No new battle behavior was claimed.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`
+  reports `restored_hash_rows=1`, `active_status_rows=1`,
+  `auto_execution_rows=1`, `expected_scope_rows=1`,
+  `split_mdfc_rule_rows=1`, and `backup_rows=1`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`
+  reports `pg_rows_loaded=1830`, `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_sync_battle_card_rules_pg_selection_20260623_114030.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_reviewed_battle_card_rules_20260623_114030.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`.
+
+Latest recurring battle remains separate:
+
+- `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`.
+- Fresh register evidence above records `timestamp_utc=2026-06-23T11:37:11Z`.
+- `battle_replay_final_status=review_required`.
+- `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Decision:
+
+- PG097 is accepted as a card-rule/source-of-truth correction.
+- It preserves deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
+  `high=15`, `medium=4`, `pass=75`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, and global `high=29`, `medium=4`, `pass=172`.
+- It does not change the latest recurring battle status.

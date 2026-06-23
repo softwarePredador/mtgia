@@ -2,13 +2,13 @@
 
 Owner: Auditor Central / single operator
 Controller: Auditor Central
-Status: active register. Latest current card-rule package in this thread is
-PG096A/PG096B, applied, postchecked, synced from PostgreSQL to Hermes
-SQLite/canonical snapshot, tested, and documented on 2026-06-23 11:26 UTC.
-PG096A promoted `High Noon` from false removal to an Oracle-specific passive
-rule, and PG096B restored hash/effect/status provenance for 12 already-approved
-deck 6/606 rules. These were not deck swaps, learned-deck promotions, or battle
-rebaselines.
+Status: active register. Latest current card-rule/source-of-truth package in
+this thread is PG097, applied, postchecked, synced from PostgreSQL to Hermes
+SQLite/canonical snapshot, tested, and documented on 2026-06-23 11:41 UTC.
+PG097 restored `Valakut Awakening` simple-name rule provenance and hardened the
+PG -> SQLite/canonical sync path so missing incoming hashes do not erase
+reviewed/existing `oracle_hash` metadata. This was not a deck swap,
+learned-deck promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -8638,9 +8638,100 @@ Tests:
   and
   `docs/hermes-analysis/master_optimizer_reports/pg095_test_battle_analyst_v10_3_runtime_post_20260623_110204.out`.
 
+Next deploy number at the PG096 combined checkpoint:
+
+- PG097 was next at this checkpoint. Current latest package is PG097 below;
+  PG098 is next now.
+
+## PG097 Valakut Awakening Simple-Name Provenance + Sync Guard - Applied 2026-06-23 11:39 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored the simple-name `Valakut Awakening` curated runtime row to match the
+  reviewed rule layer and current PostgreSQL Oracle text hash.
+- Target rule:
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a`.
+- Oracle hash restored:
+  `22b42fcc181b7aed71f78b2e1e51e887`.
+- Review/execution restored to `active/auto`.
+- Existing split-name MDFC rule
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d` remained intact with the
+  same Oracle hash and scope
+  `bottom_then_draw_plus_one_mdfc_land_v1`.
+- Code guard added so SQLite upsert preserves an existing `oracle_hash` when an
+  incoming mirror row lacks one, and PG + reviewed runtime merge fills missing
+  hash/scope metadata for the same logical key before exporting the canonical
+  snapshot.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  battle rebaseline.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_precheck_20260623_113918.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_apply_20260623_113918.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_rollback_20260623_113918.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg097_valakut_simple_hash_restore_20260623_113918`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_precheck_20260623_113918.out`
+  reported `target_rule_rows=1`, `card_oracle_hash_match_rows=1`,
+  `rows_needing_hash_restore=1`, `rows_needing_status_restore=1`,
+  `rows_needing_execution_restore=0`, `expected_scope_rows=1`,
+  `split_mdfc_rule_rows=1`, and `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_apply_20260623_113918.out`
+  reported backup `SELECT 1`, `updated_rows=1`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`
+  reported `target_rule_rows=1`, `card_oracle_hash_match_rows=1`,
+  `restored_hash_rows=1`, `active_status_rows=1`,
+  `auto_execution_rows=1`, `expected_scope_rows=1`,
+  `split_mdfc_rule_rows=1`, and `backup_rows=1`.
+
+Sync/audit evidence:
+
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`
+  reported `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Canonical snapshot now keeps both `Valakut Awakening` and
+  `Valakut Awakening // Valakut Stoneforge` with
+  `battle_rule_oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`.
+- Post-PG097 audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_valakut_post_20260623_114030.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_valakut_post_20260623_114030.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_valakut_post_20260623_114030.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg097_valakut_post_20260623_114030.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_valakut_post_20260623_114030.json`.
+  Results: deck `6` `pass=100`; deck `606` `pass=81`; deck `607`
+  `high=15`, `medium=4`, `pass=75`; deck `608` `high=14`, `medium=3`,
+  `pass=51`; global `high=29`, `medium=4`, `pass=172`.
+
+Tests:
+
+- `python3 -m py_compile ...`:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_py_compile_20260623_114030.out`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_sync_battle_card_rules_pg_selection_20260623_114030.out`
+  reported `Ran 10 tests ... OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_reviewed_battle_card_rules_20260623_114030.out`
+  reported `Ran 28 tests ... OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`
+  contains 390 `PASS` lines.
+
 Next deploy number:
 
-- PG097 is next for any future PostgreSQL package.
+- PG098 is next for any future PostgreSQL package.
 
 ## PG096A Deck 607 High Noon Rule - Applied 2026-06-23 11:18 UTC
 
@@ -8774,4 +8865,4 @@ Tests:
 
 Next deploy number:
 
-- PG097 is next for any future PostgreSQL package.
+- PG098 is next for any future PostgreSQL package.

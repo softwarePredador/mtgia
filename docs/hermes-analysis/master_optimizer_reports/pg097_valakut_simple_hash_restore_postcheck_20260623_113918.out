@@ -1,0 +1,4 @@
+ target_rule_rows | card_oracle_hash_match_rows | restored_hash_rows | active_status_rows | auto_execution_rows | expected_scope_rows | split_mdfc_rule_rows | backup_rows
+------------------+-----------------------------+--------------------+--------------------+---------------------+---------------------+----------------------+-------------
+                1 |                           1 |                  1 |                  1 |                   1 |                   1 |                    1 |           1
+(1 row)

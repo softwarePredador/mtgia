@@ -3861,6 +3861,27 @@ Scope guard:
 - No PostgreSQL write, live route call, OpenAI call, deck `6` mutation, deck
   swap, code edit, battle-engine edit, commit, or push was performed.
 
+## PG097 Valakut Awakening Provenance/Sync Note - 2026-06-23 11:41 UTC
+
+- The deck-builder/card-rule flow hit a cache lineage issue before the next
+  deck `607` card could be promoted: a PG -> SQLite/canonical sync attempted
+  to export `Valakut Awakening` without `battle_rule_oracle_hash`.
+- PostgreSQL still had the split MDFC rule intact, but the simple-name row had
+  lost hash/status provenance. PG097 restored it to
+  `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`, `active/auto`, scope
+  `bottom_then_draw_plus_one_v1`.
+- Sync guard now prevents incoming missing-hash rows from erasing an existing
+  SQLite hash and uses reviewed same-key metadata to fill missing hash/scope
+  before canonical export.
+- Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`.
+- Deck queue counts did not change: deck `607` remains `high=15`,
+  `medium=4`, `pass=75`; next card-rule package should continue with a real
+  high-impact deck `607` card, preferably `Call Forth the Tempest`.
+
 ## 2026-06-23 11:26 UTC - PG096A/PG096B Card-Rule Gate Reading
 
 - PG096A corrected `High Noon` for deck `607`: false `remove_creature` behavior

@@ -32041,7 +32041,7 @@
     "instant": true,
     "max_bottom": 99,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
+    "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 2,

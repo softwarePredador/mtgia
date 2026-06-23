@@ -17741,3 +17741,119 @@ Post-PG095 card-rule queue:
 - Global: `high=30`, `medium=4`, `pass=171`.
 - `Winds of Abandon` specifically moved from `high` to `pass`.
 - No deck swap, no `deck_cards` mutation, and no battle rebaseline.
+
+## PG097 Start Sync/Audit + Fresh 16-Seed Gate - 2026-06-23 11:40 UTC
+
+Status: `validated_gate_refresh_review_required`.
+
+Scope:
+
+- PostgreSQL remained the source of truth.
+- Hermes SQLite/canonical data was refreshed from PostgreSQL.
+- No PostgreSQL apply package was executed and no rollback artifact was needed
+  in this cycle.
+- No deck swap, no `deck_cards` mutation, and no learned-deck promotion
+  occurred.
+
+Sync/audit evidence:
+
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`
+  reports `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Deck `6` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_start_20260623_113452.json`
+  reports `pass=100`.
+- Deck `606` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_start_20260623_113452.json`
+  reports `pass=81`.
+- Deck `607` audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_start_20260623_113452.json`
+  reports `high=15`, `medium=4`, `pass=75`.
+- Global audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_start_20260623_113452.json`
+  reports `high=29`, `medium=4`, `pass=172`.
+
+Fresh 16-seed evidence:
+
+- Run directory:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711`.
+- `summary.json` reports `timestamp_utc=2026-06-23T11:37:11Z`,
+  `run_profile=recurring_16_seed`, `run_scope=recurring_full`,
+  `seeds_requested=16`, `start_seed=63241137`, `seeds_completed=16`,
+  `events=13752`, and `decisions=2198`.
+- Test gate: `test_results_status_counts={"pass":18}` with
+  `test_result_failures=[]`.
+- Runtime/effect gates:
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `unknown_template_backlog_status=focused_template_backlog_ready`, and
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`.
+- Remaining mandatory gate:
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Result:
+
+- Deck `6` and deck `606` are still closed at the card-rule audit layer.
+- The recurring replay gate remains `review_required`, not promotable, because
+  of the static event-contract residual.
+- The residual static unclassified event types are
+  `etb_recursion_resolved`, `etb_removal_resolved`,
+  `etb_removal_skipped`, `powerbalance_trigger_resolved`,
+  `steal_all_creatures_resolved`, and `tokens_created`.
+- Next card-rule validation should continue with deck `607`
+  battle-critical high cards before support/passive rows.
+
+## PG097 Valakut Awakening Simple-Name Provenance + Sync Guard - 2026-06-23 11:41 UTC
+
+Status: `applied_validated`.
+
+- PG097 closed a source-of-truth/cache regression rather than a new battle
+  behavior: the simple-name `Valakut Awakening` curated row in PostgreSQL had
+  lost its `oracle_hash` and `active` status while the reviewed runtime layer
+  still carried both.
+- PostgreSQL restored rule
+  `battle_rule_v1:245b8d2627720fadfd7a30464d07605a` to
+  `oracle_hash=22b42fcc181b7aed71f78b2e1e51e887`, `review_status=active`,
+  `execution_status=auto`, with scope `bottom_then_draw_plus_one_v1`.
+- The split-name MDFC rule
+  `battle_rule_v1:6e1f3b876822abafe1de47610f46858d` remained intact with the
+  same Oracle hash and scope `bottom_then_draw_plus_one_mdfc_land_v1`.
+- Sync guard added:
+  `battle_rule_registry.upsert_battle_card_rule` no longer erases existing
+  SQLite `oracle_hash` when the incoming mirror row lacks one, and
+  `sync_battle_card_rules_pg.merge_pg_rows_with_reviewed_runtime_rows` fills
+  missing hash/scope metadata from the reviewed runtime row for the same
+  logical key before canonical export.
+
+Evidence:
+
+- PostgreSQL precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_precheck_20260623_113918.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_apply_20260623_113918.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_rollback_20260623_113918.sql`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`
+  with `pg_rows_loaded=1830`, `sqlite_inserted_or_updated=1808`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Post-PG097 audits: deck `6` `pass=100`; deck `606` `pass=81`; deck `607`
+  `high=15`, `medium=4`, `pass=75`; deck `608` `high=14`, `medium=3`,
+  `pass=51`; global `high=29`, `medium=4`, `pass=172`.
+- Tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_py_compile_20260623_114030.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_sync_battle_card_rules_pg_selection_20260623_114030.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_reviewed_battle_card_rules_20260623_114030.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`.
+
+Decision:
+
+- PG097 is accepted as a provenance/sync correction.
+- It does not change the latest recurring battle status and does not authorize
+  a deck swap, learned-deck promotion, or battle rebaseline.
+- PG098 should return to deck `607` battle-critical high cards. `Call Forth
+  the Tempest` remains high from `generic_effect_without_model_scope` and
+  `trusted_rule_without_oracle_hash`.

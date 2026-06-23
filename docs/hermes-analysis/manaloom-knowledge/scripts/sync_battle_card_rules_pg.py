@@ -770,8 +770,36 @@ def merge_pg_rows_with_reviewed_runtime_rows(
     reviewed layer and leave only broad `needs_review` generated rows in the
     degraded canonical snapshot.
     """
-    merged = [dict(row) for row in rows]
-    seen = {key for row in merged if (key := runtime_rule_key(row))}
+    reviewed_by_key: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in reviewed_rows:
+        source = str(row.get("source") or "")
+        if source not in {"curated", "manual"}:
+            continue
+        key = runtime_rule_key(row)
+        if key is not None:
+            reviewed_by_key[key] = row
+
+    merged: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for row in rows:
+        next_row = dict(row)
+        key = runtime_rule_key(next_row)
+        if key is not None:
+            reviewed_row = reviewed_by_key.get(key)
+            if reviewed_row is not None:
+                if not next_row.get("oracle_hash") and reviewed_row.get("oracle_hash"):
+                    next_row["oracle_hash"] = reviewed_row.get("oracle_hash")
+                if not json_obj(next_row.get("effect_json")).get("battle_model_scope"):
+                    reviewed_effect = json_obj(reviewed_row.get("effect_json"))
+                    if reviewed_effect.get("battle_model_scope"):
+                        merged_effect = json_obj(next_row.get("effect_json"))
+                        merged_effect["battle_model_scope"] = reviewed_effect[
+                            "battle_model_scope"
+                        ]
+                        next_row["effect_json"] = merged_effect
+            seen.add(key)
+        merged.append(next_row)
+
     for row in reviewed_rows:
         source = str(row.get("source") or "")
         if source not in {"curated", "manual"}:
