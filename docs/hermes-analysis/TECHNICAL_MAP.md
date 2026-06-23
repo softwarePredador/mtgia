@@ -236,14 +236,15 @@ mtgia/
   teste.
 
 - **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente em
-  2026-06-21 03:00 UTC no checkout local `aeb667b2`. O auditor textual executou
-  com sucesso (`221` arquivos backend, `205` classes, `0` imports quebrados),
-  mas continua limitado a `server/lib` e `server/routes`; a evidencia app veio
-  de `rg` e leitura direta. Desde a ultima rodada de classes
-  (`6244d33b..HEAD`), nao houve delta em `app/lib`, `app/test`,
-  `app/integration_test`, `server/lib`, `server/routes`, `server/bin`,
-  `server/test` nem `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; somente docs
-  Hermes mudaram. Nao surgiu novo achado confiavel. `LifeCounterScreen`
+  2026-06-23 03:00 UTC no checkout local `d89c9f8c`. O auditor textual executou
+  com sucesso (`221` arquivos backend, `205` classes, `116` tabelas
+  textualmente referenciadas, `0` imports quebrados), mas continua limitado a
+  `server/lib` e `server/routes`; a evidencia app veio de `rg` e leitura
+  direta. Desde a ultima rodada de classes (`aeb667b2..HEAD`) e desde a ultima
+  rodada de coerencia (`75662e64..HEAD`), nao houve delta em `app/lib`,
+  `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
+  `server/bin`, `server/test` nem `server/doc/API_CONTRACTS_AND_DATA_MAP.md`.
+  Nao surgiu novo achado confiavel. `LifeCounterScreen`
   continua legado/test-only enquanto a rota ativa usa `LotusLifeCounterScreen`;
   `DeckCard` e `DeckProgressChip` continuam sem uso runtime confirmado nas
   listagens; e `LotusPresentationMode` nao e importado/chamado pelo Lotus.

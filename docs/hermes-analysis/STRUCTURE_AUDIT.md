@@ -36,9 +36,189 @@
 > `commander_learned_decks`, e `server/routes/ai/_middleware.dart` encaminha
 > esse path para handler auth-only.
 
-> Atualizacao local Codex: 2026-06-22 23:00 UTC
-> Rotacao: `module-coherence-server-lib-routes-app-lib`
+> Atualizacao local Codex: 2026-06-23 03:00 UTC
+> Rotacao: `classes-not-used`
 > Branch de memoria: `codex/hermes-analysis-docs`
+
+## Rodada focada: Classes not used - revalidacao 2026-06-23 03:00 UTC
+
+Escopo desta rodada: somente classes declaradas sem uso runtime confirmado.
+Nao foi feita auditoria ampla de funcoes sem chamador, imports/ciclos, tabelas
+PostgreSQL, duplicacao ou coerencia app/server fora do necessario para validar
+ou falsificar este foco.
+
+### Setup executado
+
+- `pwd` confirmou o root do repositorio:
+  `/Users/desenvolvimentomobile/.manaloom-agents/mtgia`.
+- `git fetch --all --prune`: concluido.
+- `git checkout codex/hermes-analysis-docs`: branch ja ativa e rastreando
+  `origin/codex/hermes-analysis-docs`.
+- `git pull --ff-only origin codex/hermes-analysis-docs`: `Already up to date`.
+- `git status --short`: sem saida no inicio da rodada.
+- `git rev-parse --short HEAD`: `d89c9f8c`.
+- Deltas focados desde a ultima rodada de classes e desde a ultima rodada de
+  coerencia nao retornaram arquivos de produto/teste/contrato:
+  - `git diff --name-status aeb667b2..HEAD -- app/lib app/test app/integration_test server/lib server/routes server/bin server/test server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+  - `git diff --name-status 75662e64..HEAD -- app/lib app/test app/integration_test server/lib server/routes server/bin server/test server/doc/API_CONTRACTS_AND_DATA_MAP.md`
+
+### Contexto lido
+
+Foram consultados os documentos solicitados para evitar claims stale:
+`docs/hermes-analysis/TECHNICAL_MAP.md`,
+`docs/hermes-analysis/OPEN_RISKS.md`,
+`docs/hermes-analysis/STRUCTURE_AUDIT.md`,
+`docs/hermes-analysis/PLANO_CORRECAO.md`,
+`docs/hermes-analysis/scripts/structure_auditor.py`,
+`docs/CONTEXTO_PRODUTO_ATUAL.md`, secoes relevantes de
+`server/manual-de-instrucao.md` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. A skill local
+`manaloom-data-semantic-layer` tambem foi carregada; a regra relevante aqui e
+tratar backend/PostgreSQL como fonte de verdade de produto e Hermes como
+laboratorio/auditor/cache.
+
+### Auditor estrutural
+
+`python3 docs/hermes-analysis/scripts/structure_auditor.py` foi executado com
+sucesso no Mac local.
+
+Resultado reportado pelo script:
+
+- Arquivos analisados: 221.
+- Classes encontradas: 205.
+- Tabelas PostgreSQL referenciadas: 116.
+- Problemas identificados pelo relatorio gerado: 123.
+- Imports quebrados: 0.
+
+Limitacoes relevantes para este foco:
+
+- O auditor base cobre apenas `server/lib` e `server/routes`; ele nao cobre
+  `app/lib`, onde estao os candidatos vivos deste foco.
+- O script e textual/regex e nao constroi grafo de chamadas. A secao de classes
+  e inventario, nao prova de uso ou de ausencia.
+- A execucao inseriu novamente inventario gerado em `STRUCTURE_AUDIT.md`; essa
+  mutacao mecanica foi removida antes desta atualizacao manual, preservando
+  apenas os numeros acima como evidencia da execucao.
+
+### Metodo manual focado
+
+- Reexecutei as buscas `rg` usadas nas rodadas anteriores para os quatro
+  candidatos app ainda abertos.
+- Usei busca repo-local e leitura direta de definicoes/rotas/listagens para
+  distinguir classes test-only de controles positivos usados em runtime.
+- Nao promovi classes backend do inventario textual como achado, porque nao ha
+  grafo de chamadas e nao houve delta de produto desde o baseline de classes.
+
+### Achados revalidados
+
+#### Status preservado - sem delta de produto desde a ultima rodada de classes
+
+- **Evidencia:** os diffs focados `aeb667b2..HEAD` e `75662e64..HEAD` retornaram
+  vazio para `app/lib`, `app/test`, `app/integration_test`, `server/lib`,
+  `server/routes`, `server/bin`, `server/test` e o API contract map.
+- **Por que importa:** nao ha base nova para abrir candidato adicional alem dos
+  quatro ja documentados.
+- **O que falsifica:** qualquer proximo delta nesses recortes, ou busca focada
+  encontrando uma nova classe desconectada de runtime.
+
+#### P1/P2 - `LifeCounterScreen` continua legado/test-only
+
+- **Definicao:** `app/lib/features/home/life_counter_screen.dart:61` define
+  `LifeCounterScreen`; o construtor esta em `:66`.
+- **Rota ativa:** `app/lib/main.dart:282`-`:284` registra
+  `lifeCounterRoutePath` com `const LotusLifeCounterScreen()`.
+- **Busca focada:** `rg -n '(^|[^A-Za-z0-9_])LifeCounterScreen\(' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou apenas o construtor e duas instanciacoes em teste:
+  `app/test/features/home/life_counter_screen_test.dart:36` e
+  `app/test/features/home/life_counter_clone_proof_test.dart:277`.
+- **Por que parece nao usada:** nenhuma rota ou superficie viva instancia
+  `LifeCounterScreen`; o caminho app-facing do contador usa Lotus.
+- **O que valida:** remover/deprecar formalmente `LifeCounterScreen`, ou marcar
+  como harness legado com escopo explicito.
+- **O que falsifica:** rota, import ou tela em `app/lib` instanciando
+  `LifeCounterScreen` fora dos testes.
+
+#### P1/P2 - `DeckCard` permanece testado, mas sem consumidor runtime
+
+- **Definicao:** `app/lib/features/decks/widgets/deck_card.dart:17` define
+  `DeckCard`; o construtor esta em `:22`.
+- **Busca focada:** `rg -n '\bDeckCard\b|deck_card\.dart|_RecentDeckCard|_CommunityDeckCard|_FollowingDeckCard|_EmptyDeckCard' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou `DeckCard` em `app/lib` somente no proprio arquivo. Fora dele,
+  aparece apenas em `app/test/features/decks/widgets/deck_card_test.dart:4`/`:9`
+  e `app/test/features/decks/widgets/deck_card_overflow_test.dart:4`/`:47`.
+- **Listagens reais:** Home usa `_RecentDeckCard` em
+  `app/lib/features/home/home_screen.dart:519` e define em `:525`.
+  Community usa `_CommunityDeckCard` em
+  `app/lib/features/community/screens/community_screen.dart:341` e define em
+  `:774`; usa `_FollowingDeckCard` em `:542` e define em `:955`.
+  A listagem de decks vazia usa `_EmptyDeckCard` em
+  `app/lib/features/decks/screens/deck_list_screen.dart:1777` e define em
+  `:1829`.
+- **Por que parece nao usada:** nao ha import de `deck_card.dart` nem chamada
+  `DeckCard(...)` em telas vivas; as listagens usam cards locais privados.
+- **O que valida:** remover `DeckCard` e seus testes, ou religar a listagem real
+  ao widget compartilhado.
+- **O que falsifica:** import de `deck_card.dart` ou chamada `DeckCard(...)` em
+  `app/lib`.
+
+#### P2 - `DeckProgressChip` continua sem chamada de construtor
+
+- **Definicao:** `app/lib/features/decks/widgets/deck_progress_indicator.dart:295`
+  define `DeckProgressChip`; o construtor esta em `:301`.
+- **Busca focada:** `rg -n '\bDeckProgressChip\(|\bDeckProgressIndicator\(|deck_progress_indicator\.dart' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou `DeckProgressChip(` somente no construtor da propria classe.
+- **Controle positivo:** `DeckProgressIndicator` no mesmo arquivo continua vivo
+  em `app/lib/features/decks/screens/deck_details_screen.dart:403` e
+  `app/lib/features/decks/widgets/deck_details_overview_tab.dart:328`.
+- **Por que parece nao usada:** nao ha chamada `DeckProgressChip(...)` em
+  `app/lib`, `app/test` ou `app/integration_test`.
+- **O que valida:** remover `DeckProgressChip`, ou substituir alguma superficie
+  compacta/lista por esse widget.
+- **O que falsifica:** qualquer chamada `DeckProgressChip(...)` em `app/lib` ou
+  teste de runtime que o use por uma tela viva.
+
+#### P2 - `LotusPresentationMode` nao e chamado pelo Lotus runtime
+
+- **Definicao:** `app/lib/features/home/lotus/lotus_presentation_mode.dart:4`
+  define `LotusPresentationMode`; `enter()` e `exit()` estao em `:15` e `:26`.
+- **Busca focada:** `rg -n 'lotus_presentation_mode\.dart|LotusPresentationMode\.(enter|exit)|\bLotusPresentationMode\b' app/lib app/test app/integration_test --glob '*.dart'`
+  encontrou apenas a propria definicao da classe.
+- **Controle positivo:** `LotusLifeCounterScreen` esta vivo na rota
+  `app/lib/main.dart:282`-`:284` e tem ampla cobertura em `app/test` e
+  `app/integration_test`, mas nao importa `lotus_presentation_mode.dart` nem
+  chama `LotusPresentationMode.enter()` ou `exit()`.
+- **Por que parece nao usada:** o utilitario de orientacao/UI system nao participa
+  do lifecycle atual do Lotus.
+- **O que valida:** remover o utilitario, ou conectar `enter()`/`exit()` ao
+  lifecycle de `LotusLifeCounterScreen` com teste que prove restauracao de
+  UI/orientacao.
+- **O que falsifica:** import/chamada de `LotusPresentationMode.enter/exit` em
+  `app/lib` ou teste vivo que demonstre uso indireto.
+
+### Controles positivos
+
+- `LotusLifeCounterScreen` nao esta unused: a rota ativa usa a classe e os
+  testes/integration tests a exercitam diretamente.
+- `DeckProgressIndicator` nao esta unused: somente o `DeckProgressChip`
+  compacto no mesmo arquivo continua sem chamada.
+- `_RecentDeckCard`, `_CommunityDeckCard`, `_FollowingDeckCard` e
+  `_EmptyDeckCard` continuam vivas dentro das suas telas/listagens.
+
+### Validacao executada
+
+- Buscas `rg` listadas acima para os quatro candidatos e controles positivos.
+- `test -f server/.dart_tool/package_config.json`: `SERVER_PACKAGE_CONFIG_PRESENT`.
+- `test -f app/.dart_tool/package_config.json`: `APP_PACKAGE_CONFIG_MISSING`.
+  Por isso nao executei testes Flutter `--no-pub`; a rodada alterou apenas
+  docs e a evidencia de classes veio de busca/leitura direta.
+
+### Resultado
+
+Nenhum novo achado confiavel de classe sem uso foi aberto. Permanecem abertos
+os mesmos quatro candidatos app: `LifeCounterScreen`, `DeckCard`,
+`DeckProgressChip` e `LotusPresentationMode`. A recomendacao segue remover,
+reconectar ou documentar explicitamente o status legado/test-only antes de manter
+testes que nao protegem runtime real.
 
 ## Rodada focada: Coerencia entre `server/lib` <-> `server/routes` <-> `app/lib` - revalidacao 2026-06-22 23:00 UTC
 

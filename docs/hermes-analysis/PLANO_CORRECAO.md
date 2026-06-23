@@ -4,10 +4,22 @@
 > Nao e contrato Hermes runtime. Use junto com `TECHNICAL_MAP.md` e revalide
 > cada item antes de executar.
 
-> Data: 2026-06-22 23:00 UTC
+> Data: 2026-06-23 03:00 UTC
 > Escopo: documentar problemas estruturais detectados em `STRUCTURE_AUDIT.md` sem alterar codigo de produto.
 
 ## Resumo executivo
+
+A revalidacao de classes sem uso de 2026-06-23 03:00 UTC no checkout
+`d89c9f8c` confirmou que desde a ultima rodada de classes (`aeb667b2`) e desde
+a ultima rodada de coerencia (`75662e64`) nao houve delta de produto/teste/API
+no recorte `app/lib`, `app/test`, `app/integration_test`, `server/lib`,
+`server/routes`, `server/bin`, `server/test` e
+`server/doc/API_CONTRACTS_AND_DATA_MAP.md`. O auditor base continuou
+compativel (`221` arquivos backend, `205` classes, `116` tabelas textualmente
+referenciadas, `0` imports quebrados), mas segue backend-only/textual para este
+foco. Nao houve novo candidato confiavel. Permanecem abertos os mesmos quatro
+candidatos app: `LifeCounterScreen`, `DeckCard`, `DeckProgressChip` e
+`LotusPresentationMode`.
 
 A revalidacao de coerencia app/server de 2026-06-22 23:00 UTC no checkout
 `75662e64` confirmou que desde os baselines recentes deste foco (`7857d7ef`,
@@ -224,10 +236,11 @@ Permanece aberto somente o SCC app entre `life_counter_tabletop_engine.dart` e
    como achados por terem leitores/escritores ou consumidores operacionais
    confirmados.
 8. **P1/P2 — Classes app sem uso de runtime confirmado**: revalidado novamente
-   na rotacao local Codex de 2026-06-21 03:00 UTC no checkout `aeb667b2`.
-   Desde a ultima rodada de classes (`6244d33b..HEAD`), somente docs Hermes
-   mudaram no recorte de produto/testes/contrato; nao houve novo candidato
-   confiavel. `LifeCounterScreen` segue como caminho legado/test-only enquanto
+   na rotacao local Codex de 2026-06-23 03:00 UTC no checkout `d89c9f8c`.
+   Desde a ultima rodada de classes (`aeb667b2..HEAD`) e desde a ultima rodada
+   de coerencia (`75662e64..HEAD`), nao houve delta em produto/testes/contrato;
+   nao houve novo candidato confiavel. `LifeCounterScreen` segue como caminho
+   legado/test-only enquanto
    a rota viva usa `LotusLifeCounterScreen`; `DeckCard` continua testado mas sem
    import/chamada na listagem real; `DeckProgressChip` nao tem chamada de
    construtor; `LotusPresentationMode` nao tem import nem chamada para
@@ -1022,15 +1035,15 @@ continuam válidas apenas para os demais helpers abaixo.
 
 ### P1/P2 — Remover ou documentar classes app sem uso de runtime confirmado
 
-- **Status 2026-06-21 03:00 UTC: REVALIDADO/ABERTO no checkout `aeb667b2`.**
-  Desde a ultima rodada de classes (`6244d33b..HEAD`), nao houve delta em
-  `app/lib`, `app/test`, `app/integration_test`, `server/lib`, `server/routes`,
-  `server/bin`, `server/test` nem
-  `server/doc/API_CONTRACTS_AND_DATA_MAP.md`; somente docs Hermes mudaram. O
-  auditor textual executou com sucesso (`221` arquivos backend, `205` classes,
-  `0` imports quebrados), mas continua limitado a inventario de
-  `server/lib`/`server/routes`. Nenhum novo candidato confiavel de classe sem
-  uso foi confirmado.
+- **Status 2026-06-23 03:00 UTC: REVALIDADO/ABERTO no checkout `d89c9f8c`.**
+  Desde a ultima rodada de classes (`aeb667b2..HEAD`) e desde a ultima rodada
+  de coerencia (`75662e64..HEAD`), nao houve delta em `app/lib`, `app/test`,
+  `app/integration_test`, `server/lib`, `server/routes`, `server/bin`,
+  `server/test` nem `server/doc/API_CONTRACTS_AND_DATA_MAP.md`. O auditor
+  textual executou com sucesso (`221` arquivos backend, `205` classes,
+  `116` tabelas textualmente referenciadas, `0` imports quebrados), mas continua
+  limitado a inventario de `server/lib`/`server/routes`. Nenhum novo candidato
+  confiavel de classe sem uso foi confirmado.
 - **Evidência**:
   - `app/lib/features/home/life_counter_screen.dart:61` define
     `LifeCounterScreen`, mas `app/lib/main.dart:282`-`:284` usa
