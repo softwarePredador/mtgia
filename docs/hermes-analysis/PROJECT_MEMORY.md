@@ -56,27 +56,33 @@ ver a `master` viva. A sync mergeia `origin/master` em
 - Toda tela do fluxo core precisa preservar: `formato`, `deckId`, feedback de erro e estado de carregamento.
 - Toda melhoria de UX precisa de validacao tecnica repetivel.
 
-## ManaLoom PG097 start sync/audit/gate refresh - 2026-06-23 11:40 UTC
+## ManaLoom PG097 Valakut sync/audit/gate refresh - 2026-06-23 11:48 UTC
 
 - PostgreSQL remained the source of truth; Hermes SQLite/canonical cache was
   refreshed with
-  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`.
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`.
   The sync reported `include_needs_review=false`, `pg_rows_loaded=1830`,
   `sqlite_inserted_or_updated=1808`, and
   `canonical_snapshot_rows_exported=3201`.
-- Fresh deck-card audits after the sync: deck `6` `pass=100`, deck `606`
+- PG097 restored simple-name `Valakut Awakening` provenance in PostgreSQL:
+  precheck found 1 row needing hash/status restore, apply reported
+  `updated_rows=1` and `COMMIT`, and postcheck confirmed 1 restored
+  hash/status row. Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_rollback_20260623_113918.sql`.
+- Fresh deck-card audits after PG097 sync: deck `6` `pass=100`, deck `606`
   `pass=81`, deck `607` `high=15`, `medium=4`, `pass=75`, and global
   `high=29`, `medium=4`, `pass=172`.
 - A fresh manual recurring 16-seed gate ran at
-  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711`.
-  It completed 16/16 seeds, recorded 13,752 events and 2,198 decisions, and
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_114452`.
+  It completed 16/16 seeds, recorded 13,305 events and 2,219 decisions, and
   passed all 18 wrapper tests.
 - The recurring battle baseline remains `review_required`, with
   `mandatory_gate_divergences=["event_contract_static=review_required"]`.
   This is an event-contract/static-fixture residual, not a new deck `6` or
   deck `606` card-rule failure.
-- No PostgreSQL apply package, no deck swap, no `deck_cards` mutation, no
-  learned-deck promotion, and no commit/push occurred in this checkpoint.
+- No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
+  commit/push occurred in this checkpoint. PG098 is the next PostgreSQL package
+  number.
 - Operator card observations remain audit hints only; durable behavior still
   requires Oracle/ruling-backed PostgreSQL rows and runtime/replay evidence
   when battle-relevant.

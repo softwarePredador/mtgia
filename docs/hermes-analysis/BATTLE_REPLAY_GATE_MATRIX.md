@@ -4346,7 +4346,7 @@ Evidence:
 Latest recurring battle remains separate:
 
 - `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`.
-- Fresh register evidence above records `timestamp_utc=2026-06-23T11:37:11Z`.
+- Fresh register evidence above records `timestamp_utc=2026-06-23T11:44:52Z`.
 - `battle_replay_final_status=review_required`.
 - `mandatory_gate_divergences=["event_contract_static=review_required"]`.
 

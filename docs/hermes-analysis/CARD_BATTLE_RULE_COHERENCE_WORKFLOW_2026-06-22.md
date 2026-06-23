@@ -4297,9 +4297,9 @@ Remaining queue:
   `Promise of Loyalty`, and `Starfall Invocation` still need card-specific
   battle models or explicit annotation boundaries before they can leave high.
 
-## PG097 Start Checkpoint - 2026-06-23 11:40 UTC
+## PG097 Valakut Checkpoint - 2026-06-23 11:48 UTC
 
-Status: `sync_audit_gate_refresh_complete`.
+Status: `applied_validated_gate_refresh_review_required`.
 
 Operator rule:
 
@@ -4313,33 +4313,45 @@ Actions completed:
 
 - Synced PostgreSQL to Hermes SQLite/canonical with
   `include_needs_review=false`.
-- Ran filtered deck-card audits for deck `6`, deck `606`, and deck `607`, plus
-  the global audit.
-- Ran a fresh manual `recurring_16_seed` battle strategy gate after the sync.
-- No PostgreSQL apply package was executed; PG097 remains available as the
-  next PostgreSQL package number.
+- Applied PG097 to restore simple-name `Valakut Awakening` Oracle hash/status
+  provenance and harden the PG -> SQLite/canonical sync path against missing
+  incoming hashes.
+- Ran filtered deck-card audits for deck `6`, deck `606`, deck `607`, deck
+  `608`, plus the global audit after PG097 sync.
+- Ran a fresh manual `recurring_16_seed` battle strategy gate after the PG097
+  package/sync/audits were stable.
+- PG098 is the next PostgreSQL package number.
 
 Evidence:
 
+- PostgreSQL precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_precheck_20260623_113918.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_apply_20260623_113918.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_postcheck_20260623_113918.out`
+  report 1 target row, `updated_rows=1`, `COMMIT`, and 1 restored
+  hash/status row.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_rollback_20260623_113918.sql`.
 - Sync:
-  `docs/hermes-analysis/master_optimizer_reports/pg097_start_sync_report_20260623_113429.json`
+  `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_simple_hash_restore_sync_report_20260623_114030.json`
   reports `pg_rows_loaded=1830`, `sqlite_inserted_or_updated=1808`, and
   `canonical_snapshot_rows_exported=3201`.
 - Deck `6`:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg097_valakut_post_20260623_114030.json`
   reports `pass=100`.
 - Deck `606`:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg097_valakut_post_20260623_114030.json`
   reports `pass=81`.
 - Deck `607`:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg097_valakut_post_20260623_114030.json`
   reports `high=15`, `medium=4`, `pass=75`.
 - Global:
-  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_start_20260623_113452.json`
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg097_valakut_post_20260623_114030.json`
   reports `high=29`, `medium=4`, `pass=172`.
 - Fresh 16-seed gate:
-  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_113711/summary.json`
-  reports `seeds_completed=16`, `events=13752`, `decisions=2198`,
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_114452/summary.json`
+  reports `seeds_completed=16`, `events=13305`, `decisions=2219`,
   `test_results_status_counts={"pass":18}`, and
   `battle_replay_final_status=review_required`.
 
