@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "can_pay": {
+        "{1}": true,
+        "{C}": true,
+        "{R}": true
+      },
+      "is_mana_source": true,
+      "mana_pool_after_refresh": {
+        "black": 0,
+        "blue": 0,
+        "colorless": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0,
+        "wildcard": 1
+      },
+      "source": "Bender's Waterskin",
+      "source_colors": [
+        "wildcard"
+      ]
+    },
+    {
+      "can_pay": {
+        "{1}": true,
+        "{C}": true,
+        "{R}": false
+      },
+      "is_mana_source": true,
+      "mana_pool_after_refresh": {
+        "black": 0,
+        "blue": 0,
+        "colorless": 1,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0,
+        "wildcard": 0
+      },
+      "source": "Victory Chimes",
+      "source_colors": [
+        "colorless"
+      ]
+    }
+  ],
+  "limitations": [
+    "Runtime treats multiplayer untap cadence as model scope/provenance; this focused check validates mana color/payment behavior only.",
+    "Victory Chimes political target choice is not promoted as draw_engine; self-use/colorless mana behavior is represented as ramp_permanent produces C."
+  ],
+  "mutations_performed": [],
+  "status": "ready"
+}

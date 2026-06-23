@@ -1,0 +1,188 @@
+{
+  "generated_at": "2026-06-23T15:37:18+00:00",
+  "metadata_results": [],
+  "metadata_rows_checked": 0,
+  "mutations_performed": [],
+  "policy": "reference_audit_only_no_product_legality_replacement_no_postgresql_write",
+  "status": "ready",
+  "xmage_reference": {
+    "found_count": 9,
+    "missing_count": 0,
+    "reference_count": 9,
+    "references": [
+      {
+        "class_names": [
+          "AbstractCommander"
+        ],
+        "key": "abstract_commander_deck_validation",
+        "method_names": [
+          "checkBanned",
+          "checkColorIdentity",
+          "checkCommander",
+          "checkPartners",
+          "getDeckMinSize",
+          "getEdhPowerLevel",
+          "getSideboardMinSize",
+          "validate"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Server.Plugins/Mage.Deck.Constructed/src/mage/deck/AbstractCommander.java",
+        "relative_path": "Mage.Server.Plugins/Mage.Deck.Constructed/src/mage/deck/AbstractCommander.java",
+        "signals": [
+          "color_identity",
+          "partner",
+          "background",
+          "companion",
+          "commander_tax",
+          "commander_damage"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [],
+        "key": "partner",
+        "method_names": [
+          "checkPartner"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/util/validation/PartnerValidator.java",
+        "relative_path": "Mage/src/main/java/mage/util/validation/PartnerValidator.java",
+        "signals": [
+          "partner"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [],
+        "key": "partner_with",
+        "method_names": [
+          "checkPartner"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/util/validation/PartnerWithValidator.java",
+        "relative_path": "Mage/src/main/java/mage/util/validation/PartnerWithValidator.java",
+        "signals": [
+          "partner"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [],
+        "key": "choose_a_background",
+        "method_names": [
+          "checkBothPartners",
+          "checkPartner",
+          "specialCheck"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/util/validation/ChooseABackgroundValidator.java",
+        "relative_path": "Mage/src/main/java/mage/util/validation/ChooseABackgroundValidator.java",
+        "signals": [
+          "partner",
+          "background"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [],
+        "key": "doctors_companion",
+        "method_names": [
+          "checkBothPartners",
+          "checkPartner",
+          "specialCheck"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/util/validation/DoctorsCompanionValidator.java",
+        "relative_path": "Mage/src/main/java/mage/util/validation/DoctorsCompanionValidator.java",
+        "signals": [
+          "partner",
+          "companion"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [
+          "GameCommanderImpl"
+        ],
+        "key": "commander_game",
+        "method_names": [
+          "addCommander",
+          "checkStateBasedActions",
+          "endMulligan",
+          "handlePipers",
+          "init",
+          "initCommander",
+          "initCommanderEffects",
+          "initCommanderWatcher",
+          "isCheckCommanderDamage",
+          "mulligan",
+          "setAlsoHand",
+          "setAlsoLibrary",
+          "setCheckCommanderDamage"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/game/GameCommanderImpl.java",
+        "relative_path": "Mage/src/main/java/mage/game/GameCommanderImpl.java",
+        "signals": [
+          "color_identity",
+          "companion",
+          "command_zone",
+          "commander_tax",
+          "commander_damage"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [
+          "CommanderReplacementEffect"
+        ],
+        "key": "commander_replacement",
+        "method_names": [
+          "applies",
+          "checksEventType",
+          "copy",
+          "init",
+          "replaceEvent"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/abilities/effects/common/continuous/CommanderReplacementEffect.java",
+        "relative_path": "Mage/src/main/java/mage/abilities/effects/common/continuous/CommanderReplacementEffect.java",
+        "signals": [
+          "command_zone"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [
+          "CommanderCostModification"
+        ],
+        "key": "commander_tax",
+        "method_names": [
+          "applies",
+          "apply",
+          "copy"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/abilities/effects/common/cost/CommanderCostModification.java",
+        "relative_path": "Mage/src/main/java/mage/abilities/effects/common/cost/CommanderCostModification.java",
+        "signals": [
+          "command_zone",
+          "commander_tax"
+        ],
+        "status": "found"
+      },
+      {
+        "class_names": [
+          "CommanderInfoWatcher"
+        ],
+        "key": "commander_damage",
+        "method_names": [
+          "addCardInfoToCommander",
+          "addInfoToObject",
+          "getDamageToPlayer",
+          "watch"
+        ],
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage/src/main/java/mage/watchers/common/CommanderInfoWatcher.java",
+        "relative_path": "Mage/src/main/java/mage/watchers/common/CommanderInfoWatcher.java",
+        "signals": [
+          "command_zone",
+          "commander_damage"
+        ],
+        "status": "found"
+      }
+    ],
+    "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"
+  }
+}

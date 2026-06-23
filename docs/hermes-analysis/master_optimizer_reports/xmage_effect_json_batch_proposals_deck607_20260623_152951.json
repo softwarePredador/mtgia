@@ -1,0 +1,504 @@
+{
+  "generated_at": "2026-06-23T18:29:52+00:00",
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "battle_model_scope": "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1",
+      "card_name": "Promise of Loyalty",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "board_control",
+        "subtype": "wipe_or_sacrifice",
+        "timing": "resolution"
+      },
+      "effect": "vow_counter_each_player_sacrifice_rest",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1",
+        "cmc": 5.0,
+        "effect": "vow_counter_each_player_sacrifice_rest"
+      },
+      "execution_status": "review_only",
+      "family_id": "board_wipe_choice",
+      "focused_test_scenario_count": 3,
+      "logical_rule_key": "battle_rule_v1:2a6bfeb84af3ff8d5d294d553caf1a31",
+      "normalized_name": "promise of loyalty",
+      "notes": "XMage batch proposal: exact local XMage class PromiseOfLoyalty mapped to family board_wipe_choice; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "21dd715160fde6e50b8edc015ce83b0f",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "PromiseOfLoyalty",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PromiseOfLoyalty.java"
+    },
+    {
+      "battle_model_scope": "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1",
+      "card_name": "Starfall Invocation",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "board_control",
+        "subtype": "wipe_or_sacrifice",
+        "timing": "resolution"
+      },
+      "effect": "gift_destroy_all_creatures_return_own_destroyed_creature",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1",
+        "cmc": 5.0,
+        "effect": "gift_destroy_all_creatures_return_own_destroyed_creature"
+      },
+      "execution_status": "review_only",
+      "family_id": "board_wipe_choice",
+      "focused_test_scenario_count": 2,
+      "logical_rule_key": "battle_rule_v1:0a2c3c26b4c00093ebbd0a60b11cbc6e",
+      "normalized_name": "starfall invocation",
+      "notes": "XMage batch proposal: exact local XMage class StarfallInvocation mapped to family board_wipe_choice; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "3429884949eac8ffe09d86dc85bee1ae",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "StarfallInvocation",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/StarfallInvocation.java"
+    },
+    {
+      "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
+      "card_name": "Pearl Medallion",
+      "confidence": 0.94,
+      "deck_role_json": {
+        "category": "support",
+        "effect": "static_cost_reduction",
+        "subtype": "cost_reducer",
+        "timing": "static"
+      },
+      "effect": "static_cost_reduction",
+      "effect_json": {
+        "ability_kind": "static",
+        "applies_to_controller": "source_controller",
+        "applies_to_spell_colors": [
+          "W"
+        ],
+        "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
+        "cmc": 2.0,
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction"
+      },
+      "execution_status": "auto",
+      "family_id": "static_cost_reducer",
+      "focused_test_scenario_count": 2,
+      "logical_rule_key": "battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2",
+      "normalized_name": "pearl medallion",
+      "notes": "XMage batch proposal: exact local XMage class PearlMedallion mapped to family static_cost_reducer; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "77f7f449ee56143d6b63814fecd37176",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "source": "curated_xmage_batch_candidate",
+      "xmage_class": "PearlMedallion",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PearlMedallion.java"
+    },
+    {
+      "battle_model_scope": "xmage_create_token_variant_emeriascall_v1",
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "board_development",
+        "effect": "token_maker",
+        "timing": "resolution_or_trigger"
+      },
+      "effect": "token_maker",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_create_token_variant_emeriascall_v1",
+        "effect": "token_maker"
+      },
+      "execution_status": "review_only",
+      "family_id": "token_maker",
+      "focused_test_scenario_count": 2,
+      "logical_rule_key": "battle_rule_v1:ae4a933d873bec332ec2a46106b79277",
+      "normalized_name": "emeria's call // emeria, shattered skyclave",
+      "notes": "XMage batch proposal: exact local XMage class EmeriasCall mapped to family token_maker; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "dc58cda92b87365d5d89339bf7116f44",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "EmeriasCall",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/EmeriasCall.java"
+    },
+    {
+      "battle_model_scope": null,
+      "card_name": "Molecule Man",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": null,
+      "effect_json": {
+        "battle_model_scope": "external_reference_required_manual_model_v1",
+        "cmc": 6.0,
+        "effect": "passive"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 0,
+      "logical_rule_key": "battle_rule_v1:a12fc852258c5bebe68910e6205159f9",
+      "normalized_name": "molecule man",
+      "notes": "XMage batch proposal: exact local XMage class None mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "35e82bd52776c455745138b048ccc116",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "blocked_missing_xmage_source",
+      "proposal_status": "blocked_missing_xmage_source",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": null,
+      "xmage_path": null
+    },
+    {
+      "battle_model_scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+      "card_name": "The Mind Stone",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent",
+        "subtype": "modal_mana_rock",
+        "timing": "activated"
+      },
+      "effect": "mana_rock_with_harnessed_blink",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+        "cmc": 2.0,
+        "effect": "mana_rock_with_harnessed_blink",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "modal_mana_rock",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:9b412fde07574a30fb427cef33abd7f9",
+      "normalized_name": "the mind stone",
+      "notes": "XMage batch proposal: exact local XMage class TheMindStone mapped to family modal_mana_rock; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "17bda9d167ae2799376387d03be5681f",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "TheMindStone",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheMindStone.java"
+    },
+    {
+      "battle_model_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+      "card_name": "The Scarlet Witch",
+      "confidence": 0.94,
+      "deck_role_json": {
+        "category": "support",
+        "effect": "static_cost_reduction",
+        "subtype": "cost_reducer",
+        "timing": "static"
+      },
+      "effect": "static_cost_reduction",
+      "effect_json": {
+        "ability_kind": "static",
+        "applies_to_card_types": [
+          "instant",
+          "sorcery"
+        ],
+        "applies_to_controller": "source_controller",
+        "battle_model_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+        "cmc": 3.0,
+        "cost_reduction_amount_source": "source_power",
+        "cost_reduction_applies_to": "instant_sorcery_spells_you_cast",
+        "effect": "static_cost_reduction",
+        "minimum_mana_value": 4
+      },
+      "execution_status": "auto",
+      "family_id": "static_cost_reducer",
+      "focused_test_scenario_count": 2,
+      "logical_rule_key": "battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc",
+      "normalized_name": "the scarlet witch",
+      "notes": "XMage batch proposal: exact local XMage class TheScarletWitch mapped to family static_cost_reducer; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "6129fda2f5ae1f8edad5a2f2e77d05c2",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "source": "curated_xmage_batch_candidate",
+      "xmage_class": "TheScarletWitch",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheScarletWitch.java"
+    },
+    {
+      "battle_model_scope": null,
+      "card_name": "Thor, God of Thunder",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": null,
+      "effect_json": {
+        "battle_model_scope": "external_reference_required_manual_model_v1",
+        "cmc": 5.0,
+        "effect": "passive"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 0,
+      "logical_rule_key": "battle_rule_v1:94898724936c70d90c6688425ed7e029",
+      "normalized_name": "thor, god of thunder",
+      "notes": "XMage batch proposal: exact local XMage class None mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "0f2238f2ce8e4f2c0bbc2d5cea55f4d7",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "blocked_missing_xmage_source",
+      "proposal_status": "blocked_missing_xmage_source",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": null,
+      "xmage_path": null
+    },
+    {
+      "battle_model_scope": "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1",
+      "card_name": "Tragic Arrogance",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "board_control",
+        "subtype": "wipe_or_sacrifice",
+        "timing": "resolution"
+      },
+      "effect": "selective_nonland_sacrifice",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1",
+        "cmc": 5.0,
+        "effect": "selective_nonland_sacrifice"
+      },
+      "execution_status": "review_only",
+      "family_id": "board_wipe_choice",
+      "focused_test_scenario_count": 2,
+      "logical_rule_key": "battle_rule_v1:114ac00cb8604e086793ec66f39bbbf4",
+      "normalized_name": "tragic arrogance",
+      "notes": "XMage batch proposal: exact local XMage class TragicArrogance mapped to family board_wipe_choice; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "efdf5d051aaa7f94b12c4dccbbfd7d3d",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "TragicArrogance",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TragicArrogance.java"
+    },
+    {
+      "battle_model_scope": "artifact_untaps_each_other_player_untap_step_tap_any_color_v1",
+      "card_name": "Bender's Waterskin",
+      "confidence": 0.94,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent",
+        "subtype": "mana_rock",
+        "timing": "activated"
+      },
+      "effect": "other_turn_untapping_any_color_mana_rock",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "artifact_untaps_each_other_player_untap_step_tap_any_color_v1",
+        "cmc": 3.0,
+        "effect": "other_turn_untapping_any_color_mana_rock"
+      },
+      "execution_status": "auto",
+      "family_id": "other_turn_mana_rock",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:04b0c59bed983b3005b83c46554b6c04",
+      "normalized_name": "bender's waterskin",
+      "notes": "XMage batch proposal: exact local XMage class BendersWaterskin mapped to family other_turn_mana_rock; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "1bd371e1f09ed8b48837c3fc5cd2a2ff",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "source": "curated_xmage_batch_candidate",
+      "xmage_class": "BendersWaterskin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BendersWaterskin.java"
+    },
+    {
+      "battle_model_scope": "artifact_untaps_each_other_player_untap_step_tap_target_player_add_colorless_v1",
+      "card_name": "Victory Chimes",
+      "confidence": 0.94,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent",
+        "subtype": "mana_rock",
+        "timing": "activated"
+      },
+      "effect": "other_turn_untapping_target_player_colorless_mana_rock",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "artifact_untaps_each_other_player_untap_step_tap_target_player_add_colorless_v1",
+        "cmc": 3.0,
+        "effect": "other_turn_untapping_target_player_colorless_mana_rock",
+        "target_constraints": {
+          "mana_pool_owner": "chosen_player",
+          "target": "player"
+        }
+      },
+      "execution_status": "auto",
+      "family_id": "other_turn_mana_rock",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:882f4dccc04e90fa59d8d459361758fe",
+      "normalized_name": "victory chimes",
+      "notes": "XMage batch proposal: exact local XMage class VictoryChimes mapped to family other_turn_mana_rock; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "8ca84e1f2e9f3efd1fe740d16d216105",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "source": "curated_xmage_batch_candidate",
+      "xmage_class": "VictoryChimes",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VictoryChimes.java"
+    },
+    {
+      "battle_model_scope": "discard_trigger_choose_unchosen_mode_draw_or_treasure_or_each_opponent_loses_3_v1",
+      "card_name": "Monument to Endurance",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "value_engine",
+        "effect": "discard_trigger_modal",
+        "timing": "triggered"
+      },
+      "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "discard_trigger_choose_unchosen_mode_draw_or_treasure_or_each_opponent_loses_3_v1",
+        "cmc": 3.0,
+        "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss"
+      },
+      "execution_status": "review_only",
+      "family_id": "discard_modal_trigger",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:0ae531be7c36226d3f118c93feab3735",
+      "normalized_name": "monument to endurance",
+      "notes": "XMage batch proposal: exact local XMage class MonumentToEndurance mapped to family discard_modal_trigger; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "a60dc736f7e86e15001c8c7e59ff23c4",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "MonumentToEndurance",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MonumentToEndurance.java"
+    },
+    {
+      "battle_model_scope": "exile_target_instant_sorcery_boost_team_and_combat_damage_copy_cast_free_v1",
+      "card_name": "Surge to Victory",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "combo_value",
+        "effect": "graveyard_spell_copy_cast",
+        "timing": "delayed_trigger"
+      },
+      "effect": "exile_instant_sorcery_boost_combat_damage_copy_cast",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "exile_target_instant_sorcery_boost_team_and_combat_damage_copy_cast_free_v1",
+        "cmc": 6.0,
+        "effect": "exile_instant_sorcery_boost_combat_damage_copy_cast",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "zone": "graveyard"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "graveyard_spell_copy_cast",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:5af791c47d2b65f4bcf3186754d4d822",
+      "normalized_name": "surge to victory",
+      "notes": "XMage batch proposal: exact local XMage class SurgeToVictory mapped to family graveyard_spell_copy_cast; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "5381f78ff0798b9afad371e0fa495831",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "runtime_family_implementation_required",
+      "proposal_status": "runtime_family_implementation_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "source": "xmage_batch_review_candidate",
+      "xmage_class": "SurgeToVictory",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SurgeToVictory.java"
+    }
+  ],
+  "source": {
+    "deck_id": 607,
+    "external_harvest_status": "ready_for_manual_review",
+    "family_summary": {
+      "batch_metadata_candidate_count": 4,
+      "card_count": 13,
+      "family_count": 8,
+      "family_counts": {
+        "board_wipe_choice": 3,
+        "discard_modal_trigger": 1,
+        "graveyard_spell_copy_cast": 1,
+        "manual_model": 2,
+        "modal_mana_rock": 1,
+        "other_turn_mana_rock": 2,
+        "static_cost_reducer": 2,
+        "token_maker": 1
+      },
+      "manual_or_blocked_count": 2,
+      "promotion_lane_counts": {
+        "batch_metadata_candidate_requires_pg_precheck": 4,
+        "blocked_missing_xmage_source": 2,
+        "runtime_family_implementation_required": 7
+      },
+      "runtime_family_required_count": 7
+    }
+  },
+  "status": "ready",
+  "summary": {
+    "blocked_missing_xmage_source_count": 2,
+    "family_counts": {
+      "board_wipe_choice": 3,
+      "discard_modal_trigger": 1,
+      "graveyard_spell_copy_cast": 1,
+      "manual_model": 2,
+      "modal_mana_rock": 1,
+      "other_turn_mana_rock": 2,
+      "static_cost_reducer": 2,
+      "token_maker": 1
+    },
+    "proposal_count": 13,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 4,
+      "blocked_missing_xmage_source": 2,
+      "runtime_family_implementation_required": 7
+    },
+    "runtime_family_required_count": 7,
+    "safe_for_batch_pg_package_count": 4
+  }
+}

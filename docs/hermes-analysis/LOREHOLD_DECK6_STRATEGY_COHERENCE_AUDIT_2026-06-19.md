@@ -22194,11 +22194,689 @@ XMage usage decision:
   needed, postcheck, sync, and re-audit. XMage evidence alone does not promote
   a rule.
 
+## XMage Local Absorption Implementation - 2026-06-23
+
+Status: `implemented_read_only_validated`.
+
+Scope:
+
+- Local XMage checkout:
+  `/Users/desenvolvimentomobile/Downloads/mage-master`.
+- No PostgreSQL writes, no deck swaps, no rule promotion, no commit/push in
+  this implementation step.
+- The previous top-5 harvester run remains historical. The structured local
+  XMage run below supersedes its generic `Pearl Medallion -> ramp_permanent`
+  cue with `Pearl Medallion -> static_cost_reduction_for_matching_spells_v1`.
+
+Files implemented:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_local_rule_indexer.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_reference_test_scenario_builder.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_commander_legality_reference_audit.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py`
+
+Focused tests:
+
+- `test_xmage_local_rule_indexer.py`: `Ran 5 tests OK`.
+- `test_xmage_to_manaloom_effect_hints.py`: `Ran 3 tests OK`.
+- `test_xmage_reference_test_scenario_builder.py`: `Ran 1 test OK`.
+- `test_xmage_commander_legality_reference_audit.py`: `Ran 2 tests OK`.
+- `test_external_card_rule_reference_harvester.py`: `Ran 6 tests OK`.
+- `python3 -m py_compile` over all new/changed XMage absorption modules:
+  exit `0`.
+
+Live artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg107_high_20260623.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg107_high_20260623.md`
+- `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg107_xmage_local_20260623.json`
+- `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg107_xmage_local_20260623.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_commander_legality_reference_audit_20260623.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_commander_legality_reference_audit_20260623.md`
+
+Live deck `607` high-queue result:
+
+- `9` high-queue cards requested from
+  `deck_card_battle_rule_coherence_audit_deck607_pg107_post_20260623_143808.json`.
+- `7` exact local XMage implementations resolved from `31706` card classes.
+- `2` exact local misses: `Molecule Man`, `Thor, God of Thunder`.
+- The misses remain pending manual/Oracle/Scryfall/Forge review. Nearby
+  candidates are emitted as untrusted hints only, not as matches.
+- `mutations_performed=[]` in all generated artifacts.
+
+Structured local XMage hints:
+
+- `Promise of Loyalty`:
+  `each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1`.
+- `Starfall Invocation`:
+  `gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1`.
+- `Pearl Medallion`:
+  `static_cost_reduction_for_matching_spells_v1`.
+- `Emeria's Call // Emeria, Shattered Skyclave`:
+  `xmage_create_token_variant_emeriascall_v1`.
+- `The Mind Stone`:
+  `legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1`.
+- `The Scarlet Witch`:
+  `static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1`.
+- `Tragic Arrogance`:
+  `controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1`.
+
+Commander reference audit:
+
+- `xmage_commander_legality_reference_audit_20260623.json` found `9/9`
+  Commander/partner/background/command-zone reference files in local XMage.
+- This audit is a checklist source for future ManaLoom tests only. It does not
+  replace product legality logic or prove learned-deck metadata by itself.
+
 Next validation focus:
 
-- Use the harvester output to start the next manually reviewed package with
-  `Promise of Loyalty` or `Starfall Invocation`; both are still pending until
-  Oracle/reference comparison, focused tests/replay, dry-run SQL package, and
-  post-audit evidence exist.
-- `Pearl Medallion` is the lower-risk battle-support slice if a smaller next
-  package is preferred.
+- Use the structured XMage-local output to start the next manually reviewed
+  package with `Pearl Medallion` if the goal is a low-risk proof package, or
+  `Promise of Loyalty` / `Starfall Invocation` if the goal is to close one of
+  the higher-risk runtime gaps.
+- Each card remains pending until Oracle/reference comparison, ManaLoom-native
+  focused tests/replay, dry-run SQL package when needed, explicit PostgreSQL
+  apply approval, postcheck, sync, and post-audit evidence exist.
+
+## PG108 Pearl Medallion Runtime Package Prepared - 2026-06-23
+
+Status: `runtime_implemented_validated_pg_apply_pending`.
+
+Scope:
+
+- Card: `Pearl Medallion`.
+- No PostgreSQL write, no deck swap, no commit/push, no stash/revert.
+- Runtime implementation is complete locally; canonical PostgreSQL promotion
+  remains approval-gated.
+
+What changed locally:
+
+- `battle_analyst_v9.py` now applies battlefield static cost reducers during
+  cast cost locking, affordability checks, and card mana spending.
+- `battle_mana_cost_support.py` now exposes static cost-reduction provenance in
+  replay locked-cost snapshots.
+- `battle_rule_registry.py` maps `static_cost_reduction` and `cost_reduction`
+  to deck category `support`, not `ramp`.
+- The XMage/Oracle harvester fallback no longer labels "spells you cast cost
+  less" as `ramp_permanent`; it emits `static_cost_reduction` with
+  `cost_reduction_generic=1`, `cost_reduction_applies_to=spells_you_cast`, and
+  `applies_to_spell_colors=["W"]` for `Pearl Medallion`.
+
+Runtime evidence:
+
+- `python3 -m py_compile` over the changed battle/harvester/hint modules:
+  exit `0`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py`:
+  `Ran 3 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_external_card_rule_reference_harvester.py`:
+  `Ran 7 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`:
+  passed, including
+  `test_pearl_medallion_reduces_white_spell_generic_cost_without_mana_source`
+  and `test_pearl_medallion_does_not_reduce_nonwhite_spell`.
+- Focused runtime artifact:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_focused_runtime_20260623_170353.json`.
+  It shows `White Audit Spell` paid after a one-generic reduction,
+  `Blue Audit Spell` not reduced and not payable with only one blue mana, and
+  `pearl_is_mana_source=false` in both cases.
+
+PostgreSQL package evidence:
+
+- Package summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_package_20260623_170353.md`.
+- Precheck SQL/output:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353.sql`,
+  `.json`, and `.out`.
+- Apply candidate:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_rollback_20260623_170353.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_postcheck_20260623_170353.sql`.
+- Precheck was read-only guarded and executed only `SELECT/WITH`; it reported
+  `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `existing_rule_rows=2`, `expected_rule_rows_before=0`,
+  `trusted_rule_rows_before=0`, `active_ramp_shadow_rows_before=2`,
+  `would_deprecate_shadow_rows=2`, and `rows_missing_oracle_hash_before=2`.
+
+External reference evidence:
+
+- Fresh harvester packet:
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg108_pearl_20260623_170353.json`
+  and `.md`.
+- It found local XMage class `PearlMedallion` and emitted candidate effect
+  `static_cost_reduction` with `applies_to_spell_colors=["W"]` and
+  `mutations_performed=[]`.
+
+Pre-apply deck-card coherence evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pearl_preapply_20260623_170353.json`
+  and `.md`.
+- Result remains `severity_counts={"high":9,"medium":4,"pass":81}` because no
+  PostgreSQL apply/sync was executed.
+- `Pearl Medallion` remains `high` in the local cache with
+  `trusted_executable_rule_count=0`, `review_only_rule_count=2`, and current
+  effects `["ramp_permanent"]`.
+
+Active pending classification:
+
+- Closed locally: ManaLoom-native runtime support and focused validation for
+  `Pearl Medallion` as a static white-spell cost reducer.
+- Still active and approval-gated: PG108 apply, postcheck, PG -> SQLite sync,
+  deck `607` coherence re-audit, and optional battle rerun after sync.
+- Do not remove `Pearl Medallion` from the active deck-card pending list until
+  PG108 is applied/synced and the post-audit no longer reports it as high.
+
+## XMage Credit Queue and PG109 Prepared - 2026-06-23
+
+Status: `xmage_first_queue_ready_pg109_prepared_pending_apply`.
+
+Purpose:
+
+- Answered whether giving more credit to XMage makes adaptation easier.
+- Result: yes for most current deck `607` pending cards, but only with
+  confidence tiers. Exact local XMage class plus Oracle-aligned candidate is a
+  strong design/test reference, not automatic truth or PostgreSQL approval.
+
+New read-only artifacts:
+
+- Full high/medium XMage local index:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_20260623.json`
+  and `.md`.
+- Full high/medium external reference harvest:
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg108_high_medium_20260623.json`
+  and `.md`.
+- XMage credit/adaptation queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_credit_adaptation_queue_deck607_pg108_20260623.json`
+  and `.md`.
+
+XMage credit result:
+
+- Current deck `607` high/medium queue size: `13`.
+- Exact local XMage classes found: `11/13`.
+- Strong XMage references: `8/13`.
+- Oracle-only/no exact local XMage class: `2/13` (`Molecule Man`,
+  `Thor, God of Thunder`).
+- Runtime already done but PG pending: `1/13` (`Pearl Medallion`, PG108).
+- Metadata/hash/scope likely: `3/13`.
+- New or extended runtime still needed: `9/13`.
+
+Practical consequence:
+
+- For cards like `Promise of Loyalty`, `Starfall Invocation`,
+  `Emeria's Call`, `The Mind Stone`, `The Scarlet Witch`, and
+  `Tragic Arrogance`, XMage is now a strong implementation/test oracle for
+  adaptation shape.
+- For `Molecule Man` and `Thor, God of Thunder`, local XMage does not provide
+  exact implementation; these remain Oracle/Scryfall-first manual runtime work.
+- For `Bender's Waterskin` and `Victory Chimes`, XMage/Oracle exposed that the
+  next useful action is PostgreSQL metadata/source correction, not new runtime.
+
+PG109 prepared:
+
+- Package summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_package_20260623_171938.md`.
+- SQL files:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_rollback_20260623_171938.sql`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_postcheck_20260623_171938.sql`.
+- Runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_focused_runtime_20260623_171938.json`.
+- Read-only precheck outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938.json`
+  and `.out`.
+
+PG109 precheck result:
+
+- Target DB: `143.198.230.247:5433/halder`.
+- `Bender's Waterskin`: one Oracle-hash-matched card row, two existing rule
+  rows, no expected scoped/hash rule yet, one trusted row missing oracle hash,
+  two rows would be deprecated.
+- `Victory Chimes`: one Oracle-hash-matched card row, two existing rule rows,
+  no expected scoped/hash rule yet, one trusted row missing oracle hash, two
+  rows would be deprecated, and `active_draw_engine_rows_before=1`.
+- The `Victory Chimes` draw-engine row is live PostgreSQL drift. Local SQLite
+  currently has the correct colorless `ramp_permanent` shape, but a future
+  PG -> SQLite sync could reintroduce the stale PG behavior unless PG109 is
+  applied.
+
+Active pending classification after this checkpoint:
+
+- PG108 remains pending apply/sync/re-audit for `Pearl Medallion`.
+- PG109 remains pending apply/sync/re-audit for `Bender's Waterskin` and
+  `Victory Chimes`.
+- Do not apply either package without explicit approval for the exact command.
+- Next runtime-heavy XMage-backed candidates after PG108/PG109 are:
+  `Emeria's Call`, `Promise of Loyalty`, `Starfall Invocation`,
+  `The Mind Stone`, `The Scarlet Witch`, and `Tragic Arrogance`.
+
+## XMage High/Medium Batch Validity Gate - 2026-06-23
+
+Status: `batch_validated_11_ready_for_structured_pull_2_missing_xmage_class`.
+
+Purpose:
+
+- Validate the complete current deck `607` high/medium queue against the local
+  XMage checkout before using XMage data as a structured input source.
+- Fix false metadata risk before trusting the batch: the local XMage parser was
+  corrected so constructor mana costs are not recorded as card names, and
+  filter predicates such as `CardType.LAND` do not contaminate constructor card
+  types.
+- Extend the conservative XMage -> ManaLoom mapper for currently visible
+  high/medium patterns: other-turn untapping mana rocks, target-player
+  colorless mana, discard-trigger modal draw/Treasure/life-loss, and
+  Surge-to-Victory exile/copy/cast behavior.
+
+New source files:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_batch_validity_audit.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_validity_audit.py`
+
+Updated source files:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_local_rule_indexer.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_local_rule_indexer.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py`
+
+Read-only artifacts:
+
+- Corrected full high/medium local XMage index:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_batch_validity_20260623.json`
+  and `.md`.
+- Batch validity gate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_validity_audit_deck607_pg108_high_medium_20260623.json`
+  and `.md`.
+
+Batch result:
+
+- Audited cards: `13` (`high=9`, `medium=4`).
+- Exact local XMage classes found: `11/13`.
+- Valid XMage source count: `11/13`.
+- Ready for structured XMage pull with ManaLoom review/tests still required:
+  `11/13`.
+- Missing exact local XMage class: `2/13`: `Molecule Man` and
+  `Thor, God of Thunder`.
+- `mutations_performed=[]`; PostgreSQL was not changed; no deck swaps were
+  applied.
+
+Ready-for-structured-pull candidates:
+
+- `Promise of Loyalty` ->
+  `vow_counter_each_player_sacrifice_rest`.
+- `Starfall Invocation` ->
+  `gift_destroy_all_creatures_return_own_destroyed_creature`.
+- `Pearl Medallion` -> `static_cost_reduction`.
+- `Emeria's Call // Emeria, Shattered Skyclave` -> `token_maker`
+  with corrected MDFC constructor metadata.
+- `The Mind Stone` -> `mana_rock_with_harnessed_blink`.
+- `The Scarlet Witch` -> `static_cost_reduction`.
+- `Tragic Arrogance` -> `selective_nonland_sacrifice`.
+- `Bender's Waterskin` ->
+  `other_turn_untapping_any_color_mana_rock`.
+- `Victory Chimes` ->
+  `other_turn_untapping_target_player_colorless_mana_rock`.
+- `Monument to Endurance` ->
+  `discard_trigger_modal_draw_treasure_opponent_life_loss`.
+- `Surge to Victory` ->
+  `exile_instant_sorcery_boost_combat_damage_copy_cast`.
+
+Blocked/local-XMage-missing evidence:
+
+- `Molecule Man`: exact candidate class `MoleculeMan` was not found. Wide local
+  search only found `MolecularModifier.java` and
+  `UnstableMoleculeSuit.java`, which are not exact implementations.
+- `Thor, God of Thunder`: exact candidate class `ThorGodOfThunder` was not
+  found. Local Thor-adjacent classes exist (`TheMightyThorJaneFoster`,
+  `ThorGuardianOfMidgard`, `ThorOdinson`), but none is an exact class match for
+  this card name.
+
+Tests:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_validity_audit.py`:
+  `Ran 5 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py`:
+  `Ran 7 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_local_rule_indexer.py`:
+  `Ran 7 tests OK`.
+
+Active pending classification after this gate:
+
+- Do not treat local XMage readiness as PostgreSQL closure. These are
+  structured source inputs, not promoted trusted rules.
+- Still approval-gated: PG108 apply/sync/re-audit for `Pearl Medallion` and
+  PG109 apply/sync/re-audit for `Bender's Waterskin` and `Victory Chimes`.
+- Runtime/model work can now proceed in smaller XMage-backed batches for the
+  other `ready_for_structured_xmage_pull_review_required` cards.
+- `Molecule Man` and `Thor, God of Thunder` remain manual/Oracle/Scryfall-first
+  until an exact XMage class or another trusted implementation source is found.
+
+### XMage Fast-Path Test Gate - 2026-06-23 14:52 -03
+
+Status: `structured_pull_requires_focused_test_scenario`.
+
+Decision:
+
+- Yes, the fastest safe flow is now:
+  `Scryfall/Oracle text -> exact XMage class -> ManaLoom effect adapter ->
+  focused ManaLoom test scenario -> reviewed runtime/PG package`.
+- XMage can be treated as the primary implementation reference for cards with
+  exact local class and compatible metadata, but it is not promoted directly as
+  product truth.
+- The batch gate now requires usable focused test scenarios before a card is
+  counted as `ready_for_structured_pull`.
+
+Implementation update:
+
+- `xmage_reference_test_scenario_builder.py` now emits effect-specific
+  scenarios for:
+  `other_turn_untapping_any_color_mana_rock`,
+  `other_turn_untapping_target_player_colorless_mana_rock`,
+  `discard_trigger_modal_draw_treasure_opponent_life_loss`, and
+  `exile_instant_sorcery_boost_combat_damage_copy_cast`.
+- `xmage_batch_validity_audit.py` now checks `suggested_test_scenarios` and
+  exposes `focused_test_scenarios_present` plus
+  `focused_test_scenario_count`.
+- `ready_for_structured_pull` now means: exact XMage class, compatible
+  metadata, specific effect candidate, and at least one usable focused test
+  scenario.
+
+Regenerated artifact evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_batch_validity_20260623.json`
+  and `.md`.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_batch_validity_audit_deck607_pg108_high_medium_20260623.json`
+  and `.md`.
+- Batch summary after the test gate:
+  `audited_card_count=13`, `exact_xmage_found_count=11`,
+  `focused_test_scenario_ready_count=11`,
+  `ready_for_structured_pull_count=11`, `missing_xmage_class_count=2`.
+
+Tests:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_reference_test_scenario_builder.py`:
+  `Ran 3 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_validity_audit.py`:
+  `Ran 6 tests OK`.
+
+Active boundary:
+
+- The 11 cards are ready for the fast adaptation path, not closed in product.
+- `Molecule Man` and `Thor, God of Thunder` remain outside the XMage fast path
+  until exact source classes or another trusted implementation source is found.
+
+## PG110 The Scarlet Witch Runtime Package Prepared - 2026-06-23
+
+Status: `runtime_implemented_validated_pg_apply_pending`.
+
+What changed:
+
+- Implemented ManaLoom runtime support for
+  `static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1`.
+- The reducer now supports dynamic generic cost reduction from source permanent
+  power, constrained by card type and minimum mana value.
+- `The Scarlet Witch` model is: instant/sorcery spells its controller casts
+  with mana value `4+` cost `source_power` less, using non-negative source
+  power. It is not a mana source and not a fixed `cost_reduction_generic=1`
+  effect.
+- PostgreSQL was not changed. PG110 is prepared only and awaits explicit
+  approval for the exact apply command.
+
+Evidence:
+
+- Runtime source:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py`.
+- Focused tests:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py`.
+- XMage hint extractor:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py`.
+- Runtime artifact:
+  `docs/hermes-analysis/master_optimizer_reports/scarlet_witch_runtime_validation_20260623_150416.json`
+  and `.md`.
+- PG110 package:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_package_20260623_150416.md`.
+- PG110 read-only precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416.json`
+  and `.out`, with `mutations_performed=[]`.
+- Pre-apply deck-card coherence audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg110_scarlet_preapply_20260623_150416.json`
+  and `.md`, still `high=9`, `medium=4`, `pass=81` because PG110 was not
+  applied/synced.
+- Regenerated XMage index:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_scarlet_20260623_150235.json`
+  and `.md`.
+- Regenerated XMage batch gate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_validity_audit_deck607_pg108_high_medium_scarlet_20260623_150242.json`
+  and `.md`.
+
+Runtime validation result:
+
+- Positive case: mana-value-4 sorcery `{3}{R}` with Scarlet power `2` locked
+  cost as `generic=1`, `colored.red=1`,
+  `static_cost_reduction_total=2`, and `applied_amount=2`.
+- Negative cases: mana-value-3 instant and mana-value-4 creature did not
+  receive `static_cost_reduction_total`.
+
+XMage evidence:
+
+- Exact source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheScarletWitch.java`.
+- XMage uses `CostModificationEffectImpl`, `FilterInstantOrSorceryCard`,
+  `ManaValuePredicate(ComparisonType.OR_GREATER, 4)`,
+  `SourcePermanentPowerValue.NOT_NEGATIVE`, and `CardUtil.reduceCost`.
+- Batch gate now reports `The Scarlet Witch` as
+  `ready_for_structured_xmage_pull_review_required` with
+  `ready_for_structured_pull=true`, `valid_xmage_source=true`,
+  `specific_effect_candidate=true`, `type_match=true`, `mana_cost_match=true`,
+  and `focused_test_scenario_count=2`.
+
+PostgreSQL read-only precheck result:
+
+- Target DB: `143.198.230.247:5433/halder`.
+- `target_card_rows=1`, `card_oracle_hash_match_rows=1`.
+- `existing_rule_rows=0`, `expected_rule_rows_before=0`,
+  `trusted_rule_rows_before=0`, `would_deprecate_shadow_rows=0`.
+- No PG write/apply was executed.
+
+Tests:
+
+- Focused Scarlet harness: `ran=2` for
+  `test_scarlet_witch_reduces_mv4_instant_or_sorcery_by_source_power` and
+  `test_scarlet_witch_does_not_reduce_mv3_or_non_instant_sorcery_spell`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py`:
+  `Ran 8 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py --help`:
+  due the harness behavior, this executed the full suite and all printed tests
+  passed, including the two Scarlet tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py --sqlite-db docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db --deck-id 607 --output-json docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg110_scarlet_preapply_20260623_150416.json --output-md docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg110_scarlet_preapply_20260623_150416.md`:
+  `severity_counts={"high":9,"medium":4,"pass":81}`.
+
+Active pending classification after this checkpoint:
+
+- `The Scarlet Witch` is no longer a runtime implementation pending item.
+- `The Scarlet Witch` remains approval-gated until PG110 apply, postcheck,
+  PG -> SQLite sync, deck `607` coherence re-audit, and any requested battle
+  rerun prove product closure.
+- Current approval-gated PG packages: PG108 `Pearl Medallion`, PG109
+  `Bender's Waterskin`/`Victory Chimes`, and PG110 `The Scarlet Witch`.
+- Remaining runtime-heavy XMage-backed candidates exclude `The Scarlet Witch`
+  and are now: `Emeria's Call`, `Promise of Loyalty`,
+  `Starfall Invocation`, `The Mind Stone`, and `Tragic Arrogance`.
+
+## XMage Semantic Family Batch Pipeline - 2026-06-23
+
+Status: `family_batch_pipeline_implemented_read_only`.
+
+What changed:
+
+- Added the batching layer needed to avoid a 3000-card card-by-card workflow.
+- New unit of work is now semantic family, then card metadata within that
+  family, not one bespoke cycle per card.
+- PostgreSQL was not changed and no deck swap/commit/push was executed.
+
+New scripts:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_semantic_family_classifier.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_effect_json_batch_generator.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_batch_pg_package_builder.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_semantic_family_batch_pipeline.py`
+
+Artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_semantic_family_classification_deck607_20260623_152813.json`
+  and `.md`.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_effect_json_batch_proposals_deck607_20260623_152951.json`
+  and `.md`.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152951_manifest.json`
+  and package/sql preview files with the same prefix.
+
+Current deck `607` family summary:
+
+- `13` high/medium cards -> `8` semantic families.
+- Batch metadata candidates after PG precheck: `4`
+  (`Pearl Medallion`, `The Scarlet Witch`, `Bender's Waterskin`,
+  `Victory Chimes`).
+- Runtime-family required: `7`
+  (`Promise of Loyalty`, `Starfall Invocation`, `Emeria's Call`,
+  `The Mind Stone`, `Tragic Arrogance`, `Monument to Endurance`,
+  `Surge to Victory`).
+- Missing exact XMage source: `2` (`Molecule Man`, `Thor, God of Thunder`).
+
+Validation:
+
+- `python3 -m py_compile` for the three new scripts and test: exit `0`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_semantic_family_batch_pipeline.py`:
+  `Ran 3 tests OK`.
+
+Boundary:
+
+- The static-cost SQL preview proves that family batching can produce one
+  package for `Pearl Medallion` + `The Scarlet Witch`, with logical keys
+  matching PG108/PG110.
+- It is not an apply request and must not be used while PG108/PG110 remain
+  pending unless those packages are explicitly replaced.
+- Next real scaling step is to implement one runtime family at a time. Current
+  best first family is `board_wipe_choice`, covering `Promise of Loyalty`,
+  `Starfall Invocation`, and `Tragic Arrogance` together.
+
+## XMage Engine Absorption Inventory - 2026-06-23
+
+Status: `read_only_engine_inventory_ready`.
+
+Rafael asked whether the current card-by-card validation is too heavy and what
+XMage can contribute beyond exact card classes. A new read-only inventory now
+scans the local XMage checkout as a rules/test corpus.
+
+New source/test files:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_engine_absorption_inventory.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_engine_absorption_inventory.py`
+
+Artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_engine_absorption_inventory_20260623.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_engine_absorption_inventory_20260623.md`
+
+Evidence:
+
+- Java files scanned: `38,739`.
+- Card implementations: `31,706`.
+- Core engine files: `3,688`.
+- Effect files: `802`.
+- Target files: `84`.
+- Filter files: `207`.
+- Watcher files: `87`.
+- XMage tests: `2,009`.
+- `GameEvent.EventType` indexed values: `311`.
+- Full JSON catalogs generated for effect, target, filter, watcher, cost,
+  dynamic value, and condition classes.
+
+Test corpus acceleration evidence:
+
+- `addCard=24540`, `castSpell=6719`, `execute=6490`,
+  `setChoice=4122`, `activateAbility=2042`,
+  `waitStackResolved=1402`, `checkPlayableAbility=997`,
+  `checkPermanentCount=601`, `checkStackObject=83`.
+
+Conclusion for Lorehold/deck-rule work:
+
+- Current manual rigor is still needed for PostgreSQL promotion, but the unit
+  of work should no longer be one card at a time.
+- XMage should be used as a local contract/test corpus:
+  exact card source, effect taxonomy, target/filter legality, cost adjusters,
+  watcher/replacement/prevention contracts, priority/stack/turn references,
+  and test scenario mining.
+- A full XMage engine port is not recommended at this stage. The faster path is
+  to mine XMage contracts and tests into ManaLoom runtime families.
+
+Recommended next slice:
+
+1. Add an XMage test-miner for exact card-name tests.
+2. Use it on the deck `607` `board_wipe_choice` family:
+   `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+3. Convert the mined setup/action/assertion shape into ManaLoom focused tests
+   before any new PG promotion.
+
+Validation:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/xmage_engine_absorption_inventory.py docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_engine_absorption_inventory.py`:
+  exit `0`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_engine_absorption_inventory.py`:
+  `Ran 3 tests OK`.
+
+Boundary:
+
+- No PostgreSQL write, deck swap, commit, push, stash, revert, LaunchAgent
+  change, or artifact deletion was executed by this inventory.
+
+## XMage Test Scenario Mining - 2026-06-23
+
+Status: `read_only_test_miner_ready`.
+
+The engine inventory showed that XMage has `2,009` Java tests, so a new miner
+was added to determine whether current deck `607` high/medium cards can reuse
+actual XMage test scenarios.
+
+New source/test files:
+
+- `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_test_scenario_miner.py`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py`
+
+Artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_test_scenario_miner_deck607_board_wipe_choice_20260623.json`
+  and `.md`.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_test_scenario_miner_deck607_high_medium_20260623.json`
+  and `.md`.
+
+Results:
+
+- Board-wipe-choice group (`Promise of Loyalty`, `Starfall Invocation`,
+  `Tragic Arrogance`): `0/3` exact test references and `0` usable scenario
+  candidates.
+- Full deck `607` high/medium queue: `13` cards scanned, `2,009` XMage test
+  files scanned, `2/13` exact test references, `1` usable scenario candidate.
+- `Emeria's Call // Emeria, Shattered Skyclave` has one usable scenario shape
+  from `ModalDoubleFacedCardsTest.java`.
+- `Pearl Medallion` has one XMage test reference, but it has no assertion
+  commands and is not directly usable as a ManaLoom focused-test candidate.
+
+Validation:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/xmage_test_scenario_miner.py docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py`:
+  exit `0`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py`:
+  `Ran 3 tests OK`.
+
+Conclusion:
+
+- For the current queue, XMage tests are a supplemental accelerator, not the
+  main one.
+- The fastest reliable path is still: exact XMage card class + Oracle text +
+  effect/cost/target taxonomy -> generated ManaLoom focused tests -> runtime
+  implementation -> PG package/precheck/apply only when approved.
+- `board_wipe_choice` should proceed with generated ManaLoom tests rather than
+  waiting for existing XMage tests.

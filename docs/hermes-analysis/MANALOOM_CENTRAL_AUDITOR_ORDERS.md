@@ -3334,3 +3334,303 @@ Current order:
 - This order performed no new PostgreSQL write, rollback, deck swap, commit,
   push, stash, revert, LaunchAgent reenable, script deletion, plist deletion,
   or artifact deletion.
+
+## PG108 Pearl Medallion Prepared - 2026-06-23
+
+Central order update:
+
+- `Pearl Medallion` runtime support is locally implemented and tested as
+  `static_cost_reduction`, not `ramp_permanent`.
+- PostgreSQL remains unchanged. PG108 is prepared only and awaits explicit
+  approval for the exact apply command.
+- Current PG precheck evidence shows the live product DB has one Oracle-matched
+  `Pearl Medallion` card row and two active generated review-only
+  `ramp_permanent` shadows, with no trusted executable rule.
+
+Evidence:
+
+- Runtime package summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_package_20260623_170353.md`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353.json`
+  and `.out`, with `mutations_performed=[]`.
+- Focused runtime artifact:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_focused_runtime_20260623_170353.json`.
+- Deck `607` pre-apply coherence audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pearl_preapply_20260623_170353.json`
+  and `.md`, still `high=9`, `medium=4`, `pass=81`.
+- Fresh external reference packet:
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg108_pearl_20260623_170353.json`
+  and `.md`, local XMage class `PearlMedallion`, candidate
+  `static_cost_reduction`, color `W`, `mutations_performed=[]`.
+
+Current order:
+
+- Keep PG107 closed.
+- Keep PG108 pending apply approval; do not remove `Pearl Medallion` from active
+  deck-card pending until PG108 apply/postcheck/sync/re-audit prove closure.
+- Continue to avoid LaunchAgent reenablement while card-by-card validation is
+  manual and artifact-named.
+
+## XMage Credit Queue and PG109 Prepared - 2026-06-23
+
+Central order update:
+
+- A full deck `607` high/medium XMage-first queue now exists:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_credit_adaptation_queue_deck607_pg108_20260623.json`
+  and `.md`.
+- Exact local XMage implementations exist for `11/13` current high/medium
+  pending cards; `8/13` are strong adaptation references.
+- `Molecule Man` and `Thor, God of Thunder` remain Oracle-only in the local
+  XMage checkout and require manual runtime modeling.
+- `Victory Chimes` has a live PostgreSQL drift: a verified executable
+  `draw_engine` row remains in PG even though the local runtime shape is
+  colorless `ramp_permanent`.
+
+PG109 state:
+
+- PG109 prepared for `Bender's Waterskin` and `Victory Chimes`; PostgreSQL not
+  applied.
+- Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_package_20260623_171938.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_focused_runtime_20260623_171938.json`.
+
+Current order:
+
+- Keep PG108 and PG109 pending explicit apply approval.
+- If approvals arrive, apply one package at a time with precheck, apply,
+  postcheck, sync, and re-audit.
+- For new runtime work, prefer exact-XMage strong-reference cards first, but do
+  not promote from XMage alone.
+
+## XMage High/Medium Batch Validity Gate - 2026-06-23
+
+Central order update:
+
+- Full deck `607` high/medium XMage validity gate now exists:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_validity_audit_deck607_pg108_high_medium_20260623.json`
+  and `.md`.
+- Corrected local XMage index now exists:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_batch_validity_20260623.json`
+  and `.md`.
+- Audited cards: `13` (`high=9`, `medium=4`).
+- Exact local XMage classes found: `11/13`.
+- Ready for structured XMage pull with ManaLoom review/tests still required:
+  `11/13`.
+- Missing exact local XMage class remains `2/13`: `Molecule Man` and
+  `Thor, God of Thunder`.
+
+Implementation changes:
+
+- `xmage_local_rule_indexer.py` now keeps constructor mana costs out of
+  `xmage_card_name` and reads card types from constructor context instead of
+  effect/filter predicates.
+- `xmage_to_manaloom_effect_hints.py` now maps the current medium queue
+  patterns for `Bender's Waterskin`, `Victory Chimes`,
+  `Monument to Endurance`, and `Surge to Victory`.
+- New `xmage_batch_validity_audit.py` classifies each card as structured-pull
+  ready, mapper-required, metadata-mismatch, or missing local XMage class.
+
+Validation:
+
+- `test_xmage_batch_validity_audit.py`: `Ran 5 tests OK`.
+- `test_xmage_to_manaloom_effect_hints.py`: `Ran 7 tests OK`.
+- `test_xmage_local_rule_indexer.py`: `Ran 7 tests OK`.
+- `mutations_performed=[]`; no PostgreSQL writes, deck swaps, commits, or
+  pushes were executed.
+
+Current order:
+
+- It is now valid to use the 11 structured-pull-ready XMage references as
+  source inputs for ManaLoom review packets and focused tests.
+- Do not auto-promote these candidates to trusted PostgreSQL rules. Each card
+  still requires Oracle/hash confirmation, ManaLoom model review, focused
+  tests, approval-gated PG package when needed, sync, and post-audit.
+- Keep `Molecule Man` and `Thor, God of Thunder` manual/Oracle/Scryfall-first
+  until an exact XMage class or another trusted implementation source is found.
+
+### XMage Fast-Path Test Gate - 2026-06-23 14:52 -03
+
+Update:
+
+- The fast path is now explicitly gated as:
+  `Scryfall/Oracle text -> exact XMage class -> ManaLoom effect adapter ->
+  focused ManaLoom test scenario -> reviewed runtime/PG package`.
+- `xmage_batch_validity_audit.py` now requires usable
+  `suggested_test_scenarios` before a card counts as
+  `ready_for_structured_pull`.
+- `xmage_reference_test_scenario_builder.py` now has effect-specific scenarios
+  for Bender/Victory/Monument/Surge style effects.
+
+Regenerated evidence:
+
+- `xmage_batch_validity_audit_deck607_pg108_high_medium_20260623.json` now
+  reports `focused_test_scenario_ready_count=11`,
+  `ready_for_structured_pull_count=11`, and
+  `missing_xmage_class_count=2`.
+- Tests: `test_xmage_reference_test_scenario_builder.py` `Ran 3 tests OK`;
+  `test_xmage_batch_validity_audit.py` `Ran 6 tests OK`.
+
+Order:
+
+- For the 11 fast-path cards, start future implementation slices from the
+  generated focused scenarios and convert each scenario into a real ManaLoom
+  runtime/unit/replay test before any PostgreSQL promotion.
+- The fast path does not change the no-apply/no-swap/no-commit boundary.
+
+## PG110 The Scarlet Witch Prepared - 2026-06-23
+
+Central order update:
+
+- `The Scarlet Witch` runtime support is locally implemented and tested as a
+  static source-power cost reducer for instant/sorcery spells with mana value
+  `4+`.
+- PostgreSQL remains unchanged. PG110 is prepared only and awaits explicit
+  approval for the exact apply command.
+- Current PG precheck evidence shows the live product DB has one Oracle-matched
+  `The Scarlet Witch` card row, zero existing `card_battle_rules` rows for the
+  normalized name, and zero rows to deprecate.
+
+Evidence:
+
+- Runtime package summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_package_20260623_150416.md`.
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416.json`
+  and `.out`, with `mutations_performed=[]`.
+- Focused runtime artifact:
+  `docs/hermes-analysis/master_optimizer_reports/scarlet_witch_runtime_validation_20260623_150416.json`.
+- Regenerated XMage batch gate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_validity_audit_deck607_pg108_high_medium_scarlet_20260623_150242.json`
+  and `.md`.
+- Pre-apply deck-card coherence audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg110_scarlet_preapply_20260623_150416.json`
+  and `.md`, still `high=9`, `medium=4`, `pass=81` because PG110 was not
+  applied/synced.
+
+Current order:
+
+- Keep PG108, PG109, and PG110 pending explicit apply approval.
+- Do not remove `The Scarlet Witch` from the deck-card product pending list
+  until PG110 apply/postcheck/sync/re-audit prove closure.
+- For new runtime work, skip `The Scarlet Witch` and move to the next
+  exact-XMage runtime-heavy candidate.
+
+## XMage Semantic Family Batch Pipeline - 2026-06-23
+
+Central order update:
+
+- Stop scaling the XMage workflow as one manual cycle per card.
+- New implemented path:
+  `XMage batch validity -> semantic family classification -> effect_json batch proposals -> optional approval-gated PG package preview`.
+- New scripts:
+  `xmage_semantic_family_classifier.py`,
+  `xmage_effect_json_batch_generator.py`, and
+  `xmage_batch_pg_package_builder.py`.
+
+Evidence:
+
+- Family classification:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_semantic_family_classification_deck607_20260623_152813.json`
+  and `.md`.
+- Effect proposals:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effect_json_batch_proposals_deck607_20260623_152951.json`
+  and `.md`.
+- Static-cost batch preview:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152951_package.md`.
+- Tests:
+  `test_xmage_semantic_family_batch_pipeline.py` `Ran 3 tests OK`.
+
+Result:
+
+- Current deck `607` high/medium queue is `13` cards across `8` families.
+- `4` cards are metadata-batch candidates after PG precheck, but all overlap
+  existing PG108/PG109/PG110 pending packages.
+- `7` cards should be handled by runtime-family implementation, not individual
+  bespoke cycles.
+- `2` cards remain manual due missing exact local XMage source.
+
+Current order:
+
+- Do not apply the static-cost preview package while PG108/PG110 are pending.
+- Use the new family classifier before starting any further card implementation.
+- Next recommended family is `board_wipe_choice`: implement/test one runtime
+  family for `Promise of Loyalty`, `Starfall Invocation`, and
+  `Tragic Arrogance`.
+
+## XMage Engine Absorption Inventory - 2026-06-23
+
+Central order update:
+
+- XMage is now validated as a broad local rules/test corpus, not only a
+  per-card Java source lookup.
+- Do not port the whole XMage Java engine into ManaLoom at this stage.
+- Do absorb XMage in targeted layers:
+  exact card implementations, effect taxonomy, target/filter/predicate
+  legality, cost adjusters, watchers/replacement/prevention, GameEvent
+  taxonomy, priority/stack/turn references, Commander validators, and test
+  scenario mining.
+
+Evidence:
+
+- New scanner:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_engine_absorption_inventory.py`.
+- New focused test:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_engine_absorption_inventory.py`.
+- Inventory artifacts:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_engine_absorption_inventory_20260623.json`
+  and `.md`.
+- Real checkout counts: `38,739` Java files, `31,706` card
+  implementations, `3,688` core engine files, `802` effect files, `84`
+  target files, `207` filter files, `87` watcher files, `2,009` test files,
+  and `311` `GameEvent.EventType` values.
+- Test-corpus signal: `addCard=24540`, `castSpell=6719`, `execute=6490`,
+  `setChoice=4122`, `activateAbility=2042`, `waitStackResolved=1402`.
+- Validation: py_compile exit `0`; `test_xmage_engine_absorption_inventory.py`
+  `Ran 3 tests OK`.
+
+Current order:
+
+- Next engineering slice should be an XMage test-miner plus one runtime-family
+  implementation, not another isolated one-card hand analysis.
+- Preferred family remains deck `607` `board_wipe_choice`:
+  `Promise of Loyalty`, `Starfall Invocation`, and `Tragic Arrogance`.
+- PG108, PG109, and PG110 remain pending apply/sync/re-audit until their exact
+  packages are executed or explicitly replaced.
+
+## XMage Test Scenario Miner - 2026-06-23
+
+Central order update:
+
+- XMage test mining is implemented and validated as a read-only accelerator.
+- It should be used before starting a runtime family, but lack of XMage tests
+  must not block the family if exact card classes and Oracle evidence exist.
+
+Evidence:
+
+- New miner:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_test_scenario_miner.py`.
+- New focused test:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_test_scenario_miner.py`.
+- Board-wipe-choice mining artifact:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_test_scenario_miner_deck607_board_wipe_choice_20260623.json`
+  and `.md`: `0/3` exact test references.
+- Full high/medium mining artifact:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_test_scenario_miner_deck607_high_medium_20260623.json`
+  and `.md`: `13` cards scanned, `2/13` exact test references, `1` usable
+  scenario candidate.
+- Usable test reference: `Emeria's Call // Emeria, Shattered Skyclave` in
+  XMage `ModalDoubleFacedCardsTest.java`.
+- Non-usable reference: `Pearl Medallion` in XMage `DisturbTest.java` because
+  the mined method has no assertion commands.
+- Validation: py_compile exit `0`; `test_xmage_test_scenario_miner.py`
+  `Ran 3 tests OK`.
+
+Current order:
+
+- For deck `607` `board_wipe_choice`, generate ManaLoom focused tests from
+  Oracle/XMage class structure; there are no exact XMage tests to convert.
+- Continue using exact XMage class evidence, but require ManaLoom runtime tests
+  before PostgreSQL promotion.

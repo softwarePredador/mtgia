@@ -1,0 +1,95 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "mutations_performed": [],
+  "readonly_guard": "only SELECT/WITH statements executed",
+  "results": [
+    {
+      "columns": [
+        "target_card_rows",
+        "card_oracle_hash_match_rows",
+        "existing_rule_rows",
+        "expected_rule_rows_before",
+        "trusted_rule_rows_before",
+        "active_ramp_shadow_rows_before",
+        "would_deprecate_shadow_rows",
+        "rows_missing_oracle_hash_before"
+      ],
+      "rows": [
+        {
+          "active_ramp_shadow_rows_before": 2,
+          "card_oracle_hash_match_rows": 1,
+          "existing_rule_rows": 2,
+          "expected_rule_rows_before": 0,
+          "rows_missing_oracle_hash_before": 2,
+          "target_card_rows": 1,
+          "trusted_rule_rows_before": 0,
+          "would_deprecate_shadow_rows": 2
+        }
+      ],
+      "statement_index": 1
+    },
+    {
+      "columns": [
+        "normalized_name",
+        "card_name",
+        "logical_rule_key",
+        "source",
+        "review_status",
+        "execution_status",
+        "confidence",
+        "rule_version",
+        "oracle_hash",
+        "effect_json",
+        "deck_role_json",
+        "notes"
+      ],
+      "rows": [
+        {
+          "card_name": "Pearl Medallion",
+          "confidence": "0.550",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "review_only",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "normalized_name": "pearl medallion",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        },
+        {
+          "card_name": "Pearl Medallion",
+          "confidence": "0.550",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "review_only",
+          "logical_rule_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67",
+          "normalized_name": "pearl medallion",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ],
+      "statement_index": 2
+    }
+  ],
+  "sql_path": "docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353.sql",
+  "status": "ready"
+}

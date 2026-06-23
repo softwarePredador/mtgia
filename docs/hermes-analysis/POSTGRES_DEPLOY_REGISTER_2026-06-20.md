@@ -9599,3 +9599,204 @@ Tests:
 Next deploy number:
 
 - PG098 is next for any future PostgreSQL package.
+
+## PG108 Pearl Medallion Static Cost Reducer - Prepared 2026-06-23 17:03 UTC
+
+Status: `prepared_read_only_precheck_pending_apply_approval`.
+
+Scope:
+
+- Prepared canonical battle-rule promotion for `Pearl Medallion`.
+- Proposed rule:
+  `logical_rule_key=battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2`,
+  `oracle_hash=77f7f449ee56143d6b63814fecd37176`,
+  `effect=static_cost_reduction`, `deck_role=support/cost_reducer`,
+  `review_status=verified`, `execution_status=auto`, `source=curated`.
+- No PostgreSQL write was executed in this step.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_rollback_20260623_170353.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_postcheck_20260623_170353.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_package_20260623_170353.md`
+
+Read-only PostgreSQL evidence:
+
+- Precheck outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_precheck_20260623_170353.out`.
+- Precheck executed only `SELECT/WITH` statements and recorded
+  `mutations_performed=[]`.
+- Counts: `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `existing_rule_rows=2`, `expected_rule_rows_before=0`,
+  `trusted_rule_rows_before=0`, `active_ramp_shadow_rows_before=2`,
+  `would_deprecate_shadow_rows=2`, and `rows_missing_oracle_hash_before=2`.
+
+Runtime and audit evidence:
+
+- Focused runtime artifact:
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_focused_runtime_20260623_170353.json`.
+- Pre-apply deck-card coherence audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pearl_preapply_20260623_170353.json`
+  and `.md`, with `high=9`, `medium=4`, `pass=81`.
+- External reference packet:
+  `docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg108_pearl_20260623_170353.json`
+  and `.md`; it found local XMage `PearlMedallion` and candidate
+  `static_cost_reduction` with `applies_to_spell_colors=["W"]`.
+- Tests: `py_compile` exit `0`; XMage hint tests `Ran 3 tests OK`;
+  external harvester `Ran 7 tests OK`; battle analyst v10.3 passed including
+  two new Pearl Medallion static reducer tests.
+
+Apply gate:
+
+- PG108 is reserved but not applied.
+- Do not run
+  `docs/hermes-analysis/master_optimizer_reports/pg108_pearl_medallion_static_cost_reducer_apply_20260623_170353.sql`
+  without explicit approval for the exact command.
+- If approved later, required sequence is precheck, apply, postcheck,
+  PG -> SQLite sync for `Pearl Medallion`, focused tests, deck-card coherence
+  re-audit, and battle rerun if the Auditor Central requests one.
+
+Next deploy number:
+
+- PG108 remains the current pending package until applied or explicitly
+  abandoned. Do not reuse PG108 for another package.
+
+## PG109 Bender's Waterskin and Victory Chimes - Prepared 2026-06-23 17:19 UTC
+
+Status: `prepared_read_only_precheck_pending_apply_approval`.
+
+Scope:
+
+- Prepared canonical metadata/source correction for `Bender's Waterskin` and
+  `Victory Chimes`.
+- No PostgreSQL write was executed.
+- Goal: prevent stale PostgreSQL rows from overwriting correct local runtime
+  shape during future PG -> SQLite syncs.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_rollback_20260623_171938.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_postcheck_20260623_171938.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_package_20260623_171938.md`
+
+Read-only PostgreSQL evidence:
+
+- Precheck outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_precheck_20260623_171938.json`
+  and `.out`.
+- Precheck executed only `SELECT/WITH` statements and recorded
+  `mutations_performed=[]`.
+- `Bender's Waterskin`: `target_card_rows=1`,
+  `card_oracle_hash_match_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `trusted_rule_rows_before=1`,
+  `trusted_missing_oracle_hash_rows_before=1`,
+  `would_deprecate_shadow_rows=2`.
+- `Victory Chimes`: `target_card_rows=1`,
+  `card_oracle_hash_match_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `trusted_rule_rows_before=1`,
+  `trusted_missing_oracle_hash_rows_before=1`,
+  `would_deprecate_shadow_rows=2`,
+  `active_draw_engine_rows_before=1`.
+
+Runtime evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_focused_runtime_20260623_171938.json`.
+- `Bender's Waterskin` resolves to wildcard mana and can pay `{R}`, `{1}`,
+  and `{C}` in focused runtime.
+- `Victory Chimes` resolves to colorless mana and can pay `{1}`/`{C}` but not
+  `{R}`; it must not be modeled as `draw_engine`.
+
+Apply gate:
+
+- PG109 is prepared but not applied.
+- Do not run
+  `docs/hermes-analysis/master_optimizer_reports/pg109_benders_waterskin_victory_chimes_apply_20260623_171938.sql`
+  without explicit approval for the exact command.
+- If approved later, required sequence is precheck, apply, postcheck,
+  PG -> SQLite sync for both cards, and deck `607` coherence re-audit.
+
+Next deploy number:
+
+- PG108 and PG109 are both pending packages. Do not reuse either deploy number.
+
+## PG110 The Scarlet Witch Static Cost Reducer - Prepared 2026-06-23 15:04 -03
+
+Status: `prepared_read_only_precheck_pending_apply_approval`.
+
+Scope:
+
+- Prepared canonical battle-rule promotion for `The Scarlet Witch`.
+- Proposed rule:
+  `logical_rule_key=battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc`,
+  `oracle_hash=6129fda2f5ae1f8edad5a2f2e77d05c2`,
+  `effect=static_cost_reduction`, `deck_role=support/cost_reducer`,
+  `review_status=verified`, `execution_status=auto`, `source=curated`.
+- No PostgreSQL write was executed in this step.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_apply_20260623_150416.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_rollback_20260623_150416.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_postcheck_20260623_150416.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_package_20260623_150416.md`
+
+Read-only PostgreSQL evidence:
+
+- Precheck outputs:
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_precheck_20260623_150416.out`.
+- Precheck executed only `SELECT/WITH` statements in a readonly session and
+  recorded `mutations_performed=[]`.
+- Counts: `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `existing_rule_rows=0`, `expected_rule_rows_before=0`,
+  `trusted_rule_rows_before=0`,
+  `active_static_cost_reduction_rows_before=0`,
+  `would_deprecate_shadow_rows=0`, and `rows_missing_oracle_hash_before=0`.
+
+Runtime and XMage evidence:
+
+- Focused runtime artifact:
+  `docs/hermes-analysis/master_optimizer_reports/scarlet_witch_runtime_validation_20260623_150416.json`.
+- Regenerated local XMage index:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_scarlet_20260623_150235.json`
+  and `.md`.
+- Regenerated XMage batch gate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_validity_audit_deck607_pg108_high_medium_scarlet_20260623_150242.json`
+  and `.md`.
+- Pre-apply deck-card coherence audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg110_scarlet_preapply_20260623_150416.json`
+  and `.md`, with `high=9`, `medium=4`, `pass=81`.
+- Runtime artifact confirms the positive MV4 sorcery reduction by source power
+  and the negative MV3 instant / MV4 creature cases.
+
+Tests:
+
+- Focused Scarlet harness: `ran=2` for the two new Scarlet tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py`:
+  `Ran 8 tests OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py --help`:
+  due harness behavior, this executed the full suite and all printed tests
+  passed, including the Scarlet tests.
+
+Apply gate:
+
+- PG110 is reserved but not applied.
+- Do not run
+  `docs/hermes-analysis/master_optimizer_reports/pg110_the_scarlet_witch_static_cost_reducer_apply_20260623_150416.sql`
+  without explicit approval for the exact command.
+- If approved later, required sequence is precheck, apply, postcheck,
+  PG -> SQLite sync for `The Scarlet Witch`, focused tests, deck-card coherence
+  re-audit, and battle rerun if the Auditor Central requests one.
+
+Next deploy number:
+
+- PG108, PG109, and PG110 are pending packages. Do not reuse any of these
+  deploy numbers.

@@ -54,6 +54,8 @@ EFFECT_TO_DECK_CATEGORY = {
     "land_ramp": "ramp",
     "lander_token_maker": "ramp",
     "treasure_maker": "ramp",
+    "static_cost_reduction": "support",
+    "cost_reduction": "support",
     "silence_opponents": "protection",
     "silence_spell": "protection",
     "gift_hexproof_indestructible": "protection",

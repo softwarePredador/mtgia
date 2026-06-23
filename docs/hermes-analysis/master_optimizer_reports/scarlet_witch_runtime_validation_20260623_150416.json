@@ -1,0 +1,154 @@
+{
+  "assertions": {
+    "mv3_has_reduction": false,
+    "mv4_creature_has_reduction": false,
+    "mv4_sorcery_applied_amount": 2,
+    "mv4_sorcery_static_cost_reduction_total": 2
+  },
+  "cases": [
+    {
+      "available_mana_after_commit": 0,
+      "available_mana_before_commit": 2,
+      "can_pay_locked_cost": true,
+      "case_id": "mv4_sorcery_reduced_by_source_power",
+      "commit_result": true,
+      "locked_cost": {
+        "colored": {
+          "red": 1
+        },
+        "generic": 1,
+        "hybrid": [],
+        "monocolored_hybrid": [],
+        "phyrexian": [],
+        "phyrexian_hybrid": [],
+        "spend_tags": [
+          "instant_or_sorcery_spell",
+          "noncreature_spell"
+        ],
+        "static_cost_reduction_total": 2,
+        "static_cost_reductions": [
+          {
+            "amount": 2,
+            "amount_source": "source_power",
+            "applied_amount": 2,
+            "applies_to_card_types": [
+              "instant",
+              "sorcery"
+            ],
+            "colors": [],
+            "minimum_mana_value": 4,
+            "scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+            "source": "The Scarlet Witch"
+          }
+        ]
+      },
+      "mana_setup": {
+        "colored": {
+          "red": 1
+        },
+        "generic": 1
+      },
+      "spell": {
+        "cmc": 4,
+        "colors": [
+          "R"
+        ],
+        "mana_cost": "{3}{R}",
+        "name": "Red Audit Sorcery",
+        "type_line": "Sorcery"
+      }
+    },
+    {
+      "available_mana_after_commit": 1,
+      "available_mana_before_commit": 1,
+      "can_pay_locked_cost": false,
+      "case_id": "mv3_instant_not_reduced",
+      "commit_result": false,
+      "locked_cost": {
+        "colored": {
+          "red": 1
+        },
+        "generic": 2,
+        "hybrid": [],
+        "monocolored_hybrid": [],
+        "phyrexian": [],
+        "phyrexian_hybrid": [],
+        "spend_tags": [
+          "instant_or_sorcery_spell",
+          "noncreature_spell"
+        ]
+      },
+      "mana_setup": {
+        "colored": {
+          "red": 1
+        },
+        "generic": 0
+      },
+      "spell": {
+        "cmc": 3,
+        "colors": [
+          "R"
+        ],
+        "mana_cost": "{2}{R}",
+        "name": "Small Red Audit Instant",
+        "type_line": "Instant"
+      }
+    },
+    {
+      "available_mana_after_commit": 1,
+      "available_mana_before_commit": 1,
+      "can_pay_locked_cost": false,
+      "case_id": "mv4_creature_not_reduced",
+      "commit_result": false,
+      "locked_cost": {
+        "colored": {
+          "red": 1
+        },
+        "generic": 3,
+        "hybrid": [],
+        "monocolored_hybrid": [],
+        "phyrexian": [],
+        "phyrexian_hybrid": [],
+        "spend_tags": [
+          "creature_spell"
+        ]
+      },
+      "mana_setup": {
+        "colored": {
+          "red": 1
+        },
+        "generic": 0
+      },
+      "spell": {
+        "cmc": 4,
+        "colors": [
+          "R"
+        ],
+        "mana_cost": "{3}{R}",
+        "name": "Large Red Audit Creature",
+        "type_line": "Creature"
+      }
+    }
+  ],
+  "generated_at": "2026-06-23T18:04:17.213265+00:00",
+  "mutations_performed": [],
+  "scarlet_model": {
+    "applies_to_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "battle_model_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+    "cost_reduction_amount_source": "source_power",
+    "effect": "static_cost_reduction",
+    "minimum_mana_value": 4,
+    "name": "The Scarlet Witch",
+    "power": 2,
+    "type_line": "Legendary Creature - Mutant Warlock Hero"
+  },
+  "source": {
+    "runtime": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "tests": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py",
+    "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheScarletWitch.java"
+  },
+  "status": "ready"
+}

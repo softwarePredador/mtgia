@@ -626,6 +626,154 @@ def register_tests(battle, player):
         assert battle.commit_cast_payment(ctx) is True
         assert active.available_mana() == 0
 
+    def test_pearl_medallion_reduces_white_spell_generic_cost_without_mana_source():
+        active = player("Active")
+        pearl = {
+            "name": "Pearl Medallion",
+            "type_line": "Artifact",
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
+            "cost_reduction_generic": 1,
+            "applies_to_spell_colors": ["W"],
+        }
+        spell = {
+            "name": "White Audit Spell",
+            "cmc": 3,
+            "mana_cost": "{2}{W}",
+            "type_line": "Sorcery",
+            "colors": ["W"],
+        }
+        active.battlefield = [pearl]
+        active.mana_pool.add("white", 1)
+        active.mana_pool.add_generic(1)
+
+        ctx = battle.begin_cast_context(active, spell, "precombat_main")
+
+        assert battle.is_mana_source_permanent(pearl) is False
+        assert ctx.locked_cost["generic"] == 1
+        assert dict(ctx.locked_cost["colored"]) == {"white": 1}
+        assert ctx.locked_cost["static_cost_reduction_total"] == 1
+        assert ctx.locked_cost["static_cost_reductions"][0]["source"] == "Pearl Medallion"
+        assert battle.commit_cast_payment(ctx) is True
+        assert active.available_mana() == 0
+
+    def test_pearl_medallion_does_not_reduce_nonwhite_spell():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Pearl Medallion",
+                "type_line": "Artifact",
+                "effect": "static_cost_reduction",
+                "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
+                "cost_reduction_generic": 1,
+                "applies_to_spell_colors": ["W"],
+            }
+        ]
+        spell = {
+            "name": "Blue Audit Spell",
+            "cmc": 2,
+            "mana_cost": "{1}{U}",
+            "type_line": "Instant",
+            "colors": ["U"],
+        }
+        active.mana_pool.add("blue", 1)
+
+        ctx = battle.begin_cast_context(active, spell, "precombat_main")
+
+        assert ctx.locked_cost["generic"] == 1
+        assert dict(ctx.locked_cost["colored"]) == {"blue": 1}
+        assert "static_cost_reduction_total" not in ctx.locked_cost
+        assert battle.commit_cast_payment(ctx) is False
+        assert active.available_mana() == 1
+
+    def test_scarlet_witch_reduces_mv4_instant_or_sorcery_by_source_power():
+        active = player("Active")
+        scarlet = {
+            "name": "The Scarlet Witch",
+            "type_line": "Legendary Creature - Mutant Warlock Hero",
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+            "cost_reduction_amount_source": "source_power",
+            "applies_to_card_types": ["instant", "sorcery"],
+            "minimum_mana_value": 4,
+            "power": 2,
+        }
+        spell = {
+            "name": "Red Audit Sorcery",
+            "cmc": 4,
+            "mana_cost": "{3}{R}",
+            "type_line": "Sorcery",
+            "colors": ["R"],
+        }
+        active.battlefield = [scarlet]
+        active.mana_pool.add("red", 1)
+        active.mana_pool.add_generic(1)
+
+        ctx = battle.begin_cast_context(active, spell, "precombat_main")
+
+        assert ctx.locked_cost["generic"] == 1
+        assert dict(ctx.locked_cost["colored"]) == {"red": 1}
+        assert ctx.locked_cost["static_cost_reduction_total"] == 2
+        reduction = ctx.locked_cost["static_cost_reductions"][0]
+        assert reduction["source"] == "The Scarlet Witch"
+        assert reduction["amount"] == 2
+        assert reduction["applied_amount"] == 2
+        assert reduction["amount_source"] == "source_power"
+        assert reduction["applies_to_card_types"] == ["instant", "sorcery"]
+        assert reduction["minimum_mana_value"] == 4
+        assert battle.commit_cast_payment(ctx) is True
+        assert active.available_mana() == 0
+
+    def test_scarlet_witch_does_not_reduce_mv3_or_non_instant_sorcery_spell():
+        scarlet = {
+            "name": "The Scarlet Witch",
+            "type_line": "Legendary Creature - Mutant Warlock Hero",
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+            "cost_reduction_amount_source": "source_power",
+            "applies_to_card_types": ["instant", "sorcery"],
+            "minimum_mana_value": 4,
+            "power": 2,
+        }
+
+        mv3_player = player("Active")
+        mv3_player.battlefield = [scarlet]
+        mv3_player.mana_pool.add("red", 1)
+        mv3_spell = {
+            "name": "Small Red Audit Instant",
+            "cmc": 3,
+            "mana_cost": "{2}{R}",
+            "type_line": "Instant",
+            "colors": ["R"],
+        }
+
+        mv3_ctx = battle.begin_cast_context(mv3_player, mv3_spell, "precombat_main")
+
+        assert mv3_ctx.locked_cost["generic"] == 2
+        assert dict(mv3_ctx.locked_cost["colored"]) == {"red": 1}
+        assert "static_cost_reduction_total" not in mv3_ctx.locked_cost
+        assert battle.commit_cast_payment(mv3_ctx) is False
+        assert mv3_player.available_mana() == 1
+
+        creature_player = player("Active")
+        creature_player.battlefield = [scarlet]
+        creature_player.mana_pool.add("red", 1)
+        creature_spell = {
+            "name": "Large Red Audit Creature",
+            "cmc": 4,
+            "mana_cost": "{3}{R}",
+            "type_line": "Creature",
+            "colors": ["R"],
+        }
+
+        creature_ctx = battle.begin_cast_context(creature_player, creature_spell, "precombat_main")
+
+        assert creature_ctx.locked_cost["generic"] == 3
+        assert dict(creature_ctx.locked_cost["colored"]) == {"red": 1}
+        assert "static_cost_reduction_total" not in creature_ctx.locked_cost
+        assert battle.commit_cast_payment(creature_ctx) is False
+        assert creature_player.available_mana() == 1
+
     def test_casting_context_emits_cost_paid_event():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -1687,6 +1835,10 @@ def register_tests(battle, player):
         test_spell_resolved_includes_stack_and_zone_provenance,
         test_direct_spell_resolution_fills_minimum_resolution_context,
         test_casting_context_locks_cost_before_payment,
+        test_pearl_medallion_reduces_white_spell_generic_cost_without_mana_source,
+        test_pearl_medallion_does_not_reduce_nonwhite_spell,
+        test_scarlet_witch_reduces_mv4_instant_or_sorcery_by_source_power,
+        test_scarlet_witch_does_not_reduce_mv3_or_non_instant_sorcery_spell,
         test_casting_context_emits_cost_paid_event,
         test_casting_context_locks_x_alternative_and_additional_costs,
         test_casting_context_replay_exposes_modes_targets_and_x_value,

@@ -23,6 +23,8 @@ from typing import Any, Callable
 
 import battle_rule_registry
 import deck_card_battle_rule_coherence_audit as coherence
+import xmage_local_rule_indexer
+import xmage_to_manaloom_effect_hints
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -271,10 +273,37 @@ def classify_gap(card: dict[str, Any], xmage: dict[str, Any], forge: dict[str, A
     return "manual_review"
 
 
-def infer_effect_candidate(card: dict[str, Any], oracle_text: str, xmage: dict[str, Any], forge: dict[str, Any]) -> dict[str, Any]:
+def local_xmage_reference(
+    card_name: str,
+    xmage_root: Path | None,
+    class_index: dict[str, Path] | None = None,
+) -> dict[str, Any]:
+    if xmage_root is None:
+        return {}
+    return xmage_local_rule_indexer.build_index_for_card(
+        card_name,
+        xmage_root=xmage_root,
+        class_index=class_index,
+    )
+
+
+def infer_effect_candidate(
+    card: dict[str, Any],
+    oracle_text: str,
+    xmage: dict[str, Any],
+    forge: dict[str, Any],
+) -> dict[str, Any]:
     text = str(oracle_text or "").lower()
     effects = [str(effect) for effect in card.get("effects", []) if effect]
     signals = set(xmage.get("signals") or []) | set(forge.get("signals") or [])
+
+    if xmage.get("status") == "found" and xmage.get("xmage_class_name"):
+        hint = xmage_to_manaloom_effect_hints.build_effect_hints(xmage, oracle_text)
+        primary = hint.get("primary_candidate", {}).get("effect_json", {})
+        if primary.get("effect") != "external_reference_required_manual_model":
+            candidate = dict(primary)
+            candidate["xmage_hint_policy"] = "review_candidate_only"
+            return candidate
 
     if "each player puts a vow counter" in text and "sacrifices the rest" in text:
         return {
@@ -293,8 +322,11 @@ def infer_effect_candidate(card: dict[str, Any], oracle_text: str, xmage: dict[s
         }
     if "spells you cast cost" in text and "less to cast" in text:
         return {
-            "effect": "ramp_permanent",
+            "effect": "static_cost_reduction",
             "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
+            **xmage_to_manaloom_effect_hints.static_cost_reduction_fields_from_oracle(
+                oracle_text
+            ),
         }
     if "add {c}" in text and "draw a card" in text:
         return {
@@ -311,7 +343,15 @@ def infer_effect_candidate(card: dict[str, Any], oracle_text: str, xmage: dict[s
             "effect": "board_wipe",
             "battle_model_scope": "external_reference_required_board_wipe_variant_v1",
         }
-    if "ramp_permanent" in effects or "cost_reduction" in signals or "mana" in signals:
+    if "cost_reduction" in signals:
+        return {
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "external_reference_required_static_cost_reduction_variant_v1",
+            **xmage_to_manaloom_effect_hints.static_cost_reduction_fields_from_oracle(
+                oracle_text
+            ),
+        }
+    if "ramp_permanent" in effects or "mana" in signals:
         return {
             "effect": "ramp_permanent",
             "battle_model_scope": "external_reference_required_ramp_permanent_variant_v1",
@@ -359,10 +399,13 @@ def build_packet_for_card(
     *,
     offline: bool = False,
     scryfall_fetcher: Fetcher | None = None,
+    xmage_root: Path | None = None,
+    xmage_class_index: dict[str, Path] | None = None,
 ) -> dict[str, Any]:
     card_name = str(card.get("card_name") or "")
     scryfall = (scryfall_fetcher or (lambda name, off: fetch_scryfall(name, offline=off)))(card_name, offline)
-    xmage = first_found_text(xmage_url_candidates(card_name), offline=offline)
+    xmage_local = local_xmage_reference(card_name, xmage_root, class_index=xmage_class_index) if xmage_root else {}
+    xmage = xmage_local if xmage_local else first_found_text(xmage_url_candidates(card_name), offline=offline)
     forge = first_found_text(forge_url_candidates(card_name), offline=offline)
     oracle_text = str(scryfall.get("oracle_text") or "")
     effect_json = infer_effect_candidate(card, oracle_text, xmage, forge)
@@ -392,6 +435,7 @@ def build_packet_for_card(
         "external_references": {
             "scryfall": scryfall,
             "xmage": xmage,
+            "xmage_local": xmage_local or {"status": "not_requested"},
             "forge": forge,
         },
         "gap_bucket": gap_bucket,
@@ -434,8 +478,18 @@ def build_harvest_report(
     *,
     limit: int,
     offline: bool = False,
+    xmage_root: Path | None = None,
 ) -> dict[str, Any]:
-    cards = [build_packet_for_card(card, offline=offline) for card in actionable_cards(source_report, limit)]
+    xmage_class_index = xmage_local_rule_indexer.build_card_class_index(xmage_root) if xmage_root else None
+    cards = [
+        build_packet_for_card(
+            card,
+            offline=offline,
+            xmage_root=xmage_root,
+            xmage_class_index=xmage_class_index,
+        )
+        for card in actionable_cards(source_report, limit)
+    ]
     return {
         "generated_at": utc_now(),
         "status": "ready_for_manual_review",
@@ -450,6 +504,7 @@ def build_harvest_report(
         "external_sources": {
             "scryfall": SCRYFALL_NAMED_URL,
             "xmage": XMAGE_RAW_BASE,
+            "xmage_local_root": str(xmage_root) if xmage_root else None,
             "forge": FORGE_RAW_BASE,
         },
         "cards": cards,
@@ -533,6 +588,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
     parser.add_argument("--deck-id", type=int, help="Build a fresh coherence audit for this deck id.")
     parser.add_argument("--from-report", help="Use an existing deck_card_battle_rule_coherence_audit JSON report.")
+    parser.add_argument("--xmage-root", help="Prefer a local XMage checkout before remote XMage URL fallback.")
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--offline", action="store_true", help="Skip network fetches and emit local candidates only.")
     parser.add_argument("--output-json")
@@ -546,7 +602,13 @@ def main() -> int:
         source_report = load_report_from_json(Path(args.from_report))
     else:
         source_report = load_report_from_sqlite(Path(args.sqlite_db), args.deck_id)
-    report = build_harvest_report(source_report, limit=args.limit, offline=args.offline)
+    xmage_root = Path(args.xmage_root) if args.xmage_root else None
+    report = build_harvest_report(
+        source_report,
+        limit=args.limit,
+        offline=args.offline,
+        xmage_root=xmage_root,
+    )
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     deck_part = f"_deck{source_report.get('deck_id')}" if source_report.get("deck_id") is not None else ""
     stem = f"external_card_rule_reference_harvest{deck_part}_{timestamp}"

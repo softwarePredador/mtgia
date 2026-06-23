@@ -150,7 +150,7 @@ def card_mana_cost(
 def replay_cost_snapshot(cost):
     if not isinstance(cost, dict):
         return cost
-    return {
+    snapshot = {
         "generic": cost.get("generic", 0),
         "colored": dict(cost.get("colored", {})),
         "hybrid": [list(options) for options in cost.get("hybrid", [])],
@@ -163,3 +163,13 @@ def replay_cost_snapshot(cost):
         ],
         "spend_tags": list(cost.get("spend_tags", [])),
     }
+    if cost.get("static_cost_reduction_total"):
+        snapshot["static_cost_reduction_total"] = cost.get(
+            "static_cost_reduction_total",
+            0,
+        )
+    if cost.get("static_cost_reductions"):
+        snapshot["static_cost_reductions"] = [
+            dict(reduction) for reduction in cost.get("static_cost_reductions", [])
+        ]
+    return snapshot

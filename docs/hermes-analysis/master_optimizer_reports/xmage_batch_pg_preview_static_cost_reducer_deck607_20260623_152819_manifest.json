@@ -1,0 +1,25 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.preview_static_cost_deck607_static_cost_reducer_preview_",
+  "deploy_id": "PREVIEW_STATIC_COST",
+  "family_counts": {
+    "static_cost_reducer": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152819_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152819_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152819_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152819_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152819_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_preview_static_cost_reducer_deck607_20260623_152819_rollback.sql"
+  },
+  "generated_at": "2026-06-23T18:28:37+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Pearl Medallion",
+    "The Scarlet Witch"
+  ],
+  "selected_count": 2,
+  "slug": "deck607_static_cost_reducer_preview",
+  "status": "prepared_read_only_pending_apply_approval"
+}

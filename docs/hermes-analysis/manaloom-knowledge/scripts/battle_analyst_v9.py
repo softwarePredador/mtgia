@@ -962,9 +962,315 @@ def alternative_cost_for_effect(player, card, effect_data):
     return None, None
 
 
+STATIC_COST_REDUCTION_EFFECTS = {"static_cost_reduction", "cost_reduction"}
+STATIC_COST_REDUCTION_SCOPE = "static_cost_reduction_for_matching_spells_v1"
+POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE = (
+    "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
+)
+MEDALLION_COLOR_RESTRICTIONS = {
+    "pearl medallion": "W",
+    "sapphire medallion": "U",
+    "jet medallion": "B",
+    "ruby medallion": "R",
+    "emerald medallion": "G",
+}
+COLOR_NAME_TO_SYMBOL = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+    "w": "W",
+    "u": "U",
+    "b": "B",
+    "r": "R",
+    "g": "G",
+}
+SYMBOL_TO_COLOR_NAME = {
+    "W": "white",
+    "U": "blue",
+    "B": "black",
+    "R": "red",
+    "G": "green",
+}
+
+
+def _as_list(value):
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    if isinstance(value, tuple) or isinstance(value, set):
+        return list(value)
+    if isinstance(value, str):
+        decoded = read_json_list(value)
+        if decoded is not None:
+            return decoded
+        if "," in value:
+            return [part.strip() for part in value.split(",") if part.strip()]
+    return [value]
+
+
+def _color_symbol(value):
+    text = str(value or "").strip()
+    if not text:
+        return None
+    return COLOR_NAME_TO_SYMBOL.get(text.lower(), text.upper())
+
+
+def _symbols_from_value(value):
+    symbols = set()
+    for item in _as_list(value):
+        symbol = _color_symbol(item)
+        if symbol in SYMBOL_TO_COLOR_NAME:
+            symbols.add(symbol)
+    return symbols
+
+
+def _spell_color_symbols(card):
+    symbols = set()
+    for key in ("colors", "colors_json", "card_colors"):
+        symbols.update(_symbols_from_value(card.get(key)))
+    if symbols:
+        return symbols
+    mana_cost = str(card.get("mana_cost") or "")
+    for symbol in re.findall(r"\{([WUBRG])\}", mana_cost.upper()):
+        symbols.add(symbol)
+    return symbols
+
+
+def _spell_has_color(card, requested_symbol):
+    symbol = _color_symbol(requested_symbol)
+    if not symbol:
+        return False
+    return symbol in _spell_color_symbols(card)
+
+
+def _card_type_matches(card, allowed_types):
+    allowed = {str(value).lower() for value in _as_list(allowed_types) if value}
+    if not allowed:
+        return True
+    type_line = str(card.get("type_line") or "").lower()
+    return any(card_type in type_line for card_type in allowed)
+
+
+def _static_cost_reduction_scope(effect_data):
+    return str(effect_data.get("battle_model_scope") or STATIC_COST_REDUCTION_SCOPE).strip()
+
+
+def _static_cost_reduction_amount_source(effect_data):
+    for key in (
+        "cost_reduction_amount_source",
+        "generic_cost_reduction_source",
+        "cost_reduction_dynamic",
+        "amount_source",
+    ):
+        value = str(effect_data.get(key) or "").strip().lower()
+        if value:
+            return value
+    if _static_cost_reduction_scope(effect_data) == POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE:
+        return "source_power"
+    return ""
+
+
+def _source_power_value(source):
+    for key in ("current_power", "power", "base_power"):
+        if key not in source:
+            continue
+        try:
+            return max(0, int(float(source.get(key) or 0)))
+        except (TypeError, ValueError):
+            continue
+    return 0
+
+
+def _static_cost_reduction_amount(source, effect_data):
+    amount_source = _static_cost_reduction_amount_source(effect_data)
+    if amount_source in {"source_power", "this_power", "source_permanent_power"}:
+        return _source_power_value(source)
+    for key in (
+        "cost_reduction_generic",
+        "generic_cost_reduction",
+        "cost_reduction_amount",
+        "generic_reduction",
+        "amount",
+    ):
+        if key not in effect_data:
+            continue
+        try:
+            return max(0, int(effect_data.get(key) or 0))
+        except (TypeError, ValueError):
+            return 0
+    if str(effect_data.get("effect") or "") in STATIC_COST_REDUCTION_EFFECTS:
+        return 1
+    return 0
+
+
+def _static_cost_reduction_card_types(effect_data):
+    for key in (
+        "applies_to_card_types",
+        "applies_to_spell_types",
+        "spell_types",
+        "card_types",
+    ):
+        values = [str(value).lower() for value in _as_list(effect_data.get(key)) if value]
+        if values:
+            return values
+    if _static_cost_reduction_scope(effect_data) == POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE:
+        return ["instant", "sorcery"]
+    return []
+
+
+def _static_cost_reduction_min_mana_value(effect_data):
+    for key in (
+        "minimum_mana_value",
+        "min_mana_value",
+        "mana_value_min",
+        "minimum_cmc",
+        "min_cmc",
+        "cmc_min",
+    ):
+        if key not in effect_data:
+            continue
+        try:
+            return max(0, int(float(effect_data.get(key) or 0)))
+        except (TypeError, ValueError):
+            return None
+    if _static_cost_reduction_scope(effect_data) == POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE:
+        return 4
+    return None
+
+
+def _static_cost_reduction_color_restrictions(source, effect_data):
+    color_values = []
+    for key in (
+        "applies_to_spell_colors",
+        "spell_colors",
+        "spell_color",
+        "applies_to_colors",
+        "applies_to_color",
+        "color",
+    ):
+        color_values.extend(_as_list(effect_data.get(key)))
+    if not color_values:
+        source_name = normalize_card_name(source.get("name", ""))
+        medallion_symbol = MEDALLION_COLOR_RESTRICTIONS.get(source_name)
+        if medallion_symbol:
+            color_values.append(medallion_symbol)
+    return {
+        symbol
+        for symbol in (_color_symbol(value) for value in color_values)
+        if symbol in SYMBOL_TO_COLOR_NAME
+    }
+
+
+def _source_static_cost_reduction_effect(source):
+    if not isinstance(source, dict):
+        return {}
+    direct_effect = str(source.get("effect") or "").strip()
+    if direct_effect in STATIC_COST_REDUCTION_EFFECTS:
+        return source
+    try:
+        effect_data = get_card_effect(source)
+    except Exception:
+        return {}
+    if not isinstance(effect_data, dict):
+        return {}
+    if str(effect_data.get("effect") or "").strip() in STATIC_COST_REDUCTION_EFFECTS:
+        return effect_data
+    return {}
+
+
+def _static_cost_reduction_matches_spell(source, effect_data, card):
+    amount = _static_cost_reduction_amount(source, effect_data)
+    if amount <= 0:
+        return None
+    colors = _static_cost_reduction_color_restrictions(source, effect_data)
+    if colors and not any(_spell_has_color(card, color) for color in colors):
+        return None
+    card_types = _static_cost_reduction_card_types(effect_data)
+    if not _card_type_matches(card, card_types):
+        return None
+    min_mana_value = _static_cost_reduction_min_mana_value(effect_data)
+    if min_mana_value is not None and card_mana_value(card) < min_mana_value:
+        return None
+    scope = _static_cost_reduction_scope(effect_data)
+    amount_source = _static_cost_reduction_amount_source(effect_data)
+    return {
+        "source": source.get("name", "unknown"),
+        "amount": amount,
+        "scope": scope,
+        "colors": sorted(colors),
+        "applies_to_card_types": card_types,
+        "minimum_mana_value": min_mana_value,
+        "amount_source": amount_source or "fixed",
+    }
+
+
+def static_cost_reductions_for_spell(player, card):
+    reductions = []
+    for source in getattr(player, "battlefield", []) or []:
+        if not isinstance(source, dict):
+            continue
+        effect_data = _source_static_cost_reduction_effect(source)
+        if not effect_data:
+            continue
+        reduction = _static_cost_reduction_matches_spell(source, effect_data, card)
+        if reduction:
+            reductions.append(reduction)
+    return reductions
+
+
+def apply_static_cost_reductions_to_cost(cost, reductions):
+    if not reductions:
+        return cost
+    adjusted = copy.deepcopy(cost)
+    starting_generic = max(0, int(adjusted.get("generic", 0) or 0))
+    remaining_generic = starting_generic
+    applied = []
+    for reduction in reductions:
+        amount = max(0, int(reduction.get("amount", 0) or 0))
+        if amount <= 0:
+            continue
+        applied_amount = min(remaining_generic, amount)
+        if applied_amount <= 0:
+            continue
+        remaining_generic -= applied_amount
+        applied_reduction = dict(reduction)
+        applied_reduction["applied_amount"] = applied_amount
+        applied.append(applied_reduction)
+    if not applied:
+        return cost
+    adjusted["generic"] = remaining_generic
+    adjusted["static_cost_reduction_total"] = starting_generic - remaining_generic
+    adjusted["static_cost_reductions"] = applied
+    return adjusted
+
+
+def card_cost_for_player_state(
+    player,
+    card,
+    additional_generic=0,
+    *,
+    alternative_cost=None,
+    x_value=0,
+    additional_costs=None,
+):
+    cost = card_mana_cost(
+        card,
+        additional_generic,
+        alternative_cost=alternative_cost,
+        x_value=x_value,
+        additional_costs=additional_costs,
+    )
+    reductions = static_cost_reductions_for_spell(player, card)
+    return apply_static_cost_reductions_to_cost(cost, reductions)
+
+
 def card_cost_for_effect(player, card, effect_data, additional_generic=0):
     alternative_cost, _alternative_cost_kind = alternative_cost_for_effect(player, card, effect_data)
-    return card_mana_cost(
+    return card_cost_for_player_state(
+        player,
         card,
         additional_generic,
         alternative_cost=alternative_cost,
@@ -1008,7 +1314,8 @@ def begin_cast_context(
     )
     ctx.effect_data = effect_data or get_card_effect(card)
     ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase)
-    ctx.locked_cost = card_mana_cost(
+    ctx.locked_cost = card_cost_for_player_state(
+        player,
         card,
         additional_generic,
         alternative_cost=alternative_cost,
@@ -4324,7 +4631,7 @@ class Player:
         return self._payment_plan(cost) is not None
 
     def can_pay_card(self, card, additional_generic=0):
-        return self.can_pay(card_mana_cost(card, additional_generic))
+        return self.can_pay(card_cost_for_player_state(self, card, additional_generic))
 
     def spend_mana(self, cost):
         """Spend colored/generic mana and flexible Treasure according to a real cost."""
@@ -4351,7 +4658,7 @@ class Player:
         return True
 
     def spend_card_mana(self, card, additional_generic=0):
-        return self.spend_mana(card_mana_cost(card, additional_generic))
+        return self.spend_mana(card_cost_for_player_state(self, card, additional_generic))
 
     def is_alive(self):
         return not self.eliminated and (

@@ -1,0 +1,342 @@
+{
+  "cards": [
+    {
+      "adaptation_note": "PG108 apply/sync/re-audit remains.",
+      "adaptation_status": "runtime_done_pg_pending",
+      "candidate_effect": "static_cost_reduction",
+      "candidate_scope": "static_cost_reduction_for_matching_spells_v1",
+      "card_name": "Pearl Medallion",
+      "current_effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        "no_trusted_executable_rule",
+        "review_only_or_needs_review_rule"
+      ],
+      "impact_tier": "battle_support",
+      "oracle_excerpt": "White spells you cast cost {1} less to cast.",
+      "priority_rank": 0,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "PearlMedallion",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "cost_reduction",
+        "static_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Trusted broad ramp exists; add Oracle hash/scope if runtime covers any-color rock/untap cadence sufficiently.",
+      "adaptation_status": "metadata_scope_hash_likely",
+      "candidate_effect": "ramp_permanent",
+      "candidate_scope": "external_reference_required_ramp_permanent_variant_v1",
+      "card_name": "Bender's Waterskin",
+      "current_effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        "generic_effect_without_model_scope",
+        "trusted_rule_without_oracle_hash"
+      ],
+      "impact_tier": "battle_support",
+      "oracle_excerpt": "Untap this artifact during each other player's untap step. // {T}: Add one mana of any color.",
+      "priority_rank": 120,
+      "scryfall_status": "found",
+      "severity": "medium",
+      "xmage_class": "BendersWaterskin",
+      "xmage_credit": "exact_xmage_partial_generic",
+      "xmage_signals": [
+        "mana",
+        "static_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Trusted broad ramp exists but gives chosen player colorless; verify self-use model before hash-only.",
+      "adaptation_status": "metadata_hash_plus_scope_review",
+      "candidate_effect": "ramp_permanent",
+      "candidate_scope": "external_reference_required_ramp_permanent_variant_v1",
+      "card_name": "Victory Chimes",
+      "current_effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        "trusted_rule_without_oracle_hash"
+      ],
+      "impact_tier": "battle_support",
+      "oracle_excerpt": "Untap this artifact during each other player's untap step. // {T}: A player of your choice adds {C}.",
+      "priority_rank": 120,
+      "scryfall_status": "found",
+      "severity": "medium",
+      "xmage_class": "VictoryChimes",
+      "xmage_credit": "exact_xmage_partial_generic",
+      "xmage_signals": [
+        "targeting",
+        "mana",
+        "static_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "MDFC sorcery/land, two flying Angel Warrior tokens, non-Angel indestructible duration.",
+      "adaptation_status": "runtime_new_executor",
+      "candidate_effect": "token_maker",
+      "candidate_scope": "xmage_create_token_variant_emeriascall_v1",
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "current_effects": [],
+      "findings": [
+        "no_active_battle_rule"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Create two 4/4 white Angel Warrior creature tokens with flying. Non-Angel creatures you control gain indestructible until your next turn. // // // As this land enters, you may pay 3 life. If you don't, it enters tapped. // {T}: Add {W}.",
+      "priority_rank": 200,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "EmeriasCall",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "token",
+        "mana"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Vow counter + each-player sacrifice-rest + attack restriction.",
+      "adaptation_status": "runtime_new_executor",
+      "candidate_effect": "vow_counter_each_player_sacrifice_rest",
+      "candidate_scope": "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1",
+      "card_name": "Promise of Loyalty",
+      "current_effects": [
+        "draw_cards"
+      ],
+      "findings": [
+        "no_trusted_executable_rule",
+        "review_only_or_needs_review_rule"
+      ],
+      "impact_tier": "battle_critical",
+      "oracle_excerpt": "Each player puts a vow counter on a creature they control and sacrifices the rest. Each of those creatures can't attack you or planeswalkers you control for as long as it has a vow counter on it.",
+      "priority_rank": 200,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "PromiseOfLoyalty",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "targeting",
+        "counter"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Gift branch + destroy all creatures + return own destroyed creature.",
+      "adaptation_status": "runtime_new_executor",
+      "candidate_effect": "gift_destroy_all_creatures_return_own_destroyed_creature",
+      "candidate_scope": "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1",
+      "card_name": "Starfall Invocation",
+      "current_effects": [
+        "board_wipe"
+      ],
+      "findings": [
+        "no_trusted_executable_rule",
+        "review_only_or_needs_review_rule"
+      ],
+      "impact_tier": "battle_critical",
+      "oracle_excerpt": "Gift a card (You may promise an opponent a gift as you cast this spell. If you do, they draw a card before its other effects.) // Destroy all creatures. If the gift was promised, return a creature card put into your graveyard this way to the battlefield under ",
+      "priority_rank": 200,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "StarfallInvocation",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "targeting",
+        "condition",
+        "gift"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Mana rock plus harnessed blink end-step loop; XMage exact but not generic Mind Stone.",
+      "adaptation_status": "runtime_new_executor",
+      "candidate_effect": "mana_rock_with_harnessed_blink",
+      "candidate_scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+      "card_name": "The Mind Stone",
+      "current_effects": [],
+      "findings": [
+        "no_active_battle_rule"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Indestructible // {T}: Add {W}. // {5}{W}, {T}: Harness The Mind Stone. (Once harnessed, its \u221e ability is active.) // \u221e \u2014 At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield un",
+      "priority_rank": 200,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "TheMindStone",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "targeting",
+        "mana",
+        "static_ability",
+        "triggered_ability",
+        "activated_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Power-based static cost reduction for instant/sorcery MV>=4.",
+      "adaptation_status": "runtime_extension_needed",
+      "candidate_effect": "static_cost_reduction",
+      "candidate_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+      "card_name": "The Scarlet Witch",
+      "current_effects": [],
+      "findings": [
+        "no_active_battle_rule"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Instant and sorcery spells you cast with mana value 4 or greater cost {X} less to cast, where X is The Scarlet Witch's power.",
+      "priority_rank": 200,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "TheScarletWitch",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "static_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Per-player/type controller choice then sacrifice all other nonland permanents.",
+      "adaptation_status": "runtime_new_executor",
+      "candidate_effect": "selective_nonland_sacrifice",
+      "candidate_scope": "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1",
+      "card_name": "Tragic Arrogance",
+      "current_effects": [],
+      "findings": [
+        "no_active_battle_rule"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "For each player, you choose from among the permanents that player controls an artifact, a creature, an enchantment, and a planeswalker. Then each player sacrifices all other nonland permanents they control.",
+      "priority_rank": 200,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": "TragicArrogance",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "targeting"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Current passive trusted row misses discard-trigger modal draw/treasure/life-loss behavior.",
+      "adaptation_status": "rule_model_conflict_review",
+      "candidate_effect": "token_maker",
+      "candidate_scope": "xmage_create_token_variant_monumenttoendurance_v1",
+      "card_name": "Monument to Endurance",
+      "current_effects": [
+        "passive"
+      ],
+      "findings": [
+        "trusted_rule_without_oracle_hash"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Whenever you discard a card, choose one that hasn't been chosen this turn \u2014 // \u2022 Draw a card. // \u2022 Create a Treasure token. // \u2022 Each opponent loses 3 life.",
+      "priority_rank": 320,
+      "scryfall_status": "found",
+      "severity": "medium",
+      "xmage_class": "MonumentToEndurance",
+      "xmage_credit": "exact_xmage_strong_reference",
+      "xmage_signals": [
+        "token",
+        "draw",
+        "triggered_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "Current pump_all trusted row misses combat-damage copy/cast branch; likely more than hash-only.",
+      "adaptation_status": "metadata_hash_plus_runtime_review",
+      "candidate_effect": "pump_all",
+      "candidate_scope": "external_reference_required_pump_all_variant_v1",
+      "card_name": "Surge to Victory",
+      "current_effects": [
+        "pump_all"
+      ],
+      "findings": [
+        "trusted_rule_without_oracle_hash"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Exile target instant or sorcery card from your graveyard. Creatures you control get +X/+0 until end of turn, where X is that card's mana value. Whenever a creature you control deals combat damage to a player this turn, copy the exiled card. You may cast the co",
+      "priority_rank": 320,
+      "scryfall_status": "found",
+      "severity": "medium",
+      "xmage_class": "SurgeToVictory",
+      "xmage_credit": "exact_xmage_partial_generic",
+      "xmage_signals": [
+        "targeting",
+        "triggered_ability"
+      ],
+      "xmage_status": "found"
+    },
+    {
+      "adaptation_note": "No exact local XMage class; miracle grant for nonland hand cards.",
+      "adaptation_status": "oracle_only_runtime_new_executor",
+      "candidate_effect": "passive",
+      "candidate_scope": "external_reference_required_manual_model_v1",
+      "card_name": "Molecule Man",
+      "current_effects": [],
+      "findings": [
+        "no_active_battle_rule"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Nonland cards in your hand have miracle {0}. (You may cast a card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+      "priority_rank": 400,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": null,
+      "xmage_credit": "oracle_only_no_exact_xmage",
+      "xmage_signals": [],
+      "xmage_status": "not_found"
+    },
+    {
+      "adaptation_note": "No exact local XMage class; ETB graveyard play permission plus noncreature spell damage trigger.",
+      "adaptation_status": "oracle_only_runtime_new_executor",
+      "candidate_effect": "passive",
+      "candidate_scope": "external_reference_required_manual_model_v1",
+      "card_name": "Thor, God of Thunder",
+      "current_effects": [],
+      "findings": [
+        "no_active_battle_rule"
+      ],
+      "impact_tier": "support_or_passive",
+      "oracle_excerpt": "Flying // When Thor enters, exile target Equipment, instant, or sorcery card from your graveyard. Until the end of your next turn, you may play that card. // Whenever you cast a noncreature spell, Thor deals damage equal to that spell's mana value to any targe",
+      "priority_rank": 400,
+      "scryfall_status": "found",
+      "severity": "high",
+      "xmage_class": null,
+      "xmage_credit": "oracle_only_no_exact_xmage",
+      "xmage_signals": [],
+      "xmage_status": "not_found"
+    }
+  ],
+  "credit_policy": {
+    "exact_xmage_partial_generic": "Exact local XMage class but local mapper emitted generic scope. Inspect Java/oracle before implementing.",
+    "exact_xmage_strong_reference": "Exact local XMage class plus non-generic ManaLoom candidate. Use as strong design/test reference, still gated by Oracle and local tests.",
+    "exact_xmage_unmapped_needs_manual": "Exact local XMage class exists but mapper cannot model it yet.",
+    "oracle_only_no_exact_xmage": "No exact local XMage class; use Oracle/Scryfall and optional nearby classes only."
+  },
+  "generated_at": "2026-06-23T17:18:00+00:00",
+  "mutations_performed": [],
+  "source_reports": {
+    "coherence": "docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg108_pearl_preapply_20260623_170353.json",
+    "external_harvest": "docs/hermes-analysis/master_optimizer_reports/external_card_rule_reference_harvest_deck607_pg108_high_medium_20260623.json",
+    "xmage_local_index": "docs/hermes-analysis/master_optimizer_reports/xmage_local_rule_index_deck607_pg108_high_medium_20260623.json"
+  },
+  "status": "ready",
+  "summary": {
+    "exact_xmage_found": 11,
+    "metadata_likely": 3,
+    "new_or_extended_runtime": 9,
+    "oracle_only_no_exact_xmage": 2,
+    "runtime_done_pg_pending": 1,
+    "strong_xmage_reference": 8,
+    "total": 13
+  }
+}

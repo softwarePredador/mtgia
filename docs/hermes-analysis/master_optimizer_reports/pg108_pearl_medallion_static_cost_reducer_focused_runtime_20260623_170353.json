@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "available_mana_after": 0,
+      "locked_cost": {
+        "colored": {
+          "white": 1
+        },
+        "generic": 1,
+        "hybrid": [],
+        "monocolored_hybrid": [],
+        "phyrexian": [],
+        "phyrexian_hybrid": [],
+        "spend_tags": [
+          "instant_or_sorcery_spell",
+          "noncreature_spell"
+        ],
+        "static_cost_reduction_total": 1,
+        "static_cost_reductions": [
+          {
+            "amount": 1,
+            "applied_amount": 1,
+            "colors": [
+              "W"
+            ],
+            "scope": "static_cost_reduction_for_matching_spells_v1",
+            "source": "Pearl Medallion"
+          }
+        ]
+      },
+      "paid": true,
+      "pearl_is_mana_source": false,
+      "spell": "White Audit Spell"
+    },
+    {
+      "available_mana_after": 1,
+      "locked_cost": {
+        "colored": {
+          "blue": 1
+        },
+        "generic": 1,
+        "hybrid": [],
+        "monocolored_hybrid": [],
+        "phyrexian": [],
+        "phyrexian_hybrid": [],
+        "spend_tags": [
+          "instant_or_sorcery_spell",
+          "noncreature_spell"
+        ]
+      },
+      "paid": false,
+      "pearl_is_mana_source": false,
+      "spell": "Blue Audit Spell"
+    }
+  ],
+  "mutations_performed": [],
+  "status": "ready"
+}
