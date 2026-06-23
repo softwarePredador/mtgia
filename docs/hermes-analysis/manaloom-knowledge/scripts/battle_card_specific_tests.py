@@ -7590,6 +7590,104 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg102_creative_technique_demonstrates_top_nonland_free_casts():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Chosen Opponent")
+            active.library = [
+                {"name": "Mountain", "type_line": "Basic Land - Mountain", "cmc": 0, "effect": "land"},
+                {"name": "Free Creature A", "type_line": "Creature - Spirit", "cmc": 4, "effect": "creature", "power": 4},
+                {"name": "Plains", "type_line": "Basic Land - Plains", "cmc": 0, "effect": "land"},
+                {"name": "Free Creature B", "type_line": "Creature - Spirit", "cmc": 3, "effect": "creature", "power": 3},
+            ]
+            opponent.library = [
+                {"name": "Island", "type_line": "Basic Land - Island", "cmc": 0, "effect": "land"},
+                {"name": "Opponent Free Creature", "type_line": "Creature - Wizard", "cmc": 2, "effect": "creature", "power": 2},
+            ]
+            creative_technique = {
+                "name": "Creative Technique",
+                "type_line": "Sorcery",
+                "cmc": 5,
+            }
+            effect_data = {
+                "effect": "exile_top_nonland_free_cast",
+                "shuffle_before_reveal": True,
+                "revealed_card_cast_without_paying_mana": True,
+                "demonstrate": True,
+                "battle_model_scope": "shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1",
+                "_rule_logical_key": "battle_rule_v1:creative-technique-test",
+                "_rule_oracle_hash": "creative-technique-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                creative_technique,
+                turn=5,
+                rng=random.Random(102),
+                effect_data_override=effect_data,
+                stack=battle.Stack(),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        active_creatures = {
+            permanent.get("name")
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        }
+        opponent_creatures = {
+            permanent.get("name")
+            for permanent in opponent.battlefield
+            if isinstance(permanent, dict)
+        }
+        assert active_creatures == {"Free Creature A", "Free Creature B"}
+        assert opponent_creatures == {"Opponent Free Creature"}
+        assert [card.get("name") for card in active.graveyard] == ["Creative Technique"]
+        assert active.exile == []
+        assert opponent.exile == []
+
+        demonstrate_event = next(
+            data
+            for event, data in events
+            if event == "demonstrate_resolved"
+        )
+        assert demonstrate_event["demonstrated"] is True
+        assert demonstrate_event["chosen_opponent"] == "Chosen Opponent"
+        assert [
+            row["resolution"]
+            for row in demonstrate_event["resolutions"]
+        ] == [
+            "demonstrate_controller_copy",
+            "demonstrate_opponent_copy",
+            "original",
+        ]
+        free_cast_events = [
+            data for event, data in events if event == "top_nonland_free_cast"
+        ]
+        assert len(free_cast_events) == 3
+        assert all(data["cast_without_paying_mana_cost"] is True for data in free_cast_events)
+        free_creature_resolutions = [
+            data
+            for event, data in events
+            if event == "spell_resolved"
+            and data.get("card") in {
+                "Free Creature A",
+                "Free Creature B",
+                "Opponent Free Creature",
+            }
+        ]
+        assert len(free_creature_resolutions) == 3
+        assert all(data["source_zone"] == "exile" for data in free_creature_resolutions)
+        assert all(
+            data["locked_cost"]["spend_tags"] == ["cast_without_paying_mana_cost"]
+            for data in free_creature_resolutions
+        )
+
     def test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -8780,6 +8878,7 @@ def register_tests(battle, player):
         test_dragons_approach_deals_fixed_damage_and_tutors_dragon_from_graveyard_cost,
         test_thrumming_stone_ripples_dragons_approach_without_bonus_damage,
         test_pg079_powerbalance_casts_same_mana_value_top_card_without_paying,
+        test_pg102_creative_technique_demonstrates_top_nonland_free_casts,
         test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant,
         test_pg079_reforge_the_soul_discards_then_draws_seven_with_scope,
         test_pg079_rise_of_the_eldrazi_resolves_composite_destroy_draw_extra_turn_exile,

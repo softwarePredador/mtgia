@@ -1,0 +1,11 @@
+ target_card_rows | card_oracle_hash_match_rows | new_rule_already_present_rows | active_shadow_rows | review_or_disabled_shadow_rows | rows_still_claiming_draw_cards | trusted_missing_oracle_hash_rows | backup_table_already_exists 
+------------------+-----------------------------+-------------------------------+--------------------+--------------------------------+--------------------------------+----------------------------------+-----------------------------
+                1 |                           1 |                             0 |                  0 |                              2 |                              2 |                                0 | f
+(1 row)
+
+  normalized_name   |     card_name      |                logical_rule_key                 |  source   | review_status | execution_status | confidence | rule_version | oracle_hash |                   effect_json                    |                deck_role_json                |                             notes                              
+--------------------+--------------------+-------------------------------------------------+-----------+---------------+------------------+------------+--------------+-------------+--------------------------------------------------+----------------------------------------------+----------------------------------------------------------------
+ creative technique | Creative Technique | battle_rule_v1:45c2a4f6d6d4930fb4cb54b8fa886bc2 | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 5.0, "count": 1, "effect": "draw_cards"} | {"effect": "draw_cards", "category": "draw"} | Seeded from known_cards_generated.json; audit before trusting.
+ creative technique | Creative Technique | battle_rule_v1:b0ccc811be3022e88f1338ff5dbeb676 | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 5.0, "count": 1, "effect": "draw_cards"} | {"effect": "draw_cards", "category": "draw"} | Seeded from known_cards_generated.json; audit before trusting.
+(2 rows)
+

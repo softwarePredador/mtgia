@@ -150,6 +150,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "damage_wipe_treasure",
     "draw_engine",
     "equipment_static_attachment",
+    "exile_top_nonland_free_cast",
     "finisher",
     "graveyard_flashback_grant",
     "land_tax",
@@ -2779,6 +2780,22 @@ def normalize_effect_by_oracle(card, effect_data):
     if "return target spell" in text:
         normalized["effect"] = "counter"
         normalized["instant"] = True
+        return normalized
+
+    if (
+        "reveal cards from the top of it until you reveal a nonland card" in text
+        and "may cast the exiled card without paying its mana cost" in text
+        and normalized.get("battle_model_scope") != "canonical_snapshot_rule_not_runtime_safe"
+    ):
+        normalized["effect"] = "exile_top_nonland_free_cast"
+        normalized["shuffle_before_reveal"] = True
+        normalized["revealed_card_cast_without_paying_mana"] = True
+        normalized["demonstrate"] = "demonstrate" in text
+        normalized["battle_model_scope"] = (
+            normalized.get("battle_model_scope")
+            or "shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1"
+        )
+        normalized.pop("instant", None)
         return normalized
 
     if (
@@ -8215,6 +8232,289 @@ def resolve_jeskas_will(player, opponents, card, effect_data, turn):
         mana_pool_before=mana_before,
         mana_pool_after=player.mana_pool.snapshot(),
         turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def choose_demonstrate_opponent(player, opponents):
+    alive_opponents = [
+        opponent
+        for opponent in opponents or []
+        if getattr(opponent, "is_alive", lambda: False)()
+    ]
+    if not alive_opponents:
+        return None
+    return min(
+        alive_opponents,
+        key=lambda opponent: (
+            table_visible_threat_score(opponent),
+            len(getattr(opponent, "hand", []) or []),
+            -int(getattr(opponent, "life", 40) or 40),
+            getattr(opponent, "name", ""),
+        ),
+    )
+
+
+def reveal_top_nonland_for_free_cast(player, rng, source_card, turn, effect_data):
+    if effect_data.get("shuffle_before_reveal", True):
+        player.shuffle(rng)
+    revealed_lands = []
+    exiled_card = None
+    while player.library:
+        candidate = player.library.pop(0)
+        if is_effective_land(candidate):
+            revealed_lands.append(candidate)
+            continue
+        exiled_card = candidate
+        break
+    if revealed_lands:
+        rng.shuffle(revealed_lands)
+        player.library.extend(revealed_lands)
+    if isinstance(exiled_card, dict):
+        move_to_exile(
+            player,
+            exiled_card,
+            reason="top_nonland_free_cast_revealed",
+            turn=turn,
+        )
+    return exiled_card, revealed_lands
+
+
+def cast_exiled_card_without_paying_mana(
+    player,
+    opponents,
+    all_players,
+    source_card,
+    exiled_card,
+    turn,
+    rng,
+    *,
+    source_effect_data,
+    stack=None,
+    phase=None,
+    resolution_label="original",
+):
+    if not isinstance(exiled_card, dict) or exiled_card not in player.exile:
+        return False, "not_in_exile"
+    if is_effective_land(exiled_card):
+        return False, "land_not_castable"
+    exiled_effect = get_card_effect(exiled_card)
+    if exiled_effect.get("effect") in {"unknown", "land", "counter"}:
+        return False, "unsupported_or_reactive_effect"
+    cast_phase = phase or "precombat_main"
+    cast_ctx = begin_cast_context(
+        player,
+        exiled_card,
+        cast_phase,
+        effect_data=exiled_effect,
+        role="free_cast_from_exile",
+        modes=["cast_without_paying_mana"],
+        alternative_cost="{0}",
+        source_zone="exile",
+        alternative_cost_kind="cast_without_paying_mana",
+    )
+    cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+    store_cast_context_fields(
+        exiled_effect,
+        {
+            "phase": cast_phase,
+            **cast_ctx.to_replay_fields(),
+        },
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False, "cast_payment_or_timing_failed"
+    player.exile.remove(exiled_card)
+    emit_replay_event(
+        "top_nonland_free_cast",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        cast_card=exiled_card.get("name", "?"),
+        cast_effect=exiled_effect.get("effect", "unknown"),
+        cast_without_paying_mana_cost=True,
+        source_resolution=resolution_label,
+        turn=turn,
+        phase=cast_phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(source_effect_data),
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=exiled_card.get("name", "?"),
+        effect=exiled_effect.get("effect", "unknown"),
+        type_line=exiled_card.get("type_line", ""),
+        cmc=exiled_card.get("cmc", 0),
+        turn=turn,
+        phase=cast_phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(exiled_effect),
+    )
+    mark_cast_ledger_emitted(exiled_effect)
+    trigger_spell_cast_engines(
+        player,
+        all_players,
+        exiled_card,
+        turn,
+        cast_phase,
+        stack=stack,
+        active_player=player,
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        exiled_card,
+        turn,
+        cast_phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    apply_effect_immediate(
+        player,
+        opponents,
+        exiled_card,
+        turn,
+        rng,
+        effect_data_override=exiled_effect,
+        stack=stack,
+        phase=cast_phase,
+    )
+    return True, "cast_without_paying_mana"
+
+
+def resolve_top_nonland_free_cast(
+    player,
+    opponents,
+    all_players,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    phase=None,
+    resolution_label="original",
+):
+    exiled_card, revealed_lands = reveal_top_nonland_for_free_cast(
+        player,
+        rng,
+        card,
+        turn,
+        effect_data,
+    )
+    cast_success, cast_result = cast_exiled_card_without_paying_mana(
+        player,
+        opponents,
+        all_players,
+        card,
+        exiled_card,
+        turn,
+        rng,
+        source_effect_data=effect_data,
+        stack=stack,
+        phase=phase,
+        resolution_label=resolution_label,
+    )
+    emit_replay_event(
+        "top_nonland_free_cast_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        source_resolution=resolution_label,
+        revealed_lands=[land.get("name", "?") for land in revealed_lands if isinstance(land, dict)],
+        revealed_land_count=len(revealed_lands),
+        exiled_card=exiled_card.get("name", "?") if isinstance(exiled_card, dict) else None,
+        cast_without_paying_mana_cost=bool(cast_success),
+        result=cast_result,
+        library_remaining=len(player.library),
+        exile_size=len(player.exile),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return {
+        "controller": player.name,
+        "resolution": resolution_label,
+        "exiled_card": exiled_card.get("name", "?") if isinstance(exiled_card, dict) else None,
+        "revealed_land_count": len(revealed_lands),
+        "cast_success": cast_success,
+        "cast_result": cast_result,
+    }
+
+
+def resolve_demonstrate_top_nonland_free_cast(
+    player,
+    opponents,
+    all_players,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    phase=None,
+):
+    demonstrate_enabled = bool(effect_data.get("demonstrate"))
+    chosen_opponent = choose_demonstrate_opponent(player, opponents) if demonstrate_enabled else None
+    summaries = []
+    if chosen_opponent is not None:
+        summaries.append(
+            resolve_top_nonland_free_cast(
+                player,
+                opponents,
+                all_players,
+                card,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                phase=phase,
+                resolution_label="demonstrate_controller_copy",
+            )
+        )
+        opponent_opponents = [
+            participant
+            for participant in all_players
+            if participant is not chosen_opponent
+        ]
+        summaries.append(
+            resolve_top_nonland_free_cast(
+                chosen_opponent,
+                opponent_opponents,
+                all_players,
+                card,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                phase=phase,
+                resolution_label="demonstrate_opponent_copy",
+            )
+        )
+    summaries.append(
+        resolve_top_nonland_free_cast(
+            player,
+            opponents,
+            all_players,
+            card,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            phase=phase,
+            resolution_label="original",
+        )
+    )
+    emit_replay_event(
+        "demonstrate_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        demonstrated=chosen_opponent is not None,
+        chosen_opponent=getattr(chosen_opponent, "name", None),
+        resolutions=summaries,
+        turn=turn,
+        phase=phase,
         **replay_rule_fields(effect_data),
     )
     finish_resolved_spell(player, card, turn=turn)
@@ -17379,6 +17679,18 @@ def apply_effect_immediate(
     elif effect == "graveyard_flashback_grant":
         grant_graveyard_flashback_until_eot(player, card, effect_data, turn)
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "exile_top_nonland_free_cast":
+        resolve_demonstrate_top_nonland_free_cast(
+            player,
+            opponents,
+            all_players_for_entry,
+            card,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            phase=phase,
+        )
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
         declared_targets = effect_data.get("declared_targets") or []
         if len(declared_targets) == 1 and resolve_declared_single_removal(

@@ -17967,3 +17967,52 @@ Next work:
 - Continue deck `607` high `battle_critical`: `Creative Technique`,
   `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
   `Promise of Loyalty`, and `Starfall Invocation`.
+
+## PG102 Battle Validation - Creative Technique Top-Nonland Free Cast
+
+Status: `validated_runtime_and_16_seed_gate_review_required_static_contract_only`.
+
+Runtime changes validated:
+
+- Added executable `exile_top_nonland_free_cast` support for `Creative Technique`.
+- Added top-nonland reveal, exile, and cast-from-exile without paying mana.
+- Added demonstrate modeling: controller copy plus chosen lowest-visible-threat
+  opponent copy.
+- Added replay event contract coverage for:
+  `top_nonland_free_cast`, `top_nonland_free_cast_resolved`, and
+  `demonstrate_resolved`.
+
+PostgreSQL/source-of-truth changes:
+
+- PG102 promoted `Creative Technique`:
+  `battle_rule_v1:fcb6b63cf730c83aa99760cc53bf3dd9`,
+  `oracle_hash=98c26337370ce75f10e3e529a94b8ef3`,
+  `effect=exile_top_nonland_free_cast`,
+  `review_status=verified`, `execution_status=auto`.
+- Two old generated `draw_cards` rows were deprecated and disabled.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_postcheck_20260623_130933.out`.
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_sync_report_20260623_130933.json`.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_focused_replay_20260623_130933.json`.
+- Full test output:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_battle_analyst_v10_3_test_20260623_130933.out`.
+- 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_131442/summary.json`.
+
+Battle gate interpretation:
+
+- `seeds_completed=16`, `events=18628`, `decisions=2789`.
+- Wrapper tests: `{"pass":18}`.
+- Action, forensic, replay-decision, target-pressure, and table-intent gates
+  pass with zero blockers/findings.
+- Final status remains `review_required` only from the known
+  `event_contract_static` fixture backlog:
+  observed unclassified events are `0`, static unclassified fixture types are
+  `etb_recursion_resolved`, `etb_removal_resolved`,
+  `etb_removal_skipped`, `powerbalance_trigger_resolved`,
+  `steal_all_creatures_resolved`, and `tokens_created`.

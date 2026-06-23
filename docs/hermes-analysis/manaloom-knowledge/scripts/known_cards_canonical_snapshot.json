@@ -5820,15 +5820,22 @@
     "battle_rule_oracle_hash": "57fcd38030641ceb36bbcf1a6dcbc6c8"
   },
   "Creative Technique": {
-    "cmc": 5.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b0ccc811be3022e88f1338ff5dbeb676"
+    "battle_model_scope": "shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1",
+    "demonstrate": true,
+    "demonstrate_choice_model": "choose_lowest_visible_threat_opponent",
+    "demonstrate_copy_model": "controller_copy_and_chosen_opponent_copy",
+    "effect": "exile_top_nonland_free_cast",
+    "revealed_card_cast_without_paying_mana": true,
+    "shuffle_before_reveal": true,
+    "sorcery": true,
+    "top_reveal_until": "nonland",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fcb6b63cf730c83aa99760cc53bf3dd9",
+    "battle_rule_oracle_hash": "98c26337370ce75f10e3e529a94b8ef3"
   },
   "Creeping Tar Pit": {
     "effect": "land",

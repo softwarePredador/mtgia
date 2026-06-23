@@ -91,6 +91,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "damage_player_and_creatures": "removal",
     "deal_damage": "removal",
     "copy_spell": "engine",
+    "exile_top_nonland_free_cast": "engine",
     "recursion": "engine",
     "graveyard_flashback_grant": "engine",
     "redistribute_life_totals": "wincon",

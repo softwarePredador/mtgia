@@ -3,12 +3,12 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG097, applied, postchecked, synced from PostgreSQL to Hermes
-SQLite/canonical snapshot, tested, and documented on 2026-06-23 11:41 UTC.
-PG097 restored `Valakut Awakening` simple-name rule provenance and hardened the
-PG -> SQLite/canonical sync path so missing incoming hashes do not erase
-reviewed/existing `oracle_hash` metadata. This was not a deck swap,
-learned-deck promotion, or battle rebaseline.
+this thread is PG102, applied, postchecked, synced from PostgreSQL to Hermes
+SQLite/canonical snapshot, tested, battle-gated, and documented on
+2026-06-23 13:24 UTC. PG102 promoted `Creative Technique` from stale generated
+`draw_cards` review-only shadows to an Oracle-backed executable demonstrate /
+top-nonland free-cast rule. This was not a deck swap, learned-deck promotion,
+or battle rebaseline.
 
 ## Purpose
 
@@ -8729,9 +8729,134 @@ Tests:
   `docs/hermes-analysis/master_optimizer_reports/pg097_valakut_sync_guard_test_battle_analyst_v10_3_20260623_114030.out`
   contains 390 `PASS` lines.
 
+## PG102 Creative Technique Top-Nonland Free Cast - Applied 2026-06-23 13:24 UTC
+
+Status: `applied_validated_synced_battle_review_required_static_contract_only`.
+
+Scope:
+
+- Target card: `Creative Technique`.
+- Target table: `public.card_battle_rules`.
+- DB mutation: promoted one curated executable rule and deprecated two stale
+  generated `draw_cards` shadows.
+- No `deck_cards` mutation, no learned-deck promotion, no deck swap, and no
+  rollback required.
+
+Oracle/source evidence:
+
+- Current local PostgreSQL `cards.oracle_text` for `Creative Technique`
+  matches the current Scryfall Oracle text fetched during the audit:
+  demonstrate, shuffle library, reveal until nonland, exile that card, put the
+  rest on bottom random, and may cast the exiled card without paying mana.
+- PostgreSQL card row is unique:
+  `card_id=a16f9ee6-8e65-4ea7-96d6-0662bd702e13`,
+  `oracle_id=c336b735-3e6b-471e-be7a-84d7402ae2f5`,
+  local `oracle_hash=98c26337370ce75f10e3e529a94b8ef3`.
+
+Promoted rule:
+
+- `logical_rule_key=battle_rule_v1:fcb6b63cf730c83aa99760cc53bf3dd9`
+- `effect=exile_top_nonland_free_cast`
+- `battle_model_scope=shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1`
+- `review_status=verified`
+- `execution_status=auto`
+- `source=curated`
+- `confidence=0.97`
+- `oracle_hash=98c26337370ce75f10e3e529a94b8ef3`
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_precheck_20260623_130933.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_apply_20260623_130933.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_postcheck_20260623_130933.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_rollback_20260623_130933.sql`
+
+PostgreSQL evidence:
+
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_precheck_20260623_130933.out`
+  reported `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `new_rule_already_present_rows=0`, `active_shadow_rows=0`,
+  `review_or_disabled_shadow_rows=2`,
+  `rows_still_claiming_draw_cards=2`,
+  `trusted_missing_oracle_hash_rows=0`, and
+  `backup_table_already_exists=f`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_apply_20260623_130933.out`
+  reported backup `SELECT 2`, `deprecated_shadow_rows=2`,
+  `upserted_rows=1`, and `COMMIT`.
+- Postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_postcheck_20260623_130933.out`
+  reported `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, `promoted_oracle_hash_rows=1`,
+  `promoted_expected_effect_rows=1`, `active_shadow_rows=0`,
+  `active_rows_still_claiming_draw_cards=0`,
+  `trusted_missing_oracle_hash_rows=0`, and `backup_rows=2`.
+
+Runtime/sync evidence:
+
+- Runtime now supports `exile_top_nonland_free_cast`:
+  it shuffles, reveals until nonland, exiles the nonland card, casts it from
+  exile with a zero locked cost, emits explicit `top_nonland_free_cast` /
+  `top_nonland_free_cast_resolved` events, and models demonstrate as a
+  controller copy plus a chosen lowest-visible-threat opponent copy.
+- Sync report:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_sync_report_20260623_130933.json`
+  reported `pg_rows_loaded=1832`,
+  `sqlite_inserted_or_updated=1812`, and
+  `canonical_snapshot_rows_exported=3201`.
+- SQLite probe after sync shows `Creative Technique` with
+  `effect=exile_top_nonland_free_cast`,
+  `review_status=verified`, `execution_status=auto`, and the PG102 logical key.
+- Canonical snapshot entry
+  `docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json`
+  now exposes the PG102 effect, scope, status, key, and hash.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_focused_replay_20260623_130933.json`
+  records starting hands/library seed order and shows Lorehold casting two
+  exiled nonland creatures without paying mana while the chosen opponent casts
+  one, with no card stuck in exile afterward.
+
+Tests and battle gate:
+
+- `python3 -m py_compile ...` passed before deploy.
+- Full battle analyst suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_battle_analyst_v10_3_test_20260623_130933.out`
+  passed.
+- Supporting tests passed:
+  `pg102_creative_technique_test_battle_forensic_audit_supported_effects_20260623_130933.out`,
+  `pg102_creative_technique_event_contract_static_test_20260623_130933.out`,
+  `pg102_creative_technique_test_sync_battle_card_rules_pg_selection_20260623_130933.out`,
+  `pg102_creative_technique_test_deck_card_battle_rule_coherence_audit_20260623_130933.out`,
+  and
+  `pg102_creative_technique_test_reviewed_battle_card_rules_20260623_130933.out`.
+- 16-seed battle gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_131442/summary.json`
+  ran with `run_profile=pg102_creative_technique_16_seed`,
+  `invocation_kind=manual_codex_pg102`, `seeds_completed=16`,
+  `events=18628`, `decisions=2789`, and
+  `test_results_status_counts={"pass":18}`.
+- The battle gate has no action, forensic, replay-decision, target-pressure,
+  or table-intent blockers. It remains `review_required` only because the
+  known static event-contract fixture backlog still reports six unaccepted
+  static fixture types:
+  `etb_recursion_resolved`, `etb_removal_resolved`,
+  `etb_removal_skipped`, `powerbalance_trigger_resolved`,
+  `steal_all_creatures_resolved`, and `tokens_created`.
+  Observed unclassified events in the PG102 run are `0`.
+
+Post-PG102 deck audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=12`, `medium=4`, `pass=78`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=26`, `medium=4`, `pass=175`.
+- `Creative Technique` is now `pass` for deck `607` with one trusted
+  executable rule.
+
 Next deploy number:
 
-- PG098 is next for any future PostgreSQL package.
+- PG103 is next for any future PostgreSQL package.
 
 ## PG099 Avatar's Wrath Airbend Runtime Rule - Applied 2026-06-23 12:37 UTC
 

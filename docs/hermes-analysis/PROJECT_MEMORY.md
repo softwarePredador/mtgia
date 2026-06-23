@@ -1271,3 +1271,29 @@ Next package number is PG086. Next queue should prioritize remaining deck
   Next deck `607` battle-critical cards are `Creative Technique`,
   `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
   `Promise of Loyalty`, and `Starfall Invocation`.
+
+## ManaLoom PG102 Creative Technique - 2026-06-23 13:24 UTC
+
+- PG102 promoted `Creative Technique` from two stale generated
+  `draw_cards` review-only rows to a curated verified executable rule:
+  `battle_rule_v1:fcb6b63cf730c83aa99760cc53bf3dd9`,
+  `oracle_hash=98c26337370ce75f10e3e529a94b8ef3`,
+  `effect=exile_top_nonland_free_cast`, scope
+  `shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1`.
+- Runtime now shuffles/reveals until nonland, exiles that card, casts it from
+  exile with zero locked cost, and models demonstrate as controller copy plus
+  chosen lowest-visible-threat opponent copy.
+- Evidence:
+  `pg102_creative_technique_top_nonland_free_cast_postcheck_20260623_130933.out`,
+  `pg102_creative_technique_top_nonland_free_cast_sync_report_20260623_130933.json`,
+  `pg102_creative_technique_focused_replay_20260623_130933.json`, and
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_131442/summary.json`.
+- Tests passed: full `test_battle_analyst_v10_3.py`, forensic supported
+  effects, static event contract test, PG sync selection, deck-card coherence
+  audit tests, and reviewed battle card rules.
+- Current card-rule queue after PG102: deck `6` `pass=100`, deck `607`
+  `high=12`, `medium=4`, `pass=78`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, global `high=26`, `medium=4`, `pass=175`.
+  Next deck `607` battle-critical cards are `Dawn's Truce`,
+  `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
+  `Starfall Invocation`.

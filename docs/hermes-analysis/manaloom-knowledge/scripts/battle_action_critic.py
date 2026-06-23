@@ -209,6 +209,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "variable damage wipe plus treasure creation result is consumed by replay and strategy checks.",
     ),
+    "demonstrate_resolved": (
+        "strategy_signal",
+        "demonstrate copy choice and resulting free-cast resolutions are card-specific strategy context.",
+    ),
     "dragons_approach_dragon_tutored": (
         "strategy_signal",
         "Dragon's Approach tutor result is combo/finisher context for replay checks.",
@@ -224,6 +228,14 @@ EVENT_CONTRACT_OVERRIDES = {
     "draw_equal_to_discarded_hand_resolved": (
         "strategy_signal",
         "discard-hand-then-draw resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
+    "top_nonland_free_cast": (
+        "strategy_signal",
+        "free cast of the revealed exiled nonland card is represented by spell_cast/spell_resolved ledger events.",
+    ),
+    "top_nonland_free_cast_resolved": (
+        "strategy_signal",
+        "top-library reveal, exile, and free-cast result is card-flow evidence consumed by replay/strategy context.",
     ),
     "end_step_token_sacrificed": (
         "renderer_only",

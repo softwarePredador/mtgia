@@ -21803,3 +21803,63 @@ Next validation focus:
   `Creative Technique`, `Dawn's Truce`, `Everything Comes to Dust`,
   `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.
   `Pearl Medallion` is the next high `battle_support` card after those.
+
+## PG102 Creative Technique Validation - 2026-06-23 13:24 UTC
+
+Status: `deck607_queue_reduced_battle_gate_review_required_static_contract_only`.
+
+What changed:
+
+- `Creative Technique` was validated against current Oracle text and promoted
+  from stale generated `draw_cards` review-only shadows to:
+  `battle_rule_v1:fcb6b63cf730c83aa99760cc53bf3dd9`,
+  `oracle_hash=98c26337370ce75f10e3e529a94b8ef3`,
+  `effect=exile_top_nonland_free_cast`, and
+  `battle_model_scope=shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1`.
+- Runtime now models the actual card function: shuffle, reveal until nonland,
+  exile the nonland card, cast it from exile without paying mana, and model
+  demonstrate as controller copy plus a chosen lowest-visible-threat opponent
+  copy.
+
+Evidence:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_postcheck_20260623_130933.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_top_nonland_free_cast_sync_report_20260623_130933.json`.
+- Focused replay with starting hands/library seed order:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_focused_replay_20260623_130933.json`.
+- Full suite:
+  `docs/hermes-analysis/master_optimizer_reports/pg102_creative_technique_battle_analyst_v10_3_test_20260623_130933.out`.
+- Fresh 16-seed battle artifact:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_131442/summary.json`.
+
+Current audit counts:
+
+- Deck `6`: `pass=100`.
+- Deck `607`: `high=12`, `medium=4`, `pass=78`.
+- Deck `608`: `high=14`, `medium=3`, `pass=51`.
+- Global: `high=26`, `medium=4`, `pass=175`.
+- `Creative Technique` is closed for the current deck `607` gate.
+
+Current deck `607` high queue:
+
+- `Dawn's Truce`
+- `Everything Comes to Dust`
+- `Fated Clash`
+- `Promise of Loyalty`
+- `Starfall Invocation`
+- `Pearl Medallion`
+- `Emeria's Call // Emeria, Shattered Skyclave`
+- `Molecule Man`
+- `The Mind Stone`
+- `The Scarlet Witch`
+- `Thor, God of Thunder`
+- `Tragic Arrogance`
+
+Next validation focus:
+
+- Continue deck `607` high `battle_critical` first:
+  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
+  `Promise of Loyalty`, and `Starfall Invocation`.
+  `Pearl Medallion` remains the next high `battle_support` card after those.
