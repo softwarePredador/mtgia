@@ -23416,14 +23416,21 @@
     "battle_rule_logical_key": "battle_rule_v1:b4c60a038f87f7550bf5dcff0a16d939"
   },
   "Rishkar, Peema Renegade": {
-    "cmc": 3.0,
-    "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
+    "ability_kind": "triggered",
+    "battle_model_scope": "rishkar_counter_mana_creature_waiver_v1",
+    "countered_creatures_tap_for_mana": true,
+    "effect": "creature",
+    "etb_plus_one_counter_targets": 2,
+    "power": 2,
+    "produces": "G",
+    "toughness": 2,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3e4f3afe97ce898401c128885bdf6fc3",
+    "battle_rule_oracle_hash": "f8292a28b5787943930f045618fcb8c9"
   },
   "Rising Chicane": {
     "effect": "land",
@@ -32415,15 +32422,24 @@
     "battle_rule_logical_key": "battle_rule_v1:f76564d35e8cbcd2be2bb75b3381d499"
   },
   "Veil of Summer": {
-    "cmc": 1.0,
-    "effect": "unknown",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "veil_of_summer_draw_and_protection_waiver_v1",
+    "conditional_draw_if_opponent_cast_blue_or_black_spell_this_turn": true,
+    "controller_and_permanents_hexproof_from_colors_until_eot": [
+      "U",
+      "B"
+    ],
+    "count": 1,
+    "effect": "draw_cards",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3d0de9850c65eda2a71457e2bc803846"
+    "spells_you_control_cant_be_countered_this_turn": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:345e8a0b063c6d805551bfb85618f0f6",
+    "battle_rule_oracle_hash": "2de390b3ac2c9680e9c3b8b5fe09d103"
   },
   "Veldt": {
     "effect": "land",

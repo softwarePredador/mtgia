@@ -79,23 +79,6 @@ def test_rise_of_the_eldrazi_uses_composite_oracle_runtime():
 
 
 def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
-    veil = battle.get_card_effect(
-        {
-            "name": "Veil of Summer",
-            "type_line": "Instant",
-            "oracle_text": (
-                "Draw a card if an opponent has cast a blue or black spell "
-                "this turn. Spells you control can't be countered this turn."
-            ),
-            "functional_tags_json": '["draw"]',
-        }
-    )
-    assert veil["effect"] == "draw_cards"
-    assert veil["count"] == 1
-    assert veil["_rule_source"] == "manual_runtime_waiver"
-    assert veil["_rule_review_status"] == "verified"
-    assert veil["_rule_logical_key"].startswith("battle_rule_v1:")
-
     barbarian = battle.get_card_effect(
         {
             "name": "Reckless Barbarian",
@@ -216,25 +199,6 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert prized_statue["_rule_source"] == "manual_runtime_waiver"
     assert prized_statue["_rule_review_status"] == "verified"
     assert prized_statue["_rule_logical_key"].startswith("battle_rule_v1:")
-
-    rishkar = battle.get_card_effect(
-        {
-            "name": "Rishkar, Peema Renegade",
-            "type_line": "Legendary Creature - Elf Druid",
-            "oracle_text": (
-                "When Rishkar enters, put a +1/+1 counter on each of up to two "
-                "target creatures. Each creature you control with a counter on "
-                "it has \"{T}: Add {G}.\""
-            ),
-            "functional_tags_json": '["ramp"]',
-        }
-    )
-    assert rishkar["effect"] == "creature"
-    assert rishkar["etb_plus_one_counter_targets"] == 2
-    assert rishkar["countered_creatures_tap_for_mana"] is True
-    assert rishkar["_rule_source"] == "manual_runtime_waiver"
-    assert rishkar["_rule_review_status"] == "verified"
-    assert rishkar["_rule_logical_key"].startswith("battle_rule_v1:")
 
     jeweled_amulet = battle.get_card_effect(
         {
@@ -358,15 +322,6 @@ def test_sacrifice_waiver_uses_sacrificed_creature_mana_value():
 def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
     events = [
         {
-            "event": "spell_resolved",
-            "card": "Veil of Summer",
-            "effect": "draw_cards",
-            "rule_source": "manual_runtime_waiver",
-            "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test",
-            "turn": 4,
-        },
-        {
             "event": "spell_cast",
             "card": "Reckless Barbarian",
             "effect": "creature",
@@ -413,20 +368,11 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
         },
         {
             "event": "spell_cast",
-            "card": "Rishkar, Peema Renegade",
-            "effect": "creature",
-            "rule_source": "manual_runtime_waiver",
-            "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test-7",
-            "turn": 7,
-        },
-        {
-            "event": "spell_cast",
             "card": "Jeweled Amulet",
             "effect": "ramp_permanent",
             "rule_source": "manual_runtime_waiver",
             "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test-8",
+            "rule_logical_key": "battle_rule_v1:manual-waiver-test-7",
             "turn": 1,
         },
         {
@@ -435,7 +381,7 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
             "effect": "draw_cards",
             "rule_source": "manual_runtime_waiver",
             "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test-9",
+            "rule_logical_key": "battle_rule_v1:manual-waiver-test-8",
             "turn": 2,
         },
         {
@@ -444,7 +390,7 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
             "effect": "creature",
             "rule_source": "manual_runtime_waiver",
             "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test-10",
+            "rule_logical_key": "battle_rule_v1:manual-waiver-test-9",
             "turn": 4,
         },
         {
@@ -453,7 +399,7 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
             "effect": "tutor",
             "rule_source": "manual_runtime_waiver",
             "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test-11",
+            "rule_logical_key": "battle_rule_v1:manual-waiver-test-10",
             "turn": 9,
         },
         {
@@ -462,16 +408,11 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
             "effect": "ramp_ritual",
             "rule_source": "manual_runtime_waiver",
             "rule_review_status": "verified",
-            "rule_logical_key": "battle_rule_v1:manual-waiver-test-12",
+            "rule_logical_key": "battle_rule_v1:manual-waiver-test-11",
             "turn": 9,
         },
     ]
     stale_rules = {
-        "veil of summer": {
-            "effect_json": {"effect": "unknown"},
-            "source": "generated",
-            "review_status": "needs_review",
-        },
         "ephemerate": {
             "effect_json": {"effect": "remove_creature"},
             "source": "generated",
@@ -482,17 +423,109 @@ def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
     findings, summary = audit.audit_rule_provenance(events, stale_rules)
 
     assert findings == []
-    assert summary["by_source"]["manual_runtime_waiver"] == 12
+    assert summary["by_source"]["manual_runtime_waiver"] == 10
     assert summary["rule_logical_key_missing"] == 0
-    assert summary["card_id_missing"] == 12
-    assert summary["card_id_missing_accepted"] == 12
+    assert summary["card_id_missing"] == 10
+    assert summary["card_id_missing_accepted"] == 10
     assert summary["card_id_missing_unaccepted"] == 0
-    assert summary["semantic_hash_missing"] == 12
-    assert summary["semantic_hash_missing_accepted"] == 12
+    assert summary["semantic_hash_missing"] == 10
+    assert summary["semantic_hash_missing_accepted"] == 10
     assert summary["semantic_hash_missing_unaccepted"] == 0
     assert summary["lineage_missing_waiver_reasons"] == {
-        "manual_runtime_waiver_without_pg_identity": 24
+        "manual_runtime_waiver_without_pg_identity": 20
     }
+
+
+def test_veil_of_summer_promoted_rule_has_identity_for_forensic():
+    effect = battle.get_card_effect(
+        {
+            "name": "Veil of Summer",
+            "type_line": "Instant",
+            "oracle_text": (
+                "Draw a card if an opponent has cast a blue or black spell this turn. "
+                "Spells you control can't be countered this turn. You and permanents you control "
+                "gain hexproof from blue and from black until end of turn."
+            ),
+            "functional_tags_json": '["draw"]',
+        }
+    )
+    assert effect["effect"] == "draw_cards"
+    assert effect["count"] == 1
+    assert effect["_rule_source"] == "curated"
+    assert effect["_rule_review_status"] == "verified"
+    fields = battle.replay_rule_fields(effect)
+    events = [
+        {
+            "event": "spell_cast",
+            "card": "Veil of Summer",
+            "effect": "draw_cards",
+            "turn": 4,
+            **fields,
+        },
+        {
+            "event": "spell_resolved",
+            "card": "Veil of Summer",
+            "effect": "draw_cards",
+            "turn": 4,
+            **fields,
+        },
+    ]
+
+    findings, summary = audit.audit_rule_provenance(events, {})
+
+    assert findings == []
+    assert summary["by_source"]["curated"] == 2
+    assert summary["by_status"]["verified"] == 2
+    assert summary["by_effect"]["draw_cards"] == 2
+    assert summary["rule_logical_key_missing"] == 0
+    assert summary["card_id_missing_unaccepted"] == 2
+    assert summary["semantic_hash_missing_unaccepted"] == 2
+
+
+def test_rishkar_promoted_rule_has_identity_for_forensic():
+    effect = battle.get_card_effect(
+        {
+            "name": "Rishkar, Peema Renegade",
+            "type_line": "Legendary Creature - Elf Druid",
+            "oracle_text": (
+                "When Rishkar enters, put a +1/+1 counter on each of up to two target creatures. "
+                "Each creature you control with a counter on it has \"{T}: Add {G}.\""
+            ),
+            "functional_tags_json": '["ramp"]',
+        }
+    )
+    assert effect["effect"] == "creature"
+    assert effect["etb_plus_one_counter_targets"] == 2
+    assert effect["countered_creatures_tap_for_mana"] is True
+    assert effect["_rule_source"] == "curated"
+    assert effect["_rule_review_status"] == "verified"
+    fields = battle.replay_rule_fields(effect)
+    events = [
+        {
+            "event": "spell_cast",
+            "card": "Rishkar, Peema Renegade",
+            "effect": "creature",
+            "turn": 7,
+            **fields,
+        },
+        {
+            "event": "spell_resolved",
+            "card": "Rishkar, Peema Renegade",
+            "effect": "creature",
+            "turn": 7,
+            **fields,
+        },
+    ]
+
+    findings, summary = audit.audit_rule_provenance(events, {})
+
+    assert findings == []
+    assert summary["by_source"]["curated"] == 2
+    assert summary["by_status"]["verified"] == 2
+    assert summary["by_effect"]["creature"] == 2
+    assert summary["rule_logical_key_missing"] == 0
+    assert summary["card_id_missing_unaccepted"] == 2
+    assert summary["semantic_hash_missing_unaccepted"] == 2
 
 
 def test_aura_of_silence_promoted_rule_has_identity_for_forensic():

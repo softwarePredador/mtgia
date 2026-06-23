@@ -315,6 +315,107 @@ def _build_modal_mana_rock_fields(
     }
 
 
+def _build_veil_of_summer_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"INSTANT"}:
+        return None
+    required = {"DrawCardSourceControllerEffect", "CantBeCounteredControlledEffect"}
+    if not required.issubset(effect_classes):
+        return None
+    if not (
+        _oracle_has(
+            rules_text,
+            "draw a card if an opponent has cast a blue or black spell this turn",
+            "spells you control can't be countered this turn",
+            "gain hexproof from blue and from black until end of turn",
+        )
+        or (
+            "veilofsummerwatcher" in _normalized_rules_text(rules_text)
+            and {
+                "GainAbilityControlledEffect",
+                "GainAbilityControllerEffect",
+            }.issubset(effect_classes)
+            and {
+                "HexproofFromBlueAbility",
+                "HexproofFromBlackAbility",
+            }.issubset(ability_classes)
+        )
+    ):
+        return None
+    return {
+        "effect": "draw_cards",
+        "scope": "veil_of_summer_draw_and_protection_waiver_v1",
+        "fields": {
+            "count": 1,
+            "instant": True,
+            "conditional_draw_if_opponent_cast_blue_or_black_spell_this_turn": True,
+            "spells_you_control_cant_be_countered_this_turn": True,
+            "controller_and_permanents_hexproof_from_colors_until_eot": ["U", "B"],
+        },
+        "reason": (
+            "XMage structure matches Veil of Summer conditional draw plus anti-counter and "
+            "controller/permanents hexproof-from-blue-and-black protection."
+        ),
+        "signals": [
+            "DrawCardSourceControllerEffect",
+            "CantBeCounteredControlledEffect",
+            "hexproof_from_blue_black",
+        ],
+    }
+
+
+def _build_rishkar_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"CREATURE"}:
+        return None
+    if "AddCountersTargetEffect" not in effect_classes or "GainAbilityControlledEffect" not in effect_classes:
+        return None
+    if not {"EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes):
+        return None
+    if not (
+        _oracle_has(
+            rules_text,
+            "put a +1/+1 counter on each of up to two target creatures",
+            'each creature you control with a counter on it has "{t}: add {g}."',
+        )
+        or (
+            "counteranypredicate" in _normalized_rules_text(rules_text)
+            and "greenmanaability" in _normalized_rules_text(rules_text)
+        )
+    ):
+        return None
+    return {
+        "effect": "creature",
+        "scope": "rishkar_counter_mana_creature_waiver_v1",
+        "fields": {
+            "power": 2,
+            "toughness": 2,
+            "etb_plus_one_counter_targets": 2,
+            "countered_creatures_tap_for_mana": True,
+            "produces": "G",
+        },
+        "reason": (
+            "XMage structure matches Rishkar ETB +1/+1 counters on up to two targets plus the "
+            "static mana ability for your creatures with counters."
+        ),
+        "signals": [
+            "AddCountersTargetEffect",
+            "GainAbilityControlledEffect",
+            "GreenManaAbility",
+        ],
+    }
+
+
 def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> dict[str, Any]:
     """Return conservative ManaLoom hints for one parsed XMage card entry."""
 
@@ -407,6 +508,44 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(mana_rock_fields["fields"]),
                 matched_signals=["mana", "draw", "sacrifice_cost"],
+            )
+        )
+
+    veil_fields = _build_veil_of_summer_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if veil_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(veil_fields["effect"]),
+                scope=str(veil_fields["scope"]),
+                reason=str(veil_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(veil_fields["fields"]),
+                matched_signals=list(veil_fields["signals"]),
+            )
+        )
+
+    rishkar_fields = _build_rishkar_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if rishkar_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(rishkar_fields["effect"]),
+                scope=str(rishkar_fields["scope"]),
+                reason=str(rishkar_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(rishkar_fields["fields"]),
+                matched_signals=list(rishkar_fields["signals"]),
             )
         )
 

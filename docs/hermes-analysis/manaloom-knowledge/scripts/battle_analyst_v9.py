@@ -2863,14 +2863,6 @@ def handcrafted_runtime_rule(effect_json):
 # waiver. They let the replay engine stop trusting broad functional tags while
 # the canonical battle-rule cache is refreshed.
 HANDCRAFTED_KNOWN_CARD_RULES = {
-    "Veil of Summer": handcrafted_runtime_rule(
-        {
-            "effect": "draw_cards",
-            "count": 1,
-            "instant": True,
-            "battle_model_scope": "veil_of_summer_draw_and_protection_waiver_v1",
-        }
-    ),
     "Reckless Barbarian": handcrafted_runtime_rule(
         {
             "effect": "creature",
@@ -2959,17 +2951,6 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "prized_statue_treasure_artifact_waiver_v1",
         }
     ),
-    "Rishkar, Peema Renegade": handcrafted_runtime_rule(
-        {
-            "effect": "creature",
-            "power": 2,
-            "toughness": 2,
-            "etb_plus_one_counter_targets": 2,
-            "countered_creatures_tap_for_mana": True,
-            "produces": "G",
-            "battle_model_scope": "rishkar_counter_mana_creature_waiver_v1",
-        }
-    ),
     "Jeweled Amulet": handcrafted_runtime_rule(
         {
             "effect": "ramp_permanent",
@@ -3030,7 +3011,6 @@ HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 # snapshot/SQLite pipeline is refreshed. Any temporary waiver must be audited
 # and short-lived.
 MANUAL_RULE_RUNTIME_WAIVERS = {
-    "Veil of Summer",
     "Reckless Barbarian",
     "Ephemerate",
     "Moonsnare Prototype",
@@ -3040,7 +3020,6 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Mardu Devotee",
     "Orcish Lumberjack",
     "Prized Statue",
-    "Rishkar, Peema Renegade",
     "Jeweled Amulet",
     "Ponder",
     "Vivi Ornitier",
@@ -3067,11 +3046,6 @@ def manual_runtime_waiver_metadata(reason, source_runs, opened_at_utc):
 
 
 MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
-    "Veil of Summer": manual_runtime_waiver_metadata(
-        "Replace heuristic draw/protection runtime evidence from functional_tags_json.",
-        ["20260619_174452", "20260619_175415"],
-        "2026-06-19T17:54:15Z",
-    ),
     "Reckless Barbarian": manual_runtime_waiver_metadata(
         "Replace heuristic creature mana-source runtime evidence from functional_tags_json.",
         ["20260619_174452", "20260619_175415"],
@@ -3114,11 +3088,6 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
     ),
     "Prized Statue": manual_runtime_waiver_metadata(
         "Replace heuristic artifact ramp evidence with Treasure trigger semantics.",
-        ["20260619_200324", "20260619_202628"],
-        "2026-06-19T20:26:28Z",
-    ),
-    "Rishkar, Peema Renegade": manual_runtime_waiver_metadata(
-        "Replace heuristic ramp evidence with counter-granting creature mana-source semantics.",
         ["20260619_200324", "20260619_202628"],
         "2026-06-19T20:26:28Z",
     ),

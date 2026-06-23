@@ -38,6 +38,7 @@ ADDITIONAL_CANONICAL_NAMES = {
     "Mox Diamond",
     "Mental Misstep",
     "Nature's Claim",
+    "Rishkar, Peema Renegade",
     "Rise of the Eldrazi",
     "Roiling Regrowth",
     "Scour for Scrap",
@@ -47,6 +48,7 @@ ADDITIONAL_CANONICAL_NAMES = {
     "Snapback",
     "Surge to Victory",
     "Turn to Mist",
+    "Veil of Summer",
 }
 PROMOTED_CANONICAL_NAMES = sorted(
     set(audit.TEMPORARY_HOTFIX_NAMES) | ADDITIONAL_CANONICAL_NAMES

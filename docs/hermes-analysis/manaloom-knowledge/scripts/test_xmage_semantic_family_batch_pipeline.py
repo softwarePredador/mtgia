@@ -472,6 +472,89 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_veil_of_summer_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Veil of Summer",
+                        "severity": "high",
+                        "oracle_hash": "veilhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "VeilOfSummer",
+                            "path": "/xmage/VeilOfSummer.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "ConditionalOneShotEffect",
+                                "DrawCardSourceControllerEffect",
+                                "CantBeCounteredControlledEffect",
+                                "GainAbilityControlledEffect",
+                                "GainAbilityControllerEffect",
+                                "VeilOfSummerEffect",
+                            ],
+                            "ability_classes": ["HexproofFromBlueAbility", "HexproofFromBlackAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_cards",
+                                "battle_model_scope": "veil_of_summer_draw_and_protection_waiver_v1",
+                                "count": 1,
+                                "instant": True,
+                                "conditional_draw_if_opponent_cast_blue_or_black_spell_this_turn": True,
+                                "spells_you_control_cant_be_countered_this_turn": True,
+                                "controller_and_permanents_hexproof_from_colors_until_eot": ["U", "B"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_rishkar_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Rishkar, Peema Renegade",
+                        "severity": "high",
+                        "oracle_hash": "rishkarhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "RishkarPeemaRenegade",
+                            "path": "/xmage/RishkarPeemaRenegade.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersTargetEffect", "GainAbilityControlledEffect"],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "rishkar_counter_mana_creature_waiver_v1",
+                                "power": 2,
+                                "toughness": 2,
+                                "etb_plus_one_counter_targets": 2,
+                                "countered_creatures_tap_for_mana": True,
+                                "produces": "G",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_normalizes_modal_mana_rock_to_runtime_ramp_effect(self) -> None:
         report = generator.build_generator_report(
             batch_audit={

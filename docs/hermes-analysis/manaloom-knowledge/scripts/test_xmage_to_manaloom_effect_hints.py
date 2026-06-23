@@ -347,6 +347,82 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertEqual(primary["taxes_opponent_artifact_enchantment_spells"], 2)
 
+    def test_veil_of_summer_maps_to_exact_draw_and_protection_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "ConditionalOneShotEffect",
+                    "DrawCardSourceControllerEffect",
+                    "CantBeCounteredControlledEffect",
+                    "GainAbilityControlledEffect",
+                    "GainAbilityControllerEffect",
+                    "VeilOfSummerEffect",
+                ],
+                "ability_classes": ["HexproofFromBlueAbility", "HexproofFromBlackAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new ConditionalOneShotEffect("
+                    "new DrawCardSourceControllerEffect(1), VeilOfSummerCondition.instance)); "
+                    "this.getSpellAbility().addEffect(new CantBeCounteredControlledEffect("
+                    "StaticFilters.FILTER_SPELL, Duration.EndOfTurn)); "
+                    "this.getSpellAbility().addEffect(new VeilOfSummerEffect()); "
+                    "game.addEffect(new GainAbilityControlledEffect(HexproofFromBlueAbility.getInstance(), Duration.EndOfTurn, StaticFilters.FILTER_PERMANENTS), source); "
+                    "game.addEffect(new GainAbilityControlledEffect(HexproofFromBlackAbility.getInstance(), Duration.EndOfTurn, StaticFilters.FILTER_PERMANENTS), source);"
+                ),
+            },
+            "Draw a card if an opponent has cast a blue or black spell this turn. "
+            "Spells you control can't be countered this turn. You and permanents you control "
+            "gain hexproof from blue and from black until end of turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "draw_cards")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "veil_of_summer_draw_and_protection_waiver_v1",
+        )
+        self.assertEqual(primary["count"], 1)
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["conditional_draw_if_opponent_cast_blue_or_black_spell_this_turn"])
+        self.assertTrue(primary["spells_you_control_cant_be_countered_this_turn"])
+        self.assertEqual(
+            primary["controller_and_permanents_hexproof_from_colors_until_eot"],
+            ["U", "B"],
+        )
+
+    def test_rishkar_maps_to_exact_counter_mana_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersTargetEffect", "GainAbilityControlledEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "Effect effect = new AddCountersTargetEffect(CounterType.P1P1.createInstance()); "
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(effect, false); "
+                    "ability.addTarget(new TargetCreaturePermanent(0, 2)); "
+                    "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                    "new GreenManaAbility(), Duration.WhileOnBattlefield, filter))); "
+                    "filter.add(CounterAnyPredicate.instance);"
+                ),
+            },
+            'When this creature enters the battlefield, put a +1/+1 counter on each of up to two target creatures. '
+            'Each creature you control with a counter on it has "{T}: Add {G}."',
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "rishkar_counter_mana_creature_waiver_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertEqual(primary["etb_plus_one_counter_targets"], 2)
+        self.assertTrue(primary["countered_creatures_tap_for_mana"])
+        self.assertEqual(primary["produces"], "G")
+
 
 if __name__ == "__main__":
     unittest.main()

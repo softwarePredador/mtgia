@@ -320,11 +320,51 @@ def modal_mana_rock_batch_safe(card: dict[str, Any]) -> bool:
     return True
 
 
+def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
+    effect_json = primary_effect(card)
+    effect = str(effect_json.get("effect") or "")
+    scope = str(effect_json.get("battle_model_scope") or "")
+    types = xmage_types(card)
+    ability_classes = xmage_ability_classes(card)
+    effect_classes = xmage_effect_classes(card)
+
+    if effect == "draw_cards" and scope == "veil_of_summer_draw_and_protection_waiver_v1":
+        return (
+            types == {"INSTANT"}
+            and {
+                "ConditionalOneShotEffect",
+                "DrawCardSourceControllerEffect",
+                "CantBeCounteredControlledEffect",
+            }.issubset(effect_classes)
+            and int(effect_json.get("count") or 0) == 1
+            and bool(effect_json.get("conditional_draw_if_opponent_cast_blue_or_black_spell_this_turn"))
+            and bool(effect_json.get("spells_you_control_cant_be_countered_this_turn"))
+            and effect_json.get("controller_and_permanents_hexproof_from_colors_until_eot") == ["U", "B"]
+            and {"HexproofFromBlueAbility", "HexproofFromBlackAbility"}.issubset(ability_classes)
+        )
+
+    if effect == "creature" and scope == "rishkar_counter_mana_creature_waiver_v1":
+        return (
+            types == {"CREATURE"}
+            and {"EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and {"AddCountersTargetEffect", "GainAbilityControlledEffect"}.issubset(effect_classes)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and int(effect_json.get("etb_plus_one_counter_targets") or 0) == 2
+            and bool(effect_json.get("countered_creatures_tap_for_mana"))
+            and effect_json.get("produces") == "G"
+        )
+
+    return False
+
+
 def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     if card.get("status") == "blocked_missing_xmage_class":
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
+    if exact_scope_batch_safe(card):
+        return "batch_metadata_candidate_requires_pg_precheck"
     if generic_runtime_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
     if specialized_targeted_interaction_batch_safe(card):
