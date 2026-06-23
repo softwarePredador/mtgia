@@ -1057,7 +1057,7 @@ def commit_cast_payment(ctx):
     ctx.paid = ctx.controller.spend_mana(ctx.locked_cost)
     if not ctx.paid:
         return False
-    ctx.controller.record_spell_cast(CURRENT_REPLAY_TURN)
+    ctx.controller.record_spell_cast(CURRENT_REPLAY_TURN, card=ctx.card)
     record_approach_cast_from_hand(ctx.controller, ctx.card, ctx.effect_data, phase=ctx.phase)
     emit_replay_event(
         "cost_paid",
@@ -1074,6 +1074,12 @@ def commit_cast_payment(ctx):
         life_before=life_before,
         life_after=ctx.controller.life,
         life_paid=max(0, life_before - ctx.controller.life),
+        spells_cast_this_turn=getattr(ctx.controller, "spells_cast_this_turn", 0),
+        spell_mana_value_cast_this_turn=getattr(
+            ctx.controller,
+            "spell_mana_value_cast_this_turn",
+            0,
+        ),
         **ctx.to_replay_fields(),
         **replay_rule_fields(ctx.effect_data),
     )
@@ -3701,11 +3707,19 @@ class ManaPool:
 class Player:
     def shuffle(self, rng): rng.shuffle(self.library)
 
-    def record_spell_cast(self, turn_marker=None):
+    def record_spell_cast(self, turn_marker=None, card=None, mana_value=None):
         if turn_marker is not None and getattr(self, "_spells_cast_turn_marker", None) != turn_marker:
             self.spells_cast_this_turn = 0
+            self.spell_mana_value_cast_this_turn = 0
             self._spells_cast_turn_marker = turn_marker
+        if mana_value is None and card is not None:
+            mana_value = card_mana_value(card)
+        try:
+            spell_mana_value = max(0, int(float(mana_value or 0)))
+        except Exception:
+            spell_mana_value = 0
         self.spells_cast_this_turn += 1
+        self.spell_mana_value_cast_this_turn += spell_mana_value
         return self.spells_cast_this_turn
 
     def record_noncreature_spell_cast(self, turn_marker=None):
@@ -3779,6 +3793,7 @@ class Player:
         self.cards_drawn_this_turn = 0
         self._cards_drawn_turn_marker = None
         self.spells_cast_this_turn = 0
+        self.spell_mana_value_cast_this_turn = 0
         self._spells_cast_turn_marker = None
         self.noncreature_spells_cast_this_turn = 0
         self._noncreature_spells_cast_turn_marker = None
@@ -14372,8 +14387,44 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
     finish_resolved_spell(player, card, turn=turn)
 
 
+def damage_wipe_amount(player, card, effect_data):
+    source = effect_data.get("damage_amount_source")
+    if source in {
+        "other_spells_cast_mana_value_this_turn",
+        "other_spells_cast_mv_this_turn",
+    }:
+        try:
+            total = int(float(getattr(player, "spell_mana_value_cast_this_turn", 0) or 0))
+        except Exception:
+            total = 0
+        if effect_data.get("current_spell_included_in_mana_value_ledger", True):
+            current_value = effect_data.get("current_spell_mana_value")
+            if current_value is None:
+                current_value = card_mana_value(card)
+            try:
+                total -= int(float(current_value or 0))
+            except Exception:
+                pass
+        return max(0, total)
+    try:
+        return int(effect_data.get("damage") or effect_data.get("amount") or 0)
+    except Exception:
+        return 0
+
+
 def apply_damage_wipe(player, opponents, card, effect_data, turn):
-    amount = int(effect_data.get("damage") or effect_data.get("amount") or 0)
+    amount = damage_wipe_amount(player, card, effect_data)
+    damage_scope = effect_data.get("damage_scope", "each_creature")
+    affected_players = (
+        list(opponents)
+        if damage_scope
+        in {
+            "opponent_creatures",
+            "each_creature_opponents_control",
+            "creatures_opponents_control",
+        }
+        else [player] + list(opponents)
+    )
     destroyed = []
     protected = []
     survived_damage = []
@@ -14381,7 +14432,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
     own_creatures_destroyed = 0
     opponent_creatures_destroyed = 0
     live_opponent_creatures_destroyed = 0
-    for participant in [player] + list(opponents):
+    for participant in affected_players:
         is_self = participant is player
         is_live_opponent = (not is_self) and participant.is_alive()
         for permanent in list(participant.battlefield):
@@ -14432,7 +14483,16 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
         player=player.name,
         card=card.get("name", "?"),
         damage=amount,
-        damage_scope=effect_data.get("damage_scope", "each_creature"),
+        damage_scope=damage_scope,
+        damage_amount_source=effect_data.get("damage_amount_source"),
+        current_spell_mana_value=card_mana_value(card),
+        spell_mana_value_cast_this_turn=getattr(
+            player,
+            "spell_mana_value_cast_this_turn",
+            0,
+        ),
+        cascade_instances=effect_data.get("cascade_instances"),
+        cascade_execution_status=effect_data.get("cascade_execution_status"),
         creatures_seen=creatures_seen,
         creatures_destroyed=len(destroyed),
         own_creatures_destroyed=own_creatures_destroyed,

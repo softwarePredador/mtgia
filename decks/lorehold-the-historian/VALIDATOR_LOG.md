@@ -98,13 +98,13 @@ Fonte: PostgreSQL `commander_reference_deck_analysis` (3 decks analisados, perfi
 ## Secao 3: SYNERGY_MAP — 7 Eixos Estrategicos
 
 ### A) TOKEN MAKERS + PUMP — Score: 7/10
-**Token Makers (6):** Rite of the Dragoncaller (5/5 Dragon por spell), Storm Herd (X Pegasus), Call Forth the Tempest (X tokens), Brass's Bounty (X Treasure), Smothering Tithe (Treasure), Storm-Kiln Artist (Treasure).
+**Token Makers (5):** Rite of the Dragoncaller (5/5 Dragon por spell), Storm Herd (X Pegasus), Brass's Bounty (X Treasure), Smothering Tithe (Treasure), Storm-Kiln Artist (Treasure).
 **Pump (2):** Akroma's Will (double strike + keywords para TODAS), Boros Charm (double strike para 1).
 **Melhor par:** Storm-Kiln Artist + Rite of the Dragoncaller → Treasure + 5/5 Dragon por spell. Akroma's Will no turno seguinte = dano massivo.
 **PG:** ritual_treasure = IDEAL, win_condition ACIMA.
 
 ### B) BOARD WIPES + PROTECTION — Score: 8/10
-**Wipes (5):** Blasphemous Act (CMC 1 com board), Call Forth the Tempest (modal), Volcanic Vision (dano + recursion), Olorin's Searing Light (exila GY), Worldfire (reset total).
+**Wipes (5):** Blasphemous Act (CMC 1 com board), Call Forth the Tempest (dano dinamico em criaturas dos oponentes; cascade ainda anotada no runtime), Volcanic Vision (dano + recursion), Olorin's Searing Light (exila GY), Worldfire (reset total).
 **Protection (8):** Teferi's Protection, Flawless Maneuver (gratis!), Boros Charm, Mother of Runes, Lightning Greaves, Grand Abolisher, Hexing Squelcher, Akroma's Will.
 **Ratio:** 5 wipes / 8 protecoes = 0.625. Cada wipe tem 1.6 protecoes de cobertura.
 **PG:** board_wipe +3.0, protection +4.3. Ambos robustos.

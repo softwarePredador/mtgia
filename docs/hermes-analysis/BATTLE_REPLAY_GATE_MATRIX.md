@@ -4127,10 +4127,35 @@ Decision:
 
 - PG094 is accepted as a card-rule/source-of-truth restore.
 - It does not change the latest recurring battle status.
+
+## PG098 Call Forth Dynamic Damage Gate - 2026-06-23 12:09 UTC
+
+Status: `card_rule_applied_replay_gate_review_required`.
+
+- PostgreSQL package PG098 corrected `Call Forth the Tempest` from a stale
+  token-maker/generic `damage_wipe` row into Oracle-backed dynamic
+  opponent-creature damage.
+- Runtime evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_focused_replay_20260623_120031.json`
+  records `damage=6`, `damage_scope=opponent_creatures`,
+  `spell_mana_value_cast_this_turn=14`, `current_spell_mana_value=8`,
+  `own_creatures_destroyed=0`, and `opponent_creatures_destroyed=1`.
+- Fresh gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555/summary.json`.
+- Gate numbers: `run_profile=pg098_call_forth_dynamic_damage_16_seed`,
+  `start_seed=63241153`, `seeds_completed=16`, `events=15168`,
+  `decisions=2498`, `test_results_status_counts={"pass":18}`, and
+  `test_result_failures=[]`.
+- Result remains `battle_replay_final_status=review_required` because the
+  mandatory static event-contract gate still reports
+  `event_contract_static=review_required`.
+- `Call Forth the Tempest` was not present in the generated 16-seed replays;
+  use the focused replay artifact for card-specific proof and the 16-seed gate
+  for broad regression proof.
 - It does not authorize a deck swap or learned-deck promotion.
 - Next replay/battle work should continue from the live `event_contract_static`
   review state or from a deliberate fresh multi-seed run after the next card
-  rule batch, not from PG094 alone.
+  rule batch; PG098 leaves the same static event-contract residual open.
 
 ## PG095 Winds of Abandon Gate Reading - 2026-06-23 11:02 UTC
 

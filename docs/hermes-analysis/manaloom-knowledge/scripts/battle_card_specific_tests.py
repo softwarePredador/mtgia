@@ -1692,6 +1692,86 @@ def register_tests(battle, player):
             for entry in damage_event["survived_damage"]
         )
 
+    def test_pg098_call_forth_tempest_uses_dynamic_opponent_creature_damage():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.spell_mana_value_cast_this_turn = 14
+            active.battlefield = [
+                {
+                    "name": "Own Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                }
+            ]
+            opponent.battlefield = [
+                {
+                    "name": "Opponent Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 4,
+                    "toughness": 4,
+                },
+                {
+                    "name": "Opponent Large Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 7,
+                    "toughness": 7,
+                },
+            ]
+            effect_data = {
+                "effect": "damage_wipe",
+                "damage_amount_source": "other_spells_cast_mana_value_this_turn",
+                "current_spell_included_in_mana_value_ledger": True,
+                "damage_scope": "opponent_creatures",
+                "cascade_instances": 2,
+                "cascade_execution_status": "annotation_only_no_cascade_executor",
+                "battle_model_scope": "cascade_cascade_other_spells_mana_value_opponent_creature_damage_v1",
+                "_rule_logical_key": "battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739",
+                "_rule_oracle_hash": "5e76c466448cabbfd764e746566b41c1",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Call Forth the Tempest",
+                    "cmc": 8,
+                    "type_line": "Sorcery",
+                },
+                turn=6,
+                rng=random.Random(230623),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        active_names = {card.get("name") for card in active.battlefield}
+        opponent_names = {card.get("name") for card in opponent.battlefield}
+        assert "Own Small Creature" in active_names
+        assert "Opponent Small Creature" not in opponent_names
+        assert "Opponent Large Creature" in opponent_names
+        damage_event = next(data for event, data in events if event == "damage_wipe_resolved")
+        assert damage_event["damage"] == 6
+        assert damage_event["damage_scope"] == "opponent_creatures"
+        assert damage_event["damage_amount_source"] == "other_spells_cast_mana_value_this_turn"
+        assert damage_event["spell_mana_value_cast_this_turn"] == 14
+        assert damage_event["current_spell_mana_value"] == 8
+        assert damage_event["cascade_instances"] == 2
+        assert damage_event["cascade_execution_status"] == "annotation_only_no_cascade_executor"
+        assert damage_event["own_creatures_destroyed"] == 0
+        assert damage_event["opponent_creatures_destroyed"] == 1
+        assert damage_event["rule_logical_key"] == "battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739"
+        assert damage_event["rule_oracle_hash"] == "5e76c466448cabbfd764e746566b41c1"
+
     def test_akromas_will_keywords_are_until_end_of_turn_without_power_boost():
         active = player("Lorehold")
         creature = {
@@ -8477,6 +8557,7 @@ def register_tests(battle, player):
         test_boros_charm_double_strike_targets_one_creature_until_cleanup,
         test_austere_command_resolves_two_destroy_modes,
         test_blasphemous_act_deals_13_damage_to_each_creature,
+        test_pg098_call_forth_tempest_uses_dynamic_opponent_creature_damage,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_mox_amber_only_counts_mana_with_live_legend,
         test_silence_effect_blocks_counterspell_responses,

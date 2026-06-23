@@ -1214,3 +1214,27 @@ Next package number is PG086. Next queue should prioritize remaining deck
 - At that PG086 checkpoint, the next package number was PG087; this was
   superseded by the PG087/PG088 deck `606` checkpoint above. Current next
   package number is PG089.
+
+## ManaLoom PG098 Call Forth the Tempest dynamic damage - 2026-06-23 12:09 UTC
+
+- PG098 corrected `Call Forth the Tempest` for deck `607`: the stale trusted
+  PostgreSQL row claimed `token_maker=true` and had no Oracle hash/scope. The
+  promoted rule is `battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739`,
+  `oracle_hash=5e76c466448cabbfd764e746566b41c1`, `verified/auto`, and
+  `battle_model_scope=cascade_cascade_other_spells_mana_value_opponent_creature_damage_v1`.
+- Runtime now records `spell_mana_value_cast_this_turn` at cast payment and
+  `damage_wipe` supports
+  `damage_amount_source=other_spells_cast_mana_value_this_turn` plus
+  `damage_scope=opponent_creatures`.
+- Cascade remains intentionally `annotation_only_no_cascade_executor`.
+- Evidence: PostgreSQL postcheck
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_postcheck_20260623_120031.out`;
+  sync report
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_sync_report_20260623_120031.json`;
+  focused replay
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_focused_replay_20260623_120031.json`;
+  16-seed gate
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555/summary.json`.
+- Post-PG098 counts: deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
+  `high=14`, `medium=4`, `pass=76`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, and global `high=28`, `medium=4`, `pass=173`.

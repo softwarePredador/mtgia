@@ -4288,9 +4288,10 @@ Post-PG096 auditor result:
 - Deck `608`: `high=14`, `medium=3`, `pass=51`.
 - Global: `high=29`, `medium=4`, `pass=172`.
 
-Remaining queue:
+Remaining queue before PG098:
 
-- PG097 should continue deck `607` battle-critical high cards.
+- PG097 should continue deck `607` battle-critical high cards. This queue was
+  superseded by the PG098 Call Forth closure below.
 - `Call Forth the Tempest` is still a generic `damage_wipe` without
   Oracle-specific scope/hash.
 - `Avatar's Wrath`, `Dawn's Truce`, `Everything Comes to Dust`,
@@ -4363,7 +4364,7 @@ Gate decision:
 - This is a static event-contract residual, not evidence of a new deck `6` or
   deck `606` card-rule failure.
 
-Current deck `607` open queue:
+Deck `607` open queue before PG098:
 
 - `high` + `battle_critical`: `Avatar's Wrath`,
   `Call Forth the Tempest`, `Creative Technique`, `Dawn's Truce`,
@@ -4376,7 +4377,7 @@ Current deck `607` open queue:
 - `medium`: `Bender's Waterskin`, `Victory Chimes`,
   `Monument to Endurance`, and `Surge to Victory`.
 
-Next recommended lot:
+Next recommended lot before PG098:
 
 - Start with the deck `607` `battle_critical` high cards, grouping by executor
   family where the Oracle text supports it.
@@ -4385,7 +4386,7 @@ Next recommended lot:
   Truce`), impulse/cascade-style card flow (`Creative Technique`, `Promise of
   Loyalty` requires separate Oracle check before grouping), and unique review
   for `Avatar's Wrath` / `Call Forth the Tempest` if they do not share a safe
-  executor model.
+  executor model. PG098 below closed `Call Forth the Tempest`.
 
 ## PG097 Valakut Awakening Sync Guard - 2026-06-23 11:41 UTC
 
@@ -4409,3 +4410,49 @@ Next recommended lot:
   `high=14`, `medium=3`, `pass=51`, global `high=29`, `medium=4`,
   `pass=172`.
 - Next package is PG098, returning to deck `607` battle-critical high cards.
+
+## PG098 Call Forth Dynamic Opponent Damage - 2026-06-23 12:09 UTC
+
+Status: `applied_validated`.
+
+- `Call Forth the Tempest` moved out of deck `607` high after PostgreSQL,
+  SQLite, canonical snapshot, focused replay, and audit validation.
+- Old state: trusted curated row was `{"effect":"damage_wipe","token_maker":true}`
+  with no `oracle_hash` and no `battle_model_scope`; generated `board_wipe`
+  shadow was still `needs_review/review_only`.
+- New state: curated `verified/auto` rule
+  `battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739`,
+  `oracle_hash=5e76c466448cabbfd764e746566b41c1`,
+  `damage_amount_source=other_spells_cast_mana_value_this_turn`,
+  `damage_scope=opponent_creatures`, and
+  `battle_model_scope=cascade_cascade_other_spells_mana_value_opponent_creature_damage_v1`.
+- Boundary: cascade is still explicitly
+  `annotation_only_no_cascade_executor`; this package does not pretend full
+  cascade selection/casting exists.
+- Runtime support added a current-turn spell mana value ledger and dynamic
+  `damage_wipe` amount calculation.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_focused_replay_20260623_120031.json`
+  shows damage 6 from total ledger 14 minus Call Forth MV 8, one opponent
+  creature destroyed, own creature preserved, and a larger opponent creature
+  surviving.
+- Post-PG098 audits: deck `6` `pass=100`, deck `606` `pass=81`, deck `607`
+  `high=14`, `medium=4`, `pass=76`, deck `608` `high=14`, `medium=3`,
+  `pass=51`, global `high=28`, `medium=4`, `pass=173`.
+- Fresh 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555/summary.json`
+  reports `seeds_completed=16`, `events=15168`, `decisions=2498`, all 18
+  wrapper tests pass, and the same residual
+  `event_contract_static=review_required`.
+
+Current deck `607` high queue after PG098:
+
+- `battle_critical`: `Avatar's Wrath`, `Creative Technique`, `Dawn's Truce`,
+  `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
+  `Starfall Invocation`.
+- `battle_support`: `Pearl Medallion`.
+- `support_or_passive`: `Emeria's Call // Emeria, Shattered Skyclave`,
+  `Molecule Man`, `The Mind Stone`, `The Scarlet Witch`, `Thor, God of
+  Thunder`, and `Tragic Arrogance`.
+- `medium`: `Bender's Waterskin`, `Victory Chimes`,
+  `Monument to Endurance`, and `Surge to Victory`.

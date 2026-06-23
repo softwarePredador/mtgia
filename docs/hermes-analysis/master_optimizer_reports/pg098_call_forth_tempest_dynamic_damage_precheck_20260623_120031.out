@@ -1,0 +1,10 @@
+ target_card_rows | card_oracle_hash_match_rows | new_rule_already_present_rows | active_shadow_rows | rows_still_claiming_token_maker | trusted_missing_oracle_hash_rows | backup_table_already_exists
+------------------+-----------------------------+-------------------------------+--------------------+---------------------------------+----------------------------------+-----------------------------
+                1 |                           1 |                             0 |                  1 |                               1 |                                1 | f
+(1 row)
+
+    normalized_name     |       card_name        |                logical_rule_key                 |  source   | review_status | execution_status | confidence | rule_version | oracle_hash |                  effect_json                   |                deck_role_json                 |                                          notes
+------------------------+------------------------+-------------------------------------------------+-----------+---------------+------------------+------------+--------------+-------------+------------------------------------------------+-----------------------------------------------+------------------------------------------------------------------------------------------
+ call forth the tempest | Call Forth the Tempest | battle_rule_v1:650591170d2627e66333696ec360c17b | curated   | verified      | auto             |      1.000 |            1 |             | {"effect": "damage_wipe", "token_maker": true} | {"effect": "damage_wipe", "category": "wipe"} | Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.
+ call forth the tempest | Call Forth the Tempest | battle_rule_v1:f7544cbd53f0e83560b5568aa5115943 | generated | needs_review  | review_only      |      0.550 |            1 |             | {"cmc": 8.0, "effect": "board_wipe"}           | {"effect": "board_wipe", "category": "wipe"}  | Seeded from known_cards_generated.json; audit before trusting.
+(2 rows)

@@ -8733,6 +8733,120 @@ Next deploy number:
 
 - PG098 is next for any future PostgreSQL package.
 
+## PG098 Call Forth the Tempest Dynamic Damage Rule - Applied 2026-06-23 12:00 UTC
+
+Status: `applied_validated_rebaseline_review_required`.
+
+Scope:
+
+- Corrected `Call Forth the Tempest` from a stale trusted generic
+  `damage_wipe` with `token_maker=true` into an Oracle-backed dynamic
+  opponent-creature damage rule.
+- Target rule:
+  `battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739`.
+- Raw Oracle hash:
+  `5e76c466448cabbfd764e746566b41c1`.
+- Runtime scope:
+  `cascade_cascade_other_spells_mana_value_opponent_creature_damage_v1`.
+- The runtime now executes opponent-creature-only damage using the controller's
+  current-turn spell mana value ledger minus the resolving spell's own mana
+  value. The two cascade instances are recorded as
+  `annotation_only_no_cascade_executor`; PG098 does not claim full cascade
+  execution.
+- No deck swap, no `deck_cards` mutation, and no learned-deck promotion.
+
+Code/runtime changes:
+
+- `battle_analyst_v9.py` now records
+  `spell_mana_value_cast_this_turn` during cast payment.
+- `damage_wipe` can resolve
+  `damage_amount_source=other_spells_cast_mana_value_this_turn`.
+- `damage_wipe` now respects `damage_scope=opponent_creatures`.
+- Regression test added:
+  `test_pg098_call_forth_tempest_uses_dynamic_opponent_creature_damage`.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_precheck_20260623_120031.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_apply_20260623_120031.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_postcheck_20260623_120031.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_rollback_20260623_120031.sql`
+
+PostgreSQL evidence:
+
+- Backup table:
+  `manaloom_deploy_audit.pg098_call_forth_tempest_dynamic_damage_20260623_120031`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_precheck_20260623_120031.out`
+  reported `target_card_rows=1`, `card_oracle_hash_match_rows=1`,
+  `new_rule_already_present_rows=0`, `active_shadow_rows=1`,
+  `rows_still_claiming_token_maker=1`,
+  `trusted_missing_oracle_hash_rows=1`, and
+  `backup_table_already_exists=f`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_apply_20260623_120031.out`
+  reported backup `SELECT 2`, `deprecated_shadow_rows=2`,
+  `upserted_rows=1`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_postcheck_20260623_120031.out`
+  reported `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `promoted_expected_effect_rows=1`,
+  `active_shadow_rows=0`, `active_rows_still_claiming_token_maker=0`,
+  `trusted_missing_oracle_hash_rows=0`, and `backup_rows=2`.
+
+Sync/audit evidence:
+
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_dynamic_damage_sync_report_20260623_120031.json`
+  reported `include_needs_review=false`, `pg_rows_loaded=1830`,
+  `sqlite_inserted_or_updated=1809`, and
+  `canonical_snapshot_rows_exported=3201`.
+- Canonical snapshot proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_canonical_snapshot_20260623_120031.out`.
+- Focused replay proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_focused_replay_20260623_120031.json`
+  shows `damage=6`, `damage_scope=opponent_creatures`,
+  `spell_mana_value_cast_this_turn=14`, `current_spell_mana_value=8`,
+  `own_creatures_destroyed=0`, `opponent_creatures_destroyed=1`, and
+  `cascade_execution_status=annotation_only_no_cascade_executor`.
+- Post-PG098 audits:
+  deck `6` `pass=100`; deck `606` `pass=81`; deck `607` `high=14`,
+  `medium=4`, `pass=76`; deck `608` `high=14`, `medium=3`, `pass=51`;
+  global `high=28`, `medium=4`, `pass=173`.
+
+Tests:
+
+- `python3 -m py_compile ...`:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_py_compile_20260623_120031.out`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_test_sync_battle_card_rules_pg_selection_20260623_120031.out`
+  reported `Ran 10 tests ... OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_test_deck_card_battle_rule_coherence_audit_20260623_120031.out`
+  reported `Ran 8 tests ... OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_test_reviewed_battle_card_rules_20260623_120031.out`
+  reported `Ran 28 tests ... OK`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_test_battle_analyst_v10_3_20260623_120031.out`
+  includes the new PG098 regression and passed.
+
+Battle gate:
+
+- Rebaseline run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555/summary.json`.
+- Same comparison seed as the prior latest: `start_seed=63241153`,
+  `seeds_completed=16`, `events=15168`, `decisions=2498`,
+  `test_results_status_counts={"pass":18}`, and `test_result_failures=[]`.
+- `battle_replay_final_status=review_required` remains solely because
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- `Call Forth the Tempest` did not appear in those 16 generated replays; the
+  card-specific runtime proof is therefore the focused replay artifact above.
+
+Next deploy number:
+
+- PG099 is next for any future PostgreSQL package.
+
 ## PG096A Deck 607 High Noon Rule - Applied 2026-06-23 11:18 UTC
 
 Status: `applied_validated`.

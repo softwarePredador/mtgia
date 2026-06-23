@@ -17871,6 +17871,35 @@ Decision:
 - PG097 is accepted as a provenance/sync correction.
 - It does not change the latest recurring battle status and does not authorize
   a deck swap, learned-deck promotion, or battle rebaseline.
-- PG098 should return to deck `607` battle-critical high cards. `Call Forth
-  the Tempest` remains high from `generic_effect_without_model_scope` and
+- Superseded by PG098 below: before PG098, `Call Forth the Tempest` remained
+  high from `generic_effect_without_model_scope` and
   `trusted_rule_without_oracle_hash`.
+
+## PG098 Call Forth the Tempest Dynamic Damage - 2026-06-23 12:09 UTC
+
+Status: `applied_validated_replay_gate_review_required`.
+
+- PostgreSQL: PG098 promoted
+  `battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739` for `Call Forth the
+  Tempest`, with `oracle_hash=5e76c466448cabbfd764e746566b41c1`,
+  `review_status=verified`, `execution_status=auto`, and disabled the two old
+  shadows.
+- Runtime: `battle_analyst_v9.py` now tracks current-turn spell mana value at
+  cast payment and `damage_wipe` can calculate damage from other spells cast
+  this turn while respecting `damage_scope=opponent_creatures`.
+- Boundary: cascade remains `annotation_only_no_cascade_executor`.
+- Focused proof:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_focused_replay_20260623_120031.json`.
+- Post-PG098 audits: deck `607` moved from `high=15`, `pass=75` to
+  `high=14`, `pass=76`; global moved from `high=29`, `pass=172` to
+  `high=28`, `pass=173`.
+- Fresh 16-seed gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555/summary.json`
+  completed 16/16 seeds with 18 test passes and no test failures, but remains
+  `review_required` on `event_contract_static=review_required`.
+
+Next validation focus:
+
+- Continue deck `607` high `battle_critical` queue: `Avatar's Wrath`,
+  `Creative Technique`, `Dawn's Truce`, `Everything Comes to Dust`,
+  `Fated Clash`, `Promise of Loyalty`, and `Starfall Invocation`.

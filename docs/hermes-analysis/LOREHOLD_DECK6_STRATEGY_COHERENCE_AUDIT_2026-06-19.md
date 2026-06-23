@@ -21555,11 +21555,42 @@ Result:
 - No deck swap, no `deck_cards` mutation, no learned-deck promotion, and no
   battle rebaseline.
 
-Remaining queue:
+Remaining queue before PG098:
 
-- PG098 should return to deck `607` battle-critical high cards.
-- `Call Forth the Tempest` remains high because its trusted row is still a
-  generic `damage_wipe` without Oracle-specific scope/hash.
+- Before PG098, `Call Forth the Tempest` remained high because its trusted row
+  was still a generic `damage_wipe` without Oracle-specific scope/hash. PG098
+  below closed that item.
+
+## PG098 Call Forth the Tempest Closure - 2026-06-23 12:09 UTC
+
+Status: `deck607_call_forth_closed_with_runtime_boundary`.
+
+- `Call Forth the Tempest` no longer remains high after PG098.
+- PostgreSQL promoted rule
+  `battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739` with raw Oracle hash
+  `5e76c466448cabbfd764e746566b41c1`.
+- Runtime behavior now executes dynamic damage to creatures opponents control
+  from other spells' total mana value this turn.
+- Explicit boundary: cascade is recorded as
+  `annotation_only_no_cascade_executor`, so the battle engine still does not
+  fully perform cascade reveal/cast selection.
+- Focused replay:
+  `docs/hermes-analysis/master_optimizer_reports/pg098_call_forth_tempest_focused_replay_20260623_120031.json`
+  proves damage 6 from ledger 14 minus current spell MV 8, own creature
+  preserved, one opponent creature destroyed, and one larger opponent creature
+  surviving.
+- Deck `607` audit now reports `high=14`, `medium=4`, `pass=76`.
+- Global audit now reports `high=28`, `medium=4`, `pass=173`.
+- Fresh 16-seed gate at
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555/summary.json`
+  passed all 18 wrapper tests, completed 16 seeds, and remains
+  `review_required` only on `event_contract_static=review_required`.
+
+Next deck `607` battle-critical high queue:
+
+- `Avatar's Wrath`, `Creative Technique`, `Dawn's Truce`,
+  `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
+  `Starfall Invocation`.
 
 ## PG097 Valakut Fresh Sync + Battle Gate - 2026-06-23 11:48 UTC
 
@@ -21630,6 +21661,75 @@ Interpretation:
 Next queue:
 
 - Continue deck `607` high `battle_critical` before support/passive rows:
-  `Avatar's Wrath`, `Call Forth the Tempest`, `Creative Technique`,
-  `Dawn's Truce`, `Everything Comes to Dust`, `Fated Clash`,
-  `Promise of Loyalty`, and `Starfall Invocation`.
+  `Avatar's Wrath`, `Creative Technique`, `Dawn's Truce`,
+  `Everything Comes to Dust`, `Fated Clash`, `Promise of Loyalty`, and
+  `Starfall Invocation`.
+
+## PG098 Call Forth Fresh Battle Gate - 2026-06-23 12:11 UTC
+
+Status: `deck6_card_rule_clean_replay_gate_review_required`.
+
+What was checked:
+
+- A manual recurring 16-seed battle strategy audit was already active when the
+  check started: `manaloom-battle-strategy-audit.sh --seeds 16 --start-seed
+  63241153`. The run was allowed to finish; no parallel battle runner was
+  started.
+- The completed run updated
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest`
+  to
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555`.
+- The replay summary reports `lorehold_deck_source_kind=sqlite_deck_cards`,
+  `lorehold_deck_source_ref=deck_id:6`, `seeds_requested=16`,
+  `seeds_completed=16`, `events=15168`, and `decisions=2498`.
+- Runtime deck metrics were derived from the resolved card list, not cached
+  metadata: `lorehold_deck_lands=33`,
+  `lorehold_deck_avg_cmc_nonlands=2.561`, and
+  `lorehold_deck_cached_metadata_used_for_metrics=false`.
+- Local Hermes `deck_cards` still reports `100` rows, summed quantity `100`,
+  commander quantity `1`, and land quantity `33` for deck id `6`.
+
+Card-rule audit result:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg098_call_forth_post_20260623_120031.json`
+  reports `total_cards=100`, `severity_counts={"pass":100}`, and no finding
+  counts.
+- The companion Markdown report
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg098_call_forth_post_20260623_120031.md`
+  reports `critical=0`, `high=0`, `medium=0`, `low=0`, and `pass=100`.
+
+Battle gate result:
+
+- Run:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260623_120555`.
+- `summary.json` reports `run_profile=pg098_call_forth_dynamic_damage_16_seed`,
+  `run_scope=recurring_full`, `invocation_kind=manual_cli`,
+  `start_seed=63241153`, and `seeds_completed=16`.
+- All 18 wrapper tests passed.
+- `target_pressure` and `table_intent` passed for all 16 seeds.
+- No high/critical action findings, strategy blockers, replay-decision
+  blockers, forensic blockers, target-pressure violations, or table-intent
+  violations were reported.
+- Strategy audit remained pass with `strategy_review_required_findings=0`; the
+  only strategy counts were three medium
+  `forced_keep_after_bad_mulligan` observations.
+- `battle_replay_final_status=review_required` remains because
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+- The event-contract residual is static-fixture coverage only in this run:
+  `observed_unclassified_total=0`, `static_unclassified_total=6`, and
+  `fixture_unaccepted_types=["etb_recursion_resolved",
+  "etb_removal_resolved", "etb_removal_skipped",
+  "powerbalance_trigger_resolved", "steal_all_creatures_resolved",
+  "tokens_created"]`.
+
+Interpretation:
+
+- Deck id `6` remains coherent at the card-rule layer: all 100 cards have the
+  required current gate evidence and no card-specific actionable queue remains.
+- The fresh battle exercised deck id `6` under the recurring pressure/table
+  intent gates without deck-source blockers or strategy blockers.
+- The replay gate is still not fully green due to event-contract/static-fixture
+  backlog, not because of a deck id `6` card-coherence failure.
+- No PostgreSQL write, deck swap, `deck_cards` mutation, commit, push, cleanup,
+  revert, or stash was performed in this check.
