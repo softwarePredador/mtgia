@@ -423,6 +423,126 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["countered_creatures_tap_for_mana"])
         self.assertEqual(primary["produces"], "G")
 
+    def test_an_offer_you_cant_refuse_maps_to_exact_counter_treasure_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "CreateTokenControllerTargetEffect"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect()); "
+                    "this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new TreasureToken(), 2, false)); "
+                    "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_NON_CREATURE));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_noncreature_spell_target_controller_treasure_two_v1",
+        )
+        self.assertEqual(primary["target"], "noncreature_spell")
+        self.assertEqual(primary["target_controller_creates_treasure"], 2)
+
+    def test_swan_song_maps_to_exact_counter_bird_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "CreateTokenControllerTargetEffect"],
+                "target_classes": ["TargetSpell"],
+                "filter_classes": ["FilterSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "filter.add(Predicates.or(CardType.ENCHANTMENT.getPredicate(), CardType.INSTANT.getPredicate(), CardType.SORCERY.getPredicate())); "
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect()); "
+                    "this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new SwanSongBirdToken())); "
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_enchantment_instant_sorcery_spell_target_controller_bird_v1",
+        )
+        self.assertEqual(primary["target"], "enchantment_instant_or_sorcery_spell")
+        self.assertEqual(primary["target_controller_creates_token"]["name"], "Bird")
+        self.assertEqual(primary["target_controller_creates_token"]["power"], 2)
+
+    def test_pact_of_negation_maps_to_exact_delayed_upkeep_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "CreateDelayedTriggeredAbilityEffect"],
+                "ability_classes": ["PactDelayedTriggeredAbility"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addTarget(new TargetSpell()); "
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect()); "
+                    "this.getSpellAbility().addEffect(new CreateDelayedTriggeredAbilityEffect("
+                    "new PactDelayedTriggeredAbility(new ManaCostsImpl<>(\"{3}{U}{U}\")), false));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "pact_of_negation_delayed_upkeep_counter_v1",
+        )
+        self.assertEqual(primary["target"], "spell")
+        self.assertEqual(primary["delayed_upkeep_mana_payment"], "{3}{U}{U}")
+        self.assertTrue(primary["lose_game_if_unpaid"])
+
+    def test_refute_maps_to_exact_counter_draw_discard_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "DrawDiscardControllerEffect"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect()); "
+                    "this.getSpellAbility().addTarget(new TargetSpell()); "
+                    "this.getSpellAbility().addEffect(new DrawDiscardControllerEffect(1, 1));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(primary["battle_model_scope"], "counter_spell_draw_then_discard_v1")
+        self.assertEqual(primary["draw_then_discard"], 1)
+
+    def test_wizards_retort_maps_to_exact_control_wizard_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "SpellCostReductionSourceEffect"],
+                "ability_classes": ["SimpleStaticAbility"],
+                "target_classes": ["TargetSpell"],
+                "filter_classes": ["FilterControlledPermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "filter.add(SubType.WIZARD.getPredicate()); "
+                    "Ability ability = new SimpleStaticAbility(Zone.ALL, new SpellCostReductionSourceEffect(1, condition)); "
+                    "ability.addHint(new ConditionHint(condition, \"You control a Wizard\")); "
+                    "this.getSpellAbility().addTarget(new TargetSpell()); "
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_spell_costs_one_less_if_control_wizard_v1",
+        )
+        self.assertEqual(primary["cost_reduction_generic_if_control_wizard"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

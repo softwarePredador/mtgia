@@ -702,14 +702,19 @@
     "battle_rule_logical_key": "battle_rule_v1:90345eb5573a6295450e7f625c28b943"
   },
   "An Offer You Can't Refuse": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_noncreature_spell_target_controller_treasure_two_v1",
     "effect": "counter",
     "instant": true,
+    "target": "noncreature_spell",
+    "target_controller_creates_treasure": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eafa496b9179d9cbd3350b078d13f17e",
+    "battle_rule_oracle_hash": "fd5c2cd66bcbe90bb2d072f0146d67b3"
   },
   "An-Havva Township": {
     "effect": "land",
@@ -20397,14 +20402,20 @@
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
   "Pact of Negation": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "pact_of_negation_delayed_upkeep_counter_v1",
+    "delayed_upkeep_mana_payment": "{3}{U}{U}",
     "effect": "counter",
     "instant": true,
+    "lose_game_if_unpaid": true,
+    "target": "spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:395f96ea9a7b45f017ebef88b456663b",
+    "battle_rule_oracle_hash": "262a21c885bcc509fa438d4ba3ead7d8"
   },
   "Pact of the Serpent": {
     "cmc": 3.0,
@@ -22640,15 +22651,19 @@
     "battle_rule_oracle_hash": "041645992d04029f74855292bb1459f4"
   },
   "Refute": {
-    "cmc": 3.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_spell_draw_then_discard_v1",
+    "draw_then_discard": 1,
     "effect": "counter",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:58cf40a9a929b66bca25048353cb1498"
+    "target": "spell",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41a3506a6969888f362a122077db87cb",
+    "battle_rule_oracle_hash": "08a27b0252c823f1a0d6532701925010"
   },
   "Regrowth": {
     "cmc": 2.0,
@@ -28191,14 +28206,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Swan Song": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_enchantment_instant_sorcery_spell_target_controller_bird_v1",
     "effect": "counter",
     "instant": true,
+    "target": "enchantment_instant_or_sorcery_spell",
+    "target_controller_creates_token": {
+      "colors": [
+        "U"
+      ],
+      "count": 1,
+      "keywords": [
+        "flying"
+      ],
+      "name": "Bird",
+      "power": 2,
+      "toughness": 2
+    },
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9e1a27e7c6c194ebfab6c500503665a6",
+    "battle_rule_oracle_hash": "f31d32e77db92d33647a4424c52ade5d"
   },
   "Swarmyard": {
     "effect": "land",
@@ -33857,6 +33888,21 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:81f188e4e97035598c3746c5f81a02d8"
+  },
+  "Wizard's Retort": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_spell_costs_one_less_if_control_wizard_v1",
+    "cost_reduction_generic_if_control_wizard": 1,
+    "effect": "counter",
+    "instant": true,
+    "target": "spell",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:642383d239e504a8da473caca3b05597",
+    "battle_rule_oracle_hash": "ff5f40a24723d9dbc7424b86099c51b1"
   },
   "Wizards' School": {
     "effect": "land",

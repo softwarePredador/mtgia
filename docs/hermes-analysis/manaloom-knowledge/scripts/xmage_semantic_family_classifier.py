@@ -355,6 +355,60 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "G"
         )
 
+    if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CounterTargetEffect", "CreateDelayedTriggeredAbilityEffect"}.issubset(effect_classes)
+            and "PactDelayedTriggeredAbility" in ability_classes
+            and effect_json.get("target") == "spell"
+            and bool(effect_json.get("instant"))
+            and effect_json.get("delayed_upkeep_mana_payment") == "{3}{U}{U}"
+            and bool(effect_json.get("lose_game_if_unpaid"))
+        )
+
+    if effect == "counter_spell" and scope == "counter_noncreature_spell_target_controller_treasure_two_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CounterTargetEffect", "CreateTokenControllerTargetEffect"}.issubset(effect_classes)
+            and effect_json.get("target") == "noncreature_spell"
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("target_controller_creates_treasure") or 0) == 2
+        )
+
+    if effect == "counter_spell" and scope == "counter_enchantment_instant_sorcery_spell_target_controller_bird_v1":
+        token = effect_json.get("target_controller_creates_token") or {}
+        return (
+            types == {"INSTANT"}
+            and {"CounterTargetEffect", "CreateTokenControllerTargetEffect"}.issubset(effect_classes)
+            and effect_json.get("target") == "enchantment_instant_or_sorcery_spell"
+            and bool(effect_json.get("instant"))
+            and token.get("name") == "Bird"
+            and int(token.get("count") or 0) == 1
+            and int(token.get("power") or 0) == 2
+            and int(token.get("toughness") or 0) == 2
+            and token.get("colors") == ["U"]
+            and token.get("keywords") == ["flying"]
+        )
+
+    if effect == "counter_spell" and scope == "counter_spell_draw_then_discard_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CounterTargetEffect", "DrawDiscardControllerEffect"}.issubset(effect_classes)
+            and effect_json.get("target") == "spell"
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("draw_then_discard") or 0) == 1
+        )
+
+    if effect == "counter_spell" and scope == "counter_spell_costs_one_less_if_control_wizard_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CounterTargetEffect", "SpellCostReductionSourceEffect"}.issubset(effect_classes)
+            and "SimpleStaticAbility" in ability_classes
+            and effect_json.get("target") == "spell"
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("cost_reduction_generic_if_control_wizard") or 0) == 1
+        )
+
     return False
 
 

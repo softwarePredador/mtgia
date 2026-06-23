@@ -555,6 +555,189 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_an_offer_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "An Offer You Can't Refuse",
+                        "severity": "high",
+                        "oracle_hash": "offerhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AnOfferYouCantRefuse",
+                            "path": "/xmage/AnOfferYouCantRefuse.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect", "CreateTokenControllerTargetEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_noncreature_spell_target_controller_treasure_two_v1",
+                                "target": "noncreature_spell",
+                                "instant": True,
+                                "target_controller_creates_treasure": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_swan_song_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Swan Song",
+                        "severity": "high",
+                        "oracle_hash": "swanhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SwanSong",
+                            "path": "/xmage/SwanSong.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect", "CreateTokenControllerTargetEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_enchantment_instant_sorcery_spell_target_controller_bird_v1",
+                                "target": "enchantment_instant_or_sorcery_spell",
+                                "instant": True,
+                                "target_controller_creates_token": {
+                                    "name": "Bird",
+                                    "count": 1,
+                                    "power": 2,
+                                    "toughness": 2,
+                                    "colors": ["U"],
+                                    "keywords": ["flying"],
+                                },
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_pact_of_negation_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Pact of Negation",
+                        "severity": "high",
+                        "oracle_hash": "pacthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PactOfNegation",
+                            "path": "/xmage/PactOfNegation.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect", "CreateDelayedTriggeredAbilityEffect"],
+                            "ability_classes": ["PactDelayedTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "pact_of_negation_delayed_upkeep_counter_v1",
+                                "target": "spell",
+                                "instant": True,
+                                "delayed_upkeep_mana_payment": "{3}{U}{U}",
+                                "lose_game_if_unpaid": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_refute_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Refute",
+                        "severity": "high",
+                        "oracle_hash": "refutehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Refute",
+                            "path": "/xmage/Refute.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect", "DrawDiscardControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_spell_draw_then_discard_v1",
+                                "target": "spell",
+                                "instant": True,
+                                "draw_then_discard": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_wizards_retort_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Wizard's Retort",
+                        "severity": "high",
+                        "oracle_hash": "retorthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WizardsRetort",
+                            "path": "/xmage/WizardsRetort.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect", "SpellCostReductionSourceEffect"],
+                            "ability_classes": ["SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_spell_costs_one_less_if_control_wizard_v1",
+                                "target": "spell",
+                                "instant": True,
+                                "cost_reduction_generic_if_control_wizard": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_normalizes_modal_mana_rock_to_runtime_ramp_effect(self) -> None:
         report = generator.build_generator_report(
             batch_audit={

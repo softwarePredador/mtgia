@@ -369,6 +369,129 @@ def _build_veil_of_summer_fields(
     }
 
 
+def _build_counter_variant_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"INSTANT"} or "CounterTargetEffect" not in effect_classes:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+
+    if "CreateDelayedTriggeredAbilityEffect" in effect_classes and "PactDelayedTriggeredAbility" in ability_classes:
+        return {
+            "effect": "counter_spell",
+            "scope": "pact_of_negation_delayed_upkeep_counter_v1",
+            "fields": {
+                "target": "spell",
+                "instant": True,
+                "delayed_upkeep_mana_payment": "{3}{U}{U}",
+                "lose_game_if_unpaid": True,
+            },
+            "reason": (
+                "XMage structure matches Pact of Negation counterspell plus delayed upkeep payment-or-lose trigger."
+            ),
+            "signals": [
+                "CounterTargetEffect",
+                "CreateDelayedTriggeredAbilityEffect",
+                "PactDelayedTriggeredAbility",
+            ],
+        }
+
+    if "CreateTokenControllerTargetEffect" in effect_classes:
+        if "treasuretoken" in normalized and "filter_spell_non_creature" in normalized:
+            return {
+                "effect": "counter_spell",
+                "scope": "counter_noncreature_spell_target_controller_treasure_two_v1",
+                "fields": {
+                    "target": "noncreature_spell",
+                    "instant": True,
+                    "target_controller_creates_treasure": 2,
+                },
+                "reason": (
+                    "XMage structure matches An Offer You Can't Refuse countering a noncreature spell and creating two Treasures for its controller."
+                ),
+                "signals": [
+                    "CounterTargetEffect",
+                    "CreateTokenControllerTargetEffect",
+                    "TreasureToken",
+                ],
+            }
+        if (
+            "swansongbirdtoken" in normalized
+            and "cardtype.enchantment.getpredicate" in normalized
+            and "cardtype.instant.getpredicate" in normalized
+            and "cardtype.sorcery.getpredicate" in normalized
+        ):
+            return {
+                "effect": "counter_spell",
+                "scope": "counter_enchantment_instant_sorcery_spell_target_controller_bird_v1",
+                "fields": {
+                    "target": "enchantment_instant_or_sorcery_spell",
+                    "instant": True,
+                    "target_controller_creates_token": {
+                        "name": "Bird",
+                        "count": 1,
+                        "power": 2,
+                        "toughness": 2,
+                        "colors": ["U"],
+                        "keywords": ["flying"],
+                    },
+                },
+                "reason": (
+                    "XMage structure matches Swan Song countering enchantment/instant/sorcery and creating a 2/2 blue Bird with flying for that spell's controller."
+                ),
+                "signals": [
+                    "CounterTargetEffect",
+                    "CreateTokenControllerTargetEffect",
+                    "SwanSongBirdToken",
+                ],
+            }
+
+    if "DrawDiscardControllerEffect" in effect_classes and "drawdiscardcontrollereffect(1, 1)" in normalized:
+        return {
+            "effect": "counter_spell",
+            "scope": "counter_spell_draw_then_discard_v1",
+            "fields": {
+                "target": "spell",
+                "instant": True,
+                "draw_then_discard": 1,
+            },
+            "reason": "XMage structure matches Refute countering a spell and then drawing and discarding one card.",
+            "signals": [
+                "CounterTargetEffect",
+                "DrawDiscardControllerEffect",
+            ],
+        }
+
+    if (
+        "SpellCostReductionSourceEffect" in effect_classes
+        and "SimpleStaticAbility" in ability_classes
+        and ("control a wizard" in normalized or "subtype.wizard.getpredicate" in normalized)
+    ):
+        return {
+            "effect": "counter_spell",
+            "scope": "counter_spell_costs_one_less_if_control_wizard_v1",
+            "fields": {
+                "target": "spell",
+                "instant": True,
+                "cost_reduction_generic_if_control_wizard": 1,
+            },
+            "reason": "XMage structure matches Wizard's Retort countering a spell with a cost reduction while you control a Wizard.",
+            "signals": [
+                "CounterTargetEffect",
+                "SpellCostReductionSourceEffect",
+                "control_wizard",
+            ],
+        }
+
+    return None
+
+
 def _build_rishkar_fields(
     *,
     card_types: set[str],
@@ -508,6 +631,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(mana_rock_fields["fields"]),
                 matched_signals=["mana", "draw", "sacrifice_cost"],
+            )
+        )
+
+    counter_variant_fields = _build_counter_variant_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if counter_variant_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(counter_variant_fields["effect"]),
+                scope=str(counter_variant_fields["scope"]),
+                reason=str(counter_variant_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(counter_variant_fields["fields"]),
+                matched_signals=list(counter_variant_fields["signals"]),
             )
         )
 
