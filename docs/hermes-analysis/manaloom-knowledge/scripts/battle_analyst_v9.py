@@ -1860,6 +1860,10 @@ def mana_source_production_for_state(player, source):
             if isinstance(permanent, dict)
         ):
             return 0
+    if source.get("metalcraft_required") or normalized_name == "mox opal":
+        threshold = int(source.get("metalcraft_artifact_threshold") or 3)
+        if controlled_artifact_count(player) < threshold:
+            return 0
     return int(source.get("mana_produced", 1) or 0)
 
 
@@ -7846,6 +7850,31 @@ def ritual_mana_replay_fields(player, effect_data, opponents=None):
     }
 
 
+def activate_hand_exile_mana_ability(player, card, effect_data, turn, opponents=None, *, phase=None):
+    produced = ritual_mana_produced(player, effect_data, opponents)
+    if card in player.hand:
+        player.hand.remove(card)
+    if card not in player.exile:
+        player.exile.append(card)
+    player.mana_pool.add_generic(produced)
+    fields = replay_rule_fields(effect_data)
+    fields.setdefault("source_zone", "hand")
+    emit_replay_event(
+        "ritual_mana_added",
+        player=player.name,
+        card=card.get("name", "?"),
+        mana_added=produced,
+        mana_pool_total=player.mana_pool.total(),
+        destination="exile",
+        activation_kind="hand_exile_mana_ability",
+        turn=turn,
+        phase=phase,
+        **ritual_mana_replay_fields(player, effect_data, opponents),
+        **fields,
+    )
+    return produced
+
+
 def choose_largest_hand_opponent(opponents):
     alive_opponents = [
         opponent
@@ -13756,6 +13785,49 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
     return moved
 
 
+def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
+    count = max(1, int(effect_data.get("etb_recursion_count") or 1))
+    target_type = effect_data.get("etb_recursion_target") or "nonland"
+    destination = effect_data.get("etb_recursion_destination", "hand")
+    candidates = [
+        grave_card
+        for grave_card in list(player.graveyard)
+        if graveyard_card_matches_recursion_target(grave_card, target_type)
+    ]
+    recovered = []
+    for recovered_card in candidates[:count]:
+        if recovered_card not in player.graveyard:
+            continue
+        player.graveyard.remove(recovered_card)
+        recovered.append(recovered_card)
+        if destination == "battlefield":
+            permanent_effect = get_card_effect(recovered_card)
+            permanent = prepare_entering_permanent(
+                enrich_card({**recovered_card, **permanent_effect}),
+                controller=player,
+                all_players=[player],
+                turn=turn,
+            )
+            if is_creature_card(recovered_card):
+                permanent["effect"] = "creature"
+            player.battlefield.append(permanent)
+        else:
+            player.hand.append(recovered_card)
+    emit_replay_event(
+        "etb_recursion_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        trigger="enters_battlefield",
+        target_type=target_type,
+        destination=destination,
+        recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
+        recovered_count=len(recovered),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return recovered
+
+
 def resolve_etb_removal(player, opponents, card, effect_data, turn, rng):
     target_type = (
         effect_data.get("etb_remove_target")
@@ -14395,6 +14467,88 @@ def trigger_spell_cast_engines(
         spell_is_creature = is_creature_card(spell) or "creature" in str(spell.get("type_line") or "").lower()
         if trigger_kind == "noncreature_spell_cast" and spell_is_creature:
             continue
+        if permanent.get("trigger_effect") == "rummage":
+            discard_card, discard_reason, risk_flags, use_top_replacement, scored_options = (
+                choose_lorehold_rummage_discard(player)
+            )
+            if not discard_card:
+                emit_replay_event(
+                    "trigger_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    reason="no_discard_candidate",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+
+            def resolve_spell_cast_rummage_trigger(
+                permanent=permanent,
+                discard_card=discard_card,
+                discard_reason=discard_reason,
+                risk_flags=risk_flags,
+                use_top_replacement=use_top_replacement,
+                trigger_kind=trigger_kind,
+                spell=spell,
+            ):
+                if discard_card not in player.hand:
+                    emit_replay_event(
+                        "trigger_skipped",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger_kind,
+                        trigger_spell=spell.get("name", "?"),
+                        reason="discard_candidate_missing_on_resolution",
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                    return
+                player.hand.remove(discard_card)
+                discard_resolution = resolve_effect_discard_cards(
+                    player,
+                    [discard_card],
+                    top_limit=1 if use_top_replacement else 0,
+                )
+                drawn = player.draw(1)
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="rummage",
+                    discarded=discard_card.get("name", "?"),
+                    discard_reason=discard_reason,
+                    discarded_to_top=[
+                        card.get("name", "?")
+                        for card in discard_resolution.get("to_top", [])
+                    ],
+                    discarded_to_graveyard=[
+                        card.get("name", "?")
+                        for card in discard_resolution.get("to_graveyard", [])
+                    ],
+                    cards_drawn=len(drawn),
+                    drawn=[card.get("name", "?") for card in drawn],
+                    risk_flags=risk_flags,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_rummage_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         if permanent.get("spell_cast_token_power_from_spell_cmc"):
             token_size = max(1, int(spell.get("cmc") or 1))
 
@@ -14616,6 +14770,54 @@ def trigger_opponent_spell_draw_engines(
     for opponent in opponents:
         for permanent in list(opponent.battlefield):
             if not isinstance(permanent, dict):
+                continue
+            if permanent.get("effect") == "ramp_engine":
+                trigger = permanent.get("trigger")
+                if trigger not in ("opponent_spell", "opponent_second_spell"):
+                    continue
+                if (
+                    permanent.get("opponent_second_spell_each_turn")
+                    and getattr(caster, "spells_cast_this_turn", 0) != 2
+                ):
+                    continue
+                treasure_count = int(permanent.get("treasure_count") or 1)
+
+                def resolve_opponent_spell_resource_trigger(
+                    opponent=opponent,
+                    permanent=permanent,
+                    trigger=trigger,
+                    treasure_count=treasure_count,
+                ):
+                    treasures_before = opponent.treasures
+                    opponent.treasures += treasure_count
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=opponent.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger,
+                        trigger_spell=spell.get("name", "?"),
+                        effect="create_treasure",
+                        treasures_created=treasure_count,
+                        treasures_before=treasures_before,
+                        treasures_after=opponent.treasures,
+                        opponent_second_spell_each_turn=bool(
+                            permanent.get("opponent_second_spell_each_turn")
+                        ),
+                        opponent_spell_count=getattr(caster, "spells_cast_this_turn", 0),
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+
+                resolve_or_enqueue_trigger(
+                    opponent,
+                    permanent,
+                    trigger,
+                    resolve_opponent_spell_resource_trigger,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players or [caster, *opponents],
+                )
                 continue
             if permanent.get("effect") != "draw_engine":
                 continue
@@ -15180,6 +15382,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         additional_costs = []
         modes = []
         metadata = {}
+        if ramp_effect.get("hand_exile_mana_ability"):
+            return {
+                "additional_costs": additional_costs,
+                "modes": ["hand_exile_mana_ability"],
+                "uses_hand_exile_mana_ability": True,
+            }
         if ramp_effect.get("multikicker_generic_cost"):
             cost = int(ramp_effect.get("multikicker_generic_cost") or 0)
             min_kicks = int(ramp_effect.get("min_kicker_count_for_mana") or 1)
@@ -15523,6 +15731,19 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     flag for flag in (strategy_context.get("strategic_risk_flags") or [])
                     if flag and flag not in ramp_risk_flags
                 )
+                if cast_plan.get("uses_hand_exile_mana_ability"):
+                    activate_hand_exile_mana_ability(
+                        player,
+                        c,
+                        eff,
+                        turn,
+                        opponents,
+                        phase=phase,
+                    )
+                    mana = player.available_mana()
+                    if note_action():
+                        return True
+                    continue
                 def ramp_trace_score(option_card, option_context):
                     base_score = max(1, int(option_card.get("cmc", 0) or 0) + 10)
                     if option_context.get("unlocks_same_turn_action"):
@@ -16022,37 +16243,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                             artifact=bool(eff.get("etb_artifact_tokens")),
                         )
                 if eff.get("etb_recursion_count"):
-                    target_type = eff.get("etb_recursion_target")
-                    destination = eff.get("etb_recursion_destination", "hand")
-                    candidates = [
-                        grave_card
-                        for grave_card in player.graveyard
-                        if isinstance(grave_card, dict)
-                        and not is_land(grave_card)
-                        and (
-                            target_type != "creature"
-                            or is_creature_card(grave_card)
-                        )
-                        and (
-                            target_type == "creature"
-                            or target_type != "instant_or_sorcery"
-                            or is_instant_or_sorcery_spell(grave_card)
-                        )
-                    ]
-                    for recovered_card in candidates[: int(eff.get("etb_recursion_count") or 1)]:
-                        if recovered_card in player.graveyard:
-                            player.graveyard.remove(recovered_card)
-                            if destination == "battlefield":
-                                permanent_effect = get_card_effect(recovered_card)
-                                permanent = enrich_card({**recovered_card, **permanent_effect})
-                                if is_creature_card(recovered_card):
-                                    permanent["effect"] = "creature"
-                                    permanent["haste"] = has_haste(permanent)
-                                    permanent["summoning_sick"] = not permanent["haste"]
-                                    permanent["tapped"] = False
-                                player.battlefield.append(permanent)
-                            else:
-                                player.hand.append(recovered_card)
+                    resolve_etb_graveyard_recursion(player, c_copy, eff, turn)
                 played += 1
                 if note_action():
                     return True
@@ -16318,6 +16509,16 @@ def apply_effect_immediate(
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect = effect_data.get("effect", "unknown")
+    if effect == "ramp_ritual" and effect_data.get("hand_exile_mana_ability"):
+        activate_hand_exile_mana_ability(
+            player,
+            card,
+            effect_data,
+            turn,
+            opponents,
+            phase=phase,
+        )
+        return
     if (
         isinstance(card, dict)
         and (card.get("is_copy") or effect_data.get("_copied_from_spell"))
@@ -16392,6 +16593,8 @@ def apply_effect_immediate(
             resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
         if effect_data.get("etb_remove_target") or effect_data.get("etb_removal_target"):
             resolve_etb_removal(player, opponents, permanent, effect_data, turn, rng)
+        if effect_data.get("etb_recursion_count"):
+            resolve_etb_graveyard_recursion(player, permanent, effect_data, turn)
         emit_replay_event(
             "creature_to_battlefield",
             player=player.name,

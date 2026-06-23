@@ -20779,6 +20779,51 @@ Current reading:
 - Treat the two remaining `forced_keep_after_bad_mulligan` records as
   seed-level low-confidence exclusions, not as deck `6` review blockers.
 
+## PG080 Deck 606 L3 Mana/Ramp Card Gate - 2026-06-23 08:20 UTC
+
+Scope:
+
+- Closed the deck `606` L3 mana/ramp support queue:
+  `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.
+- This was a PostgreSQL card-rule package plus focused runtime proof, not a
+  strategy rebaseline and not a deck swap.
+
+PostgreSQL and cache evidence:
+
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_postcheck_20260623_081220.out`
+  reports `target_rule_rows=3`, `target_hash_match_rows=3`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=3`,
+  `non_disabled_shadow_rows=0`, and `disabled_shadow_rows=3`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_rollback_20260623_081220.sql`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg080_l3_mana_ramp_sync_report_20260623_081412.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1805`, and
+  `canonical_snapshot_rows_exported=3201`.
+
+Runtime evidence:
+
+- Focused event artifact:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg080_l3_mana_ramp_focused_events_20260623_052022.jsonl`
+  has three rows proving all three PG080 logical rule keys.
+- `test_battle_analyst_v10_3.py` passed after adding the PG080 L3 focused
+  tests.
+
+Current reading:
+
+- Deck `6` remains closed for card-rule coherence:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg080_after_l3_20260623_052200.json`
+  reports `pass=100`.
+- Deck `606` L3 mana/ramp queue is closed:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg080_after_l3_20260623_052200.json`
+  reports `high=0`, `medium=4`, `pass=77`.
+- Global card-rule queue is now `high=43`, `medium=8`, `pass=154`.
+- Next deck `606` lane should be `medium/support_or_passive` hash-only
+  cleanup: `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
+  `Skyclave Apparition`, and `Underworld Breach`.
+
 ## PG079 Deck 606 High Battle-Critical Card Gate - 2026-06-23 08:01 UTC
 
 Scope:
@@ -20871,3 +20916,92 @@ Current reading:
   by itself prove a better Lorehold deck composition or authorize a deck swap.
 - Next validation should move to deck `607`/`608` high shared cards before the
   next battle-learning/deck-selection cycle.
+
+## PG081-PG085 Lorehold Card-Rule Reading - 2026-06-23 08:38 UTC
+
+What changed:
+
+- Deck `6` remains fully closed for the card-rule coherence gate:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg085_post_runtime_20260623_083836.json`
+  reports `pass=100`.
+- PG081 closed three shared high-card rules from the new Lorehold candidates
+  `607` and `608`: `Artist's Talent`, `Pinnacle Monk // Mystic Peak`, and
+  `Redirect Lightning`.
+- PG082, PG083, and PG084 restored trusted hash/runtime metadata that the
+  PostgreSQL sync and wrapper needed before future deck/battle comparison.
+- PG085 is only a post-runtime checkpoint; no PG085 apply was performed.
+- No deck swap, no `deck_cards` mutation, and no learned-deck promotion was
+  performed.
+
+Evidence:
+
+- PG081 focused event log:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_607_608_pg080_pg081_focused_events_20260623_082229.jsonl`.
+- PG081-PG084 PostgreSQL postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_postcheck_20260623_082229.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_postcheck_20260623_082754.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.out`,
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_postcheck_20260623_083050.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_postcheck_20260623_083303.out`.
+- Full runtime wrapper:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed with 371 tests after the closeout.
+
+Current candidate status:
+
+- Deck `606`: `high=0`, `medium=4`, `pass=77`.
+- Deck `607`: `high=23`, `medium=5`, `pass=66`.
+- Deck `608`: `high=17`, `medium=3`, `pass=48`.
+- Global card-rule queue: `high=40`, `medium=8`, `pass=157`.
+
+Auditor decision:
+
+- Deck `6` can remain the currently clean reference for card-rule coherence.
+- Decks `607` and `608` are registered candidates, but they are not ready to be
+  promoted as “best Lorehold deck” until their high-card queues are closed and
+  a fresh multi-seed battle artifact is generated.
+- The next PostgreSQL package number is PG086.
+
+## PG082 Deck 6/606 Hash-Only Card Gate - 2026-06-23 08:37 UTC
+
+Scope:
+
+- Restored missing hash provenance for five already scoped rules:
+  `Library of Leng`, `Scroll Rack`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- This was a PostgreSQL hash/provenance package plus focused runtime proof, not
+  a strategy rebaseline and not a deck swap.
+
+PostgreSQL and cache evidence:
+
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.out`
+  reports `target_rule_rows=5`, `target_hash_match_rows=5`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=5`,
+  `non_disabled_shadow_rows=0`, and `backup_rows=15`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_rollback_20260623_083100.sql`.
+- Sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg082_hash_only_final_sync_report_20260623_083100.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+
+Runtime evidence:
+
+- Focused event artifact:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl`
+  has 10 rows proving all five PG082 logical rule keys/hashes.
+- `test_battle_analyst_v10_3.py` passed after adding the PG082 focused cache
+  test.
+
+Current reading:
+
+- Deck `6` is again closed for card-rule coherence:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg082_after_hash_only_20260623_083100.json`
+  reports `pass=100`.
+- Deck `606` remains open only on four medium semantic-review rows:
+  `Hexing Squelcher`, `Ragavan, Nimble Pilferer`, `Skyclave Apparition`, and
+  `Underworld Breach`.
+- Global card-rule queue is now `high=40`, `medium=8`, `pass=157`.

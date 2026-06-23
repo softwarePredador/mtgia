@@ -1,0 +1,10 @@
+Pager usage is off.
+  name   |                logical_rule_key                 |       current_oracle_hash        | current_rule_oracle_hash | review_status | execution_status |  battle_model_scope  |                                              effect_json
+---------+-------------------------------------------------+----------------------------------+--------------------------+---------------+------------------+----------------------+--------------------------------------------------------------------------------------------------------
+ Silence | battle_rule_v1:74b210b77b004a677906e0216d44e445 | a0ca3c09a7db091c435ab31adb9c1780 |                          | verified      | auto             | silence_until_eot_v1 | {"cmc": 1.0, "effect": "silence_spell", "instant": true, "battle_model_scope": "silence_until_eot_v1"}
+(1 row)
+
+ target_rows | missing_hash_rows | oracle_hash_match_rows | trusted_auto_rows
+-------------+-------------------+------------------------+-------------------
+           1 |                 1 |                      1 |                 1
+(1 row)

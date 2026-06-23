@@ -533,8 +533,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1134718ef1509d04fbc1291dbdbdf23e",
-    "battle_rule_oracle_hash": "006e2b72eae264e2aaba82d99d07f593"
+    "battle_rule_logical_key": "battle_rule_v1:1134718ef1509d04fbc1291dbdbdf23e"
   },
   "Alchemist's Refuge": {
     "effect": "land",
@@ -775,8 +774,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.99,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ea7e00f2d90b2ceead4036ab10cd0200",
-    "battle_rule_oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf"
+    "battle_rule_logical_key": "battle_rule_v1:ea7e00f2d90b2ceead4036ab10cd0200"
   },
   "Ancient Gold Dragon": {
     "cmc": 7.0,
@@ -823,8 +821,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c364544e9bd651211acf851db2313ccd",
-    "battle_rule_oracle_hash": "5f61966c5bfc67508502d929ca891af3"
+    "battle_rule_logical_key": "battle_rule_v1:c364544e9bd651211acf851db2313ccd"
   },
   "Ancient Ziggurat": {
     "effect": "land",
@@ -1434,13 +1431,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Artist's Talent": {
+    "battle_model_scope": "class_level1_own_noncreature_spell_optional_discard_draw_level2_level3_annotations_v1",
+    "cmc": 2.0,
+    "draw_on_enter": false,
     "effect": "draw_engine",
+    "level2_cost_reduction_status": "annotation_only",
+    "level3_noncombat_damage_bonus_status": "annotation_only",
+    "optional_trigger": true,
+    "oracle_runtime_scope": "own_noncreature_spell_optional_rummage_compact_v1",
+    "trigger": "noncreature_spell_cast",
+    "trigger_effect": "rummage",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1a21b06bc25fe4cc34352b3dcb8d3903"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e57aa58c2e76015a0851a6bfef5dca90",
+    "battle_rule_oracle_hash": "d49d9b1a361e7d2b0f9a373cb239b875"
   },
   "As Foretold": {
     "cmc": 3.0,
@@ -1496,8 +1503,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.86,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d63eb0bbc240132b9aeb80caf675bcc4",
-    "battle_rule_oracle_hash": "dd3e1f004f2b178f31b638fad9cad591"
+    "battle_rule_logical_key": "battle_rule_v1:d63eb0bbc240132b9aeb80caf675bcc4"
   },
   "Assassin's Trophy": {
     "effect": "remove_permanent",
@@ -2149,8 +2155,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.88,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4a8564b60f39507bb2bb7fe5ca0b3a72",
-    "battle_rule_oracle_hash": "325bca13766fa2c770259e79375080bc"
+    "battle_rule_logical_key": "battle_rule_v1:4a8564b60f39507bb2bb7fe5ca0b3a72"
   },
   "Bastion of Remembrance": {
     "cmc": 3.0,
@@ -2472,8 +2477,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.92,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a7af0fd25d7c196baa8ff58d193b2695",
-    "battle_rule_oracle_hash": "5f1ed696a63cd668fd46a2fe9971a54e"
+    "battle_rule_logical_key": "battle_rule_v1:a7af0fd25d7c196baa8ff58d193b2695"
   },
   "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
     "back_face": {
@@ -4712,8 +4716,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.81,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7ff862e1720f195ee0374e3a6767b0da",
-    "battle_rule_oracle_hash": "e42c268c0db1c7273a78d08b85d8918b"
+    "battle_rule_logical_key": "battle_rule_v1:7ff862e1720f195ee0374e3a6767b0da"
   },
   "Chrome Mox": {
     "battle_model_scope": "imprint_fast_mana_v1",
@@ -4727,8 +4730,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:baf0ceea81b709c31104e0fcb4fc4e95",
-    "battle_rule_oracle_hash": "44481be7f5347792ede1a9b679a424b3"
+    "battle_rule_logical_key": "battle_rule_v1:baf0ceea81b709c31104e0fcb4fc4e95"
   },
   "Chronicle of Victory": {
     "cmc": 6.0,
@@ -5867,8 +5869,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c",
-    "battle_rule_oracle_hash": "67869230ccb8b4499893e14915ca8b14"
+    "battle_rule_logical_key": "battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c"
   },
   "Crosis's Catacombs": {
     "effect": "land",
@@ -7358,8 +7359,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2f513570333d9f48be476602a7ce1593",
-    "battle_rule_oracle_hash": "e3824a160f31571d21bccb7be33474cf"
+    "battle_rule_logical_key": "battle_rule_v1:2f513570333d9f48be476602a7ce1593"
   },
   "Dispatch": {
     "cmc": 1.0,
@@ -8308,8 +8308,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:908888276dcbc8c3db1126707691ae2c",
-    "battle_rule_oracle_hash": "336afa048144f8fb9a88dfc3b6588f4b"
+    "battle_rule_logical_key": "battle_rule_v1:908888276dcbc8c3db1126707691ae2c"
   },
   "Electrostatic Field": {
     "cmc": 2.0,
@@ -8834,8 +8833,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:eb8223965ca43b8748902c1f16770332",
-    "battle_rule_oracle_hash": "ff9463f33167f2489bb78394a914d43c"
+    "battle_rule_logical_key": "battle_rule_v1:eb8223965ca43b8748902c1f16770332"
   },
   "Ephemerate": {
     "_rule_logical_key": "battle_rule_v1:4e0a382ebe5adda98c1360cd44617ca3",
@@ -9049,8 +9047,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:67f848a7a9f40c7337ec0c13e0c1de7c",
-    "battle_rule_oracle_hash": "2916ac287962232283ac7b1dbe684b7d"
+    "battle_rule_logical_key": "battle_rule_v1:67f848a7a9f40c7337ec0c13e0c1de7c"
   },
   "Everglades": {
     "effect": "land",
@@ -10577,8 +10574,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.88,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ba0c54df93c61d9c92a11905c50b7bea",
-    "battle_rule_oracle_hash": "2339245d7d8beb5a87ea1c0c8b67dc88"
+    "battle_rule_logical_key": "battle_rule_v1:ba0c54df93c61d9c92a11905c50b7bea"
   },
   "Forsaken City": {
     "effect": "land",
@@ -11139,8 +11135,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.84,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9384b4cf2ffc3b4afc5cb65fb4febaea",
-    "battle_rule_oracle_hash": "2c25335e12791e77b9c19c9b3af0a413"
+    "battle_rule_logical_key": "battle_rule_v1:9384b4cf2ffc3b4afc5cb65fb4febaea"
   },
   "Gemstone Mine": {
     "effect": "land",
@@ -12236,8 +12231,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.99,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9a28465081dd2ac48819f94e919646a6",
-    "battle_rule_oracle_hash": "ed6887f502cae452812d5f5d0a0c5792"
+    "battle_rule_logical_key": "battle_rule_v1:9a28465081dd2ac48819f94e919646a6"
   },
   "Great Hall of Starnheim": {
     "effect": "land",
@@ -12672,8 +12666,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4bddcb4c084d969a7ac60a4e378b06dd",
-    "battle_rule_oracle_hash": "cf91d14269b30b7db1f05234d34db931"
+    "battle_rule_logical_key": "battle_rule_v1:4bddcb4c084d969a7ac60a4e378b06dd"
   },
   "Hall of Oracles": {
     "effect": "land",
@@ -14123,8 +14116,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.84,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:86b5c2438a3ba7a20bfd9a0845e1bbc6",
-    "battle_rule_oracle_hash": "5bb72caef291ea420e5de42a141665ab"
+    "battle_rule_logical_key": "battle_rule_v1:86b5c2438a3ba7a20bfd9a0845e1bbc6"
   },
   "Indatha Triome": {
     "effect": "land",
@@ -14464,8 +14456,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c11487143935b327650306d7e7e8c8e2",
-    "battle_rule_oracle_hash": "9529349d5e874f6304264ddf6a2d0c2f"
+    "battle_rule_logical_key": "battle_rule_v1:c11487143935b327650306d7e7e8c8e2"
   },
   "Invert Polarity": {
     "cmc": 3.0,
@@ -16117,7 +16108,7 @@
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
     "battle_rule_oracle_hash": "575aef3cc2523831e440ea7dcd55fa6e"
   },
@@ -16765,8 +16756,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.96,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:847f9ee3ec1da14f043c8a52a4dbfb52",
-    "battle_rule_oracle_hash": "6d55531f06ba4e627600f3962ad9f95f"
+    "battle_rule_logical_key": "battle_rule_v1:847f9ee3ec1da14f043c8a52a4dbfb52"
   },
   "Lupinflower Village": {
     "effect": "land",
@@ -17838,8 +17828,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:53afed56bbee9885bfb6201f8587db07",
-    "battle_rule_oracle_hash": "8d1c9b62d7e5642df44a61a63de5e240"
+    "battle_rule_logical_key": "battle_rule_v1:53afed56bbee9885bfb6201f8587db07"
   },
   "Mindblaze": {
     "cmc": 6.0,
@@ -17987,8 +17976,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6b480fbda0d69779cde9b6a366089c4a",
-    "battle_rule_oracle_hash": "dff145f1eaaa76d6f9e44e688bb29726"
+    "battle_rule_logical_key": "battle_rule_v1:6b480fbda0d69779cde9b6a366089c4a"
   },
   "Misdirection": {
     "effect": "redirect_removal",
@@ -18279,14 +18267,20 @@
     "battle_rule_logical_key": "battle_rule_v1:8453093ba13d27b12638c7002a93f1c2"
   },
   "Monologue Tax": {
+    "battle_model_scope": "opponent_second_spell_each_turn_create_treasure_v1",
+    "cmc": 3.0,
     "effect": "ramp_engine",
-    "trigger": "opponent_second_spell",
+    "opponent_second_spell_each_turn": true,
+    "oracle_runtime_scope": "opponent_second_spell_each_turn_treasure_trigger_compact_v1",
+    "treasure_count": 1,
+    "trigger": "opponent_spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f1e0d9cb7e20dbb87296e1fc11566ad5"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4c6a09e794fd065ea945bb51e8fe045d",
+    "battle_rule_oracle_hash": "ebe3a1480ad7cad5f9de5567b06db92e"
   },
   "Monster Manual // Zoological Study": {
     "cmc": 4.0,
@@ -18567,8 +18561,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:80a4b5beca8834e0c642dc8c0663106c",
-    "battle_rule_oracle_hash": "517f664e6c81ce9c204c09a20e14be2d"
+    "battle_rule_logical_key": "battle_rule_v1:80a4b5beca8834e0c642dc8c0663106c"
   },
   "Mox Jasper": {
     "cmc": 0.0,
@@ -18582,15 +18575,21 @@
     "battle_rule_logical_key": "battle_rule_v1:5112a61521124fd47e89c61029e7d3fe"
   },
   "Mox Opal": {
+    "battle_model_scope": "metalcraft_three_artifacts_any_color_mana_rock_v1",
+    "cmc": 0.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
+    "metalcraft_artifact_threshold": 3,
+    "metalcraft_required": true,
+    "oracle_runtime_scope": "metalcraft_checked_on_mana_refresh_v1",
     "produces": "WUBRGC",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b236b60de8fac9e692f1442119330f34",
+    "battle_rule_oracle_hash": "24b582b5091c110d1da08fec15ad07a1"
   },
   "Muddle the Mixture": {
     "cmc": 2.0,
@@ -18898,8 +18897,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:86137800253980cc4594e0cf3fd78953",
-    "battle_rule_oracle_hash": "6a72f3c0228efaa3bb3bb616122ed036"
+    "battle_rule_logical_key": "battle_rule_v1:86137800253980cc4594e0cf3fd78953"
   },
   "Mystifying Maze": {
     "effect": "land",
@@ -18963,8 +18961,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.96,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8a9cf49fe56ad1fabdb48aead5531bd1",
-    "battle_rule_oracle_hash": "313e25b11a10c99127eca70b7fefbb75"
+    "battle_rule_logical_key": "battle_rule_v1:8a9cf49fe56ad1fabdb48aead5531bd1"
   },
   "Naturalize": {
     "cmc": 2.0,
@@ -18990,8 +18987,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b68a368de3add71ee716cda718b9bcb9",
-    "battle_rule_oracle_hash": "c88d03f66daf06b46fd567dca8e34c50"
+    "battle_rule_logical_key": "battle_rule_v1:b68a368de3add71ee716cda718b9bcb9"
   },
   "Nature's Lore": {
     "cmc": 2.0,
@@ -20771,15 +20767,26 @@
     "battle_rule_logical_key": "battle_rule_v1:63081deaefeeb350bed5e0c95d4e1ac0"
   },
   "Pinnacle Monk // Mystic Peak": {
+    "back_face_land_status": "annotation_only",
+    "battle_model_scope": "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_back_land_annotation_v1",
     "cmc": 5.0,
-    "effect": "remove_permanent",
-    "instant": true,
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_target": "instant_or_sorcery",
+    "keywords": [
+      "prowess"
+    ],
+    "oracle_runtime_scope": "creature_etb_return_instant_or_sorcery_graveyard_to_hand_v1",
+    "power": 2,
+    "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:720ffd7f16297a705ae4352b033b186e"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bcde63b5e56f2b9f20af6384bc70ad5d",
+    "battle_rule_oracle_hash": "aa1967461796c715e0c5e0b4d741f249"
   },
   "Piranha Marsh": {
     "effect": "land",
@@ -21959,8 +21966,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:439f162ed0ffa2321dd21b0692f07af4",
-    "battle_rule_oracle_hash": "4ce07a0d5e5a33a68517b988b63dbe42"
+    "battle_rule_logical_key": "battle_rule_v1:439f162ed0ffa2321dd21b0692f07af4"
   },
   "Ramunap Ruins": {
     "effect": "land",
@@ -22224,8 +22230,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:853d724485700fc5e29a050e9f5856a4",
-    "battle_rule_oracle_hash": "5936b4653734cd7087eb67229b4efbc3"
+    "battle_rule_logical_key": "battle_rule_v1:853d724485700fc5e29a050e9f5856a4"
   },
   "Reassembling Skeleton": {
     "cmc": 2.0,
@@ -22372,16 +22377,20 @@
     "battle_rule_logical_key": "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
   },
   "Redirect Lightning": {
+    "additional_cost_status": "pay_five_life_or_two_generic_annotation",
+    "battle_model_scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
     "cmc": 1.0,
-    "count": 1,
-    "effect": "draw_cards",
+    "effect": "redirect_removal",
     "instant": true,
+    "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+    "target": "single_target_spell_or_ability",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fb9b2b633a4842d42599c293e0de4d68"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d47b67e18fbd03ed1745f6917901d6c9",
+    "battle_rule_oracle_hash": "f031e271e574af339ecf11d43dbe6a5d"
   },
   "Reef Roads": {
     "effect": "land",
@@ -23680,8 +23689,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:955e0141660dfdc8b31aaf15056693aa",
-    "battle_rule_oracle_hash": "abe8e79d26d363a82e68a55e6c19c0b3"
+    "battle_rule_logical_key": "battle_rule_v1:955e0141660dfdc8b31aaf15056693aa"
   },
   "Rune-Scarred Demon": {
     "cmc": 7.0,
@@ -23886,8 +23894,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b25c35d72e00a057dc20945c38059d0e",
-    "battle_rule_oracle_hash": "d88d3c9d7319f3ce78f286614392ffbf"
+    "battle_rule_logical_key": "battle_rule_v1:b25c35d72e00a057dc20945c38059d0e"
   },
   "Sanctum of Eternity": {
     "effect": "land",
@@ -24208,8 +24215,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c6c94f94c02d497596c4f1b1cd05a9bd",
-    "battle_rule_oracle_hash": "072765012c562c0dd7e6c1965a77fa17"
+    "battle_rule_logical_key": "battle_rule_v1:c6c94f94c02d497596c4f1b1cd05a9bd"
   },
   "Scene of the Crime": {
     "effect": "land",
@@ -25497,6 +25503,7 @@
     "cmc": 1.0,
     "effect": "silence_spell",
     "instant": true,
+    "oracle_runtime_scope": "opponent_spell_cast_lock_until_eot_runtime",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -25598,16 +25605,22 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Simian Spirit Guide": {
+    "battle_model_scope": "hand_exile_red_mana_ability_v1",
+    "cmc": 3.0,
     "effect": "ramp_ritual",
-    "instant": true,
+    "hand_exile_mana_ability": true,
+    "mana_color_status": "abstracted_to_generic_pool_runtime",
     "mana_produced": 1,
+    "oracle_runtime_scope": "hand_exile_for_red_mana_generic_pool_runtime_v1",
     "produces": "R",
+    "source_zone": "hand",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4e1327303383797ace516af3151eed77"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5ceeb0717088fe3c67faab83de1a48c9",
+    "battle_rule_oracle_hash": "d48d6662206fd4ed5137e37ec214e46d"
   },
   "Simic Ascendancy": {
     "cmc": 2.0,
@@ -25849,8 +25862,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f996204e0cd900b700b6bf7defb607a6",
-    "battle_rule_oracle_hash": "01408ac2502c74e39791c1779ab33833"
+    "battle_rule_logical_key": "battle_rule_v1:f996204e0cd900b700b6bf7defb607a6"
   },
   "Sky Diamond": {
     "cmc": 2.0,
@@ -26471,8 +26483,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3454aa122d10a4abd906132eb7745339",
-    "battle_rule_oracle_hash": "6a9e4cf9a4397715ccd0737e1b8cf270"
+    "battle_rule_logical_key": "battle_rule_v1:3454aa122d10a4abd906132eb7745339"
   },
   "Soulfire Eruption": {
     "amount": 5,
@@ -26841,8 +26852,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.96,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:323e4e2c6e95da761c1614e4dff44778",
-    "battle_rule_oracle_hash": "81249444bdb32006d5e687858df04b9a"
+    "battle_rule_logical_key": "battle_rule_v1:323e4e2c6e95da761c1614e4dff44778"
   },
   "Splinter's Technique": {
     "effect": "tutor",
@@ -26978,8 +26988,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d464d25de43eb912c79baea1cee783e5",
-    "battle_rule_oracle_hash": "6b66f4e89a1a484d4fd15b2acc365603"
+    "battle_rule_logical_key": "battle_rule_v1:d464d25de43eb912c79baea1cee783e5"
   },
   "Staff of Domination": {
     "count": 1,
@@ -27628,8 +27637,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:07c97c73f65d524510e30b6bbfca0b61",
-    "battle_rule_oracle_hash": "eae946655b75e4666adfbdb760bee0ff"
+    "battle_rule_logical_key": "battle_rule_v1:07c97c73f65d524510e30b6bbfca0b61"
   },
   "Sunbillow Verge": {
     "battle_model_scope": "verge_dual_source_condition_annotation_v1",
@@ -31781,8 +31789,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b62b6dfa5cdc9db4b8b21faf7bfc0498",
-    "battle_rule_oracle_hash": "43e3b1636425f22bbd834442ddb93bc0"
+    "battle_rule_logical_key": "battle_rule_v1:b62b6dfa5cdc9db4b8b21faf7bfc0498"
   },
   "Urza's Tower": {
     "effect": "land",
@@ -31879,8 +31886,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a",
-    "battle_rule_oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887"
+    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a"
   },
   "Valakut Awakening // Valakut Stoneforge": {
     "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1",
@@ -32169,8 +32175,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6a85170698c85498bf618c0c0283a770",
-    "battle_rule_oracle_hash": "020e696ec9560830bb82bf0244595d69"
+    "battle_rule_logical_key": "battle_rule_v1:6a85170698c85498bf618c0c0283a770"
   },
   "Veyran, Voice of Duality": {
     "cmc": 3.0,
@@ -32640,8 +32645,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ee84dfe5a22708bf0b0ef435699ed7a4",
-    "battle_rule_oracle_hash": "755be179e545f27507f78b6a79a34485"
+    "battle_rule_logical_key": "battle_rule_v1:ee84dfe5a22708bf0b0ef435699ed7a4"
   },
   "Wall of Roots": {
     "effect": "creature",
@@ -32698,8 +32702,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.93,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9cdb33ac0e813c0a25d960b65dbc7417",
-    "battle_rule_oracle_hash": "d9c250570bb91d94ceae9fcd74081ef5"
+    "battle_rule_logical_key": "battle_rule_v1:9cdb33ac0e813c0a25d960b65dbc7417"
   },
   "Warleader's Call": {
     "cmc": 3.0,
@@ -32921,7 +32924,7 @@
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.92,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab",
     "battle_rule_oracle_hash": "f11935fa793ae03d95ae75d62cdfa516"
   },
@@ -33627,8 +33630,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.99,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1b9bb9bfd6774cc55d21e50009efa9f3",
-    "battle_rule_oracle_hash": "dfb75aa49416e7e281ad8e5cdcf721fa"
+    "battle_rule_logical_key": "battle_rule_v1:1b9bb9bfd6774cc55d21e50009efa9f3"
   },
   "Worldly Tutor": {
     "effect": "tutor",
@@ -33898,7 +33900,6 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d977323f1ef9834d148ef87dc519ba37",
-    "battle_rule_oracle_hash": "5fef1974ee8b02952ac5612ea66c5c33"
+    "battle_rule_logical_key": "battle_rule_v1:d977323f1ef9834d148ef87dc519ba37"
   }
 }

@@ -1,0 +1,14 @@
+Pager usage is off.
+ target_rows | target_hash_match_rows | missing_hash_rows | trusted_auto_rows | rule_version_at_least_2_rows | backup_rows
+-------------+------------------------+-------------------+-------------------+------------------------------+-------------
+           5 |                      5 |                 0 |                 5 |                            5 |           5
+(1 row)
+
+       card_name        |                logical_rule_key                 |           oracle_hash            |     effect     |           battle_model_scope            | review_status | execution_status | rule_version
+------------------------+-------------------------------------------------+----------------------------------+----------------+-----------------------------------------+---------------+------------------+--------------
+ Fellwar Stone          | battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba | d63befc8ac40d9a38732f9b5c1a7414a | ramp_permanent | conditional_opponent_color_mana_rock_v1 | active        | auto             |            2
+ Mana Vault             | battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff | 35e3fd94c8453c0e326033af49ae18c8 | ramp_permanent | fast_mana_artifact_partial_v1           | active        | auto             |            2
+ Mox Amber              | battle_rule_v1:972703914ee50acd7a4e6f529fea1adf | e47b40cf2afc4c9ceac6bf91815da706 | ramp_permanent | legend_gated_fast_mana_v1               | verified      | auto             |            2
+ Seething Song          | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | ccd492289c6f1c14c8fb7a248d7bbf32 | ramp_ritual    | single_shot_red_ritual_v1               | verified      | auto             |            2
+ Talisman of Conviction | battle_rule_v1:02133e513da5ea98ac74d32d39b16470 | d49ceec937367a344a9f0948eea4f8f2 | ramp_permanent | pain_talisman_color_pair_partial_v1     | active        | auto             |            2
+(5 rows)

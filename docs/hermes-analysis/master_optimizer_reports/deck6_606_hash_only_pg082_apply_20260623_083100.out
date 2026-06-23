@@ -1,0 +1,12 @@
+Pager usage is off.
+BEGIN
+psql:docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_apply_20260623_083100.sql:5: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+DO
+CREATE TABLE
+INSERT 0 5
+SELECT 15
+DO
+UPDATE 5
+UPDATE 0
+COMMIT

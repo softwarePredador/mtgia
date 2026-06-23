@@ -1,0 +1,6 @@
+Pager usage is off.
+BEGIN
+CREATE SCHEMA
+SELECT 6
+DO
+COMMIT

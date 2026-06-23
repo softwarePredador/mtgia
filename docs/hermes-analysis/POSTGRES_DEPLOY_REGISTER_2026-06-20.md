@@ -7635,3 +7635,313 @@ Test and replay evidence:
 Next deploy number:
 
 - PG080 is next for any future PostgreSQL package.
+
+## PG080 Deck 606 L3 Mana/Ramp Rules - Applied 2026-06-23 08:12-08:14 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Validated and promoted the three deck `606` L3 mana/ramp support rules:
+  `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.
+- Added `oracle_hash`, oracle-specific `battle_model_scope`, stable runtime
+  metadata, and version `2` provenance to the trusted PostgreSQL rows.
+- Disabled three superseded generated/review-only shadow rows.
+- No deck swap, no `deck_cards` mutation, and no learned-deck state mutation.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_precheck_20260623_081220.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_apply_20260623_081220.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_postcheck_20260623_081220.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_rollback_20260623_081220.sql`
+
+Backup table:
+
+- `manaloom_deploy_audit.pg080_deck606_l3_mana_ramp_20260623_081220`
+  with six backed-up rows.
+
+Postcheck evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_postcheck_20260623_081220.out`
+  reported `target_rule_rows=3`, `target_hash_match_rows=3`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=3`,
+  `trusted_auto_rows=3`, `rule_version_at_least_2_rows=3`,
+  `non_disabled_shadow_rows=0`, `disabled_shadow_rows=3`, and
+  `backup_rows=6`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg080_l3_mana_ramp_sync_report_20260623_081412.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1805`,
+  `canonical_snapshot_rows_exported=3201`, and
+  `include_needs_review=false`.
+- Deck `6` post-PG080 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg080_after_l3_20260623_052200.json`
+  reports `pass=100`.
+- Deck `606` post-PG080 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg080_after_l3_20260623_052200.json`
+  reports `high=0`, `medium=4`, `pass=77`.
+- Global post-PG080 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg080_after_l3_20260623_052200.json`
+  reports `high=43`, `medium=8`, `pass=154`.
+
+Test and replay evidence:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after adding the PG080 L3 focused tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/deck606_pg080_l3_mana_ramp_focused_events_20260623_052022.jsonl`
+  contains three focused rows proving the three PG080 logical rule keys.
+
+Next deploy number:
+
+- PG081 is next for any future PostgreSQL package.
+
+## PG082 Deck 6/606 Hash-Only Rules - Applied 2026-06-23 08:35-08:37 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored missing `oracle_hash` provenance for five already scoped trusted
+  executable rows: `Library of Leng`, `Scroll Rack`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- This was a hash/provenance-only package. `effect_json`, `deck_role_json`,
+  deck composition, and learned-deck state were not changed.
+- PG081 artifacts already existed in the worktree for a deck `607`/`608`
+  package, so this deck `6`/`606` package used PG082 to avoid deploy-number
+  collision.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_precheck_20260623_083100.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_apply_20260623_083100.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_rollback_20260623_083100.sql`
+
+Backup table:
+
+- `manaloom_deploy_audit.pg082_deck6_606_hash_only_20260623_083100`
+  with 15 backed-up rows.
+
+Postcheck evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.out`
+  reported `target_rule_rows=5`, `target_hash_match_rows=5`,
+  `target_missing_hash_rows=0`, `target_expected_effect_rows=5`,
+  `target_expected_scope_rows=5`, `trusted_auto_rows=5`,
+  `rule_version_at_least_2_rows=5`, `non_disabled_shadow_rows=0`, and
+  `backup_rows=15`.
+
+Sync/audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg082_hash_only_final_sync_report_20260623_083100.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`,
+  `canonical_snapshot_rows_exported=3201`, and
+  `include_needs_review=false`.
+- Deck `6` post-PG082 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg082_after_hash_only_20260623_083100.json`
+  reports `pass=100`.
+- Deck `606` post-PG082 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg082_after_hash_only_20260623_083100.json`
+  reports `high=0`, `medium=4`, `pass=77`.
+- Global post-PG082 audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg082_after_hash_only_20260623_083100.json`
+  reports `high=40`, `medium=8`, `pass=157`.
+
+Test and replay evidence:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed after adding the PG082 hash-only focused cache test.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed.
+- `python3 -m py_compile` passed for the touched runtime/test/audit/sync
+  scripts.
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl`
+  contains 10 focused rows proving the five PG082 logical rule keys/hashes.
+
+Next deploy number:
+
+- PG083 is next for any future PostgreSQL package in this thread.
+
+## PG081 Deck 607/608 Shared High Rules - Applied 2026-06-23 08:22-08:25 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Validated and promoted the shared deck `607`/`608` high-card rules for
+  `Artist's Talent`, `Pinnacle Monk // Mystic Peak`, and
+  `Redirect Lightning`.
+- Added executable runtime support for Artist's Talent rummage triggers,
+  Pinnacle Monk instant/sorcery graveyard recursion, and Redirect Lightning
+  single-target redirection.
+- Preserved the current MDFC storage convention: no `cards` metadata rewrite
+  was made for `Pinnacle Monk // Mystic Peak`.
+- No deck swap, no `deck_cards` mutation, and no learned-deck state mutation.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_precheck_20260623_082229.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_apply_20260623_082229.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_postcheck_20260623_082229.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_rollback_20260623_082229.sql`
+
+Postcheck evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_postcheck_20260623_082229.out`
+  reported `target_rule_rows=3`, `target_hash_match_rows=3`,
+  `target_missing_hash_rows=0`, `target_expected_scope_rows=3`,
+  `target_expected_effect_rows=3`, `trusted_auto_rows=3`,
+  `rule_version_at_least_2_rows=3`, `non_disabled_shadow_rows=0`,
+  `disabled_shadow_rows=3`, `old_problem_active_rows=0`, and
+  `backup_rows=6`.
+
+Sync and focused runtime evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg081_deck607_608_shared_high_sync_report_20260623_082229.json`
+  refreshed SQLite/canonical fallback from PostgreSQL with
+  `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1805`, and
+  `canonical_snapshot_rows_exported=3201`.
+- `docs/hermes-analysis/master_optimizer_reports/deck606_607_608_pg080_pg081_focused_events_20260623_082229.jsonl`
+  contains focused rows for PG080 plus the three PG081 logical rule keys.
+
+## PG082 Hash Restore Packages - Applied 2026-06-23 08:27-08:38 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored trusted hash/runtime provenance for `Silence`.
+- Adopted and validated the concurrently produced deck `6`/`606` hash-only
+  package for `Library of Leng`, `Scroll Rack`,
+  `Unexpected Windfall`, `Valakut Awakening // Valakut Stoneforge`, and
+  `Wayfarer's Bauble`.
+- No semantic deck swap, no `deck_cards` mutation, and no learned-deck state
+  mutation.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_precheck_20260623_082754.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_apply_20260623_082754.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_postcheck_20260623_082754.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_rollback_20260623_082754.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_precheck_20260623_083100.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_apply_20260623_083100.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.sql`
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_rollback_20260623_083100.sql`
+
+Postcheck evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_postcheck_20260623_082754.out`
+  reported one target row, one hash match, zero missing hashes, expected
+  runtime scope, and one backed-up row.
+- `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.out`
+  reported `expected_target_rules=5`, `target_rule_rows=5`,
+  `target_hash_match_rows=5`, `target_missing_hash_rows=0`,
+  `target_expected_effect_rows=5`, `target_expected_scope_rows=5`,
+  `trusted_auto_rows=5`, `rule_version_at_least_2_rows=5`,
+  `generated_shadow_rows=6`, `non_disabled_shadow_rows=0`, and
+  `backup_rows=15`.
+
+Sync evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg082_silence_hash_restore_sync_report_20260623_082754.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg082_hash_only_sync_report_20260623_083100.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg082_resync_before_apply_report_20260623_083800.json`
+
+## PG083 Runtime Hash Restore - Applied 2026-06-23 08:30-08:32 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored trusted runtime hashes for `Fellwar Stone`, `Mana Vault`,
+  `Mox Amber`, `Talisman of Conviction`, and `Seething Song`.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_precheck_20260623_083050.sql`
+- `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_apply_20260623_083050.sql`
+- `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_postcheck_20260623_083050.sql`
+- `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_rollback_20260623_083050.sql`
+
+Postcheck and sync evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_postcheck_20260623_083050.out`
+  reported `target_rows=5`, `target_hash_match_rows=5`,
+  `missing_hash_rows=0`, `trusted_auto_rows=5`,
+  `rule_version_at_least_2_rows=5`, and `backup_rows=5`.
+- `docs/hermes-analysis/master_optimizer_reports/pg083_runtime_hash_restore_sync_report_20260623_083050.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+
+## PG084 Seething Song Runtime Metadata Restore - Applied 2026-06-23 08:33-08:34 UTC
+
+Status: `applied_validated`.
+
+Scope:
+
+- Restored `Seething Song` runtime metadata for the generic-pool red ritual
+  model: `mana_color_status`, `oracle_runtime_scope`, and
+  `pg058_l3b_simple_red_ritual_family`.
+
+SQL artifacts:
+
+- `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_precheck_20260623_083303.sql`
+- `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_apply_20260623_083303.sql`
+- `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_postcheck_20260623_083303.sql`
+- `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_rollback_20260623_083303.sql`
+
+Postcheck and sync evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_postcheck_20260623_083303.out`
+  reported one target row with matching hash, expected scope,
+  expected `mana_color_status`, expected runtime scope, expected family marker,
+  trusted auto status, and one backed-up row.
+- `docs/hermes-analysis/master_optimizer_reports/pg084_seething_song_runtime_metadata_sync_report_20260623_083303.json`
+  reported `pg_rows_loaded=1824`, `sqlite_inserted_or_updated=1802`, and
+  `canonical_snapshot_rows_exported=3201`.
+
+## PG085 Post-Runtime Checkpoint - 2026-06-23 08:38 UTC
+
+Status: `checkpoint_no_apply`.
+
+Reading:
+
+- No PG085 apply was needed. The intended hash-only targets were already
+  covered by the validated PG082 deck `6`/`606` hash-only package.
+- The PG085 label is used only for the post-runtime audit checkpoint after
+  PG081, PG082, PG083, and PG084 were synced.
+
+Final card-rule audits:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg085_post_runtime_20260623_083836.json`
+  reports `pass=100`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg085_post_runtime_20260623_083836.json`
+  reports `high=0`, `medium=4`, `pass=77`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg085_post_runtime_20260623_083836.json`
+  reports `high=23`, `medium=5`, `pass=66`.
+- Deck `608`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg085_post_runtime_20260623_083836.json`
+  reports `high=17`, `medium=3`, `pass=48`.
+- Global:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pg085_post_runtime_20260623_083836.json`
+  reports `high=40`, `medium=8`, `pass=157`.
+
+Test evidence:
+
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed with 371 tests.
+- The focused collector reported `total_tests=371` and `failures=0`.
+
+Next deploy number:
+
+- PG086 is next for any future PostgreSQL package.

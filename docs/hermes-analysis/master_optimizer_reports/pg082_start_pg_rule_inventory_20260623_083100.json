@@ -1,0 +1,1059 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "cards": [
+        {
+          "mana_cost": "{2}",
+          "name": "Fellwar Stone",
+          "oracle_hash": "d63befc8ac40d9a38732f9b5c1a7414a",
+          "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+          "type_line": "Artifact"
+        }
+      ],
+      "normalized_name": "fellwar stone",
+      "rules": [
+        {
+          "card_name": "Fellwar Stone",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent",
+            "subtype": "conditional_mana_rock"
+          },
+          "effect_json": {
+            "battle_model_scope": "conditional_opponent_color_mana_rock_v1",
+            "cmc": 2.0,
+            "conditionally_produces_opponent_land_colors": true,
+            "effect": "ramp_permanent",
+            "mana_produced": 1,
+            "produces": "WUBRGC"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+          "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Fellwar Stone taps for one mana of any color that a land an opponent controls could produce. Runtime intentionally models the safe baseline as a live one-mana rock with conditional color flexibility, while exact opponent color derivation remains a tracked refinement.",
+          "oracle_hash": null,
+          "review_status": "active",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Fellwar Stone",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "effect": "ramp_permanent",
+            "mana_produced": 1,
+            "produces": "WUBRGC"
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG055 2026-06-23: Disabled generated/legacy artifact mana-rock shadow after retaining an oracle-hashed trusted runtime rule for Deck 6 L3A artifact mana family.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Fellwar Stone",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{1}{R}",
+          "name": "Hexing Squelcher",
+          "oracle_hash": "ed00818e6ca804b7d1a3ef47c29277ea",
+          "oracle_text": "This spell can't be countered.\nWard—Pay 2 life.\nSpells you control can't be countered.\nOther creatures you control have \"Ward—Pay 2 life.\"",
+          "type_line": "Creature — Goblin Sorcerer"
+        }
+      ],
+      "normalized_name": "hexing squelcher",
+      "rules": [
+        {
+          "card_name": "Hexing Squelcher",
+          "deck_role_json": {
+            "category": "unknown",
+            "effect": "creature"
+          },
+          "effect_json": {
+            "effect": "creature",
+            "is_creature_permanent": true,
+            "power": 2,
+            "toughness": 2
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Hexing Squelcher",
+          "deck_role_json": {
+            "category": "unknown",
+            "effect": "creature"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "effect": "creature",
+            "uncounterable": true
+          },
+          "execution_status": "review_only",
+          "logical_rule_key": "battle_rule_v1:f8324576b802b811d585643f3bac8856",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{1}",
+          "name": "Library of Leng",
+          "oracle_hash": "575aef3cc2523831e440ea7dcd55fa6e",
+          "oracle_text": "You have no maximum hand size.\nIf an effect causes you to discard a card, discard it, but you may put it on top of your library instead of into your graveyard.",
+          "type_line": "Artifact"
+        }
+      ],
+      "normalized_name": "library of leng",
+      "rules": [
+        {
+          "card_name": "Library of Leng",
+          "deck_role_json": {
+            "category": "engine",
+            "effect": "discard_effect_to_top_replacement"
+          },
+          "effect_json": {
+            "battle_model_scope": "discard_replacement_to_top_v1",
+            "cmc": 1.0,
+            "discard_effect_to_top_replacement": true,
+            "effect": "passive",
+            "no_max_hand_size": true
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+          "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer-Scryfall text: you have no maximum hand size, and if an effect causes you to discard a card you may discard it to the top of your library instead of to your graveyard. This is especially relevant for Lorehold miracle turns and rummage lines; it is not a mana rock.",
+          "oracle_hash": null,
+          "review_status": "active",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Library of Leng",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 1.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:8caf0789b3906db96a0e271861bfbdd3",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        },
+        {
+          "card_name": "Library of Leng",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 1.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:90345eb5573a6295450e7f625c28b943",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.\nPG078: disabled superseded deck606 L2 shadow row after scoped trusted executable replacement retained oracle_hash provenance.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{1}",
+          "name": "Mana Vault",
+          "oracle_hash": "35e3fd94c8453c0e326033af49ae18c8",
+          "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}.",
+          "type_line": "Artifact"
+        }
+      ],
+      "normalized_name": "mana vault",
+      "rules": [
+        {
+          "card_name": "Mana Vault",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent",
+            "subtype": "fast_mana"
+          },
+          "effect_json": {
+            "battle_model_scope": "fast_mana_artifact_partial_v1",
+            "cmc": 1.0,
+            "does_not_untap_normally": true,
+            "effect": "ramp_permanent",
+            "mana_produced": 3,
+            "produces": "C",
+            "tapped_upkeep_damage": 1,
+            "upkeep_optional_untap_cost_generic": 4
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+          "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Mana Vault taps for three colorless mana, does not untap normally, can be untapped in upkeep for {4}, and pings while tapped. Runtime already models the fast-mana baseline; the untap/upkeep pain policy remains partial and therefore stays active instead of verified.",
+          "oracle_hash": null,
+          "review_status": "active",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Mana Vault",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "effect": "ramp_permanent",
+            "mana_produced": 3,
+            "produces": "C"
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:3f989c33316a642a5dc230cb618161a4",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG055 2026-06-23: Disabled generated/legacy artifact mana-rock shadow after retaining an oracle-hashed trusted runtime rule for Deck 6 L3A artifact mana family.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Mana Vault",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 1.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 3
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:ab16a5a0ccb234e728884d215847af56",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{0}",
+          "name": "Mox Amber",
+          "oracle_hash": "e47b40cf2afc4c9ceac6bf91815da706",
+          "oracle_text": "{T}: Add one mana of any color among legendary creatures and planeswalkers you control.",
+          "type_line": "Legendary Artifact"
+        }
+      ],
+      "normalized_name": "mox amber",
+      "rules": [
+        {
+          "card_name": "Mox Amber",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent",
+            "subtype": "legend_gated_fast_mana"
+          },
+          "effect_json": {
+            "battle_model_scope": "legend_gated_fast_mana_v1",
+            "cmc": 0.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1,
+            "produces": "WUBRGC",
+            "requires_legendary_creature_or_planeswalker_for_mana": true
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:972703914ee50acd7a4e6f529fea1adf",
+          "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mox Amber taps for one mana of any color among legendary creatures and planeswalkers you control. Runtime must not count it as live opening-hand ramp or active mana without a valid legendary permanent on the battlefield.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Mox Amber",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "effect": "ramp_permanent",
+            "mana_produced": 1,
+            "produces": "WUBRGC"
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG055 2026-06-23: Disabled generated/legacy artifact mana-rock shadow after retaining an oracle-hashed trusted runtime rule for Deck 6 L3A artifact mana family.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Mox Amber",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 0.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:5112a61521124fd47e89c61029e7d3fe",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{R}",
+          "name": "Ragavan, Nimble Pilferer",
+          "oracle_hash": "e337b9515b6984af8a1572db48f47eec",
+          "oracle_text": "Whenever Ragavan deals combat damage to a player, create a Treasure token and exile the top card of that player's library. Until end of turn, you may cast that card.\nDash {1}{R} (You may cast this spell for its dash cost. If you do, it gains haste, and it's returned from the battlefield to its owner's hand at the beginning of the next end step.)",
+          "type_line": "Legendary Creature — Monkey Pirate"
+        }
+      ],
+      "normalized_name": "ragavan, nimble pilferer",
+      "rules": [
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "deck_role_json": {
+            "category": "unknown",
+            "effect": "creature"
+          },
+          "effect_json": {
+            "effect": "creature",
+            "is_creature_permanent": true,
+            "keywords": [
+              "haste"
+            ],
+            "power": 2,
+            "toughness": 1
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2076e435470ab6c446676d321a12f1b",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_engine"
+          },
+          "effect_json": {
+            "cmc": 1.0,
+            "effect": "ramp_engine"
+          },
+          "execution_status": "review_only",
+          "logical_rule_key": "battle_rule_v1:5e5d87fb045a95bc22c1d5c3db5c0255",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{2}",
+          "name": "Scroll Rack",
+          "oracle_hash": "8133928f03d5a5a77f2beecfcbd09e30",
+          "oracle_text": "{1}, {T}: Exile any number of cards from your hand face down. Put that many cards from the top of your library into your hand. Then look at the exiled cards and put them on top of your library in any order.",
+          "type_line": "Artifact"
+        }
+      ],
+      "normalized_name": "scroll rack",
+      "rules": [
+        {
+          "card_name": "Scroll Rack",
+          "deck_role_json": {
+            "category": "draw",
+            "effect": "topdeck_manipulation"
+          },
+          "effect_json": {
+            "activation_cost_generic": 1,
+            "battle_model_scope": "scroll_rack_upkeep_single_exchange_v1",
+            "cmc": 2.0,
+            "effect": "topdeck_manipulation",
+            "hand_to_top_exchange": true
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
+          "notes": "Oracle-reviewed on 2026-06-17: {1}, {T}, Exile any number of cards from your hand face down, put that many cards from the top of your library into your hand, then put the exiled cards on top in any order. Runtime now supports a low-risk Lorehold-only upkeep slice that exchanges a single high-priority instant/sorcery from hand onto the top for the next first-draw miracle window; full arbitrary exchange sequencing remains pending.",
+          "oracle_hash": null,
+          "review_status": "active",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "deck_role_json": {
+            "category": "draw",
+            "effect": "topdeck_manipulation"
+          },
+          "effect_json": {
+            "effect": "topdeck_manipulation"
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:efb8905b224067dc9b1c61e0bf194bfe",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG065 disabled: superseded by oracle-hashed Scroll Rack topdeck_manipulation runtime slice battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{2}{R}",
+          "name": "Seething Song",
+          "oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32",
+          "oracle_text": "Add {R}{R}{R}{R}{R}.",
+          "type_line": "Instant"
+        }
+      ],
+      "normalized_name": "seething song",
+      "rules": [
+        {
+          "card_name": "Seething Song",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_ritual",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "battle_model_scope": "single_shot_red_ritual_v1",
+            "cmc": 3.0,
+            "effect": "ramp_ritual",
+            "instant": true,
+            "mana_produced": 5,
+            "produces": "R"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
+          "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Seething Song adds five red mana immediately and then goes to the graveyard. Runtime should keep it as a one-shot ritual, not a permanent mana source or generic draw placeholder.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Seething Song",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_ritual"
+          },
+          "effect_json": {
+            "effect": "ramp_ritual",
+            "mana_produced": 5
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:e74e2572d38b7bc2ac333159dfee0be0",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG058 2026-06-23: Disabled generated/legacy simple-red-ritual shadow after retaining one oracle-hashed trusted runtime rule for Deck 6 L3B.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Seething Song",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_ritual",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "cmc": 3.0,
+            "effect": "ramp_ritual",
+            "instant": true,
+            "mana_produced": 5
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:41a31344e35504dd54da43a12481a1f1",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{W}",
+          "name": "Silence",
+          "oracle_hash": "a0ca3c09a7db091c435ab31adb9c1780",
+          "oracle_text": "Your opponents can't cast spells this turn.",
+          "type_line": "Instant"
+        }
+      ],
+      "normalized_name": "silence",
+      "rules": [
+        {
+          "card_name": "Silence",
+          "deck_role_json": {
+            "category": "interaction",
+            "effect": "silence_spell",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "battle_model_scope": "silence_until_eot_v1",
+            "cmc": 1.0,
+            "effect": "silence_spell",
+            "instant": true
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:74b210b77b004a677906e0216d44e445",
+          "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: opponents cannot cast spells this turn. Runtime should set the until-end-of-turn silence state, not materialize a battlefield permanent.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Silence",
+          "deck_role_json": {
+            "category": "protection",
+            "effect": "silence_spell",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "effect": "silence_spell",
+            "instant": true
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:d3367950588008088c6a73c604765da0",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG054 2026-06-23: Disabled silence-lock legacy/shadow row after retaining an oracle-hashed trusted runtime rule for Deck 6 L6 silence-lock family.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Silence",
+          "deck_role_json": {
+            "category": "protection",
+            "effect": "silence_opponents",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "cmc": 1.0,
+            "effect": "silence_opponents",
+            "instant": true
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:8b27af907705709f0b9065304d5ea68e",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{1}{W}{W}",
+          "name": "Skyclave Apparition",
+          "oracle_hash": "4d0c162906712b2c428b754ad2f0b3a0",
+          "oracle_text": "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.\nWhen this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.",
+          "type_line": "Creature — Kor Spirit"
+        }
+      ],
+      "normalized_name": "skyclave apparition",
+      "rules": [
+        {
+          "card_name": "Skyclave Apparition",
+          "deck_role_json": {
+            "category": "unknown",
+            "effect": "creature"
+          },
+          "effect_json": {
+            "effect": "creature",
+            "is_creature_permanent": true,
+            "power": 2,
+            "toughness": 2
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Skyclave Apparition",
+          "deck_role_json": {
+            "category": "wincon",
+            "effect": "token_maker"
+          },
+          "effect_json": {
+            "cmc": 3.0,
+            "effect": "token_maker"
+          },
+          "execution_status": "review_only",
+          "logical_rule_key": "battle_rule_v1:030b2f3e0f549a462c3c8ea429877980",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{2}",
+          "name": "Talisman of Conviction",
+          "oracle_hash": "d49ceec937367a344a9f0948eea4f8f2",
+          "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {W}. This artifact deals 1 damage to you.",
+          "type_line": "Artifact"
+        }
+      ],
+      "normalized_name": "talisman of conviction",
+      "rules": [
+        {
+          "card_name": "Talisman of Conviction",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent",
+            "subtype": "pain_mana_rock"
+          },
+          "effect_json": {
+            "battle_model_scope": "pain_talisman_color_pair_partial_v1",
+            "cmc": 2.0,
+            "effect": "ramp_permanent",
+            "life_for_colored_mana": 1,
+            "mana_produced": 1,
+            "produces": "CRW"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+          "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Talisman of Conviction can tap for colorless freely or for red/white while dealing 1 damage to its controller. Runtime safely models the card as a one-mana rock with tracked pain-color metadata; exact per-tap color-choice and pain sequencing remain partial.",
+          "oracle_hash": null,
+          "review_status": "active",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Talisman of Conviction",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "effect": "ramp_permanent",
+            "mana_produced": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG055 2026-06-23: Disabled generated/legacy artifact mana-rock shadow after retaining an oracle-hashed trusted runtime rule for Deck 6 L3A artifact mana family.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Talisman of Conviction",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "effect": "ramp_permanent"
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:7b0724138094316c227d006975e0cfe4",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{1}{R}",
+          "name": "Underworld Breach",
+          "oracle_hash": "a98ca5777789e48c44daff97999f2beb",
+          "oracle_text": "Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard. (You may cast cards from your graveyard for their escape cost.)\nAt the beginning of the end step, sacrifice this enchantment.",
+          "type_line": "Enchantment"
+        }
+      ],
+      "normalized_name": "underworld breach",
+      "rules": [
+        {
+          "card_name": "Underworld Breach",
+          "deck_role_json": {
+            "category": "unknown",
+            "effect": "passive"
+          },
+          "effect_json": {
+            "effect": "passive"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Underworld Breach",
+          "deck_role_json": {
+            "category": "engine",
+            "effect": "recursion"
+          },
+          "effect_json": {
+            "cmc": 2.0,
+            "count": 1,
+            "effect": "recursion"
+          },
+          "execution_status": "review_only",
+          "logical_rule_key": "battle_rule_v1:584ca12657bcbfed3a55cb27e0e494fa",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{2}{R}{R}",
+          "name": "Unexpected Windfall",
+          "oracle_hash": "9c4fbe06104051a2e8b1d295d307b26a",
+          "oracle_text": "As an additional cost to cast this spell, discard a card.\nDraw two cards and create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+          "type_line": "Instant"
+        }
+      ],
+      "normalized_name": "unexpected windfall",
+      "rules": [
+        {
+          "card_name": "Unexpected Windfall",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "treasure_maker",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "battle_model_scope": "discard_draw_create_treasures_v1",
+            "cmc": 4.0,
+            "draw_count": 2,
+            "effect": "treasure_maker",
+            "instant": true,
+            "requires_discard_card": true,
+            "treasure_count": 2
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4",
+          "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost discard a card, then draw two cards and create two Treasure tokens. Runtime already supports the discard/draw/treasure executor; this reviewed rule prevents the card from degrading into a generic ramp bucket.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Unexpected Windfall",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "treasure_maker",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "draw_count": 2,
+            "effect": "treasure_maker",
+            "instant": true,
+            "requires_discard_card": true,
+            "treasure_count": 2
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b965bf2683a8977ac8a6c559ebc441ab",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG069: disabled superseded review-only or duplicate broad row after confirming a scoped runtime replacement.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Unexpected Windfall",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_engine",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "cmc": 4.0,
+            "effect": "ramp_engine",
+            "instant": true
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:ff9144b5fff75408e1a76a99888fdeca",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{2}{R}",
+          "name": "Valakut Awakening // Valakut Stoneforge",
+          "oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887",
+          "oracle_text": "Put any number of cards from your hand on the bottom of your library, then draw that many cards plus one.",
+          "type_line": "Instant"
+        }
+      ],
+      "normalized_name": "valakut awakening // valakut stoneforge",
+      "rules": [
+        {
+          "card_name": "Valakut Awakening // Valakut Stoneforge",
+          "deck_role_json": {
+            "category": "draw",
+            "effect": "hand_filter",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1",
+            "cmc": 3.0,
+            "draw_extra": 1,
+            "effect": "hand_filter",
+            "instant": true,
+            "max_bottom": 99,
+            "mdfc_land_face": {
+              "effect": "land",
+              "enters_tapped": true,
+              "mana_produced": 1,
+              "produces": "R"
+            }
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6e1f3b876822abafe1de47610f46858d",
+          "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: front face is the hand-filter instant, back face is Valakut Stoneforge tapped red land. Runtime keeps both faces together so split-name lookups do not degrade into generic draw heuristics.",
+          "oracle_hash": null,
+          "review_status": "verified",
+          "rule_version": 2,
+          "source": "curated"
+        },
+        {
+          "card_name": "Valakut Awakening // Valakut Stoneforge",
+          "deck_role_json": {
+            "category": "unknown",
+            "effect": "hand_filter",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "draw_extra": 1,
+            "effect": "hand_filter",
+            "instant": true,
+            "max_bottom": 3,
+            "mdfc_land_face": {
+              "effect": "land",
+              "enters_tapped": true,
+              "name": "Valakut Stoneforge",
+              "produces": "R",
+              "type_line": "Land"
+            }
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:abc2aab4f282840b48f5cc1d23c71457",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG042 disabled: legacy curated Valakut hand-filter row lacks oracle_hash and battle_model_scope; superseded by oracle-hashed bottom_then_draw_plus_one rule.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Valakut Awakening // Valakut Stoneforge",
+          "deck_role_json": {
+            "category": "draw",
+            "effect": "draw_cards",
+            "timing": "instant"
+          },
+          "effect_json": {
+            "cmc": 3.0,
+            "count": 1,
+            "effect": "draw_cards",
+            "instant": true
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:1bd5dce7cffed8d0af007d20b15e8549",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    },
+    {
+      "cards": [
+        {
+          "mana_cost": "{1}",
+          "name": "Wayfarer's Bauble",
+          "oracle_hash": "f11935fa793ae03d95ae75d62cdfa516",
+          "oracle_text": "{2}, {T}, Sacrifice this artifact: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+          "type_line": "Artifact"
+        }
+      ],
+      "normalized_name": "wayfarer's bauble",
+      "rules": [
+        {
+          "card_name": "Wayfarer's Bauble",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent",
+            "subtype": "utility_artifact"
+          },
+          "effect_json": {
+            "activated_self_sacrifice_land_tutor": true,
+            "activation_cost_generic": 2,
+            "activation_requires_tap": true,
+            "basic_only": true,
+            "battle_model_scope": "self_sacrifice_basic_land_tutor_artifact_v1",
+            "cmc": 1.0,
+            "effect": "ramp_permanent",
+            "land_count": 1,
+            "land_enters_tapped": true,
+            "lands_to_battlefield": 1
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab",
+          "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wayfarer's Bauble is not immediate land ramp on cast; it is a battlefield artifact that later pays {2}, taps, and sacrifices itself to fetch a basic land tapped. Runtime now preserves the permanent-first sequencing and a safe activation slice.",
+          "oracle_hash": null,
+          "review_status": "active",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Wayfarer's Bauble",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "land_ramp"
+          },
+          "effect_json": {
+            "basic_only": true,
+            "effect": "land_ramp",
+            "land_count": 1
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5",
+          "notes": "Migrated from legacy HANDCRAFTED_KNOWN_CARDS provenance to curated source on 2026-06-17.\nPG078: disabled superseded deck606 L2 shadow row after scoped trusted executable replacement retained oracle_hash provenance.",
+          "oracle_hash": null,
+          "review_status": "deprecated",
+          "rule_version": 1,
+          "source": "curated"
+        },
+        {
+          "card_name": "Wayfarer's Bauble",
+          "deck_role_json": {
+            "category": "ramp",
+            "effect": "ramp_permanent"
+          },
+          "effect_json": {
+            "cmc": 1.0,
+            "effect": "ramp_permanent"
+          },
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43",
+          "notes": "Seeded from known_cards_generated.json; audit before trusting.",
+          "oracle_hash": null,
+          "review_status": "needs_review",
+          "rule_version": 1,
+          "source": "generated"
+        }
+      ]
+    }
+  ]
+}

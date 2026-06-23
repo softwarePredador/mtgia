@@ -1,0 +1,10 @@
+Pager usage is off.
+ target_rows | target_hash_match_rows | missing_hash_rows | expected_scope_rows | expected_runtime_scope_rows | trusted_auto_rows | rule_version_at_least_2_rows | backup_rows
+-------------+------------------------+-------------------+---------------------+-----------------------------+-------------------+------------------------------+-------------
+           1 |                      1 |                 0 |                   1 |                           1 |                 1 |                            1 |           1
+(1 row)
+
+  name   |                logical_rule_key                 |           oracle_hash            |    effect     |  battle_model_scope  |            oracle_runtime_scope            | rule_version | review_status | execution_status
+---------+-------------------------------------------------+----------------------------------+---------------+----------------------+--------------------------------------------+--------------+---------------+------------------
+ Silence | battle_rule_v1:74b210b77b004a677906e0216d44e445 | a0ca3c09a7db091c435ab31adb9c1780 | silence_spell | silence_until_eot_v1 | opponent_spell_cast_lock_until_eot_runtime |            2 | verified      | auto
+(1 row)

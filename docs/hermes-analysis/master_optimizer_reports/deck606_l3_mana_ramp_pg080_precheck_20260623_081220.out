@@ -1,0 +1,12 @@
+Pager usage is off.
+ expected_target_rules | target_rule_rows | trusted_auto_rows | target_missing_hash_rows | target_missing_scope_rows | review_shadow_rows | backup_table_already_exists
+-----------------------+------------------+-------------------+--------------------------+---------------------------+--------------------+-----------------------------
+                     3 |                3 |                 3 |                        3 |                         3 |                  3 | f
+(1 row)
+
+        name         |       type_line       | mana_cost | cmc |       computed_oracle_hash       |       expected_oracle_hash       |                                            oracle_text
+---------------------+-----------------------+-----------+-----+----------------------------------+----------------------------------+----------------------------------------------------------------------------------------------------
+ Monologue Tax       | Enchantment           | {2}{W}    | 3.0 | ebe3a1480ad7cad5f9de5567b06db92e | ebe3a1480ad7cad5f9de5567b06db92e | Whenever an opponent casts their second spell each turn, you create a Treasure token.
+ Mox Opal            | Legendary Artifact    | {0}       | 0.0 | 24b582b5091c110d1da08fec15ad07a1 | 24b582b5091c110d1da08fec15ad07a1 | Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts.
+ Simian Spirit Guide | Creature — Ape Spirit | {2}{R}    | 3.0 | d48d6662206fd4ed5137e37ec214e46d | d48d6662206fd4ed5137e37ec214e46d | Exile this card from your hand: Add {R}.
+(3 rows)

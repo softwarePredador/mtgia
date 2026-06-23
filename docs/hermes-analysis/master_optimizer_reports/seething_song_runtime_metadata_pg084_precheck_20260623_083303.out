@@ -1,0 +1,10 @@
+Pager usage is off.
+     name      |       current_oracle_hash        |                logical_rule_key                 |           oracle_hash            |    battle_model_scope     | mana_color_status | oracle_runtime_scope | pg058_family | review_status | execution_status |                                                                  effect_json
+---------------+----------------------------------+-------------------------------------------------+----------------------------------+---------------------------+-------------------+----------------------+--------------+---------------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------
+ Seething Song | ccd492289c6f1c14c8fb7a248d7bbf32 | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | ccd492289c6f1c14c8fb7a248d7bbf32 | single_shot_red_ritual_v1 |                   |                      |              | verified      | auto             | {"cmc": 3.0, "effect": "ramp_ritual", "instant": true, "produces": "R", "mana_produced": 5, "battle_model_scope": "single_shot_red_ritual_v1"}
+(1 row)
+
+ target_rows | hash_match_rows | missing_mana_color_status_rows | missing_runtime_scope_rows | trusted_auto_rows
+-------------+-----------------+--------------------------------+----------------------------+-------------------
+           1 |               1 |                              1 |                          1 |                 1
+(1 row)

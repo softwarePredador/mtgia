@@ -3665,3 +3665,110 @@ Status:
 - Global queue after PG079 is `high=43`, `medium=11`, `pass=151`.
 - Next card-rule gate should start with deck `606` `medium/battle_support`:
   `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.
+
+## PG080 Deck 606 L3 Mana/Ramp Focused Card-Rule Gate - 2026-06-23 08:20 UTC
+
+Artifacts:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_l3_mana_ramp_pg080_postcheck_20260623_081220.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg080_l3_mana_ramp_sync_report_20260623_081412.json`.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_pg080_l3_mana_ramp_focused_events_20260623_052022.jsonl`.
+- Post-test deck `606` card-gate audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg080_after_l3_20260623_052200.json`.
+
+Gate:
+
+- The focused event artifact has three rows and proves runtime propagation of
+  the three PG080 `rule_logical_key` values.
+- Covered cards: `Monologue Tax`, `Mox Opal`, and `Simian Spirit Guide`.
+- This is card-rule execution/provenance evidence only. It is not a 16-seed
+  battle rebaseline and is not strategy-learning evidence.
+- The runtime wrapper passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Status:
+
+- Deck `606` L3 mana/ramp queue is closed for this PG080 batch:
+  post-test audit reports `high=0`, `medium=4`, `pass=77`.
+- Deck `6` remains closed at `pass=100`.
+- Global queue after PG080 is `high=43`, `medium=8`, `pass=154`.
+- Next card-rule gate should process deck `606` `medium/support_or_passive`
+  hash-only cleanup: `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
+  `Skyclave Apparition`, and `Underworld Breach`.
+
+## PG081-PG085 Card-Rule/Cache Gate - 2026-06-23 08:38 UTC
+
+Replay relevance:
+
+- This cycle did not produce a new accepted multi-seed battle replay baseline.
+- The latest accepted battle strategy-learning artifact remains
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json`
+  with `run_profile=deck6_pg078_learning_gate_fix_16_seed`,
+  `start_seed=64270200`, `seeds_completed=16`, and
+  `battle_replay_final_status=trusted_for_strategy_learning`.
+- PG081-PG085 are card-rule/cache gates that prepare future battle tests; they
+  are not by themselves deck-selection or win-rate evidence.
+
+Gate artifacts:
+
+- PG081 focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck606_607_608_pg080_pg081_focused_events_20260623_082229.jsonl`.
+- PG081-PG084 PostgreSQL postchecks:
+  `docs/hermes-analysis/master_optimizer_reports/deck607_608_shared_high_pg081_postcheck_20260623_082229.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_silence_hash_restore_pg082_postcheck_20260623_082754.out`,
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.out`,
+  `docs/hermes-analysis/master_optimizer_reports/runtime_hash_restore_pg083_postcheck_20260623_083050.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/seething_song_runtime_metadata_pg084_postcheck_20260623_083303.out`.
+- Final PG085 checkpoint audits:
+  deck `6` `pass=100`; deck `606` `high=0`, `medium=4`, `pass=77`;
+  deck `607` `high=23`, `medium=5`, `pass=66`; deck `608` `high=17`,
+  `medium=3`, `pass=48`; global `high=40`, `medium=8`, `pass=157`.
+
+Validation:
+
+- Full wrapper passed after the closeout:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  with 371 tests.
+
+Decision:
+
+- Keep the PG078 battle summary as the only accepted replay-learning baseline
+  until a fresh multi-seed run is generated after the remaining deck `607` or
+  deck `608` high-card queue is addressed.
+
+## PG082 Deck 6/606 Hash-Only Focused Card-Rule Gate - 2026-06-23 08:37 UTC
+
+Artifacts:
+
+- PostgreSQL postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_hash_only_pg082_postcheck_20260623_083100.out`.
+- PG -> SQLite/canonical sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg082_hash_only_final_sync_report_20260623_083100.json`.
+- Focused event evidence:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl`.
+- Post-test deck `6` card-gate audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg082_after_hash_only_20260623_083100.json`.
+
+Gate:
+
+- The focused event artifact has 10 rows and proves runtime propagation of the
+  five PG082 `rule_logical_key` and `rule_oracle_hash` values.
+- Covered cards: `Library of Leng`, `Scroll Rack`, `Unexpected Windfall`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wayfarer's Bauble`.
+- This is hash/provenance evidence for already scoped rules, not a 16-seed
+  battle rebaseline and not strategy-learning evidence.
+- The runtime wrapper passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Status:
+
+- Deck `6` is restored to `pass=100` after the current PostgreSQL-source sync.
+- Deck `606` remains at `high=0`, `medium=4`, `pass=77`.
+- Global queue after PG082 is `high=40`, `medium=8`, `pass=157`.
+- Next card-rule gate should process deck `606` semantic reviews, not
+  hash-only cleanup: `Hexing Squelcher`, `Ragavan, Nimble Pilferer`,
+  `Skyclave Apparition`, and `Underworld Breach`.

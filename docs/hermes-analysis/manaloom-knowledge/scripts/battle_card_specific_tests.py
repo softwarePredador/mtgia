@@ -1900,6 +1900,173 @@ def register_tests(battle, player):
             == "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7"
         )
 
+    def test_pg080_deck606_l3_mana_ramp_family_rule_provenance():
+        cases = [
+            (
+                {"name": "Monologue Tax", "cmc": 3, "type_line": "Enchantment"},
+                "ramp_engine",
+                "opponent_second_spell_each_turn_create_treasure_v1",
+                "battle_rule_v1:4c6a09e794fd065ea945bb51e8fe045d",
+                "ebe3a1480ad7cad5f9de5567b06db92e",
+            ),
+            (
+                {"name": "Mox Opal", "cmc": 0, "type_line": "Legendary Artifact"},
+                "ramp_permanent",
+                "metalcraft_three_artifacts_any_color_mana_rock_v1",
+                "battle_rule_v1:b236b60de8fac9e692f1442119330f34",
+                "24b582b5091c110d1da08fec15ad07a1",
+            ),
+            (
+                {"name": "Simian Spirit Guide", "cmc": 3, "type_line": "Creature — Ape Spirit"},
+                "ramp_ritual",
+                "hand_exile_red_mana_ability_v1",
+                "battle_rule_v1:5ceeb0717088fe3c67faab83de1a48c9",
+                "d48d6662206fd4ed5137e37ec214e46d",
+            ),
+        ]
+
+        for card, effect, scope, logical_key, oracle_hash in cases:
+            rule = battle.get_card_effect(card)
+            assert rule["effect"] == effect
+            assert rule["battle_model_scope"] == scope
+            assert rule["_rule_logical_key"] == logical_key
+            assert rule["_rule_oracle_hash"] == oracle_hash
+            assert rule["_rule_execution_status"] == "auto"
+
+    def test_pg080_monologue_tax_creates_treasure_on_opponent_second_spell():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Lorehold")
+        opponent = player("Opponent")
+        tax_rule = battle.get_card_effect(
+            {"name": "Monologue Tax", "cmc": 3, "type_line": "Enchantment"}
+        )
+        active.battlefield = [
+            {
+                "name": "Monologue Tax",
+                "cmc": 3,
+                "type_line": "Enchantment",
+                **tax_rule,
+            }
+        ]
+        opponent.spells_cast_this_turn = 2
+
+        try:
+            battle.trigger_opponent_spell_draw_engines(
+                opponent,
+                [active],
+                {"name": "Opponent Follow-up", "cmc": 2, "type_line": "Sorcery"},
+                5,
+                "precombat_main",
+                random.Random(80),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.treasures == 1
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Monologue Tax"
+            and data.get("effect") == "create_treasure"
+            and data.get("treasures_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:4c6a09e794fd065ea945bb51e8fe045d"
+            for event, data in events
+        )
+
+    def test_pg080_mox_opal_requires_metalcraft_for_mana():
+        mox_rule = battle.get_card_effect(
+            {"name": "Mox Opal", "cmc": 0, "type_line": "Legendary Artifact"}
+        )
+        active = player("Active")
+        mox = {
+            "name": "Mox Opal",
+            "cmc": 0,
+            "type_line": "Legendary Artifact",
+            **mox_rule,
+        }
+        active.battlefield = [
+            mox,
+            {"name": "Sol Ring", "effect": "ramp_permanent", "type_line": "Artifact", "mana_produced": 2, "produces": "C"},
+        ]
+        assert battle.mana_source_production_for_state(active, mox) == 0
+
+        active.battlefield.append(
+            {"name": "Ancient Den", "effect": "land", "type_line": "Artifact Land", "mana_produced": 1, "produces": "W"}
+        )
+        assert battle.mana_source_production_for_state(active, mox) == 1
+
+    def test_pg080_simian_spirit_guide_exiles_from_hand_for_one_mana():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        simian = {"name": "Simian Spirit Guide", "cmc": 3, "type_line": "Creature — Ape Spirit"}
+        active.hand = [simian]
+
+        try:
+            battle.apply_effect_immediate(active, [], simian, 5, random.Random(81))
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert simian not in active.hand
+        assert simian in active.exile
+        assert active.mana_pool.generic == 1
+        assert any(
+            event == "ritual_mana_added"
+            and data.get("card") == "Simian Spirit Guide"
+            and data.get("source_zone") == "hand"
+            and data.get("destination") == "exile"
+            and data.get("mana_added") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:5ceeb0717088fe3c67faab83de1a48c9"
+            for event, data in events
+        )
+
+    def test_pg082_deck6_606_hash_only_rules_resolve_from_sqlite_cache():
+        cases = [
+            (
+                {"name": "Library of Leng", "cmc": 1, "type_line": "Artifact"},
+                "passive",
+                "discard_replacement_to_top_v1",
+                "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+                "575aef3cc2523831e440ea7dcd55fa6e",
+            ),
+            (
+                {"name": "Scroll Rack", "cmc": 2, "type_line": "Artifact"},
+                "topdeck_manipulation",
+                "scroll_rack_upkeep_single_exchange_v1",
+                "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
+                "8133928f03d5a5a77f2beecfcbd09e30",
+            ),
+            (
+                {"name": "Unexpected Windfall", "cmc": 4, "type_line": "Instant"},
+                "treasure_maker",
+                "discard_draw_create_treasures_v1",
+                "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4",
+                "9c4fbe06104051a2e8b1d295d307b26a",
+            ),
+            (
+                {"name": "Valakut Awakening // Valakut Stoneforge", "cmc": 3, "type_line": "Instant"},
+                "hand_filter",
+                "bottom_then_draw_plus_one_mdfc_land_v1",
+                "battle_rule_v1:6e1f3b876822abafe1de47610f46858d",
+                "22b42fcc181b7aed71f78b2e1e51e887",
+            ),
+            (
+                {"name": "Wayfarer's Bauble", "cmc": 1, "type_line": "Artifact"},
+                "ramp_permanent",
+                "self_sacrifice_basic_land_tutor_artifact_v1",
+                "battle_rule_v1:97eb0d5868d1c777b74aa7d35fc85eab",
+                "f11935fa793ae03d95ae75d62cdfa516",
+            ),
+        ]
+
+        for card, effect, scope, logical_key, oracle_hash in cases:
+            rule = battle.get_card_effect(card)
+            assert rule["effect"] == effect
+            assert rule["battle_model_scope"] == scope
+            assert rule["_rule_logical_key"] == logical_key
+            assert rule["_rule_oracle_hash"] == oracle_hash
+            assert rule["_rule_execution_status"] == "auto"
+
     def test_samis_curiosity_creates_lander_token_not_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -7023,6 +7190,198 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.hand = [
+                {"name": "Dead Eight Drop", "cmc": 8, "type_line": "Sorcery"},
+            ]
+            active.library = [
+                {"name": "Fresh Draw", "cmc": 2, "type_line": "Instant"},
+            ]
+            active.battlefield = [
+                {
+                    "name": "Artist's Talent",
+                    "type_line": "Enchantment — Class",
+                    "effect": "draw_engine",
+                    "trigger": "noncreature_spell_cast",
+                    "trigger_effect": "rummage",
+                    "battle_model_scope": "class_level1_own_noncreature_spell_optional_discard_draw_level2_level3_annotations_v1",
+                    "_rule_logical_key": "battle_rule_v1:artists-talent-test",
+                    "_rule_oracle_hash": "artists-talent-test-hash",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                active,
+                [active],
+                {"name": "Setup Spell", "type_line": "Instant", "cmc": 1},
+                turn=4,
+                phase="precombat_main",
+            )
+            battle.trigger_spell_cast_engines(
+                active,
+                [active],
+                {"name": "Creature Spell", "type_line": "Creature", "cmc": 2, "effect": "creature"},
+                turn=4,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in active.hand] == ["Fresh Draw"]
+        assert [card.get("name") for card in active.graveyard] == ["Dead Eight Drop"]
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Artist's Talent"
+        ]
+        assert len(trigger_events) == 1
+        event = trigger_events[0]
+        assert event["trigger"] == "noncreature_spell_cast"
+        assert event["trigger_spell"] == "Setup Spell"
+        assert event["effect"] == "rummage"
+        assert event["discarded"] == "Dead Eight Drop"
+        assert event["drawn"] == ["Fresh Draw"]
+        assert event["rule_logical_key"] == "battle_rule_v1:artists-talent-test"
+
+    def test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            target_spell = {"name": "Graveyard Lesson", "type_line": "Sorcery", "cmc": 3}
+            ignored_creature = {
+                "name": "Ignored Creature",
+                "type_line": "Creature",
+                "effect": "creature",
+                "cmc": 2,
+            }
+            active.graveyard = [target_spell, ignored_creature]
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {
+                    "name": "Pinnacle Monk // Mystic Peak",
+                    "type_line": "Creature — Djinn Monk",
+                    "cmc": 5,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                turn=5,
+                rng=random.Random(620),
+                effect_data_override={
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "keywords": ["prowess"],
+                    "etb_recursion_count": 1,
+                    "etb_recursion_target": "instant_or_sorcery",
+                    "etb_recursion_destination": "hand",
+                    "back_face_land_status": "annotation_only",
+                    "battle_model_scope": "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_back_land_annotation_v1",
+                    "_rule_logical_key": "battle_rule_v1:pinnacle-monk-test",
+                    "_rule_oracle_hash": "pinnacle-monk-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(
+            permanent.get("name") == "Pinnacle Monk // Mystic Peak"
+            and permanent.get("effect") == "creature"
+            and "prowess" in permanent.get("keywords", [])
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert target_spell in active.hand
+        assert target_spell not in active.graveyard
+        assert ignored_creature in active.graveyard
+        assert any(
+            event == "etb_recursion_resolved"
+            and data.get("card") == "Pinnacle Monk // Mystic Peak"
+            and data.get("target_type") == "instant_or_sorcery"
+            and data.get("destination") == "hand"
+            and data.get("recovered") == ["Graveyard Lesson"]
+            and data.get("rule_logical_key") == "battle_rule_v1:pinnacle-monk-test"
+            for event, data in events
+        )
+
+    def test_pg081_redirect_lightning_redirects_single_target_stack_object():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            responder = player("Lorehold")
+            protected = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            responder.battlefield = [protected]
+            caster = player("Caster")
+            opponent_threat = {
+                "name": "Opponent Threat",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 6,
+                "toughness": 6,
+            }
+            caster.battlefield = [opponent_threat]
+            removal = {"name": "Targeted Removal", "cmc": 2, "type_line": "Instant"}
+            removal_effect = {
+                "effect": "remove_creature",
+                "instant": True,
+                "declared_targets": [
+                    {
+                        "target": protected,
+                        "controller": responder,
+                        "target_type": "creature",
+                    }
+                ],
+            }
+            stack = battle.Stack()
+            stack.push(removal, caster, removal_effect)
+            context = battle.redirectable_stack_context(
+                responder,
+                [caster, responder],
+                stack.items[-1],
+            )
+            battle.resolve_redirect_removal(
+                responder,
+                [caster, responder],
+                {"name": "Redirect Lightning", "type_line": "Instant — Lesson", "cmc": 1},
+                {
+                    "effect": "redirect_removal",
+                    "instant": True,
+                    "target": "single_target_spell_or_ability",
+                    "additional_cost_status": "pay_five_life_or_two_generic_annotation",
+                    "battle_model_scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+                    "_rule_logical_key": "battle_rule_v1:redirect-lightning-test",
+                    "_rule_oracle_hash": "redirect-lightning-test-hash",
+                    "_redirect_context": context,
+                },
+                turn=4,
+                phase="combat",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        redirected_target = stack.items[-1].effect_data["declared_targets"][0]["target"]
+        assert redirected_target is opponent_threat
+        assert protected in responder.battlefield
+        assert any(
+            event == "redirect_removal_resolved"
+            and data.get("card") == "Redirect Lightning"
+            and data.get("old_target") == "Protected Creature"
+            and data.get("new_target") == "Opponent Threat"
+            and data.get("target_change_applied") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:redirect-lightning-test"
+            for event, data in events
+        )
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -7103,6 +7462,11 @@ def register_tests(battle, player):
         test_pg055_artifact_mana_rock_family_rule_provenance,
         test_pg058_simple_red_ritual_family_rule_provenance,
         test_pg058_simple_red_ritual_family_runtime_adds_one_shot_mana,
+        test_pg080_deck606_l3_mana_ramp_family_rule_provenance,
+        test_pg080_monologue_tax_creates_treasure_on_opponent_second_spell,
+        test_pg080_mox_opal_requires_metalcraft_for_mana,
+        test_pg080_simian_spirit_guide_exiles_from_hand_for_one_mana,
+        test_pg082_deck6_606_hash_only_rules_resolve_from_sqlite_cache,
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
         test_snapback_return_target_creature_stays_creature_removal,
@@ -7207,4 +7571,7 @@ def register_tests(battle, player):
         test_pg079_storm_herd_creates_life_total_flying_pegasus_tokens,
         test_pg079_rite_of_the_dragoncaller_creates_flying_dragon_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
+        test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
+        test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
+        test_pg081_redirect_lightning_redirects_single_target_stack_object,
     ]
