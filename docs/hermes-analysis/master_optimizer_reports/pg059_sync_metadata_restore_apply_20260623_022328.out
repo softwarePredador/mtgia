@@ -1,0 +1,7 @@
+BEGIN
+psql:docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_apply_20260623_022328.sql:7: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
+CREATE SCHEMA
+CREATE TABLE
+INSERT 0 7
+UPDATE 7
+COMMIT

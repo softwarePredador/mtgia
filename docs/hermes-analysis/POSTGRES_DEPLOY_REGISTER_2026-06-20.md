@@ -5398,3 +5398,224 @@ Rollback:
   deletes current rows for the two target names and restores the 5 pre-PG058
   rows from
   `manaloom_deploy_audit.pg058_deck6_l3b_simple_red_rituals_20260623_020031`.
+
+## PG059 Deck 6 L2 Hash-Only Regression Repair - Applied 2026-06-23 02:18 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable provenance repair for already trusted deck `6` runtime rows.
+- PostgreSQL is the source of truth; Hermes SQLite was synced from PostgreSQL
+  after postcheck passed.
+- No `effect_json`, executor, deck list, deck swap, or shadow-row state change
+  was intended in this package.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_precheck_20260623_021840.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_apply_20260623_021840.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_postcheck_20260623_021840.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_rollback_20260623_021840.sql`.
+
+Target cards:
+
+- `Fellwar Stone`.
+- `Mana Vault`.
+- `Mox Amber`.
+- `Seething Song`.
+- `Silence`.
+- `Talisman of Conviction`.
+- `Valakut Awakening`.
+- `Valakut Awakening // Valakut Stoneforge`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg059_deck6_l2_hash_regression_repair_20260623_021840`.
+- Backup row count: `23`.
+- Updated trusted runtime rows: `8`.
+
+Postcheck evidence:
+
+- `target_runtime_rows=8`.
+- `target_runtime_missing_hash_rows=0`.
+- `target_runtime_hash_mismatch_rows=0`.
+- `target_runtime_live_hash_mismatch_rows=0`.
+- `target_runtime_bad_effect_rows=0`.
+- `target_runtime_bad_scope_rows=0`.
+- `backup_rows=23`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg059_deck6_l2_hash_regression_repair_20260623_021840.json`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+
+Rollback:
+
+- `deck6_l2_hash_regression_repair_pg059_rollback_20260623_021840.sql`
+  restores the 23 pre-PG059 rows from
+  `manaloom_deploy_audit.pg059_deck6_l2_hash_regression_repair_20260623_021840`.
+
+## PG059 Sync Metadata Guard/Restore - Applied 2026-06-23 02:29 UTC
+
+Status:
+
+- `applied_validated`.
+- Durable metadata repair after a reviewed JSON sync drift stripped PG-only
+  oracle-runtime annotation keys from trusted curated rows.
+- Includes a code guard in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+  so future same-key curated/manual upserts preserve existing PG metadata and
+  do not blank an existing `oracle_hash`.
+- PostgreSQL is the source of truth; Hermes SQLite was synced from PostgreSQL
+  after postcheck passed.
+- No deck list, deck swap, executor, or shadow-row state change was executed.
+
+Applied package:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_precheck_20260623_022328.sql`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_apply_20260623_022328.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_postcheck_20260623_022328.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_rollback_20260623_022328.sql`.
+
+Target cards:
+
+- `Fellwar Stone`.
+- `Mana Vault`.
+- `Mox Amber`.
+- `Seething Song`.
+- `Silence`.
+- `Talisman of Conviction`.
+- `Valakut Awakening // Valakut Stoneforge`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg059_sync_metadata_restore_20260623_022328`.
+- Backup row count: `7`.
+- Updated target rows: `7`.
+
+Postcheck evidence:
+
+- `target_cards=7`.
+- `target_rule_rows=7`.
+- `target_missing_hash_rows=0`.
+- `target_hash_mismatch_rows=0`.
+- `target_missing_effect_patch_rows=0`.
+- `backup_rows=7`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg059_sync_metadata_restore_20260623_022328.json`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+
+Rollback:
+
+- `pg059_sync_metadata_restore_rollback_20260623_022328.sql` restores the 7
+  pre-restore rows from
+  `manaloom_deploy_audit.pg059_sync_metadata_restore_20260623_022328`.
+
+## PG060 Deck 6 Simple Red Ritual Metadata Attempt - Not Applied 2026-06-23 02:24 UTC
+
+Status:
+
+- `not_applied`.
+- The external `deck6_l3b_simple_red_rituals_metadata_pg060_*_20260623_022418`
+  artifact was inspected as evidence of an aborted attempt, not accepted as a
+  deploy, and removed from the commit set so it cannot be mistaken for a valid
+  rollback/apply package.
+
+Evidence:
+
+- Inspected apply output stopped before `UPDATE`/`COMMIT`.
+- Inspected postcheck output was empty.
+- Live PG inspection found no backup table
+  `manaloom_deploy_audit.pg060_deck6_l3b_simple_red_rituals_metadata_20260623_022418`.
+
+Result:
+
+- The intended Seething Song metadata concern is covered by the applied PG059
+  sync metadata restore and PG061 confirmation package.
+
+## PG061 Deck 6 L3B Simple Red Ritual Metadata Confirmation - Applied 2026-06-23 02:31 UTC
+
+Status:
+
+- `applied_validated`.
+- Current-state/idempotent backup and confirmation for `Rite of Flame` and
+  `Seething Song` after PG060 aborted before a durable backup existed.
+- PostgreSQL is the source of truth; Hermes SQLite was synced from PostgreSQL
+  after postcheck passed.
+- No executor, deck list, deck swap, or shadow-row state change was executed.
+
+Applied package:
+
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_apply_20260623_022418.sql`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_postcheck_20260623_022418.sql`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_rollback_20260623_022418.sql`.
+
+Target cards:
+
+- `Rite of Flame`.
+- `Seething Song`.
+
+Apply evidence:
+
+- Created backup table:
+  `manaloom_deploy_audit.pg061_deck6_l3b_simple_red_rituals_metadata_20260623_022418`.
+- Backup row count: `5`.
+- Updated trusted runtime rows: `2`.
+
+Postcheck evidence:
+
+- `target_runtime_rows=2`.
+- `target_hash_mismatch_rows=0`.
+- `target_bad_effect_rows=0`.
+- `target_bad_mana_rows=0`.
+- `target_bad_scope_rows=0`.
+- `target_missing_runtime_scope_rows=0`.
+- `target_missing_mana_color_status_rows=0`.
+- `backup_rows=5`.
+
+Post-apply sync/audit:
+
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg061_deck6_l3b_simple_red_rituals_metadata_20260623_023130.json`.
+- Required global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_023224.json`
+  reports `high=116`, `medium=23`, `pass=66`.
+- Deck 6 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck 606 auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+
+Rollback:
+
+- `deck6_l3b_simple_red_rituals_metadata_pg061_rollback_20260623_022418.sql`
+  restores the 5 current-state backup rows from
+  `manaloom_deploy_audit.pg061_deck6_l3b_simple_red_rituals_metadata_20260623_022418`.

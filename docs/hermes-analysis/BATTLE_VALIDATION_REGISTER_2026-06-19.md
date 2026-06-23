@@ -15519,3 +15519,152 @@ Caveats:
 - `Rite of Flame` graveyard named-copy scaling remains annotation-only.
 - Red color production is provenance metadata; the current executor adds ritual
   mana into the generic pool abstraction.
+
+## PG059 Deck 6 L2 Hash-Only Regression Repair - Closed 2026-06-23 02:18 UTC
+
+Status:
+
+- Applied external package
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_apply_20260623_021840.sql`.
+- Scope was hash-only for already trusted runtime rows:
+  `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, `Valakut Awakening`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- No `effect_json`, executor, deck list, or shadow state change was intended in
+  this package.
+
+Evidence:
+
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_apply_20260623_021840.out`
+  reports `UPDATE 8` and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_postcheck_20260623_021840.out`
+  reports `target_runtime_rows=8`,
+  `target_runtime_missing_hash_rows=0`,
+  `target_runtime_hash_mismatch_rows=0`,
+  `target_runtime_live_hash_mismatch_rows=0`,
+  `target_runtime_bad_effect_rows=0`,
+  `target_runtime_bad_scope_rows=0`, and `backup_rows=23`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg059_deck6_l2_hash_regression_repair_20260623_021840.json`.
+
+## PG059 Sync Metadata Guard/Restore - Closed 2026-06-23 02:29 UTC
+
+Status:
+
+- Added a sync guard in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+  so same-key curated/manual upserts preserve existing PG-only metadata and do
+  not blank existing `oracle_hash` when reviewed JSON lacks that field.
+- Applied central-auditor follow-up package
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_apply_20260623_022328.sql`.
+- Scope was metadata-only for:
+  `Fellwar Stone`, `Mana Vault`, `Mox Amber`, `Seething Song`, `Silence`,
+  `Talisman of Conviction`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- The package restored the missing oracle-runtime annotation keys on six rows;
+  `Valakut Awakening // Valakut Stoneforge` remained hash-confirmed only.
+
+Evidence:
+
+- Precheck output:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_precheck_20260623_022328.out`
+  reported `target_cards=7`, `target_rule_rows=7`,
+  `target_missing_hash_rows=0`, `target_hash_mismatch_rows=0`,
+  `target_missing_effect_patch_rows=6`, and
+  `target_card_id_missing_rows=0`.
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_apply_20260623_022328.out`
+  reports `INSERT 0 7`, `UPDATE 7`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_postcheck_20260623_022328.out`
+  reports `target_missing_hash_rows=0`,
+  `target_hash_mismatch_rows=0`,
+  `target_missing_effect_patch_rows=0`, and `backup_rows=7`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg059_sync_metadata_restore_20260623_022328.json`.
+- Guard test:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed `8` tests.
+
+Current audit cut after sync:
+
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+- Deck `607`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_022929.json`
+  reports `high=50`, `medium=16`, `pass=28`.
+- Deck `608`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_20260623_022929.json`
+  reports `high=38`, `medium=11`, `pass=19`.
+
+Superseded/incomplete external artifact note:
+
+- `deck6_l3b_simple_red_rituals_metadata_pg060_*_20260623_022418` was not
+  accepted as an applied package in this register: its apply output stops before
+  `UPDATE`/`COMMIT`, its postcheck output is empty, and live PG inspection found
+  no backup table
+  `manaloom_deploy_audit.pg060_deck6_l3b_simple_red_rituals_metadata_20260623_022418`.
+- The missing Seething Song metadata covered by that attempted PG060 is closed
+  by the central-auditor PG059 sync metadata restore above and by the PG061
+  confirmation package below.
+
+## PG061 Deck 6 L3B Simple Red Ritual Metadata Confirmation - Closed 2026-06-23 02:31 UTC
+
+Status:
+
+- Accepted external package
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_apply_20260623_022418.sql`.
+- The package captures a durable backup for current `Rite of Flame` and
+  `Seething Song` rows after the aborted PG060 attempt, then reapplies the
+  intended metadata idempotently.
+- No executor, deck list, or shadow row state changed.
+
+Evidence:
+
+- Apply output:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_apply_20260623_022418.out`
+  reports `SELECT 5`, `UPDATE 2`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_postcheck_20260623_022418.out`
+  reports `target_runtime_rows=2`, `target_hash_mismatch_rows=0`,
+  `target_bad_effect_rows=0`, `target_bad_mana_rows=0`,
+  `target_bad_scope_rows=0`, `target_missing_runtime_scope_rows=0`,
+  `target_missing_mana_color_status_rows=0`, and `backup_rows=5`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg061_deck6_l3b_simple_red_rituals_metadata_20260623_023130.json`.
+
+Final cycle tests:
+
+- `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`
+  passed.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed `8` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`
+  passed `6` tests.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`
+  passed, including the existing `Blasphemous Act` damage-model test and the
+  PG058 ritual provenance tests.
+
+Final cycle audit:
+
+- Required global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_023224.json`
+  reports `total_cards=205`, `high=116`, `medium=23`, `pass=66`.
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `total_cards=100`, `high=30`, `medium=8`, `pass=62`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `total_cards=81`, `high=38`, `medium=8`, `pass=35`.
+
+Gate note:
+
+- PG061 is a metadata/provenance confirmation package only. No new focused
+  event file was generated because no executor behavior changed after PG058;
+  runtime evidence remains the PG058 focused ritual event gate.

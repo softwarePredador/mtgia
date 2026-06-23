@@ -2817,3 +2817,67 @@ Caveats:
 
 - This gate proves the current one-shot ritual abstraction. It does not model
   Rite of Flame named-copy graveyard scaling across all graveyards.
+
+## PG059 Deck 6 Hash/Sync Metadata Restore Gate - 2026-06-23 02:29 UTC
+
+Artifacts:
+
+- Hash-only package postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_postcheck_20260623_021840.out`.
+- Sync metadata restore postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_postcheck_20260623_022328.out`.
+- SQLite sync after metadata restore:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg059_sync_metadata_restore_20260623_022328.json`.
+- Current deck audit cut:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`.
+
+Gate:
+
+- The hash-only package reports `target_runtime_missing_hash_rows=0`,
+  `target_runtime_hash_mismatch_rows=0`, and
+  `target_runtime_live_hash_mismatch_rows=0` for the eight trusted deck-6 L2
+  runtime rows.
+- The sync metadata restore reports `target_missing_hash_rows=0`,
+  `target_hash_mismatch_rows=0`, `target_missing_effect_patch_rows=0`, and
+  `backup_rows=7`.
+- The PG-to-Hermes sync exported `3201` canonical snapshot rows after the
+  metadata restore.
+
+Status:
+
+- The sync/upsert path now has a regression guard that preserves existing
+  `oracle_hash` and curated/manual PG-only metadata on same-key conflicts.
+- Deck `6` remains at `high=30`, `medium=8`, `pass=62` after the repair.
+- Deck `606` remains at `high=38`, `medium=8`, `pass=35`; deck `607` is
+  `high=50`, `medium=16`, `pass=28`; deck `608` is `high=38`, `medium=11`,
+  `pass=19`.
+
+Caveats:
+
+- This gate repairs provenance/annotation drift. It does not promote any new
+  card model and does not change deck contents.
+- The external `PG060` ritual metadata artifact with timestamp
+  `20260623_022418` is not a trusted gate: its apply output has no `UPDATE` or
+  `COMMIT`, its postcheck output is empty, and no matching backup table exists
+  in PostgreSQL.
+- The follow-up `PG061` ritual metadata confirmation is trusted: its apply
+  output reports `UPDATE 2` and `COMMIT`, its postcheck reports
+  `target_missing_runtime_scope_rows=0`,
+  `target_missing_mana_color_status_rows=0`, and `backup_rows=5`, and its
+  SQLite sync is
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg061_deck6_l3b_simple_red_rituals_metadata_20260623_023130.json`.
+
+Final audit after PG061:
+
+- Required global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_023224.json`
+  reports `high=116`, `medium=23`, `pass=66`.
+- Deck `6`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck `606`:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+- No new replay artifact was generated for PG061 because it did not change
+  executor behavior; the applicable runtime proof remains the PG058 simple-red
+  ritual focused event gate.

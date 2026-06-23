@@ -2345,3 +2345,79 @@ Remaining risk:
 - Ritual color is annotated as red with `produces=R`, while the executor still
   adds to the generic mana pool through
   `mana_color_status=abstracted_to_generic_pool_runtime`.
+
+## PG059/PG061 Deck 6 Hash and Sync-Metadata Repair - Closed 2026-06-23 02:32 UTC
+
+Status:
+
+- Closed a provenance regression in the already trusted deck `6` runtime rows.
+- PostgreSQL remained the source of truth; Hermes SQLite was resynced from PG
+  after each accepted package.
+- No new card model, executor behavior, deck swap, `deck_cards` mutation, or
+  shadow-row promotion was introduced.
+
+Applied PostgreSQL packages:
+
+- `PG059 Deck 6 L2 Hash-Only Regression Repair`:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_apply_20260623_021840.sql`.
+- `PG059 Sync Metadata Guard/Restore`:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_apply_20260623_022328.sql`.
+- `PG061 Deck 6 L3B Simple Red Ritual Metadata Confirmation`:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l3b_simple_red_rituals_metadata_pg061_apply_20260623_022418.sql`.
+
+Validation:
+
+- Hash-only PG059 postcheck:
+  `target_runtime_rows=8`, `target_runtime_missing_hash_rows=0`,
+  `target_runtime_hash_mismatch_rows=0`,
+  `target_runtime_live_hash_mismatch_rows=0`,
+  `target_runtime_bad_effect_rows=0`, `target_runtime_bad_scope_rows=0`,
+  and `backup_rows=23`.
+- Sync metadata PG059 postcheck:
+  `target_cards=7`, `target_rule_rows=7`,
+  `target_missing_hash_rows=0`, `target_hash_mismatch_rows=0`,
+  `target_missing_effect_patch_rows=0`, and `backup_rows=7`.
+- PG061 postcheck:
+  `target_runtime_rows=2`, `target_hash_mismatch_rows=0`,
+  `target_bad_effect_rows=0`, `target_bad_mana_rows=0`,
+  `target_bad_scope_rows=0`, `target_missing_runtime_scope_rows=0`,
+  `target_missing_mana_color_status_rows=0`, and `backup_rows=5`.
+- The aborted `PG060` artifact is not accepted as applied evidence: its apply
+  output stopped before `UPDATE`/`COMMIT`, its postcheck output is empty, and
+  no matching PG backup table exists.
+
+Sync and tests:
+
+- Final SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg061_deck6_l3b_simple_red_rituals_metadata_20260623_023130.json`.
+- Exact required global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_023224.json`
+  reports `high=116`, `medium=23`, `pass=66`.
+- Deck `6` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`
+  reports `high=30`, `medium=8`, `pass=62`.
+- Deck `606` auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`
+  reports `high=38`, `medium=8`, `pass=35`.
+- Tests passed:
+  `python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_tests.py docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py docs/hermes-analysis/manaloom-knowledge/scripts/deck_card_battle_rule_coherence_audit.py`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py -v`.
+- Tests passed:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_3.py`.
+
+Sync guard:
+
+- `sync_battle_card_rules_pg.py` now preserves existing `oracle_hash` and
+  curated/manual PG-only metadata on same-key conflicts, preventing reviewed
+  JSON syncs from erasing already validated PG evidence fields.
+
+Next queue:
+
+- Deck `6` remains at `30` high-severity findings and `8` medium findings.
+- The next deck-6 lane should be the remaining L1 land/mana-base medium set
+  only after the battle-critical/support cards already closed in this cycle are
+  left stable; otherwise continue with the next battle-critical high-impact
+  family from the auditor.

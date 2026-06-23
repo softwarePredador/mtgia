@@ -31420,7 +31420,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.9,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a"
+    "battle_rule_logical_key": "battle_rule_v1:245b8d2627720fadfd7a30464d07605a",
+    "battle_rule_oracle_hash": "22b42fcc181b7aed71f78b2e1e51e887"
   },
   "Valakut Awakening // Valakut Stoneforge": {
     "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1",

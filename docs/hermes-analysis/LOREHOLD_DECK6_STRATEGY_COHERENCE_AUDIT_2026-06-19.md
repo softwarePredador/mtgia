@@ -19864,3 +19864,85 @@ Remaining caveat:
 - `Rite of Flame` graveyard named-copy scaling and exact red pool handling are
   not full Magic-equivalent runtime models yet; both limitations are explicitly
   recorded in rule metadata.
+
+## PG059 Hash/Sync Metadata Guard Closure - 2026-06-23 02:29 UTC
+
+What changed:
+
+- Accepted and recorded the external hash-only `PG059 Deck 6 L2 Hash-Only
+  Regression Repair` after its postcheck showed the eight target runtime rows
+  with no missing or mismatched `oracle_hash`.
+- Added a central sync guard in
+  `docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py`
+  so future reviewed JSON upserts cannot blank existing PG `oracle_hash` values
+  or strip same-key curated/manual metadata already present in PostgreSQL.
+- Applied a metadata-only follow-up package for `Fellwar Stone`, `Mana Vault`,
+  `Mox Amber`, `Seething Song`, `Silence`, `Talisman of Conviction`, and
+  `Valakut Awakening // Valakut Stoneforge`.
+- No deck swap and no `deck_cards` mutation was executed.
+
+Evidence:
+
+- Hash-only postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/deck6_l2_hash_regression_repair_pg059_postcheck_20260623_021840.out`.
+- Sync metadata precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_precheck_20260623_022328.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_apply_20260623_022328.out`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_postcheck_20260623_022328.out`.
+- SQLite-from-PG sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg059_sync_metadata_restore_20260623_022328.json`.
+- Unit guard:
+  `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py -v`
+  passed.
+
+Current audit cut:
+
+- Deck `6`: `high=30`, `medium=8`, `pass=62`
+  (`deck_card_battle_rule_coherence_audit_deck6_20260623_023130.json`).
+- Deck `606`: `high=38`, `medium=8`, `pass=35`
+  (`deck_card_battle_rule_coherence_audit_deck606_20260623_023130.json`).
+- Deck `607`: `high=50`, `medium=16`, `pass=28`
+  (`deck_card_battle_rule_coherence_audit_deck607_20260623_022929.json`).
+- Deck `608`: `high=38`, `medium=11`, `pass=19`
+  (`deck_card_battle_rule_coherence_audit_deck608_20260623_022929.json`).
+
+Current reading:
+
+- This was a provenance/sync repair, not a new strategic improvement to the
+  Lorehold list.
+- Deck `607` and deck `608` remain not battle-ready because they still have
+  high-severity card-model findings.
+- The next practical executor batch should be a shared tutor/search package for
+  variant decks: `Enlightened Tutor`, `Idyllic Tutor`, `Goblin Engineer`, and
+  `Imperial Recruiter`, unless a higher-risk single-card blocker is selected
+  first from the latest deck `607`/`608` audit files.
+- The external `PG060` ritual metadata artifact with timestamp
+  `20260623_022418` is not accepted as applied evidence because its apply
+  output stopped before `UPDATE`/`COMMIT`, its postcheck output is empty, and no
+  matching PG backup table exists.
+- The follow-up `PG061` ritual metadata confirmation is accepted evidence:
+  apply output reports `UPDATE 2` and `COMMIT`, postcheck reports
+  `target_missing_runtime_scope_rows=0`,
+  `target_missing_mana_color_status_rows=0`, and `backup_rows=5`, and the
+  SQLite sync artifact is
+  `battle_card_rules_sqlite_from_pg_pg061_deck6_l3b_simple_red_rituals_metadata_20260623_023130.json`.
+
+Final PG061 audit cut:
+
+- Required global auditor:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_20260623_023224.json`
+  reports `total_cards=205`, `high=116`, `medium=23`, `pass=66`.
+- Official deck `6` remains at `high=30`, `medium=8`, `pass=62`; this confirms
+  PG061 did not regress the already closed ritual and mana-rock lanes.
+- Deck `606` remains at `high=38`, `medium=8`, `pass=35`.
+
+Next queue reading:
+
+- Deck `6` is still not battle-ready because the remaining high-severity cards
+  include battle-critical interaction, tutor, copy, draw/wheel, protection, and
+  win-condition support.
+- The next efficient batch should be selected by shared executor family from
+  the auditor queue. Land/mana-base medium cleanup can be handled after the
+  battle-deciding high-impact cards unless the next cycle is explicitly scoped
+  to the L1 land package.

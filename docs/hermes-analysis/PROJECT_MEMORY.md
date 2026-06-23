@@ -178,3 +178,15 @@ Atualizado em 2026-05-26:
 - O ultimo relatorio fica apontado por `/opt/data/.hermes/data/manaloom/reports/post_push_latest.md`.
 - Se o LLM travar, o script deve retornar `TIMEOUT` em vez de deixar processo pendurado.
 - O script faz `git fetch --all --prune` antes de calcular `origin/master`, para o smoke nao reportar SHA antigo.
+
+## ManaLoom card-rule sync guard - 2026-06-23
+
+- `card_battle_rules` continua sendo a fonte de verdade para semantica de
+  batalha; `known_cards_canonical_snapshot.json` e SQLite sao caches derivados.
+- O sync `sync_battle_card_rules_pg.py` nao pode apagar `oracle_hash` nem
+  metadados PG-only em conflitos de mesma chave logica curated/manual quando o
+  reviewed JSON de origem nao contem esses campos.
+- Evidencia PG059:
+  `docs/hermes-analysis/master_optimizer_reports/pg059_sync_metadata_restore_postcheck_20260623_022328.out`
+  fechou `target_missing_hash_rows=0`, `target_hash_mismatch_rows=0` e
+  `target_missing_effect_patch_rows=0`.

@@ -473,13 +473,18 @@ def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
         ON CONFLICT (normalized_name, logical_rule_key) DO UPDATE SET
           card_id = COALESCE(EXCLUDED.card_id, card_battle_rules.card_id),
           card_name = EXCLUDED.card_name,
-          effect_json = EXCLUDED.effect_json,
+          effect_json = CASE
+            WHEN card_battle_rules.source IN ('manual', 'curated')
+             AND EXCLUDED.source IN ('manual', 'curated')
+              THEN card_battle_rules.effect_json || EXCLUDED.effect_json
+            ELSE EXCLUDED.effect_json
+          END,
           deck_role_json = EXCLUDED.deck_role_json,
           source = EXCLUDED.source,
           confidence = EXCLUDED.confidence,
           review_status = EXCLUDED.review_status,
           execution_status = EXCLUDED.execution_status,
-          oracle_hash = EXCLUDED.oracle_hash,
+          oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash),
           notes = EXCLUDED.notes,
           reviewed_at = CASE
             WHEN EXCLUDED.review_status IN ('verified', 'active') THEN CURRENT_TIMESTAMP
@@ -598,13 +603,18 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
             ON CONFLICT (normalized_name, logical_rule_key) DO UPDATE SET
               card_id = COALESCE(EXCLUDED.card_id, card_battle_rules.card_id),
               card_name = EXCLUDED.card_name,
-              effect_json = EXCLUDED.effect_json,
+              effect_json = CASE
+                WHEN card_battle_rules.source IN ('manual', 'curated')
+                 AND EXCLUDED.source IN ('manual', 'curated')
+                  THEN card_battle_rules.effect_json || EXCLUDED.effect_json
+                ELSE EXCLUDED.effect_json
+              END,
               deck_role_json = EXCLUDED.deck_role_json,
               source = EXCLUDED.source,
               confidence = EXCLUDED.confidence,
               review_status = EXCLUDED.review_status,
               execution_status = EXCLUDED.execution_status,
-              oracle_hash = EXCLUDED.oracle_hash,
+              oracle_hash = COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash),
               notes = EXCLUDED.notes,
               reviewed_at = CASE
                 WHEN EXCLUDED.review_status IN ('verified', 'active')

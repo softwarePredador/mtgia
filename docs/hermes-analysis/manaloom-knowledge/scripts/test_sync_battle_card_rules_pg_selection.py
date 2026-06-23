@@ -193,6 +193,56 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertIn("annotation_only", captured["values"][0])
         self.assertIn("%s, %s, 1", str(captured["template"]))
 
+    def test_upsert_pg_rules_does_not_blank_existing_oracle_hash_or_curated_metadata(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_execute_values(cur, sql, values, template, page_size):
+            captured["sql"] = sql
+            captured["values"] = values
+
+        row = {
+            "card_name": "Seething Song",
+            "logical_rule_key": "battle_rule_v1:ritual",
+            "effect_json": {
+                "effect": "ramp_ritual",
+                "mana_produced": 5,
+                "produces": "R",
+                "battle_model_scope": "single_shot_red_ritual_v1",
+            },
+            "deck_role_json": {
+                "category": "ramp",
+                "effect": "ramp_ritual",
+            },
+            "source": "curated",
+            "confidence": 0.97,
+            "review_status": "verified",
+            "execution_status": "auto",
+            "notes": "reviewed runtime row without hash in source JSON",
+        }
+
+        with (
+            mock.patch.object(
+                sync_pg,
+                "load_current_sources",
+                return_value={("seething song", "battle_rule_v1:ritual"): "curated"},
+            ),
+            mock.patch.object(sync_pg, "load_card_id_lookup", return_value={}),
+            mock.patch("psycopg2.extras.execute_values", side_effect=fake_execute_values),
+        ):
+            changed, skipped = sync_pg.upsert_pg_rules(mock.Mock(), [row])
+
+        self.assertEqual(changed, 1)
+        self.assertEqual(skipped, 0)
+        self.assertIn(
+            "card_battle_rules.effect_json || EXCLUDED.effect_json",
+            str(captured["sql"]),
+        )
+        self.assertIn(
+            "COALESCE(NULLIF(EXCLUDED.oracle_hash, ''), card_battle_rules.oracle_hash)",
+            str(captured["sql"]),
+        )
+        self.assertIsNone(captured["values"][0][10])
+
     def test_pg_mirror_preserves_pg_logical_key_and_removes_shadow_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"
