@@ -4245,6 +4245,49 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_pyromancer_ascension_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Pyromancer Ascension",
+                        "severity": "high",
+                        "oracle_hash": "pyromancerhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "PyromancerAscension",
+                            "path": "/xmage/PyromancerAscension.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["AddCountersSourceEffect", "CopyTargetStackObjectEffect"],
+                            "ability_classes": [
+                                "PyromancerAscensionQuestTriggeredAbility",
+                                "PyromancerAscensionCopyTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "copy_spell",
+                                "battle_model_scope": "pyromancer_ascension_quest_counter_copy_spell_v1",
+                                "trigger": "instant_sorcery_cast",
+                                "trigger_effect": "pyromancer_ascension",
+                                "target": "own_instant_or_sorcery_on_stack",
+                                "may_choose_new_targets": True,
+                                "choose_new_targets_status": "may",
+                                "quest_counter_on_same_name_in_graveyard": True,
+                                "quest_counter_name_match_zone": "graveyard",
+                                "quest_counter_threshold_to_copy": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_and_generator_mark_fury_storm_copy_stack_scope_as_batch_safe(self) -> None:
         batch_audit = {
             "cards": [

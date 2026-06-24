@@ -3,12 +3,11 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG114, applied, postchecked, synced from PostgreSQL to Hermes
-SQLite/canonical snapshot, tested, locally replay-audited, and documented on
-2026-06-23 20:10 UTC. PG114 promoted
-`Emeria's Call // Emeria, Shattered Skyclave` to an Oracle/XMage-backed
-token-maker rule. This was not a deck swap, learned-deck promotion, or battle
-rebaseline.
+this thread is PG188, applied, postchecked, synced from PostgreSQL to Hermes
+SQLite/canonical snapshot, tested, strategy-audited, and documented on
+2026-06-24. PG188 promoted `Pyromancer Ascension` to an Oracle/XMage-backed
+quest-counter copy-spell rule. This was not a deck swap, learned-deck promotion,
+or battle rebaseline.
 
 ## Purpose
 
@@ -10484,3 +10483,106 @@ Register decision:
 - Continue next with remaining Lorehold `needs_rule_before_strategy` cards,
   prioritizing reusable exact scopes over broad targeted-damage variants.
 - Next package number is PG188.
+
+## PG188 - Pyromancer Ascension quest-counter copy-spell rule
+
+Timestamp: 2026-06-24 18:07 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold variant card used by deck `608`: `Pyromancer Ascension`.
+- Replaces two stale generated `copy_spell` review-only shadows with one
+  verified auto rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Pyromancer Ascension`:
+  `battle_rule_v1:ebe94a8e6b11cc83126424b87aecca2b`,
+  `oracle_hash=84cc013b799522990904777d7a3e458e`,
+  `effect=copy_spell`,
+  `battle_model_scope=pyromancer_ascension_quest_counter_copy_spell_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps the exact `PyromancerAscensionQuestTriggeredAbility` +
+  `PyromancerAscensionCopyTriggeredAbility` enchantment pattern to
+  `copy_spell_engine`.
+- Semantic classifier promotes only the exact paired
+  `AddCountersSourceEffect` + `CopyTargetStackObjectEffect` structure.
+- Battle runtime now tracks named `quest_counters`, adds one for same-name
+  instant/sorcery cards in the controller graveyard, and copies only if the
+  permanent already had at least two quest counters before the cast.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Shadow inspection:
+  both existing rows were generated `needs_review/review_only`, lacked
+  `oracle_hash`, and had generic `copy_spell` with no battle model scope.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg188_pyromancer_ascension_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local active `battle_card_rules` row is `verified/auto` with
+  `pyromancer_ascension_quest_counter_copy_spell_v1`.
+- Battle loader verification:
+  `get_card_effect({"name":"Pyromancer Ascension"})` selects the curated
+  `copy_spell` rule with one active alternative.
+- Tests:
+  `python3 -m unittest test_xmage_to_manaloom_effect_hints.py test_xmage_semantic_family_batch_pipeline.py`
+  ran `320` tests OK;
+  `python3 test_battle_analyst_v10_3.py` passed, including
+  `test_pyromancer_ascension_counts_before_copying_spell`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg188_pyromancer_ascension_postsync_v1_manifest.json`;
+  expanded scope severity moved to `high=325`, `medium=54`, `pass=330`.
+- Lorehold-focused post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg188_pyromancer_ascension_postsync_v1.json`;
+  scoped rows `395`, `battle_ready=272`,
+  `needs_rule_before_strategy=123`, `split_scope=22`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg188_pyromancer_ascension_postsync_v1.json`;
+  `package_ready_unprepared=0`, `package_already_prepared=0`,
+  `split_scope_backlog=77`, `runtime_family_backlog=24`,
+  `manual_mapper_backlog=261`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg188_pyromancer_ascension_postsync_v1.json`;
+  `18/18` pass.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_battle_rule_coherence_pg188_postsync_20260624.json`;
+  deck `608` has `high=13`, `medium=6`, `pass=49`;
+  `Pyromancer Ascension` is `pass` with one trusted executable rule.
+
+Register decision:
+
+- PG188 is closed as applied, postchecked, synced, tested, and
+  strategy-audited.
+- Do not reuse PG188.
+- Continue next with remaining Lorehold `needs_rule_before_strategy` cards,
+  prioritizing reusable exact scopes; current top split-scope candidates are
+  `Cool but Rude` and `Profound Journey`.
+- Next package number is PG189.

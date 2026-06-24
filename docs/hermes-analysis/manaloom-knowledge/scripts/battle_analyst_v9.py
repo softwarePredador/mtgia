@@ -2664,6 +2664,32 @@ def add_plus_one_counters(permanent, count=1):
         permanent["toughness"] = int(float(permanent.get("toughness") or 0)) + added
 
 
+def get_named_counter_count(permanent, counter_name):
+    if not isinstance(permanent, dict):
+        return 0
+    key = f"{counter_name}_counters"
+    if key in permanent:
+        return max(0, int(permanent.get(key) or 0))
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        return max(0, int(counters.get(counter_name) or 0))
+    return 0
+
+
+def add_named_counters(permanent, counter_name, count=1):
+    if not isinstance(permanent, dict):
+        return 0
+    added = max(0, int(count or 0))
+    if added <= 0:
+        return 0
+    key = f"{counter_name}_counters"
+    permanent[key] = get_named_counter_count(permanent, counter_name) + added
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        counters[counter_name] = permanent[key]
+    return added
+
+
 def resolve_creature_cards_leave_graveyard_triggers(
     player,
     leaving_cards,
@@ -21043,6 +21069,105 @@ def trigger_spell_cast_engines(
         if not isinstance(permanent, dict):
             continue
         if permanent.get("trigger") != "instant_sorcery_cast":
+            continue
+        if permanent.get("trigger_effect") == "pyromancer_ascension":
+            threshold = max(1, int(permanent.get("quest_counter_threshold_to_copy") or 2))
+            quest_counters_before = get_named_counter_count(permanent, "quest")
+            should_copy = quest_counters_before >= threshold
+            spell_name = normalize_card_name(spell.get("name", ""))
+            same_name_in_graveyard = any(
+                isinstance(card, dict)
+                and normalize_card_name(card.get("name", "")) == spell_name
+                for card in getattr(player, "graveyard", []) or []
+            )
+
+            def resolve_pyromancer_ascension_trigger(
+                permanent=permanent,
+                spell=spell,
+                quest_counters_before=quest_counters_before,
+                same_name_in_graveyard=same_name_in_graveyard,
+                should_copy=should_copy,
+            ):
+                quest_counters_after = quest_counters_before
+                if same_name_in_graveyard:
+                    add_named_counters(permanent, "quest", 1)
+                    quest_counters_after = get_named_counter_count(permanent, "quest")
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger="instant_sorcery_cast",
+                        trigger_spell=spell.get("name", "?"),
+                        effect="add_counter",
+                        counter_type="quest",
+                        counters_added=1,
+                        quest_counters_before=quest_counters_before,
+                        quest_counters_after=quest_counters_after,
+                        same_name_in_graveyard=True,
+                        copy_triggered=False,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                if not should_copy:
+                    return
+                target_item = stack_item_for_spell_reference(stack, spell, controller=player)
+                copy_target = copy_spell_stack_target_context(player, target_item, permanent)
+                if not copy_target:
+                    emit_replay_event(
+                        "trigger_skipped",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger="instant_sorcery_cast",
+                        trigger_spell=spell.get("name", "?"),
+                        reason="no_copyable_stack_target",
+                        quest_counters_before=quest_counters_before,
+                        quest_counters_after=quest_counters_after,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                    return
+                copied_item = copy_spell_on_stack(
+                    target_item.card,
+                    player,
+                    stack,
+                    original_effect_data=target_item.effect_data,
+                    source_card=permanent,
+                    source_effect_data=permanent,
+                )
+                emit_replay_event(
+                    "spell_copied",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    copied_spell=target_item.card.get("name", "?"),
+                    copied_spell_controller=getattr(target_item.controller, "name", None),
+                    copied_stack_object=getattr(copied_item, "card", {}).get("name", "?") if copied_item else None,
+                    copy_controller=player.name,
+                    copy_is_cast=False,
+                    copy_stack_depth=len(stack.items) if stack is not None else 0,
+                    may_choose_new_targets=bool(permanent.get("may_choose_new_targets")),
+                    choose_new_targets_status=permanent.get("choose_new_targets_status"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    quest_counters_before=quest_counters_before,
+                    quest_counters_after=quest_counters_after,
+                    copy_threshold=threshold,
+                    turn=turn,
+                    phase=phase,
+                    **copy_target,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_pyromancer_ascension_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
             continue
         if permanent.get("trigger_effect") == "copy_spell":
             if (

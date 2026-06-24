@@ -10927,6 +10927,100 @@ def register_tests(battle, player):
         assert len(copied_events) == 2
         assert [data["trigger_spell"] for data in copied_events] == ["Brainstorm", "Ponder"]
 
+    def test_pyromancer_ascension_counts_before_copying_spell():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.library = [
+                {"name": "Card A", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card B", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card C", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            pyromancer = {
+                "name": "Pyromancer Ascension",
+                "cmc": 2,
+                "type_line": "Enchantment",
+                "effect": "copy_spell",
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "pyromancer_ascension",
+                "target": "own_instant_or_sorcery_on_stack",
+                "may_choose_new_targets": True,
+                "choose_new_targets_status": "may",
+                "quest_counter_on_same_name_in_graveyard": True,
+                "quest_counter_name_match_zone": "graveyard",
+                "quest_counter_threshold_to_copy": 2,
+                "quest_counters": 1,
+                "battle_model_scope": "pyromancer_ascension_quest_counter_copy_spell_v1",
+            }
+            active.battlefield = [pyromancer]
+            active.graveyard = [{"name": "Opt", "type_line": "Instant", "cmc": 1}]
+            stack = battle.Stack()
+            draw_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": True,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+
+            first_spell = {"name": "Opt", "type_line": "Instant", "cmc": 1}
+            active.record_spell_cast(9, card=first_spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                first_spell,
+                turn=9,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(first_spell, active, draw_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 9, random.Random(615), phase="precombat_main")
+
+            second_spell = {"name": "Lightning Bolt", "type_line": "Instant", "cmc": 1}
+            active.record_spell_cast(9, card=second_spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                second_spell,
+                turn=9,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(second_spell, active, draw_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 9, random.Random(616), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert pyromancer["quest_counters"] == 2
+        copied_events = [
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Pyromancer Ascension"
+        ]
+        assert len(copied_events) == 1
+        assert copied_events[0]["trigger_spell"] == "Lightning Bolt"
+        assert copied_events[0]["quest_counters_before"] == 2
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Pyromancer Ascension"
+            and data.get("trigger_spell") == "Opt"
+            and data.get("effect") == "add_counter"
+            and data.get("quest_counters_before") == 1
+            and data.get("quest_counters_after") == 2
+            for event, data in events
+        )
+        assert not any(
+            event == "spell_copied"
+            and data.get("card") == "Pyromancer Ascension"
+            and data.get("trigger_spell") == "Opt"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -12992,6 +13086,7 @@ def register_tests(battle, player):
         test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands,
         test_land_tax_skips_when_no_opponent_controls_more_lands,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
+        test_pyromancer_ascension_counts_before_copying_spell,
         test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance,
         test_pg070_faithless_looting_draws_two_discards_two_with_rule_provenance,
         test_pg070_gamble_tutors_then_randomly_discards_with_rule_provenance,

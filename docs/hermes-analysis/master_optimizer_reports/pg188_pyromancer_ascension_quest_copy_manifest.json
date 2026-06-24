@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg188_pyromancer_ascension_quest_copy_20260624_210604",
+  "deploy_id": "PG188",
+  "family_counts": {
+    "copy_spell_engine": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg188_pyromancer_ascension_quest_copy_rollback.sql"
+  },
+  "generated_at": "2026-06-24T21:06:04+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Pyromancer Ascension"
+  ],
+  "selected_count": 1,
+  "slug": "pyromancer-ascension-quest-copy",
+  "status": "prepared_read_only_pending_apply_approval"
+}

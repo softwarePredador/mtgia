@@ -2646,6 +2646,40 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["choose_new_targets_status"], "may")
         self.assertFalse(primary.get("trigger_first_instant_or_sorcery_each_turn", False))
 
+    def test_pyromancer_ascension_maps_to_quest_counter_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect", "CopyTargetStackObjectEffect"],
+                "ability_classes": [
+                    "PyromancerAscensionQuestTriggeredAbility",
+                    "PyromancerAscensionCopyTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "xmage_class_name": "PyromancerAscension",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{1}{R}"); '
+                    "new AddCountersSourceEffect(CounterType.QUEST.createInstance(), true); "
+                    "new CopyTargetStackObjectEffect(true); "
+                    "Whenever you cast an instant or sorcery spell while Pyromancer Ascension has two or more quest counters on it, "
+                    "you may copy that spell. You may choose new targets for the copy."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "copy_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "pyromancer_ascension_quest_counter_copy_spell_v1",
+        )
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "pyromancer_ascension")
+        self.assertEqual(primary["target"], "own_instant_or_sorcery_on_stack")
+        self.assertTrue(primary["may_choose_new_targets"])
+        self.assertTrue(primary["quest_counter_on_same_name_in_graveyard"])
+        self.assertEqual(primary["quest_counter_name_match_zone"], "graveyard")
+        self.assertEqual(primary["quest_counter_threshold_to_copy"], 2)
+
     def test_candelabra_of_tawnos_maps_to_x_untap_lands_scope(self) -> None:
         result = hints.build_effect_hints(
             {

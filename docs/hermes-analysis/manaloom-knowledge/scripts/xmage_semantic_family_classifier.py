@@ -937,6 +937,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and not bool(effect_json.get("trigger_first_instant_or_sorcery_each_turn"))
         )
 
+    if effect == "copy_spell" and scope == "pyromancer_ascension_quest_counter_copy_spell_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"AddCountersSourceEffect", "CopyTargetStackObjectEffect"}.issubset(effect_classes)
+            and {
+                "PyromancerAscensionQuestTriggeredAbility",
+                "PyromancerAscensionCopyTriggeredAbility",
+            }.issubset(ability_classes)
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "pyromancer_ascension"
+            and effect_json.get("target") == "own_instant_or_sorcery_on_stack"
+            and bool(effect_json.get("may_choose_new_targets"))
+            and bool(effect_json.get("quest_counter_on_same_name_in_graveyard"))
+            and effect_json.get("quest_counter_name_match_zone") == "graveyard"
+            and int(effect_json.get("quest_counter_threshold_to_copy") or 0) == 2
+        )
+
     if effect == "copy_spell" and scope == "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1":
         return (
             types == {"INSTANT"}

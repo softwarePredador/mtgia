@@ -2018,6 +2018,42 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "PyromancerAscension"
+        or (
+            card_types == {"ENCHANTMENT"}
+            and {"AddCountersSourceEffect", "CopyTargetStackObjectEffect"}.issubset(effect_classes)
+            and {
+                "PyromancerAscensionQuestTriggeredAbility",
+                "PyromancerAscensionCopyTriggeredAbility",
+            }.issubset(ability_classes)
+            and "two or more quest counters" in normalized
+            and "you may copy that spell" in normalized
+        )
+    ):
+        return {
+            "effect": "copy_spell",
+            "scope": "pyromancer_ascension_quest_counter_copy_spell_v1",
+            "fields": {
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "pyromancer_ascension",
+                "target": "own_instant_or_sorcery_on_stack",
+                "may_choose_new_targets": True,
+                "choose_new_targets_status": "may",
+                "quest_counter_on_same_name_in_graveyard": True,
+                "quest_counter_name_match_zone": "graveyard",
+                "quest_counter_threshold_to_copy": 2,
+            },
+            "reason": "XMage structure matches Pyromancer Ascension adding quest counters for same-name graveyard spells and copying instant or sorcery spells only while it already has at least two quest counters.",
+            "signals": [
+                "PyromancerAscensionQuestTriggeredAbility",
+                "PyromancerAscensionCopyTriggeredAbility",
+                "AddCountersSourceEffect",
+                "CopyTargetStackObjectEffect",
+                "quest_counter_threshold_2",
+            ],
+        }
+
+    if (
         xmage_class_name == "DoubleVision"
         or (
             card_types == {"ENCHANTMENT"}
