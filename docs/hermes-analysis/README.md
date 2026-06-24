@@ -9,6 +9,22 @@ Updated: 2026-06-15
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
+## Decisoes atuais XMage -> ManaLoom
+
+- `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md`
+  - Decisao atual para acelerar XMage -> ManaLoom: usar
+    `hybrid_effective_queue_pattern_registry`.
+  - Supersede a leitura card-by-card como metodo padrao enquanto existirem
+    pacotes preparados, clusters split-scope ou runtime scopes homogeneos.
+  - Evidencia comparativa:
+    `master_optimizer_reports/xmage_acceleration_strategy_benchmark_20260624_expanded_608_619_real_v1.md`.
+
+- `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
+  - Workflow operacional atual para a fila real Lorehold 608-616,
+    novos decks nao-Lorehold e oponentes de auditoria/replay.
+  - Define lanes, comandos, gates, pattern registry shadow-only e quando
+    regenerar o benchmark.
+
 ## Triagens recentes
 
 - `BRANCH_RETENTION_AUDIT_2026-06-11.md`

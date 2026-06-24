@@ -15,6 +15,7 @@ import materialize_learned_deck_to_deck_cards as materializer
 import xmage_batch_validity_audit as validity_audit
 import xmage_effect_json_batch_generator as proposal_generator
 import xmage_local_rule_indexer as local_indexer
+import xmage_pattern_registry_builder as pattern_registry_builder
 import xmage_semantic_family_classifier as family_classifier
 
 
@@ -84,6 +85,19 @@ def deck_targets_from_latest_artifact(artifact_dir: Path) -> dict[str, Any]:
         "learned_deck_ids": sorted(learned_deck_ids),
         "source_names": dict(sorted(source_names.items())),
         "seed_map": seed_map,
+    }
+
+
+def aggregate_scope(deck_targets: dict[str, Any], include_deck_ids: list[int]) -> dict[str, Any]:
+    artifact_deck_ids = sorted(set(int(deck_id) for deck_id in deck_targets.get("deck_ids", [])))
+    learned_deck_ids = sorted(set(int(deck_id) for deck_id in deck_targets.get("learned_deck_ids", [])))
+    forced_deck_ids = sorted(set(int(deck_id) for deck_id in include_deck_ids))
+    effective_deck_ids = sorted(set(artifact_deck_ids) | set(learned_deck_ids) | set(forced_deck_ids))
+    return {
+        "artifact_deck_ids": artifact_deck_ids,
+        "learned_deck_ids": learned_deck_ids,
+        "forced_include_deck_ids": forced_deck_ids,
+        "effective_deck_ids": effective_deck_ids,
     }
 
 
@@ -226,12 +240,16 @@ def markdown_manifest(manifest: dict[str, Any]) -> str:
         f"- Artifact dir: `{manifest['battle_artifact_dir']}`",
         f"- XMage root: `{manifest['xmage_root']}`",
         f"- SQLite DB: `{manifest['sqlite_db']}`",
-        f"- Deck ids: `{json.dumps(manifest['deck_targets']['deck_ids'])}`",
-        f"- Learned deck ids: `{json.dumps(manifest['deck_targets']['learned_deck_ids'])}`",
+        f"- Artifact deck ids: `{json.dumps(manifest['aggregate_scope']['artifact_deck_ids'])}`",
+        f"- Learned deck ids: `{json.dumps(manifest['aggregate_scope']['learned_deck_ids'])}`",
+        f"- Forced include deck ids: `{json.dumps(manifest['aggregate_scope']['forced_include_deck_ids'])}`",
+        f"- Effective deck ids: `{json.dumps(manifest['aggregate_scope']['effective_deck_ids'])}`",
         f"- Combined severity counts: `{json.dumps(manifest['combined_coherence']['severity_counts'], sort_keys=True)}`",
         f"- Validity status counts: `{json.dumps(manifest['validity_audit']['summary']['status_counts'], sort_keys=True)}`",
         f"- Family counts: `{json.dumps(manifest['family_report']['summary']['family_counts'], sort_keys=True)}`",
         f"- Proposal status counts: `{json.dumps(manifest['proposal_report']['summary']['proposal_status_counts'], sort_keys=True)}`",
+        f"- Pattern status counts: `{json.dumps(manifest['pattern_registry']['summary']['pattern_status_counts'], sort_keys=True)}`",
+        f"- Pattern promotion status: `{manifest['pattern_registry']['summary']['promotion_status']}`",
         "",
         "## Materialized Learned Decks",
         "",
@@ -262,6 +280,10 @@ def parse_args() -> argparse.Namespace:
         help="Additional deck_ids to force into the aggregate scope.",
     )
     parser.add_argument(
+        "--external-harvest",
+        help="Optional external card reference harvest JSON used for oracle_hash and metadata enrichment.",
+    )
+    parser.add_argument(
         "--skip-materialize",
         action="store_true",
         help="Do not apply learned_deck -> deck_cards materialization before auditing.",
@@ -275,6 +297,7 @@ def main() -> int:
     sqlite_db = Path(args.sqlite_db)
     artifact_dir = Path(args.battle_artifact_dir)
     xmage_root = Path(args.xmage_root)
+    external_harvest = family_classifier.load_json(Path(args.external_harvest)) if args.external_harvest else None
     timestamp = compact_timestamp()
     output_prefix = Path(
         args.output_prefix
@@ -283,7 +306,8 @@ def main() -> int:
 
     deck_targets = deck_targets_from_latest_artifact(artifact_dir)
     include_deck_ids = sorted(set(int(deck_id) for deck_id in args.include_deck_id))
-    deck_ids = sorted(set(deck_targets["deck_ids"]) | set(include_deck_ids) | set(deck_targets["learned_deck_ids"]))
+    scope = aggregate_scope(deck_targets, include_deck_ids)
+    deck_ids = scope["effective_deck_ids"]
 
     materialization = materialize_latest_learned_decks(
         sqlite_db=sqlite_db,
@@ -312,12 +336,16 @@ def main() -> int:
     validity_report = validity_audit.build_audit(
         coherence_report=combined,
         xmage_index=index_report,
-        external_harvest=None,
+        external_harvest=external_harvest,
     )
     family_report = family_classifier.build_family_report(validity_report)
     proposal_report = proposal_generator.build_generator_report(
         batch_audit=validity_report,
-        external_harvest=None,
+        external_harvest=external_harvest,
+    )
+    pattern_registry_report = pattern_registry_builder.build_report(
+        proposal_report=proposal_report,
+        report_dir=DEFAULT_REPORT_DIR,
     )
 
     files = {
@@ -333,6 +361,8 @@ def main() -> int:
         "families_md": str(output_prefix.with_name(output_prefix.name + "_families.md")),
         "proposals_json": str(output_prefix.with_name(output_prefix.name + "_proposals.json")),
         "proposals_md": str(output_prefix.with_name(output_prefix.name + "_proposals.md")),
+        "pattern_registry_json": str(output_prefix.with_name(output_prefix.name + "_pattern_registry.json")),
+        "pattern_registry_md": str(output_prefix.with_name(output_prefix.name + "_pattern_registry.md")),
     }
 
     write_json(Path(files["combined_coherence_json"]), combined)
@@ -341,6 +371,8 @@ def main() -> int:
     validity_audit.write_report(validity_report, Path(files["validity_json"]), Path(files["validity_md"]))
     family_classifier.write_report(family_report, Path(files["families_json"]), Path(files["families_md"]))
     proposal_generator.write_report(proposal_report, Path(files["proposals_json"]), Path(files["proposals_md"]))
+    write_json(Path(files["pattern_registry_json"]), pattern_registry_report)
+    write_markdown(Path(files["pattern_registry_md"]), pattern_registry_builder.render_markdown(pattern_registry_report))
 
     manifest = {
         "generated_at": utc_now(),
@@ -348,6 +380,7 @@ def main() -> int:
         "sqlite_db": str(sqlite_db),
         "xmage_root": str(xmage_root.resolve()),
         "deck_targets": deck_targets,
+        "aggregate_scope": scope,
         "materialization": materialization,
         "combined_coherence": {
             "total_cards": combined["total_cards"],
@@ -362,6 +395,10 @@ def main() -> int:
         "proposal_report": {
             "summary": proposal_report["summary"],
         },
+        "pattern_registry": {
+            "summary": pattern_registry_report["summary"],
+            "registry_contract": pattern_registry_report["registry_contract"],
+        },
         "files": files,
     }
     write_json(Path(files["manifest_json"]), manifest)
@@ -373,11 +410,13 @@ def main() -> int:
     print(f"validity_json={files['validity_json']}")
     print(f"families_json={files['families_json']}")
     print(f"proposals_json={files['proposals_json']}")
+    print(f"pattern_registry_json={files['pattern_registry_json']}")
     print(f"deck_ids={json.dumps(deck_ids)}")
     print(f"severity_counts={json.dumps(combined['severity_counts'], sort_keys=True)}")
     print(f"validity_status_counts={json.dumps(validity_report['summary']['status_counts'], sort_keys=True)}")
     print(f"family_counts={json.dumps(family_report['summary']['family_counts'], sort_keys=True)}")
     print(f"proposal_status_counts={json.dumps(proposal_report['summary']['proposal_status_counts'], sort_keys=True)}")
+    print(f"pattern_status_counts={json.dumps(pattern_registry_report['summary']['pattern_status_counts'], sort_keys=True)}")
     return 0
 
 

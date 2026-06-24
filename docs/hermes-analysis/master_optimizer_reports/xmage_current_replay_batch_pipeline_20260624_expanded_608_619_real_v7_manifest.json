@@ -1,0 +1,505 @@
+{
+  "aggregate_scope": {
+    "artifact_deck_ids": [
+      6
+    ],
+    "effective_deck_ids": [
+      6,
+      25,
+      31,
+      42,
+      58,
+      62,
+      74,
+      83,
+      84,
+      104,
+      105,
+      116,
+      608,
+      609,
+      610,
+      611,
+      612,
+      613,
+      614,
+      615,
+      616,
+      617,
+      618,
+      619
+    ],
+    "forced_include_deck_ids": [
+      6,
+      608,
+      609,
+      610,
+      611,
+      612,
+      613,
+      614,
+      615,
+      616,
+      617,
+      618,
+      619
+    ],
+    "learned_deck_ids": [
+      25,
+      31,
+      42,
+      58,
+      62,
+      74,
+      83,
+      84,
+      104,
+      105,
+      116
+    ]
+  },
+  "battle_artifact_dir": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_052838",
+  "combined_coherence": {
+    "severity_counts": {
+      "high": 458,
+      "medium": 64,
+      "pass": 408
+    },
+    "total_cards": 930
+  },
+  "deck_targets": {
+    "artifact_dir": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_052838",
+    "deck_ids": [
+      6
+    ],
+    "generated_at": "2026-06-24T15:19:08+00:00",
+    "learned_deck_ids": [
+      25,
+      31,
+      42,
+      58,
+      62,
+      74,
+      83,
+      84,
+      104,
+      105,
+      116
+    ],
+    "seed_map": {
+      "seed_63250528": [
+        "deck_id:6",
+        "learned_deck:105",
+        "learned_deck:31",
+        "learned_deck:83"
+      ],
+      "seed_63250529": [
+        "deck_id:6",
+        "learned_deck:104",
+        "learned_deck:105",
+        "learned_deck:58"
+      ],
+      "seed_63250530": [
+        "deck_id:6",
+        "learned_deck:105",
+        "learned_deck:58",
+        "learned_deck:74"
+      ],
+      "seed_63250531": [
+        "deck_id:6",
+        "learned_deck:25",
+        "learned_deck:62",
+        "learned_deck:84"
+      ],
+      "seed_63250532": [
+        "deck_id:6",
+        "learned_deck:104",
+        "learned_deck:116",
+        "learned_deck:25"
+      ],
+      "seed_63250533": [
+        "deck_id:6",
+        "learned_deck:58",
+        "learned_deck:83",
+        "learned_deck:84"
+      ],
+      "seed_63250534": [
+        "deck_id:6",
+        "learned_deck:25",
+        "learned_deck:31",
+        "learned_deck:42"
+      ],
+      "seed_63250535": [
+        "deck_id:6",
+        "learned_deck:105",
+        "learned_deck:31",
+        "learned_deck:74"
+      ],
+      "seed_63250536": [
+        "deck_id:6",
+        "learned_deck:25",
+        "learned_deck:42",
+        "learned_deck:74"
+      ],
+      "seed_63250537": [
+        "deck_id:6",
+        "learned_deck:104",
+        "learned_deck:25",
+        "learned_deck:58"
+      ],
+      "seed_63250538": [
+        "deck_id:6",
+        "learned_deck:104",
+        "learned_deck:31",
+        "learned_deck:58"
+      ],
+      "seed_63250539": [
+        "deck_id:6",
+        "learned_deck:25",
+        "learned_deck:42",
+        "learned_deck:83"
+      ],
+      "seed_63250540": [
+        "deck_id:6",
+        "learned_deck:104",
+        "learned_deck:74",
+        "learned_deck:83"
+      ],
+      "seed_63250541": [
+        "deck_id:6",
+        "learned_deck:25",
+        "learned_deck:42",
+        "learned_deck:83"
+      ],
+      "seed_63250542": [
+        "deck_id:6",
+        "learned_deck:105",
+        "learned_deck:42",
+        "learned_deck:84"
+      ],
+      "seed_63250543": [
+        "deck_id:6",
+        "learned_deck:105",
+        "learned_deck:116",
+        "learned_deck:58"
+      ]
+    },
+    "source_names": {
+      "deck_id:6": "Lorehold",
+      "learned_deck:104": "Kinnan, Bonder Prodigy #104 (real)",
+      "learned_deck:105": "Etali, Primal Conqueror #105 (real)",
+      "learned_deck:116": "Tayam, Luminous Enigma #116 (real)",
+      "learned_deck:25": "Tayam, Luminous Enigma #25 (real)",
+      "learned_deck:31": "Sisay, Weatherlight Captain #31 (real)",
+      "learned_deck:42": "The Emperor of Palamecia #42 (real)",
+      "learned_deck:58": "Thrasios, Triton Hero #58 (real)",
+      "learned_deck:62": "Rograkh, Son of Rohgahh #62 (real)",
+      "learned_deck:74": "Dargo, the Shipwrecker #74 (real)",
+      "learned_deck:83": "Kraum, Ludevic's Opus #83 (real)",
+      "learned_deck:84": "Kinnan, Bonder Prodigy #84 (real)"
+    }
+  },
+  "family_report": {
+    "summary": {
+      "batch_metadata_candidate_count": 54,
+      "card_count": 504,
+      "family_count": 17,
+      "family_counts": {
+        "board_wipe_choice": 4,
+        "copy_permanent_etb": 9,
+        "copy_spell_engine": 2,
+        "creature": 8,
+        "draw_engine": 3,
+        "land": 4,
+        "land_ramp": 1,
+        "manual_model": 357,
+        "passive": 4,
+        "ramp_permanent": 7,
+        "ramp_ritual": 1,
+        "static_cost_reducer": 3,
+        "targeted_interaction": 70,
+        "token_maker": 21,
+        "treasure_maker": 1,
+        "tutor": 5,
+        "untap_land_engine": 4
+      },
+      "manual_or_blocked_count": 426,
+      "promotion_lane_counts": {
+        "batch_metadata_candidate_requires_pg_precheck": 54,
+        "blocked_missing_xmage_source": 2,
+        "mapper_metadata_or_test_scenario_required": 356,
+        "runtime_family_implementation_required": 24,
+        "split_family_scope_review_required": 68
+      },
+      "runtime_family_required_count": 24
+    }
+  },
+  "files": {
+    "combined_coherence_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_combined_coherence.json",
+    "combined_coherence_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_combined_coherence.md",
+    "families_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_families.json",
+    "families_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_families.md",
+    "manifest_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_manifest.json",
+    "manifest_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_manifest.md",
+    "pattern_registry_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_pattern_registry.json",
+    "pattern_registry_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_pattern_registry.md",
+    "proposals_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_proposals.json",
+    "proposals_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_proposals.md",
+    "validity_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_validity.json",
+    "validity_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_validity.md",
+    "xmage_index_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_xmage_index.json",
+    "xmage_index_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_xmage_index.md"
+  },
+  "generated_at": "2026-06-24T15:19:11+00:00",
+  "materialization": [
+    {
+      "apply": false,
+      "commander": "Tayam, Luminous Enigma",
+      "deck_name": "Tayam, Luminous Enigma",
+      "filled_basic": 0,
+      "learned_deck_id": 25,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 25
+    },
+    {
+      "apply": false,
+      "commander": "Sisay, Weatherlight Captain",
+      "deck_name": "Sisay, Weatherlight Captain",
+      "filled_basic": 0,
+      "learned_deck_id": 31,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 31
+    },
+    {
+      "apply": false,
+      "commander": "The Emperor of Palamecia",
+      "deck_name": "The Emperor of Palamecia",
+      "filled_basic": 0,
+      "learned_deck_id": 42,
+      "oracle_rows": 80,
+      "quantity": 100,
+      "rows": 80,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 42
+    },
+    {
+      "apply": false,
+      "commander": "Thrasios, Triton Hero",
+      "deck_name": "Thrasios, Triton Hero + Vial Smasher the Fierce",
+      "filled_basic": 0,
+      "learned_deck_id": 58,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 58
+    },
+    {
+      "apply": false,
+      "commander": "Rograkh, Son of Rohgahh",
+      "deck_name": "Rograkh, Son of Rohgahh + Thrasios, Triton Hero",
+      "filled_basic": 0,
+      "learned_deck_id": 62,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 62
+    },
+    {
+      "apply": false,
+      "commander": "Dargo, the Shipwrecker",
+      "deck_name": "Dargo, the Shipwrecker + Tymna the Weaver",
+      "filled_basic": 0,
+      "learned_deck_id": 74,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 74
+    },
+    {
+      "apply": false,
+      "commander": "Kraum, Ludevic's Opus",
+      "deck_name": "Kraum, Ludevic's Opus + Tymna the Weaver",
+      "filled_basic": 0,
+      "learned_deck_id": 83,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 83
+    },
+    {
+      "apply": false,
+      "commander": "Kinnan, Bonder Prodigy",
+      "deck_name": "Kinnan, Bonder Prodigy",
+      "filled_basic": 0,
+      "learned_deck_id": 84,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 84
+    },
+    {
+      "apply": false,
+      "commander": "Kinnan, Bonder Prodigy",
+      "deck_name": "Kinnan, Bonder Prodigy",
+      "filled_basic": 0,
+      "learned_deck_id": 104,
+      "oracle_rows": 94,
+      "quantity": 100,
+      "rows": 94,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 104
+    },
+    {
+      "apply": false,
+      "commander": "Etali, Primal Conqueror",
+      "deck_name": "Etali, Primal Conqueror",
+      "filled_basic": 0,
+      "learned_deck_id": 105,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 105
+    },
+    {
+      "apply": false,
+      "commander": "Tayam, Luminous Enigma",
+      "deck_name": "Tayam, Luminous Enigma",
+      "filled_basic": 0,
+      "learned_deck_id": 116,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 116
+    }
+  ],
+  "pattern_registry": {
+    "registry_contract": {
+      "consumer_boundary": "Patterns are advisory and must not be joined directly into deck-card consumers.",
+      "kind": "shadow_pattern_registry",
+      "postgresql_source_of_truth_table": "card_battle_rules",
+      "promotion_status": "shadow_only"
+    },
+    "summary": {
+      "auto_promotable_pattern_count": 0,
+      "card_counts_by_pattern_status": {
+        "blocked_missing_xmage_source": 2,
+        "fragmented_runtime_observation_only": 20,
+        "governance_only_pending_pg_apply": 51,
+        "manual_model_observation_only": 359,
+        "requires_subpattern_split_before_promotion": 68,
+        "runtime_template_candidate_requires_executor_tests": 4
+      },
+      "executable_pattern_count": 0,
+      "lane_counts": {
+        "blocked_missing_xmage_source": 2,
+        "manual_mapper_backlog": 359,
+        "package_already_prepared": 51,
+        "runtime_family_backlog": 24,
+        "split_scope_backlog": 68
+      },
+      "pattern_count": 77,
+      "pattern_status_counts": {
+        "blocked_missing_xmage_source": 1,
+        "fragmented_runtime_observation_only": 20,
+        "governance_only_pending_pg_apply": 40,
+        "manual_model_observation_only": 5,
+        "requires_subpattern_split_before_promotion": 9,
+        "runtime_template_candidate_requires_executor_tests": 2
+      },
+      "promotion_status": "shadow_only",
+      "proposal_count": 504
+    }
+  },
+  "proposal_report": {
+    "summary": {
+      "blocked_missing_xmage_source_count": 2,
+      "family_counts": {
+        "board_wipe_choice": 4,
+        "copy_permanent_etb": 9,
+        "copy_spell_engine": 2,
+        "creature": 8,
+        "draw_engine": 3,
+        "land": 4,
+        "land_ramp": 1,
+        "manual_model": 357,
+        "passive": 4,
+        "ramp_permanent": 7,
+        "ramp_ritual": 1,
+        "static_cost_reducer": 3,
+        "targeted_interaction": 70,
+        "token_maker": 21,
+        "treasure_maker": 1,
+        "tutor": 5,
+        "untap_land_engine": 4
+      },
+      "proposal_count": 504,
+      "proposal_status_counts": {
+        "batch_pg_candidate_after_precheck": 51,
+        "blocked_missing_xmage_source": 2,
+        "mapper_metadata_or_test_scenario_required": 356,
+        "oracle_hash_required_before_batch_pg": 3,
+        "runtime_family_implementation_required": 24,
+        "split_family_scope_review_required": 68
+      },
+      "runtime_family_required_count": 24,
+      "safe_for_batch_pg_package_count": 51
+    }
+  },
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "validity_audit": {
+    "summary": {
+      "audited_card_count": 504,
+      "exact_xmage_found_count": 502,
+      "focused_test_scenario_ready_count": 502,
+      "missing_xmage_class_count": 2,
+      "ready_for_structured_pull_count": 146,
+      "severity_counts": {
+        "high": 458,
+        "medium": 46
+      },
+      "status_counts": {
+        "blocked_missing_xmage_class": 2,
+        "ready_for_structured_xmage_pull_review_required": 146,
+        "xmage_source_found_metadata_mismatch": 1,
+        "xmage_source_valid_mapper_required": 355
+      },
+      "valid_xmage_source_count": 501
+    }
+  },
+  "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"
+}

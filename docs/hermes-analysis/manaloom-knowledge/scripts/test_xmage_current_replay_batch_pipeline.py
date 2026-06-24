@@ -41,6 +41,20 @@ class XMageCurrentReplayBatchPipelineTests(unittest.TestCase):
         self.assertEqual(targets["source_names"]["deck_id:6"], "Lorehold")
         self.assertEqual(targets["seed_map"]["seed_123"], ["deck_id:6", "learned_deck:105", "learned_deck:54"])
 
+    def test_aggregate_scope_exposes_forced_decks_and_effective_scope(self) -> None:
+        scope = pipeline.aggregate_scope(
+            {
+                "deck_ids": [6],
+                "learned_deck_ids": [25, 31],
+            },
+            [6, 608, 609, 608],
+        )
+
+        self.assertEqual(scope["artifact_deck_ids"], [6])
+        self.assertEqual(scope["learned_deck_ids"], [25, 31])
+        self.assertEqual(scope["forced_include_deck_ids"], [6, 608, 609])
+        self.assertEqual(scope["effective_deck_ids"], [6, 25, 31, 608, 609])
+
     def test_merge_usage_maps_unions_decks_and_sums_quantities(self) -> None:
         first = {
             "birds of paradise": coherence.DeckCardUsage(
