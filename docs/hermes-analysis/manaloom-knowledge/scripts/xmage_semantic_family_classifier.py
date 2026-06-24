@@ -350,6 +350,7 @@ GENERIC_BATCH_SAFE_SCOPES = {
     ("removal_destroy", "targeted_destroy_variant_v1"),
     ("direct_damage", "targeted_damage_variant_v1"),
     ("recursion", "graveyard_to_battlefield_variant_v1"),
+    ("recursion", "return_target_permanent_from_graveyard_to_battlefield_rebound_v1"),
     ("sweeper_damage", "damage_all_variant_v1"),
 }
 MANA_ROCK_BATCH_SAFE_SCOPE = (
@@ -431,6 +432,16 @@ def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
     if effect == "recursion":
         if "ReturnFromGraveyardToBattlefieldTargetEffect" not in effect_classes:
             return False
+        if scope == "return_target_permanent_from_graveyard_to_battlefield_rebound_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}
+                and ability_classes == {"ReboundAbility"}
+                and str(effect_json.get("target") or "") == "permanent"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and int(effect_json.get("count") or 0) == 1
+                and bool(effect_json.get("rebound"))
+            )
     else:
         allowed_effects = GENERIC_BATCH_SAFE_EFFECT_CLASSES.get(effect)
         if allowed_effects is None or not effect_classes.issubset(allowed_effects):

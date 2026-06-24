@@ -2054,6 +2054,39 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "ProfoundJourney"
+        or (
+            card_types == {"SORCERY"}
+            and effect_classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}
+            and ability_classes == {"ReboundAbility"}
+            and "TargetCardInYourGraveyard" in target_classes
+            and (
+                "filterpermanentcard" in normalized
+                or "permanent card from your graveyard" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "recursion",
+            "scope": "return_target_permanent_from_graveyard_to_battlefield_rebound_v1",
+            "fields": {
+                "target": "permanent",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "count": 1,
+                "rebound": True,
+            },
+            "reason": "XMage structure matches Profound Journey returning one target permanent card from your graveyard to the battlefield and exiling itself for rebound.",
+            "signals": [
+                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                "TargetCardInYourGraveyard",
+                "FilterPermanentCard",
+                "ReboundAbility",
+            ],
+        }
+
+    if (
         xmage_class_name == "DoubleVision"
         or (
             card_types == {"ENCHANTMENT"}

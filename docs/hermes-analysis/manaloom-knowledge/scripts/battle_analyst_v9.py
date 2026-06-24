@@ -767,6 +767,8 @@ def resolved_spell_destination(card, effect_data, effect, player=None):
         return "exile"
     if isinstance(card, dict) and card.get("_adventure_cast") and card.get("_adventure_parent"):
         return "exile"
+    if is_first_rebound_resolution(card, effect_data):
+        return "exile"
     if effect_data.get("exiles_self"):
         return "exile"
     if effect == "ramp_ritual" and effect_data.get("sacrifice_self_for_mana"):
@@ -2311,6 +2313,22 @@ def finish_countered_spell(player, card):
 
 
 def finish_resolved_spell(player, card, turn=None, effect_data=None):
+    if is_first_rebound_resolution(card, effect_data):
+        if isinstance(card, dict):
+            card["_rebound_pending"] = True
+            card["_rebound_available_turn"] = (turn or 0) + 1
+            card["_rebound_original_controller"] = player.name
+            card["_rebound_effect_data"] = copy.deepcopy(effect_data or {})
+        move_to_exile(player, card, reason="rebound", turn=turn)
+        emit_replay_event(
+            "rebound_exiled",
+            player=player.name,
+            card=card.get("name", "?") if isinstance(card, dict) else str(card),
+            available_turn=(turn or 0) + 1,
+            turn=turn,
+            **replay_rule_fields(effect_data or {}),
+        )
+        return
     return _finish_resolved_spell(
         player,
         card,
@@ -10384,6 +10402,145 @@ def cast_exiled_card_without_paying_mana(
         phase=cast_phase,
     )
     return True, "cast_without_paying_mana"
+
+
+def _effect_source_zone(effect_data):
+    if not isinstance(effect_data, dict):
+        return "hand"
+    cast_context = effect_data.get("_cast_context") or {}
+    return cast_context.get("source_zone") or effect_data.get("source_zone") or "hand"
+
+
+def is_first_rebound_resolution(card, effect_data):
+    if not isinstance(effect_data, dict) or not effect_data.get("rebound"):
+        return False
+    if isinstance(card, dict) and (
+        card.get("is_copy")
+        or card.get("_flashback_cast")
+        or card.get("_adventure_cast")
+    ):
+        return False
+    return _effect_source_zone(effect_data) not in {"exile", "stack_copy"}
+
+
+def process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=None):
+    rebound_cards = []
+    for exiled_card in list(getattr(player, "exile", []) or []):
+        if not isinstance(exiled_card, dict) or not exiled_card.get("_rebound_pending"):
+            continue
+        available_turn = int(exiled_card.get("_rebound_available_turn") or 0)
+        if available_turn > turn:
+            continue
+        rebound_cards.append(exiled_card)
+
+    cast_count = 0
+    for exiled_card in rebound_cards:
+        if exiled_card not in player.exile or is_effective_land(exiled_card):
+            continue
+        rebound_effect = copy.deepcopy(exiled_card.get("_rebound_effect_data") or get_card_effect(exiled_card))
+        if rebound_effect.get("effect") in {"unknown", "land", "counter"}:
+            emit_replay_event(
+                "rebound_skipped",
+                player=player.name,
+                card=exiled_card.get("name", "?"),
+                reason="unsupported_or_reactive_effect",
+                turn=turn,
+                **replay_rule_fields(rebound_effect),
+            )
+            continue
+
+        cast_phase = "upkeep"
+        cast_ctx = begin_cast_context(
+            player,
+            exiled_card,
+            cast_phase,
+            effect_data=rebound_effect,
+            role="rebound",
+            modes=["rebound"],
+            alternative_cost="{0}",
+            source_zone="exile",
+            alternative_cost_kind="rebound",
+        )
+        cast_ctx.is_legal = True
+        cast_ctx.locked_cost = zero_mana_cost_snapshot("rebound_cost")
+        store_cast_context_fields(
+            rebound_effect,
+            {
+                "phase": cast_phase,
+                **cast_ctx.to_replay_fields(),
+            },
+        )
+        if not commit_cast_payment(cast_ctx):
+            emit_replay_event(
+                "rebound_skipped",
+                player=player.name,
+                card=exiled_card.get("name", "?"),
+                reason="cast_payment_or_timing_failed",
+                turn=turn,
+                **replay_rule_fields(rebound_effect),
+            )
+            continue
+
+        player.exile.remove(exiled_card)
+        exiled_card.pop("_rebound_pending", None)
+        exiled_card.pop("_rebound_available_turn", None)
+        exiled_card.pop("_rebound_original_controller", None)
+        emit_replay_event(
+            "rebound_cast",
+            player=player.name,
+            card=exiled_card.get("name", "?"),
+            effect=rebound_effect.get("effect", "unknown"),
+            cast_without_paying_mana_cost=True,
+            turn=turn,
+            phase=cast_phase,
+            **cast_ctx.to_replay_fields(),
+            **replay_rule_fields(rebound_effect),
+        )
+        emit_replay_event(
+            "spell_cast",
+            player=player.name,
+            card=exiled_card.get("name", "?"),
+            effect=rebound_effect.get("effect", "unknown"),
+            type_line=exiled_card.get("type_line", ""),
+            cmc=exiled_card.get("cmc", 0),
+            turn=turn,
+            phase=cast_phase,
+            **cast_ctx.to_replay_fields(),
+            **replay_rule_fields(rebound_effect),
+        )
+        mark_cast_ledger_emitted(rebound_effect)
+        trigger_spell_cast_engines(
+            player,
+            all_players,
+            exiled_card,
+            turn,
+            cast_phase,
+            stack=stack,
+            active_player=player,
+        )
+        trigger_opponent_spell_draw_engines(
+            player,
+            opponents,
+            exiled_card,
+            turn,
+            cast_phase,
+            rng,
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        apply_effect_immediate(
+            player,
+            opponents,
+            exiled_card,
+            turn,
+            rng,
+            effect_data_override=rebound_effect,
+            stack=stack,
+            phase=cast_phase,
+        )
+        cast_count += 1
+    return cast_count
 
 
 def resolve_top_nonland_free_cast(
@@ -18657,10 +18814,17 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
 
 def graveyard_card_matches_recursion_target(card, target_type):
     """Return whether a graveyard card matches a narrow recursion target."""
-    if not isinstance(card, dict) or is_land(card):
+    if not isinstance(card, dict):
         return False
     target = str(target_type or "nonland").lower()
     type_line = str(card.get("type_line") or "").lower()
+    if target in ("permanent", "permanent_card"):
+        return is_land(card) or any(
+            kind in type_line
+            for kind in ("artifact", "creature", "enchantment", "planeswalker", "battle")
+        )
+    if is_land(card):
+        return False
     if target in ("any", "nonland", "nonland_card"):
         return (
             is_instant(card)
@@ -23527,7 +23691,7 @@ def apply_effect_immediate(
         if effect_data.get("exiles_self"):
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:
-            finish_resolved_spell(player, card, turn=turn)
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "land": pass
     elif effect == "creature":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
@@ -24730,7 +24894,7 @@ def apply_effect_immediate(
         if effect_data.get("exiles_self"):
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:
-            finish_resolved_spell(player, card, turn=turn)
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "pump_all":
         if effect_data.get("combat_damage_player_copies_exiled_card"):
             resolve_surge_to_victory(
@@ -27038,6 +27202,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.protection_from_everything_source = None
     player.refresh_mana_sources(turn)
     process_upkeep_utility_lands(player, turn, all_players=all_players)
+    process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=stack)
 
     # The One Ring loses life on upkeep; drawing happens through its tap
     # activation, not automatically when the upkeep starts.

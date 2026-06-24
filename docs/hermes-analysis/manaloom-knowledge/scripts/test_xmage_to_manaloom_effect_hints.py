@@ -2680,6 +2680,37 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["quest_counter_name_match_zone"], "graveyard")
         self.assertEqual(primary["quest_counter_threshold_to_copy"], 2)
 
+    def test_profound_journey_maps_to_permanent_rebound_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ReturnFromGraveyardToBattlefieldTargetEffect"],
+                "ability_classes": ["ReboundAbility"],
+                "target_classes": ["TargetCardInYourGraveyard"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "xmage_class_name": "ProfoundJourney",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{5}{W}{W}"); '
+                    'private static final FilterCard filter = new FilterPermanentCard("permanent card from your graveyard"); '
+                    "this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect()); "
+                    "this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filter)); "
+                    "this.addAbility(new ReboundAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_target_permanent_from_graveyard_to_battlefield_rebound_v1",
+        )
+        self.assertEqual(primary["target"], "permanent")
+        self.assertEqual(primary["target_zone"], "graveyard")
+        self.assertEqual(primary["target_controller"], "self")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertEqual(primary["count"], 1)
+        self.assertTrue(primary["rebound"])
+
     def test_candelabra_of_tawnos_maps_to_x_untap_lands_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -3,11 +3,11 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG188, applied, postchecked, synced from PostgreSQL to Hermes
+this thread is PG189, applied, postchecked, synced from PostgreSQL to Hermes
 SQLite/canonical snapshot, tested, strategy-audited, and documented on
-2026-06-24. PG188 promoted `Pyromancer Ascension` to an Oracle/XMage-backed
-quest-counter copy-spell rule. This was not a deck swap, learned-deck promotion,
-or battle rebaseline.
+2026-06-24. PG189 promoted `Profound Journey` to an Oracle/XMage-backed
+rebound recursion rule. This was not a deck swap, learned-deck promotion, or
+battle rebaseline.
 
 ## Purpose
 
@@ -10586,3 +10586,106 @@ Register decision:
   prioritizing reusable exact scopes; current top split-scope candidates are
   `Cool but Rude` and `Profound Journey`.
 - Next package number is PG189.
+
+## PG189 - Profound Journey rebound recursion rule
+
+Timestamp: 2026-06-24 18:24 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold variant card used by deck `611`: `Profound Journey`.
+- Replaces two stale generated review-only shadows with one verified auto rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Profound Journey`:
+  `battle_rule_v1:3d604bc1b145027e23d76f9c9b5804d1`,
+  `oracle_hash=fd8bfd2a04b8a975ddb20ad80d24230d`,
+  `effect=recursion`,
+  `battle_model_scope=return_target_permanent_from_graveyard_to_battlefield_rebound_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps the exact `ReturnFromGraveyardToBattlefieldTargetEffect` +
+  `TargetCardInYourGraveyard(FilterPermanentCard)` + `ReboundAbility` sorcery
+  pattern to one permanent-card graveyard recursion with rebound.
+- Semantic classifier promotes only the exact sorcery/rebound/permanent-target
+  structure with `count=1`, `destination=battlefield`, and `rebound=true`.
+- Battle runtime now supports rebound by exiling first-resolution rebound
+  spells, casting them from exile at the next upkeep for zero mana, and allowing
+  the second resolution to go to graveyard.
+- Graveyard recursion target matching now recognizes `permanent` as artifact,
+  creature, enchantment, planeswalker, battle, or land.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg189_profound_journey_rebound_recursion_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg189_profound_journey_rebound_recursion_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg189_profound_journey_rebound_recursion_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg189_profound_journey_rebound_recursion_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg189_profound_journey_rebound_recursion_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg189_profound_journey_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local active `battle_card_rules` row is `verified/auto` with
+  `return_target_permanent_from_graveyard_to_battlefield_rebound_v1` and
+  `rebound=true`.
+- Battle loader verification:
+  `get_card_effect({"name":"Profound Journey"})` selects the curated
+  `recursion` rule with one active alternative.
+- Tests:
+  `python3 -m unittest test_xmage_to_manaloom_effect_hints.py test_xmage_semantic_family_batch_pipeline.py`
+  ran `322` tests OK;
+  `python3 test_battle_analyst_v10_3.py` passed, including
+  `test_profound_journey_rebounds_and_returns_permanents_to_battlefield`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg189_profound_journey_postsync_v1_manifest.json`;
+  expanded scope severity moved to `high=324`, `medium=54`, `pass=331`.
+- Lorehold-focused post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg189_profound_journey_postsync_v1.json`;
+  scoped rows `395`, `battle_ready=273`,
+  `needs_rule_before_strategy=122`, `split_scope=21`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg189_profound_journey_postsync_v1.json`;
+  `package_ready_unprepared=0`, `package_already_prepared=0`,
+  `split_scope_backlog=76`, `runtime_family_backlog=24`,
+  `manual_mapper_backlog=261`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg189_profound_journey_postsync_v1.json`;
+  `18/18` pass.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck611_battle_rule_coherence_pg189_postsync_20260624.json`;
+  deck `611` has `high=21`, `medium=4`, `pass=65`;
+  `Profound Journey` is `pass` with one trusted executable rule.
+
+Register decision:
+
+- PG189 is closed as applied, postchecked, synced, tested, and
+  strategy-audited.
+- Do not reuse PG189.
+- Continue next with remaining Lorehold `needs_rule_before_strategy` cards.
+  Current top item is `Cool but Rude`, but it is not a simple PG package: it
+  requires Class/level runtime plus attack-loot, discard-damage, tutor, and
+  random-discard modeling before promotion.
+- Next package number is PG190.

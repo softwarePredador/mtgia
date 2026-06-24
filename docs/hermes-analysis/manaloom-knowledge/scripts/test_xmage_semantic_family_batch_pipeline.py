@@ -4288,6 +4288,45 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_profound_journey_rebound_recursion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Profound Journey",
+                        "severity": "high",
+                        "oracle_hash": "profoundhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ProfoundJourney",
+                            "path": "/xmage/ProfoundJourney.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["ReturnFromGraveyardToBattlefieldTargetEffect"],
+                            "ability_classes": ["ReboundAbility"],
+                            "target_classes": ["TargetCardInYourGraveyard"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "recursion",
+                                "battle_model_scope": "return_target_permanent_from_graveyard_to_battlefield_rebound_v1",
+                                "target": "permanent",
+                                "target_zone": "graveyard",
+                                "target_controller": "self",
+                                "destination": "battlefield",
+                                "count": 1,
+                                "rebound": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_and_generator_mark_fury_storm_copy_stack_scope_as_batch_safe(self) -> None:
         batch_audit = {
             "cards": [

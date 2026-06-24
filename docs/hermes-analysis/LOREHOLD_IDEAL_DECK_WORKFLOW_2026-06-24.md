@@ -29,12 +29,12 @@ Current generated evidence:
 
 - initial matrix:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`
-- current post-PG188 Lorehold-focused matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg188_pyromancer_ascension_postsync_v1.json`
-- current post-PG188 strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg188_pyromancer_ascension_postsync_v1.json`
-- current post-PG188 effective queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg188_pyromancer_ascension_postsync_v1.json`
+- current post-PG189 Lorehold-focused matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg189_profound_journey_postsync_v1.json`
+- current post-PG189 strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg189_profound_journey_postsync_v1.json`
+- current post-PG189 effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg189_profound_journey_postsync_v1.json`
 
 The script reads:
 
@@ -44,7 +44,7 @@ The script reads:
 - expanded opponent/non-Lorehold comparison decks `58`, `74`, `105`, and
   `617` through `619`;
 - current XMage proposal report
-  `xmage_current_replay_batch_pipeline_20260624_pg188_pyromancer_ascension_postsync_v1_proposals.json`;
+  `xmage_current_replay_batch_pipeline_20260624_pg189_profound_journey_postsync_v1_proposals.json`;
 - Hermes SQLite battle-rule cache for rule readiness.
 
 It does not mutate deck rows, SQLite, or PostgreSQL.
@@ -204,9 +204,42 @@ PG188 closure evidence:
 - strategy consistency:
   `18/18` pass.
 
+Post-PG189 Lorehold-focused matrix generated on 2026-06-24 after closing
+`Profound Journey` for deck `611`:
+
+- total Lorehold scoped cards in matrix: `395`;
+- `core_keep`: `87`;
+- `priority_benchmark_candidate`: `37`;
+- `watchlist_candidate`: `91`;
+- `needs_rule_before_strategy`: `122`;
+- `active_low_confidence_review`: `13`;
+- `low_priority`: `43`;
+- `policy_blocked`: `2`.
+
+Post-PG189 rule-readiness split:
+
+- `battle_ready`: `273`;
+- `mapper_manual`: `88`;
+- `split_scope`: `21`;
+- `runtime_needed`: `11`;
+- `blocked_missing_xmage_source`: `2`.
+
+PG189 closure evidence:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/pg189_profound_journey_rebound_recursion_package.md`;
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg189_profound_journey_20260624.json`;
+- affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck611_battle_rule_coherence_pg189_postsync_20260624.json`;
+- final pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg189_profound_journey_postsync_v1_manifest.json`;
+- strategy consistency:
+  `18/18` pass.
+
 Operational interpretation:
 
-- The `123` `needs_rule_before_strategy` cards in the Lorehold-focused scope must not
+- The `122` `needs_rule_before_strategy` cards in the Lorehold-focused scope must not
   drive deck swaps yet. They first need mapper/runtime/split-scope closure.
 - The `37` `priority_benchmark_candidate` cards are the first practical swap
   candidates after baseline hash guard and battle gate review.
@@ -221,7 +254,7 @@ Lorehold card rules from the matrix.
 Start with:
 
 - split-scope cards that are strategically relevant, such as
-  `Cool but Rude`, `Profound Journey`, `Sun Titan`, `Glint-Horn Buccaneer`,
+  `Cool but Rude`, `Sun Titan`, `Glint-Horn Buccaneer`,
   `Taii Wakeen, Perfect Shot`, `Primal Amulet // Primal Wellspring`,
   `Starfield Shepherd`, `Erode`, `Kederekt Parasite`, and `Rakdos Charm`;
 - runtime-needed token or damage families only when the exact scope is
@@ -278,6 +311,21 @@ copy engine:
    deprecated two stale generated review-only shadows.
 5. PG -> Hermes sync made deck `608` report `Pyromancer Ascension` as `pass`,
    and the Lorehold-focused matrix moved it to `battle_ready`.
+
+`Profound Journey` is the fifth completed proof and the first rebound recursion
+spell:
+
+1. XMage local source matched `ReturnFromGraveyardToBattlefieldTargetEffect` +
+   `TargetCardInYourGraveyard(FilterPermanentCard)` + `ReboundAbility`.
+2. The mapper/classifier promoted only the exact
+   `return_target_permanent_from_graveyard_to_battlefield_rebound_v1` scope.
+3. Battle runtime now exiles first-resolution rebound spells, casts them from
+   exile at the next upkeep for zero mana, and sends the second resolution to
+   the graveyard.
+4. PG189 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated review-only shadows.
+5. PG -> Hermes sync made deck `611` report `Profound Journey` as `pass`, and
+   the Lorehold-focused matrix moved it to `battle_ready` / `watchlist_candidate`.
 
 ## Current Benchmark Candidate Lane
 

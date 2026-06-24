@@ -11021,6 +11021,74 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_profound_journey_rebounds_and_returns_permanents_to_battlefield():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "permanent",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "count": 1,
+                "rebound": True,
+                "battle_model_scope": "return_target_permanent_from_graveyard_to_battlefield_rebound_v1",
+                "_rule_logical_key": "battle_rule_v1:profound-journey-test",
+                "_rule_oracle_hash": "profound-journey-test-hash",
+            }
+            spell = {
+                "name": "Profound Journey",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=3,
+                rng=random.Random(617),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+
+            assert [card.get("name") for card in active.battlefield] == ["Sol Ring"]
+            assert [card.get("name") for card in active.graveyard] == ["Mountain"]
+            assert len(active.exile) == 1
+            assert active.exile[0].get("name") == "Profound Journey"
+            assert active.exile[0].get("_rebound_pending") is True
+            assert active.exile[0].get("_rebound_available_turn") == 4
+
+            cast_count = battle.process_rebound_upkeep(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=4,
+                rng=random.Random(618),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert cast_count == 1
+        assert [card.get("name") for card in active.battlefield] == ["Sol Ring", "Mountain"]
+        assert active.exile == []
+        assert [card.get("name") for card in active.graveyard] == ["Profound Journey"]
+        recursion_events = [data for event, data in events if event == "recursion_resolved"]
+        assert len(recursion_events) == 2
+        assert recursion_events[0]["recovered"] == ["Sol Ring"]
+        assert recursion_events[1]["recovered"] == ["Mountain"]
+        assert any(event == "rebound_exiled" and data.get("card") == "Profound Journey" for event, data in events)
+        assert any(event == "rebound_cast" and data.get("card") == "Profound Journey" for event, data in events)
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13232,6 +13300,7 @@ def register_tests(battle, player):
         test_pg079_rite_of_the_dragoncaller_creates_flying_dragon_on_instant_sorcery_cast,
         test_double_vision_copies_only_first_instant_or_sorcery_each_turn,
         test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too,
+        test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

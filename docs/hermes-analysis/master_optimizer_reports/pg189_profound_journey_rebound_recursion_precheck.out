@@ -1,0 +1,4 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------------+------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Profound Journey | profound journey | fd8bfd2a04b8a975ddb20ad80d24230d | battle_rule_v1:3d604bc1b145027e23d76f9c9b5804d1 |                1 | 61aad34c-46c6-43de-ba96-8b7a58ebdb32 |                  2 |                         0 |                           2
+(1 row)
