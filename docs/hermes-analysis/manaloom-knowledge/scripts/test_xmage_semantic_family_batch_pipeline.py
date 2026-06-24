@@ -328,6 +328,127 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "copy_creature_token")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_jaxis_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Jaxis, the Troublemaker",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "JaxisTheTroublemaker",
+                            "path": "/xmage/JaxisTheTroublemaker.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect", "DrawCardSourceControllerEffect"],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_target_another_creature_you_control_haste_draw_on_death_sacrifice_end_step_v1",
+                                "ability_kind": "activated",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "own",
+                                "exclude_source_from_copy_targets": True,
+                                "token_haste": True,
+                                "token_draw_cards_when_this_dies": 1,
+                                "sacrifice_token_at_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_rionya_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Rionya, Fire Dancer",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "RionyaFireDancer",
+                            "path": "/xmage/RionyaFireDancer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect"],
+                            "ability_classes": ["BeginningOfCombatTriggeredAbility"],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_target_another_creature_you_control_x_instant_sorcery_plus_one_haste_exile_end_step_v1",
+                                "ability_kind": "triggered",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "own",
+                                "exclude_source_from_copy_targets": True,
+                                "token_count_source": "instant_or_sorcery_spells_cast_this_turn_plus_one",
+                                "token_haste": True,
+                                "exile_token_at_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_jolly_balloon_man_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "The Jolly Balloon Man",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TheJollyBalloonMan",
+                            "path": "/xmage/TheJollyBalloonMan.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect"],
+                            "ability_classes": ["ActivateAsSorceryActivatedAbility"],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_target_another_creature_you_control_balloon_1_1_red_flying_haste_sacrifice_end_step_v1",
+                                "ability_kind": "activated",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "own",
+                                "exclude_source_from_copy_targets": True,
+                                "force_token_creature": True,
+                                "token_power": 1,
+                                "token_toughness": 1,
+                                "token_extra_colors": ["R"],
+                                "token_subtype": "Balloon",
+                                "token_flying": True,
+                                "token_haste": True,
+                                "sacrifice_token_at_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_lotho_treasure_engine_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

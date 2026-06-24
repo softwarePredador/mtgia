@@ -298,6 +298,89 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["token_haste"])
         self.assertTrue(primary["sacrifice_token_at_end_step"])
 
+    def test_jaxis_maps_to_copy_another_creature_haste_dies_draw_sacrifice(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "JaxisTheTroublemaker",
+                "effect_classes": ["CreateTokenCopyTargetEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": ["ActivateAsSorceryActivatedAbility", "DiesSourceTriggeredAbility", "HasteAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "Create a token that's a copy of another target creature you control. It gains haste and \"When this creature dies, draw a card.\" Sacrifice it at the beginning of the next end step.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "copy_target_another_creature_you_control_haste_draw_on_death_sacrifice_end_step_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "own")
+        self.assertTrue(primary["exclude_source_from_copy_targets"])
+        self.assertTrue(primary["token_haste"])
+        self.assertEqual(primary["token_draw_cards_when_this_dies"], 1)
+        self.assertTrue(primary["sacrifice_token_at_end_step"])
+
+    def test_rionya_maps_to_dynamic_copy_count_haste_exile_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "RionyaFireDancer",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["BeginningOfCombatTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "At the beginning of combat on your turn, create X tokens that are copies of another target creature you control, where X is one plus the number of instant and sorcery spells you've cast this turn. They gain haste. Exile them at the beginning of the next end step.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "copy_target_another_creature_you_control_x_instant_sorcery_plus_one_haste_exile_end_step_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "own")
+        self.assertTrue(primary["exclude_source_from_copy_targets"])
+        self.assertEqual(
+            primary["token_count_source"],
+            "instant_or_sorcery_spells_cast_this_turn_plus_one",
+        )
+        self.assertTrue(primary["token_haste"])
+        self.assertTrue(primary["exile_token_at_end_step"])
+
+    def test_jolly_balloon_man_maps_to_balloon_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TheJollyBalloonMan",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["ActivateAsSorceryActivatedAbility", "HasteAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "Create a token that's a copy of another target creature you control, except it's a 1/1 red Balloon creature in addition to its other colors and types and it has flying and haste. Sacrifice it at the beginning of the next end step.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "copy_target_another_creature_you_control_balloon_1_1_red_flying_haste_sacrifice_end_step_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "own")
+        self.assertTrue(primary["exclude_source_from_copy_targets"])
+        self.assertTrue(primary["force_token_creature"])
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+        self.assertEqual(primary["token_extra_colors"], ["R"])
+        self.assertEqual(primary["token_subtype"], "Balloon")
+        self.assertTrue(primary["token_flying"])
+        self.assertTrue(primary["token_haste"])
+        self.assertTrue(primary["sacrifice_token_at_end_step"])
+
     def test_flash_photography_maps_to_copy_target_permanent(self) -> None:
         result = hints.build_effect_hints(
             {

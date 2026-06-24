@@ -15245,16 +15245,24 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Jaxis, the Troublemaker": {
-    "effect": "creature",
-    "is_creature_permanent": true,
-    "power": 2,
-    "toughness": 3,
+    "ability_kind": "triggered",
+    "battle_model_scope": "copy_target_another_creature_you_control_haste_draw_on_death_sacrifice_end_step_v1",
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "exclude_source_from_copy_targets": true,
+    "sacrifice_token_at_end_step": true,
+    "target_controller": "own",
+    "token_draw_cards_when_this_dies": 1,
+    "token_haste": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7c760cde02cb7568435f549d534a802f"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:082e6fbdbbb20e5efed4de5cf8ab3bf1",
+    "battle_rule_oracle_hash": "92a1b679c9eca885a43a49b79f3d6fb7"
   },
   "Jaya's Immolating Inferno": {
     "cmc": 2.0,
@@ -23583,17 +23591,24 @@
     "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
   },
   "Rionya, Fire Dancer": {
-    "begin_combat_copy_engine": true,
-    "effect": "creature",
-    "is_creature_permanent": true,
-    "power": 3,
-    "toughness": 4,
+    "ability_kind": "triggered",
+    "battle_model_scope": "copy_target_another_creature_you_control_x_instant_sorcery_plus_one_haste_exile_end_step_v1",
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "exclude_source_from_copy_targets": true,
+    "exile_token_at_end_step": true,
+    "target_controller": "own",
+    "token_count_source": "instant_or_sorcery_spells_cast_this_turn_plus_one",
+    "token_haste": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8d2f6dc541acbf152dc2d9c198d7d105"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c907c29d4de7bea750538d5110daa852",
+    "battle_rule_oracle_hash": "ef40defdde750928a8c7425749e9fba6"
   },
   "Ripples of Potential": {
     "cmc": 2.0,
@@ -30010,6 +30025,33 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
+  },
+  "The Jolly Balloon Man": {
+    "ability_kind": "activated",
+    "battle_model_scope": "copy_target_another_creature_you_control_balloon_1_1_red_flying_haste_sacrifice_end_step_v1",
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "exclude_source_from_copy_targets": true,
+    "force_token_creature": true,
+    "sacrifice_token_at_end_step": true,
+    "target_controller": "own",
+    "token_extra_colors": [
+      "R"
+    ],
+    "token_flying": true,
+    "token_haste": true,
+    "token_power": 1,
+    "token_subtype": "Balloon",
+    "token_toughness": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e2ff37fab414ef5ed43b5dc17b921f63",
+    "battle_rule_oracle_hash": "c7f3f2f27d70fe9c5abb53ad64e06dd0"
   },
   "The Key to the Vault": {
     "cmc": 2.0,

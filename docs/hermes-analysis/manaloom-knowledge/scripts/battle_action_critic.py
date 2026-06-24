@@ -245,6 +245,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "renderer_only",
         "scheduled token exile cleanup state evidence.",
     ),
+    "end_step_token_death_draw_resolved": (
+        "technical",
+        "token death-trigger draw ledger after scheduled end-step cleanup.",
+    ),
     "etb_tutor_resolved": (
         "strategy_signal",
         "enter-the-battlefield tutor resolution is card-flow evidence consumed by replay/strategy context.",

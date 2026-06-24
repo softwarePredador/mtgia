@@ -504,6 +504,49 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("copy_all_matching_targets"))
         )
 
+    if effect == "copy_creature_token" and scope == "copy_target_another_creature_you_control_haste_draw_on_death_sacrifice_end_step_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenCopyTargetEffect" in effect_classes
+            and effect_json.get("copy_target_types") == ["creature"]
+            and effect_json.get("target_controller") == "own"
+            and bool(effect_json.get("exclude_source_from_copy_targets"))
+            and bool(effect_json.get("token_haste"))
+            and int(effect_json.get("token_draw_cards_when_this_dies") or 0) == 1
+            and bool(effect_json.get("sacrifice_token_at_end_step"))
+        )
+
+    if effect == "copy_creature_token" and scope == "copy_target_another_creature_you_control_x_instant_sorcery_plus_one_haste_exile_end_step_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenCopyTargetEffect" in effect_classes
+            and "BeginningOfCombatTriggeredAbility" in ability_classes
+            and effect_json.get("copy_target_types") == ["creature"]
+            and effect_json.get("target_controller") == "own"
+            and bool(effect_json.get("exclude_source_from_copy_targets"))
+            and effect_json.get("token_count_source") == "instant_or_sorcery_spells_cast_this_turn_plus_one"
+            and bool(effect_json.get("token_haste"))
+            and bool(effect_json.get("exile_token_at_end_step"))
+        )
+
+    if effect == "copy_creature_token" and scope == "copy_target_another_creature_you_control_balloon_1_1_red_flying_haste_sacrifice_end_step_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenCopyTargetEffect" in effect_classes
+            and "ActivateAsSorceryActivatedAbility" in ability_classes
+            and effect_json.get("copy_target_types") == ["creature"]
+            and effect_json.get("target_controller") == "own"
+            and bool(effect_json.get("exclude_source_from_copy_targets"))
+            and bool(effect_json.get("force_token_creature"))
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and effect_json.get("token_extra_colors") == ["R"]
+            and effect_json.get("token_subtype") == "Balloon"
+            and bool(effect_json.get("token_flying"))
+            and bool(effect_json.get("token_haste"))
+            and bool(effect_json.get("sacrifice_token_at_end_step"))
+        )
+
     if effect == "ramp_permanent" and scope == "artifact_etb_or_dies_create_treasure_v1":
         return (
             types == {"ARTIFACT"}

@@ -1,0 +1,119 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "precheck_rows": [
+    {
+      "card_name": "Jaxis, the Troublemaker",
+      "normalized_name": "jaxis, the troublemaker",
+      "oracle_hash": "92a1b679c9eca885a43a49b79f3d6fb7",
+      "logical_rule_key": "battle_rule_v1:082e6fbdbbb20e5efed4de5cf8ab3bf1",
+      "target_card_rows": 1,
+      "canonical_card_id": "3b3a290c-2d86-44ab-99dd-3058cf90a04e",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "card_name": "Rionya, Fire Dancer",
+      "normalized_name": "rionya, fire dancer",
+      "oracle_hash": "ef40defdde750928a8c7425749e9fba6",
+      "logical_rule_key": "battle_rule_v1:c907c29d4de7bea750538d5110daa852",
+      "target_card_rows": 1,
+      "canonical_card_id": "707cd1ae-58dd-4848-a884-7dfe21a48750",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "card_name": "The Jolly Balloon Man",
+      "normalized_name": "the jolly balloon man",
+      "oracle_hash": "c7f3f2f27d70fe9c5abb53ad64e06dd0",
+      "logical_rule_key": "battle_rule_v1:e2ff37fab414ef5ed43b5dc17b921f63",
+      "target_card_rows": 1,
+      "canonical_card_id": "3e1b358f-fc68-4cb8-bc01-e6d160aab6a7",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "apply_rows": [],
+  "postcheck_rows": [
+    {
+      "card_name": "Jaxis, the Troublemaker",
+      "normalized_name": "jaxis, the troublemaker",
+      "logical_rule_key": "battle_rule_v1:082e6fbdbbb20e5efed4de5cf8ab3bf1",
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1,
+      "promoted_oracle_hash_rows": 1,
+      "backup_rows": 4
+    },
+    {
+      "card_name": "Rionya, Fire Dancer",
+      "normalized_name": "rionya, fire dancer",
+      "logical_rule_key": "battle_rule_v1:c907c29d4de7bea750538d5110daa852",
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1,
+      "promoted_oracle_hash_rows": 1,
+      "backup_rows": 4
+    },
+    {
+      "card_name": "The Jolly Balloon Man",
+      "normalized_name": "the jolly balloon man",
+      "logical_rule_key": "battle_rule_v1:e2ff37fab414ef5ed43b5dc17b921f63",
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1,
+      "promoted_oracle_hash_rows": 1,
+      "backup_rows": 4
+    }
+  ],
+  "current_rows": [
+    {
+      "normalized_name": "jaxis, the troublemaker",
+      "logical_rule_key": "battle_rule_v1:7c760cde02cb7568435f549d534a802f",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    },
+    {
+      "normalized_name": "jaxis, the troublemaker",
+      "logical_rule_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    },
+    {
+      "normalized_name": "jaxis, the troublemaker",
+      "logical_rule_key": "battle_rule_v1:082e6fbdbbb20e5efed4de5cf8ab3bf1",
+      "oracle_hash": "92a1b679c9eca885a43a49b79f3d6fb7",
+      "review_status": "verified",
+      "execution_status": "auto"
+    },
+    {
+      "normalized_name": "rionya, fire dancer",
+      "logical_rule_key": "battle_rule_v1:c907c29d4de7bea750538d5110daa852",
+      "oracle_hash": "ef40defdde750928a8c7425749e9fba6",
+      "review_status": "verified",
+      "execution_status": "auto"
+    },
+    {
+      "normalized_name": "rionya, fire dancer",
+      "logical_rule_key": "battle_rule_v1:11829490134165c06027b2b30d451766",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    },
+    {
+      "normalized_name": "rionya, fire dancer",
+      "logical_rule_key": "battle_rule_v1:8d2f6dc541acbf152dc2d9c198d7d105",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    },
+    {
+      "normalized_name": "the jolly balloon man",
+      "logical_rule_key": "battle_rule_v1:e2ff37fab414ef5ed43b5dc17b921f63",
+      "oracle_hash": "c7f3f2f27d70fe9c5abb53ad64e06dd0",
+      "review_status": "verified",
+      "execution_status": "auto"
+    }
+  ]
+}

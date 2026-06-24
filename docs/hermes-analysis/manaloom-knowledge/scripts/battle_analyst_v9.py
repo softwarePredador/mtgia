@@ -4685,6 +4685,7 @@ class Player:
         if turn_marker is not None and getattr(self, "_spells_cast_turn_marker", None) != turn_marker:
             self.spells_cast_this_turn = 0
             self.spell_mana_value_cast_this_turn = 0
+            self.instant_or_sorcery_spells_cast_this_turn = 0
             self._spells_cast_turn_marker = turn_marker
         if mana_value is None and card is not None:
             mana_value = card_mana_value(card)
@@ -4694,6 +4695,8 @@ class Player:
             spell_mana_value = 0
         self.spells_cast_this_turn += 1
         self.spell_mana_value_cast_this_turn += spell_mana_value
+        if card is not None and is_instant_or_sorcery_spell(card):
+            self.instant_or_sorcery_spells_cast_this_turn += 1
         return self.spells_cast_this_turn
 
     def record_noncreature_spell_cast(self, turn_marker=None):
@@ -4771,6 +4774,7 @@ class Player:
         self._cards_drawn_turn_marker = None
         self.spells_cast_this_turn = 0
         self.spell_mana_value_cast_this_turn = 0
+        self.instant_or_sorcery_spells_cast_this_turn = 0
         self._spells_cast_turn_marker = None
         self.noncreature_spells_cast_this_turn = 0
         self._noncreature_spells_cast_turn_marker = None
@@ -17415,12 +17419,25 @@ def _apply_copy_token_modifiers(token, effect_data):
     if effect_data.get("token_colors"):
         token["colors"] = list(effect_data.get("token_colors") or [])
         token["color_identity"] = list(effect_data.get("token_colors") or [])
+    if effect_data.get("token_extra_colors"):
+        existing_colors = [str(color) for color in list(token.get("colors") or []) if str(color)]
+        for color in effect_data.get("token_extra_colors") or []:
+            color_value = str(color)
+            if color_value and color_value not in existing_colors:
+                existing_colors.append(color_value)
+        token["colors"] = existing_colors
+        token["color_identity"] = list(existing_colors)
     if effect_data.get("token_flying"):
         token["flying"] = True
         keywords = list(token.get("keywords") or [])
         if "flying" not in keywords:
             keywords.append("flying")
         token["keywords"] = keywords
+    if effect_data.get("token_draw_cards_when_this_dies") is not None:
+        token["draw_cards_when_this_dies"] = max(
+            0,
+            int(effect_data.get("token_draw_cards_when_this_dies") or 0),
+        )
     if effect_data.get("sacrifice_token_at_end_step"):
         token["sacrifice_at_end_step"] = True
     if effect_data.get("exile_token_at_end_step"):
@@ -17446,9 +17463,25 @@ def _selected_copy_targets(candidates, effect_data):
     return [max(candidates, key=lambda item: target_priority(item[1]))]
 
 
+def _copy_token_count(effect_data, player):
+    source = str(effect_data.get("token_count_source") or "").strip().lower()
+    if source == "instant_or_sorcery_spells_cast_this_turn_plus_one":
+        return max(
+            1,
+            int(getattr(player, "instant_or_sorcery_spells_cast_this_turn", 0) or 0) + 1,
+        )
+    return max(1, int(effect_data.get("token_count") or 1))
+
+
 def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None, *, finish_spell=True):
     """Create one or more token copies of legal permanents."""
     candidates = copy_token_target_candidates(player, opponents or [], effect_data)
+    if effect_data.get("exclude_source_from_copy_targets"):
+        candidates = [
+            (controller, permanent)
+            for controller, permanent in candidates
+            if permanent is not card
+        ]
     if not candidates:
         emit_replay_event(
             "copy_creature_token_failed",
@@ -17463,7 +17496,7 @@ def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None,
             finish_resolved_spell(player, card, turn=turn)
         return None
     selected_targets = _selected_copy_targets(candidates, effect_data)
-    token_count = max(1, int(effect_data.get("token_count") or 1))
+    token_count = _copy_token_count(effect_data, player)
     created_tokens = []
     for target_controller, target in selected_targets:
         for _ in range(token_count):
@@ -17498,6 +17531,7 @@ def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None,
 def process_end_step_token_sacrifices(player, turn):
     sacrificed = []
     exiled = []
+    death_draw_total = 0
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):
             continue
@@ -17510,6 +17544,7 @@ def process_end_step_token_sacrifices(player, turn):
         else:
             player.graveyard.append(permanent)
             sacrificed.append(permanent)
+            death_draw_total += max(0, int(permanent.get("draw_cards_when_this_dies") or 0))
     if sacrificed:
         emit_replay_event(
             "end_step_token_sacrificed",
@@ -17522,6 +17557,15 @@ def process_end_step_token_sacrifices(player, turn):
             "end_step_token_exiled",
             player=player.name,
             tokens=[token.get("name", "?") for token in exiled],
+            turn=turn,
+        )
+    if death_draw_total > 0:
+        drawn = player.draw(death_draw_total)
+        emit_replay_event(
+            "end_step_token_death_draw_resolved",
+            player=player.name,
+            draw_count=death_draw_total,
+            cards_drawn=[card.get("name", "?") for card in drawn if isinstance(card, dict)],
             turn=turn,
         )
     return sacrificed + exiled

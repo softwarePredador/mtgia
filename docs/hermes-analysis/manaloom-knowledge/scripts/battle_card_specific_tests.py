@@ -6319,6 +6319,177 @@ def register_tests(battle, player):
         assert all(token.get("flying") is True for token in dragon_tokens)
         assert all("dragon" in token.get("type_line", "").lower() for token in dragon_tokens)
 
+    def test_jaxis_copies_another_creature_draws_on_token_death_and_excludes_source(self):
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.library = [
+                {"name": "Drawn Off Jaxis", "cmc": 2, "type_line": "Instant", "effect": "draw_cards"}
+            ]
+            jaxis = {
+                "name": "Jaxis, the Troublemaker",
+                "effect": "creature",
+                "type_line": "Legendary Creature — Human Warrior",
+                "power": 2,
+                "toughness": 3,
+            }
+            target = {
+                "name": "Big Artifact Dragon",
+                "effect": "creature",
+                "type_line": "Artifact Creature — Dragon",
+                "power": 6,
+                "toughness": 6,
+            }
+            active.battlefield = [jaxis, target]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                jaxis,
+                7,
+                random.Random(687),
+                effect_data_override={
+                    "effect": "copy_creature_token",
+                    "copy_target_types": ["creature"],
+                    "target_controller": "own",
+                    "exclude_source_from_copy_targets": True,
+                    "token_haste": True,
+                    "token_draw_cards_when_this_dies": 1,
+                    "sacrifice_token_at_end_step": True,
+                    "battle_model_scope": "copy_target_another_creature_you_control_haste_draw_on_death_sacrifice_end_step_v1",
+                },
+            )
+            token = next(
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict) and permanent.get("copy_of") == "Big Artifact Dragon"
+            )
+            battle.process_end_step_token_sacrifices(active, 7)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert token not in active.battlefield
+        assert token in active.graveyard
+        assert len(active.hand) == 1
+        assert active.hand[0]["name"] == "Drawn Off Jaxis"
+        created = next(data for event, data in events if event == "copy_creature_token_created")
+        assert created["target"] == "Big Artifact Dragon"
+        assert all(
+            not (event == "copy_creature_token_created" and data.get("target") == "Jaxis, the Troublemaker")
+            for event, data in events
+        )
+        draw_event = next(data for event, data in events if event == "end_step_token_death_draw_resolved")
+        assert draw_event["draw_count"] == 1
+        assert draw_event["cards_drawn"] == ["Drawn Off Jaxis"]
+
+    def test_rionya_creates_one_plus_instant_and_sorcery_spell_copies_and_exiles_them(self):
+        active = player("Active")
+        target = {
+            "name": "Copied Wizard",
+            "effect": "creature",
+            "type_line": "Creature — Wizard",
+            "power": 3,
+            "toughness": 3,
+            "colors": ["U"],
+        }
+        rionya = {
+            "name": "Rionya, Fire Dancer",
+            "effect": "creature",
+            "type_line": "Legendary Creature — Human Wizard",
+            "power": 3,
+            "toughness": 4,
+        }
+        active.battlefield = [rionya, target]
+        active.instant_or_sorcery_spells_cast_this_turn = 2
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            rionya,
+            8,
+            random.Random(688),
+            effect_data_override={
+                "effect": "copy_creature_token",
+                "copy_target_types": ["creature"],
+                "target_controller": "own",
+                "exclude_source_from_copy_targets": True,
+                "token_count_source": "instant_or_sorcery_spells_cast_this_turn_plus_one",
+                "token_haste": True,
+                "exile_token_at_end_step": True,
+                "battle_model_scope": "copy_target_another_creature_you_control_x_instant_sorcery_plus_one_haste_exile_end_step_v1",
+            },
+        )
+
+        tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("copy_of") == "Copied Wizard"
+        ]
+        assert len(tokens) == 3
+        assert all(token.get("haste") is True for token in tokens)
+        battle.process_end_step_token_sacrifices(active, 8)
+        assert all(token in active.exile for token in tokens)
+        assert all(token not in active.battlefield for token in tokens)
+
+    def test_jolly_balloon_man_adds_red_balloon_flying_haste_without_losing_other_colors(self):
+        active = player("Active")
+        source = {
+            "name": "The Jolly Balloon Man",
+            "effect": "creature",
+            "type_line": "Legendary Creature — Human Clown",
+            "power": 1,
+            "toughness": 4,
+            "colors": ["R", "W"],
+        }
+        target = {
+            "name": "Azure Geist",
+            "effect": "creature",
+            "type_line": "Enchantment Creature — Spirit",
+            "power": 4,
+            "toughness": 4,
+            "colors": ["U"],
+        }
+        active.battlefield = [source, target]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            source,
+            9,
+            random.Random(689),
+            effect_data_override={
+                "effect": "copy_creature_token",
+                "copy_target_types": ["creature"],
+                "target_controller": "own",
+                "exclude_source_from_copy_targets": True,
+                "force_token_creature": True,
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_extra_colors": ["R"],
+                "token_subtype": "Balloon",
+                "token_flying": True,
+                "token_haste": True,
+                "sacrifice_token_at_end_step": True,
+                "battle_model_scope": "copy_target_another_creature_you_control_balloon_1_1_red_flying_haste_sacrifice_end_step_v1",
+            },
+        )
+
+        token = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("copy_of") == "Azure Geist"
+        )
+        assert token["power"] == 1
+        assert token["toughness"] == 1
+        assert token["flying"] is True
+        assert token["haste"] is True
+        assert token["colors"] == ["U", "R"]
+        assert "balloon" in token.get("type_line", "").lower()
+        battle.process_end_step_token_sacrifices(active, 9)
+        assert token in active.graveyard
+
     def test_valakut_awakening_filters_hand_and_draws_plus_one():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))

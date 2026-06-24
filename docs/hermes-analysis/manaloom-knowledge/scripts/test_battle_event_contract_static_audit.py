@@ -48,6 +48,7 @@ def test_known_static_and_observed_events_are_classified():
                 "graveyard_flashback_granted",
                 "mizzix_mastery_resolved",
                 "spell_copy_ceased_to_exist",
+                "end_step_token_death_draw_resolved",
             ],
         )
         write_events(
@@ -65,6 +66,7 @@ def test_known_static_and_observed_events_are_classified():
                 {"event": "graveyard_flashback_granted", "turn": 4, "player": "A"},
                 {"event": "mizzix_mastery_resolved", "turn": 4, "player": "A"},
                 {"event": "spell_copy_ceased_to_exist", "turn": 4, "player": "A"},
+                {"event": "end_step_token_death_draw_resolved", "player": "A"},
             ],
         )
 

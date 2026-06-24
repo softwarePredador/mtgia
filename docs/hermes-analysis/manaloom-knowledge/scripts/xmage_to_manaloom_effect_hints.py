@@ -1476,6 +1476,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     ability_kind = _ability_kind(ability_classes)
     target_constraints = _target_constraints(target_classes, filter_classes)
     card_types = _constructor_card_types(index_entry)
+    xmage_class_name = str(index_entry.get("xmage_class_name") or "").strip()
     candidates: list[dict[str, Any]] = []
 
     if _oracle_has(rules_text, "vow counter", "sacrifices the rest") or (
@@ -1763,7 +1764,113 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     normalized_text = _normalized_rules_text(rules_text)
 
     if "CreateTokenCopyTargetEffect" in effect_classes:
-        if _oracle_has(
+        if (
+            xmage_class_name == "JaxisTheTroublemaker"
+            or (
+                _oracle_has(
+                    rules_text,
+                    "create a token that's a copy of another target creature you control",
+                    "when this creature dies, draw a card",
+                    "sacrifice it at the beginning of the next end step",
+                )
+                and "DrawCardSourceControllerEffect" in effect_classes
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="copy_target_another_creature_you_control_haste_draw_on_death_sacrifice_end_step_v1",
+                    reason="XMage structure matches another-creature copy token with haste, dies-draw rider, and end-step sacrifice.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "copy_target_types": ["creature"],
+                        "target_controller": "own",
+                        "exclude_source_from_copy_targets": True,
+                        "token_haste": True,
+                        "token_draw_cards_when_this_dies": 1,
+                        "sacrifice_token_at_end_step": True,
+                    },
+                    matched_signals=[
+                        "CreateTokenCopyTargetEffect",
+                        "copy_another_creature_you_control",
+                        "dies_draw",
+                        "sacrifice_end_step",
+                    ],
+                )
+            )
+        elif (
+            xmage_class_name == "RionyaFireDancer"
+            or _oracle_has(
+                rules_text,
+                "create x tokens that are copies of another target creature you control",
+                "one plus the number of instant and sorcery spells you've cast this turn",
+                "exile them at the beginning of the next end step",
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="copy_target_another_creature_you_control_x_instant_sorcery_plus_one_haste_exile_end_step_v1",
+                    reason="XMage structure matches another-creature copy tokens counted from instant/sorcery spells cast this turn plus one, with haste and end-step exile.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "copy_target_types": ["creature"],
+                        "target_controller": "own",
+                        "exclude_source_from_copy_targets": True,
+                        "token_count_source": "instant_or_sorcery_spells_cast_this_turn_plus_one",
+                        "token_haste": True,
+                        "exile_token_at_end_step": True,
+                    },
+                    matched_signals=[
+                        "CreateTokenCopyTargetEffect",
+                        "copy_another_creature_you_control",
+                        "instant_sorcery_count_plus_one",
+                        "exile_end_step",
+                    ],
+                )
+            )
+        elif (
+            xmage_class_name == "TheJollyBalloonMan"
+            or _oracle_has(
+                rules_text,
+                "create a token that's a copy of another target creature you control",
+                "it's a 1/1 red balloon creature in addition to its other colors and types",
+                "it has flying and haste",
+                "sacrifice it at the beginning of the next end step",
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="copy_target_another_creature_you_control_balloon_1_1_red_flying_haste_sacrifice_end_step_v1",
+                    reason="XMage structure matches another-creature copy token with 1/1 Balloon override, added red color, flying, haste, and end-step sacrifice.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "copy_target_types": ["creature"],
+                        "target_controller": "own",
+                        "exclude_source_from_copy_targets": True,
+                        "force_token_creature": True,
+                        "token_power": 1,
+                        "token_toughness": 1,
+                        "token_extra_colors": ["R"],
+                        "token_subtype": "Balloon",
+                        "token_flying": True,
+                        "token_haste": True,
+                        "sacrifice_token_at_end_step": True,
+                    },
+                    matched_signals=[
+                        "CreateTokenCopyTargetEffect",
+                        "copy_another_creature_you_control",
+                        "balloon_1_1_red",
+                        "flying_haste",
+                        "sacrifice_end_step",
+                    ],
+                )
+            )
+        elif _oracle_has(
             rules_text,
             "create a token that's a copy of target creature you control",
             "sacrifice this token",
