@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg190_cool_but_rude_class_rummage_20260624_213939",
+  "deploy_id": "PG190",
+  "family_counts": {
+    "draw_engine": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_rollback.sql"
+  },
+  "generated_at": "2026-06-24T21:39:39+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Cool but Rude"
+  ],
+  "selected_count": 1,
+  "slug": "cool-but-rude-class-rummage",
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -1,0 +1,4 @@
+   card_name   | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+---------------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Cool but Rude | cool but rude   | aec5006936a17b54f6fc3dddb2786c82 | battle_rule_v1:5d3a49840003607e0e0174ff2ef46be4 |                1 | 976bf6dc-452c-47e5-b11f-09820568f18f |                  2 |                         0 |                           2
+(1 row)

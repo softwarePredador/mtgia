@@ -11469,6 +11469,135 @@ def register_tests(battle, player):
         assert event["drawn"] == ["Fresh Draw"]
         assert event["rule_logical_key"] == "battle_rule_v1:artists-talent-test"
 
+    def test_cool_but_rude_attack_rummage_level_two_damages_each_opponent():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            active.hand = [{"name": "Dead Eight Drop", "cmc": 8, "type_line": "Sorcery"}]
+            active.library = [{"name": "Fresh Draw", "cmc": 2, "type_line": "Instant"}]
+            active.battlefield = [
+                {
+                    "name": "Cool but Rude",
+                    "type_line": "Enchantment — Class",
+                    "effect": "draw_engine",
+                    "battle_model_scope": "cool_but_rude_class_attack_rummage_level_damage_tutor_v1",
+                    "draw_on_enter": False,
+                    "class_level": 2,
+                    "class_level_start": 1,
+                    "class_level_costs": {"2": "{1}{R}", "3": "{1}{R}"},
+                    "attack_trigger_optional_discard_draw": True,
+                    "trigger": "controller_discard",
+                    "controller_discard_damage_each_opponent": 2,
+                    "controller_discard_damage_each_opponent_level_min": 2,
+                    "class_level3_tutor_any_to_hand_random_discard": True,
+                    "_rule_logical_key": "battle_rule_v1:cool-but-rude-test",
+                    "_rule_oracle_hash": "cool-but-rude-test-hash",
+                }
+            ]
+            battle.resolve_attack_class_rummage_triggers(
+                active,
+                [opponent_a, opponent_b],
+                [active, opponent_a, opponent_b],
+                turn=5,
+                rng=random.Random(190),
+                phase="combat",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in active.hand] == ["Fresh Draw"]
+        assert [card.get("name") for card in active.graveyard] == ["Dead Eight Drop"]
+        assert opponent_a.life == 38
+        assert opponent_b.life == 38
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Cool but Rude"
+            and data.get("trigger") == "attack"
+            and data.get("effect") == "rummage"
+            and data.get("discarded") == "Dead Eight Drop"
+            and data.get("drawn") == ["Fresh Draw"]
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Cool but Rude"
+            and data.get("trigger") == "controller_discard"
+            and data.get("damage_each_opponent") == 2
+            and len(data.get("damaged_opponents") or []) == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:cool-but-rude-test"
+            for event, data in events
+        )
+
+    def test_cool_but_rude_level_three_tutors_then_randomly_discards():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.mana_pool.add("red", 1)
+            active.mana_pool.add_generic(1)
+            active.hand = [{"name": "Pitch Card", "cmc": 6, "type_line": "Sorcery"}]
+            tutored = {"name": "Aurelia's Fury", "cmc": 4, "type_line": "Instant"}
+            active.library = [tutored]
+            cool = {
+                "name": "Cool but Rude",
+                "type_line": "Enchantment — Class",
+                "effect": "draw_engine",
+                "battle_model_scope": "cool_but_rude_class_attack_rummage_level_damage_tutor_v1",
+                "draw_on_enter": False,
+                "class_level": 2,
+                "class_level_start": 1,
+                "class_level_costs": {"2": "{1}{R}", "3": "{1}{R}"},
+                "attack_trigger_optional_discard_draw": True,
+                "trigger": "controller_discard",
+                "controller_discard_damage_each_opponent": 2,
+                "controller_discard_damage_each_opponent_level_min": 2,
+                "class_level3_tutor_any_to_hand_random_discard": True,
+                "_rule_logical_key": "battle_rule_v1:cool-but-rude-test",
+                "_rule_oracle_hash": "cool-but-rude-test-hash",
+            }
+            active.battlefield = [cool]
+            battle.activate_class_level_abilities(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=5,
+                rng=random.Random(190),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert cool["class_level"] == 3
+        assert active.available_mana() == 0
+        assert all(card.get("name") != "Aurelia's Fury" for card in active.library)
+        assert len(active.hand) == 1
+        assert len(active.graveyard) == 1
+        assert opponent.life == 38
+        assert any(
+            event == "class_level_gained"
+            and data.get("card") == "Cool but Rude"
+            and data.get("class_level") == 3
+            and data.get("cost") == "{1}{R}"
+            for event, data in events
+        )
+        assert any(
+            event == "class_level_trigger_resolved"
+            and data.get("card") == "Cool but Rude"
+            and data.get("effect") == "tutor"
+            and data.get("tutored") == ["Aurelia's Fury"]
+            for event, data in events
+        )
+        assert any(
+            event == "random_discard_after_tutor"
+            and data.get("card") == "Cool but Rude"
+            and data.get("class_level") == 3
+            for event, data in events
+        )
+
     def test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13177,6 +13306,8 @@ def register_tests(battle, player):
         test_underworld_dreams_and_fate_unraveler_punish_each_opponent_drawn_card,
         test_geths_grimoire_and_megrim_trigger_on_opponent_discard_with_rule_provenance,
         test_feast_of_sanity_triggers_on_controller_discard_and_gains_life,
+        test_cool_but_rude_attack_rummage_level_two_damages_each_opponent,
+        test_cool_but_rude_level_three_tutors_then_randomly_discards,
         test_lightning_helix_damage_spell_gains_life_with_rule_provenance,
         test_caldera_pyremaw_instant_sorcery_trigger_adds_counter_then_deals_power_damage,
         test_reckless_endeavor_damage_wipe_creates_treasures,

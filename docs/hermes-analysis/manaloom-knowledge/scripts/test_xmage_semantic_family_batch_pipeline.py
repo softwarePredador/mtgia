@@ -2324,6 +2324,60 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_cool_but_rude_exact_class_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Cool but Rude",
+                        "severity": "high",
+                        "oracle_hash": "coolhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "CoolButRude",
+                            "path": "/xmage/CoolButRude.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": [
+                                "DamagePlayersEffect",
+                                "DiscardControllerEffect",
+                                "DoIfCostPaid",
+                                "DrawCardSourceControllerEffect",
+                                "GainClassAbilitySourceEffect",
+                                "SearchLibraryPutInHandEffect",
+                            ],
+                            "ability_classes": [
+                                "AttacksWithCreaturesTriggeredAbility",
+                                "BecomesClassLevelTriggeredAbility",
+                                "ClassLevelAbility",
+                                "ClassReminderAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "cost_classes": ["DiscardCardCost"],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "cool_but_rude_class_attack_rummage_level_damage_tutor_v1",
+                                "draw_on_enter": False,
+                                "class_level_start": 1,
+                                "class_level_costs": {"2": "{1}{R}", "3": "{1}{R}"},
+                                "attack_trigger_optional_discard_draw": True,
+                                "trigger": "controller_discard",
+                                "controller_discard_damage_each_opponent": 2,
+                                "controller_discard_damage_each_opponent_level_min": 2,
+                                "class_level3_tutor_any_to_hand_random_discard": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_lightning_helix_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

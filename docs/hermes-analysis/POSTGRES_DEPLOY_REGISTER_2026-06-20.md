@@ -10689,3 +10689,110 @@ Register decision:
   requires Class/level runtime plus attack-loot, discard-damage, tutor, and
   random-discard modeling before promotion.
 - Next package number is PG190.
+
+## PG190 - Cool but Rude Class attack rummage rule
+
+Timestamp: 2026-06-24 18:40 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold variant card used by decks `608` and `613`:
+  `Cool but Rude`.
+- Replaces two stale generated review-only shadows with one verified auto rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Cool but Rude`:
+  `battle_rule_v1:5d3a49840003607e0e0174ff2ef46be4`,
+  `oracle_hash=aec5006936a17b54f6fc3dddb2786c82`,
+  `effect=draw_engine`,
+  `battle_model_scope=cool_but_rude_class_attack_rummage_level_damage_tutor_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps the exact `CoolButRude` Class structure:
+  attack rummage through `AttacksWithCreaturesTriggeredAbility` +
+  `DoIfCostPaid(DiscardCardCost)`, level 2 controller-discard damage to each
+  opponent, and level 3 tutor plus random discard.
+- Semantic classifier promotes only the exact enchantment/Class source with
+  `class_level_costs={"2":"{1}{R}","3":"{1}{R}"}`,
+  `attack_trigger_optional_discard_draw=true`,
+  `controller_discard_damage_each_opponent=2`, and
+  `class_level3_tutor_any_to_hand_random_discard=true`.
+- Battle runtime now supports the scoped Class pattern through
+  `resolve_attack_class_rummage_triggers`, `activate_class_level_abilities`,
+  and controller-discard damage to each opponent.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg190_cool_but_rude_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local `get_card_effect({"name":"Cool but Rude"})` selects the curated
+  `draw_engine` rule with `verified/auto` provenance and
+  `cool_but_rude_class_attack_rummage_level_damage_tutor_v1`.
+- Tests:
+  `python3 -m unittest test_xmage_to_manaloom_effect_hints.py test_xmage_semantic_family_batch_pipeline.py`
+  ran `324` tests OK;
+  `python3 test_battle_analyst_v10_3.py` passed, including
+  `test_cool_but_rude_attack_rummage_level_two_damages_each_opponent` and
+  `test_cool_but_rude_level_three_tutors_then_randomly_discards`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg190_cool_but_rude_postsync_v1_manifest.json`;
+  expanded scope severity moved to `high=323`, `medium=54`, `pass=332`.
+- Lorehold-focused post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg190_cool_but_rude_postsync_lorehold_v1.json`;
+  scoped rows `395`, `battle_ready=274`,
+  `needs_rule_before_strategy=121`, `split_scope=20`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg190_cool_but_rude_postsync_v1.json`;
+  `package_ready_unprepared=0`, `package_already_prepared=0`,
+  `split_scope_backlog=75`, `runtime_family_backlog=24`,
+  `manual_mapper_backlog=261`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg190_cool_but_rude_postsync_v1.json`;
+  `18/18` pass.
+- Affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_battle_rule_coherence_pg190_cool_but_rude_postsync_v1.json`
+  reports deck `608` as `high=12`, `medium=6`, `pass=50`, with
+  `Cool but Rude` as `pass`;
+  `docs/hermes-analysis/master_optimizer_reports/deck613_battle_rule_coherence_pg190_cool_but_rude_postsync_v1.json`
+  reports deck `613` as `high=19`, `medium=6`, `pass=66`, with
+  `Cool but Rude` as `pass`.
+
+Register decision:
+
+- PG190 is closed as applied, postchecked, synced, tested, and
+  strategy-audited.
+- Do not reuse PG190.
+- Continue next with remaining Lorehold `needs_rule_before_strategy` cards.
+  Current top items are `Invoke Calamity` (`mapper_manual`),
+  `Perch Protection` (`runtime_needed`), `Sand Scout` (`runtime_needed`), and
+  `Sun Titan` (`split_scope`).
+- Next package number is PG191.

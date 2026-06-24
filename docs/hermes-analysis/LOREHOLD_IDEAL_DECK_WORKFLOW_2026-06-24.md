@@ -29,12 +29,12 @@ Current generated evidence:
 
 - initial matrix:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`
-- current post-PG189 Lorehold-focused matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg189_profound_journey_postsync_v1.json`
-- current post-PG189 strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg189_profound_journey_postsync_v1.json`
-- current post-PG189 effective queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg189_profound_journey_postsync_v1.json`
+- current post-PG190 Lorehold-focused matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg190_cool_but_rude_postsync_lorehold_v1.json`
+- current post-PG190 strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg190_cool_but_rude_postsync_v1.json`
+- current post-PG190 effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg190_cool_but_rude_postsync_v1.json`
 
 The script reads:
 
@@ -44,7 +44,7 @@ The script reads:
 - expanded opponent/non-Lorehold comparison decks `58`, `74`, `105`, and
   `617` through `619`;
 - current XMage proposal report
-  `xmage_current_replay_batch_pipeline_20260624_pg189_profound_journey_postsync_v1_proposals.json`;
+  `xmage_current_replay_batch_pipeline_20260624_pg190_cool_but_rude_postsync_v1_proposals.json`;
 - Hermes SQLite battle-rule cache for rule readiness.
 
 It does not mutate deck rows, SQLite, or PostgreSQL.
@@ -237,11 +237,46 @@ PG189 closure evidence:
 - strategy consistency:
   `18/18` pass.
 
+Post-PG190 Lorehold-focused matrix generated on 2026-06-24 after closing
+`Cool but Rude` for decks `608` and `613`:
+
+- total Lorehold scoped cards in matrix: `395`;
+- `core_keep`: `87`;
+- `priority_benchmark_candidate`: `38`;
+- `watchlist_candidate`: `91`;
+- `needs_rule_before_strategy`: `121`;
+- `active_low_confidence_review`: `13`;
+- `low_priority`: `43`;
+- `policy_blocked`: `2`.
+
+Post-PG190 rule-readiness split:
+
+- `battle_ready`: `274`;
+- `mapper_manual`: `88`;
+- `split_scope`: `20`;
+- `runtime_needed`: `11`;
+- `blocked_missing_xmage_source`: `2`.
+
+PG190 closure evidence:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/pg190_cool_but_rude_class_rummage_package.md`;
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg190_cool_but_rude_20260624.json`;
+- affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_battle_rule_coherence_pg190_cool_but_rude_postsync_v1.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck613_battle_rule_coherence_pg190_cool_but_rude_postsync_v1.json`;
+- final pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg190_cool_but_rude_postsync_v1_manifest.json`;
+- strategy consistency:
+  `18/18` pass.
+
 Operational interpretation:
 
-- The `122` `needs_rule_before_strategy` cards in the Lorehold-focused scope must not
+- The `121` `needs_rule_before_strategy` cards in the Lorehold-focused scope must not
   drive deck swaps yet. They first need mapper/runtime/split-scope closure.
-- The `37` `priority_benchmark_candidate` cards are the first practical swap
+- The `38` `priority_benchmark_candidate` cards are the first practical swap
   candidates after baseline hash guard and battle gate review.
 - `Chrome Mox` and `Mox Opal` are policy-blocked for the current no-premium-Mox
   Lorehold lane even if they have rule evidence.
@@ -254,7 +289,7 @@ Lorehold card rules from the matrix.
 Start with:
 
 - split-scope cards that are strategically relevant, such as
-  `Cool but Rude`, `Sun Titan`, `Glint-Horn Buccaneer`,
+  `Sun Titan`, `Glint-Horn Buccaneer`,
   `Taii Wakeen, Perfect Shot`, `Primal Amulet // Primal Wellspring`,
   `Starfield Shepherd`, `Erode`, `Kederekt Parasite`, and `Rakdos Charm`;
 - runtime-needed token or damage families only when the exact scope is
@@ -326,6 +361,22 @@ spell:
    deprecated two stale generated review-only shadows.
 5. PG -> Hermes sync made deck `611` report `Profound Journey` as `pass`, and
    the Lorehold-focused matrix moved it to `battle_ready` / `watchlist_candidate`.
+
+`Cool but Rude` is the sixth completed proof and the first Class-level runtime
+scope:
+
+1. XMage local source matched `AttacksWithCreaturesTriggeredAbility` +
+   `DoIfCostPaid(DiscardCardCost)` + paired `ClassLevelAbility` levels.
+2. The mapper/classifier promoted only the exact
+   `cool_but_rude_class_attack_rummage_level_damage_tutor_v1` scope.
+3. Battle runtime now supports this Class pattern through attack rummage,
+   level-2 controller-discard damage to each opponent, and level-3 tutor plus
+   random discard.
+4. PG190 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated review-only shadows.
+5. PG -> Hermes sync made decks `608` and `613` report `Cool but Rude` as
+   `pass`, and the Lorehold-focused matrix moved it to `battle_ready` /
+   `priority_benchmark_candidate`.
 
 ## Current Benchmark Candidate Lane
 

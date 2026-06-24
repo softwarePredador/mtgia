@@ -8691,6 +8691,41 @@ def process_player_discard_triggers(
         effect_data = permanent
         if effect_data.get("trigger") != "controller_discard":
             continue
+        damage_each_opponent = int(effect_data.get("controller_discard_damage_each_opponent") or 0)
+        level_min = int(effect_data.get("controller_discard_damage_each_opponent_level_min") or 0)
+        class_level = int(effect_data.get("class_level") or effect_data.get("class_level_start") or 1)
+        if damage_each_opponent > 0 and class_level >= level_min:
+            total_damage = max(0, discarded_count * damage_each_opponent)
+            damaged_opponents = []
+            for opponent in opponents:
+                if not opponent.is_alive():
+                    continue
+                life_before = opponent.life
+                dealt = deal_damage(opponent, total_damage)
+                damaged_opponents.append(
+                    {
+                        "player": opponent.name,
+                        "life_before": life_before,
+                        "life_after": opponent.life,
+                        "result": "player_damage" if dealt else "prevented",
+                    }
+                )
+            event_payload = {
+                "player": player.name,
+                "card": permanent.get("name", "?"),
+                "trigger": "controller_discard",
+                "discarded_count": discarded_count,
+                "effect": "direct_damage",
+                "damage_per_card": damage_each_opponent,
+                "damage_each_opponent": total_damage,
+                "damaged_opponents": damaged_opponents,
+                "class_level": class_level,
+                "turn": turn,
+                "phase": phase,
+                **replay_rule_fields(effect_data),
+            }
+            emit_replay_event("trigger_resolved", **event_payload)
+            trigger_events.append(event_payload)
         damage_any_target = int(effect_data.get("controller_discard_damage_any_target") or 0)
         life_gain_per_card = int(effect_data.get("controller_discard_gain_life") or 0)
         if damage_any_target > 0:
@@ -17891,6 +17926,210 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     return score, reason
 
 
+def resolve_attack_class_rummage_triggers(player, opponents, all_players, turn, rng, *, phase="combat"):
+    trigger_events = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("attack_trigger_optional_discard_draw"):
+            continue
+        discard_card, discard_reason, risk_flags, use_top_replacement, _scored_options = (
+            choose_lorehold_rummage_discard(player)
+        )
+        if not discard_card:
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="attack",
+                reason="no_discard_candidate",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if discard_card not in player.hand:
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="attack",
+                reason="discard_candidate_missing_on_resolution",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        player.hand.remove(discard_card)
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            [discard_card],
+            top_limit=1 if use_top_replacement else 0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        drawn = player.draw(1, rng)
+        process_player_draw_triggers(
+            player,
+            len(drawn),
+            turn,
+            phase,
+            all_players,
+            turn_player=player,
+        )
+        event_payload = {
+            "player": player.name,
+            "card": permanent.get("name", "?"),
+            "trigger": "attack",
+            "effect": "rummage",
+            "discarded": discard_card.get("name", "?"),
+            "discard_reason": discard_reason,
+            "discarded_to_top": [
+                card.get("name", "?")
+                for card in discard_resolution.get("to_top", [])
+            ],
+            "discarded_to_graveyard": [
+                card.get("name", "?")
+                for card in discard_resolution.get("to_graveyard", [])
+            ],
+            "cards_drawn": len(drawn),
+            "drawn": [card.get("name", "?") for card in drawn],
+            "risk_flags": risk_flags,
+            "class_level": int(permanent.get("class_level") or 1),
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(permanent),
+        }
+        emit_replay_event("trigger_resolved", **event_payload)
+        trigger_events.append(event_payload)
+    return trigger_events
+
+
+def activate_class_level_abilities(player, opponents, all_players, turn, rng, *, phase="precombat_main"):
+    activations = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        level_costs = permanent.get("class_level_costs") or {}
+        if not isinstance(level_costs, dict) or not level_costs:
+            continue
+        try:
+            current_level = int(permanent.get("class_level") or permanent.get("class_level_start") or 1)
+        except Exception:
+            current_level = 1
+        next_levels = sorted(
+            int(level)
+            for level in level_costs
+            if str(level).isdigit() and int(level) > current_level
+        )
+        for next_level in next_levels:
+            cost = level_costs.get(str(next_level)) or level_costs.get(next_level)
+            if not cost or not player.can_pay(cost):
+                continue
+            mana_before = player.available_mana()
+            mana_pool_before = player.mana_pool.snapshot()
+            if not player.spend_mana(cost):
+                continue
+            permanent["class_level"] = next_level
+            activations += 1
+            emit_replay_event(
+                "class_level_gained",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                class_level=next_level,
+                cost=cost,
+                mana_before=mana_before,
+                mana_after=player.available_mana(),
+                mana_pool_before=mana_pool_before,
+                mana_pool_after=player.mana_pool.snapshot(),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            if (
+                next_level == 3
+                and permanent.get("class_level3_tutor_any_to_hand_random_discard")
+                and not permanent.get("class_level3_triggered")
+            ):
+                permanent["class_level3_triggered"] = True
+                candidates = library_tutor_candidates(player, "any")
+                selected = None
+                tutor_reason = "no_library_candidate"
+                if candidates:
+                    scored = [
+                        (
+                            candidate,
+                            *tutor_candidate_score(candidate, "any", player, opponents, turn),
+                        )
+                        for candidate in candidates
+                    ]
+                    scored.sort(
+                        key=lambda item: (
+                            -item[1],
+                            -int(float(item[0].get("cmc") or 0)),
+                            item[0].get("name", ""),
+                        )
+                    )
+                    selected, _score, tutor_reason = scored[0]
+                    moved, destination = move_library_tutor_selection(player, [selected], "any")
+                    emit_replay_event(
+                        "class_level_trigger_resolved",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger="becomes_class_level",
+                        class_level=next_level,
+                        effect="tutor",
+                        target="any",
+                        tutored=[card.get("name", "?") for card in moved],
+                        destination=destination,
+                        tutor_reason=tutor_reason,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                if player.hand:
+                    discard_index = rng.randrange(len(player.hand))
+                    discarded = player.hand.pop(discard_index)
+                    discard_resolution = resolve_effect_discard_cards(
+                        player,
+                        [discarded],
+                        opponents=opponents,
+                        turn=turn,
+                        phase=phase,
+                        rng=rng,
+                    )
+                    emit_replay_event(
+                        "random_discard_after_tutor",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        discarded=discarded.get("name", "?"),
+                        discarded_to_graveyard=[
+                            card.get("name", "?")
+                            for card in discard_resolution.get("to_graveyard", [])
+                        ],
+                        class_level=next_level,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                elif selected is None:
+                    emit_replay_event(
+                        "class_level_trigger_skipped",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger="becomes_class_level",
+                        class_level=next_level,
+                        reason=tutor_reason,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+            current_level = next_level
+    return activations
+
+
 def mizzix_mastery_graveyard_candidates(player):
     return [
         grave_card
@@ -23853,6 +24092,9 @@ def apply_effect_immediate(
     elif effect == "draw_engine":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "draw_engine"
+        if permanent.get("class_level_start") or permanent.get("class_level_costs"):
+            permanent["class_level"] = int(permanent.get("class_level_start") or permanent.get("class_level") or 1)
+            permanent.setdefault("class_level3_triggered", False)
         if is_the_one_ring(card):
             permanent["burden"] = True
             permanent["burden_counters"] = int(permanent.get("burden_counters") or 0)
@@ -27023,6 +27265,14 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             turn,
             phase="combat",
         )
+    resolve_attack_class_rummage_triggers(
+        attacker,
+        alive_defenders,
+        all_players,
+        turn,
+        rng,
+        phase="combat",
+    )
 
     combat_instant_removal_window(attacker, alive_defenders, attackers, turn, rng)
     if not attackers:
@@ -27345,6 +27595,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         phase="precombat_main",
     )
     activate_utility_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase="precombat_main",
+    )
+    activate_class_level_abilities(
         player,
         opponents,
         all_players,

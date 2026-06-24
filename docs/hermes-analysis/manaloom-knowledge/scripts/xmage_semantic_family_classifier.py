@@ -2010,6 +2010,34 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("controller_discard_gain_life") or 0) == 1
         )
 
+    if effect == "draw_engine" and scope == "cool_but_rude_class_attack_rummage_level_damage_tutor_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {
+                "DamagePlayersEffect",
+                "DiscardControllerEffect",
+                "DrawCardSourceControllerEffect",
+                "GainClassAbilitySourceEffect",
+                "SearchLibraryPutInHandEffect",
+            }.issubset(effect_classes)
+            and {
+                "AttacksWithCreaturesTriggeredAbility",
+                "BecomesClassLevelTriggeredAbility",
+                "ClassLevelAbility",
+                "ClassReminderAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and "DiscardCardCost" in cost_classes
+            and bool(effect_json.get("attack_trigger_optional_discard_draw"))
+            and effect_json.get("trigger") == "controller_discard"
+            and int(effect_json.get("class_level_start") or 0) == 1
+            and (effect_json.get("class_level_costs") or {}) == {"2": "{1}{R}", "3": "{1}{R}"}
+            and int(effect_json.get("controller_discard_damage_each_opponent") or 0) == 2
+            and int(effect_json.get("controller_discard_damage_each_opponent_level_min") or 0) == 2
+            and bool(effect_json.get("class_level3_tutor_any_to_hand_random_discard"))
+            and effect_json.get("draw_on_enter") is False
+        )
+
     if effect == "direct_damage" and scope == "damage_any_target_and_gain_life_v1":
         return (
             types.issubset({"INSTANT", "SORCERY"})

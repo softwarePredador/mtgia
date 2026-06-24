@@ -3379,6 +3379,63 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["controller_discard_damage_any_target"], 1)
         self.assertEqual(primary["controller_discard_gain_life"], 1)
 
+    def test_cool_but_rude_maps_to_exact_class_attack_rummage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CoolButRude",
+                "effect_classes": [
+                    "DamagePlayersEffect",
+                    "DiscardControllerEffect",
+                    "DoIfCostPaid",
+                    "DrawCardSourceControllerEffect",
+                    "GainClassAbilitySourceEffect",
+                    "SearchLibraryPutInHandEffect",
+                ],
+                "ability_classes": [
+                    "AttacksWithCreaturesTriggeredAbility",
+                    "BecomesClassLevelTriggeredAbility",
+                    "ClassLevelAbility",
+                    "ClassReminderAbility",
+                    "SimpleStaticAbility",
+                ],
+                "cost_classes": ["DiscardCardCost"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new AttacksWithCreaturesTriggeredAbility(new DoIfCostPaid("
+                    "new DrawCardSourceControllerEffect(1), new DiscardCardCost()), 1); "
+                    "new ClassLevelAbility(2, \"{1}{R}\"); "
+                    "new GainClassAbilitySourceEffect(new DiscardCardControllerTriggeredAbility("
+                    "new DamagePlayersEffect(2, TargetController.OPPONENT), false), 2); "
+                    "new ClassLevelAbility(3, \"{1}{R}\"); "
+                    "new BecomesClassLevelTriggeredAbility(new SearchLibraryPutInHandEffect("
+                    "new TargetCardInLibrary(), false), 3); "
+                    "ability.addEffect(new DiscardControllerEffect(1, true));"
+                ),
+            },
+            (
+                "Whenever you attack, you may discard a card. If you do, draw a card. "
+                "{1}{R}: Level 2. Whenever you discard a card, this Class deals 2 damage "
+                "to each opponent. {1}{R}: Level 3. When this Class becomes level 3, "
+                "search your library for a card, put it into your hand, shuffle, then "
+                "discard a card at random."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "cool_but_rude_class_attack_rummage_level_damage_tutor_v1",
+        )
+        self.assertFalse(primary["draw_on_enter"])
+        self.assertEqual(primary["class_level_start"], 1)
+        self.assertEqual(primary["class_level_costs"], {"2": "{1}{R}", "3": "{1}{R}"})
+        self.assertTrue(primary["attack_trigger_optional_discard_draw"])
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertEqual(primary["controller_discard_damage_each_opponent"], 2)
+        self.assertEqual(primary["controller_discard_damage_each_opponent_level_min"], 2)
+        self.assertTrue(primary["class_level3_tutor_any_to_hand_random_discard"])
+
     def test_lightning_helix_maps_to_exact_damage_any_target_and_lifegain_scope(self) -> None:
         result = hints.build_effect_hints(
             {

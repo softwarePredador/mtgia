@@ -1507,6 +1507,53 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "CoolButRude"
+        and {
+            "DamagePlayersEffect",
+            "DiscardControllerEffect",
+            "DrawCardSourceControllerEffect",
+            "GainClassAbilitySourceEffect",
+            "SearchLibraryPutInHandEffect",
+        }.issubset(effect_classes)
+        and "doifcostpaid" in normalized
+        and {
+            "AttacksWithCreaturesTriggeredAbility",
+            "BecomesClassLevelTriggeredAbility",
+            "ClassLevelAbility",
+            "ClassReminderAbility",
+            "SimpleStaticAbility",
+        }.issubset(ability_classes)
+        and "DiscardCardCost" in cost_classes
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "cool_but_rude_class_attack_rummage_level_damage_tutor_v1",
+            "fields": {
+                "draw_on_enter": False,
+                "class_level_start": 1,
+                "class_level_costs": {"2": "{1}{R}", "3": "{1}{R}"},
+                "attack_trigger_optional_discard_draw": True,
+                "trigger": "controller_discard",
+                "controller_discard_damage_each_opponent": 2,
+                "controller_discard_damage_each_opponent_level_min": 2,
+                "class_level3_tutor_any_to_hand_random_discard": True,
+            },
+            "reason": "XMage structure matches Cool but Rude as a Class with attack rummage, a level-2 controller-discard damage trigger, and a level-3 tutor followed by random discard.",
+            "signals": [
+                "AttacksWithCreaturesTriggeredAbility",
+                "DoIfCostPaid",
+                "DiscardCardCost",
+                "ClassLevelAbility",
+                "GainClassAbilitySourceEffect",
+                "DamagePlayersEffect",
+                "BecomesClassLevelTriggeredAbility",
+                "SearchLibraryPutInHandEffect",
+                "DiscardControllerEffect(random)",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
         and effect_classes == {"OneShotEffect", "RhysticStudyDrawEffect"}
         and ability_classes == {"SpellCastOpponentTriggeredAbility"}
         and (
