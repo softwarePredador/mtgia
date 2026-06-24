@@ -244,7 +244,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
     def test_strike_it_rich_maps_to_single_treasure_creation(self) -> None:
         result = hints.build_effect_hints(
             {
-                "effect_classes": ["CreateTokenEffect"],
+                "effect_classes": ["CreateTokenEffect", "WinGameSourceControllerEffect"],
                 "ability_classes": ["FlashbackAbility"],
                 "constructor_metadata": {"card_types": ["SORCERY"]},
             },
@@ -1239,6 +1239,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             primary["etb_target_opponent_may_draw_choice_model"],
             "compact_assume_yes_single_card_v1",
         )
+
+    def test_knuckles_maps_to_exact_combat_damage_treasure_engine_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": [
+                    "DoubleStrikeAbility",
+                    "HasteAbility",
+                    "OneOrMoreCombatDamagePlayerTriggeredAbility",
+                    "TrampleAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(2); this.toughness = new MageInt(4); "
+                    "this.addAbility(DoubleStrikeAbility.getInstance()); "
+                    "this.addAbility(TrampleAbility.getInstance()); "
+                    "this.addAbility(HasteAbility.getInstance()); "
+                    "this.addAbility(new OneOrMoreCombatDamagePlayerTriggeredAbility("
+                    "new CreateTokenEffect(new TreasureToken()), StaticFilters.FILTER_CONTROLLED_CREATURES));"
+                ),
+                "oracle_text": (
+                    "Double strike, trample, haste\n"
+                    "Whenever one or more creatures you control deal combat damage to a player, create a Treasure token.\n"
+                    "At the beginning of your upkeep, if you control thirty or more artifacts, you win the game."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "one_or_more_creatures_you_control_combat_damage_player_create_treasure_v1",
+        )
+        self.assertEqual(primary["trigger"], "combat_damage_to_player")
+        self.assertTrue(primary["trigger_creatures_you_control"])
+        self.assertEqual(primary["treasure_count"], 1)
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["double_strike"])
+        self.assertTrue(primary["trample"])
+        self.assertTrue(primary["haste"])
+        self.assertEqual(primary["upkeep_win_if_control_artifacts_at_least"], 30)
+        self.assertEqual(primary["upkeep_win_status"], "annotation_only")
 
     def test_wan_shi_tong_maps_to_exact_x_growth_draw_creature_scope(self) -> None:
         result = hints.build_effect_hints(

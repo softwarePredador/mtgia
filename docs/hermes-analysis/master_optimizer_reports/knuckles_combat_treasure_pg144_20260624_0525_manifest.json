@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg144_knuckles_combat_treasure_20260624_052524",
+  "deploy_id": "PG144",
+  "family_counts": {
+    "ramp_engine": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/knuckles_combat_treasure_pg144_20260624_0525_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/knuckles_combat_treasure_pg144_20260624_0525_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/knuckles_combat_treasure_pg144_20260624_0525_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/knuckles_combat_treasure_pg144_20260624_0525_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/knuckles_combat_treasure_pg144_20260624_0525_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/knuckles_combat_treasure_pg144_20260624_0525_rollback.sql"
+  },
+  "generated_at": "2026-06-24T05:25:24+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Knuckles the Echidna"
+  ],
+  "selected_count": 1,
+  "slug": "knuckles_combat_treasure",
+  "status": "prepared_read_only_pending_apply_approval"
+}

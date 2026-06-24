@@ -15888,21 +15888,27 @@
     "battle_rule_logical_key": "battle_rule_v1:3c5e078ac2d66be738bdeb07941b8f51"
   },
   "Knuckles the Echidna": {
-    "effect": "creature",
+    "ability_kind": "triggered",
+    "battle_model_scope": "one_or_more_creatures_you_control_combat_damage_player_create_treasure_v1",
+    "double_strike": true,
+    "effect": "ramp_engine",
+    "haste": true,
     "is_creature_permanent": true,
-    "keywords": [
-      "double_strike",
-      "trample",
-      "haste"
-    ],
     "power": 2,
     "toughness": 4,
+    "trample": true,
+    "treasure_count": 1,
+    "trigger": "combat_damage_to_player",
+    "trigger_creatures_you_control": true,
+    "upkeep_win_if_control_artifacts_at_least": 30,
+    "upkeep_win_status": "annotation_only",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5accd8db6e2e78c45a160aec4911d12a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9a9beaa23c31ad3d60c8c593696399cf",
+    "battle_rule_oracle_hash": "c1d16fe4ac367c244d328c560c58f1dd"
   },
   "Kodama of the West Tree": {
     "cmc": 3.0,

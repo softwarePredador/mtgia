@@ -2084,6 +2084,47 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
         elif (
+            card_types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and effect_classes.issubset({"CreateTokenEffect", "WinGameSourceControllerEffect"})
+            and "OneOrMoreCombatDamagePlayerTriggeredAbility" in ability_classes
+            and (
+                _oracle_has(
+                    rules_text,
+                    "whenever one or more creatures you control deal combat damage to a player",
+                    "create a treasure token",
+                )
+                or "oneormorecombatdamageplayertriggeredability" in normalized_text
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="ramp_engine",
+                    scope="one_or_more_creatures_you_control_combat_damage_player_create_treasure_v1",
+                    reason="Oracle and XMage structure match a creature that creates a Treasure whenever one or more creatures you control deal combat damage to a player.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "is_creature_permanent": True,
+                        "power": 2,
+                        "toughness": 4,
+                        "double_strike": True,
+                        "trample": True,
+                        "haste": True,
+                        "trigger": "combat_damage_to_player",
+                        "trigger_creatures_you_control": True,
+                        "treasure_count": 1,
+                        "upkeep_win_if_control_artifacts_at_least": 30,
+                        "upkeep_win_status": "annotation_only",
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "OneOrMoreCombatDamagePlayerTriggeredAbility",
+                        "combat_damage_treasure",
+                    ],
+                )
+            )
+        elif (
             "treasuretoken" in normalized_text
             and "drawcardsourcecontrollereffect(2)" in normalized_text
             and "discardcardcost" in normalized_text

@@ -620,6 +620,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             == "compact_assume_yes_single_card_v1"
         )
 
+    if effect == "ramp_engine" and scope == "one_or_more_creatures_you_control_combat_damage_player_create_treasure_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and effect_classes.issubset({"CreateTokenEffect", "WinGameSourceControllerEffect"})
+            and "OneOrMoreCombatDamagePlayerTriggeredAbility" in ability_classes
+            and bool(effect_json.get("is_creature_permanent"))
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("double_strike"))
+            and bool(effect_json.get("trample"))
+            and bool(effect_json.get("haste"))
+            and effect_json.get("trigger") == "combat_damage_to_player"
+            and bool(effect_json.get("trigger_creatures_you_control"))
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and int(effect_json.get("upkeep_win_if_control_artifacts_at_least") or 0) == 30
+            and effect_json.get("upkeep_win_status") == "annotation_only"
+        )
+
     if effect == "creature" and scope == "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1":
         return (
             types == {"CREATURE"}

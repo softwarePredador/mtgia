@@ -5944,6 +5944,69 @@ def register_tests(battle, player):
         assert trigger_event["life_after"] == 29
         assert trigger_event["opponent_spell_count"] == 2
 
+    def test_pg144_knuckles_combat_damage_trigger_creates_treasure_each_damage_step():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            knuckles = {"name": "Knuckles the Echidna", "cmc": 4, "type_line": "Legendary Creature — Echidna Warrior"}
+            effect_data = {
+                "effect": "ramp_engine",
+                "battle_model_scope": "one_or_more_creatures_you_control_combat_damage_player_create_treasure_v1",
+                "is_creature_permanent": True,
+                "power": 2,
+                "toughness": 4,
+                "double_strike": True,
+                "trample": True,
+                "haste": True,
+                "trigger": "combat_damage_to_player",
+                "trigger_creatures_you_control": True,
+                "treasure_count": 1,
+                "upkeep_win_if_control_artifacts_at_least": 30,
+                "upkeep_win_status": "annotation_only",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                knuckles,
+                5,
+                random.Random(12021),
+                effect_data_override=effect_data,
+            )
+
+            creature = next(card for card in active.battlefield if card.get("name") == "Knuckles the Echidna")
+            creature["summoning_sick"] = False
+            creature["tapped"] = True
+            battle.combat_damage_steps(
+                active,
+                [opponent],
+                opponent,
+                [creature],
+                [(creature, [])],
+                5,
+                random.Random(12022),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.treasures == 2
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Knuckles the Echidna"
+            and data.get("trigger") == "combat_damage_to_player"
+        ]
+        assert len(trigger_events) == 2
+        assert all(data.get("treasures_created") == 1 for data in trigger_events)
+        assert all(data.get("damaged_player") == "Opponent" for data in trigger_events)
+        assert trigger_events[0]["phase"] == "first_strike_damage"
+        assert trigger_events[1]["phase"] == "combat_damage"
+
     def test_prized_statue_enters_and_dies_create_treasures():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -10833,6 +10896,7 @@ def register_tests(battle, player):
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,
         test_lotho_second_spell_trigger_creates_treasure_and_loses_life,
+        test_pg144_knuckles_combat_damage_trigger_creates_treasure_each_damage_step,
         test_prized_statue_enters_and_dies_create_treasures,
         test_impulsive_pilferer_dies_create_treasure,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,

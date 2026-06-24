@@ -16199,6 +16199,74 @@ def process_surge_to_victory_combat_damage_triggers(
     return resolved
 
 
+def process_combat_damage_resource_triggers(
+    player,
+    opponents,
+    all_players,
+    damaging_creatures,
+    damaged_player,
+    turn,
+    *,
+    stack=None,
+    phase="combat_damage",
+):
+    if not damaging_creatures:
+        return 0
+    damaged_player_name = getattr(damaged_player, "name", "?")
+    trigger_creature_names = [
+        creature.get("name", "?")
+        for creature in damaging_creatures
+        if isinstance(creature, dict)
+    ]
+    resolved = 0
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "ramp_engine":
+            continue
+        if permanent.get("trigger") != "combat_damage_to_player":
+            continue
+        if not permanent.get("trigger_creatures_you_control"):
+            continue
+        treasure_count = max(1, int(permanent.get("treasure_count") or 1))
+
+        def resolve_combat_damage_treasure_trigger(
+            permanent=permanent,
+            treasure_count=treasure_count,
+            trigger_creature_names=tuple(trigger_creature_names),
+            damaged_player_name=damaged_player_name,
+        ):
+            treasures_before = player.treasures
+            player.treasures += treasure_count
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="combat_damage_to_player",
+                trigger_creatures=list(trigger_creature_names),
+                damaged_player=damaged_player_name,
+                effect="ramp_engine",
+                treasures_created=treasure_count,
+                treasures_before=treasures_before,
+                treasures_after=player.treasures,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+
+        resolve_or_enqueue_trigger(
+            player,
+            permanent,
+            "combat_damage_to_player",
+            resolve_combat_damage_treasure_trigger,
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        resolved += 1
+    return resolved
+
+
 def create_creature_token(
     player,
     *,
@@ -23478,6 +23546,7 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                 rng,
                 stack=stack,
             )
+        return damage_dealt
 
     marked_damage = defaultdict(int)
     deathtouch_damage = set()
@@ -23514,6 +23583,7 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                     )
 
     def combat_damage_step(first_strike_phase):
+        damaging_creatures_to_player = []
         for attacking_creature, declared_blockers in block_assignments:
             if attacking_creature not in attacker.battlefield:
                 continue
@@ -23524,7 +23594,8 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             if deals_in_phase(attacking_creature, first_strike_phase):
                 remaining = combat_stat(attacking_creature, "power", 2)
                 if not declared_blockers:
-                    deal_player_damage(attacking_creature, remaining)
+                    if deal_player_damage(attacking_creature, remaining):
+                        damaging_creatures_to_player.append(attacking_creature)
                 else:
                     for blocker in combat_damage_assignment_order(
                         attacking_creature,
@@ -23540,7 +23611,8 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                         mark_damage(attacking_creature, blocker, assigned_damage)
                         remaining -= assigned_damage
                     if attacking_creature.get("trample") and remaining > 0:
-                        deal_player_damage(attacking_creature, remaining)
+                        if deal_player_damage(attacking_creature, remaining):
+                            damaging_creatures_to_player.append(attacking_creature)
 
             for blocker in surviving_blockers:
                 if deals_in_phase(blocker, first_strike_phase):
@@ -23550,6 +23622,17 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                         combat_stat(blocker, "power", 2),
                     )
 
+        if damaging_creatures_to_player:
+            process_combat_damage_resource_triggers(
+                attacker,
+                opponents,
+                all_players or [attacker, *list(opponents or [])],
+                damaging_creatures_to_player,
+                target,
+                turn,
+                stack=stack,
+                phase="first_strike_damage" if first_strike_phase else "combat_damage",
+            )
         destroy_lethal_creatures()
 
     if any(
