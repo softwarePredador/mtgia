@@ -4008,6 +4008,72 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target"], "opponent_creature")
         self.assertEqual(primary["gift_promised_target"], "opponent_nonland_permanent")
 
+    def test_perch_protection_maps_to_exact_composite_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "CreateTokenEffect",
+                    "ExileSpellEffect",
+                    "GainAbilityControllerEffect",
+                    "LifeTotalCantChangeControllerEffect",
+                    "OneShotEffect",
+                    "PerchProtectionEffect",
+                ],
+                "ability_classes": ["GiftAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "new CreateTokenEffect(new SwanSongBirdToken(), 4); "
+                    "new LifeTotalCantChangeControllerEffect(Duration.UntilYourNextTurn); "
+                    "new GainAbilityControllerEffect(new ProtectionFromEverythingAbility(), Duration.UntilYourNextTurn); "
+                    "new ExileSpellEffect();"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "composite_resolution")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1",
+        )
+        self.assertTrue(primary["gift_extra_turn"])
+        self.assertTrue(primary["exiles_self"])
+        components = primary["_composite_rule_components"]
+        self.assertEqual(components[0]["effect"], "token_maker")
+        self.assertEqual(components[0]["token_count"], 4)
+        self.assertEqual(components[0]["token_name"], "Bird Token")
+        self.assertEqual(components[1]["effect"], "phase_out")
+        self.assertTrue(components[1]["phase_out_includes_lands"])
+        self.assertTrue(components[1]["life_total_cant_change"])
+
+    def test_sand_scout_maps_to_exact_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect", "SearchLibraryPutInPlayEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldTriggeredAbility",
+                    "PutCardIntoGraveFromAnywhereAllTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "filter.add(SubType.DESERT.getPredicate()); "
+                    "new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter), true); "
+                    "new CreateTokenEffect(new SandWarriorToken());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "sand_scout_etb_desert_if_behind_lands_land_graveyard_token_v1",
+        )
+        self.assertEqual(primary["etb_land_ramp_condition"], "opponent_controls_more_lands")
+        self.assertEqual(primary["land_subtypes_any"], ["desert"])
+        self.assertEqual(primary["land_graveyard_token_name"], "Sand Warrior Token")
+        self.assertEqual(primary["land_graveyard_token_colors"], ["R", "G", "W"])
+
     def test_snap_maps_to_exact_bounce_and_untap_scope(self) -> None:
         result = hints.build_effect_hints(
             {

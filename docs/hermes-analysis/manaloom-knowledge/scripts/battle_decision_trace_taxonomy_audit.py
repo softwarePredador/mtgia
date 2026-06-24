@@ -57,6 +57,24 @@ CONTRACTS: dict[str, dict[str, Any]] = {
         "required_score_keys": {"damage", "target", "creature_options"},
         "fixture_gate": "field_contract_required_before_observed_learning",
     },
+    "activated_self_counter_growth": {
+        "owner": "activated-self-counter-growth-field-contract",
+        "strategy_auditor": "generic_strategy_fields_only",
+        "research_category": None,
+        "specific_status": "accepted_field_contract_waiver",
+        "waiver_reason": (
+            "Self-counter sacrifice outlet is a deterministic board conversion; "
+            "the trace must expose counter gain, sacrificed permanent, and "
+            "resulting outlet stats before it can be used as learning evidence."
+        ),
+        "required_score_keys": {
+            "counter_gain",
+            "sacrificed",
+            "outlet_power_after",
+            "outlet_toughness_after",
+        },
+        "fixture_gate": "field_contract_required_before_observed_learning",
+    },
     "attack_trigger_artifact_tutor": {
         "owner": "attack-trigger-artifact-tutor-field-contract",
         "strategy_auditor": "generic_strategy_fields_only",
@@ -182,6 +200,23 @@ CONTRACTS: dict[str, dict[str, Any]] = {
             {"peek_top_count"},
             {"found_land"},
             {"produced_mana"},
+        ],
+        "fixture_gate": "field_contract_required_before_observed_learning",
+    },
+    "utility_creature_activation": {
+        "owner": "utility-creature-activation-field-contract",
+        "strategy_auditor": "generic_strategy_fields_only",
+        "research_category": None,
+        "specific_status": "accepted_field_contract_waiver",
+        "waiver_reason": (
+            "Utility creature activations cover deterministic tutor/token/mana "
+            "conversions; each observed row must expose the activation family "
+            "through concrete score keys before it can feed learning."
+        ),
+        "required_score_key_any_group": [
+            {"treasures_before", "treasures_spent", "candidate_count"},
+            {"activation_cost_generic", "player_land_count", "selected_card"},
+            {"activation_cost_generic", "tokens_created"},
         ],
         "fixture_gate": "field_contract_required_before_observed_learning",
     },

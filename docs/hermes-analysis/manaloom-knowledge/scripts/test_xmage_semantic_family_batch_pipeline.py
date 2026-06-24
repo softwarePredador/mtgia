@@ -5722,6 +5722,119 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_perch_protection_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Perch Protection",
+                        "severity": "high",
+                        "oracle_hash": "perchhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PerchProtection",
+                            "path": "/xmage/PerchProtection.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "CreateTokenEffect",
+                                "ExileSpellEffect",
+                                "GainAbilityControllerEffect",
+                                "LifeTotalCantChangeControllerEffect",
+                                "OneShotEffect",
+                                "PerchProtectionEffect",
+                            ],
+                            "ability_classes": ["GiftAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "composite_resolution",
+                                "battle_model_scope": (
+                                    "create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1"
+                                ),
+                                "instant": True,
+                                "gift_extra_turn": True,
+                                "gift_default_promised": True,
+                                "exiles_self": True,
+                                "_composite_rule_components": [
+                                    {
+                                        "effect": "token_maker",
+                                        "token_count": 4,
+                                        "token_name": "Bird Token",
+                                        "token_subtype": "Bird",
+                                        "token_colors": ["U"],
+                                        "token_power": 2,
+                                        "token_toughness": 2,
+                                        "token_flying": True,
+                                    },
+                                    {
+                                        "effect": "phase_out",
+                                        "gift_required": True,
+                                        "phase_out_all_permanents_you_control": True,
+                                        "phase_out_includes_lands": True,
+                                        "life_total_cant_change": True,
+                                        "protection_from_everything": True,
+                                    },
+                                ],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_sand_scout_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Sand Scout",
+                        "severity": "high",
+                        "oracle_hash": "sandhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SandScout",
+                            "path": "/xmage/SandScout.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenEffect", "SearchLibraryPutInPlayEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldTriggeredAbility",
+                                "PutCardIntoGraveFromAnywhereAllTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": (
+                                    "sand_scout_etb_desert_if_behind_lands_land_graveyard_token_v1"
+                                ),
+                                "power": 2,
+                                "toughness": 2,
+                                "etb_land_ramp_count": 1,
+                                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                                "land_subtypes_any": ["desert"],
+                                "land_enters_tapped": True,
+                                "land_cards_to_your_graveyard_create_token": True,
+                                "land_graveyard_trigger_once_each_turn": True,
+                                "land_graveyard_token_name": "Sand Warrior Token",
+                                "land_graveyard_token_subtype": "Sand Warrior",
+                                "land_graveyard_token_colors": ["R", "G", "W"],
+                                "land_graveyard_token_power": 1,
+                                "land_graveyard_token_toughness": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_snap_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

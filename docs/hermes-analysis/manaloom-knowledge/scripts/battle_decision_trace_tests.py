@@ -60,6 +60,39 @@ def register_tests(battle, replay_auditor):
         assert trace["rejected_option_scores"][0]["score"] == 19.0
         assert replay_auditor.audit_decision_traces(traces) == []
 
+    def test_emit_decision_trace_derives_rejected_scores_from_available_options():
+        traces = []
+        battle.DECISION_TRACE_HANDLER = traces.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            active = battle.Player("Trace Player", None, [])
+            chosen = {"action": "activate_engine", "card": "Engine", "score": 30}
+            fallback = {"action": "reuse_land_mana", "card": "Land", "score": 22}
+            battle.emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=active,
+                turn=4,
+                phase="precombat_main",
+                available_options=[chosen, fallback],
+                chosen_option=chosen,
+                score_components={"activation_cost_generic": 1},
+                rule_source="test",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=30,
+                expected_payoff_reason="activate engine over lower-value mana reuse",
+            )
+        finally:
+            battle.DECISION_TRACE_HANDLER = None
+
+        assert len(traces) == 1
+        trace = traces[0]
+        assert trace["rejected_options"] == [fallback]
+        assert trace["best_rejected_option_score"] == 22.0
+        assert trace["score_gap_vs_best_rejected"] == 8.0
+        assert replay_auditor.audit_decision_traces(traces) == []
+
     def test_decision_trace_auditor_flags_missing_score_and_duplicate_id():
         decisions = [
             {
@@ -249,6 +282,7 @@ def register_tests(battle, replay_auditor):
 
     return [
         test_emit_decision_trace_includes_chosen_option_and_scores,
+        test_emit_decision_trace_derives_rejected_scores_from_available_options,
         test_decision_trace_auditor_flags_missing_score_and_duplicate_id,
         test_decision_trace_auditor_flags_chosen_outside_options,
         test_decision_trace_auditor_flags_missing_comparative_fields_for_multi_option_choice,

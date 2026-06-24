@@ -416,6 +416,32 @@ scope:
    `pass`, and the Lorehold-focused matrix moved it to `battle_ready` /
    `priority_benchmark_candidate`.
 
+`Perch Protection` and `Sand Scout` are the seventh completed proof and the
+first mixed token-family batch that closed two different runtime shapes in one
+PG package:
+
+1. XMage local sources matched `PerchProtection` and `SandScout` directly from
+   `/Users/desenvolvimentomobile/Downloads/mage-master`.
+2. `Perch Protection` is modeled as a composed spell: token creation plus
+   gift-gated phase-out/life-lock/protection, reusing the existing
+   `phase_out` runtime instead of creating a one-off executor.
+3. `Sand Scout` is modeled as a creature, not a token spell: ETB Desert ramp is
+   guarded by `opponent_controls_more_lands`, and the land-card graveyard token
+   trigger stays on the permanent with a once-per-turn limit.
+4. PG192 precheck/apply/postcheck promoted two verified auto rules and
+   deprecated two stale `Perch Protection` shadows.
+5. PG -> Hermes sync made `Perch Protection` pass in decks `609`, `610`,
+   `611`, `613`, `614`, and `615`; `Sand Scout` passes in deck `609`.
+6. The expanded post-sync pipeline moved from `high=322/pass=333` before PG192
+   to `high=320/pass=335` after PG192.
+7. The follow-up battle closure added real stack-targeted `removal_exile`
+   support, derived rejected-option scores for decision traces, accepted
+   compact forensic runtime normalizations, and produced final gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_230939/summary.json`
+   with `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, tests `18/18` pass,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

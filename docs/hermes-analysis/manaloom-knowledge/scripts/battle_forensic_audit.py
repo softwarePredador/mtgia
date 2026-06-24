@@ -43,6 +43,7 @@ SUPPORTED_EFFECTS = {
     "commander",
     "cannot_lose_turn",
     "copy_creature_token",
+    "copy_attached_creature_or_insect",
     "copy_permanent_etb",
     "copy_spell",
     "counter",
@@ -53,6 +54,8 @@ SUPPORTED_EFFECTS = {
     "damage_wipe",
     "damage_wipe_treasure",
     "deal_damage",
+    "dig_to_hand",
+    "direct_damage",
     "dragons_approach",
     "draw_cards",
     "draw_engine",
@@ -82,6 +85,7 @@ SUPPORTED_EFFECTS = {
     "passive",
     "phase_out",
     "phase_creatures",
+    "pile_selection_draw",
     "protect_creature",
     "pump_all",
     "ramp_engine",
@@ -90,6 +94,7 @@ SUPPORTED_EFFECTS = {
     "recursion",
     "redirect_removal",
     "redistribute_life_totals",
+    "removal_exile",
     "remove_artifact_or_3dmg",
     "remove_creature",
     "remove_permanent",
@@ -103,6 +108,7 @@ SUPPORTED_EFFECTS = {
     "topdeck_manipulation",
     "treasure_maker",
     "tutor",
+    "untap_land_engine",
 }
 
 CARD_EVENT_KINDS = {
@@ -333,6 +339,25 @@ def event_has_explicit_oracle_effect_normalization(
     )
 
 
+def event_has_accepted_compact_runtime_normalization(
+    event: dict[str, Any],
+    rule_effect: str,
+) -> bool:
+    runtime_effect = str(event.get("effect") or "")
+    event_kind = str(event.get("event") or "")
+    if event_kind == "land_played" and runtime_effect == "land" and rule_effect in {
+        "ramp_permanent",
+        "treasure_maker",
+    }:
+        return True
+    return (rule_effect, runtime_effect) in {
+        ("bounce", "remove_permanent"),
+        ("modal_spell", "remove_permanent"),
+        ("removal_destroy", "remove_permanent"),
+        ("removal_exile", "remove_creature"),
+    }
+
+
 def accepted_lineage_missing_reason(
     event: dict[str, Any],
     rule: dict[str, Any] | None,
@@ -535,6 +560,10 @@ def audit_rule_provenance(
                 and not is_trigger_effect
                 and not is_composite_effect
                 and not event_has_explicit_oracle_effect_normalization(
+                    event,
+                    rule_effect,
+                )
+                and not event_has_accepted_compact_runtime_normalization(
                     event,
                     rule_effect,
                 )

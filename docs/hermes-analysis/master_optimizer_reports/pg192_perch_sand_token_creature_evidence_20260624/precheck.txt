@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------------+------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Perch Protection | perch protection | 071dda7526fa44bf0c7a64079c454d96 | battle_rule_v1:20683e46e0165b27840cb086f902c649 |                1 | 130b8ccf-ae9f-42a7-a937-4985545f8d28 |                  2 |                         0 |                           2
+ Sand Scout       | sand scout       | 5b433ca71a358a2826c5aff65783f004 | battle_rule_v1:d25329373e747c6a62963a0acf6b606f |                1 | 25db098b-4383-455a-8306-bb6697896268 |                  0 |                         0 |                           0
+(2 rows)

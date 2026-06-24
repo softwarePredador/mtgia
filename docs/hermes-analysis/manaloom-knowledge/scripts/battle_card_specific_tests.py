@@ -864,6 +864,191 @@ def register_tests(battle, player):
         assert phase_event["rule_logical_key"] == "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a"
         assert phase_event["rule_oracle_hash"] == "bdc0faecf4420dc6162c7e72e98cc0eb"
 
+    def test_pg192_perch_protection_creates_birds_then_phases_everything_and_exiles_self():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            creature = {
+                "name": "Monastery Mentor",
+                "cmc": 3,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            land = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            active.battlefield = [creature, land]
+            perch = {"name": "Perch Protection", "cmc": 6, "type_line": "Instant"}
+            effect_data = {
+                "effect": "composite_resolution",
+                "battle_model_scope": "create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1",
+                "instant": True,
+                "gift_extra_turn": True,
+                "gift_default_promised": True,
+                "exiles_self": True,
+                "_rule_logical_key": "battle_rule_v1:pg192_perch",
+                "_rule_oracle_hash": "071dda7526fa44bf0c7a64079c454d96",
+                "_composite_rule_components": [
+                    {
+                        "effect": "token_maker",
+                        "token_count": 4,
+                        "token_name": "Bird Token",
+                        "token_subtype": "Bird",
+                        "token_colors": ["U"],
+                        "token_power": 2,
+                        "token_toughness": 2,
+                        "token_flying": True,
+                    },
+                    {
+                        "effect": "phase_out",
+                        "gift_required": True,
+                        "phase_out_all_permanents_you_control": True,
+                        "phase_out_includes_lands": True,
+                        "life_total_cant_change": True,
+                        "protection_from_everything": True,
+                    },
+                ],
+            }
+            battle.apply_effect_immediate(
+                active,
+                [],
+                perch,
+                turn=8,
+                rng=random.Random(19201),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.battlefield == []
+        assert creature in active.phased_out
+        assert land in active.phased_out
+        bird_tokens = [
+            permanent
+            for permanent in active.phased_out
+            if isinstance(permanent, dict) and permanent.get("name") == "Bird Token"
+        ]
+        assert len(bird_tokens) == 4
+        assert all(token.get("flying") is True and token.get("colors") == ["U"] for token in bird_tokens)
+        assert active.life_cant_change is True
+        assert active.protection_from_everything is True
+        assert perch in active.exile
+        assert any(
+            event == "composite_rule_resolved"
+            and data.get("card") == "Perch Protection"
+            and data.get("components_applied") == 2
+            for event, data in events
+        )
+        assert any(
+            event == "phase_out_resolved"
+            and data.get("card") == "Perch Protection"
+            and data.get("phased_count") == 6
+            and data.get("life_total_cant_change") is True
+            for event, data in events
+        )
+
+    def test_pg192_sand_scout_tutors_desert_when_behind_and_creates_one_sand_warrior_per_turn():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {"name": "Plains", "type_line": "Basic Land - Plains", "effect": "land"}
+            ]
+            opponent.battlefield = [
+                {"name": "Island", "type_line": "Basic Land - Island", "effect": "land"},
+                {"name": "Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+            ]
+            active.library = [
+                {"name": "Sunscorched Desert", "type_line": "Land - Desert", "effect": "land"},
+                {"name": "Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+            ]
+            sand_scout = {"name": "Sand Scout", "cmc": 2, "type_line": "Creature - Human Scout"}
+            effect_data = {
+                "effect": "creature",
+                "battle_model_scope": "sand_scout_etb_desert_if_behind_lands_land_graveyard_token_v1",
+                "power": 2,
+                "toughness": 2,
+                "etb_land_ramp_count": 1,
+                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                "land_subtypes_any": ["desert"],
+                "land_enters_tapped": True,
+                "land_cards_to_your_graveyard_create_token": True,
+                "land_graveyard_trigger_once_each_turn": True,
+                "land_graveyard_token_name": "Sand Warrior Token",
+                "land_graveyard_token_subtype": "Sand Warrior",
+                "land_graveyard_token_colors": ["R", "G", "W"],
+                "land_graveyard_token_power": 1,
+                "land_graveyard_token_toughness": 1,
+                "_rule_logical_key": "battle_rule_v1:pg192_sand",
+                "_rule_oracle_hash": "5b433ca71a358a2826c5aff65783f004",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                sand_scout,
+                turn=4,
+                rng=random.Random(19202),
+                effect_data_override=effect_data,
+            )
+            scout_permanent = next(
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict) and permanent.get("name") == "Sand Scout"
+            )
+            grave_land_1 = {"name": "Forgotten Cave", "type_line": "Land", "effect": "land"}
+            grave_land_2 = {"name": "Secluded Steppe", "type_line": "Land", "effect": "land"}
+            battle.resolve_land_cards_enter_graveyard_triggers(
+                active,
+                [grave_land_1],
+                turn=4,
+                source_event="test_land_graveyard",
+            )
+            battle.resolve_land_cards_enter_graveyard_triggers(
+                active,
+                [grave_land_2],
+                turn=4,
+                source_event="test_land_graveyard",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert scout_permanent["power"] == 2
+        desert = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Sunscorched Desert"
+        )
+        assert desert.get("tapped") is True
+        sand_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Sand Warrior Token"
+        ]
+        assert len(sand_tokens) == 1
+        assert sand_tokens[0]["colors"] == ["R", "G", "W"]
+        assert any(
+            event == "land_ramp_resolved"
+            and data.get("card") == "Sand Scout"
+            and data.get("found") == ["Sunscorched Desert"]
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_skipped"
+            and data.get("card") == "Sand Scout"
+            and data.get("reason") == "once_each_turn_limit"
+            for event, data in events
+        )
+
     def test_reverberate_copies_stack_spell_with_pg038_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -5449,6 +5634,58 @@ def register_tests(battle, player):
         assert counter_event["target"] == "Blue Threat"
         assert counter_event["rule_logical_key"] == "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
         assert counter_event["rule_oracle_hash"] == "ecf9ad1f393a664f16867aab8a6edf77"
+
+    def test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard():
+        active = player("Active")
+        responder = player("Responder")
+        threat = {
+            "name": "Worldfire",
+            "cmc": 6,
+            "type_line": "Sorcery",
+        }
+        threat_effect = {"effect": "worldfire_reset"}
+        trap = {
+            "name": "Mindbreak Trap",
+            "cmc": 4,
+            "type_line": "Instant — Trap",
+        }
+        trap_effect = battle.get_card_effect(trap)
+        assert trap_effect["effect"] == "removal_exile"
+        assert trap_effect["target_constraints"]["zone"] == "stack"
+        assert battle.should_hold_for_response_window(responder, trap, trap_effect, "precombat_main")
+
+        responder.hand = [trap]
+        responder.mana_pool.add("blue", 2)
+        responder.mana_pool.add_generic(2)
+        stack = battle.Stack()
+        stack.push(threat, active, threat_effect)
+
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            acted = battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                4,
+                random.Random(1104),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert acted
+        assert stack.empty()
+        assert threat in active.exile
+        assert threat not in active.graveyard
+        assert trap in responder.graveyard
+        exile_event = next(data for event, data in events if event == "spell_exiled_from_stack")
+        assert exile_event["card"] == "Mindbreak Trap"
+        assert exile_event["exiled_spell"] == "Worldfire"
+        assert exile_event["target_type"] == "spell_on_stack"
+        assert exile_event["destination"] == "exile"
+        assert not any(event == "spell_countered" for event, _ in events)
 
     def test_pg086_counter_target_filter_respects_uncounterable_static_shield():
         active = player("Active")
@@ -13354,6 +13591,8 @@ def register_tests(battle, player):
         test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance,
         test_pg096_high_noon_is_passive_static_rule_not_creature_removal,
         test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,
+        test_pg192_perch_protection_creates_birds_then_phases_everything_and_exiles_self,
+        test_pg192_sand_scout_tutors_desert_when_behind_and_creates_one_sand_warrior_per_turn,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,
         test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance,
@@ -13570,6 +13809,7 @@ def register_tests(battle, player):
         test_pg151_magda_tapped_dwarf_creates_treasure,
         test_pg151_magda_sacrifices_five_treasures_to_tutor_valid_target,
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
+        test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,

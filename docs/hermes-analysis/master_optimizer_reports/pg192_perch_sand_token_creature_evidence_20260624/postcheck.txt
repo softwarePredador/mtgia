@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Perch Protection | perch protection | battle_rule_v1:20683e46e0165b27840cb086f902c649 |                  1 |                           1 |                         1 |           2
+ Sand Scout       | sand scout       | battle_rule_v1:d25329373e747c6a62963a0acf6b606f |                  1 |                           1 |                         1 |           2
+(2 rows)

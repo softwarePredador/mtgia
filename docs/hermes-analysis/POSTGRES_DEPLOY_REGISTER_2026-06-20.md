@@ -10914,3 +10914,127 @@ Register decision:
   (`runtime_needed`), `Sun Titan` (`split_scope`), and
   `Glint-Horn Buccaneer` (`split_scope`).
 - Next package number is PG192.
+
+## PG192 - Perch Protection / Sand Scout token and creature scopes
+
+Timestamp: 2026-06-24 19:16 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes two Lorehold cards from the current expanded deck set:
+  `Perch Protection` and `Sand Scout`.
+- Replaces two stale generated `Perch Protection` shadows and inserts the
+  first trusted `Sand Scout` rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rules:
+
+- `Perch Protection`:
+  `battle_rule_v1:20683e46e0165b27840cb086f902c649`,
+  `oracle_hash=071dda7526fa44bf0c7a64079c454d96`,
+  `effect=composite_resolution`,
+  `battle_model_scope=create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1`.
+- `Sand Scout`:
+  `battle_rule_v1:d25329373e747c6a62963a0acf6b606f`,
+  `oracle_hash=5b433ca71a358a2826c5aff65783f004`,
+  `effect=creature`,
+  `battle_model_scope=sand_scout_etb_desert_if_behind_lands_land_graveyard_token_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps `PerchProtection` as a composed spell: four 2/2 blue flying
+  Bird tokens, gift-extra-turn annotation, gift-gated phase out of all
+  controller permanents including lands, life-total lock, protection from
+  everything, and self-exile.
+- Composite battle resolution now supports `phase_out` components without
+  moving the source spell twice.
+- XMage hint maps `SandScout` as a 2/2 creature with ETB tapped-Desert ramp
+  only while an opponent controls more lands, plus a once-per-turn land-card
+  graveyard token trigger.
+- Battle runtime now handles land-card-to-your-graveyard token triggers for
+  the central permanent move path, land-sacrifice costs, activated land tutors,
+  and mill paths used by existing land-recursion models.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg192_perch_sand_token_creature_package_20260624_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg192_perch_sand_token_creature_package_20260624_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg192_perch_sand_token_creature_package_20260624_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg192_perch_sand_token_creature_package_20260624_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg192_perch_sand_token_creature_package_20260624_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `Perch Protection target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`;
+  `Sand Scout target_card_rows=1`, `existing_rule_rows=0`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=0`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  both target rules report `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, `promoted_oracle_hash_rows=1`,
+  `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg192_perch_sand_20260624.json`;
+  `selected_card_count=2`, `pg_rows_loaded=4`,
+  `sqlite_inserted_or_updated=4`, `canonical_snapshot_rows_exported=3240`.
+- SQLite verification:
+  local cache has two deprecated `Perch Protection` shadows, one active
+  verified/auto `Perch Protection` composite rule, and one active verified/auto
+  `Sand Scout` creature rule.
+- Tests:
+  mapper tests ran `172` tests OK; classifier tests ran `158` tests OK;
+  `battle_card_specific_tests.py` passed including
+  `test_pg192_perch_protection_creates_birds_then_phases_everything_and_exiles_self`
+  and
+  `test_pg192_sand_scout_tutors_desert_when_behind_and_creates_one_sand_warrior_per_turn`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_manifest.json`;
+  expanded scope severity moved to `high=320`, `medium=54`, `pass=335`.
+- Lorehold-focused post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg192_perch_sand_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=355`,
+  `needs_rule_before_strategy=225`, `runtime_needed=19`,
+  `mapper_manual=145`, `split_scope=57`.
+- Affected deck audits:
+  `Perch Protection` is `pass/coherent_for_current_gate` in decks `609`,
+  `610`, `611`, `613`, `614`, and `615`;
+  `Sand Scout` is `pass/coherent_for_current_gate` in deck `609`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_230939/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, tests `18/18` pass,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `event_contract_static_status=event_contract_static_ready`.
+- Runtime audit closure:
+  added stack-targeted `removal_exile` support for effects such as
+  `Mindbreak Trap`, derived rejected-option scores for multi-option decision
+  traces without explicit rejected options, and accepted compact forensic
+  normalizations for already-modeled runtime surfaces such as fetchlands as
+  `land`, modal removal as `remove_permanent`, and creature exile as
+  `remove_creature`.
+
+Register decision:
+
+- PG192 is applied, postchecked, synced, locally tested, and deck-coherence
+  validated for the affected cards.
+- PG192 follow-up runtime/audit closure is complete; latest full 16-seed gate
+  is trusted for strategy learning.
+- Do not reuse PG192.
+- Continue next with the remaining Lorehold `needs_rule_before_strategy`
+  cards. Current top items after PG192 are `Sun Titan`, `Glint-Horn Buccaneer`,
+  `Taii Wakeen, Perfect Shot`, `Deflecting Palm`,
+  `Primal Amulet // Primal Wellspring`, and `Squee, Goblin Nabob`.
+- Next package number is PG193.

@@ -45,14 +45,20 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "graveyard_flashback_grant" in audit.SUPPORTED_EFFECTS
     assert "hand_filter" in audit.SUPPORTED_EFFECTS
     assert "copy_creature_token" in audit.SUPPORTED_EFFECTS
+    assert "copy_attached_creature_or_insect" in audit.SUPPORTED_EFFECTS
     assert "copy_permanent_etb" in audit.SUPPORTED_EFFECTS
     assert "create_treasure" in audit.SUPPORTED_EFFECTS
+    assert "dig_to_hand" in audit.SUPPORTED_EFFECTS
+    assert "direct_damage" in audit.SUPPORTED_EFFECTS
     assert "land_tax" in audit.SUPPORTED_EFFECTS
     assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
     assert "exile_top_nonland_free_cast" in audit.SUPPORTED_EFFECTS
     assert "redistribute_life_totals" in audit.SUPPORTED_EFFECTS
+    assert "removal_exile" in audit.SUPPORTED_EFFECTS
+    assert "pile_selection_draw" in audit.SUPPORTED_EFFECTS
     assert "static_cost_reduction" in audit.SUPPORTED_EFFECTS
     assert "thassa_oracle" in audit.SUPPORTED_EFFECTS
+    assert "untap_land_engine" in audit.SUPPORTED_EFFECTS
 
 
 def test_rise_of_the_eldrazi_uses_composite_oracle_runtime():
@@ -791,6 +797,65 @@ def test_forensic_accepts_explicit_oracle_effect_normalization():
     assert summary["by_effect"]["remove_creature"] == 1
 
 
+def test_forensic_accepts_compact_runtime_effect_normalizations():
+    events = [
+        {
+            "event": "land_played",
+            "card": "Polluted Delta",
+            "effect": "land",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "rule_logical_key": "battle_rule_v1:fetchland",
+            "turn": 1,
+        },
+        {
+            "event": "spell_resolved",
+            "card": "Eldrazi Confluence",
+            "effect": "remove_permanent",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "rule_logical_key": "battle_rule_v1:eldrazi-confluence",
+            "turn": 4,
+        },
+        {
+            "event": "spell_resolved",
+            "card": "Deadly Rollick",
+            "effect": "remove_creature",
+            "rule_source": "curated",
+            "rule_review_status": "verified",
+            "rule_logical_key": "battle_rule_v1:deadly-rollick",
+            "turn": 5,
+        },
+    ]
+    rules = {
+        "polluted delta": {
+            "effect_json": {"effect": "ramp_permanent"},
+            "source": "curated",
+            "review_status": "verified",
+            "logical_rule_key": "battle_rule_v1:fetchland",
+        },
+        "eldrazi confluence": {
+            "effect_json": {"effect": "modal_spell"},
+            "source": "curated",
+            "review_status": "verified",
+            "logical_rule_key": "battle_rule_v1:eldrazi-confluence",
+        },
+        "deadly rollick": {
+            "effect_json": {"effect": "removal_exile"},
+            "source": "curated",
+            "review_status": "verified",
+            "logical_rule_key": "battle_rule_v1:deadly-rollick",
+        },
+    }
+
+    findings, summary = audit.audit_rule_provenance(events, rules)
+
+    assert findings == []
+    assert summary["by_effect"]["land"] == 1
+    assert summary["by_effect"]["remove_permanent"] == 1
+    assert summary["by_effect"]["remove_creature"] == 1
+
+
 def test_forensic_reconciles_front_face_event_by_logical_rule_key():
     events = [
         {
@@ -929,6 +994,7 @@ if __name__ == "__main__":
         test_forensic_accepts_composite_runtime_over_primary_registry_effect,
         test_oracle_normalized_creature_bounce_marks_effect_override,
         test_forensic_accepts_explicit_oracle_effect_normalization,
+        test_forensic_accepts_compact_runtime_effect_normalizations,
         test_forensic_reconciles_front_face_event_by_logical_rule_key,
         test_forensic_accepts_brainstone_first_draw_miracle_candidate,
         test_forensic_blocks_non_first_draw_miracle_without_brainstone_marker,

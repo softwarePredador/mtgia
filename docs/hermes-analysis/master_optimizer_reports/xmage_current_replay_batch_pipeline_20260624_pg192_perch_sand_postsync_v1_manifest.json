@@ -1,0 +1,256 @@
+{
+  "aggregate_scope": {
+    "artifact_deck_ids": [
+      6
+    ],
+    "effective_deck_ids": [
+      6,
+      58,
+      74,
+      105,
+      606,
+      607,
+      608,
+      609,
+      610,
+      611,
+      612,
+      613,
+      614,
+      615,
+      616,
+      617,
+      618,
+      619
+    ],
+    "forced_include_deck_ids": [
+      6,
+      58,
+      74,
+      105,
+      606,
+      607,
+      608,
+      609,
+      610,
+      611,
+      612,
+      613,
+      614,
+      615,
+      616,
+      617,
+      618,
+      619
+    ],
+    "learned_deck_ids": [
+      58,
+      74,
+      105
+    ]
+  },
+  "battle_artifact_dir": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_193554",
+  "combined_coherence": {
+    "severity_counts": {
+      "high": 320,
+      "medium": 54,
+      "pass": 335
+    },
+    "total_cards": 709
+  },
+  "deck_targets": {
+    "artifact_dir": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_193554",
+    "deck_ids": [
+      6
+    ],
+    "generated_at": "2026-06-24T22:17:28+00:00",
+    "learned_deck_ids": [
+      58,
+      74,
+      105
+    ],
+    "seed_map": {
+      "seed_63250530": [
+        "deck_id:6",
+        "learned_deck:105",
+        "learned_deck:58",
+        "learned_deck:74"
+      ]
+    },
+    "source_names": {
+      "deck_id:6": "Lorehold",
+      "learned_deck:105": "Etali, Primal Conqueror #105 (real)",
+      "learned_deck:58": "Thrasios, Triton Hero #58 (real)",
+      "learned_deck:74": "Dargo, the Shipwrecker #74 (real)"
+    }
+  },
+  "family_report": {
+    "summary": {
+      "batch_metadata_candidate_count": 0,
+      "card_count": 361,
+      "family_count": 8,
+      "family_counts": {
+        "board_wipe_choice": 4,
+        "creature": 4,
+        "manual_model": 263,
+        "mill_spell": 1,
+        "static_cost_reducer": 2,
+        "targeted_interaction": 64,
+        "token_maker": 19,
+        "tutor": 4
+      },
+      "manual_or_blocked_count": 339,
+      "promotion_lane_counts": {
+        "blocked_missing_xmage_source": 4,
+        "mapper_metadata_or_test_scenario_required": 260,
+        "runtime_family_implementation_required": 22,
+        "split_family_scope_review_required": 75
+      },
+      "runtime_family_required_count": 22
+    }
+  },
+  "files": {
+    "combined_coherence_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_combined_coherence.json",
+    "combined_coherence_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_combined_coherence.md",
+    "families_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_families.json",
+    "families_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_families.md",
+    "manifest_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_manifest.json",
+    "manifest_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_manifest.md",
+    "pattern_registry_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_pattern_registry.json",
+    "pattern_registry_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_pattern_registry.md",
+    "proposals_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_proposals.json",
+    "proposals_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_proposals.md",
+    "validity_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_validity.json",
+    "validity_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_validity.md",
+    "xmage_index_json": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_xmage_index.json",
+    "xmage_index_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg192_perch_sand_postsync_v1_xmage_index.md"
+  },
+  "generated_at": "2026-06-24T22:17:28+00:00",
+  "materialization": [
+    {
+      "apply": true,
+      "commander": "Thrasios, Triton Hero",
+      "deck_name": "Thrasios, Triton Hero + Vial Smasher the Fierce",
+      "filled_basic": 0,
+      "learned_deck_id": 58,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 58
+    },
+    {
+      "apply": true,
+      "commander": "Dargo, the Shipwrecker",
+      "deck_name": "Dargo, the Shipwrecker + Tymna the Weaver",
+      "filled_basic": 0,
+      "learned_deck_id": 74,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 74
+    },
+    {
+      "apply": true,
+      "commander": "Etali, Primal Conqueror",
+      "deck_name": "Etali, Primal Conqueror",
+      "filled_basic": 0,
+      "learned_deck_id": 105,
+      "oracle_rows": 100,
+      "quantity": 100,
+      "rows": 100,
+      "source_main_quantity": 99,
+      "source_total_with_commander": 100,
+      "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "target_deck_id": 105
+    }
+  ],
+  "pattern_registry": {
+    "registry_contract": {
+      "consumer_boundary": "Patterns are advisory and must not be joined directly into deck-card consumers.",
+      "kind": "shadow_pattern_registry",
+      "postgresql_source_of_truth_table": "card_battle_rules",
+      "promotion_status": "shadow_only"
+    },
+    "summary": {
+      "auto_promotable_pattern_count": 0,
+      "card_counts_by_pattern_status": {
+        "blocked_missing_xmage_source": 4,
+        "candidate_template_requires_review_tests": 9,
+        "fragmented_runtime_observation_only": 18,
+        "manual_model_observation_only": 260,
+        "requires_subpattern_split_before_promotion": 66,
+        "runtime_template_candidate_requires_executor_tests": 4
+      },
+      "executable_pattern_count": 0,
+      "lane_counts": {
+        "blocked_missing_xmage_source": 4,
+        "manual_mapper_backlog": 260,
+        "runtime_family_backlog": 22,
+        "split_scope_backlog": 75
+      },
+      "pattern_count": 42,
+      "pattern_status_counts": {
+        "blocked_missing_xmage_source": 1,
+        "candidate_template_requires_review_tests": 9,
+        "fragmented_runtime_observation_only": 18,
+        "manual_model_observation_only": 2,
+        "requires_subpattern_split_before_promotion": 10,
+        "runtime_template_candidate_requires_executor_tests": 2
+      },
+      "promotion_status": "shadow_only",
+      "proposal_count": 361
+    }
+  },
+  "proposal_report": {
+    "summary": {
+      "blocked_missing_xmage_source_count": 4,
+      "family_counts": {
+        "board_wipe_choice": 4,
+        "creature": 4,
+        "manual_model": 263,
+        "mill_spell": 1,
+        "static_cost_reducer": 2,
+        "targeted_interaction": 64,
+        "token_maker": 19,
+        "tutor": 4
+      },
+      "proposal_count": 361,
+      "proposal_status_counts": {
+        "blocked_missing_xmage_source": 4,
+        "mapper_metadata_or_test_scenario_required": 260,
+        "runtime_family_implementation_required": 22,
+        "split_family_scope_review_required": 75
+      },
+      "runtime_family_required_count": 22,
+      "safe_for_batch_pg_package_count": 0
+    }
+  },
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "validity_audit": {
+    "summary": {
+      "audited_card_count": 361,
+      "exact_xmage_found_count": 357,
+      "focused_test_scenario_ready_count": 357,
+      "missing_xmage_class_count": 4,
+      "ready_for_structured_pull_count": 97,
+      "severity_counts": {
+        "high": 320,
+        "medium": 41
+      },
+      "status_counts": {
+        "blocked_missing_xmage_class": 4,
+        "ready_for_structured_xmage_pull_review_required": 97,
+        "xmage_source_found_metadata_mismatch": 1,
+        "xmage_source_valid_mapper_required": 259
+      },
+      "valid_xmage_source_count": 356
+    }
+  },
+  "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"
+}

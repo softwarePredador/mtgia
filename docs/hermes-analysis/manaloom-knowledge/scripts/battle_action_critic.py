@@ -38,6 +38,7 @@ ACTION_EVENTS = {
     "replacement_applied",
     "spell_cast",
     "spell_countered",
+    "spell_exiled_from_stack",
     "spell_resolved",
     "trigger_put_on_stack",
     "trigger_resolved",
@@ -63,6 +64,7 @@ CARD_ACTION_EVENTS = {
     "spell_cast",
     "spell_resolved",
     "spell_countered",
+    "spell_exiled_from_stack",
     "redirect_removal_resolved",
 }
 
@@ -229,6 +231,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "discard-hand-then-draw resolution is card-flow evidence consumed by replay/strategy context.",
     ),
+    "dig_to_hand_resolved": (
+        "strategy_signal",
+        "look-at-top-cards selection resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
     "top_nonland_free_cast": (
         "strategy_signal",
         "free cast of the revealed exiled nonland card is represented by spell_cast/spell_resolved ledger events.",
@@ -248,6 +254,38 @@ EVENT_CONTRACT_OVERRIDES = {
     "end_step_token_death_draw_resolved": (
         "technical",
         "token death-trigger draw ledger after scheduled end-step cleanup.",
+    ),
+    "class_level_gained": (
+        "strategy_signal",
+        "class level activation is represented in replay state and decision context.",
+    ),
+    "class_level_trigger_resolved": (
+        "strategy_signal",
+        "class level trigger resolution is card-flow evidence consumed by replay/strategy context.",
+    ),
+    "class_level_trigger_skipped": (
+        "ignored_with_reason",
+        "class level trigger was considered but skipped because no legal effect remained.",
+    ),
+    "discard_modal_trigger_resolved": (
+        "strategy_signal",
+        "discard-trigger modal resolution changes card/resource/life context for replay checks.",
+    ),
+    "etb_land_ramp_skipped": (
+        "ignored_with_reason",
+        "enter-the-battlefield land ramp was considered but skipped because its condition failed.",
+    ),
+    "etb_recursion_resolved": (
+        "strategy_signal",
+        "enter-the-battlefield recursion resolution is card-flow evidence consumed by replay context.",
+    ),
+    "etb_removal_resolved": (
+        "strategy_signal",
+        "enter-the-battlefield removal resolution is board-state evidence consumed by replay checks.",
+    ),
+    "etb_removal_skipped": (
+        "ignored_with_reason",
+        "enter-the-battlefield removal was considered but skipped because no legal target existed.",
     ),
     "etb_tutor_resolved": (
         "strategy_signal",
@@ -320,6 +358,14 @@ EVENT_CONTRACT_OVERRIDES = {
     "imprint_resolved": (
         "strategy_signal",
         "imprint resolution is resource-context evidence for later cast decisions.",
+    ),
+    "invoke_calamity_free_cast": (
+        "strategy_signal",
+        "Invoke Calamity free-cast signal is represented by spell_cast/spell_resolved ledger events.",
+    ),
+    "invoke_calamity_resolved": (
+        "strategy_signal",
+        "Invoke Calamity aggregate resolution is recursion/free-cast outcome context.",
     ),
     "instant_removal": (
         "forensic_card_event",
@@ -401,6 +447,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "Boros Charm modal resolution is protection/damage context for replay checks.",
     ),
+    "modal_spell_resolved": (
+        "strategy_signal",
+        "modal spell resolution is effect evidence consumed by replay/strategy context.",
+    ),
     "multikicker_paid": (
         "technical",
         "kicker payment ledger detail; primary cast remains the audited action.",
@@ -408,6 +458,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "paradigm_exiled": (
         "renderer_only",
         "library/exile state transition for Paradigm Shift-style effects.",
+    ),
+    "pile_selection_draw_resolved": (
+        "strategy_signal",
+        "Fact-or-Fiction style pile selection is card-flow evidence consumed by replay/strategy context.",
     ),
     "permanent_moved_by_sba": (
         "ignored_with_reason",
@@ -433,6 +487,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "renderer_only",
         "copy setup state evidence for later replay resolution.",
     ),
+    "powerbalance_trigger_resolved": (
+        "strategy_signal",
+        "Powerbalance trigger resolution is topdeck/free-cast context for replay checks.",
+    ),
     "protection_resolved": (
         "strategy_signal",
         "protection effect resolution is consumed by replay/forensic checks.",
@@ -445,9 +503,29 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "Gamble-style random discard after tutor changes card-flow/resource context.",
     ),
+    "rebound_cast": (
+        "strategy_signal",
+        "rebound recast is represented in stack/cast context and human replay.",
+    ),
+    "rebound_exiled": (
+        "technical",
+        "rebound replacement-zone ledger after a tracked spell resolves.",
+    ),
+    "rebound_skipped": (
+        "ignored_with_reason",
+        "rebound permission was checked and intentionally skipped with reason metadata.",
+    ),
     "removal_countered_by_ward": (
         "strategy_signal",
         "ward counter result is stack/interaction context for replay checks.",
+    ),
+    "replacement_exiled_on_resolution": (
+        "technical",
+        "replacement exile zone movement after spell resolution.",
+    ),
+    "spell_exiled_from_stack": (
+        "strategy_signal",
+        "stack-targeted exile interaction resolved; spell_cast and target fields carry legality context.",
     ),
     "ripple_trigger_resolved": (
         "strategy_signal",
@@ -481,6 +559,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "technical",
         "copied spell cleanup after stack resolution.",
     ),
+    "spell_shuffled_into_library_on_resolution": (
+        "strategy_signal",
+        "self-shuffle on resolution changes library/card-flow context for replay checks.",
+    ),
     "static_enter_tapped_applied": (
         "technical",
         "static tapped-entry replacement was applied during zone movement.",
@@ -488,6 +570,14 @@ EVENT_CONTRACT_OVERRIDES = {
     "station_activated": (
         "strategy_signal",
         "station activation is represented in replay state and decision context.",
+    ),
+    "steal_all_creatures_resolved": (
+        "strategy_signal",
+        "mass creature-control resolution changes board and damage context for replay checks.",
+    ),
+    "surge_to_victory_resolved": (
+        "strategy_signal",
+        "Surge to Victory resolution creates delayed combat/free-cast context for replay checks.",
     ),
     "thassa_oracle_resolved": (
         "strategy_signal",
@@ -497,6 +587,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "renderer_only",
         "token zone cleanup state evidence.",
     ),
+    "tokens_created": (
+        "renderer_only",
+        "token creation is rendered as board-state evidence, not a standalone action verdict.",
+    ),
     "topdeck_manipulation_activated": (
         "strategy_signal",
         "topdeck manipulation is represented in decision trace score components.",
@@ -504,6 +598,10 @@ EVENT_CONTRACT_OVERRIDES = {
     "treasure_created": (
         "renderer_only",
         "token/resource state evidence, not a standalone action verdict.",
+    ),
+    "tutor_life_loss_resolved": (
+        "strategy_signal",
+        "tutor life-loss rider changes life total context for replay and strategy checks.",
     ),
     "trigger_skipped": (
         "ignored_with_reason",

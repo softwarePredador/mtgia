@@ -59,6 +59,8 @@ def test_known_field_contract_waivers_are_not_generic_only_gaps():
             engine,
             [
                 "utility_artifact_activation",
+                "utility_creature_activation",
+                "activated_self_counter_growth",
                 "lorehold_upkeep_rummage",
                 "saga_chapter_resolution",
             ],
@@ -69,6 +71,23 @@ def test_known_field_contract_waivers_are_not_generic_only_gaps():
                 base_decision(
                     "utility_artifact_activation",
                     {"activation_cost_generic": 1, "cards_drawn": 1},
+                ),
+                base_decision(
+                    "utility_creature_activation",
+                    {
+                        "activation_cost_generic": 2,
+                        "player_land_count": 3,
+                        "selected_card": "Plains",
+                    },
+                ),
+                base_decision(
+                    "activated_self_counter_growth",
+                    {
+                        "counter_gain": 1,
+                        "sacrificed": "Servo Token",
+                        "outlet_power_after": 3,
+                        "outlet_toughness_after": 3,
+                    },
                 ),
                 base_decision(
                     "lorehold_upkeep_rummage",

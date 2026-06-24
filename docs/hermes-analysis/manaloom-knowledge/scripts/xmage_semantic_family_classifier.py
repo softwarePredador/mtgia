@@ -148,7 +148,7 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
     "token_maker": {
-        "effects": {"token_maker"},
+        "effects": {"token_maker", "composite_resolution"},
         "support_status": "runtime_family_required",
         "implementation_unit": "token creation with stats, abilities, duration, and zone cleanup",
         "family_tests": [],
@@ -590,6 +590,43 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("draw_then_discard") or 0) == 1
         )
 
+    if (
+        effect == "composite_resolution"
+        and scope == "create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1"
+    ):
+        components = effect_json.get("_composite_rule_components") or []
+        token_component = next(
+            (component for component in components if component.get("effect") == "token_maker"),
+            {},
+        )
+        phase_component = next(
+            (component for component in components if component.get("effect") == "phase_out"),
+            {},
+        )
+        return (
+            types == {"INSTANT"}
+            and "GiftAbility" in ability_classes
+            and {
+                "CreateTokenEffect",
+                "ExileSpellEffect",
+                "LifeTotalCantChangeControllerEffect",
+                "GainAbilityControllerEffect",
+            }.issubset(effect_classes)
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("gift_extra_turn"))
+            and bool(effect_json.get("gift_default_promised"))
+            and bool(effect_json.get("exiles_self"))
+            and int(token_component.get("token_count") or 0) == 4
+            and token_component.get("token_name") == "Bird Token"
+            and token_component.get("token_colors") == ["U"]
+            and bool(token_component.get("token_flying"))
+            and bool(phase_component.get("gift_required"))
+            and bool(phase_component.get("phase_out_all_permanents_you_control"))
+            and bool(phase_component.get("phase_out_includes_lands"))
+            and bool(phase_component.get("life_total_cant_change"))
+            and bool(phase_component.get("protection_from_everything"))
+        )
+
     if effect == "counter_spell" and scope == "counter_spell_costs_one_less_if_control_wizard_v1":
         return (
             types == {"INSTANT"}
@@ -866,6 +903,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("activation_condition") == "opponent_controls_more_lands"
             and effect_json.get("tutor_target") == "land"
             and effect_json.get("tutor_destination") == "hand"
+        )
+
+    if effect == "creature" and scope == "sand_scout_etb_desert_if_behind_lands_land_graveyard_token_v1":
+        return (
+            types == {"CREATURE"}
+            and {"SearchLibraryPutInPlayEffect", "CreateTokenEffect"}.issubset(effect_classes)
+            and {
+                "EntersBattlefieldTriggeredAbility",
+                "PutCardIntoGraveFromAnywhereAllTriggeredAbility",
+            }.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and int(effect_json.get("etb_land_ramp_count") or 0) == 1
+            and effect_json.get("etb_land_ramp_condition") == "opponent_controls_more_lands"
+            and effect_json.get("land_subtypes_any") == ["desert"]
+            and bool(effect_json.get("land_enters_tapped"))
+            and bool(effect_json.get("land_cards_to_your_graveyard_create_token"))
+            and bool(effect_json.get("land_graveyard_trigger_once_each_turn"))
+            and effect_json.get("land_graveyard_token_name") == "Sand Warrior Token"
+            and effect_json.get("land_graveyard_token_subtype") == "Sand Warrior"
+            and effect_json.get("land_graveyard_token_colors") == ["R", "G", "W"]
+            and int(effect_json.get("land_graveyard_token_power") or 0) == 1
+            and int(effect_json.get("land_graveyard_token_toughness") or 0) == 1
         )
 
     if effect == "creature" and scope == "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1":

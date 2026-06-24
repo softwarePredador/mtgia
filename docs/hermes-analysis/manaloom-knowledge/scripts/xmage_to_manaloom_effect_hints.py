@@ -2520,6 +2520,99 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"INSTANT"}
+        and "GiftAbility" in ability_classes
+        and {
+            "CreateTokenEffect",
+            "ExileSpellEffect",
+            "LifeTotalCantChangeControllerEffect",
+            "GainAbilityControllerEffect",
+        }.issubset(effect_classes)
+        and "swansongbirdtoken" in normalized
+        and (
+            "ProtectionFromEverythingAbility" in ability_classes
+            or "protectionfromeverythingability" in normalized
+        )
+    ):
+        return {
+            "effect": "composite_resolution",
+            "scope": "create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1",
+            "fields": {
+                "instant": True,
+                "gift_extra_turn": True,
+                "gift_default_promised": True,
+                "exiles_self": True,
+                "_composite_rule_components": [
+                    {
+                        "effect": "token_maker",
+                        "token_count": 4,
+                        "token_name": "Bird Token",
+                        "token_subtype": "Bird",
+                        "token_colors": ["U"],
+                        "token_power": 2,
+                        "token_toughness": 2,
+                        "token_flying": True,
+                        "battle_model_scope": "create_four_2_2_blue_flying_bird_tokens_component_v1",
+                    },
+                    {
+                        "effect": "phase_out",
+                        "gift_required": True,
+                        "phase_out_all_permanents_you_control": True,
+                        "phase_out_includes_lands": True,
+                        "life_total_cant_change": True,
+                        "protection_from_everything": True,
+                        "battle_model_scope": "gift_promised_phase_all_permanents_life_lock_protection_component_v1",
+                    },
+                ],
+            },
+            "reason": "XMage structure matches Perch Protection creating four Swan Song Bird tokens, then applying gift-gated phase-out, life lock, protection from everything, and self-exile.",
+            "signals": [
+                "GiftAbility",
+                "CreateTokenEffect",
+                "SwanSongBirdToken",
+                "LifeTotalCantChangeControllerEffect",
+                "ProtectionFromEverythingAbility",
+                "ExileSpellEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and "EntersBattlefieldTriggeredAbility" in ability_classes
+        and "PutCardIntoGraveFromAnywhereAllTriggeredAbility" in ability_classes
+        and {"SearchLibraryPutInPlayEffect", "CreateTokenEffect"}.issubset(effect_classes)
+        and "sandwarriortoken" in normalized
+        and "subtype.desert.getpredicate" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "sand_scout_etb_desert_if_behind_lands_land_graveyard_token_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "etb_land_ramp_count": 1,
+                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                "land_subtypes_any": ["desert"],
+                "land_enters_tapped": True,
+                "land_cards_to_your_graveyard_create_token": True,
+                "land_graveyard_trigger_once_each_turn": True,
+                "land_graveyard_token_name": "Sand Warrior Token",
+                "land_graveyard_token_subtype": "Sand Warrior",
+                "land_graveyard_token_colors": ["R", "G", "W"],
+                "land_graveyard_token_power": 1,
+                "land_graveyard_token_toughness": 1,
+            },
+            "reason": "XMage structure matches Sand Scout entering as a 2/2, tutoring a tapped Desert when an opponent controls more lands, and creating a 1/1 red-green-white Sand Warrior once each turn when land cards go to your graveyard.",
+            "signals": [
+                "EntersBattlefieldTriggeredAbility",
+                "OpponentControlsMoreCondition",
+                "SearchLibraryPutInPlayEffect",
+                "PutCardIntoGraveFromAnywhereAllTriggeredAbility",
+                "SandWarriorToken",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
         and effect_classes == {"ReturnToHandTargetEffect", "UntapLandsEffect"}
         and not ability_classes
     ):
